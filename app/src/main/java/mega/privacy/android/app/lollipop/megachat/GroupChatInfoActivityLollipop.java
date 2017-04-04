@@ -438,7 +438,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
         String myFullName = getMyFullName();
 
-        MegaChatParticipant me = new MegaChatParticipant(megaApi.getMyUser().getHandle(), null, null, getString(R.string.chat_me_text_bracket, myFullName), megaChatApi.getMyEmail(), chat.getOwnPrivilege(), megaChatApi.getOnlineStatus());
+        MegaChatParticipant me = new MegaChatParticipant(megaChatApi.getMyUserHandle(), null, null, getString(R.string.chat_me_text_bracket, myFullName), megaChatApi.getMyEmail(), chat.getOwnPrivilege(), megaChatApi.getOnlineStatus());
 
         participants.add(me);
 

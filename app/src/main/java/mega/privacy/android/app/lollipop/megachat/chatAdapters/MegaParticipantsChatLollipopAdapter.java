@@ -31,6 +31,9 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
+import mega.privacy.android.app.lollipop.ContactFileListActivityLollipop;
+import mega.privacy.android.app.lollipop.FolderLinkActivityLollipop;
+import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.listeners.ChatParticipantAvatarListener;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.MegaChatParticipant;
@@ -38,6 +41,7 @@ import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApi;
+import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaUser;
@@ -53,6 +57,7 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 	ArrayList<MegaChatParticipant> participants;
 	RecyclerView listFragment;
 	MegaApiAndroid megaApi;
+	MegaChatApiAndroid megaChatApi;
 	boolean multipleSelect;
 	DatabaseHandler dbH = null;
 	private SparseBooleanArray selectedItems;
@@ -64,6 +69,10 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 		
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
+		}
+
+		if (megaChatApi == null){
+			megaChatApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaChatApi();
 		}
 
 		listFragment = _listView;
@@ -226,7 +235,7 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 
 			createDefaultAvatar(((ViewHolderParticipantsList)holder));
 
-			String myUserHandleEncoded = MegaApiAndroid.userHandleToBase64(megaApi.getMyUser().getHandle());
+			String myUserHandleEncoded = MegaApiAndroid.userHandleToBase64(megaChatApi.getMyUserHandle());
 			if((((ViewHolderParticipantsList)holder).userHandle).equals(myUserHandleEncoded)){
 				log("It's me!!!");
 				File avatar = null;
@@ -567,6 +576,13 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
     
 	@Override
 	public void onClick(View v) {
+
+		if(!Util.isOnline(context)){
+			if(context instanceof GroupChatInfoActivityLollipop){
+				((GroupChatInfoActivityLollipop) context).showSnackbar(context.getString(R.string.error_server_connection_problem));
+			}
+			return;
+		}
 
 		switch (v.getId()){
 			case R.id.participant_list_three_dots:{

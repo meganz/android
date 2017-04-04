@@ -264,7 +264,15 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 				setDefaultAvatar(fullName);
 			}
 
-			setAvatar();
+			if(Util.isOnline(this)){
+				setAvatar();
+			}
+			else{
+				if(chat!=null){
+					String userEmail = chat.getPeerEmail(0);
+					setOfflineAvatar(userEmail);
+				}
+			}
 
 			//OPTIONS LAYOUT
 			optionsLayout = (LinearLayout) findViewById(R.id.chat_contact_properties_options);
@@ -310,9 +318,15 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			sharedFoldersButton = (Button) findViewById(R.id.chat_contact_properties_shared_folders_button);
 			sharedFoldersButton.setOnClickListener(this);
 
-			sharedFoldersButton.setText(getDescription(megaApi.getInShares(user)));
-
 			dividerSharedFoldersLayout = (View) findViewById(R.id.divider_shared_folder_layout);
+
+			if(user!=null){
+				sharedFoldersButton.setText(getDescription(megaApi.getInShares(user)));
+			}
+			else{
+				sharedFoldersLayout.setVisibility(View.GONE);
+				dividerSharedFoldersLayout.setVisibility(View.GONE);
+			}
 
 			//Share Contact Layout
 
@@ -324,7 +338,16 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			shareContactContentLayout = (RelativeLayout) findViewById(R.id.chat_contact_properties_share_contact_content);
 
 			shareContactText = (TextView) findViewById(R.id.chat_contact_properties_share_contact);
-			shareContactText.setText(user.getEmail());
+			if(user!=null){
+				shareContactText.setText(user.getEmail());
+			}
+			else{
+				if(Util.isChatEnabled()){
+					if(chat!=null){
+						shareContactText.setText(chat.getPeerEmail(0));
+					}
+				}
+			}
 
 			dividerShareContactLayout = (View) findViewById(R.id.divider_share_contact_layout);
 
@@ -551,6 +574,39 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 
 		if (avatar != null) {
 			setProfileAvatar(avatar);
+		}
+	}
+
+	public void setOfflineAvatar(String email) {
+		log("setAvatar");
+		File avatar = null;
+		if (getExternalCacheDir() != null) {
+			avatar = new File(getExternalCacheDir().getAbsolutePath(), email + ".jpg");
+		} else {
+			avatar = new File(getCacheDir().getAbsolutePath(), email + ".jpg");
+		}
+
+		if (avatar != null) {
+			Bitmap imBitmap = null;
+			if (avatar.exists()) {
+				if (avatar.length() > 0) {
+					BitmapFactory.Options bOpts = new BitmapFactory.Options();
+					bOpts.inPurgeable = true;
+					bOpts.inInputShareable = true;
+					imBitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
+					if (imBitmap != null) {
+						contactPropertiesImage.setImageBitmap(imBitmap);
+						initialLetter.setVisibility(View.GONE);
+
+						if (imBitmap != null && !imBitmap.isRecycled()) {
+//						Palette palette = Palette.from(imBitmap).generate();
+//						int colorBackground = palette.getDarkMutedColor(ContextCompat.getColor(this, R.color.black));
+							int colorBackground = getDominantColor1(imBitmap);
+							imageLayout.setBackgroundColor(colorBackground);
+						}
+					}
+				}
+			}
 		}
 	}
 
