@@ -10735,7 +10735,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				startService(uploadServiceIntent);
 			}
 		}
-
 	}
 
 	void disableNavigationViewMenu(Menu menu){
@@ -10759,9 +10758,21 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		}
 		mi = menu.findItem(R.id.navigation_item_inbox);
 		if (mi != null){
-			mi.setIcon(getResources().getDrawable(R.drawable.inbox_grey));
-			mi.setChecked(false);
-			mi.setEnabled(false);
+			if(inboxNode==null){
+				mi.setVisible(false);
+			}
+			else{
+				boolean hasChildren = megaApi.hasChildren(inboxNode);
+				if(hasChildren){
+					mi.setIcon(getResources().getDrawable(R.drawable.inbox_grey));
+					mi.setChecked(false);
+					mi.setEnabled(false);
+					mi.setVisible(true);
+				}
+				else{
+					mi.setVisible(false);
+				}
+			}
 		}
 		mi = menu.findItem(R.id.navigation_item_shared_items);
 		if (mi != null){
@@ -10815,32 +10826,24 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		}
 		mi = menu.findItem(R.id.navigation_item_inbox);
 		if (mi != null){
-			mi.setIcon(getResources().getDrawable(R.drawable.inbox_grey));
-			mi.setChecked(false);
-			mi.setEnabled(true);
+			if(inboxNode==null){
+				mi.setVisible(false);
+				log("Inbox Node is NULL");
+			}
+			else{
+				boolean hasChildren = megaApi.hasChildren(inboxNode);
+				if(hasChildren){
+					mi.setIcon(getResources().getDrawable(R.drawable.inbox_grey));
+					mi.setChecked(false);
+					mi.setEnabled(true);
+					mi.setVisible(true);
+				}
+				else{
+					log("Inbox Node NO children");
+					mi.setVisible(false);
+				}
+			}
 		}
-//		mi = menu.findItem(R.id.navigation_item_inbox);
-//		if (mi != null){
-//			if(inboxNode==null){
-//				mi.setVisible(false);
-//			}
-//			else{
-//				MegaNodeList inboxList = inboxNode.getChildren();
-//				if(inboxList!=null){
-//					if(inboxList.size()==0){
-//						mi.setVisible(false);
-//					}
-//					else{
-//						mi.setIcon(getResources().getDrawable(R.drawable.inbox_grey));
-//						mi.setChecked(false);
-//						mi.setEnabled(true);
-//					}
-//				}
-//				else{
-//					mi.setVisible(false);
-//				}
-//			}
-//		}
 		mi = menu.findItem(R.id.navigation_item_shared_items);
 		if (mi != null){
 			mi.setIcon(getResources().getDrawable(R.drawable.shared_items_grey));
@@ -12347,6 +12350,16 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			statusDialog.dismiss();
 		}
 		catch (Exception ex) {}
+
+		if(updatedNodes!=null){
+			//Verify is it is a new item to the inbox
+			for(int i=0;i<updatedNodes.size(); i++){
+				MegaNode updateNode = updatedNodes.get(i);
+				if(updateNode.getHandle()==inboxNode.getHandle()){
+					log("New element to Inbox!!");
+				}
+			}
+		}
 
 		if (drawerItem == DrawerItem.CLOUD_DRIVE){
 			log("DrawerItem.CLOUD_DRIVE");
