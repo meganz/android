@@ -53,7 +53,7 @@
     <item
         android:id="@+id/cab_menu_move"
         android:orderInCategory="120"
-        android:icon="@drawable/ic_menu_move_dark"
+        android:icon="@drawable/ic_move_white"
         android:title="@string/general_move_to"
         MEGA:showAsAction="never" />
     
@@ -74,7 +74,7 @@
     
     <item
         android:id="@+id/cab_menu_trash"
-        android:icon="@drawable/ic_rubbish_bin"
+        android:icon="@drawable/ic_close_white"
         android:orderInCategory="130"
         android:title="@string/context_move_to_trash"
         MEGA:showAsAction="never" />   
