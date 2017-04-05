@@ -57,6 +57,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
+import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -264,16 +265,6 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 				setDefaultAvatar(fullName);
 			}
 
-			if(Util.isOnline(this)){
-				setAvatar();
-			}
-			else{
-				if(chat!=null){
-					String userEmail = chat.getPeerEmail(0);
-					setOfflineAvatar(userEmail);
-				}
-			}
-
 			//OPTIONS LAYOUT
 			optionsLayout = (LinearLayout) findViewById(R.id.chat_contact_properties_options);
 
@@ -320,14 +311,6 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 
 			dividerSharedFoldersLayout = (View) findViewById(R.id.divider_shared_folder_layout);
 
-			if(user!=null){
-				sharedFoldersButton.setText(getDescription(megaApi.getInShares(user)));
-			}
-			else{
-				sharedFoldersLayout.setVisibility(View.GONE);
-				dividerSharedFoldersLayout.setVisibility(View.GONE);
-			}
-
 			//Share Contact Layout
 
 			shareContactLayout = (RelativeLayout) findViewById(R.id.chat_contact_properties_share_contact_layout);
@@ -338,16 +321,6 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			shareContactContentLayout = (RelativeLayout) findViewById(R.id.chat_contact_properties_share_contact_content);
 
 			shareContactText = (TextView) findViewById(R.id.chat_contact_properties_share_contact);
-			if(user!=null){
-				shareContactText.setText(user.getEmail());
-			}
-			else{
-				if(Util.isChatEnabled()){
-					if(chat!=null){
-						shareContactText.setText(chat.getPeerEmail(0));
-					}
-				}
-			}
 
 			dividerShareContactLayout = (View) findViewById(R.id.divider_share_contact_layout);
 
@@ -355,11 +328,63 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			clearChatLayout = (RelativeLayout) findViewById(R.id.chat_contact_properties_clear_layout);
 			clearChatLayout.setOnClickListener(this);
 
-			if(chat!=null){
-				clearChatLayout.setVisibility(View.VISIBLE);
-				dividerShareContactLayout.setVisibility(View.VISIBLE);
+			if(Util.isOnline(this)){
+				log("online -- network connection");
+				setAvatar();
+
+				if(user!=null){
+					sharedFoldersLayout.setVisibility(View.VISIBLE);
+					dividerSharedFoldersLayout.setVisibility(View.VISIBLE);
+
+					sharedFoldersButton.setText(getDescription(megaApi.getInShares(user)));
+					shareContactText.setText(user.getEmail());
+
+					if(Util.isChatEnabled()){
+						if(chat!=null){
+							clearChatLayout.setVisibility(View.VISIBLE);
+							dividerShareContactLayout.setVisibility(View.VISIBLE);
+						}
+						else{
+							clearChatLayout.setVisibility(View.GONE);
+							dividerShareContactLayout.setVisibility(View.GONE);
+						}
+					}
+					else{
+						clearChatLayout.setVisibility(View.GONE);
+						dividerShareContactLayout.setVisibility(View.GONE);
+					}
+				}
+				else{
+					sharedFoldersLayout.setVisibility(View.GONE);
+					dividerSharedFoldersLayout.setVisibility(View.GONE);
+
+					if(Util.isChatEnabled()){
+						if(chat!=null){
+							shareContactText.setText(chat.getPeerEmail(0));
+
+							clearChatLayout.setVisibility(View.VISIBLE);
+							dividerShareContactLayout.setVisibility(View.VISIBLE);
+						}
+						else{
+							clearChatLayout.setVisibility(View.GONE);
+							dividerShareContactLayout.setVisibility(View.GONE);
+						}
+					}
+					else{
+						clearChatLayout.setVisibility(View.GONE);
+						dividerShareContactLayout.setVisibility(View.GONE);
+					}
+				}
 			}
 			else{
+				log("OFFLINE -- NO network connection");
+				if(chat!=null){
+					String userEmail = chat.getPeerEmail(0);
+					setOfflineAvatar(userEmail);
+					shareContactText.setText(userEmail);
+				}
+				sharedFoldersLayout.setVisibility(View.GONE);
+				dividerSharedFoldersLayout.setVisibility(View.GONE);
 				clearChatLayout.setVisibility(View.GONE);
 				dividerShareContactLayout.setVisibility(View.GONE);
 			}
@@ -437,28 +462,37 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 		viewFoldersMenuItem = menu.findItem(R.id.cab_menu_view_shares);
 		startConversationMenuItem = menu.findItem(R.id.cab_menu_start_conversation);
 
-		ArrayList<MegaNode> shares = megaApi.getInShares(user);
-		if(shares!=null){
-			if(shares.size()>0){
-				viewFoldersMenuItem.setVisible(true);
+		if(Util.isOnline(this)){
+			ArrayList<MegaNode> shares = megaApi.getInShares(user);
+			if(shares!=null){
+				if(shares.size()>0){
+					viewFoldersMenuItem.setVisible(true);
+				}
+				else{
+					viewFoldersMenuItem.setVisible(false);
+				}
 			}
 			else{
 				viewFoldersMenuItem.setVisible(false);
 			}
-		}
-		else{
-			viewFoldersMenuItem.setVisible(false);
-		}
 
-		if(Util.isChatEnabled()){
-			if(fromContacts){
-				startConversationMenuItem.setVisible(true);
+			if(Util.isChatEnabled()){
+				if(fromContacts){
+					startConversationMenuItem.setVisible(true);
+				}
+				else{
+					startConversationMenuItem.setVisible(false);
+				}
 			}
 			else{
 				startConversationMenuItem.setVisible(false);
 			}
+
 		}
 		else{
+			log("Hide all - no network connection");
+			shareMenuItem.setVisible(false);
+			viewFoldersMenuItem.setVisible(false);
 			startConversationMenuItem.setVisible(false);
 		}
 
@@ -468,6 +502,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		log("onOptionsItemSelected");
+
 		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 
 		int id = item.getItemId();
@@ -481,6 +516,12 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 				break;
 			}
 			case R.id.cab_menu_view_shares:{
+				if(!Util.isOnline(this)){
+
+					showSnackbar(getString(R.string.error_server_connection_problem));
+					return true;
+				}
+
 				Intent i = new Intent(this, ContactFileListActivityLollipop.class);
 				i.putExtra("name", user.getEmail());
 				this.startActivity(i);
@@ -488,6 +529,13 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			}
 			case R.id.cab_menu_start_conversation:{
 				showSnackbar("Start conversation");
+
+				if(!Util.isOnline(this)){
+
+					showSnackbar(getString(R.string.error_server_connection_problem));
+					return true;
+				}
+
 				if(user!=null){
 					MegaChatRoom chat = megaChatApi.getChatRoomByUser(user.getHandle());
 					if(chat==null){
@@ -578,7 +626,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 	}
 
 	public void setOfflineAvatar(String email) {
-		log("setAvatar");
+		log("setOfflineAvatar");
 		File avatar = null;
 		if (getExternalCacheDir() != null) {
 			avatar = new File(getExternalCacheDir().getAbsolutePath(), email + ".jpg");
