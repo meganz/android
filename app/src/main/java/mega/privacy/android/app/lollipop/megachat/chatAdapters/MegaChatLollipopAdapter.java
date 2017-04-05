@@ -977,7 +977,25 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
 
                         log("Message is edited");
                         Spannable content = new SpannableString(messageContent);
-                        content.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.name_my_account)), 0, content.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                        int status = message.getStatus();
+                        if((status==MegaChatMessage.STATUS_SERVER_REJECTED)||(status==MegaChatMessage.STATUS_SENDING_MANUAL)){
+                            log("Show triangle retry!");
+                            holder.contentOwnMessageText.setTextColor(ContextCompat.getColor(context, R.color.mail_my_account));
+                            content.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.mail_my_account)), 0, content.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                            holder.triangleIcon.setVisibility(View.VISIBLE);
+                            holder.retryAlert.setVisibility(View.VISIBLE);
+                        }
+                        else if((status==MegaChatMessage.STATUS_SENDING||status==MegaChatMessage.STATUS_DELIVERED)){
+                            log("Status not received by server: "+message.getStatus());
+                            holder.contentOwnMessageText.setTextColor(ContextCompat.getColor(context, R.color.mail_my_account));
+                            content.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.mail_my_account)), 0, content.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                        }
+                        else{
+                            log("Status: "+message.getStatus());
+                            holder.contentOwnMessageText.setTextColor(ContextCompat.getColor(context, R.color.name_my_account));
+                            content.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.name_my_account)), 0, content.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                        }
+
                         holder.contentOwnMessageText.setText(content+" ");
 
                         Spannable edited = new SpannableString(context.getString(R.string.edited_message_text));
@@ -1871,6 +1889,16 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
     public void appendMessage(ArrayList<AndroidMegaChatMessage> messages){
         this.messages = messages;
         notifyItemInserted(messages.size() - 1);
+    }
+
+    public void addMessage(ArrayList<AndroidMegaChatMessage> messages, int position){
+        this.messages = messages;
+        notifyItemInserted(position);
+    }
+
+    public void removeMesage(int position, ArrayList<AndroidMegaChatMessage> messages){
+        this.messages = messages;
+        notifyItemRemoved(position);
     }
 
     public void loadPreviousMessage(ArrayList<AndroidMegaChatMessage> messages){
