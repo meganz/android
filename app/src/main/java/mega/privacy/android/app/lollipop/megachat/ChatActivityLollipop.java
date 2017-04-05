@@ -2093,7 +2093,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }
         }
         else{
-            log("onMessageLoaded: The message is null  --> reach final history");
+            log("onMessageLoaded: The message is null");
+            log("----> REACH FINAL HISTORY: onMessageLoaded");
 
             if(bufferSending.size()!=0){
                 for(int i=0;i<bufferSending.size();i++){
@@ -2189,10 +2190,23 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
         if(msg.hasChanged(MegaChatMessage.CHANGE_TYPE_CONTENT)){
             log("Change content of the message");
-            if(msg.isDeleted()){
-                log("Message deleted!!");
+
+            if(msg.getType()==MegaChatMessage.TYPE_TRUNCATE){
+                log("TRUNCATE MESSAGE");
+                messages.clear();
+                androidMsg.setInfoToShow(Constants.CHAT_ADAPTER_SHOW_ALL);
+                messages.add(androidMsg);
+                adapter.setMessages(messages);
+                adapter.notifyDataSetChanged();
+                invalidateOptionsMenu();
             }
-            modifyMessageReceived(androidMsg, false);
+            else{
+                if(msg.isDeleted()){
+                    log("Message deleted!!");
+                }
+                modifyMessageReceived(androidMsg, false);
+            }
+
         }
         else{
             log("Status change");
@@ -2824,13 +2838,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             if(e.getErrorCode()==MegaChatError.ERROR_OK){
                 log("Ok. Clear history done");
                 showSnackbar(getString(R.string.clear_history_success));
-                int lastIndex = messages.size()-1;
-                AndroidMegaChatMessage lastMessage = messages.get(lastIndex);
-                lastMessage.setInfoToShow(Constants.CHAT_ADAPTER_SHOW_ALL);
-                messages.clear();
-                messages.add(lastMessage);
-                adapter.setMessages(messages);
-                invalidateOptionsMenu();
             }
             else{
                 log("Error clearing history: "+e.getErrorString());
