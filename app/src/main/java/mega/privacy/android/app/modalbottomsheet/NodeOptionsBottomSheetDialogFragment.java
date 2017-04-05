@@ -304,17 +304,17 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                         optionMove.setVisibility(View.VISIBLE);
                         optionRemove.setVisibility(View.VISIBLE);
                         optionInfo.setVisibility(View.VISIBLE);
+                        optionDownload.setVisibility(View.VISIBLE);
+                        optionRename.setVisibility(View.VISIBLE);
+                        optionCopy.setVisibility(View.VISIBLE);
 
                         //Hide
                         optionClearShares.setVisibility(View.GONE);
                         optionPermissions.setVisibility(View.GONE);
                         optionLeaveShares.setVisibility(View.GONE);
                         optionRubbishBin.setVisibility(View.GONE);
-                        optionRename.setVisibility(View.GONE);
-                        optionCopy.setVisibility(View.GONE);
                         optionSendInbox.setVisibility(View.GONE);
                         optionShare.setVisibility(View.GONE);
-                        optionDownload.setVisibility(View.GONE);
                         optionLink.setVisibility(View.GONE);
                         optionRemoveLink.setVisibility(View.GONE);
                         optionOpenFolder.setVisibility(View.GONE);

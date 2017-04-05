@@ -161,6 +161,9 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 
 					NodeController nC = new NodeController(context);
 					nC.chooseLocationToMoveNodes(handleList);
+
+					clearSelections();
+					hideMultipleSelect();
 					break;
 				}
 				case R.id.cab_menu_share:{
@@ -205,6 +208,9 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 					}
 
 					((ManagerActivityLollipop) context).askConfirmationMoveToRubbish(handleList);
+
+					clearSelections();
+					hideMultipleSelect();
 					break;
 				}
 				case R.id.cab_menu_select_all:{

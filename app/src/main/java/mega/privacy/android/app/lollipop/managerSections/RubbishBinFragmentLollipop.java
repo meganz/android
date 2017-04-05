@@ -116,6 +116,26 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 
 					NodeController nC = new NodeController(context);
 					nC.chooseLocationToMoveNodes(handleList);
+
+					clearSelections();
+					hideMultipleSelect();
+					break;
+				}
+				case R.id.cab_menu_rename:{
+
+					if (documents.size()==1){
+						((ManagerActivityLollipop) context).showRenameDialog(documents.get(0), documents.get(0).getName());
+					}
+					break;
+				}
+				case R.id.cab_menu_copy:{
+					ArrayList<Long> handleList = new ArrayList<Long>();
+					for (int i=0;i<documents.size();i++){
+						handleList.add(documents.get(i).getHandle());
+					}
+
+					NodeController nC = new NodeController(context);
+					nC.chooseLocationToCopyNodes(handleList);
 					break;
 				}
 				case R.id.cab_menu_trash:{
@@ -125,6 +145,9 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 					}
 
 					((ManagerActivityLollipop) context).askConfirmationMoveToRubbish(handleList);
+
+					clearSelections();
+					hideMultipleSelect();
 					break;
 				}
 				case R.id.cab_menu_select_all:{
@@ -169,13 +192,21 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 			if (selected.size() != 0) {
 				showTrash = true;
 				showMove = true;
+                showCopy = true;
 
-				for(int i=0; i<selected.size();i++)	{
-					if(megaApi.checkMove(selected.get(i), megaApi.getRubbishNode()).getErrorCode() != MegaError.API_OK)	{
-						showTrash = false;
-						showMove = false;
-						break;
-					}
+//				for(int i=0; i<selected.size();i++)	{
+//					if(megaApi.checkMove(selected.get(i), megaApi.getRubbishNode()).getErrorCode() != MegaError.API_OK)	{
+//						showTrash = false;
+//						showMove = false;
+//						break;
+//					}
+//				}
+
+				if(selected.size()==1){
+					showRename=true;
+				}
+				else{
+					showRename=false;
 				}
 
 				MenuItem unselect = menu.findItem(R.id.cab_menu_unselect_all);
@@ -198,12 +229,19 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 			menu.findItem(R.id.cab_menu_download).setVisible(showDownload);
 			menu.findItem(R.id.cab_menu_rename).setVisible(showRename);
 			menu.findItem(R.id.cab_menu_copy).setVisible(showCopy);
+			if(showMove){
+				menu.findItem(R.id.cab_menu_move).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+			}
 			menu.findItem(R.id.cab_menu_move).setVisible(showMove);
+
 			menu.findItem(R.id.cab_menu_share_link).setVisible(showLink);
 			if (showTrash){
 				menu.findItem(R.id.cab_menu_trash).setTitle(context.getString(R.string.context_remove));
 			}
 			menu.findItem(R.id.cab_menu_trash).setVisible(showTrash);
+			if(showTrash){
+				menu.findItem(R.id.cab_menu_trash).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+			}
 			menu.findItem(R.id.cab_menu_leave_multiple_share).setVisible(false);
 			
 			return false;

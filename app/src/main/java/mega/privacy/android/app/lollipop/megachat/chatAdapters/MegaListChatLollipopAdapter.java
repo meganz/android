@@ -1199,7 +1199,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 					break;
 				}
 				case MegaChatMessage.TYPE_CONTACT:{
-					log("Mesasge type contact!!");
+					log("Message type contact!!");
 					holder.textViewContent.setText("Contact: "+lastMessageString);
 					break;
 				}

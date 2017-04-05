@@ -617,7 +617,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
             }
         }
         else if(item.hasChanged(MegaChatListItem.CHANGE_TYPE_LAST_MSG)){
-            log("listItemUpdate: Change last message: "+item.getChanges());
+            log("listItemUpdate: Change last message: "+item.getTitle());
 
             if(item!=null){
 

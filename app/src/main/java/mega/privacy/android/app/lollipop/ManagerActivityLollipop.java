@@ -184,6 +184,7 @@ import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaGlobalListenerInterface;
 import nz.mega.sdk.MegaNode;
+import nz.mega.sdk.MegaNodeList;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaShare;
@@ -217,6 +218,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	TextView leftCancelButton;
 	TextView rightUpgradeButton;
 	FloatingActionButton fabButton;
+
+	MegaNode inboxNode = null;
 
 	boolean mkLayoutVisible = false;
 
@@ -1456,7 +1459,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		}
 		else{
 			log("rootNode != null");
-
+			inboxNode = megaApi.getInboxNode();
 			attr = dbH.getAttributes();
 			if (attr != null){
 				if (attr.getInvalidateSdkCache() != null){
@@ -4356,7 +4359,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						}
 
 						rubbishBinMenuItem.setVisible(false);
-						rubbishBinMenuItem.setTitle(getString(R.string.section_cloud_drive));
 						gridSmallLargeMenuItem.setVisible(false);
 					}
 				}
@@ -10817,6 +10819,28 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			mi.setChecked(false);
 			mi.setEnabled(true);
 		}
+//		mi = menu.findItem(R.id.navigation_item_inbox);
+//		if (mi != null){
+//			if(inboxNode==null){
+//				mi.setVisible(false);
+//			}
+//			else{
+//				MegaNodeList inboxList = inboxNode.getChildren();
+//				if(inboxList!=null){
+//					if(inboxList.size()==0){
+//						mi.setVisible(false);
+//					}
+//					else{
+//						mi.setIcon(getResources().getDrawable(R.drawable.inbox_grey));
+//						mi.setChecked(false);
+//						mi.setEnabled(true);
+//					}
+//				}
+//				else{
+//					mi.setVisible(false);
+//				}
+//			}
+//		}
 		mi = menu.findItem(R.id.navigation_item_shared_items);
 		if (mi != null){
 			mi.setIcon(getResources().getDrawable(R.drawable.shared_items_grey));
