@@ -1364,21 +1364,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 		log("setOrder:Cloud");
 		this.orderGetChildren = orderGetChildren;
 	}
-	
-	public void setTransfers(HashMap<Long, MegaTransfer> _mTHash){
-		this.mTHash = _mTHash;
-		
-		if (isList){
-			if (adapter != null){
-				adapter.setTransfers(mTHash);
-			}
-		}
-		else{
-			if (adapter != null){
-				adapter.setTransfers(mTHash);
-			}
-		}
-	}
 
 	private static void log(String log) {
 		Util.log("FileBrowserFragmentLollipop", log);
