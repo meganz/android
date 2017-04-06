@@ -51,7 +51,7 @@ import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 
-public class RubbishBinFragmentLollipop extends Fragment implements OnClickListener{
+public class RubbishBinFragmentLollipop extends Fragment {
 
 	public static int GRID_WIDTH =400;
 	
@@ -74,10 +74,7 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 	TextView emptyTextView;
 	TextView contentText;
 	RelativeLayout contentTextLayout;
-	boolean downloadInProgress = false;
-	ProgressBar progressBar;
-	ImageView transferArrow;
-	
+
 	MegaApiAndroid megaApi;
 	
 	public ActionMode actionMode;
@@ -376,12 +373,6 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 			emptyImageView = (ImageView) v.findViewById(R.id.rubbishbin_list_empty_image);
 			emptyTextView = (TextView) v.findViewById(R.id.rubbishbin_list_empty_text);
 
-			progressBar = (ProgressBar) v.findViewById(R.id.rubbishbin_list_download_progress_bar);
-			transferArrow = (ImageView) v.findViewById(R.id.rubbishbin_list_transfer_arrow);
-			RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams)transferArrow.getLayoutParams();
-			lp.setMargins(0, 0, Util.scaleWidthPx(15, outMetrics), Util.scaleHeightPx(4, outMetrics)); 
-			transferArrow.setLayoutParams(lp);
-			
 			contentTextLayout = (RelativeLayout) v.findViewById(R.id.rubbishbin_content_text_layout);
 			contentText = (TextView) v.findViewById(R.id.rubbishbin_list_content_text);			
 
@@ -422,24 +413,13 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 			
 			if(megaApi.getRubbishNode()!=null){
 				if (parentHandle == megaApi.getRubbishNode().getHandle()||parentHandle==-1){
-					if(((ManagerActivityLollipop)getActivity()).isTransferInProgress()){
-						showProgressBar();
-						progressBar.setProgress(((ManagerActivityLollipop)context).getProgressPercent());
-					}
-					else{
-						log("setContent of the Rubbish Bin");
-						contentText.setText(MegaApiUtils.getInfoFolder(megaApi.getRubbishNode(), context));
-					}				
+					log("setContent of the Rubbish Bin");
+					contentText.setText(MegaApiUtils.getInfoFolder(megaApi.getRubbishNode(), context));
+
 				}
 				else{
-					if(((ManagerActivityLollipop)getActivity()).isTransferInProgress()){
-						showProgressBar();
-						progressBar.setProgress(((ManagerActivityLollipop)context).getProgressPercent());
-					}
-					else{
-						MegaNode infoNode = megaApi.getNodeByHandle(parentHandle);
-						contentText.setText(MegaApiUtils.getInfoFolder(infoNode, context));
-					}
+					MegaNode infoNode = megaApi.getNodeByHandle(parentHandle);
+					contentText.setText(MegaApiUtils.getInfoFolder(infoNode, context));
 				}
 			}
 			
@@ -465,13 +445,7 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 			emptyTextView = (TextView) v.findViewById(R.id.rubbishbin_grid_empty_text);
 			emptyImageView.setImageResource(R.drawable.rubbish_bin_empty);
 			emptyTextView.setText(R.string.file_browser_empty_folder);
-			
-			progressBar = (ProgressBar) v.findViewById(R.id.rubbishbin_grid_download_progress_bar);
-			transferArrow = (ImageView) v.findViewById(R.id.rubbishbin_grid_transfer_arrow);
-			RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams)transferArrow.getLayoutParams();
-			lp.setMargins(0, 0, Util.scaleWidthPx(15, outMetrics), Util.scaleHeightPx(4, outMetrics)); 
-			transferArrow.setLayoutParams(lp);
-			
+
 			contentTextLayout = (RelativeLayout) v.findViewById(R.id.rubbishbin_grid_content_text_layout);
 			contentText = (TextView) v.findViewById(R.id.rubbishbin_grid_content_text);			
 
@@ -486,24 +460,11 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 
 			if(megaApi.getRubbishNode()!=null){
 				if (parentHandle == megaApi.getRubbishNode().getHandle()||parentHandle==-1){
-					if(((ManagerActivityLollipop)getActivity()).isTransferInProgress()){
-						showProgressBar();
-						progressBar.setProgress(((ManagerActivityLollipop)context).getProgressPercent());
-					}
-					else{
-						MegaNode infoNode = megaApi.getRubbishNode();
-						contentText.setText(MegaApiUtils.getInfoFolder(megaApi.getRubbishNode(), context));
-					}				
+					contentText.setText(MegaApiUtils.getInfoFolder(megaApi.getRubbishNode(), context));
 				}
 				else{
-					if(((ManagerActivityLollipop)getActivity()).isTransferInProgress()){
-						showProgressBar();
-						progressBar.setProgress(((ManagerActivityLollipop)context).getProgressPercent());
-					}
-					else{
-						MegaNode infoNode = megaApi.getNodeByHandle(parentHandle);
-						contentText.setText(MegaApiUtils.getInfoFolder(infoNode, context));
-					}
+					MegaNode infoNode = megaApi.getNodeByHandle(parentHandle);
+					contentText.setText(MegaApiUtils.getInfoFolder(infoNode, context));
 				}
 			}
 
@@ -535,34 +496,6 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 			return v;
 		}
 	}
-	
-	public void showProgressBar(){
-		log("showProgressBar");
-		downloadInProgress = true;
-		progressBar.setVisibility(View.VISIBLE);
-		transferArrow.setVisibility(View.VISIBLE);
-		contentText.setText(R.string.text_downloading);
-		contentTextLayout.setOnClickListener(this);
-	}
-	
-	public void hideProgressBar(){
-		log("hideProgressBar");
-		downloadInProgress = false;
-		progressBar.setVisibility(View.GONE);	
-		transferArrow.setVisibility(View.GONE);
-		setContentText();
-		contentTextLayout.setOnClickListener(null);
-	}
-	
-	public void updateProgressBar(int progress){
-		if(downloadInProgress){
-			progressBar.setProgress(progress);
-		}
-		else{
-			showProgressBar();
-			progressBar.setProgress(progress);
-		}
-	}
 
 	@Override
     public void onAttach(Activity activity) {
@@ -570,24 +503,6 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
         context = activity;
         aB = ((AppCompatActivity)activity).getSupportActionBar();
     }
-	
-	@Override
-	public void onClick(View v) {
-		log("onCLick");
-		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
-
-		switch(v.getId()){
-		
-			case R.id.rubbishbin_content_text_layout:
-			case R.id.rubbishbin_grid_content_text_layout:{
-				log("click show transfersFragment");
-				if(((ManagerActivityLollipop)getActivity()).isTransferInProgress()){
-					((ManagerActivityLollipop)getActivity()).selectDrawerItemLollipop(DrawerItem.TRANSFERS);
-				}				
-				break;
-			}
-		}
-	}	
 
     public void itemClick(int position) {
 		log("itemClick: "+position);

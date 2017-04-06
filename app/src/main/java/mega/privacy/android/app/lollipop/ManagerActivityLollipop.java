@@ -11819,17 +11819,21 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					log("show PLAY button");
 
 					if (tFLol != null){
-						pauseTransfersMenuIcon.setVisible(false);
-						playTransfersMenuIcon.setVisible(true);
-						tFLol.setPause(true);
+						if (drawerItem == DrawerItem.TRANSFERS && tFLol.isAdded()) {
+							pauseTransfersMenuIcon.setVisible(false);
+							playTransfersMenuIcon.setVisible(true);
+							tFLol.setPause(true);
+						}
 					}
     			}
     			else{
     				log("show PAUSE button");
 					if (tFLol != null){
-						pauseTransfersMenuIcon.setVisible(true);
-						playTransfersMenuIcon.setVisible(false);
-						tFLol.setPause(false);
+						if (drawerItem == DrawerItem.TRANSFERS && tFLol.isAdded()) {
+							pauseTransfersMenuIcon.setVisible(true);
+							playTransfersMenuIcon.setVisible(false);
+							tFLol.setPause(false);
+						}
 					}
     			}
 			}
@@ -11840,23 +11844,18 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			totalSizePendingTransfer = 0;
 			//Hide Transfer ProgressBar
 			if (fbFLol != null){
-				fbFLol.hideProgressBar();
-			}
-			if (rbFLol != null){
-				rbFLol.hideProgressBar();
-			}
-			if (iFLol != null){
-				iFLol.hideProgressBar();
-			}
-			if (outSFLol != null){
-				outSFLol.hideProgressBar();
-			}
-			if (inSFLol != null){
-				inSFLol.hideProgressBar();
+				if(fbFLol.isAdded()){
+					fbFLol.setOverviewLayout();
+				}
 			}
 
-			pauseTransfersMenuIcon.setVisible(false);
-			playTransfersMenuIcon.setVisible(false);
+			if (tFLol != null){
+				if (drawerItem == DrawerItem.TRANSFERS && tFLol.isAdded()){
+					pauseTransfersMenuIcon.setVisible(false);
+					playTransfersMenuIcon.setVisible(false);
+				}
+			}
+
 		}
 		else if (request.getType() == MegaRequest.TYPE_CANCEL_TRANSFER){
 			log("one MegaRequest.TYPE_CANCEL_TRANSFER");
@@ -12717,56 +12716,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				}
 			}
 
-			//Update transfer list
-			tL = megaApi.getTransfers();
-
-			if (tL != null){
-				if(tL.size()<=0){
-					log("Hide Transfer ProgressBar: "+tL.size());
-					supportInvalidateOptionsMenu();
-					//Hide Transfer ProgressBar
-					if (fbFLol != null){
-						fbFLol.hideProgressBar();
-					}
-					if (rbFLol != null){
-						rbFLol.hideProgressBar();
-					}
-					if (iFLol != null){
-						iFLol.hideProgressBar();
-					}
-					if (outSFLol != null){
-						outSFLol.hideProgressBar();
-					}
-					if (inSFLol != null){
-						inSFLol.hideProgressBar();
-					}
-				}
-			}
-			else{
-				log("megaApi Transfers NULL - Hide Transfer ProgressBar: ");
-				supportInvalidateOptionsMenu();
-				//Hide Transfer ProgressBar
-				if (fbFLol != null){
-					fbFLol.hideProgressBar();
-				}
-				if (rbFLol != null){
-					rbFLol.hideProgressBar();
-				}
-				if (iFLol != null){
-					iFLol.hideProgressBar();
-				}
-				if (outSFLol != null){
-					outSFLol.hideProgressBar();
-				}
-				if (inSFLol != null){
-					inSFLol.hideProgressBar();
-				}
-			}
-
-			if (tFLol != null){
-				tFLol.setTransfers(tL);
-			}
-
 			log("END onTransferFinish: " + transfer.getFileName() + " - " + transfer.getTag());
 
 		}
@@ -12782,7 +12731,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			pendingTransfers = 	megaApi.getNumPendingDownloads() + megaApi.getNumPendingUploads();
 			totalTransfers = 	megaApi.getTotalDownloads() + megaApi.getTotalUploads();
 
-
 			totalSizePendingTransfer -= transfer.getTransferredBytes();
 			totalSizeTransfered = megaApi.getTotalDownloadedBytes() + megaApi.getTotalUploadedBytes();
 			log("Pending transfers: "+pendingTransfers+" totalTransfers "+totalTransfers);
@@ -12794,41 +12742,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				}
 			}
 
-			if (drawerItem == DrawerItem.CLOUD_DRIVE){
-				if (fbFLol != null){
-					if (transfer.getType() == MegaTransfer.TYPE_DOWNLOAD){
-						Time now = new Time();
-						now.setToNow();
-						long nowMillis = now.toMillis(false);
-						if (lastTimeOnTransferUpdate < 0){
-							lastTimeOnTransferUpdate = now.toMillis(false);
-							fbFLol.setCurrentTransfer(transfer);
-						}
-						else if ((nowMillis - lastTimeOnTransferUpdate) > Util.ONTRANSFERUPDATE_REFRESH_MILLIS){
-							lastTimeOnTransferUpdate = nowMillis;
-							fbFLol.setCurrentTransfer(transfer);
-						}
-					}
-				}
-			}
-			else if (drawerItem == DrawerItem.SHARED_ITEMS){
-				if (inSFLol != null){
-					if (transfer.getType() == MegaTransfer.TYPE_DOWNLOAD){
-						Time now = new Time();
-						now.setToNow();
-						long nowMillis = now.toMillis(false);
-						if (lastTimeOnTransferUpdate < 0){
-							lastTimeOnTransferUpdate = now.toMillis(false);
-							inSFLol.setCurrentTransfer(transfer);
-						}
-						else if ((nowMillis - lastTimeOnTransferUpdate) > Util.ONTRANSFERUPDATE_REFRESH_MILLIS){
-							lastTimeOnTransferUpdate = nowMillis;
-							inSFLol.setCurrentTransfer(transfer);
-						}
-					}
-				}
-			}
-			else if (drawerItem == DrawerItem.TRANSFERS){
+			if (drawerItem == DrawerItem.TRANSFERS){
 				if (tFLol != null){
 					Time now = new Time();
 					now.setToNow();
@@ -12869,21 +12783,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		return true;
 	}
 
-	public boolean isTransferInProgress(){
-		//Update transfer list
-		return false;
-	}
-
 	public static void log(String message) {
 		Util.log("ManagerActivityLollipop", message);
-	}
-
-	public int getProgressPercent() {
-		return 0;
-	}
-
-	public void setProgressPercent(int progressPercent) {
-
 	}
 
 	public MegaAccountDetails getAccountInfo() {

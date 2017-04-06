@@ -573,23 +573,11 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			
 			if (parentHandle == megaApi.getRootNode().getHandle()){
 				MegaNode infoNode = megaApi.getRootNode();
-				if(((ManagerActivityLollipop)getActivity()).isTransferInProgress()){
-					showProgressBar();
-
-				}
-				else{					
-					contentText.setText(MegaApiUtils.getInfoFolder(infoNode, context));
-				}
+				contentText.setText(MegaApiUtils.getInfoFolder(infoNode, context));
 			}
 			else{
 				MegaNode infoNode = megaApi.getNodeByHandle(parentHandle);
-				if(((ManagerActivityLollipop)getActivity()).isTransferInProgress()){
-					showProgressBar();
-
-				}
-				else{					
-					contentText.setText(MegaApiUtils.getInfoFolder(infoNode, context));
-				}
+				contentText.setText(MegaApiUtils.getInfoFolder(infoNode, context));
 			}						
 
 			adapter.setMultipleSelect(false);
@@ -1080,12 +1068,9 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 
 		parentHandle = n.getHandle();
 		MegaNode infoNode = megaApi.getNodeByHandle(parentHandle);
-		if(((ManagerActivityLollipop)getActivity()).isTransferInProgress()){
-			showProgressBar();
-		}
-		else{
-			contentText.setText(MegaApiUtils.getInfoFolder(infoNode, context));
-		}
+
+		contentText.setText(MegaApiUtils.getInfoFolder(infoNode, context));
+
 		((ManagerActivityLollipop)context).setParentHandleBrowser(parentHandle);
 		adapter.setParentHandle(parentHandle);
 		nodes = megaApi.getChildren(n, orderGetChildren);
@@ -1254,12 +1239,8 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 				}
 
 				adapter.setParentHandle(parentHandle);
-				if(((ManagerActivityLollipop)getActivity()).isTransferInProgress()){
-					showProgressBar();
-				}
-				else{
-					contentText.setText(MegaApiUtils.getInfoFolder(parentNode, context));
-				}
+
+				contentText.setText(MegaApiUtils.getInfoFolder(parentNode, context));
 				log("return 2");
 				return 2;
 			}
@@ -1398,20 +1379,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			}
 		}
 	}
-	
-	public void setCurrentTransfer(MegaTransfer mT){
-		if (isList){
-			if (adapter != null){
-				adapter.setCurrentTransfer(mT);
-			}
-		}
-		else{
-			if (adapter != null){
-				adapter.setCurrentTransfer(mT);
-			}
-		}		
-	}
-	
+
 	private static void log(String log) {
 		Util.log("FileBrowserFragmentLollipop", log);
 	}
