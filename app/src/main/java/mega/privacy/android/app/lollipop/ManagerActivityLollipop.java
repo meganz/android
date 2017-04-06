@@ -157,6 +157,7 @@ import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFra
 import mega.privacy.android.app.modalbottomsheet.OfflineOptionsBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.ReceivedRequestBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.SentRequestBottomSheetDialogFragment;
+import mega.privacy.android.app.modalbottomsheet.TransfersBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment;
 import mega.privacy.android.app.receivers.NetworkStateReceiver;
 import mega.privacy.android.app.utils.Constants;
@@ -189,6 +190,7 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaTransfer;
+import nz.mega.sdk.MegaTransferData;
 import nz.mega.sdk.MegaTransferListenerInterface;
 import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUtilsAndroid;
@@ -200,10 +202,16 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	Button expiryDateButton;
 	SwitchCompat switchGetLink;
 
-	long totalSizeToDownload=0;
-	long totalSizeDownloaded=0;
+	public long totalSizePendingTransfer=0;
+	public long totalSizeTransfered=0;
 	private SparseArray<Long> transfersDownloadedSize;
-	int progressPercent = 0;
+
+	public MegaTransferData transferData;
+	public int pendingTransfers = 0;
+	public int totalTransfers = 0;
+	public long transferCallback = 0;
+
+	TransfersBottomSheetDialogFragment transfersBottomSheet = null;
 
 	//OVERQUOTA WARNING
 	LinearLayout outSpaceLayout=null;
@@ -1520,7 +1528,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			initGooglePlayPayments();
 
 			megaApi.addGlobalListener(this);
-			megaApi.addTransferListener(this);
+
+			transferData = megaApi.getTransferData(this);
 
 			if(savedInstanceState==null) {
 				log("Run async task to check offline files");
@@ -11800,19 +11809,26 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			log("MegaRequest.TYPE_PAUSE_TRANSFERS");
 			if (e.getErrorCode() == MegaError.API_OK) {
 
+				if(fbFLol!=null){
+					if(fbFLol.isAdded()){
+						fbFLol.updateTransferButton();
+					}
+				}
+
 				if(megaApi.areTransfersPaused(MegaTransfer.TYPE_DOWNLOAD)||megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD)){
 					log("show PLAY button");
-					pauseTransfersMenuIcon.setVisible(false);
-					playTransfersMenuIcon.setVisible(true);
+
 					if (tFLol != null){
+						pauseTransfersMenuIcon.setVisible(false);
+						playTransfersMenuIcon.setVisible(true);
 						tFLol.setPause(true);
 					}
     			}
     			else{
     				log("show PAUSE button");
-					pauseTransfersMenuIcon.setVisible(true);
-					playTransfersMenuIcon.setVisible(false);
 					if (tFLol != null){
+						pauseTransfersMenuIcon.setVisible(true);
+						playTransfersMenuIcon.setVisible(false);
 						tFLol.setPause(false);
 					}
     			}
@@ -11821,7 +11837,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		else if(request.getType() == MegaRequest.TYPE_CANCEL_TRANSFERS){
 			log("MegaRequest.TYPE_CANCEL_TRANSFERS");
 			//After cancelling all the transfers
-			totalSizeToDownload = 0;
+			totalSizePendingTransfer = 0;
 			//Hide Transfer ProgressBar
 			if (fbFLol != null){
 				fbFLol.hideProgressBar();
@@ -12613,170 +12629,121 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		}
 	}
 
+	public void changeTransfersStatus(){
+		log("changeTransfersStatus");
+		if(megaApi.areTransfersPaused(MegaTransfer.TYPE_DOWNLOAD)||megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD)){
+			log("show PLAY button");
+			megaApi.pauseTransfers(false, this);
+		}
+		else{
+			log("Transfers are play -> pause");
+			megaApi.pauseTransfers(true, this);
+		}
+	}
+
 	@Override
 	public void onTransferStart(MegaApiJava api, MegaTransfer transfer) {
-		log("onTransferStart");
+		log("onTransferStart: "+transfer.getNotificationNumber());
 
-		HashMap<Long, MegaTransfer> mTHash = new HashMap<Long, MegaTransfer>();
+		if(transferCallback<transfer.getNotificationNumber()) {
+			transferCallback = transfer.getNotificationNumber();
+			pendingTransfers = 	megaApi.getNumPendingDownloads() + megaApi.getNumPendingUploads();
+			totalTransfers = 	megaApi.getTotalDownloads() + megaApi.getTotalUploads();
 
-		totalSizeToDownload += transfer.getTotalBytes();
-		progressPercent = (int) Math.round((double) totalSizeDownloaded / totalSizeToDownload * 100);
-		log(progressPercent + " " + totalSizeDownloaded + " " + totalSizeToDownload);
+			log("Pending transfers: "+pendingTransfers+" totalTransfers "+totalTransfers);
 
-		//Update transfer list
-		tL = megaApi.getTransfers();
-		if (tL != null){
-			if(tL.size()>0){
-				//Show Transfer ProgressBar
-				if (fbFLol != null){
-					fbFLol.showProgressBar();
-					fbFLol.updateProgressBar(progressPercent);
-				}
-				if (rbFLol != null){
-					rbFLol.showProgressBar();
-					rbFLol.updateProgressBar(progressPercent);
-				}
-				if (iFLol != null){
-					iFLol.showProgressBar();
-					iFLol.updateProgressBar(progressPercent);
-				}
-				if (outSFLol != null){
-					outSFLol.showProgressBar();
-					outSFLol.updateProgressBar(progressPercent);
-				}
-				if (inSFLol != null){
-					inSFLol.showProgressBar();
-					inSFLol.updateProgressBar(progressPercent);
-				}
-				if (tFLol != null){
-					tFLol.updateProgressBar(progressPercent);
-				}
-			}
-		}
+			totalSizePendingTransfer += transfer.getTotalBytes();
+			totalSizeTransfered = megaApi.getTotalDownloadedBytes() + megaApi.getTotalUploadedBytes();
 
-		//Update File Browser Fragment
-		if (fbFLol != null){
-			for(int i=0; i<tL.size(); i++){
+			log("Pending bytes: "+totalSizePendingTransfer+" totalBytes "+totalSizeTransfered);
 
-				MegaTransfer tempT = tL.get(i);
-				if (tempT.getType() == MegaTransfer.TYPE_DOWNLOAD){
-					long handleT = tempT.getNodeHandle();
-					MegaNode nodeT = megaApi.getNodeByHandle(handleT);
-					MegaNode parentT = megaApi.getParentNode(nodeT);
-
-					if (parentT != null){
-						if(parentT.getHandle() == this.parentHandleBrowser){
-							mTHash.put(handleT,tempT);
-						}
-					}
+			if (fbFLol != null){
+				if(fbFLol.isAdded()){
+					fbFLol.setOverviewLayout();
 				}
 			}
 
-			fbFLol.setTransfers(mTHash);
-		}
 
-		if (inSFLol != null){
-			for(int i=0; i<tL.size(); i++){
-
-				MegaTransfer tempT = tL.get(i);
-				if (tempT.getType() == MegaTransfer.TYPE_DOWNLOAD){
-					long handleT = tempT.getNodeHandle();
-
-					mTHash.put(handleT,tempT);
-				}
+			if (tFLol != null){
+				tFLol.setTransfers(tL);
 			}
-
-			inSFLol.setTransfers(mTHash);
+			log("onTransferStart: " + transfer.getFileName() + " - " + transfer.getTag());
 		}
-
-		if (tFLol != null){
-			tFLol.setTransfers(tL);
-		}
-
-		log("onTransferStart: " + transfer.getFileName() + " - " + transfer.getTag());
 	}
 
 	@Override
 	public void onTransferFinish(MegaApiJava api, MegaTransfer transfer, MegaError e) {
 		log("onTransferFinish: "+transfer.getPath());
 
-		HashMap<Long, MegaTransfer> mTHash = new HashMap<Long, MegaTransfer>();
+		if(transferCallback<transfer.getNotificationNumber()) {
+			transferCallback = transfer.getNotificationNumber();
 
-		if (e.getErrorCode() == MegaError.API_OK) {
+			pendingTransfers = 	megaApi.getNumPendingDownloads() + megaApi.getNumPendingUploads();
+			totalTransfers = 	megaApi.getTotalDownloads() + megaApi.getTotalUploads();
 
-//			if(Util.isVideoFile(transfer.getPath())){
-//				log("Is video!!!");
-//				ThumbnailUtilsLollipop.createThumbnailVideo(this, transfer.getPath(), megaApi, transfer.getNodeHandle());
-//			}
-//			else{
-//				log("NOT video!");
-//			}
+			log("Pending transfers: "+pendingTransfers+" totalTransfers "+totalTransfers);
+			totalSizePendingTransfer -= transfer.getTransferredBytes();
+			totalSizeTransfered = megaApi.getTotalDownloadedBytes() + megaApi.getTotalUploadedBytes();
 
-			long currentSizeDownloaded = 0;
-			if (transfersDownloadedSize.get(transfer.getTag()) != null){
-				currentSizeDownloaded = transfersDownloadedSize.get(transfer.getTag());
-			}
-
-			totalSizeDownloaded += (transfer.getTotalBytes()-currentSizeDownloaded);
-			transfersDownloadedSize.put(transfer.getTag(), transfer.getTotalBytes());
-
-			progressPercent = (int) Math.round((double) totalSizeDownloaded / totalSizeToDownload * 100);
-			log(progressPercent + " " + totalSizeDownloaded + " " + totalSizeToDownload);
-			if (fbFLol != null){
-				fbFLol.updateProgressBar(progressPercent);
-			}
-			if (rbFLol != null){
-				rbFLol.updateProgressBar(progressPercent);
-			}
-			if (iFLol != null){
-				iFLol.updateProgressBar(progressPercent);
-			}
-			if (outSFLol != null){
-				outSFLol.updateProgressBar(progressPercent);
-			}
-			if (inSFLol != null){
-				inSFLol.updateProgressBar(progressPercent);
-			}
-			if (tFLol != null){
-				tFLol.updateProgressBar(progressPercent);
-			}
-		}
-		else if(e.getErrorCode() == MegaError.API_EINCOMPLETE){
-			log("API_EINCOMPLETE: " + transfer.getFileName());
-			totalSizeToDownload -= transfer.getTotalBytes();
-			Long currentSizeDownloaded = transfersDownloadedSize.get(transfer.getTag());
-			if (currentSizeDownloaded != null){
-				totalSizeDownloaded -= currentSizeDownloaded;
+			if(pendingTransfers<=0){
+				if(transfersBottomSheet!=null){
+					if(transfersBottomSheet.isAdded()){
+						transfersBottomSheet.dismiss();
+					}
+				}
 			}
 
-			progressPercent = (int) Math.round((double) totalSizeDownloaded / totalSizeToDownload * 100);
-			log(progressPercent + " " + totalSizeDownloaded + " " + totalSizeToDownload);
-			if (fbFLol != null){
-				fbFLol.updateProgressBar(progressPercent);
-			}
-			if (rbFLol != null){
-				rbFLol.updateProgressBar(progressPercent);
-			}
-			if (iFLol != null){
-				iFLol.updateProgressBar(progressPercent);
-			}
-			if (outSFLol != null){
-				outSFLol.updateProgressBar(progressPercent);
-			}
-			if (inSFLol != null){
-				inSFLol.updateProgressBar(progressPercent);
-			}
-			if (tFLol != null){
-				tFLol.updateProgressBar(progressPercent);
-			}
-		}
+			if (e.getErrorCode() == MegaError.API_OK) {
 
-		//Update transfer list
-		tL = megaApi.getTransfers();
+				if (fbFLol != null){
+					if(fbFLol.isAdded()){
+						fbFLol.setOverviewLayout();
+					}
+				}
 
-		if (tL != null){
-			if(tL.size()<=0){
-				log("Hide Transfer ProgressBar: "+tL.size());
+			}
+			else if(e.getErrorCode() == MegaError.API_EINCOMPLETE){
+				log("API_EINCOMPLETE: " + transfer.getFileName());
+				totalSizePendingTransfer -= transfer.getTotalBytes();
+				Long currentSizeDownloaded = transfersDownloadedSize.get(transfer.getTag());
+				if (currentSizeDownloaded != null){
+					totalSizeTransfered -= currentSizeDownloaded;
+				}
+
+				if (fbFLol != null){
+					if(fbFLol.isAdded()){
+						fbFLol.setOverviewLayout();
+					}
+				}
+			}
+
+			//Update transfer list
+			tL = megaApi.getTransfers();
+
+			if (tL != null){
+				if(tL.size()<=0){
+					log("Hide Transfer ProgressBar: "+tL.size());
+					supportInvalidateOptionsMenu();
+					//Hide Transfer ProgressBar
+					if (fbFLol != null){
+						fbFLol.hideProgressBar();
+					}
+					if (rbFLol != null){
+						rbFLol.hideProgressBar();
+					}
+					if (iFLol != null){
+						iFLol.hideProgressBar();
+					}
+					if (outSFLol != null){
+						outSFLol.hideProgressBar();
+					}
+					if (inSFLol != null){
+						inSFLol.hideProgressBar();
+					}
+				}
+			}
+			else{
+				log("megaApi Transfers NULL - Hide Transfer ProgressBar: ");
 				supportInvalidateOptionsMenu();
 				//Hide Transfer ProgressBar
 				if (fbFLol != null){
@@ -12795,148 +12762,88 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					inSFLol.hideProgressBar();
 				}
 			}
+
+			if (tFLol != null){
+				tFLol.setTransfers(tL);
+			}
+
+			log("END onTransferFinish: " + transfer.getFileName() + " - " + transfer.getTag());
+
 		}
-		else{
-			log("megaApi Transfers NULL - Hide Transfer ProgressBar: ");
-			supportInvalidateOptionsMenu();
-			//Hide Transfer ProgressBar
-			if (fbFLol != null){
-				fbFLol.hideProgressBar();
-			}
-			if (rbFLol != null){
-				rbFLol.hideProgressBar();
-			}
-			if (iFLol != null){
-				iFLol.hideProgressBar();
-			}
-			if (outSFLol != null){
-				outSFLol.hideProgressBar();
-			}
-			if (inSFLol != null){
-				inSFLol.hideProgressBar();
-			}
-		}
-
-		if (tFLol != null){
-			tFLol.setTransfers(tL);
-		}
-
-		//Update File Browser Fragment
-		if (fbFLol != null){
-			for(int i=0; i<tL.size(); i++){
-
-				MegaTransfer tempT = tL.get(i);
-				long handleT = tempT.getNodeHandle();
-				MegaNode nodeT = megaApi.getNodeByHandle(handleT);
-				MegaNode parentT = megaApi.getParentNode(nodeT);
-
-				if (parentT != null){
-					if(parentT.getHandle() == this.parentHandleBrowser){
-						mTHash.put(handleT,tempT);
-					}
-				}
-			}
-			fbFLol.setTransfers(mTHash);
-		}
-
-		if (inSFLol != null){
-			for(int i=0; i<tL.size(); i++){
-
-				MegaTransfer tempT = tL.get(i);
-				if (tempT.getType() == MegaTransfer.TYPE_DOWNLOAD){
-					long handleT = tempT.getNodeHandle();
-
-					mTHash.put(handleT,tempT);
-				}
-			}
-
-			inSFLol.setTransfers(mTHash);
-		}
-
-		log("END onTransferFinish: " + transfer.getFileName() + " - " + transfer.getTag());
 	}
 
 	@Override
 	public void onTransferUpdate(MegaApiJava api, MegaTransfer transfer) {
 //		log("onTransferUpdate: " + transfer.getFileName() + " - " + transfer.getTag());
 
-		long currentSizeDownloaded = 0;
-		if (transfersDownloadedSize.get(transfer.getTag()) != null){
-			currentSizeDownloaded = transfersDownloadedSize.get(transfer.getTag());
-		}
-		totalSizeDownloaded += (transfer.getTransferredBytes()-currentSizeDownloaded);
-		transfersDownloadedSize.put(transfer.getTag(), transfer.getTransferredBytes());
+		if(transferCallback<transfer.getNotificationNumber()){
+			transferCallback = transfer.getNotificationNumber();
 
-		progressPercent = (int) Math.round((double) totalSizeDownloaded / totalSizeToDownload * 100);
-//		log(progressPercent + " " + totalSizeDownloaded + " " + totalSizeToDownload);
-		if (fbFLol != null){
-			fbFLol.updateProgressBar(progressPercent);
-		}
-		if (rbFLol != null){
-			rbFLol.updateProgressBar(progressPercent);
-		}
-		if (iFLol != null){
-			iFLol.updateProgressBar(progressPercent);
-		}
-		if (outSFLol != null){
-			outSFLol.updateProgressBar(progressPercent);
-		}
-		if (inSFLol != null){
-			inSFLol.updateProgressBar(progressPercent);
-		}
-		if (tFLol != null){
-			tFLol.updateProgressBar(progressPercent);
-		}
+			pendingTransfers = 	megaApi.getNumPendingDownloads() + megaApi.getNumPendingUploads();
+			totalTransfers = 	megaApi.getTotalDownloads() + megaApi.getTotalUploads();
 
-		if (drawerItem == DrawerItem.CLOUD_DRIVE){
+
+			totalSizePendingTransfer -= transfer.getTransferredBytes();
+			totalSizeTransfered = megaApi.getTotalDownloadedBytes() + megaApi.getTotalUploadedBytes();
+			log("Pending transfers: "+pendingTransfers+" totalTransfers "+totalTransfers);
+			log("Pending bytes: "+totalSizePendingTransfer+" totalBytes "+totalSizeTransfered);
+
 			if (fbFLol != null){
-				if (transfer.getType() == MegaTransfer.TYPE_DOWNLOAD){
-					Time now = new Time();
-					now.setToNow();
-					long nowMillis = now.toMillis(false);
-					if (lastTimeOnTransferUpdate < 0){
-						lastTimeOnTransferUpdate = now.toMillis(false);
-						fbFLol.setCurrentTransfer(transfer);
-					}
-					else if ((nowMillis - lastTimeOnTransferUpdate) > Util.ONTRANSFERUPDATE_REFRESH_MILLIS){
-						lastTimeOnTransferUpdate = nowMillis;
-						fbFLol.setCurrentTransfer(transfer);
-					}
+				if(fbFLol.isAdded()){
+					fbFLol.setOverviewLayout();
 				}
 			}
-		}
-		else if (drawerItem == DrawerItem.SHARED_ITEMS){
-			if (inSFLol != null){
-				if (transfer.getType() == MegaTransfer.TYPE_DOWNLOAD){
-					Time now = new Time();
-					now.setToNow();
-					long nowMillis = now.toMillis(false);
-					if (lastTimeOnTransferUpdate < 0){
-						lastTimeOnTransferUpdate = now.toMillis(false);
-						inSFLol.setCurrentTransfer(transfer);
-					}
-					else if ((nowMillis - lastTimeOnTransferUpdate) > Util.ONTRANSFERUPDATE_REFRESH_MILLIS){
-						lastTimeOnTransferUpdate = nowMillis;
-						inSFLol.setCurrentTransfer(transfer);
-					}
-				}
-			}
-		}
-		else if (drawerItem == DrawerItem.TRANSFERS){
-			if (tFLol != null){
-				Time now = new Time();
-				now.setToNow();
-				long nowMillis = now.toMillis(false);
-				log("on transfers update... "+transfer.getTransferredBytes());
-				if (lastTimeOnTransferUpdate < 0){
-					lastTimeOnTransferUpdate = now.toMillis(false);
-					tFLol.setCurrentTransfer(transfer);
-				}
-				else if ((nowMillis - lastTimeOnTransferUpdate) > Util.ONTRANSFERUPDATE_REFRESH_MILLIS){
-					lastTimeOnTransferUpdate = nowMillis;
-					tFLol.setCurrentTransfer(transfer);
-				}
 
+			if (drawerItem == DrawerItem.CLOUD_DRIVE){
+				if (fbFLol != null){
+					if (transfer.getType() == MegaTransfer.TYPE_DOWNLOAD){
+						Time now = new Time();
+						now.setToNow();
+						long nowMillis = now.toMillis(false);
+						if (lastTimeOnTransferUpdate < 0){
+							lastTimeOnTransferUpdate = now.toMillis(false);
+							fbFLol.setCurrentTransfer(transfer);
+						}
+						else if ((nowMillis - lastTimeOnTransferUpdate) > Util.ONTRANSFERUPDATE_REFRESH_MILLIS){
+							lastTimeOnTransferUpdate = nowMillis;
+							fbFLol.setCurrentTransfer(transfer);
+						}
+					}
+				}
+			}
+			else if (drawerItem == DrawerItem.SHARED_ITEMS){
+				if (inSFLol != null){
+					if (transfer.getType() == MegaTransfer.TYPE_DOWNLOAD){
+						Time now = new Time();
+						now.setToNow();
+						long nowMillis = now.toMillis(false);
+						if (lastTimeOnTransferUpdate < 0){
+							lastTimeOnTransferUpdate = now.toMillis(false);
+							inSFLol.setCurrentTransfer(transfer);
+						}
+						else if ((nowMillis - lastTimeOnTransferUpdate) > Util.ONTRANSFERUPDATE_REFRESH_MILLIS){
+							lastTimeOnTransferUpdate = nowMillis;
+							inSFLol.setCurrentTransfer(transfer);
+						}
+					}
+				}
+			}
+			else if (drawerItem == DrawerItem.TRANSFERS){
+				if (tFLol != null){
+					Time now = new Time();
+					now.setToNow();
+					long nowMillis = now.toMillis(false);
+					log("on transfers update... "+transfer.getTransferredBytes());
+					if (lastTimeOnTransferUpdate < 0){
+						lastTimeOnTransferUpdate = now.toMillis(false);
+						tFLol.setCurrentTransfer(transfer);
+					}
+					else if ((nowMillis - lastTimeOnTransferUpdate) > Util.ONTRANSFERUPDATE_REFRESH_MILLIS){
+						lastTimeOnTransferUpdate = nowMillis;
+						tFLol.setCurrentTransfer(transfer);
+					}
+
+				}
 			}
 		}
 	}
@@ -12964,16 +12871,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 	public boolean isTransferInProgress(){
 		//Update transfer list
-		tL = megaApi.getTransfers();
-		if (tL != null){
-			if(tL.size()<=0){
-				return false;
-			}
-		}
-		else{
-			return false;
-		}
-		return true;
+		return false;
 	}
 
 	public static void log(String message) {
@@ -12981,11 +12879,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	}
 
 	public int getProgressPercent() {
-		return progressPercent;
+		return 0;
 	}
 
 	public void setProgressPercent(int progressPercent) {
-		this.progressPercent = progressPercent;
+
 	}
 
 	public MegaAccountDetails getAccountInfo() {
@@ -13144,6 +13042,17 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			this.selectedChatItem = chat;
 			ChatBottomSheetDialogFragment bottomSheetDialogFragment = new ChatBottomSheetDialogFragment();
 			bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
+		}
+	}
+
+	public void showTransfersPanel(){
+		log("showChatPanel");
+
+		pendingTransfers = megaApi.getNumPendingUploads()+megaApi.getNumPendingDownloads();
+
+		if(pendingTransfers>0){
+			transfersBottomSheet = new TransfersBottomSheetDialogFragment();
+			transfersBottomSheet.show(getSupportFragmentManager(), transfersBottomSheet.getTag());
 		}
 	}
 

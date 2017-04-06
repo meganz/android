@@ -79,8 +79,7 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 	RelativeLayout contentTextLayout;
 	boolean downloadInProgress = false;
 	ProgressBar progressBar;
-	ImageView transferArrow;
-	
+
 	float density;
 	DisplayMetrics outMetrics;
 	Display display;
@@ -342,12 +341,6 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 			emptyImageView = (ImageView) v.findViewById(R.id.file_list_empty_image);
 			emptyTextView = (TextView) v.findViewById(R.id.file_list_empty_text);
 
-			progressBar = (ProgressBar) v.findViewById(R.id.file_list_download_progress_bar);
-			transferArrow = (ImageView) v.findViewById(R.id.file_list_transfer_arrow);
-			RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams)transferArrow.getLayoutParams();
-			lp.setMargins(0, 0, Util.scaleWidthPx(15, outMetrics), Util.scaleHeightPx(4, outMetrics)); 
-			transferArrow.setLayoutParams(lp);
-
 			contentTextLayout = (RelativeLayout) v.findViewById(R.id.content_text_layout);
 			contentText = (TextView) v.findViewById(R.id.content_text);
 			
@@ -432,10 +425,6 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 			emptyTextView = (TextView) v.findViewById(R.id.file_grid_empty_text);
 
 			progressBar = (ProgressBar) v.findViewById(R.id.file_grid_download_progress_bar);
-			transferArrow = (ImageView) v.findViewById(R.id.file_grid_transfer_arrow);
-			RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams)transferArrow.getLayoutParams();
-			lp.setMargins(0, 0, Util.scaleWidthPx(15, outMetrics), Util.scaleHeightPx(4, outMetrics)); 
-			transferArrow.setLayoutParams(lp);
 
 			contentTextLayout = (RelativeLayout) v.findViewById(R.id.content_grid_text_layout);
 			contentText = (TextView) v.findViewById(R.id.content_grid_text);			
@@ -599,8 +588,7 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 	public void showProgressBar(){
 		log("showProgressBar");
 		downloadInProgress = true;
-		progressBar.setVisibility(View.VISIBLE);	
-		transferArrow.setVisibility(View.VISIBLE);
+		progressBar.setVisibility(View.VISIBLE);
 		contentText.setText(R.string.text_downloading);
 		contentTextLayout.setOnClickListener(this);
 	}
@@ -609,7 +597,6 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 		log("hideProgressBar");
 		downloadInProgress = false;
 		progressBar.setVisibility(View.GONE);
-		transferArrow.setVisibility(View.GONE);
 		if (deepBrowserTree == 0){
 			contentText.setText(MegaApiUtils.getInfoNodeOnlyFolders(nodes, context));
 		}
