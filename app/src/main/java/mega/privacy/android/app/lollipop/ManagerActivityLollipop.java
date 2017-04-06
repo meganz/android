@@ -9778,8 +9778,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					}
 				}
 			}
-
-			fbFLol.setTransfers(mTHash);
 		}
 	}
 
@@ -11842,6 +11840,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			log("MegaRequest.TYPE_CANCEL_TRANSFERS");
 			//After cancelling all the transfers
 			totalSizePendingTransfer = 0;
+
+			pendingTransfers = megaApi.getNumPendingDownloads() + megaApi.getNumPendingUploads();
+			totalTransfers = megaApi.getTotalDownloads() + megaApi.getTotalUploads();
+
 			//Hide Transfer ProgressBar
 			if (fbFLol != null){
 				if(fbFLol.isAdded()){
@@ -11860,34 +11862,39 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		else if (request.getType() == MegaRequest.TYPE_CANCEL_TRANSFER){
 			log("one MegaRequest.TYPE_CANCEL_TRANSFER");
 			//After cancelling ONE transfer
+			pendingTransfers = megaApi.getNumPendingDownloads() + megaApi.getNumPendingUploads();
+			totalTransfers = megaApi.getTotalDownloads() + megaApi.getTotalUploads();
+
+			log("Pending transfers: "+pendingTransfers+" totalTransfers "+totalTransfers);
+
 			if (e.getErrorCode() == MegaError.API_OK){
+
+				if (tFLol != null){
+					if (drawerItem == DrawerItem.TRANSFERS && tFLol.isAdded()){
+						if(pendingTransfers<=0){
+							pauseTransfersMenuIcon.setVisible(false);
+							playTransfersMenuIcon.setVisible(false);
+						}
+						else{
+							if(megaApi.areTransfersPaused(MegaTransfer.TYPE_DOWNLOAD)||megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD)) {
+								log("show PLAY button");
+								pauseTransfersMenuIcon.setVisible(false);
+								playTransfersMenuIcon.setVisible(true);
+							}
+							else{
+								log("show PLAY button");
+								pauseTransfersMenuIcon.setVisible(true);
+								playTransfersMenuIcon.setVisible(false);
+							}
+						}
+					}
+				}
+
 				tL = megaApi.getTransfers();
 				if (tFLol != null){
 					if (drawerItem == DrawerItem.TRANSFERS){
 						tFLol.setTransfers(tL);
 					}
-				}
-				//Update File Browser Fragment
-				if (fbFLol != null){
-
-					HashMap<Long, MegaTransfer> mTHash = new HashMap<Long, MegaTransfer>();
-					for(int i=0; i<tL.size(); i++){
-
-						MegaTransfer tempT = tL.get(i);
-						if (tempT.getType() == MegaTransfer.TYPE_DOWNLOAD){
-							long handleT = tempT.getNodeHandle();
-							MegaNode nodeT = megaApi.getNodeByHandle(handleT);
-							MegaNode parentT = megaApi.getParentNode(nodeT);
-
-							if (parentT != null){
-								if(parentT.getHandle() == this.parentHandleBrowser){
-									mTHash.put(handleT,tempT);
-								}
-							}
-						}
-					}
-
-					fbFLol.setTransfers(mTHash);
 				}
 			}
 			supportInvalidateOptionsMenu();
@@ -12618,13 +12625,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					updateContactsView(true, false, true);
 				}
 			}
-		}
-	}
-
-	public void setTransfers(ArrayList<MegaTransfer> transfersList){
-		log("setTransfers");
-		if (tFLol != null){
-			tFLol.setTransfers(transfersList);
 		}
 	}
 
