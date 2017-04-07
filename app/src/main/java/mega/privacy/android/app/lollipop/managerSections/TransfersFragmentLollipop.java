@@ -59,8 +59,8 @@ public class TransfersFragmentLollipop extends Fragment implements RecyclerView.
 	
 //	SparseArray<TransfersHolder> transfersListArray = null;
 	
-	ArrayList<MegaTransfer> tL = null;	
-	
+	ArrayList<MegaTransfer> tL = null;
+
 	private Handler handler;
 	
 	@Override
@@ -101,22 +101,15 @@ public class TransfersFragmentLollipop extends Fragment implements RecyclerView.
 	    density  = getResources().getDisplayMetrics().density;
 	    
 		View v = inflater.inflate(R.layout.fragment_transfers, container, false);
-		
-		
-//		if (transfersListArray == null){
-//			tL = megaApi.getTransfers();
-//			transfersListArray = new SparseArray<TransfersHolder>();
-//			
-//			for (int i = 0; i< tL.size(); i++){
-//				MegaTransfer t = tL.get(i);
-//				TransfersHolder th = new TransfersHolder();
-//				
-//				th.setName(new String(t.getFileName()));
-//				
-//				transfersListArray.put(t.getTag(), th);
-//			}
-//		}
-		tL = megaApi.getTransfers();
+
+		synchronized(((ManagerActivityLollipop)context).transfersInProgressSync) {
+			for(int i=0; i<((ManagerActivityLollipop)context).transfersInProgressSync.size();i++){
+				MegaTransfer transfer = megaApi.getTransferByTag(((ManagerActivityLollipop)context).transfersInProgressSync.get(i));
+				if(transfer!=null){
+					tL.add(transfer);
+				}
+			}
+		}
 		
 		listView = (RecyclerView) v.findViewById(R.id.transfers_list_view);
 		listView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
