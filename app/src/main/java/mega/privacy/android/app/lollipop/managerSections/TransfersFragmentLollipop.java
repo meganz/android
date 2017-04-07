@@ -42,14 +42,12 @@ public class TransfersFragmentLollipop extends Fragment implements RecyclerView.
 	MegaTransfersLollipopAdapter adapter;
 	
 	MegaApiAndroid megaApi;
-	RelativeLayout contentTextLayout;
 	TextView contentText;
 	ImageView emptyImage;
 	TextView emptyText;
 	ImageView pauseImage;
 	TextView pauseText;
-	ProgressBar progressBar;
-	
+
 	float density;
 	DisplayMetrics outMetrics;
 	Display display;
@@ -61,8 +59,8 @@ public class TransfersFragmentLollipop extends Fragment implements RecyclerView.
 	
 //	SparseArray<TransfersHolder> transfersListArray = null;
 	
-	ArrayList<MegaTransfer> tL = null;	
-	
+	ArrayList<MegaTransfer> tL = null;
+
 	private Handler handler;
 	
 	@Override
@@ -103,22 +101,15 @@ public class TransfersFragmentLollipop extends Fragment implements RecyclerView.
 	    density  = getResources().getDisplayMetrics().density;
 	    
 		View v = inflater.inflate(R.layout.fragment_transfers, container, false);
-		
-		
-//		if (transfersListArray == null){
-//			tL = megaApi.getTransfers();
-//			transfersListArray = new SparseArray<TransfersHolder>();
-//			
-//			for (int i = 0; i< tL.size(); i++){
-//				MegaTransfer t = tL.get(i);
-//				TransfersHolder th = new TransfersHolder();
-//				
-//				th.setName(new String(t.getFileName()));
-//				
-//				transfersListArray.put(t.getTag(), th);
-//			}
-//		}
-		tL = megaApi.getTransfers();
+
+		synchronized(((ManagerActivityLollipop)context).transfersInProgressSync) {
+			for(int i=0; i<((ManagerActivityLollipop)context).transfersInProgressSync.size();i++){
+				MegaTransfer transfer = megaApi.getTransferByTag(((ManagerActivityLollipop)context).transfersInProgressSync.get(i));
+				if(transfer!=null){
+					tL.add(transfer);
+				}
+			}
+		}
 		
 		listView = (RecyclerView) v.findViewById(R.id.transfers_list_view);
 		listView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
@@ -130,15 +121,6 @@ public class TransfersFragmentLollipop extends Fragment implements RecyclerView.
 //		adapter = new MegaTransfersAdapter(context, transfersListArray, aB);
 		adapter = new MegaTransfersLollipopAdapter(context, this, tL, aB);
 		adapter.setPositionClicked(-1);
-		
-		contentTextLayout = (RelativeLayout) v.findViewById(R.id.transfers_list_content_text_layout);
-		progressBar = (ProgressBar) v.findViewById(R.id.transfers_list_download_progress_bar);
-		progressBar.setProgress(((ManagerActivityLollipop)context).getProgressPercent());
-		contentText = (TextView) v.findViewById(R.id.transfers_list_content_text);			
-		//Margins
-		RelativeLayout.LayoutParams contentTextParams = (RelativeLayout.LayoutParams)contentText.getLayoutParams();
-		contentTextParams.setMargins(Util.scaleWidthPx(78, outMetrics), Util.scaleHeightPx(5, outMetrics), 0, Util.scaleHeightPx(5, outMetrics)); 
-		contentText.setLayoutParams(contentTextParams);
 
 		adapter.setMultipleSelect(false);
 		
@@ -161,7 +143,6 @@ public class TransfersFragmentLollipop extends Fragment implements RecyclerView.
 			emptyImage.setVisibility(View.GONE);
 			emptyText.setVisibility(View.GONE);
 			listView.setVisibility(View.GONE);
-			contentTextLayout.setVisibility(View.VISIBLE);
 			pauseImage.setVisibility(View.VISIBLE);
 			pauseText.setVisibility(View.VISIBLE);
 		}
@@ -169,14 +150,12 @@ public class TransfersFragmentLollipop extends Fragment implements RecyclerView.
 			if (tL.size() == 0){
 				emptyImage.setVisibility(View.VISIBLE);
 				emptyText.setVisibility(View.VISIBLE);
-				contentTextLayout.setVisibility(View.GONE);
 				listView.setVisibility(View.GONE);
 			}
 			else{
 				emptyImage.setVisibility(View.GONE);
 				emptyText.setVisibility(View.GONE);
 				listView.setVisibility(View.VISIBLE);
-				contentTextLayout.setVisibility(View.VISIBLE);
 			}
 			
 			pauseImage.setVisibility(View.GONE);
@@ -246,7 +225,6 @@ public class TransfersFragmentLollipop extends Fragment implements RecyclerView.
 				emptyImage.setVisibility(View.GONE);
 				emptyText.setVisibility(View.GONE);
 				listView.setVisibility(View.GONE);
-				contentTextLayout.setVisibility(View.VISIBLE);
 				pauseImage.setVisibility(View.VISIBLE);
 				pauseText.setVisibility(View.VISIBLE);
 			}
@@ -254,14 +232,12 @@ public class TransfersFragmentLollipop extends Fragment implements RecyclerView.
 				if (tL.size() == 0){
 					emptyImage.setVisibility(View.VISIBLE);
 					emptyText.setVisibility(View.VISIBLE);
-					contentTextLayout.setVisibility(View.GONE);
 					listView.setVisibility(View.GONE);
 				}
 				else{
 					emptyImage.setVisibility(View.GONE);
 					emptyText.setVisibility(View.GONE);
 					listView.setVisibility(View.VISIBLE);
-					contentTextLayout.setVisibility(View.VISIBLE);
 				}	
 				
 				pauseImage.setVisibility(View.GONE);
@@ -290,7 +266,6 @@ public class TransfersFragmentLollipop extends Fragment implements RecyclerView.
 				emptyImage.setVisibility(View.GONE);
 				emptyText.setVisibility(View.GONE);
 				listView.setVisibility(View.GONE);
-				contentTextLayout.setVisibility(View.VISIBLE);
 				pauseImage.setVisibility(View.VISIBLE);
 				pauseText.setVisibility(View.VISIBLE);
 			}
@@ -298,14 +273,12 @@ public class TransfersFragmentLollipop extends Fragment implements RecyclerView.
 				if (tL.size() == 0){
 					emptyImage.setVisibility(View.VISIBLE);
 					emptyText.setVisibility(View.VISIBLE);
-					contentTextLayout.setVisibility(View.GONE);
 					listView.setVisibility(View.GONE);
 				}
 				else{
 					emptyImage.setVisibility(View.GONE);
 					emptyText.setVisibility(View.GONE);
 					listView.setVisibility(View.VISIBLE);
-					contentTextLayout.setVisibility(View.VISIBLE);
 				}
 				
 				pauseImage.setVisibility(View.GONE);
@@ -313,19 +286,13 @@ public class TransfersFragmentLollipop extends Fragment implements RecyclerView.
 			}
 		}
 	} 
-	
-	public void updateProgressBar(int progress){
-		if(progressBar!=null){
-			progressBar.setProgress(progress);
-		}			
-	}
+
 	
 	public void setNoActiveTransfers(){
 		this.pause = false;
 		if (emptyImage != null){
 			emptyImage.setVisibility(View.VISIBLE);
 			emptyText.setVisibility(View.VISIBLE);
-			contentTextLayout.setVisibility(View.VISIBLE);
 			listView.setVisibility(View.GONE);
 			pauseImage.setVisibility(View.GONE);
 			pauseText.setVisibility(View.GONE);

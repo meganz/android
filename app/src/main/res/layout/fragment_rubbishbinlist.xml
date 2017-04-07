@@ -11,37 +11,14 @@
         android:layout_height="36dp"
         android:background="@color/content_text_background">
 
-		<RelativeLayout
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:id="@+id/rubbishbin_list_content_text_nested_layout"
-			android:layout_centerVertical="true">
-
 			<TextView
 				android:id="@+id/rubbishbin_list_content_text"
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
 				android:textColor="@color/mail_my_account"
+				android:layout_centerVertical="true"
 				android:layout_marginLeft="72dp"
 				android:textSize="14sp"/>
-		</RelativeLayout>
-
-       <ProgressBar
-		    android:id="@+id/rubbishbin_list_download_progress_bar"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content" 
-			android:layout_below="@id/rubbishbin_list_content_text_nested_layout"
-			style="@style/UsedSpaceProgressBar"
-			android:visibility="gone"/>
-       
-      	<ImageView
-	        android:id="@+id/rubbishbin_list_transfer_arrow"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:src="@drawable/ic_chevron_right_grey"
-	        android:layout_above="@id/rubbishbin_list_download_progress_bar" 
-	        android:layout_alignParentRight="true" 
-	        android:visibility="gone"/> 
     </RelativeLayout>
 
     <View

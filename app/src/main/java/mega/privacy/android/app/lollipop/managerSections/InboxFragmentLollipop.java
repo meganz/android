@@ -58,7 +58,7 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 
 
-public class InboxFragmentLollipop extends Fragment implements OnClickListener{
+public class InboxFragmentLollipop extends Fragment{
 
 	public static int GRID_WIDTH =400;
 	
@@ -81,10 +81,6 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener{
 	TextView emptyTextView;
 	TextView contentText;
 	RelativeLayout contentTextLayout;
-	boolean downloadInProgress = false;
-	ProgressBar progressBar;
-	ImageView transferArrow;
-
 	Stack<Integer> lastPositionStack;
 	
 	MegaApiAndroid megaApi;
@@ -360,12 +356,6 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener{
 			emptyImageView = (ImageView) v.findViewById(R.id.inbox_list_empty_image);
 			emptyTextView = (TextView) v.findViewById(R.id.inbox_list_empty_text);
 
-			progressBar = (ProgressBar) v.findViewById(R.id.inbox_list_download_progress_bar);
-			transferArrow = (ImageView) v.findViewById(R.id.inbox_list_transfer_arrow);
-			RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams)transferArrow.getLayoutParams();
-			lp.setMargins(0, 0, Util.scaleWidthPx(15, outMetrics), Util.scaleHeightPx(4, outMetrics)); 
-			transferArrow.setLayoutParams(lp);
-			
 			contentTextLayout = (RelativeLayout) v.findViewById(R.id.inbox_list_content_text_layout);
 			contentText = (TextView) v.findViewById(R.id.inbox_list_content_text);			
 
@@ -381,14 +371,7 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener{
 			adapter.setMultipleSelect(false);
 
 			recyclerView.setAdapter(adapter);
-			
-			if(((ManagerActivityLollipop)getActivity()).isTransferInProgress()){
-				showProgressBar();
-				progressBar.setProgress(((ManagerActivityLollipop)context).getProgressPercent());
-			}
-			else{					
-				contentText.setText(MegaApiUtils.getInfoFolder(inboxNode, context));
-			}			
+			contentText.setText(MegaApiUtils.getInfoFolder(inboxNode, context));
 
 			log("call to setNodes");
 			setNodes(nodes);
@@ -428,13 +411,7 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener{
 			emptyTextView = (TextView) v.findViewById(R.id.inbox_grid_empty_text);
 			emptyImageView.setImageResource(R.drawable.inbox_empty);
 			emptyTextView.setText(R.string.empty_inbox);
-			
-			progressBar = (ProgressBar) v.findViewById(R.id.inbox_grid_download_progress_bar);
-			transferArrow = (ImageView) v.findViewById(R.id.inbox_grid_transfer_arrow);
-			RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams)transferArrow.getLayoutParams();
-			lp.setMargins(0, 0, Util.scaleWidthPx(15, outMetrics), Util.scaleHeightPx(4, outMetrics)); 
-			transferArrow.setLayoutParams(lp);
-			
+
 			contentTextLayout = (RelativeLayout) v.findViewById(R.id.inbox_grid_content_text_layout);
 			contentText = (TextView) v.findViewById(R.id.inbox_content_grid_text);			
 
@@ -449,14 +426,7 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener{
 
 			recyclerView.setAdapter(adapter);
 
-			if(((ManagerActivityLollipop)getActivity()).isTransferInProgress()){
-				showProgressBar();
-				progressBar.setProgress(((ManagerActivityLollipop)context).getProgressPercent());
-			}
-			else{					
-				contentText.setText(MegaApiUtils.getInfoFolder(inboxNode, context));
-			}
-			
+			contentText.setText(MegaApiUtils.getInfoFolder(inboxNode, context));
 			setNodes(nodes);
 
 			if (megaApi.getInboxNode().getHandle()==parentHandle||parentHandle==-1) {
@@ -483,41 +453,12 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener{
 				nodes = megaApi.getChildren(parentNode, orderGetChildren);
 			}
 		}
+
 		setNodes(nodes);
 		contentText.setText(MegaApiUtils.getInfoFolder(inboxNode, context));
 		if(adapter != null){				
 			adapter.notifyDataSetChanged();
 		}		
-	}
-
-	public void showProgressBar(){
-		log("showProgressBar");
-		downloadInProgress = true;
-		if(progressBar!=null){
-			progressBar.setVisibility(View.VISIBLE);
-			transferArrow.setVisibility(View.VISIBLE);
-		}
-		contentText.setText(R.string.text_downloading);
-		contentTextLayout.setOnClickListener(this);
-	}
-	
-	public void hideProgressBar(){
-		log("hideProgressBar");
-		downloadInProgress = false;
-		progressBar.setVisibility(View.GONE);	
-		transferArrow.setVisibility(View.GONE);
-		contentText.setText(MegaApiUtils.getInfoFolder(inboxNode, context));
-		contentTextLayout.setOnClickListener(null);
-	}
-	
-	public void updateProgressBar(int progress){
-		if(downloadInProgress){
-			progressBar.setProgress(progress);
-		}
-		else{
-			showProgressBar();
-			progressBar.setProgress(progress);
-		}
 	}
 
 	@Override
@@ -527,22 +468,7 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener{
         aB = ((AppCompatActivity)activity).getSupportActionBar();
     }
 	
-	@Override
-	public void onClick(View v) {
-		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
-		switch(v.getId()){
-			case R.id.inbox_list_content_text_layout:
-			case R.id.inbox_grid_content_text_layout:{
-				log("click show transfersFragment");
-				if(((ManagerActivityLollipop)getActivity()).isTransferInProgress()){
-					((ManagerActivityLollipop)getActivity()).selectDrawerItemLollipop(DrawerItem.TRANSFERS);
-				}				
-				break;
-			}
-		}
-	}	
-
-    public void itemClick(int position) {
+	public void itemClick(int position) {
 		log("itemClick");
 		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
@@ -582,13 +508,7 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener{
 
 				parentHandle = nodes.get(position).getHandle();
 				MegaNode infoNode = megaApi.getNodeByHandle(parentHandle);
-				if(((ManagerActivityLollipop)getActivity()).isTransferInProgress()){
-					showProgressBar();
-				}
-				else{
-					contentText.setText(MegaApiUtils.getInfoFolder(infoNode, context));
-				}
-//				((ManagerActivityLollipop)context).setParentHandleBrowser(parentHandle);
+				contentText.setText(MegaApiUtils.getInfoFolder(infoNode, context));
 				adapter.setParentHandle(parentHandle);
 				nodes = megaApi.getChildren(nodes.get(position), orderGetChildren);
 				adapter.setNodes(nodes);
@@ -726,6 +646,7 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener{
 	 * Disable selection
 	 */
 	public void hideMultipleSelect() {
+		log("hideMultipleSelect");
 		adapter.setMultipleSelect(false);
 		if (actionMode != null) {
 			actionMode.finish();
@@ -783,12 +704,8 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener{
 			}
 
 			adapter.setParentHandle(parentHandle);
-			if(((ManagerActivityLollipop)getActivity()).isTransferInProgress()){
-				showProgressBar();
-			}
-			else{
-				contentText.setText(MegaApiUtils.getInfoFolder(parentNode, context));
-			}
+
+			contentText.setText(MegaApiUtils.getInfoFolder(parentNode, context));
 			return 2;
 		}
 		else{

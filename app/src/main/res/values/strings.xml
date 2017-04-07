@@ -1104,4 +1104,9 @@
     <string name="loading_status" context="Message shown meanwhile the app is waiting for a the chat status">Loading status&#8230;</string>
 
     <string name="error_editing_message" context="Error when a message cannot be edited">This message cannot be edited</string>
+
+    <string name="text_number_transfers" context="Label to show the number of transfers in progress" formatted="false">%1$d of %2$d</string>
+    <string name="option_to_transfer_manager" context="Label of the modal bottom sheet to Transfer Manager section" formatted="false">Show transfers</string>
+    <string name="option_to_pause_transfers" context="Label of the modal bottom sheet to pause all transfers">Pause all transfers</string>
+    <string name="option_to_clear_transfers" context="Label of the modal bottom sheet to clear completed transfers">Clear completed transfers</string>
 </resources>

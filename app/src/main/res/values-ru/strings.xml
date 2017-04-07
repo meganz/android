@@ -414,7 +414,7 @@
     <string name="my_account_total_space" context="Headline for the amount of total storage space">Свободное место</string>
     <string name="my_account_free_space" context="Headline for the amount of storage space is remaining">Свободно</string>
     <string name="my_account_used_space" context="Headline for the amount of storage space is used">Занято</string>
-    <string name="my_account_upgrade_pro" context="Button to upgrade the account to PRO account">Улучшить сейчас!</string>
+    <string name="my_account_upgrade_pro" context="Button to upgrade the account to PRO account">Улучшить</string>
     <string name="my_account_change_password" context="menu item">Изменить пароль</string>
     <string name="warning_out_space" context="Warning in Cloud Drive when the user is runningut of space">Заканчивается свободное место!Улучшить учётную запись?</string>
     <string name="get_pro_account" context="Message to promote PRO accounts">Вы можете стать Pro пользователем!Вы хотите улучшить свой аккаунт?</string>
