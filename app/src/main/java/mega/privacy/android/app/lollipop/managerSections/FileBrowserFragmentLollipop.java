@@ -171,9 +171,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 
 					NodeController nC = new NodeController(context);
 					nC.chooseLocationToMoveNodes(handleList);
-
-					clearSelections();
-					hideMultipleSelect();
 					break;
 				}
 				case R.id.cab_menu_share:{
@@ -218,9 +215,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 					}
 
 					((ManagerActivityLollipop) context).askConfirmationMoveToRubbish(handleList);
-
-					clearSelections();
-					hideMultipleSelect();
 					break;
 				}
 				case R.id.cab_menu_select_all:{
@@ -598,138 +592,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 				emptyTextView.setVisibility(View.GONE);
 			}
 
-			/*
-			Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
-			DisplayMetrics outMetrics = new DisplayMetrics ();
-		    display.getMetrics(outMetrics);
-		    float density  = ((Activity)context).getResources().getDisplayMetrics().density;
-			
-		    float scaleW = Util.getScaleW(outMetrics, density);
-		    float scaleH = Util.getScaleH(outMetrics, density);
-		    
-		    int totalWidth = outMetrics.widthPixels;
-		    int totalHeight = outMetrics.heightPixels;
-		    
-		    int numberOfCells = totalWidth / GRID_WIDTH;
-		    if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-		    	if (numberOfCells < 3){
-					numberOfCells = 3;
-				}	
-		    }
-		    else if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT){
-		    	if (numberOfCells < 2){
-					numberOfCells = 2;
-				}	
-		    }
-		    
-		    listView = (ListView) v.findViewById(R.id.file_grid_view_browser);
-			listView.setOnItemClickListener(null);
-			listView.setItemsCanFocus(false);
-		    
-			emptyImageView = (ImageView) v.findViewById(R.id.file_grid_empty_image);
-			emptyTextView = (TextView) v.findViewById(R.id.file_grid_empty_text);
-			contentText = (TextView) v.findViewById(R.id.content_grid_text);
-			
-			buttonsLayout = (LinearLayout) v.findViewById(R.id.buttons_grid_layout);
-			leftNewFolder = (Button) v.findViewById(R.id.btnLeft_grid_new);
-			rightUploadButton = (Button) v.findViewById(R.id.btnRight_grid_upload);			
-			
-			leftNewFolder.setOnClickListener(this);
-			rightUploadButton.setOnClickListener(this);
-			
-			getProLayout=(LinearLayout) v.findViewById(R.id.get_pro_account_grid);
-			getProText= (TextView) v.findViewById(R.id.get_pro_account_text_grid);
-			leftCancelButton = (Button) v.findViewById(R.id.btnLeft_cancel_grid);
-			rightUpgradeButton = (Button) v.findViewById(R.id.btnRight_upgrade_grid);
-			leftCancelButton.setOnClickListener(this);
-			rightUpgradeButton.setOnClickListener(this);			
-		
-			usedSpacePerc=((ManagerActivityLollipop)context).getUsedPerc();
-			
-			if(usedSpacePerc>95){
-				//Change below of ListView
-				log("usedSpacePerc>95");
-				buttonsLayout.setVisibility(View.GONE);				
-//				RelativeLayout.LayoutParams p = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
-//				p.addRule(RelativeLayout.ABOVE, R.id.out_space);
-//				listView.setLayoutParams(p);
-				outSpaceLayout.setVisibility(View.VISIBLE);
-				outSpaceLayout.bringToFront();
-				
-				Handler handler = new Handler();
-				handler.postDelayed(new Runnable() {					
-					
-					@Override
-					public void run() {
-						log("BUTTON DISAPPEAR");
-						log("altura: "+outSpaceLayout.getHeight());
-						
-						TranslateAnimation animTop = new TranslateAnimation(0, 0, 0, outSpaceLayout.getHeight());
-						animTop.setDuration(2000);
-						animTop.setFillAfter(true);
-						outSpaceLayout.setAnimation(animTop);
-					
-						outSpaceLayout.setVisibility(View.GONE);
-						outSpaceLayout.invalidate();
-//						RelativeLayout.LayoutParams p = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
-//						p.addRule(RelativeLayout.ABOVE, R.id.buttons_layout);
-//						listView.setLayoutParams(p);
-					}
-				}, 15 * 1000);
-				
-			}	
-			else{
-				outSpaceLayout.setVisibility(View.GONE);
-			}
-			
-			
-//		    Toast.makeText(context, totalWidth + "x" + totalHeight + "= " + numberOfCells, Toast.LENGTH_LONG).show();
-			
-		    if (adapterGrid == null){
-				adapterGrid = new MegaBrowserNewGridAdapter(context, nodes, parentHandle, listView, aB, numberOfCells, ManagerActivityLollipop.FILE_BROWSER_ADAPTER, orderGetChildren, emptyImageView, emptyTextView, leftNewFolder, rightUploadButton, contentText);
-				if (mTHash != null){
-					adapterGrid.setTransfers(mTHash);
-				}
-			}
-			else{
-				adapterGrid.setParentHandle(parentHandle);
-				adapterGrid.setNodes(nodes);
-			}
-		    
-			if (parentHandle == megaApi.getRootNode().getHandle()){
-				MegaNode infoNode = megaApi.getRootNode();
-				contentText.setText(getInfoFolder(infoNode));
-				aB.setTitle(getString(R.string.section_cloud_drive));
-			}
-			else{
-				MegaNode infoNode = megaApi.getRootNode();
-				contentText.setText(getInfoFolder(infoNode));
-				aB.setTitle(megaApi.getNodeByHandle(parentHandle).getName());
-			}
-			
-			adapterGrid.setPositionClicked(-1);
-			
-			listView.setAdapter(adapterGrid);
-			
-			setNodes(nodes);
-			
-			if (adapterGrid.getCount() == 0){				
-				
-				listView.setVisibility(View.GONE);
-				emptyImageView.setVisibility(View.VISIBLE);
-				emptyTextView.setVisibility(View.VISIBLE);
-				leftNewFolder.setVisibility(View.VISIBLE);
-				rightUploadButton.setVisibility(View.VISIBLE);
-			}
-			else{
-				listView.setVisibility(View.VISIBLE);
-				contentText.setVisibility(View.VISIBLE);
-				emptyImageView.setVisibility(View.GONE);
-				emptyTextView.setVisibility(View.GONE);
-				leftNewFolder.setVisibility(View.GONE);
-				rightUploadButton.setVisibility(View.GONE);
-			}		*/
-			
 			return v;
 		}		
 	}
@@ -770,30 +632,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 		}
 	}
 
-	public void showProgressBar(){
-		log("showProgressBar");
-		downloadInProgress = true;
-		progressBar.setVisibility(View.VISIBLE);	
-		contentText.setText(R.string.text_downloading);
-	}
-	
-	public void hideProgressBar(){
-		log("hideProgressBar");
-		downloadInProgress = false;
-		progressBar.setVisibility(View.GONE);
-		setContentText();
-	}
-	
-	public void updateProgressBar(int progress){
-		if(downloadInProgress){
-			progressBar.setProgress(progress);
-		}
-		else{
-			showProgressBar();
-			progressBar.setProgress(progress);
-		}
-	}
-	
 //	public void showNodeOptionsPanel(MegaNode sNode){
 //		log("showNodeOptionsPanel");
 //

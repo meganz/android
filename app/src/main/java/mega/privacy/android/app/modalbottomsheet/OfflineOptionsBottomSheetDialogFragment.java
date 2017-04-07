@@ -212,69 +212,6 @@ public class OfflineOptionsBottomSheetDialogFragment extends BottomSheetDialogFr
 
         switch(v.getId()){
 
-            case R.id.option_download_layout:{
-                log("Download option");
-                if(Util.isOnline(context)) {
-                    long handle = Long.parseLong(nodeOffline.getHandle());
-                    MegaNode node = megaApi.getNodeByHandle(handle);
-                    if(node==null){
-                        log("The selected node is NULL");
-                        return;
-                    }
-                    ArrayList<Long> handleList = new ArrayList<Long>();
-                    handleList.add(node.getHandle());
-                    nC.prepareForDownload(handleList);
-                }
-                else{
-                    if(context instanceof ManagerActivityLollipop){
-                        ((ManagerActivityLollipop)context).showSnackbar(getString(R.string.error_server_connection_problem));
-                    }
-                }
-                break;
-            }
-            case R.id.option_properties_layout:{
-                log("Properties option");
-
-                if(Util.isOnline(context)) {
-                    long handle = Long.parseLong(nodeOffline.getHandle());
-                    MegaNode node = megaApi.getNodeByHandle(handle);
-                    if(node==null){
-                        log("The selected node is NULL");
-                        return;
-                    }
-
-                    Intent i = new Intent(context, FileInfoActivityLollipop.class);
-                    i.putExtra("handle", node.getHandle());
-
-                    if (node.isFolder()) {
-                        if (node.isInShare()){
-                            i.putExtra("imageId", R.drawable.ic_folder_incoming);
-                        }
-                        else if (node.isOutShare()){
-                            i.putExtra("imageId", R.drawable.ic_folder_outgoing);
-                        }
-                        else{
-                            i.putExtra("imageId", R.drawable.ic_folder);
-                        }
-                    }
-                    else {
-                        i.putExtra("imageId", MimeTypeMime.typeForName(node.getName()).getIconResourceId());
-                    }
-                    i.putExtra("name", node.getName());
-                    MyAccountInfo accountInfo = ((ManagerActivityLollipop)context).getMyAccountInfo();
-                    if(accountInfo!=null){
-                        i.putExtra("typeAccount", accountInfo.getAccountType());
-                    }
-                    context.startActivity(i);
-                    dismissAllowingStateLoss();
-                }
-                else{
-                    if(context instanceof ManagerActivityLollipop){
-                        ((ManagerActivityLollipop)context).showSnackbar(getString(R.string.error_server_connection_problem));
-                    }
-                }
-                break;
-            }
             case R.id.option_delete_offline_layout:{
                 log("Delete Offline");
                 if(context instanceof ManagerActivityLollipop){

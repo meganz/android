@@ -113,9 +113,6 @@ public class RubbishBinFragmentLollipop extends Fragment {
 
 					NodeController nC = new NodeController(context);
 					nC.chooseLocationToMoveNodes(handleList);
-
-					clearSelections();
-					hideMultipleSelect();
 					break;
 				}
 				case R.id.cab_menu_rename:{
@@ -142,9 +139,6 @@ public class RubbishBinFragmentLollipop extends Fragment {
 					}
 
 					((ManagerActivityLollipop) context).askConfirmationMoveToRubbish(handleList);
-
-					clearSelections();
-					hideMultipleSelect();
 					break;
 				}
 				case R.id.cab_menu_select_all:{
@@ -321,14 +315,7 @@ public class RubbishBinFragmentLollipop extends Fragment {
 		}
 
 		if (parentHandle == -1||parentHandle==megaApi.getRubbishNode().getHandle()){
-
-			if(aB!=null){
-//				aB.setTitle(getString(R.string.section_rubbish_bin));
-
-				log("indicator_arrow_back_445");
-//				aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
-//				((ManagerActivityLollipop)context).setFirstNavigationLevel(true);
-			}
+			log("Parent is the Rubbish: "+parentHandle);
 
 			nodes = megaApi.getChildren(megaApi.getRubbishNode(), orderGetChildren);
 			((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
@@ -380,17 +367,29 @@ public class RubbishBinFragmentLollipop extends Fragment {
 				adapter = new MegaBrowserLollipopAdapter(context, this, nodes, parentHandle, recyclerView, aB, Constants.RUBBISH_BIN_ADAPTER, MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST);
 			}
 			else{
+
+
 				adapter.setParentHandle(parentHandle);
 				adapter.setNodes(nodes);
 				adapter.setAdapterType(MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST);
 			}
 
+			if(megaApi.getRubbishNode()!=null){
+				log("setContent of the Rubbish Bin");
+				if (parentHandle == megaApi.getRubbishNode().getHandle()||parentHandle==-1){
+					contentText.setText(MegaApiUtils.getInfoFolder(megaApi.getRubbishNode(), context));
+
+				}
+				else{
+					MegaNode infoNode = megaApi.getNodeByHandle(parentHandle);
+					contentText.setText(MegaApiUtils.getInfoFolder(infoNode, context));
+				}
+			}
+
 			adapter.setMultipleSelect(false);
 
 			recyclerView.setAdapter(adapter);
-			
-			setNodes(nodes);
-			
+
 			if (adapter.getItemCount() == 0){
 				
 				recyclerView.setVisibility(View.GONE);
@@ -409,18 +408,6 @@ public class RubbishBinFragmentLollipop extends Fragment {
 				recyclerView.setVisibility(View.VISIBLE);
 				emptyImageView.setVisibility(View.GONE);
 				emptyTextView.setVisibility(View.GONE);
-			}
-			
-			if(megaApi.getRubbishNode()!=null){
-				if (parentHandle == megaApi.getRubbishNode().getHandle()||parentHandle==-1){
-					log("setContent of the Rubbish Bin");
-					contentText.setText(MegaApiUtils.getInfoFolder(megaApi.getRubbishNode(), context));
-
-				}
-				else{
-					MegaNode infoNode = megaApi.getNodeByHandle(parentHandle);
-					contentText.setText(MegaApiUtils.getInfoFolder(infoNode, context));
-				}
 			}
 			
 			return v;
@@ -722,17 +709,24 @@ public class RubbishBinFragmentLollipop extends Fragment {
 	
 	public void setContentText(){
 		log("setContentText");
-		if (parentHandle == megaApi.getRubbishNode().getHandle()){
-			MegaNode infoNode = megaApi.getRubbishNode();
-			if (infoNode !=  null){
-				contentText.setText(MegaApiUtils.getInfoFolder(infoNode, context));
+		MegaNode rN = megaApi.getRubbishNode();
+		if(rN!=null){
+			if (parentHandle == rN.getHandle()||parentHandle==-1){
+				contentText.setText(MegaApiUtils.getInfoFolder(rN, context));
+
+			}
+			else{
+				MegaNode infoNode = megaApi.getNodeByHandle(parentHandle);
+				if (infoNode !=  null){
+					contentText.setText(MegaApiUtils.getInfoFolder(infoNode, context));
+				}
+				else{
+					log("INFO NODE null");
+				}
 			}
 		}
 		else{
-			MegaNode infoNode = megaApi.getNodeByHandle(parentHandle);
-			if (infoNode !=  null){
-				contentText.setText(MegaApiUtils.getInfoFolder(infoNode, context));
-			}
+			log("INFO NODE null");
 		}
 	}
 	
@@ -788,7 +782,9 @@ public class RubbishBinFragmentLollipop extends Fragment {
 				emptyImageView.setVisibility(View.GONE);
 				emptyTextView.setVisibility(View.GONE);
 			}			
-		}	
+		}
+
+		setContentText();
 	}
 
 	public void notifyDataSetChanged(){
