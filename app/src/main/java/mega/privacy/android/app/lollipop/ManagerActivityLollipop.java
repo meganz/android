@@ -91,9 +91,11 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Locale;
 import java.util.TimeZone;
 
@@ -204,8 +206,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 	public long totalSizePendingTransfer=0;
 	public long totalSizeTransfered=0;
-	private SparseArray<Long> transfersDownloadedSize;
 
+	ArrayList<Integer> transfersInProgress;
+	public List<Integer> transfersInProgressSync;
 	public MegaTransferData transferData;
 	public int pendingTransfers = 0;
 	public int totalTransfers = 0;
@@ -1111,7 +1114,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			megaApi.retryPendingConnections();
 		}
 
-		transfersDownloadedSize = new SparseArray<Long>();
+		transfersInProgress = new ArrayList<Integer>();
+		transfersInProgressSync = Collections.synchronizedList(transfersInProgress);
 
 		Display display = getWindowManager().getDefaultDisplay();
 		outMetrics = new DisplayMetrics ();
@@ -1530,6 +1534,19 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			megaApi.addGlobalListener(this);
 
 			transferData = megaApi.getTransferData(this);
+			int downloadsInProgress = transferData.getNumDownloads();
+			int uploadsInProgress = transferData.getNumUploads();
+
+			synchronized(transfersInProgressSync) {
+				for(int i=0;i<downloadsInProgress;i++){
+					Integer downloadProgressTag = transferData.getDownloadTag(i);
+					transfersInProgressSync.add(downloadProgressTag);
+				}
+				for(int i=0;i<uploadsInProgress;i++){
+					Integer uploadProgressTag = transferData.getUploadTag(i);
+					transfersInProgressSync.add(uploadProgressTag);
+				}
+			}
 
 			if(savedInstanceState==null) {
 				log("Run async task to check offline files");
@@ -12644,7 +12661,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	public void onTransferStart(MegaApiJava api, MegaTransfer transfer) {
 		log("onTransferStart: "+transfer.getNotificationNumber());
 
+
 		if(transferCallback<transfer.getNotificationNumber()) {
+
+			synchronized(transfersInProgressSync) {
+				transfersInProgressSync.add(transfer.getTag());
+			}
+
 			transferCallback = transfer.getNotificationNumber();
 			pendingTransfers = 	megaApi.getNumPendingDownloads() + megaApi.getNumPendingUploads();
 			totalTransfers = 	megaApi.getTotalDownloads() + megaApi.getTotalUploads();
@@ -12675,6 +12698,21 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		log("onTransferFinish: "+transfer.getPath());
 
 		if(transferCallback<transfer.getNotificationNumber()) {
+
+			synchronized(transfersInProgressSync) {
+				ListIterator li = transfersInProgressSync.listIterator();
+				int index = 0;
+				while(li.hasNext()) {
+					int tag = (Integer) li.next();
+					if(tag == transfer.getTag()){
+						index=li.previousIndex()+1;
+						break;
+					}
+				}
+				transfersInProgressSync.remove(index);
+				log("The transfer with index : "+index +"has been removed, left: "+transfersInProgressSync.size());
+			}
+
 			transferCallback = transfer.getNotificationNumber();
 
 			pendingTransfers = 	megaApi.getNumPendingDownloads() + megaApi.getNumPendingUploads();
@@ -12692,28 +12730,17 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				}
 			}
 
-			if (e.getErrorCode() == MegaError.API_OK) {
-
-				if (fbFLol != null){
-					if(fbFLol.isAdded()){
-						fbFLol.setOverviewLayout();
-					}
+			if (fbFLol != null){
+				if(fbFLol.isAdded()){
+					fbFLol.setOverviewLayout();
 				}
+			}
+
+			if (e.getErrorCode() == MegaError.API_OK) {
 
 			}
 			else if(e.getErrorCode() == MegaError.API_EINCOMPLETE){
 				log("API_EINCOMPLETE: " + transfer.getFileName());
-				totalSizePendingTransfer -= transfer.getTotalBytes();
-				Long currentSizeDownloaded = transfersDownloadedSize.get(transfer.getTag());
-				if (currentSizeDownloaded != null){
-					totalSizeTransfered -= currentSizeDownloaded;
-				}
-
-				if (fbFLol != null){
-					if(fbFLol.isAdded()){
-						fbFLol.setOverviewLayout();
-					}
-				}
 			}
 
 			log("END onTransferFinish: " + transfer.getFileName() + " - " + transfer.getTag());

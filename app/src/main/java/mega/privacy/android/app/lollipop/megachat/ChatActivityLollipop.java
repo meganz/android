@@ -1379,8 +1379,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             msgEdited = megaChatApi.editMessage(idChat, messageToEdit.getTempId(), text);
         }
 
-
-
         if(msgEdited!=null){
             log("Edited message: status: "+msgEdited.getStatus());
             AndroidMegaChatMessage androidMsgEdited = new AndroidMegaChatMessage(msgEdited);
