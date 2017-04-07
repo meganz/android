@@ -646,6 +646,7 @@ public class InboxFragmentLollipop extends Fragment{
 	 * Disable selection
 	 */
 	public void hideMultipleSelect() {
+		log("hideMultipleSelect");
 		adapter.setMultipleSelect(false);
 		if (actionMode != null) {
 			actionMode.finish();

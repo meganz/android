@@ -81,6 +81,7 @@ public class MultipleRequestListener implements MegaRequestListenerInterface {
                         else{
                             message = context.getString(R.string.number_correctly_moved_to_rubbish, max_items);
                         }
+                        ((ManagerActivityLollipop) context).refreshAfterMovingToRubbish();
                     }
                     else{
                         log("move nodes request finished");
@@ -90,6 +91,7 @@ public class MultipleRequestListener implements MegaRequestListenerInterface {
                         else{
                             message = context.getString(R.string.number_correctly_moved, max_items);
                         }
+                        ((ManagerActivityLollipop) context).refreshAfterMoving();
                     }
                     break;
                 }
@@ -112,6 +114,7 @@ public class MultipleRequestListener implements MegaRequestListenerInterface {
                         else{
                             message = context.getString(R.string.number_correctly_removed, max_items);
                         }
+                        ((ManagerActivityLollipop) context).refreshAfterRemoving();
                     }
 
                     break;
@@ -124,6 +127,8 @@ public class MultipleRequestListener implements MegaRequestListenerInterface {
                     else{
                         message = context.getString(R.string.number_contact_removed, max_items);
                     }
+
+                    ((ManagerActivityLollipop) context).updateContactsView(true, false, false);
                     break;
                 }
                 case MegaRequest.TYPE_COPY:{
