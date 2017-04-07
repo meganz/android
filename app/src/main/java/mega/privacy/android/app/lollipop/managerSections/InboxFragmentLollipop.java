@@ -453,6 +453,7 @@ public class InboxFragmentLollipop extends Fragment{
 				nodes = megaApi.getChildren(parentNode, orderGetChildren);
 			}
 		}
+
 		setNodes(nodes);
 		contentText.setText(MegaApiUtils.getInfoFolder(inboxNode, context));
 		if(adapter != null){				
