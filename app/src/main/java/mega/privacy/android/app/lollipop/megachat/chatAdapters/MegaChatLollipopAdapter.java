@@ -985,7 +985,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                             holder.triangleIcon.setVisibility(View.VISIBLE);
                             holder.retryAlert.setVisibility(View.VISIBLE);
                         }
-                        else if((status==MegaChatMessage.STATUS_SENDING||status==MegaChatMessage.STATUS_DELIVERED)){
+                        else if((status==MegaChatMessage.STATUS_SENDING)){
                             log("Status not received by server: "+message.getStatus());
                             holder.contentOwnMessageText.setTextColor(ContextCompat.getColor(context, R.color.mail_my_account));
                             content.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.mail_my_account)), 0, content.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);

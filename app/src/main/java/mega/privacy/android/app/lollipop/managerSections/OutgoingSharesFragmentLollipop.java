@@ -59,7 +59,7 @@ import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaTransfer;
 
 
-public class OutgoingSharesFragmentLollipop extends Fragment implements OnClickListener{
+public class OutgoingSharesFragmentLollipop extends Fragment{
 
 	Context context;
 	ActionBar aB;
@@ -73,9 +73,6 @@ public class OutgoingSharesFragmentLollipop extends Fragment implements OnClickL
 
 	TextView contentText;	
 	RelativeLayout contentTextLayout;
-	boolean downloadInProgress = false;
-	ProgressBar progressBar;
-	ImageView transferArrow;
 
 	Stack<Integer> lastPositionStack;
 	
@@ -343,12 +340,6 @@ public class OutgoingSharesFragmentLollipop extends Fragment implements OnClickL
 					
 			emptyImageView = (ImageView) v.findViewById(R.id.file_list_empty_image);
 			emptyTextView = (TextView) v.findViewById(R.id.file_list_empty_text);
-			
-			progressBar = (ProgressBar) v.findViewById(R.id.file_list_download_progress_bar);
-			transferArrow = (ImageView) v.findViewById(R.id.file_list_transfer_arrow);
-			RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams)transferArrow.getLayoutParams();
-			lp.setMargins(0, 0, Util.scaleWidthPx(15, outMetrics), Util.scaleHeightPx(4, outMetrics)); 
-			transferArrow.setLayoutParams(lp);
 
 			contentTextLayout = (RelativeLayout) v.findViewById(R.id.content_text_layout);
 			contentText = (TextView) v.findViewById(R.id.content_text);			
@@ -405,15 +396,10 @@ public class OutgoingSharesFragmentLollipop extends Fragment implements OnClickL
 					emptyImageView.setVisibility(View.GONE);
 					emptyTextView.setVisibility(View.GONE);
 				}			
-			}	
-			
-			if(((ManagerActivityLollipop)getActivity()).isTransferInProgress()){
-				showProgressBar();
-				progressBar.setProgress(((ManagerActivityLollipop)context).getProgressPercent());
 			}
-			else{
-				contentText.setText(MegaApiUtils.getInfoNodeOnlyFolders(nodes, context));
-			}			
+
+			contentText.setText(MegaApiUtils.getInfoNodeOnlyFolders(nodes, context));
+
 			return v;
 		}
 		else{
@@ -431,12 +417,6 @@ public class OutgoingSharesFragmentLollipop extends Fragment implements OnClickL
 		
 			emptyImageView = (ImageView) v.findViewById(R.id.file_grid_empty_image);
 			emptyTextView = (TextView) v.findViewById(R.id.file_grid_empty_text);
-
-			progressBar = (ProgressBar) v.findViewById(R.id.file_grid_download_progress_bar);
-			transferArrow = (ImageView) v.findViewById(R.id.file_grid_transfer_arrow);
-			RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams)transferArrow.getLayoutParams();
-			lp.setMargins(0, 0, Util.scaleWidthPx(15, outMetrics), Util.scaleHeightPx(4, outMetrics)); 
-			transferArrow.setLayoutParams(lp);
 
 			contentTextLayout = (RelativeLayout) v.findViewById(R.id.content_grid_text_layout);
 			contentText = (TextView) v.findViewById(R.id.content_grid_text);			
@@ -468,23 +448,12 @@ public class OutgoingSharesFragmentLollipop extends Fragment implements OnClickL
 			}
 			((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 			if (deepBrowserTree == 0){
-				
-				if(((ManagerActivityLollipop)getActivity()).isTransferInProgress()){
-					showProgressBar();
-					progressBar.setProgress(((ManagerActivityLollipop)context).getProgressPercent());
-				}
-				else{
-					contentText.setText(MegaApiUtils.getInfoNodeOnlyFolders(nodes, context));
-				}
+				contentText.setText(MegaApiUtils.getInfoNodeOnlyFolders(nodes, context));
 			}
 			else{
 				MegaNode infoNode = megaApi.getNodeByHandle(parentHandle);
-				if(((ManagerActivityLollipop)getActivity()).isTransferInProgress()){
-					showProgressBar();
-				}
-				else{					
-					contentText.setText(MegaApiUtils.getInfoFolder(infoNode, context));
-				}				
+				contentText.setText(MegaApiUtils.getInfoFolder(infoNode, context));
+
 				aB.setTitle(infoNode.getName());
 			}
 			adapter.setMultipleSelect(false);
@@ -525,14 +494,8 @@ public class OutgoingSharesFragmentLollipop extends Fragment implements OnClickL
 		aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
 		((ManagerActivityLollipop)context).setFirstNavigationLevel(false);
 		((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
-		
-		if(((ManagerActivityLollipop)getActivity()).isTransferInProgress()){
-			showProgressBar();
-		}
-		else{					
-			contentText.setText(MegaApiUtils.getInfoFolder(n, context));
-		}
-		
+
+		contentText.setText(MegaApiUtils.getInfoFolder(n, context));
 		adapter.setParentHandle(parentHandle);
 		nodes = megaApi.getChildren(n, orderGetChildren);
 		adapter.setNodes(nodes);
@@ -601,63 +564,12 @@ public class OutgoingSharesFragmentLollipop extends Fragment implements OnClickL
 		}
 	}
 
-	public void showProgressBar(){
-		log("showProgressBar");
-		downloadInProgress = true;
-		progressBar.setVisibility(View.VISIBLE);
-		transferArrow.setVisibility(View.VISIBLE);
-		contentText.setText(R.string.text_downloading);
-		contentTextLayout.setOnClickListener(this);
-	}
-	
-	public void hideProgressBar(){
-		log("hideProgressBar");
-		downloadInProgress = false;
-		progressBar.setVisibility(View.GONE);	
-		transferArrow.setVisibility(View.GONE);
-		if (deepBrowserTree == 0){
-			contentText.setText(MegaApiUtils.getInfoNodeOnlyFolders(nodes, context));
-		}
-		else{
-			MegaNode infoNode = megaApi.getNodeByHandle(parentHandle);
-			contentText.setText(MegaApiUtils.getInfoFolder(infoNode, context));
-		}
-		contentTextLayout.setOnClickListener(null);
-	}
-	
-	public void updateProgressBar(int progress){
-		if(downloadInProgress){
-			progressBar.setProgress(progress);
-		}
-		else{
-			showProgressBar();
-			progressBar.setProgress(progress);
-		}
-	}
-		
 	@Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         context = activity;
         aB = ((AppCompatActivity)activity).getSupportActionBar();
     }
-	
-	@Override
-	public void onClick(View v) {
-		log("onClick");
-		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
-		switch(v.getId()){
-		
-			case R.id.content_text_layout:
-			case R.id.content_grid_text_layout:{
-				log("click show transfersFragment");
-				if(((ManagerActivityLollipop)getActivity()).isTransferInProgress()){
-					((ManagerActivityLollipop)getActivity()).selectDrawerItemLollipop(DrawerItem.TRANSFERS);
-				}				
-				break;
-			}
-		}
-	}
 
     public void itemClick(int position) {
 		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
@@ -702,13 +614,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment implements OnClickL
 				
 				parentHandle = nodes.get(position).getHandle();
 				MegaNode infoNode = megaApi.getNodeByHandle(parentHandle);
-				if(((ManagerActivityLollipop)getActivity()).isTransferInProgress()){
-					showProgressBar();
-				}
-				else{					
-					contentText.setText(MegaApiUtils.getInfoFolder(infoNode, context));
-				}
-
+				contentText.setText(MegaApiUtils.getInfoFolder(infoNode, context));
 				((ManagerActivityLollipop)context).setParentHandleOutgoing(parentHandle);
 				adapter.setParentHandle(parentHandle);
 				nodes = megaApi.getChildren(nodes.get(position), orderGetChildren);
@@ -1033,14 +939,8 @@ public class OutgoingSharesFragmentLollipop extends Fragment implements OnClickL
 					gridLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
 				}
 			}
-			
-			if(((ManagerActivityLollipop)getActivity()).isTransferInProgress()){
-				showProgressBar();
-			}
-			else{
-				contentText.setText(MegaApiUtils.getInfoNodeOnlyFolders(nodes, context));
-			}
-			
+
+			contentText.setText(MegaApiUtils.getInfoNodeOnlyFolders(nodes, context));
 			recyclerView.setVisibility(View.VISIBLE);
 			emptyImageView.setVisibility(View.GONE);
 			emptyTextView.setVisibility(View.GONE);
@@ -1053,13 +953,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment implements OnClickL
 			//((ManagerActivityLollipop)context).setParentHandleBrowser(parentHandle);			
 			
 			MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(parentHandle));	
-			if(((ManagerActivityLollipop)getActivity()).isTransferInProgress()){
-				showProgressBar();
-			}
-			else{					
-				contentText.setText(MegaApiUtils.getInfoFolder(parentNode, context));
-			}
-			
+			contentText.setText(MegaApiUtils.getInfoFolder(parentNode, context));
 			if (parentNode != null){
 				recyclerView.setVisibility(View.VISIBLE);
 				emptyImageView.setVisibility(View.GONE);

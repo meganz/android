@@ -59,7 +59,7 @@ import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaTransfer;
 
 
-public class IncomingSharesFragmentLollipop extends Fragment implements OnClickListener{
+public class IncomingSharesFragmentLollipop extends Fragment{
 
 	Context context;
 	ActionBar aB;
@@ -77,10 +77,7 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 	
 	TextView contentText;	
 	RelativeLayout contentTextLayout;
-	boolean downloadInProgress = false;
-	ProgressBar progressBar;
-	ImageView transferArrow;
-	
+
 	float density;
 	DisplayMetrics outMetrics;
 	Display display;
@@ -342,12 +339,6 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 			emptyImageView = (ImageView) v.findViewById(R.id.file_list_empty_image);
 			emptyTextView = (TextView) v.findViewById(R.id.file_list_empty_text);
 
-			progressBar = (ProgressBar) v.findViewById(R.id.file_list_download_progress_bar);
-			transferArrow = (ImageView) v.findViewById(R.id.file_list_transfer_arrow);
-			RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams)transferArrow.getLayoutParams();
-			lp.setMargins(0, 0, Util.scaleWidthPx(15, outMetrics), Util.scaleHeightPx(4, outMetrics)); 
-			transferArrow.setLayoutParams(lp);
-
 			contentTextLayout = (RelativeLayout) v.findViewById(R.id.content_text_layout);
 			contentText = (TextView) v.findViewById(R.id.content_text);
 			
@@ -402,16 +393,8 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 				emptyImageView.setVisibility(View.GONE);
 				emptyTextView.setVisibility(View.GONE);
 			}	
-//			setNodes(nodes);	
-			
-			if(((ManagerActivityLollipop)getActivity()).isTransferInProgress()){
-				showProgressBar();
-				progressBar.setProgress(((ManagerActivityLollipop)context).getProgressPercent());
-			}
-			else{
 
-				contentText.setText(MegaApiUtils.getInfoNodeOnlyFolders(nodes, context));
-			}
+			contentText.setText(MegaApiUtils.getInfoNodeOnlyFolders(nodes, context));
 
 			return v;
 		}
@@ -430,12 +413,6 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 		
 			emptyImageView = (ImageView) v.findViewById(R.id.file_grid_empty_image);
 			emptyTextView = (TextView) v.findViewById(R.id.file_grid_empty_text);
-
-			progressBar = (ProgressBar) v.findViewById(R.id.file_grid_download_progress_bar);
-			transferArrow = (ImageView) v.findViewById(R.id.file_grid_transfer_arrow);
-			RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams)transferArrow.getLayoutParams();
-			lp.setMargins(0, 0, Util.scaleWidthPx(15, outMetrics), Util.scaleHeightPx(4, outMetrics)); 
-			transferArrow.setLayoutParams(lp);
 
 			contentTextLayout = (RelativeLayout) v.findViewById(R.id.content_grid_text_layout);
 			contentText = (TextView) v.findViewById(R.id.content_grid_text);			
@@ -471,26 +448,11 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 			((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 
 			if (deepBrowserTree == 0){
-				if(((ManagerActivityLollipop)getActivity()).isTransferInProgress()){
-					showProgressBar();
-					progressBar.setProgress(((ManagerActivityLollipop)context).getProgressPercent());
-				}
-				else{
-					contentText.setText(MegaApiUtils.getInfoNodeOnlyFolders(nodes, context));
-				}
-//				aB.setTitle(getString(R.string.section_shared_items));
-//				log("aB.setHomeAsUpIndicator_59");
-//				aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
-//				((ManagerActivityLollipop)context).setFirstNavigationLevel(true);
+				contentText.setText(MegaApiUtils.getInfoNodeOnlyFolders(nodes, context));
 			}
 			else{
 				MegaNode infoNode = megaApi.getNodeByHandle(parentHandle);
-				if(((ManagerActivityLollipop)getActivity()).isTransferInProgress()){
-					showProgressBar();
-				}
-				else{					
-					contentText.setText(MegaApiUtils.getInfoFolder(infoNode, context));
-				};
+				contentText.setText(MegaApiUtils.getInfoFolder(infoNode, context));
 				aB.setTitle(infoNode.getName());
 			}						
 			
@@ -564,19 +526,14 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 		}
 		((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 
-		if(((ManagerActivityLollipop)getActivity()).isTransferInProgress()){
-			showProgressBar();
+		if(deepBrowserTree==0){
+			contentText.setText(MegaApiUtils.getInfoNodeOnlyFolders(nodes, context));
 		}
 		else{
-			if(deepBrowserTree==0){
-				contentText.setText(MegaApiUtils.getInfoNodeOnlyFolders(nodes, context));
+			if(parentNode!=null){
+				contentText.setText(MegaApiUtils.getInfoFolder(parentNode, context));
 			}
-			else{
-				if(parentNode!=null){
-					contentText.setText(MegaApiUtils.getInfoFolder(parentNode, context));
-				}
 
-			}
 		}
 
 		//If folder has no files
@@ -596,63 +553,12 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 	
 	}
 
-	public void showProgressBar(){
-		log("showProgressBar");
-		downloadInProgress = true;
-		progressBar.setVisibility(View.VISIBLE);	
-		transferArrow.setVisibility(View.VISIBLE);
-		contentText.setText(R.string.text_downloading);
-		contentTextLayout.setOnClickListener(this);
-	}
-	
-	public void hideProgressBar(){
-		log("hideProgressBar");
-		downloadInProgress = false;
-		progressBar.setVisibility(View.GONE);
-		transferArrow.setVisibility(View.GONE);
-		if (deepBrowserTree == 0){
-			contentText.setText(MegaApiUtils.getInfoNodeOnlyFolders(nodes, context));
-		}
-		else{
-			MegaNode infoNode = megaApi.getNodeByHandle(parentHandle);
-			contentText.setText(MegaApiUtils.getInfoFolder(infoNode, context));
-		}
-		contentTextLayout.setOnClickListener(null);
-	}
-	
-	public void updateProgressBar(int progress){
-		if(downloadInProgress){
-			progressBar.setProgress(progress);
-		}
-		else{
-			showProgressBar();
-			progressBar.setProgress(progress);
-		}
-	}
-
 	@Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         context = activity;
         aB = ((AppCompatActivity)activity).getSupportActionBar();
     }
-	
-	@Override
-	public void onClick(View v) {
-		log("onclick");
-		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
-		switch(v.getId()){
-
-			case R.id.content_text_layout:
-			case R.id.content_grid_text_layout:{
-				log("click show transfersFragment");
-				if(((ManagerActivityLollipop)getActivity()).isTransferInProgress()){
-					((ManagerActivityLollipop)getActivity()).selectDrawerItemLollipop(ManagerActivityLollipop.DrawerItem.TRANSFERS);
-				}
-				break;
-			}
-		}
-	}
 
     public void itemClick(int position) {
     	log("itemClick");
@@ -697,13 +603,8 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 				
 				parentHandle = nodes.get(position).getHandle();
 				MegaNode infoNode = megaApi.getNodeByHandle(parentHandle);
-														
-				if(((ManagerActivityLollipop)getActivity()).isTransferInProgress()){
-					showProgressBar();
-				}
-				else{					
-					contentText.setText(MegaApiUtils.getInfoFolder(infoNode, context));
-				}
+				contentText.setText(MegaApiUtils.getInfoFolder(infoNode, context));
+
 				((ManagerActivityLollipop)context).setParentHandleIncoming(parentHandle);
 				adapter.setParentHandle(parentHandle);
 				nodes = megaApi.getChildren(nodes.get(position), orderGetChildren);
@@ -831,14 +732,7 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 			emptyImageView.setVisibility(View.GONE);
 			emptyTextView.setVisibility(View.GONE);
 		}
-
-		if(((ManagerActivityLollipop)getActivity()).isTransferInProgress()){
-			showProgressBar();
-			progressBar.setProgress(((ManagerActivityLollipop)context).getProgressPercent());
-		}
-		else{
-			contentText.setText(MegaApiUtils.getInfoNodeOnlyFolders(nodes, context));
-		}
+		contentText.setText(MegaApiUtils.getInfoNodeOnlyFolders(nodes, context));
 	}
 
 	public void selectAll(){
@@ -965,12 +859,7 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 				}
 			}
 
-			if(((ManagerActivityLollipop)getActivity()).isTransferInProgress()){
-				showProgressBar();
-			}
-			else{
-				contentText.setText(MegaApiUtils.getInfoNodeOnlyFolders(nodes, context));
-			}
+			contentText.setText(MegaApiUtils.getInfoNodeOnlyFolders(nodes, context));
 			((ManagerActivityLollipop) context).showFabButton();
 
 			emptyImageView.setVisibility(View.GONE);
@@ -983,12 +872,7 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 			//((ManagerActivityLollipop)context).setParentHandleSharedWithMe(parentHandle);	
 
 			MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(parentHandle));	
-			if(((ManagerActivityLollipop)getActivity()).isTransferInProgress()){
-				showProgressBar();
-			}
-			else{					
-				contentText.setText(MegaApiUtils.getInfoFolder(parentNode, context));
-			}
+			contentText.setText(MegaApiUtils.getInfoFolder(parentNode, context));
 
 			if (parentNode != null){
 				recyclerView.setVisibility(View.VISIBLE);
@@ -1174,20 +1058,6 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 			return adapter.getItemCount();
 		}
 		return 0;
-	}
-	
-	public void setTransfers(HashMap<Long, MegaTransfer> _mTHash){
-		this.mTHash = _mTHash;
-		
-		if (adapter != null){
-			adapter.setTransfers(mTHash);
-		}	
-	}
-	
-	public void setCurrentTransfer(MegaTransfer mT){
-		if (adapter != null){
-			adapter.setCurrentTransfer(mT);
-		}		
 	}
 
 	public boolean isMultipleselect(){

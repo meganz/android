@@ -70,7 +70,6 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 	RelativeLayout contentTextLayout;
 	ProgressBar progressBar;
 	MegaApiAndroid megaApi;	
-	ImageView transferArrow;
 
 	Stack<Integer> lastPositionStack;
 		
@@ -327,11 +326,9 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 			recyclerView.setLayoutManager(mLayoutManager);
 			recyclerView.setItemAnimator(new DefaultItemAnimator()); 
 			
-			progressBar = (ProgressBar) v.findViewById(R.id.file_list_download_progress_bar);
+			progressBar = (ProgressBar) v.findViewById(R.id.transfers_overview_progress_bar);
 			progressBar.setVisibility(View.GONE);
-			transferArrow = (ImageView) v.findViewById(R.id.file_list_transfer_arrow);
-			transferArrow.setVisibility(View.GONE);
-					
+
 			contentTextLayout = (RelativeLayout) v.findViewById(R.id.content_text_layout);
 			contentText = (TextView) v.findViewById(R.id.content_text);			
 
@@ -371,11 +368,7 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 			recyclerView.setItemAnimator(new DefaultItemAnimator());
 			
 			progressBar = (ProgressBar) v.findViewById(R.id.file_grid_download_progress_bar);
-			transferArrow = (ImageView) v.findViewById(R.id.file_grid_transfer_arrow);
-			RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams)transferArrow.getLayoutParams();
-			lp.setMargins(0, 0, Util.scaleWidthPx(15, outMetrics), Util.scaleHeightPx(4, outMetrics)); 
-			transferArrow.setLayoutParams(lp);
-			
+
 			emptyImageView = (ImageView) v.findViewById(R.id.file_grid_empty_image);
 			emptyTextView = (TextView) v.findViewById(R.id.file_grid_empty_text);			
 			contentTextLayout = (RelativeLayout) v.findViewById(R.id.content_grid_text_layout);
