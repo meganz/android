@@ -145,7 +145,6 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
     	public TextView textViewFileName;
     	public ImageView imageViewCompleted;
     	public TextView textViewCompleted;
-    	public TextView textViewRate;
     	public ProgressBar transferProgressBar;
     	public RelativeLayout itemLayout;
     	public ImageButton optionRemove;
@@ -200,8 +199,7 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
 		holder.textViewFileName.getLayoutParams().width = Util.px2dp((150*scaleW), outMetrics);
 		holder.imageViewCompleted = (ImageView) v.findViewById(R.id.transfers_list_completed_image);
 		holder.textViewCompleted = (TextView) v.findViewById(R.id.transfers_list_completed_text);
-		holder.textViewRate = (TextView) v.findViewById(R.id.transfers_list_transfer_rate);
-		holder.transferProgressBar = (ProgressBar) v.findViewById(R.id.transfers_list_bar); 
+		holder.transferProgressBar = (ProgressBar) v.findViewById(R.id.transfers_list_bar);
 		holder.optionRemove = (ImageButton) v.findViewById(R.id.transfers_list_option_remove);		
 		//Right margin
 		RelativeLayout.LayoutParams actionButtonParams = (RelativeLayout.LayoutParams)holder.optionRemove.getLayoutParams();
@@ -341,28 +339,60 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
 				}*/
 			}
 		}
-			
-		long speed = transfer.getSpeed();
-		if (speed == 0){
-			holder.textViewCompleted.setVisibility(View.VISIBLE);
-			holder.imageViewCompleted.setVisibility(View.VISIBLE);
-			holder.textViewCompleted.setText("Queued");
-			holder.imageViewCompleted.setImageResource(R.drawable.ic_queue);
-			holder.transferProgressBar.setVisibility(View.GONE);
-			holder.textViewRate.setVisibility(View.GONE);
+
+		int state = transfer.getState();
+		switch (state){
+			case MegaTransfer.STATE_PAUSED:{
+				holder.textViewCompleted.setVisibility(View.VISIBLE);
+				holder.imageViewCompleted.setVisibility(View.VISIBLE);
+				holder.textViewCompleted.setText("Paused");
+				holder.imageViewCompleted.setImageResource(R.drawable.ic_queue);
+				holder.transferProgressBar.setVisibility(View.GONE);
+				break;
+			}
+			case MegaTransfer.STATE_CANCELLED:{
+				holder.textViewCompleted.setVisibility(View.VISIBLE);
+				holder.imageViewCompleted.setVisibility(View.VISIBLE);
+				holder.textViewCompleted.setText("Cancelled");
+				holder.imageViewCompleted.setImageResource(R.drawable.ic_queue);
+				holder.transferProgressBar.setVisibility(View.GONE);
+				break;
+			}
+			case MegaTransfer.STATE_COMPLETED:{
+				holder.textViewCompleted.setVisibility(View.VISIBLE);
+				holder.imageViewCompleted.setVisibility(View.VISIBLE);
+				holder.textViewCompleted.setText("Completed");
+				holder.imageViewCompleted.setImageResource(R.drawable.ic_queue);
+				holder.transferProgressBar.setVisibility(View.GONE);
+				break;
+			}
+			case MegaTransfer.STATE_ACTIVE:{
+				holder.textViewCompleted.setVisibility(View.GONE);
+				holder.imageViewCompleted.setVisibility(View.GONE);
+				holder.transferProgressBar.setVisibility(View.VISIBLE);
+				holder.transferProgressBar.getLayoutParams().width = Util.px2dp((250*scaleW), outMetrics);
+				double progressValue = 100.0 * transfer.getTransferredBytes() / transfer.getTotalBytes();
+				log("Progress Value: "+ progressValue);
+				holder.transferProgressBar.setProgress((int)progressValue);
+				break;
+			}
+			case MegaTransfer.STATE_QUEUED:{
+				holder.textViewCompleted.setVisibility(View.VISIBLE);
+				holder.imageViewCompleted.setVisibility(View.VISIBLE);
+				holder.textViewCompleted.setText("Queued");
+				holder.imageViewCompleted.setImageResource(R.drawable.ic_queue);
+				holder.transferProgressBar.setVisibility(View.GONE);
+				break;
+			}
+			default:{
+				log("Default status");
+				holder.imageViewCompleted.setVisibility(View.VISIBLE);
+				holder.transferProgressBar.setVisibility(View.GONE);
+				holder.textViewCompleted.setText("DEFAULT");
+				break;
+			}
 		}
-		else{
-			holder.textViewCompleted.setVisibility(View.GONE);
-			holder.imageViewCompleted.setVisibility(View.GONE);
-			holder.transferProgressBar.setVisibility(View.VISIBLE);
-			holder.textViewRate.setVisibility(View.VISIBLE);
-			holder.textViewRate.setText(Formatter.formatFileSize(context, transfer.getSpeed()) + "/s");
-			holder.transferProgressBar.getLayoutParams().width = Util.px2dp((250*scaleW), outMetrics);
-			double progressValue = 100.0 * transfer.getTransferredBytes() / transfer.getTotalBytes();
-			log("Progress Value: "+ progressValue);
-			holder.transferProgressBar.setProgress((int)progressValue);
-		}
-		
+
 		if (positionClicked != -1){
 			if (positionClicked == position){
 				listFragment.smoothScrollToPosition(position);

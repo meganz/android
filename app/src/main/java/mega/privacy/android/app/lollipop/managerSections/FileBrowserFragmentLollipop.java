@@ -610,7 +610,8 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			int progressPercent = (int) Math.round((double) ((ManagerActivityLollipop)context).totalSizeTransfered / ((ManagerActivityLollipop)context).totalSizePendingTransfer * 100);
 			progressBar.setProgress(progressPercent);
 
-			transfersNumberText.setText(getString(R.string.text_number_transfers, ((ManagerActivityLollipop)context).pendingTransfers, ((ManagerActivityLollipop)context).totalTransfers));
+            int inProgress = ((ManagerActivityLollipop)context).totalTransfers - ((ManagerActivityLollipop)context).pendingTransfers + 1;
+			transfersNumberText.setText(getString(R.string.text_number_transfers, inProgress, ((ManagerActivityLollipop)context).totalTransfers));
 
 			RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) recyclerView.getLayoutParams();
 			params.addRule(RelativeLayout.BELOW, transfersOverViewLayout.getId());
