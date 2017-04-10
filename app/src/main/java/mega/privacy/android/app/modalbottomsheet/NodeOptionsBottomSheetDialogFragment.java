@@ -488,11 +488,9 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                             optionInfoText.setText(R.string.general_folder_info);
                             optionShare.setVisibility(View.VISIBLE);
                             optionShareText.setText(R.string.context_sharing_folder);
-                            optionSendInbox.setVisibility(View.GONE);
                         } else {
                             optionInfoText.setText(R.string.general_file_info);
                             optionShare.setVisibility(View.GONE);
-                            optionSendInbox.setVisibility(View.VISIBLE);
                         }
 
                         if(node.isExported()){
@@ -500,6 +498,8 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                             nodeIconLayout.setVisibility(View.VISIBLE);
                             nodeIcon.setImageResource(R.drawable.link_ic);
                             nodeIcon.setColorFilter(ContextCompat.getColor(context,R.color.transparency_white));
+                            optionLinkText.setText(R.string.edit_link_option);
+                            optionRemoveLink.setVisibility(View.VISIBLE);
                             if(node.isExpired()){
                                 log("Node exported but expired!!");
                                 nodeIconLayout.setVisibility(View.GONE);
@@ -507,6 +507,8 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                         }
                         else{
                             nodeIconLayout.setVisibility(View.GONE);
+                            optionLinkText.setText(R.string.context_get_link_menu);
+                            optionRemoveLink.setVisibility(View.GONE);
                         }
 
                         if (((ManagerActivityLollipop) context).getDeepBrowserTreeOutgoing() == 0) {
@@ -528,12 +530,11 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                         optionRename.setVisibility(View.VISIBLE);
                         optionMove.setVisibility(View.VISIBLE);
                         optionCopy.setVisibility(View.VISIBLE);
+                        optionSendInbox.setVisibility(View.VISIBLE);
 
                         //Hide
                         optionRubbishBin.setVisibility(View.GONE);
                         optionRemove.setVisibility(View.GONE);
-                        optionLink.setVisibility(View.GONE);
-                        optionRemoveLink.setVisibility(View.GONE);
                         optionLeaveShares.setVisibility(View.GONE);
                         optionOpenFolder.setVisibility(View.GONE);
                     }
