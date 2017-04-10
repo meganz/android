@@ -71,6 +71,8 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 	MegaBrowserLollipopAdapter adapter;
 	IncomingSharesFragmentLollipop incomingSharesFragment = this;
 
+	RelativeLayout transfersOverViewLayout;
+
 	Stack<Integer> lastPositionStack;
 
 	MegaApiAndroid megaApi;
@@ -344,6 +346,9 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 			
 			emptyImageView.setImageResource(R.drawable.incoming_shares_empty);			
 			emptyTextView.setText(R.string.file_browser_empty_incoming_shares);
+
+			transfersOverViewLayout = (RelativeLayout) v.findViewById(R.id.transfers_overview_item_layout);
+			transfersOverViewLayout.setVisibility(View.GONE);
 
 			if (adapter == null){
 				adapter = new MegaBrowserLollipopAdapter(context, this, nodes, parentHandle, recyclerView, aB, Constants.INCOMING_SHARES_ADAPTER, MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST);
