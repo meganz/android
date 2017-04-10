@@ -204,6 +204,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
         chatSettings = dbH.getChatSettings();
         if(chatSettings==null){
+            log("chatSettings is null --> enable chat by default");
             chatSettings = new ChatSettings(true+"", true + "", true + "",true + "");
             dbH.setChatSettings(chatSettings);
         }
