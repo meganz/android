@@ -69,7 +69,8 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 	TextView contentText;
 	RelativeLayout contentTextLayout;
 	ProgressBar progressBar;
-	MegaApiAndroid megaApi;	
+	MegaApiAndroid megaApi;
+	RelativeLayout transfersOverViewLayout;
 
 	Stack<Integer> lastPositionStack;
 		
@@ -334,7 +335,10 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 
 			emptyImageView = (ImageView) v.findViewById(R.id.file_list_empty_image);
 			emptyTextView = (TextView) v.findViewById(R.id.file_list_empty_text);
-			
+
+			transfersOverViewLayout = (RelativeLayout) v.findViewById(R.id.transfers_overview_item_layout);
+			transfersOverViewLayout.setVisibility(View.GONE);
+
 			if (adapter == null){
 				adapter = new MegaBrowserLollipopAdapter(context, this, nodes, parentHandle, recyclerView, aB, Constants.SEARCH_ADAPTER, MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST);
 			}

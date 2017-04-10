@@ -70,6 +70,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 	TextView emptyTextView;
 	MegaBrowserLollipopAdapter adapter;
 	OutgoingSharesFragmentLollipop outgoingSharesFragment = this;
+	RelativeLayout transfersOverViewLayout;
 
 	TextView contentText;	
 	RelativeLayout contentTextLayout;
@@ -345,7 +346,10 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 			contentText = (TextView) v.findViewById(R.id.content_text);			
 
 			emptyImageView.setImageResource(R.drawable.outgoing_shares_empty);
-			emptyTextView.setText(R.string.file_browser_empty_outgoing_shares);			
+			emptyTextView.setText(R.string.file_browser_empty_outgoing_shares);
+
+			transfersOverViewLayout = (RelativeLayout) v.findViewById(R.id.transfers_overview_item_layout);
+			transfersOverViewLayout.setVisibility(View.GONE);
 			
 			if (adapter == null){
 				log("Creating the adapter: "+parentHandle);

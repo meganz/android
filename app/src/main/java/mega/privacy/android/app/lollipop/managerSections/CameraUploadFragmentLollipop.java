@@ -105,6 +105,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	TextView emptyTextView;
 	RelativeLayout contentTextLayout;
 //	Button turnOnOff;
+	RelativeLayout transfersOverViewLayout;
 	
 	DatabaseHandler dbH;
 	MegaPreferences prefs;
@@ -603,6 +604,9 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			turnOnOff.setGravity(Gravity.CENTER);
 
 			turnOnOff.setTextSize(TypedValue.COMPLEX_UNIT_SP, (14*scaleText));
+
+			transfersOverViewLayout = (RelativeLayout) v.findViewById(R.id.transfers_overview_item_layout);
+			transfersOverViewLayout.setVisibility(View.GONE);
 			
 			boolean camEnabled = false;
 			prefs=dbH.getPreferences();
