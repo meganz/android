@@ -11102,6 +11102,41 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		}
 	}
 
+	public void setInboxNavigationDrawer(){
+		log("setInboxNavigationDrawer");
+		if (nV != null){
+			Menu nVMenu = nV.getMenu();
+			MenuItem mi = nVMenu.findItem(R.id.navigation_item_inbox);
+			if (mi != null){
+				if(inboxNode==null){
+					mi.setVisible(false);
+					log("Inbox Node is NULL");
+				}
+				else{
+					boolean hasChildren = megaApi.hasChildren(inboxNode);
+					if(hasChildren){
+						if(drawerItem==DrawerItem.INBOX){
+							mi.setChecked(true);
+							mi.setIcon(getResources().getDrawable(R.drawable.inbox_red));
+							mi.setEnabled(true);
+							mi.setVisible(true);
+						}
+						else{
+							mi.setIcon(getResources().getDrawable(R.drawable.inbox_grey));
+							mi.setChecked(false);
+							mi.setEnabled(true);
+							mi.setVisible(true);
+						}
+					}
+					else{
+						log("Inbox Node NO children");
+						mi.setVisible(false);
+					}
+				}
+			}
+		}
+	}
+
 	public void showProPanel(){
 		log("showProPanel");
 		//Left and Right margin
@@ -11847,6 +11882,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						log("Move to Rubbish");
 						refreshAfterMovingToRubbish();
 						showSnackbar(getString(R.string.context_correctly_moved_to_rubbish));
+
+						if (drawerItem == DrawerItem.INBOX){
+							setInboxNavigationDrawer();
+						}
 					}
 					else{
 						log("Not moved to rubbish");
@@ -12386,8 +12425,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			//Verify is it is a new item to the inbox
 			for(int i=0;i<updatedNodes.size(); i++){
 				MegaNode updateNode = updatedNodes.get(i);
-				if(updateNode.getHandle()==inboxNode.getHandle()){
+				if(updateNode.getParentHandle()==inboxNode.getHandle()){
 					log("New element to Inbox!!");
+					setInboxNavigationDrawer();
 				}
 			}
 		}
