@@ -201,11 +201,6 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
 		holder.textViewCompleted = (TextView) v.findViewById(R.id.transfers_list_completed_text);
 		holder.transferProgressBar = (ProgressBar) v.findViewById(R.id.transfers_list_bar);
 		holder.optionRemove = (ImageButton) v.findViewById(R.id.transfers_list_option_remove);		
-		//Right margin
-		RelativeLayout.LayoutParams actionButtonParams = (RelativeLayout.LayoutParams)holder.optionRemove.getLayoutParams();
-		actionButtonParams.setMargins(0, 0, Util.scaleWidthPx(10, outMetrics), 0); 
-		holder.optionRemove.setLayoutParams(actionButtonParams);
-		
 		holder.optionRemove.setOnClickListener(this);
 		v.setTag(holder);
     	
@@ -241,15 +236,7 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
 		}
 		String fileName = transfer.getFileName();
 		holder.textViewFileName.setText(fileName);
-		
-		if (!multipleSelect){
 
-		}
-		else{
-			
-			
-		}
-		
 		if (transfer.getType() == MegaTransfer.TYPE_DOWNLOAD){
 		
 			holder.iconDownloadUploadView.setImageResource(R.drawable.ic_download_transfers);
@@ -348,6 +335,7 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
 				holder.textViewCompleted.setText("Paused");
 				holder.imageViewCompleted.setImageResource(R.drawable.ic_queue);
 				holder.transferProgressBar.setVisibility(View.GONE);
+				holder.optionRemove.setVisibility(View.VISIBLE);
 				break;
 			}
 			case MegaTransfer.STATE_CANCELLED:{
@@ -356,6 +344,7 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
 				holder.textViewCompleted.setText("Cancelled");
 				holder.imageViewCompleted.setImageResource(R.drawable.ic_queue);
 				holder.transferProgressBar.setVisibility(View.GONE);
+				holder.optionRemove.setVisibility(View.GONE);
 				break;
 			}
 			case MegaTransfer.STATE_COMPLETED:{
@@ -364,6 +353,7 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
 				holder.textViewCompleted.setText("Completed");
 				holder.imageViewCompleted.setImageResource(R.drawable.ic_queue);
 				holder.transferProgressBar.setVisibility(View.GONE);
+				holder.optionRemove.setVisibility(View.GONE);
 				break;
 			}
 			case MegaTransfer.STATE_ACTIVE:{
@@ -374,14 +364,18 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
 				double progressValue = 100.0 * transfer.getTransferredBytes() / transfer.getTotalBytes();
 				log("Progress Value: "+ progressValue);
 				holder.transferProgressBar.setProgress((int)progressValue);
+				holder.optionRemove.setVisibility(View.VISIBLE);
 				break;
 			}
+			case MegaTransfer.STATE_COMPLETING:
+			case MegaTransfer.STATE_RETRYING:
 			case MegaTransfer.STATE_QUEUED:{
 				holder.textViewCompleted.setVisibility(View.VISIBLE);
 				holder.imageViewCompleted.setVisibility(View.VISIBLE);
 				holder.textViewCompleted.setText("Queued");
 				holder.imageViewCompleted.setImageResource(R.drawable.ic_queue);
 				holder.transferProgressBar.setVisibility(View.GONE);
+				holder.optionRemove.setVisibility(View.VISIBLE);
 				break;
 			}
 			default:{
