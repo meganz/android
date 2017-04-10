@@ -280,7 +280,7 @@
                     android:textColor="@color/name_my_account"
                     android:textSize="16sp"/>
             </LinearLayout>
-
+<!--
             <LinearLayout
                 android:id="@+id/option_permissions_layout"
                 android:layout_width="match_parent"
@@ -310,7 +310,7 @@
                     android:text="@string/file_properties_shared_folder_select_contact"
                     android:textColor="@color/name_my_account"
                     android:textSize="16sp"/>
-            </LinearLayout>
+            </LinearLayout>-->
 
             <LinearLayout
                 android:id="@+id/option_clear_share_layout"
