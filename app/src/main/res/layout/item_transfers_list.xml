@@ -57,6 +57,7 @@
 		android:src="@drawable/ic_close_grey"
 		android:background="@null"
 		android:layout_centerVertical="true"
+		android:layout_marginLeft="16dp"
 		android:layout_alignParentRight="true"/>
          
     <ProgressBar
