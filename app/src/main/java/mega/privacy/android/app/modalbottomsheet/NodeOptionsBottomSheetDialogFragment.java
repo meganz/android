@@ -66,7 +66,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
     ImageView optionLinkImage;
     LinearLayout optionRemoveLink;
     LinearLayout optionShare;
-    LinearLayout optionPermissions;
+    TextView optionShareText;
     LinearLayout optionClearShares;
     LinearLayout optionLeaveShares;
     LinearLayout optionSendInbox;
@@ -143,7 +143,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
         optionLinkImage = (ImageView) contentView.findViewById(R.id.option_link_image);
         optionRemoveLink = (LinearLayout) contentView.findViewById(R.id.option_remove_link_layout);
         optionShare = (LinearLayout) contentView.findViewById(R.id.option_share_layout);
-        optionPermissions = (LinearLayout) contentView.findViewById(R.id.option_permissions_layout);
+        optionShareText = (TextView) contentView.findViewById(R.id.option_share_text);
         optionClearShares = (LinearLayout) contentView.findViewById(R.id.option_clear_share_layout);
         optionLeaveShares = (LinearLayout) contentView.findViewById(R.id.option_leave_share_layout);
         optionSendInbox = (LinearLayout) contentView.findViewById(R.id.option_send_inbox_layout);
@@ -159,7 +159,6 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
         optionLink.setOnClickListener(this);
         optionRemoveLink.setOnClickListener(this);
         optionShare.setOnClickListener(this);
-        optionPermissions.setOnClickListener(this);
         optionClearShares.setOnClickListener(this);
         optionLeaveShares.setOnClickListener(this);
         optionSendInbox.setOnClickListener(this);
@@ -237,7 +236,12 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                         if (node.isFolder()) {
                             optionInfoText.setText(R.string.general_folder_info);
                             optionShare.setVisibility(View.VISIBLE);
-
+                            if(node.isOutShare()){
+                                optionShareText.setText(R.string.context_sharing_folder);
+                            }
+                            else{
+                                optionShareText.setText(R.string.context_share_folder);
+                            }
                         } else {
                             optionInfoText.setText(R.string.general_file_info);
                             optionShare.setVisibility(View.GONE);
@@ -288,7 +292,6 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
 
                         //Hide
                         optionRemove.setVisibility(View.GONE);
-                        optionPermissions.setVisibility(View.GONE);
                         optionLeaveShares.setVisibility(View.GONE);
                         optionOpenFolder.setVisibility(View.GONE);
                     } else if (tabSelected == 1) {
@@ -310,7 +313,6 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
 
                         //Hide
                         optionClearShares.setVisibility(View.GONE);
-                        optionPermissions.setVisibility(View.GONE);
                         optionLeaveShares.setVisibility(View.GONE);
                         optionRubbishBin.setVisibility(View.GONE);
                         optionSendInbox.setVisibility(View.GONE);
@@ -326,11 +328,9 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
 
                     if (node.isFolder()) {
                         optionInfoText.setText(R.string.general_folder_info);
-                        optionShare.setVisibility(View.VISIBLE);
 
                     } else {
                         optionInfoText.setText(R.string.general_file_info);
-                        optionShare.setVisibility(View.GONE);
                     }
 
                     if(node.isExported()){
@@ -365,9 +365,9 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                     //Hide
                     optionClearShares.setVisibility(View.GONE);
                     optionRemove.setVisibility(View.GONE);
-                    optionPermissions.setVisibility(View.GONE);
                     optionLeaveShares.setVisibility(View.GONE);
                     optionOpenFolder.setVisibility(View.GONE);
+                    optionShare.setVisibility(View.GONE);
 
                     break;
                 }
@@ -390,7 +390,6 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                         optionOpenFolder.setVisibility(View.GONE);
                         optionDownload.setVisibility(View.VISIBLE);
                         optionInfo.setVisibility(View.VISIBLE);
-                        optionPermissions.setVisibility(View.GONE);
                         optionRemove.setVisibility(View.GONE);
                         optionShare.setVisibility(View.GONE);
                         optionSendInbox.setVisibility(View.GONE);
@@ -488,6 +487,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                         if (node.isFolder()) {
                             optionInfoText.setText(R.string.general_folder_info);
                             optionShare.setVisibility(View.VISIBLE);
+                            optionShareText.setText(R.string.context_sharing_folder);
                             optionSendInbox.setVisibility(View.GONE);
                         } else {
                             optionInfoText.setText(R.string.general_file_info);
@@ -510,7 +510,6 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                         }
 
                         if (((ManagerActivityLollipop) context).getDeepBrowserTreeOutgoing() == 0) {
-                            optionPermissions.setVisibility(View.VISIBLE);
                             optionClearShares.setVisibility(View.VISIBLE);
 
                             //Show the number of contacts who shared the folder
@@ -521,7 +520,6 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                                 }
                             }
                         } else {
-                            optionPermissions.setVisibility(View.GONE);
                             optionClearShares.setVisibility(View.GONE);
                         }
 
@@ -586,7 +584,6 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                     optionCopy.setVisibility(View.GONE);
                     optionClearShares.setVisibility(View.GONE);
                     optionRemove.setVisibility(View.GONE);
-                    optionPermissions.setVisibility(View.GONE);
                     optionLeaveShares.setVisibility(View.GONE);
                     break;
                 }
@@ -721,20 +718,17 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                     log("The selected node is NULL");
                     return;
                 }
-                nC.selectContactToShareFolder(node);
-                dismissAllowingStateLoss();
-                break;
-            }
-            case R.id.option_permissions_layout:{
-                log("Share with");
-                if(node==null){
-                    log("The selected node is NULL");
-                    return;
+                if(node.isOutShare()){
+                    Intent i = new Intent(context, FileContactListActivityLollipop.class);
+                    i.putExtra("name", node.getHandle());
+                    context.startActivity(i);
+                    dismissAllowingStateLoss();
                 }
-                Intent i = new Intent(context, FileContactListActivityLollipop.class);
-                i.putExtra("name", node.getHandle());
-                context.startActivity(i);
-                dismissAllowingStateLoss();
+                else{
+                    nC.selectContactToShareFolder(node);
+                    dismissAllowingStateLoss();
+                }
+
                 break;
             }
             case R.id.option_clear_share_layout:{
