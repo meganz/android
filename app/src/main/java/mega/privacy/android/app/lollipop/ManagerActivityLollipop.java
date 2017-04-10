@@ -207,8 +207,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	public long totalSizePendingTransfer=0;
 	public long totalSizeTransfered=0;
 
-	ArrayList<Integer> transfersInProgress;
-	public List<Integer> transfersInProgressSync;
+	ArrayList<MegaTransfer> transfersInProgress;
+	public ArrayList<MegaTransfer> transfersCompleted;
+	public List<MegaTransfer> transfersInProgressSync;
 	public MegaTransferData transferData;
 	public int pendingTransfers = 0;
 	public int totalTransfers = 0;
@@ -272,7 +273,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	Handler handler;
 	Handler outSpaceHandler;
 	Runnable outSpaceRunnable;
-    ArrayList<MegaTransfer> tL;
 	DisplayMetrics outMetrics;
     float scaleText;
     FrameLayout fragmentContainer;
@@ -1114,8 +1114,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			megaApi.retryPendingConnections();
 		}
 
-		transfersInProgress = new ArrayList<Integer>();
+		transfersInProgress = new ArrayList<MegaTransfer>();
 		transfersInProgressSync = Collections.synchronizedList(transfersInProgress);
+
+		transfersCompleted = new ArrayList<MegaTransfer>();
 
 		Display display = getWindowManager().getDefaultDisplay();
 		outMetrics = new DisplayMetrics ();
@@ -1540,11 +1542,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			synchronized(transfersInProgressSync) {
 				for(int i=0;i<downloadsInProgress;i++){
 					Integer downloadProgressTag = transferData.getDownloadTag(i);
-					transfersInProgressSync.add(downloadProgressTag);
+					MegaTransfer transfer = megaApi.getTransferByTag(downloadProgressTag);
+					transfersInProgressSync.add(transfer);
 				}
 				for(int i=0;i<uploadsInProgress;i++){
 					Integer uploadProgressTag = transferData.getUploadTag(i);
-					transfersInProgressSync.add(uploadProgressTag);
+					MegaTransfer transfer = megaApi.getTransferByTag(uploadProgressTag);
+					transfersInProgressSync.add(transfer);
 				}
 			}
 
@@ -3984,7 +3988,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
     				tFLol = new TransfersFragmentLollipop();
     			}
 
-    			tFLol.setTransfers(megaApi.getTransfers());
+//    			tFLol.setTransfers(megaApi.getTransfers());
 
     			if(megaApi.areTransfersPaused(MegaTransfer.TYPE_DOWNLOAD)||megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD)){
     				tFLol.setPause(true);
@@ -9980,30 +9984,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		log("setParentHandleBrowser: set value to:"+parentHandleBrowser);
 
 		this.parentHandleBrowser = parentHandleBrowser;
-
-		HashMap<Long, MegaTransfer> mTHash = new HashMap<Long, MegaTransfer>();
-
-		//Update transfer list
-		tL = megaApi.getTransfers();
-
-		//Update File Browser Fragment
-		if (fbFLol != null){
-			for(int i=0; i<tL.size(); i++){
-
-				MegaTransfer tempT = tL.get(i);
-				if (tempT.getType() == MegaTransfer.TYPE_DOWNLOAD){
-					long handleT = tempT.getNodeHandle();
-					MegaNode nodeT = megaApi.getNodeByHandle(handleT);
-					MegaNode parentT = megaApi.getParentNode(nodeT);
-
-					if (parentT != null){
-						if(parentT.getHandle() == this.parentHandleBrowser){
-							mTHash.put(handleT,tempT);
-						}
-					}
-				}
-			}
-		}
 	}
 
 	public void setParentHandleRubbish(long parentHandleRubbish){
@@ -11986,10 +11966,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					}
 				}
 
-				tL = megaApi.getTransfers();
 				if (tFLol != null){
 					if (drawerItem == DrawerItem.TRANSFERS){
-						tFLol.setTransfers(tL);
+//						tFLol.setTransfers(tL);
 					}
 				}
 			}
@@ -12702,13 +12681,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 	@Override
 	public void onTransferStart(MegaApiJava api, MegaTransfer transfer) {
-		log("onTransferStart: "+transfer.getNotificationNumber());
-
+		log("onTransferStart: " + transfer.getNotificationNumber()+ "-" + transfer.getFileName() + " - " + transfer.getTag());
 
 		if(transferCallback<transfer.getNotificationNumber()) {
 
 			synchronized(transfersInProgressSync) {
-				transfersInProgressSync.add(transfer.getTag());
+				transfersInProgressSync.add(transfer);
 			}
 
 			transferCallback = transfer.getNotificationNumber();
@@ -12728,17 +12706,17 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				}
 			}
 
-
 			if (tFLol != null){
-				tFLol.setTransfers(tL);
+				if(tFLol.isAdded()){
+					tFLol.setTransfers();
+				}
 			}
-			log("onTransferStart: " + transfer.getFileName() + " - " + transfer.getTag());
 		}
 	}
 
 	@Override
 	public void onTransferFinish(MegaApiJava api, MegaTransfer transfer, MegaError e) {
-		log("onTransferFinish: "+transfer.getPath());
+		log("onTransferFinish: "+transfer.getFileName() + " - " + transfer.getTag() + "- " +transfer.getNotificationNumber());
 
 		if(transferCallback<transfer.getNotificationNumber()) {
 
@@ -12746,8 +12724,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				ListIterator li = transfersInProgressSync.listIterator();
 				int index = 0;
 				while(li.hasNext()) {
-					int tag = (Integer) li.next();
-					if(tag == transfer.getTag()){
+					MegaTransfer next = (MegaTransfer) li.next();
+					if(next.getTag() == transfer.getTag()){
 						index=li.previousIndex();
 						break;
 					}
@@ -12755,6 +12733,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				transfersInProgressSync.remove(index);
 				log("The transfer with index : "+index +"has been removed, left: "+transfersInProgressSync.size());
 			}
+			transfersCompleted.add(transfer);
+			log("Transfer added to completed: "+transfersCompleted.size());
 
 			transferCallback = transfer.getNotificationNumber();
 
@@ -12779,15 +12759,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				}
 			}
 
-			if (e.getErrorCode() == MegaError.API_OK) {
-
+			if (tFLol != null){
+				if(tFLol.isAdded()){
+					tFLol.updateTransfers();
+				}
 			}
-			else if(e.getErrorCode() == MegaError.API_EINCOMPLETE){
-				log("API_EINCOMPLETE: " + transfer.getFileName());
-			}
-
-			log("END onTransferFinish: " + transfer.getFileName() + " - " + transfer.getTag());
-
 		}
 	}
 
@@ -12820,11 +12796,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					log("on transfers update... "+transfer.getTransferredBytes());
 					if (lastTimeOnTransferUpdate < 0){
 						lastTimeOnTransferUpdate = now.toMillis(false);
-						tFLol.setCurrentTransfer(transfer);
+//						tFLol.setCurrentTransfer(transfer);
 					}
 					else if ((nowMillis - lastTimeOnTransferUpdate) > Util.ONTRANSFERUPDATE_REFRESH_MILLIS){
 						lastTimeOnTransferUpdate = nowMillis;
-						tFLol.setCurrentTransfer(transfer);
+//						tFLol.setCurrentTransfer(transfer);
 					}
 
 				}

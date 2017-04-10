@@ -45,8 +45,6 @@ public class TransfersFragmentLollipop extends Fragment implements RecyclerView.
 	TextView contentText;
 	ImageView emptyImage;
 	TextView emptyText;
-	ImageView pauseImage;
-	TextView pauseText;
 
 	float density;
 	DisplayMetrics outMetrics;
@@ -58,7 +56,7 @@ public class TransfersFragmentLollipop extends Fragment implements RecyclerView.
 	TransfersFragmentLollipop transfersFragment = this;
 	
 //	SparseArray<TransfersHolder> transfersListArray = null;
-	
+
 	ArrayList<MegaTransfer> tL = null;
 
 	private Handler handler;
@@ -70,7 +68,9 @@ public class TransfersFragmentLollipop extends Fragment implements RecyclerView.
 		}
 		
 		handler = new Handler();
-		
+
+		tL = new ArrayList<MegaTransfer>();
+
 		super.onCreate(savedInstanceState);
 		log("onCreate");		
 	}
@@ -102,69 +102,77 @@ public class TransfersFragmentLollipop extends Fragment implements RecyclerView.
 	    
 		View v = inflater.inflate(R.layout.fragment_transfers, container, false);
 
-		synchronized(((ManagerActivityLollipop)context).transfersInProgressSync) {
-			for(int i=0; i<((ManagerActivityLollipop)context).transfersInProgressSync.size();i++){
-				MegaTransfer transfer = megaApi.getTransferByTag(((ManagerActivityLollipop)context).transfersInProgressSync.get(i));
-				if(transfer!=null){
-					tL.add(transfer);
-				}
-			}
-		}
-		
+
 		listView = (RecyclerView) v.findViewById(R.id.transfers_list_view);
 		listView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
 		mLayoutManager = new LinearLayoutManager(context);
 		listView.setLayoutManager(mLayoutManager);
 		listView.addOnItemTouchListener(this);
-		listView.setItemAnimator(new DefaultItemAnimator());		
+		listView.setItemAnimator(new DefaultItemAnimator());
+
+		emptyImage = (ImageView) v.findViewById(R.id.transfers_empty_image);
+		emptyText = (TextView) v.findViewById(R.id.transfers_empty_text);
+
+		emptyImage.setImageResource(R.drawable.ic_no_active_transfers);
+		emptyText.setText(getString(R.string.transfers_empty));
+
+		setTransfers();
 		
 //		adapter = new MegaTransfersAdapter(context, transfersListArray, aB);
 		adapter = new MegaTransfersLollipopAdapter(context, this, tL, aB);
-		adapter.setPositionClicked(-1);
 
 		adapter.setMultipleSelect(false);
-		
 		listView.setAdapter(adapter);
-		
-		emptyImage = (ImageView) v.findViewById(R.id.transfers_empty_image);
-		pauseImage = (ImageView) v.findViewById(R.id.transfers_pause_image);
-		emptyText = (TextView) v.findViewById(R.id.transfers_empty_text);
-		pauseText = (TextView) v.findViewById(R.id.transfers_pause_text);
-		
-		emptyImage.setImageResource(R.drawable.ic_no_active_transfers);
-		pauseImage.setImageResource(R.drawable.ic_pause_tranfers);
-		emptyText.setText(getString(R.string.transfers_empty));
-		pauseText.setText(getString(R.string.transfers_pause));
-		
-		pauseImage.setVisibility(View.GONE);
-		pauseText.setVisibility(View.GONE);
-		
-		if (pause){
-			emptyImage.setVisibility(View.GONE);
-			emptyText.setVisibility(View.GONE);
+
+		return v;
+	}
+
+	public void setTransfers(){
+		log("setTransfers");
+		synchronized(((ManagerActivityLollipop)context).transfersInProgressSync) {
+			tL.addAll(((ManagerActivityLollipop)context).transfersInProgressSync);
+		}
+		if(!(((ManagerActivityLollipop)context).transfersCompleted.isEmpty())){
+			log("Add completed transfers");
+			tL.addAll(((ManagerActivityLollipop)context).transfersCompleted);
+		}
+
+		if (tL.size() == 0){
+			emptyImage.setVisibility(View.VISIBLE);
+			emptyText.setVisibility(View.VISIBLE);
 			listView.setVisibility(View.GONE);
-			pauseImage.setVisibility(View.VISIBLE);
-			pauseText.setVisibility(View.VISIBLE);
 		}
 		else{
-			if (tL.size() == 0){
-				emptyImage.setVisibility(View.VISIBLE);
-				emptyText.setVisibility(View.VISIBLE);
-				listView.setVisibility(View.GONE);
-			}
-			else{
-				emptyImage.setVisibility(View.GONE);
-				emptyText.setVisibility(View.GONE);
-				listView.setVisibility(View.VISIBLE);
-			}
-			
-			pauseImage.setVisibility(View.GONE);
-			pauseText.setVisibility(View.GONE);
-		}    
-		 
-//		refreshTransfers();
-		
-		return v;
+			emptyImage.setVisibility(View.GONE);
+			emptyText.setVisibility(View.GONE);
+			listView.setVisibility(View.VISIBLE);
+		}
+	}
+
+	public void updateTransfers(){
+		log("setTransfers");
+		tL.clear();
+
+		synchronized(((ManagerActivityLollipop)context).transfersInProgressSync) {
+			tL.addAll(((ManagerActivityLollipop)context).transfersInProgressSync);
+		}
+		if(!(((ManagerActivityLollipop)context).transfersCompleted.isEmpty())){
+			log("Add completed transfers");
+			tL.addAll(((ManagerActivityLollipop)context).transfersCompleted);
+		}
+
+		if (tL.size() == 0){
+			emptyImage.setVisibility(View.VISIBLE);
+			emptyText.setVisibility(View.VISIBLE);
+			listView.setVisibility(View.GONE);
+		}
+		else{
+			emptyImage.setVisibility(View.GONE);
+			emptyText.setVisibility(View.GONE);
+			listView.setVisibility(View.VISIBLE);
+		}
+
+		adapter.notifyDataSetChanged();
 	}
 	
 	@Override
@@ -205,7 +213,7 @@ public class TransfersFragmentLollipop extends Fragment implements RecyclerView.
 //		}
 //	}
 	
-	public void setTransfers(ArrayList<MegaTransfer> _transfers){
+	public void updateTransfers(ArrayList<MegaTransfer> _transfers){
 		this.tL = _transfers;
 		
 		if (adapter != null){
@@ -220,32 +228,33 @@ public class TransfersFragmentLollipop extends Fragment implements RecyclerView.
 			adapter.setTransfers(tL);
 		}
 		
-		if (emptyImage != null){
-			if (pause){
-				emptyImage.setVisibility(View.GONE);
-				emptyText.setVisibility(View.GONE);
-				listView.setVisibility(View.GONE);
-				pauseImage.setVisibility(View.VISIBLE);
-				pauseText.setVisibility(View.VISIBLE);
-			}
-			else{
-				if (tL.size() == 0){
-					emptyImage.setVisibility(View.VISIBLE);
-					emptyText.setVisibility(View.VISIBLE);
-					listView.setVisibility(View.GONE);
-				}
-				else{
-					emptyImage.setVisibility(View.GONE);
-					emptyText.setVisibility(View.GONE);
-					listView.setVisibility(View.VISIBLE);
-				}	
-				
-				pauseImage.setVisibility(View.GONE);
-				pauseText.setVisibility(View.GONE);
-			}
-		}
+
+        if (tL.size() == 0){
+            emptyImage.setVisibility(View.VISIBLE);
+            emptyText.setVisibility(View.VISIBLE);
+            listView.setVisibility(View.GONE);
+        }
+        else{
+            emptyImage.setVisibility(View.GONE);
+            emptyText.setVisibility(View.GONE);
+            listView.setVisibility(View.VISIBLE);
+        }
+
 	}
-	
+
+	public void addNewTransfer(){
+
+	}
+
+	public void addCompleteTransfer(){
+
+	}
+
+	public void addCurrentTransfer(){
+
+	}
+
+
 	public void setCurrentTransfer(MegaTransfer mT){
 		log("setCurrentTransfer");
 		if (adapter != null){
@@ -257,35 +266,10 @@ public class TransfersFragmentLollipop extends Fragment implements RecyclerView.
 		this.pause = pause;
 		
 		if (adapter != null){
-			tL = megaApi.getTransfers();
-			adapter.setTransfers(tL);
+			adapter.notifyDataSetChanged();
 		}
 		
-		if (emptyImage != null){ //This means that the view has been already created
-			if (pause){
-				emptyImage.setVisibility(View.GONE);
-				emptyText.setVisibility(View.GONE);
-				listView.setVisibility(View.GONE);
-				pauseImage.setVisibility(View.VISIBLE);
-				pauseText.setVisibility(View.VISIBLE);
-			}
-			else{
-				if (tL.size() == 0){
-					emptyImage.setVisibility(View.VISIBLE);
-					emptyText.setVisibility(View.VISIBLE);
-					listView.setVisibility(View.GONE);
-				}
-				else{
-					emptyImage.setVisibility(View.GONE);
-					emptyText.setVisibility(View.GONE);
-					listView.setVisibility(View.VISIBLE);
-				}
-				
-				pauseImage.setVisibility(View.GONE);
-				pauseText.setVisibility(View.GONE);
-			}
-		}
-	} 
+	}
 
 	
 	public void setNoActiveTransfers(){
@@ -294,8 +278,6 @@ public class TransfersFragmentLollipop extends Fragment implements RecyclerView.
 			emptyImage.setVisibility(View.VISIBLE);
 			emptyText.setVisibility(View.VISIBLE);
 			listView.setVisibility(View.GONE);
-			pauseImage.setVisibility(View.GONE);
-			pauseText.setVisibility(View.GONE);
 		}
 	}
 	

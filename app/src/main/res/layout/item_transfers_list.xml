@@ -71,13 +71,5 @@
 		android:layout_toLeftOf="@id/transfers_list_option_remove"
         android:layout_toRightOf="@id/transfers_list_thumbnail" />
 
-	<TextView
-		android:id="@+id/transfers_list_transfer_rate"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:layout_alignRight="@id/transfers_list_bar"
-		android:textColor="@color/file_list_second_row"
-		android:layout_marginTop="17dp" />
-            
 </RelativeLayout>
 
