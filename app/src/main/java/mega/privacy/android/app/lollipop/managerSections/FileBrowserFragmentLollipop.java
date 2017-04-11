@@ -79,8 +79,12 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 	FileBrowserFragmentLollipop fileBrowserFragment = this;
 	TextView contentText;
 	RelativeLayout contentTextLayout;
-	boolean downloadInProgress = false;
 	ProgressBar progressBar;
+
+	public int pendingTransfers = 0;
+	public int totalTransfers = 0;
+	public long totalSizePendingTransfer=0;
+	public long totalSizeTransfered=0;
 
 	Stack<Integer> lastPositionStack;
 
@@ -599,7 +603,13 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 	public void setOverviewLayout(){
 		log("setOverviewLayout");
 		//Check transfers in progress
-		if((((ManagerActivityLollipop)context).pendingTransfers)>0){
+		pendingTransfers = megaApi.getNumPendingDownloads() + megaApi.getNumPendingUploads();
+		totalTransfers = megaApi.getTotalDownloads() + megaApi.getTotalUploads();
+
+		totalSizePendingTransfer = 100;
+		totalSizeTransfered = megaApi.getTotalDownloadedBytes() + megaApi.getTotalUploadedBytes();
+
+		if(pendingTransfers>0){
 			log("Transfers in progress");
 			contentTextLayout.setVisibility(View.GONE);
 			separator.setVisibility(View.GONE);
@@ -607,11 +617,11 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			dotsOptionsTransfers.setOnClickListener(this);
 			playButton.setOnClickListener(this);
 
-			int progressPercent = (int) Math.round((double) ((ManagerActivityLollipop)context).totalSizeTransfered / ((ManagerActivityLollipop)context).totalSizePendingTransfer * 100);
+			int progressPercent = (int) Math.round((double) totalSizeTransfered / totalSizePendingTransfer * 100);
 			progressBar.setProgress(progressPercent);
 
-            int inProgress = ((ManagerActivityLollipop)context).totalTransfers - ((ManagerActivityLollipop)context).pendingTransfers + 1;
-			transfersNumberText.setText(getString(R.string.text_number_transfers, inProgress, ((ManagerActivityLollipop)context).totalTransfers));
+            int inProgress = totalTransfers - pendingTransfers + 1;
+			transfersNumberText.setText(getString(R.string.text_number_transfers, inProgress, totalTransfers));
 
 			RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) recyclerView.getLayoutParams();
 			params.addRule(RelativeLayout.BELOW, transfersOverViewLayout.getId());
@@ -1241,4 +1251,5 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 		}
 		return 0;
 	}
+
 }
