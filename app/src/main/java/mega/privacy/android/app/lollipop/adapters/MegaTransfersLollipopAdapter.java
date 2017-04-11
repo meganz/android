@@ -34,6 +34,7 @@ import java.util.ArrayList;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.managerSections.TransfersFragmentLollipop;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaListChatLollipopAdapter;
 import mega.privacy.android.app.utils.ThumbnailUtils;
@@ -329,6 +330,7 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
 		}
 
 		int state = transfer.getState();
+		log("State of the transfer: "+state);
 		switch (state){
 			case MegaTransfer.STATE_PAUSED:{
 				holder.textViewCompleted.setVisibility(View.VISIBLE);
@@ -355,7 +357,7 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
 				holder.textViewCompleted.setVisibility(View.VISIBLE);
 				holder.imageViewCompleted.setVisibility(View.VISIBLE);
 				holder.textViewCompleted.setText("Completed");
-				holder.imageViewCompleted.setImageResource(R.drawable.ic_queue);
+				holder.imageViewCompleted.setImageResource(R.drawable.ic_complete_transfer);
 				holder.transferProgressBar.setVisibility(View.GONE);
 				holder.optionRemove.setVisibility(View.GONE);
 				holder.optionPause.setVisibility(View.GONE);
@@ -440,9 +442,14 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
 			case R.id.transfers_list_option_remove:{
 				log("click to cancel transfer");
 				MegaTransfer t = (MegaTransfer) getItem(currentPosition);
-				fragment.cancelTransferConfirmation(t);
-				positionClicked = -1;
-				notifyDataSetChanged();
+
+				((ManagerActivityLollipop) context).showConfirmationCancelTransfer(t, true);
+				break;
+			}
+			case R.id.transfers_list_option_pause:{
+				log("click to cancel transfer");
+				MegaTransfer t = (MegaTransfer) getItem(currentPosition);
+                ((ManagerActivityLollipop) context).showConfirmationCancelTransfer(t, false);
 				break;
 			}
 		}

@@ -1109,4 +1109,6 @@
     <string name="option_to_transfer_manager" context="Label of the modal bottom sheet to Transfer Manager section" formatted="false">Show transfers</string>
     <string name="option_to_pause_transfers" context="Label of the modal bottom sheet to pause all transfers">Pause all transfers</string>
     <string name="option_to_clear_transfers" context="Label of the modal bottom sheet to clear completed transfers">Clear completed transfers</string>
+    <string name="menu_pause_individual_transfer" context="Dialog to confirm the action of pausing one transfer">Pause transfer?</string>
+    <string name="menu_restart_individual_transfer" context="Dialog to confirm the action of restarting one transfer">Restart transfer?</string>
 </resources>
