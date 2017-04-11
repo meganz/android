@@ -7053,6 +7053,21 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 
 		}
+		else if (drawerItem == DrawerItem.SHARED_ITEMS){
+			String sharesTag = getFragmentTag(R.id.shares_tabs_pager, 1);
+			outSFLol = (OutgoingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(sharesTag);
+			outSFLol.hideMultipleSelect();
+			outSFLol.refresh(parentHandleOutgoing);
+
+			//Refresh Rubbish Fragment
+			String cFTagRb = getFragmentTag(R.id.cloud_drive_tabs_pager, 1);
+			rbFLol = (RubbishBinFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTagRb);
+			if (rbFLol != null){
+				ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(rbFLol.getParentHandle()), orderCloud);
+				rbFLol.setNodes(nodes);
+				rbFLol.getRecyclerView().invalidate();
+			}
+		}
 	}
 
 	public void refreshAfterMoving() {
@@ -7136,7 +7151,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			outSFLol = (OutgoingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(sharesTag);
 			if (outSFLol != null){
 				outSFLol.hideMultipleSelect();
-				outSFLol.getRecyclerView().invalidate();
+				outSFLol.refresh(parentHandleOutgoing);
 			}
 
 			//Refresh Cloud Drive
