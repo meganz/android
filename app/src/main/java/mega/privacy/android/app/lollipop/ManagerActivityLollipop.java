@@ -204,15 +204,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	Button expiryDateButton;
 	SwitchCompat switchGetLink;
 
-	public long totalSizePendingTransfer=0;
-	public long totalSizeTransfered=0;
-
 	ArrayList<MegaTransfer> transfersInProgress;
 	public ArrayList<MegaTransfer> transfersCompleted;
 	public List<MegaTransfer> transfersInProgressSync;
 	public MegaTransferData transferData;
-	public int pendingTransfers = 0;
-	public int totalTransfers = 0;
+
 	public long transferCallback = 0;
 	public int downloadInProgress = -1;
 	public int uploadInProgress = -1;
@@ -11978,11 +11974,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		else if(request.getType() == MegaRequest.TYPE_CANCEL_TRANSFERS){
 			log("MegaRequest.TYPE_CANCEL_TRANSFERS");
 			//After cancelling all the transfers
-			totalSizePendingTransfer = 0;
-
-			pendingTransfers = megaApi.getNumPendingDownloads() + megaApi.getNumPendingUploads();
-			totalTransfers = megaApi.getTotalDownloads() + megaApi.getTotalUploads();
-
 			if (e.getErrorCode() == MegaError.API_OK){
 				if (fbFLol != null){
 					if(fbFLol.isAdded()){
@@ -12005,10 +11996,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		else if (request.getType() == MegaRequest.TYPE_CANCEL_TRANSFER){
 			log("one MegaRequest.TYPE_CANCEL_TRANSFER");
 			//After cancelling ONE transfer
-			pendingTransfers = megaApi.getNumPendingDownloads() + megaApi.getNumPendingUploads();
-			totalTransfers = megaApi.getTotalDownloads() + megaApi.getTotalUploads();
-
-			log("Pending transfers: "+pendingTransfers+" totalTransfers "+totalTransfers);
+			int pendingTransfers = megaApi.getNumPendingDownloads() + megaApi.getNumPendingUploads();
 
 			if (e.getErrorCode() == MegaError.API_OK){
 
@@ -12033,9 +12021,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					}
 				}
 
-				if (tFLol != null){
-					if (drawerItem == DrawerItem.TRANSFERS){
-//						tFLol.setTransfers(tL);
+				if (fbFLol != null){
+					if(fbFLol.isAdded()){
+						fbFLol.setOverviewLayout();
 					}
 				}
 				supportInvalidateOptionsMenu();
@@ -12764,15 +12752,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 
 			transferCallback = transfer.getNotificationNumber();
-			pendingTransfers = 	megaApi.getNumPendingDownloads() + megaApi.getNumPendingUploads();
-			totalTransfers = 	megaApi.getTotalDownloads() + megaApi.getTotalUploads();
-
-			log("Pending transfers: "+pendingTransfers+" totalTransfers "+totalTransfers);
-
-			totalSizePendingTransfer += transfer.getTotalBytes();
-			totalSizeTransfered = megaApi.getTotalDownloadedBytes() + megaApi.getTotalUploadedBytes();
-
-			log("Pending bytes: "+totalSizePendingTransfer+" totalBytes "+totalSizeTransfered);
 
 			if (fbFLol != null){
 				if(fbFLol.isAdded()){
@@ -12815,12 +12794,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 			transferCallback = transfer.getNotificationNumber();
 
-			pendingTransfers = 	megaApi.getNumPendingDownloads() + megaApi.getNumPendingUploads();
-			totalTransfers = 	megaApi.getTotalDownloads() + megaApi.getTotalUploads();
-
-			log("Pending transfers: "+pendingTransfers+" totalTransfers "+totalTransfers);
-			totalSizePendingTransfer -= transfer.getTransferredBytes();
-			totalSizeTransfered = megaApi.getTotalDownloadedBytes() + megaApi.getTotalUploadedBytes();
+			int pendingTransfers = 	megaApi.getNumPendingDownloads() + megaApi.getNumPendingUploads();
 
 			if(pendingTransfers<=0){
 				if(transfersBottomSheet!=null){
@@ -12861,14 +12835,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 			if(transferCallback<transfer.getNotificationNumber()){
 				transferCallback = transfer.getNotificationNumber();
-
-				pendingTransfers = 	megaApi.getNumPendingDownloads() + megaApi.getNumPendingUploads();
-				totalTransfers = 	megaApi.getTotalDownloads() + megaApi.getTotalUploads();
-
-				totalSizePendingTransfer -= transfer.getTransferredBytes();
-				totalSizeTransfered = megaApi.getTotalDownloadedBytes() + megaApi.getTotalUploadedBytes();
-				log("Pending transfers: "+pendingTransfers+" totalTransfers "+totalTransfers);
-				log("Pending bytes: "+totalSizePendingTransfer+" totalBytes "+totalSizeTransfered);
 
 				if (fbFLol != null){
 					if(fbFLol.isAdded()){
@@ -13142,7 +13108,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	public void showTransfersPanel(){
 		log("showChatPanel");
 
-		pendingTransfers = megaApi.getNumPendingUploads()+megaApi.getNumPendingDownloads();
+		int pendingTransfers = megaApi.getNumPendingUploads()+megaApi.getNumPendingDownloads();
 
 		if(pendingTransfers>0){
 			transfersBottomSheet = new TransfersBottomSheetDialogFragment();
