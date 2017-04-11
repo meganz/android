@@ -187,7 +187,7 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 					log("Disabled!");
 					holder.imageView.setAlpha(.4f);
 					holder.textViewFileName.setTextColor(context.getResources().getColor(R.color.text_secondary));
-					holder.permissionsIcon.setImageResource(R.drawable.ic_permissions_read_only);
+					holder.permissionsIcon.setImageResource(R.drawable.ic_shared_read);
 					holder.permissionsIcon.setAlpha(.4f);
 					holder.itemView.setOnClickListener(null);
 				}
@@ -200,10 +200,10 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 					int accessLevel = megaApi.getAccess(node);
 
 					if(accessLevel== MegaShare.ACCESS_FULL){
-						holder.permissionsIcon.setImageResource(R.drawable.ic_permissions_full_access);
+						holder.permissionsIcon.setImageResource(R.drawable.ic_shared_fullaccess);
 					}
 					else{
-						holder.permissionsIcon.setImageResource(R.drawable.ic_permissions_read_write);
+						holder.permissionsIcon.setImageResource(R.drawable.ic_shared_read_write);
 					}
 
 					holder.permissionsIcon.setAlpha(1.0f);

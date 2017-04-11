@@ -949,17 +949,17 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 							case MegaShare.ACCESS_OWNER:
 							case MegaShare.ACCESS_FULL:{
 								permissionInfo.setText(getResources().getString(R.string.file_properties_shared_folder_full_access));
-								permissionsIcon.setImageResource(R.drawable.ic_permissions_full_access);
+								permissionsIcon.setImageResource(R.drawable.ic_shared_fullaccess);
 								break;
 							}
 							case MegaShare.ACCESS_READ:{
 								permissionInfo.setText(getResources().getString(R.string.file_properties_shared_folder_read_only));
-								permissionsIcon.setImageResource(R.drawable.ic_permissions_read_only);
+								permissionsIcon.setImageResource(R.drawable.ic_shared_read);
 								break;
 							}
 							case MegaShare.ACCESS_READWRITE:{
 								permissionInfo.setText(getResources().getString(R.string.file_properties_shared_folder_read_write));
-								permissionsIcon.setImageResource(R.drawable.ic_permissions_read_write);
+								permissionsIcon.setImageResource(R.drawable.ic_shared_read_write);
 								break;
 							}
 						}
