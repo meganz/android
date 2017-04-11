@@ -322,20 +322,18 @@ public class MegaSharedFolderLollipopAdapter extends RecyclerView.Adapter<MegaSh
 					}
 				}
 				else{
-					if (!pendingAvatars.contains(holder.contactMail)){
-						pendingAvatars.add(holder.contactMail);
-						if (context.getExternalCacheDir() != null){
-							megaApi.getUserAvatar(contact, context.getExternalCacheDir().getAbsolutePath() + "/" + holder.contactMail + ".jpg", listener);
-						}
-						else{
-							megaApi.getUserAvatar(contact, context.getCacheDir().getAbsolutePath() + "/" + holder.contactMail + ".jpg", listener);
-						}
+					if (context.getExternalCacheDir() != null){
+						megaApi.getUserAvatar(contact, context.getExternalCacheDir().getAbsolutePath() + "/" + holder.contactMail + ".jpg", listener);
+					}
+					else{
+						megaApi.getUserAvatar(contact, context.getCacheDir().getAbsolutePath() + "/" + holder.contactMail + ".jpg", listener);
 					}
 				}
 			} else {
 
 				if(this.isItemChecked(position)){
 					holder.imageView.setImageResource(R.drawable.ic_multiselect);
+					holder.initialLetter.setVisibility(View.GONE);
 					holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.new_multiselect_color));
 				}
 				else{
@@ -383,14 +381,11 @@ public class MegaSharedFolderLollipopAdapter extends RecyclerView.Adapter<MegaSh
 						}
 					}
 					else{
-						if (!pendingAvatars.contains(holder.contactMail)){
-							pendingAvatars.add(holder.contactMail);
-							if (context.getExternalCacheDir() != null){
-								megaApi.getUserAvatar(contact, context.getExternalCacheDir().getAbsolutePath() + "/" + holder.contactMail + ".jpg", listener);
-							}
-							else{
-								megaApi.getUserAvatar(contact, context.getCacheDir().getAbsolutePath() + "/" + holder.contactMail + ".jpg", listener);
-							}
+						if (context.getExternalCacheDir() != null){
+							megaApi.getUserAvatar(contact, context.getExternalCacheDir().getAbsolutePath() + "/" + holder.contactMail + ".jpg", listener);
+						}
+						else{
+							megaApi.getUserAvatar(contact, context.getCacheDir().getAbsolutePath() + "/" + holder.contactMail + ".jpg", listener);
 						}
 					}
 				}
@@ -416,7 +411,6 @@ public class MegaSharedFolderLollipopAdapter extends RecyclerView.Adapter<MegaSh
 		
         holder.imageButtonThreeDots.setTag(holder);
 		holder.imageButtonThreeDots.setOnClickListener(this);
-
 	}
 	
 	public void createDefaultAvatar(ViewHolderShareList holder, MegaUser contact){
@@ -660,6 +654,14 @@ public class MegaSharedFolderLollipopAdapter extends RecyclerView.Adapter<MegaSh
 	}
 
 	public void selectAll(){
+		for (int i= 0; i<this.getItemCount();i++){
+			if(!isItemChecked(i)){
+				toggleAllSelection(i);
+			}
+		}
+	}
+
+	public void clearSelections() {
 		log("clearSelections");
 		for (int i= 0; i<this.getItemCount();i++){
 			if(isItemChecked(i)){
@@ -688,16 +690,7 @@ public class MegaSharedFolderLollipopAdapter extends RecyclerView.Adapter<MegaSh
 		} catch (IndexOutOfBoundsException e) {}
 		return null;
 	}
-	
-	public void clearSelections() {
-		log("clearSelections");
-		for (int i= 0; i<this.getItemCount();i++){
-			if(isItemChecked(i)){
-				toggleAllSelection(i);
-			}
-		}
-	}
-	
+
 	private boolean isItemChecked(int position) {
         return selectedItems.get(position);
     }
