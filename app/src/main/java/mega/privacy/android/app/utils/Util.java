@@ -85,7 +85,7 @@ import nz.mega.sdk.MegaNode;
 
 public class Util {
 	
-	public static int ONTRANSFERUPDATE_REFRESH_MILLIS = 250;
+	public static int ONTRANSFERUPDATE_REFRESH_MILLIS = 400;
 	
 	public static float dpWidthAbs = 360;
 	public static float dpHeightAbs = 592;

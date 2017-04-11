@@ -35,10 +35,14 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.managerSections.TransfersFragmentLollipop;
+import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaListChatLollipopAdapter;
 import mega.privacy.android.app.utils.ThumbnailUtils;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
+import mega.privacy.android.app.utils.TimeChatUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaChatListItem;
+import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaTransfer;
 
@@ -56,7 +60,7 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
 	
 	boolean multipleSelect;
 	
-	ListView listFragment;
+	RecyclerView listFragment;
 	
 //	public MegaTransfersAdapter(Context _context, SparseArray<TransfersHolder> _transfers, ActionBar aB) {
 //		this.context = _context;
@@ -147,7 +151,8 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
     	public TextView textViewCompleted;
     	public ProgressBar transferProgressBar;
     	public RelativeLayout itemLayout;
-    	public ImageButton optionRemove;
+    	public ImageView optionRemove;
+		public ImageView optionPause;
     	public int currentPosition;
     	public long document;
     	public String currentPath;
@@ -162,14 +167,7 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
     	this.tL = transfers;
     	notifyDataSetChanged();
     }
-    
-    public void setCurrentTransfer(MegaTransfer mT)
-    {
-    	log("setCurrentTransfer");
-    	this.currentTransfer = mT;
-    	notifyDataSetChanged();    		
-   }   
-    
+
     @Override
 	public ViewHolderTransfer onCreateViewHolder(ViewGroup parent, int viewType) {
     	log("onCreateViewHolder");
@@ -200,8 +198,10 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
 		holder.imageViewCompleted = (ImageView) v.findViewById(R.id.transfers_list_completed_image);
 		holder.textViewCompleted = (TextView) v.findViewById(R.id.transfers_list_completed_text);
 		holder.transferProgressBar = (ProgressBar) v.findViewById(R.id.transfers_list_bar);
-		holder.optionRemove = (ImageButton) v.findViewById(R.id.transfers_list_option_remove);		
+		holder.optionRemove = (ImageView) v.findViewById(R.id.transfers_list_option_remove);
 		holder.optionRemove.setOnClickListener(this);
+		holder.optionPause = (ImageView) v.findViewById(R.id.transfers_list_option_pause);
+		holder.optionPause.setOnClickListener(this);
 		v.setTag(holder);
     	
     	return holder;
@@ -209,7 +209,7 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
 
 	@Override
 	public void onBindViewHolder(ViewHolderTransfer holder, int position) {
-		log("onBindViewHolder");
+		log("onBindViewHolder: "+position);
 		
 		Display display = ((Activity) context).getWindowManager().getDefaultDisplay();
 		DisplayMetrics outMetrics = new DisplayMetrics();
@@ -235,6 +235,7 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
 			}
 		}
 		String fileName = transfer.getFileName();
+		log("onBindViewHolder: "+fileName);
 		holder.textViewFileName.setText(fileName);
 
 		if (transfer.getType() == MegaTransfer.TYPE_DOWNLOAD){
@@ -336,6 +337,8 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
 				holder.imageViewCompleted.setImageResource(R.drawable.ic_queue);
 				holder.transferProgressBar.setVisibility(View.GONE);
 				holder.optionRemove.setVisibility(View.VISIBLE);
+				holder.optionPause.setImageResource(R.drawable.ic_play);
+				holder.optionPause.setVisibility(View.VISIBLE);
 				break;
 			}
 			case MegaTransfer.STATE_CANCELLED:{
@@ -345,6 +348,7 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
 				holder.imageViewCompleted.setImageResource(R.drawable.ic_queue);
 				holder.transferProgressBar.setVisibility(View.GONE);
 				holder.optionRemove.setVisibility(View.GONE);
+				holder.optionPause.setVisibility(View.GONE);
 				break;
 			}
 			case MegaTransfer.STATE_COMPLETED:{
@@ -354,6 +358,7 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
 				holder.imageViewCompleted.setImageResource(R.drawable.ic_queue);
 				holder.transferProgressBar.setVisibility(View.GONE);
 				holder.optionRemove.setVisibility(View.GONE);
+				holder.optionPause.setVisibility(View.GONE);
 				break;
 			}
 			case MegaTransfer.STATE_ACTIVE:{
@@ -365,6 +370,8 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
 				log("Progress Value: "+ progressValue);
 				holder.transferProgressBar.setProgress((int)progressValue);
 				holder.optionRemove.setVisibility(View.VISIBLE);
+				holder.optionPause.setImageResource(R.drawable.ic_item_pause);
+				holder.optionPause.setVisibility(View.VISIBLE);
 				break;
 			}
 			case MegaTransfer.STATE_COMPLETING:
@@ -376,6 +383,7 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
 				holder.imageViewCompleted.setImageResource(R.drawable.ic_queue);
 				holder.transferProgressBar.setVisibility(View.GONE);
 				holder.optionRemove.setVisibility(View.VISIBLE);
+				holder.optionPause.setVisibility(View.VISIBLE);
 				break;
 			}
 			default:{
@@ -383,6 +391,7 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
 				holder.imageViewCompleted.setVisibility(View.VISIBLE);
 				holder.transferProgressBar.setVisibility(View.GONE);
 				holder.textViewCompleted.setText("DEFAULT");
+				holder.optionPause.setVisibility(View.GONE);
 				break;
 			}
 		}
@@ -452,6 +461,25 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
 				notifyDataSetChanged();
 				break;
 			}
+		}
+	}
+
+	public void updateProgress(int position) {
+		log("updateProgress");
+
+		ViewHolderTransfer holder = (ViewHolderTransfer) listFragment.findViewHolderForAdapterPosition(position);
+
+		if(holder!=null){
+			MegaTransfer transfer = tL.get(position);
+
+			double progressValue = 100.0 * transfer.getTransferredBytes() / transfer.getTotalBytes();
+			log("Progress Value: "+ progressValue);
+			holder.transferProgressBar.setProgress((int)progressValue);
+
+		}
+		else{
+			log("Holder is NULL: "+position);
+			notifyItemChanged(position);
 		}
 	}
 	
