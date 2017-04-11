@@ -404,6 +404,7 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
 
 		holder.itemLayout.setBackgroundColor(Color.WHITE);
 		holder.optionRemove.setTag(holder);
+		holder.optionPause.setTag(holder);
 	}
  
 	@Override
@@ -426,23 +427,6 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
     
     public void setPositionClicked(int p){
     	positionClicked = p;
-    }
-    
-    public void threeDotsClick(int position){
-    	if (positionClicked == -1){
-			positionClicked = position;
-			notifyDataSetChanged();
-		}
-		else{
-			if (positionClicked == position){
-				positionClicked = -1;
-				notifyDataSetChanged();
-			}
-			else{
-				positionClicked = position;
-				notifyDataSetChanged();
-			}
-		}
     }
 
 	@Override

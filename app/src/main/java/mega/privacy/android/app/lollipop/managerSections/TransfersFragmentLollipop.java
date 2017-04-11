@@ -182,14 +182,6 @@ public class TransfersFragmentLollipop extends Fragment implements RecyclerView.
         aB = ((AppCompatActivity)activity).getSupportActionBar();
     }
 
-    public void itemClick(AdapterView<?> parent, View view, int position, long id) {
-		
-		if (adapter != null){
-			adapter.threeDotsClick(position);
-		}	
-		
-    }
-	
 	public int onBackPressed(){
 		
 		if (adapter == null){
