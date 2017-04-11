@@ -156,17 +156,17 @@ public class ContactFileListBottomSheetDialogFragment extends BottomSheetDialogF
                     switch (accessLevel) {
                         case MegaShare.ACCESS_FULL: {
                             log("LEVEL 0 - access FULL");
-                            nodeIcon.setImageResource(R.drawable.ic_permissions_full_access);
+                            nodeIcon.setImageResource(R.drawable.ic_shared_fullaccess);
                             break;
                         }
                         case MegaShare.ACCESS_READ: {
                             log("LEVEL 0 - access read");
-                            nodeIcon.setImageResource(R.drawable.ic_permissions_read_only);
+                            nodeIcon.setImageResource(R.drawable.ic_shared_read);
                             break;
                         }
                         case MegaShare.ACCESS_READWRITE: {
                             log("LEVEL 0 - readwrite");
-                            nodeIcon.setImageResource(R.drawable.ic_permissions_read_write);
+                            nodeIcon.setImageResource(R.drawable.ic_shared_read_write);
                         }
                     }
                     nodeIconLayout.setVisibility(View.VISIBLE);

@@ -251,7 +251,6 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                             //Node has public link
                             nodeIconLayout.setVisibility(View.VISIBLE);
                             nodeIcon.setImageResource(R.drawable.link_ic);
-                            nodeIcon.setColorFilter(ContextCompat.getColor(context,R.color.transparency_white));
 
                             optionLinkText.setText(R.string.edit_link_option);
                             optionRemoveLink.setVisibility(View.VISIBLE);
@@ -337,7 +336,6 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                         //Node has public link
                         nodeIconLayout.setVisibility(View.VISIBLE);
                         nodeIcon.setImageResource(R.drawable.link_ic);
-                        nodeIcon.setColorFilter(ContextCompat.getColor(context,R.color.transparency_white));
                         optionLinkText.setText(R.string.edit_link_option);
                         optionRemoveLink.setVisibility(View.VISIBLE);
                         if(node.isExpired()){
@@ -428,17 +426,17 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                             switch (accessLevel) {
                                 case MegaShare.ACCESS_FULL: {
                                     log("LEVEL 0 - access FULL");
-                                    nodeIcon.setImageResource(R.drawable.ic_permissions_full_access);
+                                    nodeIcon.setImageResource(R.drawable.ic_shared_fullaccess);
                                     break;
                                 }
                                 case MegaShare.ACCESS_READ: {
                                     log("LEVEL 0 - access read");
-                                    nodeIcon.setImageResource(R.drawable.ic_permissions_read_only);
+                                    nodeIcon.setImageResource(R.drawable.ic_shared_read);
                                     break;
                                 }
                                 case MegaShare.ACCESS_READWRITE: {
                                     log("LEVEL 0 - readwrite");
-                                    nodeIcon.setImageResource(R.drawable.ic_permissions_read_write);
+                                    nodeIcon.setImageResource(R.drawable.ic_shared_read_write);
                                 }
                             }
                         }
@@ -497,7 +495,6 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                             //Node has public link
                             nodeIconLayout.setVisibility(View.VISIBLE);
                             nodeIcon.setImageResource(R.drawable.link_ic);
-                            nodeIcon.setColorFilter(ContextCompat.getColor(context,R.color.transparency_white));
                             optionLinkText.setText(R.string.edit_link_option);
                             optionRemoveLink.setVisibility(View.VISIBLE);
                             if(node.isExpired()){
@@ -555,7 +552,6 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                         //Node has public link
                         nodeIconLayout.setVisibility(View.VISIBLE);
                         nodeIcon.setImageResource(R.drawable.link_ic);
-                        nodeIcon.setColorFilter(ContextCompat.getColor(context,R.color.transparency_white));
                         optionLinkText.setText(R.string.edit_link_option);
                         optionRemoveLink.setVisibility(View.VISIBLE);
                         if(node.isExpired()){
