@@ -531,16 +531,15 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                         optionMove.setVisibility(View.VISIBLE);
                         optionCopy.setVisibility(View.VISIBLE);
                         optionSendInbox.setVisibility(View.VISIBLE);
+                        optionRubbishBin.setVisibility(View.VISIBLE);
 
                         //Hide
-                        optionRubbishBin.setVisibility(View.GONE);
                         optionRemove.setVisibility(View.GONE);
                         optionLeaveShares.setVisibility(View.GONE);
                         optionOpenFolder.setVisibility(View.GONE);
                     }
 
                     break;
-
                 }
                 case SEARCH: {
                     if (node.isFolder()) {
@@ -758,6 +757,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                     return;
                 }
                 nC.selectContactToSendNode(node);
+                dismissAllowingStateLoss();
                 break;
             }
             case R.id.option_rename_layout:{
