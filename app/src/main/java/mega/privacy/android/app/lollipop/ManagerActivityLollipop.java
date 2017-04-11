@@ -214,6 +214,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	public int pendingTransfers = 0;
 	public int totalTransfers = 0;
 	public long transferCallback = 0;
+	public int downloadInProgress = -1;
+	public int uploadInProgress = -1;
 
 	TransfersBottomSheetDialogFragment transfersBottomSheet = null;
 
@@ -355,8 +357,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	int levelsSearch = -1;
 	boolean openLink = false;
 	boolean sendToInbox = false;
-//	long handleToDownload=0;
-	long lastTimeOnTransferUpdate = -1;
+
+	long lastTimeOnTransferUpdate = Calendar.getInstance().getTimeInMillis();
 
 	private int orderCloud = MegaApiJava.ORDER_DEFAULT_ASC;
 	private int orderContacts = MegaApiJava.ORDER_DEFAULT_ASC;
@@ -12681,9 +12683,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 	@Override
 	public void onTransferStart(MegaApiJava api, MegaTransfer transfer) {
-		log("onTransferStart: " + transfer.getNotificationNumber()+ "-" + transfer.getFileName() + " - " + transfer.getTag());
+		log("-------------------onTransferStart: " + transfer.getNotificationNumber()+ "-" + transfer.getFileName() + " - " + transfer.getTag());
 
 		if(transferCallback<transfer.getNotificationNumber()) {
+
+			long now = Calendar.getInstance().getTimeInMillis();
+			lastTimeOnTransferUpdate = now;
 
 			synchronized(transfersInProgressSync) {
 				transfersInProgressSync.add(transfer);
@@ -12708,7 +12713,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 			if (tFLol != null){
 				if(tFLol.isAdded()){
-					tFLol.setTransfers();
+					tFLol.refreshAllTransfers();
 				}
 			}
 		}
@@ -12716,9 +12721,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 	@Override
 	public void onTransferFinish(MegaApiJava api, MegaTransfer transfer, MegaError e) {
-		log("onTransferFinish: "+transfer.getFileName() + " - " + transfer.getTag() + "- " +transfer.getNotificationNumber());
+		log("--------------onTransferFinish: "+transfer.getFileName() + " - " + transfer.getTag() + "- " +transfer.getNotificationNumber());
 
 		if(transferCallback<transfer.getNotificationNumber()) {
+
+			long now = Calendar.getInstance().getTimeInMillis();
+			lastTimeOnTransferUpdate = now;
 
 			synchronized(transfersInProgressSync) {
 				ListIterator li = transfersInProgressSync.listIterator();
@@ -12759,9 +12767,16 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				}
 			}
 
+			if(transfer.getType()==MegaTransfer.TYPE_DOWNLOAD){
+				downloadInProgress=-1;
+			}
+			else{
+				uploadInProgress=-1;
+			}
+
 			if (tFLol != null){
 				if(tFLol.isAdded()){
-					tFLol.updateTransfers();
+					tFLol.refreshAllTransfers();
 				}
 			}
 		}
@@ -12770,39 +12785,102 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	@Override
 	public void onTransferUpdate(MegaApiJava api, MegaTransfer transfer) {
 //		log("onTransferUpdate: " + transfer.getFileName() + " - " + transfer.getTag());
+		long now = Calendar.getInstance().getTimeInMillis();
+		if((now - lastTimeOnTransferUpdate)>Util.ONTRANSFERUPDATE_REFRESH_MILLIS){
+			log("Update onTransferUpdate: " + transfer.getFileName() + " - " + transfer.getTag()+ " - "+ transfer.getNotificationNumber());
+			lastTimeOnTransferUpdate = now;
 
-		if(transferCallback<transfer.getNotificationNumber()){
-			transferCallback = transfer.getNotificationNumber();
+			if(transferCallback<transfer.getNotificationNumber()){
+				transferCallback = transfer.getNotificationNumber();
 
-			pendingTransfers = 	megaApi.getNumPendingDownloads() + megaApi.getNumPendingUploads();
-			totalTransfers = 	megaApi.getTotalDownloads() + megaApi.getTotalUploads();
+				pendingTransfers = 	megaApi.getNumPendingDownloads() + megaApi.getNumPendingUploads();
+				totalTransfers = 	megaApi.getTotalDownloads() + megaApi.getTotalUploads();
 
-			totalSizePendingTransfer -= transfer.getTransferredBytes();
-			totalSizeTransfered = megaApi.getTotalDownloadedBytes() + megaApi.getTotalUploadedBytes();
-			log("Pending transfers: "+pendingTransfers+" totalTransfers "+totalTransfers);
-			log("Pending bytes: "+totalSizePendingTransfer+" totalBytes "+totalSizeTransfered);
+				totalSizePendingTransfer -= transfer.getTransferredBytes();
+				totalSizeTransfered = megaApi.getTotalDownloadedBytes() + megaApi.getTotalUploadedBytes();
+				log("Pending transfers: "+pendingTransfers+" totalTransfers "+totalTransfers);
+				log("Pending bytes: "+totalSizePendingTransfer+" totalBytes "+totalSizeTransfered);
 
-			if (fbFLol != null){
-				if(fbFLol.isAdded()){
-					fbFLol.setOverviewLayout();
+				if (fbFLol != null){
+					if(fbFLol.isAdded()){
+						fbFLol.setOverviewLayout();
+					}
 				}
-			}
 
-			if (drawerItem == DrawerItem.TRANSFERS){
-				if (tFLol != null){
-					Time now = new Time();
-					now.setToNow();
-					long nowMillis = now.toMillis(false);
-					log("on transfers update... "+transfer.getTransferredBytes());
-					if (lastTimeOnTransferUpdate < 0){
-						lastTimeOnTransferUpdate = now.toMillis(false);
-//						tFLol.setCurrentTransfer(transfer);
-					}
-					else if ((nowMillis - lastTimeOnTransferUpdate) > Util.ONTRANSFERUPDATE_REFRESH_MILLIS){
-						lastTimeOnTransferUpdate = nowMillis;
-//						tFLol.setCurrentTransfer(transfer);
-					}
+				if(transfer.getType()==MegaTransfer.TYPE_DOWNLOAD){
+					if(transfer.getTag()!=downloadInProgress){
+						log("Reorder list of transfers! -- DOWNLOAD CHANGE");
+						downloadInProgress=transfer.getTag();
+						//Find item in the list and move to the first element
+						synchronized(transfersInProgressSync) {
+							ListIterator li = transfersInProgressSync.listIterator();
+							int index = 0;
+							while(li.hasNext()) {
+								MegaTransfer next = (MegaTransfer) li.next();
+								if(next.getTag() == transfer.getTag()){
+									index=li.previousIndex();
+									break;
+								}
+							}
+							transfersInProgressSync.remove(index);
+							transfersInProgressSync.add(0, transfer);
+							log("The download with index : "+index +"has been moved to position 0");
+						}
 
+						if (tFLol != null){
+							if(tFLol.isAdded()){
+								tFLol.refreshAllTransfers();
+							}
+						}
+
+					}
+					else{
+						if (tFLol != null){
+							if(tFLol.isAdded()){
+								tFLol.transferUpdate(transfer);
+							}
+						}
+					}
+				}
+				else {
+					if(transfer.getTag()!=uploadInProgress){
+						log("Reorder list of transfers! -- UPLOAD CHANGE");
+						uploadInProgress=transfer.getTag();
+						//Find item in the list and move to the first element
+						synchronized(transfersInProgressSync) {
+							ListIterator li = transfersInProgressSync.listIterator();
+							int index = 0;
+							while(li.hasNext()) {
+								MegaTransfer next = (MegaTransfer) li.next();
+								if(next.getTag() == transfer.getTag()){
+									index=li.previousIndex();
+									break;
+								}
+							}
+							transfersInProgressSync.remove(index);
+							if(downloadInProgress!=-1){
+								transfersInProgressSync.add(1, transfer);
+							}
+							else{
+								transfersInProgressSync.add(0, transfer);
+							}
+							log("The download with index : "+index +"has been moved to position 0");
+						}
+
+						if (tFLol != null){
+							if(tFLol.isAdded()){
+								tFLol.refreshAllTransfers();
+							}
+						}
+
+					}
+					else{
+						if (tFLol != null){
+							if(tFLol.isAdded()){
+								tFLol.transferUpdate(transfer);
+							}
+						}
+					}
 				}
 			}
 		}

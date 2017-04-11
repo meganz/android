@@ -13,8 +13,8 @@
     
     <ImageView
         android:id="@+id/transfers_list_small_icon"
-        android:layout_width="10dp"
-        android:layout_height="10dp"
+        android:layout_width="21dp"
+        android:layout_height="21dp"
         android:src="@drawable/ic_download_transfers"
         android:layout_alignRight="@id/transfers_list_thumbnail"
         android:layout_alignTop="@id/transfers_list_thumbnail" />
@@ -30,7 +30,6 @@
         android:ellipsize="end"
         android:textSize="16sp"
         android:maxLines="1"/>
-
     
     <ImageView
         android:id="@+id/transfers_list_completed_image"
@@ -57,19 +56,31 @@
 		android:src="@drawable/ic_close_grey"
 		android:background="@null"
 		android:layout_centerVertical="true"
-		android:layout_marginLeft="16dp"
+		android:layout_marginRight="16dp"
 		android:layout_alignParentRight="true"/>
-         
+
+    <ImageView
+        android:id="@+id/transfers_list_option_pause"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_item_pause"
+        android:background="@null"
+        android:tint="@color/transparency_white"
+        android:layout_centerVertical="true"
+        android:layout_marginRight="12dp"
+        android:layout_marginLeft="12dp"
+        android:layout_toLeftOf="@id/transfers_list_option_remove"/>
+
     <ProgressBar
 	    android:id="@+id/transfers_list_bar"
 		android:layout_width="fill_parent"
-		android:layout_height="wrap_content" 
+		android:layout_height="5dp"
 		style="@style/UsedSpaceProgressBar"  
         android:layout_marginLeft="13dp" 
-        android:layout_marginRight="10dp"
-        android:layout_marginTop="6dp" 
+        android:layout_marginRight="16dp"
+        android:layout_marginTop="10dp"
 		android:layout_below="@id/transfers_list_filename"
-		android:layout_toLeftOf="@id/transfers_list_option_remove"
+		android:layout_toLeftOf="@id/transfers_list_option_pause"
         android:layout_toRightOf="@id/transfers_list_thumbnail" />
 
 </RelativeLayout>

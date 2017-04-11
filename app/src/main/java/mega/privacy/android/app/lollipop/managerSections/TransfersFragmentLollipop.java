@@ -107,7 +107,7 @@ public class TransfersFragmentLollipop extends Fragment implements RecyclerView.
 		listView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
 		mLayoutManager = new LinearLayoutManager(context);
 		listView.setLayoutManager(mLayoutManager);
-		listView.addOnItemTouchListener(this);
+		listView.setHasFixedSize(true);
 		listView.setItemAnimator(new DefaultItemAnimator());
 
 		emptyImage = (ImageView) v.findViewById(R.id.transfers_empty_image);
@@ -149,8 +149,8 @@ public class TransfersFragmentLollipop extends Fragment implements RecyclerView.
 		}
 	}
 
-	public void updateTransfers(){
-		log("setTransfers");
+	public void refreshAllTransfers(){
+		log("refreshAllTransfers");
 		tL.clear();
 
 		synchronized(((ManagerActivityLollipop)context).transfersInProgressSync) {
@@ -205,63 +205,25 @@ public class TransfersFragmentLollipop extends Fragment implements RecyclerView.
 			return 0;
 		}
 	}
-	
-//	public void setTransfers(SparseArray<TransfersHolder> tl){
-//		transfersListArray = tl;
-//		if (adapter != null){
-//			adapter.setTransfers(transfersListArray);
-//		}
-//	}
-	
-	public void updateTransfers(ArrayList<MegaTransfer> _transfers){
-		this.tL = _transfers;
-		
-		if (adapter != null){
-			if (tL == null){
-				adapter.setPositionClicked(-1);
-			}
-			else{
-				if (tL.size() == 0){
-					adapter.setPositionClicked(-1);					
-				}				
-			}
-			adapter.setTransfers(tL);
-		}
-		
 
-        if (tL.size() == 0){
-            emptyImage.setVisibility(View.VISIBLE);
-            emptyText.setVisibility(View.VISIBLE);
-            listView.setVisibility(View.GONE);
+	public void transferUpdate(MegaTransfer transfer){
+        log("transferUpdate");
+        if(transfer.getType()==MegaTransfer.TYPE_DOWNLOAD){
+            tL.set(0, transfer);
+            adapter.notifyItemChanged(0);
         }
-        else{
-            emptyImage.setVisibility(View.GONE);
-            emptyText.setVisibility(View.GONE);
-            listView.setVisibility(View.VISIBLE);
+        else {
+            if(((ManagerActivityLollipop)context).downloadInProgress!=-1){
+                tL.set(1, transfer);
+                adapter.updateProgress(1);
+            }
+            else{
+                tL.set(0, transfer);
+                adapter.updateProgress(0);
+            }
         }
+    }
 
-	}
-
-	public void addNewTransfer(){
-
-	}
-
-	public void addCompleteTransfer(){
-
-	}
-
-	public void addCurrentTransfer(){
-
-	}
-
-
-	public void setCurrentTransfer(MegaTransfer mT){
-		log("setCurrentTransfer");
-		if (adapter != null){
-			adapter.setCurrentTransfer(mT);
-		}
-	}
-	
 	public void setPause(boolean pause){
 		this.pause = pause;
 		
