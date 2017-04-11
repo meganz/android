@@ -8233,9 +8233,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		this.isGetLink = value;
 	}
 
-	public void cancelTransfer (MegaTransfer t){
+	public void showConfirmationCancelTransfer (MegaTransfer t, boolean cancelValue){
 		log("cancelTransfer");
 		final MegaTransfer mT = t;
+		final boolean cancel = cancelValue;
 
 		//Show confirmation message
 		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
@@ -8244,7 +8245,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		        switch (which){
 		        case DialogInterface.BUTTON_POSITIVE:
 		        	log("Pressed button positive to cancel transfer");
-		    		megaApi.cancelTransfer(mT, managerActivity);
+					if(cancel){
+						megaApi.cancelTransfer(mT, managerActivity);
+					}
+					else{
+						megaApi.pauseTransfer(mT, true, managerActivity);
+					}
+
 		            break;
 
 		        case DialogInterface.BUTTON_NEGATIVE:
@@ -8255,9 +8262,18 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
 //		builder.setTitle(getResources().getString(R.string.cancel_transfer_title));
-        builder.setMessage(getResources().getString(R.string.cancel_transfer_confirmation));
-        builder.setPositiveButton(R.string.general_cancel, dialogClickListener);
-        builder.setNegativeButton(R.string.general_dismiss, dialogClickListener);
+        if(cancel){
+
+			builder.setMessage(getResources().getString(R.string.cancel_transfer_confirmation));
+			builder.setPositiveButton(R.string.general_cancel, dialogClickListener);
+			builder.setNegativeButton(R.string.general_dismiss, dialogClickListener);
+		}
+		else {
+
+			builder.setMessage(getResources().getString(R.string.menu_pause_individual_transfer));
+			builder.setPositiveButton(R.string.action_pause, dialogClickListener);
+			builder.setNegativeButton(R.string.general_cancel, dialogClickListener);
+		}
         builder.show();
 	}
 
@@ -11929,6 +11945,36 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
     			}
 			}
 		}
+		else if (request.getType() == MegaRequest.TYPE_PAUSE_TRANSFER) {
+			log("one MegaRequest.TYPE_PAUSE_TRANSFER");
+
+			if (e.getErrorCode() == MegaError.API_OK){
+				int index = 0;
+				MegaTransfer newTransfer = megaApi.getTransferByTag(request.getTransferTag());
+				synchronized(transfersInProgressSync) {
+					ListIterator li = transfersInProgressSync.listIterator();
+
+					while(li.hasNext()) {
+						MegaTransfer next = (MegaTransfer) li.next();
+						if(next.getTag() == request.getTransferTag()){
+							index=li.previousIndex();
+							break;
+						}
+					}
+					transfersInProgressSync.set(index, newTransfer);
+					log("The transfer with index : "+index +"has been replaced is paused");
+				}
+
+				if (tFLol != null){
+					if (drawerItem == DrawerItem.TRANSFERS && tFLol.isAdded()){
+						tFLol.cancelTransferConfirmation(newTransfer, index);
+					}
+				}
+			}
+			else{
+				showSnackbar(getString(R.string.error_general_nodes));
+			}
+		}
 		else if(request.getType() == MegaRequest.TYPE_CANCEL_TRANSFERS){
 			log("MegaRequest.TYPE_CANCEL_TRANSFERS");
 			//After cancelling all the transfers
@@ -11937,18 +11983,22 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			pendingTransfers = megaApi.getNumPendingDownloads() + megaApi.getNumPendingUploads();
 			totalTransfers = megaApi.getTotalDownloads() + megaApi.getTotalUploads();
 
-			//Hide Transfer ProgressBar
-			if (fbFLol != null){
-				if(fbFLol.isAdded()){
-					fbFLol.setOverviewLayout();
+			if (e.getErrorCode() == MegaError.API_OK){
+				if (fbFLol != null){
+					if(fbFLol.isAdded()){
+						fbFLol.setOverviewLayout();
+					}
+				}
+
+				if (tFLol != null){
+					if (drawerItem == DrawerItem.TRANSFERS && tFLol.isAdded()){
+						pauseTransfersMenuIcon.setVisible(false);
+						playTransfersMenuIcon.setVisible(false);
+					}
 				}
 			}
-
-			if (tFLol != null){
-				if (drawerItem == DrawerItem.TRANSFERS && tFLol.isAdded()){
-					pauseTransfersMenuIcon.setVisible(false);
-					playTransfersMenuIcon.setVisible(false);
-				}
+			else{
+				showSnackbar(getString(R.string.error_general_nodes));
 			}
 
 		}
@@ -11988,8 +12038,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 //						tFLol.setTransfers(tL);
 					}
 				}
+				supportInvalidateOptionsMenu();
 			}
-			supportInvalidateOptionsMenu();
+			else{
+				showSnackbar(getString(R.string.error_general_nodes));
+			}
+
 		}
 		else if (request.getType() == MegaRequest.TYPE_KILL_SESSION){
 			log("requestFinish TYPE_KILL_SESSION"+MegaRequest.TYPE_KILL_SESSION);

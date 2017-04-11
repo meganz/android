@@ -235,9 +235,11 @@ public class TransfersFragmentLollipop extends Fragment implements RecyclerView.
 		}
 	}
 	
-	public void cancelTransferConfirmation (MegaTransfer t){
+	public void cancelTransferConfirmation (MegaTransfer newTransfer, int position){
+		log("cancelTransferConfirmation");
+        tL.set(position, newTransfer);
+        adapter.notifyItemChanged(position);
 
-		((ManagerActivityLollipop) context).cancelTransfer(t);
 	}
 
 	private static void log(String log) {
