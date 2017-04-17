@@ -55,7 +55,6 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
 	ArrayList<MegaTransfer> tL = null;
 	MegaTransfer currentTransfer = null;
 	int positionClicked;
-	ActionBar aB;
 	TransfersFragmentLollipop fragment;
 	MegaApiAndroid megaApi;
 	
@@ -127,12 +126,12 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
 	}
 	
 	
-	public MegaTransfersLollipopAdapter(Context _context, TransfersFragmentLollipop _fragment, ArrayList<MegaTransfer> _transfers, ActionBar aB) {
+	public MegaTransfersLollipopAdapter(Context _context, TransfersFragmentLollipop _fragment, ArrayList<MegaTransfer> _transfers, RecyclerView _listView) {
 		this.context = _context;
 		this.tL = _transfers;
 		this.positionClicked = -1;
-		this.aB = aB;
 		this.fragment = _fragment;
+		this.listFragment = _listView;
 		
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();

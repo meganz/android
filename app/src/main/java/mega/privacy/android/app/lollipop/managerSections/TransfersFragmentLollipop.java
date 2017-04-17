@@ -120,7 +120,7 @@ public class TransfersFragmentLollipop extends Fragment implements RecyclerView.
 		setTransfers();
 		
 //		adapter = new MegaTransfersAdapter(context, transfersListArray, aB);
-		adapter = new MegaTransfersLollipopAdapter(context, this, tL, aB);
+		adapter = new MegaTransfersLollipopAdapter(context, this, tL, listView);
 
 		adapter.setMultipleSelect(false);
 		listView.setAdapter(adapter);
