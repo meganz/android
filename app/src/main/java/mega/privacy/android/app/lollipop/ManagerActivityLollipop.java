@@ -2056,7 +2056,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 								public void onClick(DialogInterface dialog, int whichButton) {
 									if (tFLol != null){
 										if (tFLol.isVisible()){
-											tFLol.setNoActiveTransfers();
+											tFLol.setTransfers();
 											supportInvalidateOptionsMenu();
 										}
 									}
@@ -5486,44 +5486,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		    }
 		    case R.id.action_menu_cancel_all_transfers:{
 
-		    	Intent tempIntentDownload = null;
-		    	Intent tempIntentUpload = null;
-				String title = null;
-				String text = null;
-
-				tempIntentUpload = new Intent(this, UploadService.class);
-				tempIntentUpload.setAction(UploadService.ACTION_CANCEL);
-				tempIntentDownload = new Intent(this, DownloadService.class);
-				tempIntentDownload.setAction(DownloadService.ACTION_CANCEL);
-				title = getString(R.string.menu_cancel_all_transfers);
-				text = getString(R.string.cancel_all_transfer_confirmation);
-
-				final Intent cancelIntentDownload = tempIntentDownload;
-				final Intent cancelIntentUpload = tempIntentUpload;
-				AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-//				builder.setTitle(title);
-	            builder.setMessage(text);
-				builder.setPositiveButton(getString(R.string.general_cancel),
-						new DialogInterface.OnClickListener() {
-							public void onClick(DialogInterface dialog, int whichButton) {
-								if (tFLol != null){
-									if (tFLol.isVisible()){
-										tFLol.setNoActiveTransfers();
-									}
-								}
-								startService(cancelIntentDownload);
-								startService(cancelIntentUpload);
-							}
-						});
-				builder.setNegativeButton(getString(R.string.general_dismiss), null);
-				final AlertDialog dialog = builder.create();
-				try {
-					dialog.show();
-				}
-				catch(Exception ex)	{
-					startService(cancelIntentDownload);
-					startService(cancelIntentUpload);
-				}
+		    	showConfirmationCancelAllTransfers();
 
 		    	return true;
 		    }
@@ -8222,50 +8185,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 	public void setIsGetLink(boolean value){
 		this.isGetLink = value;
-	}
-
-	public void showConfirmationCancelTransfer (MegaTransfer t, boolean cancelValue){
-		log("cancelTransfer");
-		final MegaTransfer mT = t;
-		final boolean cancel = cancelValue;
-
-		//Show confirmation message
-		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-		    @Override
-		    public void onClick(DialogInterface dialog, int which) {
-		        switch (which){
-		        case DialogInterface.BUTTON_POSITIVE:
-		        	log("Pressed button positive to cancel transfer");
-					if(cancel){
-						megaApi.cancelTransfer(mT, managerActivity);
-					}
-					else{
-						megaApi.pauseTransfer(mT, true, managerActivity);
-					}
-
-		            break;
-
-		        case DialogInterface.BUTTON_NEGATIVE:
-		            break;
-		        }
-		    }
-		};
-
-		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-//		builder.setTitle(getResources().getString(R.string.cancel_transfer_title));
-        if(cancel){
-
-			builder.setMessage(getResources().getString(R.string.cancel_transfer_confirmation));
-			builder.setPositiveButton(R.string.general_cancel, dialogClickListener);
-			builder.setNegativeButton(R.string.general_dismiss, dialogClickListener);
-		}
-		else {
-
-			builder.setMessage(getResources().getString(R.string.menu_pause_individual_transfer));
-			builder.setPositiveButton(R.string.action_pause, dialogClickListener);
-			builder.setNegativeButton(R.string.general_cancel, dialogClickListener);
-		}
-        builder.show();
 	}
 
 	public void setIsClearRubbishBin(boolean value){
@@ -12720,6 +12639,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		}
 	}
 
+	////TRANSFERS/////
+
 	public void changeTransfersStatus(){
 		log("changeTransfersStatus");
 		if(megaApi.areTransfersPaused(MegaTransfer.TYPE_DOWNLOAD)||megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD)){
@@ -12730,6 +12651,115 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			log("Transfers are play -> pause");
 			megaApi.pauseTransfers(true, this);
 		}
+	}
+
+	public void showConfirmationClearCompletedTransfers (){
+		log("showConfirmationClearCompletedTransfers");
+
+		//Show confirmation message
+		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				switch (which){
+					case DialogInterface.BUTTON_POSITIVE:
+						log("Pressed button positive to clear transfers");
+						transfersCompleted.clear();
+						if(tFLol!=null){
+							if(tFLol.isAdded()){
+								tFLol.refreshAllTransfers();
+							}
+						}
+						break;
+
+					case DialogInterface.BUTTON_NEGATIVE:
+						break;
+				}
+			}
+		};
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+//		builder.setTitle(getResources().getString(R.string.cancel_transfer_title));
+
+		builder.setMessage(getResources().getString(R.string.confirmation_to_clear_completed_transfers));
+		builder.setPositiveButton(R.string.general_clear, dialogClickListener);
+		builder.setNegativeButton(R.string.general_cancel, dialogClickListener);
+
+		builder.show();
+	}
+
+	public void showConfirmationCancelTransfer (MegaTransfer t, boolean cancelValue){
+		log("showConfirmationCancelTransfer");
+		final MegaTransfer mT = t;
+		final boolean cancel = cancelValue;
+
+		//Show confirmation message
+		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				switch (which){
+					case DialogInterface.BUTTON_POSITIVE:
+						log("Pressed button positive to cancel transfer");
+						if(cancel){
+							megaApi.cancelTransfer(mT, managerActivity);
+						}
+						else{
+							megaApi.pauseTransfer(mT, true, managerActivity);
+						}
+
+						break;
+
+					case DialogInterface.BUTTON_NEGATIVE:
+						break;
+				}
+			}
+		};
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+//		builder.setTitle(getResources().getString(R.string.cancel_transfer_title));
+		if(cancel){
+
+			builder.setMessage(getResources().getString(R.string.cancel_transfer_confirmation));
+			builder.setPositiveButton(R.string.general_cancel, dialogClickListener);
+			builder.setNegativeButton(R.string.general_dismiss, dialogClickListener);
+		}
+		else {
+
+			builder.setMessage(getResources().getString(R.string.menu_pause_individual_transfer));
+			builder.setPositiveButton(R.string.action_pause, dialogClickListener);
+			builder.setNegativeButton(R.string.general_cancel, dialogClickListener);
+		}
+		builder.show();
+	}
+
+	public void showConfirmationCancelAllTransfers (){
+		log("showConfirmationCancelAllTransfers");
+
+		//Show confirmation message
+		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				switch (which){
+					case DialogInterface.BUTTON_POSITIVE:
+						log("Pressed button positive to cancel transfer");
+						megaApi.cancelTransfers(MegaTransfer.TYPE_DOWNLOAD);
+						megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD);
+
+						break;
+
+					case DialogInterface.BUTTON_NEGATIVE:
+						break;
+				}
+			}
+		};
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+//		builder.setTitle(getResources().getString(R.string.cancel_transfer_title));
+
+		builder.setMessage(getResources().getString(R.string.cancel_all_transfer_confirmation));
+		builder.setPositiveButton(R.string.general_cancel, dialogClickListener);
+		builder.setNegativeButton(R.string.general_dismiss, dialogClickListener);
+
+		builder.show();
 	}
 
 	@Override

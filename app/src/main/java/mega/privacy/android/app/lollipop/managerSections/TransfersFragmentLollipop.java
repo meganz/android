@@ -220,16 +220,6 @@ public class TransfersFragmentLollipop extends Fragment implements RecyclerView.
 		
 	}
 
-	
-	public void setNoActiveTransfers(){
-		this.pause = false;
-		if (emptyImage != null){
-			emptyImage.setVisibility(View.VISIBLE);
-			emptyText.setVisibility(View.VISIBLE);
-			listView.setVisibility(View.GONE);
-		}
-	}
-	
 	public void cancelTransferConfirmation (MegaTransfer newTransfer, int position){
 		log("cancelTransferConfirmation");
         tL.set(position, newTransfer);

@@ -372,7 +372,7 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
 				log("Progress Value: "+ progressValue);
 				holder.transferProgressBar.setProgress((int)progressValue);
 				holder.optionRemove.setVisibility(View.VISIBLE);
-				holder.optionPause.setImageResource(R.drawable.ic_item_pause);
+				holder.optionPause.setImageResource(R.drawable.ic_pause);
 				holder.optionPause.setVisibility(View.VISIBLE);
 				break;
 			}
