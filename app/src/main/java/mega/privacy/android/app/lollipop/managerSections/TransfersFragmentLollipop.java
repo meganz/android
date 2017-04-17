@@ -129,13 +129,11 @@ public class TransfersFragmentLollipop extends Fragment implements RecyclerView.
 
 	public void setTransfers(){
 		log("setTransfers");
-		synchronized(((ManagerActivityLollipop)context).transfersInProgressSync) {
-			tL.addAll(((ManagerActivityLollipop)context).transfersInProgressSync);
-		}
-		if(!(((ManagerActivityLollipop)context).transfersCompleted.isEmpty())){
-			log("Add completed transfers");
-			tL.addAll(((ManagerActivityLollipop)context).transfersCompleted);
-		}
+
+		tL.addAll(((ManagerActivityLollipop)context).transfersInProgress);
+
+		log("Add completed transfers");
+		tL.addAll(((ManagerActivityLollipop)context).transfersCompleted);
 
 		if (tL.size() == 0){
 			emptyImage.setVisibility(View.VISIBLE);
@@ -153,13 +151,10 @@ public class TransfersFragmentLollipop extends Fragment implements RecyclerView.
 		log("refreshAllTransfers");
 		tL.clear();
 
-		synchronized(((ManagerActivityLollipop)context).transfersInProgressSync) {
-			tL.addAll(((ManagerActivityLollipop)context).transfersInProgressSync);
-		}
-		if(!(((ManagerActivityLollipop)context).transfersCompleted.isEmpty())){
-			log("Add completed transfers");
-			tL.addAll(((ManagerActivityLollipop)context).transfersCompleted);
-		}
+		tL.addAll(((ManagerActivityLollipop)context).transfersInProgress);
+
+		log("Add completed transfers");
+		tL.addAll(((ManagerActivityLollipop)context).transfersCompleted);
 
 		if (tL.size() == 0){
 			emptyImage.setVisibility(View.VISIBLE);

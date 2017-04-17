@@ -204,9 +204,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	Button expiryDateButton;
 	SwitchCompat switchGetLink;
 
-	ArrayList<MegaTransfer> transfersInProgress;
+	public ArrayList<MegaTransfer> transfersInProgress;
 	public ArrayList<MegaTransfer> transfersCompleted;
-	public List<MegaTransfer> transfersInProgressSync;
 	public MegaTransferData transferData;
 
 	public long transferCallback = 0;
@@ -1113,8 +1112,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		}
 
 		transfersInProgress = new ArrayList<MegaTransfer>();
-		transfersInProgressSync = Collections.synchronizedList(transfersInProgress);
-
 		transfersCompleted = new ArrayList<MegaTransfer>();
 
 		Display display = getWindowManager().getDefaultDisplay();
@@ -1537,18 +1534,16 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			int downloadsInProgress = transferData.getNumDownloads();
 			int uploadsInProgress = transferData.getNumUploads();
 
-			synchronized(transfersInProgressSync) {
-				for(int i=0;i<downloadsInProgress;i++){
-					Integer downloadProgressTag = transferData.getDownloadTag(i);
-					MegaTransfer transfer = megaApi.getTransferByTag(downloadProgressTag);
-					transfersInProgressSync.add(transfer);
-				}
-				for(int i=0;i<uploadsInProgress;i++){
-					Integer uploadProgressTag = transferData.getUploadTag(i);
-					MegaTransfer transfer = megaApi.getTransferByTag(uploadProgressTag);
-					transfersInProgressSync.add(transfer);
-				}
-			}
+            for(int i=0;i<downloadsInProgress;i++){
+                Integer downloadProgressTag = transferData.getDownloadTag(i);
+                MegaTransfer transfer = megaApi.getTransferByTag(downloadProgressTag);
+                transfersInProgress.add(transfer);
+            }
+            for(int i=0;i<uploadsInProgress;i++){
+                Integer uploadProgressTag = transferData.getUploadTag(i);
+                MegaTransfer transfer = megaApi.getTransferByTag(uploadProgressTag);
+                transfersInProgress.add(transfer);
+            }
 
 			if(savedInstanceState==null) {
 				log("Run async task to check offline files");
@@ -11947,19 +11942,18 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			if (e.getErrorCode() == MegaError.API_OK){
 				int index = 0;
 				MegaTransfer newTransfer = megaApi.getTransferByTag(request.getTransferTag());
-				synchronized(transfersInProgressSync) {
-					ListIterator li = transfersInProgressSync.listIterator();
 
-					while(li.hasNext()) {
-						MegaTransfer next = (MegaTransfer) li.next();
-						if(next.getTag() == request.getTransferTag()){
-							index=li.previousIndex();
-							break;
-						}
-					}
-					transfersInProgressSync.set(index, newTransfer);
-					log("The transfer with index : "+index +"has been replaced is paused");
-				}
+                ListIterator li = transfersInProgress.listIterator();
+
+                while(li.hasNext()) {
+                    MegaTransfer next = (MegaTransfer) li.next();
+                    if(next.getTag() == request.getTransferTag()){
+                        index=li.previousIndex();
+                        break;
+                    }
+                }
+                transfersInProgress.set(index, newTransfer);
+                log("The transfer with index : "+index +"has been replaced is paused");
 
 				if (tFLol != null){
 					if (drawerItem == DrawerItem.TRANSFERS && tFLol.isAdded()){
@@ -12747,9 +12741,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			long now = Calendar.getInstance().getTimeInMillis();
 			lastTimeOnTransferUpdate = now;
 
-			synchronized(transfersInProgressSync) {
-				transfersInProgressSync.add(transfer);
-			}
+			transfersInProgress.add(transfer);
 
 			transferCallback = transfer.getNotificationNumber();
 
@@ -12776,19 +12768,19 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			long now = Calendar.getInstance().getTimeInMillis();
 			lastTimeOnTransferUpdate = now;
 
-			synchronized(transfersInProgressSync) {
-				ListIterator li = transfersInProgressSync.listIterator();
-				int index = 0;
-				while(li.hasNext()) {
-					MegaTransfer next = (MegaTransfer) li.next();
-					if(next.getTag() == transfer.getTag()){
-						index=li.previousIndex();
-						break;
-					}
-				}
-				transfersInProgressSync.remove(index);
-				log("The transfer with index : "+index +"has been removed, left: "+transfersInProgressSync.size());
-			}
+
+            ListIterator li = transfersInProgress.listIterator();
+            int index = 0;
+            while(li.hasNext()) {
+                MegaTransfer next = (MegaTransfer) li.next();
+                if(next.getTag() == transfer.getTag()){
+                    index=li.previousIndex();
+                    break;
+                }
+            }
+            transfersInProgress.remove(index);
+            log("The transfer with index : "+index +"has been removed, left: "+transfersInProgress.size());
+
 			transfersCompleted.add(transfer);
 			log("Transfer added to completed: "+transfersCompleted.size());
 
@@ -12847,20 +12839,19 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						log("Reorder list of transfers! -- DOWNLOAD CHANGE");
 						downloadInProgress=transfer.getTag();
 						//Find item in the list and move to the first element
-						synchronized(transfersInProgressSync) {
-							ListIterator li = transfersInProgressSync.listIterator();
-							int index = 0;
-							while(li.hasNext()) {
-								MegaTransfer next = (MegaTransfer) li.next();
-								if(next.getTag() == transfer.getTag()){
-									index=li.previousIndex();
-									break;
-								}
-							}
-							transfersInProgressSync.remove(index);
-							transfersInProgressSync.add(0, transfer);
-							log("The download with index : "+index +"has been moved to position 0");
-						}
+                        ListIterator li = transfersInProgress.listIterator();
+                        int index = 0;
+                        while(li.hasNext()) {
+                            MegaTransfer next = (MegaTransfer) li.next();
+                            if(next.getTag() == transfer.getTag()){
+                                index=li.previousIndex();
+                                break;
+                            }
+                        }
+                        transfersInProgress.remove(index);
+                        transfersInProgress.add(0, transfer);
+                        log("The download with index : "+index +"has been moved to position 0");
+
 
 						if (tFLol != null){
 							if(tFLol.isAdded()){
@@ -12882,25 +12873,24 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						log("Reorder list of transfers! -- UPLOAD CHANGE");
 						uploadInProgress=transfer.getTag();
 						//Find item in the list and move to the first element
-						synchronized(transfersInProgressSync) {
-							ListIterator li = transfersInProgressSync.listIterator();
-							int index = 0;
-							while(li.hasNext()) {
-								MegaTransfer next = (MegaTransfer) li.next();
-								if(next.getTag() == transfer.getTag()){
-									index=li.previousIndex();
-									break;
-								}
-							}
-							transfersInProgressSync.remove(index);
-							if(downloadInProgress!=-1){
-								transfersInProgressSync.add(1, transfer);
-							}
-							else{
-								transfersInProgressSync.add(0, transfer);
-							}
-							log("The download with index : "+index +"has been moved to position 0");
-						}
+
+                        ListIterator li = transfersInProgress.listIterator();
+                        int index = 0;
+                        while(li.hasNext()) {
+                            MegaTransfer next = (MegaTransfer) li.next();
+                            if(next.getTag() == transfer.getTag()){
+                                index=li.previousIndex();
+                                break;
+                            }
+                        }
+                        transfersInProgress.remove(index);
+                        if(downloadInProgress!=-1){
+                            transfersInProgress.add(1, transfer);
+                        }
+                        else{
+                            transfersInProgress.add(0, transfer);
+                        }
+                        log("The download with index : "+index +"has been moved to position 0");
 
 						if (tFLol != null){
 							if(tFLol.isAdded()){
