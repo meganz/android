@@ -73,7 +73,8 @@
             android:layout_marginLeft="5dp"
             android:paddingBottom="2dp"
             android:paddingTop="2dp"
-            android:src="@drawable/ic_item_pause"
+            android:alpha="0.54"
+            android:src="@drawable/ic_pause"
             android:visibility="visible" />
 
         <TextView

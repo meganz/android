@@ -1111,4 +1111,6 @@
     <string name="option_to_clear_transfers" context="Label of the modal bottom sheet to clear completed transfers">Clear completed transfers</string>
     <string name="menu_pause_individual_transfer" context="Dialog to confirm the action of pausing one transfer">Pause transfer?</string>
     <string name="menu_restart_individual_transfer" context="Dialog to confirm the action of restarting one transfer">Restart transfer?</string>
+
+    <string name="confirmation_to_clear_completed_transfers" context="Dialog to confirm before removing completed transfers">Clear completed transfers?</string>
 </resources>

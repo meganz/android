@@ -23,7 +23,8 @@
         android:layout_centerVertical="true"
 		android:layout_marginRight="12dp"
 		android:layout_marginLeft="12dp"
-		android:src="@drawable/ic_item_pause"
+		android:alpha="0.54"
+		android:src="@drawable/ic_pause"
         android:layout_toLeftOf="@id/transfers_overview_three_dots"/>
         
 	<TextView

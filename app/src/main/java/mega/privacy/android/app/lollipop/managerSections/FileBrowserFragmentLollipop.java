@@ -714,7 +714,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 		}
 		else{
 			log("show PAUSE button");
-			playButton.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_item_pause));
+			playButton.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_pause));
 		}
 	}
 
