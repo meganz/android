@@ -455,14 +455,17 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
 		}
 	}
 
-	public void updateProgress(int position) {
+	public void removeItemData(int position) {
+		notifyItemRemoved(position);
+		notifyItemRangeChanged(position,getItemCount());
+	}
+
+	public void updateProgress(int position, MegaTransfer transfer) {
 		log("updateProgress");
 
 		ViewHolderTransfer holder = (ViewHolderTransfer) listFragment.findViewHolderForAdapterPosition(position);
 
 		if(holder!=null){
-			MegaTransfer transfer = tL.get(position);
-
 			double progressValue = 100.0 * transfer.getTransferredBytes() / transfer.getTotalBytes();
 			log("Progress Value: "+ progressValue);
 			holder.transferProgressBar.setProgress((int)progressValue);

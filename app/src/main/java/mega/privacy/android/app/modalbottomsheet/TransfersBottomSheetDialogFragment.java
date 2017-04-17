@@ -39,6 +39,7 @@ public class TransfersBottomSheetDialogFragment extends BottomSheetDialogFragmen
     public LinearLayout optionClear;
     public LinearLayout optionCancel;
     public ImageView iconPause;
+    public TextView textPause;
 
     DisplayMetrics outMetrics;
 
@@ -74,16 +75,19 @@ public class TransfersBottomSheetDialogFragment extends BottomSheetDialogFragmen
         optionTransferManager= (LinearLayout) contentView.findViewById(R.id.transfers_manager_option_layout);
         optionPauseAll = (LinearLayout) contentView.findViewById(R.id.transfers_pause_layout);
         iconPause = (ImageView) contentView.findViewById(R.id.transfers_option_pause);
+        textPause = (TextView) contentView.findViewById(R.id.transfers_option_pause_text);
         optionClear = (LinearLayout) contentView.findViewById(R.id.transfers_clear_layout);
         optionCancel = (LinearLayout) contentView.findViewById(R.id.transfers_cancel_layout);
 
         if(megaApi.areTransfersPaused(MegaTransfer.TYPE_DOWNLOAD)||megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD)){
             log("show PLAY button");
             iconPause.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_play));
+            textPause.setText(getString(R.string.option_to_resume_transfers));
         }
         else{
             log("show PAUSE button");
             iconPause.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_pause));
+            textPause.setText(getString(R.string.option_to_pause_transfers));
         }
 
         optionTransferManager.setOnClickListener(this);
