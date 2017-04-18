@@ -23,7 +23,7 @@ import nz.mega.sdk.MegaChatApi;
 
 public class DatabaseHandler extends SQLiteOpenHelper {
 	
-	private static final int DATABASE_VERSION = 29;
+	private static final int DATABASE_VERSION = 30;
     private static final String DATABASE_NAME = "megapreferences"; 
     private static final String TABLE_PREFERENCES = "preferences";
     private static final String TABLE_CREDENTIALS = "credentials";
@@ -33,6 +33,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	private static final String TABLE_CHAT_ITEMS = "chat";
 	private static final String TABLE_NON_CONTACTS = "noncontacts";
 	private static final String TABLE_CHAT_SETTINGS = "chatsettings";
+	private static final String TABLE_COMPLETED_TRANSFERS = "completedtransfers";
 
     private static final String KEY_ID = "id";
     private static final String KEY_EMAIL = "email";
@@ -110,6 +111,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 	private static final String KEY_INVALIDATE_SDK_CACHE = "invalidatesdkcache";
 
+	private static final String KEY_TRANSFER_FILENAME = "transferfilename";
+	private static final String KEY_TRANSFER_TYPE = "transfertype";
+	private static final String KEY_TRANSFER_STATE = "transferstate";
+	private static final String KEY_TRANSFER_SIZE = "transfersize";
+	private static final String KEY_TRANSFER_HANDLE = "transferhandle";
+
+
     private static DatabaseHandler instance;
     
     private static SQLiteDatabase db;
@@ -186,6 +194,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				+ KEY_ID + " INTEGER PRIMARY KEY, " + KEY_CHAT_ENABLED + " BOOLEAN, " + KEY_CHAT_NOTIFICATIONS_ENABLED + " BOOLEAN, " +
 				KEY_CHAT_SOUND_NOTIFICATIONS+ " TEXT, "+KEY_CHAT_VIBRATION_ENABLED+ " BOOLEAN, "+ KEY_CHAT_STATUS + " TEXT"+")";
 		db.execSQL(CREATE_CHAT_TABLE);
+
+		String CREATE_COMPLETED_TRANSFER_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_COMPLETED_TRANSFERS + "("
+				+ KEY_ID + " INTEGER PRIMARY KEY, " + KEY_TRANSFER_FILENAME + " TEXT, " + KEY_TRANSFER_TYPE + " TEXT, " +
+				KEY_TRANSFER_STATE+ " TEXT, "+ KEY_TRANSFER_SIZE+ " TEXT, " + KEY_TRANSFER_HANDLE + " TEXT"+")";
+		db.execSQL(CREATE_COMPLETED_TRANSFER_TABLE);
   
 	}
 
@@ -430,6 +443,14 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		if (oldVersion <= 28){
 			db.execSQL("ALTER TABLE " + TABLE_CREDENTIALS + " ADD COLUMN " + KEY_MY_HANDLE + " TEXT;");
 			db.execSQL("UPDATE " + TABLE_CREDENTIALS + " SET " + KEY_MY_HANDLE + " = '" + encrypt("") + "';");
+		}
+
+		if (oldVersion <= 29) {
+			String CREATE_COMPLETED_TRANSFER_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_COMPLETED_TRANSFERS + "("
+					+ KEY_ID + " INTEGER PRIMARY KEY, " + KEY_TRANSFER_FILENAME + " TEXT, " + KEY_TRANSFER_TYPE + " TEXT, " +
+					KEY_TRANSFER_STATE+ " TEXT, "+ KEY_TRANSFER_SIZE+ " TEXT, " + KEY_TRANSFER_HANDLE + " TEXT"+")";
+			db.execSQL(CREATE_COMPLETED_TRANSFER_TABLE);
+
 		}
 	} 
 	
@@ -787,7 +808,53 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		cursor.close();
 		return null;
 	}
-	
+
+	public void setCompletedTransfer(AndroidCompletedTransfer transfer){
+		ContentValues values = new ContentValues();
+		values.put(KEY_TRANSFER_FILENAME, encrypt(transfer.getFileName()));
+		values.put(KEY_TRANSFER_TYPE, encrypt(transfer.getType()+""));
+		values.put(KEY_TRANSFER_STATE, encrypt(transfer.getState()+""));
+		values.put(KEY_TRANSFER_SIZE, encrypt(transfer.getSize()));
+		values.put(KEY_TRANSFER_HANDLE, encrypt(transfer.getNodeHandle()));
+
+		db.insert(TABLE_COMPLETED_TRANSFERS, null, values);
+	}
+
+	public void emptyCompletedTransfers(){
+		db.delete(TABLE_COMPLETED_TRANSFERS, null,null);
+	}
+
+	public ArrayList<AndroidCompletedTransfer> getCompletedTransfers(){
+		ArrayList<AndroidCompletedTransfer> cTs = new ArrayList<AndroidCompletedTransfer> ();
+
+		String selectQuery = "SELECT * FROM " + TABLE_COMPLETED_TRANSFERS;
+		Cursor cursor = db.rawQuery(selectQuery, null);
+		try {
+			if (cursor.moveToFirst()){
+
+				do {
+					int id = Integer.parseInt(cursor.getString(0));
+					String filename = decrypt(cursor.getString(1));
+					String type =  decrypt(cursor.getString(2));
+					int typeInt = Integer.parseInt(type);
+					String state = decrypt(cursor.getString(3));
+					int stateInt = Integer.parseInt(state);
+					String size = decrypt(cursor.getString(4));
+					String nodeHandle = decrypt(cursor.getString(5));
+
+					AndroidCompletedTransfer cT = new AndroidCompletedTransfer(filename, typeInt, stateInt, size, nodeHandle);
+					cTs.add(cT);
+				} while (cursor.moveToNext());
+			}
+
+		} finally {
+			try { cursor.close(); } catch (Exception ignore) {}
+		}
+
+		return cTs;
+	}
+
+
 	public boolean isPinLockEnabled(SQLiteDatabase db){
 		log("getPinLockEnabled");
 		
@@ -2269,6 +2336,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		db.execSQL("DROP TABLE IF EXISTS " + TABLE_OFFLINE);
 		onCreate(db);
 	}
+
+    public void clearCompletedTransfers(){
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_COMPLETED_TRANSFERS);
+        onCreate(db);
+    }
 	
 	private static void log(String log) {
 		Util.log("DatabaseHandler", log);
