@@ -1,0 +1,300 @@
+package mega.privacy.android.app.lollipop.adapters;
+
+import android.app.Activity;
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.media.ExifInterface;
+import android.os.AsyncTask;
+import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils.TruncateAt;
+import android.util.DisplayMetrics;
+import android.util.TypedValue;
+import android.view.Display;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.widget.ImageView;
+import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+
+import mega.privacy.android.app.AndroidCompletedTransfer;
+import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.MimeTypeList;
+import mega.privacy.android.app.R;
+import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.lollipop.managerSections.CompletedTransfersFragmentLollipop;
+import mega.privacy.android.app.lollipop.managerSections.TransfersFragmentLollipop;
+import mega.privacy.android.app.utils.ThumbnailUtils;
+import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
+import mega.privacy.android.app.utils.Util;
+import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaNode;
+import nz.mega.sdk.MegaTransfer;
+
+
+public class MegaCompletedTransfersAdapter extends RecyclerView.Adapter<MegaCompletedTransfersAdapter.ViewHolderTransfer> implements OnClickListener {
+
+	Context context;
+	ArrayList<AndroidCompletedTransfer> tL = null;
+	MegaTransfer currentTransfer = null;
+	int positionClicked;
+	CompletedTransfersFragmentLollipop fragment;
+	MegaApiAndroid megaApi;
+
+	RecyclerView listFragment;
+
+	public MegaCompletedTransfersAdapter(Context _context, CompletedTransfersFragmentLollipop _fragment, ArrayList<AndroidCompletedTransfer> _transfers, RecyclerView _listView) {
+		this.context = _context;
+		this.tL = _transfers;
+		this.positionClicked = -1;
+		this.fragment = _fragment;
+		this.listFragment = _listView;
+		
+		if (megaApi == null){
+			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
+		}
+	}
+
+		
+	/*private view holder class*/
+    public class ViewHolderTransfer extends RecyclerView.ViewHolder{
+    	public ViewHolderTransfer(View v) {
+			super(v);
+		}
+		public ImageView imageView;
+    	public ImageView iconDownloadUploadView;
+    	public TextView textViewFileName;
+    	public ImageView imageViewCompleted;
+    	public TextView textViewCompleted;
+    	public ProgressBar transferProgressBar;
+    	public RelativeLayout itemLayout;
+    	public ImageView optionRemove;
+		public ImageView optionPause;
+    	public int currentPosition;
+    	public long document;
+    	public String currentPath;
+    }
+    
+//    public void setTransfers(SparseArray<TransfersHolder> transfers){
+//    	this.transfersListArray = transfers;
+//    	notifyDataSetChanged();
+//    }
+    
+    public void setTransfers(ArrayList<AndroidCompletedTransfer> transfers){
+    	this.tL = transfers;
+    	notifyDataSetChanged();
+    }
+
+    @Override
+	public ViewHolderTransfer onCreateViewHolder(ViewGroup parent, int viewType) {
+    	log("onCreateViewHolder");
+    	
+    	ViewHolderTransfer holder;
+    	
+		Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
+		DisplayMetrics outMetrics = new DisplayMetrics ();
+	    display.getMetrics(outMetrics);
+	    float density  = ((Activity)context).getResources().getDisplayMetrics().density;
+		
+	    float scaleW = Util.getScaleW(outMetrics, density);
+	    float scaleH = Util.getScaleH(outMetrics, density);
+		
+		LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
+		View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_transfers_list, parent, false);
+
+		holder = new ViewHolderTransfer(v);
+		holder.itemLayout = (RelativeLayout) v.findViewById(R.id.transfers_list_item_layout);
+		holder.imageView = (ImageView) v.findViewById(R.id.transfers_list_thumbnail);
+		holder.iconDownloadUploadView = (ImageView) v.findViewById(R.id.transfers_list_small_icon);
+		holder.textViewFileName = (TextView) v.findViewById(R.id.transfers_list_filename);
+		holder.textViewFileName.setSingleLine(true);
+		holder.textViewFileName.setEllipsize(TruncateAt.MIDDLE);
+		holder.textViewFileName.getLayoutParams().height = RelativeLayout.LayoutParams.WRAP_CONTENT;
+		holder.textViewFileName.getLayoutParams().width = Util.px2dp((150*scaleW), outMetrics);
+		holder.imageViewCompleted = (ImageView) v.findViewById(R.id.transfers_list_completed_image);
+		holder.textViewCompleted = (TextView) v.findViewById(R.id.transfers_list_completed_text);
+		holder.transferProgressBar = (ProgressBar) v.findViewById(R.id.transfers_list_bar);
+		holder.optionRemove = (ImageView) v.findViewById(R.id.transfers_list_option_remove);
+//		holder.optionRemove.setOnClickListener(this);
+		holder.optionPause = (ImageView) v.findViewById(R.id.transfers_list_option_pause);
+		v.setTag(holder);
+    	
+    	return holder;
+    }
+
+	@Override
+	public void onBindViewHolder(ViewHolderTransfer holder, int position) {
+		log("onBindViewHolder: "+position);
+		
+		Display display = ((Activity) context).getWindowManager().getDefaultDisplay();
+		DisplayMetrics outMetrics = new DisplayMetrics();
+		display.getMetrics(outMetrics);
+
+		holder.currentPosition = position;
+
+		AndroidCompletedTransfer transfer = (AndroidCompletedTransfer) getItem(position);
+
+		String fileName = transfer.getFileName();
+		log("onBindViewHolder: "+fileName);
+		holder.textViewFileName.setText(fileName);
+		holder.optionPause.setVisibility(View.GONE);
+		holder.optionRemove.setVisibility(View.GONE);
+		holder.transferProgressBar.setVisibility(View.GONE);
+
+        holder.imageView.setImageResource(MimeTypeList.typeForName(transfer.getFileName()).getIconResourceId());
+
+        if (MimeTypeList.typeForName(transfer.getFileName()).isImage()||MimeTypeList.typeForName(transfer.getFileName()).isVideo()){
+            RelativeLayout.LayoutParams params2 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
+            params2.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
+            params2.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
+            params2.setMargins(54, 0, 12, 0);
+
+            long handle = Long.parseLong(transfer.getNodeHandle());
+            Bitmap thumb = ThumbnailUtils.getThumbnailFromCache(handle);
+            if (thumb != null){
+                RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
+                params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
+                params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
+                params1.setMargins(54, 0, 12, 0);
+                holder.imageView.setLayoutParams(params1);
+                holder.imageView.setImageBitmap(thumb);
+            }
+            else{
+                MegaNode node = megaApi.getNodeByHandle(handle);
+                thumb = ThumbnailUtils.getThumbnailFromFolder(node, context);
+                if (thumb != null){
+                    RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
+                    params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
+                    params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
+                    params1.setMargins(54, 0, 12, 0);
+                    holder.imageView.setImageBitmap(thumb);
+                }
+            }
+        }
+
+		if (transfer.getType() == MegaTransfer.TYPE_DOWNLOAD){
+			holder.iconDownloadUploadView.setImageResource(R.drawable.ic_download_transfers);
+
+		}
+		else if (transfer.getType() == MegaTransfer.TYPE_UPLOAD){
+			holder.iconDownloadUploadView.setImageResource(R.drawable.ic_upload_transfers);
+		}
+
+		int state = transfer.getState();
+		log("State of the transfer: "+state);
+		switch (state){
+			case MegaTransfer.STATE_CANCELLED:{
+				holder.textViewCompleted.setVisibility(View.VISIBLE);
+				holder.imageViewCompleted.setVisibility(View.VISIBLE);
+				holder.textViewCompleted.setText("Cancelled");
+				holder.imageViewCompleted.setImageResource(R.drawable.ic_queue);
+
+				break;
+			}
+			case MegaTransfer.STATE_COMPLETED:{
+				holder.textViewCompleted.setVisibility(View.VISIBLE);
+				holder.imageViewCompleted.setVisibility(View.VISIBLE);
+				holder.textViewCompleted.setText("Completed");
+				holder.imageViewCompleted.setImageResource(R.drawable.ic_complete_transfer);
+
+				break;
+			}
+
+			case MegaTransfer.STATE_COMPLETING:
+			case MegaTransfer.STATE_RETRYING:
+			case MegaTransfer.STATE_QUEUED:{
+				holder.textViewCompleted.setVisibility(View.VISIBLE);
+				holder.imageViewCompleted.setVisibility(View.VISIBLE);
+				holder.textViewCompleted.setText("Queued");
+				holder.imageViewCompleted.setImageResource(R.drawable.ic_queue);
+
+
+				break;
+			}
+			default:{
+				log("Default status");
+				holder.imageViewCompleted.setVisibility(View.VISIBLE);
+				holder.textViewCompleted.setText("DEFAULT");
+
+				break;
+			}
+		}
+
+		if (positionClicked != -1){
+			if (positionClicked == position){
+				listFragment.smoothScrollToPosition(position);
+			}
+		}
+
+		holder.itemLayout.setBackgroundColor(Color.WHITE);
+//		holder.optionRemove.setTag(holder);
+//		holder.optionPause.setTag(holder);
+	}
+ 
+	@Override
+	public int getItemCount() {
+		return tL.size();
+	}
+	
+	public Object getItem(int position) {
+		return tL.get(position);
+	}
+	
+    @Override
+    public long getItemId(int position) {
+        return position;
+    }    
+    
+    public int getPositionClicked (){
+    	return positionClicked;
+    }
+    
+    public void setPositionClicked(int p){
+    	positionClicked = p;
+    }
+
+	@Override
+	public void onClick(View v) {
+		log("onClick");
+		
+//		ViewHolderTransfer holder = (ViewHolderTransfer) v.getTag();
+//		int currentPosition = holder.currentPosition;
+//
+//		switch(v.getId()){
+//			case R.id.transfers_list_option_remove:{
+//				log("click to cancel transfer");
+//				MegaTransfer t = (MegaTransfer) getItem(currentPosition);
+//
+//				((ManagerActivityLollipop) context).showConfirmationCancelTransfer(t, true);
+//				break;
+//			}
+//			case R.id.transfers_list_option_pause:{
+//				log("click to cancel transfer");
+//				MegaTransfer t = (MegaTransfer) getItem(currentPosition);
+//                ((ManagerActivityLollipop) context).showConfirmationCancelTransfer(t, false);
+//				break;
+//			}
+//		}
+	}
+
+//	public void removeItemData(int position) {
+//		notifyItemRemoved(position);
+//		notifyItemRangeChanged(position,getItemCount());
+//	}
+
+	private static void log(String log) {
+		Util.log("MegaCompletedTransfersAdapter", log);
+	}
+
+}

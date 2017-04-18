@@ -99,6 +99,7 @@ import java.util.ListIterator;
 import java.util.Locale;
 import java.util.TimeZone;
 
+import mega.privacy.android.app.AndroidCompletedTransfer;
 import mega.privacy.android.app.CameraSyncService;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.DownloadService;
@@ -120,6 +121,7 @@ import mega.privacy.android.app.lollipop.adapters.CloudDrivePagerAdapter;
 import mega.privacy.android.app.lollipop.adapters.ContactsPageAdapter;
 import mega.privacy.android.app.lollipop.adapters.MyAccountPageAdapter;
 import mega.privacy.android.app.lollipop.adapters.SharesPageAdapter;
+import mega.privacy.android.app.lollipop.adapters.TransfersPageAdapter;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
@@ -128,6 +130,7 @@ import mega.privacy.android.app.lollipop.listeners.ContactNameListener;
 import mega.privacy.android.app.lollipop.listeners.FabButtonListener;
 import mega.privacy.android.app.lollipop.managerSections.CameraUploadFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.CentiliFragmentLollipop;
+import mega.privacy.android.app.lollipop.managerSections.CompletedTransfersFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.ContactsFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.CreditCardFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.FileBrowserFragmentLollipop;
@@ -205,7 +208,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	SwitchCompat switchGetLink;
 
 	public ArrayList<Integer> transfersInProgress;
-	public ArrayList<MegaTransfer> transfersCompleted;
 	public MegaTransferData transferData;
 
 	public long transferCallback = 0;
@@ -342,6 +344,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	MyAccountPageAdapter mTabsAdapterMyAccount;
 	ViewPager viewPagerMyAccount;
 
+	//Tabs in Transfers
+	TabLayout tabLayoutTransfers;
+	TransfersPageAdapter mTabsAdapterTransfers;
+	ViewPager viewPagerTransfers;
+
 	boolean firstTime = true;
 //	String pathNavigation = "/";
 	String searchQuery = null;
@@ -396,6 +403,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	int indexContacts = -1;
 //	int indexChat = -1;
 	int indexAccount = -1;
+	int indexTransfers = -1;
 
 	//LOLLIPOP FRAGMENTS
     private FileBrowserFragmentLollipop fbFLol;
@@ -410,6 +418,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	private MyAccountFragmentLollipop maFLol;
 	private MyStorageFragmentLollipop mStorageFLol;
 	private TransfersFragmentLollipop tFLol;
+	private CompletedTransfersFragmentLollipop completedTFLol;
 	private SearchFragmentLollipop sFLol;
 	private SettingsFragmentLollipop sttFLol;
 	private CameraUploadFragmentLollipop muFLol;
@@ -1110,7 +1119,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		}
 
 		transfersInProgress = new ArrayList<Integer>();
-		transfersCompleted = new ArrayList<MegaTransfer>();
 
 		Display display = getWindowManager().getDefaultDisplay();
 		outMetrics = new DisplayMetrics ();
@@ -1368,6 +1376,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		tabLayoutMyAccount =  (TabLayout) findViewById(R.id.sliding_tabs_my_account);
 		viewPagerMyAccount = (ViewPager) findViewById(R.id.my_account_tabs_pager);
 
+		//Tab section Transfers
+		tabLayoutTransfers =  (TabLayout) findViewById(R.id.sliding_tabs_transfers);
+		viewPagerTransfers = (ViewPager) findViewById(R.id.transfers_tabs_pager);
 
 		networkStateReceiver = new NetworkStateReceiver();
 		networkStateReceiver.addListener(this);
@@ -2630,6 +2641,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		viewPagerShares.setVisibility(View.GONE);
 		tabLayoutMyAccount.setVisibility(View.GONE);
 		viewPagerMyAccount.setVisibility(View.GONE);
+		tabLayoutTransfers.setVisibility(View.GONE);
+		viewPagerTransfers.setVisibility(View.GONE);
 
 		fragmentContainer.setVisibility(View.GONE);
 
@@ -3119,6 +3132,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		viewPagerCDrive.setVisibility(View.GONE);
 		tabLayoutMyAccount.setVisibility(View.GONE);
 		viewPagerMyAccount.setVisibility(View.GONE);
+		tabLayoutTransfers.setVisibility(View.GONE);
+		viewPagerTransfers.setVisibility(View.GONE);
 
 		fragmentContainer.setVisibility(View.GONE);
 
@@ -3310,6 +3325,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		viewPagerCDrive.setVisibility(View.GONE);
 		tabLayoutMyAccount.setVisibility(View.GONE);
 		viewPagerMyAccount.setVisibility(View.GONE);
+		tabLayoutTransfers.setVisibility(View.GONE);
+		viewPagerTransfers.setVisibility(View.GONE);
 
 		fragmentContainer.setVisibility(View.GONE);
 
@@ -3420,6 +3437,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		viewPagerShares.setVisibility(View.GONE);
 		tabLayoutCloud.setVisibility(View.GONE);
 		viewPagerCDrive.setVisibility(View.GONE);
+		tabLayoutTransfers.setVisibility(View.GONE);
+		viewPagerTransfers.setVisibility(View.GONE);
 
 		switch(accountFragment){
 			case Constants.UPGRADE_ACCOUNT_FRAGMENT:{
@@ -3539,6 +3558,115 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		}
 	}
 
+	public void selectDrawerItemTransfers(){
+		log("selectDrawerItemTransfers");
+
+		tB.setVisibility(View.VISIBLE);
+
+		drawerItem = DrawerItem.TRANSFERS;
+
+		if (nV != null){
+			Menu nVMenu = nV.getMenu();
+			MenuItem hidden = nVMenu.findItem(R.id.navigation_item_hidden);
+			resetNavigationViewMenu(nVMenu);
+			hidden.setChecked(true);
+		}
+
+		tabLayoutContacts.setVisibility(View.GONE);
+		viewPagerContacts.setVisibility(View.GONE);
+		tabLayoutShares.setVisibility(View.GONE);
+		viewPagerShares.setVisibility(View.GONE);
+		tabLayoutCloud.setVisibility(View.GONE);
+		viewPagerCDrive.setVisibility(View.GONE);
+		tabLayoutMyAccount.setVisibility(View.GONE);
+		viewPagerMyAccount.setVisibility(View.GONE);
+
+		fragmentContainer.setVisibility(View.GONE);
+
+		drawerLayout.closeDrawer(Gravity.LEFT);
+
+		tabLayoutTransfers.setVisibility(View.VISIBLE);
+		viewPagerTransfers.setVisibility(View.VISIBLE);
+
+		if (mTabsAdapterTransfers == null){
+			log("mTabsAdapterTransfers == null");
+
+			mTabsAdapterTransfers = new TransfersPageAdapter(getSupportFragmentManager(),this);
+			viewPagerTransfers.setAdapter(mTabsAdapterTransfers);
+			tabLayoutTransfers.setupWithViewPager(viewPagerTransfers);
+
+			log("The index of the TAB TRANSFERS is: " + indexTransfers);
+			if(indexTransfers!=-1) {
+				if (viewPagerMyAccount != null) {
+					switch (indexTransfers){
+						case 0:{
+							viewPagerMyAccount.setCurrentItem(0);
+							log("General TAB");
+							break;
+						}
+						case 1:{
+							viewPagerMyAccount.setCurrentItem(1);
+							log("Storage TAB");
+							break;
+						}
+						default:{
+							viewPagerContacts.setCurrentItem(0);
+							log("Default general TAB");
+							break;
+						}
+					}
+				}
+			}
+			else{
+				//No bundle, no change of orientation
+				log("indexTransfers is NOT -1");
+			}
+		}
+		else{
+			log("mTabsAdapterTransfers NOT null");
+			String transfersTag = getFragmentTag(R.id.transfers_tabs_pager, 0);
+			tFLol = (TransfersFragmentLollipop) getSupportFragmentManager().findFragmentByTag(transfersTag);
+
+			transfersTag = getFragmentTag(R.id.transfers_tabs_pager, 1);
+			completedTFLol = (CompletedTransfersFragmentLollipop) getSupportFragmentManager().findFragmentByTag(transfersTag);
+
+			if(indexTransfers!=-1) {
+				log("The index of the TAB Transfers is: " + indexTransfers);
+				if (viewPagerTransfers != null) {
+					switch (indexTransfers) {
+						case 1: {
+							viewPagerTransfers.setCurrentItem(1);
+							log("Select Storage TAB");
+							break;
+						}
+						default: {
+							viewPagerTransfers.setCurrentItem(0);
+							log("Select General TAB");
+							break;
+						}
+					}
+				}
+			}
+		}
+
+		viewPagerMyAccount.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+			@Override
+			public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+			}
+
+			@Override
+			public void onPageSelected(int position) {
+				supportInvalidateOptionsMenu();
+			}
+
+			@Override
+			public void onPageScrollStateChanged(int state) {
+			}
+		});
+
+		drawerLayout.closeDrawer(Gravity.LEFT);
+	}
+
 	public void selectDrawerItemChat(){
 		log("selectDrawerItemChat");
 
@@ -3559,6 +3687,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		viewPagerContacts.setVisibility(View.GONE);
 		tabLayoutMyAccount.setVisibility(View.GONE);
 		viewPagerMyAccount.setVisibility(View.GONE);
+		tabLayoutTransfers.setVisibility(View.GONE);
+		viewPagerTransfers.setVisibility(View.GONE);
 
 		fragmentContainer.setVisibility(View.VISIBLE);
 
@@ -3636,6 +3766,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
     			tabLayoutShares.setVisibility(View.GONE);
 				tabLayoutMyAccount.setVisibility(View.GONE);
 				viewPagerMyAccount.setVisibility(View.GONE);
+				tabLayoutTransfers.setVisibility(View.GONE);
+				viewPagerTransfers.setVisibility(View.GONE);
 
 				fragmentContainer.setVisibility(View.VISIBLE);
 
@@ -3674,6 +3806,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
     			viewPagerShares.setVisibility(View.GONE);
 				tabLayoutMyAccount.setVisibility(View.GONE);
 				viewPagerMyAccount.setVisibility(View.GONE);
+				tabLayoutTransfers.setVisibility(View.GONE);
+				viewPagerTransfers.setVisibility(View.GONE);
 
 				fragmentContainer.setVisibility(View.VISIBLE);
 
@@ -3745,6 +3879,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
     			viewPagerShares.setVisibility(View.GONE);
 				tabLayoutMyAccount.setVisibility(View.GONE);
 				viewPagerMyAccount.setVisibility(View.GONE);
+				tabLayoutTransfers.setVisibility(View.GONE);
+				viewPagerTransfers.setVisibility(View.GONE);
 
 				fragmentContainer.setVisibility(View.VISIBLE);
 
@@ -3810,6 +3946,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
     			viewPagerShares.setVisibility(View.GONE);
 				tabLayoutMyAccount.setVisibility(View.GONE);
 				viewPagerMyAccount.setVisibility(View.GONE);
+				tabLayoutTransfers.setVisibility(View.GONE);
+				viewPagerTransfers.setVisibility(View.GONE);
 
 				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 				ft.replace(R.id.fragment_container, iFLol, "iFLol");
@@ -3854,6 +3992,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
     			viewPagerCDrive.setVisibility(View.GONE);
 				tabLayoutMyAccount.setVisibility(View.GONE);
 				viewPagerMyAccount.setVisibility(View.GONE);
+				tabLayoutTransfers.setVisibility(View.GONE);
+				viewPagerTransfers.setVisibility(View.GONE);
 
     			Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
     			if (currentFragment != null){
@@ -3927,6 +4067,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
     			viewPagerShares.setVisibility(View.GONE);
 				tabLayoutMyAccount.setVisibility(View.GONE);
 				viewPagerMyAccount.setVisibility(View.GONE);
+				tabLayoutTransfers.setVisibility(View.GONE);
+				viewPagerTransfers.setVisibility(View.GONE);
 
 				fragmentContainer.setVisibility(View.VISIBLE);
 
@@ -3947,49 +4089,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
     		case TRANSFERS:{
 
-    			tB.setVisibility(View.VISIBLE);
-
-				log("select TRANSFERS");
-
-				drawerItem = DrawerItem.TRANSFERS;
-
-				if (nV != null){
-					Menu nVMenu = nV.getMenu();
-					MenuItem hidden = nVMenu.findItem(R.id.navigation_item_hidden);
-					resetNavigationViewMenu(nVMenu);
-					hidden.setChecked(true);
-				}
-
-				tabLayoutContacts.setVisibility(View.GONE);
-    			viewPagerContacts.setVisibility(View.GONE);
-    			tabLayoutShares.setVisibility(View.GONE);
-    			viewPagerShares.setVisibility(View.GONE);
-    			tabLayoutCloud.setVisibility(View.GONE);
-    			viewPagerCDrive.setVisibility(View.GONE);
-				tabLayoutMyAccount.setVisibility(View.GONE);
-				viewPagerMyAccount.setVisibility(View.GONE);
-
-				fragmentContainer.setVisibility(View.VISIBLE);
-
-    			if (tFLol == null){
-    				tFLol = new TransfersFragmentLollipop();
-    			}
-
-//    			tFLol.setTransfers(megaApi.getTransfers());
-
-    			if(megaApi.areTransfersPaused(MegaTransfer.TYPE_DOWNLOAD)||megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD)){
-    				tFLol.setPause(true);
-    			}
-    			else{
-    				tFLol.setPause(false);
-    			}
-
-				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-				ft.replace(R.id.fragment_container, tFLol, "tFLol");
-    			ft.commitNow();
-
-    			drawerLayout.closeDrawer(Gravity.LEFT);
-
+				selectDrawerItemTransfers();
     			supportInvalidateOptionsMenu();
 				showFabButton();
     			break;
@@ -4036,6 +4136,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		viewPagerShares.setVisibility(View.GONE);
 		tabLayoutMyAccount.setVisibility(View.GONE);
 		viewPagerMyAccount.setVisibility(View.GONE);
+		tabLayoutTransfers.setVisibility(View.GONE);
+		viewPagerTransfers.setVisibility(View.GONE);
 		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 		if (!refresh){
 			if (ccFL == null){
@@ -4097,6 +4199,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		viewPagerShares.setVisibility(View.GONE);
 		tabLayoutMyAccount.setVisibility(View.GONE);
 		viewPagerMyAccount.setVisibility(View.GONE);
+		tabLayoutTransfers.setVisibility(View.GONE);
+		viewPagerTransfers.setVisibility(View.GONE);
 		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 		if (fFL == null){
 			fFL = new FortumoFragmentLollipop();
@@ -4120,6 +4224,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		viewPagerShares.setVisibility(View.GONE);
 		tabLayoutMyAccount.setVisibility(View.GONE);
 		viewPagerMyAccount.setVisibility(View.GONE);
+		tabLayoutTransfers.setVisibility(View.GONE);
+		viewPagerTransfers.setVisibility(View.GONE);
 		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 		if (ctFL == null){
 			ctFL = new CentiliFragmentLollipop();
@@ -4152,6 +4258,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		viewPagerShares.setVisibility(View.GONE);
 		tabLayoutMyAccount.setVisibility(View.GONE);
 		viewPagerMyAccount.setVisibility(View.GONE);
+		tabLayoutTransfers.setVisibility(View.GONE);
+		viewPagerTransfers.setVisibility(View.GONE);
 
 		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 		if (myFL == null){
@@ -4185,6 +4293,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		viewPagerCDrive.setVisibility(View.GONE);
 		tabLayoutMyAccount.setVisibility(View.GONE);
 		viewPagerMyAccount.setVisibility(View.GONE);
+		tabLayoutTransfers.setVisibility(View.GONE);
+		viewPagerTransfers.setVisibility(View.GONE);
 
 		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 		if(upAFL==null){
@@ -11830,7 +11940,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						if (drawerItem == DrawerItem.TRANSFERS && tFLol.isAdded()) {
 							pauseTransfersMenuIcon.setVisible(false);
 							playTransfersMenuIcon.setVisible(true);
-							tFLol.setPause(true);
 						}
 					}
     			}
@@ -11840,7 +11949,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						if (drawerItem == DrawerItem.TRANSFERS && tFLol.isAdded()) {
 							pauseTransfersMenuIcon.setVisible(true);
 							playTransfersMenuIcon.setVisible(false);
-							tFLol.setPause(false);
 						}
 					}
     			}
@@ -12634,7 +12742,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				switch (which){
 					case DialogInterface.BUTTON_POSITIVE:
 						log("Pressed button positive to clear transfers");
-						transfersCompleted.clear();
+						dbH.emptyCompletedTransfers();
 						if(tFLol!=null){
 							if(tFLol.isAdded()){
 								tFLol.refreshAllTransfers();
@@ -12733,6 +12841,20 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		builder.show();
 	}
 
+	public void addCompletedTransfer(MegaTransfer transfer){
+		log("addCompletedTransfer: "+transfer.getFileName());
+
+		String size = Util.getSizeString(transfer.getTotalBytes());
+		AndroidCompletedTransfer completedTransfer = new AndroidCompletedTransfer(transfer.getFileName(), transfer.getType(), transfer.getState(), size, transfer.getNodeHandle()+"");
+		dbH.setCompletedTransfer(completedTransfer);
+
+		if(completedTFLol!=null){
+			if(completedTFLol.isAdded()){
+				completedTFLol.transferFinish(completedTransfer);
+			}
+		}
+	}
+
 	@Override
 	public void onTransferStart(MegaApiJava api, MegaTransfer transfer) {
 		log("-------------------onTransferStart: " + transfer.getNotificationNumber()+ "-" + transfer.getFileName() + " - " + transfer.getTag());
@@ -12783,8 +12905,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
             transfersInProgress.remove(index);
             log("The transfer with index : "+index +"has been removed, left: "+transfersInProgress.size());
 
-			transfersCompleted.add(transfer);
-			log("Transfer added to completed: "+transfersCompleted.size());
+			addCompletedTransfer(transfer);
 
 			int pendingTransfers = 	megaApi.getNumPendingDownloads() + megaApi.getNumPendingUploads();
 

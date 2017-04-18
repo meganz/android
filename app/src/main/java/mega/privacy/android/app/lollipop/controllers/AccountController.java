@@ -384,6 +384,8 @@ public class AccountController {
 
         dbH.clearChatItems();
 
+        dbH.clearCompletedTransfers();
+
         if (!isManagerActivityLollipop){
             Intent tourIntent = new Intent(context, LoginActivityLollipop.class);
             tourIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
