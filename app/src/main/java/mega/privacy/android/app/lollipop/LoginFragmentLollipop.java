@@ -583,6 +583,9 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
                         ((LoginActivityLollipop) context).startCameraSyncService(false, 5 * 60 * 1000);
 
+                        log("Empty completed transfers data");
+                        dbH.emptyCompletedTransfers();
+
                         this.startActivity(intent);
                         ((LoginActivityLollipop) context).finish();
                     }
@@ -599,14 +602,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     log("rootNode != null");
                     Intent intent = new Intent(context, ManagerActivityLollipop.class);
                     if (action != null){
-//						if (action.equals(ManagerActivityLollipop.ACTION_FILE_EXPLORER_UPLOAD)){
-//							intent = new Intent(this, FileExplorerActivityLollipop.class);
-//							if(extras != null)
-//							{
-//								intent.putExtras(extras);
-//							}
-//							intent.setData(uriData);
-//						}
+
                         if (action.equals(Constants.ACTION_FILE_PROVIDER)){
                             intent = new Intent(context, FileProviderActivity.class);
                             if(extras != null)
@@ -634,6 +630,9 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                             }
                         }
                     }
+
+                    log("Empty completed transfers data");
+                    dbH.emptyCompletedTransfers();
                     this.startActivity(intent);
                     ((LoginActivityLollipop) context).finish();
                 }
@@ -1317,6 +1316,9 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             log("value of resumeSession: "+resumeSesion);
 
             if((action!=null)&&(url!=null)) {
+                log("Empty completed transfers data");
+                dbH.emptyCompletedTransfers();
+
                 if (action.equals(Constants.ACTION_CHANGE_MAIL)) {
                     log("Action change mail after fetch nodes");
                     Intent changeMailIntent = new Intent(context, ManagerActivityLollipop.class);
@@ -1428,6 +1430,9 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                         }
                         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     }
+
+                    log("Empty completed transfers data");
+                    dbH.emptyCompletedTransfers();
 
                     startActivity(intent);
                     ((LoginActivityLollipop)context).finish();

@@ -606,7 +606,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 		pendingTransfers = megaApi.getNumPendingDownloads() + megaApi.getNumPendingUploads();
 		totalTransfers = megaApi.getTotalDownloads() + megaApi.getTotalUploads();
 
-		totalSizePendingTransfer = 100;
+		totalSizePendingTransfer = megaApi.getTotalDownloadBytes() + megaApi.getTotalUploadBytes();
 		totalSizeTransfered = megaApi.getTotalDownloadedBytes() + megaApi.getTotalUploadedBytes();
 
 		if(pendingTransfers>0){
@@ -619,6 +619,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 
 			int progressPercent = (int) Math.round((double) totalSizeTransfered / totalSizePendingTransfer * 100);
 			progressBar.setProgress(progressPercent);
+			log("Progress Percent: "+progressPercent);
 
             int inProgress = totalTransfers - pendingTransfers + 1;
 			transfersNumberText.setText(getString(R.string.text_number_transfers, inProgress, totalTransfers));

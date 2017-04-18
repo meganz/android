@@ -830,7 +830,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		String selectQuery = "SELECT * FROM " + TABLE_COMPLETED_TRANSFERS;
 		Cursor cursor = db.rawQuery(selectQuery, null);
 		try {
-			if (cursor.moveToFirst()){
+			if (cursor.moveToLast()){
 
 				do {
 					int id = Integer.parseInt(cursor.getString(0));
@@ -844,7 +844,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 					AndroidCompletedTransfer cT = new AndroidCompletedTransfer(filename, typeInt, stateInt, size, nodeHandle);
 					cTs.add(cT);
-				} while (cursor.moveToNext());
+				} while (cursor.moveToPrevious());
 			}
 
 		} finally {

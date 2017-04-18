@@ -12923,10 +12923,15 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				}
 			}
 
+			String tFTag = getFragmentTag(R.id.transfers_tabs_pager, 0);
+			tFLol = (TransfersFragmentLollipop) getSupportFragmentManager().findFragmentByTag(tFTag);
 			if (tFLol != null){
 				if(tFLol.isAdded()){
 					tFLol.transferFinish(index);
 				}
+			}
+			else{
+				log("tF is null!");
 			}
 		}
 	}
