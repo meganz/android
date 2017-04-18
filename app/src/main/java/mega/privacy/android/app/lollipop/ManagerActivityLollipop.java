@@ -11974,14 +11974,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				String tFTag = getFragmentTag(R.id.transfers_tabs_pager, 0);
 				tFLol = (TransfersFragmentLollipop) getSupportFragmentManager().findFragmentByTag(tFTag);
 				if (tFLol != null){
-					if (drawerItem == DrawerItem.TRANSFERS && tFLol.isAdded()){
-						if(pendingTransfers<=0){
-							pauseTransfersMenuIcon.setVisible(false);
-							playTransfersMenuIcon.setVisible(false);
-						}
-						else{
-							tFLol.changeStatusButton(request.getTransferTag());
-						}
+					if (tFLol.isAdded()){
+						tFLol.changeStatusButton(request.getTransferTag());
 					}
 				}
 			}
@@ -12007,6 +12001,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					if (drawerItem == DrawerItem.TRANSFERS && tFLol.isAdded()){
 						pauseTransfersMenuIcon.setVisible(false);
 						playTransfersMenuIcon.setVisible(false);
+						cancelAllTransfersMenuItem.setVisible(false);
 					}
 				}
 			}
@@ -12931,6 +12926,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						transfersBottomSheet.dismiss();
 					}
 				}
+				pauseTransfersMenuIcon.setVisible(false);
+				playTransfersMenuIcon.setVisible(false);
+				cancelAllTransfersMenuItem.setVisible(false);
 			}
 
 			String cloudTag = getFragmentTag(R.id.cloud_drive_tabs_pager, 0);
