@@ -233,6 +233,17 @@ public class TransfersFragmentLollipop extends Fragment {
 		log("transferStart");
 		tL.add(transfer);
 		adapter.notifyItemInserted(tL.size()-1);
+
+		if (tL.size() == 0){
+			emptyImage.setVisibility(View.VISIBLE);
+			emptyText.setVisibility(View.VISIBLE);
+			listView.setVisibility(View.GONE);
+		}
+		else{
+			emptyImage.setVisibility(View.GONE);
+			emptyText.setVisibility(View.GONE);
+			listView.setVisibility(View.VISIBLE);
+		}
 	}
 
 	private static void log(String log) {

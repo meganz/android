@@ -197,7 +197,7 @@ public class MegaCompletedTransfersAdapter extends RecyclerView.Adapter<MegaComp
 			case MegaTransfer.STATE_CANCELLED:{
 				holder.textViewCompleted.setVisibility(View.VISIBLE);
 				holder.imageViewCompleted.setVisibility(View.VISIBLE);
-				holder.textViewCompleted.setText("Cancelled");
+				holder.textViewCompleted.setText(context.getResources().getString(R.string.transfer_cancelled));
 				holder.imageViewCompleted.setImageResource(R.drawable.ic_queue);
 
 				break;
@@ -205,28 +205,16 @@ public class MegaCompletedTransfersAdapter extends RecyclerView.Adapter<MegaComp
 			case MegaTransfer.STATE_COMPLETED:{
 				holder.textViewCompleted.setVisibility(View.VISIBLE);
 				holder.imageViewCompleted.setVisibility(View.VISIBLE);
-				holder.textViewCompleted.setText("Completed");
+				holder.textViewCompleted.setText(context.getResources().getString(R.string.title_tab_completed_transfers));
 				holder.imageViewCompleted.setImageResource(R.drawable.ic_complete_transfer);
-
-				break;
-			}
-
-			case MegaTransfer.STATE_COMPLETING:
-			case MegaTransfer.STATE_RETRYING:
-			case MegaTransfer.STATE_QUEUED:{
-				holder.textViewCompleted.setVisibility(View.VISIBLE);
-				holder.imageViewCompleted.setVisibility(View.VISIBLE);
-				holder.textViewCompleted.setText("Queued");
-				holder.imageViewCompleted.setImageResource(R.drawable.ic_queue);
-
 
 				break;
 			}
 			default:{
 				log("Default status");
 				holder.imageViewCompleted.setVisibility(View.VISIBLE);
-				holder.textViewCompleted.setText("DEFAULT");
-
+				holder.textViewCompleted.setText(context.getResources().getString(R.string.transfer_unknown));
+				holder.imageViewCompleted.setImageResource(R.drawable.ic_queue);
 				break;
 			}
 		}
