@@ -112,10 +112,9 @@ public class CompletedTransfersFragmentLollipop extends Fragment {
 		listView = (RecyclerView) v.findViewById(R.id.transfers_list_view);
 		listView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
 		mLayoutManager = new LinearLayoutManager(context);
-		listView.setLayoutManager(mLayoutManager);
 		listView.setHasFixedSize(true);
 		listView.setItemAnimator(new DefaultItemAnimator());
-		mLayoutManager.setReverseLayout(true);
+		listView.setLayoutManager(mLayoutManager);
 
 		emptyImage = (ImageView) v.findViewById(R.id.transfers_empty_image);
 		emptyText = (TextView) v.findViewById(R.id.transfers_empty_text);
@@ -181,7 +180,13 @@ public class CompletedTransfersFragmentLollipop extends Fragment {
 
     public void transferFinish(AndroidCompletedTransfer transfer){
 		log("transferFinish");
-		tL.add(transfer);
+		if(tL!=null){
+			tL.add(0,transfer);
+		}
+		else{
+			tL = new ArrayList<AndroidCompletedTransfer>();
+			tL.add(transfer);
+		}
 
 		if (tL.size() == 0){
 			emptyImage.setVisibility(View.VISIBLE);

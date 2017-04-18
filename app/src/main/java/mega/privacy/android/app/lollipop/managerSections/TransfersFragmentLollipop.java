@@ -218,7 +218,7 @@ public class TransfersFragmentLollipop extends Fragment {
     }
 
     public void transferFinish(int position){
-		log("transferFinish");
+		log("transferFinish: "+position);
 		tL.remove(position);
 		adapter.removeItemData(position);
 
