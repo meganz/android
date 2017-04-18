@@ -217,6 +217,25 @@ public class TransfersFragmentLollipop extends Fragment {
 		adapter.updateProgress(index, transfer);
     }
 
+	public void changeStatusButton(int tag){
+		log("transferUpdate");
+
+		ListIterator li = tL.listIterator();
+		int index = 0;
+		while(li.hasNext()) {
+			MegaTransfer next = (MegaTransfer) li.next();
+			if(next.getTag() == tag){
+				index=li.previousIndex();
+				break;
+			}
+		}
+		MegaTransfer transfer = megaApi.getTransferByTag(tag);
+		tL.set(index, transfer);
+		log("The transfer with index : "+index +"has paused/resumed, left: "+tL.size());
+
+		adapter.notifyItemChanged(index);
+	}
+
     public void transferFinish(int position){
 		log("transferFinish: "+position);
 		tL.remove(position);
