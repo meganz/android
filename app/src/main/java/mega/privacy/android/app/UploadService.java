@@ -536,6 +536,11 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 	public void onTransferFinish(MegaApiJava api, MegaTransfer transfer,MegaError error) {
 		log("Upload finished: " + transfer.getFileName() + " size " + transfer.getTransferredBytes());
 		log("transfer.getPath:" + transfer.getPath());
+
+		String size = Util.getSizeString(transfer.getTotalBytes());
+		AndroidCompletedTransfer completedTransfer = new AndroidCompletedTransfer(transfer.getFileName(), transfer.getType(), transfer.getState(), size, transfer.getNodeHandle()+"");
+		dbH.setCompletedTransfer(completedTransfer);
+
 		if (!transfer.isFolderTransfer()){
 			if (canceled) {
 				log("Upload cancelled: " + transfer.getFileName());

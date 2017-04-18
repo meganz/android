@@ -1996,6 +1996,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
     				intent.removeExtra("parentHandle");
     				setParentHandleBrowser(parentHandleBrowser);
 
+					String cloudTag = getFragmentTag(R.id.cloud_drive_tabs_pager, 0);
+					fbFLol = (FileBrowserFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cloudTag);
     				if (fbFLol != null){
 						fbFLol.setParentHandle(parentHandleBrowser);
     					fbFLol.setIsList(isList);
@@ -2753,6 +2755,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						log("FileBrowserFragmentLollipop recovered twice!");
 						fbFLol.setNodes(nodes);
 						fbFLol.setParentHandle(parentHandleBrowser);
+						fbFLol.setOverviewLayout();
 					}
 				}
 			}
@@ -2784,6 +2787,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				if(fbFLol!=null){
 					log("FileBrowserFragmentLollipop recovered once more!");
 					fbFLol.setNodes(nodes);
+					fbFLol.setOverviewLayout();
 				}
 			}
 		}
@@ -2825,12 +2829,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					}
 				}
 				else if(position == 1){
+					String cFTag = getFragmentTag(R.id.cloud_drive_tabs_pager, 0);
+					fbFLol = (FileBrowserFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
 					if (fbFLol != null){
 						if(fbFLol.isMultipleselect()){
 							fbFLol.actionMode.finish();
 						}
 					}
-					String cFTag = getFragmentTag(R.id.cloud_drive_tabs_pager, 1);
+					cFTag = getFragmentTag(R.id.cloud_drive_tabs_pager, 1);
 					rbFLol = (RubbishBinFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
 					if (rbFLol != null){
 						log("parentHandleRubbish: "+ parentHandleRubbish);
@@ -5109,32 +5115,31 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 			else if (drawerItem == DrawerItem.TRANSFERS){
 				log("in Transfers Section");
-				if (tFLol != null) {
-					searchMenuItem.setVisible(false);
-					//Hide
-					createFolderMenuItem.setVisible(false);
-					addContactMenuItem.setVisible(false);
-					addMenuItem.setVisible(false);
-					sortByMenuItem.setVisible(false);
-					selectMenuItem.setVisible(false);
-					unSelectMenuItem.setVisible(false);
-					thumbViewMenuItem.setVisible(false);
-					rubbishBinMenuItem.setVisible(false);
-					clearRubbishBinMenuitem.setVisible(false);
-					importLinkMenuItem.setVisible(false);
-					takePicture.setVisible(false);
-					refreshMenuItem.setVisible(false);
-					helpMenuItem.setVisible(false);
-					upgradeAccountMenuItem.setVisible(true);
-					changePass.setVisible(false);
-					cancelSubscription.setVisible(false);
-					killAllSessions.setVisible(false);
-					logoutMenuItem.setVisible(false);
-					forgotPassMenuItem.setVisible(false);
-					newChatMenuItem.setVisible(false);
-					setStatusMenuItem.setVisible(false);
+				searchMenuItem.setVisible(false);
+				//Hide
+				createFolderMenuItem.setVisible(false);
+				addContactMenuItem.setVisible(false);
+				addMenuItem.setVisible(false);
+				sortByMenuItem.setVisible(false);
+				selectMenuItem.setVisible(false);
+				unSelectMenuItem.setVisible(false);
+				thumbViewMenuItem.setVisible(false);
+				rubbishBinMenuItem.setVisible(false);
+				clearRubbishBinMenuitem.setVisible(false);
+				importLinkMenuItem.setVisible(false);
+				takePicture.setVisible(false);
+				refreshMenuItem.setVisible(false);
+				helpMenuItem.setVisible(false);
+				upgradeAccountMenuItem.setVisible(true);
+				changePass.setVisible(false);
+				cancelSubscription.setVisible(false);
+				killAllSessions.setVisible(false);
+				logoutMenuItem.setVisible(false);
+				forgotPassMenuItem.setVisible(false);
+				newChatMenuItem.setVisible(false);
+				setStatusMenuItem.setVisible(false);
 
-					cancelAllTransfersMenuItem.setVisible(true);
+				cancelAllTransfersMenuItem.setVisible(true);
 
 //				if(tranfersPaused){
 //					playTransfersMenuIcon.setVisible(true);
@@ -5144,31 +5149,31 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 //					playTransfersMenuIcon.setVisible(true);
 //					pauseTransfersMenuIcon.setVisible(false);
 //				}
-					if (transfersInProgress != null) {
-						if (transfersInProgress.size() > 0) {
+				if (transfersInProgress != null) {
+					if (transfersInProgress.size() > 0) {
 
-							if (megaApi.areTransfersPaused(MegaTransfer.TYPE_DOWNLOAD) || megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD)) {
-								log("Any transfer is paused");
-								playTransfersMenuIcon.setVisible(true);
-								pauseTransfersMenuIcon.setVisible(false);
-								cancelAllTransfersMenuItem.setVisible(true);
-							} else {
-								log("No transfers paused");
-								playTransfersMenuIcon.setVisible(false);
-								pauseTransfersMenuIcon.setVisible(true);
-								cancelAllTransfersMenuItem.setVisible(true);
-							}
-						} else {
-							playTransfersMenuIcon.setVisible(false);
+						if (megaApi.areTransfersPaused(MegaTransfer.TYPE_DOWNLOAD) || megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD)) {
+							log("Any transfer is paused");
+							playTransfersMenuIcon.setVisible(true);
 							pauseTransfersMenuIcon.setVisible(false);
-							cancelAllTransfersMenuItem.setVisible(false);
+							cancelAllTransfersMenuItem.setVisible(true);
+						} else {
+							log("No transfers paused");
+							playTransfersMenuIcon.setVisible(false);
+							pauseTransfersMenuIcon.setVisible(true);
+							cancelAllTransfersMenuItem.setVisible(true);
 						}
 					} else {
 						playTransfersMenuIcon.setVisible(false);
 						pauseTransfersMenuIcon.setVisible(false);
 						cancelAllTransfersMenuItem.setVisible(false);
 					}
+				} else {
+					playTransfersMenuIcon.setVisible(false);
+					pauseTransfersMenuIcon.setVisible(false);
+					cancelAllTransfersMenuItem.setVisible(false);
 				}
+
 
 			}
 
@@ -5479,20 +5484,20 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		    			}
 		    		}
 		    		else if (drawerItem == DrawerItem.TRANSFERS){
-		    			if (tFLol != null){
-		        			if (tFLol.onBackPressed() == 0){
-		        				drawerItem = DrawerItem.CLOUD_DRIVE;
-		    					if (nV != null){
-		    						Menu nVMenu = nV.getMenu();
-		    						MenuItem cloudDrive = nVMenu.findItem(R.id.navigation_item_cloud_drive);
-		    						resetNavigationViewMenu(nVMenu);
-		    						cloudDrive.setChecked(true);
-		    						cloudDrive.setIcon(getResources().getDrawable(R.drawable.cloud_drive_red));
-		    					}
-		        				selectDrawerItemLollipop(drawerItem);
-		        				return true;
-		        			}
-		        		}
+
+						if (tFLol.onBackPressed() == 0){
+							drawerItem = DrawerItem.CLOUD_DRIVE;
+							if (nV != null){
+								Menu nVMenu = nV.getMenu();
+								MenuItem cloudDrive = nVMenu.findItem(R.id.navigation_item_cloud_drive);
+								resetNavigationViewMenu(nVMenu);
+								cloudDrive.setChecked(true);
+								cloudDrive.setIcon(getResources().getDrawable(R.drawable.cloud_drive_red));
+							}
+							selectDrawerItemLollipop(drawerItem);
+							return true;
+						}
+
 		    		}
 					else if (drawerItem == DrawerItem.ACCOUNT){
 						if(accountFragment==Constants.UPGRADE_ACCOUNT_FRAGMENT){
@@ -7417,20 +7422,20 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			super.onBackPressed();
 		}
 		else if (drawerItem == DrawerItem.TRANSFERS){
-			if (tFLol != null){
-    			if (tFLol.onBackPressed() == 0){
-    				drawerItem = DrawerItem.CLOUD_DRIVE;
-					if (nV != null){
-						Menu nVMenu = nV.getMenu();
-						MenuItem cloudDrive = nVMenu.findItem(R.id.navigation_item_cloud_drive);
-						resetNavigationViewMenu(nVMenu);
-						cloudDrive.setChecked(true);
-						cloudDrive.setIcon(getResources().getDrawable(R.drawable.cloud_drive_red));
-					}
-    				selectDrawerItemLollipop(drawerItem);
-    				return;
-    			}
-    		}
+
+			if (tFLol.onBackPressed() == 0){
+				drawerItem = DrawerItem.CLOUD_DRIVE;
+				if (nV != null){
+					Menu nVMenu = nV.getMenu();
+					MenuItem cloudDrive = nVMenu.findItem(R.id.navigation_item_cloud_drive);
+					resetNavigationViewMenu(nVMenu);
+					cloudDrive.setChecked(true);
+					cloudDrive.setIcon(getResources().getDrawable(R.drawable.cloud_drive_red));
+				}
+				selectDrawerItemLollipop(drawerItem);
+				return;
+			}
+
     	}
 		else if (drawerItem == DrawerItem.INBOX){
 			if (iFLol != null){
@@ -11927,6 +11932,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			log("MegaRequest.TYPE_PAUSE_TRANSFERS");
 			if (e.getErrorCode() == MegaError.API_OK) {
 
+				String cFTag = getFragmentTag(R.id.cloud_drive_tabs_pager, 0);
+				fbFLol = (FileBrowserFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
 				if(fbFLol!=null){
 					if(fbFLol.isAdded()){
 						fbFLol.updateTransferButton();
@@ -11936,6 +11943,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				if(megaApi.areTransfersPaused(MegaTransfer.TYPE_DOWNLOAD)||megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD)){
 					log("show PLAY button");
 
+					String tFTag = getFragmentTag(R.id.transfers_tabs_pager, 0);
+					tFLol = (TransfersFragmentLollipop) getSupportFragmentManager().findFragmentByTag(tFTag);
 					if (tFLol != null){
 						if (drawerItem == DrawerItem.TRANSFERS && tFLol.isAdded()) {
 							pauseTransfersMenuIcon.setVisible(false);
@@ -11945,6 +11954,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
     			}
     			else{
     				log("show PAUSE button");
+					String tFTag = getFragmentTag(R.id.transfers_tabs_pager, 0);
+					tFLol = (TransfersFragmentLollipop) getSupportFragmentManager().findFragmentByTag(tFTag);
 					if (tFLol != null){
 						if (drawerItem == DrawerItem.TRANSFERS && tFLol.isAdded()) {
 							pauseTransfersMenuIcon.setVisible(true);
@@ -11959,6 +11970,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 			if (e.getErrorCode() == MegaError.API_OK){
 				int pendingTransfers = megaApi.getNumPendingDownloads() + megaApi.getNumPendingUploads();
+
+				String tFTag = getFragmentTag(R.id.transfers_tabs_pager, 0);
+				tFLol = (TransfersFragmentLollipop) getSupportFragmentManager().findFragmentByTag(tFTag);
 				if (tFLol != null){
 					if (drawerItem == DrawerItem.TRANSFERS && tFLol.isAdded()){
 						if(pendingTransfers<=0){
@@ -11966,16 +11980,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 							playTransfersMenuIcon.setVisible(false);
 						}
 						else{
-							if(megaApi.areTransfersPaused(MegaTransfer.TYPE_DOWNLOAD)||megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD)) {
-								log("show PLAY button");
-								pauseTransfersMenuIcon.setVisible(false);
-								playTransfersMenuIcon.setVisible(true);
-							}
-							else{
-								log("show PLAY button");
-								pauseTransfersMenuIcon.setVisible(true);
-								playTransfersMenuIcon.setVisible(false);
-							}
+							tFLol.changeStatusButton(request.getTransferTag());
 						}
 					}
 				}
@@ -11988,12 +11993,16 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			log("MegaRequest.TYPE_CANCEL_TRANSFERS");
 			//After cancelling all the transfers
 			if (e.getErrorCode() == MegaError.API_OK){
+				String cFTag = getFragmentTag(R.id.cloud_drive_tabs_pager, 0);
+				fbFLol = (FileBrowserFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
 				if (fbFLol != null){
 					if(fbFLol.isAdded()){
 						fbFLol.setOverviewLayout();
 					}
 				}
 
+				String tFTag = getFragmentTag(R.id.transfers_tabs_pager, 0);
+				tFLol = (TransfersFragmentLollipop) getSupportFragmentManager().findFragmentByTag(tFTag);
 				if (tFLol != null){
 					if (drawerItem == DrawerItem.TRANSFERS && tFLol.isAdded()){
 						pauseTransfersMenuIcon.setVisible(false);
@@ -12013,6 +12022,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 				log("REQUEST OK - wait for onTransferFinish()");
 
+				String cFTag = getFragmentTag(R.id.cloud_drive_tabs_pager, 0);
+				fbFLol = (FileBrowserFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
 				if (fbFLol != null){
 					if(fbFLol.isAdded()){
 						fbFLol.setOverviewLayout();
@@ -12846,8 +12857,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 		String size = Util.getSizeString(transfer.getTotalBytes());
 		AndroidCompletedTransfer completedTransfer = new AndroidCompletedTransfer(transfer.getFileName(), transfer.getType(), transfer.getState(), size, transfer.getNodeHandle()+"");
-		dbH.setCompletedTransfer(completedTransfer);
 
+		String tFTag = getFragmentTag(R.id.transfers_tabs_pager, 1);
+		completedTFLol = (CompletedTransfersFragmentLollipop) getSupportFragmentManager().findFragmentByTag(tFTag);
 		if(completedTFLol!=null){
 			if(completedTFLol.isAdded()){
 				completedTFLol.transferFinish(completedTransfer);
@@ -12868,12 +12880,16 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 			transferCallback = transfer.getNotificationNumber();
 
+			String cloudTag = getFragmentTag(R.id.cloud_drive_tabs_pager, 0);
+			fbFLol = (FileBrowserFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cloudTag);
 			if (fbFLol != null){
 				if(fbFLol.isAdded()){
 					fbFLol.setOverviewLayout();
 				}
 			}
 
+			String tFTag = getFragmentTag(R.id.transfers_tabs_pager, 0);
+			tFLol = (TransfersFragmentLollipop) getSupportFragmentManager().findFragmentByTag(tFTag);
 			if (tFLol != null){
 				if(tFLol.isAdded()){
 					tFLol.transferStart(transfer);
@@ -12917,6 +12933,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				}
 			}
 
+			String cloudTag = getFragmentTag(R.id.cloud_drive_tabs_pager, 0);
+			fbFLol = (FileBrowserFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cloudTag);
 			if (fbFLol != null){
 				if(fbFLol.isAdded()){
 					fbFLol.setOverviewLayout();
@@ -12947,12 +12965,16 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			if(transferCallback<transfer.getNotificationNumber()){
 				transferCallback = transfer.getNotificationNumber();
 
+				String cloudTag = getFragmentTag(R.id.cloud_drive_tabs_pager, 0);
+				fbFLol = (FileBrowserFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cloudTag);
 				if (fbFLol != null){
 					if(fbFLol.isAdded()){
 						fbFLol.setOverviewLayout();
 					}
 				}
 
+				String tFTag = getFragmentTag(R.id.transfers_tabs_pager, 0);
+				tFLol = (TransfersFragmentLollipop) getSupportFragmentManager().findFragmentByTag(tFTag);
 				if (tFLol != null){
 					if(tFLol.isAdded()){
 						tFLol.transferUpdate(transfer);

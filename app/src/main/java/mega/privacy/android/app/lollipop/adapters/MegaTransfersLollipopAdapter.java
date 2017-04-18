@@ -263,27 +263,23 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
 				
 				Bitmap thumb = null;
 				if (node.hasThumbnail()){
-					RelativeLayout.LayoutParams params2 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
-					params2.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-					params2.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-					params2.setMargins(54, 0, 12, 0);
-					
+					RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
+					params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
+					params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
+					params1.setMargins(54, 0, 12, 0);
+					holder.imageView.setLayoutParams(params1);
+//
+//					RelativeLayout.LayoutParams params2 = (RelativeLayout.LayoutParams) holder.iconDownloadUploadView.getLayoutParams();
+//					params.addRule(RelativeLayout.ALIGN_RIGHT, R.id.transfers_list_thumbnail);
+//					holder.iconDownloadUploadView.setLayoutParams(params2);
+//
 					thumb = ThumbnailUtils.getThumbnailFromCache(node);
 					if (thumb != null){
-						RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
-						params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-						params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-						params1.setMargins(54, 0, 12, 0);
-						holder.imageView.setLayoutParams(params1);
 						holder.imageView.setImageBitmap(thumb);
 					}
 					else{
 						thumb = ThumbnailUtils.getThumbnailFromFolder(node, context);
 						if (thumb != null){
-							RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
-							params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-							params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-							params1.setMargins(54, 0, 12, 0);
 							holder.imageView.setImageBitmap(thumb);
 						}
 						else{ 
@@ -304,11 +300,11 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
 			holder.iconDownloadUploadView.setImageResource(R.drawable.ic_upload_transfers);
 			holder.imageView.setImageResource(MimeTypeList.typeForName(transfer.getFileName()).getIconResourceId());
 			holder.currentPath = transfer.getPath();
-			
+
 			RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
 			params.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
 			params.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
-			params.setMargins(36, 0, 0, 0);
+			params.setMargins(0, 0, 0, 0);
 			holder.imageView.setLayoutParams(params);
 			
 			if (MimeTypeList.typeForName(transfer.getFileName()).isImage()){

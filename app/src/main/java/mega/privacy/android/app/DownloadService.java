@@ -771,6 +771,11 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			MegaError error) {
 		log("Download finished: " + transfer.getFileName() + " size " + transfer.getTransferredBytes());
 		log("transfer.getPath:" + transfer.getPath());
+
+		String size = Util.getSizeString(transfer.getTotalBytes());
+		AndroidCompletedTransfer completedTransfer = new AndroidCompletedTransfer(transfer.getFileName(), transfer.getType(), transfer.getState(), size, transfer.getNodeHandle()+"");
+		dbH.setCompletedTransfer(completedTransfer);
+
 		if (canceled) {
 			if((lock != null) && (lock.isHeld()))
 				try{ lock.release(); } catch(Exception ex) {}
