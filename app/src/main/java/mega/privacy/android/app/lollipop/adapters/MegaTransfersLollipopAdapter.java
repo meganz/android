@@ -334,32 +334,12 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
 			case MegaTransfer.STATE_PAUSED:{
 				holder.textViewCompleted.setVisibility(View.VISIBLE);
 				holder.imageViewCompleted.setVisibility(View.VISIBLE);
-				holder.textViewCompleted.setText("Paused");
+				holder.textViewCompleted.setText(context.getResources().getString(R.string.transfer_paused));
 				holder.imageViewCompleted.setImageResource(R.drawable.ic_queue);
 				holder.transferProgressBar.setVisibility(View.GONE);
 				holder.optionRemove.setVisibility(View.VISIBLE);
 				holder.optionPause.setImageResource(R.drawable.ic_play);
 				holder.optionPause.setVisibility(View.VISIBLE);
-				break;
-			}
-			case MegaTransfer.STATE_CANCELLED:{
-				holder.textViewCompleted.setVisibility(View.VISIBLE);
-				holder.imageViewCompleted.setVisibility(View.VISIBLE);
-				holder.textViewCompleted.setText("Cancelled");
-				holder.imageViewCompleted.setImageResource(R.drawable.ic_queue);
-				holder.transferProgressBar.setVisibility(View.GONE);
-				holder.optionRemove.setVisibility(View.GONE);
-				holder.optionPause.setVisibility(View.GONE);
-				break;
-			}
-			case MegaTransfer.STATE_COMPLETED:{
-				holder.textViewCompleted.setVisibility(View.VISIBLE);
-				holder.imageViewCompleted.setVisibility(View.VISIBLE);
-				holder.textViewCompleted.setText("Completed");
-				holder.imageViewCompleted.setImageResource(R.drawable.ic_complete_transfer);
-				holder.transferProgressBar.setVisibility(View.GONE);
-				holder.optionRemove.setVisibility(View.GONE);
-				holder.optionPause.setVisibility(View.GONE);
 				break;
 			}
 			case MegaTransfer.STATE_ACTIVE:{
@@ -380,7 +360,7 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
 			case MegaTransfer.STATE_QUEUED:{
 				holder.textViewCompleted.setVisibility(View.VISIBLE);
 				holder.imageViewCompleted.setVisibility(View.VISIBLE);
-				holder.textViewCompleted.setText("Queued");
+				holder.textViewCompleted.setText(context.getResources().getString(R.string.transfer_queued));
 				holder.imageViewCompleted.setImageResource(R.drawable.ic_queue);
 				holder.transferProgressBar.setVisibility(View.GONE);
 				holder.optionRemove.setVisibility(View.VISIBLE);
@@ -391,7 +371,7 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
 				log("Default status");
 				holder.imageViewCompleted.setVisibility(View.VISIBLE);
 				holder.transferProgressBar.setVisibility(View.GONE);
-				holder.textViewCompleted.setText("DEFAULT");
+				holder.textViewCompleted.setText(context.getResources().getString(R.string.transfer_unknown));
 				holder.optionPause.setVisibility(View.GONE);
 				break;
 			}

@@ -116,7 +116,6 @@ public class CompletedTransfersFragmentLollipop extends Fragment {
 		listView.setHasFixedSize(true);
 		listView.setItemAnimator(new DefaultItemAnimator());
 		mLayoutManager.setReverseLayout(true);
-		mLayoutManager.setStackFromEnd(true);
 
 		emptyImage = (ImageView) v.findViewById(R.id.transfers_empty_image);
 		emptyText = (TextView) v.findViewById(R.id.transfers_empty_text);

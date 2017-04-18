@@ -1117,4 +1117,9 @@
 
     <string name="title_tab_in_progress_transfers" context="Title of the tab section for transfers in progress">In progress</string>
     <string name="title_tab_completed_transfers" context="Title of the tab section for completed transfers">Completed</string>
+
+    <string name="transfer_paused" context="Possible state of a transfer">Paused</string>
+    <string name="transfer_queued" context="Possible state of a transfer">Queued</string>
+    <string name="transfer_cancelled" context="Possible state of a transfer">Cancelled</string>
+    <string name="transfer_unknown" context="Possible state of a transfer">Unknown</string>
 </resources>
