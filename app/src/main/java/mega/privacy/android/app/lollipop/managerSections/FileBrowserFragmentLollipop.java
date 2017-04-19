@@ -596,7 +596,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 		pendingTransfers = megaApi.getNumPendingDownloads() + megaApi.getNumPendingUploads();
 		totalTransfers = megaApi.getTotalDownloads() + megaApi.getTotalUploads();
 
-		totalSizePendingTransfer = megaApi.getTotalDownloadBytes() + megaApi.getTotalUploadBytes();
+		//totalSizePendingTransfer = megaApi.getTotalDownloadBytes() + megaApi.getTotalUploadBytes();
 		totalSizeTransfered = megaApi.getTotalDownloadedBytes() + megaApi.getTotalUploadedBytes();
 
 		if(pendingTransfers>0){

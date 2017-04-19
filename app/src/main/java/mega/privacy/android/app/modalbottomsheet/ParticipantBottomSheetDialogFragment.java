@@ -181,6 +181,14 @@ public class ParticipantBottomSheetDialogFragment extends BottomSheetDialogFragm
             optionStartConversationChat.setVisibility(View.GONE);
             optionChangePermissionsChat.setVisibility(View.GONE);
             optionRemoveParticipantChat.setVisibility(View.GONE);
+
+            if(selectedChat.getOwnPrivilege()==MegaChatRoom.PRIV_MODERATOR){
+                optionInvite.setVisibility(View.VISIBLE);
+            }
+            else{
+                optionInvite.setVisibility(View.GONE);
+            }
+
         }
         else{
             MegaUser contact = megaApi.getContact(selectedParticipant.getEmail());
