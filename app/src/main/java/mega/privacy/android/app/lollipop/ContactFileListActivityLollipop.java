@@ -78,7 +78,7 @@ import nz.mega.sdk.MegaTransferListenerInterface;
 import nz.mega.sdk.MegaUser;
 
 
-public class ContactFileListActivityLollipop extends PinActivityLollipop implements MegaGlobalListenerInterface, MegaTransferListenerInterface, MegaRequestListenerInterface {
+public class ContactFileListActivityLollipop extends PinActivityLollipop implements MegaGlobalListenerInterface, MegaRequestListenerInterface {
 
 	FrameLayout fragmentContainer;
     
@@ -123,7 +123,6 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 	private AlertDialog renameDialog;
 	ProgressDialog statusDialog;
 
-	ArrayList<MegaTransfer> tL;
 	long lastTimeOnTransferUpdate = -1;
 
 	private List<ShareInfo> filePreparedInfos;
@@ -340,7 +339,6 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 		}
 
 		megaApi.addGlobalListener(this);
-		megaApi.addTransferListener(this);
 
 		contactPropertiesMainActivity=this;
 
@@ -592,7 +590,6 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 		if(megaApi != null)
 		{
 			megaApi.removeGlobalListener(this);	
-			megaApi.removeTransferListener(this);
 			megaApi.removeRequestListener(this);
 		}
 	}
@@ -1534,106 +1531,6 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 				}
 			}
 		}
-	}
-
-	@Override
-	public void onTransferStart(MegaApiJava api, MegaTransfer transfer) {
-		log("onTransferStart");
-
-		HashMap<Long, MegaTransfer> mTHash = new HashMap<Long, MegaTransfer>();
-
-		tL = megaApi.getTransfers();
-
-		if (cflF != null){
-			for(int i=0; i<tL.size(); i++){
-
-				MegaTransfer tempT = tL.get(i);
-				if (tempT.getType() == MegaTransfer.TYPE_DOWNLOAD){
-					long handleT = tempT.getNodeHandle();
-					MegaNode nodeT = megaApi.getNodeByHandle(handleT);
-					MegaNode parentT = megaApi.getParentNode(nodeT);
-
-					if (parentT != null){
-						if(parentT.getHandle() == this.parentHandle){	
-							mTHash.put(handleT,tempT);						
-						}
-					}
-				}
-			}
-
-			cflF.setTransfers(mTHash);
-		}
-
-		log("onTransferStart: " + transfer.getFileName() + " - " + transfer.getTag());
-	}
-
-	@Override
-	public void onTransferFinish(MegaApiJava api, MegaTransfer transfer,
-			MegaError e) {
-		log("onTransferFinish");
-
-		HashMap<Long, MegaTransfer> mTHash = new HashMap<Long, MegaTransfer>();
-
-		tL = megaApi.getTransfers();
-
-		if (cflF != null){
-			for(int i=0; i<tL.size(); i++){
-
-				MegaTransfer tempT = tL.get(i);
-				if (tempT.getType() == MegaTransfer.TYPE_DOWNLOAD){
-					long handleT = tempT.getNodeHandle();
-					MegaNode nodeT = megaApi.getNodeByHandle(handleT);
-					MegaNode parentT = megaApi.getParentNode(nodeT);
-
-					if (parentT != null){
-						if(parentT.getHandle() == this.parentHandle){	
-							mTHash.put(handleT,tempT);						
-						}
-					}
-				}
-			}
-
-			cflF.setTransfers(mTHash);
-		}
-
-		log("onTransferFinish: " + transfer.getFileName() + " - " + transfer.getTag());
-	}
-
-	@Override
-	public void onTransferUpdate(MegaApiJava api, MegaTransfer transfer) {
-		log("onTransferUpdate: " + transfer.getFileName() + " - " + transfer.getTag());
-
-		if (cflF != null){
-			if (cflF.isVisible()){
-				if (transfer.getType() == MegaTransfer.TYPE_DOWNLOAD){
-					Time now = new Time();
-					now.setToNow();
-					long nowMillis = now.toMillis(false);
-					if (lastTimeOnTransferUpdate < 0){
-						lastTimeOnTransferUpdate = now.toMillis(false);
-						cflF.setCurrentTransfer(transfer);
-					}
-					else if ((nowMillis - lastTimeOnTransferUpdate) > Util.ONTRANSFERUPDATE_REFRESH_MILLIS){
-						lastTimeOnTransferUpdate = nowMillis;
-						cflF.setCurrentTransfer(transfer);
-					}			
-				}		
-			}
-		}
-	}
-
-	@Override
-	public void onTransferTemporaryError(MegaApiJava api,
-			MegaTransfer transfer, MegaError e) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public boolean onTransferData(MegaApiJava api, MegaTransfer transfer,
-			byte[] buffer) {
-		// TODO Auto-generated method stub
-		return false;
 	}
 
 	@Override

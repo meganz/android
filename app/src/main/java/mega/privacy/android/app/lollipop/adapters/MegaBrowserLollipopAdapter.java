@@ -1645,31 +1645,6 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 		}
 	}
 
-//	public void setOrder(int orderGetChildren) {
-//		this.orderGetChildren = orderGetChildren;
-//	}
-
-	public void setTransfers(HashMap<Long, MegaTransfer> _mTHash)
-	{
-		this.mTHash = _mTHash;
-		notifyDataSetChanged();
-	}
-
-	public void setCurrentTransfer(MegaTransfer mT)
-	{
-		this.currentTransfer = mT;
-		MegaNode nodeT = megaApi.getNodeByHandle(mT.getNodeHandle());
-		if (megaApi.getParentNode(nodeT) != null){
-			if(megaApi.getParentNode(nodeT).getHandle() == parentHandle){    		
-				notifyDataSetChanged();    		
-			}
-		}
-
-		if (type == Constants.SHARED_WITH_ME_ADAPTER){
-			notifyDataSetChanged();
-		}
-	}
-
 	private static void log(String log) {
 		Util.log("MegaBrowserLollipopAdapter", log);
 	}

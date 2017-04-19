@@ -120,7 +120,7 @@ public class CompletedTransfersFragmentLollipop extends Fragment {
 		emptyText = (TextView) v.findViewById(R.id.transfers_empty_text);
 
 		emptyImage.setImageResource(R.drawable.ic_no_active_transfers);
-		emptyText.setText(getString(R.string.transfers_empty));
+		emptyText.setText(getString(R.string.completed_transfers_empty));
 
 		setCompletedTransfers();
 
@@ -153,6 +153,13 @@ public class CompletedTransfersFragmentLollipop extends Fragment {
 			emptyText.setVisibility(View.VISIBLE);
 			listView.setVisibility(View.GONE);
 		}
+	}
+
+	public void updateCompletedTransfers(){
+		log("updateCompletedTransfers");
+
+		setCompletedTransfers();
+		adapter.notifyDataSetChanged();
 	}
 
 	@Override
@@ -201,6 +208,19 @@ public class CompletedTransfersFragmentLollipop extends Fragment {
 		adapter.notifyDataSetChanged();
 	}
 
+	public boolean isAnyTransferCompleted (){
+		if(tL!=null){
+			if(tL.isEmpty()){
+				return false;
+			}
+			else{
+				return true;
+			}
+		}
+		else{
+			return false;
+		}
+	}
 	private static void log(String log) {
 		Util.log("CompletedTransfersFragmentLollipop", log);
 	}

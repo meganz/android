@@ -477,6 +477,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	private MenuItem forgotPassMenuItem;
 	private MenuItem newChatMenuItem;
 	private MenuItem setStatusMenuItem;
+	private MenuItem clearCompletedTransfers;
 
 	boolean fromTakePicture = false;
 
@@ -3655,6 +3656,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 		}
 
+		aB.setTitle(getString(R.string.section_transfers));
+		aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+		firstNavigationLevel = true;
+
 		viewPagerMyAccount.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
 			@Override
 			public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
@@ -4371,9 +4376,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		rubbishBinMenuItem = menu.findItem(R.id.action_rubbish_bin);
 		clearRubbishBinMenuitem = menu.findItem(R.id.action_menu_clear_rubbish_bin);
 		cancelAllTransfersMenuItem = menu.findItem(R.id.action_menu_cancel_all_transfers);
+		clearCompletedTransfers = menu.findItem(R.id.action_menu_clear_completed_transfers);
 		playTransfersMenuIcon = menu.findItem(R.id.action_play);
 		pauseTransfersMenuIcon = menu.findItem(R.id.action_pause);
 		cancelAllTransfersMenuItem.setVisible(false);
+		clearCompletedTransfers.setVisible(false);
 
 		changePass = menu.findItem(R.id.action_menu_change_pass);
 
@@ -4991,6 +4998,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						//Hide
 						upgradeAccountMenuItem.setVisible(true);
 						cancelAllTransfersMenuItem.setVisible(false);
+						clearCompletedTransfers.setVisible(false);
 						pauseTransfersMenuIcon.setVisible(false);
 						playTransfersMenuIcon.setVisible(false);
 						log("createFolderMenuItem.setVisible_23");
@@ -5057,6 +5065,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					importLinkMenuItem.setVisible(false);
 					takePicture.setVisible(false);
 					cancelAllTransfersMenuItem.setVisible(false);
+					clearCompletedTransfers.setVisible(false);
 					gridSmallLargeMenuItem.setVisible(false);
 					newChatMenuItem.setVisible(false);
 					setStatusMenuItem.setVisible(false);
@@ -5130,7 +5139,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				takePicture.setVisible(false);
 				refreshMenuItem.setVisible(false);
 				helpMenuItem.setVisible(false);
-				upgradeAccountMenuItem.setVisible(true);
+				upgradeAccountMenuItem.setVisible(false);
 				changePass.setVisible(false);
 				cancelSubscription.setVisible(false);
 				killAllSessions.setVisible(false);
@@ -5141,14 +5150,19 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 				cancelAllTransfersMenuItem.setVisible(true);
 
-//				if(tranfersPaused){
-//					playTransfersMenuIcon.setVisible(true);
-//					pauseTransfersMenuIcon.setVisible(false);
-//				}
-//				else{
-//					playTransfersMenuIcon.setVisible(true);
-//					pauseTransfersMenuIcon.setVisible(false);
-//				}
+				String tFTag = getFragmentTag(R.id.transfers_tabs_pager, 1);
+				completedTFLol = (CompletedTransfersFragmentLollipop) getSupportFragmentManager().findFragmentByTag(tFTag);
+				if(completedTFLol!=null){
+					if(completedTFLol.isAdded()){
+						if(completedTFLol.isAnyTransferCompleted()){
+							clearCompletedTransfers.setVisible(true);
+						}
+						else{
+							clearCompletedTransfers.setVisible(false);
+						}
+					}
+				}
+
 				if (transfersInProgress != null) {
 					if (transfersInProgress.size() > 0) {
 
@@ -5203,6 +5217,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					killAllSessions.setVisible(false);
 					logoutMenuItem.setVisible(false);
 					cancelAllTransfersMenuItem.setVisible(false);
+					clearCompletedTransfers.setVisible(false);
 					forgotPassMenuItem.setVisible(false);
 					playTransfersMenuIcon.setVisible(false);
 					pauseTransfersMenuIcon.setVisible(false);
@@ -5250,6 +5265,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					killAllSessions.setVisible(false);
 					logoutMenuItem.setVisible(false);
 					cancelAllTransfersMenuItem.setVisible(false);
+					clearCompletedTransfers.setVisible(false);
 					forgotPassMenuItem.setVisible(false);
 					playTransfersMenuIcon.setVisible(false);
 					pauseTransfersMenuIcon.setVisible(false);
@@ -5279,6 +5295,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					killAllSessions.setVisible(false);
 					logoutMenuItem.setVisible(false);
 					cancelAllTransfersMenuItem.setVisible(false);
+					clearCompletedTransfers.setVisible(false);
 					forgotPassMenuItem.setVisible(false);
 					playTransfersMenuIcon.setVisible(false);
 					pauseTransfersMenuIcon.setVisible(false);
@@ -5286,6 +5303,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 		}
 		else{
+			log("Offline options shown");
 			if (drawerItem == DrawerItem.CHAT) {
 				log("in Chat Section without NET");
 				ChatController chatController = new ChatController(this);
@@ -5324,6 +5342,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					killAllSessions.setVisible(false);
 					logoutMenuItem.setVisible(false);
 					cancelAllTransfersMenuItem.setVisible(false);
+					clearCompletedTransfers.setVisible(false);
 					forgotPassMenuItem.setVisible(false);
 					playTransfersMenuIcon.setVisible(false);
 					pauseTransfersMenuIcon.setVisible(false);
@@ -5354,6 +5373,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					killAllSessions.setVisible(false);
 					logoutMenuItem.setVisible(false);
 					cancelAllTransfersMenuItem.setVisible(false);
+					clearCompletedTransfers.setVisible(false);
 					forgotPassMenuItem.setVisible(false);
 					playTransfersMenuIcon.setVisible(false);
 					pauseTransfersMenuIcon.setVisible(false);
@@ -5385,6 +5405,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				killAllSessions.setVisible(false);
 				logoutMenuItem.setVisible(false);
 				cancelAllTransfersMenuItem.setVisible(false);
+				clearCompletedTransfers.setVisible(false);
 				forgotPassMenuItem.setVisible(false);
 				playTransfersMenuIcon.setVisible(false);
 				pauseTransfersMenuIcon.setVisible(false);
@@ -5591,11 +5612,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		    	return true;
 		    }
 		    case R.id.action_menu_cancel_all_transfers:{
-
 		    	showConfirmationCancelAllTransfers();
-
 		    	return true;
 		    }
+			case R.id.action_menu_clear_completed_transfers:{
+				showConfirmationClearCompletedTransfers();
+				return true;
+			}
 	        case R.id.action_pause:{
 	        	if (drawerItem == DrawerItem.TRANSFERS){
 	        		log("Click on action_pause - play visible");
@@ -12746,18 +12769,22 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
 				switch (which){
-					case DialogInterface.BUTTON_POSITIVE:
+					case DialogInterface.BUTTON_POSITIVE: {
 						log("Pressed button positive to clear transfers");
 						dbH.emptyCompletedTransfers();
-						if(tFLol!=null){
-							if(tFLol.isAdded()){
-								tFLol.refreshAllTransfers();
+						String tFTag = getFragmentTag(R.id.transfers_tabs_pager, 1);
+						completedTFLol = (CompletedTransfersFragmentLollipop) getSupportFragmentManager().findFragmentByTag(tFTag);
+						if (completedTFLol != null) {
+							if (completedTFLol.isAdded()) {
+								completedTFLol.updateCompletedTransfers();
 							}
 						}
+						invalidateOptionsMenu();
 						break;
-
-					case DialogInterface.BUTTON_NEGATIVE:
+					}
+					case DialogInterface.BUTTON_NEGATIVE: {
 						break;
+					}
 				}
 			}
 		};
@@ -12788,7 +12815,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 							megaApi.cancelTransfer(mT, managerActivity);
 						}
 						else{
-							megaApi.pauseTransfer(mT, true, managerActivity);
+							if(mT.getState()==MegaTransfer.STATE_PAUSED){
+								megaApi.pauseTransfer(mT, false, managerActivity);
+							}
+							else{
+								megaApi.pauseTransfer(mT, true, managerActivity);
+							}
 						}
 
 						break;
@@ -12809,9 +12841,17 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		}
 		else {
 
-			builder.setMessage(getResources().getString(R.string.menu_pause_individual_transfer));
-			builder.setPositiveButton(R.string.action_pause, dialogClickListener);
-			builder.setNegativeButton(R.string.general_cancel, dialogClickListener);
+			if(mT.getState()==MegaTransfer.STATE_PAUSED){
+				builder.setMessage(getResources().getString(R.string.menu_resume_individual_transfer));
+				builder.setPositiveButton(R.string.button_resume_individual_transfer, dialogClickListener);
+				builder.setNegativeButton(R.string.general_cancel, dialogClickListener);
+			}
+			else{
+				builder.setMessage(getResources().getString(R.string.menu_pause_individual_transfer));
+				builder.setPositiveButton(R.string.action_pause, dialogClickListener);
+				builder.setNegativeButton(R.string.general_cancel, dialogClickListener);
+			}
+
 		}
 		builder.show();
 	}
@@ -12860,6 +12900,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				completedTFLol.transferFinish(completedTransfer);
 			}
 		}
+
+		clearCompletedTransfers.setVisible(true);
 	}
 
 	@Override
@@ -12916,7 +12958,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
             transfersInProgress.remove(index);
             log("The transfer with index : "+index +"has been removed, left: "+transfersInProgress.size());
 
-			addCompletedTransfer(transfer);
+			if(transfer.getState()==MegaTransfer.STATE_COMPLETED){
+				addCompletedTransfer(transfer);
+			}
 
 			int pendingTransfers = 	megaApi.getNumPendingDownloads() + megaApi.getNumPendingUploads();
 
@@ -12929,6 +12973,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				pauseTransfersMenuIcon.setVisible(false);
 				playTransfersMenuIcon.setVisible(false);
 				cancelAllTransfersMenuItem.setVisible(false);
+
+				showSnackbar(getString(R.string.message_transfers_completed));
 			}
 
 			String cloudTag = getFragmentTag(R.id.cloud_drive_tabs_pager, 0);

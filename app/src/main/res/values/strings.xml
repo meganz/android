@@ -1105,13 +1105,18 @@
 
     <string name="error_editing_message" context="Error when a message cannot be edited">This message cannot be edited</string>
 
-    <string name="text_number_transfers" context="Label to show the number of transfers in progress" formatted="false">%1$d of %2$d</string>
-    <string name="option_to_transfer_manager" context="Label of the modal bottom sheet to Transfer Manager section" formatted="false">Show transfers</string>
+    <plurals name="text_number_transfers" context="Label to show the number of transfers in progress">
+        <item context="Singular" quantity="one">%1$d of %2$d file</item>
+        <item context="Plural" quantity="other">%1$d of %2$d files</item>
+    </plurals>
+
+    <string name="option_to_transfer_manager" context="Label of the modal bottom sheet to Transfer Manager section" formatted="false">View</string>
     <string name="option_to_pause_transfers" context="Label of the modal bottom sheet to pause all transfers">Pause all transfers</string>
     <string name="option_to_resume_transfers" context="Label of the modal bottom sheet to resume all transfers">Resume all transfers</string>
-    <string name="option_to_clear_transfers" context="Label of the modal bottom sheet to clear completed transfers">Clear completed transfers</string>
+    <string name="option_to_clear_transfers" context="Label of the modal bottom sheet to clear completed transfers">Clear completed</string>
     <string name="menu_pause_individual_transfer" context="Dialog to confirm the action of pausing one transfer">Pause transfer?</string>
-    <string name="menu_restart_individual_transfer" context="Dialog to confirm the action of restarting one transfer">Restart transfer?</string>
+    <string name="menu_resume_individual_transfer" context="Dialog to confirm the action of restarting one transfer">Resume transfer?</string>
+    <string name="button_resume_individual_transfer" context="Button to confirm the action of restarting one transfer">Resume</string>
 
     <string name="confirmation_to_clear_completed_transfers" context="Dialog to confirm before removing completed transfers">Clear completed transfers?</string>
 
@@ -1120,6 +1125,12 @@
 
     <string name="transfer_paused" context="Possible state of a transfer">Paused</string>
     <string name="transfer_queued" context="Possible state of a transfer">Queued</string>
-    <string name="transfer_cancelled" context="Possible state of a transfer">Cancelled</string>
+    <string name="transfer_canceled" context="Possible state of a transfer">Canceled</string>
     <string name="transfer_unknown" context="Possible state of a transfer">Unknown</string>
+
+    <string name="paused_transfers_title" context="Title of the panel where the progress of the transfers is shown">Paused transfers</string>
+
+    <string name="completed_transfers_empty" context="message shown in the screen when there are not any active transfer">No completed transfers</string>
+
+    <string name="message_transfers_completed" context="Message shown when the pending transfers are completed">Transfers completed</string>
 </resources>

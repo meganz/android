@@ -243,8 +243,7 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
 			holder.iconDownloadUploadView.setImageResource(R.drawable.ic_download_transfers);
 			MegaNode node = megaApi.getNodeByHandle(transfer.getNodeHandle());
 			holder.document = transfer.getNodeHandle();
-			
-			//if node == null --> Public node
+
 			if (node == null){
 				holder.imageView.setImageResource(MimeTypeList.typeForName(transfer.getFileName()).getIconResourceId());
 				RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
@@ -260,26 +259,41 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
 				params.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
 				params.setMargins(36, 0, 0, 0);
 				holder.imageView.setLayoutParams(params);
+
+				RelativeLayout.LayoutParams params3 = (RelativeLayout.LayoutParams) holder.iconDownloadUploadView.getLayoutParams();
+				params3.setMargins(0, 0, 0, 0);
+				holder.iconDownloadUploadView.setLayoutParams(params3);
 				
 				Bitmap thumb = null;
 				if (node.hasThumbnail()){
-					RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
-					params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-					params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-					params1.setMargins(54, 0, 12, 0);
-					holder.imageView.setLayoutParams(params1);
-//
-//					RelativeLayout.LayoutParams params2 = (RelativeLayout.LayoutParams) holder.iconDownloadUploadView.getLayoutParams();
-//					params.addRule(RelativeLayout.ALIGN_RIGHT, R.id.transfers_list_thumbnail);
-//					holder.iconDownloadUploadView.setLayoutParams(params2);
 //
 					thumb = ThumbnailUtils.getThumbnailFromCache(node);
 					if (thumb != null){
+						RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
+						params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
+						params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
+						params1.setMargins(54, 0, 18, 0);
+						holder.imageView.setLayoutParams(params1);
+
+						RelativeLayout.LayoutParams params2 = (RelativeLayout.LayoutParams) holder.iconDownloadUploadView.getLayoutParams();
+						params2.setMargins(0, -12, -12, 0);
+						holder.iconDownloadUploadView.setLayoutParams(params2);
+
 						holder.imageView.setImageBitmap(thumb);
 					}
 					else{
 						thumb = ThumbnailUtils.getThumbnailFromFolder(node, context);
 						if (thumb != null){
+							RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
+							params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
+							params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
+							params1.setMargins(54, 0, 18, 0);
+							holder.imageView.setLayoutParams(params1);
+
+							RelativeLayout.LayoutParams params2 = (RelativeLayout.LayoutParams) holder.iconDownloadUploadView.getLayoutParams();
+							params2.setMargins(0, -12, -12, 0);
+							holder.iconDownloadUploadView.setLayoutParams(params2);
+
 							holder.imageView.setImageBitmap(thumb);
 						}
 						else{ 
@@ -289,6 +303,16 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
 							catch(Exception e){} //Too many AsyncTasks
 							
 							if (thumb != null){
+								RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
+								params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
+								params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
+								params1.setMargins(54, 0, 18, 0);
+								holder.imageView.setLayoutParams(params1);
+
+								RelativeLayout.LayoutParams params2 = (RelativeLayout.LayoutParams) holder.iconDownloadUploadView.getLayoutParams();
+								params2.setMargins(0, -12, -12, 0);
+								holder.iconDownloadUploadView.setLayoutParams(params2);
+
 								holder.imageView.setImageBitmap(thumb);
 							}
 						}
@@ -304,24 +328,13 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
 			RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
 			params.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
 			params.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
-			params.setMargins(0, 0, 0, 0);
+			params.setMargins(36, 0, 0, 0);
 			holder.imageView.setLayoutParams(params);
-			
-			if (MimeTypeList.typeForName(transfer.getFileName()).isImage()){
-				/*Bitmap thumb = null;
-				thumb = ThumbnailUtils.getThumbnailFromCache(holder.currentPath);
-				if (thumb != null){
-					holder.imageView.setImageBitmap(thumb);
-				}
-				else{
-					try{
-						new TransferThumbnailAsyncTask(holder).execute(transfer.getPath());
-					}
-					catch(Exception e){
-						//Too many AsyncTasks
-					}
-				}*/
-			}
+
+			RelativeLayout.LayoutParams params3 = (RelativeLayout.LayoutParams) holder.iconDownloadUploadView.getLayoutParams();
+			params3.setMargins(0, 0, 0, 0);
+			holder.iconDownloadUploadView.setLayoutParams(params3);
+
 		}
 
 		int state = transfer.getState();
@@ -361,6 +374,7 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
 				holder.transferProgressBar.setVisibility(View.GONE);
 				holder.optionRemove.setVisibility(View.VISIBLE);
 				holder.optionPause.setVisibility(View.VISIBLE);
+				holder.optionPause.setImageResource(R.drawable.ic_pause);
 				break;
 			}
 			default:{
@@ -411,7 +425,7 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
 		log("onClick");
 		
 		ViewHolderTransfer holder = (ViewHolderTransfer) v.getTag();
-		int currentPosition = holder.currentPosition;
+		int currentPosition = holder.getAdapterPosition();
 		
 		switch(v.getId()){
 			case R.id.transfers_list_option_remove:{
@@ -422,7 +436,7 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
 				break;
 			}
 			case R.id.transfers_list_option_pause:{
-				log("click to cancel transfer");
+				log("click to pause/play transfer");
 				MegaTransfer t = (MegaTransfer) getItem(currentPosition);
                 ((ManagerActivityLollipop) context).showConfirmationCancelTransfer(t, false);
 				break;
@@ -441,6 +455,11 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
 		ViewHolderTransfer holder = (ViewHolderTransfer) listFragment.findViewHolderForAdapterPosition(position);
 
 		if(holder!=null){
+			if(holder.transferProgressBar.getVisibility()==View.GONE){
+				holder.transferProgressBar.setVisibility(View.VISIBLE);
+				holder.textViewCompleted.setVisibility(View.GONE);
+				holder.imageViewCompleted.setVisibility(View.GONE);
+			}
 			double progressValue = 100.0 * transfer.getTransferredBytes() / transfer.getTotalBytes();
 			log("Progress Value: "+ progressValue);
 			holder.transferProgressBar.setProgress((int)progressValue);

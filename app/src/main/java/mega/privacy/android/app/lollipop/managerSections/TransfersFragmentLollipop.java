@@ -212,7 +212,7 @@ public class TransfersFragmentLollipop extends Fragment {
 			}
 		}
 		tL.set(index, transfer);
-		log("The transfer with index : "+index +"has been removed, left: "+tL.size());
+		log("Update the transfer with index : "+index +", left: "+tL.size());
 
 		adapter.updateProgress(index, transfer);
     }
@@ -231,7 +231,7 @@ public class TransfersFragmentLollipop extends Fragment {
 		}
 		MegaTransfer transfer = megaApi.getTransferByTag(tag);
 		tL.set(index, transfer);
-		log("The transfer with index : "+index +"has paused/resumed, left: "+tL.size());
+		log("The transfer with index : "+index +"has been paused/resumed, left: "+tL.size());
 
 		adapter.notifyItemChanged(index);
 	}

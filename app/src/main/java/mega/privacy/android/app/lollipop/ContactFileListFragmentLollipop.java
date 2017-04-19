@@ -99,9 +99,6 @@ public class ContactFileListFragmentLollipop extends Fragment{
 	DatabaseHandler dbH = null;
 	MegaPreferences prefs = null;
 
-	ArrayList<MegaTransfer> tL;
-	HashMap<Long, MegaTransfer> mTHash = null;
-
 	public void activateActionMode(){
 		log("activateActionMode");
 		if (!adapter.isMultipleSelect()){
@@ -318,9 +315,7 @@ public class ContactFileListFragmentLollipop extends Fragment{
 
 			if (adapter == null) {
 				adapter = new MegaBrowserLollipopAdapter(context, this, contactNodes, -1,listView, aB,Constants.CONTACT_FILE_ADAPTER, MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST);
-				if (mTHash != null){
-					adapter.setTransfers(mTHash);
-				}
+
 			} else {
 				adapter.setNodes(contactNodes);
 				adapter.setParentHandle(-1);
@@ -742,20 +737,6 @@ public class ContactFileListFragmentLollipop extends Fragment{
 
 	public int getFabVisibility(){
 		return fab.getVisibility();
-	}
-
-	public void setTransfers(HashMap<Long, MegaTransfer> _mTHash){
-		this.mTHash = _mTHash;
-
-		if (adapter != null){
-			adapter.setTransfers(mTHash);
-		}
-	}
-
-	public void setCurrentTransfer(MegaTransfer mT){
-		if (adapter != null){
-			adapter.setCurrentTransfer(mT);
-		}
 	}
 
 	public long getParentHandle() {
