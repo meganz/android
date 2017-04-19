@@ -129,8 +129,6 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 		
 		isForeground = false;
 		canceled = false;
-
-		
 		
 		int wifiLockMode = WifiManager.WIFI_MODE_FULL;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR1) {
