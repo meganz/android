@@ -153,32 +153,48 @@ public class MegaCompletedTransfersAdapter extends RecyclerView.Adapter<MegaComp
 		holder.transferProgressBar.setVisibility(View.GONE);
 
         holder.imageView.setImageResource(MimeTypeList.typeForName(transfer.getFileName()).getIconResourceId());
+		RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
+		params.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
+		params.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
+		params.setMargins(36, 0, 0, 0);
+		holder.imageView.setLayoutParams(params);
+
+		RelativeLayout.LayoutParams params3 = (RelativeLayout.LayoutParams) holder.iconDownloadUploadView.getLayoutParams();
+		params3.setMargins(0, 0, 0, 0);
+		holder.iconDownloadUploadView.setLayoutParams(params3);
 
         if (MimeTypeList.typeForName(transfer.getFileName()).isImage()||MimeTypeList.typeForName(transfer.getFileName()).isVideo()){
-            RelativeLayout.LayoutParams params2 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
-            params2.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-            params2.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-            params2.setMargins(54, 0, 12, 0);
 
             long handle = Long.parseLong(transfer.getNodeHandle());
             Bitmap thumb = ThumbnailUtils.getThumbnailFromCache(handle);
             if (thumb != null){
-                RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
-                params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-                params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-                params1.setMargins(54, 0, 12, 0);
-                holder.imageView.setLayoutParams(params1);
-                holder.imageView.setImageBitmap(thumb);
+				RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
+				params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
+				params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
+				params1.setMargins(54, 0, 18, 0);
+				holder.imageView.setLayoutParams(params1);
+
+				RelativeLayout.LayoutParams params2 = (RelativeLayout.LayoutParams) holder.iconDownloadUploadView.getLayoutParams();
+				params2.setMargins(0, -12, -12, 0);
+				holder.iconDownloadUploadView.setLayoutParams(params2);
+
+				holder.imageView.setImageBitmap(thumb);
             }
             else{
                 MegaNode node = megaApi.getNodeByHandle(handle);
                 thumb = ThumbnailUtils.getThumbnailFromFolder(node, context);
                 if (thumb != null){
-                    RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
-                    params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-                    params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-                    params1.setMargins(54, 0, 12, 0);
-                    holder.imageView.setImageBitmap(thumb);
+					RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
+					params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
+					params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
+					params1.setMargins(54, 0, 18, 0);
+					holder.imageView.setLayoutParams(params1);
+
+					RelativeLayout.LayoutParams params2 = (RelativeLayout.LayoutParams) holder.iconDownloadUploadView.getLayoutParams();
+					params2.setMargins(0, -12, -12, 0);
+					holder.iconDownloadUploadView.setLayoutParams(params2);
+
+					holder.imageView.setImageBitmap(thumb);
                 }
             }
         }
@@ -194,25 +210,14 @@ public class MegaCompletedTransfersAdapter extends RecyclerView.Adapter<MegaComp
 		int state = transfer.getState();
 		log("State of the transfer: "+state);
 		switch (state){
-			case MegaTransfer.STATE_CANCELLED:{
-				holder.textViewCompleted.setVisibility(View.VISIBLE);
-				holder.imageViewCompleted.setVisibility(View.VISIBLE);
-				holder.textViewCompleted.setText(context.getResources().getString(R.string.transfer_cancelled));
-				holder.imageViewCompleted.setImageResource(R.drawable.ic_queue);
-
-				break;
-			}
 			case MegaTransfer.STATE_COMPLETED:{
-				holder.textViewCompleted.setVisibility(View.VISIBLE);
-				holder.imageViewCompleted.setVisibility(View.VISIBLE);
 				holder.textViewCompleted.setText(context.getResources().getString(R.string.title_tab_completed_transfers));
 				holder.imageViewCompleted.setImageResource(R.drawable.ic_complete_transfer);
 
 				break;
 			}
 			default:{
-				log("Default status");
-				holder.imageViewCompleted.setVisibility(View.VISIBLE);
+				log("Default status -- error, this should be completed state always");
 				holder.textViewCompleted.setText(context.getResources().getString(R.string.transfer_unknown));
 				holder.imageViewCompleted.setImageResource(R.drawable.ic_queue);
 				break;

@@ -91,9 +91,7 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 	
 	ArrayList<MegaNode> nodes;
 	MegaNode selectedNode;
-	
-	HashMap<Long, MegaTransfer> mTHash = null;
-	
+
 	public ActionMode actionMode;
 
 	public void activateActionMode(){
@@ -352,10 +350,6 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 
 			if (adapter == null){
 				adapter = new MegaBrowserLollipopAdapter(context, this, nodes, parentHandle, recyclerView, aB, Constants.INCOMING_SHARES_ADAPTER, MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST);
-				if (mTHash != null){
-					adapter.setTransfers(mTHash);
-				}
-//				adapterList.setNodes(nodes);
 			}
 			else{
 				adapter.setParentHandle(parentHandle);
@@ -427,9 +421,6 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 
 			if (adapter == null){
 				adapter = new MegaBrowserLollipopAdapter(context, this, nodes, parentHandle, recyclerView, aB, Constants.INCOMING_SHARES_ADAPTER, MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_GRID);
-				if (mTHash != null){
-					adapter.setTransfers(mTHash);
-				}
 //				adapterList.setNodes(nodes);
 			}
 			else{

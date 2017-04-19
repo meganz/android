@@ -90,8 +90,6 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 	
 	ArrayList<MegaNode> nodes;
 
-	HashMap<Long, MegaTransfer> mTHash = null;
-	
 	public ActionMode actionMode;
 
 	public void activateActionMode(){
@@ -354,9 +352,6 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 			if (adapter == null){
 				log("Creating the adapter: "+parentHandle);
 				adapter = new MegaBrowserLollipopAdapter(context, this, nodes, parentHandle, recyclerView, aB, Constants.OUTGOING_SHARES_ADAPTER, MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST);
-				if (mTHash != null){
-					adapter.setTransfers(mTHash);
-				}
 			}
 			else{
 				log("Before passing the parent to the adapter: "+parentHandle);
@@ -430,9 +425,6 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 
 			if (adapter == null){
 				adapter = new MegaBrowserLollipopAdapter(context, this, nodes, parentHandle, recyclerView, aB, Constants.OUTGOING_SHARES_ADAPTER, MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_GRID);
-				if (mTHash != null){
-					adapter.setTransfers(mTHash);
-				}
 //				adapterList.setNodes(nodes);
 			}
 			else{
@@ -1088,20 +1080,6 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 			return adapter.getItemCount();
 		}
 		return 0;
-	}
-	
-	public void setTransfers(HashMap<Long, MegaTransfer> _mTHash){
-		this.mTHash = _mTHash;
-		
-		if (adapter != null){
-			adapter.setTransfers(mTHash);
-		}	
-	}
-	
-	public void setCurrentTransfer(MegaTransfer mT){
-		if (adapter != null){
-			adapter.setCurrentTransfer(mT);
-		}	
 	}
 
 	public boolean isMultipleselect(){
