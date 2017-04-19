@@ -190,7 +190,7 @@ public class ParticipantBottomSheetDialogFragment extends BottomSheetDialogFragm
             }
 
         }
-        else{
+    else{
             MegaUser contact = megaApi.getContact(selectedParticipant.getEmail());
 
             if(contact!=null) {

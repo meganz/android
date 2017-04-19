@@ -2062,12 +2062,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					builder.setPositiveButton(getString(R.string.general_yes),
 							new DialogInterface.OnClickListener() {
 								public void onClick(DialogInterface dialog, int whichButton) {
-									if (tFLol != null){
-										if (tFLol.isVisible()){
-											tFLol.setTransfers();
-											supportInvalidateOptionsMenu();
-										}
-									}
 									startService(cancelIntent);
 								}
 							});
