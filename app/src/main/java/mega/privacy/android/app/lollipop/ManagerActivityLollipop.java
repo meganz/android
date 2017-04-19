@@ -5233,13 +5233,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					if (rChatFL != null){
 						if(Util.isOnline(this)){
 							newChatMenuItem.setVisible(true);
-							addContactMenuItem.setVisible(true);
 							selectMenuItem.setVisible(true);
 							setStatusMenuItem.setVisible(true);
 						}
 						else{
 							newChatMenuItem.setVisible(false);
-							addContactMenuItem.setVisible(false);
 							selectMenuItem.setVisible(false);
 							setStatusMenuItem.setVisible(false);
 						}
@@ -5269,6 +5267,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					forgotPassMenuItem.setVisible(false);
 					playTransfersMenuIcon.setVisible(false);
 					pauseTransfersMenuIcon.setVisible(false);
+					addContactMenuItem.setVisible(false);
 				}
 				else{
 					//Hide ALL
@@ -5312,17 +5311,16 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					newChatMenuItem.setVisible(true);
 					if (rChatFL != null) {
 						if (Util.isOnline(this)) {
-							addContactMenuItem.setVisible(true);
 							selectMenuItem.setVisible(true);
 							setStatusMenuItem.setVisible(true);
 						} else {
-							addContactMenuItem.setVisible(false);
 							selectMenuItem.setVisible(false);
 							setStatusMenuItem.setVisible(false);
 						}
 					}
 
 					//Hide
+					addContactMenuItem.setVisible(false);
 					searchMenuItem.setVisible(false);
 					createFolderMenuItem.setVisible(false);
 					addMenuItem.setVisible(false);
