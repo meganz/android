@@ -57,6 +57,7 @@ import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.PinActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
+import mega.privacy.android.app.lollipop.listeners.ChatNonContactNameListener;
 import mega.privacy.android.app.lollipop.listeners.MultipleGroupChatRequestListener;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaChatLollipopAdapter;
 import mega.privacy.android.app.modalbottomsheet.MessageNotSentBottomSheetDialogFragment;
@@ -106,6 +107,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     boolean noMoreNoSentMessages = false;
 
+    ChatController chatC;
     boolean scrollingUp = false;
 
     long myUserHandle;
@@ -323,6 +325,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         detector = new GestureDetectorCompat(this, new RecyclerViewOnGestureListener());
 
         chatActivity = this;
+        chatC = new ChatController(chatActivity);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             Window window = this.getWindow();
@@ -1103,7 +1106,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         log("Clear chat!");
 //						megaChatApi.truncateChat(chatHandle, MegaChatHandle.MEGACHAT_INVALID_HANDLE);
                         log("Clear history selected!");
-                        ChatController chatC = new ChatController(chatActivity);
                         chatC.clearHistory(c);
                         break;
 
@@ -1828,26 +1830,26 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     MegaChatParticipant participantTyping = new MegaChatParticipant(userHandleTyping);
                     UserTyping currentUserTyping = new UserTyping(participantTyping);
 
-                    String nameTyping = chat.getPeerFirstnameByHandle(userHandleTyping);
+                    String nameTyping = chatC.getFirstName(userHandleTyping, chatRoom);
+
                     log("userHandleTyping: "+userHandleTyping);
+                    String userTyping = getResources().getQuantityString(R.plurals.user_typing, 1);
+                    userTypingText.setText(userTyping);
+
                     if(nameTyping==null){
                         log("NULL name");
-                        nameTyping = "";
-                    }
-                    if(nameTyping.trim().isEmpty()){
-                        log("EMPTY name");
-                        nameTyping = chat.getPeerFullnameByHandle(userHandleTyping)+" ";
-                        participantTyping.setFirstName(nameTyping);
-                        String userTyping = getResources().getQuantityString(R.plurals.user_typing, 1);
-                        userTypingText.setText(userTyping);
-                        userTypingName.setText(nameTyping);
+                        userTypingName.setText(getString(R.string.transfer_unknown)+" ");
                     }
                     else{
-                        participantTyping.setFirstName(nameTyping);
-                        String userTyping = getResources().getQuantityString(R.plurals.user_typing, 1);
-                        userTypingText.setText(userTyping);
-                        userTypingName.setText(nameTyping+" ");
+                        if(nameTyping.trim().isEmpty()){
+                            log("EMPTY name");
+                            userTypingName.setText(getString(R.string.transfer_unknown)+" ");
+                        }
+                        else{
+                            userTypingName.setText(nameTyping+" ");
+                        }
                     }
+                    participantTyping.setFirstName(nameTyping);
 
                     userTypingTimeStamp = System.currentTimeMillis()/1000;
                     currentUserTyping.setTimeStampTyping(userTypingTimeStamp);
@@ -1876,17 +1878,22 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         MegaChatParticipant participantTyping = new MegaChatParticipant(userHandleTyping);
                         UserTyping currentUserTyping = new UserTyping(participantTyping);
 
-                        String nameTyping = chat.getPeerFirstnameByHandle(userHandleTyping);
+                        String nameTyping = chatC.getFirstName(userHandleTyping, chatRoom);
                         if(nameTyping==null){
-                            nameTyping = "";
-                        }
-                        if(nameTyping.trim().isEmpty()){
-                            nameTyping = chat.getPeerFullnameByHandle(userHandleTyping);
-                            participantTyping.setFirstName(nameTyping);
+                            log("NULL name");
+                            userTypingName.setText(getString(R.string.transfer_unknown)+" ");
                         }
                         else{
-                            participantTyping.setFirstName(nameTyping);
+                            if(nameTyping.trim().isEmpty()){
+                                log("EMPTY name");
+                                userTypingName.setText(getString(R.string.transfer_unknown)+" ");
+                            }
+                            else{
+                                userTypingName.setText(nameTyping+" ");
+                            }
                         }
+                        participantTyping.setFirstName(nameTyping);
+
                         userTypingTimeStamp = System.currentTimeMillis()/1000;
                         currentUserTyping.setTimeStampTyping(userTypingTimeStamp);
 

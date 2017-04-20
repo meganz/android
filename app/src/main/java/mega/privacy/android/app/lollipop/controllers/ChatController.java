@@ -577,6 +577,35 @@ public class ChatController {
         }
     }
 
+    public String getFirstName(long userHandle, MegaChatRoom chatRoom){
+        log("getFullName: "+userHandle);
+        int privilege = chatRoom.getPeerPrivilegeByHandle(userHandle);
+        log("privilege is: "+privilege);
+        if(privilege==MegaChatRoom.PRIV_UNKNOWN||privilege==MegaChatRoom.PRIV_RM){
+            log("Not participant any more!");
+            String handleString = megaApi.handleToBase64(userHandle);
+            MegaUser contact = megaApi.getContact(handleString);
+            if(contact!=null){
+                if(contact.getVisibility()==MegaUser.VISIBILITY_VISIBLE){
+                    log("Is contact!");
+                    return getContactFirstName(userHandle);
+                }
+                else{
+                    log("Old contact");
+                    return getNonContactFirstName(userHandle);
+                }
+            }
+            else{
+                log("Non contact");
+                return getNonContactFirstName(userHandle);
+            }
+        }
+        else{
+            log("Is participant");
+            return getParticipantFirstName(userHandle, chatRoom);
+        }
+    }
+
     public String getFullName(long userHandle, MegaChatRoom chatRoom){
         log("getFullName: "+userHandle);
         int privilege = chatRoom.getPeerPrivilegeByHandle(userHandle);
@@ -604,6 +633,47 @@ public class ChatController {
             log("Is participant");
             return getParticipantFullName(userHandle, chatRoom);
         }
+    }
+
+    public String getContactFirstName(long userHandle){
+        MegaContactDB contactDB = dbH.findContactByHandle(String.valueOf(userHandle));
+        if(contactDB!=null){
+
+            String name = contactDB.getName();
+
+            if(name==null){
+                name="";
+            }
+
+            if (name.trim().length() <= 0){
+                String lastName = contactDB.getLastName();
+                if(lastName==null){
+                    lastName="";
+                }
+                if (lastName.trim().length() <= 0){
+                    log("1- Full name empty");
+                    log("2-Put email as fullname");
+                    String mail = contactDB.getMail();
+                    if(mail==null){
+                        mail="";
+                    }
+                    if (mail.trim().length() <= 0){
+                        return "";
+                    }
+                    else{
+                        return mail;
+                    }
+                }
+                else{
+                    return lastName;
+                }
+
+            }
+            else{
+                return name;
+            }
+        }
+        return "";
     }
 
     public String getContactFullName(long userHandle){
@@ -644,6 +714,48 @@ public class ChatController {
             }
 
             return fullName;
+        }
+        return "";
+    }
+
+    public String getNonContactFirstName(long userHandle){
+        NonContactInfo nonContact = dbH.findNonContactByHandle(userHandle+"");
+
+        if(nonContact!=null){
+
+            String name = nonContact.getFirstName();
+
+            if(name==null){
+                name="";
+            }
+
+            if (name.trim().length() <= 0){
+                String lastName = nonContact.getLastName();
+                if(lastName==null){
+                    lastName="";
+                }
+                if (lastName.trim().length() <= 0){
+                    log("1- Full name empty");
+                    log("2-Put email as fullname");
+                    String mail = nonContact.getEmail();
+                    if(mail==null){
+                        mail="";
+                    }
+                    if (mail.trim().length() <= 0){
+                        return "";
+                    }
+                    else{
+                        return mail;
+                    }
+                }
+                else{
+                    return lastName;
+                }
+
+            }
+            else{
+                return name;
+            }
         }
         return "";
     }
@@ -723,6 +835,44 @@ public class ChatController {
         }
         return "";
     }
+
+    public String getParticipantFirstName(long userHandle, MegaChatRoom chatRoom){
+        log("getParticipantFirstName: "+userHandle);
+        String firstName = chatRoom.getPeerFirstnameByHandle(userHandle);
+
+        if(firstName==null){
+            firstName="";
+        }
+
+        if (firstName.trim().length() <= 0){
+            String lastName = chatRoom.getPeerLastnameByHandle(userHandle);
+            if(lastName==null){
+                lastName="";
+            }
+            if (lastName.trim().length() <= 0){
+                log("1- Full name empty");
+                log("2-Put email as fullname");
+                String mail = chatRoom.getPeerEmailByHandle(userHandle);
+                if(mail==null){
+                    mail="";
+                }
+                if (mail.trim().length() <= 0){
+                    return "";
+                }
+                else{
+                    return mail;
+                }
+            }
+            else{
+                return lastName;
+            }
+
+        }
+        else{
+            return firstName;
+        }
+    }
+
     public String getParticipantFullName(long userHandle, MegaChatRoom chatRoom){
         log("getParticipantFullName: "+userHandle);
         String fullName = chatRoom.getPeerFullnameByHandle(userHandle);
