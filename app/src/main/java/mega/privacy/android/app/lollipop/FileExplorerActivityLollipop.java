@@ -155,7 +155,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 
 	ArrayList<MegaNode> nodes;
 	
-	long gParentHandle;
+//	long gParentHandle;
 	long parentHandleIncoming;
 	long parentHandleCloud;
 	int deepBrowserTree;
@@ -663,7 +663,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 									changeTitle(getString(R.string.title_incoming_shares_explorer));
 								}
 								else{
-									changeTitle(iSharesExplorer.name);
+									changeTitle(megaApi.getNodeByHandle(iSharesExplorer.parentHandle).getName());
 								}
 							}
 
@@ -924,7 +924,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 					parentHandle = cDriveExplorer.getParentHandle();
 				}
 				else{
-					parentHandle = gParentHandle;
+					parentHandle = parentHandleCloud;
 				}
 				MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
 				if(parentNode == null){
@@ -960,7 +960,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		}
 		
 		folderSelected = true;
-		this.gParentHandle = handle;
+		this.parentHandleCloud = handle;
 		
 		if (mode == MOVE) {
 			long parentHandle = handle;
@@ -1270,7 +1270,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 	}
 	
 	public void setParentHandle (long parentHandle){
-		this.gParentHandle = parentHandle;
+		this.parentHandleCloud = parentHandle;
 	}
 
 	/*
@@ -1305,30 +1305,22 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			catch (Exception ex) {}
 			
 			if (error.getErrorCode() == MegaError.API_OK){
-				Snackbar.make(fragmentContainer,getString(R.string.context_folder_created),Snackbar.LENGTH_LONG).show();
-				long parentHandle;
 				if(tabShown==CLOUD_TAB){
 					gcFTag = getFragmentTag(R.id.explorer_tabs_pager, 0);
 					cDriveExplorer = (CloudDriveExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag(gcFTag);
 					if (cDriveExplorer != null){
-						parentHandle = cDriveExplorer.getParentHandle();
-						if (megaApi.getNodeByHandle(parentHandle) != null){
-							nodes = megaApi.getChildren(megaApi.getNodeByHandle(cDriveExplorer.getParentHandle()));
-							cDriveExplorer.setNodes(nodes);
-							cDriveExplorer.getListView().invalidate();
-						}
+						cDriveExplorer.navigateToFolder(request.getNodeHandle());
+						parentHandleCloud = request.getNodeHandle();
+						log("The handle of the created folder is: "+parentHandleCloud);
+
 					}						
 				}
 				else{
 					gcFTag = getFragmentTag(R.id.explorer_tabs_pager, 1);
 					iSharesExplorer = (IncomingSharesExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag(gcFTag);
 					if (iSharesExplorer != null){
-						parentHandle = iSharesExplorer.getParentHandle();
-						if (megaApi.getNodeByHandle(parentHandle) != null){
-							nodes = megaApi.getChildren(megaApi.getNodeByHandle(iSharesExplorer.getParentHandle()));
-							iSharesExplorer.setNodes(nodes);
-							iSharesExplorer.getListView().invalidate();
-						}
+						iSharesExplorer.navigateToFolder(request.getNodeHandle());
+						parentHandleIncoming = request.getNodeHandle();
 					}	
 				}
 			}

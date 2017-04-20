@@ -145,11 +145,6 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 		holder.textViewFileSize = (TextView) v.findViewById(R.id.file_explorer_filesize);
 		holder.permissionsIcon = (ImageView) v.findViewById(R.id.file_explorer_permissions);
 
-		//Right margin
-		RelativeLayout.LayoutParams actionButtonParams = (RelativeLayout.LayoutParams)holder.permissionsIcon.getLayoutParams();
-		actionButtonParams.setMargins(0, 0, Util.scaleWidthPx(15, outMetrics), 0);
-		holder.permissionsIcon.setLayoutParams(actionButtonParams);
-
 		v.setTag(holder);
 		return holder;
 	}
@@ -161,10 +156,7 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 		DisplayMetrics outMetrics = new DisplayMetrics ();
 	    display.getMetrics(outMetrics);
 	    float density  = ((Activity)context).getResources().getDisplayMetrics().density;
-		
-	    float scaleW = Util.getScaleW(outMetrics, density);
-	    float scaleH = Util.getScaleH(outMetrics, density);
-		
+
 		holder.currentPosition = position;
 		
 		MegaNode node = (MegaNode) getItem(position);
@@ -188,7 +180,7 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 					holder.imageView.setAlpha(.4f);
 					holder.textViewFileName.setTextColor(context.getResources().getColor(R.color.text_secondary));
 					holder.permissionsIcon.setImageResource(R.drawable.ic_shared_read);
-					holder.permissionsIcon.setAlpha(.4f);
+					holder.permissionsIcon.setAlpha(.2f);
 					holder.itemView.setOnClickListener(null);
 				}
 				else{
@@ -206,7 +198,7 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 						holder.permissionsIcon.setImageResource(R.drawable.ic_shared_read_write);
 					}
 
-					holder.permissionsIcon.setAlpha(1.0f);
+					holder.permissionsIcon.setAlpha(.35f);
 				}
 			}
 			else{
