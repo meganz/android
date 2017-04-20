@@ -942,7 +942,7 @@
     <string name="title_properties_chat_leave_chat" context="Title of the section to leave a group content in the Contact Properties screen">Leave chat</string>
     <string name="participants_chat_label" context="Label for participants of a group chat">Participants</string>
 
-    <string name="confirmation_remove_chat_contact" context="confirmation message before removing a contact from a chat.">Remove the contact %s from this chat?</string>
+    <string name="confirmation_remove_chat_contact" context="confirmation message before removing a contact from a chat.">Remove %s from this chat?</string>
 
     <string name="observer_permission_label_participants_panel" context="Label to show the participant permission in the options panel of the group info screen">Read-only</string>
     <string name="member_permission_label_participants_panel" context="Label to show the participant permission in the options panel of the group info screen">Member</string>

@@ -46,7 +46,7 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 	MegaPreferences prefs;
 	DatabaseHandler dbH;
 	
-	public String name;
+//	public String name;
 	
 //	boolean first = false;
 //	private boolean folderSelected = false;
@@ -343,6 +343,40 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 		}
 	}
 
+	public void navigateToFolder(long handle) {
+		log("navigateToFolder");
+
+		int lastFirstVisiblePosition = 0;
+		lastFirstVisiblePosition = mLayoutManager.findFirstCompletelyVisibleItemPosition();
+
+		log("Push to stack "+lastFirstVisiblePosition+" position");
+		lastPositionStack.push(lastFirstVisiblePosition);
+
+		parentHandle = handle;
+
+		MegaNode parentNode = megaApi.getNodeByHandle(handle);
+		changeActionBarTitle(parentNode.getName());
+
+		adapter.setParentHandle(parentHandle);
+		nodes.clear();
+		adapter.setNodes(nodes);
+		listView.scrollToPosition(0);
+
+		//If folder has no files
+		if (adapter.getItemCount() == 0){
+			listView.setVisibility(View.GONE);
+			emptyImageView.setVisibility(View.VISIBLE);
+			emptyTextView.setVisibility(View.VISIBLE);
+			emptyImageView.setImageResource(R.drawable.ic_empty_folder);
+			emptyTextView.setText(R.string.file_browser_empty_folder);
+		}
+		else{
+			listView.setVisibility(View.VISIBLE);
+			emptyImageView.setVisibility(View.GONE);
+			emptyTextView.setVisibility(View.GONE);
+		}
+	}
+
     public void itemClick(View view, int position) {
 		log("itemClick");
 		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
@@ -357,14 +391,14 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 			log("Push to stack "+lastFirstVisiblePosition+" position");
 			lastPositionStack.push(lastFirstVisiblePosition);
 			
-			String path=n.getName();	
-			String[] temp;
-			temp = path.split("/");
-			name = temp[temp.length-1];
+//			String path=n.getName();
+//			String[] temp;
+//			temp = path.split("/");
+//			name = temp[temp.length-1];
 
 			if(n.getType() != MegaNode.TYPE_ROOT)
 			{
-				changeActionBarTitle(name);
+				changeActionBarTitle(n.getName());
 				if(modeCloud==FileExplorerActivityLollipop.SELECT){
 					if(!selectFile)
 					{
@@ -454,12 +488,12 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 				}
 			}
 			else{
-				String path=parentNode.getName();	
-				String[] temp;
-				temp = path.split("/");
-				name = temp[temp.length-1];
+//				String path=parentNode.getName();
+//				String[] temp;
+//				temp = path.split("/");
+//				name = temp[temp.length-1];
 
-				changeActionBarTitle(name);
+				changeActionBarTitle(parentNode.getName());
 				if(modeCloud==FileExplorerActivityLollipop.SELECT){
 					if(!selectFile)
 					{

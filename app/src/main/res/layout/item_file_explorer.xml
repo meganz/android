@@ -44,6 +44,7 @@
         android:alpha="0.35"
         android:background="@null"
         android:paddingLeft="10dp"
+        android:layout_marginRight="16dp"
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
         android:visibility="gone"/>

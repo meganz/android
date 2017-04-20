@@ -44,8 +44,7 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 	
 	int modeCloud;
 	boolean selectFile;
-	public String name;
-	
+
 	RecyclerView listView;
 	LinearLayoutManager mLayoutManager;
 	ImageView emptyImageView;
@@ -293,6 +292,57 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 		}
 	}
 
+	public void navigateToFolder(long handle) {
+		log("navigateToFolder");
+
+		deepBrowserTree = deepBrowserTree+1;
+		log("deepBrowserTree value: "+deepBrowserTree);
+		if (deepBrowserTree <= 0){
+			separator.setVisibility(View.GONE);
+			optionsBar.setVisibility(View.GONE);
+		}
+		else{
+			if(selectFile){
+				separator.setVisibility(View.GONE);
+				optionsBar.setVisibility(View.GONE);
+			}
+			else{
+				separator.setVisibility(View.VISIBLE);
+				optionsBar.setVisibility(View.VISIBLE);
+			}
+		}
+
+		int lastFirstVisiblePosition = 0;
+		lastFirstVisiblePosition = mLayoutManager.findFirstCompletelyVisibleItemPosition();
+
+		log("Push to stack "+lastFirstVisiblePosition+" position");
+		lastPositionStack.push(lastFirstVisiblePosition);
+
+		MegaNode parentNode = megaApi.getNodeByHandle(handle);
+		changeActionBarTitle(parentNode.getName());
+
+		parentHandle = handle;
+		adapter.setParentHandle(parentHandle);
+		nodes.clear();
+		adapter.setNodes(nodes);
+		listView.scrollToPosition(0);
+
+		//If folder has no files
+		if (adapter.getItemCount() == 0){
+			listView.setVisibility(View.GONE);
+			emptyImageView.setImageResource(R.drawable.ic_empty_folder);
+			emptyTextView.setText(R.string.file_browser_empty_folder);
+			emptyImageView.setVisibility(View.VISIBLE);
+			emptyTextView.setVisibility(View.VISIBLE);
+		}
+		else{
+			listView.setVisibility(View.VISIBLE);
+			emptyImageView.setVisibility(View.GONE);
+			emptyTextView.setVisibility(View.GONE);
+		}
+
+	}
+
     public void itemClick(View view, int position) {
 		log("------------------itemClick: "+deepBrowserTree);
 		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
@@ -324,12 +374,7 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 			log("Push to stack "+lastFirstVisiblePosition+" position");
 			lastPositionStack.push(lastFirstVisiblePosition);
 
-			String path=n.getName();	
-			String[] temp;
-			temp = path.split("/");
-			name = temp[temp.length-1];
-
-			changeActionBarTitle(name);			
+			changeActionBarTitle(n.getName());
 			
 			parentHandle = nodes.get(position).getHandle();
 			adapter.setParentHandle(parentHandle);
