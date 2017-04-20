@@ -1836,7 +1836,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     }
                     if(nameTyping.trim().isEmpty()){
                         log("EMPTY name");
-                        nameTyping = chat.getPeerFullnameByHandle(userHandleTyping);
+                        nameTyping = chat.getPeerFullnameByHandle(userHandleTyping)+" ";
                         participantTyping.setFirstName(nameTyping);
                         String userTyping = getResources().getQuantityString(R.plurals.user_typing, 1);
                         userTypingText.setText(userTyping);
@@ -1846,7 +1846,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         participantTyping.setFirstName(nameTyping);
                         String userTyping = getResources().getQuantityString(R.plurals.user_typing, 1);
                         userTypingText.setText(userTyping);
-                        userTypingName.setText(nameTyping);
+                        userTypingName.setText(nameTyping+" ");
                     }
 
                     userTypingTimeStamp = System.currentTimeMillis()/1000;
@@ -1898,20 +1898,20 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                             case 1:{
                                 String userTyping = getResources().getQuantityString(R.plurals.user_typing, 1);
                                 userTypingText.setText(userTyping);
-                                userTypingName.setText(usersTypingSync.get(0).getParticipantTyping().getFirstName());
+                                userTypingName.setText(usersTypingSync.get(0).getParticipantTyping().getFirstName()+" ");
                                 break;
                             }
                             case 2:{
                                 String userTyping = getResources().getQuantityString(R.plurals.user_typing, 2);
                                 userTypingText.setText(userTyping);
-                                String userNames = usersTypingSync.get(0).getParticipantTyping().getFirstName()+", "+usersTypingSync.get(1).getParticipantTyping().getFirstName();
+                                String userNames = usersTypingSync.get(0).getParticipantTyping().getFirstName()+", "+usersTypingSync.get(1).getParticipantTyping().getFirstName()+" ";
                                 userTypingName.setText(userNames);
                                 break;
                             }
                             default:{
-                                String userTyping = getResources().getQuantityString(R.plurals.user_typing, 3);
+                                String userTyping = getString(R.string.more_users_typing);
                                 userTypingText.setText(userTyping);
-                                String userNames = usersTypingSync.get(0).getParticipantTyping().getFirstName()+", "+usersTypingSync.get(1).getParticipantTyping().getFirstName();
+                                String userNames = usersTypingSync.get(0).getParticipantTyping().getFirstName()+", "+usersTypingSync.get(1).getParticipantTyping().getFirstName()+" ";
                                 userTypingName.setText(userNames);
                                 break;
                             }
@@ -1968,20 +1968,20 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     case 1:{
                         String userTyping = getResources().getQuantityString(R.plurals.user_typing, 1);
                         userTypingText.setText(userTyping);
-                        userTypingName.setText(usersTypingSync.get(0).getParticipantTyping().getFirstName());
+                        userTypingName.setText(usersTypingSync.get(0).getParticipantTyping().getFirstName()+" ");
                         break;
                     }
                     case 2:{
                         String userTyping = getResources().getQuantityString(R.plurals.user_typing, 2);
                         userTypingText.setText(userTyping);
-                        String userNames = usersTypingSync.get(0).getParticipantTyping().getFirstName()+", "+usersTypingSync.get(1).getParticipantTyping().getFirstName();
+                        String userNames = usersTypingSync.get(0).getParticipantTyping().getFirstName()+", "+usersTypingSync.get(1).getParticipantTyping().getFirstName()+" ";
                         userTypingName.setText(userNames);
                         break;
                     }
                     default:{
-                        String userTyping = getResources().getQuantityString(R.plurals.user_typing, 3);
+                        String userTyping = getString(R.string.more_users_typing);
                         userTypingText.setText(userTyping);
-                        String userNames = usersTypingSync.get(0).getParticipantTyping().getFirstName()+", "+usersTypingSync.get(1).getParticipantTyping().getFirstName();
+                        String userNames = usersTypingSync.get(0).getParticipantTyping().getFirstName()+", "+usersTypingSync.get(1).getParticipantTyping().getFirstName()+" ";
                         userTypingName.setText(userNames);
                         break;
                     }
