@@ -1041,11 +1041,11 @@
 
     <string name="no_conversation_history" context="message shown when a chat has no messages">No conversation history</string>
 
-    <string name="one_user_typing" formatted="false" context="message shown when a chat has no messages">%1s is typing...</string>
-
-    <string name="two_users_typing" formatted="false" context="message shown when a chat has no messages">%1s, %2s are typing...</string>
-
-    <string name="three_users_typing" formatted="false" context="message shown when a chat has no messages">%1s, %2s and more are typing...</string>
+    <plurals name="user_typing" context="title of confirmation alert before removing a contact">
+        <item context="one" quantity="one"> is typing...</item>
+        <item context="two" quantity="two"> are typing...</item>
+        <item context="other" quantity="other"> more are typing</item>
+    </plurals>
 
     <string name="tab_my_account_general" context="Title of the general tab in My Account Section">General</string>
     <string name="tab_my_account_storage" context="Title of the storage tab in My Account Section">Storage</string>
