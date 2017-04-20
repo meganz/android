@@ -407,7 +407,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 	//LOLLIPOP FRAGMENTS
     private FileBrowserFragmentLollipop fbFLol;
-    private RubbishBinFragmentLollipop rbFLol;
+    private RubbishBinFragmentLollipop rubbishBinFLol;
     private OfflineFragmentLollipop oFLol;
     private InboxFragmentLollipop iFLol;
     private IncomingSharesFragmentLollipop inSFLol;
@@ -2141,13 +2141,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 							aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
 						}
 //						String cloudTag = getFragmentTag(R.id.cloud_drive_tabs_pager, 1);
-//						rbFLol = (RubbishBinFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cloudTag);
-//						if (rbFLol != null){
+//						rubbishBinFLol = (RubbishBinFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cloudTag);
+//						if (rubbishBinFLol != null){
 ////								outSFLol.refresh(parentHandleOutgoing);
 //							getSupportFragmentManager()
 //									.beginTransaction()
-//									.detach(rbFLol)
-//									.attach(rbFLol)
+//									.detach(rubbishBinFLol)
+//									.attach(rubbishBinFLol)
 //									.commitNowAllowingStateLoss();
 //						}
 					}
@@ -2681,7 +2681,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			fbFLol = (FileBrowserFragmentLollipop) getSupportFragmentManager().findFragmentByTag(sharesTag);
 
 			sharesTag = getFragmentTag(R.id.cloud_drive_tabs_pager, 1);
-			rbFLol = (RubbishBinFragmentLollipop) getSupportFragmentManager().findFragmentByTag(sharesTag);
+			rubbishBinFLol = (RubbishBinFragmentLollipop) getSupportFragmentManager().findFragmentByTag(sharesTag);
 
 			//Check viewPager to determine the tab shown
 
@@ -2712,7 +2712,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						firstNavigationLevel = true;
 					}
 					ArrayList<MegaNode> nodes = megaApi.getChildren(parentNode, orderCloud);
-					rbFLol.setNodes(nodes);
+					rubbishBinFLol.setNodes(nodes);
 				}
 				else{
 					//Cloud Drive TAB
@@ -2796,9 +2796,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				supportInvalidateOptionsMenu();
 
 				if(position == 0){
-					if (rbFLol != null){
-						if(rbFLol.isMultipleselect()){
-							rbFLol.actionMode.finish();
+					if (rubbishBinFLol != null){
+						if(rubbishBinFLol.isMultipleselect()){
+							rubbishBinFLol.actionMode.finish();
 						}
 					}
 					String cFTag = getFragmentTag(R.id.cloud_drive_tabs_pager, 0);
@@ -2832,14 +2832,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						}
 					}
 					cFTag = getFragmentTag(R.id.cloud_drive_tabs_pager, 1);
-					rbFLol = (RubbishBinFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
-					if (rbFLol != null){
+					rubbishBinFLol = (RubbishBinFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
+					if (rubbishBinFLol != null){
 						log("parentHandleRubbish: "+ parentHandleRubbish);
 						if(parentHandleRubbish == megaApi.getRubbishNode().getHandle() || parentHandleRubbish == -1){
 							aB.setTitle(getResources().getString(R.string.section_rubbish_bin));
 							log("aB.setHomeAsUpIndicator_13");
 							aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
-							rbFLol.setNodes(megaApi.getChildren(megaApi.getRubbishNode(), orderCloud));
+							rubbishBinFLol.setNodes(megaApi.getChildren(megaApi.getRubbishNode(), orderCloud));
 							firstNavigationLevel = true;
 						}
 						else{
@@ -2847,7 +2847,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 							aB.setTitle(node.getName());
 							log("indicator_arrow_back_892");
 							aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
-							rbFLol.setNodes(megaApi.getChildren(node, orderCloud));
+							rubbishBinFLol.setNodes(megaApi.getChildren(node, orderCloud));
 							firstNavigationLevel = false;
 						}
 					}
@@ -4445,8 +4445,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				log("----------------------------------------INDEX: "+index);
 				if(index==1){
 					String cFTag = getFragmentTag(R.id.cloud_drive_tabs_pager, 1);
-					rbFLol = (RubbishBinFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
-					if (rbFLol != null){
+					rubbishBinFLol = (RubbishBinFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
+					if (rubbishBinFLol != null){
 						//Show
 						sortByMenuItem.setVisible(true);
 						selectMenuItem.setVisible(true);
@@ -4480,10 +4480,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 							thumbViewMenuItem.setTitle(getString(R.string.action_list));
 						}
 
-						rbFLol.setIsList(isList);
-						rbFLol.setParentHandle(parentHandleRubbish);
+						rubbishBinFLol.setIsList(isList);
+						rubbishBinFLol.setParentHandle(parentHandleRubbish);
 
-						if(rbFLol.getItemCount()>0){
+						if(rubbishBinFLol.getItemCount()>0){
 							selectMenuItem.setVisible(true);
 							clearRubbishBinMenuitem.setVisible(true);
 						}
@@ -5438,9 +5438,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		    				//Rubbish Bin
 		    				String cFTag2 = getFragmentTag(R.id.cloud_drive_tabs_pager, 1);
 		    				log("Tag: "+ cFTag2);
-		    				rbFLol = (RubbishBinFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag2);
-		    				if (rbFLol != null){
-		    					rbFLol.onBackPressed();
+		    				rubbishBinFLol = (RubbishBinFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag2);
+		    				if (rubbishBinFLol != null){
+		    					rubbishBinFLol.onBackPressed();
 		    					return true;
 		    				}
 		    			}
@@ -5627,8 +5627,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 //    					if (fbFLol != null){
 //    						fbFLol.updateProgressBar(progressPercent);
 //    					}
-//    					if (rbFLol != null){
-//    						rbFLol.updateProgressBar(progressPercent);
+//    					if (rubbishBinFLol != null){
+//    						rubbishBinFLol.updateProgressBar(progressPercent);
 //    					}
 //    					if (iFLol != null){
 //    						iFLol.updateProgressBar(progressPercent);
@@ -5776,10 +5776,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
         			if(index==1){
         				//Rubbish bin
         				String cFTag = getFragmentTag(R.id.cloud_drive_tabs_pager, 1);
-        				rbFLol = (RubbishBinFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
-        				if (rbFLol != null){
-            				rbFLol.selectAll();
-            				if (rbFLol.showSelectMenuItem()){
+        				rubbishBinFLol = (RubbishBinFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
+        				if (rubbishBinFLol != null){
+            				rubbishBinFLol.selectAll();
+            				if (rubbishBinFLol.showSelectMenuItem()){
             					selectMenuItem.setVisible(true);
             					unSelectMenuItem.setVisible(false);
             				}
@@ -6110,28 +6110,28 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	    			//Rubbish Bin
 	    			if (drawerItem == DrawerItem.CLOUD_DRIVE){
 	    				String cFTagRB = getFragmentTag(R.id.cloud_drive_tabs_pager, 1);
-	    				rbFLol = (RubbishBinFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTagRB);
-	    				if (rbFLol != null){
-							log("rbFLol != null");
-//							rbFLol.setIsList(isList);
-//							rbFLol.setParentHandle(parentHandleRubbish);
+	    				rubbishBinFLol = (RubbishBinFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTagRB);
+	    				if (rubbishBinFLol != null){
+							log("rubbishBinFLol != null");
+//							rubbishBinFLol.setIsList(isList);
+//							rubbishBinFLol.setParentHandle(parentHandleRubbish);
 //
 //							getSupportFragmentManager()
 //									.beginTransaction()
-//									.detach(rbFLol)
-//									.attach(rbFLol)
+//									.detach(rubbishBinFLol)
+//									.attach(rubbishBinFLol)
 //									.commit();
 
 
 		        			FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
-		        			fragTransaction.detach(rbFLol);
+		        			fragTransaction.detach(rubbishBinFLol);
 		        			fragTransaction.commitNowAllowingStateLoss();
 
-		        			rbFLol.setIsList(isList);
-		        			rbFLol.setParentHandle(parentHandleRubbish);
+		        			rubbishBinFLol.setIsList(isList);
+		        			rubbishBinFLol.setParentHandle(parentHandleRubbish);
 
 		        			fragTransaction = getSupportFragmentManager().beginTransaction();
-		        			fragTransaction.attach(rbFLol);
+		        			fragTransaction.attach(rubbishBinFLol);
 		        			fragTransaction.commitNowAllowingStateLoss();
 	    				}
 	    				//Cloud Drive
@@ -7087,16 +7087,16 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 		if (drawerItem == DrawerItem.CLOUD_DRIVE) {
 			String cloudTag = getFragmentTag(R.id.cloud_drive_tabs_pager, 1);
-			rbFLol = (RubbishBinFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cloudTag);
-			if (rbFLol != null) {
+			rubbishBinFLol = (RubbishBinFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cloudTag);
+			if (rubbishBinFLol != null) {
 				ArrayList<MegaNode> nodes;
-				if (rbFLol.getParentHandle() == -1) {
+				if (rubbishBinFLol.getParentHandle() == -1) {
 					nodes = megaApi.getChildren(megaApi.getNodeByHandle(megaApi.getRubbishNode().getHandle()), orderCloud);
 				} else {
-					nodes = megaApi.getChildren(megaApi.getNodeByHandle(rbFLol.getParentHandle()), orderCloud);
+					nodes = megaApi.getChildren(megaApi.getNodeByHandle(rubbishBinFLol.getParentHandle()), orderCloud);
 				}
-				rbFLol.setNodes(nodes);
-				rbFLol.getRecyclerView().invalidate();
+				rubbishBinFLol.setNodes(nodes);
+				rubbishBinFLol.getRecyclerView().invalidate();
 			}
 
 			//Cloud Drive
@@ -7120,11 +7120,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 			//Refresh Rubbish Fragment
 			String cFTagRb = getFragmentTag(R.id.cloud_drive_tabs_pager, 1);
-			rbFLol = (RubbishBinFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTagRb);
-			if (rbFLol != null){
-				ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(rbFLol.getParentHandle()), orderCloud);
-				rbFLol.setNodes(nodes);
-				rbFLol.getRecyclerView().invalidate();
+			rubbishBinFLol = (RubbishBinFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTagRb);
+			if (rubbishBinFLol != null){
+				ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(rubbishBinFLol.getParentHandle()), orderCloud);
+				rubbishBinFLol.setNodes(nodes);
+				rubbishBinFLol.getRecyclerView().invalidate();
 			}
 
 		}
@@ -7136,11 +7136,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 			//Refresh Rubbish Fragment
 			String cFTagRb = getFragmentTag(R.id.cloud_drive_tabs_pager, 1);
-			rbFLol = (RubbishBinFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTagRb);
-			if (rbFLol != null){
-				ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(rbFLol.getParentHandle()), orderCloud);
-				rbFLol.setNodes(nodes);
-				rbFLol.getRecyclerView().invalidate();
+			rubbishBinFLol = (RubbishBinFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTagRb);
+			if (rubbishBinFLol != null){
+				ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(rubbishBinFLol.getParentHandle()), orderCloud);
+				rubbishBinFLol.setNodes(nodes);
+				rubbishBinFLol.getRecyclerView().invalidate();
 			}
 		}
 	}
@@ -7153,18 +7153,18 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			if(index==1){
 				//Rubbish bin
 				String cFTag = getFragmentTag(R.id.cloud_drive_tabs_pager, 1);
-				rbFLol = (RubbishBinFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
-				if (rbFLol != null){
+				rubbishBinFLol = (RubbishBinFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
+				if (rubbishBinFLol != null){
 					ArrayList<MegaNode> nodes;
-					if(rbFLol.getParentHandle()==-1){
+					if(rubbishBinFLol.getParentHandle()==-1){
 						nodes = megaApi.getChildren(megaApi.getNodeByHandle(megaApi.getRubbishNode().getHandle()), orderCloud);
 					}
 					else{
-						nodes = megaApi.getChildren(megaApi.getNodeByHandle(rbFLol.getParentHandle()), orderCloud);
+						nodes = megaApi.getChildren(megaApi.getNodeByHandle(rubbishBinFLol.getParentHandle()), orderCloud);
 					}
-					rbFLol.hideMultipleSelect();
-					rbFLol.setNodes(nodes);
-					rbFLol.getRecyclerView().invalidate();
+					rubbishBinFLol.hideMultipleSelect();
+					rubbishBinFLol.setNodes(nodes);
+					rubbishBinFLol.getRecyclerView().invalidate();
 				}
 			}
 			else{
@@ -7256,17 +7256,17 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			if(index==1){
 				//Rubbish bin
 				String cFTag = getFragmentTag(R.id.cloud_drive_tabs_pager, 1);
-				rbFLol = (RubbishBinFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
-				if (rbFLol != null){
-					rbFLol.hideMultipleSelect();
+				rubbishBinFLol = (RubbishBinFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
+				if (rubbishBinFLol != null){
+					rubbishBinFLol.hideMultipleSelect();
 
 					if (isClearRubbishBin){
 						isClearRubbishBin = false;
 						parentHandleRubbish = megaApi.getRubbishNode().getHandle();
-						rbFLol.setParentHandle(megaApi.getRubbishNode().getHandle());
+						rubbishBinFLol.setParentHandle(megaApi.getRubbishNode().getHandle());
 						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getRubbishNode(), orderCloud);
-						rbFLol.setNodes(nodes);
-						rbFLol.getRecyclerView().invalidate();
+						rubbishBinFLol.setNodes(nodes);
+						rubbishBinFLol.getRecyclerView().invalidate();
 						aB.setTitle(getString(R.string.section_rubbish_bin));
 						log("aB.setHomeAsUpIndicator_23");
 						aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
@@ -7274,14 +7274,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					}
 					else{
 						ArrayList<MegaNode> nodes;
-						if(rbFLol.getParentHandle()==-1){
+						if(rubbishBinFLol.getParentHandle()==-1){
 							nodes = megaApi.getChildren(megaApi.getNodeByHandle(megaApi.getRubbishNode().getHandle()), orderCloud);
 						}
 						else{
-							nodes = megaApi.getChildren(megaApi.getNodeByHandle(rbFLol.getParentHandle()), orderCloud);
+							nodes = megaApi.getChildren(megaApi.getNodeByHandle(rubbishBinFLol.getParentHandle()), orderCloud);
 						}
-						rbFLol.setNodes(nodes);
-						rbFLol.getRecyclerView().invalidate();
+						rubbishBinFLol.setNodes(nodes);
+						rubbishBinFLol.getRecyclerView().invalidate();
 					}
 				}
 			}
@@ -7293,7 +7293,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		else if (drawerItem == DrawerItem.INBOX){
 			if (iFLol != null){
 //							ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(iFLol.getParentHandle()), orderGetChildren);
-//							rbFLol.setNodes(nodes);
+//							rubbishBinFLol.setNodes(nodes);
 				iFLol.hideMultipleSelect();
 				iFLol.refresh();
 			}
@@ -7320,18 +7320,18 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		}
 
 		cloudTag = getFragmentTag(R.id.cloud_drive_tabs_pager, 1);
-		rbFLol = (RubbishBinFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cloudTag);
-		if (rbFLol != null){
+		rubbishBinFLol = (RubbishBinFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cloudTag);
+		if (rubbishBinFLol != null){
 			log("RubbishBinFragment is not NULL -> UPDATE");
-			rbFLol.hideMultipleSelect();
-			rbFLol.setIsList(isList);
+			rubbishBinFLol.hideMultipleSelect();
+			rubbishBinFLol.setIsList(isList);
 
 			FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
-			fragTransaction.detach(rbFLol);
+			fragTransaction.detach(rubbishBinFLol);
 			fragTransaction.commitNowAllowingStateLoss();
 
 			fragTransaction = getSupportFragmentManager().beginTransaction();
-			fragTransaction.attach(rbFLol);
+			fragTransaction.attach(rubbishBinFLol);
 			fragTransaction.commitNowAllowingStateLoss();
 		}
 
@@ -7414,9 +7414,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			if(index==1){
 				//Rubbish Bin
 				String cFTag = getFragmentTag(R.id.cloud_drive_tabs_pager, 1);
-				rbFLol = (RubbishBinFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
-				if (rbFLol != null){
-					if (rbFLol.onBackPressed() == 0){
+				rubbishBinFLol = (RubbishBinFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
+				if (rubbishBinFLol != null){
+					if (rubbishBinFLol.onBackPressed() == 0){
 						viewPagerCDrive.setCurrentItem(0);
 					}
 					return;
@@ -8978,8 +8978,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	public void showClearRubbishBinDialog(String editText){
 		log("showClearRubbishBinDialog");
 
-		if (rbFLol.isVisible()){
-			rbFLol.notifyDataSetChanged();
+		if (rubbishBinFLol.isVisible()){
+			rubbishBinFLol.notifyDataSetChanged();
 		}
 
 		String text;
@@ -10735,17 +10735,17 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 //				parentHandleRubbish = intent.getLongExtra("PARENT_HANDLE", -1);
 //				MegaNode parentNode = megaApi.getNodeByHandle(parentHandleRubbish);
 //				if (parentNode != null){
-//					if (rbFLol != null){
+//					if (rubbishBinFLol != null){
 //						ArrayList<MegaNode> nodes = megaApi.getChildren(parentNode, orderGetChildren);
-//						rbFLol.setNodes(nodes);
-//						rbFLol.getListView().invalidateViews();
+//						rubbishBinFLol.setNodes(nodes);
+//						rubbishBinFLol.getListView().invalidateViews();
 //					}
 //				}
 //				else{
-//					if (rbFLol != null){
+//					if (rubbishBinFLol != null){
 //						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getRubbishNode(), orderGetChildren);
-//						rbFLol.setNodes(nodes);
-//						rbFLol.getListView().invalidateViews();
+//						rubbishBinFLol.setNodes(nodes);
+//						rubbishBinFLol.getListView().invalidateViews();
 //					}
 //				}
 //			}
@@ -10824,19 +10824,19 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 //			else if (drawerItem == DrawerItem.RUBBISH_BIN){
 //				MegaNode parentNode = megaApi.getNodeByHandle(parentHandleRubbish);
 //				if (parentNode != null){
-//					if (rbFLol != null){
+//					if (rubbishBinFLol != null){
 //						ArrayList<MegaNode> nodes = megaApi.getChildren(parentNode, orderGetChildren);
-//						rbFLol.setOrder(orderGetChildren);
-//						rbFLol.setNodes(nodes);
-//						rbFLol.getListView().invalidateViews();
+//						rubbishBinFLol.setOrder(orderGetChildren);
+//						rubbishBinFLol.setNodes(nodes);
+//						rubbishBinFLol.getListView().invalidateViews();
 //					}
 //				}
 //				else{
-//					if (rbFLol != null){
+//					if (rubbishBinFLol != null){
 //						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getRubbishNode(), orderGetChildren);
-//						rbFLol.setOrder(orderGetChildren);
-//						rbFLol.setNodes(nodes);
-//						rbFLol.getListView().invalidateViews();
+//						rubbishBinFLol.setOrder(orderGetChildren);
+//						rubbishBinFLol.setNodes(nodes);
+//						rubbishBinFLol.getListView().invalidateViews();
 //					}
 //				}
 //			}
@@ -11327,7 +11327,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			rRFLol = (ReceivedRequestsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTagRR);
 			if (rRFLol != null){
 				if (drawerItem == DrawerItem.CONTACTS){
-					rbFLol.hideMultipleSelect();
+					rRFLol.hideMultipleSelect();
 					rRFLol.updateView();
 				}
 			}
@@ -12231,11 +12231,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	        			if(index==1){
 	        				//Rubbish bin
 	        				String cFTag = getFragmentTag(R.id.cloud_drive_tabs_pager, 1);
-	        				rbFLol = (RubbishBinFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
-	        				if (rbFLol != null){
-								ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(rbFLol.getParentHandle()), orderCloud);
-								rbFLol.setNodes(nodes);
-								rbFLol.getRecyclerView().invalidate();
+	        				rubbishBinFLol = (RubbishBinFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
+	        				if (rubbishBinFLol != null){
+								ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(rubbishBinFLol.getParentHandle()), orderCloud);
+								rubbishBinFLol.setNodes(nodes);
+								rubbishBinFLol.getRecyclerView().invalidate();
 							}
 	        			}
 	        			else{
@@ -12508,8 +12508,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					}
 
 					String rubbishTag = getFragmentTag(R.id.cloud_drive_tabs_pager, 1);
-					rbFLol = (RubbishBinFragmentLollipop) getSupportFragmentManager().findFragmentByTag(rubbishTag);
-					if (rbFLol != null){
+					rubbishBinFLol = (RubbishBinFragmentLollipop) getSupportFragmentManager().findFragmentByTag(rubbishTag);
+					if (rubbishBinFLol != null){
 						if (isClearRubbishBin){
 							isClearRubbishBin = false;
 							parentHandleRubbish = megaApi.getRubbishNode().getHandle();
@@ -12519,28 +12519,28 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 							this.firstNavigationLevel = true;
 
 							ArrayList<MegaNode> nodes;
-							if(rbFLol.getParentHandle()==-1){
+							if(rubbishBinFLol.getParentHandle()==-1){
 								nodes = megaApi.getChildren(megaApi.getNodeByHandle(megaApi.getRubbishNode().getHandle()), orderCloud);
 							}
 							else{
-								nodes = megaApi.getChildren(megaApi.getNodeByHandle(rbFLol.getParentHandle()), orderCloud);
+								nodes = megaApi.getChildren(megaApi.getNodeByHandle(rubbishBinFLol.getParentHandle()), orderCloud);
 							}
-							rbFLol.setParentHandle(megaApi.getRubbishNode().getHandle());
-							rbFLol.setNodes(nodes);
-							rbFLol.getRecyclerView().invalidate();
+							rubbishBinFLol.setParentHandle(megaApi.getRubbishNode().getHandle());
+							rubbishBinFLol.setNodes(nodes);
+							rubbishBinFLol.getRecyclerView().invalidate();
 
 						}
 						else{
 
 							ArrayList<MegaNode> nodes;
-							if(rbFLol.getParentHandle()==-1){
+							if(rubbishBinFLol.getParentHandle()==-1){
 								nodes = megaApi.getChildren(megaApi.getNodeByHandle(megaApi.getRubbishNode().getHandle()), orderCloud);
 							}
 							else{
-								nodes = megaApi.getChildren(megaApi.getNodeByHandle(rbFLol.getParentHandle()), orderCloud);
+								nodes = megaApi.getChildren(megaApi.getNodeByHandle(rubbishBinFLol.getParentHandle()), orderCloud);
 							}
-							rbFLol.setNodes(nodes);
-							rbFLol.getRecyclerView().invalidate();
+							rubbishBinFLol.setNodes(nodes);
+							rubbishBinFLol.getRecyclerView().invalidate();
 
 						}
 					}
@@ -12550,8 +12550,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					log("Cloud drive shown");
 
 					String rubbishTag = getFragmentTag(R.id.cloud_drive_tabs_pager, 1);
-					rbFLol = (RubbishBinFragmentLollipop) getSupportFragmentManager().findFragmentByTag(rubbishTag);
-					if (rbFLol != null){
+					rubbishBinFLol = (RubbishBinFragmentLollipop) getSupportFragmentManager().findFragmentByTag(rubbishTag);
+					if (rubbishBinFLol != null){
 						if (isClearRubbishBin){
 							isClearRubbishBin = false;
 							parentHandleRubbish = megaApi.getRubbishNode().getHandle();
@@ -12561,9 +12561,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 							this.firstNavigationLevel = true;
 
 							ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getRubbishNode(), orderCloud);
-							rbFLol.setParentHandle(megaApi.getRubbishNode().getHandle());
-							rbFLol.setNodes(nodes);
-							rbFLol.getRecyclerView().invalidate();
+							rubbishBinFLol.setParentHandle(megaApi.getRubbishNode().getHandle());
+							rubbishBinFLol.setNodes(nodes);
+							rubbishBinFLol.getRecyclerView().invalidate();
 
 						}
 						else{
@@ -12576,8 +12576,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 								nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleRubbish), orderCloud);
 							}
 							if(nodes!=null){
-								rbFLol.setNodes(nodes);
-								rbFLol.getRecyclerView().invalidate();
+								rubbishBinFLol.setNodes(nodes);
+								rubbishBinFLol.getRecyclerView().invalidate();
 							}
 						}
 					}
