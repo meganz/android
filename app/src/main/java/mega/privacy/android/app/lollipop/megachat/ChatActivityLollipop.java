@@ -1540,8 +1540,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     menu.findItem(R.id.chat_cab_menu_copy).setVisible(true);
                     menu.findItem(R.id.chat_cab_menu_delete).setVisible(true);
                     for(int i=0; i<selected.size();i++){
-                        if(messages.get(i).getMessage().getUserHandle()==myUserHandle){
-                            if(!(messages.get(i).getMessage().isEditable())){
+                        if(selected.get(i).getMessage().getUserHandle()==myUserHandle){
+                            if(!(selected.get(i).getMessage().isEditable())){
                                 menu.findItem(R.id.chat_cab_menu_delete).setVisible(false);
                                 break;
                             }
@@ -1560,13 +1560,15 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     menu.findItem(R.id.chat_cab_menu_delete).setVisible(true);
                     menu.findItem(R.id.chat_cab_menu_delete).setVisible(true);
                     for(int i=0; i<selected.size();i++){
-                        if(messages.get(i).getMessage().getUserHandle()==myUserHandle){
-                            if(!(messages.get(i).getMessage().isEditable())){
+                        if(selected.get(i).getMessage().getUserHandle()==myUserHandle){
+                            if(!(selected.get(i).getMessage().isEditable())){
+                                log("onPrepareActionMode: not editable");
                                 menu.findItem(R.id.chat_cab_menu_delete).setVisible(false);
                                 break;
                             }
                         }
                         else{
+                            log("onPrepareActionMode: not MY message");
                             menu.findItem(R.id.chat_cab_menu_delete).setVisible(false);
                         }
                     }
