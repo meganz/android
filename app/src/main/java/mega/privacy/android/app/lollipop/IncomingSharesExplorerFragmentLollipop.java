@@ -96,14 +96,7 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 		
 	    float scaleW = Util.getScaleW(outMetrics, density);
 	    float scaleH = Util.getScaleH(outMetrics, density);
-	    float scaleText;
-	    if (scaleH < scaleW){
-	    	scaleText = scaleH;
-	    }
-	    else{
-	    	scaleText = scaleW;
-	    }
-				
+
 		View v = inflater.inflate(R.layout.fragment_fileexplorerlist, container, false);
 		
 		separator = (View) v.findViewById(R.id.separator);
@@ -138,10 +131,23 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 		
 		emptyImageView.setImageResource(R.drawable.incoming_shares_empty);			
 		emptyTextView.setText(R.string.file_browser_empty_incoming_shares);
+
+		parentHandle = ((FileExplorerActivityLollipop)context).parentHandleIncoming;
+		deepBrowserTree = ((FileExplorerActivityLollipop)context).deepBrowserTree;
+
+		modeCloud = ((FileExplorerActivityLollipop)context).getMode();
+		selectFile = ((FileExplorerActivityLollipop)context).isSelectFile();
+
+		if (parentHandle == -1){
+			findNodes();
+		}
+		else{
+			MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
+			nodes = megaApi.getChildren(parentNode);
+		}
 		
 		if (adapter == null){
 			adapter = new MegaExplorerLollipopAdapter(context, nodes, parentHandle, listView, selectFile);
-			
 			adapter.SetOnItemClickListener(new MegaExplorerLollipopAdapter.OnItemClickListener() {
 				
 				@Override
@@ -149,6 +155,7 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 					itemClick(view, position);
 				}
 			});
+			listView.setAdapter(adapter);
 		}
 		else{
 			adapter.setParentHandle(parentHandle);
@@ -156,8 +163,9 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 			adapter.setSelectFile(selectFile);
 		}
 
-		modeCloud = ((FileExplorerActivityLollipop)context).getMode();
-		selectFile = ((FileExplorerActivityLollipop)context).isSelectFile();
+		findDisabledNodes();
+
+		adapter.setPositionClicked(-1);
 		
 		if (modeCloud == FileExplorerActivityLollipop.MOVE) {
 			optionButton.setText(getString(R.string.context_move).toUpperCase(Locale.getDefault()));
@@ -181,19 +189,6 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 			optionButton.setText(getString(R.string.general_select).toUpperCase(Locale.getDefault()));
 		}
 
-		if (parentHandle == -1){			
-			findNodes();	
-			adapter.setParentHandle(-1);
-//			uploadButton.setText(getString(R.string.choose_folder_explorer));
-		}
-		else{
-			adapter.setParentHandle(parentHandle);
-			MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
-			nodes = megaApi.getChildren(parentNode);
-		}
-
-		adapter.setPositionClicked(-1);
-		listView.setAdapter(adapter);
 
 		log("deepBrowserTree value: "+deepBrowserTree);
 		if (deepBrowserTree <= 0){
@@ -228,13 +223,13 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 	}
 	
 	public void findNodes(){
+		log("findNodes");
 		deepBrowserTree=0;
 
 		separator.setVisibility(View.GONE);
 		optionsBar.setVisibility(View.GONE);
 
 		ArrayList<MegaUser> contacts = megaApi.getContacts();
-		ArrayList<Long> disabledNodes = new ArrayList<Long>();
 		nodes.clear();
 		for (int i=0;i<contacts.size();i++){			
 			ArrayList<MegaNode> nodeContact=megaApi.getInShares(contacts.get(i));
@@ -244,11 +239,17 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 				}
 			}			
 		}
-		
-		for (int i=0;i<nodes.size();i++){	
+	}
+
+	public void findDisabledNodes (){
+		log("findDisabledNodes");
+
+		ArrayList<Long> disabledNodes = new ArrayList<Long>();
+
+		for (int i=0;i<nodes.size();i++){
 			MegaNode folder = nodes.get(i);
 			int accessLevel = megaApi.getAccess(folder);
-			
+
 			if(selectFile){
 				if(accessLevel!=MegaShare.ACCESS_FULL) {
 					disabledNodes.add(folder.getHandle());
@@ -260,9 +261,8 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 				}
 			}
 		}
-		
+
 		this.setDisableNodes(disabledNodes);
-		
 	}
 	
 	public void changeActionBarTitle(String folder){
@@ -432,6 +432,7 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 			changeActionBarTitle(getString(R.string.title_incoming_shares_explorer));
 //			uploadButton.setText(getString(R.string.choose_folder_explorer));
 			findNodes();
+			findDisabledNodes();
 			
 			adapter.setNodes(nodes);
 			int lastVisiblePosition = 0;

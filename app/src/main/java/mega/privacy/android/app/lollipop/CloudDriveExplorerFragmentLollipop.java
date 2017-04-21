@@ -130,6 +130,8 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 
 		modeCloud = ((FileExplorerActivityLollipop)context).getMode();
 		selectFile = ((FileExplorerActivityLollipop)context).isSelectFile();
+
+		parentHandle = ((FileExplorerActivityLollipop)context).parentHandleCloud;
 		
 		if(modeCloud==FileExplorerActivityLollipop.SELECT_CAMERA_FOLDER){
 			parentHandle = -1;

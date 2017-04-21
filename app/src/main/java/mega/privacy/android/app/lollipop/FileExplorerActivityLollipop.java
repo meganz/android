@@ -159,7 +159,6 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 	long parentHandleIncoming;
 	long parentHandleCloud;
 	int deepBrowserTree;
-	String gcFTag = "";
 
 	Intent intent = null;
 
@@ -448,7 +447,8 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		if ((intent != null) && (intent.getAction() != null)){
 			log("intent OK: "+intent.getAction());
 			if (intent.getAction().equals(ACTION_SELECT_FOLDER_TO_SHARE)){
-				//Just show Cloud Drive, no need of tabhost
+				log("action = ACTION_SELECT_FOLDER_TO_SHARE");
+				//Just show Cloud Drive, no INCOMING tab , no need of tabhost
 
 				mode = SELECT;
 				selectFile = false;
@@ -479,7 +479,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			}
 			else if (intent.getAction().equals(ACTION_SELECT_FILE)){
 				log("action = ACTION_SELECT_FILE");
-				//Just show Cloud Drive, no need of tabhost
+				//Just show Cloud Drive, no INCOMING tab , no need of tabhost
 
 				mode = SELECT;
 				selectFile = true;
@@ -520,7 +520,9 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 						mTabsAdapterExplorer = new FileExplorerPagerAdapter(getSupportFragmentManager(),this);
 						viewPagerExplorer.setAdapter(mTabsAdapterExplorer);
 						tabLayoutExplorer.setupWithViewPager(viewPagerExplorer);
-
+					}
+					else{
+						log("mTabsAdapterExplorer != null");
 					}
 
 					ArrayList<Long> list = new ArrayList<Long>(moveFromHandles.length);
@@ -528,7 +530,6 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 						list.add(n);
 					}
 					String cFTag = getFragmentTag(R.id.explorer_tabs_pager, 0);
-					gcFTag = getFragmentTag(R.id.explorer_tabs_pager, 0);
 					cDriveExplorer = (CloudDriveExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
 					if(cDriveExplorer!=null){
 						cDriveExplorer.setDisableNodes(list);
@@ -554,7 +555,6 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 						list.add(n);
 					}
 					String cFTag = getFragmentTag(R.id.explorer_tabs_pager, 0);
-					gcFTag = getFragmentTag(R.id.explorer_tabs_pager, 0);
 					cDriveExplorer = (CloudDriveExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
 					if(cDriveExplorer!=null){
 						cDriveExplorer.setDisableNodes(list);
@@ -639,7 +639,6 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 						if(position == 0){
 							tabShown=CLOUD_TAB;
 							String cFTag = getFragmentTag(R.id.explorer_tabs_pager, 0);
-							gcFTag = getFragmentTag(R.id.explorer_tabs_pager, 0);
 							cDriveExplorer = (CloudDriveExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
 
 							if(cDriveExplorer!=null){
@@ -655,7 +654,6 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 							tabShown=INCOMING_TAB;
 
 							String cFTag = getFragmentTag(R.id.explorer_tabs_pager, 1);
-							gcFTag = getFragmentTag(R.id.explorer_tabs_pager, 1);
 							iSharesExplorer = (IncomingSharesExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
 
 							if(iSharesExplorer!=null){
@@ -728,7 +726,6 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			}
 			else{
 				String cFTag1 = getFragmentTag(R.id.explorer_tabs_pager, 1);		
-				log("Tag: "+ cFTag1);
 				iSharesExplorer = (IncomingSharesExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag1);
 				if(iSharesExplorer != null){	
 					log("Level deepBrowserTree: "+iSharesExplorer.getDeepBrowserTree());
@@ -820,6 +817,8 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			parentHandleCloud = -1;
 		}
 		bundle.putLong("parentHandleCloud", parentHandleCloud);
+		String cFTag1 = getFragmentTag(R.id.explorer_tabs_pager, 1);
+		iSharesExplorer = (IncomingSharesExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag1);
 		if(iSharesExplorer!=null){
 			parentHandleIncoming = iSharesExplorer.getParentHandle();
 			deepBrowserTree = iSharesExplorer.getDeepBrowserTree();
@@ -865,7 +864,6 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		
 		if(tabShown==CLOUD_TAB){
 			String cFTag = getFragmentTag(R.id.explorer_tabs_pager, 0);
-			gcFTag = getFragmentTag(R.id.explorer_tabs_pager, 0);
 			cDriveExplorer = (CloudDriveExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
 	
 			if(cDriveExplorer!=null){
@@ -877,9 +875,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		}
 		else if(tabShown==INCOMING_TAB){
 			String cFTag = getFragmentTag(R.id.explorer_tabs_pager, 1);
-			gcFTag = getFragmentTag(R.id.explorer_tabs_pager, 1);
 			iSharesExplorer = (IncomingSharesExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
-		
 			if(iSharesExplorer!=null){
 				if (iSharesExplorer.onBackPressed() == 0){
 					super.onBackPressed();
@@ -1181,7 +1177,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 				log("1)cDriveExplorer != null: " + parentHandle);
 			}
 			else{
-				gcFTag = getFragmentTag(R.id.explorer_tabs_pager, 0);
+				String gcFTag = getFragmentTag(R.id.explorer_tabs_pager, 0);
 				cDriveExplorer = (CloudDriveExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag(gcFTag);
 				if (cDriveExplorer != null){
 					parentHandle = cDriveExplorer.getParentHandle();
@@ -1195,7 +1191,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 				log("1)iSharesExplorer != null: " + parentHandle);
 			}
 			else{
-				gcFTag = getFragmentTag(R.id.explorer_tabs_pager, 1);
+				String gcFTag = getFragmentTag(R.id.explorer_tabs_pager, 1);
 				iSharesExplorer = (IncomingSharesExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag(gcFTag);
 				if (iSharesExplorer != null){
 					parentHandle = iSharesExplorer.getParentHandle();
@@ -1306,7 +1302,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			
 			if (error.getErrorCode() == MegaError.API_OK){
 				if(tabShown==CLOUD_TAB){
-					gcFTag = getFragmentTag(R.id.explorer_tabs_pager, 0);
+					String gcFTag = getFragmentTag(R.id.explorer_tabs_pager, 0);
 					cDriveExplorer = (CloudDriveExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag(gcFTag);
 					if (cDriveExplorer != null){
 						cDriveExplorer.navigateToFolder(request.getNodeHandle());
@@ -1316,7 +1312,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 					}						
 				}
 				else{
-					gcFTag = getFragmentTag(R.id.explorer_tabs_pager, 1);
+					String gcFTag = getFragmentTag(R.id.explorer_tabs_pager, 1);
 					iSharesExplorer = (IncomingSharesExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag(gcFTag);
 					if (iSharesExplorer != null){
 						iSharesExplorer.navigateToFolder(request.getNodeHandle());
