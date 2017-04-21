@@ -124,7 +124,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:tint="@color/white"
-                        android:src="@drawable/ic_upload_image"/>
+                        android:src="@drawable/ic_chat_upload_media"/>
 
                 </RelativeLayout>
 
@@ -139,7 +139,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:tint="@color/white"
-                        android:src="@drawable/ic_upload_audio"/>
+                        android:src="@drawable/ic_chat_upload_audio"/>
 
                 </RelativeLayout>
 
@@ -154,7 +154,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:tint="@color/white"
-                        android:src="@drawable/ic_cloud_drive"/>
+                        android:src="@drawable/ic_chat_upload_cloud"/>
 
                 </RelativeLayout>
 
@@ -169,7 +169,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:tint="@color/white"
-                        android:src="@drawable/ic_upload_pick_file"/>
+                        android:src="@drawable/ic_chat_upload_system"/>
 
                 </RelativeLayout>
 
@@ -184,7 +184,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:tint="@color/white"
-                        android:src="@drawable/ic_contacts"/>
+                        android:src="@drawable/ic_chat_upload_contact"/>
 
                 </RelativeLayout>
 
