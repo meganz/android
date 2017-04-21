@@ -31,7 +31,7 @@
             android:layout_alignParentBottom="true"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/chat_background"
+            android:background="@color/participants_layout"
             android:orientation="vertical">
 
             <RelativeLayout
@@ -199,7 +199,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_below="@id/toolbar_chat"
-            android:background="@color/chat_background"
+            android:background="@color/participants_layout"
             android:layout_above="@id/writing_container_layout_chat_layout"
             android:orientation="vertical">
 
@@ -208,7 +208,7 @@
                 android:id="@+id/layout_empty_scroll_view"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@color/chat_background"
+                android:background="@color/participants_layout"
                 android:fillViewport="true">
 
                 <RelativeLayout
@@ -350,7 +350,7 @@
                 android:id="@+id/relative_chat_layout"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@color/chat_background">
+                android:background="@color/participants_layout">
 
                 <android.support.v7.widget.RecyclerView
                     android:id="@+id/messages_chat_list_view"
@@ -359,6 +359,35 @@
                     android:choiceMode="multipleChoice"
                     android:paddingBottom="32dp"/>
 
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/user_typing_layout"
+                android:layout_width="match_parent"
+                android:layout_height="24dp"
+                android:layout_marginLeft="16dp"
+                android:layout_alignParentBottom="true"
+                android:background="@color/participants_layout">
+
+                <TextView
+                    android:id="@+id/user_typing_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/name_my_account"
+                    android:layout_centerVertical="true"
+                    android:ellipsize="end"
+                    android:singleLine="true"
+                    android:lines="1"
+                    android:textSize="14sp"/>
+
+                <TextView
+                    android:id="@+id/user_typing_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:ellipsize="end"
+                    android:layout_toRightOf="@+id/user_typing_name"
+                    android:textSize="12sp"/>
             </RelativeLayout>
 
             <android.support.design.widget.FloatingActionButton
@@ -373,33 +402,6 @@
                 app:pressedTranslationZ="12dp"
                 android:layout_margin="16dp"
                 android:src="@drawable/ic_add_white" />
-
-            <RelativeLayout
-                android:id="@+id/user_typing_layout"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="16dp"
-                android:layout_marginBottom="5dp"
-                android:layout_alignParentBottom="true">
-
-                <TextView
-                    android:id="@+id/user_typing_name"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="@color/name_my_account"
-                    android:ellipsize="end"
-                    android:singleLine="true"
-                    android:lines="1"
-                    android:textSize="12sp"/>
-
-                <TextView
-                    android:id="@+id/user_typing_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:ellipsize="end"
-                    android:layout_toRightOf="@+id/user_typing_name"
-                    android:textSize="12sp"/>
-            </RelativeLayout>
 
         </RelativeLayout>
 
