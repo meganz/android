@@ -52,7 +52,7 @@
         android:id="@+id/options_file_storage_layout"
         android:layout_width="match_parent"
         android:layout_height="48dp"
-		android:background="@color/preference_category_title"
+		android:background="@color/participants_layout"
 		android:gravity="right|center_vertical"
 		android:layout_alignParentBottom="true"
         android:orientation="horizontal" >
@@ -64,7 +64,7 @@
 			android:textColor="@color/accentColor"
 			android:gravity="center_vertical|center_horizontal"
 			android:stateListAnimator="@null"
-		 	android:background="@color/preference_category_title"/>
+		 	android:background="@color/participants_layout"/>
 
 		<Button
 			android:id="@+id/file_storage_button"
@@ -73,7 +73,7 @@
 			android:textColor="@color/accentColor"
 			android:gravity="center_vertical|center_horizontal"
 			android:stateListAnimator="@null"
-			android:background="@color/preference_category_title"/>
+			android:background="@color/participants_layout"/>
 
     </LinearLayout>
 

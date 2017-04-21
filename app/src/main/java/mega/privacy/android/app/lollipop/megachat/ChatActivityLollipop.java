@@ -560,6 +560,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
         userTypingName.setMaxWidth(Util.scaleWidthPx(165, outMetrics));
 
+        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams)userTypingText.getLayoutParams();
+        params.addRule(RelativeLayout.ALIGN_BOTTOM, R.id.user_typing_name);
+        userTypingText.setLayoutParams(params);
+
         fab = (FloatingActionButton) findViewById(R.id.fab_chat);
         fab.setOnClickListener(this);
 

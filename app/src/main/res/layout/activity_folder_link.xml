@@ -52,7 +52,7 @@
         android:layout_width="fill_parent"
         android:layout_height="48dp"
         android:layout_alignParentBottom="true"
-        android:background="@color/preference_category_title"
+        android:background="@color/participants_layout"
         android:gravity="right|center_vertical"
         android:orientation="horizontal" >
 
@@ -63,7 +63,7 @@
            android:textColor="@color/accentColor"
            android:gravity="center_vertical|center_horizontal"
            android:stateListAnimator="@null"
-           android:background="@color/preference_category_title"
+           android:background="@color/participants_layout"
            android:text="@string/general_import"/>
 
         <Button
@@ -73,7 +73,7 @@
             android:textColor="@color/accentColor"
             android:gravity="center_vertical|center_horizontal"
             android:stateListAnimator="@null"
-            android:background="@color/preference_category_title"
+            android:background="@color/participants_layout"
             android:text="@string/general_download"/>
     </LinearLayout>
 

@@ -77,7 +77,7 @@
         android:id="@+id/options_explorer_layout"
 		android:layout_width="fill_parent"
 		android:layout_height="48dp"
-		android:background="@color/preference_category_title"
+		android:background="@color/participants_layout"
 		android:gravity="right|center_vertical"
 		android:layout_alignParentBottom="true"
 		android:orientation="horizontal" >
@@ -88,7 +88,7 @@
              android:layout_height="wrap_content"
              android:textColor="@color/accentColor"
 			 android:stateListAnimator="@null"
-			 android:background="@color/preference_category_title"
+			 android:background="@color/participants_layout"
              android:gravity="center_vertical|center_horizontal"/>
 
          <Button
@@ -97,7 +97,7 @@
              android:layout_height="wrap_content"
              android:textColor="@color/accentColor"
 			 android:stateListAnimator="@null"
-			 android:background="@color/preference_category_title"
+			 android:background="@color/participants_layout"
              android:gravity="center_vertical|center_horizontal"/>
      </LinearLayout>
      

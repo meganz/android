@@ -2,7 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/preference_category_title">
+    android:background="@color/participants_layout">
 
     <TextView xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@android:id/title"
