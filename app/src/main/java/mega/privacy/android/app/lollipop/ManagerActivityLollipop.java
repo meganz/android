@@ -10357,10 +10357,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			Uri treeUri = intent.getData();
 	        DocumentFile pickedDir = DocumentFile.fromTreeUri(this, treeUri);
 		}
-		if (requestCode == Constants.ENABLE_CHAT && resultCode == RESULT_OK){
-			log("OnActivityResult-->connect");
-
-		}
 		else if (requestCode == Constants.REQUEST_CODE_GET && resultCode == RESULT_OK) {
 			if (intent == null) {
 				log("Return.....");
