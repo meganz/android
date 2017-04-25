@@ -2,10 +2,12 @@ package mega.privacy.android.app.lollipop.controllers;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.media.RingtoneManager;
 import android.net.Uri;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
@@ -13,12 +15,14 @@ import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
+import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.AndroidMegaChatMessage;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.NonContactInfo;
+import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
@@ -899,6 +903,18 @@ public class ChatController {
             String participantEmail = chatRoom.getPeerEmailByHandle(userHandle);
             return participantEmail;
         }
+    }
+
+    public void pickFileToSend(){
+        log("pickFileToSend");
+        Intent intent = new Intent(context, FileExplorerActivityLollipop.class);
+        intent.setAction(FileExplorerActivityLollipop.ACTION_SELECT_FILE);
+//        ArrayList<String> longArray = new ArrayList<String>();
+//        for (int i=0; i<users.size(); i++){
+//            longArray.add(users.get(i).getEmail());
+//        }
+//        intent.putStringArrayListExtra("SELECTED_CONTACTS", longArray);
+        ((ChatActivityLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_FILE);
     }
 
     public static void log(String message) {
