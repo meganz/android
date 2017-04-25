@@ -201,7 +201,7 @@ public class ChatController {
         if (message.getType() == MegaChatMessage.TYPE_ALTER_PARTICIPANTS) {
             log("ALTER PARTICIPANT MESSAGE!!");
 
-            if (message.getUserHandleOfAction() == megaApi.getMyUser().getHandle()) {
+            if (message.getHandleOfAction() == megaApi.getMyUser().getHandle()) {
                 log("me alter participant");
 
                 StringBuilder builder = new StringBuilder();
@@ -232,7 +232,7 @@ public class ChatController {
                     textToShow = String.format(context.getString(R.string.non_format_message_add_participant), context.getString(R.string.chat_I_text), fullNameAction);
                 } else {
                     log("I was removed or left");
-                    if (message.getUserHandle() == message.getUserHandleOfAction()) {
+                    if (message.getUserHandle() == message.getHandleOfAction()) {
                         log("I left the chat");
                         textToShow = String.format(context.getString(R.string.non_format_message_participant_left_group_chat), context.getString(R.string.chat_I_text));
 
@@ -250,18 +250,18 @@ public class ChatController {
                 int privilege = message.getPrivilege();
                 log("Privilege of the user: " + privilege);
 
-                String fullNameTitle = getParticipantFullName(message.getUserHandleOfAction(), chatRoom);
+                String fullNameTitle = getParticipantFullName(message.getHandleOfAction(), chatRoom);
 
                 if (fullNameTitle.trim().length() <= 0) {
-                    NonContactInfo nonContact = dbH.findNonContactByHandle(message.getUserHandleOfAction() + "");
+                    NonContactInfo nonContact = dbH.findNonContactByHandle(message.getHandleOfAction() + "");
                     if (nonContact != null) {
                         fullNameTitle = nonContact.getFullName();
                     } else {
                         fullNameTitle = "Unknown name";
 //                            log("3-Call for nonContactName: "+ message.getUserHandle());
-//                        ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, message.getUserHandleOfAction());
-//                        megaChatApi.getUserFirstname(message.getUserHandleOfAction(), listener);
-//                        megaChatApi.getUserLastname(message.getUserHandleOfAction(), listener);
+//                        ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, message.getHandleOfAction());
+//                        megaChatApi.getUserFirstname(message.getHandleOfAction(), listener);
+//                        megaChatApi.getUserLastname(message.getHandleOfAction(), listener);
                     }
                 }
 
@@ -275,7 +275,7 @@ public class ChatController {
                         log("By me");
                         textToShow = String.format(context.getString(R.string.non_format_message_add_participant), fullNameTitle, context.getString(R.string.chat_me_text));
                     } else {
-//                        textToShow = String.format(context.getString(R.string.message_add_participant), message.getUserHandleOfAction()+"");
+//                        textToShow = String.format(context.getString(R.string.message_add_participant), message.getHandleOfAction()+"");
                         log("By other");
                         String fullNameAction = getParticipantFullName(message.getUserHandle(), chatRoom);
 
@@ -302,7 +302,7 @@ public class ChatController {
                         textToShow = String.format(context.getString(R.string.non_format_message_remove_participant), fullNameTitle, context.getString(R.string.chat_me_text));
                     } else {
 
-                        if (message.getUserHandle() == message.getUserHandleOfAction()) {
+                        if (message.getUserHandle() == message.getHandleOfAction()) {
                             log("The participant left the chat");
 
                             textToShow = String.format(context.getString(R.string.non_format_message_participant_left_group_chat), fullNameTitle);
@@ -327,7 +327,7 @@ public class ChatController {
 
                             textToShow = String.format(context.getString(R.string.non_format_message_remove_participant), fullNameTitle, fullNameAction);
                         }
-//                        textToShow = String.format(context.getString(R.string.message_remove_participant), message.getUserHandleOfAction()+"");
+//                        textToShow = String.format(context.getString(R.string.message_remove_participant), message.getHandleOfAction()+"");
                     }
                 } //END participant removed
 
@@ -337,7 +337,7 @@ public class ChatController {
             } //END CONTACT MANAGEMENT MESSAGE
         } else if (message.getType() == MegaChatMessage.TYPE_PRIV_CHANGE) {
             log("PRIVILEGE CHANGE message");
-            if (message.getUserHandleOfAction() == megaApi.getMyUser().getHandle()) {
+            if (message.getHandleOfAction() == megaApi.getMyUser().getHandle()) {
                 log("a moderator change my privilege");
                 int privilege = message.getPrivilege();
                 log("Privilege of the user: " + privilege);
@@ -388,18 +388,18 @@ public class ChatController {
                 log("Participant privilege change!");
                 log("Message type PRIVILEGE CHANGE: " + message.getContent());
 
-                String fullNameTitle = getParticipantFullName(message.getUserHandleOfAction(), chatRoom);
+                String fullNameTitle = getParticipantFullName(message.getHandleOfAction(), chatRoom);
 
                 if (fullNameTitle.trim().length() <= 0) {
-                    NonContactInfo nonContact = dbH.findNonContactByHandle(message.getUserHandleOfAction() + "");
+                    NonContactInfo nonContact = dbH.findNonContactByHandle(message.getHandleOfAction() + "");
                     if (nonContact != null) {
                         fullNameTitle = nonContact.getFullName();
                     } else {
                         fullNameTitle = "Unknown name";
                         log("6-Call for nonContactName: " + message.getUserHandle());
-//                            ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, message.getUserHandleOfAction());
-//                            megaChatApi.getUserFirstname(message.getUserHandleOfAction(), listener);
-//                            megaChatApi.getUserLastname(message.getUserHandleOfAction(), listener);
+//                            ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, message.getHandleOfAction());
+//                            megaChatApi.getUserFirstname(message.getHandleOfAction(), listener);
+//                            megaChatApi.getUserLastname(message.getHandleOfAction(), listener);
                     }
                 }
 

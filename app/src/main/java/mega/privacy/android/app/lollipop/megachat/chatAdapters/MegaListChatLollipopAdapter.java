@@ -1193,14 +1193,19 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 					break;
 				}
-				case MegaChatMessage.TYPE_ATTACHMENT:{
+				case MegaChatMessage.TYPE_NODE_ATTACHMENT:{
 					log("Message type attached!!");
 					holder.textViewContent.setText("Attached: "+lastMessageString);
 					break;
 				}
-				case MegaChatMessage.TYPE_CONTACT:{
+				case MegaChatMessage.TYPE_CONTACT_ATTACHMENT:{
 					log("Message type contact!!");
 					holder.textViewContent.setText("Contact: "+lastMessageString);
+					break;
+				}
+				case MegaChatMessage.TYPE_REVOKE_NODE_ATTACHMENT:{
+					log("Message type revoke node attachement!!");
+					holder.textViewContent.setText("Revoke node attachement: "+lastMessageString);
 					break;
 				}
 				default:{
