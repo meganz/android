@@ -1396,6 +1396,28 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
     }
 
+    public void editMessageMS(String text, MegaChatMessage messageToEdit){
+        log("editMessageMS: "+text);
+        MegaChatMessage msgEdited = null;
+
+        if(messageToEdit.getMsgId()!=-1){
+            msgEdited = megaChatApi.editMessage(idChat, messageToEdit.getMsgId(), text);
+        }
+        else{
+            msgEdited = megaChatApi.editMessage(idChat, messageToEdit.getTempId(), text);
+        }
+
+        if(msgEdited!=null){
+            log("Edited message: status: "+msgEdited.getStatus());
+            AndroidMegaChatMessage androidMsgEdited = new AndroidMegaChatMessage(msgEdited);
+            modifyMessageReceived(androidMsgEdited, false);
+        }
+        else{
+            log("Message cannot be edited!");
+            showSnackbar(getString(R.string.error_editing_message));
+        }
+    }
+
     public void showUploadPanel(){
         fab.setVisibility(View.GONE);
         uploadPanel.setVisibility(View.VISIBLE);
