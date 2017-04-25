@@ -19,6 +19,7 @@ import mega.privacy.android.app.lollipop.megachat.AndroidMegaChatMessage;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaChatApiAndroid;
+import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatRoom;
 
 public class MessageNotSentBottomSheetDialogFragment extends BottomSheetDialogFragment implements View.OnClickListener {
@@ -37,6 +38,10 @@ public class MessageNotSentBottomSheetDialogFragment extends BottomSheetDialogFr
     DisplayMetrics outMetrics;
 
     MegaChatApiAndroid megaChatApi;
+    MegaChatRoom selectedChat = null;
+
+    AndroidMegaChatMessage selectedMessage = null;
+    MegaChatMessage originalMsg = null;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -44,6 +49,11 @@ public class MessageNotSentBottomSheetDialogFragment extends BottomSheetDialogFr
 
         if (megaChatApi == null){
             megaChatApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaChatApi();
+        }
+
+        if(context instanceof ChatActivityLollipop){
+            selectedMessage = ((ChatActivityLollipop) context).getSelectedMessage();
+            selectedChat = ((ChatActivityLollipop) context).getChatRoom();
         }
     }
     @Override
@@ -61,9 +71,29 @@ public class MessageNotSentBottomSheetDialogFragment extends BottomSheetDialogFr
         titleSlidingPanel = (TextView)  contentView.findViewById(R.id.msg_not_sent_title_text);
         optionRetryLayout = (LinearLayout) contentView.findViewById(R.id.msg_not_sent_retry_layout);
         optionDeleteLayout = (LinearLayout) contentView.findViewById(R.id.msg_not_sent_delete_layout);
-
-        optionRetryLayout.setOnClickListener(this);
         optionDeleteLayout.setOnClickListener(this);
+
+        if(selectedMessage.getMessage().isEdited()){
+            log("Message edited : final id: "+selectedMessage.getMessage().getMsgId()+" temp id: "+selectedMessage.getMessage().getTempId());
+            originalMsg = megaChatApi.getMessage(selectedChat.getChatId(), selectedMessage.getMessage().getTempId());
+            if(originalMsg!=null){
+                if(originalMsg.isEditable()){
+                    optionRetryLayout.setVisibility(View.VISIBLE);
+                    optionRetryLayout.setOnClickListener(this);
+                }
+                else{
+                    optionRetryLayout.setVisibility(View.GONE);
+                }
+            }
+            else{
+                log("Null recovering the original msg");
+                optionRetryLayout.setVisibility(View.GONE);
+            }
+        }
+        else{
+            optionRetryLayout.setVisibility(View.VISIBLE);
+            optionRetryLayout.setOnClickListener(this);
+        }
 
         dialog.setContentView(contentView);
     }
@@ -71,12 +101,6 @@ public class MessageNotSentBottomSheetDialogFragment extends BottomSheetDialogFr
     @Override
     public void onClick(View v) {
         log("onClick");
-        MegaChatRoom selectedChat = null;
-        AndroidMegaChatMessage selectedMessage = null;
-        if(context instanceof ChatActivityLollipop){
-            selectedMessage = ((ChatActivityLollipop) context).getSelectedMessage();
-            selectedChat = ((ChatActivityLollipop) context).getChatRoom();
-        }
 
         switch(v.getId()){
 
@@ -85,7 +109,17 @@ public class MessageNotSentBottomSheetDialogFragment extends BottomSheetDialogFr
                 if(selectedMessage!=null&&selectedChat!=null){
                     ((ChatActivityLollipop) context).removeMsgNotSent();
                     megaChatApi.removeUnsentMessage(selectedChat.getChatId(), selectedMessage.getMessage().getRowId());
-                    ((ChatActivityLollipop) context).sendMessage(selectedMessage.getMessage().getContent());
+
+                    if(selectedMessage.getMessage().isEdited()){
+                        log("Message is edited --> edit");
+                        if(originalMsg!=null){
+                            ((ChatActivityLollipop) context).editMessageMS(selectedMessage.getMessage().getContent(), originalMsg);
+                        }
+                    }
+                    else{
+                        log("Message NOT edited --> send");
+                        ((ChatActivityLollipop) context).sendMessage(selectedMessage.getMessage().getContent());
+                    }
                 }
                 else{
                     log("onClick: Chat or message are NULL");
