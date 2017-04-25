@@ -2073,6 +2073,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     }
                 }
                 else{
+                    log("NOOOT MESSAGE EDITED");
                     int returnValue = modifyMessageReceived(androidMsg, true);
                     if(returnValue!=-1){
                         log("onMessageLoaded: Message " + returnValue + " modified!");
@@ -2685,6 +2686,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     public int appendMessagePosition(AndroidMegaChatMessage msg){
         log("appendMessagePosition: "+messages.size()+" messages");
+        log("status of message: "+msg.getMessage().getStatus());
         int lastIndex = messages.size()-1;
         if(messages.size()==0){
             msg.setInfoToShow(Constants.CHAT_ADAPTER_SHOW_ALL);
@@ -2692,11 +2694,14 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
         else{
             log("Finding where to append the message");
+
             while(messages.get(lastIndex).getMessage().getStatus()==MegaChatMessage.STATUS_SENDING_MANUAL){
+                log("one less index");
                 lastIndex--;
             }
-            if(msg.getMessage().getStatus()==MegaChatMessage.STATUS_SERVER_RECEIVED){
+            if(msg.getMessage().getStatus()==MegaChatMessage.STATUS_SERVER_RECEIVED||msg.getMessage().getStatus()==MegaChatMessage.STATUS_NOT_SEEN){
                 while(messages.get(lastIndex).getMessage().getStatus()==MegaChatMessage.STATUS_SENDING){
+                    log("one less index");
                     lastIndex--;
                 }
             }
