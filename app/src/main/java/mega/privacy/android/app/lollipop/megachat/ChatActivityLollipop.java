@@ -560,10 +560,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
         userTypingName.setMaxWidth(Util.scaleWidthPx(165, outMetrics));
 
-        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams)userTypingText.getLayoutParams();
-        params.addRule(RelativeLayout.ALIGN_BOTTOM, R.id.user_typing_name);
-        userTypingText.setLayoutParams(params);
-
         fab = (FloatingActionButton) findViewById(R.id.fab_chat);
         fab.setOnClickListener(this);
 
@@ -1838,19 +1834,19 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
                     log("userHandleTyping: "+userHandleTyping);
                     String userTyping = getResources().getQuantityString(R.plurals.user_typing, 1);
-                    userTypingText.setText(userTyping);
+                    userTypingText.setText(" "+userTyping);
 
                     if(nameTyping==null){
                         log("NULL name");
-                        userTypingName.setText(getString(R.string.transfer_unknown)+" ");
+                        userTypingName.setText(getString(R.string.transfer_unknown));
                     }
                     else{
                         if(nameTyping.trim().isEmpty()){
                             log("EMPTY name");
-                            userTypingName.setText(getString(R.string.transfer_unknown)+" ");
+                            userTypingName.setText(getString(R.string.transfer_unknown));
                         }
                         else{
-                            userTypingName.setText(nameTyping+" ");
+                            userTypingName.setText(nameTyping);
                         }
                     }
                     participantTyping.setFirstName(nameTyping);
@@ -1885,15 +1881,15 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         String nameTyping = chatC.getFirstName(userHandleTyping, chatRoom);
                         if(nameTyping==null){
                             log("NULL name");
-                            userTypingName.setText(getString(R.string.transfer_unknown)+" ");
+                            userTypingName.setText(getString(R.string.transfer_unknown));
                         }
                         else{
                             if(nameTyping.trim().isEmpty()){
                                 log("EMPTY name");
-                                userTypingName.setText(getString(R.string.transfer_unknown)+" ");
+                                userTypingName.setText(getString(R.string.transfer_unknown));
                             }
                             else{
-                                userTypingName.setText(nameTyping+" ");
+                                userTypingName.setText(nameTyping);
                             }
                         }
                         participantTyping.setFirstName(nameTyping);
@@ -1908,20 +1904,20 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         switch (size){
                             case 1:{
                                 String userTyping = getResources().getQuantityString(R.plurals.user_typing, 1);
-                                userTypingText.setText(userTyping);
+                                userTypingText.setText(" "+userTyping);
                                 userTypingName.setText(usersTypingSync.get(0).getParticipantTyping().getFirstName()+" ");
                                 break;
                             }
                             case 2:{
                                 String userTyping = getResources().getQuantityString(R.plurals.user_typing, 2);
-                                userTypingText.setText(userTyping);
+                                userTypingText.setText(" "+userTyping);
                                 String userNames = usersTypingSync.get(0).getParticipantTyping().getFirstName()+", "+usersTypingSync.get(1).getParticipantTyping().getFirstName()+" ";
                                 userTypingName.setText(userNames);
                                 break;
                             }
                             default:{
                                 String userTyping = getString(R.string.more_users_typing);
-                                userTypingText.setText(userTyping);
+                                userTypingText.setText(" "+userTyping);
                                 String userNames = usersTypingSync.get(0).getParticipantTyping().getFirstName()+", "+usersTypingSync.get(1).getParticipantTyping().getFirstName()+" ";
                                 userTypingName.setText(userNames);
                                 break;
@@ -1978,20 +1974,20 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     }
                     case 1:{
                         String userTyping = getResources().getQuantityString(R.plurals.user_typing, 1);
-                        userTypingText.setText(userTyping);
+                        userTypingText.setText(" "+userTyping);
                         userTypingName.setText(usersTypingSync.get(0).getParticipantTyping().getFirstName()+" ");
                         break;
                     }
                     case 2:{
                         String userTyping = getResources().getQuantityString(R.plurals.user_typing, 2);
-                        userTypingText.setText(userTyping);
+                        userTypingText.setText(" "+userTyping);
                         String userNames = usersTypingSync.get(0).getParticipantTyping().getFirstName()+", "+usersTypingSync.get(1).getParticipantTyping().getFirstName()+" ";
                         userTypingName.setText(userNames);
                         break;
                     }
                     default:{
                         String userTyping = getString(R.string.more_users_typing);
-                        userTypingText.setText(userTyping);
+                        userTypingText.setText(" "+userTyping);
                         String userNames = usersTypingSync.get(0).getParticipantTyping().getFirstName()+", "+usersTypingSync.get(1).getParticipantTyping().getFirstName()+" ";
                         userTypingName.setText(userNames);
                         break;
