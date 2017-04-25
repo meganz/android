@@ -213,6 +213,13 @@
 		MEGA:showAsAction="never" />
 
 	<item
+		android:id="@+id/action_menu_clear_completed_transfers"
+		android:orderInCategory="165"
+		android:title="@string/option_to_clear_transfers"
+		android:icon="@drawable/ic_action_bar_null"
+		MEGA:showAsAction="never" />
+
+	<item
 		android:id="@+id/action_menu_cancel_all_transfers"
 		android:orderInCategory="165"
 		android:title="@string/menu_cancel_all_transfers"
