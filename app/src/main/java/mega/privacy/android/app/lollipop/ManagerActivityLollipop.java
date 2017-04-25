@@ -1209,6 +1209,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		}
 		log("Preferred View List: "+isList);
 
+
+		String language = Locale.getDefault().toString();
+		log("Language: "+language);
+
 		if(prefs!=null){
 			if(prefs.getPreferredSortCloud()!=null){
 				orderCloud = Integer.parseInt(prefs.getPreferredSortCloud());

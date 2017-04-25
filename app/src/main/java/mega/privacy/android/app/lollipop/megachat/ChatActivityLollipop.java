@@ -40,6 +40,9 @@ import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -77,6 +80,7 @@ import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaChatRoomListenerInterface;
 import nz.mega.sdk.MegaNode;
+import nz.mega.sdk.MegaNodeList;
 import nz.mega.sdk.MegaUser;
 
 public class ChatActivityLollipop extends PinActivityLollipop implements MegaChatRequestListenerInterface, MegaChatRoomListenerInterface, RecyclerView.OnItemTouchListener, GestureDetector.OnGestureListener, View.OnClickListener, EmojiconGridFragment.OnEmojiconClickedListener, EmojiconsFragment.OnEmojiconBackspaceClickedListener {
@@ -1102,9 +1106,12 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             MegaNode node = megaApi.getNodeByHandle(fileHandle);
             if(node!=null){
                 log("Node to send: "+node.getName());
+                MegaNodeList nodeList = MegaNodeList.createInstance();
+                nodeList.addNode(node);
+                megaChatApi.attachNodes(idChat, nodeList, this);
+
             }
-//
-//            nC.sendToInbox(fileHandle, selectedContacts);
+
         }
         else{
             log("Error onActivityResult");
@@ -2562,7 +2569,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         if(messages.size()>1) {
             long userHandleToCompare = -1;
             if ((messageToShow.getMessage().getType() == MegaChatMessage.TYPE_PRIV_CHANGE) || (messageToShow.getMessage().getType() == MegaChatMessage.TYPE_ALTER_PARTICIPANTS)) {
-                userHandleToCompare = messageToShow.getMessage().getUserHandleOfAction();
+                userHandleToCompare = messageToShow.getMessage().getHandleOfAction();
             } else {
                 userHandleToCompare = messageToShow.getMessage().getUserHandle();
             }
@@ -2574,7 +2581,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 //                log("MY message!!: "+messageToShow.getContent());
                 long previousUserHandleToCompare = -1;
                 if ((previousMessage.getMessage().getType() == MegaChatMessage.TYPE_PRIV_CHANGE) || (messageToShow.getMessage().getType() == MegaChatMessage.TYPE_ALTER_PARTICIPANTS)) {
-                    previousUserHandleToCompare = previousMessage.getMessage().getUserHandleOfAction();
+                    previousUserHandleToCompare = previousMessage.getMessage().getHandleOfAction();
                 } else {
                     previousUserHandleToCompare = previousMessage.getMessage().getUserHandle();
                 }
@@ -2611,7 +2618,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 //                    log("previous message: "+previousMessage.getContent());
                 long previousUserHandleToCompare = -1;
                 if ((previousMessage.getMessage().getType() == MegaChatMessage.TYPE_PRIV_CHANGE) || (messageToShow.getMessage().getType() == MegaChatMessage.TYPE_ALTER_PARTICIPANTS)) {
-                    previousUserHandleToCompare = previousMessage.getMessage().getUserHandleOfAction();
+                    previousUserHandleToCompare = previousMessage.getMessage().getHandleOfAction();
                 } else {
                     previousUserHandleToCompare = previousMessage.getMessage().getUserHandle();
                 }
@@ -2735,7 +2742,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
             long userHandleToCompare = -1;
             if ((msg.getMessage().getType() == MegaChatMessage.TYPE_PRIV_CHANGE) || (msg.getMessage().getType() == MegaChatMessage.TYPE_ALTER_PARTICIPANTS)) {
-                userHandleToCompare = msg.getMessage().getUserHandleOfAction();
+                userHandleToCompare = msg.getMessage().getHandleOfAction();
             } else {
                 userHandleToCompare = msg.getMessage().getUserHandle();
             }
@@ -2744,7 +2751,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 //                log("MY message!!: "+messageToShow.getContent());
                 long previousUserHandleToCompare = -1;
                 if ((previousMessage.getMessage().getType() == MegaChatMessage.TYPE_PRIV_CHANGE) || (msg.getMessage().getType() == MegaChatMessage.TYPE_ALTER_PARTICIPANTS)) {
-                    previousUserHandleToCompare = previousMessage.getMessage().getUserHandleOfAction();
+                    previousUserHandleToCompare = previousMessage.getMessage().getHandleOfAction();
                 } else {
                     previousUserHandleToCompare = previousMessage.getMessage().getUserHandle();
                 }
@@ -2781,7 +2788,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 //                    log("previous message: "+previousMessage.getContent());
                 long previousUserHandleToCompare = -1;
                 if ((previousMessage.getMessage().getType() == MegaChatMessage.TYPE_PRIV_CHANGE) || (msg.getMessage().getType() == MegaChatMessage.TYPE_ALTER_PARTICIPANTS)) {
-                    previousUserHandleToCompare = previousMessage.getMessage().getUserHandleOfAction();
+                    previousUserHandleToCompare = previousMessage.getMessage().getHandleOfAction();
                 } else {
                     previousUserHandleToCompare = previousMessage.getMessage().getUserHandle();
                 }
@@ -2948,6 +2955,18 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 else{
                     showSnackbar(getString(R.string.add_participant_error));
                 }
+            }
+        }
+        else if(request.getType() == MegaChatRequest.TYPE_ATTACH_NODE_MESSAGE){
+            if(e.getErrorCode()==MegaChatError.ERROR_OK){
+                log("File sent correctly");
+                MegaNodeList nodeList = request.getMegaNodeList();
+                for(int i = 0; i<nodeList.size();i++){
+                    log("Node name: "+nodeList.get(i).getName());
+                }
+            }
+            else{
+                log("File NOT sent: "+e.getErrorCode());
             }
         }
     }

@@ -19,7 +19,7 @@ import nz.mega.sdk.MegaError;
 public class ChatNonContactNameListener implements MegaChatRequestListenerInterface {
 
     Context context;
-    MegaChatLollipopAdapter.ViewHolderMessageChatList holder;
+    MegaChatLollipopAdapter.ViewHolderTextMessageChat holder;
     MegaChatLollipopAdapter adapter;
     boolean isUserHandle;
     DatabaseHandler dbH;
@@ -31,7 +31,7 @@ public class ChatNonContactNameListener implements MegaChatRequestListenerInterf
     boolean receivedLastName = false;
     MegaApiAndroid megaApi;
 
-    public ChatNonContactNameListener(Context context, MegaChatLollipopAdapter.ViewHolderMessageChatList holder, MegaChatLollipopAdapter adapter, long userHandle) {
+    public ChatNonContactNameListener(Context context, MegaChatLollipopAdapter.ViewHolderTextMessageChat holder, MegaChatLollipopAdapter adapter, long userHandle) {
         this.context = context;
         this.holder = holder;
         this.adapter = adapter;
