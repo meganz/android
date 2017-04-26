@@ -46,9 +46,8 @@ import nz.mega.sdk.MegaChatRoom;
 public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements View.OnClickListener {
 
     public static final int ITEM_VIEW_TYPE_NORMAL = 0;
-    public static final int ITEM_VIEW_TYPE_IMAGE = 1;
-    public static final int ITEM_VIEW_TYPE_FILE= 2;
-    public static final int ITEM_VIEW_TYPE_CONTACT= 3;
+    public static final int ITEM_VIEW_TYPE_FILE= 1;
+    public static final int ITEM_VIEW_TYPE_CONTACT= 2;
 
     public static int LEFT_MARGIN_CONTACT_MSG_MANAGEMENT = 40;
     public static int RIGHT_MARGIN_CONTACT_MSG_MANAGEMENT = 68;
@@ -201,7 +200,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
         View v = null;
         if(viewType == ITEM_VIEW_TYPE_NORMAL) {
-            v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_message_chat, parent, false);
+            v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_text_message_chat, parent, false);
             holder = new ViewHolderTextMessageChat(v);
             holder.itemLayout = (RelativeLayout) v.findViewById(R.id.message_chat_item_layout);
             holder.dateLayout = (RelativeLayout) v.findViewById(R.id.message_chat_date_layout);
@@ -337,7 +336,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
         }
         else{
-            v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_message_chat, parent, false);
+            v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_text_message_chat, parent, false);
             holderImage = new ViewHolderImageMessageChat(v);
 
             v.setTag(holderImage);
@@ -1179,6 +1178,9 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                         }
                         else if(message.getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT){
                             ((ViewHolderTextMessageChat)holder).contentOwnMessageText.setTextColor(ContextCompat.getColor(context, R.color.accentColor));
+
+
+
                             messageContent = "An attachment was sent";
                         }
                         else if(message.getType()==MegaChatMessage.TYPE_REVOKE_NODE_ATTACHMENT){
@@ -1978,7 +1980,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         int type = message.getMessage().getType();
         switch (type){
             case MegaChatMessage.TYPE_NODE_ATTACHMENT:{
-                return ITEM_VIEW_TYPE_IMAGE;
+                return ITEM_VIEW_TYPE_FILE;
             }
             case MegaChatMessage.TYPE_CONTACT_ATTACHMENT:{
                 return ITEM_VIEW_TYPE_NORMAL;
