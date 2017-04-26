@@ -520,7 +520,6 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 
 								megaApi.setNodeDuration(node, secondsAprox, null);
 							}
-
 						}
 					}
 					else{
@@ -659,10 +658,11 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 					}	
 				}
 				else{
-					Intent tempIntent = null;
-					tempIntent = new Intent(this, UploadService.class);
-					tempIntent.setAction(UploadService.ACTION_CANCEL);
-					startService(tempIntent);
+					log("ERROR - node is NULL");
+//					Intent tempIntent = null;
+//					tempIntent = new Intent(this, UploadService.class);
+//					tempIntent.setAction(UploadService.ACTION_CANCEL);
+//					startService(tempIntent);
 				}
 			}
 			else if(e.getErrorCode()==MegaError.API_EOVERQUOTA){
@@ -680,10 +680,11 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 				startService(tempIntent);	
 			}
 			else{
-				Intent tempIntent = null;
-				tempIntent = new Intent(this, UploadService.class);
-				tempIntent.setAction(UploadService.ACTION_CANCEL);
-				startService(tempIntent);
+				log("ERROR: "+e.getErrorCode());
+//				Intent tempIntent = null;
+//				tempIntent = new Intent(this, UploadService.class);
+//				tempIntent.setAction(UploadService.ACTION_CANCEL);
+//				startService(tempIntent);
 			}
 		}
 	}
