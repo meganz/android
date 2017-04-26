@@ -4,7 +4,6 @@
     <string name="full_description_text" context="Full description text of the app in the Google Play page of the app">MEGA je bezpečné cloudové úložisko, ktoré vám dá 50GB zdarma. Narozdiel od iných poskytovateľov cloudových úložísk, u nás sú vaše dáta vždy šifrované na vašich zariadeniach a nikdy nie u nás.Vaše dáta sú prístupné kedykoľvek, kdekoľvek a z akéhokoľvek zariadenia. Zdieľajte priečinky svojim kontaktom a sledujte ich zmeny v reálnom čase.Cloud vo vašom vrecku. Pristupujte k svojim súborom a streamujte ich z vášho smartfónu či tabletu. Nahrávajte a synchronizujte svoje médiá do cloudu.Prehľadávajte, ukladajte, sťahujte, prezerajte, zdieľajte, premenovávajte alebo mažte svoje súbory. Všetko je vo vašich rukách.Pre viac informácií navštívte našu webovú stránku: http://mega.nz/</string>
     <string name="short_description_text" context="Short description text of the app in the Google Play page of the app">MEGA je Cloduvé úložisko s výkonným, vždy zapnutým súkromím. 50GB zdarma</string>
     
-    <string name="general_total_size" context="label for the total file size of multiple files and/or folders (no need to put the colon punctuation in the translation)">Ceľková veľkosť</string>
     <string name="general_x_of_x" context="Showing progress of elements. Example: 2 of 10."> z </string>
     <string name="general_yes" context="Answer for confirmation dialog.">Áno</string>
     <string name="general_no" context="Answer for confirmation dialog.">Nie</string>

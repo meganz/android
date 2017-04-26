@@ -3,8 +3,7 @@
     
     <string name="full_description_text" context="Full description text of the app in the Google Play page of the app">MEGA este un serviciu sigur de stocare în cloud care îţi oferă 50GB gratuit. Spre deosebire de ceilalţi furnizori de stocare în cloud, datele tale sunt criptate şi decriptate doar de către dispozitivele clientului şi niciodată de către noi.Datele tale sunt accesibile oricând, de pe orice dispozitiv, oriunde. Partajează foldere cu contactele tale şi vezi modificările acestora în timp real.Stocare în cloud la purtător. Accesează şi transmite-ţi fişierele de pe smartphone sau tabletă. Încarcă şi sincronizează conţinutul tău media în cloud.Caută, stochează, descarcă, difuzează, vezi, partajează, redenumeşte sau şterge fişiere. Ai totul la dispoziţie în mâinile tale.Pentru mai multe informaţii te rugăm să verifici site-ul nostru:https://mega.nz/</string>
     <string name="short_description_text" context="Short description text of the app in the Google Play page of the app">MEGA reprezintă stocare în cloud cu o confideţialitate puternică mereu în funcţiune. 50GB gratuit</string>
-    
-    <string name="general_total_size" context="label for the total file size of multiple files and/or folders (no need to put the colon punctuation in the translation)">Mărime totală</string>
+
     <string name="general_x_of_x" context="Showing progress of elements. Example: 2 of 10.">din</string>
     <string name="general_yes" context="Answer for confirmation dialog.">Da</string>
     <string name="general_no" context="Answer for confirmation dialog.">Nu</string>

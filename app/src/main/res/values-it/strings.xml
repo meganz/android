@@ -2,8 +2,7 @@
 <resources>
     <string name="full_description_text" context="Full description text of the app in the Google Play page of the app">MEGA è un servizio di cloud storage sicuro che ti rende disponibili 50GB gratuiti. Diversamente dagli altri fornitori di cloud storage, i dati sono cifrati e decifrati solamente dai dispositivi client e non da noi.I tuoi dati sono accessibili in qualsiasi momento, da qualsiasi dispositivo, ovunque. Condividi le cartelle con i tuoi contatti e vedi i loro aggiornamenti in tempo reale.La nuvola nella tu tasca. Accesso e streaming dei tuoi file da smartphone o tablet. Carica e sincronizza i tuoi documenti in cloud.Cerca, memorizza, scarica, stream, visualizza, condividi, rinomina o elimina i tuoi files. È tutto lì - nel palmo delle tue mani.Per maggiori informazioni, consulta il nostro sito web: https://mega.nz/</string>
     <string name="short_description_text" context="Short description text of the app in the Google Play page of the app">MEGA e un servizio di stoccaggio datti online crittografato e con 50 GB di spazio gratis</string>
-    
-    <string name="general_total_size" context="label for the total file size of multiple files and/or folders (no need to put the colon punctuation in the translation)">Dimensione Totale</string>
+
     <string name="general_x_of_x" context="Showing progress of elements. Example: 2 of 10.">di</string>
     <string name="general_yes" context="Answer for confirmation dialog.">Si</string>
     <string name="general_no" context="Answer for confirmation dialog.">No</string>

@@ -3,8 +3,7 @@
     
     <string name="full_description_text" context="Full description text of the app in the Google Play page of the app">MEGA là một dịch vụ lưu trữ trên nền điện toán đám mây cung cấp cho bạn 50 GB không gian lưu trữ miễn phí. Không giống như các hãng dịch vụ khác, toàn bộ dữ liệu của bạn hoàn toàn được mã hóa và chỉ có thể giải mã bởi bạn và các thiết bị của bạn, và chúng tôi sẽ chẳng bao giờ tự giải mã được dù của bất kỳ ai.Bạn có thể truy cập mọi lúc, mọi nơi từ thiết bị của bạn. Các thư mục chia sẻ chung với bạn, mọi thay đổi sẽ được cập nhật từng giây.Mang cả "mây" vào trong túi quần của bạn, chỉ với một cú chạm. Truy cập và truyền tải tệp tin, mọi nội dung số từ điện thoại của bạn hay máy tính bảng lên mây, và theo bạn bất cứ nơi đâu.Quản lý, tìm kiếm, lưu trữ, tải xuống, truyền dữ liệu, xem, chia sẻ, đổi tên hoặc xóa tệp tin. Tất cả đều có trong đây - một ứng dụng nằm trong tầm tay của bạn.Để biết thêm thông tin chi tiết, xin truy cập website:https://mega.nz/</string>
     <string name="short_description_text" context="Short description text of the app in the Google Play page of the app">MEGA  - Dịch Vụ Lưu Trữ Đám Mây với Bảo Mật Nghiêm Ngặt. Cung cấp 50 GB miễn phí</string>
-    
-    <string name="general_total_size" context="label for the total file size of multiple files and/or folders (no need to put the colon punctuation in the translation)">Tổng kích thước</string>
+
     <string name="general_x_of_x" context="Showing progress of elements. Example: 2 of 10.">trong tổng</string>
     <string name="general_yes" context="Answer for confirmation dialog.">Có</string>
     <string name="general_no" context="Answer for confirmation dialog.">Không</string>

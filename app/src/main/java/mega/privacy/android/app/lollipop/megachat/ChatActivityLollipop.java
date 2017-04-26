@@ -2542,7 +2542,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         if(messages.size()>1) {
             long userHandleToCompare = -1;
             if ((messageToShow.getMessage().getType() == MegaChatMessage.TYPE_PRIV_CHANGE) || (messageToShow.getMessage().getType() == MegaChatMessage.TYPE_ALTER_PARTICIPANTS)) {
-                userHandleToCompare = messageToShow.getMessage().getUserHandleOfAction();
+                userHandleToCompare = messageToShow.getMessage().getHandleOfAction();
             } else {
                 userHandleToCompare = messageToShow.getMessage().getUserHandle();
             }
@@ -2554,7 +2554,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 //                log("MY message!!: "+messageToShow.getContent());
                 long previousUserHandleToCompare = -1;
                 if ((previousMessage.getMessage().getType() == MegaChatMessage.TYPE_PRIV_CHANGE) || (messageToShow.getMessage().getType() == MegaChatMessage.TYPE_ALTER_PARTICIPANTS)) {
-                    previousUserHandleToCompare = previousMessage.getMessage().getUserHandleOfAction();
+                    previousUserHandleToCompare = previousMessage.getMessage().getHandleOfAction();
                 } else {
                     previousUserHandleToCompare = previousMessage.getMessage().getUserHandle();
                 }
@@ -2591,7 +2591,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 //                    log("previous message: "+previousMessage.getContent());
                 long previousUserHandleToCompare = -1;
                 if ((previousMessage.getMessage().getType() == MegaChatMessage.TYPE_PRIV_CHANGE) || (messageToShow.getMessage().getType() == MegaChatMessage.TYPE_ALTER_PARTICIPANTS)) {
-                    previousUserHandleToCompare = previousMessage.getMessage().getUserHandleOfAction();
+                    previousUserHandleToCompare = previousMessage.getMessage().getHandleOfAction();
                 } else {
                     previousUserHandleToCompare = previousMessage.getMessage().getUserHandle();
                 }
@@ -2715,7 +2715,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
             long userHandleToCompare = -1;
             if ((msg.getMessage().getType() == MegaChatMessage.TYPE_PRIV_CHANGE) || (msg.getMessage().getType() == MegaChatMessage.TYPE_ALTER_PARTICIPANTS)) {
-                userHandleToCompare = msg.getMessage().getUserHandleOfAction();
+                userHandleToCompare = msg.getMessage().getHandleOfAction();
             } else {
                 userHandleToCompare = msg.getMessage().getUserHandle();
             }
@@ -2724,7 +2724,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 //                log("MY message!!: "+messageToShow.getContent());
                 long previousUserHandleToCompare = -1;
                 if ((previousMessage.getMessage().getType() == MegaChatMessage.TYPE_PRIV_CHANGE) || (msg.getMessage().getType() == MegaChatMessage.TYPE_ALTER_PARTICIPANTS)) {
-                    previousUserHandleToCompare = previousMessage.getMessage().getUserHandleOfAction();
+                    previousUserHandleToCompare = previousMessage.getMessage().getHandleOfAction();
                 } else {
                     previousUserHandleToCompare = previousMessage.getMessage().getUserHandle();
                 }
@@ -2761,7 +2761,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 //                    log("previous message: "+previousMessage.getContent());
                 long previousUserHandleToCompare = -1;
                 if ((previousMessage.getMessage().getType() == MegaChatMessage.TYPE_PRIV_CHANGE) || (msg.getMessage().getType() == MegaChatMessage.TYPE_ALTER_PARTICIPANTS)) {
-                    previousUserHandleToCompare = previousMessage.getMessage().getUserHandleOfAction();
+                    previousUserHandleToCompare = previousMessage.getMessage().getHandleOfAction();
                 } else {
                     previousUserHandleToCompare = previousMessage.getMessage().getUserHandle();
                 }

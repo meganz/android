@@ -3,8 +3,7 @@
     
     <string name="full_description_text" context="Full description text of the app in the Google Play page of the app">MEGA size ücretsiz 50 GB veren güvenli bir bulut depolama hizmetidir. Diğer bulut depolama sağlayıcıların aksine, verileriniz sadece istemci cihazda şifrelenir ve deşifre edilir, asla bizim tarafımızdan değil.Verileriniz her yerden, herhangi bir cihazdan, her zaman erişilebilirdir. Kişiler ile klasörleri paylaşın ve gerçek zamanlı olarak güncellemeleri görün.Cebinizdeki bulut. Dosyalarınıza akıllı telefon ve tabletinizden erişin. Dosyalarınızı buluta yükleyin ve senkronize edin.Dosyalarınızı arayın, saklayın, indirin, görüntüleyin, paylaşın, yeniden adlandırın veya silin. Hepsi orada - avuçlarınızın içinde. Daha fazla bilgi için, lütfen web sayfamızı ziyaret edin:https://mega.nz/</string>
     <string name="short_description_text" context="Short description text of the app in the Google Play page of the app">MEGA, Güçlü Her Zaman Aktif Gizliliğe sahip Bulut Depolama. Ücretsiz 50 GB alan.</string>
-    
-    <string name="general_total_size" context="label for the total file size of multiple files and/or folders (no need to put the colon punctuation in the translation)">Toplam boyut</string>
+
     <string name="general_x_of_x" context="Showing progress of elements. Example: 2 of 10."> /</string>
     <string name="general_yes" context="Answer for confirmation dialog.">Evet</string>
     <string name="general_no" context="Answer for confirmation dialog.">Hayır</string>

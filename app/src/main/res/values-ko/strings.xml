@@ -3,8 +3,7 @@
     
     <string name="full_description_text" context="Full description text of the app in the Google Play page of the app">MEGA는 당신에게 50GB를 무료로 주는 안전한 클라우드 저장소입니다. 다른 클라우드 저장소 제공자들과 달리, 당신의 데이터는 클라이언트 장치에 의해서만 암호화되고 해독됩니다.당신의 데이터는 언제든지 어느 정치에서, 어디서나 접근 가능합니다. 당신의 연락처와 폴더를 공유하고 그들의 업데이트를 실시간으로 보세요.클라우드는 당신의 주머니 안에 있습니다. 당신의 스마트폰 또는 타블렛에서 당신의 파일에 접근하고 스트림하세요. 클라우드에 당신의 미디어를 업로드하고 동기화하세요.당신의 파일을 검색, 저장, 다운로드, 스트림, 보기, 공유, 이름 변경 또는 삭제를 하세요. 모든 것이 가능합니다 - 당신의 손바닥 안에서.더 자세한 정보를 보려면, 우리의 웹사이트를 확인하세요: https://mega.nz</string>
     <string name="short_description_text" context="Short description text of the app in the Google Play page of the app">MEGA는 항상 작동하는 개인정보 보호 기능이 있는 클라우드 저장소입니다. 50GB는 무료입니다.</string>
-    
-    <string name="general_total_size" context="label for the total file size of multiple files and/or folders (no need to put the colon punctuation in the translation)">총 크기</string>
+
     <string name="general_x_of_x" context="Showing progress of elements. Example: 2 of 10.">개째 진행중. 전체:</string>
     <string name="general_yes" context="Answer for confirmation dialog.">예</string>
     <string name="general_no" context="Answer for confirmation dialog.">아니요</string>

@@ -3,8 +3,7 @@
     
     <string name="full_description_text" context="Full description text of the app in the Google Play page of the app">MEGA هي خدمة التخزين السحابية الآمنة التي تمنحك 50GB مجانا. خلافا لغيرها من مقدمي سحابة التخزين، يتم تشفير البيانات الخاصة بك وفك من قبل الأجهزة العميل فقط وليس من قبلنا.البيانات الخاصة بك يمكن الوصول إليها في أي وقت، من أي جهاز وفي أي مكان. مشاركة المجلدات مع جهات الاتصال الخاصة بك، ومشاهدة التحديثات في الوقت الحقيقي.السحابة في جيبك. الوصول وتشغيل الملفات من الهاتف الذكي أو الكمبيوتر اللوحي. تحميل ومزامنة الميديا الخاصة بك إلى سحابة.بحث وتخزين وتحميل،عرض، مشاركة، إعادة تسمية أو حذف الملفات الخاصة بك. كل شيء هناك - في راحة يديك.للمزيد من المعلومات، يرجى مراجعة موقعنا على الانترنت: https://mega.nz/</string>
     <string name="short_description_text" context="Short description text of the app in the Google Play page of the app">MEGA هي سحابة تخزين تتمتع دائما بقوة الخصوصية. 50GB مجانا</string>
-    
-    <string name="general_total_size" context="label for the total file size of multiple files and/or folders (no need to put the colon punctuation in the translation)">الحجم الإجمالي</string>
+
     <string name="general_x_of_x" context="Showing progress of elements. Example: 2 of 10.">من</string>
     <string name="general_yes" context="Answer for confirmation dialog.">نعم</string>
     <string name="general_no" context="Answer for confirmation dialog.">لا</string>

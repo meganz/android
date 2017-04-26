@@ -3,8 +3,7 @@
     
     <string name="full_description_text" context="Full description text of the app in the Google Play page of the app">MEGA הינו שירות אחסון בענן מאובטח אשר נותן לך 50 ג\'יגה בייט במתנה. לא כמו בשירותי ענן אחרים, המידע שלך מוצפן ומפוענח על ידי הלקוח בלבד ולא על ידינו.המידע שלך נגיש בכל זמן, מכל מכשיר, בכל מקום. שתף תיקיות עם אנשי קשר שלך וצפה בעדכונים שלהם בזמן אמת.הענן בכיס שלך. גש והזרם את כל הקבצים שלך מהטלפון החכם שלך או טאבלט. העלה וסנכרן את המדיה שלך לענן.חפש, שמור, הורד, הזרם, צפה, שתף, שנה שם או מחק את הקבצים שלך. הכל שם - בכף ידך.למידע נוסף, אנא הכנס לאתר האינטרנט שלנו: https://mega.nz/</string>
     <string name="short_description_text" context="Short description text of the app in the Google Play page of the app">MEGA הינו שירות אחסון בענן בעל פרטיות מושלמת. 50 ג\'יגה בייט בחינם.</string>
-    
-    <string name="general_total_size" context="label for the total file size of multiple files and/or folders (no need to put the colon punctuation in the translation)">משקל כולל</string>
+
     <string name="general_x_of_x" context="Showing progress of elements. Example: 2 of 10.">מתוך</string>
     <string name="general_yes" context="Answer for confirmation dialog.">כן</string>
     <string name="general_no" context="Answer for confirmation dialog.">לא</string>

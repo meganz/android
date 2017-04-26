@@ -3,8 +3,7 @@
     
     <string name="full_description_text" context="Full description text of the app in the Google Play page of the app">MEGA е защитена услуга за cloud съхранение на данни, която ви дава 50GB безплатно.За разлика от други доставчици на cloud съхранение, вашите данни са криптирани и разшифровани само от клиентските устройства и никога от нас.Вашите данни са достъпни по всяко време, от всяко устройство, навсякъде. Споделяйте папки с вашите контакти и наблюдавайте техните ъпдейти в реално време.Облакът в джоба ти. Достъп и стрийм на вашите файлове от вашия смартфон или таблет. Качване и синхронизиране на файловете с облака.Търсете, съхранявайте, сваляйте, стриймвайте, преглеждайте, споделяйте, преименувайте или изтривайте вашите файлове. Всичко е там - върха дланта на ръката ви.За повече информация, моля проверете нашия уебсайт: https://mega.nz/</string>
     <string name="short_description_text" context="Short description text of the app in the Google Play page of the app">MEGA е Cloud Пространство с Мощна Винаги-Активна Поверителност. 50GB безплатно</string>
-    
-    <string name="general_total_size" context="label for the total file size of multiple files and/or folders (no need to put the colon punctuation in the translation)">Размер</string>
+
     <string name="general_x_of_x" context="Showing progress of elements. Example: 2 of 10.">от</string>
     <string name="general_yes" context="Answer for confirmation dialog.">Да</string>
     <string name="general_no" context="Answer for confirmation dialog.">Не</string>

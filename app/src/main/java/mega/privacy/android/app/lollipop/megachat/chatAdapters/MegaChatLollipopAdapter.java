@@ -327,7 +327,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
         if(message.getType()==MegaChatMessage.TYPE_ALTER_PARTICIPANTS){
             log("ALTER PARTICIPANT MESSAGE!!");
 
-            if(message.getUserHandleOfAction()==myUserHandle){
+            if(message.getHandleOfAction()==myUserHandle){
                 log("me alter participant");
 
                 if(messages.get(position).getInfoToShow()!=-1){
@@ -387,7 +387,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                 }
                 else{
                     log("I was removed or left");
-                    if(message.getUserHandle()==message.getUserHandleOfAction()){
+                    if(message.getUserHandle()==message.getHandleOfAction()){
                         log("I left the chat");
                         textToShow = String.format(context.getString(R.string.message_participant_left_group_chat), context.getString(R.string.chat_I_text));
 
@@ -529,7 +529,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                     }
                 }
 
-                holder.fullNameTitle = cC.getFullName(message.getUserHandleOfAction(), chatRoom);
+                holder.fullNameTitle = cC.getFullName(message.getHandleOfAction(), chatRoom);
 
                 if(holder.fullNameTitle==null){
                     holder.fullNameTitle = "";
@@ -542,9 +542,9 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                     if(!(holder.nameRequested)){
                         log("3-Call for nonContactName: "+ message.getUserHandle());
                         holder.nameRequested=true;
-                        ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, message.getUserHandleOfAction());
-                        megaChatApi.getUserFirstname(message.getUserHandleOfAction(), listener);
-                        megaChatApi.getUserLastname(message.getUserHandleOfAction(), listener);
+                        ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, message.getHandleOfAction());
+                        megaChatApi.getUserFirstname(message.getHandleOfAction(), listener);
+                        megaChatApi.getUserLastname(message.getHandleOfAction(), listener);
                     }
                     else{
                         log("4-Name already asked and no name received: "+ message.getUserHandle());
@@ -559,7 +559,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                         textToShow = String.format(context.getString(R.string.message_add_participant), holder.fullNameTitle, context.getString(R.string.chat_me_text));
                     }
                     else{
-//                        textToShow = String.format(context.getString(R.string.message_add_participant), message.getUserHandleOfAction()+"");
+//                        textToShow = String.format(context.getString(R.string.message_add_participant), message.getHandleOfAction()+"");
                         log("By other");
                         String fullNameAction = cC.getFullName(message.getUserHandle(), chatRoom);
 
@@ -594,7 +594,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                     }
                     else{
 
-                        if(message.getUserHandle()==message.getUserHandleOfAction()){
+                        if(message.getUserHandle()==message.getHandleOfAction()){
                             log("The participant left the chat");
 
                             textToShow = String.format(context.getString(R.string.message_participant_left_group_chat), holder.fullNameTitle);
@@ -626,7 +626,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
 
                             textToShow = String.format(context.getString(R.string.message_remove_participant), holder.fullNameTitle, fullNameAction);
                         }
-//                        textToShow = String.format(context.getString(R.string.message_remove_participant), message.getUserHandleOfAction()+"");
+//                        textToShow = String.format(context.getString(R.string.message_remove_participant), message.getHandleOfAction()+"");
                     }
                 } //END participant removed
 
@@ -642,7 +642,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
         }
         else if(message.getType()==MegaChatMessage.TYPE_PRIV_CHANGE){
             log("PRIVILEGE CHANGE message");
-            if(message.getUserHandleOfAction()==myUserHandle){
+            if(message.getHandleOfAction()==myUserHandle){
                 log("a moderator change my privilege");
                 int privilege = message.getPrivilege();
                 log("Privilege of the user: "+privilege);
@@ -852,7 +852,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                     }
                 }
 
-                holder.fullNameTitle = cC.getFullName(message.getUserHandleOfAction(), chatRoom);
+                holder.fullNameTitle = cC.getFullName(message.getHandleOfAction(), chatRoom);
 
                 if(holder.fullNameTitle==null){
                     holder.fullNameTitle = "";
@@ -865,9 +865,9 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                     if(!(holder.nameRequested)){
                         log("3-Call for nonContactName: "+ message.getUserHandle());
                         holder.nameRequested=true;
-                        ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, message.getUserHandleOfAction());
-                        megaChatApi.getUserFirstname(message.getUserHandleOfAction(), listener);
-                        megaChatApi.getUserLastname(message.getUserHandleOfAction(), listener);
+                        ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, message.getHandleOfAction());
+                        megaChatApi.getUserFirstname(message.getHandleOfAction(), listener);
+                        megaChatApi.getUserLastname(message.getHandleOfAction(), listener);
                     }
                     else{
                         log("4-Name already asked and no name received: "+ message.getUserHandle());
@@ -964,7 +964,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                 holder.ownMessageLayout.setVisibility(View.VISIBLE);
                 holder.contactMessageLayout.setVisibility(View.GONE);
 
-                if(message.getType()==MegaChatMessage.TYPE_NORMAL||message.getType()==MegaChatMessage.TYPE_ATTACHMENT||message.getType()==MegaChatMessage.TYPE_REVOKE_ATTACHMENT||message.getType()==MegaChatMessage.TYPE_CONTACT){
+                if(message.getType()==MegaChatMessage.TYPE_NORMAL||message.getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT||message.getType()==MegaChatMessage.TYPE_REVOKE_NODE_ATTACHMENT||message.getType()==MegaChatMessage.TYPE_CONTACT_ATTACHMENT){
 
                     log("Message type: "+message.getMsgId());
 
@@ -1120,15 +1120,15 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                                 holder.contentOwnMessageText.setTextColor(ContextCompat.getColor(context, R.color.name_my_account));
                             }
                         }
-                        else if(message.getType()==MegaChatMessage.TYPE_ATTACHMENT){
+                        else if(message.getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT){
                             holder.contentOwnMessageText.setTextColor(ContextCompat.getColor(context, R.color.accentColor));
                             messageContent = "An attachment was sent";
                         }
-                        else if(message.getType()==MegaChatMessage.TYPE_REVOKE_ATTACHMENT){
+                        else if(message.getType()==MegaChatMessage.TYPE_REVOKE_NODE_ATTACHMENT){
                             holder.contentOwnMessageText.setTextColor(ContextCompat.getColor(context, R.color.accentColor));
                             messageContent = "Attachment revoked";
                         }
-                        else if(message.getType()==MegaChatMessage.TYPE_CONTACT){
+                        else if(message.getType()==MegaChatMessage.TYPE_CONTACT_ATTACHMENT){
                             holder.contentOwnMessageText.setTextColor(ContextCompat.getColor(context, R.color.accentColor));
                             messageContent = "A contact was sent";
                         }
@@ -1354,7 +1354,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                 holder.ownMessageLayout.setVisibility(View.GONE);
                 holder.contactMessageLayout.setVisibility(View.VISIBLE);
 
-                if(message.getType()==MegaChatMessage.TYPE_NORMAL||message.getType()==MegaChatMessage.TYPE_ATTACHMENT||message.getType()==MegaChatMessage.TYPE_REVOKE_ATTACHMENT||message.getType()==MegaChatMessage.TYPE_CONTACT){
+                if(message.getType()==MegaChatMessage.TYPE_NORMAL||message.getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT||message.getType()==MegaChatMessage.TYPE_REVOKE_NODE_ATTACHMENT||message.getType()==MegaChatMessage.TYPE_CONTACT_ATTACHMENT){
 
                     if(((ChatActivityLollipop) context).isGroup()){
                         Spannable name = new SpannableString(holder.fullNameTitle+"\n");
@@ -1510,15 +1510,15 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<MegaChatLollip
                                 messageContent = message.getContent();
                             }
                         }
-                        else if(message.getType()==MegaChatMessage.TYPE_ATTACHMENT){
+                        else if(message.getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT){
                             holder.contentContactMessageText.setTextColor(ContextCompat.getColor(context, R.color.accentColor));
                             messageContent = "An attachment was received";
                         }
-                        else if(message.getType()==MegaChatMessage.TYPE_REVOKE_ATTACHMENT){
+                        else if(message.getType()==MegaChatMessage.TYPE_REVOKE_NODE_ATTACHMENT){
                             holder.contentContactMessageText.setTextColor(ContextCompat.getColor(context, R.color.accentColor));
                             messageContent = "Attachment revoked";
                         }
-                        else if(message.getType()==MegaChatMessage.TYPE_CONTACT){
+                        else if(message.getType()==MegaChatMessage.TYPE_CONTACT_ATTACHMENT){
                             holder.contentContactMessageText.setTextColor(ContextCompat.getColor(context, R.color.accentColor));
                             messageContent = "A contact was received";
                         }
