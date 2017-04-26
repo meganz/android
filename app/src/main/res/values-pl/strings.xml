@@ -3,8 +3,7 @@
 
     <string name="full_description_text" context="Full description text of the app in the Google Play page of the app">MEGA to bezpieczny dysk w chmurze, który udostępnia 50GB za darmo. W odróżnieniu od innych podobnych rozwiązań, Twoje dane są zawsze szyfrowane i deszyfrowane przez Twoje urządzenie a nie przez nas.Twoje dane są dostępne z każdego urządzenia, w dowolnym czasie. Udostępniaj katalogi swoim znajomym i obserwuj zmiany na żywo.Chmura w Twojej kieszeni dzięki której udostępniasz pliki ze swojego telefonu lub tableta. Wgrywaj i synchronizuj pliki w chmurze.Szukaj, wgrywaj, pobieraj, udostępniaj, zmieniaj i kasuj swoje pliki. Wszystko to jest dostępne tutaj - w zasięgu Twojej ręki.Więcej informacji znajdziesz na naszej stronie: https://mega.nz/</string>
     <string name="short_description_text" context="Short description text of the app in the Google Play page of the app">MEGA to dysk w chmurze z pełnym wsparciem prywatności. 50GB za darmo</string>
-    
-    <string name="general_total_size" context="label for the total file size of multiple files and/or folders (no need to put the colon punctuation in the translation)">Całkowity rozmiar</string>
+
     <string name="general_x_of_x" context="Showing progress of elements. Example: 2 of 10.">z</string>
     <string name="general_yes" context="Answer for confirmation dialog.">Tak</string>
     <string name="general_no" context="Answer for confirmation dialog.">Nie</string>

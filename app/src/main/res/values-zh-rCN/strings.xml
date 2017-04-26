@@ -4,7 +4,6 @@
     <string name="full_description_text" context="Full description text of the app in the Google Play page of the app">MEGA提供安全的云存储服务并赠送50 GB 免费空间。与其它云存储服务商不同的是，数据的加密和解密始终不经过我们，而只通过您的设备进行。您可以在任何设备上随时随地访问您的数据，与您的联系人共享文件夹，并即时查看他们的更新。云端就在您的口袋！通过您的智能手机或平板电脑访问和传输您的数据。上载并同步您的多媒体文件到云端。搜索，存储、下载、传输、查看、共享、重命名或删除您的文件。 一切尽在掌中！更多详情，请登录我们的网站： http://mega.nz</string>
     <string name="short_description_text" context="Short description text of the app in the Google Play page of the app">MEGA，时刻保护您的隐私的强大的云存储。我们提供 50 GB 的免费空间。</string>
     
-    <string name="general_total_size" context="label for the total file size of multiple files and/or folders (no need to put the colon punctuation in the translation)">总大小</string>
     <string name="general_x_of_x" context="Showing progress of elements. Example: 2 of 10.">共</string>
     <string name="general_yes" context="Answer for confirmation dialog.">是</string>
     <string name="general_no" context="Answer for confirmation dialog.">否</string>

@@ -2030,24 +2030,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					log("onPostResume: Path of the avatar: "+path);
 					megaApi.setAvatar(path, this);
 				}
-    			else if (intent.getAction().equals(Constants.ACTION_CANCEL_UPLOAD) || intent.getAction().equals(Constants.ACTION_CANCEL_DOWNLOAD) || intent.getAction().equals(Constants.ACTION_CANCEL_CAM_SYNC)){
+    			else if (intent.getAction().equals(Constants.ACTION_CANCEL_CAM_SYNC)){
     				log("onPostResume: ACTION_CANCEL_UPLOAD or ACTION_CANCEL_DOWNLOAD or ACTION_CANCEL_CAM_SYNC");
 					Intent tempIntent = null;
 					String title = null;
 					String text = null;
-					if(intent.getAction().equals(Constants.ACTION_CANCEL_UPLOAD)){
-						tempIntent = new Intent(this, UploadService.class);
-						tempIntent.setAction(UploadService.ACTION_CANCEL);
-						title = getString(R.string.upload_uploading);
-						text = getString(R.string.upload_cancel_uploading);
-					}
-					else if (intent.getAction().equals(Constants.ACTION_CANCEL_DOWNLOAD)){
-						tempIntent = new Intent(this, DownloadService.class);
-						tempIntent.setAction(DownloadService.ACTION_CANCEL);
-						title = getString(R.string.download_downloading);
-						text = getString(R.string.download_cancel_downloading);
-					}
-					else if (intent.getAction().equals(Constants.ACTION_CANCEL_CAM_SYNC)){
+					if (intent.getAction().equals(Constants.ACTION_CANCEL_CAM_SYNC)){
 						tempIntent = new Intent(this, CameraSyncService.class);
 						tempIntent.setAction(CameraSyncService.ACTION_CANCEL);
 						title = getString(R.string.cam_sync_syncing);

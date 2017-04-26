@@ -3,8 +3,7 @@
    
     <string name="full_description_text" context="Full description text of the app in the Google Play page of the app">O MEGA é um serviço de armazenamento em nuvem que te dá 500GB gratuitamente. Diferente de outros provedores de armazenamento em nuvem, seus dados são criptografados e descriptografados apenas pelos dispositivos e nunca por nós.Seus dados são acessíveis o tempo todo, de qualquer dispositivo, em qualquer lugar. Compartilhe pastas com seus contatos e veja as atualizações em tempo real.A nuvem no seu bolso. Acesse e transmita os dados do seu celular ou tablet. Envie e sincronize seus arquivos de mídia para a nuvem.Procure, armazene, baixe, transmita, visualize, compartilhe, renomeie ou delete seus arquivos. Está tudo lá - na palma de suas mãos.Para mais informações, por favor visite nosso site: https://mega.nz/</string>
     <string name="short_description_text" context="Short description text of the app in the Google Play page of the app">MEGA é o armazenamento na nuvem com privacidade poderosa sempre ativada. 50GB gratuitos</string>
-    
-    <string name="general_total_size" context="label for the total file size of multiple files and/or folders (no need to put the colon punctuation in the translation)">Tamanho total</string>
+
     <string name="general_x_of_x" context="Showing progress of elements. Example: 2 of 10.">de</string>
     <string name="general_yes" context="Answer for confirmation dialog.">Sim</string>
     <string name="general_no" context="Answer for confirmation dialog.">Não</string>

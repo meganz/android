@@ -3,8 +3,7 @@
     
     <string name="full_description_text" context="Full description text of the app in the Google Play page of the app">MEGA is een veilige cloud opslag dienst die je 50 GB gratis opslag geeft. In tegenstelling tot andere cloud opslag aanbieders worden je gegevens gecodeerd en gedecodeerd door je apparaat en nooit door ons. Je gegevens zijn overal en altijd beschikbaar op elk apparaat. Deel je mappen met je contacten en bekijk hun updates in real time.De cloud in je zak. Toegang en streamen van je bestanden vanaf je smartphone of tablet. Upload en synchroniseer je media naar de cloud.Zoek, bewaar, download, stream, bekijk, hernoem of verwijder je bestanden. Het is er allemaal - in de palm van je hand. Voor meer informatie, kijk dan op onze website: https://mega.nz/</string>
     <string name="short_description_text" context="Short description text of the app in the Google Play page of the app">MEGA is cloud opslag met krachtige always-on privacy. 50 GB gratis</string>
-    
-    <string name="general_total_size" context="label for the total file size of multiple files and/or folders (no need to put the colon punctuation in the translation)">Totale grootte</string>
+
     <string name="general_x_of_x" context="Showing progress of elements. Example: 2 of 10.">van de</string>
     <string name="general_yes" context="Answer for confirmation dialog.">Ja</string>
     <string name="general_no" context="Answer for confirmation dialog.">Nee</string>

@@ -3,8 +3,7 @@
     
     <string name="full_description_text" context="Full description text of the app in the Google Play page of the app">MEGA adalah layanan cloud storage yang aman yang memberikan anda 50GB gratis. Tidak seperti layanan cloud storage lainnya, data anda di enkripsi dan dekripsi oleh perangkat anda sendiri, bukan oleh kami.Data anda dapat diakses kapanpun dan dimanapun. Bagikan folder dengan kontak anda dan lihat update mereka secara real time.Cloud dalam kantong anda. Akses dan stream file anda lewat smartphone atau tablet. Upload dan sinkronisasi media anda ke cloud.Cari, simpan, download, stream, lihat, bagikan, dan beri nama atau hapus file anda. Semuanya tersedia dalam genggaman anda.Untuk info lebih lanjut, harap lihat website kami: https://mega.nz/</string>
     <string name="short_description_text" context="Short description text of the app in the Google Play page of the app">MEGA adalah Cloud Storage dengan Privacy yang sangat terjamin. 50GB gratis</string>
-    
-    <string name="general_total_size" context="label for the total file size of multiple files and/or folders (no need to put the colon punctuation in the translation)">Ukuran total</string>
+
     <string name="general_x_of_x" context="Showing progress of elements. Example: 2 of 10.">dari</string>
     <string name="general_yes" context="Answer for confirmation dialog.">Ya</string>
     <string name="general_no" context="Answer for confirmation dialog.">Tidak</string>

@@ -3,8 +3,7 @@
     
     <string name="full_description_text" context="Full description text of the app in the Google Play page of the app">Mega est un hébergeur en ligne sécurisé qui vous met gratuitement à disposition 50Go. Contrairement aux autres hébergeurs en ligne, vos données sont uniquement chiffrées et déchiffrées par les appareils du client et jamais par nous.Vos données sont accessibles quand vous voulez, à partir de n\'importe quel appareil, et où vous voulez. Partagez des dossiers entiers avec vos contacts et voyez leurs apports en temps réel.Le cloud dans votre poche. Accéder et diffuser vos fichiers depuis votre téléphone ou votre tablette. Envoyer et synchroniser vos médias dans le cloud.Cherchez, stockez, diffusez, visionnez, partagez, renommez ou supprimez vos fichiers. Tout est là, dans la paume de votre main.Pour plus d\'information, veuillez vous rendre sur notre site Internet : https://mega.nz/</string>
     <string name="short_description_text" context="Short description text of the app in the Google Play page of the app">MEGA est un Service de Cloud Avec une Confidentialité Puissante et Toujours Active. 50Go gratuit</string>
-    
-    <string name="general_total_size" context="label for the total file size of multiple files and/or folders (no need to put the colon punctuation in the translation)">Taille totale</string>
+
     <string name="general_x_of_x" context="Showing progress of elements. Example: 2 of 10.">sur</string>
     <string name="general_yes" context="Answer for confirmation dialog.">Oui</string>
     <string name="general_no" context="Answer for confirmation dialog.">Non</string>

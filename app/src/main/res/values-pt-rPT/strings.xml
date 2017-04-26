@@ -3,8 +3,7 @@
     
     <string name="full_description_text" context="Full description text of the app in the Google Play page of the app">O MEGA é um serviço de armazenamento na Cloud que te dá 50 GB gratuitamente. Ao contrário de outras empresas, aqui os teus dados são encriptados  e decifrados pelos dispositivos do cliente e nunca por nós.Os teu dados podem ser acedidos em qualquer altura e lugar, através de qualquer dispositivo. Partilha pastas com os teus contactos e vê as atualizações deles em tempo real.O poder da Cloud no teu bolso. Acede e interage com os teus ficheiros através do teu smartphone ou tablet. Transfere e sincroniza os teus ficheiros média para a Cloud.Procura, guarda, transfere, visualizar, partilha, renomeia ou apaga os teus ficheiros. Está tudo aqui - na palma das tuas mãos.Para mais informações, dá uma vista de olhos no nosso site: https://mega.nz/</string>
     <string name="short_description_text" context="Short description text of the app in the Google Play page of the app">O MEGA é um poderoso armazenamento na Cloud, com a sua privacidade acima de tudo. 50 GB totalmente grátis.</string>
-    
-    <string name="general_total_size" context="label for the total file size of multiple files and/or folders (no need to put the colon punctuation in the translation)">Tamanho total</string>
+
     <string name="general_x_of_x" context="Showing progress of elements. Example: 2 of 10.">de</string>
     <string name="general_yes" context="Answer for confirmation dialog.">Sim</string>
     <string name="general_no" context="Answer for confirmation dialog.">Não</string>

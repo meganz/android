@@ -3,9 +3,7 @@
     
     <string name="full_description_text" context="Full description text of the app in the Google Play page of the app">MEGA — це безпечний сервіс хмарного зберігання даних, що дає вам 50 ГБ безкоштовно. На відміну від інших постачальників хмарного зберігання, ваші дані шифруються і розшифровуються виключно за допомогою клієнтських пристроїв.Ваші дані доступні в будь-який час, з будь-якого пристрою, в будь-якому місці. Діліться теками з вашими контактами, і спостерігайте їх оновлення у реальному часі.Хмара у кишені. Доступ і потік ваших файлів зі смартфона або планшета. Закачуйте і синхронізуйте ваші дані у хмарі.Пошук, магазин, завантаження, струм, перегляд, обмін, перейменування або видалення файлів. Це все є — у вашій долоні.Для отримання додаткової інформації, будь ласка, відвідайте наш веб-сайт: https://mega.nz/</string>
     <string name="short_description_text" context="Short description text of the app in the Google Play page of the app">MEGA — це Хмарний сервіс збереження даних з потужною системою безпеки. 50 ГБ безкоштовно</string>
-    
-    <string name="general_total_size" context="label for the total file size of multiple files and/or folders (no need to put the colon punctuation in the translation)">Загальний розмір</string>
-    <string name="general_x_of_x" context="Showing progress of elements. Example: 2 of 10.">з</string>
+
     <string name="general_yes" context="Answer for confirmation dialog.">Так</string>
     <string name="general_no" context="Answer for confirmation dialog.">Ні</string>
     <string name="general_cancel" context="Answer for confirmation dialog.">Скасувати</string>

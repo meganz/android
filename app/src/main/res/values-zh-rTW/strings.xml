@@ -3,8 +3,7 @@
 
     <string name="full_description_text" context="Full description text of the app in the Google Play page of the app">MEGA提供安全的雲存儲服務並贈送有50GB 免費空間。與其它雲存儲服務商不同的是，數據的加密和解密始終不經過我們，而只能通過您的設備進行。您可以在任何設備上隨時隨地訪問您的數據，與您的聯系人共享文件夾，並即時查看他們的更新。雲端就在您的口袋！通過您的智能手機或平板電腦訪問和傳輸您的數據。上載並同步您的多媒體文件到雲端。搜索，存儲、下載、傳輸、查看、共享、重命名或刪除您的文件。 一切盡在掌中！更多詳情，請登錄我們的網站： http://mega.nz</string>
     <string name="short_description_text" context="Short description text of the app in the Google Play page of the app">MEGA，時刻保護您的隱私的強大的雲存儲。我們提供 50 GB 的免費空間。</string>
-    
-    <string name="general_total_size" context="label for the total file size of multiple files and/or folders (no need to put the colon punctuation in the translation)">大小總計</string>
+
     <string name="general_x_of_x" context="Showing progress of elements. Example: 2 of 10.">之</string>
     <string name="general_yes" context="Answer for confirmation dialog.">是的</string>
     <string name="general_no" context="Answer for confirmation dialog.">不是</string>

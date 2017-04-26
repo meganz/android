@@ -3,8 +3,7 @@
     
     <string name="full_description_text" context="Full description text of the app in the Google Play page of the app">MEGA is a secure cloud storage service that gives you 50GB for free.Unlike other cloud storage providers, your data is encrypted and decrypted by the client devices only and never by us.Your data is accessible any time, from any device, anywhere. Share folders with your contacts and see their updates in real time.The cloud in your pocket. Access and stream your files from your smartphone or tablet. Upload and sync your media to the cloud.Search, store, download, stream, view, share, rename or delete your files. It\'s all there - in the palm of your hands.For more info, please check our website: https://mega.co.nz/</string>
     <string name="short_description_text" context="Short description text of the app in the Google Play page of the app">MEGA es Almacenamiento en la Nube con Potenhte Privacidad Contínuamente Activa. 50GB gratis</string>
-    
-    <string name="general_total_size" context="label for the total file size of multiple files and/or folders (no need to put the colon punctuation in the translation)">Tamaño total</string>
+
     <string name="general_x_of_x" context="Showing progress of elements. Example: 2 of 10.">de</string>
     <string name="general_yes" context="Answer for confirmation dialog.">Si</string>
     <string name="general_no" context="Answer for confirmation dialog.">No</string>
@@ -896,4 +895,6 @@
     <string name="context_invitacion_reply_ignored" context="Ignored request invitacion alert">Invitación ignorada</string>
 
     <string name="offline_empty_folder" context="Text that indicates that a the offline section is currently empty">No hay archivos disponibles</string>
+
+    <string name="general_total_size" context="label for the total file size of multiple files and/or folders (no need to put the colon punctuation in the translation)" formatted="false">Tamaño total: %1$s</string>
 </resources>

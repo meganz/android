@@ -3,8 +3,7 @@
 
     <string name="full_description_text" context="Full description text of the app in the Google Play page of the app">MEGA är en säker moln lagringsservice som ger dig 50GB gratis. Gentemot andra moln lagringsservice företag, så är din data krypterad och dekrypterad av endast klientes enheter och aldrig av oss. Din data är tillgänglig alla tider på dygnet, från vilken enhet som helst och vart du än kan vara. Du kan dela dina mappar med dina kontakter och se deras uppdateringar direkt. Molnet är i din ficka. Kom åt och streama dina filer från antingen en smartphone eller en tablet. Ladda upp och synka din media till molnlagringen. Sök, affär, ladda ner, stream, visa, dela, byt namn eller ta bort dina filer. Allt finns här, bollen är i dina händer. För mer information, besök våran hemsida:https://mega.nz/</string>
     <string name="short_description_text" context="Short description text of the app in the Google Play page of the app">MEGA är en molnlagringstjänst med kraftfull kryptering. 50GB gratis</string>
-    
-    <string name="general_total_size" context="label for the total file size of multiple files and/or folders (no need to put the colon punctuation in the translation)">Total storlek</string>
+
     <string name="general_x_of_x" context="Showing progress of elements. Example: 2 of 10.">av</string>
     <string name="general_yes" context="Answer for confirmation dialog.">Ja</string>
     <string name="general_no" context="Answer for confirmation dialog.">Nej</string>
