@@ -1151,7 +1151,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		    		if (newIntent.getAction().equals(Constants.ACTION_EXPORT_MASTER_KEY) || newIntent.getAction().equals(Constants.ACTION_OPEN_MEGA_LINK) || newIntent.getAction().equals(Constants.ACTION_OPEN_MEGA_FOLDER_LINK)){
 		    			openLink = true;
 		    		}
-		    		else if (newIntent.getAction().equals(Constants.ACTION_CANCEL_UPLOAD) || newIntent.getAction().equals(Constants.ACTION_CANCEL_DOWNLOAD) || newIntent.getAction().equals(Constants.ACTION_CANCEL_CAM_SYNC)){
+		    		else if (newIntent.getAction().equals(Constants.ACTION_CANCEL_CAM_SYNC)){
 						Intent cancelTourIntent = new Intent(this, LoginActivityLollipop.class);
 						cancelTourIntent.putExtra("visibleFragment", Constants. TOUR_FRAGMENT);
 						cancelTourIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -1449,7 +1449,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						finish();
 						return;
 					}
-					else if (getIntent().getAction().equals(Constants.ACTION_CANCEL_UPLOAD) || getIntent().getAction().equals(Constants.ACTION_CANCEL_DOWNLOAD) || getIntent().getAction().equals(Constants.ACTION_CANCEL_CAM_SYNC)){
+					else if (getIntent().getAction().equals(Constants.ACTION_CANCEL_CAM_SYNC)){
 						Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
 						intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
 						intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);

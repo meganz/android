@@ -518,7 +518,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                         action = Constants.ACTION_OPEN_MEGA_LINK;
                         url = intentReceived.getDataString();
                     }
-                    else if (intentReceived.getAction().equals(Constants.ACTION_CANCEL_UPLOAD) || intentReceived.getAction().equals(Constants.ACTION_CANCEL_DOWNLOAD) || intentReceived.getAction().equals(Constants.ACTION_CANCEL_CAM_SYNC)){
+                    else if (intentReceived.getAction().equals(Constants.ACTION_CANCEL_CAM_SYNC)){
                         action = intentReceived.getAction();
                     }
                     else if(intentReceived.getAction().equals(Constants.ACTION_CHANGE_MAIL)){
