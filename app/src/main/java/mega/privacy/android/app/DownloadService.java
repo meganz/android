@@ -691,15 +691,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 		Intent intent;
 		intent = new Intent(DownloadService.this, ManagerActivityLollipop.class);
-		if (dbH == null){
-			dbH = DatabaseHandler.getDbHandler(getApplicationContext());
-		}
-		if (dbH.getCredentials() == null){
-			intent.setAction(Constants.ACTION_CANCEL_DOWNLOAD);
-		}
-		else{
-			intent.setAction(Constants.ACTION_SHOW_TRANSFERS);
-		}
+		intent.setAction(Constants.ACTION_SHOW_TRANSFERS);
 
 		String info = Util.getProgressSize(DownloadService.this, progress, totalSizeToDownload);
 
