@@ -16,6 +16,7 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
@@ -119,6 +120,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 
 	Toolbar toolbar;
 	ActionBar aB;
+	AppBarLayout appBarLayout;
 
 	MegaUser user;
 	long chatHandle;
@@ -144,6 +146,12 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 	MenuItem shareMenuItem;
 	MenuItem viewFoldersMenuItem;
 	MenuItem startConversationMenuItem;
+
+	private void setAppBarOffset(int offsetPx){
+		CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) appBarLayout.getLayoutParams();
+		AppBarLayout.Behavior behavior = (AppBarLayout.Behavior) params.getBehavior();
+		behavior.onNestedPreScroll(fragmentContainer, appBarLayout, null, 0, 300, new int[]{0, 0});
+	}
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -179,6 +187,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			setContentView(R.layout.activity_chat_contact_properties);
 			fragmentContainer = (CoordinatorLayout) findViewById(R.id.fragment_container);
 			toolbar = (Toolbar) findViewById(R.id.toolbar);
+			appBarLayout = (AppBarLayout) findViewById(R.id.app_bar);
 			setSupportActionBar(toolbar);
 			aB = getSupportActionBar();
 			imageLayout = (RelativeLayout) findViewById(R.id.chat_contact_properties_image_layout);
@@ -199,6 +208,13 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			initialLetter = (TextView) findViewById(R.id.chat_contact_properties_toolbar_initial_letter);
 
 			dbH = DatabaseHandler.getDbHandler(getApplicationContext());
+
+			appBarLayout.post(new Runnable() {
+				@Override
+				public void run() {
+					setAppBarOffset(180);
+				}
+			});
 
 			chatHandle = extras.getLong("handle",-1);
 			if (chatHandle != -1) {
