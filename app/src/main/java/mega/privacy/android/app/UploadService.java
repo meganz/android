@@ -293,9 +293,10 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 
 		showCompleteNotification();
 
-		int total = megaApi.getTotalUploads() + megaApi.getTotalDownloads();
-
+		int total = megaApi.getNumPendingUploads() + megaApi.getNumPendingDownloads();
+		log("onQueueComplete: total of files before reset " + total);
 		if(total <= 0){
+			log("onQueueComplete: reset total uploads/downloads");
 			megaApi.resetTotalUploads();
 			megaApi.resetTotalDownloads();
 			errorCount = 0;
@@ -330,7 +331,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 		notificationTitle = getResources().getQuantityString(R.plurals.upload_service_final_notification, totalUploads, totalUploads);
 
 		if (errorCount > 0){
-			size = getResources().getQuantityString(R.plurals.upload_service_final_notification, errorCount, errorCount);
+			size = getResources().getQuantityString(R.plurals.upload_service_failed, errorCount, errorCount);
 		}
 		else{
 			String totalBytes = Formatter.formatFileSize(UploadService.this, megaApi.getTotalUploadedBytes());
@@ -595,14 +596,9 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 	@Override
 	public void onRequestFinish(MegaApiJava api, MegaRequest request,
 			MegaError e) {
-		if (request.getType() == MegaRequest.TYPE_CANCEL_TRANSFERS){
-			log("cancel_transfers received");
-			if (e.getErrorCode() == MegaError.API_OK){
-				megaApi.pauseTransfers(false, this);
-				megaApi.resetTotalUploads();
-			}
-		}
-		else if (request.getType() == MegaRequest.TYPE_COPY){
+		log("onRequestFinish "+request.getRequestString());
+		if (request.getType() == MegaRequest.TYPE_COPY){
+			log("TYPE_COPY finished");
 			if (e.getErrorCode() == MegaError.API_OK){
 				MegaNode n = megaApi.getNodeByHandle(request.getNodeHandle());
 				if (n != null){
@@ -619,7 +615,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 
 					if (megaApi.getNumPendingUploads() == 0){
 						onQueueComplete();
-					}	
+					}
 				}
 				else{
 					log("ERROR - node is NULL");
@@ -631,17 +627,17 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 			}
 			else if(e.getErrorCode()==MegaError.API_EOVERQUOTA){
 				log("OVERQUOTA ERROR: "+e.getErrorCode());
-				
+
 				Intent intent;
 				intent = new Intent(this, ManagerActivityLollipop.class);
 				intent.setAction(Constants.ACTION_OVERQUOTA_ALERT);
 				intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 				startActivity(intent);
-				
+
 				Intent tempIntent = null;
 				tempIntent = new Intent(this, UploadService.class);
 				tempIntent.setAction(UploadService.ACTION_CANCEL);
-				startService(tempIntent);	
+				startService(tempIntent);
 			}
 			else{
 				log("ERROR: "+e.getErrorCode());
