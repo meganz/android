@@ -64,10 +64,6 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	public static String EXTRA_PATH = "SAVE_PATH";
 	public static String EXTRA_FOLDER_LINK = "FOLDER_LINK";
 	public static String EXTRA_OFFLINE = "IS_OFFLINE";
-	public static String ACTION_OPEN_PDF = "OPEN_PDF";
-	public static String EXTRA_PATH_PDF = "PATH_PDF";
-	public static String ACTION_EXPLORE_ZIP = "EXPLORE_ZIP";
-	public static String EXTRA_PATH_ZIP = "PATH_ZIP";
 	public static String EXTRA_CONTACT_ACTIVITY = "CONTACT_ACTIVITY";
 	public static String EXTRA_ZIP_FILE_TO_OPEN = "FILE_TO_OPEN";
 	public static String EXTRA_OPEN_FILE = "OPEN_FILE";
@@ -76,7 +72,6 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	public static String DB_FILE = "0";
 	public static String DB_FOLDER = "1";
 
-	private int successCount = 0;
 	private int errorCount = 0;
 
 	private boolean isForeground = false;
@@ -89,8 +84,6 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	private Uri contentUri;
 
 	private boolean openFile = true;
-
-	ArrayList<MegaNode> dTreeList = null;
 
 	MegaApplication app;
 	MegaApiAndroid megaApi;
@@ -113,21 +106,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	private Notification.Builder mBuilder;
 	private NotificationManager mNotificationManager;
 
-	private SparseArray<MegaTransfer> currentTransfers;
-	private SparseArray<MegaTransfer> transfersOK;
-	private SparseArray<MegaTransfer> transfersError;
-	private SparseArray<Long> transfersDownloadedSize;
-
-	int lastTag = -1;
-	int totalToDownload;
-	int totalDownloaded;
-	int totalDownloadedError;
-	long totalSizeToDownload;
-	long totalSizeDownloaded;
-	long totalSizeDownloadedError;
-
 	MegaNode offlineNode;
-
 
 	@SuppressLint("NewApi")
 	@Override
@@ -139,29 +118,17 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		megaApi = app.getMegaApi();
 		megaApiFolder = app.getMegaApiFolder();
 
-		successCount = 0;
-
-		totalToDownload = 0;
-		totalDownloaded = 0;
-		totalDownloadedError = 0;
-		totalSizeToDownload = 0;
-		totalSizeDownloaded = 0;
-		totalSizeDownloadedError = 0;
-
 		isForeground = false;
 		canceled = false;
 
 		storeToAdvacedDevices = new HashMap<Long, Uri>();
 
-		currentTransfers = new SparseArray<MegaTransfer>();
-		transfersOK = new SparseArray<MegaTransfer>();
-		transfersError = new SparseArray<MegaTransfer>();
-		transfersDownloadedSize = new SparseArray<Long>();
-
 		int wifiLockMode = WifiManager.WIFI_MODE_FULL;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR1) {
             wifiLockMode = WifiManager.WIFI_MODE_FULL_HIGH_PERF;
         }
+
+        dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 
 		WifiManager wifiManager = (WifiManager) getApplicationContext().getApplicationContext().getSystemService(Context.WIFI_SERVICE);
 		lock = wifiManager.createWifiLock(wifiLockMode, "MegaDownloadServiceWifiLock");
@@ -186,6 +153,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		if(megaApi != null)
 		{
 			megaApi.removeRequestListener(this);
+            megaApi.removeTransferListener(this);
 		}
 
 		super.onDestroy();
@@ -214,241 +182,177 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		return START_NOT_STICKY;
 	}
 
+    protected void onHandleIntent(final Intent intent) {
+        log("onHandleIntent");
+
+        long hash = intent.getLongExtra(EXTRA_HASH, -1);
+        String url = intent.getStringExtra(EXTRA_URL);
+        isOffline = intent.getBooleanExtra(EXTRA_OFFLINE, false);
+        isFolderLink = intent.getBooleanExtra(EXTRA_FOLDER_LINK, false);
+        fromContactFile = intent.getBooleanExtra(EXTRA_CONTACT_ACTIVITY, false);
+        openFile = intent.getBooleanExtra(EXTRA_OPEN_FILE, true);
+        if(intent.getStringExtra(EXTRA_CONTENT_URI)!=null){
+            contentUri = Uri.parse(intent.getStringExtra(EXTRA_CONTENT_URI));
+        }
+
+        if(intent.getStringExtra(EXTRA_ZIP_FILE_TO_OPEN)!=null){
+            pathFileToOpen = intent.getStringExtra(EXTRA_ZIP_FILE_TO_OPEN);
+        }
+        else{
+            pathFileToOpen=null;
+        }
+
+        megaApi = app.getMegaApi();
+
+        if (isFolderLink){
+            currentDocument = megaApiFolder.getNodeByHandle(hash);
+        }
+        else{
+            currentDocument = megaApi.getNodeByHandle(hash);
+        }
+
+        if((currentDocument == null) && (url == null)){
+            log("Node not found");
+            return;
+        }
+
+        if(url != null){
+            log("Public node");
+            currentDir = new File(intent.getStringExtra(EXTRA_PATH));
+            if (currentDir != null){
+                currentDir.mkdirs();
+            }
+            megaApi.getPublicNode(url, this);
+            return;
+        }
+
+        currentDir = getDir(currentDocument, intent);
+        currentDir.mkdirs();
+        if (currentDir.isDirectory()){
+            log("currentDir is Directory");
+            currentFile = new File(currentDir, megaApi.escapeFsIncompatible(currentDocument.getName()));
+        }
+        else{
+            log("currentDir is File");
+            currentFile = currentDir;
+        }
+        log("dir: " + currentDir.getAbsolutePath() + " file: " + currentDocument.getName() + "  Size: " + currentDocument.getSize());
+        if(!checkCurrentFile(currentDocument)){
+            log("checkCurrentFile == false");
+
+            if (megaApi.getNumPendingDownloads() == 0){
+                onQueueComplete();
+            }
+
+            return;
+        }
+
+        if(!wl.isHeld()){
+            wl.acquire();
+        }
+        if(!lock.isHeld()){
+            lock.acquire();
+        }
+
+        if(contentUri!=null){
+            //To download to Advanced Devices
+            log("Download to advanced devices checked");
+            currentDir = new File(intent.getStringExtra(EXTRA_PATH));
+            currentDir.mkdirs();
+
+            if (currentDir.isDirectory()){
+                log("To download(dir): " + currentDir.getAbsolutePath() + "/");
+            }
+            else{
+                log("currentDir is not a directory");
+            }
+            storeToAdvacedDevices.put(currentDocument.getHandle(), contentUri);
+
+            if (isFolderLink){
+                megaApiFolder.startDownload(currentDocument, currentDir.getAbsolutePath() + "/", this);
+            }
+            else{
+                megaApi.startDownload(currentDocument, currentDir.getAbsolutePath() + "/", this);
+            }
+        }
+        else{
+            if (currentDir.isDirectory()){
+                log("To download(dir): " + currentDir.getAbsolutePath() + "/");
+
+                if(currentFile.exists()){
+                    log("The file already exists!");
+                    //Check the fingerprint
+                    String localFingerprint = megaApi.getFingerprint(currentFile.getAbsolutePath());
+                    String megaFingerprint = megaApi.getFingerprint(currentDocument);
+
+                    if((localFingerprint!=null) && (!localFingerprint.isEmpty()) && (megaFingerprint!=null) && (!megaFingerprint.isEmpty()))
+                    {
+                        if(localFingerprint.compareTo(megaFingerprint)!=0)
+                        {
+                            log("Delete the old version");
+                            currentFile.delete();
+                        }
+                    }
+                }
+
+                if (currentDocument.isFolder()){
+                    log("IS FOLDER_:_");
+                }
+                else{
+                    log("IS FILE_:_");
+                }
+
+                if (isFolderLink){
+                    if (megaApi.getRootNode() == null){
+                        megaApiFolder.startDownload(currentDocument, currentDir.getAbsolutePath() + "/", this);
+                        log("Root node is null");
+                        return;
+                    }
+
+                    log("Root node is not null");
+                    currentDocument = megaApiFolder.authorizeNode(currentDocument);
+                    if (currentDocument == null){
+                        log("CurrentDocument is null");
+                        megaApiFolder.startDownload(currentDocument, currentDir.getAbsolutePath() + "/", this);
+                        return;
+                    }
+                }
+
+                log("CurrentDocument is not null");
+                megaApi.startDownload(currentDocument, currentDir.getAbsolutePath() + "/", this);
+
+            }
+            else{
+                log("currentDir is not a directory");
+            }
+        }
+    }
+
 	private void onQueueComplete() {
 		log("onQueueComplete");
-		log("Stopping foreground!");
-		log("stopping service! success: " + successCount + " total: " + totalToDownload);
-		megaApi.resetTotalDownloads();
 
 		if((lock != null) && (lock.isHeld()))
 			try{ lock.release(); } catch(Exception ex) {}
 		if((wl != null) && (wl.isHeld()))
 			try{ wl.release(); } catch(Exception ex) {}
 
-		if ((successCount + errorCount) > 0){
-			if (!isOffline){
-				if (successCount == 0) {
-					log("stopping service!2");
-					showCompleteFailNotification();
-				} else {
-					log("stopping service!");
-					showCompleteSuccessNotification();
-				}
-			}
-		}
+        showCompleteNotification();
 
-		long totalFromSparse = 0;
-		for (int i=0; i<transfersDownloadedSize.size(); i++){
-			totalFromSparse += transfersDownloadedSize.valueAt(i);
-		}
-
-		log("totalSizeDownloaded: " + totalSizeDownloaded + "______ TOTALFROMSPARSE: " + totalFromSparse);
-
-		log("stopping service!!!!!!!!!!:::::::::::::::!!!!!!!!!!!!");
 		isForeground = false;
 		stopForeground(true);
 		mNotificationManager.cancel(notificationId);
 		stopSelf();
+
+		int total = megaApi.getNumPendingUploads() + megaApi.getNumPendingDownloads();
+		log("onQueueComplete: total of files before reset " + total);
+		if(total <= 0){
+			log("onQueueComplete: reset total uploads/downloads");
+			megaApi.resetTotalUploads();
+			megaApi.resetTotalDownloads();
+			errorCount = 0;
+		}
 	}
 
-	protected void onHandleIntent(final Intent intent) {
-		log("onHandleIntent");
-
-		updateProgressNotification(totalSizeDownloaded);
-
-		long hash = intent.getLongExtra(EXTRA_HASH, -1);
-		String url = intent.getStringExtra(EXTRA_URL);
-		isOffline = intent.getBooleanExtra(EXTRA_OFFLINE, false);
-		isFolderLink = intent.getBooleanExtra(EXTRA_FOLDER_LINK, false);
-		fromContactFile = intent.getBooleanExtra(EXTRA_CONTACT_ACTIVITY, false);
-		openFile = intent.getBooleanExtra(EXTRA_OPEN_FILE, true);
-		if(intent.getStringExtra(EXTRA_CONTENT_URI)!=null){
-			contentUri = Uri.parse(intent.getStringExtra(EXTRA_CONTENT_URI));
-		}
-
-		if(intent.getStringExtra(EXTRA_ZIP_FILE_TO_OPEN)!=null){
-			pathFileToOpen = intent.getStringExtra(EXTRA_ZIP_FILE_TO_OPEN);
-		}
-		else{
-			pathFileToOpen=null;
-		}
-
-//		if (isFolderLink){
-//			megaApi = app.getMegaApiFolder();
-//		}
-//		else{
-//			megaApi = app.getMegaApi();
-//		}
-
-		megaApi = app.getMegaApi();
-
-		if (isFolderLink){
-			currentDocument = megaApiFolder.getNodeByHandle(hash);
-		}
-		else{
-			currentDocument = megaApi.getNodeByHandle(hash);
-		}
-
-		if((currentDocument == null) && (url == null)){
-			log("Node not found");
-			return;
-		}
-
-		if(url != null){
-			log("Public node");
-			currentDir = new File(intent.getStringExtra(EXTRA_PATH));
-			if (currentDir != null){
-				currentDir.mkdirs();
-			}
-			megaApi.getPublicNode(url, this);
-			return;
-		}
-
-		currentDir = getDir(currentDocument, intent);
-		currentDir.mkdirs();
-		if (currentDir.isDirectory()){
-			log("currentDir is Directory");
-			currentFile = new File(currentDir, megaApi.escapeFsIncompatible(currentDocument.getName()));
-		}
-		else{
-			log("currentDir is File");
-			currentFile = currentDir;
-		}
-		log("dir: " + currentDir.getAbsolutePath() + " file: " + currentDocument.getName() + "  Size: " + currentDocument.getSize());
-		if(!checkCurrentFile(currentDocument)){
-			log("checkCurrentFile == false");
-
-			if (currentTransfers.size() == 0){
-				successCount = transfersOK.size();
-				errorCount = transfersError.size();
-				onQueueComplete();
-			}
-
-			return;
-		}
-
-		if(!wl.isHeld()){
-			wl.acquire();
-		}
-		if(!lock.isHeld()){
-			lock.acquire();
-		}
-
-		if(contentUri!=null){
-			//To download to Advanced Devices
-			log("Download to advanced devices checked");
-			currentDir = new File(intent.getStringExtra(EXTRA_PATH));
-			currentDir.mkdirs();
-
-			if (currentDir.isDirectory()){
-				log("To download(dir): " + currentDir.getAbsolutePath() + "/");
-			}
-			else{
-				log("currentDir is not a directory");
-			}
-			storeToAdvacedDevices.put(currentDocument.getHandle(), contentUri);
-
-			if (isFolderLink){
-				megaApiFolder.startDownload(currentDocument, currentDir.getAbsolutePath() + "/", this);
-			}
-			else{
-				megaApi.startDownload(currentDocument, currentDir.getAbsolutePath() + "/", this);
-			}
-		}
-		else{
-			if (currentDir.isDirectory()){
-				log("To download(dir): " + currentDir.getAbsolutePath() + "/");
-
-				if(currentFile.exists()){
-					log("The file already exists!");
-					//Check the fingerprint				
-					String localFingerprint = megaApi.getFingerprint(currentFile.getAbsolutePath());
-					String megaFingerprint = megaApi.getFingerprint(currentDocument);
-
-					if((localFingerprint!=null) && (!localFingerprint.isEmpty()) && (megaFingerprint!=null) && (!megaFingerprint.isEmpty()))
-					{
-						if(localFingerprint.compareTo(megaFingerprint)!=0)
-						{
-							log("Delete the old version");
-							currentFile.delete();
-						}
-					}
-				}
-
-				if (currentDocument.isFolder()){
-					log("IS FOLDER_:_");
-				}
-				else{
-					log("IS FILE_:_");
-				}
-
-				if (isFolderLink){
-					if (megaApi.getRootNode() == null){
-						megaApiFolder.startDownload(currentDocument, currentDir.getAbsolutePath() + "/", this);
-						log("Root node is null");
-						return;
-					}
-
-					log("Root node is not null");
-					currentDocument = megaApiFolder.authorizeNode(currentDocument);
-					if (currentDocument == null){
-						log("CurrentDocument is null");
-						megaApiFolder.startDownload(currentDocument, currentDir.getAbsolutePath() + "/", this);
-						return;
-					}
-
-
-//					if (currentDocument.isFolder()){
-//						megaApiFolder.startDownload(currentDocument, currentDir.getAbsolutePath() + "/", this);
-//						return;
-//					}
-//					else{
-////						if (dbH == null){
-////							dbH = DatabaseHandler.getDbHandler(getApplicationContext());
-////						}
-////
-////						if (dbH == null){
-////							megaApiFolder.startDownload(currentDocument, currentDir.getAbsolutePath() + "/", this);
-////							log("dBH is null");
-////							return;
-////						}
-////
-////						if (dbH.getCredentials() == null){
-////							megaApiFolder.startDownload(currentDocument, currentDir.getAbsolutePath() + "/", this);
-////							log("No credentials");
-////							return;
-////						}
-////
-//						if (megaApi.getRootNode() == null){
-//							megaApiFolder.startDownload(currentDocument, currentDir.getAbsolutePath() + "/", this);
-//							log("Root node is null");
-//							return;
-//						}
-//
-//						log("Root node is not null");
-//						currentDocument = megaApiFolder.authorizeNode(currentDocument);
-//						if (currentDocument == null){
-//							log("CurrentDocument is null");
-//							megaApiFolder.startDownload(currentDocument, currentDir.getAbsolutePath() + "/", this);
-//							return;
-//						}
-//					}
-				}
-
-				log("CurrentDocument is not null");
-				megaApi.startDownload(currentDocument, currentDir.getAbsolutePath() + "/", this);
-
-			}
-			else{
-				log("currentDir is not a directory");
-			}
-		}
-
-//		else{
-//			log("To download(file): " + currentDir.getAbsolutePath());
-//			megaApi.startDownload(document, currentDir.getAbsolutePath(), this);
-//		}
-	}
 
 	private File getDir(MegaNode document, Intent intent) {
 		log("getDir");
@@ -487,43 +391,25 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	}
 
 	/*
-	 * Show download fail notification
-	 */
-	private void showCompleteFailNotification() {
-		log("showCompleteFailNotification");
-		String title = getString(R.string.download_failed);
-		String message = getString(R.string.error_server_connection_problem);
-//		if(lastError != 0) message = MegaError.getErrorString(lastError);
-		Intent intent;
-		intent = new Intent(DownloadService.this, ManagerActivityLollipop.class);
-
-		mBuilderCompat
-				.setSmallIcon(R.drawable.ic_stat_notify_download)
-				.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
-				.setAutoCancel(true).setContentTitle(title)
-				.setContentText(message)
-				.setOngoing(false);
-
-		mNotificationManager.notify(notificationIdFinal, mBuilderCompat.build());
-	}
-
-	/*
 	 * Show download success notification
 	 */
-	private void showCompleteSuccessNotification() {
-		log("showCompleteSuccessNotification");
+	private void showCompleteNotification() {
+		log("showCompleteNotification");
 		String notificationTitle, size;
 
-		notificationTitle = successCount
-				+ " "
-				+ getResources().getQuantityString(R.plurals.general_num_files,
-						successCount) + " "
-				+ getString(R.string.download_downloaded);
-		size = getString(R.string.general_total_size) + " "
-				+ Formatter.formatFileSize(DownloadService.this, totalSizeToDownload);
+        int totalDownloads = megaApi.getTotalDownloads();
+        notificationTitle = getResources().getQuantityString(R.plurals.download_service_final_notification, totalDownloads, totalDownloads);
+
+        if (errorCount > 0){
+            size = getResources().getQuantityString(R.plurals.download_service_failed, errorCount, errorCount);
+        }
+        else{
+            String totalBytes = Formatter.formatFileSize(DownloadService.this, megaApi.getTotalDownloadedBytes());
+            size = getString(R.string.general_total_size, totalBytes);
+        }
 
 		Intent intent = null;
-		if(successCount != 1)
+		if(totalDownloads != 1)
 		{
 			intent = new Intent(getApplicationContext(), ManagerActivityLollipop.class);
 
@@ -656,48 +542,36 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	 * Update notification download progress
 	 */
 	@SuppressLint("NewApi")
-	private void updateProgressNotification(final long progress) {
-		log("updateProgressNotification");
-		int progressPercent = (int) Math.round((double) progress / totalSizeToDownload * 100);
-		log(progressPercent + " " + progress + " " + totalSizeToDownload);
-		int left = totalToDownload - (totalDownloaded + totalDownloadedError);
-		int current = totalToDownload - left + 1;
-		int currentapiVersion = android.os.Build.VERSION.SDK_INT;
+	private void updateProgressNotification() {
 
-		String message = "";
-		if (totalToDownload == 0){
-			message = getString(R.string.download_preparing_files);
-		}
-		else{
-			message = getString(R.string.download_downloading) + " "
-					+ current + " ";
-			if (totalToDownload == 1) {
-				message += getResources().getQuantityString(
-						R.plurals.general_num_files, 1);
-			}
-			else {
-				message += getString(R.string.general_x_of_x)
-						+ " "
-						+ totalToDownload;
+		int pendingTransfers = megaApi.getNumPendingDownloads();
+        int totalTransfers = megaApi.getTotalDownloads();
 
-				if (currentapiVersion >= android.os.Build.VERSION_CODES.HONEYCOMB)
-				{
-					message += " "
-						+ getResources().getQuantityString(
-								R.plurals.general_num_files, totalToDownload);
-				}
-			}
+        long totalSizePendingTransfer = megaApi.getTotalDownloadBytes();
+        long totalSizeTransferred = megaApi.getTotalDownloadedBytes();
+
+        int progressPercent = (int) Math.round((double) totalSizeTransferred / totalSizePendingTransfer * 100);
+        log("updateProgressNotification: "+progressPercent);
+
+        String message = "";
+        if (totalTransfers == 0){
+            message = getString(R.string.download_preparing_files);
+        }
+        else{
+            int inProgress = totalTransfers - pendingTransfers + 1;
+            message = getResources().getQuantityString(R.plurals.download_service_notification, totalTransfers, inProgress, totalTransfers);
 		}
 
 		Intent intent;
 		intent = new Intent(DownloadService.this, ManagerActivityLollipop.class);
 		intent.setAction(Constants.ACTION_SHOW_TRANSFERS);
 
-		String info = Util.getProgressSize(DownloadService.this, progress, totalSizeToDownload);
+		String info = Util.getProgressSize(DownloadService.this, totalSizePendingTransfer, totalSizeTransferred);
 
 		PendingIntent pendingIntent = PendingIntent.getActivity(DownloadService.this, 0, intent, 0);
 		Notification notification = null;
 
+        int currentapiVersion = android.os.Build.VERSION.SDK_INT;
 		if (currentapiVersion >= android.os.Build.VERSION_CODES.ICE_CREAM_SANDWICH)
 		{
 				mBuilder
@@ -751,18 +625,12 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	public void onTransferStart(MegaApiJava api, MegaTransfer transfer) {
 		log("Download start: " + transfer.getFileName() + "_" + megaApi.getTotalDownloads());
 
-		currentTransfers.put(transfer.getTag(), transfer);
-		totalToDownload++;
-		totalSizeToDownload += transfer.getTotalBytes();
-
-		log("CURRENTTRANSFERS.SIZE = " + currentTransfers.size() + "___" + "TOTALTODOWNLOAD: " + totalToDownload + "___" + "TOTALSIZETODOWNLOAD: " + totalSizeToDownload + "____" + "TRANSFER.TAG: " + transfer.getTag());
+        updateProgressNotification();
 	}
 
 	@Override
-	public void onTransferFinish(MegaApiJava api, MegaTransfer transfer,
-			MegaError error) {
-		log("Download finished: " + transfer.getFileName() + " size " + transfer.getTransferredBytes());
-		log("transfer.getPath:" + transfer.getPath());
+	public void onTransferFinish(MegaApiJava api, MegaTransfer transfer, MegaError error) {
+		log("onTransferFinish: " + transfer.getFileName());
 
 		if(transfer.getState()==MegaTransfer.STATE_COMPLETED){
 			String size = Util.getSizeString(transfer.getTotalBytes());
@@ -770,140 +638,111 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			dbH.setCompletedTransfer(completedTransfer);
 		}
 
-		int pendingTransfers = 	megaApi.getNumPendingDownloads() + megaApi.getNumPendingUploads();
-		if(pendingTransfers<=0){
-			log("Reset counter of transfers");
-			megaApi.resetTotalDownloads();
-			megaApi.resetTotalUploads();
-		}
+        updateProgressNotification();
 
-		if (canceled) {
-			if((lock != null) && (lock.isHeld()))
-				try{ lock.release(); } catch(Exception ex) {}
-			if((wl != null) && (wl.isHeld()))
-				try{ wl.release(); } catch(Exception ex) {}
+        if (canceled) {
+            if((lock != null) && (lock.isHeld()))
+                try{ lock.release(); } catch(Exception ex) {}
+            if((wl != null) && (wl.isHeld()))
+                try{ wl.release(); } catch(Exception ex) {}
 
-			log("Download cancelled: " + transfer.getFileName());
-			File file = new File(transfer.getPath());
-			file.delete();
-			DownloadService.this.cancel();
-		}
-		else{
-			if (error.getErrorCode() == MegaError.API_OK) {
-				log("Download OK: " + transfer.getFileName());
-				log("DOWNLOADFILE: " + transfer.getPath());
+            log("Download cancelled: " + transfer.getFileName());
+            File file = new File(transfer.getPath());
+            file.delete();
+            DownloadService.this.cancel();
+        }
+        else{
+            if (error.getErrorCode() == MegaError.API_OK) {
+                log("Download OK: " + transfer.getFileName());
+                log("DOWNLOADFILE: " + transfer.getPath());
 
-				//To update thumbnails for videos
-				if(Util.isVideoFile(transfer.getPath())){
-					log("Is video!!!");
-					MegaNode videoNode = megaApi.getNodeByHandle(transfer.getNodeHandle());
-					if (videoNode != null){
-						if(!videoNode.hasThumbnail()){
-							log("The video has not thumb");
-							ThumbnailUtilsLollipop.createThumbnailVideo(this, transfer.getPath(), megaApi, transfer.getNodeHandle());
-						}
-						if(videoNode.getDuration()<1){
-							log("The video has not duration!!!");
-							MediaMetadataRetriever retriever = new MediaMetadataRetriever();
-							retriever.setDataSource(transfer.getPath());
-							String time = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
-							if(time!=null){
-								double seconds = Double.parseDouble(time)/1000;
-								log("The original duration is: "+seconds);
-								int secondsAprox = (int) Math.round(seconds);
-								log("The duration aprox is: "+secondsAprox);
+                //To update thumbnails for videos
+                if(Util.isVideoFile(transfer.getPath())){
+                    log("Is video!!!");
+                    MegaNode videoNode = megaApi.getNodeByHandle(transfer.getNodeHandle());
+                    if (videoNode != null){
+                        if(!videoNode.hasThumbnail()){
+                            log("The video has not thumb");
+                            ThumbnailUtilsLollipop.createThumbnailVideo(this, transfer.getPath(), megaApi, transfer.getNodeHandle());
+                        }
+                        if(videoNode.getDuration()<1){
+                            log("The video has not duration!!!");
+                            MediaMetadataRetriever retriever = new MediaMetadataRetriever();
+                            retriever.setDataSource(transfer.getPath());
+                            String time = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
+                            if(time!=null){
+                                double seconds = Double.parseDouble(time)/1000;
+                                log("The original duration is: "+seconds);
+                                int secondsAprox = (int) Math.round(seconds);
+                                log("The duration aprox is: "+secondsAprox);
 
-								megaApi.setNodeDuration(videoNode, secondsAprox, null);
-							}
-						}
-					}
-					else{
-						log("videoNode is NULL");
-					}
-				}
-				else{
-					log("NOT video!");
-				}
+                                megaApi.setNodeDuration(videoNode, secondsAprox, null);
+                            }
+                        }
+                    }
+                    else{
+                        log("videoNode is NULL");
+                    }
+                }
+                else{
+                    log("NOT video!");
+                }
 
-				totalDownloaded++;
-				currentTransfers.remove(transfer.getTag());
-				transfersOK.put(transfer.getTag(), transfer);
-				long currentSizeDownloaded = 0;
-				if (transfersDownloadedSize.get(transfer.getTag()) != null){
-					currentSizeDownloaded = transfersDownloadedSize.get(transfer.getTag());
-				}
+                File resultFile = new File(transfer.getPath());
+                File treeParent = resultFile.getParentFile();
+                while(treeParent != null)
+                {
+                    treeParent.setReadable(true, false);
+                    treeParent.setExecutable(true, false);
+                    treeParent = treeParent.getParentFile();
+                }
+                resultFile.setReadable(true, false);
+                resultFile.setExecutable(true, false);
 
-				totalSizeDownloaded += (transfer.getTotalBytes()-currentSizeDownloaded);
-				transfersDownloadedSize.put(transfer.getTag(), transfer.getTotalBytes());
+                String filePath = transfer.getPath();
 
-				File resultFile = new File(transfer.getPath());
-				File treeParent = resultFile.getParentFile();
-				while(treeParent != null)
-				{
-					treeParent.setReadable(true, false);
-					treeParent.setExecutable(true, false);
-					treeParent = treeParent.getParentFile();
-				}
-				resultFile.setReadable(true, false);
-				resultFile.setExecutable(true, false);
+                Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+                File f = new File(filePath);
+                Uri contentUri = FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", f);
+                mediaScanIntent.setData(contentUri);
+                mediaScanIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                this.sendBroadcast(mediaScanIntent);
 
-				String filePath = transfer.getPath();
+                if(storeToAdvacedDevices.containsKey(transfer.getNodeHandle())){
+                    log("Now copy the file to the SD Card");
+                    openFile=false;
+                    Uri tranfersUri = storeToAdvacedDevices.get(transfer.getNodeHandle());
+                    MegaNode node = megaApi.getNodeByHandle(transfer.getNodeHandle());
+                    alterDocument(tranfersUri, node.getName());
+                }
 
-				Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-				File f = new File(filePath);
-			    Uri contentUri = FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", f);
-				mediaScanIntent.setData(contentUri);
-				mediaScanIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-			    this.sendBroadcast(mediaScanIntent);
+                if(isOffline){
+                    dbH = DatabaseHandler.getDbHandler(getApplicationContext());
+                    offlineNode = megaApi.getNodeByHandle(transfer.getNodeHandle());
 
-			    if(storeToAdvacedDevices.containsKey(transfer.getNodeHandle())){
-			    	log("Now copy the file to the SD Card");
-			    	openFile=false;
-			    	Uri tranfersUri = storeToAdvacedDevices.get(transfer.getNodeHandle());
-			    	MegaNode node = megaApi.getNodeByHandle(transfer.getNodeHandle());
-			    	alterDocument(tranfersUri, node.getName());
-			    }
+                    if(offlineNode!=null){
+                        saveOffline(offlineNode, transfer.getPath());
+                    }
+                }
+            }
+            else
+            {
+                log("Download Error: " + transfer.getFileName() + "_" + error.getErrorCode() + "___" + error.getErrorString());
+                errorCount++;
+                if(error.getErrorCode() == MegaError.API_EINCOMPLETE){
+                    File file = new File(transfer.getPath());
+                    file.delete();
+                }
+                else{
+                    File file = new File(transfer.getPath());
+                    file.delete();
+                }
+            }
+        }
 
-			    if(isOffline){
-					dbH = DatabaseHandler.getDbHandler(getApplicationContext());
-					offlineNode = megaApi.getNodeByHandle(transfer.getNodeHandle());
-
-					if(offlineNode!=null){
-						saveOffline(offlineNode, transfer.getPath());
-					}
-			    }
-			}
-			else
-			{
-				log("Download Error: " + transfer.getFileName() + "_" + error.getErrorCode() + "___" + error.getErrorString());
-
-				if(error.getErrorCode() == MegaError.API_EINCOMPLETE){
-					totalToDownload--;
-					totalSizeToDownload -= transfer.getTotalBytes();
-					Long currentSizeDownloaded = transfersDownloadedSize.get(transfer.getTag());
-					if (currentSizeDownloaded != null){
-						totalSizeDownloaded -= currentSizeDownloaded;
-					}
-					currentTransfers.remove(transfer.getTag());
-					File file = new File(transfer.getPath());
-					file.delete();
-				}
-				else{
-					totalDownloadedError++;
-					totalSizeDownloadedError += transfer.getTotalBytes();
-					currentTransfers.remove(transfer.getTag());
-					transfersError.put(transfer.getTag(), transfer);
-					File file = new File(transfer.getPath());
-					file.delete();
-				}
-			}
-			log("CURRENTTRANSFERS: " + currentTransfers.size() + "___ OK: " + transfersOK.size() + "___ ERROR: " + transfersError.size());
-			if (currentTransfers.size() == 0){
-				successCount = transfersOK.size();
-				errorCount = transfersError.size();
-				onQueueComplete();
-			}
-		}
+        if (megaApi.getNumPendingDownloads() == 0){
+            onQueueComplete();
+        }
 	}
 
 	private void alterDocument(Uri uri, String fileName) {
@@ -1372,17 +1211,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			return;
 		}
 
-		long currentSizeDownloaded = 0;
-		if (transfersDownloadedSize.get(transfer.getTag()) != null){
-			currentSizeDownloaded = transfersDownloadedSize.get(transfer.getTag());
-		}
-		totalSizeDownloaded += (transfer.getTransferredBytes()-currentSizeDownloaded);
-		transfersDownloadedSize.put(transfer.getTag(), transfer.getTransferredBytes());
-
-		final long bytes = transfer.getTransferredBytes();
-		log("Transfer update: " + transfer.getFileName() + "  Bytes: " + bytes);
-    	updateProgressNotification(totalSizeDownloaded);
-
+    	updateProgressNotification();
 	}
 
 	@Override
@@ -1401,15 +1230,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
 		log("onRequestFinish");
 
-		if (request.getType() == MegaRequest.TYPE_CANCEL_TRANSFERS){
-			log("cancel_transfers received");
-			if (e.getErrorCode() == MegaError.API_OK){
-				megaApi.pauseTransfers(false, this);
-				megaApi.resetTotalDownloads();
-				totalSizeToDownload = 0;
-			}
-		}
-		else if (request.getType() == MegaRequest.TYPE_PAUSE_TRANSFERS){
+		if (request.getType() == MegaRequest.TYPE_PAUSE_TRANSFERS){
 			log("pause_transfer false received");
 			if (e.getErrorCode() == MegaError.API_OK){
 				cancel();

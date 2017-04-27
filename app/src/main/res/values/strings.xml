@@ -1150,4 +1150,19 @@
         <item context="Singular" quantity="one">%1$d file not uploaded</item>
         <item context="Plural" quantity="other">%1$d files not uploaded</item>
     </plurals>
+
+    <plurals name="download_service_final_notification" context="Text of the notification shown when the download service has finished">
+        <item context="Singular" quantity="one">Downloaded %1$d file</item>
+        <item context="Plural" quantity="other">Downloaded %1$d files</item>
+    </plurals>
+
+    <plurals name="download_service_failed" context="Text of the notification shown when the download service has finished with any transfer error">
+        <item context="Singular" quantity="one">%1$d file not downloaded</item>
+        <item context="Plural" quantity="other">%1$d files not downloaded</item>
+    </plurals>
+
+    <plurals name="download_service_notification" context="Text of the notification shown when the download service is running">
+        <item context="Singular" quantity="one">Downloading %1$d of %2$d file</item>
+        <item context="Plural" quantity="other">Downloading %1$d of %2$d files</item>
+    </plurals>
 </resources>
