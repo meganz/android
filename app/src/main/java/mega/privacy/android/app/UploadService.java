@@ -358,9 +358,9 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 		int totalTransfers = megaApi.getTotalUploads();
 
 		long totalSizePendingTransfer = megaApi.getTotalUploadBytes();
-		long totalSizeTransfered = megaApi.getTotalUploadedBytes();
+		long totalSizeTransferred = megaApi.getTotalUploadedBytes();
 
-		int progressPercent = (int) Math.round((double) totalSizeTransfered / totalSizePendingTransfer * 100);
+		int progressPercent = (int) Math.round((double) totalSizeTransferred / totalSizePendingTransfer * 100);
 		log("updateProgressNotification: "+progressPercent);
 		
 		String message = "";
@@ -371,7 +371,9 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 			int inProgress = totalTransfers - pendingTransfers + 1;
 			message = getResources().getQuantityString(R.plurals.upload_service_notification, totalTransfers, inProgress, totalTransfers);
 		}
-		
+
+		String info = Util.getProgressSize(UploadService.this, totalSizePendingTransfer, totalSizeTransferred);
+
 		Intent intent;
 		intent = new Intent(UploadService.this, ManagerActivityLollipop.class);
 		intent.setAction(Constants.ACTION_SHOW_TRANSFERS);
@@ -385,7 +387,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 			.setSmallIcon(R.drawable.ic_stat_notify_upload)
 			.setProgress(100, progressPercent, false)
 			.setContentIntent(pendingIntent)
-			.setOngoing(true).setContentTitle(message)
+			.setOngoing(true).setContentTitle(message).setContentInfo(info)
 			.setContentText(getString(R.string.download_touch_to_show))
 			.setOnlyAlertOnce(true);
 			notification = mBuilder.getNotification();
@@ -399,6 +401,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 			notification.contentIntent = pendingIntent;
 			notification.contentView.setImageViewResource(R.id.status_icon, R.drawable.ic_stat_notify_upload);
 			notification.contentView.setTextViewText(R.id.status_text, message);
+			notification.contentView.setTextViewText(R.id.progress_text, info);
 			notification.contentView.setProgressBar(R.id.status_progress, 100, progressPercent, false);
 		}
 			
@@ -573,8 +576,6 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 				}
 			}
 
-			final long bytes = transfer.getTransferredBytes();
-			log("Transfer update: " + transfer.getFileName() + "  Bytes: " + bytes);
 			updateProgressNotification();
 		}
 	}
