@@ -11253,6 +11253,25 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		outSpaceHandler.postDelayed(outSpaceRunnable,3000);
 	}
 
+	public void showTransferOverquotaDialog(){
+		log("showTransferOverquotaDialog");
+
+		AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+
+		LayoutInflater inflater = this.getLayoutInflater();
+		View dialogView = inflater.inflate(R.layout.transfer_overquota_layout, null);
+		dialogBuilder.setView(dialogView);
+
+//		Text editText = (EditText) dialogView.findViewById(R.id.label_field);
+//		editText.setText("test label");
+
+
+
+		AlertDialog alertDialog = dialogBuilder.create();
+		alertDialog.show();
+
+	}
+
 	public void updateCancelSubscriptions(){
 		log("updateCancelSubscriptions");
 		if (cancelSubscription != null){
