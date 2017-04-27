@@ -75,6 +75,7 @@ import android.widget.CompoundButton;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
@@ -1858,6 +1859,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 		}
 		log("END onCreate");
+		showTransferOverquotaDialog();
 	}
 
 	@Override
@@ -10084,6 +10086,23 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
     	return;
 	}
 
+	public void navigateToUpgradeAccount(){
+		log("navigateToUpgradeAccount");
+		drawerItem = DrawerItem.ACCOUNT;
+		if (nV != null){
+			Menu nVMenu = nV.getMenu();
+			MenuItem hidden = nVMenu.findItem(R.id.navigation_item_hidden);
+			resetNavigationViewMenu(nVMenu);
+			hidden.setChecked(true);
+		}
+		outSpaceLayout.setVisibility(View.GONE);
+		getProLayout.setVisibility(View.GONE);
+		drawerItem = DrawerItem.ACCOUNT;
+		accountFragment = Constants.UPGRADE_ACCOUNT_FRAGMENT;
+		displayedAccountType = -1;
+		selectDrawerItemLollipop(drawerItem);
+	}
+
 	@Override
 	public void onClick(View v) {
 		log("onClick");
@@ -10118,19 +10137,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			case R.id.overquota_alert_btnRight_upgrade:{
 				//Add navigation to Upgrade Account
 				log("click on Upgrade in overquota or pro panel!");
-				drawerItem = DrawerItem.ACCOUNT;
-				if (nV != null){
-					Menu nVMenu = nV.getMenu();
-					MenuItem hidden = nVMenu.findItem(R.id.navigation_item_hidden);
-					resetNavigationViewMenu(nVMenu);
-					hidden.setChecked(true);
-				}
-				outSpaceLayout.setVisibility(View.GONE);
-				getProLayout.setVisibility(View.GONE);
-				drawerItem = DrawerItem.ACCOUNT;
-				accountFragment = Constants.UPGRADE_ACCOUNT_FRAGMENT;
-				displayedAccountType = -1;
-				selectDrawerItemLollipop(drawerItem);
+				navigateToUpgradeAccount();
 				break;
 			}
 
@@ -11262,14 +11269,47 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		View dialogView = inflater.inflate(R.layout.transfer_overquota_layout, null);
 		dialogBuilder.setView(dialogView);
 
-//		Text editText = (EditText) dialogView.findViewById(R.id.label_field);
-//		editText.setText("test label");
+		TextView title = (TextView) dialogView.findViewById(R.id.transfer_overquota_title);
+		title.setText(getString(R.string.title_depleted_transfer_overquota));
 
+		ImageView icon = (ImageView) dialogView.findViewById(R.id.image_transfer_overquota);
+		icon.setImageDrawable(getDrawable(R.drawable.transfer_quota_empty));
 
+		TextView text = (TextView) dialogView.findViewById(R.id.text_transfer_overquota);
+		text.setText(getString(R.string.text_depleted_transfer_overquota));
 
-		AlertDialog alertDialog = dialogBuilder.create();
+		Button continueButton = (Button) dialogView.findViewById(R.id.transfer_overquota_button_continue);
+
+		Button paymentButton = (Button) dialogView.findViewById(R.id.transfer_overquota_button_payment);
+		if(myAccountInfo.getAccountType()>MegaAccountDetails.ACCOUNT_TYPE_FREE){
+			log("USER PRO");
+			paymentButton.setText(getString(R.string.action_upgrade_account));
+		}
+		else{
+			log("FREE USER");
+			paymentButton.setText(getString(R.string.plans_depleted_transfer_overquota));
+		}
+
+		final AlertDialog alertDialog = dialogBuilder.create();
+
+		continueButton.setOnClickListener(new OnClickListener(){
+			public void onClick(View v) {
+				alertDialog.dismiss();
+			}
+
+		});
+
+		paymentButton.setOnClickListener(new OnClickListener(){
+			public void onClick(View v) {
+				alertDialog.dismiss();
+				navigateToUpgradeAccount();
+			}
+
+		});
+
+		alertDialog.setCancelable(false);
+		alertDialog.setCanceledOnTouchOutside(false);
 		alertDialog.show();
-
 	}
 
 	public void updateCancelSubscriptions(){
