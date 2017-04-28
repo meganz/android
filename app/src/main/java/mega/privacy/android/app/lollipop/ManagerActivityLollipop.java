@@ -12970,104 +12970,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 		if(transferCallback<transfer.getNotificationNumber()) {
 
-			long now = Calendar.getInstance().getTimeInMillis();
-			lastTimeOnTransferUpdate = now;
-
-			transfersInProgress.add(transfer.getTag());
-
-			transferCallback = transfer.getNotificationNumber();
-
-			String cloudTag = getFragmentTag(R.id.cloud_drive_tabs_pager, 0);
-			fbFLol = (FileBrowserFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cloudTag);
-			if (fbFLol != null){
-				if(fbFLol.isAdded()){
-					fbFLol.setOverviewLayout();
-				}
-			}
-
-			String tFTag = getFragmentTag(R.id.transfers_tabs_pager, 0);
-			tFLol = (TransfersFragmentLollipop) getSupportFragmentManager().findFragmentByTag(tFTag);
-			if (tFLol != null){
-				if(tFLol.isAdded()){
-					tFLol.transferStart(transfer);
-				}
-			}
-		}
-	}
-
-	@Override
-	public void onTransferFinish(MegaApiJava api, MegaTransfer transfer, MegaError e) {
-		log("--------------onTransferFinish: "+transfer.getFileName() + " - " + transfer.getTag() + "- " +transfer.getNotificationNumber());
-
-		if(transferCallback<transfer.getNotificationNumber()) {
-
 			transferCallback = transfer.getNotificationNumber();
 
 			long now = Calendar.getInstance().getTimeInMillis();
 			lastTimeOnTransferUpdate = now;
 
-            ListIterator li = transfersInProgress.listIterator();
-            int index = 0;
-            while(li.hasNext()) {
-                Integer next = (Integer) li.next();
-                if(next == transfer.getTag()){
-                    index=li.previousIndex();
-                    break;
-                }
-            }
-            transfersInProgress.remove(index);
-            log("The transfer with index : "+index +"has been removed, left: "+transfersInProgress.size());
-
-			if(transfer.getState()==MegaTransfer.STATE_COMPLETED){
-				addCompletedTransfer(transfer);
-			}
-
-			int pendingTransfers = 	megaApi.getNumPendingDownloads() + megaApi.getNumPendingUploads();
-
-			if(pendingTransfers<=0){
-				if(transfersBottomSheet!=null){
-					if(transfersBottomSheet.isAdded()){
-						transfersBottomSheet.dismiss();
-					}
-				}
-				pauseTransfersMenuIcon.setVisible(false);
-				playTransfersMenuIcon.setVisible(false);
-				cancelAllTransfersMenuItem.setVisible(false);
-
-				showSnackbar(getString(R.string.message_transfers_completed));
-			}
-
-			String cloudTag = getFragmentTag(R.id.cloud_drive_tabs_pager, 0);
-			fbFLol = (FileBrowserFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cloudTag);
-			if (fbFLol != null){
-				if(fbFLol.isAdded()){
-					fbFLol.setOverviewLayout();
-				}
-			}
-
-			String tFTag = getFragmentTag(R.id.transfers_tabs_pager, 0);
-			tFLol = (TransfersFragmentLollipop) getSupportFragmentManager().findFragmentByTag(tFTag);
-			if (tFLol != null){
-				if(tFLol.isAdded()){
-					tFLol.transferFinish(index);
-				}
-			}
-			else{
-				log("tF is null!");
-			}
-		}
-	}
-
-	@Override
-	public void onTransferUpdate(MegaApiJava api, MegaTransfer transfer) {
-//		log("onTransferUpdate: " + transfer.getFileName() + " - " + transfer.getTag());
-		long now = Calendar.getInstance().getTimeInMillis();
-		if((now - lastTimeOnTransferUpdate)>Util.ONTRANSFERUPDATE_REFRESH_MILLIS){
-			log("Update onTransferUpdate: " + transfer.getFileName() + " - " + transfer.getTag()+ " - "+ transfer.getNotificationNumber());
-			lastTimeOnTransferUpdate = now;
-
-			if(transferCallback<transfer.getNotificationNumber()){
-				transferCallback = transfer.getNotificationNumber();
+			if(!transfer.isFolderTransfer()){
+				transfersInProgress.add(transfer.getTag());
 
 				String cloudTag = getFragmentTag(R.id.cloud_drive_tabs_pager, 0);
 				fbFLol = (FileBrowserFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cloudTag);
@@ -13081,10 +12990,106 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				tFLol = (TransfersFragmentLollipop) getSupportFragmentManager().findFragmentByTag(tFTag);
 				if (tFLol != null){
 					if(tFLol.isAdded()){
-						tFLol.transferUpdate(transfer);
+						tFLol.transferStart(transfer);
+					}
+				}
+			}
+		}
+	}
+
+	@Override
+	public void onTransferFinish(MegaApiJava api, MegaTransfer transfer, MegaError e) {
+		log("--------------onTransferFinish: "+transfer.getFileName() + " - " + transfer.getTag() + "- " +transfer.getNotificationNumber());
+
+		if(transferCallback<transfer.getNotificationNumber()) {
+
+			transferCallback = transfer.getNotificationNumber();
+			long now = Calendar.getInstance().getTimeInMillis();
+			lastTimeOnTransferUpdate = now;
+
+			if(!transfer.isFolderTransfer()){
+				ListIterator li = transfersInProgress.listIterator();
+				int index = 0;
+				while(li.hasNext()) {
+					Integer next = (Integer) li.next();
+					if(next == transfer.getTag()){
+						index=li.previousIndex();
+						break;
+					}
+				}
+				transfersInProgress.remove(index);
+				log("The transfer with index : "+index +"has been removed, left: "+transfersInProgress.size());
+
+				if(transfer.getState()==MegaTransfer.STATE_COMPLETED){
+					addCompletedTransfer(transfer);
+				}
+
+				int pendingTransfers = 	megaApi.getNumPendingDownloads() + megaApi.getNumPendingUploads();
+
+				if(pendingTransfers<=0){
+					if(transfersBottomSheet!=null){
+						if(transfersBottomSheet.isAdded()){
+							transfersBottomSheet.dismiss();
+						}
+					}
+					pauseTransfersMenuIcon.setVisible(false);
+					playTransfersMenuIcon.setVisible(false);
+					cancelAllTransfersMenuItem.setVisible(false);
+
+					showSnackbar(getString(R.string.message_transfers_completed));
+				}
+
+				String cloudTag = getFragmentTag(R.id.cloud_drive_tabs_pager, 0);
+				fbFLol = (FileBrowserFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cloudTag);
+				if (fbFLol != null){
+					if(fbFLol.isAdded()){
+						fbFLol.setOverviewLayout();
 					}
 				}
 
+				String tFTag = getFragmentTag(R.id.transfers_tabs_pager, 0);
+				tFLol = (TransfersFragmentLollipop) getSupportFragmentManager().findFragmentByTag(tFTag);
+				if (tFLol != null){
+					if(tFLol.isAdded()){
+						tFLol.transferFinish(index);
+					}
+				}
+				else{
+					log("tF is null!");
+				}
+			}
+		}
+	}
+
+	@Override
+	public void onTransferUpdate(MegaApiJava api, MegaTransfer transfer) {
+//		log("onTransferUpdate: " + transfer.getFileName() + " - " + transfer.getTag());
+		long now = Calendar.getInstance().getTimeInMillis();
+		if((now - lastTimeOnTransferUpdate)>Util.ONTRANSFERUPDATE_REFRESH_MILLIS){
+			log("Update onTransferUpdate: " + transfer.getFileName() + " - " + transfer.getTag()+ " - "+ transfer.getNotificationNumber());
+			lastTimeOnTransferUpdate = now;
+
+			if (!transfer.isFolderTransfer()){
+				if(transferCallback<transfer.getNotificationNumber()){
+					transferCallback = transfer.getNotificationNumber();
+
+					String cloudTag = getFragmentTag(R.id.cloud_drive_tabs_pager, 0);
+					fbFLol = (FileBrowserFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cloudTag);
+					if (fbFLol != null){
+						if(fbFLol.isAdded()){
+							fbFLol.setOverviewLayout();
+						}
+					}
+
+					String tFTag = getFragmentTag(R.id.transfers_tabs_pager, 0);
+					tFLol = (TransfersFragmentLollipop) getSupportFragmentManager().findFragmentByTag(tFTag);
+					if (tFLol != null){
+						if(tFLol.isAdded()){
+							tFLol.transferUpdate(transfer);
+						}
+					}
+
+				}
 			}
 		}
 	}
