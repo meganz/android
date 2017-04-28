@@ -2359,9 +2359,21 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 	}
 
 	@Override
-	public void onTransferTemporaryError(MegaApiJava api,
-										 MegaTransfer transfer, MegaError e) {
+	public void onTransferTemporaryError(MegaApiJava api, MegaTransfer transfer, MegaError e) {
 		log("onTransferTemporaryError: " + transfer.getFileName());
+
+		if(e.getErrorCode() == MegaError.API_EOVERQUOTA) {
+			log("API_EOVERQUOTA error!!");
+
+			Intent intent = null;
+			intent = new Intent(this, ManagerActivityLollipop.class);
+			intent.setAction(Constants.ACTION_OVERQUOTA_TRANSFER);
+			intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+			startActivity(intent);
+
+			CameraSyncService.this.cancel();
+			//Cancel all tranfers too - discuss
+		}
 	}
 
 	@SuppressWarnings("deprecation")

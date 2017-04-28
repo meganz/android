@@ -115,6 +115,8 @@ public class Constants {
 	public static String ACTION_CHAT_INVITE = "CHAT_INVITE";
 	public static String ACTION_CLEAR_CHAT = "ACTION_CLEAR_CHAT";
 
+	public static String ACTION_OVERQUOTA_TRANSFER = "OVERQUOTA_TRANSFER";
+
 	final public static int CHAT_ADAPTER_SHOW_ALL = 2;
 	final public static int CHAT_ADAPTER_SHOW_TIME = 1;
 	final public static int CHAT_ADAPTER_SHOW_NOTHING = 0;

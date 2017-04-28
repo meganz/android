@@ -448,6 +448,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	private AlertDialog changeUserAttributeDialog;
 	private AlertDialog getLinkDialog;
 	private AlertDialog setPinDialog;
+	private AlertDialog alertDialogTransferOverquota;
 
 	private MenuItem searchMenuItem;
 	private MenuItem gridSmallLargeMenuItem;
@@ -1671,6 +1672,17 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						selectDrawerItemLollipop(drawerItem);
 						selectDrawerItemPending=false;
 					}
+					else if(getIntent().getAction().equals(Constants.ACTION_OVERQUOTA_TRANSFER)){
+						log("intent overquota transfer alert!!");
+						if(alertDialogTransferOverquota==null){
+							showTransferOverquotaDialog();
+						}
+						else{
+							if(!(alertDialogTransferOverquota.isShowing())){
+								showTransferOverquotaDialog();
+							}
+						}
+					}
 				}
 	        }
 
@@ -1859,7 +1871,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 		}
 		log("END onCreate");
-		showTransferOverquotaDialog();
+//		showTransferOverquotaDialog();
 	}
 
 	@Override
@@ -11278,7 +11290,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		TextView text = (TextView) dialogView.findViewById(R.id.text_transfer_overquota);
 		text.setText(getString(R.string.text_depleted_transfer_overquota));
 
-		Button continueButton = (Button) dialogView.findViewById(R.id.transfer_overquota_button_continue);
+		Button continueButton = (Button) dialogView.findViewById(R.id.transfer_overquota_button_dissmiss);
 
 		Button paymentButton = (Button) dialogView.findViewById(R.id.transfer_overquota_button_payment);
 		if(myAccountInfo.getAccountType()>MegaAccountDetails.ACCOUNT_TYPE_FREE){
@@ -11290,26 +11302,26 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			paymentButton.setText(getString(R.string.plans_depleted_transfer_overquota));
 		}
 
-		final AlertDialog alertDialog = dialogBuilder.create();
+		alertDialogTransferOverquota = dialogBuilder.create();
 
 		continueButton.setOnClickListener(new OnClickListener(){
 			public void onClick(View v) {
-				alertDialog.dismiss();
+				alertDialogTransferOverquota.dismiss();
 			}
 
 		});
 
 		paymentButton.setOnClickListener(new OnClickListener(){
 			public void onClick(View v) {
-				alertDialog.dismiss();
+				alertDialogTransferOverquota.dismiss();
 				navigateToUpgradeAccount();
 			}
 
 		});
 
-		alertDialog.setCancelable(false);
-		alertDialog.setCanceledOnTouchOutside(false);
-		alertDialog.show();
+		alertDialogTransferOverquota.setCancelable(false);
+		alertDialogTransferOverquota.setCanceledOnTouchOutside(false);
+		alertDialogTransferOverquota.show();
 	}
 
 	public void updateCancelSubscriptions(){
@@ -12761,6 +12773,15 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	@Override
 	public void onAccountUpdate(MegaApiJava api) {
 		log("onAccountUpdate");
+
+		if(myAccountInfo==null){
+			myAccountInfo=new MyAccountInfo(this);
+		}
+		megaApi.getPaymentMethods(myAccountInfo);
+		megaApi.getAccountDetails(myAccountInfo);
+		megaApi.getPricing(myAccountInfo);
+		megaApi.creditCardQuerySubscriptions(myAccountInfo);
+		dbH.resetExtendedAccountDetailsTimestamp();
 	}
 
 	@Override
@@ -13069,9 +13090,20 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	}
 
 	@Override
-	public void onTransferTemporaryError(MegaApiJava api,
-			MegaTransfer transfer, MegaError e) {
+	public void onTransferTemporaryError(MegaApiJava api, MegaTransfer transfer, MegaError e) {
 		log("onTransferTemporaryError: " + transfer.getFileName() + " - " + transfer.getTag());
+
+		if(e.getErrorCode() == MegaError.API_EOVERQUOTA){
+			log("API_EOVERQUOTA error!!");
+			if(alertDialogTransferOverquota==null){
+				showTransferOverquotaDialog();
+			}
+			else{
+				if(!(alertDialogTransferOverquota.isShowing())){
+					showTransferOverquotaDialog();
+				}
+			}
+		}
 	}
 
 	@Override
