@@ -205,21 +205,23 @@ public class ThumbnailUtils {
 	
 	public static Bitmap getThumbnailFromFolder(MegaNode node, Context context){
 		File thumbDir = getThumbFolder(context);
-		File thumb = new File(thumbDir, node.getBase64Handle()+".jpg");
-		Bitmap bitmap = null;
-		if (thumb.exists()){
-			if (thumb.length() > 0){
-				bitmap = getBitmapForCache(thumb, context);
-				if (bitmap == null) {
-					thumb.delete();
-				}
-				else{
-					thumbnailCache.put(node.getHandle(), bitmap);
+		if(node!=null){
+			File thumb = new File(thumbDir, node.getBase64Handle()+".jpg");
+			Bitmap bitmap = null;
+			if (thumb.exists()){
+				if (thumb.length() > 0){
+					bitmap = getBitmapForCache(thumb, context);
+					if (bitmap == null) {
+						thumb.delete();
+					}
+					else{
+						thumbnailCache.put(node.getHandle(), bitmap);
+					}
 				}
 			}
+			return thumbnailCache.get(node.getHandle());
 		}
-		return thumbnailCache.get(node.getHandle());
-
+		return null;
 	}
 
 	/*

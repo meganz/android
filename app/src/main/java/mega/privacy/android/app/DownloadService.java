@@ -636,15 +636,17 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	public void onTransferFinish(MegaApiJava api, MegaTransfer transfer, MegaError error) {
 		log("onTransferFinish: " + transfer.getFileName());
 
-		if(transfer.getState()==MegaTransfer.STATE_COMPLETED){
-			String size = Util.getSizeString(transfer.getTotalBytes());
-			AndroidCompletedTransfer completedTransfer = new AndroidCompletedTransfer(transfer.getFileName(), transfer.getType(), transfer.getState(), size, transfer.getNodeHandle()+"");
-			dbH.setCompletedTransfer(completedTransfer);
-		}
-
 		transfersCount--;
 
-        updateProgressNotification();
+		if(!transfer.isFolderTransfer()){
+			if(transfer.getState()==MegaTransfer.STATE_COMPLETED){
+				String size = Util.getSizeString(transfer.getTotalBytes());
+				AndroidCompletedTransfer completedTransfer = new AndroidCompletedTransfer(transfer.getFileName(), transfer.getType(), transfer.getState(), size, transfer.getNodeHandle()+"");
+				dbH.setCompletedTransfer(completedTransfer);
+			}
+
+			updateProgressNotification();
+		}
 
         if (canceled) {
             if((lock != null) && (lock.isHeld()))
@@ -734,7 +736,11 @@ public class DownloadService extends Service implements MegaTransferListenerInte
             else
             {
                 log("Download Error: " + transfer.getFileName() + "_" + error.getErrorCode() + "___" + error.getErrorString());
-                errorCount++;
+
+				if(!transfer.isFolderTransfer()){
+					errorCount++;
+				}
+
                 if(error.getErrorCode() == MegaError.API_EINCOMPLETE){
                     File file = new File(transfer.getPath());
                     file.delete();
@@ -1216,13 +1222,13 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			DownloadService.this.cancel();
 			return;
 		}
-
-    	updateProgressNotification();
+		if(!transfer.isFolderTransfer()){
+			updateProgressNotification();
+		}
 	}
 
 	@Override
-	public void onTransferTemporaryError(MegaApiJava api,
-			MegaTransfer transfer, MegaError e) {
+	public void onTransferTemporaryError(MegaApiJava api, MegaTransfer transfer, MegaError e) {
 		log(transfer.getPath() + "\nDownload Temporary Error: " + e.getErrorString() + "__" + e.getErrorCode());
 
 		if(e.getErrorCode() == MegaError.API_EOVERQUOTA) {

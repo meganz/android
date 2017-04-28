@@ -2371,6 +2371,7 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 			intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 			startActivity(intent);
 
+			megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD, this);
 			CameraSyncService.this.cancel();
 			//Cancel all tranfers too - discuss
 		}
