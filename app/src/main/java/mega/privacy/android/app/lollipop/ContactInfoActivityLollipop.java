@@ -88,6 +88,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 	ContactInfoActivityLollipop contactInfoActivityLollipop;
 	CoordinatorLayout fragmentContainer;
 	CollapsingToolbarLayout collapsingToolbar;
+	View imageGradient;
 	TextView initialLetter;
 	ImageView contactPropertiesImage;
 	LinearLayout optionsLayout;
@@ -150,7 +151,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 	private void setAppBarOffset(int offsetPx){
 		CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) appBarLayout.getLayoutParams();
 		AppBarLayout.Behavior behavior = (AppBarLayout.Behavior) params.getBehavior();
-		behavior.onNestedPreScroll(fragmentContainer, appBarLayout, null, 0, 300, new int[]{0, 0});
+		behavior.onNestedPreScroll(fragmentContainer, appBarLayout, null, 0, offsetPx, new int[]{0, 0});
 	}
 
 	@Override
@@ -192,6 +193,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			aB = getSupportActionBar();
 			imageLayout = (RelativeLayout) findViewById(R.id.chat_contact_properties_image_layout);
 			collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.collapse_toolbar);
+			imageGradient = (View) findViewById(R.id.gradient_view);
 
 			collapsingToolbar.setExpandedTitleMarginBottom(Util.scaleHeightPx(24, outMetrics));
 			collapsingToolbar.setExpandedTitleMarginStart((int) getResources().getDimension(R.dimen.recycler_view_separator));
@@ -212,7 +214,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			appBarLayout.post(new Runnable() {
 				@Override
 				public void run() {
-					setAppBarOffset(180);
+					setAppBarOffset(310);
 				}
 			});
 
@@ -660,6 +662,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 					imBitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
 					if (imBitmap != null) {
 						contactPropertiesImage.setImageBitmap(imBitmap);
+						imageGradient.setVisibility(View.VISIBLE);
 						initialLetter.setVisibility(View.GONE);
 
 						if (imBitmap != null && !imBitmap.isRecycled()) {
@@ -692,6 +695,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 					}
 				} else {
 					contactPropertiesImage.setImageBitmap(imBitmap);
+					imageGradient.setVisibility(View.VISIBLE);
 					initialLetter.setVisibility(View.GONE);
 
 					if (imBitmap != null && !imBitmap.isRecycled()) {
@@ -809,6 +813,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 				initialLetter.setTextSize(100);
 				initialLetter.setTextColor(Color.WHITE);
 				initialLetter.setVisibility(View.VISIBLE);
+				imageGradient.setVisibility(View.GONE);
 			} else {
 				setInitialByMail = true;
 			}
@@ -826,6 +831,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 					initialLetter.setTextSize(100);
 					initialLetter.setTextColor(Color.WHITE);
 					initialLetter.setVisibility(View.VISIBLE);
+					imageGradient.setVisibility(View.GONE);
 				}
 			}
 		}
@@ -1122,6 +1128,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 							avatar.delete();
 						} else {
 							contactPropertiesImage.setImageBitmap(imBitmap);
+							imageGradient.setVisibility(View.VISIBLE);
 							initialLetter.setVisibility(View.GONE);
 
 							if (imBitmap != null && !imBitmap.isRecycled()) {
