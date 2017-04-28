@@ -69,6 +69,8 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 	WifiLock lock;
 	WakeLock wl;
 	DatabaseHandler dbH = null;
+
+	int transfersCount = 0;
 	
 	private Notification.Builder mBuilder;
 	private NotificationCompat.Builder mBuilderCompat;
@@ -423,6 +425,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 	public void onTransferStart(MegaApiJava api, MegaTransfer transfer) {
 		log("Upload start: " + transfer.getFileName() + "_" + megaApi.getTotalUploads());
 		if (!transfer.isFolderTransfer()){
+			transfersCount++;
 			updateProgressNotification();
 		}
 	}
@@ -438,9 +441,10 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 			dbH.setCompletedTransfer(completedTransfer);
 		}
 
-		updateProgressNotification();
-
 		if (!transfer.isFolderTransfer()){
+			updateProgressNotification();
+			transfersCount--;
+
 			if (canceled) {
 				log("Upload cancelled: " + transfer.getFileName());
 				
@@ -532,7 +536,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 					}
 				}
 
-				if (megaApi.getNumPendingUploads() == 0){
+				if (megaApi.getNumPendingUploads() == 0 && transfersCount==0){
 					onQueueComplete();
 				}
 				
@@ -584,6 +588,16 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 	public void onTransferTemporaryError(MegaApiJava api,
 			MegaTransfer transfer, MegaError e) {
 		log(transfer.getPath() + "\nDownload Temporary Error: " + e.getErrorString() + "__" + e.getErrorCode());
+
+		if(e.getErrorCode() == MegaError.API_EOVERQUOTA) {
+			log("API_EOVERQUOTA error!!");
+
+			Intent intent = null;
+			intent = new Intent(this, ManagerActivityLollipop.class);
+			intent.setAction(Constants.ACTION_OVERQUOTA_TRANSFER);
+			intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+			startActivity(intent);
+		}
 	}
 
 	@Override

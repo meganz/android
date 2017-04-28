@@ -27,16 +27,17 @@
         android:layout_marginLeft="28dp"
         android:layout_marginTop="30dp"
         android:textSize="16sp"
+        android:gravity="center_horizontal"
         android:textColor="@color/mail_my_account"
         android:layout_gravity="center_horizontal"/>
 
     <Button
-        android:id="@+id/transfer_overquota_button_continue"
+        android:id="@+id/transfer_overquota_button_dissmiss"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="@color/accentColor"
         android:background="@android:color/transparent"
-        android:text="@string/button_depleted_transfer_overquota"
+        android:text="@string/general_dismiss"
         android:layout_marginTop="35dp"
         android:layout_marginRight="16dp"
         android:layout_gravity="right"

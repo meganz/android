@@ -1132,7 +1132,7 @@
 
     <string name="completed_transfers_empty" context="message shown in the screen when there are not any active transfer">No completed transfers</string>
 
-    <string name="message_transfers_completed" context="Message shown when the pending transfers are completed">Transfers completed</string>
+    <string name="message_transfers_completed" context="Message shown when the pending transfers are completed">Transfers finished</string>
 
     <plurals name="upload_service_notification" context="Text of the notification shown when the upload service is running">
         <item context="Singular" quantity="one">Uploading %1$d of %2$d file</item>
@@ -1167,9 +1167,6 @@
     </plurals>
 
     <string name="title_depleted_transfer_overquota" context="Title of the alert when the transfer quota is depleted">Depleted transfer quota</string>
-    <string name="text_depleted_transfer_overquota" context="Text of the alert when the transfer quota is depleted">Your queued download exceeds the current transfer quota available for your IP address  and may therefore be interrupted.</string>
-    <string name="button_depleted_transfer_overquota" context="Button to hide the alert when the transfer quota is depleted">Continue without account</string>
+    <string name="text_depleted_transfer_overquota" context="Text of the alert when the transfer quota is depleted">Your queued transfer exceeds the current transfer quota available for your IP address and may therefore be interrupted.</string>
     <string name="plans_depleted_transfer_overquota" context="Button to show plans in the alert when the transfer quota is depleted">See our plans</string>
-
-
 </resources>

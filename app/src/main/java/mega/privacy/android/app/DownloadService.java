@@ -98,6 +98,8 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 	DatabaseHandler dbH = null;
 
+	int transfersCount = 0;
+
 	HashMap<Long, Uri> storeToAdvacedDevices;
 
 	private int notificationId = Constants.NOTIFICATION_DOWNLOAD;
@@ -625,6 +627,8 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	public void onTransferStart(MegaApiJava api, MegaTransfer transfer) {
 		log("Download start: " + transfer.getFileName() + "_" + megaApi.getTotalDownloads());
 
+		transfersCount++;
+
         updateProgressNotification();
 	}
 
@@ -637,6 +641,8 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			AndroidCompletedTransfer completedTransfer = new AndroidCompletedTransfer(transfer.getFileName(), transfer.getType(), transfer.getState(), size, transfer.getNodeHandle()+"");
 			dbH.setCompletedTransfer(completedTransfer);
 		}
+
+		transfersCount--;
 
         updateProgressNotification();
 
@@ -740,7 +746,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
             }
         }
 
-        if (megaApi.getNumPendingDownloads() == 0){
+        if (megaApi.getNumPendingDownloads() == 0 && transfersCount==0){
             onQueueComplete();
         }
 	}
@@ -1219,6 +1225,15 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			MegaTransfer transfer, MegaError e) {
 		log(transfer.getPath() + "\nDownload Temporary Error: " + e.getErrorString() + "__" + e.getErrorCode());
 
+		if(e.getErrorCode() == MegaError.API_EOVERQUOTA) {
+			log("API_EOVERQUOTA error!!");
+
+			Intent intent = null;
+			intent = new Intent(this, ManagerActivityLollipop.class);
+			intent.setAction(Constants.ACTION_OVERQUOTA_TRANSFER);
+			intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+			startActivity(intent);
+		}
 	}
 
 	@Override
