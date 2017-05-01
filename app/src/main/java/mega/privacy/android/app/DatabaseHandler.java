@@ -23,7 +23,7 @@ import nz.mega.sdk.MegaChatApi;
 
 public class DatabaseHandler extends SQLiteOpenHelper {
 	
-	private static final int DATABASE_VERSION = 30;
+	private static final int DATABASE_VERSION = 31;
     private static final String DATABASE_NAME = "megapreferences"; 
     private static final String TABLE_PREFERENCES = "preferences";
     private static final String TABLE_CREDENTIALS = "credentials";
@@ -117,6 +117,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	private static final String KEY_TRANSFER_SIZE = "transfersize";
 	private static final String KEY_TRANSFER_HANDLE = "transferhandle";
 
+	private static final String KEY_FIRST_LOGIN_CHAT = "firstloginchat";
+
 
     private static DatabaseHandler instance;
     
@@ -165,7 +167,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         		" TEXT, "+ KEY_SEC_FOLDER_HANDLE + " TEXT, " + KEY_SEC_SYNC_TIMESTAMP+" TEXT, "+KEY_KEEP_FILE_NAMES + " BOOLEAN, "+
         		KEY_STORAGE_ADVANCED_DEVICES+ "	BOOLEAN, "+ KEY_PREFERRED_VIEW_LIST+ "	BOOLEAN, "+KEY_PREFERRED_VIEW_LIST_CAMERA+ " BOOLEAN, " +
         		KEY_URI_EXTERNAL_SD_CARD + " TEXT, " + KEY_CAMERA_FOLDER_EXTERNAL_SD_CARD + " BOOLEAN, " + KEY_PIN_LOCK_TYPE + " TEXT, " +
-				KEY_PREFERRED_SORT_CLOUD + " TEXT, " + KEY_PREFERRED_SORT_CONTACTS + " TEXT, " +KEY_PREFERRED_SORT_OTHERS + " TEXT" +")";
+				KEY_PREFERRED_SORT_CLOUD + " TEXT, " + KEY_PREFERRED_SORT_CONTACTS + " TEXT, " +KEY_PREFERRED_SORT_OTHERS + " TEXT," +
+				KEY_FIRST_LOGIN_CHAT + " BOOLEAN" +")";
         
         db.execSQL(CREATE_PREFERENCES_TABLE);
         
@@ -452,6 +455,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			db.execSQL(CREATE_COMPLETED_TRANSFER_TABLE);
 
 		}
+
+		if (oldVersion <= 30){
+			db.execSQL("ALTER TABLE " + TABLE_PREFERENCES + " ADD COLUMN " + KEY_FIRST_LOGIN_CHAT + " BOOLEAN;");
+			db.execSQL("UPDATE " + TABLE_PREFERENCES + " SET " + KEY_FIRST_LOGIN_CHAT + " = '" + encrypt("true") + "';");
+		}
 	} 
 	
 //	public MegaOffline encrypt(MegaOffline off){
@@ -601,6 +609,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		values.put(KEY_PREFERRED_SORT_CLOUD, encrypt(prefs.getPreferredSortCloud()));
 		values.put(KEY_PREFERRED_SORT_CONTACTS, encrypt(prefs.getPreferredSortContacts()));
 		values.put(KEY_PREFERRED_SORT_OTHERS, encrypt(prefs.getPreferredSortOthers()));
+		values.put(KEY_FIRST_LOGIN_CHAT, encrypt(prefs.getFirstTimeChat()));
         db.insert(TABLE_PREFERENCES, null, values);
 	}
 	
@@ -640,11 +649,12 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			String preferredSortCloud = decrypt(cursor.getString(26));
 			String preferredSortContacts = decrypt(cursor.getString(27));
 			String preferredSortOthers = decrypt(cursor.getString(28));
+			String firstTimeChat = decrypt(cursor.getString(29));
 			
 			prefs = new MegaPreferences(firstTime, wifi, camSyncEnabled, camSyncHandle, camSyncLocalPath, fileUpload, camSyncTimeStamp, pinLockEnabled, 
 					pinLockCode, askAlways, downloadLocation, camSyncCharging, lastFolderUpload, lastFolderCloud, secondaryFolderEnabled, secondaryPath, secondaryHandle, 
 					secSyncTimeStamp, keepFileNames, storageAdvancedDevices, preferredViewList, preferredViewListCamera, uriExternalSDCard, cameraFolderExternalSDCard,
-					pinLockType, preferredSortCloud, preferredSortContacts, preferredSortOthers);
+					pinLockType, preferredSortCloud, preferredSortContacts, preferredSortOthers, firstTimeChat);
 		}
 		cursor.close();
 		
@@ -673,6 +683,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 	public void setChatSettings(ChatSettings chatSettings){
 		log("setChatSettings");
+
+        db.execSQL("DELETE FROM " + TABLE_CHAT_SETTINGS);
+
 		ContentValues values = new ContentValues();
 		values.put(KEY_CHAT_ENABLED, encrypt(chatSettings.getEnabled()));
 		values.put(KEY_CHAT_NOTIFICATIONS_ENABLED, encrypt(chatSettings.getNotificationsEnabled()));
@@ -1658,7 +1671,22 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		}
 		cursor.close();
 	}
-	
+
+	public void setFirstTimeChat (boolean firstTimeChat){
+		String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
+		ContentValues values = new ContentValues();
+		Cursor cursor = db.rawQuery(selectQuery, null);
+		if (cursor.moveToFirst()){
+			String UPDATE_PREFERENCES_TABLE = "UPDATE " + TABLE_PREFERENCES + " SET " + KEY_FIRST_LOGIN_CHAT + "= '" + encrypt(firstTimeChat + "") + "' WHERE " + KEY_ID + " = '1'";
+			db.execSQL(UPDATE_PREFERENCES_TABLE);
+//			log("UPDATE_PREFERENCES_TABLE: " + UPDATE_PREFERENCES_TABLE);
+		}
+		else{
+			values.put(KEY_FIRST_LOGIN_CHAT, encrypt(firstTimeChat + ""));
+			db.insert(TABLE_PREFERENCES, null, values);
+		}
+		cursor.close();
+	}
 	
 	
 	public void setCamSyncWifi (boolean wifi){
