@@ -14,6 +14,10 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
 import android.view.Display;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -24,6 +28,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
+import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaApiAndroid;
 
 
@@ -53,6 +58,8 @@ public class LoginActivityLollipop extends AppCompatActivity {
 	DatabaseHandler dbH;
 
     Handler handler = new Handler();
+
+	private android.support.v7.app.AlertDialog alertDialogTransferOverquota;
 	
 	@SuppressLint("NewApi")
 	@Override
@@ -169,6 +176,52 @@ public class LoginActivityLollipop extends AppCompatActivity {
 				break;
 			}
 		}
+	}
+
+	public void showTransferOverquotaDialog(){
+		log("showTransferOverquotaDialog");
+
+		android.support.v7.app.AlertDialog.Builder dialogBuilder = new android.support.v7.app.AlertDialog.Builder(this);
+
+		LayoutInflater inflater = this.getLayoutInflater();
+		View dialogView = inflater.inflate(R.layout.transfer_overquota_layout, null);
+		dialogBuilder.setView(dialogView);
+
+		TextView title = (TextView) dialogView.findViewById(R.id.transfer_overquota_title);
+		title.setText(getString(R.string.title_depleted_transfer_overquota));
+
+		ImageView icon = (ImageView) dialogView.findViewById(R.id.image_transfer_overquota);
+		icon.setImageDrawable(getDrawable(R.drawable.transfer_quota_empty));
+
+		TextView text = (TextView) dialogView.findViewById(R.id.text_transfer_overquota);
+		text.setText(getString(R.string.text_depleted_transfer_overquota));
+
+		Button continueButton = (Button) dialogView.findViewById(R.id.transfer_overquota_button_dissmiss);
+		continueButton.setText(getString(R.string.login_text));
+
+		Button paymentButton = (Button) dialogView.findViewById(R.id.transfer_overquota_button_payment);
+		paymentButton.setText(getString(R.string.continue_without_account_transfer_overquota));
+
+
+		alertDialogTransferOverquota = dialogBuilder.create();
+
+		continueButton.setOnClickListener(new View.OnClickListener(){
+			public void onClick(View v) {
+				alertDialogTransferOverquota.dismiss();
+			}
+
+		});
+
+		paymentButton.setOnClickListener(new View.OnClickListener(){
+			public void onClick(View v) {
+				alertDialogTransferOverquota.dismiss();
+			}
+
+		});
+
+		alertDialogTransferOverquota.setCancelable(false);
+		alertDialogTransferOverquota.setCanceledOnTouchOutside(false);
+		alertDialogTransferOverquota.show();
 	}
 
 	public void stopCameraSyncService(){

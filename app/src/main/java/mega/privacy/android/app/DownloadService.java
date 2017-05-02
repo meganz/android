@@ -34,6 +34,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.ZipBrowserActivityLollipop;
 import mega.privacy.android.app.utils.Constants;
@@ -1234,11 +1235,23 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		if(e.getErrorCode() == MegaError.API_EOVERQUOTA) {
 			log("API_EOVERQUOTA error!!");
 
-			Intent intent = null;
-			intent = new Intent(this, ManagerActivityLollipop.class);
-			intent.setAction(Constants.ACTION_OVERQUOTA_TRANSFER);
-			intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-			startActivity(intent);
+			if(megaApi.isLoggedIn()==0){
+				log("TRANSFER overquota and NOT logged in!");
+				Intent intent = null;
+				intent = new Intent(this, LoginActivityLollipop.class);
+				intent.setAction(Constants.ACTION_OVERQUOTA_TRANSFER);
+				intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+				startActivity(intent);
+			}
+			else{
+				log("TRANSFER overquota and YESS logged in!");
+				Intent intent = null;
+				intent = new Intent(this, ManagerActivityLollipop.class);
+				intent.setAction(Constants.ACTION_OVERQUOTA_TRANSFER);
+				intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+				startActivity(intent);
+			}
+
 		}
 	}
 
