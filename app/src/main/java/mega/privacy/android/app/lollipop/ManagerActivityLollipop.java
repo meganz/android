@@ -8622,7 +8622,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
         	newFile.createNewFile();
         } catch (IOException e) {}
 
-        Uri outputFileUri = FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", newFile);
+		Uri outputFileUri;
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+			outputFileUri = FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", newFile);
+		}
+		else{
+			outputFileUri = Uri.fromFile(newFile);
+		}
 
         Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, outputFileUri);

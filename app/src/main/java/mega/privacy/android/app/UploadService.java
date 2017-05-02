@@ -374,7 +374,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 			message = getResources().getQuantityString(R.plurals.upload_service_notification, totalTransfers, inProgress, totalTransfers);
 		}
 
-		String info = Util.getProgressSize(UploadService.this, totalSizePendingTransfer, totalSizeTransferred);
+		String info = Util.getProgressSize(UploadService.this, totalSizeTransferred, totalSizePendingTransfer);
 
 		Intent intent;
 		intent = new Intent(UploadService.this, ManagerActivityLollipop.class);
@@ -383,7 +383,17 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 		PendingIntent pendingIntent = PendingIntent.getActivity(UploadService.this, 0, intent, 0);
 		Notification notification = null;
 		int currentapiVersion = android.os.Build.VERSION.SDK_INT;
-		if (currentapiVersion >= android.os.Build.VERSION_CODES.ICE_CREAM_SANDWICH)	{
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+			mBuilder
+					.setSmallIcon(R.drawable.ic_stat_notify_upload)
+					.setProgress(100, progressPercent, false)
+					.setContentIntent(pendingIntent)
+					.setOngoing(true).setContentTitle(message).setSubText(info)
+					.setContentText(getString(R.string.download_touch_to_show))
+					.setOnlyAlertOnce(true);
+			notification = mBuilder.build();
+		}
+		else if (currentapiVersion >= android.os.Build.VERSION_CODES.ICE_CREAM_SANDWICH)	{
 
 			mBuilder
 			.setSmallIcon(R.drawable.ic_stat_notify_upload)

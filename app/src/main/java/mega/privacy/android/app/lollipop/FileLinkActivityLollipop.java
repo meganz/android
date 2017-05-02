@@ -946,14 +946,24 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 						catch(Exception e) {}
 						
 						Intent viewIntent = new Intent(Intent.ACTION_VIEW);
-						viewIntent.setDataAndType(FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", new File(localPath)), MimeTypeList.typeForName(tempNode.getName()).getType());
-						viewIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+							viewIntent.setDataAndType(FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", new File(localPath)), MimeTypeList.typeForName(tempNode.getName()).getType());
+						}
+						else{
+							viewIntent.setDataAndType(Uri.fromFile(new File(localPath)), MimeTypeList.typeForName(tempNode.getName()).getType());
+						}
+						viewIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 						if (MegaApiUtils.isIntentAvailable(this, viewIntent))
 							startActivity(viewIntent);
 						else{
 							Intent intentShare = new Intent(Intent.ACTION_SEND);
-							intentShare.setDataAndType(FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", new File(localPath)), MimeTypeList.typeForName(tempNode.getName()).getType());
-							intentShare.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+							if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+								intentShare.setDataAndType(FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", new File(localPath)), MimeTypeList.typeForName(tempNode.getName()).getType());
+							}
+							else{
+								intentShare.setDataAndType(Uri.fromFile(new File(localPath)), MimeTypeList.typeForName(tempNode.getName()).getType());
+							}
+							intentShare.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 							if (MegaApiUtils.isIntentAvailable(this, intentShare))
 								startActivity(intentShare);
 							String toastMessage = getString(R.string.general_already_downloaded) + ": " + localPath;
