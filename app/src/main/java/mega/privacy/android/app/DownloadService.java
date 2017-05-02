@@ -1283,7 +1283,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 				Intent intent = null;
 				intent = new Intent(this, LoginActivityLollipop.class);
 				intent.setAction(Constants.ACTION_OVERQUOTA_TRANSFER);
-				intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+				intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
 				startActivity(intent);
 			}
 			else{
@@ -1294,7 +1294,6 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 				intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 				startActivity(intent);
 			}
-
 		}
 	}
 
