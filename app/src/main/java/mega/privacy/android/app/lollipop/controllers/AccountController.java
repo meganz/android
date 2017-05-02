@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v4.content.FileProvider;
@@ -21,6 +22,7 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.DownloadService;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
+import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
@@ -95,11 +97,18 @@ public class AccountController {
             newFile.createNewFile();
         } catch (IOException e) {}
 
-        Uri outputFileUri = FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", newFile);
+        Uri outputFileUri;
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            outputFileUri = FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", newFile);
+        }
+        else{
+            outputFileUri = Uri.fromFile(newFile);
+        }
 
         Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, outputFileUri);
-        cameraIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        cameraIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         ((ManagerActivityLollipop)context).startActivityForResult(cameraIntent, Constants.TAKE_PICTURE_PROFILE_CODE);
     }
 

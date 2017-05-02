@@ -926,7 +926,13 @@ public class Util {
 				try {
 					Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
 					File fileToDelete = new File(f.getAbsolutePath());
-					Uri contentUri = FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", fileToDelete);
+					Uri contentUri;
+					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+						contentUri = FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", fileToDelete);
+					}
+					else{
+						contentUri = Uri.fromFile(fileToDelete);
+					}
 					mediaScanIntent.setData(contentUri);
 					mediaScanIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 					context.sendBroadcast(mediaScanIntent);
