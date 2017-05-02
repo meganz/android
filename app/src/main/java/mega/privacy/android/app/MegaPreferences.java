@@ -32,6 +32,7 @@ public class MegaPreferences{
 	String preferredSortCloud = "";
 	String preferredSortContacts = "";
 	String preferredSortOthers = "";
+	String firstTimeChat = "";
 		
 	public final static int ONLY_PHOTOS = 1001;
 	public final static int ONLY_VIDEOS = 1002;
@@ -40,7 +41,7 @@ public class MegaPreferences{
 	MegaPreferences(String firstTime, String camSyncWifi, String camSyncEnabled, String camSyncHandle, String camSyncLocalPath, String camSyncFileUpload, String camSyncTimeStamp, String pinLockEnabled, String pinLockCode, String storageAskAlways, 
 			String storageDownloadLocation, String camSyncCharging, String lastFolderUpload, String lastFolderCloud, String secondaryMediaFolderEnabled, String localPathSecondaryFolder, String megaHandleSecondaryFolder, String secSyncTimeStamp, 
 			String keepFileNames, String storageAdvancedDevices, String preferredViewList, String preferredViewListCameraUploads, String uriExternalSDCard, String cameraFolderExternalSDCard, String pinLockType, String preferredSortCloud, String preferredSortContacts,
-			String preferredSortOthers){
+			String preferredSortOthers, String firstTimeChat){
 		this.firstTime = firstTime;
 		this.camSyncWifi = camSyncWifi;
 		this.camSyncEnabled = camSyncEnabled;
@@ -69,6 +70,7 @@ public class MegaPreferences{
 		this.preferredSortCloud = preferredSortCloud;
 		this.preferredSortContacts = preferredSortContacts;
 		this.preferredSortOthers = preferredSortOthers;
+		this.firstTimeChat = firstTimeChat;
 	}
 	
 	public String getFirstTime (){
@@ -304,6 +306,14 @@ public class MegaPreferences{
 
 	public void setPreferredSortOthers(String preferredSortOthers) {
 		this.preferredSortOthers = preferredSortOthers;
+	}
+
+	public String getFirstTimeChat (){
+		return firstTimeChat;
+	}
+
+	public void setFirstTimeChat(String firstTimeChat){
+		this.firstTimeChat = firstTimeChat;
 	}
 }
 
