@@ -84,7 +84,7 @@ public class Constants {
 
 	public static String ACTION_OPEN_MEGA_LINK = "OPEN_MEGA_LINK";
 	public static String ACTION_OPEN_MEGA_FOLDER_LINK = "OPEN_MEGA_FOLDER_LINK";
-//	public static String ACTION_CANCEL_DOWNLOAD = "CANCEL_DOWNLOAD";
+	public static String ACTION_CANCEL_DOWNLOAD = "CANCEL_DOWNLOAD";
 //	public static String ACTION_CANCEL_UPLOAD = "CANCEL_UPLOAD";
 	public static String ACTION_CANCEL_CAM_SYNC = "CANCEL_CAM_SYNC";
 	public static String ACTION_IMPORT_LINK_FETCH_NODES = "IMPORT_LINK_FETCH_NODES";

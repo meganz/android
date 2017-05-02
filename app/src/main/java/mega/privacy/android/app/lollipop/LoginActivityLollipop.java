@@ -1,6 +1,7 @@
 package mega.privacy.android.app.lollipop;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -24,12 +25,14 @@ import android.widget.TextView;
 import mega.privacy.android.app.CameraSyncService;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.DownloadService;
+import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaTransfer;
 
 
 public class LoginActivityLollipop extends AppCompatActivity {
@@ -58,6 +61,7 @@ public class LoginActivityLollipop extends AppCompatActivity {
 	DatabaseHandler dbH;
 
     Handler handler = new Handler();
+	private MegaApiAndroid megaApi;
 
 	private android.support.v7.app.AlertDialog alertDialogTransferOverquota;
 	
@@ -83,6 +87,9 @@ public class LoginActivityLollipop extends AppCompatActivity {
 		scaleH = Util.getScaleH(outMetrics, density);
 
 	    dbH = DatabaseHandler.getDbHandler(getApplicationContext());
+		if (megaApi == null){
+			megaApi = ((MegaApplication) getApplication()).getMegaApi();
+		}
 
 		setContentView(R.layout.activity_login);
 		relativeContainer = (RelativeLayout) findViewById(R.id.relative_container_login);
@@ -259,6 +266,42 @@ public class LoginActivityLollipop extends AppCompatActivity {
 		}
 	}
 
+	public void showConfirmationCancelAllTransfers (){
+		log("showConfirmationCancelAllTransfers");
+
+		setIntent(null);
+		//Show confirmation message
+		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				switch (which){
+					case DialogInterface.BUTTON_POSITIVE:
+						log("Pressed button positive to cancel transfer");
+						if (megaApi != null){
+							megaApi.cancelTransfers(MegaTransfer.TYPE_DOWNLOAD);
+						}
+						else{
+							log("megaAPI is null");
+						}
+
+						break;
+
+					case DialogInterface.BUTTON_NEGATIVE:
+						break;
+				}
+			}
+		};
+
+		android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+//		builder.setTitle(getResources().getString(R.string.cancel_transfer_title));
+
+		builder.setMessage(getResources().getString(R.string.cancel_all_transfer_confirmation));
+		builder.setPositiveButton(R.string.general_cancel, dialogClickListener);
+		builder.setNegativeButton(R.string.general_dismiss, dialogClickListener);
+
+		builder.show();
+	}
+
 	@Override
 	public void onBackPressed() {
 		log("onBackPressed");
@@ -297,6 +340,7 @@ public class LoginActivityLollipop extends AppCompatActivity {
 
 	@Override
 	public void onResume() {
+		log("onResume");
 		super.onResume();
 
 		Intent intent = getIntent();
@@ -304,7 +348,7 @@ public class LoginActivityLollipop extends AppCompatActivity {
 		if (intent != null){
 			if (intent.getAction() != null){
 				if (intent.getAction().equals(Constants.ACTION_CANCEL_CAM_SYNC)){
-					log("ACTION_CANCEL_UPLOAD or ACTION_CANCEL_DOWNLOAD or ACTION_CANCEL_CAM_SYNC");
+					log("ACTION_CANCEL_CAM_SYNC");
 					Intent tempIntent = null;
 					String title = null;
 					String text = null;
@@ -332,6 +376,9 @@ public class LoginActivityLollipop extends AppCompatActivity {
 					catch(Exception ex)	{
 						startService(cancelIntent);
 					}
+				}
+				else if (intent.getAction().equals(Constants.ACTION_CANCEL_DOWNLOAD)){
+					showConfirmationCancelAllTransfers();
 				}
 				intent.setAction(null);
 			}

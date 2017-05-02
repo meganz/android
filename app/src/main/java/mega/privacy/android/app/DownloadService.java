@@ -593,13 +593,26 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		}
 
 		Intent intent;
-		intent = new Intent(DownloadService.this, ManagerActivityLollipop.class);
-		intent.setAction(Constants.ACTION_SHOW_TRANSFERS);
+		PendingIntent pendingIntent;
 
 		String info = Util.getProgressSize(DownloadService.this, totalSizeTransferred, totalSizePendingTransfer);
 
-		PendingIntent pendingIntent = PendingIntent.getActivity(DownloadService.this, 0, intent, 0);
 		Notification notification = null;
+
+		String contentText = "";
+
+		if(dbH.getCredentials()==null){
+			contentText = getString(R.string.download_touch_to_cancel);
+			intent = new Intent(DownloadService.this, LoginActivityLollipop.class);
+			intent.setAction(Constants.ACTION_CANCEL_DOWNLOAD);
+			pendingIntent = PendingIntent.getActivity(DownloadService.this, 0, intent, 0);
+		}
+		else{
+			contentText = getString(R.string.download_touch_to_show);
+			intent = new Intent(DownloadService.this, ManagerActivityLollipop.class);
+			intent.setAction(Constants.ACTION_SHOW_TRANSFERS);
+			pendingIntent = PendingIntent.getActivity(DownloadService.this, 0, intent, 0);
+		}
 
         int currentapiVersion = android.os.Build.VERSION.SDK_INT;
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -608,7 +621,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 					.setProgress(100, progressPercent, false)
 					.setContentIntent(pendingIntent)
 					.setOngoing(true).setContentTitle(message).setSubText(info)
-					.setContentText(getString(R.string.download_touch_to_show))
+					.setContentText(contentText)
 					.setOnlyAlertOnce(true);
 			notification = mBuilder.build();
 		}
@@ -619,7 +632,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 				.setProgress(100, progressPercent, false)
 				.setContentIntent(pendingIntent)
 				.setOngoing(true).setContentTitle(message).setContentInfo(info)
-				.setContentText(getString(R.string.download_touch_to_show))
+				.setContentText(contentText)
 				.setOnlyAlertOnce(true);
 			notification = mBuilder.getNotification();
 		}
@@ -644,9 +657,6 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		}
 	}
 
-	/*
-	 * Cancel download
-	 */
 	private void cancel() {
 		log("cancel");
 		canceled = true;
@@ -1278,6 +1288,11 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		if(e.getErrorCode() == MegaError.API_EOVERQUOTA) {
 			log("API_EOVERQUOTA error!!");
 
+			UserCredentials credentials = dbH.getCredentials();
+			if(credentials!=null){
+				log("Credentials is NOT null");
+			}
+
 			if(megaApi.isLoggedIn()==0){
 				log("TRANSFER overquota and NOT logged in!");
 				Intent intent = null;
@@ -1291,7 +1306,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 				Intent intent = null;
 				intent = new Intent(this, ManagerActivityLollipop.class);
 				intent.setAction(Constants.ACTION_OVERQUOTA_TRANSFER);
-				intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+				intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
 				startActivity(intent);
 			}
 		}
@@ -1307,10 +1322,17 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		log("onRequestFinish");
 
 		if (request.getType() == MegaRequest.TYPE_PAUSE_TRANSFERS){
-			log("pause_transfer false received");
+			log("TYPE_PAUSE_TRANSFERS finished");
 			if (e.getErrorCode() == MegaError.API_OK){
 				cancel();
 			}
+		}
+		else if (request.getType() == MegaRequest.TYPE_CANCEL_TRANSFERS){
+			log("TYPE_CANCEL_TRANSFERS finished");
+			if (e.getErrorCode() == MegaError.API_OK){
+				cancel();
+			}
+
 		}
 		else{
 			log("Public node received");

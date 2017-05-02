@@ -510,6 +510,10 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     ((LoginActivityLollipop)context).showTransferOverquotaDialog();
 
                 }
+                else if (action.equals(Constants.ACTION_CANCEL_DOWNLOAD)) {
+                    ((LoginActivityLollipop)context).showConfirmationCancelAllTransfers();
+
+                }
             }
             else{
                 log("ACTION NULL");
