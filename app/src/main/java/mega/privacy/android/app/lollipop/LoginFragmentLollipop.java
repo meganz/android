@@ -507,7 +507,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     }
                 }
                 else if (action.equals(Constants.ACTION_OVERQUOTA_TRANSFER)) {
-
+                    ((LoginActivityLollipop)context).showTransferOverquotaDialog();
 
                 }
             }
