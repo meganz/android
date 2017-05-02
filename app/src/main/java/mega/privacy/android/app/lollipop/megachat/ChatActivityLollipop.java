@@ -40,6 +40,9 @@ import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -55,6 +58,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
+import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PinActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.listeners.ChatNonContactNameListener;
@@ -75,6 +79,8 @@ import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaChatRoomListenerInterface;
+import nz.mega.sdk.MegaNode;
+import nz.mega.sdk.MegaNodeList;
 import nz.mega.sdk.MegaUser;
 
 public class ChatActivityLollipop extends PinActivityLollipop implements MegaChatRequestListenerInterface, MegaChatRoomListenerInterface, RecyclerView.OnItemTouchListener, GestureDetector.OnGestureListener, View.OnClickListener, EmojiconGridFragment.OnEmojiconClickedListener, EmojiconsFragment.OnEmojiconBackspaceClickedListener {
@@ -1088,8 +1094,27 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 }
             }
         }
+        else if (requestCode == Constants.REQUEST_CODE_SELECT_FILE && resultCode == RESULT_OK) {
+            log("requestCode == REQUEST_CODE_SELECT_FILE");
+            if (intent == null) {
+                log("Return.....");
+                return;
+            }
+
+//            final ArrayList<String> selectedContacts = intent.getStringArrayListExtra("SELECTED_CONTACTS");
+            final long fileHandle = intent.getLongExtra("SELECT", 0);
+            MegaNode node = megaApi.getNodeByHandle(fileHandle);
+            if(node!=null){
+                log("Node to send: "+node.getName());
+                MegaNodeList nodeList = MegaNodeList.createInstance();
+                nodeList.addNode(node);
+                megaChatApi.attachNodes(idChat, nodeList, this);
+
+            }
+
+        }
         else{
-            log("Error onActivityResult: REQUEST_ADD_PARTICIPANTS");
+            log("Error onActivityResult");
         }
 
         super.onActivityResult(requestCode, resultCode, intent);
@@ -1260,7 +1285,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }
             case R.id.upload_from_cloud_chat:{
                 hideUploadPanel();
-                showSnackbar(getString(R.string.general_not_yet_implemented));
+
+                ChatController chatC = new ChatController(this);
+                chatC.pickFileToSend();
                 break;
             }
             case R.id.upload_audio_chat:{
@@ -2928,6 +2955,18 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 else{
                     showSnackbar(getString(R.string.add_participant_error));
                 }
+            }
+        }
+        else if(request.getType() == MegaChatRequest.TYPE_ATTACH_NODE_MESSAGE){
+            if(e.getErrorCode()==MegaChatError.ERROR_OK){
+                log("File sent correctly");
+                MegaNodeList nodeList = request.getMegaNodeList();
+                for(int i = 0; i<nodeList.size();i++){
+                    log("Node name: "+nodeList.get(i).getName());
+                }
+            }
+            else{
+                log("File NOT sent: "+e.getErrorCode());
             }
         }
     }

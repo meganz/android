@@ -153,6 +153,13 @@
                     android:background="@drawable/rounded_text_view_chat_own_message"
                     android:padding="9dp"
                     android:gravity="right"/>
+                
+                <ImageView
+                    android:id="@+id/content_own_message_image"
+                    android:layout_width="160dp"
+                    android:layout_height="220dp"
+                    android:layout_alignParentRight="true"
+                    />
 
                 <ImageView
                     android:id="@+id/own_triangle_icon"

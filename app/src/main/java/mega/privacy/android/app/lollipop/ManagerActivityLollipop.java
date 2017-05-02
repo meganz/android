@@ -1211,6 +1211,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		}
 		log("Preferred View List: "+isList);
 
+
+		String language = Locale.getDefault().toString();
+		log("Language: "+language);
+
 		if(prefs!=null){
 			if(prefs.getPreferredSortCloud()!=null){
 				orderCloud = Integer.parseInt(prefs.getPreferredSortCloud());
@@ -10369,10 +10373,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 			Uri treeUri = intent.getData();
 	        DocumentFile pickedDir = DocumentFile.fromTreeUri(this, treeUri);
-		}
-		if (requestCode == Constants.ENABLE_CHAT && resultCode == RESULT_OK){
-			log("OnActivityResult-->connect");
-
 		}
 		else if (requestCode == Constants.REQUEST_CODE_GET && resultCode == RESULT_OK) {
 			if (intent == null) {
