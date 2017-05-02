@@ -826,8 +826,8 @@
     <string name="my_account_my_credentials" context="Title of the label in the my account section. It shows the credentials of the current user so it can be used to be verified by other contacts">My credentials</string>
     <string name="limited_bandwith" context="Word to indicate the limited bandwidth of the free accounts">Limited</string>
 
-    <string name="section_chat" context="Item of the navigation title for the chat section">Chat</string>
-    <string name="section_chat_with_notification" context="Item of the navigation title for the chat section when there is any unread message"><![CDATA[Chat <font color=\'#ff333a\'>(%1$d)</font>]]></string>
+    <string name="section_chat" context="Item of the navigation title for the chat section">Chat BETA</string>
+    <string name="section_chat_with_notification" context="Item of the navigation title for the chat section when there is any unread message"><![CDATA[Chat BETA <font color=\'#ff333a\'>(%1$d)</font>]]></string>
 
     <string name="tab_archive_chat" context="Title of the archived chats tab. Capital letters">Archive</string>
     <string name="tab_recent_chat" context="Title of the recent chats tab. Capital letters">RECENT</string>

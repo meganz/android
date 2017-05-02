@@ -2415,7 +2415,19 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 		PendingIntent pendingIntent = PendingIntent.getActivity(CameraSyncService.this, 0, intent, 0);
 		Notification notification = null;
 
-		if (currentapiVersion >= android.os.Build.VERSION_CODES.ICE_CREAM_SANDWICH)
+		if (currentapiVersion >= android.os.Build.VERSION_CODES.N) {
+			mBuilder
+					.setSmallIcon(R.drawable.ic_stat_camera_sync)
+					.setProgress(100, progressPercent, false)
+					.setContentIntent(pendingIntent)
+					.setOngoing(true)
+					.setContentTitle(message)
+					.setSubText(info)
+					.setContentText(getString(R.string.settings_camera_notif_title))
+					.setOnlyAlertOnce(true);
+			notification = mBuilder.getNotification();
+		}
+		else if (currentapiVersion >= android.os.Build.VERSION_CODES.ICE_CREAM_SANDWICH)
 		{
 			mBuilder
 					.setSmallIcon(R.drawable.ic_stat_camera_sync)

@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.app.Fragment;
@@ -995,15 +997,25 @@ public class OfflineFragmentLollipop extends Fragment{
     
     public void openFile (File currentFile){
     	Intent viewIntent = new Intent(Intent.ACTION_VIEW);
-		viewIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
-		viewIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+			viewIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
+		}
+		else{
+			viewIntent.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
+		}
+		viewIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 		if (MegaApiUtils.isIntentAvailable(context, viewIntent)){
 			context.startActivity(viewIntent);
 		}
 		else{
 			Intent intentShare = new Intent(Intent.ACTION_SEND);
-			intentShare.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
-			intentShare.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+				intentShare.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
+			}
+			else{
+				intentShare.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
+			}
+			intentShare.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 			if (MegaApiUtils.isIntentAvailable(context, intentShare)){
 				context.startActivity(intentShare);
 			}
