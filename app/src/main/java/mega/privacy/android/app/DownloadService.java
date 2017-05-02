@@ -595,7 +595,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		intent = new Intent(DownloadService.this, ManagerActivityLollipop.class);
 		intent.setAction(Constants.ACTION_SHOW_TRANSFERS);
 
-		String info = Util.getProgressSize(DownloadService.this, totalSizePendingTransfer, totalSizeTransferred);
+		String info = Util.getProgressSize(DownloadService.this, totalSizeTransferred, totalSizePendingTransfer);
 
 		PendingIntent pendingIntent = PendingIntent.getActivity(DownloadService.this, 0, intent, 0);
 		Notification notification = null;
