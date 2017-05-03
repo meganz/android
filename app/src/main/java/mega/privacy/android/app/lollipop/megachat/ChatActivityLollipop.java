@@ -1401,6 +1401,98 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
     }
 
+    public void sendMessage(MegaChatMessage msgSent){
+        log("sendMessage: msgSent");
+        AndroidMegaChatMessage androidMsgSent = new AndroidMegaChatMessage(msgSent);
+        int index = messages.size()-1;
+        if(msgSent!=null){
+            log("Sent message with id temp: "+msgSent.getTempId());
+            log("State of the message: "+msgSent.getStatus());
+            log("Index: "+index);
+            if(index==-1){
+                //First element
+                log("First element!");
+                messages.add(androidMsgSent);
+                messages.get(0).setInfoToShow(Constants.CHAT_ADAPTER_SHOW_ALL);
+            }
+            else{
+                //Not first element
+                //Find where to add in the queue
+                while(messages.get(index).getMessage().getStatus()==MegaChatMessage.STATUS_SENDING_MANUAL){
+                    index--;
+                }
+                index++;
+                log("Add in position: "+index);
+
+                messages.add(index, androidMsgSent);
+
+                AndroidMegaChatMessage androidPreviousMessage = messages.get(index-1);
+                log("previous message: "+androidPreviousMessage.getMessage().getContent());
+                if(androidPreviousMessage.getMessage().getUserHandle()==myUserHandle) {
+                    //The last two messages are mine
+                    if(compareDate(androidMsgSent, androidPreviousMessage)==0){
+                        //Same date
+                        if(compareTime(androidMsgSent, androidPreviousMessage)==0){
+                            messages.get(index).setInfoToShow(Constants.CHAT_ADAPTER_SHOW_NOTHING);
+                        }
+                        else{
+                            //Different minute
+                            messages.get(index).setInfoToShow(Constants.CHAT_ADAPTER_SHOW_TIME);
+                        }
+                    }
+                    else{
+                        //Different date
+                        messages.get(index).setInfoToShow(Constants.CHAT_ADAPTER_SHOW_ALL);
+                    }
+                }
+                else{
+                    //The last message is mine, the previous not
+                    if(compareDate(androidMsgSent, androidPreviousMessage)==0){
+                        messages.get(index).setInfoToShow(Constants.CHAT_ADAPTER_SHOW_TIME);
+                    }
+                    else{
+                        //Different date
+                        messages.get(index).setInfoToShow(Constants.CHAT_ADAPTER_SHOW_ALL);
+                    }
+                }
+            }
+            if (adapter == null){
+                adapter = new MegaChatLollipopAdapter(this, chatRoom, messages, listView);
+                adapter.setHasStableIds(true);
+                listView.setLayoutManager(mLayoutManager);
+                listView.setAdapter(adapter);
+                adapter.setMessages(messages);
+                if(adapter.getItemCount()>0){
+                    listView.setVisibility(View.VISIBLE);
+                    chatRelativeLayout.setVisibility(View.VISIBLE);
+                    emptyScrollView.setVisibility(View.GONE);
+                }
+            }
+            else{
+                adapter.addMessage(messages, index);
+                final int indexToScroll = index;
+
+                mLayoutManager.scrollToPositionWithOffset(indexToScroll,20);
+//                Handler handler = new Handler();
+//                handler.postDelayed(new Runnable() {
+//
+//                    @Override
+//                    public void run() {
+//                        log("sendMessage: Now I update the recyclerview (send): "+indexToScroll);
+//
+//
+//                    }
+//                }, 100);
+            }
+        }
+        else{
+            log("Error al enviar mensaje!");
+            //EL mensaje no se ha enviado, mostrar error al usuario pero no cambiar interfaz
+
+        }
+    }
+
+
     public void editMessage(String text){
         log("editMessage: "+text);
         MegaChatMessage msgEdited = null;
@@ -2964,6 +3056,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 for(int i = 0; i<nodeList.size();i++){
                     log("Node name: "+nodeList.get(i).getName());
                 }
+                sendMessage(request.getMegaChatMessage());
             }
             else{
                 log("File NOT sent: "+e.getErrorCode());
