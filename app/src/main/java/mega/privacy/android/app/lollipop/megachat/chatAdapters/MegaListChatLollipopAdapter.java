@@ -1124,96 +1124,93 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 			log("MessageType: "+messageType);
 			String lastMessageString = chat.getLastMessage();
 
-			switch(messageType){
-				case MegaChatMessage.TYPE_INVALID:{
-					log("Message Type -> INVALID");
-					holder.textViewContent.setText(context.getString(R.string.no_conversation_history));
-					holder.textViewContent.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
-					holder.textViewDate.setVisibility(View.GONE);
-					break;
+			if(messageType==MegaChatMessage.TYPE_INVALID){
+				log("Message Type -> INVALID");
+				holder.textViewContent.setText(context.getString(R.string.no_conversation_history));
+				holder.textViewContent.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
+				holder.textViewDate.setVisibility(View.GONE);
+			}
+			else{
+				if(lastMessageString==null){
+                    log("Message Type-> "+messageType+" last content is NULL ");
+					lastMessageString = context.getString(R.string.error_message_unrecognizable);
 				}
-				case MegaChatMessage.TYPE_NORMAL:{
+				else{
+                    log("Message Type-> "+messageType+" last content: "+lastMessageString + "length: "+lastMessageString.length());
+                }
 
-					if(lastMessageString==null){
-						lastMessageString = context.getString(R.string.error_message_unrecognizable);
+				if(chat.getLastMessageSender()==megaChatApi.getMyUserHandle()){
+
+					log("The last message is mine");
+					Spannable me = new SpannableString("Me: ");
+					me.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.file_list_first_row)), 0, me.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+					holder.textViewContent.setText(me);
+
+					if(lastMessageString!=null) {
+						Spannable myMessage = new SpannableString(lastMessageString);
+						myMessage.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.file_list_second_row)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+						holder.textViewContent.append(myMessage);
 					}
+				}
+				else{
+					log("The last message NOT mine");
+					String fullNameAction = getParticipantShortName(chat.getLastMessageSender());
 
-					log("MegaChatMessage.TYPE_NORMAL: "+lastMessageString);
+					if(chat.isGroup()){
+						Spannable name = new SpannableString(fullNameAction+": ");
+						name.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.black)), 0, name.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+						holder.textViewContent.setText(name);
 
-					if(chat.getLastMessageSender()==megaChatApi.getMyUserHandle()){
+						if(chat.getUnreadCount()==0){
+							log("Message READ");
 
-						log("The last message is mine");
-						Spannable me = new SpannableString("Me: ");
-						me.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.file_list_first_row)), 0, me.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-						holder.textViewContent.setText(me);
-
-						if(lastMessageString!=null) {
 							Spannable myMessage = new SpannableString(lastMessageString);
-							myMessage.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.file_list_second_row)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+							myMessage.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.file_list_second_row)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+							holder.textViewContent.append(myMessage);
+						}
+						else{
+							log("Message NOt read");
+							Spannable myMessage = new SpannableString(lastMessageString);
+							myMessage.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.accentColor)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 							holder.textViewContent.append(myMessage);
 						}
 					}
 					else{
-						log("The last message NOT mine");
-						String fullNameAction = getParticipantShortName(chat.getLastMessageSender());
-
-						if(chat.isGroup()){
-							Spannable name = new SpannableString(fullNameAction+": ");
-							name.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.black)), 0, name.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-							holder.textViewContent.setText(name);
-
-							if(chat.getUnreadCount()==0){
-								log("Message READ");
-
-								Spannable myMessage = new SpannableString(lastMessageString);
-								myMessage.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.file_list_second_row)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-								holder.textViewContent.append(myMessage);
-							}
-							else{
-								log("Message NOt read");
-								Spannable myMessage = new SpannableString(lastMessageString);
-								myMessage.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.accentColor)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-								holder.textViewContent.append(myMessage);
-							}
+						if(chat.getUnreadCount()==0){
+							log("Message READ");
+							holder.textViewContent.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
 						}
 						else{
-							if(chat.getUnreadCount()==0){
-								log("Message READ");
-								holder.textViewContent.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
-							}
-							else{
-								log("Message NOt read");
-								holder.textViewContent.setTextColor(ContextCompat.getColor(context, R.color.accentColor));
-							}
-
-							holder.textViewContent.setText(lastMessageString);
+							log("Message NOt read");
+							holder.textViewContent.setTextColor(ContextCompat.getColor(context, R.color.accentColor));
 						}
 
+						holder.textViewContent.setText(lastMessageString);
 					}
 
-					break;
 				}
-				case MegaChatMessage.TYPE_NODE_ATTACHMENT:{
-					log("Message type attached!!");
-					holder.textViewContent.setText("Attached: "+lastMessageString);
-					break;
-				}
-				case MegaChatMessage.TYPE_CONTACT_ATTACHMENT:{
-					log("Message type contact!!");
-					holder.textViewContent.setText("Contact: "+lastMessageString);
-					break;
-				}
-				case MegaChatMessage.TYPE_REVOKE_NODE_ATTACHMENT:{
-					log("Message type revoke node attachement!!");
-					holder.textViewContent.setText("Revoke node attachement: "+lastMessageString);
-					break;
-				}
-				default:{
-					log("Message Type -> DEFAULT");
-					holder.textViewContent.setText("Loading...");
-					holder.textViewContent.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
-					holder.textViewDate.setVisibility(View.GONE);
-				}
+
+//				switch(messageType) {
+//					case MegaChatMessage.TYPE_NORMAL: {
+//
+//						break;
+//					}
+//					case MegaChatMessage.TYPE_NODE_ATTACHMENT: {
+//						log("Message type attached!!");
+//						holder.textViewContent.setText("Attached: "+lastMessageString);
+//						break;
+//					}
+//					case MegaChatMessage.TYPE_CONTACT_ATTACHMENT: {
+//						log("Message type contact!!");
+//						holder.textViewContent.setText("Contact: "+lastMessageString);
+//						break;
+//					}
+//					case MegaChatMessage.TYPE_REVOKE_NODE_ATTACHMENT: {
+//						log("Message type revoke node attachement!!");
+//						holder.textViewContent.setText("Revoke node attachement: "+lastMessageString);
+//						break;
+//					}
+//				}
 			}
 		}
 		else{
