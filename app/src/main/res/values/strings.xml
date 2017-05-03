@@ -1170,4 +1170,9 @@
     <string name="text_depleted_transfer_overquota" context="Text of the alert when the transfer quota is depleted">Your queued transfer exceeds the current transfer quota available for your IP address and may therefore be interrupted.</string>
     <string name="plans_depleted_transfer_overquota" context="Button to show plans in the alert when the transfer quota is depleted">See our plans</string>
     <string name="continue_without_account_transfer_overquota" context="Button option of the alert when the transfer quota is depleted">Continue without account</string>
+
+    <plurals name="new_general_num_files" context="this is used for example when downloading 1 file or 2 files">
+        <item context="Singular of file. 1 file" quantity="one">%1$d file</item>
+        <item context="Plural of file. 2 files" quantity="other">%1$d files</item>
+    </plurals>
 </resources>
