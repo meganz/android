@@ -1229,7 +1229,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                             messageContent = "A contact was sent";
                         }
 
-
                         ((ViewHolderMessageChat)holder).contentOwnMessageLayout.setVisibility(View.VISIBLE);
                         ((ViewHolderMessageChat)holder).ownManagementMessageLayout.setVisibility(View.GONE);
 
@@ -1251,6 +1250,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                             }
                         } else {
                             log("Multiselect ON");
+
+                            ((ViewHolderMessageChat)holder).ownMultiselectionLayout.setVisibility(View.VISIBLE);
 
                             if(this.isItemChecked(position)){
                                 log("Selected: "+message.getContent());
