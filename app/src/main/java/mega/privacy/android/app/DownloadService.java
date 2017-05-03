@@ -271,12 +271,24 @@ public class DownloadService extends Service implements MegaTransferListenerInte
             }
             storeToAdvacedDevices.put(currentDocument.getHandle(), contentUri);
 
-            if (isFolderLink){
-                megaApiFolder.startDownload(currentDocument, currentDir.getAbsolutePath() + "/", this);
-            }
-            else{
-                megaApi.startDownload(currentDocument, currentDir.getAbsolutePath() + "/", this);
-            }
+			if (isFolderLink){
+//                    if (megaApi.getRootNode() == null){
+//                        megaApiFolder.startDownload(currentDocument, currentDir.getAbsolutePath() + "/", this);
+//                        log("Root node is null");
+//                        return;
+//                    }
+
+				log("Folder link node");
+				currentDocument = megaApiFolder.authorizeNode(currentDocument);
+				if (currentDocument == null){
+					log("CurrentDocument is null");
+					megaApiFolder.startDownload(currentDocument, currentDir.getAbsolutePath() + "/", this);
+					return;
+				}
+			}
+
+			log("CurrentDocument is not null");
+			megaApi.startDownload(currentDocument, currentDir.getAbsolutePath() + "/", this);
         }
         else{
             if (currentDir.isDirectory()){
@@ -306,13 +318,13 @@ public class DownloadService extends Service implements MegaTransferListenerInte
                 }
 
                 if (isFolderLink){
-                    if (megaApi.getRootNode() == null){
-                        megaApiFolder.startDownload(currentDocument, currentDir.getAbsolutePath() + "/", this);
-                        log("Root node is null");
-                        return;
-                    }
+//                    if (megaApi.getRootNode() == null){
+//                        megaApiFolder.startDownload(currentDocument, currentDir.getAbsolutePath() + "/", this);
+//                        log("Root node is null");
+//                        return;
+//                    }
 
-                    log("Root node is not null");
+                    log("Folder link node");
                     currentDocument = megaApiFolder.authorizeNode(currentDocument);
                     if (currentDocument == null){
                         log("CurrentDocument is null");
