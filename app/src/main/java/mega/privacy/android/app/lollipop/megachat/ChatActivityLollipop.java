@@ -73,6 +73,7 @@ import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatError;
+import nz.mega.sdk.MegaChatHandleList;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatPeerList;
 import nz.mega.sdk.MegaChatRequest;
@@ -1060,6 +1061,18 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     }
 
+    public void chooseContactsDialog(){
+        log("chooseContactsDialog");
+
+        if(megaChatApi.isSignalActivityRequired()){
+            megaChatApi.signalPresenceActivity();
+        }
+
+        Intent in = new Intent(this, AddContactActivityLollipop.class);
+        in.putExtra("contactType", Constants.CONTACT_TYPE_MEGA);
+        startActivityForResult(in, Constants.REQUEST_SEND_CONTACTS);
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
         log("onActivityResult, resultCode: " + resultCode);
@@ -1091,6 +1104,25 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                             megaChatApi.inviteToChat(chatRoom.getChatId(), user.getHandle(), MegaChatPeerList.PRIV_STANDARD, multipleListener);
                         }
                     }
+                }
+            }
+        }
+        if (requestCode == Constants.REQUEST_SEND_CONTACTS && resultCode == RESULT_OK) {
+            log("onActivityResult REQUEST_SEND_CONTACTS OK");
+
+            final ArrayList<String> contactsData = intent.getStringArrayListExtra(AddContactActivityLollipop.EXTRA_CONTACTS);
+            if (contactsData != null) {
+                MegaChatHandleList handleList = MegaChatHandleList.createInstance();
+                for(int i=0; i<contactsData.size();i++){
+                    MegaUser user = megaApi.getContact(contactsData.get(i));
+                    if (user != null) {
+                        handleList.addMegaChatHandle(user.getHandle());
+
+                    }
+                }
+                MegaChatMessage contactMessage = megaChatApi.attachContacts(idChat, handleList);
+                if(contactMessage!=null){
+                    sendMessage(contactMessage);
                 }
             }
         }
@@ -1297,7 +1329,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }
             case R.id.upload_contact_chat:{
                 hideUploadPanel();
-                showSnackbar(getString(R.string.general_not_yet_implemented));
+                chooseContactsDialog();
                 break;
             }
             case R.id.upload_from_filesystem_chat:{

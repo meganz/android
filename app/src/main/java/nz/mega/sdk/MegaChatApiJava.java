@@ -921,7 +921,7 @@ public class MegaChatApiJava {
      * @param handles MegaChatHandleList with contacts to be attached
      * @return MegaChatMessage that will be sent. The message id is not definitive, but temporal.
      */
-    MegaChatMessage attachContacts(long chatid, MegaChatHandleList handles){
+    public MegaChatMessage attachContacts(long chatid, MegaChatHandleList handles){
         return megaChatApi.attachContacts(chatid, handles);
     }
 
