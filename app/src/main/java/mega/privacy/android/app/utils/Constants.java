@@ -29,6 +29,7 @@ public class Constants {
 	public static int REQUEST_CREATE_CHAT = 1018;
 	public static int REQUEST_ADD_PARTICIPANTS = 1019;
 	public static int ENABLE_CHAT = 1020;
+	public static int REQUEST_SEND_CONTACTS = 1021;
 
 	public static String ACTION_REFRESH = "ACTION_REFRESH";
 	public static String ACTION_ENABLE_CHAT = "ACTION_ENABLE_CHAT";
