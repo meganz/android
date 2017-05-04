@@ -1238,6 +1238,9 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                             ((ViewHolderMessageChat)holder).contentOwnMessageFileLayout.setVisibility(View.VISIBLE);
 
+                            ((ViewHolderMessageChat)holder).contentOwnMessageFileLayout.setTag(holder);
+                            ((ViewHolderMessageChat)holder).contentOwnMessageFileLayout.setOnClickListener(this);
+
                             ((ViewHolderMessageChat)holder).contentOwnMessageFileThumb.setVisibility(View.VISIBLE);
                             ((ViewHolderMessageChat)holder).contentOwnMessageFileName.setVisibility(View.VISIBLE);
                             ((ViewHolderMessageChat)holder).contentOwnMessageFileSize.setVisibility(View.VISIBLE);
@@ -2468,27 +2471,19 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
     @Override
     public void onClick(View v) {
-        log("onCLick");
-//        ViewHolderMessageChat holder = (ViewHolderMessageChat) v.getTag();
-//        if(holder==null){
-//            log("Holder is null!");
-//            return;
-//        }
-//        int currentPosition = ((ViewHolderMessageChat)holder).currentPosition;
-//        switch (v.getId()){
-//            case R.id.not_sent_own_message_text:{
-//                log("not_sent_own_message_text, message_chat_item_layout");
-//
-//                AndroidMegaChatMessage m = (AndroidMegaChatMessage) getItem(currentPosition);
-//                ((ChatActivityLollipop) context).showMsgNotSentPanel(m);
-//                break;
-//            }
-//            case R.id.message_chat_item_layout:{
-//                ((ChatActivityLollipop) context).itemClick(currentPosition);
-//                break;
-//            }
-//
-//        }
+        ViewHolderMessageChat holder = (ViewHolderMessageChat) v.getTag();
+        int currentPosition = holder.getAdapterPosition();
+        log("onClick -> Current position: " + currentPosition);
+        AndroidMegaChatMessage message = (AndroidMegaChatMessage) getItem(currentPosition);
+
+        switch (v.getId()){
+            case R.id.content_own_message_file_layout:{
+                log("click on own file layout: ");
+                ((ChatActivityLollipop) context).showNodeAttachmentBottomSheet(message, currentPosition);
+                break;
+            }
+        }
+
     }
 
     private static void log(String log) {

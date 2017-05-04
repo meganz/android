@@ -279,7 +279,6 @@
     <string name="context_remove_link_menu" context="Item menu option upon right click on one or multiple files.">Remove link</string>
     <string name="context_remove_link_warning_text" context="Warning that appears prior to remove a link of a file.">This link will not be publicly available anymore.</string>
     <string name="context_rename" context="Item menu option upon right click on one or multiple files.">Rename</string>
-    <string name="context_open_link" context="Item menu option upon right click on one or multiple files.">Open</string>
     <string name="context_open_link_title" context="Item menu option upon right click on one or multiple files.">Open link</string>
     <string name="context_renaming" context="while renaming a file or folder">Renaming</string>
     <string name="context_preparing_provider" context="while file provider is downloading a file">Preparing file</string>
@@ -1175,4 +1174,9 @@
         <item context="Singular of file. 1 file" quantity="one">%1$d file</item>
         <item context="Plural of file. 2 files" quantity="other">%1$d files</item>
     </plurals>
+
+    <string name="general_view" context="Menu option">View files</string>
+    <string name="add_to_cloud" context="Menu option">Add to Cloud Drive</string>
+    <string name="save_for_offline" context="Menu option">Save for Offline</string>
+    <string name="general_revoke" context="Menu option">Revoke</string>
 </resources>

@@ -65,6 +65,7 @@ import mega.privacy.android.app.lollipop.listeners.ChatNonContactNameListener;
 import mega.privacy.android.app.lollipop.listeners.MultipleGroupChatRequestListener;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaChatLollipopAdapter;
 import mega.privacy.android.app.modalbottomsheet.MessageNotSentBottomSheetDialogFragment;
+import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.NodeAttachmentBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.TimeChatUtils;
 import mega.privacy.android.app.utils.Util;
@@ -2985,6 +2986,20 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         if(message!=null){
 //            this.selectedChatItem = chat;
             MessageNotSentBottomSheetDialogFragment bottomSheetDialogFragment = new MessageNotSentBottomSheetDialogFragment();
+            bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
+        }
+    }
+
+    public void showNodeAttachmentBottomSheet(AndroidMegaChatMessage message, int position){
+//        showSnackbar("Not yet implemented!");
+
+        log("showNodeAttachmentBottomSheet: "+position);
+        this.selectedMessage = message;
+        this.selectedPosition = position;
+
+        if(message!=null){
+//            this.selectedChatItem = chat;
+            NodeAttachmentBottomSheetDialogFragment bottomSheetDialogFragment = new NodeAttachmentBottomSheetDialogFragment();
             bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
         }
     }
