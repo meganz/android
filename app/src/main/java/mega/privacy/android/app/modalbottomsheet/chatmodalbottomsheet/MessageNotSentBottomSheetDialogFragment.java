@@ -1,4 +1,4 @@
-package mega.privacy.android.app.modalbottomsheet;
+package mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet;
 
 
 import android.app.Activity;
@@ -43,6 +43,9 @@ public class MessageNotSentBottomSheetDialogFragment extends BottomSheetDialogFr
     AndroidMegaChatMessage selectedMessage = null;
     MegaChatMessage originalMsg = null;
 
+    long chatId;
+    long messageId;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,9 +54,30 @@ public class MessageNotSentBottomSheetDialogFragment extends BottomSheetDialogFr
             megaChatApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaChatApi();
         }
 
-        if(context instanceof ChatActivityLollipop){
-            selectedMessage = ((ChatActivityLollipop) context).getSelectedMessage();
-            selectedChat = ((ChatActivityLollipop) context).getChatRoom();
+        if(savedInstanceState!=null) {
+            log("Bundle is NOT NULL");
+            chatId = savedInstanceState.getLong("chatId", -1);
+            log("Handle of the chat: "+chatId);
+            messageId = savedInstanceState.getLong("messageId", -1);
+            log("Handle of the message: "+messageId);
+            MegaChatMessage messageMega = megaChatApi.getMessage(chatId, messageId);
+            if(messageMega!=null){
+                selectedMessage = new AndroidMegaChatMessage(messageMega);
+            }
+            selectedChat = megaChatApi.getChatRoom(chatId);
+        }
+        else{
+            log("Bundle NULL");
+
+            chatId = ((ChatActivityLollipop) context).idChat;
+            log("Handle of the chat: "+chatId);
+            messageId = ((ChatActivityLollipop) context).selectedMessageId;
+            MegaChatMessage messageMega = megaChatApi.getMessage(chatId, messageId);
+            log("Handle of the message: "+messageId);
+            if(messageMega!=null){
+                selectedMessage = new AndroidMegaChatMessage(messageMega);
+            }
+            selectedChat = megaChatApi.getChatRoom(chatId);
         }
     }
     @Override
@@ -73,26 +97,28 @@ public class MessageNotSentBottomSheetDialogFragment extends BottomSheetDialogFr
         optionDeleteLayout = (LinearLayout) contentView.findViewById(R.id.msg_not_sent_delete_layout);
         optionDeleteLayout.setOnClickListener(this);
 
-        if(selectedMessage.getMessage().isEdited()){
-            log("Message edited : final id: "+selectedMessage.getMessage().getMsgId()+" temp id: "+selectedMessage.getMessage().getTempId());
-            originalMsg = megaChatApi.getMessage(selectedChat.getChatId(), selectedMessage.getMessage().getTempId());
-            if(originalMsg!=null){
-                if(originalMsg.isEditable()){
-                    optionRetryLayout.setVisibility(View.VISIBLE);
-                    optionRetryLayout.setOnClickListener(this);
+        if(selectedMessage!=null&&selectedChat!=null){
+            if(selectedMessage.getMessage().isEdited()){
+                log("Message edited : final id: "+selectedMessage.getMessage().getMsgId()+" temp id: "+selectedMessage.getMessage().getTempId());
+                originalMsg = megaChatApi.getMessage(selectedChat.getChatId(), selectedMessage.getMessage().getTempId());
+                if(originalMsg!=null){
+                    if(originalMsg.isEditable()){
+                        optionRetryLayout.setVisibility(View.VISIBLE);
+                        optionRetryLayout.setOnClickListener(this);
+                    }
+                    else{
+                        optionRetryLayout.setVisibility(View.GONE);
+                    }
                 }
                 else{
+                    log("Null recovering the original msg");
                     optionRetryLayout.setVisibility(View.GONE);
                 }
             }
             else{
-                log("Null recovering the original msg");
-                optionRetryLayout.setVisibility(View.GONE);
+                optionRetryLayout.setVisibility(View.VISIBLE);
+                optionRetryLayout.setOnClickListener(this);
             }
-        }
-        else{
-            optionRetryLayout.setVisibility(View.VISIBLE);
-            optionRetryLayout.setOnClickListener(this);
         }
 
         dialog.setContentView(contentView);
@@ -153,11 +179,19 @@ public class MessageNotSentBottomSheetDialogFragment extends BottomSheetDialogFr
         context = activity;
     }
 
-
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
         this.context = context;
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState){
+        log("onSaveInstanceState");
+        super.onSaveInstanceState(outState);
+
+        outState.putLong("chatId", chatId);
+        outState.putLong("messageId", messageId);
     }
 
     private static void log(String log) {

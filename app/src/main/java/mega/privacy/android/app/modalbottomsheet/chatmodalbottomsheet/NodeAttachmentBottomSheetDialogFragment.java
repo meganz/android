@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.BottomSheetDialogFragment;
 import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.Snackbar;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Display;
@@ -38,6 +39,8 @@ import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.ThumbnailUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaChatApiAndroid;
+import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaNodeList;
 import nz.mega.sdk.MegaShare;
@@ -47,7 +50,10 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
 
     Context context;
     MegaNode node = null;
+    MegaNodeList nodeList;
     AndroidMegaChatMessage message = null;
+    long chatId;
+    long messageId;
     NodeController nC;
 
     private BottomSheetBehavior mBehavior;
@@ -72,6 +78,7 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
     Bitmap thumb = null;
 
     MegaApiAndroid megaApi;
+    MegaChatApiAndroid megaChatApi;
     DatabaseHandler dbH;
 
     @Override
@@ -83,19 +90,29 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
             megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
         }
 
+        if (megaChatApi == null){
+            megaChatApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaChatApi();
+        }
+
         if(savedInstanceState!=null) {
             log("Bundle is NOT NULL");
-//            long handle = savedInstanceState.getLong("handle", -1);
-//            log("Handle of the node: "+handle);
-//            node = megaApi.getNodeByHandle(handle);
-//            if(context instanceof ChatActivityLollipop){
-//                drawerItem = ((ManagerActivityLollipop) context).getDrawerItem();
-//            }
+            chatId = savedInstanceState.getLong("chatId", -1);
+            log("Handle of the chat: "+chatId);
+            messageId = savedInstanceState.getLong("messageId", -1);
+            log("Handle of the message: "+messageId);
+            MegaChatMessage messageMega = megaChatApi.getMessage(chatId, messageId);
+            if(messageMega!=null){
+                message = new AndroidMegaChatMessage(messageMega);
+            }
         }
         else{
             log("Bundle NULL");
-            if(context instanceof ChatActivityLollipop){
-                message = ((ChatActivityLollipop) context).getSelectedMessage();
+
+            chatId = ((ChatActivityLollipop) context).idChat;
+            messageId = ((ChatActivityLollipop) context).selectedMessageId;
+            MegaChatMessage messageMega = megaChatApi.getMessage(chatId, messageId);
+            if(messageMega!=null){
+                message = new AndroidMegaChatMessage(messageMega);
             }
         }
 
@@ -148,7 +165,7 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
         }
 
         if (message != null) {
-            MegaNodeList nodeList = message.getMessage().getMegaNodeList();
+            nodeList = message.getMessage().getMegaNodeList();
             if(nodeList.size()==1){
                 node = nodeList.get(0);
 
@@ -185,7 +202,7 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
                         }
                     }
 
-
+                    optionView.setVisibility(View.GONE);
 
                     dialog.setContentView(contentView);
 
@@ -198,32 +215,10 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
             }
             else{
                 log("Several nodes in the message");
-
+                optionView.setVisibility(View.VISIBLE);
             }
-
         }
-
     }
-
-//    private int getBottomSheetMaximumHeight() {
-//        // get toolbar height
-//        Toolbar toolbar = (Toolbar) getActivity().findViewById(R.id.toolbar);
-//        int toolbarHeight = toolbar.getHeight();
-//
-//        //get status bar height
-//        Rect rectangle = new Rect();
-//        Window window = getActivity().getWindow();
-//        window.getDecorView().getWindowVisibleDisplayFrame(rectangle);
-//        int windowHeight = rectangle.bottom;
-//
-//        // material design recommended bottomsheet padding from actionbar
-//        final int padding = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,8, getContext().getResources().getDisplayMetrics());
-//
-//        // maximum height of the bottomsheet
-////        return windowHeight - toolbarHeight - rectangle.top - padding;
-//        return toolbarHeight + rectangle.top + padding;
-//
-//    }
 
     @Override
     public void onClick(View v) {
@@ -236,6 +231,11 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
                     log("The selected node is NULL");
                     return;
                 }
+                ArrayList<Long> handleList = new ArrayList<Long>();
+                for(int i=0;i<nodeList.size();i++){
+                    handleList.add(node.getHandle());
+                }
+                nC.prepareForDownload(handleList);
 
                 break;
             }
@@ -256,7 +256,7 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
                     log("The selected node is NULL");
                     return;
                 }
-
+                ((ChatActivityLollipop)context).saveOffline();
                 break;
             }
             case R.id.option_import_layout:{
@@ -265,7 +265,7 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
                     log("The selected node is NULL");
                     return;
                 }
-
+                ((ChatActivityLollipop)context).importNode();
                 break;
             }
             case R.id.option_revoke_layout:{
@@ -274,8 +274,7 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
                     log("The selected node is NULL");
                     return;
                 }
-
-
+                ((ChatActivityLollipop)context).showSnackbar(getString(R.string.general_not_yet_implemented));
                 break;
             }
         }
@@ -304,9 +303,9 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
     public void onSaveInstanceState(Bundle outState){
         log("onSaveInstanceState");
         super.onSaveInstanceState(outState);
-        long handle = node.getHandle();
-        log("Handle of the node: "+handle);
-        outState.putLong("handle", handle);
+
+        outState.putLong("chatId", chatId);
+        outState.putLong("messageId", messageId);
     }
 
     private static void log(String log) {
