@@ -291,7 +291,6 @@ public class NodeController {
         }
     }
 
-
     //Old onFileClick
     public void prepareForDownloadLollipop(ArrayList<Long> handleList){
         log("prepareForDownload: "+handleList.size()+" files to download");
@@ -305,6 +304,10 @@ public class NodeController {
                     size += nodeTemp.getSize();
                 }
             }
+            else{
+                log("Error - nodeTemp is NULL");
+            }
+
         }
         log("Number of files: "+hashes.length);
 
@@ -601,26 +604,31 @@ public class NodeController {
             if (hashes != null){
                 for (long hash : hashes) {
                     MegaNode node = megaApi.getNodeByHandle(hash);
-                    log("Node: "+ node.getName());
+                    if(node!=null){
+                        log("Node: "+ node.getName());
 
-                    if(node.isFile()){
-                        Intent checkIntent = new Intent(Intent.ACTION_VIEW, null);
-                        log("MimeTypeList: "+ MimeTypeList.typeForName(node.getName()).getType());
+                        if(node.isFile()){
+                            Intent checkIntent = new Intent(Intent.ACTION_VIEW, null);
+                            log("MimeTypeList: "+ MimeTypeList.typeForName(node.getName()).getType());
 
-                        checkIntent.setType(MimeTypeList.typeForName(node.getName()).getType());
+                            checkIntent.setType(MimeTypeList.typeForName(node.getName()).getType());
 
-                        try{
-                            if (!MegaApiUtils.isIntentAvailable(context, checkIntent)){
+                            try{
+                                if (!MegaApiUtils.isIntentAvailable(context, checkIntent)){
+                                    confirmationToDownload = true;
+                                    nodeToDownload=node.getName();
+                                    break;
+                                }
+                            }catch(Exception e){
+                                log("isIntent EXCEPTION");
                                 confirmationToDownload = true;
                                 nodeToDownload=node.getName();
                                 break;
                             }
-                        }catch(Exception e){
-                            log("isIntent EXCEPTION");
-                            confirmationToDownload = true;
-                            nodeToDownload=node.getName();
-                            break;
                         }
+                    }
+                    else{
+                        log("ERROR - node is NULL");
                     }
                 }
             }
@@ -646,13 +654,6 @@ public class NodeController {
                 ActivityCompat.requestPermissions(((ManagerActivityLollipop) context),
                         new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
                         Constants.REQUEST_WRITE_STORAGE);
-            }
-        }
-
-        if (hashes != null){
-            for (long hash : hashes) {
-                MegaNode node = megaApi.getNodeByHandle(hash);
-                log("Node: "+ node.getName());
             }
         }
 

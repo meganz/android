@@ -57,7 +57,7 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaNodeList;
 import nz.mega.sdk.MegaUser;
 
-public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements View.OnClickListener {
+public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     public static int LEFT_MARGIN_CONTACT_MSG_MANAGEMENT = 40;
     public static int RIGHT_MARGIN_CONTACT_MSG_MANAGEMENT = 68;
@@ -1237,9 +1237,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                             ((ViewHolderMessageChat)holder).contentOwnMessageThumbPort.setVisibility(View.GONE);
 
                             ((ViewHolderMessageChat)holder).contentOwnMessageFileLayout.setVisibility(View.VISIBLE);
-
-                            ((ViewHolderMessageChat)holder).contentOwnMessageFileLayout.setTag(holder);
-                            ((ViewHolderMessageChat)holder).contentOwnMessageFileLayout.setOnClickListener(this);
 
                             ((ViewHolderMessageChat)holder).contentOwnMessageFileThumb.setVisibility(View.VISIBLE);
                             ((ViewHolderMessageChat)holder).contentOwnMessageFileName.setVisibility(View.VISIBLE);
@@ -2467,23 +2464,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         log("loadPreviousMessages: "+counter);
         this.messages = messages;
         notifyItemRangeInserted(0, counter);
-    }
-
-    @Override
-    public void onClick(View v) {
-        ViewHolderMessageChat holder = (ViewHolderMessageChat) v.getTag();
-        int currentPosition = holder.getAdapterPosition();
-        log("onClick -> Current position: " + currentPosition);
-        AndroidMegaChatMessage message = (AndroidMegaChatMessage) getItem(currentPosition);
-
-        switch (v.getId()){
-            case R.id.content_own_message_file_layout:{
-                log("click on own file layout: ");
-                ((ChatActivityLollipop) context).showNodeAttachmentBottomSheet(message, currentPosition);
-                break;
-            }
-        }
-
     }
 
     private static void log(String log) {

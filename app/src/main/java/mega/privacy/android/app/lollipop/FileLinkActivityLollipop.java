@@ -864,7 +864,11 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 			Snackbar.make(fragmentContainer, getString(R.string.download_began), Snackbar.LENGTH_LONG).show();
 		}
 		else if (requestCode == Constants.REQUEST_CODE_SELECT_IMPORT_FOLDER && resultCode == RESULT_OK){
-			if(!Util.isOnline(this)){
+			if(!Util.isOnline(this)) {
+				try{
+					statusDialog.dismiss();
+				} catch(Exception ex) {};
+
 				Snackbar.make(fragmentContainer, getString(R.string.error_server_connection_problem), Snackbar.LENGTH_LONG).show();
 				return;
 			}
@@ -874,15 +878,6 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 			statusDialog = new ProgressDialog(this);
 			statusDialog.setMessage(getString(R.string.general_importing));
 			statusDialog.show();
-			
-			if(!Util.isOnline(this)) {	
-				try{ 
-					statusDialog.dismiss(); 
-				} catch(Exception ex) {};
-				
-				Snackbar.make(fragmentContainer, getString(R.string.error_server_connection_problem), Snackbar.LENGTH_LONG).show();
-				return;
-			}
 
 			target = null;
 			target = megaApi.getNodeByHandle(toHandle);
