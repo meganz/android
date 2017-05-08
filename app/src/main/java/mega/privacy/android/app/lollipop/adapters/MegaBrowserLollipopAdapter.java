@@ -578,7 +578,6 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 		float scaleW = Util.getScaleW(outMetrics, density);
 		float scaleH = Util.getScaleH(outMetrics, density);
 
-
 		MegaNode node = (MegaNode) getItem(position);
 		if (node == null){
 			return;
@@ -1553,8 +1552,9 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 			((ContactFileListFragmentLollipop) fragment).itemClick(currentPosition);
 		}
 		else if(type==Constants.FOLDER_LINK_ADAPTER){
-			((FolderLinkActivityLollipop) fragment).activateActionMode();
-			((FolderLinkActivityLollipop) fragment).itemClick(currentPosition);
+			log("FOLDER_LINK_ADAPTER");
+			((FolderLinkActivityLollipop) context).activateActionMode();
+			((FolderLinkActivityLollipop) context).itemClick(currentPosition);
 		}
 		else if(type==Constants.SEARCH_ADAPTER){
 			((SearchFragmentLollipop) fragment).activateActionMode();
