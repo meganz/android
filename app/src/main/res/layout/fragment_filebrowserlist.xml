@@ -23,7 +23,7 @@
     </RelativeLayout>
 
 	<View
-		android:id="@+id/separator"
+		android:id="@+id/separator_file_browser"
 		android:layout_width="fill_parent"
 		android:layout_height="1dip"
 		android:layout_below="@id/content_text_layout"
