@@ -183,22 +183,6 @@ public class TransfersFragmentLollipop extends Fragment {
         aB = ((AppCompatActivity)activity).getSupportActionBar();
     }
 
-	public int onBackPressed(){
-		
-		if (adapter == null){
-			return 0;
-		}
-		
-		if (adapter.getPositionClicked() != -1){
-			adapter.setPositionClicked(-1);
-			adapter.notifyDataSetChanged();
-			return 1;
-		}
-		else{
-			return 0;
-		}
-	}
-
 	public void transferUpdate(MegaTransfer transfer){
         log("transferUpdate");
 
