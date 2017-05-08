@@ -231,11 +231,12 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
                     log("The selected node is NULL");
                     return;
                 }
-                ArrayList<Long> handleList = new ArrayList<Long>();
-                for(int i=0;i<nodeList.size();i++){
-                    handleList.add(node.getHandle());
-                }
-                nC.prepareForDownload(handleList);
+                ((ChatActivityLollipop)context).showSnackbar("Coming soon");
+//                ArrayList<Long> handleList = new ArrayList<Long>();
+//                for(int i=0;i<nodeList.size();i++){
+//                    handleList.add(node.getHandle());
+//                }
+//                nC.prepareForDownload(handleList);
 
                 break;
             }
@@ -245,7 +246,7 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
                     log("The selected node is NULL");
                     return;
                 }
-
+                ((ChatActivityLollipop)context).showSnackbar("Coming soon");
 //                context.startActivity(i);
 //                dismissAllowingStateLoss();
                 break;
@@ -256,7 +257,8 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
                     log("The selected node is NULL");
                     return;
                 }
-                ((ChatActivityLollipop)context).saveOffline();
+//                ((ChatActivityLollipop)context).saveOffline();
+                ((ChatActivityLollipop)context).showSnackbar("Coming soon");
                 break;
             }
             case R.id.option_import_layout:{
@@ -274,7 +276,8 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
                     log("The selected node is NULL");
                     return;
                 }
-                ((ChatActivityLollipop)context).showSnackbar(getString(R.string.general_not_yet_implemented));
+                ((ChatActivityLollipop)context).showSnackbar("Coming soon");
+//                ((ChatActivityLollipop)context).showSnackbar(getString(R.string.general_not_yet_implemented));
                 break;
             }
         }

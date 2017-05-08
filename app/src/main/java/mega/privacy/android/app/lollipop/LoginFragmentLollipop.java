@@ -1637,27 +1637,10 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
                 dbH.saveCredentials(credentials);
 
-                chatSettings = dbH.getChatSettings();
-                if(chatSettings!=null) {
-                    boolean chatEnabled = Boolean.parseBoolean(chatSettings.getEnabled());
-                    if(chatEnabled){
-                        log("Chat enabled-->connect");
-                        initizalizingChatText.setVisibility(View.VISIBLE);
-                        initizalizingChatText.setText("Connecting chat...");
-                        megaChatApi.connect(this);
-                    }
-                    else{
-                        log("Chat NOT enabled - readyToManager");
-                        MegaApplication.setLoggingIn(false);
-                        readyToManager();
-                    }
-                }
-                else{
-                    log("chatSettings NULL - readyToManager");
-                    MegaApplication.setLoggingIn(false);
-                    readyToManager();
+                log("readyToManager");
+                MegaApplication.setLoggingIn(false);
+                readyToManager();
 
-                }
             }else{
                 log("Error fetch nodes");
                 String errorMessage;
@@ -1793,20 +1776,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
     public void onRequestFinish(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
         log("onRequestFinish(CHAT)");
 
-        if (request.getType() == MegaChatRequest.TYPE_CONNECT){
-            log("onRequestFinish(CHAT) CONNECT REQUEST");
-            MegaApplication.setLoggingIn(false);
-            if(e.getErrorCode()==MegaChatError.ERROR_OK){
-                log("Connected to chat!");
-                readyToManager();
-            }
-            else{
-                log("EEEERRRRROR WHEN CONNECTING " + e.getErrorString());
-//				showSnackbar(getString(R.string.chat_connection_error));
-                readyToManager();
-            }
-        }
-        else if (request.getType() == MegaChatRequest.TYPE_LOGOUT){
+        if (request.getType() == MegaChatRequest.TYPE_LOGOUT){
 //            loginLoggingIn.setVisibility(View.GONE);
 //            loginLogin.setVisibility(View.VISIBLE);
 //            scrollView.setBackgroundColor(getResources().getColor(R.color.background_create_account));
