@@ -448,37 +448,37 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		{
 			if (openFile){
 				log("openFile true");
-				if (MimeTypeList.typeForName(currentFile.getName()).isZip()){
-					log("Download success of zip file!");
-
-					if(pathFileToOpen!=null){
-						Intent intentZip;
-						intentZip = new Intent(this, ZipBrowserActivityLollipop.class);
-						intentZip.setAction(ZipBrowserActivityLollipop.ACTION_OPEN_ZIP_FILE);
-						intentZip.putExtra(ZipBrowserActivityLollipop.EXTRA_ZIP_FILE_TO_OPEN, pathFileToOpen);
-						intentZip.putExtra(ZipBrowserActivityLollipop.EXTRA_PATH_ZIP, currentFile.getAbsolutePath());
-						intentZip.putExtra(ZipBrowserActivityLollipop.EXTRA_HANDLE_ZIP, currentDocument.getHandle());
-
-
-						if(intentZip!=null){
-							intentZip.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-							startActivity(intentZip);
-						}
-					}
-					else{
-						Intent intentZip = null;
-
-						intentZip = new Intent(this, ManagerActivityLollipop.class);
-						intentZip.setAction(Constants.ACTION_EXPLORE_ZIP);
-						intentZip.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-						intentZip.putExtra(Constants.EXTRA_PATH_ZIP, currentFile.getAbsolutePath());
-
-						startActivity(intentZip);
-					}
-
-					log("Lanzo intent al manager.....");
-				}
-				else if (MimeTypeList.typeForName(currentFile.getName()).isDocument()){
+//				if (MimeTypeList.typeForName(currentFile.getName()).isZip()){
+//					log("Download success of zip file!");
+//
+//					if(pathFileToOpen!=null){
+//						Intent intentZip;
+//						intentZip = new Intent(this, ZipBrowserActivityLollipop.class);
+//						intentZip.setAction(ZipBrowserActivityLollipop.ACTION_OPEN_ZIP_FILE);
+//						intentZip.putExtra(ZipBrowserActivityLollipop.EXTRA_ZIP_FILE_TO_OPEN, pathFileToOpen);
+//						intentZip.putExtra(ZipBrowserActivityLollipop.EXTRA_PATH_ZIP, currentFile.getAbsolutePath());
+//						intentZip.putExtra(ZipBrowserActivityLollipop.EXTRA_HANDLE_ZIP, currentDocument.getHandle());
+//
+//
+//						if(intentZip!=null){
+//							intentZip.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//							startActivity(intentZip);
+//						}
+//					}
+//					else{
+//						Intent intentZip = null;
+//
+//						intentZip = new Intent(this, ManagerActivityLollipop.class);
+//						intentZip.setAction(Constants.ACTION_EXPLORE_ZIP);
+//						intentZip.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//						intentZip.putExtra(Constants.EXTRA_PATH_ZIP, currentFile.getAbsolutePath());
+//
+//						startActivity(intentZip);
+//					}
+//
+//					log("Lanzo intent al manager.....");
+//				}
+				if (MimeTypeList.typeForName(currentFile.getName()).isDocument()){
 					log("Download is document");
 
 					Intent viewIntent = new Intent(Intent.ACTION_VIEW);
