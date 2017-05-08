@@ -775,18 +775,20 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
                 String filePath = transfer.getPath();
 
-                Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-                File f = new File(filePath);
-				Uri contentUri;
-				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-					contentUri = FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", f);
+				try {
+					Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+					File f = new File(filePath);
+					Uri contentUri;
+					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+						contentUri = FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", f);
+					} else {
+						contentUri = Uri.fromFile(f);
+					}
+					mediaScanIntent.setData(contentUri);
+					mediaScanIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+					this.sendBroadcast(mediaScanIntent);
 				}
-				else{
-					contentUri = Uri.fromFile(f);
-				}
-                mediaScanIntent.setData(contentUri);
-                mediaScanIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                this.sendBroadcast(mediaScanIntent);
+				catch (Exception e){}
 
                 if(storeToAdvacedDevices.containsKey(transfer.getNodeHandle())){
                     log("Now copy the file to the SD Card");
