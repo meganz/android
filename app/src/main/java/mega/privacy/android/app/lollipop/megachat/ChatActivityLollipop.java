@@ -3059,14 +3059,12 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     }
 
     public void showMsgNotSentPanel(AndroidMegaChatMessage message, int position){
-//        showSnackbar("Not yet implemented!");
-
         log("showMsgNotSentPanel: "+position);
+
         this.selectedPosition = position;
         this.selectedMessageId = message.getMessage().getTempId();
 
         if(message!=null){
-//            this.selectedChatItem = chat;
             MessageNotSentBottomSheetDialogFragment bottomSheetDialogFragment = new MessageNotSentBottomSheetDialogFragment();
             bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
         }

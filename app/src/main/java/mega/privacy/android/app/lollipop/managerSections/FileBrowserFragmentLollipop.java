@@ -482,7 +482,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			emptyTextView = (TextView) v.findViewById(R.id.file_list_empty_text);
 			contentTextLayout = (RelativeLayout) v.findViewById(R.id.content_text_layout);
 			contentText = (TextView) v.findViewById(R.id.content_text);
-            separator = (View) v.findViewById(R.id.separator);
+            separator = v.findViewById(R.id.separator_file_browser);
 
 			transfersOverViewLayout = (RelativeLayout) v.findViewById(R.id.transfers_overview_item_layout);
 			transfersTitleText = (TextView) v.findViewById(R.id.transfers_overview_title);
@@ -592,49 +592,56 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 
 	public void setOverviewLayout(){
 		log("setOverviewLayout");
-		//Check transfers in progress
-		pendingTransfers = megaApi.getNumPendingDownloads() + megaApi.getNumPendingUploads();
-		totalTransfers = megaApi.getTotalDownloads() + megaApi.getTotalUploads();
+		if(isList){
+			//Check transfers in progress
+			pendingTransfers = megaApi.getNumPendingDownloads() + megaApi.getNumPendingUploads();
+			totalTransfers = megaApi.getTotalDownloads() + megaApi.getTotalUploads();
 
-		totalSizePendingTransfer = megaApi.getTotalDownloadBytes() + megaApi.getTotalUploadBytes();
-		totalSizeTransfered = megaApi.getTotalDownloadedBytes() + megaApi.getTotalUploadedBytes();
+			totalSizePendingTransfer = megaApi.getTotalDownloadBytes() + megaApi.getTotalUploadBytes();
+			totalSizeTransfered = megaApi.getTotalDownloadedBytes() + megaApi.getTotalUploadedBytes();
 
-		if(pendingTransfers>0){
-			log("Transfers in progress");
-			contentTextLayout.setVisibility(View.GONE);
-			separator.setVisibility(View.GONE);
-			transfersOverViewLayout.setVisibility(View.VISIBLE);
-			dotsOptionsTransfers.setOnClickListener(this);
-			playButton.setOnClickListener(this);
+			if(pendingTransfers>0){
+				log("Transfers in progress");
+				contentTextLayout.setVisibility(View.GONE);
+				separator.setVisibility(View.GONE);
+				transfersOverViewLayout.setVisibility(View.VISIBLE);
+				dotsOptionsTransfers.setOnClickListener(this);
+				playButton.setOnClickListener(this);
 
-			updateTransferButton();
+				updateTransferButton();
 
-			int progressPercent = (int) Math.round((double) totalSizeTransfered / totalSizePendingTransfer * 100);
-			progressBar.setProgress(progressPercent);
-			log("Progress Percent: "+progressPercent);
+				int progressPercent = (int) Math.round((double) totalSizeTransfered / totalSizePendingTransfer * 100);
+				progressBar.setProgress(progressPercent);
+				log("Progress Percent: "+progressPercent);
 
-            int inProgress = totalTransfers - pendingTransfers + 1;
-			String progressText = getResources().getQuantityString(R.plurals.text_number_transfers, totalTransfers, inProgress, totalTransfers);
-			transfersNumberText.setText(progressText);
+				int inProgress = totalTransfers - pendingTransfers + 1;
+				String progressText = getResources().getQuantityString(R.plurals.text_number_transfers, totalTransfers, inProgress, totalTransfers);
+				transfersNumberText.setText(progressText);
 
-			RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) recyclerView.getLayoutParams();
-			params.addRule(RelativeLayout.BELOW, transfersOverViewLayout.getId());
-			recyclerView.setLayoutParams(params);
+				RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) recyclerView.getLayoutParams();
+				params.addRule(RelativeLayout.BELOW, transfersOverViewLayout.getId());
+				recyclerView.setLayoutParams(params);
+			}
+			else{
+				log("NO TRANSFERS in progress");
+				contentTextLayout.setVisibility(View.VISIBLE);
+				separator.setVisibility(View.VISIBLE);
+				transfersOverViewLayout.setVisibility(View.GONE);
+				dotsOptionsTransfers.setOnClickListener(null);
+				playButton.setOnClickListener(null);
+
+				RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) recyclerView.getLayoutParams();
+				params.addRule(RelativeLayout.BELOW, contentTextLayout.getId());
+				recyclerView.setLayoutParams(params);
+
+				setContentText();
+			}
 		}
 		else{
-			log("NO TRANSFERS in progress");
-			contentTextLayout.setVisibility(View.VISIBLE);
-			separator.setVisibility(View.VISIBLE);
-			transfersOverViewLayout.setVisibility(View.GONE);
-			dotsOptionsTransfers.setOnClickListener(null);
-			playButton.setOnClickListener(null);
-
-			RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) recyclerView.getLayoutParams();
-			params.addRule(RelativeLayout.BELOW, contentTextLayout.getId());
-			recyclerView.setLayoutParams(params);
 
 			setContentText();
 		}
+
 	}
 
 	@Override
