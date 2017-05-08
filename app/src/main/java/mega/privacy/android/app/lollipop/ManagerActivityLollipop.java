@@ -13012,8 +13012,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						break;
 					}
 				}
-				transfersInProgress.remove(index);
-				log("The transfer with index : "+index +"has been removed, left: "+transfersInProgress.size());
+
+				if(!transfersInProgress.isEmpty()){
+					transfersInProgress.remove(index);
+					log("The transfer with index : "+index +"has been removed, left: "+transfersInProgress.size());
+				}
+				else{
+					log("The transferInProgress is EMPTY");
+				}
 
 				if(transfer.getState()==MegaTransfer.STATE_COMPLETED){
 					addCompletedTransfer(transfer);
