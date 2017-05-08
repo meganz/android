@@ -1554,7 +1554,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
                 transfersInProgress.add(transferData.getDownloadTag(i));
             }
             for(int i=0;i<uploadsInProgress;i++){
-                transfersInProgress.add(transferData.getDownloadTag(i));
+                transfersInProgress.add(transferData.getUploadTag(i));
             }
 
 			if(savedInstanceState==null) {
@@ -13037,7 +13037,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					playTransfersMenuIcon.setVisible(false);
 					cancelAllTransfersMenuItem.setVisible(false);
 
-					showSnackbar(getString(R.string.message_transfers_completed));
+//					showSnackbar(getString(R.string.message_transfers_completed));
 				}
 
 				String cloudTag = getFragmentTag(R.id.cloud_drive_tabs_pager, 0);
