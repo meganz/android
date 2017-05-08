@@ -1692,6 +1692,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 			log("onCreate - Check if there any unread chat");
 			if(Util.isChatEnabled()){
+				log("Connect to chat!");
+				megaChatApi.connect(this);
+
 				if (nV != null){
 					Menu nVMenu = nV.getMenu();
 					MenuItem chat = nVMenu.findItem(R.id.navigation_item_chat);
@@ -11590,8 +11593,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		}
 		else if (request.getType() == MegaChatRequest.TYPE_CONNECT){
 			if(e.getErrorCode()==MegaChatError.ERROR_OK){
-				log("Connected to chat!: statusToConnect: "+statusToConnect);
-				megaChatApi.setOnlineStatus(statusToConnect, this);
+				log("CONNECT CHAT finished ");
+				if(rChatFL!=null){
+					if(rChatFL.isAdded()){
+						rChatFL.onlineStatusUpdate(megaChatApi.getOnlineStatus());
+					}
+				}
 			}
 			else{
 				log("EEEERRRRROR WHEN CONNECTING " + e.getErrorString());
@@ -13678,12 +13685,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 //		String gSession = credentials.getSession();
 //		int ret = megaChatApi.init(gSession);
 //		megaApi.fetchNodes(this);
-	}
-
-	public void connectChat(int status){
-		log("connectChat");
-		statusToConnect = status;
-		megaChatApi.connect(this);
 	}
 
 	public void disableChat(){
