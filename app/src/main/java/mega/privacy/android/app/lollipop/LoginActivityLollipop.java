@@ -125,7 +125,7 @@ public class LoginActivityLollipop extends AppCompatActivity {
 				}
 				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 				ft.replace(R.id.fragment_container_login, loginFragment);
-				ft.commitNow();
+				ft.commitNowAllowingStateLoss();
 
 //
 //				getFragmentManager()
@@ -143,7 +143,7 @@ public class LoginActivityLollipop extends AppCompatActivity {
 
 				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 				ft.replace(R.id.fragment_container_login, chooseAccountFragment);
-				ft.commitNow();
+				ft.commitNowAllowingStateLoss();
 				break;
 			}
 			case Constants.CREATE_ACCOUNT_FRAGMENT:{
@@ -154,7 +154,7 @@ public class LoginActivityLollipop extends AppCompatActivity {
 
 				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 				ft.replace(R.id.fragment_container_login, createAccountFragment);
-				ft.commitNow();
+				ft.commitNowAllowingStateLoss();
 				break;
 			}
 			case Constants.TOUR_FRAGMENT:{
@@ -166,7 +166,7 @@ public class LoginActivityLollipop extends AppCompatActivity {
 
 				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 				ft.replace(R.id.fragment_container_login, tourFragment);
-				ft.commitNow();
+				ft.commitNowAllowingStateLoss();
 				break;
 			}
 			case Constants.CONFIRM_EMAIL_FRAGMENT:{
@@ -177,7 +177,7 @@ public class LoginActivityLollipop extends AppCompatActivity {
 
 				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 				ft.replace(R.id.fragment_container_login, confirmEmailFragment);
-				ft.commitNow();
+				ft.commitNowAllowingStateLoss();
 				FragmentManager fragmentManager = getSupportFragmentManager();
 				fragmentManager.executePendingTransactions();
 				break;
