@@ -1163,25 +1163,30 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 numberOfClicks++;
                 if (numberOfClicks == 5){
                     MegaAttributes attrs = dbH.getAttributes();
-                    if (attrs.getFileLogger() != null){
-                        try {
-                            if (Boolean.parseBoolean(attrs.getFileLogger()) == false) {
+                    if(attrs!=null){
+                        if (attrs.getFileLogger() != null){
+                            try {
+                                if (Boolean.parseBoolean(attrs.getFileLogger()) == false) {
+                                    ((LoginActivityLollipop)context).showConfirmationEnableLogs();
+                                }
+                                else{
+                                    dbH.setFileLogger(false);
+                                    Util.setFileLogger(false);
+                                    numberOfClicks = 0;
+                                    MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_FATAL);
+                                    ((LoginActivityLollipop)context).showSnackbar(getString(R.string.settings_disable_logs));
+                                }
+                            }
+                            catch(Exception e){
                                 ((LoginActivityLollipop)context).showConfirmationEnableLogs();
                             }
-                            else{
-                                dbH.setFileLogger(false);
-                                Util.setFileLogger(false);
-                                numberOfClicks = 0;
-                                MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_FATAL);
-                                ((LoginActivityLollipop)context).showSnackbar(getString(R.string.settings_disable_logs));
-                            }
                         }
-                        catch(Exception e){
+                        else{
                             ((LoginActivityLollipop)context).showConfirmationEnableLogs();
                         }
                     }
                     else{
-                        ((LoginActivityLollipop)context).showConfirmationEnableLogs();
+                        log("ERROR attrs is NULL!!!");
                     }
                 }
             }
