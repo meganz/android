@@ -1430,6 +1430,11 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 		int currentPosition = holder.getAdapterPosition();
 		log("onClick -> Current position: "+currentPosition);
 
+		if(currentPosition<0){
+			log("Current position error - not valid value");
+			return;
+		}
+
 		final MegaNode n = (MegaNode) getItem(currentPosition);
 
 		switch (v.getId()) {
