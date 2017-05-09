@@ -41,7 +41,6 @@ import mega.privacy.android.app.MegaStreamingService;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.CustomizedGridLayoutManager;
-import mega.privacy.android.app.components.CustomizedGridRecyclerView;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
@@ -402,7 +401,7 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 			
 			View v = inflater.inflate(R.layout.fragment_filebrowsergrid, container, false);
 			
-			recyclerView = (CustomizedGridRecyclerView) v.findViewById(R.id.file_grid_view_browser);
+			recyclerView = (RecyclerView) v.findViewById(R.id.file_grid_view_browser);
 			recyclerView.setPadding(0, 0, 0, Util.scaleHeightPx(80, outMetrics));
 			recyclerView.setClipToPadding(false);
 			recyclerView.setHasFixedSize(true);
@@ -580,13 +579,13 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 				if(isList){
 					lastFirstVisiblePosition = mLayoutManager.findFirstCompletelyVisibleItemPosition();
 				}
-				else{
-					lastFirstVisiblePosition = ((CustomizedGridRecyclerView) recyclerView).findFirstCompletelyVisibleItemPosition();
-					if(lastFirstVisiblePosition==-1){
-						log("Completely -1 then find just visible position");
-						lastFirstVisiblePosition = ((CustomizedGridRecyclerView) recyclerView).findFirstVisibleItemPosition();
-					}
-				}
+//				else{
+//					lastFirstVisiblePosition = ((CustomizedGridRecyclerView) recyclerView).findFirstCompletelyVisibleItemPosition();
+//					if(lastFirstVisiblePosition==-1){
+//						log("Completely -1 then find just visible position");
+//						lastFirstVisiblePosition = ((CustomizedGridRecyclerView) recyclerView).findFirstVisibleItemPosition();
+//					}
+//				}
 
 				log("Push to stack "+lastFirstVisiblePosition+" position");
 				lastPositionStack.push(lastFirstVisiblePosition);
