@@ -743,11 +743,18 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
                         break;
                     }
                     default:{
+
                         if(!Util.isOnline(context)){
                             aB.setSubtitle(getString(R.string.error_server_connection_problem));
                         }
                         else{
-                            aB.setSubtitle(getString(R.string.loading_status));
+                            int initStatus = megaChatApi.getInitState();
+                            if (initStatus == MegaChatApi.INIT_WAITING_NEW_SESSION || initStatus == MegaChatApi.INIT_NO_CACHE){
+                                aB.setSubtitle(getString(R.string.chat_connecting));
+                            }
+                            else{
+                                aB.setSubtitle(getString(R.string.loading_status));
+                            }
                         }
                         break;
                     }

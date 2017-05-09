@@ -54,6 +54,9 @@ import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatError;
+import nz.mega.sdk.MegaChatListItem;
+import nz.mega.sdk.MegaChatListenerInterface;
+import nz.mega.sdk.MegaChatPresenceConfig;
 import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaError;
@@ -63,7 +66,7 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUser;
 
 
-public class LoginFragmentLollipop extends Fragment implements View.OnClickListener, MegaRequestListenerInterface, MegaChatRequestListenerInterface {
+public class LoginFragmentLollipop extends Fragment implements View.OnClickListener, MegaRequestListenerInterface, MegaChatRequestListenerInterface, MegaChatListenerInterface {
 
     Context context;
     private AlertDialog insertMailDialog;
@@ -764,7 +767,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             initizalizingChatText.setVisibility(View.GONE);
             serversBusyText.setVisibility(View.GONE);
 
-            initizalizingChatText.setText("Chat initialization...");
+            initizalizingChatText.setText(getString(R.string.chat_initializacion));
             initizalizingChatText.setVisibility(View.VISIBLE);
 
             if(Util.isChatEnabled()){
@@ -773,6 +776,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     megaChatApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaChatApi();
                 }
                 log("INIT STATE: "+megaChatApi.getInitState());
+                megaChatApi.addChatListener(this);
                 int ret = megaChatApi.init(gSession);
                 log("enableChat: result of init ---> "+ret);
                 chatSettings = dbH.getChatSettings();
@@ -786,7 +790,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 {
                     log("enableChat: condition ret == MegaChatApi.INIT_ERROR");
                     // chat cannot initialize, disable chat completely
-                    initizalizingChatText.setText("Chat error, not initialized");
+                    initizalizingChatText.setText(getString(R.string.chat_not_correctly_initialized));
                     if(chatSettings==null) {
                         log("1 - enableChat: ERROR----> Switch OFF chat");
                         chatSettings = new ChatSettings(false+"", true + "", true + "",true + "");
@@ -800,7 +804,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 }
                 else{
                     log("enableChat: condition ret == OK -- chat correctly initialized");
-                    initizalizingChatText.setText("Chat correctly initialized");
+                    initizalizingChatText.setText(getString(R.string.chat_correctly_initialized));
                 }
             }
             else{
@@ -902,7 +906,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 {
                     // chat cannot initialize, disable chat completely
                     log("startFastLogin: condition ret == MegaChatApi.INIT_ERROR");
-                    initizalizingChatText.setText("Chat error, not initialized");
+                    initizalizingChatText.setText(getString(R.string.chat_not_correctly_initialized));
                     if(chatSettings==null) {
                         log("1 - startFastLogin: ERROR----> Switch OFF chat");
                         chatSettings = new ChatSettings(false+"", true + "", true + "",true + "");
@@ -916,7 +920,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 }
                 else{
                     log("startFastLogin: condition ret == OK -- chat correctly initialized");
-                    initizalizingChatText.setText("Chat correctly initialized");
+                    initizalizingChatText.setText(getString(R.string.chat_correctly_initialized));
                 }
             }
             else{
@@ -1331,7 +1335,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 if ((progressValue > 99) || (progressValue < 0)){
                     progressValue = 100;
                     prepareNodesText.setVisibility(View.VISIBLE);
-                    initizalizingChatText.setVisibility(View.GONE);
+                    initizalizingChatText.setVisibility(View.VISIBLE);
                     loginProgressBar.setVisibility(View.VISIBLE);
                 }
 //				log("progressValue = " + (int)progressValue);
@@ -2091,6 +2095,11 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         {
             megaApi.removeRequestListener(this);
         }
+        if(Util.isChatEnabled()){
+            if(megaChatApi!=null){
+                megaChatApi.removeChatListener(this);
+            }
+        }
 
         super.onDestroy();
     }
@@ -2120,6 +2129,38 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             ((LoginActivityLollipop) context).showFragment(Constants.TOUR_FRAGMENT);
             return 1;
         }
+    }
+
+
+    @Override
+    public void onChatListItemUpdate(MegaChatApiJava api, MegaChatListItem item) {
+
+    }
+
+    @Override
+    public void onChatInitStateUpdate(MegaChatApiJava api, int newState) {
+        log("onChatInitStateUpdate: "+newState);
+
+        if (newState == MegaChatApi.INIT_ERROR)
+        {
+            initizalizingChatText.setText(getString(R.string.chat_not_correctly_initialized));
+        }
+        else if (newState == MegaChatApi.INIT_WAITING_NEW_SESSION || newState == MegaChatApi.INIT_NO_CACHE){
+            initizalizingChatText.setText(getString(R.string.chat_initializacion));
+        }
+        else{
+            initizalizingChatText.setText(getString(R.string.chat_correctly_initialized));
+        }
+    }
+
+    @Override
+    public void onChatOnlineStatusUpdate(MegaChatApiJava api, long userhandle, int status, boolean inProgress) {
+
+    }
+
+    @Override
+    public void onChatPresenceConfigUpdate(MegaChatApiJava api, MegaChatPresenceConfig config) {
+
     }
 
     private static void log(String log) {
