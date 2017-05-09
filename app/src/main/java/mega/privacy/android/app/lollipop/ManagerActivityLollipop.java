@@ -9824,7 +9824,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 	public void updateAccountDetailsVisibleInfo(){
 		log("updateAccountDetailsVisibleInfo");
-		if(isFinishing() && isDestroyed()){
+		if(isFinishing()){
 			return;
 		}
 
