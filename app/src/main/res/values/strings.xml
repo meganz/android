@@ -2,7 +2,7 @@
 <resources>
 
     <string name="app_name" context="Not translate">MEGA</string>
-    <string name="app_version" context="Not translate">3.1.3 (131)</string>
+    <string name="app_version" context="Not translate">3.1.3 (132)</string>
     <string name="sdk_version" context="Not translate">facbef0</string>
     <string name="karere_version" context="Not translate">72b9301</string>
     
