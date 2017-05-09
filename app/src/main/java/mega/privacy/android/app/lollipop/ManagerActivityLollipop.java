@@ -8898,7 +8898,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		}
 		else{
 			int timeout = Integer.parseInt(value);
-			megaChatApi.setPresenceAutoaway(true, timeout*60);
+			if(megaChatApi!=null){
+				megaChatApi.setPresenceAutoaway(true, timeout*60);
+			}
 		}
 	}
 

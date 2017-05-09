@@ -175,6 +175,13 @@
                 android:text="@string/login_connecting_to_server" />
 
             <TextView
+                android:id="@+id/login_initializing_chat_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:text="@string/login_initializing_chat" />
+
+            <TextView
                 android:id="@+id/login_fetch_nodes_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -187,13 +194,6 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
                 android:text="@string/login_preparing_filelist" />
-
-            <TextView
-                android:id="@+id/login_initializing_chat_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
-                android:text="@string/login_initializing_chat" />
 
             <ProgressBar
                 android:id="@+id/login_fetching_nodes_bar"
