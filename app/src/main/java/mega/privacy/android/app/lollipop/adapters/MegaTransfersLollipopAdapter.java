@@ -139,8 +139,7 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
 	}
 
 		
-	/*private view holder class*/
-    public class ViewHolderTransfer extends RecyclerView.ViewHolder{
+    public static class ViewHolderTransfer extends RecyclerView.ViewHolder{
     	public ViewHolderTransfer(View v) {
 			super(v);
 		}
@@ -153,7 +152,7 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
     	public RelativeLayout itemLayout;
     	public ImageView optionRemove;
 		public ImageView optionPause;
-    	public int currentPosition;
+//    	public int currentPosition;
     	public long document;
     	public String currentPath;
     }
@@ -217,23 +216,28 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
 		float density = ((Activity) context).getResources().getDisplayMetrics().density;
 
 		float scaleW = Util.getScaleW(outMetrics, density);
-		float scaleH = Util.getScaleH(outMetrics, density);
-		
-		holder.currentPosition = position;
 
 		MegaTransfer transfer = null;
 		MegaTransfer transferFromList = (MegaTransfer) getItem(position);
 		if (currentTransfer == null){
+			log("currentTransfer == null");
 			transfer = transferFromList;
 		}
 		else{
 			if (transferFromList.getTag() == currentTransfer.getTag()){
+				log("transfer is the currentTransfer");
 				transfer = currentTransfer;
 			}
 			else{
 				transfer = transferFromList;
 			}
 		}
+
+		if(transfer==null){
+			log("The recovered transfer is NULL - do not update");
+			return;
+		}
+
 		String fileName = transfer.getFileName();
 		log("onBindViewHolder: "+fileName);
 		holder.textViewFileName.setText(fileName);
