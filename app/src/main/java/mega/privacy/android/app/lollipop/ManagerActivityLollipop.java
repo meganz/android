@@ -9822,6 +9822,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 	public void updateAccountDetailsVisibleInfo(){
 		log("updateAccountDetailsVisibleInfo");
+		if(isFinishing() && isDestroyed()){
+			return;
+		}
 
 		usedSpacePB.setProgress(myAccountInfo.getUsedPerc());
 
