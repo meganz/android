@@ -758,7 +758,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			return v;
 		}
 		else{
-			View v = inflater.inflate(R.layout.fragment_filebrowsergrid, container, false);
+			View v = inflater.inflate(R.layout.fragment_filebrowsergrid_camerauploads, container, false);
 			
 			detector = new GestureDetectorCompat(getActivity(), new RecyclerViewOnGestureListener());
 			
