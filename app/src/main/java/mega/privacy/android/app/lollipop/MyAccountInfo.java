@@ -534,7 +534,7 @@ public class MyAccountInfo implements MegaRequestListenerInterface {
                     }
                 }
 
-                if((!((ManagerActivityLollipop)context).isFinishing()) && (!((ManagerActivityLollipop)context).isDestroyed())){
+                if(!((ManagerActivityLollipop)context).isFinishing()){
 
                     ((ManagerActivityLollipop)context).updateAccountDetailsVisibleInfo();
 
