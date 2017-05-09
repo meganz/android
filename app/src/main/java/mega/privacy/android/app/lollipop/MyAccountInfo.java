@@ -514,8 +514,6 @@ public class MyAccountInfo implements MegaRequestListenerInterface {
 
                 setAccountDetails();
 
-                ((ManagerActivityLollipop)context).updateAccountDetailsVisibleInfo();
-
                 if(request.getMegaAccountDetails()!=null){
                     log("getMegaAccountDetails not Null");
 
@@ -536,30 +534,36 @@ public class MyAccountInfo implements MegaRequestListenerInterface {
                     }
                 }
 
-                //Check if myAccount section is visible
-                ManagerActivityLollipop.DrawerItem drawerItem = ((ManagerActivityLollipop) context).getDrawerItem();
-                if(drawerItem== ManagerActivityLollipop.DrawerItem.ACCOUNT){
-                    if(((ManagerActivityLollipop) context).getAccountFragment()== Constants.MY_ACCOUNT_FRAGMENT){
-                        MyAccountFragmentLollipop mAF = ((ManagerActivityLollipop) context).getMyAccountFragment();
-                        if(mAF!=null){
-                            if(mAF.isAdded()){
-                                mAF.setAccountDetails();
+                if((!((ManagerActivityLollipop)context).isFinishing()) && (!((ManagerActivityLollipop)context).isDestroyed())){
+
+                    ((ManagerActivityLollipop)context).updateAccountDetailsVisibleInfo();
+
+                    //Check if myAccount section is visible
+                    ManagerActivityLollipop.DrawerItem drawerItem = ((ManagerActivityLollipop) context).getDrawerItem();
+                    if(drawerItem== ManagerActivityLollipop.DrawerItem.ACCOUNT){
+                        if(((ManagerActivityLollipop) context).getAccountFragment()== Constants.MY_ACCOUNT_FRAGMENT){
+                            MyAccountFragmentLollipop mAF = ((ManagerActivityLollipop) context).getMyAccountFragment();
+                            if(mAF!=null){
+                                if(mAF.isAdded()){
+                                    mAF.setAccountDetails();
+                                }
+                            }
+                            MyStorageFragmentLollipop mStorageF = ((ManagerActivityLollipop) context).getMyStorageFragment();
+                            if(mStorageF!=null){
+                                if(mStorageF.isAdded()){
+                                    mStorageF.setAccountDetails();
+                                }
                             }
                         }
-                        MyStorageFragmentLollipop mStorageF = ((ManagerActivityLollipop) context).getMyStorageFragment();
-                        if(mStorageF!=null){
-                            if(mStorageF.isAdded()){
-                                mStorageF.setAccountDetails();
+                        else if(((ManagerActivityLollipop) context).getAccountFragment()== Constants.UPGRADE_ACCOUNT_FRAGMENT) {
+                            UpgradeAccountFragmentLollipop upAFL = ((ManagerActivityLollipop) context).getUpgradeAccountFragment();
+                            if(upAFL!=null){
+                                upAFL.showAvailableAccount();
                             }
-                        }
-                    }
-                    else if(((ManagerActivityLollipop) context).getAccountFragment()== Constants.UPGRADE_ACCOUNT_FRAGMENT) {
-                        UpgradeAccountFragmentLollipop upAFL = ((ManagerActivityLollipop) context).getUpgradeAccountFragment();
-                        if(upAFL!=null){
-                            upAFL.showAvailableAccount();
                         }
                     }
                 }
+
                 log("onRequest TYPE_ACCOUNT_DETAILS: "+getUsedPerc());
             }
         }
