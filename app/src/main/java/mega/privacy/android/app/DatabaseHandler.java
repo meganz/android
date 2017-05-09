@@ -509,6 +509,22 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.insert(TABLE_CREDENTIALS, null, values);
     }
 
+	public void saveMyEmail(String email) {
+		log("saveEmail: "+email);
+		String selectQuery = "SELECT * FROM " + TABLE_CREDENTIALS;
+		ContentValues values = new ContentValues();
+		Cursor cursor = db.rawQuery(selectQuery, null);
+		if (cursor.moveToFirst()){
+			String UPDATE_CREDENTIALS_TABLE = "UPDATE " + TABLE_CREDENTIALS + " SET " + KEY_EMAIL + "= '" + encrypt(email) + "' WHERE " + KEY_ID + " = '1'";
+			db.execSQL(UPDATE_CREDENTIALS_TABLE);
+		}
+		else{
+			values.put(KEY_EMAIL, encrypt(email));
+			db.insert(TABLE_CREDENTIALS, null, values);
+		}
+		cursor.close();
+	}
+
 	public void saveMyFirstName(String firstName) {
 
 		String selectQuery = "SELECT * FROM " + TABLE_CREDENTIALS;
@@ -519,7 +535,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			db.execSQL(UPDATE_CREDENTIALS_TABLE);
 		}
 		else{
-			values.put(KEY_CHAT_ENABLED, encrypt(firstName));
+			values.put(KEY_FIRST_NAME, encrypt(firstName));
 			db.insert(TABLE_CREDENTIALS, null, values);
 		}
 		cursor.close();
@@ -534,7 +550,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			db.execSQL(UPDATE_CREDENTIALS_TABLE);
 		}
 		else{
-			values.put(KEY_CHAT_ENABLED, encrypt(lastName));
+			values.put(KEY_LAST_NAME, encrypt(lastName));
 			db.insert(TABLE_CREDENTIALS, null, values);
 		}
 		cursor.close();
