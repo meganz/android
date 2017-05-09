@@ -1557,7 +1557,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 loggingInText.setVisibility(View.GONE);
                 fetchingNodesText.setVisibility(View.GONE);
                 prepareNodesText.setVisibility(View.GONE);
-                initizalizingChatText.setVisibility(View.GONE);
+                initizalizingChatText.setVisibility(View.VISIBLE);
                 serversBusyText.setVisibility(View.GONE);
 
                 ((LoginActivityLollipop)context).showSnackbar(errorMessage);
@@ -1576,7 +1576,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 loggingInText.setVisibility(View.VISIBLE);
                 fetchingNodesText.setVisibility(View.VISIBLE);
                 prepareNodesText.setVisibility(View.GONE);
-                initizalizingChatText.setVisibility(View.GONE);
+                initizalizingChatText.setVisibility(View.VISIBLE);
                 serversBusyText.setVisibility(View.GONE);
 
                 gSession = megaApi.dumpSession();
