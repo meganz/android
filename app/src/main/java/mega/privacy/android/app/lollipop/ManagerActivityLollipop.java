@@ -11857,6 +11857,22 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				Util.showAlert(this, getString(R.string.email_verification_text_error), getString(R.string.general_error_word));
 			}
 		}
+		else if(request.getType() == MegaRequest.TYPE_CONFIRM_CHANGE_EMAIL_LINK){
+			log("CONFIRM_CHANGE_EMAIL_LINK: "+request.getEmail());
+			if(e.getErrorCode() == MegaError.API_OK){
+				log("Email changed");
+				updateMyEmail(request.getEmail());
+			}
+			else if(e.getErrorCode() == MegaError.API_ENOENT){
+				log("Email not changed -- API_ENOENT");
+				Util.showAlert(this, "Email not changed!", getString(R.string.general_error_word));
+			}
+			else{
+				log("Error when asking for change mail link");
+				log(e.getErrorString() + "___" + e.getErrorCode());
+				Util.showAlert(this, getString(R.string.email_verification_text_error), getString(R.string.general_error_word));
+			}
+		}
 		else if(request.getType() == MegaRequest.TYPE_QUERY_RECOVERY_LINK) {
 			log("TYPE_GET_RECOVERY_LINK");
 			if (e.getErrorCode() == MegaError.API_OK){
@@ -12503,7 +12519,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						log("CHANGE_TYPE_EMAIL");
 						if(user.getEmail().equals(megaApi.getMyUser().getEmail())){
 							log("I change my mail");
-							nVEmail.setText(user.getEmail());
+							updateMyEmail(user.getEmail());
 						}
 						else{
 							log("The contact: "+user.getHandle()+" changes the mail: "+user.getEmail());
@@ -12526,6 +12542,20 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					log("Continue...");
 					continue;
 				}
+			}
+		}
+	}
+
+	public void updateMyEmail(String email){
+		log("updateMyEmail");
+		nVEmail.setText(email);
+		dbH.saveMyEmail(email);
+
+		String myAccountTag = getFragmentTag(R.id.my_account_tabs_pager, 0);
+		maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(myAccountTag);
+		if(maFLol!=null){
+			if(maFLol.isAdded()){
+				maFLol.updateMailView(email);
 			}
 		}
 	}
