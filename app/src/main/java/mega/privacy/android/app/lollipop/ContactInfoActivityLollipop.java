@@ -89,7 +89,6 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 	CoordinatorLayout fragmentContainer;
 	CollapsingToolbarLayout collapsingToolbar;
 	View imageGradient;
-	TextView initialLetter;
 	ImageView contactPropertiesImage;
 	LinearLayout optionsLayout;
 	LinearLayout notificationsLayout;
@@ -207,7 +206,6 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			aB.setDisplayHomeAsUpEnabled(true);
 
 			contactPropertiesImage = (ImageView) findViewById(R.id.chat_contact_properties_toolbar_image);
-			initialLetter = (TextView) findViewById(R.id.chat_contact_properties_toolbar_initial_letter);
 
 			dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 
@@ -663,7 +661,6 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 					if (imBitmap != null) {
 						contactPropertiesImage.setImageBitmap(imBitmap);
 						imageGradient.setVisibility(View.VISIBLE);
-						initialLetter.setVisibility(View.GONE);
 
 						if (imBitmap != null && !imBitmap.isRecycled()) {
 //						Palette palette = Palette.from(imBitmap).generate();
@@ -696,7 +693,6 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 				} else {
 					contactPropertiesImage.setImageBitmap(imBitmap);
 					imageGradient.setVisibility(View.VISIBLE);
-					initialLetter.setVisibility(View.GONE);
 
 					if (imBitmap != null && !imBitmap.isRecycled()) {
 //						Palette palette = Palette.from(imBitmap).generate();
@@ -800,61 +796,6 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 
 		contactPropertiesImage.setImageBitmap(defaultAvatar);
 
-		int avatarTextSize = getAvatarTextSize(density);
-		log("DENSITY: " + density + ":::: " + avatarTextSize);
-
-		boolean setInitialByMail = false;
-
-		if (title != null) {
-			if (title.trim().length() > 0) {
-				String firstLetter = title.charAt(0) + "";
-				firstLetter = firstLetter.toUpperCase(Locale.getDefault());
-				initialLetter.setText(firstLetter);
-				initialLetter.setTextSize(100);
-				initialLetter.setTextColor(Color.WHITE);
-				initialLetter.setVisibility(View.VISIBLE);
-				imageGradient.setVisibility(View.GONE);
-			} else {
-				setInitialByMail = true;
-			}
-		} else {
-			setInitialByMail = true;
-		}
-		if (setInitialByMail) {
-			if (user.getEmail() != null) {
-				if (user.getEmail().length() > 0) {
-					log("email TEXT: " + user.getEmail());
-					log("email TEXT AT 0: " + user.getEmail().charAt(0));
-					String firstLetter = user.getEmail().charAt(0) + "";
-					firstLetter = firstLetter.toUpperCase(Locale.getDefault());
-					initialLetter.setText(firstLetter);
-					initialLetter.setTextSize(100);
-					initialLetter.setTextColor(Color.WHITE);
-					initialLetter.setVisibility(View.VISIBLE);
-					imageGradient.setVisibility(View.GONE);
-				}
-			}
-		}
-	}
-
-	private int getAvatarTextSize(float density) {
-		float textSize = 0.0f;
-
-		if (density > 3.0) {
-			textSize = density * (DisplayMetrics.DENSITY_XXXHIGH / 72.0f);
-		} else if (density > 2.0) {
-			textSize = density * (DisplayMetrics.DENSITY_XXHIGH / 72.0f);
-		} else if (density > 1.5) {
-			textSize = density * (DisplayMetrics.DENSITY_XHIGH / 72.0f);
-		} else if (density > 1.0) {
-			textSize = density * (72.0f / DisplayMetrics.DENSITY_HIGH / 72.0f);
-		} else if (density > 0.75) {
-			textSize = density * (72.0f / DisplayMetrics.DENSITY_MEDIUM / 72.0f);
-		} else {
-			textSize = density * (72.0f / DisplayMetrics.DENSITY_LOW / 72.0f);
-		}
-
-		return (int) textSize;
 	}
 
 	@Override
@@ -1129,7 +1070,6 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 						} else {
 							contactPropertiesImage.setImageBitmap(imBitmap);
 							imageGradient.setVisibility(View.VISIBLE);
-							initialLetter.setVisibility(View.GONE);
 
 							if (imBitmap != null && !imBitmap.isRecycled()) {
 								Palette palette = Palette.from(imBitmap).generate();
