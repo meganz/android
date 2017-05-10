@@ -210,15 +210,6 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
             scrollView = (android.support.v4.widget.NestedScrollView) findViewById(R.id.scroll_view_group_chat_properties);
 
-            initialLetter = (TextView) findViewById(R.id.chat_contact_properties_toolbar_initial_letter);
-
-            float scaleText;
-            if (scaleH < scaleW) {
-                scaleText = scaleH;
-            } else {
-                scaleText = scaleW;
-            }
-
             //Info Layout
             avatarImageView = (RoundedImageView) findViewById(R.id.chat_group_properties_thumbnail);
             initialLetter = (TextView) findViewById(R.id.chat_group_properties_initial_letter);

@@ -142,7 +142,7 @@
     <string name="abc" context="in the password edittext the user can see the password or asterisks. ABC shows the letters of the password">ABC</string>
     <string name="dots" context="in the password edittext the user can see the password or asterisks. ··· shows asterisks instead of letters">···</string>
     <string name="new_to_mega" context="This question applies to users that do not have an account on MEGA yet">New to MEGA?</string>
-    <string name="create_account" context="label and text button when creating the account">Create an account</string>
+    <string name="create_account" context="label and text button when creating the account">Create account</string>
     <string name="error_enter_email" context="when the user tries to log in MEGA without typing the email">Please enter your email address</string>
     <string name="error_invalid_email" context="error when logging in to MEGA with an invalid email">Invalid email address</string>
     <string name="error_enter_password" context="when the user tries to log in MEGA without typing the password">Please enter your password</string>

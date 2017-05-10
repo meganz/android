@@ -36,13 +36,6 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
 
-                        <TextView
-                            android:id="@+id/chat_contact_properties_toolbar_initial_letter"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_centerInParent="true"
-                            android:paddingBottom="5dp" />
-
                         <ImageView
                             android:id="@+id/chat_contact_properties_toolbar_image"
                             android:layout_width="match_parent"
