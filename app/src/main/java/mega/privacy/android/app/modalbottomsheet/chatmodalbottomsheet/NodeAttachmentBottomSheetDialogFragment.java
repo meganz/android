@@ -32,6 +32,7 @@ import mega.privacy.android.app.lollipop.FileContactListActivityLollipop;
 import mega.privacy.android.app.lollipop.FileInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.MyAccountInfo;
+import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.lollipop.megachat.AndroidMegaChatMessage;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
@@ -55,6 +56,7 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
     long chatId;
     long messageId;
     NodeController nC;
+    ChatController chatC;
 
     private BottomSheetBehavior mBehavior;
 
@@ -117,6 +119,7 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
         }
 
         nC = new NodeController(context);
+        chatC = new ChatController(context);
 
         dbH = DatabaseHandler.getDbHandler(getActivity());
     }
@@ -166,57 +169,75 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
 
         if (message != null) {
             nodeList = message.getMessage().getMegaNodeList();
-            if(nodeList.size()==1){
-                node = nodeList.get(0);
+            if(nodeList==null){
+                log("Error, nodeList is NULL");
+                return;
+            }
 
-                if(node!=null) {
-                    log("node is NOT null");
-                    if (Util.isOnline(context)) {
-                        nodeName.setText(node.getName());
+            node = nodeList.get(0);
 
-                        long nodeSize = node.getSize();
-                        nodeInfo.setText(Util.getSizeString(nodeSize));
+            if(node!=null) {
+                log("node is NOT null");
+                if (Util.isOnline(context)) {
 
-                        if (node.hasThumbnail()) {
-                            log("Node has thumbnail");
-                            RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) nodeThumb.getLayoutParams();
-                            params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-                            params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-                            params1.setMargins(20, 0, 12, 0);
-                            nodeThumb.setLayoutParams(params1);
+                    if (node.hasThumbnail()) {
+                        log("Node has thumbnail");
+                        RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) nodeThumb.getLayoutParams();
+                        params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
+                        params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
+                        params1.setMargins(20, 0, 12, 0);
+                        nodeThumb.setLayoutParams(params1);
 
-                            thumb = ThumbnailUtils.getThumbnailFromCache(node);
+                        thumb = ThumbnailUtils.getThumbnailFromCache(node);
+                        if (thumb != null) {
+                            nodeThumb.setImageBitmap(thumb);
+                        } else {
+                            thumb = ThumbnailUtils.getThumbnailFromFolder(node, context);
                             if (thumb != null) {
                                 nodeThumb.setImageBitmap(thumb);
                             } else {
-                                thumb = ThumbnailUtils.getThumbnailFromFolder(node, context);
-                                if (thumb != null) {
-                                    nodeThumb.setImageBitmap(thumb);
-                                } else {
-                                    nodeThumb.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
-                                }
+                                nodeThumb.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
                             }
                         }
-                        else {
-                            nodeThumb.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
-                        }
                     }
+                    else {
+                        nodeThumb.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
+                    }
+                }
+
+                if(nodeList.size()==1){
+
+                    nodeName.setText(node.getName());
+
+                    long nodeSize = node.getSize();
+                    nodeInfo.setText(Util.getSizeString(nodeSize));
 
                     optionView.setVisibility(View.GONE);
-
-                    dialog.setContentView(contentView);
-
-                    mBehavior = BottomSheetBehavior.from((View) contentView.getParent());
-                    mBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
                 }
                 else{
-                    log("Node NULL");
+                    log("Several nodes in the message");
+                    optionView.setVisibility(View.VISIBLE);
+
+                    nodeName.setText(context.getResources().getQuantityString(R.plurals.new_general_num_files, nodeList.size(), nodeList.size()));
+
+                    long totalSize = 0;
+                    for(int i=0; i<nodeList.size(); i++){
+                        MegaNode temp = nodeList.get(i);
+                        log("Node Name: "+temp.getName());
+                        totalSize = totalSize + temp.getSize();
+                    }
+                    nodeInfo.setText(Util.getSizeString(totalSize));
                 }
+
+                dialog.setContentView(contentView);
+
+                mBehavior = BottomSheetBehavior.from((View) contentView.getParent());
+                mBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
             }
             else{
-                log("Several nodes in the message");
-                optionView.setVisibility(View.VISIBLE);
+                log("First node is NULL");
             }
+
         }
     }
 
@@ -231,13 +252,8 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
                     log("The selected node is NULL");
                     return;
                 }
-                ((ChatActivityLollipop)context).showSnackbar("Coming soon");
-//                ArrayList<Long> handleList = new ArrayList<Long>();
-//                for(int i=0;i<nodeList.size();i++){
-//                    handleList.add(node.getHandle());
-//                }
-//                nC.prepareForDownload(handleList);
 
+                chatC.prepareForChatDownload(nodeList);
                 break;
             }
             case R.id.option_view_layout:{
@@ -257,8 +273,9 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
                     log("The selected node is NULL");
                     return;
                 }
-//                ((ChatActivityLollipop)context).saveOffline();
-                ((ChatActivityLollipop)context).showSnackbar("Coming soon");
+
+                ((ChatActivityLollipop)context).saveOffline();
+
                 break;
             }
             case R.id.option_import_layout:{

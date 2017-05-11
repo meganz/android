@@ -69,6 +69,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	public static String EXTRA_ZIP_FILE_TO_OPEN = "FILE_TO_OPEN";
 	public static String EXTRA_OPEN_FILE = "OPEN_FILE";
 	public static String EXTRA_CONTENT_URI = "CONTENT_URI";
+	public static String EXTRA_SERIALIZE_STRING = "SERIALIZE_STRING";
 
 	public static String DB_FILE = "0";
 	public static String DB_FOLDER = "1";
@@ -190,7 +191,8 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
         long hash = intent.getLongExtra(EXTRA_HASH, -1);
         String url = intent.getStringExtra(EXTRA_URL);
-        isOffline = intent.getBooleanExtra(EXTRA_OFFLINE, false);
+        isOffline = intent.getBooleanExtra(EXTRA_OFFLINE, true);
+		log("isOffline flag: "+isOffline);
         isFolderLink = intent.getBooleanExtra(EXTRA_FOLDER_LINK, false);
         fromContactFile = intent.getBooleanExtra(EXTRA_CONTACT_ACTIVITY, false);
         openFile = intent.getBooleanExtra(EXTRA_OPEN_FILE, true);
@@ -198,25 +200,35 @@ public class DownloadService extends Service implements MegaTransferListenerInte
             contentUri = Uri.parse(intent.getStringExtra(EXTRA_CONTENT_URI));
         }
 
+		megaApi = app.getMegaApi();
+
+		String serialize = intent.getStringExtra(EXTRA_SERIALIZE_STRING);
+
+		if(serialize!=null){
+			log("serializeString: "+serialize);
+			currentDocument = MegaNode.unserialize(serialize);
+			if(currentDocument != null){
+				hash = currentDocument.getHandle();
+				log("hash after unserialize: "+hash);
+			}
+			else{
+				log("Node is NULL after unserialize");
+			}
+		}
+		else{
+			if (isFolderLink){
+				currentDocument = megaApiFolder.getNodeByHandle(hash);
+			}
+			else{
+				currentDocument = megaApi.getNodeByHandle(hash);
+			}
+		}
+
         if(intent.getStringExtra(EXTRA_ZIP_FILE_TO_OPEN)!=null){
             pathFileToOpen = intent.getStringExtra(EXTRA_ZIP_FILE_TO_OPEN);
         }
         else{
             pathFileToOpen=null;
-        }
-
-        megaApi = app.getMegaApi();
-
-        if (isFolderLink){
-            currentDocument = megaApiFolder.getNodeByHandle(hash);
-        }
-        else{
-            currentDocument = megaApi.getNodeByHandle(hash);
-        }
-
-        if((currentDocument == null) && (url == null)){
-            log("Node not found");
-            return;
         }
 
         if(url != null){
@@ -229,6 +241,11 @@ public class DownloadService extends Service implements MegaTransferListenerInte
             return;
         }
 
+		if((currentDocument == null) && (url == null)){
+			log("Node not found");
+			return;
+		}
+
         currentDir = getDir(currentDocument, intent);
         currentDir.mkdirs();
         if (currentDir.isDirectory()){
@@ -239,6 +256,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
             log("currentDir is File");
             currentFile = currentDir;
         }
+
         log("dir: " + currentDir.getAbsolutePath() + " file: " + currentDocument.getName() + "  Size: " + currentDocument.getSize());
         if(!checkCurrentFile(currentDocument)){
             log("checkCurrentFile == false");
@@ -798,14 +816,18 @@ public class DownloadService extends Service implements MegaTransferListenerInte
                     alterDocument(tranfersUri, node.getName());
                 }
 
-                if(isOffline){
-                    dbH = DatabaseHandler.getDbHandler(getApplicationContext());
-                    offlineNode = megaApi.getNodeByHandle(transfer.getNodeHandle());
+                if(transfer.getPath().contains(Util.offlineDIR)){
+					log("YESSSS it is Offline file");
+					dbH = DatabaseHandler.getDbHandler(getApplicationContext());
+					offlineNode = megaApi.getNodeByHandle(transfer.getNodeHandle());
 
-                    if(offlineNode!=null){
-                        saveOffline(offlineNode, transfer.getPath());
-                    }
-                }
+					if(offlineNode!=null){
+						saveOffline(offlineNode, transfer.getPath());
+					}
+					else{
+						saveOfflineChatFile(transfer);
+					}
+				}
             }
             else
             {
@@ -900,6 +922,15 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			nodesToDB.add(document);
 		}
 		insertDB(nodesToDB);
+	}
+
+	public void saveOfflineChatFile (MegaTransfer transfer){
+		log("saveOfflineChatFile: "+transfer.getNodeHandle()+ " " + transfer.getFileName());
+
+		MegaOffline mOffInsert = new MegaOffline(Long.toString(transfer.getNodeHandle()), "/", transfer.getFileName(),-1, DB_FILE, false, "-1");
+		long checkInsert=dbH.setOfflineFile(mOffInsert);
+		log("Test insert Chat File: "+checkInsert);
+
 	}
 
 	private void getDlList(Map<MegaNode, String> dlFiles, MegaNode parent, File folder) {
