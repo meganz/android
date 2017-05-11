@@ -13045,8 +13045,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				completedTFLol.transferFinish(completedTransfer);
 			}
 		}
-
-		clearCompletedTransfers.setVisible(true);
 	}
 
 	@Override

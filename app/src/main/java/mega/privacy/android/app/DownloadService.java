@@ -64,7 +64,6 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	public static String EXTRA_URL = "DOCUMENT_URL";
 	public static String EXTRA_PATH = "SAVE_PATH";
 	public static String EXTRA_FOLDER_LINK = "FOLDER_LINK";
-	public static String EXTRA_OFFLINE = "IS_OFFLINE";
 	public static String EXTRA_CONTACT_ACTIVITY = "CONTACT_ACTIVITY";
 	public static String EXTRA_ZIP_FILE_TO_OPEN = "FILE_TO_OPEN";
 	public static String EXTRA_OPEN_FILE = "OPEN_FILE";
@@ -79,7 +78,6 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	private boolean isForeground = false;
 	private boolean canceled;
 
-	private boolean isOffline = false;
 	private boolean isFolderLink = false;
 	private boolean fromContactFile = false;
 	private String pathFileToOpen;
@@ -191,8 +189,6 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
         long hash = intent.getLongExtra(EXTRA_HASH, -1);
         String url = intent.getStringExtra(EXTRA_URL);
-        isOffline = intent.getBooleanExtra(EXTRA_OFFLINE, true);
-		log("isOffline flag: "+isOffline);
         isFolderLink = intent.getBooleanExtra(EXTRA_FOLDER_LINK, false);
         fromContactFile = intent.getBooleanExtra(EXTRA_CONTACT_ACTIVITY, false);
         openFile = intent.getBooleanExtra(EXTRA_OPEN_FILE, true);

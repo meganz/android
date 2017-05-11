@@ -3319,7 +3319,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 log("serializeString: "+serializeString);
                 service.putExtra(DownloadService.EXTRA_SERIALIZE_STRING, serializeString);
                 service.putExtra(DownloadService.EXTRA_PATH, path);
-                service.putExtra(DownloadService.EXTRA_OFFLINE, true);
                 startService(service);
             }
         }

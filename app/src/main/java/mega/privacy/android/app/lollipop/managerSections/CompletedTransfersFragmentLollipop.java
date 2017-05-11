@@ -59,7 +59,7 @@ public class CompletedTransfersFragmentLollipop extends Fragment {
 	
 //	SparseArray<TransfersHolder> transfersListArray = null;
 
-	ArrayList<AndroidCompletedTransfer> tL = null;
+	public ArrayList<AndroidCompletedTransfer> tL = null;
 
 	private Handler handler;
 	
@@ -193,6 +193,10 @@ public class CompletedTransfersFragmentLollipop extends Fragment {
 		else{
 			tL = new ArrayList<AndroidCompletedTransfer>();
 			tL.add(transfer);
+		}
+
+		if(tL.size()==1){
+			((ManagerActivityLollipop)context).invalidateOptionsMenu();
 		}
 
 		if (tL.size() == 0){
