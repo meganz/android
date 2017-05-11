@@ -1074,12 +1074,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                         ((ViewHolderMessageChat) holder).contentOwnMessageThumbLand.setVisibility(View.GONE);
                         ((ViewHolderMessageChat) holder).contentOwnMessageThumbPort.setVisibility(View.GONE);
                         ((ViewHolderMessageChat) holder).contentOwnMessageFileLayout.setVisibility(View.GONE);
-
                         ((ViewHolderMessageChat) holder).contentOwnMessageContactLayout.setVisibility(View.GONE);
-                        ((ViewHolderMessageChat) holder).contentOwnMessageContactThumb.setVisibility(View.GONE);
-                        ((ViewHolderMessageChat) holder).contentOwnMessageContactName.setVisibility(View.GONE);
-                        ((ViewHolderMessageChat) holder).contentOwnMessageContactEmail.setVisibility(View.GONE);
-
 
                         Spannable content = new SpannableString(messageContent);
                         int status = message.getStatus();
@@ -1166,6 +1161,11 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                         ((ViewHolderMessageChat)holder).ownManagementMessageText.setTextColor(ContextCompat.getColor(context, R.color.accentColor));
                         ((ViewHolderMessageChat)holder).ownManagementMessageText.setText(context.getString(R.string.text_deleted_message));
                         ((ViewHolderMessageChat)holder).ownManagementMessageLayout.setVisibility(View.VISIBLE);
+
+                        ((ViewHolderMessageChat) holder).contentOwnMessageThumbLand.setVisibility(View.GONE);
+                        ((ViewHolderMessageChat) holder).contentOwnMessageThumbPort.setVisibility(View.GONE);
+                        ((ViewHolderMessageChat) holder).contentOwnMessageFileLayout.setVisibility(View.GONE);
+                        ((ViewHolderMessageChat) holder).contentOwnMessageContactLayout.setVisibility(View.GONE);
 
                         if (!multipleSelect) {
                             ((ViewHolderMessageChat)holder).ownManagementMultiselectionLayout.setVisibility(View.GONE);
