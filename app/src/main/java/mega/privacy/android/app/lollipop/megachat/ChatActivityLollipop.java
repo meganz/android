@@ -1168,9 +1168,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     if (document != null) {
                         log("DOCUMENT: " + document.getName() + "_" + document.getHandle());
                         if (target != null) {
-                            MegaNode autNode = megaApi.authorizeNode(document);
+//                            MegaNode autNode = megaApi.authorizeNode(document);
 
-                            megaApi.copyNode(autNode, target, this);
+                            megaApi.copyNode(document, target, this);
                         } else {
                             log("TARGET: null");
                             Snackbar.make(fragmentContainer, getString(R.string.import_success_error), Snackbar.LENGTH_LONG).show();
@@ -3289,8 +3289,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                             log("File already exists!");
                         }
                         else{
-                            MegaNode autNode = megaApi.authorizeNode(document);
-                            dlFiles.put(autNode, destination.getAbsolutePath());
+                            dlFiles.put(document, destination.getAbsolutePath());
                         }
                     }
                     else{
@@ -3315,11 +3314,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     continue;
                 }
 
-                String url = null;
                 Intent service = new Intent(this, DownloadService.class);
-                service.putExtra(DownloadService.EXTRA_HASH, document.getHandle());
-                service.putExtra(DownloadService.EXTRA_URL, url);
-                service.putExtra(DownloadService.EXTRA_SIZE, document.getSize());
+                String serializeString = document.serialize();
+                log("serializeString: "+serializeString);
+                service.putExtra(DownloadService.EXTRA_SERIALIZE_STRING, serializeString);
                 service.putExtra(DownloadService.EXTRA_PATH, path);
                 service.putExtra(DownloadService.EXTRA_OFFLINE, true);
                 startService(service);
