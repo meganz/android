@@ -1069,6 +1069,18 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     if(message.isEdited()){
 
                         log("Message is edited");
+
+                        ((ViewHolderMessageChat) holder).contentOwnMessageText.setVisibility(View.VISIBLE);
+                        ((ViewHolderMessageChat) holder).contentOwnMessageThumbLand.setVisibility(View.GONE);
+                        ((ViewHolderMessageChat) holder).contentOwnMessageThumbPort.setVisibility(View.GONE);
+                        ((ViewHolderMessageChat) holder).contentOwnMessageFileLayout.setVisibility(View.GONE);
+
+                        ((ViewHolderMessageChat) holder).contentOwnMessageContactLayout.setVisibility(View.GONE);
+                        ((ViewHolderMessageChat) holder).contentOwnMessageContactThumb.setVisibility(View.GONE);
+                        ((ViewHolderMessageChat) holder).contentOwnMessageContactName.setVisibility(View.GONE);
+                        ((ViewHolderMessageChat) holder).contentOwnMessageContactEmail.setVisibility(View.GONE);
+
+
                         Spannable content = new SpannableString(messageContent);
                         int status = message.getStatus();
                         if((status==MegaChatMessage.STATUS_SERVER_REJECTED)||(status==MegaChatMessage.STATUS_SENDING_MANUAL)){
