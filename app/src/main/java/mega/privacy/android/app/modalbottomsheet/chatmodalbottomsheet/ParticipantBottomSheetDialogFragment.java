@@ -1,4 +1,4 @@
-package mega.privacy.android.app.modalbottomsheet;
+package mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet;
 
 
 import android.app.Activity;
@@ -30,21 +30,25 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.lollipop.megachat.AndroidMegaChatMessage;
+import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.MegaChatParticipant;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApi;
+import nz.mega.sdk.MegaChatApiAndroid;
+import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaUser;
 
 public class ParticipantBottomSheetDialogFragment extends BottomSheetDialogFragment implements View.OnClickListener {
 
     Context context;
-//    MegaChatListItem chat = null;
-    MegaChatParticipant selectedParticipant;
     MegaChatRoom selectedChat;
+    long chatId = -1;
+    long participantHandle = -1;
 
     private BottomSheetBehavior mBehavior;
 
@@ -68,6 +72,7 @@ public class ParticipantBottomSheetDialogFragment extends BottomSheetDialogFragm
     DisplayMetrics outMetrics;
 
     MegaApiAndroid megaApi;
+    MegaChatApiAndroid megaChatApi = null;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -77,14 +82,31 @@ public class ParticipantBottomSheetDialogFragment extends BottomSheetDialogFragm
             megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
         }
 
-        if(context instanceof GroupChatInfoActivityLollipop){
-            selectedParticipant = ((GroupChatInfoActivityLollipop) context).getSelectedParticipant();
+        if (megaChatApi == null) {
+            MegaApplication app = (MegaApplication) ((Activity)context).getApplication();
+            megaChatApi = app.getMegaChatApi();
         }
 
-        if(context instanceof GroupChatInfoActivityLollipop){
-            selectedChat = ((GroupChatInfoActivityLollipop) context).getChat();
-        }
+        if(savedInstanceState!=null) {
+            log("Bundle is NOT NULL");
+            chatId = savedInstanceState.getLong("chatId", -1);
+            log("Handle of the chat: "+chatId);
+            participantHandle = savedInstanceState.getLong("participantHandle", -1);
+            log("Handle of the message: "+participantHandle);
 
+            selectedChat = megaChatApi.getChatRoom(chatId);
+        }
+        else{
+            log("Bundle NULL");
+
+            chatId = ((GroupChatInfoActivityLollipop) context).chatHandle;
+            selectedChat = megaChatApi.getChatRoom(chatId);
+            log("Handle of the chat: "+chatId);
+
+            participantHandle = ((GroupChatInfoActivityLollipop) context).selectedHandleParticipant;
+            log("Handle of the participant: "+participantHandle);
+
+        }
     }
     @Override
     public void setupDialog(final Dialog dialog, int style) {
@@ -141,9 +163,19 @@ public class ParticipantBottomSheetDialogFragment extends BottomSheetDialogFragm
             titleMailContactChatPanel.setMaxWidth(Util.scaleWidthPx(200, outMetrics));
         }
 
-        titleNameContactChatPanel.setText(selectedParticipant.getFullName());
-        titleMailContactChatPanel.setText(selectedParticipant.getEmail());
-        int permission = selectedParticipant.getPrivilege();
+        if(selectedChat==null){
+            log("Error. Selected chat is NULL");
+            return;
+        }
+
+        if(participantHandle==-1){
+            log("Error. Participant handle is -1");
+            return;
+        }
+
+        titleNameContactChatPanel.setText(selectedChat.getPeerFullnameByHandle(participantHandle));
+        titleMailContactChatPanel.setText(selectedChat.getPeerEmailByHandle(participantHandle));
+        int permission = selectedChat.getPeerPrivilegeByHandle(participantHandle);
 
         if(permission== MegaChatRoom.PRIV_STANDARD) {
             permissionsIcon.setImageResource(R.drawable.ic_permissions_read_write);
@@ -155,7 +187,7 @@ public class ParticipantBottomSheetDialogFragment extends BottomSheetDialogFragm
             permissionsIcon.setImageResource(R.drawable.ic_permissions_read_only);
         }
 
-        int state = selectedParticipant.getStatus();
+        int state = megaChatApi.getUserOnlineStatus(participantHandle);
         if(state == MegaChatApi.STATUS_ONLINE){
             log("This user is connected");
             stateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_online));
@@ -173,7 +205,7 @@ public class ParticipantBottomSheetDialogFragment extends BottomSheetDialogFragm
             stateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_offline));
         }
 
-        if(selectedParticipant.getHandle() == megaApi.getMyUser().getHandle()){
+        if(participantHandle == megaApi.getMyUser().getHandle()){
             log("Participant selected its me");
             optionEditProfileChat.setVisibility(View.VISIBLE);
             optionLeaveChat.setVisibility(View.VISIBLE);
@@ -190,8 +222,8 @@ public class ParticipantBottomSheetDialogFragment extends BottomSheetDialogFragm
             }
 
         }
-    else{
-            MegaUser contact = megaApi.getContact(selectedParticipant.getEmail());
+        else{
+            MegaUser contact = megaApi.getContact(selectedChat.getPeerEmailByHandle(participantHandle));
 
             if(contact!=null) {
                 if (contact.getVisibility() == MegaUser.VISIBILITY_VISIBLE) {
@@ -227,23 +259,24 @@ public class ParticipantBottomSheetDialogFragment extends BottomSheetDialogFragm
             }
         }
 
-        addAvatarParticipantPanel(selectedParticipant);
+        addAvatarParticipantPanel(participantHandle);
 
         dialog.setContentView(contentView);
     }
 
-    public void addAvatarParticipantPanel(MegaChatParticipant participant){
+    public void addAvatarParticipantPanel(long handle){
 
         File avatar = null;
-        if(participant.getEmail()!=null){
+        String email = selectedChat.getPeerEmailByHandle(handle);
+        if(email !=null){
             log("isContact selected!");
 
             //Ask for avatar
             if (getActivity().getExternalCacheDir() != null){
-                avatar = new File(getActivity().getExternalCacheDir().getAbsolutePath(), participant.getEmail() + ".jpg");
+                avatar = new File(getActivity().getExternalCacheDir().getAbsolutePath(), email + ".jpg");
             }
             else{
-                avatar = new File(getActivity().getCacheDir().getAbsolutePath(), participant.getEmail() + ".jpg");
+                avatar = new File(getActivity().getCacheDir().getAbsolutePath(), email + ".jpg");
             }
             Bitmap bitmap = null;
             if (avatar.exists()){
@@ -270,7 +303,7 @@ public class ParticipantBottomSheetDialogFragment extends BottomSheetDialogFragm
         Canvas c = new Canvas(defaultAvatar);
         Paint p = new Paint();
         p.setAntiAlias(true);
-        String userHandleEncoded = MegaApiAndroid.userHandleToBase64(participant.getHandle());
+        String userHandleEncoded = MegaApiAndroid.userHandleToBase64(handle);
         String color = megaApi.getUserAvatarColor(userHandleEncoded);
         if(color!=null){
             log("The color to set the avatar is "+color);
@@ -296,9 +329,10 @@ public class ParticipantBottomSheetDialogFragment extends BottomSheetDialogFragm
         float density  = getResources().getDisplayMetrics().density;
 
 //		String fullName;
-        if(participant.getFullName()!=null){
-            if(!(participant.getFullName().trim().isEmpty())){
-                String firstLetter = participant.getFullName().charAt(0) + "";
+        String name = selectedChat.getPeerFullnameByHandle(handle);
+        if(name!=null){
+            if(!(name.trim().isEmpty())){
+                String firstLetter = name.charAt(0) + "";
                 firstLetter = firstLetter.toUpperCase(Locale.getDefault());
                 contactInitialLetter.setText(firstLetter);
                 contactInitialLetter.setTextColor(Color.WHITE);
@@ -319,10 +353,8 @@ public class ParticipantBottomSheetDialogFragment extends BottomSheetDialogFragm
     @Override
     public void onClick(View v) {
 
-        MegaChatParticipant selectedParticipant = null;
         MegaChatRoom selectedChat = null;
         if(context instanceof GroupChatInfoActivityLollipop){
-            selectedParticipant = ((GroupChatInfoActivityLollipop) context).getSelectedParticipant();
             selectedChat = ((GroupChatInfoActivityLollipop) context).getChat();
         }
 
@@ -331,7 +363,7 @@ public class ParticipantBottomSheetDialogFragment extends BottomSheetDialogFragm
             case R.id.contact_info_group_participants_chat_layout: {
                 log("contact info participants panel");
                 Intent i = new Intent(context, ContactInfoActivityLollipop.class);
-                i.putExtra("name", selectedParticipant.getEmail());
+                i.putExtra("name", selectedChat.getPeerEmailByHandle(participantHandle));
                 context.startActivity(i);
                 dismissAllowingStateLoss();
                 break;
@@ -339,19 +371,19 @@ public class ParticipantBottomSheetDialogFragment extends BottomSheetDialogFragm
 
             case R.id.start_chat_group_participants_chat_layout: {
                 log("start chat participants panel");
-                ((GroupChatInfoActivityLollipop) context).startConversation(selectedParticipant);
+                ((GroupChatInfoActivityLollipop) context).startConversation(participantHandle);
                 break;
             }
 
             case R.id.change_permissions_group_participants_chat_layout: {
                 log("change permissions participants panel");
-                ((GroupChatInfoActivityLollipop) context).showChangePermissionsDialog(selectedParticipant, selectedChat);
+                ((GroupChatInfoActivityLollipop) context).showChangePermissionsDialog(participantHandle, selectedChat);
                 break;
             }
 
             case R.id.remove_group_participants_chat_layout: {
                 log("remove participants panel");
-                ((GroupChatInfoActivityLollipop) context).showRemoveParticipantConfirmation(selectedParticipant, selectedChat);
+                ((GroupChatInfoActivityLollipop) context).showRemoveParticipantConfirmation(participantHandle, selectedChat);
                 break;
             }
 
@@ -372,7 +404,7 @@ public class ParticipantBottomSheetDialogFragment extends BottomSheetDialogFragm
 
             case R.id.invite_group_participants_chat_layout: {
                 log("invite contact participants panel");
-                ((GroupChatInfoActivityLollipop) context).inviteContact(selectedParticipant.getEmail());
+                ((GroupChatInfoActivityLollipop) context).inviteContact(selectedChat.getPeerEmailByHandle(participantHandle));
                 break;
             }
 
@@ -394,6 +426,15 @@ public class ParticipantBottomSheetDialogFragment extends BottomSheetDialogFragm
     public void onAttach(Context context) {
         super.onAttach(context);
         this.context = context;
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState){
+        log("onSaveInstanceState");
+        super.onSaveInstanceState(outState);
+
+        outState.putLong("chatId", chatId);
+        outState.putLong("participantHandle", participantHandle);
     }
 
     private static void log(String log) {

@@ -3665,21 +3665,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 		firstNavigationLevel = true;
 
-		viewPagerMyAccount.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-			@Override
-			public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-			}
-
-			@Override
-			public void onPageSelected(int position) {
-				supportInvalidateOptionsMenu();
-			}
-
-			@Override
-			public void onPageScrollStateChanged(int state) {
-			}
-		});
-
 		drawerLayout.closeDrawer(Gravity.LEFT);
 	}
 
