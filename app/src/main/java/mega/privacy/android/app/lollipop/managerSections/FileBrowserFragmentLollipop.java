@@ -491,6 +491,8 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			dotsOptionsTransfers = (ImageButton) v.findViewById(R.id.transfers_overview_three_dots);
 			progressBar = (ProgressBar) v.findViewById(R.id.transfers_overview_progress_bar);
 
+			transfersOverViewLayout.setOnClickListener(this);
+
 			if (adapter == null){
 				adapter = new MegaBrowserLollipopAdapter(context, this, nodes, parentHandle, recyclerView, aB, Constants.FILE_BROWSER_ADAPTER, MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST);
 			}
@@ -667,6 +669,12 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 				log("click play/pause");
 
 				((ManagerActivityLollipop) getActivity()).changeTransfersStatus();
+				break;
+			}
+			case R.id.transfers_overview_item_layout:{
+				log("click transfers title and number");
+
+				((ManagerActivityLollipop) getActivity()).selectDrawerItemTransfers();
 				break;
 			}
 		}
