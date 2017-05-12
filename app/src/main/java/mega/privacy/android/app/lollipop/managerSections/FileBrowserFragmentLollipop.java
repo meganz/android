@@ -672,9 +672,10 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 				break;
 			}
 			case R.id.transfers_overview_item_layout:{
-				log("click transfers title and number");
+				log("click transfers layout");
 
 				((ManagerActivityLollipop) getActivity()).selectDrawerItemTransfers();
+				((ManagerActivityLollipop) getActivity()).invalidateOptionsMenu();
 				break;
 			}
 		}

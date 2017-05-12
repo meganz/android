@@ -59,7 +59,7 @@ import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.lollipop.listeners.MultipleGroupChatRequestListener;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaParticipantsChatLollipopAdapter;
-import mega.privacy.android.app.modalbottomsheet.ParticipantBottomSheetDialogFragment;
+import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ParticipantBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -85,10 +85,10 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
     GroupChatInfoActivityLollipop groupChatInfoActivity;
 
-    long chatHandle;
+    public long chatHandle;
     MegaChatRoom chat;
 
-    MegaChatParticipant selectedParticipant;
+    public long selectedHandleParticipant;
 
     AlertDialog permissionsDialog;
     AlertDialog changeTitleDialog;
@@ -600,7 +600,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
     }
 
-    public void showRemoveParticipantConfirmation (MegaChatParticipant participant, MegaChatRoom chatToChange){
+    public void showRemoveParticipantConfirmation (long handle, MegaChatRoom chatToChange){
         log("showRemoveParticipantConfirmation");
 
         if(megaChatApi.isSignalActivityRequired()){
@@ -624,17 +624,18 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         };
 
         android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(groupChatInfoActivity, R.style.AppCompatAlertDialogStyle);
-        String message= getResources().getString(R.string.confirmation_remove_chat_contact,participant.getFullName());
+        String name = chatToChange.getPeerFullnameByHandle(handle);
+        String message= getResources().getString(R.string.confirmation_remove_chat_contact,name);
         builder.setMessage(message).setPositiveButton(R.string.general_remove, dialogClickListener)
                 .setNegativeButton(R.string.general_cancel, dialogClickListener).show();
 
     }
 
     public void removeParticipant(){
-        log("removeParticipant: "+selectedParticipant.getFullName());
+        log("removeParticipant: "+selectedHandleParticipant);
         log("before remove, participants: "+chat.getPeerCount());
         ChatController cC = new ChatController(groupChatInfoActivity);
-        cC.removeParticipant(chatHandle, selectedParticipant.getHandle());
+        cC.removeParticipant(chatHandle, selectedHandleParticipant);
     }
 
     public void changeTitle(String title){
@@ -643,13 +644,13 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         cC.changeTitle(chatHandle, title);
     }
 
-    public void startConversation(MegaChatParticipant participant){
+    public void startConversation(long handle){
         log("startConversation");
-        MegaChatRoom chat = megaChatApi.getChatRoomByUser(participant.getHandle());
+        MegaChatRoom chat = megaChatApi.getChatRoomByUser(handle);
         MegaChatPeerList peers = MegaChatPeerList.createInstance();
         if(chat==null){
             log("No chat, create it!");
-            peers.addPeer(participant.getHandle(), MegaChatPeerList.PRIV_STANDARD);
+            peers.addPeer(handle, MegaChatPeerList.PRIV_STANDARD);
             megaChatApi.createChat(false, peers, this);
         }
         else{
@@ -661,14 +662,14 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         }
     }
 
-    public void showChangePermissionsDialog(MegaChatParticipant participant, MegaChatRoom chatToChange){
+    public void showChangePermissionsDialog(long handle, MegaChatRoom chatToChange){
         //Change permissions
 
         if(megaChatApi.isSignalActivityRequired()){
             megaChatApi.signalPresenceActivity();
         }
 
-        final MegaChatParticipant participantToChange = participant;
+        final long handleToChange = handle;
 
         LayoutInflater inflater = getLayoutInflater();
         View dialoglayout = inflater.inflate(R.layout.change_permissions_dialog, null);
@@ -702,7 +703,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
         permissionsDialog.show();
 
-        int permission = chatToChange.getPeerPrivilegeByHandle(participantToChange.getHandle());
+        int permission = chatToChange.getPeerPrivilegeByHandle(handleToChange);
 
         if(permission==MegaChatRoom.PRIV_STANDARD) {
             administratorCheck.setChecked(false);
@@ -760,7 +761,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
     public void changePermissions(int newPermissions){
         log("changePermissions: "+newPermissions);
         ChatController cC = new ChatController(groupChatInfoActivity);
-        cC.alterParticipantsPermissions(chatHandle, selectedParticipant.getHandle(), newPermissions);
+        cC.alterParticipantsPermissions(chatHandle, selectedHandleParticipant, newPermissions);
     }
 
     public void createGroupChatAvatar(){
@@ -823,7 +824,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         log("showParticipantsPanel");
 
         if(participant!=null){
-            this.selectedParticipant = participant;
+            this.selectedHandleParticipant = participant.getHandle();
         }
         else{
             log("participant is NULL");
@@ -832,14 +833,6 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
         ParticipantBottomSheetDialogFragment bottomSheetDialogFragment = new ParticipantBottomSheetDialogFragment();
         bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
-    }
-
-    public MegaChatParticipant getSelectedParticipant() {
-        return selectedParticipant;
-    }
-
-    public void setSelectedParticipant(MegaChatParticipant selectedParticipant) {
-        this.selectedParticipant = selectedParticipant;
     }
 
     public MegaChatRoom getChat() {
@@ -1419,7 +1412,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
                     log("Code: "+e.getErrorString());
                     if(e.getErrorCode()==MegaError.API_EEXIST)
                     {
-                        showSnackbar(getString(R.string.context_contact_already_exists, request.getEmail()));
+                        showSnackbar(getString(R.string.context_contact_already_invited, request.getEmail()));
                     }
                     else{
                         showSnackbar(getString(R.string.general_error));
