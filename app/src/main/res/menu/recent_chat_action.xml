@@ -8,7 +8,14 @@
         android:orderInCategory="100"
         android:title="@string/general_mute"
         MEGA:showAsAction="always"
-        android:icon="@drawable/ic_notifications_off_white"/>
+        android:icon="@drawable/ic_mute_white"/>
+
+    <item
+        android:id="@+id/cab_menu_unmute"
+        android:orderInCategory="100"
+        android:title="@string/general_mute"
+        MEGA:showAsAction="always"
+        android:icon="@drawable/ic_unmute_white"/>
 
     <item
         android:id="@+id/cab_menu_archive"

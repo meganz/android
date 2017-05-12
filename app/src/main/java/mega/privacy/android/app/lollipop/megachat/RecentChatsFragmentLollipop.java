@@ -370,8 +370,9 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
 
             if (selected.size() != 0) {
                 menu.findItem(R.id.cab_menu_mute).setVisible(true);
-                menu.findItem(R.id.cab_menu_archive).setVisible(true);
-                menu.findItem(R.id.cab_menu_delete).setVisible(true);
+                menu.findItem(R.id.cab_menu_unmute).setVisible(true);
+                menu.findItem(R.id.cab_menu_archive).setVisible(false);
+                menu.findItem(R.id.cab_menu_delete).setVisible(false);
 
                 MenuItem unselect = menu.findItem(R.id.cab_menu_unselect_all);
                 if(selected.size()==adapterList.getItemCount()){
