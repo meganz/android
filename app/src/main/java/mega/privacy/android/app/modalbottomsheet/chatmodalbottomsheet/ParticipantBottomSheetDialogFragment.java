@@ -223,7 +223,7 @@ public class ParticipantBottomSheetDialogFragment extends BottomSheetDialogFragm
                 optionInvite.setVisibility(View.GONE);
             }
 
-            addAvatarParticipantPanel(participantHandle, megaChatApi.getMyEmail());
+            addAvatarParticipantPanel(participantHandle, megaChatApi.getMyEmail(), myFullName);
         }
         else{
             titleNameContactChatPanel.setText(selectedChat.getPeerFullnameByHandle(participantHandle));
@@ -276,41 +276,37 @@ public class ParticipantBottomSheetDialogFragment extends BottomSheetDialogFragm
                 optionRemoveParticipantChat.setVisibility(View.GONE);
             }
 
-            addAvatarParticipantPanel(participantHandle, selectedChat.getPeerEmailByHandle(participantHandle));
+            addAvatarParticipantPanel(participantHandle, selectedChat.getPeerEmailByHandle(participantHandle), null);
         }
 
         dialog.setContentView(contentView);
     }
 
-    public void addAvatarParticipantPanel(long handle, String email){
+    public void addAvatarParticipantPanel(long handle, String email, String myName){
 
         File avatar = null;
-//        String email = selectedChat.getPeerEmailByHandle(handle);
-        if(email !=null){
-            log("isContact selected!");
 
-            //Ask for avatar
-            if (getActivity().getExternalCacheDir() != null){
-                avatar = new File(getActivity().getExternalCacheDir().getAbsolutePath(), email + ".jpg");
-            }
-            else{
-                avatar = new File(getActivity().getCacheDir().getAbsolutePath(), email + ".jpg");
-            }
-            Bitmap bitmap = null;
-            if (avatar.exists()){
-                if (avatar.length() > 0){
-                    BitmapFactory.Options bOpts = new BitmapFactory.Options();
-                    bOpts.inPurgeable = true;
-                    bOpts.inInputShareable = true;
-                    bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
-                    if (bitmap == null) {
-                        avatar.delete();
-                    }
-                    else{
-                        contactInitialLetter.setVisibility(View.GONE);
-                        contactImageView.setImageBitmap(bitmap);
-                        return;
-                    }
+        //Ask for avatar
+        if (getActivity().getExternalCacheDir() != null){
+            avatar = new File(getActivity().getExternalCacheDir().getAbsolutePath(), email + ".jpg");
+        }
+        else{
+            avatar = new File(getActivity().getCacheDir().getAbsolutePath(), email + ".jpg");
+        }
+        Bitmap bitmap = null;
+        if (avatar.exists()){
+            if (avatar.length() > 0){
+                BitmapFactory.Options bOpts = new BitmapFactory.Options();
+                bOpts.inPurgeable = true;
+                bOpts.inInputShareable = true;
+                bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
+                if (bitmap == null) {
+                    avatar.delete();
+                }
+                else{
+                    contactInitialLetter.setVisibility(View.GONE);
+                    contactImageView.setImageBitmap(bitmap);
+                    return;
                 }
             }
         }
@@ -346,8 +342,18 @@ public class ParticipantBottomSheetDialogFragment extends BottomSheetDialogFragm
         display.getMetrics(outMetrics);
         float density  = getResources().getDisplayMetrics().density;
 
-//		String fullName;
-        String name = selectedChat.getPeerFullnameByHandle(handle);
+        String name = null;
+
+        if(handle==megaChatApi.getMyUserHandle()){
+            if(myName!=null){
+                name = myName;
+            }
+        }
+        else{
+            name = selectedChat.getPeerFullnameByHandle(handle);
+
+        }
+
         if(name!=null){
             if(!(name.trim().isEmpty())){
                 String firstLetter = name.charAt(0) + "";

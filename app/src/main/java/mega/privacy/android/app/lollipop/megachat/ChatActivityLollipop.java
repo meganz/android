@@ -92,6 +92,7 @@ import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaChatRoomListenerInterface;
+import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaNodeList;
@@ -1963,20 +1964,23 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }
         }
         else{
-            log("show not sent message panel");
+
             AndroidMegaChatMessage m = messages.get(position);
 //            showMsgNotSentPanel(m);
             if(m!=null){
                 if(m.getMessage().getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT){
+                    log("show node attachment panel");
                     showNodeAttachmentBottomSheet(m, position);
                 }
-                if(m.getMessage().getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT){
+                if(m.getMessage().getType()==MegaChatMessage.TYPE_CONTACT_ATTACHMENT){
+                    log("show contact attachment panel");
                     showContactAttachmentBottomSheet(m, position);
                 }
                 else if(m.getMessage().getUserHandle()==megaChatApi.getMyUserHandle()) {
                     if(!(m.getMessage().isManagementMessage())){
                         log("selected message: "+m.getMessage().getContent());
                         if((m.getMessage().getStatus()==MegaChatMessage.STATUS_SERVER_REJECTED)||(m.getMessage().getStatus()==MegaChatMessage.STATUS_SENDING_MANUAL)){
+                            log("show not sent message panel");
                             showMsgNotSentPanel(m, position);
                         }
                     }
@@ -3379,26 +3383,56 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             statusDialog.dismiss();
         } catch(Exception ex){};
 
-        if (e.getErrorCode() != MegaError.API_OK) {
+        if (request.getType() == MegaRequest.TYPE_INVITE_CONTACT){
+            log("MegaRequest.TYPE_INVITE_CONTACT finished: "+request.getNumber());
 
-            log("e.getErrorCode() != MegaError.API_OK");
-
-            if(e.getErrorCode()==MegaError.API_EOVERQUOTA){
-                log("OVERQUOTA ERROR: "+e.getErrorCode());
-                Intent intent = new Intent(this, ManagerActivityLollipop.class);
-                intent.setAction(Constants.ACTION_OVERQUOTA_ALERT);
-                startActivity(intent);
-                finish();
-
+            if(request.getNumber()== MegaContactRequest.INVITE_ACTION_REMIND){
+                showSnackbar(getString(R.string.context_contact_invitation_resent));
             }
-            else
-            {
-                Snackbar.make(fragmentContainer, getString(R.string.import_success_error), Snackbar.LENGTH_LONG).show();
+            else{
+                if (e.getErrorCode() == MegaError.API_OK){
+                    log("OK INVITE CONTACT: "+request.getEmail());
+                    if(request.getNumber()==MegaContactRequest.INVITE_ACTION_ADD)
+                    {
+                        showSnackbar(getString(R.string.context_contact_request_sent, request.getEmail()));
+                    }
+                }
+                else{
+                    log("Code: "+e.getErrorString());
+                    if(e.getErrorCode()==MegaError.API_EEXIST)
+                    {
+                        showSnackbar(getString(R.string.context_contact_already_invited, request.getEmail()));
+                    }
+                    else{
+                        showSnackbar(getString(R.string.general_error));
+                    }
+                    log("ERROR: " + e.getErrorCode() + "___" + e.getErrorString());
+                }
             }
-
-        }else{
-            Snackbar.make(fragmentContainer, getString(R.string.import_success_message), Snackbar.LENGTH_LONG).show();
         }
+        else if(request.getType() == MegaRequest.TYPE_COPY){
+            if (e.getErrorCode() != MegaError.API_OK) {
+
+                log("e.getErrorCode() != MegaError.API_OK");
+
+                if(e.getErrorCode()==MegaError.API_EOVERQUOTA){
+                    log("OVERQUOTA ERROR: "+e.getErrorCode());
+                    Intent intent = new Intent(this, ManagerActivityLollipop.class);
+                    intent.setAction(Constants.ACTION_OVERQUOTA_ALERT);
+                    startActivity(intent);
+                    finish();
+
+                }
+                else
+                {
+                    Snackbar.make(fragmentContainer, getString(R.string.import_success_error), Snackbar.LENGTH_LONG).show();
+                }
+
+            }else{
+                Snackbar.make(fragmentContainer, getString(R.string.import_success_message), Snackbar.LENGTH_LONG).show();
+            }
+        }
+
     }
 
     @Override
