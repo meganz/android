@@ -72,6 +72,7 @@ import mega.privacy.android.app.lollipop.PinActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.listeners.MultipleGroupChatRequestListener;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaChatLollipopAdapter;
+import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ContactAttachmentBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.MessageNotSentBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.NodeAttachmentBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.Constants;
@@ -1969,6 +1970,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 if(m.getMessage().getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT){
                     showNodeAttachmentBottomSheet(m, position);
                 }
+                if(m.getMessage().getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT){
+                    showContactAttachmentBottomSheet(m, position);
+                }
                 else if(m.getMessage().getUserHandle()==megaChatApi.getMyUserHandle()) {
                     if(!(m.getMessage().isManagementMessage())){
                         log("selected message: "+m.getMessage().getContent());
@@ -3071,8 +3075,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     }
 
     public void showNodeAttachmentBottomSheet(AndroidMegaChatMessage message, int position){
-//        showSnackbar("Not yet implemented!");
-
         log("showNodeAttachmentBottomSheet: "+position);
         this.selectedPosition = position;
 
@@ -3080,6 +3082,18 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             this.selectedMessageId = message.getMessage().getMsgId();
 //            this.selectedChatItem = chat;
             NodeAttachmentBottomSheetDialogFragment bottomSheetDialogFragment = new NodeAttachmentBottomSheetDialogFragment();
+            bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
+        }
+    }
+
+    public void showContactAttachmentBottomSheet(AndroidMegaChatMessage message, int position){
+        log("showContactAttachmentBottomSheet: "+position);
+        this.selectedPosition = position;
+
+        if(message!=null){
+            this.selectedMessageId = message.getMessage().getMsgId();
+//            this.selectedChatItem = chat;
+            ContactAttachmentBottomSheetDialogFragment bottomSheetDialogFragment = new ContactAttachmentBottomSheetDialogFragment();
             bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
         }
     }

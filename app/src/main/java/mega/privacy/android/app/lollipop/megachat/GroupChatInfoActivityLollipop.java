@@ -427,7 +427,8 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         long participantsLabel = participantsCount+1; //Add one to include me
         infoNumParticipantsText.setText(participantsLabel+ " "+ getString(R.string.participants_chat_label));
 
-        String myFullName = getMyFullName();
+        ChatController chatC = new ChatController(groupChatInfoActivity);
+        String myFullName = chatC.getMyFullName();
 
         MegaChatParticipant me = new MegaChatParticipant(megaChatApi.getMyUserHandle(), null, null, getString(R.string.chat_me_text_bracket, myFullName), megaChatApi.getMyEmail(), chat.getOwnPrivilege(), megaChatApi.getOnlineStatus());
 
@@ -463,40 +464,6 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         }
         else{
             adapter.setParticipants(participants);
-        }
-    }
-
-    public String getMyFullName(){
-
-        String fullName = megaChatApi.getMyFullname();
-
-        if(fullName!=null){
-            if(fullName.isEmpty()){
-                log("1-Put MY email as fullname");
-                String myEmail = megaChatApi.getMyEmail();
-                String[] splitEmail = myEmail.split("[@._]");
-                fullName = splitEmail[0];
-                return fullName;
-            }
-            else{
-                if (fullName.trim().length() <= 0){
-                    log("2-Put MY email as fullname");
-                    String myEmail = megaChatApi.getMyEmail();
-                    String[] splitEmail = myEmail.split("[@._]");
-                    fullName = splitEmail[0];
-                    return fullName;
-                }
-                else{
-                    return fullName;
-                }
-            }
-        }
-        else{
-            log("3-Put MY  email as fullname");
-            String myEmail = megaChatApi.getMyEmail();
-            String[] splitEmail = myEmail.split("[@._]");
-            fullName = splitEmail[0];
-            return fullName;
         }
     }
 

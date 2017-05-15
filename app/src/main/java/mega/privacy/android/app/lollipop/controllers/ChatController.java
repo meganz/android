@@ -934,6 +934,40 @@ public class ChatController {
         }
     }
 
+    public String getMyFullName(){
+
+        String fullName = megaChatApi.getMyFullname();
+
+        if(fullName!=null){
+            if(fullName.isEmpty()){
+                log("1-Put MY email as fullname");
+                String myEmail = megaChatApi.getMyEmail();
+                String[] splitEmail = myEmail.split("[@._]");
+                fullName = splitEmail[0];
+                return fullName;
+            }
+            else{
+                if (fullName.trim().length() <= 0){
+                    log("2-Put MY email as fullname");
+                    String myEmail = megaChatApi.getMyEmail();
+                    String[] splitEmail = myEmail.split("[@._]");
+                    fullName = splitEmail[0];
+                    return fullName;
+                }
+                else{
+                    return fullName;
+                }
+            }
+        }
+        else{
+            log("3-Put MY  email as fullname");
+            String myEmail = megaChatApi.getMyEmail();
+            String[] splitEmail = myEmail.split("[@._]");
+            fullName = splitEmail[0];
+            return fullName;
+        }
+    }
+
     public void pickFileToSend(){
         log("pickFileToSend");
         Intent intent = new Intent(context, FileExplorerActivityLollipop.class);
