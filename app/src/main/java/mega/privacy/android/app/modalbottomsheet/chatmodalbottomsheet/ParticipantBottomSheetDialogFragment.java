@@ -30,16 +30,13 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
-import mega.privacy.android.app.lollipop.megachat.AndroidMegaChatMessage;
-import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
+import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
-import mega.privacy.android.app.lollipop.megachat.MegaChatParticipant;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
-import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaUser;
 
@@ -116,7 +113,7 @@ public class ParticipantBottomSheetDialogFragment extends BottomSheetDialogFragm
         display.getMetrics(outMetrics);
 
         super.setupDialog(dialog, style);
-        View contentView = View.inflate(getContext(), R.layout.participant_item_bottom_sheet, null);
+        View contentView = View.inflate(getContext(), R.layout.bottom_sheet_group_participant, null);
 
         mainLinearLayout = (LinearLayout) contentView.findViewById(R.id.participant_item_bottom_sheet);
 
@@ -173,20 +170,6 @@ public class ParticipantBottomSheetDialogFragment extends BottomSheetDialogFragm
             return;
         }
 
-        titleNameContactChatPanel.setText(selectedChat.getPeerFullnameByHandle(participantHandle));
-        titleMailContactChatPanel.setText(selectedChat.getPeerEmailByHandle(participantHandle));
-        int permission = selectedChat.getPeerPrivilegeByHandle(participantHandle);
-
-        if(permission== MegaChatRoom.PRIV_STANDARD) {
-            permissionsIcon.setImageResource(R.drawable.ic_permissions_read_write);
-        }
-        else if(permission==MegaChatRoom.PRIV_MODERATOR){
-            permissionsIcon.setImageResource(R.drawable.ic_permissions_full_access);
-        }
-        else{
-            permissionsIcon.setImageResource(R.drawable.ic_permissions_read_only);
-        }
-
         int state = megaChatApi.getUserOnlineStatus(participantHandle);
         if(state == MegaChatApi.STATUS_ONLINE){
             log("This user is connected");
@@ -207,6 +190,25 @@ public class ParticipantBottomSheetDialogFragment extends BottomSheetDialogFragm
 
         if(participantHandle == megaApi.getMyUser().getHandle()){
             log("Participant selected its me");
+            ChatController chatC = new ChatController(context);
+            String myFullName = chatC.getMyFullName();
+
+            titleNameContactChatPanel.setText(myFullName);
+
+            titleMailContactChatPanel.setText(megaChatApi.getMyEmail());
+
+            int permission = selectedChat.getOwnPrivilege();
+
+            if(permission== MegaChatRoom.PRIV_STANDARD) {
+                permissionsIcon.setImageResource(R.drawable.ic_permissions_read_write);
+            }
+            else if(permission==MegaChatRoom.PRIV_MODERATOR){
+                permissionsIcon.setImageResource(R.drawable.ic_permissions_full_access);
+            }
+            else{
+                permissionsIcon.setImageResource(R.drawable.ic_permissions_read_only);
+            }
+
             optionEditProfileChat.setVisibility(View.VISIBLE);
             optionLeaveChat.setVisibility(View.VISIBLE);
             optionContactInfoChat.setVisibility(View.GONE);
@@ -221,8 +223,24 @@ public class ParticipantBottomSheetDialogFragment extends BottomSheetDialogFragm
                 optionInvite.setVisibility(View.GONE);
             }
 
+            addAvatarParticipantPanel(participantHandle, megaChatApi.getMyEmail());
         }
         else{
+            titleNameContactChatPanel.setText(selectedChat.getPeerFullnameByHandle(participantHandle));
+            titleMailContactChatPanel.setText(selectedChat.getPeerEmailByHandle(participantHandle));
+
+            int permission = selectedChat.getPeerPrivilegeByHandle(participantHandle);
+
+            if(permission== MegaChatRoom.PRIV_STANDARD) {
+                permissionsIcon.setImageResource(R.drawable.ic_permissions_read_write);
+            }
+            else if(permission==MegaChatRoom.PRIV_MODERATOR){
+                permissionsIcon.setImageResource(R.drawable.ic_permissions_full_access);
+            }
+            else{
+                permissionsIcon.setImageResource(R.drawable.ic_permissions_read_only);
+            }
+
             MegaUser contact = megaApi.getContact(selectedChat.getPeerEmailByHandle(participantHandle));
 
             if(contact!=null) {
@@ -257,17 +275,17 @@ public class ParticipantBottomSheetDialogFragment extends BottomSheetDialogFragm
                 optionChangePermissionsChat.setVisibility(View.GONE);
                 optionRemoveParticipantChat.setVisibility(View.GONE);
             }
-        }
 
-        addAvatarParticipantPanel(participantHandle);
+            addAvatarParticipantPanel(participantHandle, selectedChat.getPeerEmailByHandle(participantHandle));
+        }
 
         dialog.setContentView(contentView);
     }
 
-    public void addAvatarParticipantPanel(long handle){
+    public void addAvatarParticipantPanel(long handle, String email){
 
         File avatar = null;
-        String email = selectedChat.getPeerEmailByHandle(handle);
+//        String email = selectedChat.getPeerEmailByHandle(handle);
         if(email !=null){
             log("isContact selected!");
 
