@@ -229,6 +229,13 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
                     nodeInfo.setText(Util.getSizeString(totalSize));
                 }
 
+                if(message.getMessage().getUserHandle()==megaChatApi.getMyUserHandle()){
+                    optionRevoke.setVisibility(View.VISIBLE);
+                }
+                else{
+                    optionRevoke.setVisibility(View.GONE);
+                }
+
                 dialog.setContentView(contentView);
 
                 mBehavior = BottomSheetBehavior.from((View) contentView.getParent());
@@ -293,8 +300,8 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
                     log("The selected node is NULL");
                     return;
                 }
-                ((ChatActivityLollipop)context).showSnackbar("Coming soon");
-//                ((ChatActivityLollipop)context).showSnackbar(getString(R.string.general_not_yet_implemented));
+
+                ((ChatActivityLollipop)context).revoke();
                 break;
             }
         }

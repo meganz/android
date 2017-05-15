@@ -3189,6 +3189,14 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 log("File NOT sent: "+e.getErrorCode());
             }
         }
+        else if(request.getType() == MegaChatRequest.TYPE_REVOKE_NODE_MESSAGE){
+            if(e.getErrorCode()==MegaChatError.ERROR_OK){
+                log("Node revoked correctly");
+            }
+            else{
+                log("NOT revoked correctly");
+            }
+        }
     }
 
     @Override
@@ -3246,6 +3254,20 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         intent.setAction(FileExplorerActivityLollipop.ACTION_PICK_IMPORT_FOLDER);
         startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_IMPORT_FOLDER);
 
+    }
+
+    public void revoke(){
+        log("revoke");
+
+        MegaChatMessage message = megaChatApi.getMessage(idChat, selectedMessageId);
+
+        if(message!=null) {
+            MegaNodeList nodeList = message.getMegaNodeList();
+            for (int i = 0; i < nodeList.size(); i++) {
+                MegaNode document = nodeList.get(i);
+                megaChatApi.revokeAttachment(idChat,document.getHandle(),this);
+            }
+        }
     }
 
     public void saveOffline(){
