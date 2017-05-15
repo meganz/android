@@ -189,6 +189,13 @@ public class ChatController {
         muteChat(chat.getChatId());
     }
 
+    public void unmuteChats(ArrayList<MegaChatListItem> chats){
+        for(int i=0; i<chats.size();i++){
+            unmuteChat(chats.get(i));
+            ((ManagerActivityLollipop)context).showMuteIcon(chats.get(i));
+        }
+    }
+
     public void unmuteChat(MegaChatListItem chat){
         log("UNmuteChatITEM");
         unmuteChat(chat.getChatId());

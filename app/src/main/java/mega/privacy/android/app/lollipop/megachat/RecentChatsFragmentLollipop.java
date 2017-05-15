@@ -331,6 +331,14 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
 //                    setChats();
                     break;
                 }
+                case R.id.cab_menu_unmute:{
+                    clearSelections();
+                    hideMultipleSelect();
+                    ChatController chatC = new ChatController(context);
+                    chatC.unmuteChats(chats);
+//                    setChats();
+                    break;
+                }
                 case R.id.cab_menu_archive:{
                     clearSelections();
                     hideMultipleSelect();
@@ -390,43 +398,31 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
                 for(int i=0;i<selected.size();i++){
                     MegaChatListItem chat = selected.get(i);
                     if(chat!=null){
-                        String chatHandle = chat.getChatId()+"";
-                        if (dbH.isMuted(chatHandle)) {
-                            log("Chat MUTED");
-                            showUnmute=true;
-                        }
-                        else{
+
+                        String chatHandle = String.valueOf(chat.getChatId());
+                        if (dbH.areNotificationsEnabled(chatHandle)) {
                             log("Chat UNMUTED");
-                            showMute=true;
+                            showUnmute=true;
+                            break;
                         }
-
-
-//                        ChatItemPreferences chatPrefs = dbH.findChatPreferencesByHandle(String.valueOf(chat.getChatId()));
-//                        if(chatPrefs!=null) {
-//                            log("Chat prefs exists!!!");
-//                            boolean notificationsEnabled = true;
-//                            if (chatPrefs.getNotificationsEnabled() != null) {
-//                                notificationsEnabled = Boolean.parseBoolean(chatPrefs.getNotificationsEnabled());
-//                            }
-//
-//                            if (!notificationsEnabled) {
-//                                log("Chat is MUTE");
-//                                showUnmute=true;
-//                            }
-//                            else{
-//                                log("Chat with notifications enabled!!");
-//                                showMute=true;
-//                            }
-//                        }
-//                        else{
-//                            log("Chat prefs is NULL");
-//                            showUnmute=false;
-//                        }
                     }
                 }
 
-                menu.findItem(R.id.cab_menu_mute).setVisible(showMute);
-                menu.findItem(R.id.cab_menu_unmute).setVisible(showUnmute);
+                for(int i=0;i<selected.size();i++){
+                    MegaChatListItem chat = selected.get(i);
+                    if(chat!=null){
+
+                        String chatHandle = String.valueOf(chat.getChatId());
+                        if (!(dbH.areNotificationsEnabled(chatHandle))) {
+                            log("Chat MUTED");
+                            showMute=true;
+                            break;
+                        }
+                    }
+                }
+
+                menu.findItem(R.id.cab_menu_mute).setVisible(showUnmute);
+                menu.findItem(R.id.cab_menu_unmute).setVisible(showMute);
             }
             else{
                 menu.findItem(R.id.cab_menu_select_all).setVisible(true);
