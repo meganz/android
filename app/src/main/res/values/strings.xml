@@ -1181,6 +1181,8 @@
     <string name="save_for_offline" context="Menu option">Save for Offline</string>
     <string name="general_revoke" context="Menu option">Revoke</string>
 
+    <string name="general_view_contacts" context="Menu option">View contacts</string>
+
     <string name="import_success_message" context="Menu option">Succesfully added to Cloud Drive</string>
     <string name="import_success_error" context="Menu option">Error. Not added to Cloud Drive</string>
 

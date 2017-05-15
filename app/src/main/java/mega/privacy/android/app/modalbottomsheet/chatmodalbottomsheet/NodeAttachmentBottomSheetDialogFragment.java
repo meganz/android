@@ -112,6 +112,7 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
 
             chatId = ((ChatActivityLollipop) context).idChat;
             messageId = ((ChatActivityLollipop) context).selectedMessageId;
+            log("Id Chat and Message id: "+chatId+ "___"+messageId);
             MegaChatMessage messageMega = megaChatApi.getMessage(chatId, messageId);
             if(messageMega!=null){
                 message = new AndroidMegaChatMessage(messageMega);
@@ -147,7 +148,6 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
         optionRevoke = (LinearLayout) contentView.findViewById(R.id.option_revoke_layout);
         optionSaveOffline = (LinearLayout) contentView.findViewById(R.id.option_save_offline_layout);
         optionImport = (LinearLayout) contentView.findViewById(R.id.option_import_layout);
-
 
         optionDownload.setOnClickListener(this);
         optionView.setOnClickListener(this);
