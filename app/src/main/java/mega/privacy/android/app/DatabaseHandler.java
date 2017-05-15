@@ -826,6 +826,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				int id = Integer.parseInt(cursor.getString(0));
 				String chatHandle = decrypt(cursor.getString(1));
 				String notificationsEnabled = decrypt(cursor.getString(2));
+				log("notificationsEnabled: "+notificationsEnabled);
 				String ringtone = decrypt(cursor.getString(3));
 				String notificationsSound = decrypt(cursor.getString(4));
 
@@ -838,42 +839,27 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		return null;
 	}
 
-	public boolean isMuted (String handle){
-		log("isMuted: "+handle);
+	public boolean areNotificationsEnabled (String handle){
+		log("areNotificationsEnabled: "+handle);
 
 		String selectQuery = "SELECT * FROM " + TABLE_CHAT_ITEMS + " WHERE " + KEY_CHAT_HANDLE + " = '" + encrypt(handle) + "'";
-		log("QUERY: "+selectQuery);
 		Cursor cursor = db.rawQuery(selectQuery, null);
-		String mute = null;
-		boolean result = false;
+		boolean result = true;
 		if (!cursor.equals(null)){
 			if (cursor.moveToFirst()){
 
-				mute = decrypt(cursor.getString(2));
-				log("mute_"+mute);
-				if (mute == null){
-					log("NULL");
-					result = false;
+				String notificationsEnabled = decrypt(cursor.getString(2));
+				boolean muteB = Boolean.parseBoolean(notificationsEnabled);
+				if(muteB==true){
+					result = true;
 				}
 				else{
-					boolean muteB = Boolean.parseBoolean(mute);
-					if(muteB==true){
-						result = true;
-					}
-					else{
-						result = false;
-					}
+					result = false;
 				}
 			}
 		}
-		else{
-			log("cursor NULL");
-			result = false;
-		}
+
 		cursor.close();
-
-		log("The chat is: "+result);
-
 		return result;
 	}
 
