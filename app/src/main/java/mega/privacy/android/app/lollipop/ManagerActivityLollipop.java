@@ -13519,6 +13519,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				break;
 			}
 			case CHAT:{
+				fabButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_chat_white));
 				if(megaChatApi!=null){
 					if(megaChatApi.getChatRooms().size()==0){
 						fabButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_chat_white));
