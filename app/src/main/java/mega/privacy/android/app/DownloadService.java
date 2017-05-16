@@ -257,7 +257,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
         if(!checkCurrentFile(currentDocument)){
             log("checkCurrentFile == false");
 
-            if (megaApi.getNumPendingDownloads() == 0){
+            if ((megaApi.getNumPendingDownloads() == 0) && (megaApiFolder.getNumPendingDownloads() == 0)){
                 onQueueComplete();
             }
 
@@ -378,12 +378,14 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		mNotificationManager.cancel(notificationId);
 		stopSelf();
 
-		int total = megaApi.getNumPendingUploads() + megaApi.getNumPendingDownloads();
+		int total = megaApi.getNumPendingUploads() + megaApi.getNumPendingDownloads() + megaApiFolder.getNumPendingDownloads() + megaApiFolder.getNumPendingUploads();
 		log("onQueueComplete: total of files before reset " + total);
 		if(total <= 0){
 			log("onQueueComplete: reset total uploads/downloads");
 			megaApi.resetTotalUploads();
 			megaApi.resetTotalDownloads();
+			megaApiFolder.resetTotalDownloads();
+			megaApiFolder.resetTotalUploads();
 			errorCount = 0;
 		}
 	}
@@ -432,14 +434,14 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		log("showCompleteNotification");
 		String notificationTitle, size;
 
-        int totalDownloads = megaApi.getTotalDownloads();
+        int totalDownloads = megaApi.getTotalDownloads() + megaApiFolder.getTotalDownloads();
         notificationTitle = getResources().getQuantityString(R.plurals.download_service_final_notification, totalDownloads, totalDownloads);
 
         if (errorCount > 0){
             size = getResources().getQuantityString(R.plurals.download_service_failed, errorCount, errorCount);
         }
         else{
-            String totalBytes = Formatter.formatFileSize(DownloadService.this, megaApi.getTotalDownloadedBytes());
+            String totalBytes = Formatter.formatFileSize(DownloadService.this, megaApi.getTotalDownloadedBytes()+megaApiFolder.getTotalDownloadedBytes());
             size = getString(R.string.general_total_size, totalBytes);
         }
 
@@ -606,11 +608,11 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	@SuppressLint("NewApi")
 	private void updateProgressNotification() {
 
-		int pendingTransfers = megaApi.getNumPendingDownloads();
-        int totalTransfers = megaApi.getTotalDownloads();
+		int pendingTransfers = megaApi.getNumPendingDownloads() + megaApiFolder.getNumPendingDownloads();
+        int totalTransfers = megaApi.getTotalDownloads() + megaApiFolder.getTotalDownloads();
 
-        long totalSizePendingTransfer = megaApi.getTotalDownloadBytes();
-        long totalSizeTransferred = megaApi.getTotalDownloadedBytes();
+        long totalSizePendingTransfer = megaApi.getTotalDownloadBytes() + megaApiFolder.getTotalDownloadBytes();
+        long totalSizeTransferred = megaApi.getTotalDownloadedBytes() + megaApiFolder.getTotalDownloadedBytes();
 
         int progressPercent = (int) Math.round((double) totalSizeTransferred / totalSizePendingTransfer * 100);
         log("updateProgressNotification: "+progressPercent);
@@ -705,7 +707,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 	@Override
 	public void onTransferStart(MegaApiJava api, MegaTransfer transfer) {
-		log("Download start: " + transfer.getFileName() + "_" + megaApi.getTotalDownloads());
+		log("Download start: " + transfer.getFileName() + "_" + megaApi.getTotalDownloads() + "_" + megaApiFolder.getTotalDownloads());
 
 		transfersCount++;
 
@@ -844,7 +846,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
             }
         }
 
-        if (megaApi.getNumPendingDownloads() == 0 && transfersCount==0){
+        if ((megaApi.getNumPendingDownloads() == 0) && (transfersCount==0) && (megaApiFolder.getNumPendingDownloads() == 0)){
             onQueueComplete();
         }
 	}
