@@ -1974,7 +1974,17 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 }
                 if(m.getMessage().getType()==MegaChatMessage.TYPE_CONTACT_ATTACHMENT){
                     log("show contact attachment panel");
-                    showContactAttachmentBottomSheet(m, position);
+                    if (m != null) {
+                        if (m.getMessage().getUsersCount() == 1) {
+                            long userHandle = m.getMessage().getUserHandle(0);
+                            if(userHandle != megaApi.getMyUser().getHandle()){
+                                showContactAttachmentBottomSheet(m, position);
+                            }
+                        }
+                        else{
+                            showContactAttachmentBottomSheet(m, position);
+                        }
+                    }
                 }
                 else if(m.getMessage().getUserHandle()==megaChatApi.getMyUserHandle()) {
                     if(!(m.getMessage().isManagementMessage())){
@@ -3122,6 +3132,37 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         snackbar.show();
     }
 
+    public void startConversation(long handle){
+        log("startConversation");
+        MegaChatRoom chat = megaChatApi.getChatRoomByUser(handle);
+        MegaChatPeerList peers = MegaChatPeerList.createInstance();
+        if(chat==null){
+            log("No chat, create it!");
+            peers.addPeer(handle, MegaChatPeerList.PRIV_STANDARD);
+            megaChatApi.createChat(false, peers, this);
+        }
+        else{
+            log("There is already a chat, open it!");
+            Intent intentOpenChat = new Intent(this, ChatActivityLollipop.class);
+            intentOpenChat.setAction(Constants.ACTION_CHAT_SHOW_MESSAGES);
+            intentOpenChat.putExtra("CHAT_ID", chat.getChatId());
+            finish();
+            this.startActivity(intentOpenChat);
+        }
+    }
+
+    public void startGroupConversation(ArrayList<Long> userHandles){
+        log("startGroupConversation");
+
+        MegaChatPeerList peers = MegaChatPeerList.createInstance();
+
+        for(int i=0;i<userHandles.size();i++){
+            long handle = userHandles.get(i);
+            peers.addPeer(handle, MegaChatPeerList.PRIV_STANDARD);
+        }
+        megaChatApi.createChat(true, peers, this);
+    }
+
     public void setMessages(ArrayList<AndroidMegaChatMessage> messages){
         if(dialog!=null){
             dialog.dismiss();
@@ -3213,6 +3254,23 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }
             else{
                 log("NOT revoked correctly");
+            }
+        }
+        else if(request.getType() == MegaChatRequest.TYPE_CREATE_CHATROOM){
+            log("Create chat request finish!!!");
+            if(e.getErrorCode()==MegaChatError.ERROR_OK){
+
+                log("open new chat");
+                Intent intent = new Intent(this, ChatActivityLollipop.class);
+                intent.setAction(Constants.ACTION_CHAT_NEW);
+                intent.putExtra("CHAT_ID", request.getChatHandle());
+                finish();
+                this.startActivity(intent);
+
+            }
+            else{
+                log("EEEERRRRROR WHEN CREATING CHAT " + e.getErrorString());
+                showSnackbar(getString(R.string.create_chat_error));
             }
         }
     }

@@ -25,6 +25,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Locale;
 
 import mega.privacy.android.app.DatabaseHandler;
@@ -39,6 +40,7 @@ import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.lollipop.megachat.AndroidMegaChatMessage;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
+import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.ThumbnailUtils;
 import mega.privacy.android.app.utils.Util;
@@ -176,7 +178,8 @@ public class ContactAttachmentBottomSheetDialogFragment extends BottomSheetDialo
         }
 
         if (message != null) {
-            if(message.getMessage().getUsersCount()==1){
+            long userCount  = message.getMessage().getUsersCount();
+            if(userCount==1){
                 log("One contact attached");
 
                 optionView.setVisibility(View.GONE);
@@ -201,10 +204,9 @@ public class ContactAttachmentBottomSheetDialogFragment extends BottomSheetDialo
                     stateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_offline));
                 }
 
-                if(userHandle == megaApi.getMyUser().getHandle()){
+                if(userHandle != megaApi.getMyUser().getHandle()){
 //                    addAvatarParticipantPanel(userHandle, megaChatApi.getMyEmail());
-                }
-                else{
+
                     String userName = message.getMessage().getUserName(0);
                     titleNameContactChatPanel.setText(userName);
 
@@ -241,6 +243,46 @@ public class ContactAttachmentBottomSheetDialogFragment extends BottomSheetDialo
                 log("More than one contact attached");
                 optionView.setVisibility(View.VISIBLE);
                 optionInfo.setVisibility(View.GONE);
+
+                stateIcon.setVisibility(View.GONE);
+
+                StringBuilder name = new StringBuilder("");
+                name.append(message.getMessage().getUserName(0));
+                for(int i=1; i<userCount;i++){
+                    name.append(", "+message.getMessage().getUserName(i));
+                }
+
+                optionStartConversation.setVisibility(View.VISIBLE);
+                optionInvite.setVisibility(View.GONE);
+
+                for(int i=1; i<userCount;i++){
+                    String userEmail = message.getMessage().getUserEmail(i);
+                    MegaUser contact = megaApi.getContact(userEmail);
+
+                    if(contact!=null) {
+                        if (contact.getVisibility() != MegaUser.VISIBILITY_VISIBLE) {
+                            log("Non contact");
+                            optionStartConversation.setVisibility(View.GONE);
+                            optionInvite.setVisibility(View.VISIBLE);
+                            break;
+                        }
+                    }
+                    else{
+                        log("Non contact");
+                        optionStartConversation.setVisibility(View.GONE);
+                        optionInvite.setVisibility(View.VISIBLE);
+                        break;
+                    }
+                }
+
+                log("Names of attached contacts: "+name);
+                titleMailContactChatPanel.setText(name);
+
+                String email = context.getResources().getQuantityString(R.plurals.general_selection_num_contacts, (int)userCount, userCount);
+                titleNameContactChatPanel.setText(email);
+
+                addAvatarParticipantPanel(-1, null, userCount+"");
+
             }
             dialog.setContentView(contentView);
 
@@ -251,69 +293,107 @@ public class ContactAttachmentBottomSheetDialogFragment extends BottomSheetDialo
     }
 
     public void addAvatarParticipantPanel(long handle, String email, String name){
-
+        log("addAvatarParticipantPanel: "+handle);
         File avatar = null;
 
-        //Ask for avatar
-        if (getActivity().getExternalCacheDir() != null){
-            avatar = new File(getActivity().getExternalCacheDir().getAbsolutePath(), email + ".jpg");
-        }
-        else{
-            avatar = new File(getActivity().getCacheDir().getAbsolutePath(), email + ".jpg");
-        }
-        Bitmap bitmap = null;
-        if (avatar.exists()){
-            if (avatar.length() > 0){
-                BitmapFactory.Options bOpts = new BitmapFactory.Options();
-                bOpts.inPurgeable = true;
-                bOpts.inInputShareable = true;
-                bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
-                if (bitmap == null) {
-                    avatar.delete();
+        if(handle!=-1){
+            //Ask for avatar
+            if (getActivity().getExternalCacheDir() != null){
+                avatar = new File(getActivity().getExternalCacheDir().getAbsolutePath(), email + ".jpg");
+            }
+            else{
+                avatar = new File(getActivity().getCacheDir().getAbsolutePath(), email + ".jpg");
+            }
+            Bitmap bitmap = null;
+            if (avatar.exists()){
+                if (avatar.length() > 0){
+                    BitmapFactory.Options bOpts = new BitmapFactory.Options();
+                    bOpts.inPurgeable = true;
+                    bOpts.inInputShareable = true;
+                    bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
+                    if (bitmap == null) {
+                        avatar.delete();
+                    }
+                    else{
+                        contactInitialLetter.setVisibility(View.GONE);
+                        contactImageView.setImageBitmap(bitmap);
+                        return;
+                    }
+                }
+            }
+
+            log("Set default avatar");
+            ////DEfault AVATAR
+            Bitmap defaultAvatar = Bitmap.createBitmap(Constants.DEFAULT_AVATAR_WIDTH_HEIGHT,Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
+            Canvas c = new Canvas(defaultAvatar);
+            Paint p = new Paint();
+            p.setAntiAlias(true);
+            String userHandleEncoded = MegaApiAndroid.userHandleToBase64(handle);
+            String color = megaApi.getUserAvatarColor(userHandleEncoded);
+            if(color!=null){
+                log("The color to set the avatar is "+color);
+                p.setColor(Color.parseColor(color));
+            }
+            else{
+                log("Default color to the avatar");
+                p.setColor(getResources().getColor(R.color.lollipop_primary_color));
+            }
+
+            int radius;
+            if (defaultAvatar.getWidth() < defaultAvatar.getHeight())
+                radius = defaultAvatar.getWidth()/2;
+            else
+                radius = defaultAvatar.getHeight()/2;
+
+            c.drawCircle(defaultAvatar.getWidth()/2, defaultAvatar.getHeight()/2, radius, p);
+            contactImageView.setImageBitmap(defaultAvatar);
+
+            Display display = getActivity().getWindowManager().getDefaultDisplay();
+            DisplayMetrics outMetrics = new DisplayMetrics ();
+            display.getMetrics(outMetrics);
+
+            if(name!=null){
+                if(!(name.trim().isEmpty())){
+                    String firstLetter = name.charAt(0) + "";
+                    firstLetter = firstLetter.toUpperCase(Locale.getDefault());
+                    contactInitialLetter.setText(firstLetter);
+                    contactInitialLetter.setTextColor(Color.WHITE);
+                    contactInitialLetter.setVisibility(View.VISIBLE);
+                    contactInitialLetter.setTextSize(24);
                 }
                 else{
                     contactInitialLetter.setVisibility(View.GONE);
-                    contactImageView.setImageBitmap(bitmap);
-                    return;
                 }
             }
-        }
-
-        log("Set default avatar");
-        ////DEfault AVATAR
-        Bitmap defaultAvatar = Bitmap.createBitmap(Constants.DEFAULT_AVATAR_WIDTH_HEIGHT,Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
-        Canvas c = new Canvas(defaultAvatar);
-        Paint p = new Paint();
-        p.setAntiAlias(true);
-        String userHandleEncoded = MegaApiAndroid.userHandleToBase64(handle);
-        String color = megaApi.getUserAvatarColor(userHandleEncoded);
-        if(color!=null){
-            log("The color to set the avatar is "+color);
-            p.setColor(Color.parseColor(color));
+            else{
+                contactInitialLetter.setVisibility(View.GONE);
+            }
         }
         else{
-            log("Default color to the avatar");
+            log("Set default avatar HANDLE is Null");
+            ////DEfault AVATAR
+            Bitmap defaultAvatar = Bitmap.createBitmap(Constants.DEFAULT_AVATAR_WIDTH_HEIGHT,Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
+            Canvas c = new Canvas(defaultAvatar);
+            Paint p = new Paint();
+            p.setAntiAlias(true);
             p.setColor(getResources().getColor(R.color.lollipop_primary_color));
-        }
 
-        int radius;
-        if (defaultAvatar.getWidth() < defaultAvatar.getHeight())
-            radius = defaultAvatar.getWidth()/2;
-        else
-            radius = defaultAvatar.getHeight()/2;
 
-        c.drawCircle(defaultAvatar.getWidth()/2, defaultAvatar.getHeight()/2, radius, p);
-        contactImageView.setImageBitmap(defaultAvatar);
+            int radius;
+            if (defaultAvatar.getWidth() < defaultAvatar.getHeight())
+                radius = defaultAvatar.getWidth()/2;
+            else
+                radius = defaultAvatar.getHeight()/2;
 
-        Display display = getActivity().getWindowManager().getDefaultDisplay();
-        DisplayMetrics outMetrics = new DisplayMetrics ();
-        display.getMetrics(outMetrics);
+            c.drawCircle(defaultAvatar.getWidth()/2, defaultAvatar.getHeight()/2, radius, p);
+            contactImageView.setImageBitmap(defaultAvatar);
 
-        if(name!=null){
-            if(!(name.trim().isEmpty())){
-                String firstLetter = name.charAt(0) + "";
-                firstLetter = firstLetter.toUpperCase(Locale.getDefault());
-                contactInitialLetter.setText(firstLetter);
+            Display display = getActivity().getWindowManager().getDefaultDisplay();
+            DisplayMetrics outMetrics = new DisplayMetrics ();
+            display.getMetrics(outMetrics);
+
+            if(name!=null){
+                contactInitialLetter.setText(name);
                 contactInitialLetter.setTextColor(Color.WHITE);
                 contactInitialLetter.setVisibility(View.VISIBLE);
                 contactInitialLetter.setTextSize(24);
@@ -322,20 +402,29 @@ public class ContactAttachmentBottomSheetDialogFragment extends BottomSheetDialo
                 contactInitialLetter.setVisibility(View.GONE);
             }
         }
-        else{
-            contactInitialLetter.setVisibility(View.GONE);
-        }
 
         ////
     }
 
     @Override
     public void onClick(View v) {
+        log("onClick");
+
+        if(message==null){
+            log("Error. The message is NULL");
+            return;
+        }
 
         switch(v.getId()){
 
             case R.id.option_info_layout:{
                 log("Info option");
+
+                if (!Util.isOnline(context)){
+                    ((ChatActivityLollipop) context).showSnackbar(context.getString(R.string.error_server_connection_problem));
+                    return;
+                }
+
                 Intent i = new Intent(context, ContactInfoActivityLollipop.class);
                 i.putExtra("name", message.getMessage().getUserEmail(0));
                 context.startActivity(i);
@@ -353,14 +442,49 @@ public class ContactAttachmentBottomSheetDialogFragment extends BottomSheetDialo
             case R.id.option_invite_layout:{
                 log("Invite option");
 
+                if (!Util.isOnline(context)){
+                    ((ChatActivityLollipop) context).showSnackbar(context.getString(R.string.error_server_connection_problem));
+                    return;
+                }
+
                 ContactController cC = new ContactController(context);
-                cC.inviteContact(message.getMessage().getUserEmail(0));
+                ArrayList<String> contactEmails;
+                long numUsers = message.getMessage().getUsersCount();
+                if(numUsers==1){
+                    cC.inviteContact(message.getMessage().getUserEmail(0));
+                }
+                else{
+                    log("Num users to invite: "+numUsers);
+                    contactEmails = new ArrayList<>();
+
+                    for(int i=0;i<numUsers;i++){
+                        String userMail = message.getMessage().getUserEmail(i);
+                        contactEmails.add(userMail);
+                    }
+                    cC.inviteMultipleContacts(contactEmails);
+                }
+
                 break;
             }
             case R.id.option_start_conversation_layout:{
-                log("Import option");
+                log("Start conversation option");
 
-                ((ChatActivityLollipop)context).showSnackbar("Coming soon");
+                long numUsers = message.getMessage().getUsersCount();
+                if(numUsers==1){
+                    ((ChatActivityLollipop) context).startConversation(message.getMessage().getUserHandle(0));
+                    dismissAllowingStateLoss();
+                }
+                else{
+                    log("Num users to invite: "+numUsers);
+                    ArrayList<Long> contactHandles = new ArrayList<>();
+
+                    for(int i=0;i<numUsers;i++){
+                        long userHandle = message.getMessage().getUserHandle(i);
+                        contactHandles.add(userHandle);
+                    }
+                    ((ChatActivityLollipop) context).startGroupConversation(contactHandles);
+                }
+
                 break;
             }
         }
@@ -395,6 +519,6 @@ public class ContactAttachmentBottomSheetDialogFragment extends BottomSheetDialo
     }
 
     private static void log(String log) {
-        Util.log("NodeAttachmentBottomSheetDialogFragment", log);
+        Util.log("ContactAttachmentBottomSheetDialogFragment", log);
     }
 }
