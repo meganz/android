@@ -198,7 +198,8 @@
             android:layout_marginLeft="5dp"
             android:paddingBottom="2dp"
             android:paddingTop="2dp"
-            android:src="@drawable/mute_ic"
+            android:alpha="0.54"
+            android:src="@drawable/ic_mute"
             android:visibility="visible" />
 
         <TextView
