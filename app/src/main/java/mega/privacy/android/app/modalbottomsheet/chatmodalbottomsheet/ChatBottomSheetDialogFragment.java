@@ -1,4 +1,4 @@
-package mega.privacy.android.app.modalbottomsheet;
+package mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet;
 
 
 import android.app.Activity;

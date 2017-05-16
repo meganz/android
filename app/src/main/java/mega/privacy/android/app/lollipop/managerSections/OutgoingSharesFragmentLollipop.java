@@ -341,7 +341,11 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 			emptyTextView = (TextView) v.findViewById(R.id.file_list_empty_text);
 
 			contentTextLayout = (RelativeLayout) v.findViewById(R.id.content_text_layout);
-			contentText = (TextView) v.findViewById(R.id.content_text);			
+			contentText = (TextView) v.findViewById(R.id.content_text);
+
+			RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) recyclerView.getLayoutParams();
+			params.addRule(RelativeLayout.BELOW, contentTextLayout.getId());
+			recyclerView.setLayoutParams(params);
 
 			emptyImageView.setImageResource(R.drawable.outgoing_shares_empty);
 			emptyTextView.setText(R.string.file_browser_empty_outgoing_shares);
