@@ -1361,10 +1361,10 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                     name.append(", "+message.getUserName(i));
                                 }
                                 log("Names of attached contacts: "+name);
-                                ((ViewHolderMessageChat)holder).contentOwnMessageContactName.setText(name);
+                                ((ViewHolderMessageChat)holder).contentOwnMessageContactEmail.setText(name);
 
                                 String email = context.getResources().getQuantityString(R.plurals.general_selection_num_contacts, (int)userCount, userCount);
-                                ((ViewHolderMessageChat)holder).contentOwnMessageContactEmail.setText(email);
+                                ((ViewHolderMessageChat)holder).contentOwnMessageContactName.setText(email);
 
                                 createDefaultAvatar(((ViewHolderMessageChat)holder), null, email, true);
                             }

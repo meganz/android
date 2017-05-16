@@ -11397,10 +11397,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);
 			cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
 			if (cFLol != null){
-				if (drawerItem == DrawerItem.CONTACTS){
-					cFLol.hideMultipleSelect();
-					cFLol.updateView();
-				}
+				cFLol.hideMultipleSelect();
+				cFLol.updateView();
 			}
 		}
 
@@ -11409,10 +11407,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			String cFTagSR = getFragmentTag(R.id.contact_tabs_pager, 1);
 			sRFLol = (SentRequestsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTagSR);
 			if (sRFLol != null){
-				if (drawerItem == DrawerItem.CONTACTS){
-					sRFLol.hideMultipleSelect();
-					sRFLol.updateView();
-				}
+				sRFLol.hideMultipleSelect();
+				sRFLol.updateView();
 			}
 		}
 
@@ -11421,10 +11417,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			String cFTagRR = getFragmentTag(R.id.contact_tabs_pager, 2);
 			rRFLol = (ReceivedRequestsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTagRR);
 			if (rRFLol != null){
-				if (drawerItem == DrawerItem.CONTACTS){
-					rRFLol.hideMultipleSelect();
-					rRFLol.updateView();
-				}
+				rRFLol.hideMultipleSelect();
+				rRFLol.updateView();
 			}
 		}
 	}

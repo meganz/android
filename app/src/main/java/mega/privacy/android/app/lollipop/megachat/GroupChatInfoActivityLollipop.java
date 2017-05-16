@@ -1315,7 +1315,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
                 showSnackbar(getString(R.string.add_participant_error));
             }
         }
-        if(request.getType() == MegaChatRequest.TYPE_CREATE_CHATROOM){
+        else if(request.getType() == MegaChatRequest.TYPE_CREATE_CHATROOM){
             log("Create chat request finish!!!");
             if(e.getErrorCode()==MegaChatError.ERROR_OK){
 
