@@ -8567,8 +8567,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 		builder.setMessage(getResources().getString(R.string.delete_account_text));
 
-		builder.setPositiveButton(R.string.context_delete, dialogClickListener);
-		builder.setNegativeButton(R.string.general_cancel, dialogClickListener);
+		builder.setPositiveButton(R.string.general_cancel, dialogClickListener);
+		builder.setNegativeButton(R.string.general_dismiss, dialogClickListener);
 		builder.show();
 	}
 
