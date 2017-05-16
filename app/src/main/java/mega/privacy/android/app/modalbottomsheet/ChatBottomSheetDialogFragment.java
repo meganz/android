@@ -216,13 +216,13 @@ public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment imp
 			else{
 				log("Chat with notifications enabled!!");
 				optionMuteChatText.setText(getString(R.string.general_mute));
-				optionMuteChatIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.mute_ic));
+				optionMuteChatIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_mute));
 			}
 		}
 		else{
 			log("Chat prefs is NULL");
 			optionMuteChatText.setText(getString(R.string.general_mute));
-			optionMuteChatIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.mute_ic));
+			optionMuteChatIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_mute));
 		}
 
         dialog.setContentView(contentView);
