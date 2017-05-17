@@ -810,40 +810,15 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 					if (localPath != null) {
 						try {
 							Util.copyFile(new File(localPath), new File(parentPath, tempNode.getName()));
-						} catch (Exception e) {
 						}
+						catch (Exception e) {	}
 
-//						if(MimeType.typeForName(tempNode.getName()).isPdf()){
-//
-//							File pdfFile = new File(localPath);
-//
-//							Intent intentPdf = new Intent();
-//							intentPdf.setDataAndType(Uri.fromFile(pdfFile), "application/pdf");
-//							intentPdf.setClass(this, OpenPDFActivity.class);
-//							intentPdf.setAction("android.intent.action.VIEW");
-//							this.startActivity(intentPdf);
-//
-//						}
-//						else 
-//						if(MimeTypeList.typeForName(tempNode.getName()).isZip()){
-//
-//							File zipFile = new File(localPath);
-//
-//							Intent intentZip = new Intent();
-//							intentZip.setClass(this, ZipBrowserActivityLollipop.class);
-//							intentZip.putExtra(ZipBrowserActivityLollipop.EXTRA_PATH_ZIP, zipFile.getAbsolutePath());
-//							intentZip.putExtra(ZipBrowserActivityLollipop.EXTRA_HANDLE_ZIP, tempNode.getHandle());
-//
-//							this.startActivity(intentZip);
-//
-//						}
-//						else{
 
+						try {
 							Intent viewIntent = new Intent(Intent.ACTION_VIEW);
 							if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
 								viewIntent.setDataAndType(FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", new File(localPath)), MimeTypeList.typeForName(tempNode.getName()).getType());
-							}
-							else{
+							} else {
 								viewIntent.setDataAndType(Uri.fromFile(new File(localPath)), MimeTypeList.typeForName(tempNode.getName()).getType());
 							}
 							viewIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
@@ -853,8 +828,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 								Intent intentShare = new Intent(Intent.ACTION_SEND);
 								if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
 									intentShare.setDataAndType(FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", new File(localPath)), MimeTypeList.typeForName(tempNode.getName()).getType());
-								}
-								else{
+								} else {
 									intentShare.setDataAndType(Uri.fromFile(new File(localPath)), MimeTypeList.typeForName(tempNode.getName()).getType());
 								}
 								intentShare.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
@@ -862,14 +836,23 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 									startActivity(intentShare);
 								String toastMessage = getString(R.string.general_already_downloaded) + ": " + localPath;
 								CoordinatorLayout coordinatorFragment = (CoordinatorLayout) fragmentContainer.findViewById(R.id.contact_file_list_coordinator_layout);
-								if(coordinatorFragment!=null){
+								if (coordinatorFragment != null) {
 									showSnackbar(toastMessage, coordinatorFragment);
-								}
-								else{
+								} else {
 									showSnackbar(toastMessage, fragmentContainer);
 								}
 							}
-//						}
+						}
+						catch(Exception e){
+							String toastMessage = getString(R.string.general_already_downloaded) + ": " + localPath;
+							CoordinatorLayout coordinatorFragment = (CoordinatorLayout) fragmentContainer.findViewById(R.id.contact_file_list_coordinator_layout);
+							if(coordinatorFragment!=null){
+								showSnackbar(toastMessage, coordinatorFragment);
+							}
+							else{
+								showSnackbar(toastMessage, fragmentContainer);
+							}
+						}
 						return;
 					}
 				}

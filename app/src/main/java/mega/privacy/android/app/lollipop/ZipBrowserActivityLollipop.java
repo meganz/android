@@ -446,7 +446,8 @@ public class ZipBrowserActivityLollipop extends PinActivityLollipop implements O
 				}
 			}
 			catch (Exception e){
-				log("Exception: " + e.getMessage());
+				String toastMessage = getString(R.string.general_already_downloaded) + ": " + absolutePath;
+				Toast.makeText(this, toastMessage, Toast.LENGTH_LONG).show();
 			}
 			return;
 		}		
