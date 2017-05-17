@@ -286,20 +286,27 @@ public class DownloadService extends Service implements MegaTransferListenerInte
             storeToAdvacedDevices.put(currentDocument.getHandle(), contentUri);
 
 			if (isFolderLink){
-				if (megaApi.getRootNode() == null){
+				if (dbH.getCredentials() == null) {
 					megaApiFolder.startDownload(currentDocument, currentDir.getAbsolutePath() + "/", this);
-					log("Root node is null");
+					log("getCredentials null");
 					return;
 				}
+
+//				if (megaApi.getRootNode() == null) {
+//					megaApiFolder.startDownload(currentDocument, currentDir.getAbsolutePath() + "/", this);
+//					log("Root node is null");
+//					return;
+//				}
 
 				log("Folder link node");
 				MegaNode currentDocumentAuth = megaApiFolder.authorizeNode(currentDocument);
 				if (currentDocumentAuth == null){
-					log("CurrentDocument is null");
+					log("CurrentDocumentAuth is null");
 					megaApiFolder.startDownload(currentDocument, currentDir.getAbsolutePath() + "/", this);
 					return;
 				}
 				else{
+					log("CurrentDocumentAuth is not null");
 					currentDocument = megaApiFolder.authorizeNode(currentDocument);
 				}
 			}
@@ -335,20 +342,27 @@ public class DownloadService extends Service implements MegaTransferListenerInte
                 }
 
                 if (isFolderLink){
-                    if (megaApi.getRootNode() == null){
-                        megaApiFolder.startDownload(currentDocument, currentDir.getAbsolutePath() + "/", this);
-                        log("Root node is null");
-                        return;
-                    }
+					if (dbH.getCredentials() == null) {
+						megaApiFolder.startDownload(currentDocument, currentDir.getAbsolutePath() + "/", this);
+						log("getCredentials null");
+						return;
+					}
+
+//                    if (megaApi.getRootNode() == null){
+//                        megaApiFolder.startDownload(currentDocument, currentDir.getAbsolutePath() + "/", this);
+//                        log("Root node is null");
+//                        return;
+//                    }
 
                     log("Folder link node");
                     MegaNode currentDocumentAuth = megaApiFolder.authorizeNode(currentDocument);
                     if (currentDocumentAuth == null){
-                        log("CurrentDocument is null");
+                        log("CurrentDocumentAuth is null");
                         megaApiFolder.startDownload(currentDocument, currentDir.getAbsolutePath() + "/", this);
                         return;
                     }
                     else{
+						log("CurrentDocumentAuth is not null");
 						currentDocument = megaApiFolder.authorizeNode(currentDocument);
 					}
                 }

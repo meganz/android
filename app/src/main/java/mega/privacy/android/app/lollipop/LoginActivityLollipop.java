@@ -62,6 +62,7 @@ public class LoginActivityLollipop extends AppCompatActivity {
 
     Handler handler = new Handler();
 	private MegaApiAndroid megaApi;
+	private MegaApiAndroid megaApiFolder;
 
 	private android.support.v7.app.AlertDialog alertDialogTransferOverquota;
 	
@@ -89,6 +90,10 @@ public class LoginActivityLollipop extends AppCompatActivity {
 	    dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 		if (megaApi == null){
 			megaApi = ((MegaApplication) getApplication()).getMegaApi();
+		}
+
+		if (megaApiFolder == null){
+			megaApiFolder = ((MegaApplication) getApplication()).getMegaApiFolder();
 		}
 
 		setContentView(R.layout.activity_login);
@@ -279,9 +284,15 @@ public class LoginActivityLollipop extends AppCompatActivity {
 						log("Pressed button positive to cancel transfer");
 						if (megaApi != null){
 							megaApi.cancelTransfers(MegaTransfer.TYPE_DOWNLOAD);
+							if (megaApiFolder != null){
+								megaApiFolder.cancelTransfers(MegaTransfer.TYPE_DOWNLOAD);
+							}
 						}
 						else{
 							log("megaAPI is null");
+							if (megaApiFolder != null){
+								megaApiFolder.cancelTransfers(MegaTransfer.TYPE_DOWNLOAD);
+							}
 						}
 
 						break;
