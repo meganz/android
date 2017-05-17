@@ -1154,6 +1154,7 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 					if(chatEnabled){
 						log("Chat enabled-->connect");
 						megaChatApi.connect(this);
+						MegaApplication.setLoggingIn(false);
 					}
 					else{
 						log("Chat NOT enabled - readyToManager");

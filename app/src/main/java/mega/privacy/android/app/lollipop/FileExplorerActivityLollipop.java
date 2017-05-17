@@ -1408,6 +1408,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 						log("Chat enabled-->connect");
 						initizalizingChatText.setVisibility(View.VISIBLE);
 						megaChatApi.connect(this);
+						MegaApplication.setLoggingIn(false);
 					}
 					else{
 						log("Chat NOT enabled - readyToManager");
