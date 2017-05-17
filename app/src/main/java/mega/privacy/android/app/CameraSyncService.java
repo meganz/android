@@ -2062,6 +2062,7 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 						megaChatApi.connect(this);
 						isLoggingIn = false;
 						MegaApplication.setLoggingIn(isLoggingIn);
+						retryLaterShortTime();
 					}
 					else{
 						log("Chat NOT enabled - readyToManager");
