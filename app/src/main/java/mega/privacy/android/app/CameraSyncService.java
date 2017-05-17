@@ -2060,6 +2060,8 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 					if(chatEnabled){
 						log("Chat enabled-->connect");
 						megaChatApi.connect(this);
+						isLoggingIn = false;
+						MegaApplication.setLoggingIn(isLoggingIn);
 					}
 					else{
 						log("Chat NOT enabled - readyToManager");

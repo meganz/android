@@ -37,12 +37,19 @@ import java.util.Map;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.ZipBrowserActivityLollipop;
+import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaChatApi;
+import nz.mega.sdk.MegaChatApiAndroid;
+import nz.mega.sdk.MegaChatApiJava;
+import nz.mega.sdk.MegaChatError;
+import nz.mega.sdk.MegaChatRequest;
+import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
@@ -55,7 +62,7 @@ import nz.mega.sdk.MegaTransferListenerInterface;
 /*
  * Background service to download files
  */
-public class DownloadService extends Service implements MegaTransferListenerInterface, MegaRequestListenerInterface{
+public class DownloadService extends Service implements MegaTransferListenerInterface, MegaRequestListenerInterface, MegaChatRequestListenerInterface {
 
 	// Action to stop download
 	public static String ACTION_CANCEL = "CANCEL_DOWNLOAD";
@@ -88,6 +95,10 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	MegaApplication app;
 	MegaApiAndroid megaApi;
 	MegaApiAndroid megaApiFolder;
+	MegaChatApiAndroid megaChatApi;
+	ChatSettings chatSettings;
+
+	ArrayList<Intent> pendingIntents = new ArrayList<Intent>();
 
 	WifiLock lock;
 	WakeLock wl;
@@ -109,6 +120,8 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	private NotificationManager mNotificationManager;
 
 	MegaNode offlineNode;
+
+	boolean isLoggingIn = false;
 
 	@SuppressLint("NewApi")
 	@Override
@@ -197,6 +210,55 @@ public class DownloadService extends Service implements MegaTransferListenerInte
         }
 
 		megaApi = app.getMegaApi();
+
+		UserCredentials credentials = dbH.getCredentials();
+
+		if (credentials != null) {
+
+			String gSession = credentials.getSession();
+
+			if (megaApi.getRootNode() == null) {
+				isLoggingIn = MegaApplication.isLoggingIn();
+				if (!isLoggingIn) {
+					isLoggingIn = true;
+					MegaApplication.setLoggingIn(isLoggingIn);
+
+					if (Util.isChatEnabled()) {
+						if (megaChatApi == null) {
+							megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
+						}
+						int ret = megaChatApi.init(gSession);
+						log("result of init ---> " + ret);
+						chatSettings = dbH.getChatSettings();
+						if (ret == MegaChatApi.INIT_NO_CACHE) {
+							log("condition ret == MegaChatApi.INIT_NO_CACHE");
+							megaApi.invalidateCache();
+
+						} else if (ret == MegaChatApi.INIT_ERROR) {
+							log("condition ret == MegaChatApi.INIT_ERROR");
+							if (chatSettings == null) {
+								log("ERROR----> Switch OFF chat");
+								chatSettings = new ChatSettings(false + "", true + "", true + "", true + "");
+								dbH.setChatSettings(chatSettings);
+							} else {
+								log("ERROR----> Switch OFF chat");
+								dbH.setEnabledChat(false + "");
+							}
+							megaChatApi.logout(this);
+						} else {
+							log("Chat correctly initialized");
+						}
+					}
+
+					pendingIntents.add(intent);
+					updateProgressNotification();
+					megaApi.fastLogin(gSession, this);
+					return;
+				}
+				pendingIntents.add(intent);
+				return;
+			}
+		}
 
 		String serialize = intent.getStringExtra(EXTRA_SERIALIZE_STRING);
 
@@ -292,12 +354,6 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 					return;
 				}
 
-//				if (megaApi.getRootNode() == null) {
-//					megaApiFolder.startDownload(currentDocument, currentDir.getAbsolutePath() + "/", this);
-//					log("Root node is null");
-//					return;
-//				}
-
 				log("Folder link node");
 				MegaNode currentDocumentAuth = megaApiFolder.authorizeNode(currentDocument);
 				if (currentDocumentAuth == null){
@@ -342,17 +398,6 @@ public class DownloadService extends Service implements MegaTransferListenerInte
                 }
 
                 if (isFolderLink){
-					if (dbH.getCredentials() == null) {
-						megaApiFolder.startDownload(currentDocument, currentDir.getAbsolutePath() + "/", this);
-						log("getCredentials null");
-						return;
-					}
-
-//                    if (megaApi.getRootNode() == null){
-//                        megaApiFolder.startDownload(currentDocument, currentDir.getAbsolutePath() + "/", this);
-//                        log("Root node is null");
-//                        return;
-//                    }
 
                     log("Folder link node");
                     MegaNode currentDocumentAuth = megaApiFolder.authorizeNode(currentDocument);
@@ -1397,6 +1442,54 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			}
 
 		}
+		else if (request.getType() == MegaRequest.TYPE_LOGIN){
+			if (e.getErrorCode() == MegaError.API_OK){
+				log("Fast login OK");
+				log("Calling fetchNodes from CameraSyncService");
+				megaApi.fetchNodes(this);
+			}
+			else{
+				log("ERROR: " + e.getErrorString());
+				isLoggingIn = false;
+				MegaApplication.setLoggingIn(isLoggingIn);
+//				finish();
+			}
+		}
+		else if (request.getType() == MegaRequest.TYPE_FETCH_NODES){
+			if (e.getErrorCode() == MegaError.API_OK){
+				chatSettings = dbH.getChatSettings();
+				if(chatSettings!=null) {
+					boolean chatEnabled = Boolean.parseBoolean(chatSettings.getEnabled());
+					if(chatEnabled){
+						log("Chat enabled-->connect");
+						megaChatApi.connect(this);
+						isLoggingIn = false;
+						MegaApplication.setLoggingIn(isLoggingIn);
+					}
+					else{
+						log("Chat NOT enabled - readyToManager");
+						isLoggingIn = false;
+						MegaApplication.setLoggingIn(isLoggingIn);
+					}
+				}
+				else{
+					log("chatSettings NULL - readyToManager");
+					isLoggingIn = false;
+					MegaApplication.setLoggingIn(isLoggingIn);
+				}
+
+				for (int i=0;i<pendingIntents.size();i++){
+					onHandleIntent(pendingIntents.get(i));
+				}
+				pendingIntents.clear();
+			}
+			else{
+				log("ERROR: " + e.getErrorString());
+				isLoggingIn = false;
+				MegaApplication.setLoggingIn(isLoggingIn);
+//				finish();
+			}
+		}
 		else{
 			log("Public node received");
 			if (e.getErrorCode() != MegaError.API_OK) {
@@ -1449,5 +1542,38 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	public boolean onTransferData(MegaApiJava api, MegaTransfer transfer, byte[] buffer)
 	{
 		return true;
+	}
+
+	@Override
+	public void onRequestStart(MegaChatApiJava api, MegaChatRequest request) {
+
+	}
+
+	@Override
+	public void onRequestUpdate(MegaChatApiJava api, MegaChatRequest request) {
+
+	}
+
+	@Override
+	public void onRequestFinish(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
+		if (request.getType() == MegaChatRequest.TYPE_CONNECT){
+
+			isLoggingIn = false;
+			MegaApplication.setLoggingIn(isLoggingIn);
+
+			if(e.getErrorCode()==MegaChatError.ERROR_OK){
+				log("Connected to chat!");
+			}
+			else{
+				log("EEEERRRRROR WHEN CONNECTING " + e.getErrorString());
+//				showSnackbar(getString(R.string.chat_connection_error));
+//				retryLaterShortTime();
+			}
+		}
+	}
+
+	@Override
+	public void onRequestTemporaryError(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
+
 	}
 }
