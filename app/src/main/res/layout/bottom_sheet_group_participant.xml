@@ -194,7 +194,7 @@
                 android:paddingBottom="2dp"
                 android:layout_marginLeft="5dp"
                 android:paddingTop="2dp"
-                android:src="@drawable/ic_shared_with"
+                android:src="@drawable/ic_change_permissions"
                 android:visibility="visible" />
 
             <TextView
