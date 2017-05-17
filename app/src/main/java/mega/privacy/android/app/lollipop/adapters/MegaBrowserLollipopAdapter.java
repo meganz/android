@@ -3,8 +3,19 @@ package mega.privacy.android.app.lollipop.adapters;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapShader;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
+import android.graphics.Rect;
+import android.graphics.RectF;
+import android.graphics.Shader;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.shapes.RoundRectShape;
 import android.os.Environment;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.ViewHolder;
@@ -93,8 +104,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 		public ViewHolderBrowser(View v) {
 			super(v);
 		}
-		
-		public ImageView imageView;
+
 		public ImageView savedOffline;
 		public ImageView publicLinkImage;
 		public TextView textViewFileName;
@@ -109,8 +119,8 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 		
 		public ViewHolderBrowserList(View v){
 			super(v);
-		}			
-
+		}
+		public ImageView imageView;
 		public RelativeLayout itemLayout;
 		public ImageView permissionsIcon;
 	}
@@ -120,7 +130,9 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 		public ViewHolderBrowserGrid(View v){
 			super(v);
 		}
-		
+		public ImageView imageViewThumb;
+		public ImageView imageViewIcon;
+		public RelativeLayout thumbLayout;
 		public View separator;
 		
 	}
@@ -289,7 +301,9 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 
 					}
 				});
+
 				view.imageView.startAnimation(flipAnimation);
+
 			}
 			else{
 				log("view is null - not animation");
@@ -518,7 +532,9 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 			ViewHolderBrowserGrid holderGrid = new ViewHolderBrowserGrid(v);
 			
 			holderGrid.itemLayout = (RelativeLayout) v.findViewById(R.id.file_grid_item_layout);
-			holderGrid.imageView = (ImageView) v.findViewById(R.id.file_grid_thumbnail);
+			holderGrid.imageViewThumb = (ImageView) v.findViewById(R.id.file_grid_thumbnail);
+			holderGrid.imageViewIcon = (ImageView) v.findViewById(R.id.file_grid_icon);
+			holderGrid.thumbLayout = (RelativeLayout) v.findViewById(R.id.file_grid_thumbnail_layout);
 			holderGrid.textViewFileName = (TextView) v.findViewById(R.id.file_grid_filename);
 			holderGrid.textViewFileSize = (TextView) v.findViewById(R.id.file_grid_filesize);
 			holderGrid.imageButtonThreeDots = (ImageButton) v.findViewById(R.id.file_grid_three_dots);
@@ -628,9 +644,12 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 			}else{
 				holder.textViewFileSize.setText(MegaApiUtils.getInfoFolder(node, context));
 			}
-			
+			holder.imageViewIcon.setVisibility(View.VISIBLE);
+			holder.imageViewThumb.setVisibility(View.GONE);
+			holder.thumbLayout.setBackgroundColor(Color.TRANSPARENT);
+
 			if(type==Constants.INCOMING_SHARES_ADAPTER){
-				holder.imageView.setImageResource(R.drawable.ic_folder_incoming_list);
+				holder.imageViewIcon.setImageResource(R.drawable.ic_folder_incoming_list);
 				//Show the owner of the shared folder
 				ArrayList<MegaShare> sharesIncoming = megaApi.getInSharesList();
 				for(int j=0; j<sharesIncoming.size();j++){
@@ -659,7 +678,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 				}
 			}
 			else if (type==Constants.OUTGOING_SHARES_ADAPTER){
-				holder.imageView.setImageResource(R.drawable.ic_folder_outgoing_list);
+				holder.imageViewIcon.setImageResource(R.drawable.ic_folder_outgoing_list);
 				//Show the number of contacts who shared the folder
 				ArrayList<MegaShare> sl = megaApi.getOutShares(node);
 				if (sl != null) {
@@ -670,13 +689,13 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 			}
 			else{
 				if (node.isOutShare()){
-					holder.imageView.setImageResource(R.drawable.ic_folder_outgoing_list);
+					holder.imageViewIcon.setImageResource(R.drawable.ic_folder_outgoing_list);
 				}
 				else if(node.isInShare()){
-					holder.imageView.setImageResource(R.drawable.ic_folder_incoming_list);
+					holder.imageViewIcon.setImageResource(R.drawable.ic_folder_incoming_list);
 				}
 				else{
-					holder.imageView.setImageResource(R.drawable.ic_folder_list);
+					holder.imageViewIcon.setImageResource(R.drawable.ic_folder_list);
 				}
 
 
@@ -733,71 +752,85 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 					holder.transferProgressBar.setVisibility(View.GONE);		
 					holder.textViewFileSize.setVisibility(View.VISIBLE);	
 				}
-			}					
+			}
 
-			holder.imageView.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
+			holder.imageViewIcon.setVisibility(View.VISIBLE);
+			holder.imageViewIcon.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
+			holder.imageViewThumb.setVisibility(View.GONE);
+			holder.thumbLayout.setBackgroundColor(Color.TRANSPARENT);
 
 			if (node.hasThumbnail()) {
-			
-				thumb = ThumbnailUtils.getThumbnailFromCache(node);
-				if (thumb != null) {
-					if(!multipleSelect){
-						holder.imageView.setImageBitmap(thumb);
-					}
-					else{
-						holder.imageView.setImageBitmap(thumb);
-					}
+
+//				DisplayMetrics dm = new DisplayMetrics();
+//				float px = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 56, dm);
+//
+//				RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
+//				params.width = ViewGroup.LayoutParams.MATCH_PARENT;
+//				params.height = ViewGroup.LayoutParams.MATCH_PARENT;
+//				holder.imageView.setLayoutParams(params);
+
+				Bitmap temp = ThumbnailUtils.getThumbnailFromCache(node);
+
+				if (temp != null) {
+					thumb = ThumbnailUtilsLollipop.getRoundedRectBitmap(context, temp, 3);
+					holder.imageViewIcon.setVisibility(View.GONE);
+					holder.imageViewThumb.setVisibility(View.VISIBLE);
+					holder.imageViewThumb.setImageBitmap(thumb);
+					holder.thumbLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.new_background_fragment));
+
 				} 
 				else {
-					thumb = ThumbnailUtils.getThumbnailFromFolder(node, context);
-					if (thumb != null) {
-						if(!multipleSelect){
-							holder.imageView.setImageBitmap(thumb);
-						}
-						else{
-							holder.imageView.setImageBitmap(thumb);
-						}
+					temp = ThumbnailUtils.getThumbnailFromFolder(node, context);
+
+					if (temp != null) {
+						thumb = ThumbnailUtilsLollipop.getRoundedRectBitmap(context, temp, 3);
+						holder.imageViewIcon.setVisibility(View.GONE);
+						holder.imageViewThumb.setVisibility(View.VISIBLE);
+						holder.imageViewThumb.setImageBitmap(thumb);
+						holder.thumbLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.new_background_fragment));
+
 					}
 					else {
 						try {
-							thumb = ThumbnailUtilsLollipop.getThumbnailFromMegaList(node, context, holder, megaApi, this);
+							temp = ThumbnailUtilsLollipop.getThumbnailFromMegaGrid(node, context, holder, megaApi, this);
+
 						} catch (Exception e) {
 						} // Too many AsyncTasks
 
-						if (thumb != null) {
-							if(!multipleSelect){
-								holder.imageView.setImageBitmap(thumb);
-							}
-							else{
-								holder.imageView.setImageBitmap(thumb);
-							}
+						if (temp != null) {
+							thumb = ThumbnailUtilsLollipop.getRoundedRectBitmap(context, temp, 3);
+							holder.imageViewIcon.setVisibility(View.GONE);
+							holder.imageViewThumb.setVisibility(View.VISIBLE);
+							holder.imageViewThumb.setImageBitmap(thumb);
+							holder.thumbLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.new_background_fragment));
 						}
 					}
 				}
 			} 
 			else {
-				thumb = ThumbnailUtils.getThumbnailFromCache(node);
-				if (thumb != null) {
-					if(!multipleSelect){
-						holder.imageView.setImageBitmap(thumb);
-					}
-					else{
-						holder.imageView.setImageBitmap(thumb);
-					}
+				Bitmap temp = ThumbnailUtils.getThumbnailFromCache(node);
+
+//				thumb = ThumbnailUtils.getThumbnailFromCache(node);
+				if (temp != null) {
+					thumb = ThumbnailUtilsLollipop.getRoundedRectBitmap(context, temp, 3);
+					holder.imageViewIcon.setVisibility(View.GONE);
+					holder.imageViewThumb.setVisibility(View.VISIBLE);
+					holder.imageViewThumb.setImageBitmap(thumb);
+					holder.thumbLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.new_background_fragment));
 				} 
 				else {
-					thumb = ThumbnailUtils.getThumbnailFromFolder(node, context);
-					if (thumb != null) {
-						if(!multipleSelect){
-							holder.imageView.setImageBitmap(thumb);
-						}
-						else{
-							holder.imageView.setImageBitmap(thumb);
-						}
+					temp = ThumbnailUtils.getThumbnailFromFolder(node, context);
+
+					if (temp != null) {
+						thumb = ThumbnailUtilsLollipop.getRoundedRectBitmap(context, temp, 3);
+						holder.imageViewIcon.setVisibility(View.GONE);
+						holder.imageViewThumb.setVisibility(View.VISIBLE);
+						holder.imageViewThumb.setImageBitmap(thumb);
+						holder.thumbLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.new_background_fragment));
 					} 
 					else {
 						try {
-							ThumbnailUtilsLollipop.createThumbnailList(context, node,holder, megaApi, this);
+							ThumbnailUtilsLollipop.createThumbnailGrid(context, node,holder, megaApi, this);
 						} 
 						catch (Exception e) {
 						} // Too many AsyncTasks
@@ -862,7 +895,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 			holder.savedOffline.setVisibility(View.INVISIBLE);
 		}		
 	}
-	
+
 	public void onBindViewHolderList(ViewHolderBrowserList holder, int position){
 		log("onBindViewHolderList");
 
