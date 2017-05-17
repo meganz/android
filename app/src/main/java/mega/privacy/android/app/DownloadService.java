@@ -521,140 +521,149 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		}
 		else
 		{
-			if (openFile){
-				log("openFile true");
-//				if (MimeTypeList.typeForName(currentFile.getName()).isZip()){
-//					log("Download success of zip file!");
-//
-//					if(pathFileToOpen!=null){
-//						Intent intentZip;
-//						intentZip = new Intent(this, ZipBrowserActivityLollipop.class);
-//						intentZip.setAction(ZipBrowserActivityLollipop.ACTION_OPEN_ZIP_FILE);
-//						intentZip.putExtra(ZipBrowserActivityLollipop.EXTRA_ZIP_FILE_TO_OPEN, pathFileToOpen);
-//						intentZip.putExtra(ZipBrowserActivityLollipop.EXTRA_PATH_ZIP, currentFile.getAbsolutePath());
-//						intentZip.putExtra(ZipBrowserActivityLollipop.EXTRA_HANDLE_ZIP, currentDocument.getHandle());
-//
-//
-//						if(intentZip!=null){
-//							intentZip.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//							startActivity(intentZip);
-//						}
-//					}
-//					else{
-//						Intent intentZip = null;
-//
-//						intentZip = new Intent(this, ManagerActivityLollipop.class);
-//						intentZip.setAction(Constants.ACTION_EXPLORE_ZIP);
-//						intentZip.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//						intentZip.putExtra(Constants.EXTRA_PATH_ZIP, currentFile.getAbsolutePath());
-//
-//						startActivity(intentZip);
-//					}
-//
-//					log("Lanzo intent al manager.....");
-//				}
-				if (MimeTypeList.typeForName(currentFile.getName()).isDocument()){
-					log("Download is document");
+			try {
+				if (openFile) {
+					log("openFile true");
+					//				if (MimeTypeList.typeForName(currentFile.getName()).isZip()){
+					//					log("Download success of zip file!");
+					//
+					//					if(pathFileToOpen!=null){
+					//						Intent intentZip;
+					//						intentZip = new Intent(this, ZipBrowserActivityLollipop.class);
+					//						intentZip.setAction(ZipBrowserActivityLollipop.ACTION_OPEN_ZIP_FILE);
+					//						intentZip.putExtra(ZipBrowserActivityLollipop.EXTRA_ZIP_FILE_TO_OPEN, pathFileToOpen);
+					//						intentZip.putExtra(ZipBrowserActivityLollipop.EXTRA_PATH_ZIP, currentFile.getAbsolutePath());
+					//						intentZip.putExtra(ZipBrowserActivityLollipop.EXTRA_HANDLE_ZIP, currentDocument.getHandle());
+					//
+					//
+					//						if(intentZip!=null){
+					//							intentZip.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+					//							startActivity(intentZip);
+					//						}
+					//					}
+					//					else{
+					//						Intent intentZip = null;
+					//
+					//						intentZip = new Intent(this, ManagerActivityLollipop.class);
+					//						intentZip.setAction(Constants.ACTION_EXPLORE_ZIP);
+					//						intentZip.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+					//						intentZip.putExtra(Constants.EXTRA_PATH_ZIP, currentFile.getAbsolutePath());
+					//
+					//						startActivity(intentZip);
+					//					}
+					//
+					//					log("Lanzo intent al manager.....");
+					//				}
+					if (MimeTypeList.typeForName(currentFile.getName()).isDocument()) {
+						log("Download is document");
 
-					Intent viewIntent = new Intent(Intent.ACTION_VIEW);
-					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-						viewIntent.setDataAndType(FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
-					}
-					else{
-						viewIntent.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
-					}
-					viewIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-					viewIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-
-					if (MegaApiUtils.isIntentAvailable(this, viewIntent))
-						startActivity(viewIntent);
-					else{
-						Intent intentShare = new Intent(Intent.ACTION_SEND);
+						Intent viewIntent = new Intent(Intent.ACTION_VIEW);
 						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-							intentShare.setDataAndType(FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
+							viewIntent.setDataAndType(FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
+						} else {
+							viewIntent.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
 						}
-						else{
-							intentShare.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
+						viewIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+						viewIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+						if (MegaApiUtils.isIntentAvailable(this, viewIntent))
+							startActivity(viewIntent);
+						else {
+							Intent intentShare = new Intent(Intent.ACTION_SEND);
+							if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+								intentShare.setDataAndType(FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
+							} else {
+								intentShare.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
+							}
+							intentShare.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+							intentShare.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+							startActivity(intentShare);
 						}
-						intentShare.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-						intentShare.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-						startActivity(intentShare);
-					}
-				}
-				else if (MimeTypeList.typeForName(currentFile.getName()).isImage()){
-					log("Download is IMAGE");
+					} else if (MimeTypeList.typeForName(currentFile.getName()).isImage()) {
+						log("Download is IMAGE");
 
-					Intent viewIntent = new Intent(Intent.ACTION_VIEW);
-//					viewIntent.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
-					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-						viewIntent.setDataAndType(FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
-					}
-					else{
-						viewIntent.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
-					}
-					viewIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-					viewIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-
-					if (MegaApiUtils.isIntentAvailable(this, viewIntent))
-						startActivity(viewIntent);
-					else{
-						Intent intentShare = new Intent(Intent.ACTION_SEND);
+						Intent viewIntent = new Intent(Intent.ACTION_VIEW);
+						//					viewIntent.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
 						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-							intentShare.setDataAndType(FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
+							viewIntent.setDataAndType(FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
+						} else {
+							viewIntent.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
 						}
-						else{
-							intentShare.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
+						viewIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+						viewIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+						if (MegaApiUtils.isIntentAvailable(this, viewIntent))
+							startActivity(viewIntent);
+						else {
+							Intent intentShare = new Intent(Intent.ACTION_SEND);
+							if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+								intentShare.setDataAndType(FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
+							} else {
+								intentShare.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
+							}
+							intentShare.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+							intentShare.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+							startActivity(intentShare);
 						}
-						intentShare.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-						intentShare.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-						startActivity(intentShare);
-					}
-				}
-				else{
+					} else {
 
-					log("Download is OTHER FILE");
-					intent = new Intent(Intent.ACTION_VIEW);
-					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-						intent.setDataAndType(FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
-					}
-					else{
-						intent.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
-					}
-					intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-
-					if (!MegaApiUtils.isIntentAvailable(DownloadService.this, intent)){
-						intent.setAction(Intent.ACTION_SEND);
+						log("Download is OTHER FILE");
+						intent = new Intent(Intent.ACTION_VIEW);
 						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
 							intent.setDataAndType(FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
-						}
-						else{
+						} else {
 							intent.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
-						}						intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+						}
+						intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+						if (!MegaApiUtils.isIntentAvailable(DownloadService.this, intent)) {
+							intent.setAction(Intent.ACTION_SEND);
+							if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+								intent.setDataAndType(FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
+							} else {
+								intent.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
+							}
+							intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+						}
+
+						log("Show notification");
+						mBuilderCompat
+								.setSmallIcon(R.drawable.ic_stat_notify_download)
+								.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
+								.setAutoCancel(true).setTicker(notificationTitle)
+								.setContentTitle(notificationTitle).setContentText(size)
+								.setOngoing(false);
+
+						mNotificationManager.notify(notificationIdFinal, mBuilderCompat.build());
 					}
+				} else {
+					openFile = true; //Set the openFile to the default
+
+					intent = new Intent(getApplicationContext(), ManagerActivityLollipop.class);
 
 					log("Show notification");
 					mBuilderCompat
-					.setSmallIcon(R.drawable.ic_stat_notify_download)
-					.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
-					.setAutoCancel(true).setTicker(notificationTitle)
-					.setContentTitle(notificationTitle).setContentText(size)
-					.setOngoing(false);
+							.setSmallIcon(R.drawable.ic_stat_notify_download)
+							.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
+							.setAutoCancel(true).setTicker(notificationTitle)
+							.setContentTitle(notificationTitle).setContentText(size)
+							.setOngoing(false);
 
 					mNotificationManager.notify(notificationIdFinal, mBuilderCompat.build());
 				}
 			}
-			else{
-				openFile=true; //Set the openFile to the default
+			catch (Exception e){
+				openFile = true; //Set the openFile to the default
 
 				intent = new Intent(getApplicationContext(), ManagerActivityLollipop.class);
 
 				log("Show notification");
 				mBuilderCompat
-				.setSmallIcon(R.drawable.ic_stat_notify_download)
-				.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
-				.setAutoCancel(true).setTicker(notificationTitle)
-				.setContentTitle(notificationTitle).setContentText(size)
-				.setOngoing(false);
+						.setSmallIcon(R.drawable.ic_stat_notify_download)
+						.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
+						.setAutoCancel(true).setTicker(notificationTitle)
+						.setContentTitle(notificationTitle).setContentText(size)
+						.setOngoing(false);
 
 				mNotificationManager.notify(notificationIdFinal, mBuilderCompat.build());
 			}

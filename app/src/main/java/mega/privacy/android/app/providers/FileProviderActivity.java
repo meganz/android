@@ -1345,28 +1345,33 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 	public void onTransferFinish(MegaApiJava api, MegaTransfer transfer,
 			MegaError e) {
 		log("onTransferFinish: "+transfer.getPath());
-		
-		//Get the URI of the file
-		File fileToShare = new File(transfer.getPath());
-//		File newFile = new File(fileToShare, "default_image.jpg");
-		Uri contentUri = FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", fileToShare);
-		grantUriPermission("*", contentUri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
-		log("CONTENT URI: "+contentUri);
-		//Send it
-		Intent result = new Intent();
-		result.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-		result.setData(contentUri);
-		result.setAction(Intent.ACTION_GET_CONTENT);
-		
-		
-		if (getParent() == null) {
-		    setResult(Activity.RESULT_OK, result);
-		} else {
-			Toast.makeText(this, "ENTROOO parent no null", Toast.LENGTH_LONG).show();
-		    getParent().setResult(Activity.RESULT_OK, result);
-		}
 
-		finish();		
+		try {
+			//Get the URI of the file
+			File fileToShare = new File(transfer.getPath());
+			//		File newFile = new File(fileToShare, "default_image.jpg");
+			Uri contentUri = FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", fileToShare);
+			grantUriPermission("*", contentUri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+			log("CONTENT URI: " + contentUri);
+			//Send it
+			Intent result = new Intent();
+			result.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+			result.setData(contentUri);
+			result.setAction(Intent.ACTION_GET_CONTENT);
+
+
+			if (getParent() == null) {
+				setResult(Activity.RESULT_OK, result);
+			} else {
+				Toast.makeText(this, "ENTROOO parent no null", Toast.LENGTH_LONG).show();
+				getParent().setResult(Activity.RESULT_OK, result);
+			}
+
+			finish();
+		}
+		catch (Exception exception){
+			finish();
+		}
 	}
 
 	@Override
