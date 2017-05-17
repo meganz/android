@@ -1575,8 +1575,6 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			}
 			else{
 				log("EEEERRRRROR WHEN CONNECTING " + e.getErrorString());
-//				showSnackbar(getString(R.string.chat_connection_error));
-//				retryLaterShortTime();
 			}
 		}
 	}

@@ -678,7 +678,9 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 						}
 					
 					}
-					catch(Exception e) {}
+					catch(Exception e) {
+						finish();
+					}
 				}
 
 
@@ -897,12 +899,9 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 
 			if(e.getErrorCode()==MegaChatError.ERROR_OK){
 				log("Connected to chat!");
-				afterFetchNodes();
 			}
 			else{
-				log("EEEERRRRROR WHEN CONNECTING " + e.getErrorString());
-//				showSnackbar(getString(R.string.chat_connection_error));
-				afterFetchNodes();
+				log("ERROR WHEN CONNECTING " + e.getErrorString());
 			}
 		}
 	}
@@ -1155,6 +1154,7 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 						log("Chat enabled-->connect");
 						megaChatApi.connect(this);
 						MegaApplication.setLoggingIn(false);
+                        afterFetchNodes();
 					}
 					else{
 						log("Chat NOT enabled - readyToManager");

@@ -182,12 +182,9 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			MegaApplication.setLoggingIn(false);
 			if(e.getErrorCode()==MegaChatError.ERROR_OK){
 				log("Connected to chat!");
-				afterLoginAndFetch();
 			}
 			else{
-				log("EEEERRRRROR WHEN CONNECTING " + e.getErrorString());
-//				showSnackbar(getString(R.string.chat_connection_error));
-				afterLoginAndFetch();
+				log("ERROR WHEN CONNECTING " + e.getErrorString());
 			}
 		}
 	}
@@ -1409,6 +1406,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 						initizalizingChatText.setVisibility(View.VISIBLE);
 						megaChatApi.connect(this);
 						MegaApplication.setLoggingIn(false);
+						afterLoginAndFetch();
 					}
 					else{
 						log("Chat NOT enabled - readyToManager");
