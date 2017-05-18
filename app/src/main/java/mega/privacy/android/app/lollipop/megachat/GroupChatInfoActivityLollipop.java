@@ -979,7 +979,8 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         layout.addView(input, params);
 
         input.setSingleLine();
-        input.setHint(chat.getTitle());
+        input.setText(chat.getTitle());
+        input.setSelectAllOnFocus(true);
         input.setTextColor(getResources().getColor(R.color.text_secondary));
         input.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
         input.setImeOptions(EditorInfo.IME_ACTION_DONE);
