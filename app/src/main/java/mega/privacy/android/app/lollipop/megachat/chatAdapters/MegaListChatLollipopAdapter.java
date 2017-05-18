@@ -38,6 +38,7 @@ import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.lollipop.listeners.ChatListNonContactNameListener;
 import mega.privacy.android.app.lollipop.listeners.ChatUserAvatarListener;
 import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
 import mega.privacy.android.app.lollipop.megachat.NonContactInfo;
@@ -127,6 +128,10 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		String firstNameText="";
 		String fullName = "";
 
+		public int currentPosition;
+		public long userHandle;
+		public boolean nameRequestedAction = false;
+
 		public String getContactMail (){
 			return contactMail;
 		}
@@ -137,7 +142,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		}
     }
     ViewHolderChatList holder;
-    
+
 	@Override
 	public void onBindViewHolder(ViewHolderChatList holder, int position) {
 		log("---------------onBindViewHolder----------------");
@@ -259,10 +264,11 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		}
 
 		holder.imageButtonThreeDots.setTag(holder);
-		holder.imageButtonThreeDots.setOnClickListener(this);		
+		holder.imageButtonThreeDots.setOnClickListener(this);
 	}
 
 	public String getParticipantShortName(long userHandle){
+		log("getParticipantShortName");
 
 		MegaContactDB contactDB = dbH.findContactByHandle(String.valueOf(userHandle));
 		if (contactDB != null) {
@@ -287,7 +293,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 						return megaContact.getEmail();
 					}
 					else{
-						return "No name";
+						return "Unknown name";
 					}
 				}
 				else{
@@ -589,10 +595,10 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 			}
 		}
 	}
-	
+
 	public void createDefaultAvatar(ViewHolderChatList holder, String userHandle){
 		log("createDefaultAvatar()");
-		
+
 		Bitmap defaultAvatar = Bitmap.createBitmap(Constants.DEFAULT_AVATAR_WIDTH_HEIGHT,Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
 		Canvas c = new Canvas(defaultAvatar);
 		Paint p = new Paint();
@@ -608,15 +614,15 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 			p.setColor(context.getResources().getColor(R.color.lollipop_primary_color));
 		}
 
-		int radius; 
+		int radius;
         if (defaultAvatar.getWidth() < defaultAvatar.getHeight())
         	radius = defaultAvatar.getWidth()/2;
         else
         	radius = defaultAvatar.getHeight()/2;
-        
+
 		c.drawCircle(defaultAvatar.getWidth()/2, defaultAvatar.getHeight()/2, radius, p);
 		holder.imageView.setImageBitmap(defaultAvatar);
-		
+
 		Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
 		outMetrics = new DisplayMetrics ();
 	    display.getMetrics(outMetrics);
@@ -657,12 +663,12 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
     public int getItemCount() {
         return chats.size();
     }
- 
+
 	public boolean isMultipleSelect() {
 		log("isMultipleSelect");
 		return multipleSelect;
 	}
-	
+
 	public void setMultipleSelect(boolean multipleSelect) {
 		log("setMultipleSelect");
 		if (this.multipleSelect != multipleSelect) {
@@ -717,7 +723,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 			notifyItemChanged(pos);
 		}
 	}
-	
+
 	public void toggleSelection(int pos) {
 		log("toggleSelection");
 
@@ -773,7 +779,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 			}
 		}
 	}
-	
+
 	private boolean isItemChecked(int position) {
         return selectedItems.get(position);
     }
@@ -789,7 +795,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		}
 		return items;
 	}
-	
+
 	/*
 	 * Get request at specified position
 	 */
@@ -802,13 +808,13 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		}
 		return null;
 	}
-	
+
 	/*
 	 * Get list of all selected chats
 	 */
 	public ArrayList<MegaChatListItem> getSelectedChats() {
 		ArrayList<MegaChatListItem> chats = new ArrayList<MegaChatListItem>();
-		
+
 		for (int i = 0; i < selectedItems.size(); i++) {
 			if (selectedItems.valueAt(i) == true) {
 				MegaChatListItem r = getChatAt(selectedItems.keyAt(i));
@@ -819,20 +825,20 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		}
 		return chats;
 	}
-	
+
     public Object getItem(int position) {
         return chats.get(position);
     }
- 
+
     @Override
     public long getItemId(int position) {
         return position;
-    }    
-    
+    }
+
     public int getPositionClicked (){
     	return positionClicked;
     }
-    
+
     public void setPositionClicked(int p){
 		log("setPositionClicked: "+p);
     	positionClicked = p;
@@ -846,7 +852,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		log("onClick -> Current position: "+currentPosition);
 		MegaChatListItem c = (MegaChatListItem) getItem(currentPosition);
 
-		switch (v.getId()){	
+		switch (v.getId()){
 			case R.id.recent_chat_list_three_dots:{
 				log("click three dots!: "+c.getTitle());
 				if(multipleSelect){
@@ -881,6 +887,18 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		((RecentChatsFragmentLollipop) fragment).itemClick(currentPosition);
 
 		return true;
+	}
+
+
+	public void updateNonContactName(int pos, long userHandle){
+		log("updateNonContactName: "+pos+"_"+userHandle);
+		ViewHolderChatList view = (ViewHolderChatList) listFragment.findViewHolderForLayoutPosition(pos);
+
+		if(view!=null){
+			if(view.userHandle == userHandle){
+				notifyItemChanged(pos);
+			}
+		}
 	}
 
 	public void setStatus(int position, ViewHolderChatList holder){
@@ -1111,9 +1129,10 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
                     log("Message Type-> "+messageType+" last content: "+lastMessageString + "length: "+lastMessageString.length());
                 }
 
-				if(chat.getLastMessageSender()==megaChatApi.getMyUserHandle()){
+                long lastMsgSender = chat.getLastMessageSender();
+				if(lastMsgSender==megaChatApi.getMyUserHandle()){
 
-					log("The last message is mine");
+					log("getLastMessageSender: the last message is mine: "+lastMsgSender);
 					Spannable me = new SpannableString("Me: ");
 					me.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.file_list_first_row)), 0, me.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 					holder.textViewContent.setText(me);
@@ -1125,8 +1144,24 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 					}
 				}
 				else{
-					log("The last message NOT mine");
-					String fullNameAction = getParticipantShortName(chat.getLastMessageSender());
+					log("getLastMessageSender: The last message NOT mine"+lastMsgSender);
+					String fullNameAction = getParticipantShortName(lastMsgSender);
+//					megaChatApi.getUserFirstname();
+					if(fullNameAction.isEmpty()){
+						if(!(holder.nameRequestedAction)){
+							log("3-Call for nonContactName: "+ lastMsgSender);
+							fullNameAction = "Unknown name";
+							holder.nameRequestedAction=true;
+							holder.currentPosition = position;
+							holder.userHandle = lastMsgSender;
+							ChatListNonContactNameListener listener = new ChatListNonContactNameListener(context, holder, this, lastMsgSender);
+							megaChatApi.getUserFirstname(lastMsgSender, listener);
+							megaChatApi.getUserLastname(lastMsgSender, listener);
+						}
+						else{
+							log("4-Name already asked and no name received: "+ lastMsgSender);
+						}
+					}
 
 					if(chat.isGroup()){
 						Spannable name = new SpannableString(fullNameAction+": ");
@@ -1161,28 +1196,6 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 					}
 
 				}
-
-//				switch(messageType) {
-//					case MegaChatMessage.TYPE_NORMAL: {
-//
-//						break;
-//					}
-//					case MegaChatMessage.TYPE_NODE_ATTACHMENT: {
-//						log("Message type attached!!");
-//						holder.textViewContent.setText("Attached: "+lastMessageString);
-//						break;
-//					}
-//					case MegaChatMessage.TYPE_CONTACT_ATTACHMENT: {
-//						log("Message type contact!!");
-//						holder.textViewContent.setText("Contact: "+lastMessageString);
-//						break;
-//					}
-//					case MegaChatMessage.TYPE_REVOKE_NODE_ATTACHMENT: {
-//						log("Message type revoke node attachement!!");
-//						holder.textViewContent.setText("Revoke node attachement: "+lastMessageString);
-//						break;
-//					}
-//				}
 			}
 		}
 		else{

@@ -120,7 +120,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         int currentPosition;
         long userHandle;
         String fullNameTitle;
-        boolean nameRequested = false;
+//        boolean nameRequested = false;
         boolean nameRequestedAction = false;
 
         RelativeLayout itemLayout;
@@ -627,10 +627,10 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                     log("NOT found in DB - ((ViewHolderMessageChat)holder).fullNameTitle");
                     ((ViewHolderMessageChat)holder).fullNameTitle = "Unknown name";
-                    if(!(((ViewHolderMessageChat)holder).nameRequested)){
+                    if(!(((ViewHolderMessageChat)holder).nameRequestedAction)){
                         log("3-Call for nonContactName: "+ message.getUserHandle());
 
-                        ((ViewHolderMessageChat)holder).nameRequested=true;
+                        ((ViewHolderMessageChat)holder).nameRequestedAction=true;
                         ChatNonContactNameListener listener = new ChatNonContactNameListener(context, ((ViewHolderMessageChat)holder), this, message.getHandleOfAction());
 
                         megaChatApi.getUserFirstname(message.getHandleOfAction(), listener);
@@ -953,10 +953,10 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                     log("NOT found in DB - ((ViewHolderMessageChat)holder).fullNameTitle");
                     ((ViewHolderMessageChat)holder).fullNameTitle = "Unknown name";
-                    if(!(((ViewHolderMessageChat)holder).nameRequested)){
+                    if(!(((ViewHolderMessageChat)holder).nameRequestedAction)){
                         log("3-Call for nonContactName: "+ message.getUserHandle());
 
-                        ((ViewHolderMessageChat)holder).nameRequested=true;
+                        ((ViewHolderMessageChat)holder).nameRequestedAction=true;
                         ChatNonContactNameListener listener = new ChatNonContactNameListener(context, ((ViewHolderMessageChat)holder), this, message.getHandleOfAction());
 
                         megaChatApi.getUserFirstname(message.getHandleOfAction(), listener);
@@ -1545,9 +1545,9 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                         log("NOT found in DB - ((ViewHolderMessageChat)holder).fullNameTitle");
                         ((ViewHolderMessageChat)holder).fullNameTitle = "Unknown name";
-                        if(!(((ViewHolderMessageChat)holder).nameRequested)){
+                        if(!(((ViewHolderMessageChat)holder).nameRequestedAction)){
                             log("3-Call for nonContactName: "+ message.getUserHandle());
-                            ((ViewHolderMessageChat)holder).nameRequested=true;
+                            ((ViewHolderMessageChat)holder).nameRequestedAction=true;
                             ChatNonContactNameListener listener = new ChatNonContactNameListener(context, ((ViewHolderMessageChat)holder), this, userHandle);
                             megaChatApi.getUserFirstname(userHandle, listener);
                             megaChatApi.getUserLastname(userHandle, listener);
