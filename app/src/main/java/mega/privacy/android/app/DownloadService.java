@@ -132,6 +132,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		app = (MegaApplication)getApplication();
 		megaApi = app.getMegaApi();
 		megaApiFolder = app.getMegaApiFolder();
+		megaChatApi = app.getMegaChatApi();
 
 		isForeground = false;
 		canceled = false;
