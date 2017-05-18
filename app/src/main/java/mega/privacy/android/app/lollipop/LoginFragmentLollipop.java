@@ -490,7 +490,8 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                         return v;
                     } else if (result == MegaError.API_EKEY) {
                         log("Incorrect MK when changing pass");
-                        ((LoginActivityLollipop)context).showSnackbar(getString(R.string.incorrect_MK));
+//                        ((LoginActivityLollipop)context).showSnackbar(getString(R.string.incorrect_MK));
+                        ((LoginActivityLollipop)context).showAlertIncorrectRK();
                         return v;
                     } else {
                         log("Error when changing pass - show error message");

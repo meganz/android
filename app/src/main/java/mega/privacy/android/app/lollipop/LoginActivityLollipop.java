@@ -190,6 +190,24 @@ public class LoginActivityLollipop extends AppCompatActivity {
 		}
 	}
 
+	public void showAlertIncorrectRK(){
+        log("showAlertIncorrectRK");
+		android.support.v7.app.AlertDialog.Builder dialogBuilder = new android.support.v7.app.AlertDialog.Builder(this);
+
+		dialogBuilder.setTitle(getString(R.string.incorrect_MK_title));
+		dialogBuilder.setMessage(getString(R.string.incorrect_MK));
+		dialogBuilder.setCancelable(true);
+		dialogBuilder.setNeutralButton(android.R.string.ok,
+				new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+						dialog.cancel();
+					}
+				});
+
+		android.support.v7.app.AlertDialog alert = dialogBuilder.create();
+		alert.show();
+	}
+
 	public void showTransferOverquotaDialog(){
 		log("showTransferOverquotaDialog");
 
