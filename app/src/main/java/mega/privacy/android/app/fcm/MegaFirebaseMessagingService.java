@@ -35,19 +35,29 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaChatApi;
+import nz.mega.sdk.MegaChatApiAndroid;
+import nz.mega.sdk.MegaChatApiJava;
+import nz.mega.sdk.MegaChatError;
+import nz.mega.sdk.MegaChatRequest;
+import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 
-public class MegaFirebaseMessagingService extends FirebaseMessagingService implements MegaRequestListenerInterface {
+public class MegaFirebaseMessagingService extends FirebaseMessagingService implements MegaRequestListenerInterface, MegaChatRequestListenerInterface {
 
     MegaApplication app;
     MegaApiAndroid megaApi;
     DatabaseHandler dbH;
+
+    MegaChatApiAndroid megaChatApi;
+    ChatSettings chatSettings;
 
     boolean isLoggingIn = false;
 
@@ -60,6 +70,7 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
 
         app = (MegaApplication) getApplication();
         megaApi = app.getMegaApi();
+        megaChatApi = app.getMegaChatApi();
         dbH = DatabaseHandler.getDbHandler(getApplicationContext());
     }
 
@@ -109,6 +120,34 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
                     if (!isLoggingIn){
                         isLoggingIn  = true;
                         MegaApplication.setLoggingIn(isLoggingIn);
+
+                        if (Util.isChatEnabled()) {
+                            if (megaChatApi == null) {
+                                megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
+                            }
+                            int ret = megaChatApi.init(gSession);
+                            log("result of init ---> " + ret);
+                            chatSettings = dbH.getChatSettings();
+                            if (ret == MegaChatApi.INIT_NO_CACHE) {
+                                log("condition ret == MegaChatApi.INIT_NO_CACHE");
+                                megaApi.invalidateCache();
+
+                            } else if (ret == MegaChatApi.INIT_ERROR) {
+                                log("condition ret == MegaChatApi.INIT_ERROR");
+                                if (chatSettings == null) {
+                                    log("ERROR----> Switch OFF chat");
+                                    chatSettings = new ChatSettings(false + "", true + "", true + "", true + "");
+                                    dbH.setChatSettings(chatSettings);
+                                } else {
+                                    log("ERROR----> Switch OFF chat");
+                                    dbH.setEnabledChat(false + "");
+                                }
+                                megaChatApi.logout(this);
+                            } else {
+                                log("Chat correctly initialized");
+                            }
+                        }
+
                         megaApi.fastLogin(gSession, this);
                     }
                 }
@@ -242,6 +281,13 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
             MegaApplication.setLoggingIn(isLoggingIn);
             if (e.getErrorCode() == MegaError.API_OK){
                 log("OK fetch nodes");
+                if (Util.isChatEnabled()) {
+                        log("Chat enabled-->connect");
+                        megaChatApi.connect(this);
+                }
+                else{
+                    log("Chat NOT enabled - sendNotification");
+                }
                 sendNotification(remoteMessageType);
             }
             else {
@@ -253,5 +299,25 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
     @Override
     public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) {
         log("onRequestTemporary: " + request.getRequestString());
+    }
+
+    @Override
+    public void onRequestStart(MegaChatApiJava api, MegaChatRequest request) {
+
+    }
+
+    @Override
+    public void onRequestUpdate(MegaChatApiJava api, MegaChatRequest request) {
+
+    }
+
+    @Override
+    public void onRequestFinish(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
+
+    }
+
+    @Override
+    public void onRequestTemporaryError(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
+
     }
 }
