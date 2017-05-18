@@ -192,17 +192,19 @@ public class LoginActivityLollipop extends AppCompatActivity {
 
 	public void showAlertIncorrectRK(){
         log("showAlertIncorrectRK");
-		android.support.v7.app.AlertDialog.Builder dialogBuilder = new android.support.v7.app.AlertDialog.Builder(this);
+		final android.support.v7.app.AlertDialog.Builder dialogBuilder = new android.support.v7.app.AlertDialog.Builder(this);
 
 		dialogBuilder.setTitle(getString(R.string.incorrect_MK_title));
 		dialogBuilder.setMessage(getString(R.string.incorrect_MK));
-		dialogBuilder.setCancelable(true);
-		dialogBuilder.setNeutralButton(android.R.string.ok,
-				new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int id) {
-						dialog.cancel();
-					}
-				});
+		dialogBuilder.setCancelable(false);
+
+		dialogBuilder.setPositiveButton(getString(R.string.cam_sync_ok), new android.content.DialogInterface.OnClickListener() {
+
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				dialog.dismiss();
+			}
+		});
 
 		android.support.v7.app.AlertDialog alert = dialogBuilder.create();
 		alert.show();
