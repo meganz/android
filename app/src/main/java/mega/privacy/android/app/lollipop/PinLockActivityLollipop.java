@@ -1,9 +1,11 @@
 package mega.privacy.android.app.lollipop;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.os.Handler;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
@@ -21,6 +23,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
 import android.widget.CheckedTextView;
 import android.widget.CompoundButton;
 import android.widget.EditText;
@@ -56,6 +59,8 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 	final public static int RESET_UNLOCK = 2;
 	final public static int RESET_SET = 3;
 
+	Handler handler;
+
 	float scaleH, scaleW;
 	float scaleText;
 	float density;
@@ -76,8 +81,8 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
     RelativeLayout redLayout;
     RelativeLayout buttonsLayout;
 	TextView textLogout;
-	TextView enterButton;
-	TextView logoutButton;
+	Button enterButton;
+	Button logoutButton;
 	TextView unlockText;
 	EditText passwordText;
 	TextView warningText;
@@ -171,9 +176,9 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 
 		warningLayout = (LinearLayout) findViewById(R.id.warning_layout);
 		//Margins
-		RelativeLayout.LayoutParams warningParams = (RelativeLayout.LayoutParams)warningLayout.getLayoutParams();
-		warningParams.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleHeightPx(5, outMetrics), Util.scaleWidthPx(10, outMetrics), Util.scaleHeightPx(20, outMetrics));
-		warningLayout.setLayoutParams(warningParams);
+//		RelativeLayout.LayoutParams warningParams = (RelativeLayout.LayoutParams)warningLayout.getLayoutParams();
+//		warningParams.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleHeightPx(5, outMetrics), Util.scaleWidthPx(10, outMetrics), Util.scaleHeightPx(20, outMetrics));
+//		warningLayout.setLayoutParams(warningParams);
 
 		warningText = (TextView) findViewById(R.id.warning_text);
 		//Margins
@@ -183,22 +188,17 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 
 		buttonsLayout = (RelativeLayout) findViewById(R.id.buttons_layout);
 
-		logoutButton = (TextView) findViewById(R.id.button_logout);
-		logoutButton.setText(getString(R.string.action_logout).toUpperCase(Locale.getDefault()));
+		logoutButton = (Button) findViewById(R.id.button_logout);
+		logoutButton.setText(getString(R.string.action_logout));
 		logoutButton.setOnClickListener(this);
 
-		enterButton = (TextView) findViewById(R.id.button_enter);
-		enterButton.setText(getString(R.string.cam_sync_ok).toUpperCase(Locale.getDefault()));
+		enterButton = (Button) findViewById(R.id.button_enter);
+		enterButton.setText(getString(R.string.cam_sync_ok));
 		enterButton.setOnClickListener(this);
 
 		unlockText = (TextView) findViewById(R.id.unlock_text_view);
 //		unlockText.setGravity(Gravity.CENTER_HORIZONTAL); //NOT WORKING!!!
 		unlockText.setText(R.string.unlock_pin_title);
-		unlockText.setTextSize(TypedValue.COMPLEX_UNIT_SP, (24*scaleText));
-		//Margins
-		RelativeLayout.LayoutParams unlockParams = (RelativeLayout.LayoutParams)unlockText.getLayoutParams();
-		unlockParams.setMargins(0, Util.scaleHeightPx(70, outMetrics), 0, Util.scaleHeightPx(20, outMetrics));
-		unlockText.setLayoutParams(unlockParams);
 
 		if(mode!=SET){
 			logoutButton.setVisibility(View.VISIBLE);
@@ -207,9 +207,39 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 			logoutButton.setVisibility(View.INVISIBLE);
 		}
 
+		log("ATTEMPS value: "+attemps);
 		if (attemps==MAX_ATTEMPS-1){
 			//Last intent available!!
 			log("last intent: "+attemps);
+		}
+		else if(attemps==MAX_ATTEMPS){
+			if(attemps==10){
+				//Log out!!
+				log("INTENTS==10 - LOGOUT");
+				redLayout.setVisibility(View.VISIBLE);
+				textLogout.setText(getString(R.string.incorrect_pin_activity, 5));
+
+				hideKeyboard(this);
+
+				CountDownTimer cDT = new CountDownTimer(6000, 1000) {
+
+					public void onTick(long millisUntilFinished) {
+						redLayout.setVisibility(View.VISIBLE);
+						textLogout.setText(getString(R.string.incorrect_pin_activity, millisUntilFinished / 1000));
+					}
+
+					public void onFinish() {
+						log("Logout!!!");
+						attemps=0;
+						att.setAttemps(attemps);
+//						dbH.setAttributes(att);
+						dbH.setAttrAttemps(attemps);
+						AccountController accountController = new AccountController(getApplicationContext());
+						accountController.logout(getApplication(), megaApi, false);
+						finish();
+					}
+				}.start();
+			}
 		}
 		else if(attemps>=5){
 			//Show alert
@@ -297,6 +327,9 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 		paramsPassword.width = Util.scaleWidthPx(250, outMetrics);
 		passwordText.setLayoutParams(paramsPassword);
 
+		RelativeLayout.LayoutParams warningParams = (RelativeLayout.LayoutParams)buttonsLayout.getLayoutParams();
+		warningParams.addRule(RelativeLayout.BELOW, switchLayout.getId());
+
 		passwordText.requestFocus();
 
 		passwordSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -316,8 +349,8 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 		enterButton.setVisibility(View.VISIBLE);
 
 		//Margins warningLayout
-		RelativeLayout.LayoutParams warningParams = (RelativeLayout.LayoutParams)warningLayout.getLayoutParams();
-		warningParams.addRule(RelativeLayout.BELOW, alphanumericLayout.getId());
+//		RelativeLayout.LayoutParams warningParams = (RelativeLayout.LayoutParams)warningLayout.getLayoutParams();
+//		warningParams.addRule(RelativeLayout.BELOW, switchLayout.getId());
 	}
 
 	private void add6DigitsPin(){
@@ -337,8 +370,7 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 
 		enterButton.setVisibility(View.GONE);
 
-		//Margins warningLayout
-		RelativeLayout.LayoutParams warningParams = (RelativeLayout.LayoutParams)warningLayout.getLayoutParams();
+		RelativeLayout.LayoutParams warningParams = (RelativeLayout.LayoutParams)buttonsLayout.getLayoutParams();
 		warningParams.addRule(RelativeLayout.BELOW, sixPinLayout.getId());
 
 		//PIN
@@ -630,8 +662,7 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 
 		buttonsLayout.getLayoutParams().width = Util.scaleWidthPx(210, outMetrics);
 
-		//Margins warningLayout
-		RelativeLayout.LayoutParams warningParams = (RelativeLayout.LayoutParams)warningLayout.getLayoutParams();
+		RelativeLayout.LayoutParams warningParams = (RelativeLayout.LayoutParams)buttonsLayout.getLayoutParams();
 		warningParams.addRule(RelativeLayout.BELOW, fourPinLayout.getId());
 
 		//PIN
@@ -681,7 +712,7 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 		passFirstLetter.requestFocus();
 		imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
 		imm.showSoftInput(passFirstLetter, InputMethodManager.SHOW_FORCED);
-//		imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);	
+//		imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
 
 		//Add TextWatcher to first letter		
 		passFirstLetter.addTextChangedListener(new TextWatcher() {
@@ -880,6 +911,9 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 				else{
 					log("PIN INCORRECT RESET_UNLOCK - show snackBar");
 					attemps=attemps+1;
+					att.setAttemps(attemps);
+//						dbH.setAttributes(att);
+					dbH.setAttrAttemps(attemps);
 					if(attemps==10){
 						//Log out!!
 						log("INTENTS==10 - LOGOUT");
@@ -908,6 +942,10 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 
 						     public void onFinish() {
 						    	 log("Logout!!!");
+								 attemps=0;
+								 att.setAttemps(attemps);
+//						dbH.setAttributes(att);
+								 dbH.setAttrAttemps(attemps);
 								 AccountController aC = new AccountController(getApplicationContext());
 								 aC.logout(getApplicationContext(), megaApi, megaChatApi, false);
 								 finish();
@@ -983,6 +1021,9 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 					log("PIN INCORRECT RESET_UNLOCK - show snackBar");
 //		        	Snackbar.make(, , Snackbar.LENGTH_LONG).show();
 					attemps=attemps+1;
+					att.setAttemps(attemps);
+//						dbH.setAttributes(att);
+					dbH.setAttrAttemps(attemps);
 					if(attemps==10){
 						//Log out!!
 						log("INTENTS==9 - LOGOUT");
@@ -1009,6 +1050,10 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 
 						     public void onFinish() {
 						    	 log("Logout!!!");
+								 attemps=0;
+								 att.setAttemps(attemps);
+//						dbH.setAttributes(att);
+								 dbH.setAttrAttemps(attemps);
 								 AccountController accountController = new AccountController(getApplicationContext());
 								 accountController.logout(getApplication(), megaApi, megaChatApi, false);
 								 finish();
@@ -1088,13 +1133,18 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 				else{
 					log("PIN INCORRECT RESET_UNLOCK - show snackBar");
 					attemps=attemps+1;
+					att.setAttemps(attemps);
+//						dbH.setAttributes(att);
+					dbH.setAttrAttemps(attemps);
 					if(attemps==10){
 						//Log out!!
 						log("INTENTS==10 - LOGOUT");
 				    	redLayout.setVisibility(View.VISIBLE);
 				    	textLogout.setText(getString(R.string.incorrect_pin_activity, 5));
 
-				    	passwordText.setCursorVisible(false);
+						passwordText.setCursorVisible(false);
+						passwordText.clearFocus();
+						hideKeyboard(this);
 
 						CountDownTimer cDT = new CountDownTimer(6000, 1000) {
 
@@ -1105,6 +1155,10 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 
 						     public void onFinish() {
 						    	 log("Logout!!!");
+								 attemps=0;
+								 att.setAttemps(attemps);
+//						dbH.setAttributes(att);
+								 dbH.setAttrAttemps(attemps);
 								 AccountController accountController = new AccountController(getApplicationContext());
 								 accountController.logout(getApplication(), megaApi, false);
 								 finish();
@@ -1170,15 +1224,21 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 					log("PIN INCORRECT RESET_UNLOCK - show snackBar");
 //		        	Snackbar.make(, , Snackbar.LENGTH_LONG).show();
 					attemps=attemps+1;
+					att.setAttemps(attemps);
+//						dbH.setAttributes(att);
+					dbH.setAttrAttemps(attemps);
 					if(attemps==10){
 						//Log out!!
 						log("INTENTS==9 - LOGOUT");
-						passwordText.setCursorVisible(false);
 
-						imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
 						//						Intent intent = new Intent(this, IncorrectPinActivityLollipop.class);
 						//						startActivity(intent);
 						//						finish();
+
+						passwordText.setCursorVisible(false);
+						passwordText.clearFocus();
+						hideKeyboard(this);
+
 						CountDownTimer cDT = new CountDownTimer(6000, 1000) {
 
 						     public void onTick(long millisUntilFinished) {
@@ -1189,6 +1249,10 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 
 						     public void onFinish() {
 						    	 log("Logout!!!");
+								 attemps=0;
+								 att.setAttemps(attemps);
+//						dbH.setAttributes(att);
+								 dbH.setAttrAttemps(attemps);
 								 AccountController accountController = new AccountController(getApplicationContext());
 								 accountController.logout(getApplication(), megaApi, false);
 								 finish();
@@ -1416,6 +1480,10 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 		switch(v.getId()){
 			case R.id.button_logout:{
+				attemps=0;
+				att.setAttemps(attemps);
+//						dbH.setAttributes(att);
+				dbH.setAttrAttemps(attemps);
 				AccountController aC = new AccountController(this);
 				aC.logout(getApplication(), megaApi, megaChatApi, false);
 				finish();
@@ -1512,4 +1580,14 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
             }
     	}
     }
+
+	public void hideKeyboard(Activity activity) {
+
+		enterButton.requestFocus();
+		InputMethodManager imm = (InputMethodManager) activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
+		View view = activity.getCurrentFocus();
+		if(view!=null){
+			imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+		}
+	}
 }

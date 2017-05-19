@@ -52,7 +52,12 @@ public class AccountController {
         this.context = context;
 
         if (megaApi == null){
-            megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
+            if (context instanceof MegaApplication){
+                megaApi = ((MegaApplication)context).getMegaApi();
+            }
+            else{
+                megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
+            }
         }
 
         if (dbH == null){
@@ -297,7 +302,12 @@ public class AccountController {
             }
             else{
                 isManagerActivityLollipop = false;
+                boolean chatEnabled = true;
+                chatEnabled = Util.isChatEnabled();
                 megaApi.logout();
+                if(chatEnabled){
+                    megaChatApi.logout();
+                }
             }
         }
 

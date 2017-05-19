@@ -148,7 +148,20 @@ public class MegaChatApiJava {
     }
 
     /**
-     * @brief Logout of chat servers invalidating the session
+     * Logout of chat servers invalidating the session
+     *
+     * The associated request type with this request is MegaChatRequest::TYPE_LOGOUT
+     *
+     * After calling \c logout, the subsequent call to MegaChatApi::init expects to
+     * have a new session created by MegaApi::login.
+     *
+     */
+    public void logout(){
+        megaChatApi.logout();
+    }
+
+    /**
+     * Logout of chat servers invalidating the session
      *
      * The associated request type with this request is MegaChatRequest::TYPE_LOGOUT
      *
