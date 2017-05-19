@@ -69,27 +69,6 @@
         <item name="android:maxHeight">2dp</item>
     </style>
 
-    <style name="Theme.Megaactionbar.Light" parent="@style/Theme.AppCompat.Light.DarkActionBar">
-        <item name="actionBarItemBackground">@drawable/selectable_background_megaactionbar</item>
-        <item name="popupMenuStyle">@style/PopupMenu.Megaactionbar</item>
-        <item name="dropDownListViewStyle">@style/DropDownListView.Megaactionbar</item>
-        <item name="actionBarTabStyle">@style/ActionBarTabStyle.Megaactionbar</item>
-        <item name="actionDropDownStyle">@style/DropDownNav.Megaactionbar</item>
-        <item name="actionBarStyle">@style/ActionBar.Solid.Megaactionbar</item>
-        <item name="actionModeBackground">@drawable/cab_background_top_megaactionbar</item>
-        <item name="actionModeSplitBackground">@drawable/cab_background_bottom_megaactionbar</item>
-        <item name="actionModeCloseButtonStyle">@style/ActionButton.CloseMode.Megaactionbar</item>
-
-
-    </style>
-
-    <style name="ActionBar.Solid.Megaactionbar" parent="@style/Widget.AppCompat.Light.ActionBar.Solid">
-        <item name="background">@drawable/ab_solid_megaactionbar</item>
-        <item name="backgroundStacked">@drawable/ab_stacked_solid_megaactionbar</item>
-        <item name="backgroundSplit">@drawable/ab_bottom_solid_megaactionbar</item>
-        <item name="progressBarStyle">@style/ProgressBar.Megaactionbar</item>
-    </style>
-
     <style name="ActionBar.Transparent.Megaactionbar" parent="@style/Widget.AppCompat.Light.ActionBar">
         <item name="background">@drawable/ab_transparent_megaactionbar</item>
         <item name="progressBarStyle">@style/ProgressBar.Megaactionbar</item>
@@ -115,10 +94,6 @@
 
     <style name="ProgressBar.Megaactionbar" parent="@style/Widget.AppCompat.ProgressBar.Horizontal">
         <item name="android:progressDrawable">@drawable/progress_horizontal_megaactionbar</item>
-    </style>
-
-    <style name="ActionButton.CloseMode.Megaactionbar" parent="@style/Widget.AppCompat.Light.ActionButton.CloseMode">
-        <item name="android:background">@drawable/btn_cab_done_megaactionbar</item>
     </style>
 
     <!-- this style is only referenced in a Light.DarkActionBar based theme -->

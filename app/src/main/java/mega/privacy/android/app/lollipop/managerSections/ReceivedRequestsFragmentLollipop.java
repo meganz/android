@@ -329,7 +329,7 @@ public class ReceivedRequestsFragmentLollipop extends Fragment {
     	}
     	else{
 
-    	    View v = inflater.inflate(R.layout.contacts_requests_tab, container, false);
+    	    View v = inflater.inflate(R.layout.contacts_received_requests_tab, container, false);
     	    return v;
     	}		
 

@@ -247,7 +247,7 @@
 	            android:layout_width="fill_parent"
 	      		android:layout_height="48dp"
 	      		android:layout_weight="1"
-	            android:background="@drawable/grey_btn_default_holo_light"
+	            
 	            android:textColor="@color/white"
 	            android:text="@string/general_cancel" />
 	        
@@ -256,7 +256,7 @@
 	            android:layout_width="fill_parent"
 	      		android:layout_height="48dp"
 	      		android:layout_weight="1"
-	            android:background="@drawable/btn_default_holo_light_without_corners"
+
 	            android:textColor="@color/white"
 	            android:text="@string/proceed_cc" />
 	     </LinearLayout>
