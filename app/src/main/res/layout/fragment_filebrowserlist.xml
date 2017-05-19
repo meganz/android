@@ -80,15 +80,4 @@
         android:textColor="@color/accentColor"
         android:visibility="gone" />
 
-    <Button
-        android:id="@+id/file_explorer_button"
-        android:layout_width="fill_parent"
-        android:layout_height="55dp"
-        android:layout_alignParentBottom="true"
-        android:layout_gravity="center"
-        android:background="@drawable/btn_default_holo_light_without_corners"
-        android:textColor="@color/white"
-        android:visibility="gone" >
-    </Button>
-
 </RelativeLayout>
