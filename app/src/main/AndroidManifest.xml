@@ -240,6 +240,11 @@
         </activity>
 
         <activity
+            android:name="mega.privacy.android.app.lollipop.GetLinkActivityLollipop"
+            android:label="@string/context_get_link_menu">
+        </activity>
+
+        <activity
             android:name="mega.privacy.android.app.lollipop.PinLockActivityLollipop"
             android:label="@string/settings_pin_lock"
             android:windowSoftInputMode="stateVisible">

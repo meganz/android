@@ -73,6 +73,9 @@ public class Constants {
 	final public static int CHOOSE_ACCOUNT_FRAGMENT = 6003;
 	final public static int CREATE_ACCOUNT_FRAGMENT = 604;
 
+	final public static int GET_LINK_FRAGMENT = 7000;
+	final public static int COPYRIGHT_FRAGMENT = 7001;
+
 	public static final int REQUEST_WRITE_STORAGE = 1;
 	public static final int REQUEST_CAMERA = 2;
 	public static final int REQUEST_READ_CONTACTS = 3;
