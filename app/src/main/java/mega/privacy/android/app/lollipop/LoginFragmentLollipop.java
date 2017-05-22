@@ -152,6 +152,9 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
     String url = null;
     private long parentHandle = -1;
 
+    String emailTemp = null;
+    String passwdTemp = null;
+
     @Override
     public void onSaveInstanceState(Bundle outState) {
         log("onSaveInstanceState");
@@ -711,6 +714,11 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 oldCredentialsLogin();
             }
         }
+
+        if ((passwdTemp != null) && (emailTemp != null)){
+            submitForm(true);
+        }
+
         log("END onCreateView");
         return v;
     }
@@ -933,6 +941,54 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             }
             megaApi.fastLogin(gSession, this);
         }
+    }
+
+    private void submitForm(boolean fromConfirmAccount) {
+
+        lastEmail = this.emailTemp;
+        lastPassword = this.passwdTemp;
+
+        this.emailTemp = null;
+        this.passwdTemp = null;
+
+        InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(et_user.getWindowToken(), 0);
+
+        if(!Util.isOnline(context))
+        {
+            loginLoggingIn.setVisibility(View.GONE);
+            loginLogin.setVisibility(View.VISIBLE);
+            scrollView.setBackgroundColor(getResources().getColor(R.color.background_create_account));
+            loginDelimiter.setVisibility(View.VISIBLE);
+            loginCreateAccount.setVisibility(View.VISIBLE);
+            queryingSignupLinkText.setVisibility(View.GONE);
+            confirmingAccountText.setVisibility(View.GONE);
+            generatingKeysText.setVisibility(View.GONE);
+            loggingInText.setVisibility(View.GONE);
+            fetchingNodesText.setVisibility(View.GONE);
+            prepareNodesText.setVisibility(View.GONE);
+            initizalizingChatText.setVisibility(View.GONE);
+            serversBusyText.setVisibility(View.GONE);
+
+            ((LoginActivityLollipop)context).showSnackbar(getString(R.string.error_server_connection_problem));
+            return;
+        }
+
+        loginLogin.setVisibility(View.GONE);
+        scrollView.setBackgroundColor(getResources().getColor(R.color.white));
+        loginDelimiter.setVisibility(View.GONE);
+        loginCreateAccount.setVisibility(View.GONE);
+        loginLoggingIn.setVisibility(View.VISIBLE);
+        scrollView.setBackgroundColor(getResources().getColor(R.color.white));
+        generatingKeysText.setVisibility(View.VISIBLE);
+        loginProgressBar.setVisibility(View.VISIBLE);
+        loginFetchNodesProgressBar.setVisibility(View.GONE);
+        queryingSignupLinkText.setVisibility(View.GONE);
+        confirmingAccountText.setVisibility(View.GONE);
+
+        log("generating keys");
+
+        new HashTask().execute(lastEmail, lastPassword);
     }
 
     private void submitForm() {
@@ -2135,6 +2191,21 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         }
     }
 
+    public void setPasswdTemp(String passwdTemp){
+        this.passwdTemp = passwdTemp;
+    }
+
+    public String getPasswdTemp(){
+        return this.passwdTemp;
+    }
+
+    public void setEmailTemp(String emailTemp){
+        this.emailTemp = emailTemp;
+    }
+
+    public String getEmailTemp(){
+        return this.emailTemp;
+    }
 
     @Override
     public void onChatListItemUpdate(MegaChatApiJava api, MegaChatListItem item) {
