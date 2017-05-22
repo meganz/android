@@ -22,6 +22,8 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+
 import mega.privacy.android.app.CameraSyncService;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.DownloadService;
@@ -32,10 +34,15 @@ import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaContactRequest;
+import nz.mega.sdk.MegaGlobalListenerInterface;
+import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaTransfer;
+import nz.mega.sdk.MegaUser;
 
 
-public class LoginActivityLollipop extends AppCompatActivity {
+public class LoginActivityLollipop extends AppCompatActivity implements MegaGlobalListenerInterface {
 
 	float scaleH, scaleW;
 	float density;
@@ -65,7 +72,18 @@ public class LoginActivityLollipop extends AppCompatActivity {
 	private MegaApiAndroid megaApiFolder;
 
 	private android.support.v7.app.AlertDialog alertDialogTransferOverquota;
-	
+
+	boolean waitingForConfirmAccount = false;
+	String emailTemp = null;
+	String passwdTemp = null;
+
+	@Override
+	protected void onDestroy() {
+		log("onDestroy");
+		megaApi.removeGlobalListener(this);
+		super.onDestroy();
+	}
+
 	@SuppressLint("NewApi")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -95,6 +113,8 @@ public class LoginActivityLollipop extends AppCompatActivity {
 		if (megaApiFolder == null){
 			megaApiFolder = ((MegaApplication) getApplication()).getMegaApiFolder();
 		}
+
+		megaApi.addGlobalListener(this);
 
 		setContentView(R.layout.activity_login);
 		relativeContainer = (RelativeLayout) findViewById(R.id.relative_container_login);
@@ -127,7 +147,22 @@ public class LoginActivityLollipop extends AppCompatActivity {
 				log("showLoginFragment");
 				if(loginFragment==null){
 					loginFragment = new LoginFragmentLollipop();
+					if ((passwdTemp != null) && (emailTemp != null)){
+						loginFragment.setEmailTemp(emailTemp);
+						loginFragment.setPasswdTemp(passwdTemp);
+						emailTemp = null;
+						passwdTemp = null;
+					}
 				}
+				else{
+					if ((passwdTemp != null) && (emailTemp != null)){
+						loginFragment.setEmailTemp(emailTemp);
+						loginFragment.setPasswdTemp(passwdTemp);
+						emailTemp = null;
+						passwdTemp = null;
+					}
+				}
+
 				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 				ft.replace(R.id.fragment_container_login, loginFragment);
 				ft.commitNowAllowingStateLoss();
@@ -461,6 +496,30 @@ public class LoginActivityLollipop extends AppCompatActivity {
 		log("App Version: " + Util.getVersion(this));
 	}
 
+	public void setWaitingForConfirmAccount(boolean waitingForConfirmAccount){
+		this.waitingForConfirmAccount = waitingForConfirmAccount;
+	}
+
+	public boolean getWaitingForConfirmAccount(){
+		return this.waitingForConfirmAccount;
+	}
+
+	public void setPasswdTemp(String passwdTemp){
+		this.passwdTemp = passwdTemp;
+	}
+
+	public String getPasswdTemp(){
+		return this.passwdTemp;
+	}
+
+	public void setEmailTemp(String emailTemp){
+		this.emailTemp = emailTemp;
+	}
+
+	public String getEmailTemp(){
+		return this.emailTemp;
+	}
+
 
 //	public void onNewIntent(Intent intent){
 //		if (intent != null && Constants.ACTION_CONFIRM.equals(intent.getAction())) {
@@ -472,4 +531,33 @@ public class LoginActivityLollipop extends AppCompatActivity {
 		Util.log("LoginActivityLollipop", message);
 	}
 
+	@Override
+	public void onUsersUpdate(MegaApiJava api, ArrayList<MegaUser> users) {
+		
+	}
+
+	@Override
+	public void onNodesUpdate(MegaApiJava api, ArrayList<MegaNode> nodeList) {
+
+	}
+
+	@Override
+	public void onReloadNeeded(MegaApiJava api) {
+
+	}
+
+	@Override
+	public void onAccountUpdate(MegaApiJava api) {
+		log("onAccountUpdate");
+
+		if (waitingForConfirmAccount){
+			waitingForConfirmAccount = false;
+			showFragment(Constants.LOGIN_FRAGMENT);
+		}
+	}
+
+	@Override
+	public void onContactRequestsUpdate(MegaApiJava api, ArrayList<MegaContactRequest> requests) {
+
+	}
 }

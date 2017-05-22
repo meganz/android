@@ -324,6 +324,9 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
             }
         }
         else{
+            ((LoginActivityLollipop)context).setEmailTemp(userEmail.getText().toString().toLowerCase(Locale.ENGLISH).trim());
+            ((LoginActivityLollipop)context).setPasswdTemp(userPassword.getText().toString());
+            ((LoginActivityLollipop)context).setWaitingForConfirmAccount(true);
             ((LoginActivityLollipop)context).showFragment(Constants.CONFIRM_EMAIL_FRAGMENT);
         }
     }
