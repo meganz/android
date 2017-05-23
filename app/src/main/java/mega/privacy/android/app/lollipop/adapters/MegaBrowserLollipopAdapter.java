@@ -56,6 +56,7 @@ import mega.privacy.android.app.lollipop.managerSections.IncomingSharesFragmentL
 import mega.privacy.android.app.lollipop.managerSections.OutgoingSharesFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.RubbishBinFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.SearchFragmentLollipop;
+import mega.privacy.android.app.lollipop.megachat.NodeAttachmentActivityLollipop;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.ThumbnailUtils;
@@ -1439,6 +1440,9 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 					else if(type==Constants.FOLDER_LINK_ADAPTER){
 						((FolderLinkActivityLollipop) context).showOptionsPanel(n);
 					}
+					else if(type==Constants.NODE_ATTACHMENT_ADAPTER){
+						((NodeAttachmentActivityLollipop) context).showOptionsPanel(n);
+					}
 					else{
 						((ManagerActivityLollipop) context).showNodeOptionsPanel(n);
 					}
@@ -1468,6 +1472,9 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 				}
 				else if(type==Constants.SEARCH_ADAPTER){
 					((SearchFragmentLollipop) fragment).itemClick(currentPosition);
+				}
+				else if(type==Constants.NODE_ATTACHMENT_ADAPTER){
+					log("Node attachment adapter");
 				}
 				else{
 					log("click layout FileBrowserFragmentLollipop!");
