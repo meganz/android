@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -49,7 +50,7 @@ public class GetLinkActivityLollipop extends PinActivityLollipop implements Mega
 	DisplayMetrics outMetrics;
 	Display display;
 
-	RelativeLayout relativeContainer;
+	CoordinatorLayout fragmentContainer;
 
 	//Fragments
 	GetLinkFragmentLollipop getLinkFragment;
@@ -72,9 +73,6 @@ public class GetLinkActivityLollipop extends PinActivityLollipop implements Mega
 
     Handler handler = new Handler();
 	private MegaApiAndroid megaApi;
-	private MegaApiAndroid megaApiFolder;
-
-	private android.support.v7.app.AlertDialog alertDialogTransferOverquota;
 
 	@SuppressLint("NewApi")
 	@Override
@@ -97,10 +95,6 @@ public class GetLinkActivityLollipop extends PinActivityLollipop implements Mega
 			megaApi = ((MegaApplication) getApplication()).getMegaApi();
 		}
 
-		if (megaApiFolder == null){
-			megaApiFolder = ((MegaApplication) getApplication()).getMegaApiFolder();
-		}
-
 		intentReceived = getIntent();
 		if (intentReceived != null){
 			handle = intentReceived.getLongExtra("handle", -1);
@@ -117,8 +111,8 @@ public class GetLinkActivityLollipop extends PinActivityLollipop implements Mega
 		}
 
 		setContentView(R.layout.get_link_activity_layout);
-//		relativeContainer = (RelativeLayout) findViewById(R.id.relative_container_login);
 
+		fragmentContainer = (CoordinatorLayout) findViewById(R.id.get_link_coordinator_layout);
 		tB = (Toolbar) findViewById(R.id.toolbar_get_link);
 		if(tB==null){
 			log("Tb is Null");
@@ -127,22 +121,16 @@ public class GetLinkActivityLollipop extends PinActivityLollipop implements Mega
 		tB.setVisibility(View.GONE);
 		setSupportActionBar(tB);
 		aB = getSupportActionBar();
-		log("aB.setHomeAsUpIndicator_1");
 		aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
 		aB.setHomeButtonEnabled(true);
 		aB.setDisplayHomeAsUpEnabled(true);
 
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-			Window window = this.getWindow();
-			window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-			window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-			window.setStatusBarColor(ContextCompat.getColor(this, R.color.transparent_black));
-		}
-
 		if(selectedNode.isExported()){
+
 			visibleFragment = Constants.GET_LINK_FRAGMENT;
 		}
 		else{
+
 			visibleFragment = Constants.COPYRIGHT_FRAGMENT;
 		}
 		showFragment(visibleFragment);
@@ -169,7 +157,6 @@ public class GetLinkActivityLollipop extends PinActivityLollipop implements Mega
 		intent.setType("text/plain");
 		intent.putExtra(Intent.EXTRA_TEXT, link);
 		startActivity(Intent.createChooser(intent, getString(R.string.context_get_link)));
-		finish();
 	}
 
 	public void copyLink(String link){
@@ -186,7 +173,7 @@ public class GetLinkActivityLollipop extends PinActivityLollipop implements Mega
 	}
 
 	public void showSnackbar(String message){
-		Snackbar snackbar = Snackbar.make(relativeContainer,message,Snackbar.LENGTH_LONG);
+		Snackbar snackbar = Snackbar.make(fragmentContainer,message,Snackbar.LENGTH_LONG);
 		TextView snackbarTextView = (TextView)snackbar.getView().findViewById(android.support.design.R.id.snackbar_text);
 		snackbarTextView.setMaxLines(5);
 		snackbar.show();
@@ -199,9 +186,23 @@ public class GetLinkActivityLollipop extends PinActivityLollipop implements Mega
 			case Constants.GET_LINK_FRAGMENT:{
 				log("show GET_LINK_FRAGMENT");
 
+				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+					Window window = this.getWindow();
+					window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+					window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+					window.setStatusBarColor(ContextCompat.getColor(this, R.color.lollipop_dark_primary_color));
+				}
+
 				if(aB!=null){
+					if(selectedNode.isExported()){
+
+						aB.setTitle(R.string.edit_link_option);
+					}
+					else{
+
+						aB.setTitle(R.string.context_get_link_menu);
+					}
 					aB.show();
-					aB.setTitle(R.string.context_get_link_menu);
 				}
 
 				if(getLinkFragment==null){
@@ -217,6 +218,13 @@ public class GetLinkActivityLollipop extends PinActivityLollipop implements Mega
 			case Constants.COPYRIGHT_FRAGMENT:{
 				log("Show COPYRIGHT_FRAGMENT");
 
+				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+					Window window = this.getWindow();
+					window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+					window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+					window.setStatusBarColor(ContextCompat.getColor(this, R.color.transparent_black));
+				}
+
 				if(aB!=null){
 					aB.hide();
 				}
@@ -230,64 +238,6 @@ public class GetLinkActivityLollipop extends PinActivityLollipop implements Mega
 				ft.commitNowAllowingStateLoss();
 				break;
 			}
-		}
-	}
-
-	public void showAlertIncorrectRK(){
-        log("showAlertIncorrectRK");
-		final android.support.v7.app.AlertDialog.Builder dialogBuilder = new android.support.v7.app.AlertDialog.Builder(this);
-
-		dialogBuilder.setTitle(getString(R.string.incorrect_MK_title));
-		dialogBuilder.setMessage(getString(R.string.incorrect_MK));
-		dialogBuilder.setCancelable(false);
-
-		dialogBuilder.setPositiveButton(getString(R.string.cam_sync_ok), new DialogInterface.OnClickListener() {
-
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				dialog.dismiss();
-			}
-		});
-
-		android.support.v7.app.AlertDialog alert = dialogBuilder.create();
-		alert.show();
-	}
-
-	@Override
-	public void onBackPressed() {
-		log("onBackPressed");
-
-		int valueReturn = -1;
-
-		finish();
-
-//		switch (visibleFragment){
-//			case Constants.LOGIN_FRAGMENT:{
-//				if(loginFragment!=null){
-//					valueReturn = loginFragment.onBackPressed();
-//				}
-//				break;
-//			}
-//			case Constants.CREATE_ACCOUNT_FRAGMENT:{
-//				showFragment(Constants.TOUR_FRAGMENT);
-//				break;
-//			}
-//			case Constants.TOUR_FRAGMENT:{
-//				valueReturn=0;
-//				break;
-//			}
-//			case Constants.CONFIRM_EMAIL_FRAGMENT:{
-//				valueReturn=0;
-//				break;
-//			}
-//			case Constants.CHOOSE_ACCOUNT_FRAGMENT:{
-//				//nothing to do
-//				break;
-//			}
-//		}
-
-		if (valueReturn == 0) {
-			super.onBackPressed();
 		}
 	}
 
@@ -311,13 +261,20 @@ public class GetLinkActivityLollipop extends PinActivityLollipop implements Mega
 	public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
 		log("onRequestFinish");
 
-		if(getLinkFragment!=null){
-			if(getLinkFragment.isAdded()){
-				if (request.getType() == MegaRequest.TYPE_EXPORT) {
-					log("export request finished");
-					getLinkFragment.requestFinish(request, e);
+		if (e.getErrorCode() == MegaError.API_OK) {
+			log("link: " + request.getLink());
+			selectedNode = megaApi.getNodeByHandle(request.getNodeHandle());
+			if(getLinkFragment!=null){
+				if(getLinkFragment.isAdded()){
+					if (request.getType() == MegaRequest.TYPE_EXPORT) {
+						log("export request finished");
+						getLinkFragment.requestFinish(request, e);
+					}
 				}
 			}
+		} else {
+			log("Error: " + e.getErrorString());
+			showSnackbar(getString(R.string.context_no_link));
 		}
 	}
 
