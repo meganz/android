@@ -943,7 +943,6 @@ public class NodeController {
                 return;
             }
             ((FullScreenImageViewerLollipop) context).setIsGetLink(true);
-            ((FullScreenImageViewerLollipop) context).setExpiredDateLink(true);
             megaApi.exportNode(document, timestamp, ((FullScreenImageViewerLollipop) context));
         }
         else if (context instanceof FileInfoActivityLollipop){
@@ -951,8 +950,6 @@ public class NodeController {
                 ((FileInfoActivityLollipop) context).showSnackbar(context.getString(R.string.error_server_connection_problem));
                 return;
             }
-            ((FileInfoActivityLollipop) context).setIsGetLink(true);
-            ((FileInfoActivityLollipop) context).setExpiredDateLink(true);
             megaApi.exportNode(document, timestamp, ((FileInfoActivityLollipop) context));
         }
     }
