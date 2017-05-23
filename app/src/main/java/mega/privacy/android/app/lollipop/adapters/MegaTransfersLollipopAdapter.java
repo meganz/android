@@ -442,7 +442,7 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
 			case R.id.transfers_list_option_pause:{
 				log("click to pause/play transfer");
 				MegaTransfer t = (MegaTransfer) getItem(currentPosition);
-                ((ManagerActivityLollipop) context).showConfirmationCancelTransfer(t, false);
+                ((ManagerActivityLollipop) context).pauseIndividualTransfer(t);
 				break;
 			}
 		}
