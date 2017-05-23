@@ -112,9 +112,8 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 		public long document;
 		public RelativeLayout itemLayout;
 		public ImageButton imageButtonThreeDots;
-		public ProgressBar transferProgressBar;
 	}
-	
+
 	public static class ViewHolderBrowserList extends ViewHolderBrowser{
 		
 		public ViewHolderBrowserList(View v){
@@ -503,15 +502,13 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 			holderList.textViewFileName = (TextView) v.findViewById(R.id.file_list_filename);			
 
 			holderList.textViewFileSize = (TextView) v.findViewById(R.id.file_list_filesize);
-			holderList.transferProgressBar = (ProgressBar) v.findViewById(R.id.transfers_list_browser_bar);
-			
+
 			holderList.imageButtonThreeDots = (ImageButton) v.findViewById(R.id.file_list_three_dots);
 
 			holderList.savedOffline.setVisibility(View.INVISIBLE);
 		
 			holderList.publicLinkImage.setVisibility(View.INVISIBLE);
-			
-			holderList.transferProgressBar.setVisibility(View.GONE);
+
 			holderList.textViewFileSize.setVisibility(View.VISIBLE);
 			
 			holderList.itemLayout.setTag(holderList);
@@ -538,11 +535,10 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 			holderGrid.textViewFileName = (TextView) v.findViewById(R.id.file_grid_filename);
 			holderGrid.textViewFileSize = (TextView) v.findViewById(R.id.file_grid_filesize);
 			holderGrid.imageButtonThreeDots = (ImageButton) v.findViewById(R.id.file_grid_three_dots);
-			holderGrid.transferProgressBar = (ProgressBar) v.findViewById(R.id.transfers_grid_browser_bar);
-			holderGrid.savedOffline = (ImageView) v.findViewById(R.id.file_grid_saved_offline);
+						holderGrid.savedOffline = (ImageView) v.findViewById(R.id.file_grid_saved_offline);
 			holderGrid.separator = (View) v.findViewById(R.id.file_grid_separator);
 			holderGrid.publicLinkImage = (ImageView) v.findViewById(R.id.file_grid_public_link);
-			holderGrid.transferProgressBar.setVisibility(View.GONE);
+
 			if(holderGrid.textViewFileSize!=null){
 				holderGrid.textViewFileSize.setVisibility(View.VISIBLE);
 			}
@@ -636,7 +632,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 		}
 		
 		if (node.isFolder()) {
-			holder.transferProgressBar.setVisibility(View.GONE);		
+
 			holder.textViewFileSize.setVisibility(View.VISIBLE);
 
 			if(type==Constants.FOLDER_LINK_ADAPTER){
@@ -714,45 +710,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 		}
 		else {
 			long nodeSize = node.getSize();
-			holder.textViewFileSize.setText(Util.getSizeString(nodeSize));	
-
-			if(mTHash!=null){
-
-				log("NODE: " + mTHash.get(node.getHandle()));
-				MegaTransfer tempT = mTHash.get(node.getHandle());
-
-				if (tempT != null){
-					holder.transferProgressBar.setVisibility(View.VISIBLE);		
-					holder.textViewFileSize.setVisibility(View.GONE);	
-
-					double progressValue = 100.0 * tempT.getTransferredBytes() / tempT.getTotalBytes();
-					holder.transferProgressBar.setProgress((int)progressValue);
-				}
-
-				if (currentTransfer != null){
-					if (node.getHandle() == currentTransfer.getNodeHandle()){
-						holder.transferProgressBar.setVisibility(View.VISIBLE);		
-						holder.textViewFileSize.setVisibility(View.GONE);	
-						double progressValue = 100.0 * currentTransfer.getTransferredBytes() / currentTransfer.getTotalBytes();
-						holder.transferProgressBar.setProgress((int)progressValue);
-						holder.transferProgressBar.setVisibility(View.VISIBLE);		
-						holder.textViewFileSize.setVisibility(View.GONE);
-					}
-					else{
-						holder.transferProgressBar.setVisibility(View.GONE);		
-						holder.textViewFileSize.setVisibility(View.VISIBLE);
-					}
-				}
-				else{
-					holder.transferProgressBar.setVisibility(View.GONE);		
-					holder.textViewFileSize.setVisibility(View.VISIBLE);
-				}
-
-				if(mTHash.size() == 0){
-					holder.transferProgressBar.setVisibility(View.GONE);		
-					holder.textViewFileSize.setVisibility(View.VISIBLE);	
-				}
-			}
+			holder.textViewFileSize.setText(Util.getSizeString(nodeSize));
 
 			holder.imageViewIcon.setVisibility(View.VISIBLE);
 			holder.imageViewIcon.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
@@ -935,8 +893,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 			params.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
 			params.setMargins(0, 0, 0, 0);
 			holder.imageView.setLayoutParams(params);
-			
-			holder.transferProgressBar.setVisibility(View.GONE);		
+
 			holder.textViewFileSize.setVisibility(View.VISIBLE);
 //			holder.propertiesText.setText(R.string.general_folder_info);
 			holder.textViewFileSize.setText(MegaApiUtils.getInfoFolder(node, context));
@@ -1152,46 +1109,6 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 //			holder.propertiesText.setText(R.string.general_file_info);
 			long nodeSize = node.getSize();
 			holder.textViewFileSize.setText(Util.getSizeString(nodeSize));	
-
-			if(mTHash!=null){
-
-				log("NODE: " + mTHash.get(node.getHandle()));
-				MegaTransfer tempT = mTHash.get(node.getHandle());
-
-				if (tempT!=null){
-					holder.transferProgressBar.setVisibility(View.VISIBLE);		
-					holder.textViewFileSize.setVisibility(View.GONE);	
-
-					double progressValue = 100.0 * tempT.getTransferredBytes() / tempT.getTotalBytes();
-					holder.transferProgressBar.setProgress((int)progressValue);
-				}
-
-				if (currentTransfer != null){
-					if (node.getHandle() == currentTransfer.getNodeHandle()){
-						holder.transferProgressBar.setVisibility(View.VISIBLE);		
-						holder.textViewFileSize.setVisibility(View.GONE);	
-						double progressValue = 100.0 * currentTransfer.getTransferredBytes() / currentTransfer.getTotalBytes();
-						holder.transferProgressBar.setProgress((int)progressValue);
-						holder.transferProgressBar.setVisibility(View.VISIBLE);		
-						holder.textViewFileSize.setVisibility(View.GONE);
-					}
-					else{
-						holder.transferProgressBar.setVisibility(View.GONE);		
-						holder.textViewFileSize.setVisibility(View.VISIBLE);
-					}
-				}
-				else{
-					holder.transferProgressBar.setVisibility(View.GONE);		
-					holder.textViewFileSize.setVisibility(View.VISIBLE);
-				}
-
-				if(mTHash.size() == 0){
-					holder.transferProgressBar.setVisibility(View.GONE);		
-					holder.textViewFileSize.setVisibility(View.VISIBLE);	
-				}
-				
-				log("mTHash.size()= "+mTHash.size());
-			}
 
 			if (!multipleSelect) {
 				holder.itemLayout.setBackgroundColor(Color.WHITE);
