@@ -639,6 +639,17 @@ public class ChatController {
         }
     }
 
+    public String getFullName(long userHandle, long chatId){
+        MegaChatRoom chat = megaChatApi.getChatRoom(chatId);
+        if(chat!=null){
+            return getFullName(userHandle, chat);
+        }
+        else{
+            log("Chat is NULL - error!");
+        }
+        return "";
+    }
+
     public String getFullName(long userHandle, MegaChatRoom chatRoom){
         log("getFullName: "+userHandle);
         int privilege = chatRoom.getPeerPrivilegeByHandle(userHandle);
@@ -1041,7 +1052,6 @@ public class ChatController {
         File defaultPathF = new File(downloadLocationDefaultPath);
         defaultPathF.mkdirs();
         checkSizeBeforeDownload(downloadLocationDefaultPath, nodeList);
-
     }
 
     public void checkSizeBeforeDownload(String parentPath, MegaNodeList nodeList){
@@ -1102,7 +1112,6 @@ public class ChatController {
             }
         }
     }
-
 
     public void download(String parentPath, MegaNodeList nodeList){
         log("download-----------");
