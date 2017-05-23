@@ -12629,6 +12629,16 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		}
 	}
 
+	public void pauseIndividualTransfer(MegaTransfer mT){
+		log("pauseIndividualTransfer");
+		if(mT.getState()==MegaTransfer.STATE_PAUSED){
+			megaApi.pauseTransfer(mT, false, managerActivity);
+		}
+		else{
+			megaApi.pauseTransfer(mT, true, managerActivity);
+		}
+	}
+
 	public void showConfirmationClearCompletedTransfers (){
 		log("showConfirmationClearCompletedTransfers");
 
@@ -12683,12 +12693,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 							megaApi.cancelTransfer(mT, managerActivity);
 						}
 						else{
-							if(mT.getState()==MegaTransfer.STATE_PAUSED){
-								megaApi.pauseTransfer(mT, false, managerActivity);
-							}
-							else{
-								megaApi.pauseTransfer(mT, true, managerActivity);
-							}
+							pauseIndividualTransfer(mT);
 						}
 
 						break;
