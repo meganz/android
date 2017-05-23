@@ -49,14 +49,9 @@ public class CopyrightFragmentLollipop extends Fragment implements View.OnClickL
     DisplayMetrics outMetrics;
     Display display;
     private MegaApiAndroid megaApi;
-    private MegaChatApiAndroid megaChatApi;
     ActionBar aB;
     Button agreeButton;
     Button disagreeButton;
-
-    private LinearLayout mainLinearLayout;
-    private ScrollView scrollView;
-
 
     @Override
     public void onCreate (Bundle savedInstanceState){
@@ -79,20 +74,11 @@ public class CopyrightFragmentLollipop extends Fragment implements View.OnClickL
 
         View v = inflater.inflate(R.layout.fragment_copyright, container, false);
 
-        scrollView = (ScrollView) v.findViewById(R.id.scroll_view_copyright);
-        mainLinearLayout = (LinearLayout) v.findViewById(R.id.copyright_main_linear_layout);
-
         agreeButton = (Button) v.findViewById(R.id.agree_button);
         disagreeButton = (Button) v.findViewById(R.id.disagree_button);
 
         agreeButton.setOnClickListener(this);
         disagreeButton.setOnClickListener(this);
-
-        //Replace elevation
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-            scrollView.setBackgroundColor(ContextCompat.getColor(context, R.color.grid_item_separator));
-            mainLinearLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.grid_item_separator));
-        }
 
         return v;
     }

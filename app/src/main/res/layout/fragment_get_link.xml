@@ -118,7 +118,21 @@
                     android:layout_below="@+id/title_set_expiry_date"
                     android:text="@string/subtitle_set_expiry_date"
                     android:textColor="@color/mail_my_account"
-                    android:textSize="16dp"/>
+                    android:textSize="14dp"/>
+
+                <Button
+                    android:id="@+id/expiry_date"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/accentColor"
+                    android:layout_below="@+id/title_set_expiry_date"
+                    android:stateListAnimator="@null"
+                    android:layout_marginLeft="16dp"
+                    android:minHeight="0dp"
+                    android:minWidth="0dp"
+                    android:elevation="0dp"
+                    android:background="@color/white"
+                    android:visibility="invisible"/>
 
             </RelativeLayout>
 
@@ -134,22 +148,17 @@
                     android:layout_alignParentRight="true"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginRight="18dp"/>
+                    android:layout_marginRight="16dp"/>
 
             </RelativeLayout>
 
-        </RelativeLayout>
+            <RelativeLayout
+                android:id="@+id/transparent_key_layout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/transparent_white"/>
 
-        <Button
-            android:id="@+id/expiry_date"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/accentColor"
-            android:layout_centerVertical="true"
-            android:stateListAnimator="@null"
-            android:elevation="0dp"
-            android:background="@color/white"
-            android:visibility="invisible"/>
+        </RelativeLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
