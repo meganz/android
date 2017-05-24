@@ -1522,6 +1522,10 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 			((SearchFragmentLollipop) fragment).activateActionMode();
 			((SearchFragmentLollipop) fragment).itemClick(currentPosition);
 		}
+		else if(type==Constants.NODE_ATTACHMENT_ADAPTER){
+			((NodeAttachmentActivityLollipop) context).activateActionMode();
+			((NodeAttachmentActivityLollipop) context).itemClick(currentPosition);
+		}
 		else{
 			log("click layout FileBrowserFragmentLollipop!");
 			((FileBrowserFragmentLollipop) fragment).activateActionMode();

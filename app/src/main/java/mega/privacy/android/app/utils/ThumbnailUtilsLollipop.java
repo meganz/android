@@ -351,9 +351,7 @@ public class ThumbnailUtilsLollipop {
 
 			log("Downloading thumbnail finished");
 			final long handle = request.getNodeHandle();
-			MegaNode node = api.getNodeByHandle(handle);
-
-//			pendingThumbnails.remove(handle);
+			String base64 = MegaApiJava.handleToBase64(handle);
 
 			if (e.getErrorCode() == MegaError.API_OK){
 				log("Downloading thumbnail OK: " + handle);
@@ -361,7 +359,8 @@ public class ThumbnailUtilsLollipop {
 
 				if (holder != null){
 					File thumbDir = getThumbFolder(context);
-					File thumb = new File(thumbDir, node.getBase64Handle()+".jpg");
+					File thumb = new File(thumbDir, base64+".jpg");
+
 					if (thumb.exists()) {
 						if (thumb.length() > 0) {
 							final Bitmap bitmap = getBitmapForCache(thumb, context);

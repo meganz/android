@@ -3349,80 +3349,14 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     public void saveOffline(){
         log("saveOffline");
 
-        File destination = null;
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
-            if (!hasStoragePermission) {
-                ActivityCompat.requestPermissions(this,
-                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                        Constants.REQUEST_WRITE_STORAGE);
-            }
-        }
-
         MegaChatMessage message = megaChatApi.getMessage(idChat, selectedMessageId);
-        if(message!=null) {
-
-            MegaNodeList nodeList = message.getMegaNodeList();
-            Map<MegaNode, String> dlFiles = new HashMap<MegaNode, String>();
-            for (int i = 0; i < nodeList.size(); i++) {
-
-                MegaNode document = nodeList.get(i);
-                if (document != null) {
-
-                    if (Environment.getExternalStorageDirectory() != null){
-                        destination = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/"+MegaApiUtils.createStringTree(document, this));
-                    }
-                    else{
-                        destination = getFilesDir();
-                    }
-
-                    destination.mkdirs();
-
-                    log ("DESTINATION!!!!!: " + destination.getAbsolutePath());
-                    if (destination.exists() && destination.isDirectory()){
-
-                        File offlineFile = new File(destination, document.getName());
-                        if (offlineFile.exists() && document.getSize() == offlineFile.length() && offlineFile.getName().equals(document.getName())){ //This means that is already available offline
-                            log("File already exists!");
-                        }
-                        else{
-                            dlFiles.put(document, destination.getAbsolutePath());
-                        }
-                    }
-                    else{
-                        log("Destination ERROR");
-                    }
-                }
-            }
-
-            double availableFreeSpace = Double.MAX_VALUE;
-            try{
-                StatFs stat = new StatFs(destination.getAbsolutePath());
-                availableFreeSpace = (double)stat.getAvailableBlocks() * (double)stat.getBlockSize();
-            }
-            catch(Exception ex){}
-
-            for (MegaNode document : dlFiles.keySet()) {
-
-                String path = dlFiles.get(document);
-
-                if(availableFreeSpace <document.getSize()){
-                    Util.showErrorAlertDialog(getString(R.string.error_not_enough_free_space) + " (" + new String(document.getName()) + ")", false, this);
-                    continue;
-                }
-
-                Intent service = new Intent(this, DownloadService.class);
-                String serializeString = document.serialize();
-                log("serializeString: "+serializeString);
-                service.putExtra(DownloadService.EXTRA_SERIALIZE_STRING, serializeString);
-                service.putExtra(DownloadService.EXTRA_PATH, path);
-                startService(service);
-            }
+        if(message!=null){
+            chatC.saveForOffline(message);
         }
         else{
             log("Message is NULL");
         }
+
     }
 
     @Override
