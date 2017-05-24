@@ -79,7 +79,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
     ArrayList<AndroidMegaChatMessage> messages;
     RecyclerView listFragment;
     MegaApiAndroid megaApi;
-    MegaChatApiAndroid megaChatApi;
+    static MegaChatApiAndroid megaChatApi;
     boolean multipleSelect;
     private SparseBooleanArray selectedItems;
 
@@ -1313,13 +1313,11 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                                                 PreviewDownloadListener listener = new PreviewDownloadListener(context, (ViewHolderMessageChat)holder, this);
 //                                                listenersGrid.put(node.getHandle(), listener);
-                                                log("Lo descargare aqui: " + previewFile.getAbsolutePath());
+                                                log("To download here: " + previewFile.getAbsolutePath());
                                                 megaApi.getPreview(node, previewFile.getAbsolutePath(), listener);
                                             }
                                         }
                                     }
-
-
                                 }
                                 else{
                                     long totalSize = 0;
@@ -1863,6 +1861,35 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                     ((ViewHolderMessageChat)holder).contentContactMessageFileSize.setText(Util.getSizeString(nodeSize));
 
                                     ((ViewHolderMessageChat)holder).contentContactMessageFileThumb.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
+
+                                    log("Get preview of node");
+
+                                    Bitmap preview = null;
+                                    preview = PreviewUtils.getPreviewFromCache(node);
+                                    if (preview != null){
+                                        PreviewUtils.previewCache.put(node.getHandle(), preview);
+                                        ((ViewHolderMessageChat)holder).contentContactMessageThumbPort.setImageBitmap(preview);
+                                        ((ViewHolderMessageChat)holder).contentContactMessageThumbPort.setVisibility(View.VISIBLE);
+                                        ((ViewHolderMessageChat)holder).contentContactMessageFileLayout.setVisibility(View.GONE);
+                                    }
+                                    else {
+                                        preview = PreviewUtils.getPreviewFromFolder(node, context);
+                                        if (preview != null) {
+                                            PreviewUtils.previewCache.put(node.getHandle(), preview);
+                                            ((ViewHolderMessageChat) holder).contentContactMessageThumbPort.setImageBitmap(preview);
+                                            ((ViewHolderMessageChat) holder).contentContactMessageThumbPort.setVisibility(View.VISIBLE);
+                                            ((ViewHolderMessageChat) holder).contentContactMessageFileLayout.setVisibility(View.GONE);
+                                        } else {
+                                            if (node.hasPreview()) {
+                                                File previewFile = new File(PreviewUtils.getPreviewFolder(context), node.getBase64Handle() + ".jpg");
+
+                                                PreviewDownloadListener listener = new PreviewDownloadListener(context, (ViewHolderMessageChat) holder, this);
+//                                                listenersGrid.put(node.getHandle(), listener);
+                                                log("Lo descargare aqui: " + previewFile.getAbsolutePath());
+                                                megaApi.getPreview(node, previewFile.getAbsolutePath(), listener);
+                                            }
+                                        }
+                                    }
                                 }
                                 else{
                                     long totalSize = 0;
@@ -2546,6 +2573,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
 
             log("onRequestFinish: "+request.getType() + "__" + request.getRequestString());
+            log("onRequestFinish: Node: " + request.getNodeHandle() + "_" + request.getName());
 
             if (request.getType() == MegaRequest.TYPE_GET_ATTR_FILE){
                 if (e.getErrorCode() == MegaError.API_OK){
@@ -2557,9 +2585,16 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                         if (preview.length() > 0) {
                             Bitmap bitmap = PreviewUtils.getBitmapForCache(preview, context);
                             PreviewUtils.previewCache.put(handle, bitmap);
-                            holder.contentOwnMessageThumbPort.setImageBitmap(bitmap);
-                            holder.contentOwnMessageThumbPort.setVisibility(View.VISIBLE);
-                            holder.contentOwnMessageFileLayout.setVisibility(View.GONE);
+                            if(holder.userHandle == megaChatApi.getMyUserHandle()){
+                                holder.contentOwnMessageThumbPort.setImageBitmap(bitmap);
+                                holder.contentOwnMessageThumbPort.setVisibility(View.VISIBLE);
+                                holder.contentOwnMessageFileLayout.setVisibility(View.GONE);
+                            }
+                            else{
+                                holder.contentContactMessageThumbPort.setImageBitmap(bitmap);
+                                holder.contentContactMessageThumbPort.setVisibility(View.VISIBLE);
+                                holder.contentContactMessageFileLayout.setVisibility(View.GONE);
+                            }
                         }
                     }
                 }
