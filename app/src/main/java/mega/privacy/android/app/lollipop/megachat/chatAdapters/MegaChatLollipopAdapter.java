@@ -39,6 +39,8 @@ import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.WrapTextView;
+import mega.privacy.android.app.lollipop.adapters.MegaBrowserLollipopAdapter;
+import mega.privacy.android.app.lollipop.adapters.MegaFullScreenImageAdapterLollipop;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.listeners.ChatAttachmentAvatarListener;
 import mega.privacy.android.app.lollipop.listeners.ChatNonContactNameListener;
@@ -46,18 +48,24 @@ import mega.privacy.android.app.lollipop.listeners.ChatUserAvatarListener;
 import mega.privacy.android.app.lollipop.megachat.AndroidMegaChatMessage;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.PreviewUtils;
+import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.TimeChatUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatHandleList;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatRoom;
+import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaNodeList;
+import nz.mega.sdk.MegaRequest;
+import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUser;
 
-public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
 
     public static int LEFT_MARGIN_CONTACT_MSG_MANAGEMENT = 40;
     public static int RIGHT_MARGIN_CONTACT_MSG_MANAGEMENT = 68;
@@ -74,6 +82,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
     MegaChatApiAndroid megaChatApi;
     boolean multipleSelect;
     private SparseBooleanArray selectedItems;
+
+    private MegaChatLollipopAdapter megaChatAdapter;
 
     ChatController cC;
 
@@ -99,6 +109,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         }
 
         listFragment = _listView;
+
+        megaChatAdapter = this;
 
         if(messages!=null)
         {
@@ -1276,6 +1288,38 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                     ((ViewHolderMessageChat)holder).contentOwnMessageFileSize.setText(Util.getSizeString(nodeSize));
 
                                     ((ViewHolderMessageChat)holder).contentOwnMessageFileThumb.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
+
+                                    log("Get preview of node");
+
+                                    Bitmap preview = null;
+                                    preview = PreviewUtils.getPreviewFromCache(node);
+                                    if (preview != null){
+                                        PreviewUtils.previewCache.put(node.getHandle(), preview);
+                                        ((ViewHolderMessageChat)holder).contentOwnMessageThumbPort.setImageBitmap(preview);
+                                        ((ViewHolderMessageChat)holder).contentOwnMessageThumbPort.setVisibility(View.VISIBLE);
+                                        ((ViewHolderMessageChat)holder).contentOwnMessageFileLayout.setVisibility(View.GONE);
+                                    }
+                                    else{
+                                        preview = PreviewUtils.getPreviewFromFolder(node, context);
+                                        if (preview != null){
+                                            PreviewUtils.previewCache.put(node.getHandle(), preview);
+                                            ((ViewHolderMessageChat)holder).contentOwnMessageThumbPort.setImageBitmap(preview);
+                                            ((ViewHolderMessageChat)holder).contentOwnMessageThumbPort.setVisibility(View.VISIBLE);
+                                            ((ViewHolderMessageChat)holder).contentOwnMessageFileLayout.setVisibility(View.GONE);
+                                        }
+                                        else{
+                                            if (node.hasPreview()){
+                                                File previewFile = new File(PreviewUtils.getPreviewFolder(context), node.getBase64Handle()+".jpg");
+
+                                                PreviewDownloadListener listener = new PreviewDownloadListener(context, (ViewHolderMessageChat)holder, this);
+//                                                listenersGrid.put(node.getHandle(), listener);
+                                                log("Lo descargare aqui: " + previewFile.getAbsolutePath());
+                                                megaApi.getPreview(node, previewFile.getAbsolutePath(), listener);
+                                            }
+                                        }
+                                    }
+
+
                                 }
                                 else{
                                     long totalSize = 0;
@@ -2480,5 +2524,59 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
     private static void log(String log) {
         Util.log("MegaChatLollipopAdapter", log);
+    }
+
+    static class PreviewDownloadListener implements MegaRequestListenerInterface {
+        Context context;
+        MegaChatLollipopAdapter.ViewHolderMessageChat holder;
+        MegaChatLollipopAdapter adapter;
+
+        PreviewDownloadListener(Context context, MegaChatLollipopAdapter.ViewHolderMessageChat holder, MegaChatLollipopAdapter adapter) {
+            this.context = context;
+            this.holder = holder;
+            this.adapter = adapter;
+        }
+
+        @Override
+        public void onRequestStart(MegaApiJava api, MegaRequest request) {
+
+        }
+
+        @Override
+        public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
+
+            log("onRequestFinish: "+request.getType() + "__" + request.getRequestString());
+
+            if (request.getType() == MegaRequest.TYPE_GET_ATTR_FILE){
+                if (e.getErrorCode() == MegaError.API_OK){
+                    long handle = request.getNodeHandle();
+                    String base64 = MegaApiJava.handleToBase64(handle);
+                    File previewDir = PreviewUtils.getPreviewFolder(context);
+                    File preview = new File(previewDir, base64+".jpg");
+                    if (preview.exists()) {
+                        if (preview.length() > 0) {
+                            Bitmap bitmap = PreviewUtils.getBitmapForCache(preview, context);
+                            PreviewUtils.previewCache.put(handle, bitmap);
+                            holder.contentOwnMessageThumbPort.setImageBitmap(bitmap);
+                            holder.contentOwnMessageThumbPort.setVisibility(View.VISIBLE);
+                            holder.contentOwnMessageFileLayout.setVisibility(View.GONE);
+                        }
+                    }
+                }
+                else {
+                    log("ERROR: " + e.getErrorCode() + "___" + e.getErrorString());
+                }
+            }
+        }
+
+        @Override
+        public void onRequestTemporaryError (MegaApiJava api, MegaRequest request, MegaError e){
+
+        }
+
+        @Override
+        public void onRequestUpdate (MegaApiJava api, MegaRequest request){
+
+        }
     }
 }
