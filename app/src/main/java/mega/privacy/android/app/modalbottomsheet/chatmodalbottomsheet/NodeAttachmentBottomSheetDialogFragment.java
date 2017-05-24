@@ -196,35 +196,37 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
 
             if(node!=null) {
                 log("node is NOT null");
-                if (Util.isOnline(context)) {
 
-                    if (node.hasThumbnail()) {
-                        log("Node has thumbnail");
-                        RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) nodeThumb.getLayoutParams();
-                        params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-                        params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-                        params1.setMargins(20, 0, 12, 0);
-                        nodeThumb.setLayoutParams(params1);
+                if(handle==-1){
+                    log("Panel shown from ChatActivity");
+                    if(nodeList.size()==1){
+                        log("one file included");
+                        if (Util.isOnline(context)) {
 
-                        thumb = ThumbnailUtils.getThumbnailFromCache(node);
-                        if (thumb != null) {
-                            nodeThumb.setImageBitmap(thumb);
-                        } else {
-                            thumb = ThumbnailUtils.getThumbnailFromFolder(node, context);
-                            if (thumb != null) {
-                                nodeThumb.setImageBitmap(thumb);
-                            } else {
+                            if (node.hasThumbnail()) {
+                                log("Node has thumbnail");
+                                RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) nodeThumb.getLayoutParams();
+                                params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
+                                params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
+                                params1.setMargins(20, 0, 12, 0);
+                                nodeThumb.setLayoutParams(params1);
+
+                                thumb = ThumbnailUtils.getThumbnailFromCache(node);
+                                if (thumb != null) {
+                                    nodeThumb.setImageBitmap(thumb);
+                                } else {
+                                    thumb = ThumbnailUtils.getThumbnailFromFolder(node, context);
+                                    if (thumb != null) {
+                                        nodeThumb.setImageBitmap(thumb);
+                                    } else {
+                                        nodeThumb.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
+                                    }
+                                }
+                            }
+                            else {
                                 nodeThumb.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
                             }
                         }
-                    }
-                    else {
-                        nodeThumb.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
-                    }
-                }
-
-                if(handle==-1){
-                    if(nodeList.size()==1){
 
                         nodeName.setText(node.getName());
 
@@ -246,9 +248,39 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
                             totalSize = totalSize + temp.getSize();
                         }
                         nodeInfo.setText(Util.getSizeString(totalSize));
+
+                        nodeThumb.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
                     }
                 }
                 else{
+                    log("Panel shown from NodeAttachmenntActivity - always one file selected");
+                    if (Util.isOnline(context)) {
+
+                        if (node.hasThumbnail()) {
+                            log("Node has thumbnail");
+                            RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) nodeThumb.getLayoutParams();
+                            params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
+                            params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
+                            params1.setMargins(20, 0, 12, 0);
+                            nodeThumb.setLayoutParams(params1);
+
+                            thumb = ThumbnailUtils.getThumbnailFromCache(node);
+                            if (thumb != null) {
+                                nodeThumb.setImageBitmap(thumb);
+                            } else {
+                                thumb = ThumbnailUtils.getThumbnailFromFolder(node, context);
+                                if (thumb != null) {
+                                    nodeThumb.setImageBitmap(thumb);
+                                } else {
+                                    nodeThumb.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
+                                }
+                            }
+                        }
+                        else {
+                            nodeThumb.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
+                        }
+                    }
+
                     nodeName.setText(node.getName());
 
                     long nodeSize = node.getSize();
@@ -297,7 +329,12 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
                     return;
                 }
 
-                chatC.prepareForChatDownload(nodeList);
+                if(context instanceof ChatActivityLollipop){
+                    chatC.prepareForChatDownload(nodeList);
+                }
+                else if(context instanceof NodeAttachmentActivityLollipop){
+                    chatC.prepareForChatDownload(node);
+                }
                 break;
             }
             case R.id.option_view_layout:{
@@ -320,7 +357,13 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
                     return;
                 }
 
-                ((ChatActivityLollipop)context).saveOffline();
+                if(context instanceof ChatActivityLollipop){
+                    ((ChatActivityLollipop)context).saveOffline();
+                }
+                else if(context instanceof NodeAttachmentActivityLollipop){
+                    ((NodeAttachmentActivityLollipop)context).saveOffline();
+                }
+
                 break;
             }
             case R.id.option_import_layout:{
@@ -329,7 +372,14 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
                     log("The selected node is NULL");
                     return;
                 }
-                ((ChatActivityLollipop)context).importNode();
+
+                if(context instanceof ChatActivityLollipop){
+                    ((ChatActivityLollipop)context).importNode();
+                }
+                else if(context instanceof NodeAttachmentActivityLollipop){
+                    ((NodeAttachmentActivityLollipop)context).importNode();
+                }
+
                 break;
             }
             case R.id.option_revoke_layout:{
@@ -339,7 +389,13 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
                     return;
                 }
 
-                ((ChatActivityLollipop)context).revoke();
+                if(context instanceof ChatActivityLollipop){
+                    ((ChatActivityLollipop)context).revoke();
+                }
+                else if(context instanceof NodeAttachmentActivityLollipop){
+                    ((NodeAttachmentActivityLollipop)context).revoke();
+                }
+
                 break;
             }
         }

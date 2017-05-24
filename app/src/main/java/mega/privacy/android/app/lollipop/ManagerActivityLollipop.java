@@ -7966,11 +7966,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		downloadConfirmationDialog.show();
 	}
 
-	public void askSizeConfirmationBeforeChatDownload(String parentPath, MegaNodeList nodeList, long size){
+	public void askSizeConfirmationBeforeChatDownload(String parentPath, ArrayList<MegaNode> nodeList, long size){
 		log("askSizeConfirmationBeforeChatDownload");
 
 		final String parentPathC = parentPath;
-		final MegaNodeList nodeListC = nodeList;
+		final ArrayList<MegaNode> nodeListC = nodeList;
 		final long sizeC = size;
 		final ChatController chatC = new ChatController(this);
 
