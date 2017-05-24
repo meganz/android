@@ -58,7 +58,6 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
     long chatId;
     long messageId;
     long handle=-1;
-    NodeController nC;
     ChatController chatC;
 
     private BottomSheetBehavior mBehavior;
@@ -131,7 +130,6 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
             }
         }
 
-        nC = new NodeController(context);
         chatC = new ChatController(context);
 
         dbH = DatabaseHandler.getDbHandler(getActivity());
