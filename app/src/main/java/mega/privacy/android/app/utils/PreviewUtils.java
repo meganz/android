@@ -1,6 +1,7 @@
 package mega.privacy.android.app.utils;
 
 import java.io.File;
+import java.io.IOException;
 
 import mega.privacy.android.app.PreviewCache;
 import nz.mega.sdk.MegaNode;
@@ -8,6 +9,7 @@ import nz.mega.sdk.MegaNode;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.media.ExifInterface;
 
 
 public class PreviewUtils {
@@ -64,7 +66,7 @@ public class PreviewUtils {
 		}
 		return previewCache.get(node.getHandle());
 	}
-	
+
 	/*
 	 * Load Bitmap for cache
 	 */
