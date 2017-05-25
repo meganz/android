@@ -448,7 +448,6 @@
                     android:layout_height="220dp"
                     android:layout_width="160dp"
                     android:layout_alignParentLeft="true"
-                    android:layout_marginTop="10dp"
                     android:layout_below="@+id/content_contact_message_file_sender"
                     android:scaleType="centerCrop"/>
 
@@ -457,7 +456,6 @@
                     android:layout_width="220dp"
                     android:layout_height="160dp"
                     android:layout_alignParentLeft="true"
-                    android:layout_marginTop="10dp"
                     android:layout_below="@+id/content_contact_message_file_sender"
                     android:scaleType="centerCrop"/>
 
