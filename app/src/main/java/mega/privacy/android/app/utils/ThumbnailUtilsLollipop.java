@@ -78,7 +78,7 @@ public class ThumbnailUtilsLollipop {
 
 	public static Bitmap getRoundedRectBitmap(Context context, final Bitmap bitmap,final int pixels)
 	{
-
+		log("getRoundedRectBitmap");
 		final Bitmap result = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), Bitmap.Config.ARGB_8888);
 		final Canvas canvas = new Canvas(result);
 		final Paint paint = new Paint();
