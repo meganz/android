@@ -757,7 +757,6 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			preferenceScreen.removePreference(persistenceChatCategory);
 		}
 
-
 		advancedFeaturesCache.setSummary(getString(R.string.settings_advanced_features_calculating));
 		advancedFeaturesOffline.setSummary(getString(R.string.settings_advanced_features_calculating));
 		
@@ -1510,6 +1509,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 					dbH.setEnabledChat(true+"");
 					preferenceScreen.addPreference(chatNotificationsCategory);
 					preferenceScreen.addPreference(chatStatusCategory);
+					preferenceScreen.addPreference(chatAutoAwayPreference);
 					((ManagerActivityLollipop)context).enableChat();
 				}
 				else{
@@ -1517,12 +1517,12 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 					dbH.setEnabledChat(false+"");
 					preferenceScreen.removePreference(chatNotificationsCategory);
 					preferenceScreen.removePreference(chatStatusCategory);
+					preferenceScreen.removePreference(chatAutoAwayPreference);
 					((ManagerActivityLollipop)context).disableChat();
 				}
 			}
 			else{
 				if (chatEnabled){
-					//Intent to set the PIN
 					log("CONNECT CHAT!!!");
 					dbH.setEnabledChat(true+"");
 					preferenceScreen.addPreference(chatNotificationsCategory);
