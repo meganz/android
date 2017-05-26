@@ -65,7 +65,6 @@
         android:layout_height="wrap_content"
         android:src="@drawable/ic_pause"
         android:background="@null"
-        android:alpha="0.54"
         android:layout_centerVertical="true"
         android:layout_marginRight="12dp"
         android:layout_marginLeft="12dp"
