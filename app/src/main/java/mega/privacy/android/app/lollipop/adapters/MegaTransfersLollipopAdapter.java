@@ -351,7 +351,7 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
 				holder.imageViewCompleted.setImageResource(R.drawable.ic_queue);
 				holder.transferProgressBar.setVisibility(View.GONE);
 				holder.optionRemove.setVisibility(View.VISIBLE);
-				holder.optionPause.setImageResource(R.drawable.ic_play);
+				holder.optionPause.setImageResource(R.drawable.ic_play_grey);
 				holder.optionPause.setVisibility(View.VISIBLE);
 				break;
 			}
@@ -364,7 +364,7 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
 				log("Progress Value: "+ progressValue);
 				holder.transferProgressBar.setProgress((int)progressValue);
 				holder.optionRemove.setVisibility(View.VISIBLE);
-				holder.optionPause.setImageResource(R.drawable.ic_pause);
+				holder.optionPause.setImageResource(R.drawable.ic_pause_grey);
 				holder.optionPause.setVisibility(View.VISIBLE);
 				break;
 			}
@@ -378,7 +378,7 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
 				holder.transferProgressBar.setVisibility(View.GONE);
 				holder.optionRemove.setVisibility(View.VISIBLE);
 				holder.optionPause.setVisibility(View.VISIBLE);
-				holder.optionPause.setImageResource(R.drawable.ic_pause);
+				holder.optionPause.setImageResource(R.drawable.ic_pause_grey);
 				break;
 			}
 			default:{

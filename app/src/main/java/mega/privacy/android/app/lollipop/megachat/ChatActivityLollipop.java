@@ -1994,8 +1994,23 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 //            showMsgNotSentPanel(m);
             if(m!=null){
                 if(m.getMessage().getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT){
-                    log("show node attachment panel");
-                    showNodeAttachmentBottomSheet(m, position);
+
+
+                    MegaNodeList nodeList = m.getMessage().getMegaNodeList();
+                    if(nodeList.size()==1){
+                        MegaNode node = nodeList.get(0);
+                        if(node.hasPreview()){
+                            log("Show full screen viewer");
+                        }
+                        else{
+                            log("show node attachment panel for one node");
+                            showNodeAttachmentBottomSheet(m, position);
+                        }
+                    }
+                    else{
+                        log("show node attachment panel");
+                        showNodeAttachmentBottomSheet(m, position);
+                    }
                 }
                 if(m.getMessage().getType()==MegaChatMessage.TYPE_CONTACT_ATTACHMENT){
                     log("show contact attachment panel");

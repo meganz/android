@@ -21,7 +21,7 @@
 		android:id="@+id/action_play"
 		android:orderInCategory="100"
 		android:title="@string/action_play"
-		android:icon="@drawable/ic_play_arrow_white"
+		android:icon="@drawable/ic_play_white"
 		MEGA:showAsAction="ifRoom"
 		android:visible="false"/>
 
