@@ -2145,15 +2145,17 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
     public void onChatInitStateUpdate(MegaChatApiJava api, int newState) {
         log("onChatInitStateUpdate: "+newState);
 
-        if (newState == MegaChatApi.INIT_ERROR)
-        {
-            initizalizingChatText.setText(getString(R.string.chat_not_correctly_initialized));
-        }
-        else if (newState == MegaChatApi.INIT_WAITING_NEW_SESSION || newState == MegaChatApi.INIT_NO_CACHE){
-            initizalizingChatText.setText(getString(R.string.chat_initializacion));
-        }
-        else{
-            initizalizingChatText.setText(getString(R.string.chat_correctly_initialized));
+        if(isAdded()){
+            if (newState == MegaChatApi.INIT_ERROR)
+            {
+                initizalizingChatText.setText(getString(R.string.chat_not_correctly_initialized));
+            }
+            else if (newState == MegaChatApi.INIT_WAITING_NEW_SESSION || newState == MegaChatApi.INIT_NO_CACHE){
+                initizalizingChatText.setText(getString(R.string.chat_initializacion));
+            }
+            else{
+                initizalizingChatText.setText(getString(R.string.chat_correctly_initialized));
+            }
         }
     }
 
