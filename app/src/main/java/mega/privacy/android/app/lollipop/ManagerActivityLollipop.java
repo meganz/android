@@ -13568,33 +13568,36 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		if(inProgress){
 			status = -1;
 		}
-		if(userHandle == megaChatApi.getMyUserHandle()){
-			log("My own status update");
-			if(rChatFL!=null){
-				if(rChatFL.isAdded()){
-					rChatFL.onlineStatusUpdate(status);
-				}
-			}
 
-			if(sttFLol!=null){
-				if(sttFLol.isAdded()){
-					sttFLol.verifyStatusChat(status);
+		if(megaChatApi!=null){
+			if(userHandle == megaChatApi.getMyUserHandle()){
+				log("My own status update");
+				if(rChatFL!=null){
+					if(rChatFL.isAdded()){
+						rChatFL.onlineStatusUpdate(status);
+					}
 				}
-			}
-		}
-		else{
-			log("Status update for the user: "+userHandle);
-			if(rChatFL!=null){
-				if(rChatFL.isAdded()){
-					rChatFL.contactStatusUpdate(userHandle, status);
-				}
-			}
 
-			String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);
-			cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
-			if(cFLol!=null){
-				if(cFLol.isAdded()){
-					cFLol.contactStatusUpdate(userHandle, status);
+				if(sttFLol!=null){
+					if(sttFLol.isAdded()){
+						sttFLol.verifyStatusChat(status);
+					}
+				}
+			}
+			else{
+				log("Status update for the user: "+userHandle);
+				if(rChatFL!=null){
+					if(rChatFL.isAdded()){
+						rChatFL.contactStatusUpdate(userHandle, status);
+					}
+				}
+
+				String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);
+				cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
+				if(cFLol!=null){
+					if(cFLol.isAdded()){
+						cFLol.contactStatusUpdate(userHandle, status);
+					}
 				}
 			}
 		}
