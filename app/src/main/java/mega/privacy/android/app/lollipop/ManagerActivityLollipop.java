@@ -11450,6 +11450,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 //            initizalizingChatText.setVisibility(View.GONE);
 //            serversBusyText.setVisibility(View.GONE);
 
+			if(sttFLol!=null){
+				if(sttFLol.isAdded()){
+					sttFLol.hidePreferencesChat();
+				}
+			}
+
 			megaChatApi = null;
 			if (app != null){
 				app.disableMegaChatApi();
@@ -13570,33 +13576,35 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		}
 
 		if(megaChatApi!=null){
-			if(userHandle == megaChatApi.getMyUserHandle()){
-				log("My own status update");
-				if(rChatFL!=null){
-					if(rChatFL.isAdded()){
-						rChatFL.onlineStatusUpdate(status);
+			if(Util.isChatEnabled()){
+				if(userHandle == megaChatApi.getMyUserHandle()){
+					log("My own status update");
+					if(rChatFL!=null){
+						if(rChatFL.isAdded()){
+							rChatFL.onlineStatusUpdate(status);
+						}
 					}
-				}
 
-				if(sttFLol!=null){
-					if(sttFLol.isAdded()){
-						sttFLol.verifyStatusChat(status);
+					if(sttFLol!=null){
+						if(sttFLol.isAdded()){
+							sttFLol.verifyStatusChat(status);
+						}
 					}
 				}
-			}
-			else{
-				log("Status update for the user: "+userHandle);
-				if(rChatFL!=null){
-					if(rChatFL.isAdded()){
-						rChatFL.contactStatusUpdate(userHandle, status);
+				else{
+					log("Status update for the user: "+userHandle);
+					if(rChatFL!=null){
+						if(rChatFL.isAdded()){
+							rChatFL.contactStatusUpdate(userHandle, status);
+						}
 					}
-				}
 
-				String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);
-				cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
-				if(cFLol!=null){
-					if(cFLol.isAdded()){
-						cFLol.contactStatusUpdate(userHandle, status);
+					String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);
+					cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
+					if(cFLol!=null){
+						if(cFLol.isAdded()){
+							cFLol.contactStatusUpdate(userHandle, status);
+						}
 					}
 				}
 			}

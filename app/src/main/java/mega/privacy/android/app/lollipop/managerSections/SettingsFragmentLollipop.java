@@ -1503,37 +1503,37 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			}
 
 			chatEnabled = !chatEnabled;
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-				if (chatEnabled){
-					log("CONNECT CHAT!!!");
-					dbH.setEnabledChat(true+"");
-					preferenceScreen.addPreference(chatNotificationsCategory);
-					preferenceScreen.addPreference(chatStatusCategory);
-					preferenceScreen.addPreference(chatAutoAwayPreference);
-					((ManagerActivityLollipop)context).enableChat();
-				}
-				else{
-					log("DISCONNECT CHAT!!!");
-					dbH.setEnabledChat(false+"");
-					preferenceScreen.removePreference(chatNotificationsCategory);
-					preferenceScreen.removePreference(chatStatusCategory);
-					preferenceScreen.removePreference(chatAutoAwayPreference);
-					((ManagerActivityLollipop)context).disableChat();
-				}
+			if (chatEnabled){
+				log("CONNECT CHAT!!!");
+				dbH.setEnabledChat(true+"");
+				((ManagerActivityLollipop)context).enableChat();
+				preferenceScreen.addPreference(chatNotificationsCategory);
+				preferenceScreen.addPreference(chatStatusCategory);
+				preferenceScreen.addPreference(chatAutoAwayPreference);
 			}
 			else{
-				if (chatEnabled){
-					log("CONNECT CHAT!!!");
-					dbH.setEnabledChat(true+"");
-					preferenceScreen.addPreference(chatNotificationsCategory);
-					preferenceScreen.addPreference(chatStatusCategory);
-				}
-				else{
-					dbH.setEnabledChat(false+"");
-					preferenceScreen.removePreference(chatNotificationsCategory);
-					preferenceScreen.removePreference(chatStatusCategory);
-				}
+				log("DISCONNECT CHAT!!!");
+				dbH.setEnabledChat(false+"");
+				((ManagerActivityLollipop)context).disableChat();
+				hidePreferencesChat();
 			}
+
+//			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+//
+//			}
+//			else{
+//				if (chatEnabled){
+//					log("CONNECT CHAT!!!");
+//					dbH.setEnabledChat(true+"");
+//					preferenceScreen.addPreference(chatNotificationsCategory);
+//					preferenceScreen.addPreference(chatStatusCategory);
+//				}
+//				else{
+//					dbH.setEnabledChat(false+"");
+//					preferenceScreen.removePreference(chatNotificationsCategory);
+//					preferenceScreen.removePreference(chatStatusCategory);
+//				}
+//			}
 		}
 		else if (preference.getKey().compareTo(KEY_AUTOAWAY_ENABLE) == 0){
 			log("KEY_AUTOAWAY_ENABLE");
@@ -2014,7 +2014,9 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			log("updatePresenceConfigChat status: "+chatStatus);
 		}
 
-		showPresenceChatConfig();
+		if(Util.isChatEnabled()){
+			showPresenceChatConfig();
+		}
 	}
 
 	public void waitPresenceConfig(){
@@ -2044,7 +2046,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 				}
 			}
 		}
-		else{
+		else if(chatStatus== MegaChatApi.STATUS_ONLINE){
 			//I'm online
 			preferenceScreen.addPreference(persistenceChatCategory);
 			if(statusConfig.isPersist()){
@@ -2058,6 +2060,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 				preferenceScreen.removePreference(autoawayChatCategory);
 			}
 			else{
+				log("addAutoaway 3");
 				preferenceScreen.addPreference(autoawayChatCategory);
 				if(statusConfig.isAutoawayEnabled()){
 					int timeout = (int)statusConfig.getAutoawayTimeout()/60;
@@ -2081,6 +2084,9 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 				}
 			}
 		}
+		else{
+			hidePreferencesChat();
+		}
 	}
 
 	public void verifyStatusChat(int status){
@@ -2100,15 +2106,18 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 				preferenceScreen.addPreference(persistenceChatCategory);
 			}
 		}
-		else{
+		else if(chatStatus == MegaChatApi.STATUS_ONLINE){
 			//I'm online
-			preferenceScreen.addPreference(autoawayChatCategory);
 			if(statusConfig.isPersist()){
 				preferenceScreen.removePreference(autoawayChatCategory);
 			}
 			else{
+				log("addAutoaway 6");
 				preferenceScreen.addPreference(autoawayChatCategory);
 			}
+		}
+		else{
+			hidePreferencesChat();
 		}
 	}
 
@@ -2124,6 +2133,15 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 
 		dbH.setPinLockEnabled(false);
 		dbH.setPinLockCode("");
+	}
+
+	public void hidePreferencesChat(){
+		log("hidePreferencesChat");
+
+		getPreferenceScreen().removePreference(chatNotificationsCategory);
+		getPreferenceScreen().removePreference(chatStatusCategory);
+		getPreferenceScreen().removePreference(autoawayChatCategory);
+		getPreferenceScreen().removePreference(persistenceChatCategory);
 	}
 
 
