@@ -944,12 +944,13 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
     }
 
     private void submitForm(boolean fromConfirmAccount) {
+        log("submitForm - " + fromConfirmAccount);
 
         lastEmail = this.emailTemp;
         lastPassword = this.passwdTemp;
 
-        this.emailTemp = null;
-        this.passwdTemp = null;
+//        this.emailTemp = null;
+//        this.passwdTemp = null;
 
         InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(et_user.getWindowToken(), 0);

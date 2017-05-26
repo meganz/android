@@ -76,6 +76,7 @@ public class LoginActivityLollipop extends AppCompatActivity implements MegaGlob
 	boolean waitingForConfirmAccount = false;
 	String emailTemp = null;
 	String passwdTemp = null;
+	String nameTemp = null;
 
 	@Override
 	protected void onDestroy() {
@@ -129,6 +130,7 @@ public class LoginActivityLollipop extends AppCompatActivity implements MegaGlob
 		}
 
 //		visibleFragment = Constants.CHOOSE_ACCOUNT_FRAGMENT;
+//		visibleFragment = Constants.CONFIRM_EMAIL_FRAGMENT;
 		showFragment(visibleFragment);
 	}
 
@@ -150,16 +152,18 @@ public class LoginActivityLollipop extends AppCompatActivity implements MegaGlob
 					if ((passwdTemp != null) && (emailTemp != null)){
 						loginFragment.setEmailTemp(emailTemp);
 						loginFragment.setPasswdTemp(passwdTemp);
-						emailTemp = null;
-						passwdTemp = null;
+//						emailTemp = null;
+//						passwdTemp = null;
+//						nameTemp = null;
 					}
 				}
 				else{
 					if ((passwdTemp != null) && (emailTemp != null)){
 						loginFragment.setEmailTemp(emailTemp);
 						loginFragment.setPasswdTemp(passwdTemp);
-						emailTemp = null;
-						passwdTemp = null;
+//						emailTemp = null;
+//						passwdTemp = null;
+//						nameTemp = null;
 					}
 				}
 
@@ -213,6 +217,24 @@ public class LoginActivityLollipop extends AppCompatActivity implements MegaGlob
 
 				if(confirmEmailFragment==null){
 					confirmEmailFragment = new ConfirmEmailFragmentLollipop();
+					if ((passwdTemp != null) && (emailTemp != null)){
+						confirmEmailFragment.setEmailTemp(emailTemp);
+						confirmEmailFragment.setPasswdTemp(passwdTemp);
+						confirmEmailFragment.setNameTemp(nameTemp);
+//						emailTemp = null;
+//						passwdTemp = null;
+//						nameTemp = null;
+					}
+				}
+				else{
+					if ((passwdTemp != null) && (emailTemp != null)){
+						confirmEmailFragment.setEmailTemp(emailTemp);
+						confirmEmailFragment.setPasswdTemp(passwdTemp);
+						confirmEmailFragment.setNameTemp(nameTemp);
+//						emailTemp = null;
+//						passwdTemp = null;
+//						nameTemp = null;
+					}
 				}
 
 				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
@@ -502,6 +524,14 @@ public class LoginActivityLollipop extends AppCompatActivity implements MegaGlob
 
 	public boolean getWaitingForConfirmAccount(){
 		return this.waitingForConfirmAccount;
+	}
+
+	public void setNameTemp(String nameTemp){
+		this.nameTemp = nameTemp;
+	}
+
+	public String getNameTemp(){
+		return this.nameTemp;
 	}
 
 	public void setPasswdTemp(String passwdTemp){

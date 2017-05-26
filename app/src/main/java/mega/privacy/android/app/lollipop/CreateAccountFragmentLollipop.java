@@ -206,7 +206,21 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
         creatingAccountTextView.setVisibility(View.GONE);
         createAccountProgressBar.setVisibility(View.VISIBLE);
 
-        new HashTask().execute(userEmail.getText().toString().toLowerCase(Locale.ENGLISH).trim(), userPassword.getText().toString());
+        if(!Util.isOnline(context)){
+            ((LoginActivityLollipop)context).showSnackbar(getString(R.string.error_server_connection_problem));
+            return;
+        }
+
+        createAccountLayout.setVisibility(View.GONE);
+        createAccountLoginLayout.setVisibility(View.GONE);
+        creatingAccountLayout.setVisibility(View.VISIBLE);
+        creatingAccountTextView.setVisibility(View.VISIBLE);
+        createAccountProgressBar.setVisibility(View.VISIBLE);
+        log("[CREDENTIALS]userEmail: _" + userEmail.getText().toString().trim().toLowerCase(Locale.ENGLISH) + "_");
+        log("[CREDENTIALS]userPassword: _" + userPassword.getText().toString() +"_");
+        megaApi.createAccount(userEmail.getText().toString().trim().toLowerCase(Locale.ENGLISH), userPassword.getText().toString(), userName.getText().toString(), userLastName.getText().toString(),this);
+
+//        new HashTask().execute(userEmail.getText().toString().toLowerCase(Locale.ENGLISH).trim(), userPassword.getText().toString());
     }
 
     private boolean validateForm() {
@@ -290,6 +304,8 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
         creatingAccountLayout.setVisibility(View.VISIBLE);
         creatingAccountTextView.setVisibility(View.VISIBLE);
         createAccountProgressBar.setVisibility(View.VISIBLE);
+        log("[CREDENTIALS]userEmail: _" + userEmail.getText().toString().trim().toLowerCase(Locale.ENGLISH) + "_");
+        log("[CREDENTIALS]userPassword: _" + userPassword.getText().toString() +"_");
         megaApi.createAccount(userEmail.getText().toString().trim().toLowerCase(Locale.ENGLISH), userPassword.getText().toString(), userName.getText().toString(), userLastName.getText().toString(),this);
 //		megaApi.fastCreateAccount(userEmail.getText().toString().trim().toLowerCase(Locale.ENGLISH), privateKey, userName.getText().toString().trim(), this);
     }
@@ -325,6 +341,7 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
         }
         else{
             ((LoginActivityLollipop)context).setEmailTemp(userEmail.getText().toString().toLowerCase(Locale.ENGLISH).trim());
+            ((LoginActivityLollipop)context).setNameTemp(userName.getText().toString());
             ((LoginActivityLollipop)context).setPasswdTemp(userPassword.getText().toString());
             ((LoginActivityLollipop)context).setWaitingForConfirmAccount(true);
             ((LoginActivityLollipop)context).showFragment(Constants.CONFIRM_EMAIL_FRAGMENT);
