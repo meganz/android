@@ -2031,6 +2031,10 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 
 	public void showPresenceChatConfig(){
 		log("showPresenceChatConfig: "+chatStatus);
+
+		statusChatListPreference.setValue(chatStatus+"");
+		statusChatListPreference.setSummary(statusChatListPreference.getEntry());
+
 		if(chatStatus!= MegaChatApi.STATUS_ONLINE){
 			preferenceScreen.removePreference(autoawayChatCategory);
 			if(chatStatus== MegaChatApi.STATUS_OFFLINE){
@@ -2082,38 +2086,6 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 					}
 					autoawayChatCategory.removePreference(chatAutoAwayPreference);
 				}
-			}
-		}
-		else{
-			hidePreferencesChat();
-		}
-	}
-
-	public void verifyStatusChat(int status){
-		log("verifyStatusChat: "+status);
-
-		statusChatListPreference.setValue(status+"");
-		statusChatListPreference.setSummary(statusChatListPreference.getEntry());
-
-		chatStatus = status;
-
-		if(chatStatus!= MegaChatApi.STATUS_ONLINE){
-			preferenceScreen.removePreference(autoawayChatCategory);
-			if(chatStatus== MegaChatApi.STATUS_OFFLINE){
-				preferenceScreen.removePreference(persistenceChatCategory);
-			}
-			else{
-				preferenceScreen.addPreference(persistenceChatCategory);
-			}
-		}
-		else if(chatStatus == MegaChatApi.STATUS_ONLINE){
-			//I'm online
-			if(statusConfig.isPersist()){
-				preferenceScreen.removePreference(autoawayChatCategory);
-			}
-			else{
-				log("addAutoaway 6");
-				preferenceScreen.addPreference(autoawayChatCategory);
 			}
 		}
 		else{

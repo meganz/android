@@ -11465,35 +11465,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		else if(request.getType() == MegaChatRequest.TYPE_SET_ONLINE_STATUS){
 			if(e.getErrorCode()==MegaChatError.ERROR_OK){
 				log("Status changed to: "+request.getNumber());
-				int status = (int) request.getNumber();
-				switch(status){
-					case MegaChatApi.STATUS_ONLINE:{
-						showSnackbar(getString(R.string.changing_status_to_online_success));
-						break;
-					}
-					case MegaChatApi.STATUS_AWAY:{
-						showSnackbar(getString(R.string.changing_status_to_invisible_success));
-						break;
-					}
-					case MegaChatApi.STATUS_OFFLINE:{
-						showSnackbar(getString(R.string.changing_status_to_offline_success));
-						break;
-					}
-					case MegaChatApi.STATUS_BUSY:{
-						showSnackbar(getString(R.string.changing_status_to_busy_success));
-						break;
-					}
-				}
-				if(rChatFL!=null){
-					if(rChatFL.isAdded()){
-						rChatFL.onlineStatusUpdate(status);
-					}
-				}
-				if(sttFLol!=null){
-					if(sttFLol.isAdded()){
-						sttFLol.verifyStatusChat(status);
-					}
-				}
 			}
 			else{
 				log("EEEERRRRROR WHEN TYPE_SET_ONLINE_STATUS " + e.getErrorString());
@@ -13582,12 +13553,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					if(rChatFL!=null){
 						if(rChatFL.isAdded()){
 							rChatFL.onlineStatusUpdate(status);
-						}
-					}
-
-					if(sttFLol!=null){
-						if(sttFLol.isAdded()){
-							sttFLol.verifyStatusChat(status);
 						}
 					}
 				}
