@@ -157,17 +157,17 @@
 
                 <ImageView
                     android:id="@+id/content_own_message_thumb_portrait"
-                    android:layout_width="wrap_content"
-                    android:layout_height="212dp"
-                    android:layout_alignParentRight="true"
-                    android:scaleType="fitCenter"/>
+                    android:layout_width="160dp"
+                    android:layout_height="220dp"
+                      android:layout_alignParentRight="true"
+                    android:scaleType="centerCrop"/>
 
                 <ImageView
                     android:id="@+id/content_own_message_thumb_landscape"
-                    android:layout_width="wrap_content"
-                    android:layout_height="212dp"
+                    android:layout_width="220dp"
+                    android:layout_height="160dp"
                     android:layout_alignParentRight="true"
-                    android:scaleType="fitCenter"/>
+                    android:scaleType="centerCrop"/>
 
                 <RelativeLayout
                     android:id="@+id/content_own_message_file_layout"
@@ -425,20 +425,6 @@
                 android:padding="9dp"
                 android:gravity="left"/>
 
-            <ImageView
-                android:id="@+id/content_contact_message_thumb_portrait"
-                android:layout_width="wrap_content"
-                android:layout_height="212dp"
-                android:layout_alignParentLeft="true"
-                android:scaleType="fitCenter"/>
-
-            <ImageView
-                android:id="@+id/content_contact_message_thumb_landscape"
-                android:layout_width="wrap_content"
-                android:layout_height="212dp"
-                android:layout_alignParentLeft="true"
-                android:scaleType="fitCenter"/>
-
             <RelativeLayout
                 android:id="@+id/content_contact_message_file_layout"
                 android:layout_width="match_parent"
@@ -456,6 +442,22 @@
                     android:layout_marginTop="11dp"
                     android:layout_marginRight="8dp"
                     android:gravity="left"/>
+
+                <ImageView
+                    android:id="@+id/content_contact_message_thumb_portrait"
+                    android:layout_height="220dp"
+                    android:layout_width="160dp"
+                    android:layout_alignParentLeft="true"
+                    android:layout_below="@+id/content_contact_message_file_sender"
+                    android:scaleType="centerCrop"/>
+
+                <ImageView
+                    android:id="@+id/content_contact_message_thumb_landscape"
+                    android:layout_width="220dp"
+                    android:layout_height="160dp"
+                    android:layout_alignParentLeft="true"
+                    android:layout_below="@+id/content_contact_message_file_sender"
+                    android:scaleType="centerCrop"/>
 
                 <RelativeLayout
                     android:layout_width="wrap_content"

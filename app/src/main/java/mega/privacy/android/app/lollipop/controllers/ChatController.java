@@ -10,12 +10,15 @@ import android.content.pm.PackageManager;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Environment;
 import android.os.StatFs;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
 import android.widget.Toast;
+
+import org.w3c.dom.NodeList;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -39,12 +42,14 @@ import mega.privacy.android.app.lollipop.megachat.AndroidMegaChatMessage;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
+import mega.privacy.android.app.lollipop.megachat.NodeAttachmentActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.NonContactInfo;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatMessage;
@@ -221,6 +226,13 @@ public class ChatController {
         dbH.setEnabledChat(true+"");
     }
 
+    public String createSingleManagementString(AndroidMegaChatMessage androidMessage, MegaChatRoom chatRoom) {
+        log("createSingleManagementString");
+        String text = createManagementString(androidMessage, chatRoom);
+        text = text.substring(text.indexOf(":")+2);
+        return text;
+    }
+
     public String createManagementString(AndroidMegaChatMessage androidMessage, MegaChatRoom chatRoom) {
         log("createManagementString");
 
@@ -239,21 +251,24 @@ public class ChatController {
                 int privilege = message.getPrivilege();
                 log("Privilege of me: " + privilege);
                 String textToShow = "";
-                String fullNameAction = getParticipantFullName(message.getUserHandle(), chatRoom);
+                String fullNameAction = getFullName(message.getUserHandle(), chatRoom);
 
-                if (fullNameAction.trim().length() <= 0) {
-                    log("No name!");
-                    NonContactInfo nonContact = dbH.findNonContactByHandle(message.getUserHandle() + "");
-                    if (nonContact != null) {
-                        fullNameAction = nonContact.getFullName();
-                    } else {
-                        log("Ask for name non-contact");
-                        fullNameAction = "Participant left";
+                if(!fullNameAction.isEmpty()){
+                    if (fullNameAction.trim().length() <= 0) {
+                        log("No name!");
+                        NonContactInfo nonContact = dbH.findNonContactByHandle(message.getUserHandle() + "");
+                        if (nonContact != null) {
+                            fullNameAction = nonContact.getFullName();
+                        } else {
+                            log("Ask for name non-contact");
+                            fullNameAction = "Participant left";
 //                            log("1-Call for nonContactName: "+ message.getUserHandle());
 //                            ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, message.getUserHandle());
 //                            megaChatApi.getUserFirstname(message.getUserHandle(), listener);
 //                            megaChatApi.getUserLastname(message.getUserHandle(), listener);
+                        }
                     }
+
                 }
 
                 if (privilege != MegaChatRoom.PRIV_RM) {
@@ -279,18 +294,20 @@ public class ChatController {
                 int privilege = message.getPrivilege();
                 log("Privilege of the user: " + privilege);
 
-                String fullNameTitle = getParticipantFullName(message.getHandleOfAction(), chatRoom);
+                String fullNameTitle = getFullName(message.getHandleOfAction(), chatRoom);
 
-                if (fullNameTitle.trim().length() <= 0) {
-                    NonContactInfo nonContact = dbH.findNonContactByHandle(message.getHandleOfAction() + "");
-                    if (nonContact != null) {
-                        fullNameTitle = nonContact.getFullName();
-                    } else {
-                        fullNameTitle = "Unknown name";
+                if(!fullNameTitle.isEmpty()){
+                    if (fullNameTitle.trim().length() <= 0) {
+                        NonContactInfo nonContact = dbH.findNonContactByHandle(message.getHandleOfAction() + "");
+                        if (nonContact != null) {
+                            fullNameTitle = nonContact.getFullName();
+                        } else {
+                            fullNameTitle = "Unknown name";
 //                            log("3-Call for nonContactName: "+ message.getUserHandle());
 //                        ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, message.getHandleOfAction());
 //                        megaChatApi.getUserFirstname(message.getHandleOfAction(), listener);
 //                        megaChatApi.getUserLastname(message.getHandleOfAction(), listener);
+                        }
                     }
                 }
 
@@ -306,21 +323,24 @@ public class ChatController {
                     } else {
 //                        textToShow = String.format(context.getString(R.string.message_add_participant), message.getHandleOfAction()+"");
                         log("By other");
-                        String fullNameAction = getParticipantFullName(message.getUserHandle(), chatRoom);
+                        String fullNameAction = getFullName(message.getUserHandle(), chatRoom);
 
-                        if (fullNameAction.trim().length() <= 0) {
-                            NonContactInfo nonContact = dbH.findNonContactByHandle(message.getUserHandle() + "");
-                            if (nonContact != null) {
-                                fullNameAction = nonContact.getFullName();
-                            } else {
-                                fullNameAction = "Unknown name";
-                                log("2-Call for nonContactName: " + message.getUserHandle());
+                        if(!fullNameAction.isEmpty()){
+                            if (fullNameAction.trim().length() <= 0) {
+                                NonContactInfo nonContact = dbH.findNonContactByHandle(message.getUserHandle() + "");
+                                if (nonContact != null) {
+                                    fullNameAction = nonContact.getFullName();
+                                } else {
+                                    fullNameAction = "Unknown name";
+                                    log("2-Call for nonContactName: " + message.getUserHandle());
 //                                    ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, message.getUserHandle());
 //                                    megaChatApi.getUserFirstname(message.getUserHandle(), listener);
 //                                    megaChatApi.getUserLastname(message.getUserHandle(), listener);
-                            }
+                                }
 
+                            }
                         }
+
                         textToShow = String.format(context.getString(R.string.non_format_message_add_participant), fullNameTitle, fullNameAction);
 
                     }
@@ -338,20 +358,22 @@ public class ChatController {
 
                         } else {
                             log("The participant was removed");
-                            String fullNameAction = getParticipantFullName(message.getUserHandle(), chatRoom);
+                            String fullNameAction = getFullName(message.getUserHandle(), chatRoom);
 
-                            if (fullNameAction.trim().length() <= 0) {
-                                NonContactInfo nonContact = dbH.findNonContactByHandle(message.getUserHandle() + "");
-                                if (nonContact != null) {
-                                    fullNameAction = nonContact.getFullName();
-                                } else {
-                                    fullNameAction = "Unknown name";
-                                    log("4-Call for nonContactName: " + message.getUserHandle());
+                            if(!fullNameAction.isEmpty()){
+                                if (fullNameAction.trim().length() <= 0) {
+                                    NonContactInfo nonContact = dbH.findNonContactByHandle(message.getUserHandle() + "");
+                                    if (nonContact != null) {
+                                        fullNameAction = nonContact.getFullName();
+                                    } else {
+                                        fullNameAction = "Unknown name";
+                                        log("4-Call for nonContactName: " + message.getUserHandle());
 //                                        ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, message.getUserHandle());
 //                                        megaChatApi.getUserFirstname(message.getUserHandle(), listener);
 //                                        megaChatApi.getUserLastname(message.getUserHandle(), listener);
-                                }
+                                    }
 
+                                }
                             }
 
                             textToShow = String.format(context.getString(R.string.non_format_message_remove_participant), fullNameTitle, fullNameAction);
@@ -393,21 +415,24 @@ public class ChatController {
                     textToShow = String.format(context.getString(R.string.non_format_message_permissions_changed), context.getString(R.string.chat_I_text), privilegeString, context.getString(R.string.chat_me_text));
                 } else {
                     log("I was change by someone");
-                    String fullNameAction = getParticipantFullName(message.getUserHandle(), chatRoom);
+                    String fullNameAction = getFullName(message.getUserHandle(), chatRoom);
 
-                    if (fullNameAction.trim().length() <= 0) {
-                        NonContactInfo nonContact = dbH.findNonContactByHandle(message.getUserHandle() + "");
-                        if (nonContact != null) {
-                            fullNameAction = nonContact.getFullName();
-                        } else {
-                            fullNameAction = "Unknown name";
-                            log("5-Call for nonContactName: " + message.getUserHandle());
+                    if(!fullNameAction.isEmpty()){
+                        if (fullNameAction.trim().length() <= 0) {
+                            NonContactInfo nonContact = dbH.findNonContactByHandle(message.getUserHandle() + "");
+                            if (nonContact != null) {
+                                fullNameAction = nonContact.getFullName();
+                            } else {
+                                fullNameAction = "Unknown name";
+                                log("5-Call for nonContactName: " + message.getUserHandle());
 //                                ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, message.getUserHandle());
 //                                megaChatApi.getUserFirstname(message.getUserHandle(), listener);
 //                                megaChatApi.getUserLastname(message.getUserHandle(), listener);
-                        }
+                            }
 
+                        }
                     }
+
                     textToShow = String.format(context.getString(R.string.non_format_message_permissions_changed), context.getString(R.string.chat_I_text), privilegeString, fullNameAction);
                 }
 
@@ -417,18 +442,20 @@ public class ChatController {
                 log("Participant privilege change!");
                 log("Message type PRIVILEGE CHANGE: " + message.getContent());
 
-                String fullNameTitle = getParticipantFullName(message.getHandleOfAction(), chatRoom);
+                String fullNameTitle = getFullName(message.getHandleOfAction(), chatRoom);
 
-                if (fullNameTitle.trim().length() <= 0) {
-                    NonContactInfo nonContact = dbH.findNonContactByHandle(message.getHandleOfAction() + "");
-                    if (nonContact != null) {
-                        fullNameTitle = nonContact.getFullName();
-                    } else {
-                        fullNameTitle = "Unknown name";
-                        log("6-Call for nonContactName: " + message.getUserHandle());
+                if(!fullNameTitle.isEmpty()){
+                    if (fullNameTitle.trim().length() <= 0) {
+                        NonContactInfo nonContact = dbH.findNonContactByHandle(message.getHandleOfAction() + "");
+                        if (nonContact != null) {
+                            fullNameTitle = nonContact.getFullName();
+                        } else {
+                            fullNameTitle = "Unknown name";
+                            log("6-Call for nonContactName: " + message.getUserHandle());
 //                            ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, message.getHandleOfAction());
 //                            megaChatApi.getUserFirstname(message.getHandleOfAction(), listener);
 //                            megaChatApi.getUserLastname(message.getHandleOfAction(), listener);
+                        }
                     }
                 }
 
@@ -455,18 +482,20 @@ public class ChatController {
 
                 } else {
                     log("By other");
-                    String fullNameAction = getParticipantFullName(message.getUserHandle(), chatRoom);
+                    String fullNameAction = getFullName(message.getUserHandle(), chatRoom);
 
-                    if (fullNameAction.trim().length() <= 0) {
-                        NonContactInfo nonContact = dbH.findNonContactByHandle(message.getUserHandle() + "");
-                        if (nonContact != null) {
-                            fullNameAction = nonContact.getFullName();
-                        } else {
-                            fullNameAction = "Unknown name";
-                            log("8-Call for nonContactName: " + message.getUserHandle());
+                    if(!fullNameTitle.isEmpty()){
+                        if (fullNameAction.trim().length() <= 0) {
+                            NonContactInfo nonContact = dbH.findNonContactByHandle(message.getUserHandle() + "");
+                            if (nonContact != null) {
+                                fullNameAction = nonContact.getFullName();
+                            } else {
+                                fullNameAction = "Unknown name";
+                                log("8-Call for nonContactName: " + message.getUserHandle());
 //                                ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, message.getUserHandle());
 //                                megaChatApi.getUserFirstname(message.getUserHandle(), listener);
 //                                megaChatApi.getUserLastname(message.getUserHandle(), listener);
+                            }
                         }
                     }
 
@@ -530,19 +559,21 @@ public class ChatController {
             } else {
                 log("Contact message!!");
 
-                String fullNameTitle = getParticipantFullName(userHandle, chatRoom);
+                String fullNameTitle = getFullName(userHandle, chatRoom);
 
-                if (fullNameTitle.trim().length() <= 0) {
+                if(!fullNameTitle.isEmpty()){
+                    if (fullNameTitle.trim().length() <= 0) {
 //                        String userHandleString = megaApi.userHandleToBase64(message.getUserHandle());
-                    NonContactInfo nonContact = dbH.findNonContactByHandle(message.getUserHandle() + "");
-                    if (nonContact != null) {
-                        fullNameTitle = nonContact.getFullName();
-                    } else {
-                        fullNameTitle = "Unknown name";
+                        NonContactInfo nonContact = dbH.findNonContactByHandle(message.getUserHandle() + "");
+                        if (nonContact != null) {
+                            fullNameTitle = nonContact.getFullName();
+                        } else {
+                            fullNameTitle = "Unknown name";
 //
 //                                ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, message.getUserHandle());
 //                                megaChatApi.getUserFirstname(message.getUserHandle(), listener);
 //                                megaChatApi.getUserLastname(message.getUserHandle(), listener);
+                        }
                     }
                 }
 
@@ -637,6 +668,17 @@ public class ChatController {
             log("Is participant");
             return getParticipantFirstName(userHandle, chatRoom);
         }
+    }
+
+    public String getFullName(long userHandle, long chatId){
+        MegaChatRoom chat = megaChatApi.getChatRoom(chatId);
+        if(chat!=null){
+            return getFullName(userHandle, chat);
+        }
+        else{
+            log("Chat is NULL - error!");
+        }
+        return "";
     }
 
     public String getFullName(long userHandle, MegaChatRoom chatRoom){
@@ -980,7 +1022,149 @@ public class ChatController {
         ((ChatActivityLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_FILE);
     }
 
-    public void prepareForDownloadLollipop(MegaNodeList nodeList){
+    public void saveForOffline(MegaChatMessage message){
+        log("saveForOffline - message");
+
+        File destination = null;
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            boolean hasStoragePermission = (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
+            if (!hasStoragePermission) {
+                ActivityCompat.requestPermissions(((ChatActivityLollipop) context),
+                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                        Constants.REQUEST_WRITE_STORAGE);
+            }
+        }
+
+        MegaNodeList nodeList = message.getMegaNodeList();
+        Map<MegaNode, String> dlFiles = new HashMap<MegaNode, String>();
+        for (int i = 0; i < nodeList.size(); i++) {
+
+            MegaNode document = nodeList.get(i);
+            if (document != null) {
+
+                if (Environment.getExternalStorageDirectory() != null){
+                    destination = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/"+MegaApiUtils.createStringTree(document, context));
+                }
+                else{
+                    destination = ((ChatActivityLollipop) context).getFilesDir();
+                }
+
+                destination.mkdirs();
+
+                log ("DESTINATION!!!!!: " + destination.getAbsolutePath());
+                if (destination.exists() && destination.isDirectory()){
+
+                    File offlineFile = new File(destination, document.getName());
+                    if (offlineFile.exists() && document.getSize() == offlineFile.length() && offlineFile.getName().equals(document.getName())){ //This means that is already available offline
+                        log("File already exists!");
+                    }
+                    else{
+                        dlFiles.put(document, destination.getAbsolutePath());
+                    }
+                }
+                else{
+                    log("Destination ERROR");
+                }
+            }
+        }
+
+        double availableFreeSpace = Double.MAX_VALUE;
+        try{
+            StatFs stat = new StatFs(destination.getAbsolutePath());
+            availableFreeSpace = (double)stat.getAvailableBlocks() * (double)stat.getBlockSize();
+        }
+        catch(Exception ex){}
+
+        for (MegaNode document : dlFiles.keySet()) {
+
+            String path = dlFiles.get(document);
+
+            if(availableFreeSpace <document.getSize()){
+                Util.showErrorAlertDialog(context.getString(R.string.error_not_enough_free_space) + " (" + new String(document.getName()) + ")", false, ((ChatActivityLollipop) context));
+                continue;
+            }
+
+            Intent service = new Intent(context, DownloadService.class);
+            String serializeString = document.serialize();
+            log("serializeString: "+serializeString);
+            service.putExtra(DownloadService.EXTRA_SERIALIZE_STRING, serializeString);
+            service.putExtra(DownloadService.EXTRA_PATH, path);
+            context.startService(service);
+        }
+
+    }
+
+    public void saveForOffline(MegaNode node){
+        log("saveForOffline - node");
+
+        File destination = null;
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            boolean hasStoragePermission = (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
+            if (!hasStoragePermission) {
+                ActivityCompat.requestPermissions(((ChatActivityLollipop) context),
+                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                        Constants.REQUEST_WRITE_STORAGE);
+            }
+        }
+
+        Map<MegaNode, String> dlFiles = new HashMap<MegaNode, String>();
+        if (node != null) {
+
+            if (Environment.getExternalStorageDirectory() != null){
+                destination = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/"+MegaApiUtils.createStringTree(node, context));
+            }
+            else{
+                destination = context.getFilesDir();
+            }
+
+            destination.mkdirs();
+
+            log ("DESTINATION!!!!!: " + destination.getAbsolutePath());
+            if (destination.exists() && destination.isDirectory()){
+
+                File offlineFile = new File(destination, node.getName());
+                if (offlineFile.exists() && node.getSize() == offlineFile.length() && offlineFile.getName().equals(node.getName())){ //This means that is already available offline
+                    log("File already exists!");
+                }
+                else{
+                    dlFiles.put(node, destination.getAbsolutePath());
+                }
+            }
+            else{
+                log("Destination ERROR");
+            }
+        }
+
+
+        double availableFreeSpace = Double.MAX_VALUE;
+        try{
+            StatFs stat = new StatFs(destination.getAbsolutePath());
+            availableFreeSpace = (double)stat.getAvailableBlocks() * (double)stat.getBlockSize();
+        }
+        catch(Exception ex){}
+
+        for (MegaNode document : dlFiles.keySet()) {
+
+            String path = dlFiles.get(document);
+
+            if(availableFreeSpace <document.getSize()){
+                Util.showErrorAlertDialog(context.getString(R.string.error_not_enough_free_space) + " (" + new String(document.getName()) + ")", false, ((NodeAttachmentActivityLollipop) context));
+                continue;
+            }
+
+            Intent service = new Intent(context, DownloadService.class);
+            String serializeString = document.serialize();
+            log("serializeString: "+serializeString);
+            service.putExtra(DownloadService.EXTRA_SERIALIZE_STRING, serializeString);
+            service.putExtra(DownloadService.EXTRA_PATH, path);
+            context.startService(service);
+        }
+
+    }
+
+    public void prepareForDownloadLollipop(ArrayList<MegaNode> nodeList){
         log("prepareForDownload: "+nodeList.size()+" files to download");
 
         if (dbH == null){
@@ -1009,7 +1193,8 @@ public class ChatController {
 
     }
 
-    public void prepareForChatDownload(MegaNodeList nodeList){
+    public void prepareForChatDownload(MegaNodeList list){
+        ArrayList<MegaNode> nodeList = MegaApiJava.nodeListToArray(list);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             prepareForDownloadLollipop(nodeList);
         }
@@ -1018,7 +1203,19 @@ public class ChatController {
         }
     }
 
-    public void prepareForDownloadPreLollipop(MegaNodeList nodeList){
+    public void prepareForChatDownload(MegaNode node){
+        ArrayList<MegaNode> nodeList = new ArrayList<>();
+        nodeList.add(node);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            prepareForDownloadLollipop(nodeList);
+        }
+        else{
+            prepareForDownloadPreLollipop(nodeList);
+        }
+    }
+
+    public void prepareForDownloadPreLollipop(ArrayList<MegaNode> nodeList){
         log("prepareForDownloadPreLollipop: "+nodeList.size()+" files to download");
 
         if (dbH == null){
@@ -1041,10 +1238,9 @@ public class ChatController {
         File defaultPathF = new File(downloadLocationDefaultPath);
         defaultPathF.mkdirs();
         checkSizeBeforeDownload(downloadLocationDefaultPath, nodeList);
-
     }
 
-    public void checkSizeBeforeDownload(String parentPath, MegaNodeList nodeList){
+    public void checkSizeBeforeDownload(String parentPath, ArrayList<MegaNode> nodeList){
         //Variable size is incorrect for folders, it is always -1 -> sizeTemp calculates the correct size
         log("checkSizeBeforeDownload - parentPath: "+parentPath+ " size: "+nodeList.size());
 
@@ -1095,7 +1291,13 @@ public class ChatController {
             if(sizeC>104857600){
                 log("Show size confirmacion: "+sizeC);
                 //Show alert
-                ((ManagerActivityLollipop) context).askSizeConfirmationBeforeChatDownload(parentPathC, nodeList, sizeC);
+                if(context instanceof  ManagerActivityLollipop){
+                    ((ManagerActivityLollipop) context).askSizeConfirmationBeforeChatDownload(parentPathC, nodeList, sizeC);
+                }
+                else if(context instanceof  NodeAttachmentActivityLollipop){
+                    ((NodeAttachmentActivityLollipop) context).askSizeConfirmationBeforeChatDownload(parentPathC, nodeList, sizeC);
+                }
+
             }
             else{
                 download(parentPathC, nodeList);
@@ -1103,8 +1305,7 @@ public class ChatController {
         }
     }
 
-
-    public void download(String parentPath, MegaNodeList nodeList){
+    public void download(String parentPath, ArrayList<MegaNode> nodeList){
         log("download-----------");
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -1188,11 +1389,21 @@ public class ChatController {
                                         log("call to startActivity(intentShare)");
                                         context.startActivity(intentShare);
                                     }
-                                    ((ManagerActivityLollipop) context).showSnackbar(context.getString(R.string.general_already_downloaded));
+                                    if(context instanceof  ManagerActivityLollipop){
+                                        ((ManagerActivityLollipop) context).showSnackbar(context.getString(R.string.general_already_downloaded));
+                                    }
+                                    else if(context instanceof  NodeAttachmentActivityLollipop){
+                                        ((NodeAttachmentActivityLollipop) context).showSnackbar(context.getString(R.string.general_already_downloaded));
+                                    }
                                 }
                             }
                             catch (Exception e){
-                                ((ManagerActivityLollipop) context).showSnackbar(context.getString(R.string.general_already_downloaded));
+                                if(context instanceof  ManagerActivityLollipop){
+                                    ((ManagerActivityLollipop) context).showSnackbar(context.getString(R.string.general_already_downloaded));
+                                }
+                                else if(context instanceof  NodeAttachmentActivityLollipop){
+                                    ((NodeAttachmentActivityLollipop) context).showSnackbar(context.getString(R.string.general_already_downloaded));
+                                }
                             }
                         }
                         return;

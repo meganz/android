@@ -197,7 +197,7 @@ import nz.mega.sdk.MegaTransferListenerInterface;
 import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUtilsAndroid;
 
-public class ManagerActivityLollipop extends PinActivityLollipop implements NetworkStateReceiver.NetworkStateReceiverListener, MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatRequestListenerInterface, OnNavigationItemSelectedListener, MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener, DatePickerDialog.OnDateSetListener {
+public class ManagerActivityLollipop extends PinActivityLollipop implements NetworkStateReceiver.NetworkStateReceiverListener, MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatRequestListenerInterface, OnNavigationItemSelectedListener, MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener  {
 
 	public int accountFragment;
 
@@ -366,7 +366,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 	boolean firstTimeCam = false;
 	private boolean isGetLink = false;
-	private boolean isExpiredDateLink = false;
 	private boolean isClearRubbishBin = false;
 	private boolean moveToRubbish = false;
 
@@ -7976,11 +7975,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		downloadConfirmationDialog.show();
 	}
 
-	public void askSizeConfirmationBeforeChatDownload(String parentPath, MegaNodeList nodeList, long size){
+	public void askSizeConfirmationBeforeChatDownload(String parentPath, ArrayList<MegaNode> nodeList, long size){
 		log("askSizeConfirmationBeforeChatDownload");
 
 		final String parentPathC = parentPath;
-		final MegaNodeList nodeListC = nodeList;
+		final ArrayList<MegaNode> nodeListC = nodeList;
 		final long sizeC = size;
 		final ChatController chatC = new ChatController(this);
 
@@ -8108,224 +8107,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 	}
 
-	public void showGetLinkPanel(final String link, long expirationTimestamp){
-		log("showGetLinkPanel: "+link);
-
-		final Calendar c = Calendar.getInstance();
-		int year = c.get(Calendar.YEAR);
-		int month = c.get(Calendar.MONTH);
-		int day = c.get(Calendar.DAY_OF_MONTH);
-
-		final DatePickerDialog datePickerDialog = new DatePickerDialog(managerActivity, this, year, month, day);
-		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-
-		builder.setTitle(getString(R.string.context_get_link_menu));
-
-		LayoutInflater inflater = getLayoutInflater();
-		View dialoglayout = inflater.inflate(R.layout.panel_get_link, null);
-
-		final CheckedTextView linkWithoutKeyCheck = (CheckedTextView) dialoglayout.findViewById(R.id.link_without_key);
-		linkWithoutKeyCheck.setChecked(true);
-		linkWithoutKeyCheck.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16*scaleText));
-		linkWithoutKeyCheck.setCompoundDrawablePadding(Util.scaleWidthPx(10, outMetrics));
-		ViewGroup.MarginLayoutParams linkWOK = (ViewGroup.MarginLayoutParams) linkWithoutKeyCheck.getLayoutParams();
-		linkWOK.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleHeightPx(14, outMetrics), 0, Util.scaleHeightPx(10, outMetrics));
-
-		final CheckedTextView linkDecryptionKeyCheck = (CheckedTextView) dialoglayout.findViewById(R.id.link_decryption_key);
-		linkDecryptionKeyCheck.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16*scaleText));
-		linkDecryptionKeyCheck.setCompoundDrawablePadding(Util.scaleWidthPx(10, outMetrics));
-		ViewGroup.MarginLayoutParams linkDecry = (ViewGroup.MarginLayoutParams) linkDecryptionKeyCheck.getLayoutParams();
-		linkDecry.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleHeightPx(10, outMetrics), 0, Util.scaleHeightPx(10, outMetrics));
-
-		final CheckedTextView linkWithKeyCheck = (CheckedTextView) dialoglayout.findViewById(R.id.link_with_key);
-		linkWithKeyCheck.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16*scaleText));
-		linkWithKeyCheck.setCompoundDrawablePadding(Util.scaleWidthPx(10, outMetrics));
-		ViewGroup.MarginLayoutParams linkWK = (ViewGroup.MarginLayoutParams) linkWithKeyCheck.getLayoutParams();
-		linkWK.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleHeightPx(10, outMetrics), 0, Util.scaleHeightPx(10, outMetrics));
-
-		RelativeLayout expiryDateLayout = (RelativeLayout) dialoglayout.findViewById(R.id.expiry_date_layout);
-		LinearLayout.LayoutParams paramsDateLayout = (LinearLayout.LayoutParams)expiryDateLayout.getLayoutParams();
-		paramsDateLayout.setMargins(Util.scaleWidthPx(26, outMetrics), Util.scaleHeightPx(10, outMetrics), 0, 0);
-		expiryDateLayout.setLayoutParams(paramsDateLayout);
-
-		TextView expiryDateTitle = (TextView) dialoglayout.findViewById(R.id.title_set_expiry_date);
-		expiryDateTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16*scaleText));
-
-		TextView expiryDateSubtitle = (TextView) dialoglayout.findViewById(R.id.subtitle_set_expiry_date);
-		expiryDateSubtitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, (14*scaleText));
-
-		expiryDateButton = (Button) dialoglayout.findViewById(R.id.expiry_date);
-		LinearLayout.LayoutParams paramsExpiryDate = (LinearLayout.LayoutParams)expiryDateButton.getLayoutParams();
-		paramsExpiryDate.setMargins(Util.scaleWidthPx(20, outMetrics), 0, 0, 0);
-		expiryDateButton.setLayoutParams(paramsExpiryDate);
-
-		final TextView linkText = (TextView) dialoglayout.findViewById(R.id.link);
-		linkText.setTextSize(TypedValue.COMPLEX_UNIT_SP, (14*scaleText));
-		LinearLayout.LayoutParams paramsLink = (LinearLayout.LayoutParams)linkText.getLayoutParams();
-		paramsLink.setMargins(Util.scaleWidthPx(26, outMetrics), Util.scaleHeightPx(3, outMetrics), Util.scaleWidthPx(16, outMetrics), Util.scaleHeightPx(6, outMetrics));
-		linkText.setLayoutParams(paramsLink);
-
-		switchGetLink = (SwitchCompat) dialoglayout.findViewById(R.id.switch_set_expiry_date);
-		RelativeLayout.LayoutParams paramsSwitch = (RelativeLayout.LayoutParams)switchGetLink.getLayoutParams();
-		paramsSwitch.setMargins(0, 0, Util.scaleWidthPx(16, outMetrics), 0);
-		switchGetLink.setLayoutParams(paramsSwitch);
-
-		linkWithoutKeyCheck.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				linkWithoutKeyCheck.setChecked(true);
-				linkDecryptionKeyCheck.setChecked(false);
-				linkWithKeyCheck.setChecked(false);
-				String urlString="";
-				String [] s = link.split("!");
-				if (s.length == 3){
-					urlString = s[0] + "!" + s[1];
-				}
-				linkText.setText(urlString);
-			}
-		});
-
-		linkDecryptionKeyCheck.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				linkWithoutKeyCheck.setChecked(false);
-				linkDecryptionKeyCheck.setChecked(true);
-				linkWithKeyCheck.setChecked(false);
-				String keyString="!";
-				String [] s = link.split("!");
-				if (s.length == 3){
-					keyString = keyString+s[2];
-				}
-				linkText.setText(keyString);
-			}
-		});
-
-		linkWithKeyCheck.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				linkWithoutKeyCheck.setChecked(false);
-				linkDecryptionKeyCheck.setChecked(false);
-				linkWithKeyCheck.setChecked(true);
-				linkText.setText(link);
-			}
-		});
-
-		datePickerDialog.setButton(DialogInterface.BUTTON_NEGATIVE, getString(R.string.general_cancel), new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int which) {
-				if (which == DialogInterface.BUTTON_NEGATIVE) {
-					log("Negative button of DatePicker clicked");
-					switchGetLink.setChecked(false);
-					expiryDateButton.setVisibility(View.INVISIBLE);
-				}
-			}
-		});
-		//Set by default, link without key
-		String urlString="";
-		String [] s = link.split("!");
-		if (s.length == 3){
-			urlString = s[0] + "!" + s[1];
-		}
-		linkText.setText(urlString);
-		linkWithoutKeyCheck.setChecked(true);
-
-		builder.setView(dialoglayout);
-//
-		builder.setPositiveButton(getString(R.string.context_send), new android.content.DialogInterface.OnClickListener() {
-
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				Intent intent = new Intent(Intent.ACTION_SEND);
-				intent.setType("text/plain");
-				intent.putExtra(Intent.EXTRA_TEXT, linkText.getText());
-				startActivity(Intent.createChooser(intent, getString(R.string.context_get_link)));
-			}
-		});
-
-		builder.setNegativeButton(getString(R.string.context_copy), new android.content.DialogInterface.OnClickListener() {
-
-			@SuppressLint("NewApi")
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.HONEYCOMB) {
-					android.text.ClipboardManager clipboard = (android.text.ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-					clipboard.setText(link);
-				} else {
-					android.content.ClipboardManager clipboard = (android.content.ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-					android.content.ClipData clip = android.content.ClipData.newPlainText("Copied Text", linkText.getText());
-					clipboard.setPrimaryClip(clip);
-				}
-				Snackbar.make(fragmentContainer, getString(R.string.file_properties_get_link), Snackbar.LENGTH_LONG).show();
-			}
-		});
-
-		getLinkDialog = builder.create();
-
-		expiryDateButton.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				datePickerDialog.show();
-			}
-		});
-
-		if(myAccountInfo.getAccountType()>MegaAccountDetails.ACCOUNT_TYPE_FREE){
-			log("The user is PRO - enable expiration date");
-
-			if(expirationTimestamp<=0){
-				switchGetLink.setChecked(false);
-				expiryDateButton.setVisibility(View.INVISIBLE);
-			}
-			else{
-				switchGetLink.setChecked(true);
-				java.text.DateFormat df = SimpleDateFormat.getDateInstance(SimpleDateFormat.MEDIUM, Locale.getDefault());
-				Calendar cal = Util.calculateDateFromTimestamp(expirationTimestamp);
-				TimeZone tz = cal.getTimeZone();
-				df.setTimeZone(tz);
-				Date date = cal.getTime();
-				String formattedDate = df.format(date);
-				expiryDateButton.setText(formattedDate);
-				expiryDateButton.setVisibility(View.VISIBLE);
-			}
-
-			switchGetLink.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-				public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-					if(switchGetLink.isChecked()){
-						datePickerDialog.show();
-					}
-					else{
-						isExpiredDateLink=true;
-						nC.exportLink(selectedNode);
-					}
-				}
-			});
-		}
-		else{
-			log("The is user is not PRO");
-			switchGetLink.setEnabled(false);
-			expiryDateButton.setVisibility(View.INVISIBLE);
-		}
-
-		log("show getLinkDialog");
-		getLinkDialog.show();
-	}
-
-	@Override
-	public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-		log("onDateSet: "+year+monthOfYear+dayOfMonth);
-
-		Calendar cal = Calendar.getInstance();
-		cal.set(year, monthOfYear, dayOfMonth);
-		Date date = cal.getTime();
-		SimpleDateFormat dfTimestamp = new SimpleDateFormat("yyyyMMdd", Locale.getDefault());
-		String dateString = dfTimestamp.format(date);
-		dateString = dateString + "2359";
-		log("the date string is: "+dateString);
-		int timestamp = (int) Util.calculateTimestamp(dateString);
-		log("the TIMESTAMP is: "+timestamp);
-		isExpiredDateLink=true;
-		nC.exportLinkTimestamp(selectedNode, timestamp);
+	public void showGetLinkActivity(long handle){
+		log("showGetLinkActivity");
+		Intent linkIntent = new Intent(this, GetLinkActivityLollipop.class);
+		linkIntent.putExtra("handle", handle);
+		linkIntent.putExtra("account", myAccountInfo.getAccountType());
+		startActivity(linkIntent);
 	}
 
 	/*
@@ -11672,6 +11459,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 //            initizalizingChatText.setVisibility(View.GONE);
 //            serversBusyText.setVisibility(View.GONE);
 
+			if(sttFLol!=null){
+				if(sttFLol.isAdded()){
+					sttFLol.hidePreferencesChat();
+				}
+			}
+
 			megaChatApi = null;
 			if (app != null){
 				app.disableMegaChatApi();
@@ -11681,35 +11474,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		else if(request.getType() == MegaChatRequest.TYPE_SET_ONLINE_STATUS){
 			if(e.getErrorCode()==MegaChatError.ERROR_OK){
 				log("Status changed to: "+request.getNumber());
-				int status = (int) request.getNumber();
-				switch(status){
-					case MegaChatApi.STATUS_ONLINE:{
-						showSnackbar(getString(R.string.changing_status_to_online_success));
-						break;
-					}
-					case MegaChatApi.STATUS_AWAY:{
-						showSnackbar(getString(R.string.changing_status_to_invisible_success));
-						break;
-					}
-					case MegaChatApi.STATUS_OFFLINE:{
-						showSnackbar(getString(R.string.changing_status_to_offline_success));
-						break;
-					}
-					case MegaChatApi.STATUS_BUSY:{
-						showSnackbar(getString(R.string.changing_status_to_busy_success));
-						break;
-					}
-				}
-				if(rChatFL!=null){
-					if(rChatFL.isAdded()){
-						rChatFL.onlineStatusUpdate(status);
-					}
-				}
-				if(sttFLol!=null){
-					if(sttFLol.isAdded()){
-						sttFLol.verifyStatusChat(status);
-					}
-				}
 			}
 			else{
 				log("EEEERRRRROR WHEN TYPE_SET_ONLINE_STATUS " + e.getErrorString());
@@ -12198,52 +11962,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				showSnackbar(getString(R.string.context_no_removed));
 			}
 			log("remove request finished");
-		}
-		else if (request.getType() == MegaRequest.TYPE_EXPORT){
-			log("export request finished");
-
-			try {
-				statusDialog.dismiss();
-			}
-			catch (Exception ex) {}
-
-			if (e.getErrorCode() == MegaError.API_OK){
-
-				if (isGetLink){
-					final String link = request.getLink();
-					MegaNode node = megaApi.getNodeByHandle(request.getNodeHandle());
-					log("EXPIRATION DATE: "+node.getExpirationTime());
-					if(isExpiredDateLink){
-						log("change the expiration date");
-
-						if(node.getExpirationTime()<=0){
-							switchGetLink.setChecked(false);
-							expiryDateButton.setVisibility(View.INVISIBLE);
-						}
-						else{
-							switchGetLink.setChecked(true);
-							java.text.DateFormat df = SimpleDateFormat.getDateInstance(SimpleDateFormat.MEDIUM, Locale.getDefault());
-							Calendar cal = Util.calculateDateFromTimestamp(node.getExpirationTime());
-							TimeZone tz = cal.getTimeZone();
-							df.setTimeZone(tz);
-							Date date = cal.getTime();
-							String formattedDate = df.format(date);
-							expiryDateButton.setText(formattedDate);
-							expiryDateButton.setVisibility(View.VISIBLE);
-						}
-					}
-					else{
-						showGetLinkPanel(link, node.getExpirationTime());
-					}
-				}
-				log("link: "+request.getLink());
-			}
-			else{
-				log("Error: "+e.getErrorString());
-				showSnackbar(getString(R.string.context_no_link));
-			}
-			isGetLink=false;
-			isExpiredDateLink=false;
 		}
 		else if (request.getType() == MegaRequest.TYPE_RENAME){
 
@@ -12897,6 +12615,16 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		}
 	}
 
+	public void pauseIndividualTransfer(MegaTransfer mT){
+		log("pauseIndividualTransfer");
+		if(mT.getState()==MegaTransfer.STATE_PAUSED){
+			megaApi.pauseTransfer(mT, false, managerActivity);
+		}
+		else{
+			megaApi.pauseTransfer(mT, true, managerActivity);
+		}
+	}
+
 	public void showConfirmationClearCompletedTransfers (){
 		log("showConfirmationClearCompletedTransfers");
 
@@ -12951,12 +12679,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 							megaApi.cancelTransfer(mT, managerActivity);
 						}
 						else{
-							if(mT.getState()==MegaTransfer.STATE_PAUSED){
-								megaApi.pauseTransfer(mT, false, managerActivity);
-							}
-							else{
-								megaApi.pauseTransfer(mT, true, managerActivity);
-							}
+							pauseIndividualTransfer(mT);
 						}
 
 						break;
@@ -13696,16 +13419,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		this.myAccountInfo = myAccountInfo;
 	}
 
-
-	public boolean isExpiredDateLink() {
-		return isExpiredDateLink;
-	}
-
-	public void setExpiredDateLink(boolean expiredDateLink) {
-		isExpiredDateLink = expiredDateLink;
-	}
-
-
 	public MegaOffline getSelectedOfflineNode() {
 		return selectedOfflineNode;
 	}
@@ -13841,33 +13554,32 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		if(inProgress){
 			status = -1;
 		}
-		if(userHandle == megaChatApi.getMyUserHandle()){
-			log("My own status update");
-			if(rChatFL!=null){
-				if(rChatFL.isAdded()){
-					rChatFL.onlineStatusUpdate(status);
-				}
-			}
 
-			if(sttFLol!=null){
-				if(sttFLol.isAdded()){
-					sttFLol.verifyStatusChat(status);
+		if(megaChatApi!=null){
+			if(Util.isChatEnabled()){
+				if(userHandle == megaChatApi.getMyUserHandle()){
+					log("My own status update");
+					if(rChatFL!=null){
+						if(rChatFL.isAdded()){
+							rChatFL.onlineStatusUpdate(status);
+						}
+					}
 				}
-			}
-		}
-		else{
-			log("Status update for the user: "+userHandle);
-			if(rChatFL!=null){
-				if(rChatFL.isAdded()){
-					rChatFL.contactStatusUpdate(userHandle, status);
-				}
-			}
+				else{
+					log("Status update for the user: "+userHandle);
+					if(rChatFL!=null){
+						if(rChatFL.isAdded()){
+							rChatFL.contactStatusUpdate(userHandle, status);
+						}
+					}
 
-			String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);
-			cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
-			if(cFLol!=null){
-				if(cFLol.isAdded()){
-					cFLol.contactStatusUpdate(userHandle, status);
+					String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);
+					cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
+					if(cFLol!=null){
+						if(cFLol.isAdded()){
+							cFLol.contactStatusUpdate(userHandle, status);
+						}
+					}
 				}
 			}
 		}

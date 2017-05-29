@@ -31,6 +31,9 @@ public class Constants {
 	public static int ENABLE_CHAT = 1020;
 	public static int REQUEST_SEND_CONTACTS = 1021;
 
+	public static int REQUEST_CODE_IMPORT_CHAT_NODE = 1022;
+	public static int REQUEST_CODE_IMPORT_CHAT_NODE_LIST = 1023;
+
 	public static String ACTION_REFRESH = "ACTION_REFRESH";
 	public static String ACTION_ENABLE_CHAT = "ACTION_ENABLE_CHAT";
 	public static String ACTION_CREATE_ACCOUNT_EXISTS = "ACTION_CREATE_ACCOUNT_EXISTS";
@@ -72,6 +75,9 @@ public class Constants {
 	final public static int CONFIRM_EMAIL_FRAGMENT = 6002;
 	final public static int CHOOSE_ACCOUNT_FRAGMENT = 6003;
 	final public static int CREATE_ACCOUNT_FRAGMENT = 604;
+
+	final public static int GET_LINK_FRAGMENT = 7000;
+	final public static int COPYRIGHT_FRAGMENT = 7001;
 
 	public static final int REQUEST_WRITE_STORAGE = 1;
 	public static final int REQUEST_CAMERA = 2;
@@ -137,6 +143,7 @@ public class Constants {
 	final public static int INCOMING_REQUEST_ADAPTER = 2012;
 	final public static int OUTGOING_REQUEST_ADAPTER = 2013;
 	final public static int CAMERA_UPLOAD_ADAPTER = 2014;
+	final public static int NODE_ATTACHMENT_ADAPTER = 2015;
 
 	final public static int ACCOUNT_DETAILS_MIN_DIFFERENCE = 5;
 	final public static int PAYMENT_METHODS_MIN_DIFFERENCE = 720;

@@ -119,6 +119,7 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 								avatarExists = true;
 //								holder.imageView.setImageBitmap(bitmap);
 								if (holder instanceof ViewHolderContactsGrid){
+									bitmap = ThumbnailUtilsLollipop.getRoundedRectBitmap(context, bitmap, 3);
 									((ViewHolderContactsGrid)holder).imageView.setImageBitmap(bitmap);
 								}
 								else if (holder instanceof ViewHolderContactsList){

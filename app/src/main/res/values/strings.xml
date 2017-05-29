@@ -1197,4 +1197,11 @@
     <string name="confirm_email_misspelled" context="Hint text explaining that you can change the email and resend the create account link to the new email address">If you have misspelled your email address, correct it and click \'Resend\'</string>
     <string name="confirm_email_misspelled_resend" context="Button to resend the create account email to a new email address in case the previous email address was misspelled">Resend</string>
     <string name="confirm_email_misspelled_email_sent" context="Text shown after the confirmation email has been sent to the new email address">Email sent</string>
+
+    <string name="copyright_alert_title" context="text_copyright_alert_title">Copyright warning to all users</string>
+    <string name="copyright_alert_first_paragraph" context="text_copyright_alert_first_paragraph">MEGA respects the copyrights of others and requires that users of the MEGA cloud service comply with the laws of copyright.</string>
+    <string name="copyright_alert_second_paragraph" context="text_copyright_alert_second_paragraph">You are strictly prohibited from using the MEGA cloud service to infringe copyrights. You may not upload, download, store, share, diplay, stream, distribute, email, link to, transmit or otherwise make available any files, data or content that infringes any copyright or other propriety rights of any person or entity.</string>
+    <string name="copyright_alert_agree_button" context="text of the Agree button">Agree</string>
+    <string name="copyright_alert_disagree_button" context="text of the Disagree button">Disagree</string>
+
 </resources>

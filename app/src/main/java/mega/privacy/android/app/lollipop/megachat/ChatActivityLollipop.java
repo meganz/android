@@ -1703,7 +1703,16 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     clearSelections();
                     hideMultipleSelect();
 
-                    String text = copyMessages(messagesSelected);
+                    String text = "";
+
+                    if(messagesSelected.size()==1){
+                        AndroidMegaChatMessage message = messagesSelected.get(0);
+                        text = chatC.createSingleManagementString(message, chatRoom);
+                    }
+                    else{
+                        text = copyMessages(messagesSelected);
+                    }
+
                     log("Copy: "+text);
                     if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.HONEYCOMB) {
                         android.text.ClipboardManager clipboard = (android.text.ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
@@ -1713,6 +1722,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         android.content.ClipData clip = android.content.ClipData.newPlainText("Copied Text", text);
                         clipboard.setPrimaryClip(clip);
                     }
+
                     Snackbar.make(fragmentContainer, getString(R.string.messages_copied_clipboard), Snackbar.LENGTH_LONG).show();
 
                     break;
@@ -1776,11 +1786,17 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         if(messageSelected.isEditable()){
                             log("Message EDITABLE");
                             menu.findItem(R.id.chat_cab_menu_edit).setVisible(true);
-                            menu.findItem(R.id.chat_cab_menu_delete).setVisible(true);
                         }
                         else{
                             log("Message NOT EDITABLE");
                             menu.findItem(R.id.chat_cab_menu_edit).setVisible(false);
+                        }
+                        if(messageSelected.isDeletable()){
+                            log("Message DELETABLE");
+                            menu.findItem(R.id.chat_cab_menu_delete).setVisible(true);
+                        }
+                        else{
+                            log("Message NOT DELETABLE");
                             menu.findItem(R.id.chat_cab_menu_delete).setVisible(false);
                         }
                     }
@@ -1789,12 +1805,12 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         menu.findItem(R.id.chat_cab_menu_delete).setVisible(false);
                     }
 
-                    menu.findItem(R.id.chat_cab_menu_copy).setVisible(true);
-
-//                    menu.findItem(R.id.cab_menu_select_all).setVisible(true);
-//                    menu.findItem(R.id.cab_menu_select_all).setVisible(true);
-//                    unselect.setTitle(getString(R.string.action_unselect_one));
-//                    unselect.setVisible(true);
+                    if(messageSelected.getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT||messageSelected.getType()==MegaChatMessage.TYPE_CONTACT_ATTACHMENT){
+                        menu.findItem(R.id.chat_cab_menu_copy).setVisible(false);
+                    }
+                    else{
+                        menu.findItem(R.id.chat_cab_menu_copy).setVisible(true);
+                    }
                 }
                 else if (selected.size()==adapter.getItemCount()){
                     menu.findItem(R.id.chat_cab_menu_edit).setVisible(false);
@@ -1802,7 +1818,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     menu.findItem(R.id.chat_cab_menu_delete).setVisible(true);
                     for(int i=0; i<selected.size();i++){
                         if(selected.get(i).getMessage().getUserHandle()==myUserHandle){
-                            if(!(selected.get(i).getMessage().isEditable())){
+                            if(!(selected.get(i).getMessage().isDeletable())){
                                 menu.findItem(R.id.chat_cab_menu_delete).setVisible(false);
                                 break;
                             }
@@ -1811,9 +1827,16 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                             menu.findItem(R.id.chat_cab_menu_delete).setVisible(false);
                         }
                     }
-//                    menu.findItem(R.id.cab_menu_select_all).setVisible(false);
-//                    unselect.setTitle(getString(R.string.action_unselect_all));
-//                    unselect.setVisible(true);
+
+                    for(int i=0; i<selected.size();i++){
+                        if(selected.get(i).getMessage().getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT||selected.get(i).getMessage().getType()==MegaChatMessage.TYPE_CONTACT_ATTACHMENT){
+                            menu.findItem(R.id.chat_cab_menu_copy).setVisible(false);
+                        }
+                        else{
+                            menu.findItem(R.id.chat_cab_menu_copy).setVisible(true);
+                        }
+                    }
+
                 }
                 else{
                     menu.findItem(R.id.chat_cab_menu_edit).setVisible(false);
@@ -1822,8 +1845,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     menu.findItem(R.id.chat_cab_menu_delete).setVisible(true);
                     for(int i=0; i<selected.size();i++){
                         if(selected.get(i).getMessage().getUserHandle()==myUserHandle){
-                            if(!(selected.get(i).getMessage().isEditable())){
-                                log("onPrepareActionMode: not editable");
+                            if(!(selected.get(i).getMessage().isDeletable())){
+                                log("onPrepareActionMode: not deletable");
                                 menu.findItem(R.id.chat_cab_menu_delete).setVisible(false);
                                 break;
                             }
@@ -1833,15 +1856,17 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                             menu.findItem(R.id.chat_cab_menu_delete).setVisible(false);
                         }
                     }
-//                    menu.findItem(R.id.cab_menu_select_all).setVisible(true);
-//                    unselect.setTitle(getString(R.string.action_unselect_all));
-//                    unselect.setVisible(true);
+
+                    for(int i=0; i<selected.size();i++){
+                        if(selected.get(i).getMessage().getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT||selected.get(i).getMessage().getType()==MegaChatMessage.TYPE_CONTACT_ATTACHMENT){
+                            menu.findItem(R.id.chat_cab_menu_copy).setVisible(false);
+                        }
+                        else{
+                            menu.findItem(R.id.chat_cab_menu_copy).setVisible(true);
+                        }
+                    }
                 }
             }
-//            else{
-//                menu.findItem(R.id.cab_menu_select_all).setVisible(true);
-//                menu.findItem(R.id.cab_menu_unselect_all).setVisible(false);
-//            }
 
             return false;
         }
@@ -1969,8 +1994,23 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 //            showMsgNotSentPanel(m);
             if(m!=null){
                 if(m.getMessage().getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT){
-                    log("show node attachment panel");
-                    showNodeAttachmentBottomSheet(m, position);
+
+
+                    MegaNodeList nodeList = m.getMessage().getMegaNodeList();
+                    if(nodeList.size()==1){
+                        MegaNode node = nodeList.get(0);
+                        if(node.hasPreview()){
+                            log("Show full screen viewer");
+                        }
+                        else{
+                            log("show node attachment panel for one node");
+                            showNodeAttachmentBottomSheet(m, position);
+                        }
+                    }
+                    else{
+                        log("show node attachment panel");
+                        showNodeAttachmentBottomSheet(m, position);
+                    }
                 }
                 if(m.getMessage().getType()==MegaChatMessage.TYPE_CONTACT_ATTACHMENT){
                     log("show contact attachment panel");
@@ -3349,80 +3389,14 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     public void saveOffline(){
         log("saveOffline");
 
-        File destination = null;
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
-            if (!hasStoragePermission) {
-                ActivityCompat.requestPermissions(this,
-                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                        Constants.REQUEST_WRITE_STORAGE);
-            }
-        }
-
         MegaChatMessage message = megaChatApi.getMessage(idChat, selectedMessageId);
-        if(message!=null) {
-
-            MegaNodeList nodeList = message.getMegaNodeList();
-            Map<MegaNode, String> dlFiles = new HashMap<MegaNode, String>();
-            for (int i = 0; i < nodeList.size(); i++) {
-
-                MegaNode document = nodeList.get(i);
-                if (document != null) {
-
-                    if (Environment.getExternalStorageDirectory() != null){
-                        destination = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/"+MegaApiUtils.createStringTree(document, this));
-                    }
-                    else{
-                        destination = getFilesDir();
-                    }
-
-                    destination.mkdirs();
-
-                    log ("DESTINATION!!!!!: " + destination.getAbsolutePath());
-                    if (destination.exists() && destination.isDirectory()){
-
-                        File offlineFile = new File(destination, document.getName());
-                        if (offlineFile.exists() && document.getSize() == offlineFile.length() && offlineFile.getName().equals(document.getName())){ //This means that is already available offline
-                            log("File already exists!");
-                        }
-                        else{
-                            dlFiles.put(document, destination.getAbsolutePath());
-                        }
-                    }
-                    else{
-                        log("Destination ERROR");
-                    }
-                }
-            }
-
-            double availableFreeSpace = Double.MAX_VALUE;
-            try{
-                StatFs stat = new StatFs(destination.getAbsolutePath());
-                availableFreeSpace = (double)stat.getAvailableBlocks() * (double)stat.getBlockSize();
-            }
-            catch(Exception ex){}
-
-            for (MegaNode document : dlFiles.keySet()) {
-
-                String path = dlFiles.get(document);
-
-                if(availableFreeSpace <document.getSize()){
-                    Util.showErrorAlertDialog(getString(R.string.error_not_enough_free_space) + " (" + new String(document.getName()) + ")", false, this);
-                    continue;
-                }
-
-                Intent service = new Intent(this, DownloadService.class);
-                String serializeString = document.serialize();
-                log("serializeString: "+serializeString);
-                service.putExtra(DownloadService.EXTRA_SERIALIZE_STRING, serializeString);
-                service.putExtra(DownloadService.EXTRA_PATH, path);
-                startService(service);
-            }
+        if(message!=null){
+            chatC.saveForOffline(message);
         }
         else{
             log("Message is NULL");
         }
+
     }
 
     @Override
