@@ -1635,6 +1635,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 //				DatabaseHandler dbH = new DatabaseHandler(this);
                 DatabaseHandler dbH = DatabaseHandler.getDbHandler(context.getApplicationContext());
                 dbH.clearCredentials();
+                dbH.clearEphemeral();
                 if (dbH.getPreferences() != null){
                     ((LoginActivityLollipop)context).stopCameraSyncService();
                 }
@@ -1669,6 +1670,9 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 //					log("AUTTHO: _" + authTokenType + "_");
 //					accountManager.setAuthToken(account, authTokenType, gSession);
 //				}
+
+                DatabaseHandler dbH = DatabaseHandler.getDbHandler(context.getApplicationContext());
+                dbH.clearEphemeral();
 
                 megaApi.fetchNodes(this);
             }

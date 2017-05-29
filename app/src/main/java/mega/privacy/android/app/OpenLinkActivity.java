@@ -85,6 +85,14 @@ public class OpenLinkActivity extends PinActivity implements MegaRequestListener
 			AccountController aC = new AccountController(this);
 			aC.logout(this, megaApi, megaChatApi, true);
 
+
+			if (dbH == null){
+				dbH = DatabaseHandler.getDbHandler(getApplicationContext());
+			}
+			if (dbH != null){
+				dbH.clearEphemeral();
+			}
+
 			Intent confirmIntent = new Intent(this, LoginActivityLollipop.class);
 			confirmIntent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
 			confirmIntent.putExtra(Constants.EXTRA_CONFIRMATION, url);

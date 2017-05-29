@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import mega.privacy.android.app.CameraSyncService;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.DownloadService;
+import mega.privacy.android.app.EphemeralCredentials;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.UploadService;
@@ -36,519 +37,529 @@ import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaContactRequest;
+import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaGlobalListenerInterface;
 import nz.mega.sdk.MegaNode;
+import nz.mega.sdk.MegaRequest;
+import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaUser;
 
 
-public class LoginActivityLollipop extends AppCompatActivity implements MegaGlobalListenerInterface {
+public class LoginActivityLollipop extends AppCompatActivity implements MegaGlobalListenerInterface, MegaRequestListenerInterface {
 
-	float scaleH, scaleW;
-	float density;
-	DisplayMetrics outMetrics;
-	Display display;
+    float scaleH, scaleW;
+    float density;
+    DisplayMetrics outMetrics;
+    Display display;
 
-	RelativeLayout relativeContainer;
+    RelativeLayout relativeContainer;
 
-	//Fragments
-	TourFragmentLollipop tourFragment;
-	LoginFragmentLollipop loginFragment;
-	ChooseAccountFragmentLollipop chooseAccountFragment;
-	CreateAccountFragmentLollipop createAccountFragment;
-	ConfirmEmailFragmentLollipop confirmEmailFragment;
+    //Fragments
+    TourFragmentLollipop tourFragment;
+    LoginFragmentLollipop loginFragment;
+    ChooseAccountFragmentLollipop chooseAccountFragment;
+    CreateAccountFragmentLollipop createAccountFragment;
+    ConfirmEmailFragmentLollipop confirmEmailFragment;
 
-	ActionBar aB;
-	int visibleFragment;
+    ActionBar aB;
+    int visibleFragment;
 
-	static LoginActivityLollipop loginActivity;
+    static LoginActivityLollipop loginActivity;
 
-	Intent intentReceived = null;
+    Intent intentReceived = null;
 
-	DatabaseHandler dbH;
+    DatabaseHandler dbH;
 
     Handler handler = new Handler();
-	private MegaApiAndroid megaApi;
-	private MegaApiAndroid megaApiFolder;
+    private MegaApiAndroid megaApi;
+    private MegaApiAndroid megaApiFolder;
 
-	private android.support.v7.app.AlertDialog alertDialogTransferOverquota;
+    private android.support.v7.app.AlertDialog alertDialogTransferOverquota;
 
-	boolean waitingForConfirmAccount = false;
-	String emailTemp = null;
-	String passwdTemp = null;
-	String nameTemp = null;
+    boolean waitingForConfirmAccount = false;
+    String emailTemp = null;
+    String passwdTemp = null;
+    String sessionTemp = null;
+    String firstNameTemp = null;
+    String lastNameTemp = null;
 
-	@Override
-	protected void onDestroy() {
-		log("onDestroy");
-		megaApi.removeGlobalListener(this);
-		super.onDestroy();
-	}
+    @Override
+    protected void onDestroy() {
+        log("onDestroy");
+        megaApi.removeGlobalListener(this);
+        super.onDestroy();
+    }
 
-	@SuppressLint("NewApi")
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		log("onCreate");
-		super.onCreate(savedInstanceState);
+    @SuppressLint("NewApi")
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        log("onCreate");
+        super.onCreate(savedInstanceState);
 
-		loginActivity = this;
+        loginActivity = this;
 
-		display = getWindowManager().getDefaultDisplay();
-		outMetrics = new DisplayMetrics ();
-		display.getMetrics(outMetrics);
-		density  = getResources().getDisplayMetrics().density;
+        display = getWindowManager().getDefaultDisplay();
+        outMetrics = new DisplayMetrics();
+        display.getMetrics(outMetrics);
+        density = getResources().getDisplayMetrics().density;
 
-		aB = getSupportActionBar();
-		if(aB!=null){
-			aB.hide();
-		}
+        aB = getSupportActionBar();
+        if (aB != null) {
+            aB.hide();
+        }
 
-		scaleW = Util.getScaleW(outMetrics, density);
-		scaleH = Util.getScaleH(outMetrics, density);
+        scaleW = Util.getScaleW(outMetrics, density);
+        scaleH = Util.getScaleH(outMetrics, density);
 
-	    dbH = DatabaseHandler.getDbHandler(getApplicationContext());
-		if (megaApi == null){
-			megaApi = ((MegaApplication) getApplication()).getMegaApi();
-		}
+        dbH = DatabaseHandler.getDbHandler(getApplicationContext());
+        if (megaApi == null) {
+            megaApi = ((MegaApplication) getApplication()).getMegaApi();
+        }
 
-		if (megaApiFolder == null){
-			megaApiFolder = ((MegaApplication) getApplication()).getMegaApiFolder();
-		}
+        if (megaApiFolder == null) {
+            megaApiFolder = ((MegaApplication) getApplication()).getMegaApiFolder();
+        }
 
-		megaApi.addGlobalListener(this);
+        megaApi.addGlobalListener(this);
 
-		setContentView(R.layout.activity_login);
-		relativeContainer = (RelativeLayout) findViewById(R.id.relative_container_login);
+        setContentView(R.layout.activity_login);
+        relativeContainer = (RelativeLayout) findViewById(R.id.relative_container_login);
 
-		intentReceived = getIntent();
-		if (intentReceived != null){
-			visibleFragment = intentReceived.getIntExtra("visibleFragment", Constants.LOGIN_FRAGMENT);
-			log("There is an intent! VisibleFragment: "+visibleFragment);
-		}
-		else{
-			visibleFragment = Constants.LOGIN_FRAGMENT;
-		}
+        intentReceived = getIntent();
+        if (intentReceived != null) {
+            visibleFragment = intentReceived.getIntExtra("visibleFragment", Constants.LOGIN_FRAGMENT);
+            log("There is an intent! VisibleFragment: " + visibleFragment);
+        } else {
+            visibleFragment = Constants.LOGIN_FRAGMENT;
+        }
+
+        if (dbH.getEphemeral() != null) {
+            EphemeralCredentials ephemeralCredentials = dbH.getEphemeral();
+
+            emailTemp = ephemeralCredentials.getEmail();
+            passwdTemp = ephemeralCredentials.getPassword();
+            sessionTemp = ephemeralCredentials.getSession();
+            firstNameTemp = ephemeralCredentials.getFirstName();
+            lastNameTemp = ephemeralCredentials.getLastName();
+
+            megaApi.resumeCreateAccount(sessionTemp, this);
+            return;
+        }
 
 //		visibleFragment = Constants.CHOOSE_ACCOUNT_FRAGMENT;
 //		visibleFragment = Constants.CONFIRM_EMAIL_FRAGMENT;
-		showFragment(visibleFragment);
-	}
+        showFragment(visibleFragment);
+    }
 
-	public void showSnackbar(String message){
-		Snackbar snackbar = Snackbar.make(relativeContainer,message,Snackbar.LENGTH_LONG);
-		TextView snackbarTextView = (TextView)snackbar.getView().findViewById(android.support.design.R.id.snackbar_text);
-		snackbarTextView.setMaxLines(5);
-		snackbar.show();
-	}
+    public void showSnackbar(String message) {
+        Snackbar snackbar = Snackbar.make(relativeContainer, message, Snackbar.LENGTH_LONG);
+        TextView snackbarTextView = (TextView) snackbar.getView().findViewById(android.support.design.R.id.snackbar_text);
+        snackbarTextView.setMaxLines(5);
+        snackbar.show();
+    }
 
-	public void showFragment(int visibleFragment){
-		log("showFragment: "+visibleFragment);
-		this.visibleFragment = visibleFragment;
-		switch (visibleFragment){
-			case Constants.LOGIN_FRAGMENT:{
-				log("showLoginFragment");
-				if(loginFragment==null){
-					loginFragment = new LoginFragmentLollipop();
-					if ((passwdTemp != null) && (emailTemp != null)){
-						loginFragment.setEmailTemp(emailTemp);
-						loginFragment.setPasswdTemp(passwdTemp);
+    public void showFragment(int visibleFragment) {
+        log("showFragment: " + visibleFragment);
+        this.visibleFragment = visibleFragment;
+        switch (visibleFragment) {
+            case Constants.LOGIN_FRAGMENT: {
+                log("showLoginFragment");
+                if (loginFragment == null) {
+                    loginFragment = new LoginFragmentLollipop();
+                    if ((passwdTemp != null) && (emailTemp != null)) {
+                        loginFragment.setEmailTemp(emailTemp);
+                        loginFragment.setPasswdTemp(passwdTemp);
 //						emailTemp = null;
 //						passwdTemp = null;
 //						nameTemp = null;
-					}
-				}
-				else{
-					if ((passwdTemp != null) && (emailTemp != null)){
-						loginFragment.setEmailTemp(emailTemp);
-						loginFragment.setPasswdTemp(passwdTemp);
+                    }
+                } else {
+                    if ((passwdTemp != null) && (emailTemp != null)) {
+                        loginFragment.setEmailTemp(emailTemp);
+                        loginFragment.setPasswdTemp(passwdTemp);
 //						emailTemp = null;
 //						passwdTemp = null;
 //						nameTemp = null;
-					}
-				}
+                    }
+                }
 
-				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-				ft.replace(R.id.fragment_container_login, loginFragment);
-				ft.commitNowAllowingStateLoss();
+                FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+                ft.replace(R.id.fragment_container_login, loginFragment);
+                ft.commitNowAllowingStateLoss();
 
 //
 //				getFragmentManager()
 //						.beginTransaction()
 //						.attach(loginFragment)
 //						.commit();
-				break;
-			}
-			case Constants.CHOOSE_ACCOUNT_FRAGMENT:{
-				log("Show CHOOSE_ACCOUNT_FRAGMENT");
+                break;
+            }
+            case Constants.CHOOSE_ACCOUNT_FRAGMENT: {
+                log("Show CHOOSE_ACCOUNT_FRAGMENT");
 
-				if(chooseAccountFragment==null){
-					chooseAccountFragment = new ChooseAccountFragmentLollipop();
-				}
+                if (chooseAccountFragment == null) {
+                    chooseAccountFragment = new ChooseAccountFragmentLollipop();
+                }
 
-				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-				ft.replace(R.id.fragment_container_login, chooseAccountFragment);
-				ft.commitNowAllowingStateLoss();
-				break;
-			}
-			case Constants.CREATE_ACCOUNT_FRAGMENT:{
+                FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+                ft.replace(R.id.fragment_container_login, chooseAccountFragment);
+                ft.commitNowAllowingStateLoss();
+                break;
+            }
+            case Constants.CREATE_ACCOUNT_FRAGMENT: {
 
-				if(createAccountFragment==null){
-					createAccountFragment = new CreateAccountFragmentLollipop();
-				}
+                if (createAccountFragment == null) {
+                    createAccountFragment = new CreateAccountFragmentLollipop();
+                }
 
-				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-				ft.replace(R.id.fragment_container_login, createAccountFragment);
-				ft.commitNowAllowingStateLoss();
-				break;
-			}
-			case Constants.TOUR_FRAGMENT:{
-				log("Show TOUR_FRAGMENT");
+                FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+                ft.replace(R.id.fragment_container_login, createAccountFragment);
+                ft.commitNowAllowingStateLoss();
+                break;
+            }
+            case Constants.TOUR_FRAGMENT: {
+                log("Show TOUR_FRAGMENT");
 
-				if(tourFragment==null){
-					tourFragment = new TourFragmentLollipop();
-				}
+                if (tourFragment == null) {
+                    tourFragment = new TourFragmentLollipop();
+                }
 
-				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-				ft.replace(R.id.fragment_container_login, tourFragment);
-				ft.commitNowAllowingStateLoss();
-				break;
-			}
-			case Constants.CONFIRM_EMAIL_FRAGMENT:{
+                FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+                ft.replace(R.id.fragment_container_login, tourFragment);
+                ft.commitNowAllowingStateLoss();
+                break;
+            }
+            case Constants.CONFIRM_EMAIL_FRAGMENT: {
 
-				if(confirmEmailFragment==null){
-					confirmEmailFragment = new ConfirmEmailFragmentLollipop();
-					if ((passwdTemp != null) && (emailTemp != null)){
-						confirmEmailFragment.setEmailTemp(emailTemp);
-						confirmEmailFragment.setPasswdTemp(passwdTemp);
-						confirmEmailFragment.setNameTemp(nameTemp);
+                if (confirmEmailFragment == null) {
+                    confirmEmailFragment = new ConfirmEmailFragmentLollipop();
+                    if ((passwdTemp != null) && (emailTemp != null)) {
+                        confirmEmailFragment.setEmailTemp(emailTemp);
+                        confirmEmailFragment.setPasswdTemp(passwdTemp);
+                        confirmEmailFragment.setFirstNameTemp(firstNameTemp);
 //						emailTemp = null;
 //						passwdTemp = null;
 //						nameTemp = null;
-					}
-				}
-				else{
-					if ((passwdTemp != null) && (emailTemp != null)){
-						confirmEmailFragment.setEmailTemp(emailTemp);
-						confirmEmailFragment.setPasswdTemp(passwdTemp);
-						confirmEmailFragment.setNameTemp(nameTemp);
+                    }
+                } else {
+                    if ((passwdTemp != null) && (emailTemp != null)) {
+                        confirmEmailFragment.setEmailTemp(emailTemp);
+                        confirmEmailFragment.setPasswdTemp(passwdTemp);
+                        confirmEmailFragment.setFirstNameTemp(firstNameTemp);
 //						emailTemp = null;
 //						passwdTemp = null;
 //						nameTemp = null;
-					}
-				}
+                    }
+                }
 
-				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-				ft.replace(R.id.fragment_container_login, confirmEmailFragment);
-				ft.commitNowAllowingStateLoss();
-				FragmentManager fragmentManager = getSupportFragmentManager();
-				fragmentManager.executePendingTransactions();
-				break;
-			}
-		}
-	}
+                FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+                ft.replace(R.id.fragment_container_login, confirmEmailFragment);
+                ft.commitNowAllowingStateLoss();
+                FragmentManager fragmentManager = getSupportFragmentManager();
+                fragmentManager.executePendingTransactions();
+                break;
+            }
+        }
+    }
 
-	public void showAlertIncorrectRK(){
+    public void showAlertIncorrectRK() {
         log("showAlertIncorrectRK");
-		final android.support.v7.app.AlertDialog.Builder dialogBuilder = new android.support.v7.app.AlertDialog.Builder(this);
+        final android.support.v7.app.AlertDialog.Builder dialogBuilder = new android.support.v7.app.AlertDialog.Builder(this);
 
-		dialogBuilder.setTitle(getString(R.string.incorrect_MK_title));
-		dialogBuilder.setMessage(getString(R.string.incorrect_MK));
-		dialogBuilder.setCancelable(false);
+        dialogBuilder.setTitle(getString(R.string.incorrect_MK_title));
+        dialogBuilder.setMessage(getString(R.string.incorrect_MK));
+        dialogBuilder.setCancelable(false);
 
-		dialogBuilder.setPositiveButton(getString(R.string.cam_sync_ok), new android.content.DialogInterface.OnClickListener() {
+        dialogBuilder.setPositiveButton(getString(R.string.cam_sync_ok), new android.content.DialogInterface.OnClickListener() {
 
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				dialog.dismiss();
-			}
-		});
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
 
-		android.support.v7.app.AlertDialog alert = dialogBuilder.create();
-		alert.show();
-	}
+        android.support.v7.app.AlertDialog alert = dialogBuilder.create();
+        alert.show();
+    }
 
-	public void showTransferOverquotaDialog(){
-		log("showTransferOverquotaDialog");
+    public void showTransferOverquotaDialog() {
+        log("showTransferOverquotaDialog");
 
-		android.support.v7.app.AlertDialog.Builder dialogBuilder = new android.support.v7.app.AlertDialog.Builder(this);
+        android.support.v7.app.AlertDialog.Builder dialogBuilder = new android.support.v7.app.AlertDialog.Builder(this);
 
-		LayoutInflater inflater = this.getLayoutInflater();
-		View dialogView = inflater.inflate(R.layout.transfer_overquota_layout, null);
-		dialogBuilder.setView(dialogView);
+        LayoutInflater inflater = this.getLayoutInflater();
+        View dialogView = inflater.inflate(R.layout.transfer_overquota_layout, null);
+        dialogBuilder.setView(dialogView);
 
-		TextView title = (TextView) dialogView.findViewById(R.id.transfer_overquota_title);
-		title.setText(getString(R.string.title_depleted_transfer_overquota));
+        TextView title = (TextView) dialogView.findViewById(R.id.transfer_overquota_title);
+        title.setText(getString(R.string.title_depleted_transfer_overquota));
 
-		ImageView icon = (ImageView) dialogView.findViewById(R.id.image_transfer_overquota);
-		icon.setImageDrawable(getDrawable(R.drawable.transfer_quota_empty));
+        ImageView icon = (ImageView) dialogView.findViewById(R.id.image_transfer_overquota);
+        icon.setImageDrawable(getDrawable(R.drawable.transfer_quota_empty));
 
-		TextView text = (TextView) dialogView.findViewById(R.id.text_transfer_overquota);
-		text.setText(getString(R.string.text_depleted_transfer_overquota));
+        TextView text = (TextView) dialogView.findViewById(R.id.text_transfer_overquota);
+        text.setText(getString(R.string.text_depleted_transfer_overquota));
 
-		Button continueButton = (Button) dialogView.findViewById(R.id.transfer_overquota_button_dissmiss);
-		continueButton.setText(getString(R.string.login_text));
+        Button continueButton = (Button) dialogView.findViewById(R.id.transfer_overquota_button_dissmiss);
+        continueButton.setText(getString(R.string.login_text));
 
-		Button paymentButton = (Button) dialogView.findViewById(R.id.transfer_overquota_button_payment);
-		paymentButton.setText(getString(R.string.continue_without_account_transfer_overquota));
+        Button paymentButton = (Button) dialogView.findViewById(R.id.transfer_overquota_button_payment);
+        paymentButton.setText(getString(R.string.continue_without_account_transfer_overquota));
 
 
-		alertDialogTransferOverquota = dialogBuilder.create();
+        alertDialogTransferOverquota = dialogBuilder.create();
 
-		continueButton.setOnClickListener(new View.OnClickListener(){
-			public void onClick(View v) {
-				alertDialogTransferOverquota.dismiss();
-			}
+        continueButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                alertDialogTransferOverquota.dismiss();
+            }
 
-		});
+        });
 
-		paymentButton.setOnClickListener(new View.OnClickListener(){
-			public void onClick(View v) {
-				alertDialogTransferOverquota.dismiss();
-			}
+        paymentButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                alertDialogTransferOverquota.dismiss();
+            }
 
-		});
+        });
 
-		alertDialogTransferOverquota.setCancelable(false);
-		alertDialogTransferOverquota.setCanceledOnTouchOutside(false);
-		alertDialogTransferOverquota.show();
-	}
+        alertDialogTransferOverquota.setCancelable(false);
+        alertDialogTransferOverquota.setCanceledOnTouchOutside(false);
+        alertDialogTransferOverquota.show();
+    }
 
-	public void stopCameraSyncService(){
-		log("stopCameraSyncService");
-		dbH.clearPreferences();
-		dbH.setFirstTime(false);
+    public void stopCameraSyncService() {
+        log("stopCameraSyncService");
+        dbH.clearPreferences();
+        dbH.setFirstTime(false);
 //					dbH.setPinLockEnabled(false);
 //					dbH.setPinLockCode("");
 //					dbH.setCamSyncEnabled(false);
-		Intent stopIntent = null;
-		stopIntent = new Intent(this, CameraSyncService.class);
-		stopIntent.setAction(CameraSyncService.ACTION_LOGOUT);
-		startService(stopIntent);
-	}
+        Intent stopIntent = null;
+        stopIntent = new Intent(this, CameraSyncService.class);
+        stopIntent.setAction(CameraSyncService.ACTION_LOGOUT);
+        startService(stopIntent);
+    }
 
-	public void startCameraSyncService(boolean firstTimeCam, int time){
-		log("startCameraSyncService");
-		Intent intent = null;
-		if(firstTimeCam){
-			intent = new Intent(this,ManagerActivityLollipop.class);
-			intent.putExtra("firstTimeCam", true);
-			startActivity(intent);
-			finish();
-		}
-		else{
-			log("Enciendo el servicio de la camara");
-			handler.postDelayed(new Runnable() {
+    public void startCameraSyncService(boolean firstTimeCam, int time) {
+        log("startCameraSyncService");
+        Intent intent = null;
+        if (firstTimeCam) {
+            intent = new Intent(this, ManagerActivityLollipop.class);
+            intent.putExtra("firstTimeCam", true);
+            startActivity(intent);
+            finish();
+        } else {
+            log("Enciendo el servicio de la camara");
+            handler.postDelayed(new Runnable() {
 
-				@Override
-				public void run() {
-					log("Now I start the service");
-					startService(new Intent(getApplicationContext(), CameraSyncService.class));
-				}
-			}, time);
-		}
-	}
+                @Override
+                public void run() {
+                    log("Now I start the service");
+                    startService(new Intent(getApplicationContext(), CameraSyncService.class));
+                }
+            }, time);
+        }
+    }
 
-	public void showConfirmationCancelAllTransfers (){
-		log("showConfirmationCancelAllTransfers");
+    public void showConfirmationCancelAllTransfers() {
+        log("showConfirmationCancelAllTransfers");
 
-		setIntent(null);
-		//Show confirmation message
-		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				switch (which){
-					case DialogInterface.BUTTON_POSITIVE:
-						log("Pressed button positive to cancel transfer");
-						if (megaApi != null){
-							megaApi.cancelTransfers(MegaTransfer.TYPE_DOWNLOAD);
-							if (megaApiFolder != null){
-								megaApiFolder.cancelTransfers(MegaTransfer.TYPE_DOWNLOAD);
-							}
-						}
-						else{
-							log("megaAPI is null");
-							if (megaApiFolder != null){
-								megaApiFolder.cancelTransfers(MegaTransfer.TYPE_DOWNLOAD);
-							}
-						}
+        setIntent(null);
+        //Show confirmation message
+        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                switch (which) {
+                    case DialogInterface.BUTTON_POSITIVE:
+                        log("Pressed button positive to cancel transfer");
+                        if (megaApi != null) {
+                            megaApi.cancelTransfers(MegaTransfer.TYPE_DOWNLOAD);
+                            if (megaApiFolder != null) {
+                                megaApiFolder.cancelTransfers(MegaTransfer.TYPE_DOWNLOAD);
+                            }
+                        } else {
+                            log("megaAPI is null");
+                            if (megaApiFolder != null) {
+                                megaApiFolder.cancelTransfers(MegaTransfer.TYPE_DOWNLOAD);
+                            }
+                        }
 
-						break;
+                        break;
 
-					case DialogInterface.BUTTON_NEGATIVE:
-						break;
-				}
-			}
-		};
+                    case DialogInterface.BUTTON_NEGATIVE:
+                        break;
+                }
+            }
+        };
 
-		android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+        android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
 //		builder.setTitle(getResources().getString(R.string.cancel_transfer_title));
 
-		builder.setMessage(getResources().getString(R.string.cancel_all_transfer_confirmation));
-		builder.setPositiveButton(R.string.general_cancel, dialogClickListener);
-		builder.setNegativeButton(R.string.general_dismiss, dialogClickListener);
+        builder.setMessage(getResources().getString(R.string.cancel_all_transfer_confirmation));
+        builder.setPositiveButton(R.string.general_cancel, dialogClickListener);
+        builder.setNegativeButton(R.string.general_dismiss, dialogClickListener);
 
-		builder.show();
-	}
+        builder.show();
+    }
 
-	@Override
-	public void onBackPressed() {
-		log("onBackPressed");
+    @Override
+    public void onBackPressed() {
+        log("onBackPressed");
 
-		int valueReturn = -1;
+        int valueReturn = -1;
 
-		switch (visibleFragment){
-			case Constants.LOGIN_FRAGMENT:{
-				if(loginFragment!=null){
-					valueReturn = loginFragment.onBackPressed();
-				}
-				break;
-			}
-			case Constants.CREATE_ACCOUNT_FRAGMENT:{
-				showFragment(Constants.TOUR_FRAGMENT);
-				break;
-			}
-			case Constants.TOUR_FRAGMENT:{
-				valueReturn=0;
-				break;
-			}
-			case Constants.CONFIRM_EMAIL_FRAGMENT:{
-				valueReturn=0;
-				break;
-			}
-			case Constants.CHOOSE_ACCOUNT_FRAGMENT:{
-				//nothing to do
-				break;
-			}
-		}
+        switch (visibleFragment) {
+            case Constants.LOGIN_FRAGMENT: {
+                if (loginFragment != null) {
+                    valueReturn = loginFragment.onBackPressed();
+                }
+                break;
+            }
+            case Constants.CREATE_ACCOUNT_FRAGMENT: {
+                showFragment(Constants.TOUR_FRAGMENT);
+                break;
+            }
+            case Constants.TOUR_FRAGMENT: {
+                valueReturn = 0;
+                break;
+            }
+            case Constants.CONFIRM_EMAIL_FRAGMENT: {
+                valueReturn = 0;
+                break;
+            }
+            case Constants.CHOOSE_ACCOUNT_FRAGMENT: {
+                //nothing to do
+                break;
+            }
+        }
 
-		if (valueReturn == 0) {
-			super.onBackPressed();
-		}
-	}
+        if (valueReturn == 0) {
+            super.onBackPressed();
+        }
+    }
 
-	@Override
-	public void onResume() {
-		log("onResume");
-		super.onResume();
+    @Override
+    public void onResume() {
+        log("onResume");
+        super.onResume();
 
-		Intent intent = getIntent();
+        Intent intent = getIntent();
 
-		if (intent != null){
-			if (intent.getAction() != null){
-				if (intent.getAction().equals(Constants.ACTION_CANCEL_CAM_SYNC)){
-					log("ACTION_CANCEL_CAM_SYNC");
-					Intent tempIntent = null;
-					String title = null;
-					String text = null;
-					if (intent.getAction().equals(Constants.ACTION_CANCEL_CAM_SYNC)){
-						tempIntent = new Intent(this, CameraSyncService.class);
-						tempIntent.setAction(CameraSyncService.ACTION_CANCEL);
-						title = getString(R.string.cam_sync_syncing);
-						text = getString(R.string.cam_sync_cancel_sync);
-					}
+        if (intent != null) {
+            if (intent.getAction() != null) {
+                if (intent.getAction().equals(Constants.ACTION_CANCEL_CAM_SYNC)) {
+                    log("ACTION_CANCEL_CAM_SYNC");
+                    Intent tempIntent = null;
+                    String title = null;
+                    String text = null;
+                    if (intent.getAction().equals(Constants.ACTION_CANCEL_CAM_SYNC)) {
+                        tempIntent = new Intent(this, CameraSyncService.class);
+                        tempIntent.setAction(CameraSyncService.ACTION_CANCEL);
+                        title = getString(R.string.cam_sync_syncing);
+                        text = getString(R.string.cam_sync_cancel_sync);
+                    }
 
-					final Intent cancelIntent = tempIntent;
-					AlertDialog.Builder builder = Util.getCustomAlertBuilder(this,
-							title, text, null);
-					builder.setPositiveButton(getString(R.string.general_yes),
-							new DialogInterface.OnClickListener() {
-								public void onClick(DialogInterface dialog, int whichButton) {
-									startService(cancelIntent);
-								}
-							});
-					builder.setNegativeButton(getString(R.string.general_no), null);
-					final AlertDialog dialog = builder.create();
-					try {
-						dialog.show();
-					}
-					catch(Exception ex)	{
-						startService(cancelIntent);
-					}
-				}
-				else if (intent.getAction().equals(Constants.ACTION_CANCEL_DOWNLOAD)){
-					showConfirmationCancelAllTransfers();
-				}
-				intent.setAction(null);
-			}
-		}
+                    final Intent cancelIntent = tempIntent;
+                    AlertDialog.Builder builder = Util.getCustomAlertBuilder(this,
+                            title, text, null);
+                    builder.setPositiveButton(getString(R.string.general_yes),
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int whichButton) {
+                                    startService(cancelIntent);
+                                }
+                            });
+                    builder.setNegativeButton(getString(R.string.general_no), null);
+                    final AlertDialog dialog = builder.create();
+                    try {
+                        dialog.show();
+                    } catch (Exception ex) {
+                        startService(cancelIntent);
+                    }
+                } else if (intent.getAction().equals(Constants.ACTION_CANCEL_DOWNLOAD)) {
+                    showConfirmationCancelAllTransfers();
+                }
+                intent.setAction(null);
+            }
+        }
 
-		setIntent(null);
-	}
+        setIntent(null);
+    }
 
-	public void showConfirmationEnableLogs(){
-		log("showConfirmationEnableLogs");
+    public void showConfirmationEnableLogs() {
+        log("showConfirmationEnableLogs");
 
-		if(loginFragment!=null){
-			loginFragment.numberOfClicks = 0;
-		}
-		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				switch (which){
-					case DialogInterface.BUTTON_POSITIVE:
-						enableLogs();
-						break;
+        if (loginFragment != null) {
+            loginFragment.numberOfClicks = 0;
+        }
+        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                switch (which) {
+                    case DialogInterface.BUTTON_POSITIVE:
+                        enableLogs();
+                        break;
 
-					case DialogInterface.BUTTON_NEGATIVE:
+                    case DialogInterface.BUTTON_NEGATIVE:
 
-						break;
-				}
-			}
-		};
+                        break;
+                }
+            }
+        };
 
-		android.support.v7.app.AlertDialog.Builder builder;
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-			builder = new android.support.v7.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-		}
-		else{
-			builder = new android.support.v7.app.AlertDialog.Builder(this);
-		}
+        android.support.v7.app.AlertDialog.Builder builder;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+            builder = new android.support.v7.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+        } else {
+            builder = new android.support.v7.app.AlertDialog.Builder(this);
+        }
 
-		builder.setMessage(R.string.enable_log_text_dialog).setPositiveButton(R.string.general_enable, dialogClickListener)
-				.setNegativeButton(R.string.general_cancel, dialogClickListener).show().setCanceledOnTouchOutside(false);
-	}
+        builder.setMessage(R.string.enable_log_text_dialog).setPositiveButton(R.string.general_enable, dialogClickListener)
+                .setNegativeButton(R.string.general_cancel, dialogClickListener).show().setCanceledOnTouchOutside(false);
+    }
 
-	public void enableLogs(){
-		log("enableLogs");
+    public void enableLogs() {
+        log("enableLogs");
 
-		dbH.setFileLogger(true);
-		Util.setFileLogger(true);
-		MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_MAX);
-		showSnackbar(getString(R.string.settings_enable_logs));
-		log("App Version: " + Util.getVersion(this));
-	}
+        dbH.setFileLogger(true);
+        Util.setFileLogger(true);
+        MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_MAX);
+        showSnackbar(getString(R.string.settings_enable_logs));
+        log("App Version: " + Util.getVersion(this));
+    }
 
-	public void setWaitingForConfirmAccount(boolean waitingForConfirmAccount){
-		this.waitingForConfirmAccount = waitingForConfirmAccount;
-	}
+    public void setWaitingForConfirmAccount(boolean waitingForConfirmAccount) {
+        this.waitingForConfirmAccount = waitingForConfirmAccount;
+    }
 
-	public boolean getWaitingForConfirmAccount(){
-		return this.waitingForConfirmAccount;
-	}
+    public boolean getWaitingForConfirmAccount() {
+        return this.waitingForConfirmAccount;
+    }
 
-	public void setNameTemp(String nameTemp){
-		this.nameTemp = nameTemp;
-	}
+    public void setFirstNameTemp(String firstNameTemp) {
+        this.firstNameTemp = firstNameTemp;
+    }
 
-	public String getNameTemp(){
-		return this.nameTemp;
-	}
+    public String getFirstNameTemp() {
+        return this.firstNameTemp;
+    }
 
-	public void setPasswdTemp(String passwdTemp){
-		this.passwdTemp = passwdTemp;
-	}
+    public void setPasswdTemp(String passwdTemp) {
+        this.passwdTemp = passwdTemp;
+    }
 
-	public String getPasswdTemp(){
-		return this.passwdTemp;
-	}
+    public String getPasswdTemp() {
+        return this.passwdTemp;
+    }
 
-	public void setEmailTemp(String emailTemp){
-		this.emailTemp = emailTemp;
-	}
+    public void setEmailTemp(String emailTemp) {
+        this.emailTemp = emailTemp;
+    }
 
-	public String getEmailTemp(){
-		return this.emailTemp;
-	}
+    public String getEmailTemp() {
+        return this.emailTemp;
+    }
 
 
 //	public void onNewIntent(Intent intent){
@@ -557,37 +568,74 @@ public class LoginActivityLollipop extends AppCompatActivity implements MegaGlob
 //		}
 //	}
 
-	public static void log(String message) {
-		Util.log("LoginActivityLollipop", message);
-	}
+    public static void log(String message) {
+        Util.log("LoginActivityLollipop", message);
+    }
 
-	@Override
-	public void onUsersUpdate(MegaApiJava api, ArrayList<MegaUser> users) {
-		
-	}
+    @Override
+    public void onUsersUpdate(MegaApiJava api, ArrayList<MegaUser> users) {
 
-	@Override
-	public void onNodesUpdate(MegaApiJava api, ArrayList<MegaNode> nodeList) {
+    }
 
-	}
+    @Override
+    public void onNodesUpdate(MegaApiJava api, ArrayList<MegaNode> nodeList) {
 
-	@Override
-	public void onReloadNeeded(MegaApiJava api) {
+    }
 
-	}
+    @Override
+    public void onReloadNeeded(MegaApiJava api) {
 
-	@Override
-	public void onAccountUpdate(MegaApiJava api) {
-		log("onAccountUpdate");
+    }
 
-		if (waitingForConfirmAccount){
-			waitingForConfirmAccount = false;
-			showFragment(Constants.LOGIN_FRAGMENT);
-		}
-	}
+    @Override
+    public void onAccountUpdate(MegaApiJava api) {
+        log("onAccountUpdate");
 
-	@Override
-	public void onContactRequestsUpdate(MegaApiJava api, ArrayList<MegaContactRequest> requests) {
+        if (waitingForConfirmAccount) {
+            waitingForConfirmAccount = false;
+            visibleFragment = Constants.LOGIN_FRAGMENT;
+            showFragment(visibleFragment);
+        }
+    }
 
-	}
+    @Override
+    public void onContactRequestsUpdate(MegaApiJava api, ArrayList<MegaContactRequest> requests) {
+
+    }
+
+    @Override
+    public void onRequestStart(MegaApiJava api, MegaRequest request) {
+        log("onRequestStart - " + request.getRequestString());
+    }
+
+    @Override
+    public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
+        log("onRequestUpdate - " + request.getRequestString());
+    }
+
+    @Override
+    public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
+        log("onRequestFinish - " + request.getRequestString() + "_" + e.getErrorCode());
+
+        if (request.getType() == MegaRequest.TYPE_CREATE_ACCOUNT){
+            if (request.getParamType() == 1){
+                if (e.getErrorCode() == MegaError.API_OK){
+                    waitingForConfirmAccount = true;
+                    visibleFragment = Constants.CONFIRM_EMAIL_FRAGMENT;
+                    showFragment(visibleFragment);
+                }
+                else{
+                    dbH.clearEphemeral();
+                    waitingForConfirmAccount = false;
+                    visibleFragment = Constants.LOGIN_FRAGMENT;
+                    showFragment(visibleFragment);
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) {
+        log("onRequestTemporaryError - " + request.getRequestString());
+    }
 }
