@@ -45,16 +45,6 @@ public class ZipListAdapterLollipop  extends BaseAdapter{
 		RelativeLayout itemLayout;
 
 		public ImageView publicLinkImage;
-		//ImageView arrowSelection;
-//		LinearLayout optionsLayout;
-		//ImageView optionDownload;
-		//ImageView optionProperties;
-        ProgressBar transferProgressBar;
-		//ImageView optionRename;
-		//ImageView optionCopy;
-		//ImageView optionMove;
-		//ImageView optionPublicLink;
-		//ImageView optionDelete;
 		int currentPosition;
 
 		public ImageView savedOffline;
@@ -97,7 +87,6 @@ public class ZipListAdapterLollipop  extends BaseAdapter{
 			holder.textViewFileName.getLayoutParams().height = RelativeLayout.LayoutParams.WRAP_CONTENT;
 			holder.textViewFileName.getLayoutParams().width = Util.px2dp((225 * scaleW), outMetrics);
 			holder.textViewFileSize = (TextView) convertView.findViewById(R.id.file_list_filesize);
-			holder.transferProgressBar = (ProgressBar) convertView.findViewById(R.id.transfers_list_browser_bar);
 			//holder.arrowSelection = (ImageView) convertView.findViewById(R.id.file_list_arrow_selection);
 			holder.publicLinkImage = (ImageView) convertView.findViewById(R.id.file_list_public_link);
 			holder.savedOffline = (ImageView) convertView.findViewById(R.id.file_list_saved_offline);
@@ -109,7 +98,7 @@ public class ZipListAdapterLollipop  extends BaseAdapter{
 		}
 
 		holder.savedOffline.setVisibility(View.INVISIBLE);
-		holder.transferProgressBar.setVisibility(View.GONE);
+
 		holder.publicLinkImage.setVisibility(View.INVISIBLE);
 		holder.imageButtonThreeDots.setVisibility(View.GONE);
 
@@ -143,12 +132,7 @@ public class ZipListAdapterLollipop  extends BaseAdapter{
 //		holder.textViewFileSize.setText(""+zipNode.getSize());		
 				
 		if (positionClicked == -1){
-			//holder.arrowSelection.setVisibility(View.GONE);
-//			LinearLayout.LayoutParams params = holder.optionsLayout.getLayoutParams();
-//			params.height = 0;
 			holder.itemLayout.setBackgroundColor(Color.WHITE);
-			holder.transferProgressBar.setVisibility(View.GONE);
-			//holder.arrowSelection.setVisibility(View.GONE);
 		}
 
 		return convertView;

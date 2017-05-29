@@ -108,7 +108,6 @@ public class TransfersFragmentLollipop extends Fragment {
 	    
 		View v = inflater.inflate(R.layout.fragment_transfers, container, false);
 
-
 		listView = (RecyclerView) v.findViewById(R.id.transfers_list_view);
 		listView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
 		mLayoutManager = new LinearLayoutManager(context);

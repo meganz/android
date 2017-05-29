@@ -689,14 +689,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                     log("The selected node is NULL");
                     return;
                 }
-                if(node.isExported()){
-                    log("node is already exported: "+node.getName());
-                    log("node link: "+node.getPublicLink());
-                    ((ManagerActivityLollipop) context).showGetLinkPanel(node.getPublicLink(), node.getExpirationTime());
-                }
-                else{
-                    nC.exportLink(node);
-                }
+                ((ManagerActivityLollipop) context).showGetLinkActivity(node.getHandle());
                 break;
             }
             case R.id.option_remove_link_layout:{
