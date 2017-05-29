@@ -23,7 +23,7 @@ import nz.mega.sdk.MegaChatApi;
 
 public class DatabaseHandler extends SQLiteOpenHelper {
 	
-	private static final int DATABASE_VERSION = 31;
+	private static final int DATABASE_VERSION = 32;
     private static final String DATABASE_NAME = "megapreferences"; 
     private static final String TABLE_PREFERENCES = "preferences";
     private static final String TABLE_CREDENTIALS = "credentials";
@@ -34,9 +34,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	private static final String TABLE_NON_CONTACTS = "noncontacts";
 	private static final String TABLE_CHAT_SETTINGS = "chatsettings";
 	private static final String TABLE_COMPLETED_TRANSFERS = "completedtransfers";
+	private static final String TABLE_EPHEMERAL = "ephemeral";
 
     private static final String KEY_ID = "id";
     private static final String KEY_EMAIL = "email";
+	private static final String KEY_PASSWORD = "password";
     private static final String KEY_SESSION= "session";
 	private static final String KEY_FIRST_NAME= "firstname";
 	private static final String KEY_LAST_NAME= "lastname";
@@ -202,7 +204,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				+ KEY_ID + " INTEGER PRIMARY KEY, " + KEY_TRANSFER_FILENAME + " TEXT, " + KEY_TRANSFER_TYPE + " TEXT, " +
 				KEY_TRANSFER_STATE+ " TEXT, "+ KEY_TRANSFER_SIZE+ " TEXT, " + KEY_TRANSFER_HANDLE + " TEXT"+")";
 		db.execSQL(CREATE_COMPLETED_TRANSFER_TABLE);
-  
+
+		String CREATE_EPHEMERAL = "CREATE TABLE IF NOT EXISTS " + TABLE_EPHEMERAL + "("
+				+ KEY_ID + " INTEGER PRIMARY KEY, " +  KEY_EMAIL + " TEXT, "
+				+ KEY_PASSWORD + " TEXT, " + KEY_SESSION + " TEXT, " +  KEY_FIRST_NAME + " TEXT, " + KEY_LAST_NAME + " TEXT" + ")";
+		db.execSQL(CREATE_EPHEMERAL);
 	}
 
 	@Override
@@ -460,6 +466,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			db.execSQL("ALTER TABLE " + TABLE_PREFERENCES + " ADD COLUMN " + KEY_FIRST_LOGIN_CHAT + " BOOLEAN;");
 			db.execSQL("UPDATE " + TABLE_PREFERENCES + " SET " + KEY_FIRST_LOGIN_CHAT + " = '" + encrypt("true") + "';");
 		}
+
+		if (oldVersion <= 31){
+			String CREATE_EPHEMERAL = "CREATE TABLE IF NOT EXISTS " + TABLE_EPHEMERAL + "("
+					+ KEY_ID + " INTEGER PRIMARY KEY, " +  KEY_EMAIL + " TEXT, "
+					+ KEY_PASSWORD + " TEXT, " + KEY_SESSION + " TEXT, " +  KEY_FIRST_NAME + " TEXT, " + KEY_LAST_NAME + " TEXT" + ")";
+			db.execSQL(CREATE_EPHEMERAL);
+		}
 	} 
 	
 //	public MegaOffline encrypt(MegaOffline off){
@@ -508,6 +521,26 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		}
         db.insert(TABLE_CREDENTIALS, null, values);
     }
+
+	public void saveEphemeral(EphemeralCredentials ephemeralCredentials) {
+		ContentValues values = new ContentValues();
+		if (ephemeralCredentials.getEmail() != null){
+			values.put(KEY_EMAIL, encrypt(ephemeralCredentials.getEmail()));
+		}
+		if (ephemeralCredentials.getPassword() != null){
+			values.put(KEY_PASSWORD, encrypt(ephemeralCredentials.getPassword()));
+		}
+		if (ephemeralCredentials.getSession() != null){
+			values.put(KEY_SESSION, encrypt(ephemeralCredentials.getSession()));
+		}
+		if (ephemeralCredentials.getFirstName() != null){
+			values.put(KEY_FIRST_NAME, encrypt(ephemeralCredentials.getFirstName()));
+		}
+		if (ephemeralCredentials.getLastName() != null){
+			values.put(KEY_LAST_NAME, encrypt(ephemeralCredentials.getLastName()));
+		}
+		db.insert(TABLE_EPHEMERAL, null, values);
+	}
 
 	public void saveMyEmail(String email) {
 		log("saveEmail: "+email);
@@ -596,6 +629,32 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         
         return userCredentials; 
 	}
+
+    public EphemeralCredentials getEphemeral(){
+        EphemeralCredentials ephemeralCredentials = null;
+
+        String selectQuery = "SELECT  * FROM " + TABLE_EPHEMERAL;
+        try{
+            Cursor cursor = db.rawQuery(selectQuery, null);
+            if (cursor.moveToFirst()) {
+                int id = Integer.parseInt(cursor.getString(0));
+                String email = decrypt(cursor.getString(1));
+                String password = decrypt(cursor.getString(2));
+                String session = decrypt(cursor.getString(3));
+                String firstName = decrypt(cursor.getString(4));
+                String lastName = decrypt(cursor.getString(5));
+                ephemeralCredentials = new EphemeralCredentials(email, password, session, firstName, lastName);
+            }
+            cursor.close();
+        }
+        catch (SQLiteException e){
+            if (db != null){
+                onCreate(db);
+            }
+        }
+
+        return ephemeralCredentials;
+    }
 	
 	public void setPreferences (MegaPreferences prefs){
         ContentValues values = new ContentValues();
@@ -2359,6 +2418,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	public void clearCredentials(){
 		db.execSQL("DROP TABLE IF EXISTS " + TABLE_CREDENTIALS);   
         onCreate(db);
+	}
+
+	public void clearEphemeral(){
+		db.execSQL("DROP TABLE IF EXISTS " + TABLE_EPHEMERAL);
+		onCreate(db);
 	}
 	
 	public void clearPreferences(){

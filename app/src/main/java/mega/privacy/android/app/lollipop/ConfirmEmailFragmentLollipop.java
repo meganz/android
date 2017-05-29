@@ -33,7 +33,7 @@ public class ConfirmEmailFragmentLollipop extends Fragment implements MegaReques
 
 	String emailTemp = null;
 	String passwdTemp = null;
-	String nameTemp = null;
+	String firstNameTemp = null;
 
 	EditText et_newEmail;
 	Button resendButton;
@@ -112,12 +112,12 @@ public class ConfirmEmailFragmentLollipop extends Fragment implements MegaReques
 		return this.emailTemp;
 	}
 
-	public void setNameTemp(String nameTemp){
-		this.nameTemp = nameTemp;
+	public void setFirstNameTemp(String firstNameTemp){
+		this.firstNameTemp = firstNameTemp;
 	}
 
-	public String getNameTemp(){
-		return this.nameTemp;
+	public String getFirstNameTemp(){
+		return this.firstNameTemp;
 	}
 
 	public static void log(String log) {
@@ -158,7 +158,7 @@ public class ConfirmEmailFragmentLollipop extends Fragment implements MegaReques
 		switch (v.getId()){
 			case R.id.confirm_email_new_email_resend:{
 				((LoginActivityLollipop)context).setEmailTemp(et_newEmail.getText().toString().toLowerCase(Locale.ENGLISH).trim());
-				megaApi.sendSignupLink(et_newEmail.getText().toString().toLowerCase(Locale.ENGLISH).trim(), nameTemp, passwdTemp, this);
+				megaApi.sendSignupLink(et_newEmail.getText().toString().toLowerCase(Locale.ENGLISH).trim(), firstNameTemp, passwdTemp, this);
 				break;
 			}
 		}

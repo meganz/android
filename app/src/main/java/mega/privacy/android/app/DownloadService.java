@@ -706,6 +706,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 		if(dbH.getCredentials()==null){
 			contentText = getString(R.string.download_touch_to_cancel);
+			dbH.clearEphemeral();
 			intent = new Intent(DownloadService.this, LoginActivityLollipop.class);
 			intent.setAction(Constants.ACTION_CANCEL_DOWNLOAD);
 			pendingIntent = PendingIntent.getActivity(DownloadService.this, 0, intent, 0);
@@ -1414,6 +1415,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			if(megaApi.isLoggedIn()==0){
 				log("TRANSFER overquota and NOT logged in!");
 				Intent intent = null;
+				dbH.clearEphemeral();
 				intent = new Intent(this, LoginActivityLollipop.class);
 				intent.setAction(Constants.ACTION_OVERQUOTA_TRANSFER);
 				intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);

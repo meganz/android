@@ -25,6 +25,7 @@ import android.widget.TextView;
 import java.util.Locale;
 
 import mega.privacy.android.app.DatabaseHandler;
+import mega.privacy.android.app.EphemeralCredentials;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.utils.Constants;
@@ -341,9 +342,20 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
         }
         else{
             ((LoginActivityLollipop)context).setEmailTemp(userEmail.getText().toString().toLowerCase(Locale.ENGLISH).trim());
-            ((LoginActivityLollipop)context).setNameTemp(userName.getText().toString());
+            ((LoginActivityLollipop)context).setFirstNameTemp(userName.getText().toString());
             ((LoginActivityLollipop)context).setPasswdTemp(userPassword.getText().toString());
             ((LoginActivityLollipop)context).setWaitingForConfirmAccount(true);
+
+            DatabaseHandler dbH = DatabaseHandler.getDbHandler(context.getApplicationContext());
+            if (dbH != null){
+                dbH.clearEphemeral();
+
+                log("EphemeralCredentials: (" + request.getEmail() + "," + request.getPassword() + "," + request.getSessionKey() + "," + request.getName() + "," + request.getText() + ")");
+                EphemeralCredentials ephemeral = new EphemeralCredentials(request.getEmail(), request.getPassword(), request.getSessionKey(), request.getName(), request.getText());
+
+                dbH.saveEphemeral(ephemeral);
+            }
+
             ((LoginActivityLollipop)context).showFragment(Constants.CONFIRM_EMAIL_FRAGMENT);
         }
     }

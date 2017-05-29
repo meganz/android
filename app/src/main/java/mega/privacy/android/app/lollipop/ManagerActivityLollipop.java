@@ -1133,6 +1133,15 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	    	scaleText = scaleW;
 	    }
 
+	    if (dbH.getEphemeral() != null){
+            Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
+            intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(intent);
+            finish();
+            return;
+		}
+
 	    if (dbH.getCredentials() == null){
 	    	if (OldPreferences.getOldCredentials(this) != null){
 	    		Intent loginWithOldCredentials = new Intent(this, LoginActivityLollipop.class);
