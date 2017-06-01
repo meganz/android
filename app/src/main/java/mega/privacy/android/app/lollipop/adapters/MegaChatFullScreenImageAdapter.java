@@ -393,9 +393,9 @@ public class MegaChatFullScreenImageAdapter extends PagerAdapter implements OnCl
 			    float scaleW = Util.getScaleW(outMetrics, density);
 			    float scaleH = Util.getScaleH(outMetrics, density);
 			    
-			    RelativeLayout bottomLayout = (RelativeLayout) activity.findViewById(R.id.image_viewer_layout_bottom);
-			    RelativeLayout topLayout = (RelativeLayout) activity.findViewById(R.id.image_viewer_layout_top);
-			    ListView overflowMenuList = (ListView) activity.findViewById(R.id.image_viewer_overflow_menu_list);
+			    RelativeLayout bottomLayout = (RelativeLayout) activity.findViewById(R.id.chat_image_viewer_layout_bottom);
+			    RelativeLayout topLayout = (RelativeLayout) activity.findViewById(R.id.chat_image_viewer_layout_top);
+			    ListView overflowMenuList = (ListView) activity.findViewById(R.id.chat_image_viewer_overflow_menu_list);
 			    
 			    if (menuVisible){
 //			    	AlphaAnimation a = new AlphaAnimation(0.2f, 1.0f);
@@ -434,7 +434,7 @@ public class MegaChatFullScreenImageAdapter extends PagerAdapter implements OnCl
 					}
 			    }
 				
-				RelativeLayout activityLayout = (RelativeLayout) activity.findViewById(R.id.full_image_viewer_parent_layout);
+				RelativeLayout activityLayout = (RelativeLayout) activity.findViewById(R.id.chat_full_image_viewer_parent_layout);
 				activityLayout.invalidate();
 				
 				break;

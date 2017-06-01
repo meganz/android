@@ -33,6 +33,7 @@ import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.lollipop.ChatFullScreenImageViewer;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop;
@@ -1266,7 +1267,16 @@ public class ChatController {
 
         log("availableFreeSpace: " + availableFreeSpace + "__ sizeToDownload: " + sizeC);
         if(availableFreeSpace < sizeC) {
-            ((ManagerActivityLollipop) context).showSnackbar(context.getString(R.string.error_not_enough_free_space));
+
+            if(context instanceof ChatActivityLollipop){
+                ((ChatActivityLollipop) context).showSnackbar(context.getString(R.string.error_not_enough_free_space));
+            }
+            else if(context instanceof NodeAttachmentActivityLollipop){
+                ((NodeAttachmentActivityLollipop) context).showSnackbar(context.getString(R.string.error_not_enough_free_space));
+            }
+            else if(context instanceof ChatFullScreenImageViewer){
+                ((ChatFullScreenImageViewer) context).showSnackbar(context.getString(R.string.error_not_enough_free_space));
+            }
             log("Not enough space");
             return;
         }
@@ -1290,13 +1300,15 @@ public class ChatController {
             if(sizeC>104857600){
                 log("Show size confirmacion: "+sizeC);
                 //Show alert
-                if(context instanceof  ManagerActivityLollipop){
-                    ((ManagerActivityLollipop) context).askSizeConfirmationBeforeChatDownload(parentPathC, nodeList, sizeC);
+                if(context instanceof  ChatActivityLollipop){
+                    ((ChatActivityLollipop) context).askSizeConfirmationBeforeChatDownload(parentPathC, nodeList, sizeC);
                 }
                 else if(context instanceof  NodeAttachmentActivityLollipop){
                     ((NodeAttachmentActivityLollipop) context).askSizeConfirmationBeforeChatDownload(parentPathC, nodeList, sizeC);
                 }
-
+                else if(context instanceof ChatFullScreenImageViewer){
+                    ((ChatFullScreenImageViewer) context).askSizeConfirmationBeforeChatDownload(parentPathC, nodeList, sizeC);
+                }
             }
             else{
                 download(parentPathC, nodeList);
@@ -1388,20 +1400,26 @@ public class ChatController {
                                         log("call to startActivity(intentShare)");
                                         context.startActivity(intentShare);
                                     }
-                                    if(context instanceof  ManagerActivityLollipop){
-                                        ((ManagerActivityLollipop) context).showSnackbar(context.getString(R.string.general_already_downloaded));
+                                    if(context instanceof  ChatActivityLollipop){
+                                        ((ChatActivityLollipop) context).showSnackbar(context.getString(R.string.general_already_downloaded));
                                     }
                                     else if(context instanceof  NodeAttachmentActivityLollipop){
                                         ((NodeAttachmentActivityLollipop) context).showSnackbar(context.getString(R.string.general_already_downloaded));
                                     }
+                                    else if(context instanceof ChatFullScreenImageViewer){
+                                        ((ChatFullScreenImageViewer) context).showSnackbar(context.getString(R.string.general_already_downloaded));
+                                    }
                                 }
                             }
                             catch (Exception e){
-                                if(context instanceof  ManagerActivityLollipop){
-                                    ((ManagerActivityLollipop) context).showSnackbar(context.getString(R.string.general_already_downloaded));
+                                if(context instanceof  ChatActivityLollipop){
+                                    ((ChatActivityLollipop) context).showSnackbar(context.getString(R.string.general_already_downloaded));
                                 }
                                 else if(context instanceof  NodeAttachmentActivityLollipop){
                                     ((NodeAttachmentActivityLollipop) context).showSnackbar(context.getString(R.string.general_already_downloaded));
+                                }
+                                else if(context instanceof ChatFullScreenImageViewer){
+                                    ((ChatFullScreenImageViewer) context).showSnackbar(context.getString(R.string.general_already_downloaded));
                                 }
                             }
                         }
