@@ -420,11 +420,6 @@ public class NodeAttachmentActivityLollipop extends PinActivityLollipop implemen
 		downloadConfirmationDialog.show();
 	}
 
-	public void saveOffline(){
-		log("saveOffline");
-		cC.saveForOffline(selectedNode);
-	}
-
 	public void importNode(){
 		log("importNode");
 
