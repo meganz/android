@@ -1092,7 +1092,6 @@ public class ChatController {
             service.putExtra(DownloadService.EXTRA_PATH, path);
             context.startService(service);
         }
-
     }
 
     public void saveForOffline(MegaNode node){

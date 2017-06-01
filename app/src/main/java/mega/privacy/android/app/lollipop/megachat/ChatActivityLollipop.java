@@ -65,6 +65,7 @@ import mega.privacy.android.app.DownloadService;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
+import mega.privacy.android.app.lollipop.ChatFullScreenImageViewer;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
@@ -1995,12 +1996,17 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             if(m!=null){
                 if(m.getMessage().getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT){
 
-
                     MegaNodeList nodeList = m.getMessage().getMegaNodeList();
                     if(nodeList.size()==1){
                         MegaNode node = nodeList.get(0);
                         if(node.hasPreview()){
                             log("Show full screen viewer");
+                            Intent intent = new Intent(this, ChatFullScreenImageViewer.class);
+                            intent.putExtra("position", 0);
+                            intent.putExtra("chatId", idChat);
+                            long [] messagesIds = {m.getMessage().getMsgId()};
+                            intent.putExtra("messageIds", messagesIds);
+                            startActivity(intent);
                         }
                         else{
                             log("show node attachment panel for one node");
@@ -3384,19 +3390,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 megaChatApi.revokeAttachment(idChat,document.getHandle(),this);
             }
         }
-    }
-
-    public void saveOffline(){
-        log("saveOffline");
-
-        MegaChatMessage message = megaChatApi.getMessage(idChat, selectedMessageId);
-        if(message!=null){
-            chatC.saveForOffline(message);
-        }
-        else{
-            log("Message is NULL");
-        }
-
     }
 
     @Override

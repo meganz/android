@@ -356,10 +356,16 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
                 }
 
                 if(context instanceof ChatActivityLollipop){
-                    ((ChatActivityLollipop)context).saveOffline();
+
+                    if(message!=null){
+                        chatC.saveForOffline(message.getMessage());
+                    }
+                    else{
+                        log("Message is NULL");
+                    }
                 }
                 else if(context instanceof NodeAttachmentActivityLollipop){
-                    ((NodeAttachmentActivityLollipop)context).saveOffline();
+                    chatC.saveForOffline(((NodeAttachmentActivityLollipop) context).selectedNode);
                 }
 
                 break;
