@@ -38,6 +38,7 @@ import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.CheckBox;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
@@ -111,6 +112,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     boolean getMoreHistory=true;
 
     private AlertDialog errorOpenChatDialog;
+
+    private android.support.v7.app.AlertDialog downloadConfirmationDialog;
 
     ProgressDialog dialog;
     ProgressDialog statusDialog;
@@ -3473,6 +3476,53 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         outState.putLong("selectedMessageId", selectedMessageId);
         outState.putInt("selectedPosition", selectedPosition);
     }
+
+    public void askSizeConfirmationBeforeChatDownload(String parentPath, ArrayList<MegaNode> nodeList, long size){
+        log("askSizeConfirmationBeforeChatDownload");
+
+        final String parentPathC = parentPath;
+        final ArrayList<MegaNode> nodeListC = nodeList;
+        final long sizeC = size;
+        final ChatController chatC = new ChatController(this);
+
+        android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+        LinearLayout confirmationLayout = new LinearLayout(this);
+        confirmationLayout.setOrientation(LinearLayout.VERTICAL);
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        params.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleHeightPx(10, outMetrics), Util.scaleWidthPx(17, outMetrics), 0);
+
+        final CheckBox dontShowAgain =new CheckBox(this);
+        dontShowAgain.setText(getString(R.string.checkbox_not_show_again));
+        dontShowAgain.setTextColor(getResources().getColor(R.color.text_secondary));
+
+        confirmationLayout.addView(dontShowAgain, params);
+
+        builder.setView(confirmationLayout);
+
+//				builder.setTitle(getString(R.string.confirmation_required));
+
+        builder.setMessage(getString(R.string.alert_larger_file, Util.getSizeString(sizeC)));
+        builder.setPositiveButton(getString(R.string.general_download),
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        if(dontShowAgain.isChecked()){
+                            dbH.setAttrAskSizeDownload("false");
+                        }
+                        chatC.download(parentPathC, nodeListC);
+                    }
+                });
+        builder.setNegativeButton(getString(android.R.string.cancel), new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                if(dontShowAgain.isChecked()){
+                    dbH.setAttrAskSizeDownload("false");
+                }
+            }
+        });
+
+        downloadConfirmationDialog = builder.create();
+        downloadConfirmationDialog.show();
+    }
+
 
     //    @Override
 //    protected void onResume() {
