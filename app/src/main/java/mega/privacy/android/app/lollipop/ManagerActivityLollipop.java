@@ -8939,8 +8939,23 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 		});
 
+		dialogBuilder.setOnCancelListener(
+				new DialogInterface.OnCancelListener() {
+					@Override
+					public void onCancel(DialogInterface dialog) {
+						log("setOnCancelListener setPin");
+						setPinDialog.dismiss();
+						if(sttFLol!=null){
+							if(sttFLol.isAdded()){
+								sttFLol.cancelSetPinLock();
+							}
+						}
+					}
+				}
+		);
+
 		setPinDialog = dialogBuilder.create();
-//		presenceStatusDialog.se
+		setPinDialog.setCanceledOnTouchOutside(true);
 		setPinDialog.show();
 	}
 
