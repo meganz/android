@@ -441,6 +441,8 @@
                     android:layout_marginLeft="6dp"
                     android:layout_marginTop="11dp"
                     android:layout_marginRight="8dp"
+                    android:maxLines="2"
+                    android:ellipsize="end"
                     android:gravity="left"/>
 
                 <ImageView

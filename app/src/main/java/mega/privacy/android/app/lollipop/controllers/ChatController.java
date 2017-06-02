@@ -1190,7 +1190,6 @@ public class ChatController {
         File defaultPathF = new File(downloadLocationDefaultPath);
         defaultPathF.mkdirs();
         checkSizeBeforeDownload(downloadLocationDefaultPath, nodeList);
-
     }
 
     public void prepareForChatDownload(MegaNodeList list){
