@@ -1706,11 +1706,11 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                         else if(message.getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT){
                             ((ViewHolderMessageChat)holder).contentContactMessageFileSender.setVisibility(View.VISIBLE);
                             if(color!=null){
-                                log("The color to set the avatar is "+color);
+                                log("TYPE_NODE_ATTACHMENT The color to set the avatar is "+color);
                                 ((ViewHolderMessageChat)holder).contentContactMessageFileSender.setTextColor(Color.parseColor(color));
                             }
                             else{
-                                log("Default color to the avatar");
+                                log("TYPE_NODE_ATTACHMENT Default color to the avatar");
                                 ((ViewHolderMessageChat)holder).contentContactMessageFileSender.setTextColor(ContextCompat.getColor(context, R.color.accentColor));
                             }
                             ((ViewHolderMessageChat)holder).contentContactMessageFileSender.setText(((ViewHolderMessageChat)holder).fullNameTitle);
@@ -1919,6 +1919,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                     Bitmap preview = null;
                                     preview = PreviewUtils.getPreviewFromCache(node);
                                     if (preview != null){
+                                        log("Success -> getPreviewFromCache");
                                         PreviewUtils.previewCache.put(node.getHandle(), preview);
                                         if (preview.getWidth() > preview.getHeight()) {
                                             log("Portrait");
@@ -1974,8 +1975,10 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                         }
                                     }
                                     else {
+                                        log("Fail -> getPreviewFromCache");
                                         preview = PreviewUtils.getPreviewFromFolder(node, context);
                                         if (preview != null) {
+                                            log("SUCCESS -> getPreviewFromFolder");
                                             PreviewUtils.previewCache.put(node.getHandle(), preview);
                                             if (preview.getWidth() > preview.getHeight()) {
                                                 log("Portrait");
@@ -2031,7 +2034,9 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                             }
 
                                         } else {
+                                            log("Fail -> getPreviewFromFolder");
                                             if (node.hasPreview()){
+                                                log("Node has preview");
                                                 if (pendingPreviews.contains(node.getHandle())){
                                                     log("the preview is already downloaded or added to the list");
                                                 }
@@ -2045,6 +2050,9 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                                     pendingPreviews.add(node.getHandle());
                                                     megaApi.getPreview(node, previewFile.getAbsolutePath(), listener);
                                                 }
+                                            }
+                                            else{
+                                                log("Node has NO preview!!!");
                                             }
                                         }
                                     }

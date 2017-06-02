@@ -3,9 +3,11 @@ package mega.privacy.android.app.lollipop.megachat;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
@@ -159,6 +161,9 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
 
         inviteButton = (Button) v.findViewById(R.id.invite_button);
         inviteButton.setOnClickListener(this);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            inviteButton.setBackground(ContextCompat.getDrawable(context, R.drawable.ripple_upgrade));
+        }
 
         mainRelativeLayout = (RelativeLayout) v.findViewById(R.id.main_relative_layout);
 
