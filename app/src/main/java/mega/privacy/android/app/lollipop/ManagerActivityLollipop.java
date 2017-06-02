@@ -5179,8 +5179,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					pauseTransfersMenuIcon.setVisible(false);
 					cancelAllTransfersMenuItem.setVisible(false);
 				}
-
-
 			}
 
 			else if (drawerItem == DrawerItem.SETTINGS){
@@ -5223,9 +5221,15 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				if(Util.isChatEnabled()){
 
 					if (rChatFL != null){
+
 						if(Util.isOnline(this)){
 							newChatMenuItem.setVisible(true);
-							selectMenuItem.setVisible(true);
+							if(rChatFL.getItemCount()>0){
+								selectMenuItem.setVisible(true);
+							}
+							else{
+								selectMenuItem.setVisible(false);
+							}
 							setStatusMenuItem.setVisible(true);
 						}
 						else{
@@ -11365,8 +11369,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				log("Chat CREATED.");
 
 				//Update chat view
-				if(rChatFL!=null){
-//					rChatFL.setChats();
+				if(rChatFL!=null && rChatFL.isAdded()){
+
+					if(selectMenuItem!=null){
+						selectMenuItem.setVisible(true);
+					}
 				}
 
 				log("open new chat: " + request.getChatHandle());

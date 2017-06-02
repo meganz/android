@@ -1072,6 +1072,13 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
         super.onResume();
     }
 
+    public int getItemCount(){
+        if(adapterList != null){
+            return adapterList.getItemCount();
+        }
+        return 0;
+    }
+
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         log("onActivityCreated");
