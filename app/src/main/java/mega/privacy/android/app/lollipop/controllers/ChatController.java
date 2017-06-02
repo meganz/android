@@ -1171,7 +1171,7 @@ public class ChatController {
             dbH = DatabaseHandler.getDbHandler(context.getApplicationContext());
         }
 
-        String downloadLocationDefaultPath = Util.downloadDIR;
+        String downloadLocationDefaultPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.downloadDIR;
         prefs = dbH.getPreferences();
         if (prefs != null){
             log("prefs != null");
