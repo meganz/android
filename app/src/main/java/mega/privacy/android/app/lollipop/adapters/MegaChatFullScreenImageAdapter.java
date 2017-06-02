@@ -42,7 +42,7 @@ import nz.mega.sdk.MegaTransferListenerInterface;
 import nz.mega.sdk.MegaUtilsAndroid;
 
 
-public class MegaChatFullScreenImageAdapter extends PagerAdapter implements OnClickListener, MegaRequestListenerInterface, MegaTransferListenerInterface  {
+public class MegaChatFullScreenImageAdapter extends PagerAdapter implements OnClickListener, MegaRequestListenerInterface  {
 
 	private Activity activity;
 	private MegaChatFullScreenImageAdapter megaFullScreenImageAdapter;
@@ -170,10 +170,11 @@ public class MegaChatFullScreenImageAdapter extends PagerAdapter implements OnCl
 				}
 
 				if (pendingFullImages.contains(node.getHandle())){
-					log("the image is already downloaded or added to the list");
+					log("the image is already downloaded or added to the list - return 1");
 					return 1;
 				}
 				else{
+					log("return code 2");
 					return 2;
 				}
 			}
@@ -203,64 +204,7 @@ public class MegaChatFullScreenImageAdapter extends PagerAdapter implements OnCl
 				}
 			}
 			else if (param == 2){
-
-				pendingFullImages.add(node.getHandle());
-				log("document.name: " +  node.getName() + "_handle: " + node.getHandle());
-				log("destination.getabsolutepath: " + destination.getAbsolutePath());
-				megaApi.startDownload(node, cacheDir.getAbsolutePath() + "/", megaFullScreenImageAdapter);
-			}
-		}
-	}
-
-	private class AttachPreviewTask extends AsyncTask<String, Void, String[]>{
-
-		@Override
-		protected String[] doInBackground(String... params) {
-			log("AttachPreviewStart");
-			long handle = Long.parseLong(params[0]);
-			String localPath = params[1];
-
-			MegaNode node = megaApi.getNodeByHandle(handle);
-			File fullImage = new File(localPath);
-
-			File previewDir = PreviewUtils.getPreviewFolder(activity);
-			File previewFile = new File(previewDir, node.getBase64Handle()+".jpg");
-			boolean previewCreated = MegaUtilsAndroid.createPreview(fullImage, previewFile);
-
-			if (previewCreated){
-				fullImage.delete();
-			}
-
-			return new String[]{params[0], previewCreated+""};
-		}
-
-		@Override
-		protected void onPostExecute(String[] params) {
-			long handle = Long.parseLong(params[0]);
-			boolean previewCreated = Boolean.parseBoolean(params[1]);
-
-			int position = 0;
-			boolean holderIsVisible = false;
-			for(int i = 0; i < visibleImgs.size(); i++) {
-				position = visibleImgs.keyAt(i);
-				ViewHolderFullImage holder = visibleImgs.get(position);
-				if (holder.document == handle){
-					holderIsVisible = true;
-					break;
-				}
-			}
-
-			if (holderIsVisible) {
-				if(previewCreated) {
-					MegaNode node = megaApi.getNodeByHandle(handle);
-					File previewDir = PreviewUtils.getPreviewFolder(activity);
-					File previewFile = new File(previewDir, node.getBase64Handle()+".jpg");
-					Bitmap bitmap = PreviewUtils.getBitmapForCache(previewFile, activity);
-					visibleImgs.get(position).imgDisplay.setImageBitmap(bitmap);
-				}
-
-				visibleImgs.get(position).progressBar.setVisibility(View.GONE);
-				visibleImgs.get(position).downloadProgressBar.setVisibility(View.GONE);
+				log("There is no preview for this node");
 			}
 		}
 	}
@@ -307,6 +251,7 @@ public class MegaChatFullScreenImageAdapter extends PagerAdapter implements OnCl
 		holder.imgDisplay.setImageResource(MimeTypeMime.typeForName(node.getName()).getIconResourceId());
 		holder.imgDisplay.setOnClickListener(this);
 		holder.progressBar = (ProgressBar) viewLayout.findViewById(R.id.full_screen_image_viewer_progress_bar);
+		holder.progressBar.setVisibility(View.GONE);
 		holder.downloadProgressBar = (ProgressBar) viewLayout.findViewById(R.id.full_screen_image_viewer_download_progress_bar);
 		holder.downloadProgressBar.setVisibility(View.GONE);
 		holder.document = nodes.get(position).getHandle();
@@ -332,7 +277,6 @@ public class MegaChatFullScreenImageAdapter extends PagerAdapter implements OnCl
 			if (preview != null){
 				PreviewUtils.previewCache.put(node.getHandle(), preview);
 				holder.imgDisplay.setImageBitmap(preview);
-				holder.progressBar.setVisibility(View.GONE);
 			}
 			else{
 				try{
@@ -349,7 +293,6 @@ public class MegaChatFullScreenImageAdapter extends PagerAdapter implements OnCl
 			if (preview != null){
 				PreviewUtils.previewCache.put(node.getHandle(), preview);
 				holder.imgDisplay.setImageBitmap(preview);
-				holder.progressBar.setVisibility(View.GONE);
 			}
 			else{
 				try{
@@ -526,97 +469,9 @@ public class MegaChatFullScreenImageAdapter extends PagerAdapter implements OnCl
 		log("ERROR: " + e.getErrorCode() + "_" + e.getErrorString());
 	}
 
-	@Override
-	public void onTransferStart(MegaApiJava api, MegaTransfer transfer) {
-
-		log("Download started : " + transfer.getFileName() + "_" + transfer.getTransferredBytes() + "/" + transfer.getTotalBytes());
-		long handle = transfer.getNodeHandle();
-		int position = 0;
-		boolean holderIsVisible = false;
-		for(int i = 0; i < visibleImgs.size(); i++) {
-			position = visibleImgs.keyAt(i);
-			ViewHolderFullImage holder = visibleImgs.get(position);
-			if (holder.document == handle){
-				holderIsVisible = true;
-				break;
-			}
-		}
-		
-		if (holderIsVisible){
-			visibleImgs.get(position).downloadProgressBar.setVisibility(View.VISIBLE);
-		}
-	}
-
-	@Override
-	public void onTransferFinish(MegaApiJava api, MegaTransfer transfer,
-			MegaError e) {
-		long handle = transfer.getNodeHandle();
-		
-		pendingFullImages.remove(handle);
-//		ThumbnailUtils.pendingThumbnails.remove(handle);
-		
-		if (e.getErrorCode() == MegaError.API_OK){
-			log ("Download finished OK: " + transfer.getFileName() + "_" + transfer.getTransferredBytes() + "/" + transfer.getTotalBytes());
-			
-			try{
-				new AttachPreviewTask().execute(handle+"", transfer.getPath());
-			}
-			catch(Exception ex){
-				//Too many AsyncTasks
-				log("Too many AsyncTasks");
-			}
-		}		
-			
-	}
-
-	@Override
-	public void onTransferUpdate(MegaApiJava api, MegaTransfer transfer) {
-//		log ("Download updated: " + transfer.getFileName() + "_" + transfer.getTransferredBytes() + "/" + transfer.getTotalBytes());
-		
-		long handle = transfer.getNodeHandle();
-		
-		int position = 0;
-		boolean holderIsVisible = false;
-		for(int i = 0; i < visibleImgs.size(); i++) {
-			position = visibleImgs.keyAt(i);
-			ViewHolderFullImage holder = visibleImgs.get(position);
-			if (holder.document == handle){
-				holderIsVisible = true;
-				break;
-			}
-		}
-		
-		if (holderIsVisible){
-			visibleImgs.get(position).downloadProgressBar.setVisibility(View.VISIBLE);
-			int progressValue;
-			if (transfer.getTotalBytes() == 0){
-				progressValue = 100;
-			}
-			else{
-				progressValue = (int) ((transfer.getTransferredBytes()/(float)transfer.getTotalBytes()) * 100);
-			}
-//			log("PROGRESS VALUE: " + progressValue);
-			visibleImgs.get(position).downloadProgressBar.setProgress(progressValue);
-		}
-		
-		
-	}
-
-	@Override
-	public void onTransferTemporaryError(MegaApiJava api,
-			MegaTransfer transfer, MegaError e) {
-		log ("TEMPORARY ERROR (" + transfer.getFileName() + "): " + e.getErrorCode() + "_" + e.getErrorString());
-//		Util.showErrorAlertDialog("Temporary error: " + e.getErrorString(), true, activity);
-	}
 
 	@Override
 	public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
 		
-	}
-
-	@Override
-	public boolean onTransferData(MegaApiJava api, MegaTransfer transfer, byte[] buffer)
-	{
-		return true;
 	}
 }

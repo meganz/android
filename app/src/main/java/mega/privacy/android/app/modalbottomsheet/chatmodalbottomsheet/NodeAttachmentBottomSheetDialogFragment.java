@@ -335,6 +335,22 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
                 }
                 break;
             }
+            case R.id.option_import_layout:{
+                log("Import option");
+                if(node==null){
+                    log("The selected node is NULL");
+                    return;
+                }
+
+                if(context instanceof ChatActivityLollipop){
+                    ((ChatActivityLollipop)context).importNode();
+                }
+                else if(context instanceof NodeAttachmentActivityLollipop){
+                    ((NodeAttachmentActivityLollipop)context).importNode();
+                }
+
+                break;
+            }
             case R.id.option_view_layout:{
                 log("View option");
                 if(node==null){
@@ -366,22 +382,6 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
                 }
                 else if(context instanceof NodeAttachmentActivityLollipop){
                     chatC.saveForOffline(((NodeAttachmentActivityLollipop) context).selectedNode);
-                }
-
-                break;
-            }
-            case R.id.option_import_layout:{
-                log("Import option");
-                if(node==null){
-                    log("The selected node is NULL");
-                    return;
-                }
-
-                if(context instanceof ChatActivityLollipop){
-                    ((ChatActivityLollipop)context).importNode();
-                }
-                else if(context instanceof NodeAttachmentActivityLollipop){
-                    ((NodeAttachmentActivityLollipop)context).importNode();
                 }
 
                 break;

@@ -65,11 +65,13 @@ import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
+import mega.privacy.android.app.lollipop.ChatFullScreenImageViewer;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop;
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop.Mode;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.lollipop.MyAccountInfo;
 import mega.privacy.android.app.lollipop.PinActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaBrowserLollipopAdapter;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
@@ -851,15 +853,29 @@ public class NodeAttachmentActivityLollipop extends PinActivityLollipop implemen
 
 		if (adapterList.isMultipleSelect()){
 			log("multiselect ON");
-			adapterList.toggleSelection(position);
-
-			List<MegaNode> selectedNodes = adapterList.getSelectedNodes();
-			if (selectedNodes.size() > 0){
-				updateActionModeTitle();
-			}
+//			adapterList.toggleSelection(position);
+//
+//			List<MegaNode> selectedNodes = adapterList.getSelectedNodes();
+//			if (selectedNodes.size() > 0){
+//				updateActionModeTitle();
+//			}
 		}
 		else{
+			MegaNode node = nodes.get(position);
 
+			if(node.hasPreview()){
+				log("Show full screen viewer");
+				Intent intent = new Intent(this, ChatFullScreenImageViewer.class);
+				intent.putExtra("position", position);
+				intent.putExtra("chatId", chatId);
+				long [] messagesIds = {message.getMessage().getMsgId()};
+				intent.putExtra("messageIds", messagesIds);
+				startActivity(intent);
+			}
+			else{
+				log("the node has no preview");
+//				showNodeAttachmentBottomSheet(message, position);
+			}
 		}
 	}
 	

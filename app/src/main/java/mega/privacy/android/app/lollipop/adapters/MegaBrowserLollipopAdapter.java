@@ -1475,6 +1475,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 				}
 				else if(type==Constants.NODE_ATTACHMENT_ADAPTER){
 					log("Node attachment adapter");
+					((NodeAttachmentActivityLollipop) context).itemClick(currentPosition);
 				}
 				else{
 					log("click layout FileBrowserFragmentLollipop!");

@@ -110,23 +110,21 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
     private RelativeLayout topLayout;
 	private ExtendedViewPager viewPager;
 
+	String menuOptions[];
+
 	static ChatFullScreenImageViewer fullScreenImageViewer;
     private MegaApiAndroid megaApi;
 	MegaChatApiAndroid megaChatApi;
 
     private ArrayList<String> paths;
+	MegaNode nodeToImport;
 
 	long [] messageIds;
 	long chatId = -1;
 
-    public static int REQUEST_CODE_SELECT_MOVE_FOLDER = 1001;
-	public static int REQUEST_CODE_SELECT_COPY_FOLDER = 1002;
 	public static int REQUEST_CODE_SELECT_LOCAL_FOLDER = 1004;
 
 	ArrayList<MegaNode> nodes;
-
-	private static int EDIT_TEXT_ID = 1;
-	private Handler handler;
 
 	DatabaseHandler dbH = null;
 	MegaPreferences prefs = null;
@@ -144,20 +142,10 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 	}
 
 	@Override
-	public boolean onKeyDown(int keyCode, KeyEvent event) {
-	    if ( keyCode == KeyEvent.KEYCODE_MENU ) {
-	        // do nothing
-	        return true;
-	    }
-	    return super.onKeyDown(keyCode, event);
-	}
-
-	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		log("onCreate");
 		super.onCreate(savedInstanceState);
 
-		handler = new Handler();
 		fullScreenImageViewer = this;
 
 		Display display = getWindowManager().getDefaultDisplay();
@@ -235,6 +223,17 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 						nodes.add(node);
 					}
 				}
+
+				if(message.getUserHandle()==megaChatApi.getMyUserHandle()){
+					menuOptions = new String[2];
+					menuOptions[0] = getString(R.string.save_for_offline);
+					menuOptions[1] = getString(R.string.general_revoke);
+				}
+				else{
+					menuOptions = new String[1];
+					menuOptions[0] = getString(R.string.save_for_offline);
+				}
+
 			}
 			else{
 				log("ERROR - the message is NULL");
@@ -292,10 +291,6 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 		importIcon.setOnClickListener(this);
 
 		ArrayAdapter<String> arrayAdapter;
-
-		String menuOptions[] = new String[2];
-		menuOptions[0] = getString(R.string.save_for_offline);
-		menuOptions[1] = getString(R.string.general_revoke);
 
 		overflowMenuList = (ListView) findViewById(R.id.chat_image_viewer_overflow_menu_list);
 		arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, menuOptions);
@@ -385,18 +380,7 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 				overflowVisible = false;
 				adapterMega.setMenuVisible(overflowVisible);
 
-				File previewFolder = PreviewUtils.getPreviewFolder(this);
-				File previewFile = new File(previewFolder, node.getBase64Handle() + ".jpg");
-
-				if (previewFile.exists()){
-					Intent share = new Intent(Intent.ACTION_SEND);
-					share.setType("image/*");
-					share.putExtra(Intent.EXTRA_STREAM, Uri.parse("file://" + previewFile));
-					startActivity(Intent.createChooser(share, getString(R.string.context_share_image)));
-				}
-				else{
-					Snackbar.make(fragmentContainer, getString(R.string.full_image_viewer_not_preview), Snackbar.LENGTH_LONG).show();
-				}
+				importNode(node);
 
 				break;
 			}
@@ -476,137 +460,17 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 		downloadConfirmationDialog.show();
 	}
 	
-	@Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        switch(requestCode){
-        	case Constants.REQUEST_WRITE_STORAGE:{
-		        boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
-				if (hasStoragePermission) {
-					downloadNode(handleListM);
-				}
-	        	break;
-	        }
-        }
-    }
-	
-	@SuppressLint("NewApi") 
-	public void downloadNode(ArrayList<Long> handleList){
-		
-		long size = 0;
-		long[] hashes = new long[handleList.size()];
-		for (int i=0;i<handleList.size();i++){
-			hashes[i] = handleList.get(i);
-			size += megaApi.getNodeByHandle(hashes[i]).getSize();
-		}
-		
-		if (dbH == null){
-//			dbH = new DatabaseHandler(getApplicationContext());
-			dbH = DatabaseHandler.getDbHandler(getApplicationContext());
-		}
-		
-		boolean askMe = true;
-		String downloadLocationDefaultPath = "";
-		prefs = dbH.getPreferences();		
-		if (prefs != null){
-			if (prefs.getStorageAskAlways() != null){
-				if (!Boolean.parseBoolean(prefs.getStorageAskAlways())){
-					if (prefs.getStorageDownloadLocation() != null){
-						if (prefs.getStorageDownloadLocation().compareTo("") != 0){
-							askMe = false;
-							downloadLocationDefaultPath = prefs.getStorageDownloadLocation();
-						}
-					}
-				}
-			}
-		}		
-			
-		if (askMe){
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-				File[] fs = getExternalFilesDirs(null);
-				if (fs.length > 1){
-					if (fs[1] == null){
-						Intent intent = new Intent(Mode.PICK_FOLDER.getAction());
-						intent.putExtra(FileStorageActivityLollipop.EXTRA_BUTTON_PREFIX, getString(R.string.context_download_to));
-						intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, size);
-						intent.setClass(this, FileStorageActivityLollipop.class);
-						intent.putExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES, hashes);
-						startActivityForResult(intent, REQUEST_CODE_SELECT_LOCAL_FOLDER);
-					}
-					else{
-						Dialog downloadLocationDialog;
-						String[] sdCardOptions = getResources().getStringArray(R.array.settings_storage_download_location_array);
-				        AlertDialog.Builder b=new AlertDialog.Builder(this);
-	
-						b.setTitle(getResources().getString(R.string.settings_storage_download_location));
-						final long sizeFinal = size;
-						final long[] hashesFinal = new long[hashes.length];
-						for (int i=0; i< hashes.length; i++){
-							hashesFinal[i] = hashes[i];
-						}
-						
-						b.setItems(sdCardOptions, new DialogInterface.OnClickListener() {
-							
-							@Override
-							public void onClick(DialogInterface dialog, int which) {
-								switch(which){
-									case 0:{
-										Intent intent = new Intent(Mode.PICK_FOLDER.getAction());
-										intent.putExtra(FileStorageActivityLollipop.EXTRA_BUTTON_PREFIX, getString(R.string.context_download_to));
-										intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, sizeFinal);
-										intent.setClass(getApplicationContext(), FileStorageActivityLollipop.class);
-										intent.putExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES, hashesFinal);
-										startActivityForResult(intent, REQUEST_CODE_SELECT_LOCAL_FOLDER);
-										break;
-									}
-									case 1:{
-										File[] fs = getExternalFilesDirs(null);
-										if (fs.length > 1){
-											String path = fs[1].getAbsolutePath();
-											File defaultPathF = new File(path);
-											defaultPathF.mkdirs();
-											Toast.makeText(getApplicationContext(), getString(R.string.general_download) + ": "  + defaultPathF.getAbsolutePath() , Toast.LENGTH_LONG).show();
-											downloadTo(path, null, sizeFinal, hashesFinal);
-										}
-										break;
-									}
-								}
-							}
-						});
-						b.setNegativeButton(getResources().getString(R.string.general_cancel), new DialogInterface.OnClickListener() {
-							
-							@Override
-							public void onClick(DialogInterface dialog, int which) {
-								dialog.cancel();
-							}
-						});
-						downloadLocationDialog = b.create();
-						downloadLocationDialog.show();
-					}
-				}
-				else{
-					Intent intent = new Intent(Mode.PICK_FOLDER.getAction());
-					intent.putExtra(FileStorageActivityLollipop.EXTRA_BUTTON_PREFIX, getString(R.string.context_download_to));
-					intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, size);
-					intent.setClass(this, FileStorageActivityLollipop.class);
-					intent.putExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES, hashes);
-					startActivityForResult(intent, REQUEST_CODE_SELECT_LOCAL_FOLDER);
-				}
-			}
-			else{
-				Intent intent = new Intent(Mode.PICK_FOLDER.getAction());
-				intent.putExtra(FileStorageActivityLollipop.EXTRA_BUTTON_PREFIX, getString(R.string.context_download_to));
-				intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, size);
-				intent.setClass(this, FileStorageActivityLollipop.class);
-				intent.putExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES, hashes);
-				startActivityForResult(intent, REQUEST_CODE_SELECT_LOCAL_FOLDER);
-			}
-		}
-		else{
-			downloadTo(downloadLocationDefaultPath, null, size, hashes);
-		}
+
+	public void importNode(MegaNode node){
+		log("importNode");
+
+		nodeToImport = node;
+		Intent intent = new Intent(this, FileExplorerActivityLollipop.class);
+		intent.setAction(FileExplorerActivityLollipop.ACTION_PICK_IMPORT_FOLDER);
+		startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_IMPORT_FOLDER);
+
 	}
-	
+
 	@Override
 	public void onSaveInstanceState (Bundle savedInstanceState){
 		super.onSaveInstanceState(savedInstanceState);
@@ -661,19 +525,26 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 	public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
 
 		log("onRequestFinish");
-		if (request.getType() == MegaRequest.TYPE_COPY){
-			try { 
-				statusDialog.dismiss();	
-			} 
-			catch (Exception ex) {}
-			
-			if (e.getErrorCode() == MegaError.API_OK){
-				Snackbar.make(fragmentContainer, getString(R.string.context_correctly_copied), Snackbar.LENGTH_LONG).show();
+		if(request.getType() == MegaRequest.TYPE_COPY){
+			if (e.getErrorCode() != MegaError.API_OK) {
+
+				log("e.getErrorCode() != MegaError.API_OK");
+
+				if(e.getErrorCode()==MegaError.API_EOVERQUOTA){
+					log("OVERQUOTA ERROR: "+e.getErrorCode());
+					Intent intent = new Intent(this, ManagerActivityLollipop.class);
+					intent.setAction(Constants.ACTION_OVERQUOTA_ALERT);
+					startActivity(intent);
+					finish();
+				}
+				else
+				{
+					Snackbar.make(fragmentContainer, getString(R.string.import_success_error), Snackbar.LENGTH_LONG).show();
+				}
+
+			}else{
+				Snackbar.make(fragmentContainer, getString(R.string.import_success_message), Snackbar.LENGTH_LONG).show();
 			}
-			else{
-				Snackbar.make(fragmentContainer, getString(R.string.context_no_copied), Snackbar.LENGTH_LONG).show();
-			}
-			log("copy nodes request finished");
 		}
 	}
 
@@ -697,19 +568,11 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 		
 		switch(position){
 			case 0:{
-
+				showSnackbar("Coming soon...");
 				break;
 			}
 			case 1:{
-
-				break;
-			}
-			case 2:{
-
-				break;
-			}
-			case 3:{
-
+				showSnackbar("Coming soon...");
 				break;
 			}
 		}
@@ -733,71 +596,42 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 			downloadTo (parentPath, url, size, hashes);
 			Snackbar.make(fragmentContainer, getString(R.string.download_began), Snackbar.LENGTH_LONG).show();
 		}
-		else if (requestCode == REQUEST_CODE_SELECT_MOVE_FOLDER && resultCode == RESULT_OK) {
-			
-			if(!Util.isOnline(this)){
-				Snackbar.make(fragmentContainer, getString(R.string.error_server_connection_problem), Snackbar.LENGTH_LONG).show();
-				return;
-			}
-			
-			final long[] moveHandles = intent.getLongArrayExtra("MOVE_HANDLES");
-			final long toHandle = intent.getLongExtra("MOVE_TO", 0);
-			final int totalMoves = moveHandles.length;
-			
-			MegaNode parent = megaApi.getNodeByHandle(toHandle);
+		else if (requestCode == Constants.REQUEST_CODE_SELECT_IMPORT_FOLDER && resultCode == RESULT_OK) {
+			log("onActivityResult REQUEST_CODE_SELECT_IMPORT_FOLDER OK");
 
-			ProgressDialog temp = null;
-			try{
-				temp = new ProgressDialog(this);
-				temp.setMessage(getString(R.string.context_moving));
-				temp.show();
-			}
-			catch(Exception e){
-				return;
-			}
-			statusDialog = temp;
-			
-			for(int i=0; i<moveHandles.length;i++){
-				megaApi.moveNode(megaApi.getNodeByHandle(moveHandles[i]), parent, this);
-			}
-		}
-		else if (requestCode == REQUEST_CODE_SELECT_COPY_FOLDER && resultCode == RESULT_OK){
-			if(!Util.isOnline(this)){
+			if(!Util.isOnline(this)) {
+				try{
+					statusDialog.dismiss();
+				} catch(Exception ex) {};
+
 				Snackbar.make(fragmentContainer, getString(R.string.error_server_connection_problem), Snackbar.LENGTH_LONG).show();
 				return;
 			}
-			
-			final long[] copyHandles = intent.getLongArrayExtra("COPY_HANDLES");
-			final long toHandle = intent.getLongExtra("COPY_TO", 0);
-			final int totalCopy = copyHandles.length;
-			
-			ProgressDialog temp = null;
-			try{
-				temp = new ProgressDialog(this);
-				temp.setMessage(getString(R.string.context_copying));
-				temp.show();
+
+			final long toHandle = intent.getLongExtra("IMPORT_TO", 0);
+
+			MegaNode target = null;
+			target = megaApi.getNodeByHandle(toHandle);
+			if(target == null){
+				target = megaApi.getRootNode();
 			}
-			catch(Exception e){
-				return;
-			}
-			statusDialog = temp;
-			
-			MegaNode parent = megaApi.getNodeByHandle(toHandle);
-			for(int i=0; i<copyHandles.length;i++){
-				MegaNode cN = megaApi.getNodeByHandle(copyHandles[i]);
-				if (cN != null){
-					log("cN != null, i = " + i + " of " + copyHandles.length);
-					megaApi.copyNode(cN, parent, this);
-				}
-				else{
-					log("cN == null, i = " + i + " of " + copyHandles.length);
-					try {
-						statusDialog.dismiss();
-						Snackbar.make(fragmentContainer, getString(R.string.context_no_copied), Snackbar.LENGTH_LONG).show();
-					}
-					catch (Exception ex) {}
+			log("TARGET: " + target.getName() + "and handle: " + target.getHandle());
+			//Temporal until we had preview of several messages
+
+			if (nodeToImport != null) {
+				log("DOCUMENT: " + nodeToImport.getName() + "_" + nodeToImport.getHandle());
+				if (target != null) {
+					megaApi.copyNode(nodeToImport, target, this);
+				} else {
+					log("TARGET: null");
+					Snackbar.make(fragmentContainer, getString(R.string.import_success_error), Snackbar.LENGTH_LONG).show();
 				}
 			}
+			else{
+				log("DOCUMENT: null");
+				Snackbar.make(fragmentContainer, getString(R.string.import_success_error), Snackbar.LENGTH_LONG).show();
+			}
+
 		}
 	}
 	
