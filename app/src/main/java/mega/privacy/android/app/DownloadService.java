@@ -335,6 +335,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
         }
 
         if(contentUri!=null){
+			log("contentUri is NOT null");
             //To download to Advanced Devices
             log("Download to advanced devices checked");
             currentDir = new File(intent.getStringExtra(EXTRA_PATH));
@@ -372,6 +373,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			megaApi.startDownload(currentDocument, currentDir.getAbsolutePath() + "/", this);
         }
         else{
+			log("contentUri NULL");
             if (currentDir.isDirectory()){
                 log("To download(dir): " + currentDir.getAbsolutePath() + "/");
 
