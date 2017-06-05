@@ -944,7 +944,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
     }
 
     private void submitForm(boolean fromConfirmAccount) {
-        log("submitForm - " + fromConfirmAccount);
+        log("submitForm - " + fromConfirmAccount + " email: " + this.emailTemp + "__" + this.passwdTemp);
 
         lastEmail = this.emailTemp;
         lastPassword = this.passwdTemp;
