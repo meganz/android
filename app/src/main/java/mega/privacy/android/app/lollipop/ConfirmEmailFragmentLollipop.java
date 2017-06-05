@@ -163,11 +163,16 @@ public class ConfirmEmailFragmentLollipop extends Fragment implements MegaReques
 	public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
 		log("onRequestFinish - " + request.getRequestString() + "_" + e.getErrorCode());
 
-		if (e.getErrorCode() == MegaError.API_OK){
-			((LoginActivityLollipop)context).showSnackbar(getString(R.string.confirm_email_misspelled_email_sent));
+		if (isAdded()) {
+			log("isAdded true");
+			if (e.getErrorCode() == MegaError.API_OK) {
+				((LoginActivityLollipop) context).showSnackbar(getString(R.string.confirm_email_misspelled_email_sent));
+			} else {
+				((LoginActivityLollipop) context).showSnackbar(e.getErrorString());
+			}
 		}
 		else{
-			((LoginActivityLollipop)context).showSnackbar(e.getErrorString());
+			log("isAdded false");
 		}
 	}
 
