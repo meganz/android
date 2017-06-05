@@ -801,18 +801,16 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 		Notification notification = null;
 
-		String contentText = "";
+		String contentText = getString(R.string.download_show_info);
 		String message = getString(R.string.title_depleted_transfer_overquota);
 
 		if(megaApi.isLoggedIn()==0 || dbH.getCredentials()==null){
-			contentText = getString(R.string.download_touch_to_cancel);
 			dbH.clearEphemeral();
 			intent = new Intent(DownloadService.this, LoginActivityLollipop.class);
-			intent.setAction(Constants.ACTION_CANCEL_DOWNLOAD);
+			intent.setAction(Constants.ACTION_OVERQUOTA_TRANSFER);
 			pendingIntent = PendingIntent.getActivity(DownloadService.this, 0, intent, 0);
 		}
 		else{
-			contentText = getString(R.string.download_show_info);
 			intent = new Intent(DownloadService.this, ManagerActivityLollipop.class);
 			intent.setAction(Constants.ACTION_OVERQUOTA_TRANSFER);
 			pendingIntent = PendingIntent.getActivity(DownloadService.this, 0, intent, 0);

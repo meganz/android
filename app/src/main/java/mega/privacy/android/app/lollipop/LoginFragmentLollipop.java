@@ -513,10 +513,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                         return v;
                     }
                 }
-                else if (action.equals(Constants.ACTION_OVERQUOTA_TRANSFER)) {
-                    ((LoginActivityLollipop)context).showTransferOverquotaDialog();
-
-                }
                 else if (action.equals(Constants.ACTION_CANCEL_DOWNLOAD)) {
                     ((LoginActivityLollipop)context).showConfirmationCancelAllTransfers();
 
