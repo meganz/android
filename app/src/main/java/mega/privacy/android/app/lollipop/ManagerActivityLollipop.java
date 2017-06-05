@@ -11150,7 +11150,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		title.setText(getString(R.string.title_depleted_transfer_overquota));
 
 		ImageView icon = (ImageView) dialogView.findViewById(R.id.image_transfer_overquota);
-		icon.setImageDrawable(getDrawable(R.drawable.transfer_quota_empty));
+		icon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.transfer_quota_empty));
 
 		TextView text = (TextView) dialogView.findViewById(R.id.text_transfer_overquota);
 		text.setText(getString(R.string.text_depleted_transfer_overquota));
