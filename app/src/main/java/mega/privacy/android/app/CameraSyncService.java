@@ -1055,17 +1055,23 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 						}
 					}
 
+					log("auxCameraFilesExternalSDCard.size() = " + auxCameraFilesExternalSDCard.size());
 					int j=0;
 					for (int i=0;i<auxCameraFilesExternalSDCard.size();i++){
 						if (cameraUploadNode == null){
+							log("Camera Upload Node null");
 							cameraUploadNode = megaApi.getNodeByHandle(cameraUploadHandle);
 						}
 						if (cameraUploadNode != null){
+							log("Camera Upload Node not null");
 							if (megaApi.getChildNode(cameraUploadNode, auxCameraFilesExternalSDCard.get(i).getName()) == null){
 								cameraFilesExternalSDCardList.add(j, auxCameraFilesExternalSDCard.get(i));
 								log("FILE ADDED: " + auxCameraFilesExternalSDCard.get(i).getName());
 								j++;
 							}
+						}
+						else{
+							log("Camera Upload null");
 						}
 					}
 
