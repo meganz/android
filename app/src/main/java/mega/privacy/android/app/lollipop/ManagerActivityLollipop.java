@@ -12909,6 +12909,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	@Override
 	public void onTransferUpdate(MegaApiJava api, MegaTransfer transfer) {
 //		log("onTransferUpdate: " + transfer.getFileName() + " - " + transfer.getTag());
+
 		long now = Calendar.getInstance().getTimeInMillis();
 		if((now - lastTimeOnTransferUpdate)>Util.ONTRANSFERUPDATE_REFRESH_MILLIS){
 			log("Update onTransferUpdate: " + transfer.getFileName() + " - " + transfer.getTag()+ " - "+ transfer.getNotificationNumber());
@@ -12943,17 +12944,16 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	public void onTransferTemporaryError(MegaApiJava api, MegaTransfer transfer, MegaError e) {
 		log("onTransferTemporaryError: " + transfer.getFileName() + " - " + transfer.getTag());
 
-//		if(e.getErrorCode() == MegaError.API_EOVERQUOTA){
-//			log("API_EOVERQUOTA error!!");
-//			if(alertDialogTransferOverquota==null){
-//				showTransferOverquotaDialog();
-//			}
-//			else{
-//				if(!(alertDialogTransferOverquota.isShowing())){
-//					showTransferOverquotaDialog();
-//				}
-//			}
-//		}
+		if(e.getErrorCode() == MegaError.API_EOVERQUOTA){
+			log("API_EOVERQUOTA error!!");
+			String cloudTag = getFragmentTag(R.id.cloud_drive_tabs_pager, 0);
+			fbFLol = (FileBrowserFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cloudTag);
+			if (fbFLol != null){
+				if(fbFLol.isAdded()){
+					fbFLol.setOverviewLayout();
+				}
+			}
+		}
 	}
 
 	@Override
