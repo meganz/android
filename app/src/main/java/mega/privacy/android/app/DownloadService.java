@@ -92,6 +92,9 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 	private boolean openFile = true;
 
+	private boolean isOverquota = false;
+	private long downloadedBytesToOverquota = 0;
+
 	MegaApplication app;
 	MegaApiAndroid megaApi;
 	MegaApiAndroid megaApiFolder;
@@ -685,17 +688,111 @@ public class DownloadService extends Service implements MegaTransferListenerInte
         long totalSizePendingTransfer = megaApi.getTotalDownloadBytes() + megaApiFolder.getTotalDownloadBytes();
         long totalSizeTransferred = megaApi.getTotalDownloadedBytes() + megaApiFolder.getTotalDownloadedBytes();
 
-        int progressPercent = (int) Math.round((double) totalSizeTransferred / totalSizePendingTransfer * 100);
-        log("updateProgressNotification: "+progressPercent);
+		boolean update;
 
-        String message = "";
-        if (totalTransfers == 0){
-            message = getString(R.string.download_preparing_files);
-        }
-        else{
-            int inProgress = totalTransfers - pendingTransfers + 1;
-            message = getResources().getQuantityString(R.plurals.download_service_notification, totalTransfers, inProgress, totalTransfers);
+		if(isOverquota){
+			log("Overquota flag! is TRUE");
+			if(downloadedBytesToOverquota<=totalSizeTransferred){
+				update = false;
+			}
+			else{
+				update = true;
+				log("Change overquota flag");
+				isOverquota = false;
+			}
 		}
+		else{
+			log("NOT overquota flag");
+			update = true;
+		}
+
+		if(update){
+			int progressPercent = (int) Math.round((double) totalSizeTransferred / totalSizePendingTransfer * 100);
+			log("updateProgressNotification: "+progressPercent);
+
+			String message = "";
+			if (totalTransfers == 0){
+				message = getString(R.string.download_preparing_files);
+			}
+			else{
+				int inProgress = totalTransfers - pendingTransfers + 1;
+				message = getResources().getQuantityString(R.plurals.download_service_notification, totalTransfers, inProgress, totalTransfers);
+			}
+
+			Intent intent;
+			PendingIntent pendingIntent;
+
+			String info = Util.getProgressSize(DownloadService.this, totalSizeTransferred, totalSizePendingTransfer);
+
+			Notification notification = null;
+
+			String contentText = "";
+
+			if(dbH.getCredentials()==null){
+				contentText = getString(R.string.download_touch_to_cancel);
+				intent = new Intent(DownloadService.this, LoginActivityLollipop.class);
+				intent.setAction(Constants.ACTION_CANCEL_DOWNLOAD);
+				pendingIntent = PendingIntent.getActivity(DownloadService.this, 0, intent, 0);
+			}
+			else{
+				contentText = getString(R.string.download_touch_to_show);
+				intent = new Intent(DownloadService.this, ManagerActivityLollipop.class);
+				intent.setAction(Constants.ACTION_SHOW_TRANSFERS);
+				pendingIntent = PendingIntent.getActivity(DownloadService.this, 0, intent, 0);
+			}
+
+			int currentapiVersion = android.os.Build.VERSION.SDK_INT;
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+				mBuilder
+						.setSmallIcon(R.drawable.ic_stat_notify_download)
+						.setProgress(100, progressPercent, false)
+						.setContentIntent(pendingIntent)
+						.setOngoing(true).setContentTitle(message).setSubText(info)
+						.setContentText(contentText)
+						.setOnlyAlertOnce(true);
+				notification = mBuilder.build();
+			}
+			else if (currentapiVersion >= android.os.Build.VERSION_CODES.ICE_CREAM_SANDWICH)
+			{
+				mBuilder
+						.setSmallIcon(R.drawable.ic_stat_notify_download)
+						.setProgress(100, progressPercent, false)
+						.setContentIntent(pendingIntent)
+						.setOngoing(true).setContentTitle(message).setContentInfo(info)
+						.setContentText(contentText)
+						.setOnlyAlertOnce(true);
+				notification = mBuilder.getNotification();
+			}
+			else
+			{
+				notification = new Notification(R.drawable.ic_stat_notify_download, null, 1);
+				notification.flags |= Notification.FLAG_ONGOING_EVENT;
+				notification.contentView = new RemoteViews(getApplicationContext().getPackageName(), R.layout.download_progress);
+				notification.contentIntent = pendingIntent;
+				notification.contentView.setImageViewResource(R.id.status_icon, R.drawable.ic_stat_notify_download);
+				notification.contentView.setTextViewText(R.id.status_text, message);
+				notification.contentView.setTextViewText(R.id.progress_text, info);
+				notification.contentView.setProgressBar(R.id.status_progress, 100, progressPercent, false);
+			}
+
+			if (!isForeground) {
+				log("starting foreground!");
+				startForeground(notificationId, notification);
+				isForeground = true;
+			} else {
+				mNotificationManager.notify(notificationId, notification);
+			}
+		}
+	}
+
+	private void showOverquotaNotification(){
+		log("showOverquotaNotification");
+
+		long totalSizePendingTransfer = megaApi.getTotalDownloadBytes() + megaApiFolder.getTotalDownloadBytes();
+		long totalSizeTransferred = megaApi.getTotalDownloadedBytes() + megaApiFolder.getTotalDownloadedBytes();
+
+		int progressPercent = (int) Math.round((double) totalSizeTransferred / totalSizePendingTransfer * 100);
+		log("updateProgressNotification: "+progressPercent);
 
 		Intent intent;
 		PendingIntent pendingIntent;
@@ -705,8 +802,9 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		Notification notification = null;
 
 		String contentText = "";
+		String message = getString(R.string.title_depleted_transfer_overquota);
 
-		if(dbH.getCredentials()==null){
+		if(megaApi.isLoggedIn()==0 || dbH.getCredentials()==null){
 			contentText = getString(R.string.download_touch_to_cancel);
 			dbH.clearEphemeral();
 			intent = new Intent(DownloadService.this, LoginActivityLollipop.class);
@@ -714,13 +812,13 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			pendingIntent = PendingIntent.getActivity(DownloadService.this, 0, intent, 0);
 		}
 		else{
-			contentText = getString(R.string.download_touch_to_show);
+			contentText = getString(R.string.download_show_info);
 			intent = new Intent(DownloadService.this, ManagerActivityLollipop.class);
-			intent.setAction(Constants.ACTION_SHOW_TRANSFERS);
+			intent.setAction(Constants.ACTION_OVERQUOTA_TRANSFER);
 			pendingIntent = PendingIntent.getActivity(DownloadService.this, 0, intent, 0);
 		}
 
-        int currentapiVersion = android.os.Build.VERSION.SDK_INT;
+		int currentapiVersion = android.os.Build.VERSION.SDK_INT;
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
 			mBuilder
 					.setSmallIcon(R.drawable.ic_stat_notify_download)
@@ -733,13 +831,13 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		}
 		else if (currentapiVersion >= android.os.Build.VERSION_CODES.ICE_CREAM_SANDWICH)
 		{
-				mBuilder
-				.setSmallIcon(R.drawable.ic_stat_notify_download)
-				.setProgress(100, progressPercent, false)
-				.setContentIntent(pendingIntent)
-				.setOngoing(true).setContentTitle(message).setContentInfo(info)
-				.setContentText(contentText)
-				.setOnlyAlertOnce(true);
+			mBuilder
+					.setSmallIcon(R.drawable.ic_stat_notify_download)
+					.setProgress(100, progressPercent, false)
+					.setContentIntent(pendingIntent)
+					.setOngoing(true).setContentTitle(message).setContentInfo(info)
+					.setContentText(contentText)
+					.setOnlyAlertOnce(true);
 			notification = mBuilder.getNotification();
 		}
 		else
@@ -778,7 +876,8 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	}
 
 	@Override
-	public void onTransferStart(MegaApiJava api, MegaTransfer transfer) {
+	public void
+	onTransferStart(MegaApiJava api, MegaTransfer transfer) {
 		log("Download start: " + transfer.getFileName() + "_" + megaApi.getTotalDownloads() + "_" + megaApiFolder.getTotalDownloads());
 
 		transfersCount++;
@@ -1414,23 +1513,11 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 				log("Credentials is NOT null");
 			}
 
-			if(megaApi.isLoggedIn()==0){
-				log("TRANSFER overquota and NOT logged in!");
-				Intent intent = null;
-				dbH.clearEphemeral();
-				intent = new Intent(this, LoginActivityLollipop.class);
-				intent.setAction(Constants.ACTION_OVERQUOTA_TRANSFER);
-				intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-				startActivity(intent);
-			}
-			else{
-				log("TRANSFER overquota and YESS logged in!");
-				Intent intent = null;
-				intent = new Intent(this, ManagerActivityLollipop.class);
-				intent.setAction(Constants.ACTION_OVERQUOTA_TRANSFER);
-				intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-				startActivity(intent);
-			}
+			downloadedBytesToOverquota = megaApi.getTotalDownloadedBytes() + megaApiFolder.getTotalDownloadedBytes();
+			isOverquota = true;
+			log("downloaded bytes to reach overquota: "+downloadedBytesToOverquota);
+
+			showOverquotaNotification();
 		}
 	}
 
