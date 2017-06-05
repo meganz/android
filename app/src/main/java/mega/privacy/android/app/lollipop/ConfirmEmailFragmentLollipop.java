@@ -11,8 +11,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import java.util.Locale;
 
@@ -35,8 +37,13 @@ public class ConfirmEmailFragmentLollipop extends Fragment implements MegaReques
 	String passwdTemp = null;
 	String firstNameTemp = null;
 
+	ImageView icon;
 	EditText et_newEmail;
 	Button resendButton;
+	TextView awaiting;
+	TextView explanation;
+	TextView mispelled;
+
 
 	@Override
 	public void onAttach(Activity context) {
@@ -76,19 +83,37 @@ public class ConfirmEmailFragmentLollipop extends Fragment implements MegaReques
 
 		View v = inflater.inflate(R.layout.fragment_confirm_email, container, false);
 
+		icon = (ImageView) v.findViewById(R.id.confirm_email_icon);
+		awaiting = (TextView) v.findViewById(R.id.confirm_email_awaiting);
+		explanation = (TextView) v.findViewById(R.id.confirm_email_explanation);
 		et_newEmail = (EditText) v.findViewById(R.id.confirm_email_new_email);
-		RelativeLayout.LayoutParams  textET = (RelativeLayout.LayoutParams)et_newEmail.getLayoutParams();
-		textET.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleWidthPx(20, outMetrics), Util.scaleWidthPx(10, outMetrics), Util.scaleHeightPx(10, outMetrics));
-		et_newEmail.setLayoutParams(textET);
-
-		et_newEmail.setCursorVisible(true);
-
-		et_newEmail.setText(emailTemp);
-
+		mispelled = (TextView) v.findViewById(R.id.confirm_email_misspelled);
 		resendButton = (Button) v.findViewById(R.id.confirm_email_new_email_resend);
 
+		RelativeLayout.LayoutParams iconParams = (RelativeLayout.LayoutParams) icon.getLayoutParams();
+		iconParams.setMargins(Util.scaleWidthPx(16, outMetrics), Util.scaleHeightPx(106, outMetrics), 0, 0);
+		icon.setLayoutParams(iconParams);
+
+		RelativeLayout.LayoutParams awaitingParams = (RelativeLayout.LayoutParams) awaiting.getLayoutParams();
+		awaitingParams.setMargins(Util.scaleWidthPx(24, outMetrics), Util.scaleHeightPx(20, outMetrics), 0, 0);
+		awaiting.setLayoutParams(awaitingParams);
+
+		RelativeLayout.LayoutParams explanationParams = (RelativeLayout.LayoutParams) explanation.getLayoutParams();
+		explanationParams.setMargins(Util.scaleWidthPx(24, outMetrics), Util.scaleHeightPx(10, outMetrics), Util.scaleWidthPx(56, outMetrics), 0);
+		explanation.setLayoutParams(explanationParams);
+
+		RelativeLayout.LayoutParams  textET = (RelativeLayout.LayoutParams)et_newEmail.getLayoutParams();
+		textET.setMargins(Util.scaleWidthPx(24, outMetrics), Util.scaleHeightPx(49, outMetrics), Util.scaleWidthPx(24, outMetrics), 0);
+		et_newEmail.setLayoutParams(textET);
+		et_newEmail.setCursorVisible(true);
+		et_newEmail.setText(emailTemp);
+
+		RelativeLayout.LayoutParams mispelledParams = (RelativeLayout.LayoutParams) mispelled.getLayoutParams();
+		mispelledParams.setMargins(Util.scaleWidthPx(24, outMetrics), Util.scaleHeightPx(20, outMetrics), Util.scaleWidthPx(56, outMetrics), 0);
+		mispelled.setLayoutParams(mispelledParams);
+
 		RelativeLayout.LayoutParams resendButtonParams = (RelativeLayout.LayoutParams)resendButton.getLayoutParams();
-		resendButtonParams.setMargins(0, Util.scaleWidthPx(20, outMetrics), Util.scaleWidthPx(16, outMetrics), Util.scaleWidthPx(10, outMetrics));
+		resendButtonParams.setMargins(Util.scaleWidthPx(24, outMetrics), Util.scaleWidthPx(24, outMetrics), 0, 0);
 		resendButton.setLayoutParams(resendButtonParams);
 
 		resendButton.setOnClickListener(this);

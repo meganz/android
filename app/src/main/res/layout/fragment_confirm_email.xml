@@ -9,86 +9,84 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_centerVertical="true">
+        android:layout_height="wrap_content">
 
         <ImageView
             android:id="@+id/confirm_email_icon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:layout_marginBottom="98dp"
-            android:src="@drawable/ic_confirm_email"
-            android:layout_centerHorizontal="true"/>
+            android:layout_marginTop="106dp"
+            android:layout_marginLeft="16dp"
+            android:src="@drawable/ic_awaiting_email"/>
 
         <TextView
             android:id="@+id/confirm_email_awaiting"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/confirm_email_text"
-            android:textSize="18sp"
-            android:textColor="#333333"
+            android:textSize="20sp"
+            android:textColor="#df000000"
             android:fontFamily="sans-serif-light"
-            android:layout_marginTop="229dp"
-            android:layout_centerHorizontal="true"
-            android:layout_marginLeft="66.5dp"
-            android:layout_marginRight="67.5dp"
-            android:gravity="center"/>
+            android:layout_marginTop="20dp"
+            android:layout_marginLeft="24dp"
+            android:layout_below="@id/confirm_email_icon"/>
 
         <TextView
             android:id="@+id/confirm_email_explanation"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/confirm_email_explanation"
-            android:textSize="18sp"
-            android:textColor="#999999"
+            android:textSize="16sp"
+            android:textColor="#8a000000"
             android:fontFamily="sans-serif-light"
             android:layout_below="@id/confirm_email_awaiting"
-            android:layout_marginTop="24dp"
-            android:layout_centerHorizontal="true"
-            android:layout_marginLeft="48dp"
-            android:layout_marginRight="48dp"
-            android:gravity="center"/>
-
-        <Button
-            android:id="@+id/confirm_email_new_email_resend"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_below="@id/confirm_email_explanation"
-            android:paddingLeft="10dp"
-            android:paddingRight="10dp"
-            android:paddingTop="-3dp"
-            android:paddingBottom="-3dp"
-            android:textColor="@color/white"
-            android:text="@string/confirm_email_misspelled_resend"
-            android:background="@color/accentColor"
-            android:elevation="@dimen/elevation_upgrade_low"
-            android:stateListAnimator="@anim/button_upgrade_elevation"
-            android:tint="@android:color/white" />
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="24dp"
+            android:layout_marginRight="56dp"/>
 
         <EditText
             android:id="@+id/confirm_email_new_email"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/confirm_email_explanation"
-            android:layout_toLeftOf="@id/confirm_email_new_email_resend"
+            android:textColor="#42000000"
             android:textSize="16sp"
-            android:layout_centerHorizontal="true"
-            android:imeOptions="actionNext"
-            android:inputType="textEmailAddress"/>
+            android:layout_marginTop="49dp"
+            android:layout_marginLeft="24dp"
+            android:layout_marginRight="24dp"
+            android:imeOptions="actionDone"
+            android:inputType="textEmailAddress"
+            android:hint="email@domain.com"/>
 
         <TextView
             android:id="@+id/confirm_email_misspelled"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
             android:singleLine="false"
             android:text="@string/confirm_email_misspelled"
-            android:textSize="10sp"
-            android:layout_margin="10dp"
+            android:textSize="14sp"
+            android:layout_marginTop="20dp"
+            android:layout_marginLeft="24dp"
+            android:layout_marginRight="56dp"
             android:layout_below="@id/confirm_email_new_email"/>
 
+        <Button
+            android:id="@+id/confirm_email_new_email_resend"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/confirm_email_misspelled"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:paddingTop="-3dp"
+            android:paddingBottom="-3dp"
+            android:layout_marginTop="24dp"
+            android:layout_marginLeft="24dp"
+            android:textColor="@color/white"
+            android:text="@string/confirm_email_misspelled_resend"
+            android:background="@color/accentColor"
+            android:elevation="@dimen/elevation_upgrade_low"
+            android:stateListAnimator="@anim/button_upgrade_elevation"
+            android:tint="@android:color/white" />
     </RelativeLayout>
 
 </RelativeLayout>
