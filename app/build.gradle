@@ -9,7 +9,7 @@ android {
         minSdkVersion 11
         targetSdkVersion 25
         versionCode 135
-        versionName "3.1.6 (135)"
+        versionName "3.1.6.1 (136)"
     }
 
     sourceSets.main {
