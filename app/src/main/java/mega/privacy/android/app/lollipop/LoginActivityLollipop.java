@@ -555,6 +555,14 @@ public class LoginActivityLollipop extends AppCompatActivity implements MegaGlob
 
     public void setEmailTemp(String emailTemp) {
         this.emailTemp = emailTemp;
+        if (dbH != null) {
+            if (dbH.getEphemeral() != null) {
+                EphemeralCredentials ephemeralCredentials = dbH.getEphemeral();
+                ephemeralCredentials.setEmail(emailTemp);
+                dbH.clearEphemeral();
+                dbH.saveEphemeral(ephemeralCredentials);
+            }
+        }
     }
 
     public String getEmailTemp() {
