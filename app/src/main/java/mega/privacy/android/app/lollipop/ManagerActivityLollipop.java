@@ -5188,8 +5188,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					pauseTransfersMenuIcon.setVisible(false);
 					cancelAllTransfersMenuItem.setVisible(false);
 				}
-
-
 			}
 
 			else if (drawerItem == DrawerItem.SETTINGS){
@@ -5232,9 +5230,15 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				if(Util.isChatEnabled()){
 
 					if (rChatFL != null){
+
 						if(Util.isOnline(this)){
 							newChatMenuItem.setVisible(true);
-							selectMenuItem.setVisible(true);
+							if(rChatFL.getItemCount()>0){
+								selectMenuItem.setVisible(true);
+							}
+							else{
+								selectMenuItem.setVisible(false);
+							}
 							setStatusMenuItem.setVisible(true);
 						}
 						else{
@@ -8944,8 +8948,23 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 		});
 
+		dialogBuilder.setOnCancelListener(
+				new DialogInterface.OnCancelListener() {
+					@Override
+					public void onCancel(DialogInterface dialog) {
+						log("setOnCancelListener setPin");
+						setPinDialog.dismiss();
+						if(sttFLol!=null){
+							if(sttFLol.isAdded()){
+								sttFLol.cancelSetPinLock();
+							}
+						}
+					}
+				}
+		);
+
 		setPinDialog = dialogBuilder.create();
-//		presenceStatusDialog.se
+		setPinDialog.setCanceledOnTouchOutside(true);
 		setPinDialog.show();
 	}
 
@@ -11374,8 +11393,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				log("Chat CREATED.");
 
 				//Update chat view
-				if(rChatFL!=null){
-//					rChatFL.setChats();
+				if(rChatFL!=null && rChatFL.isAdded()){
+
+					if(selectMenuItem!=null){
+						selectMenuItem.setVisible(true);
+					}
 				}
 
 				log("open new chat: " + request.getChatHandle());

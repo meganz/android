@@ -335,6 +335,22 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
                 }
                 break;
             }
+            case R.id.option_import_layout:{
+                log("Import option");
+                if(node==null){
+                    log("The selected node is NULL");
+                    return;
+                }
+
+                if(context instanceof ChatActivityLollipop){
+                    ((ChatActivityLollipop)context).importNode();
+                }
+                else if(context instanceof NodeAttachmentActivityLollipop){
+                    ((NodeAttachmentActivityLollipop)context).importNode();
+                }
+
+                break;
+            }
             case R.id.option_view_layout:{
                 log("View option");
                 if(node==null){
@@ -356,26 +372,16 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
                 }
 
                 if(context instanceof ChatActivityLollipop){
-                    ((ChatActivityLollipop)context).saveOffline();
+
+                    if(message!=null){
+                        chatC.saveForOffline(message.getMessage());
+                    }
+                    else{
+                        log("Message is NULL");
+                    }
                 }
                 else if(context instanceof NodeAttachmentActivityLollipop){
-                    ((NodeAttachmentActivityLollipop)context).saveOffline();
-                }
-
-                break;
-            }
-            case R.id.option_import_layout:{
-                log("Import option");
-                if(node==null){
-                    log("The selected node is NULL");
-                    return;
-                }
-
-                if(context instanceof ChatActivityLollipop){
-                    ((ChatActivityLollipop)context).importNode();
-                }
-                else if(context instanceof NodeAttachmentActivityLollipop){
-                    ((NodeAttachmentActivityLollipop)context).importNode();
+                    chatC.saveForOffline(((NodeAttachmentActivityLollipop) context).selectedNode);
                 }
 
                 break;

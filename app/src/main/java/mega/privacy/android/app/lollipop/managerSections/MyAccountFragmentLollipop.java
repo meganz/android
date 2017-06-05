@@ -216,7 +216,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 			upgradeButton.setBackground(ContextCompat.getDrawable(context, R.drawable.ripple_upgrade));
 		}
-		upgradeButton.setText(getString(R.string.my_account_upgrade_pro).toUpperCase(Locale.getDefault()));
+		upgradeButton.setText(getString(R.string.my_account_upgrade_pro));
 		upgradeButton.setOnClickListener(this);
 		upgradeButton.setVisibility(View.VISIBLE);
 
