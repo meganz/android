@@ -1204,4 +1204,8 @@
     <string name="copyright_alert_agree_button" context="text of the Agree button">Agree</string>
     <string name="copyright_alert_disagree_button" context="text of the Disagree button">Disagree</string>
 
+    <string name="download_show_info" context="Hint how to cancel the download">Show info</string>
+
+    <string name="context_link_removal_error" context="error message">Link removal failed. Try again later.</string>
+    <string name="context_link_action_error" context="error message">Link action failed. Try again later.</string>
 </resources>

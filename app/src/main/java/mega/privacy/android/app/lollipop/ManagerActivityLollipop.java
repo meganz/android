@@ -2058,6 +2058,17 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
     			else if(intent.getAction().equals(Constants.ACTION_OVERQUOTA_ALERT)){
 	    			showOverquotaAlert();
 	    		}
+	    		else if(intent.getAction().equals(Constants.ACTION_OVERQUOTA_TRANSFER)){
+					log("onPostResume show overquota transfer alert!!");
+					if(alertDialogTransferOverquota==null){
+						showTransferOverquotaDialog();
+					}
+					else{
+						if(!(alertDialogTransferOverquota.isShowing())){
+							showTransferOverquotaDialog();
+						}
+					}
+				}
 				else if (intent.getAction().equals(Constants.ACTION_CHANGE_AVATAR)){
 					log("onPostResume: Intent CHANGE AVATAR");
 					String path = intent.getStringExtra("IMAGE_PATH");
@@ -12202,6 +12213,15 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				log("FCM ERROR TOKEN TYPE_REGISTER_PUSH_NOTIFICATION: " + e.getErrorCode() + "__" + e.getErrorString());
 			}
 		}
+		else if (request.getType() == MegaRequest.TYPE_EXPORT) {
+			if (e.getErrorCode() == MegaError.API_ENOENT) {
+				log("Removing link error");
+				showSnackbar(getString(R.string.context_link_removal_error));
+			}
+			else if (e.getErrorCode() != MegaError.API_OK) {
+				showSnackbar(getString(R.string.context_link_action_error));
+			}
+		}
 	}
 
 	@Override
@@ -12923,17 +12943,17 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	public void onTransferTemporaryError(MegaApiJava api, MegaTransfer transfer, MegaError e) {
 		log("onTransferTemporaryError: " + transfer.getFileName() + " - " + transfer.getTag());
 
-		if(e.getErrorCode() == MegaError.API_EOVERQUOTA){
-			log("API_EOVERQUOTA error!!");
-			if(alertDialogTransferOverquota==null){
-				showTransferOverquotaDialog();
-			}
-			else{
-				if(!(alertDialogTransferOverquota.isShowing())){
-					showTransferOverquotaDialog();
-				}
-			}
-		}
+//		if(e.getErrorCode() == MegaError.API_EOVERQUOTA){
+//			log("API_EOVERQUOTA error!!");
+//			if(alertDialogTransferOverquota==null){
+//				showTransferOverquotaDialog();
+//			}
+//			else{
+//				if(!(alertDialogTransferOverquota.isShowing())){
+//					showTransferOverquotaDialog();
+//				}
+//			}
+//		}
 	}
 
 	@Override
