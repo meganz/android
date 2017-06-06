@@ -672,6 +672,7 @@ public class ChatController {
     }
 
     public String getFullName(long userHandle, long chatId){
+        log("getFullName with chatID: "+userHandle);
         MegaChatRoom chat = megaChatApi.getChatRoom(chatId);
         if(chat!=null){
             return getFullName(userHandle, chat);
@@ -689,6 +690,7 @@ public class ChatController {
         if(privilege==MegaChatRoom.PRIV_UNKNOWN||privilege==MegaChatRoom.PRIV_RM){
             log("Not participant any more!");
             String handleString = megaApi.handleToBase64(userHandle);
+            log("The user handle to find is: "+handleString);
             MegaUser contact = megaApi.getContact(handleString);
             if(contact!=null){
                 if(contact.getVisibility()==MegaUser.VISIBILITY_VISIBLE){
@@ -753,9 +755,10 @@ public class ChatController {
     }
 
     public String getContactFullName(long userHandle){
+        log("getContactFullName");
         MegaContactDB contactDB = dbH.findContactByHandle(String.valueOf(userHandle));
         if(contactDB!=null){
-
+            log("Contact DB found!");
             String name = contactDB.getName();
             String lastName = contactDB.getLastName();
 
