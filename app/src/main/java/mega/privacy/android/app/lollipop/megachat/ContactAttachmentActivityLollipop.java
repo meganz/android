@@ -222,6 +222,18 @@ public class ContactAttachmentActivityLollipop extends PinActivityLollipop imple
 
 	}
 
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		int id = item.getItemId();
+		switch(id) {
+			case android.R.id.home: {
+				finish();
+			}
+		}
+		return true;
+	}
+
 	@Override
     protected void onDestroy(){
     	super.onDestroy();
@@ -303,10 +315,18 @@ public class ContactAttachmentActivityLollipop extends PinActivityLollipop imple
 		MegaContactAdapter c = contacts.get(position);
 //            showMsgNotSentPanel(m);
 		if(c!=null){
-			if(c.getMegaUser()!=null){
-				Intent i = new Intent(this, ContactInfoActivityLollipop.class);
-				i.putExtra("name", c.getMegaUser().getEmail());
-				this.startActivity(i);
+			MegaUser contact = megaApi.getContact(c.getMegaUser().getEmail());
+
+			if(contact!=null) {
+				if (contact.getVisibility() == MegaUser.VISIBILITY_VISIBLE) {
+					Intent i = new Intent(this, ContactInfoActivityLollipop.class);
+					i.putExtra("name", c.getMegaUser().getEmail());
+					this.startActivity(i);
+				}
+				else{
+					log("The user is not contact");
+					showSnackbar(getString(R.string.alert_user_is_not_contact));
+				}
 			}
 			else{
 				log("The contact is null");
