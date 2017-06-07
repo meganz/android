@@ -1011,9 +1011,7 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 				case R.id.contact_list_item_layout:
 				case R.id.contact_grid_item_layout:{
 					log("contact_item_layout");
-					if (fragment != null){
-						fragment.itemClick(currentPosition);
-					}
+					((ContactAttachmentActivityLollipop) context).itemClick(currentPosition);
 					break;
 				}
 			}
@@ -1073,7 +1071,10 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 		ViewHolderContacts holder = (ViewHolderContacts) view.getTag();
 		int currentPosition = holder.getAdapterPosition();
 
-		if (!(adapterType == MegaContactsLollipopAdapter.ITEM_VIEW_TYPE_LIST_ADD_CONTACT)){
+		if(adapterType == MegaContactsLollipopAdapter.ITEM_VIEW_TYPE_CHAT_LIST){
+
+		}
+		else if (!(adapterType == MegaContactsLollipopAdapter.ITEM_VIEW_TYPE_LIST_ADD_CONTACT)){
 			fragment.activateActionMode();
 			fragment.itemClick(currentPosition);
 		}
