@@ -50,11 +50,13 @@ import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
+import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PinActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaContactsLollipopAdapter;
 import mega.privacy.android.app.lollipop.adapters.MegaSharedFolderLollipopAdapter;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
+import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.lollipop.listeners.FileContactMultipleRequestListener;
 import mega.privacy.android.app.modalbottomsheet.FileContactsListBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ContactAttachmentBottomSheetDialogFragment;
@@ -64,8 +66,14 @@ import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApiAndroid;
+import nz.mega.sdk.MegaChatApiJava;
+import nz.mega.sdk.MegaChatError;
 import nz.mega.sdk.MegaChatHandleList;
 import nz.mega.sdk.MegaChatMessage;
+import nz.mega.sdk.MegaChatPeerList;
+import nz.mega.sdk.MegaChatRequest;
+import nz.mega.sdk.MegaChatRequestListenerInterface;
+import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaGlobalListenerInterface;
@@ -75,7 +83,7 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 
-public class ContactAttachmentActivityLollipop extends PinActivityLollipop implements MegaRequestListenerInterface, RecyclerView.OnItemTouchListener, GestureDetector.OnGestureListener, OnClickListener {
+public class ContactAttachmentActivityLollipop extends PinActivityLollipop implements MegaRequestListenerInterface, MegaChatRequestListenerInterface, OnClickListener {
 
 	MegaApiAndroid megaApi;
 	MegaChatApiAndroid megaChatApi;
@@ -90,7 +98,6 @@ public class ContactAttachmentActivityLollipop extends PinActivityLollipop imple
 	Button inviteButton;
 	LinearLayout optionsBar;
 	LinearLayoutManager mLayoutManager;
-	GestureDetectorCompat detector;
 
 	ChatController cC;
 
@@ -102,109 +109,6 @@ public class ContactAttachmentActivityLollipop extends PinActivityLollipop imple
 
 	MegaContactsLollipopAdapter adapter;
 
-	private ActionMode actionMode;
-
-	MenuItem addSharingContact;
-	MenuItem selectMenuItem;
-	MenuItem unSelectMenuItem;
-
-	public class RecyclerViewOnGestureListener extends SimpleOnGestureListener{
-
-	    public void onLongPress(MotionEvent e) {
-			log("onLongPress -- RecyclerViewOnGestureListener");
-			// handle long press
-			if (!adapter.isMultipleSelect()){
-				adapter.setMultipleSelect(true);
-
-				actionMode = startSupportActionMode(new ActionBarCallBack());
-			}
-			super.onLongPress(e);
-	    }
-	}
-	
-	private class ActionBarCallBack implements ActionMode.Callback {
-
-		@Override
-		public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-			log("onActionItemClicked");
-			final ArrayList<MegaUser> contacts = adapter.getSelectedUsers();
-						
-			switch(item.getItemId()){
-				case R.id.action_file_contact_list_permissions:{
-					
-
-
-					break;
-				}
-				case R.id.action_file_contact_list_delete:{
-
-
-					break;
-				}
-				case R.id.cab_menu_select_all:{
-					selectAll();
-					actionMode.invalidate();
-					break;
-				}
-				case R.id.cab_menu_unselect_all:{
-					clearSelections();
-					actionMode.invalidate();
-					break;
-				}
-			}
-			return false;
-		}
-
-		@Override
-		public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-			log("onCreateActionMode");
-			MenuInflater inflater = mode.getMenuInflater();
-			inflater.inflate(R.menu.file_contact_shared_browser_action, menu);
-			return true;
-		}
-		
-		@Override
-		public void onDestroyActionMode(ActionMode arg0) {
-			log("onDestroyActionMode");
-			adapter.clearSelections();
-			adapter.setMultipleSelect(false);
-		}
-
-		@Override
-		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-			log("onPrepareActionMode");
-			List<MegaUser> selected = adapter.getSelectedUsers();
-			boolean deleteShare = false;
-			boolean permissions = false;
-						
-			if (selected.size() != 0) {
-				permissions = true;
-				deleteShare = true;
-
-				MenuItem unselect = menu.findItem(R.id.cab_menu_unselect_all);
-				if(selected.size()==adapter.getItemCount()){
-					menu.findItem(R.id.cab_menu_select_all).setVisible(false);
-					unselect.setTitle(getString(R.string.action_unselect_all));
-					unselect.setVisible(true);
-				}
-				else{
-					menu.findItem(R.id.cab_menu_select_all).setVisible(true);
-					unselect.setTitle(getString(R.string.action_unselect_all));
-					unselect.setVisible(true);
-				}	
-			}
-			else{
-				menu.findItem(R.id.cab_menu_select_all).setVisible(true);
-				menu.findItem(R.id.cab_menu_unselect_all).setVisible(false);	
-			}
-			
-			menu.findItem(R.id.action_file_contact_list_permissions).setVisible(permissions);
-			menu.findItem(R.id.action_file_contact_list_delete).setVisible(deleteShare);
-			
-			return false;
-		}
-		
-	}
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -298,14 +202,11 @@ public class ContactAttachmentActivityLollipop extends PinActivityLollipop imple
 		inviteButton = (Button) findViewById(R.id.contact_attachment_chat_invite_button);
 		inviteButton.setOnClickListener(this);
 
-		detector = new GestureDetectorCompat(this, new RecyclerViewOnGestureListener());
-
 		listView = (RecyclerView) findViewById(R.id.contact_attachment_chat_view_browser);
 		listView.setClipToPadding(false);
 		listView.addItemDecoration(new SimpleDividerItemDecoration(this, outMetrics));
 		mLayoutManager = new LinearLayoutManager(this);
 		listView.setLayoutManager(mLayoutManager);
-		listView.addOnItemTouchListener(this);
 		listView.setItemAnimator(new DefaultItemAnimator());
 
 		if (adapter == null){
@@ -330,90 +231,6 @@ public class ContactAttachmentActivityLollipop extends PinActivityLollipop imple
     		megaApi.removeRequestListener(this);
     	}
     }
-	
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		
-		// Inflate the menu items for use in the action bar
-	    MenuInflater inflater = getMenuInflater();
-	    inflater.inflate(R.menu.activity_folder_contact_list, menu);
-	    
-//	    permissionButton = menu.findItem(R.id.action_file_contact_list_permissions);
-//	    deleteShareButton = menu.findItem(R.id.action_file_contact_list_delete);
-	    addSharingContact = menu.findItem(R.id.action_folder_contacts_list_share_folder);
-	    	    
-//	    permissionButton.setVisible(false);
-//	    deleteShareButton.setVisible(false);
-	    addSharingContact.setVisible(true);
-	    
-	    selectMenuItem = menu.findItem(R.id.action_select);
-		unSelectMenuItem = menu.findItem(R.id.action_unselect);
-		
-		selectMenuItem.setVisible(true);
-		unSelectMenuItem.setVisible(false);
-	    
-	    return super.onCreateOptionsMenu(menu);
-	}
-	
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		((MegaApplication) getApplication()).sendSignalPresenceActivity();
-		// Handle presses on the action bar items
-	    switch (item.getItemId()) {
-		    case android.R.id.home:{
-		    	onBackPressed();
-		    	return true;
-		    }
-		    case R.id.action_folder_contacts_list_share_folder:{
-		    	//Option add new contact to share
-
-
-		    	
-	        	return true;
-	        }
-		    case R.id.action_select:{
-		    	
-		    	selectAll();
-		    	return true;
-		    }
-		    default:{
-	            return super.onOptionsItemSelected(item);
-	        }
-	    }
-	}
-
-	/*
-	 * Clear all selected items
-	 */
-	private void clearSelections() {
-		if(adapter.isMultipleSelect()){
-			adapter.clearSelections();
-		}
-	}
-	
-	public void selectAll(){
-		log("selectAll");
-		if (adapter != null){
-			if(adapter.isMultipleSelect()){
-				adapter.selectAll();
-			}
-			else{						
-				adapter.setMultipleSelect(true);
-				adapter.selectAll();
-				
-				actionMode = startSupportActionMode(new ActionBarCallBack());
-			}		
-			updateActionModeTitle();		
-		}
-	}
-	
-	public boolean showSelectMenuItem(){
-		if (adapter != null){
-			return adapter.isMultipleSelect();
-		}
-		
-		return false;
-	}
 
 	public void showOptionsPanel(MegaUser sUser){
 		log("showNodeOptionsPanel-Offline");
@@ -438,9 +255,35 @@ public class ContactAttachmentActivityLollipop extends PinActivityLollipop imple
 
 	@Override
 	public void onRequestFinish(MegaApiJava api, MegaRequest request,MegaError e) {
-		log("onRequestFinish: " + request.getType());
-		log("onRequestFinish: " + request.getRequestString());
+		log("onRequestFinish: " + request.getType() + "__" + request.getRequestString());
 
+		if (request.getType() == MegaRequest.TYPE_INVITE_CONTACT){
+			log("MegaRequest.TYPE_INVITE_CONTACT finished: "+request.getNumber());
+
+			if(request.getNumber()== MegaContactRequest.INVITE_ACTION_REMIND){
+				showSnackbar(getString(R.string.context_contact_invitation_resent));
+			}
+			else{
+				if (e.getErrorCode() == MegaError.API_OK){
+					log("OK INVITE CONTACT: "+request.getEmail());
+					if(request.getNumber()==MegaContactRequest.INVITE_ACTION_ADD)
+					{
+						showSnackbar(getString(R.string.context_contact_request_sent, request.getEmail()));
+					}
+				}
+				else{
+					log("Code: "+e.getErrorString());
+					if(e.getErrorCode()==MegaError.API_EEXIST)
+					{
+						showSnackbar(getString(R.string.context_contact_already_invited, request.getEmail()));
+					}
+					else{
+						showSnackbar(getString(R.string.general_error));
+					}
+					log("ERROR: " + e.getErrorCode() + "___" + e.getErrorString());
+				}
+			}
+		}
 	}
 
 
@@ -457,59 +300,45 @@ public class ContactAttachmentActivityLollipop extends PinActivityLollipop imple
 	public void itemClick(int position) {
 		log("itemClick");
 		((MegaApplication) getApplication()).sendSignalPresenceActivity();
-		if (adapter.isMultipleSelect()){
-			adapter.toggleSelection(position);
-			updateActionModeTitle();
+		MegaContactAdapter c = contacts.get(position);
+//            showMsgNotSentPanel(m);
+		if(c!=null){
+			if(c.getMegaUser()!=null){
+				Intent i = new Intent(this, ContactInfoActivityLollipop.class);
+				i.putExtra("name", c.getMegaUser().getEmail());
+				this.startActivity(i);
+			}
+			else{
+				log("The contact is null");
+			}
 		}
 	}
 
-	
-	private void updateActionModeTitle() {
-		log("updateActionModeTitle");
-		if (actionMode == null) {
-			return;
-		}
-		List<MegaUser> contacts = adapter.getSelectedUsers();
-		if(contacts!=null){
-			log("Contacts selected: "+contacts.size());
-		}
-
-		Resources res = getResources();
-		String format = "%d %s";
-	
-		actionMode.setTitle(String.format(format, contacts.size(),res.getQuantityString(R.plurals.general_num_contacts, contacts.size())));
-		try {
-			actionMode.invalidate();
-		} catch (NullPointerException e) {
-			e.printStackTrace();
-			log("oninvalidate error");
-		}		
-	}
-	
-	/*
-	 * Disable selection
-	 */
-	public void hideMultipleSelect() {
-		adapter.setMultipleSelect(false);
-		if (actionMode != null) {
-			actionMode.finish();
-		}
-	}
-	
 	@Override
 	public void onClick(View v) {
 		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 		switch (v.getId()){		
 			case R.id.contact_attachment_chat_invite_button:{
 				log("Click on Invite button");
-//				Intent i = new Intent(this, ManagerActivityLollipop.class);
-//				i.setAction(Constants.ACTION_REFRESH_PARENTHANDLE_BROWSER);
-//				i.putExtra("parentHandle", node.getHandle());
-//				startActivity(i);
-//				finish();
+
+				ArrayList<String> contactEmails = new ArrayList<>();
+				ContactController contactControllerC = new ContactController(this);
+				for(int i=0;i<contacts.size();i++){
+					MegaContactAdapter contact = contacts.get(i);
+
+					if(contact.getMegaUser().getVisibility()!=MegaUser.VISIBILITY_VISIBLE){
+						String userMail = contact.getMegaUser().getEmail();
+						contactEmails.add(userMail);
+					}
+
+				}
+				if(contactEmails!=null){
+					if(!contactEmails.isEmpty()){
+						contactControllerC.inviteMultipleContacts(contactEmails);
+					}
+				}
 				break;
 			}
-
 		}
 	}
 
@@ -524,58 +353,6 @@ public class ContactAttachmentActivityLollipop extends PinActivityLollipop imple
 			adapter.notifyDataSetChanged();
 		}		
 	}
-	
-	@Override
-	protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
-		
-		if (intent == null) {
-			return;
-		}
-	}
-
-	@Override
-	public boolean onDown(MotionEvent e) {
-		return false;
-	}
-
-	@Override
-	public void onShowPress(MotionEvent e) {
-	}
-
-	@Override
-	public boolean onSingleTapUp(MotionEvent e) {
-		return false;
-	}
-
-	@Override
-	public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX,
-			float distanceY) {
-		return false;
-	}
-
-	@Override
-	public void onLongPress(MotionEvent e) {
-	}
-
-	@Override
-	public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
-			float velocityY) {
-		return false;
-	}
-
-	@Override
-	public boolean onInterceptTouchEvent(RecyclerView rV, MotionEvent e) {
-		detector.onTouchEvent(e);
-		return false;
-	}
-
-	@Override
-	public void onRequestDisallowInterceptTouchEvent(boolean arg0) {
-	}
-
-	@Override
-	public void onTouchEvent(RecyclerView arg0, MotionEvent arg1) {
-	}
 
 	public void showSnackbar(String s){
 		log("showSnackbar");
@@ -585,5 +362,63 @@ public class ContactAttachmentActivityLollipop extends PinActivityLollipop imple
 		snackbar.show();
 	}
 
+	public void startConversation(long handle){
+		log("startConversation");
+		MegaChatRoom chat = megaChatApi.getChatRoomByUser(handle);
+		MegaChatPeerList peers = MegaChatPeerList.createInstance();
+		if(chat==null){
+			log("No chat, create it!");
+			peers.addPeer(handle, MegaChatPeerList.PRIV_STANDARD);
+			megaChatApi.createChat(false, peers, this);
+		}
+		else{
+			log("There is already a chat, open it!");
+			Intent intentOpenChat = new Intent(this, ChatActivityLollipop.class);
+			intentOpenChat.setAction(Constants.ACTION_CHAT_SHOW_MESSAGES);
+			intentOpenChat.putExtra("CHAT_ID", chat.getChatId());
+			finish();
+			intentOpenChat.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			this.startActivity(intentOpenChat);
+		}
+	}
+
+	@Override
+	public void onRequestStart(MegaChatApiJava api, MegaChatRequest request) {
+		log("onRequestStart: "+request.getRequestString());
+	}
+
+	@Override
+	public void onRequestUpdate(MegaChatApiJava api, MegaChatRequest request) {
+
+	}
+
+	@Override
+	public void onRequestFinish(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
+		log("onRequestFinish: "+request.getRequestString());
+
+		if(request.getType() == MegaChatRequest.TYPE_CREATE_CHATROOM){
+			log("Create chat request finish!!!");
+			if(e.getErrorCode()==MegaChatError.ERROR_OK){
+
+				log("open new chat");
+				Intent intent = new Intent(this, ChatActivityLollipop.class);
+				intent.setAction(Constants.ACTION_CHAT_NEW);
+				intent.putExtra("CHAT_ID", request.getChatHandle());
+				finish();
+				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+				this.startActivity(intent);
+
+			}
+			else{
+				log("EEEERRRRROR WHEN CREATING CHAT " + e.getErrorString());
+				showSnackbar(getString(R.string.create_chat_error));
+			}
+		}
+	}
+
+	@Override
+	public void onRequestTemporaryError(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
+
+	}
 }
 

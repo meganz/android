@@ -565,7 +565,9 @@ public class ContactAttachmentBottomSheetDialogFragment extends BottomSheetDialo
                     }
                 }
                 else{
-
+                    if(email!=null){
+                        cC.inviteContact(email);
+                    }
                 }
 
                 break;
@@ -591,9 +593,12 @@ public class ContactAttachmentBottomSheetDialogFragment extends BottomSheetDialo
                     }
                 }
                 else{
-
+                    log("instance of ContactAttachmentActivityLollipop");
+                    log("position: "+position);
+                    long userHandle = message.getMessage().getUserHandle(position);
+                    ((ContactAttachmentActivityLollipop) context).startConversation(userHandle);
+                    dismissAllowingStateLoss();
                 }
-
 
                 break;
             }
