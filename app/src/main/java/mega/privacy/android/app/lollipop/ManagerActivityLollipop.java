@@ -1215,9 +1215,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		}
 		log("Preferred View List: "+isList);
 
-
 		String language = Locale.getDefault().toString();
-		log("Language: "+language);
+		boolean languageString = megaApi.setLanguage(language);
+		log("Result: "+languageString+" Language: "+language);
+		if(languageString==false){
+			language = Locale.getDefault().getLanguage();
+			languageString = megaApi.setLanguage(language);
+			log("2--Result: "+languageString+" Language: "+language);
+		}
 
 		if(prefs!=null){
 			if(prefs.getPreferredSortCloud()!=null){
@@ -1886,6 +1891,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 
 	        //INITIAL FRAGMENT
+			firstTimeCam = true;
+			drawerItem = DrawerItem.CAMERA_UPLOADS;
 			if(selectDrawerItemPending){
 				selectDrawerItemLollipop(drawerItem);
 			}
