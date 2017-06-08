@@ -18,74 +18,110 @@
 		        android:id="@+id/cam_sync_image_view"
 		        android:layout_width="match_parent"
 		        android:layout_height="wrap_content"
+				android:layout_marginTop="43dp"
+				android:layout_marginBottom="32dp"
+				android:layout_gravity="center_horizontal"
 		        android:src="@drawable/camera_upload"/>
 
-		    <RelativeLayout
-		        android:id="@+id/cam_sync_relative_radio"
-		        android:layout_width="match_parent"
-		    	android:layout_height="wrap_content">
-		        
-			        <RadioGroup 
-					    android:id="@+id/cam_sync_radio_group" 
-					    android:layout_width="wrap_content"
-					    android:layout_height="wrap_content" 
-					    android:layout_gravity="left"
-					    android:layout_marginLeft="40dp"
-					    android:layout_marginTop="10dp"
-					    android:layout_marginBottom="5dp">
-			             
-						<RadioButton 
-						    android:id="@+id/cam_sync_wifi" 
-						    android:layout_width="wrap_content" 
-						    android:layout_height="wrap_content" 
-						    android:text="@string/cam_sync_wifi"
-						    android:checked="true"
-						    android:layout_marginBottom="5dp" />
-						
-						<RadioButton 
-						    android:id="@+id/cam_sync_data" 
-						    android:layout_width="wrap_content" 
-						    android:layout_height="wrap_content" 
-						    android:text="@string/cam_sync_data" />
-					</RadioGroup>
-					
-			        <LinearLayout 
-			            android:layout_width="match_parent"
-			            android:layout_height="48dp"
-			            android:orientation="vertical"
-			            android:layout_below="@id/cam_sync_radio_group">
-			            
-			        </LinearLayout>
-			        
-		 	</RelativeLayout>
+            <LinearLayout
+                android:id="@+id/upload_videos_layout"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+				android:layout_marginLeft="16dp"
+                android:layout_marginRight="8dp"
+				android:layout_marginBottom="29dp"
+                android:background="@color/white"
+                android:orientation="horizontal" >
+
+                <TextView
+                    android:id="@+id/upload_videos_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="left|center_vertical"
+                    android:layout_weight="5"
+                    android:text="@string/camera_uploads_upload_videos"
+                    android:textSize="16sp"
+                    android:textColor="@color/name_my_account"/>
+
+                <android.support.v7.widget.SwitchCompat
+                    android:id="@+id/upload_videos_switch"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="right|center_vertical"
+                    android:layout_weight="1"
+                    android:gravity="right" />
+            </LinearLayout>
+
+		   	<LinearLayout
+				android:id="@+id/cellular_connection_layout"
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content"
+				android:background="@color/white"
+				android:layout_marginLeft="16dp"
+                android:layout_marginRight="8dp"
+				android:layout_marginBottom="38dp"
+				android:orientation="horizontal" >
+
+				<TextView
+					android:id="@+id/cellular_connection_text"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_gravity="left|center_vertical"
+					android:layout_weight="5"
+					android:text="@string/camera_uploads_cellular_connection"
+					android:textSize="16sp"
+					android:textColor="@color/name_my_account"/>
+
+				<android.support.v7.widget.SwitchCompat
+					android:id="@+id/cellular_connection_switch"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_gravity="right|center_vertical"
+					android:layout_weight="1"
+					android:gravity="right" />
+			</LinearLayout>
 	     </LinearLayout>
     </ScrollView>
-		
-    <LinearLayout
-	    android:id="@+id/cam_buttons_layout"
-	    android:layout_width="match_parent"
-	    android:layout_height="wrap_content"
-	    android:layout_gravity="left"
-	    android:orientation="horizontal"
-	    android:layout_alignParentBottom="true"
-	    android:background="#ffffff">
-	
-	    <TextView
-	        android:id="@+id/cam_sync_button_skip"
-	        android:fontFamily="sans-serif-medium"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:gravity="center"
-	        android:textSize="14sp" />
-	
-	    <TextView
-	        android:id="@+id/cam_sync_button_ok"
-	        android:fontFamily="sans-serif-medium"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:textColor="@color/accentColor"
-	        android:textSize="14sp" />
+
+	<LinearLayout
+		android:id="@+id/cam_buttons_layout"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:gravity="right"
+		android:layout_alignParentRight="true"
+		android:orientation="horizontal"
+		android:layout_alignParentBottom="true"
+		android:background="#ffffff">
+
+		<Button
+			android:id="@+id/cam_sync_button_skip"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_alignParentRight="true"
+			android:textColor="@color/name_my_account"
+			android:text="@string/action_export_master_key"
+			android:background="@color/white"
+			android:layout_marginRight="8dp"
+			android:layout_marginBottom="16dp"
+			android:elevation="@dimen/elevation_upgrade_low"
+			android:stateListAnimator="@anim/button_upgrade_elevation"/>
+
+		<Button
+			android:id="@+id/cam_sync_button_ok"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_alignParentRight="true"
+			android:textColor="@color/white"
+			android:text="@string/my_account_upgrade_pro"
+			android:background="@color/accentColor"
+			android:elevation="@dimen/elevation_upgrade_low"
+			android:layout_marginBottom="16dp"
+			android:layout_marginRight="16dp"
+			android:stateListAnimator="@anim/button_upgrade_elevation"
+			android:tint="@android:color/white" />
 	</LinearLayout>
+		
+
 		
 <!--     <LinearLayout
          android:id="@+id/cam_buttons_layout"
