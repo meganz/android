@@ -11,6 +11,7 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.Locale;
 
 import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.utils.Util;
@@ -277,6 +278,15 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 
 			if(Util.isChatEnabled()){
 				megaChatApi = new MegaChatApiAndroid(megaApi);
+			}
+
+			String language = Locale.getDefault().toString();
+			boolean languageString = megaApi.setLanguage(language);
+			log("Result: "+languageString+" Language: "+language);
+			if(languageString==false){
+				language = Locale.getDefault().getLanguage();
+				languageString = megaApi.setLanguage(language);
+				log("2--Result: "+languageString+" Language: "+language);
 			}
 		}
 		

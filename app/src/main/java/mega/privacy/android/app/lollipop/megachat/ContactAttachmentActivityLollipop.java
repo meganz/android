@@ -313,7 +313,6 @@ public class ContactAttachmentActivityLollipop extends PinActivityLollipop imple
 		log("itemClick");
 		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 		MegaContactAdapter c = contacts.get(position);
-//            showMsgNotSentPanel(m);
 		if(c!=null){
 			MegaUser contact = megaApi.getContact(c.getMegaUser().getEmail());
 

@@ -1215,15 +1215,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		}
 		log("Preferred View List: "+isList);
 
-		String language = Locale.getDefault().toString();
-		boolean languageString = megaApi.setLanguage(language);
-		log("Result: "+languageString+" Language: "+language);
-		if(languageString==false){
-			language = Locale.getDefault().getLanguage();
-			languageString = megaApi.setLanguage(language);
-			log("2--Result: "+languageString+" Language: "+language);
-		}
-
 		if(prefs!=null){
 			if(prefs.getPreferredSortCloud()!=null){
 				orderCloud = Integer.parseInt(prefs.getPreferredSortCloud());
