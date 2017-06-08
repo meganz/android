@@ -11739,6 +11739,20 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				Util.showAlert(this, getString(R.string.email_verification_text_error), getString(R.string.general_error_word));
 			}
 		}
+		else if(request.getType() == MegaRequest.TYPE_GET_CANCEL_LINK){
+            log("TYPE_GET_CANCEL_LINK");
+
+			if (e.getErrorCode() == MegaError.API_OK){
+				log("cancelation link received!");
+				log(e.getErrorString() + "___" + e.getErrorCode());
+				Util.showAlert(this, getString(R.string.email_verification_text), getString(R.string.email_verification_title));
+			}
+			else{
+				log("Error when asking for the cancelation link");
+				log(e.getErrorString() + "___" + e.getErrorCode());
+				Util.showAlert(this, getString(R.string.email_verification_text_error), getString(R.string.general_error_word));
+			}
+        }
 		else if (request.getType() == MegaRequest.TYPE_REMOVE_CONTACT){
 
 			if (e.getErrorCode() == MegaError.API_OK){
