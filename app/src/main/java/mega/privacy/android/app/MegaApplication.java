@@ -140,7 +140,7 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 	public void onCreate() {
 		super.onCreate();
 
-		MegaApiAndroid.setLoggerObject(new AndroidLogger());
+		MegaApiAndroid.addLoggerObject(new AndroidLogger());
 		MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_MAX);
 
 		dbH = DatabaseHandler.getDbHandler(getApplicationContext());

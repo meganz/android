@@ -1719,7 +1719,7 @@ public class Util {
 
 	public static void resetAndroidLogger(){
 
-		MegaApiAndroid.setLoggerObject(new AndroidLogger());
+		MegaApiAndroid.addLoggerObject(new AndroidLogger());
 		MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_MAX);
 
 		boolean fileLogger = false;
