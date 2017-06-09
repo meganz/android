@@ -226,6 +226,9 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 
 				String userHandleEncoded = MegaApiAndroid.userHandleToBase64(userHandle);
 				user = megaApi.getContact(userHandleEncoded);
+				if(user!=null){
+					log("User foundd!!!");
+				}
 
 				chatPrefs = dbH.findChatPreferencesByHandle(String.valueOf(chatHandle));
 
@@ -240,9 +243,10 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 
 				String fullName = "";
 				if(user!=null){
+					log("User handle: "+user.getHandle());
 					MegaContactDB contactDB = dbH.findContactByHandle(String.valueOf(user.getHandle()));
 					if(contactDB!=null){
-
+						log("Contact DB found!");
 						String firstNameText = "";
 						String lastNameText = "";
 
@@ -1112,7 +1116,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 	}
 
 	public static void log(String message) {
-		Util.log("ContactChatInfoActivityLollipop", message);
+		Util.log("ContactInfoActivityLollipop", message);
 	}
 
 	@Override

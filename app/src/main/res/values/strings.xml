@@ -1208,4 +1208,12 @@
 
     <string name="context_link_removal_error" context="error message">Link removal failed. Try again later.</string>
     <string name="context_link_action_error" context="error message">Link action failed. Try again later.</string>
+
+    <string name="activity_title_files_attached" context="title of the screen to see the details of several node attachments">Files attached</string>
+    <string name="activity_title_contacts_attached" context="title of the screen to see the details of several contact attachments">Contacts attached</string>
+
+    <string name="alert_user_is_not_contact">The user is not a contact</string>
+
+    <string name="camera_uploads_cellular_connection">Use cellular connection</string>
+    <string name="camera_uploads_upload_videos">Upload videos</string>
 </resources>
