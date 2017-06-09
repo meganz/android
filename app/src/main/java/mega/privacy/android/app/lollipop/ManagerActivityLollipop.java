@@ -2719,29 +2719,26 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				log("Fragment Index: " + index);
 				if(index == 1){
 					//Rubbish Bin TAB
-					MegaNode parentNode = megaApi.getNodeByHandle(parentHandleRubbish);
-					if (parentNode != null){
-						if (parentNode.getHandle() == megaApi.getRubbishNode().getHandle()){
-							aB.setTitle(getString(R.string.section_rubbish_bin));
+					String cloudTag = getFragmentTag(R.id.cloud_drive_tabs_pager, 1);
+					rubbishBinFLol = (RubbishBinFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cloudTag);
+					if (rubbishBinFLol != null){
+						log("parentHandleRubbish: "+ parentHandleRubbish);
+						if(parentHandleRubbish == megaApi.getRubbishNode().getHandle() || parentHandleRubbish == -1){
+							aB.setTitle(getResources().getString(R.string.section_rubbish_bin));
+							log("aB.setHomeAsUpIndicator_156");
 							aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+							rubbishBinFLol.setNodes(megaApi.getChildren(megaApi.getRubbishNode(), orderCloud));
 							firstNavigationLevel = true;
 						}
 						else{
-							aB.setTitle(parentNode.getName());
-							log("indicator_arrow_back_886");
+							MegaNode node = megaApi.getNodeByHandle(parentHandleRubbish);
+							aB.setTitle(node.getName());
+							log("indicator_arrow_back_969");
 							aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+							rubbishBinFLol.setNodes(megaApi.getChildren(node, orderCloud));
 							firstNavigationLevel = false;
 						}
 					}
-					else{
-						parentHandleRubbish = megaApi.getRubbishNode().getHandle();
-						parentNode = megaApi.getRootNode();
-						aB.setTitle(getString(R.string.section_rubbish_bin));
-						aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
-						firstNavigationLevel = true;
-					}
-					ArrayList<MegaNode> nodes = megaApi.getChildren(parentNode, orderCloud);
-					rubbishBinFLol.setNodes(nodes);
 				}
 				else{
 					//Cloud Drive TAB
