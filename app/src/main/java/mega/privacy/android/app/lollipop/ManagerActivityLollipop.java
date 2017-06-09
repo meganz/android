@@ -1882,8 +1882,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 
 	        //INITIAL FRAGMENT
-			firstTimeCam = true;
-			drawerItem = DrawerItem.CAMERA_UPLOADS;
 			if(selectDrawerItemPending){
 				selectDrawerItemLollipop(drawerItem);
 			}
