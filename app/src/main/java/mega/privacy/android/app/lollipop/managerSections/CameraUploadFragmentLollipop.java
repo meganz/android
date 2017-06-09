@@ -150,17 +150,10 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 		public long handle2;
 		public long handle3;
 	}
-	
-//	private TourImageAdapter adapter;
-//	private LoopViewPager viewPager;
+
 	private ImageView initialImageView;
-//	private ImageView bar;
 	private TextView bOK;
 	private TextView bSkip;	
-//	private RadioGroup camSyncRadioGroup;
-//	private RadioButton camSyncData;
-//	private RadioButton camSyncWifi;
-//	private RelativeLayout layoutRadioGroup;
 	private RelativeLayout fragmentContainer;
 	
 	float scaleH, scaleW;
