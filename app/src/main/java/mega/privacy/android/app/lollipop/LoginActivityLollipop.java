@@ -209,7 +209,7 @@ public class LoginActivityLollipop extends AppCompatActivity implements MegaGlob
                 break;
             }
             case Constants.CREATE_ACCOUNT_FRAGMENT: {
-
+                log("Show CREATE_ACCOUNT_FRAGMENT");
                 if (createAccountFragment == null) {
                     createAccountFragment = new CreateAccountFragmentLollipop();
                 }

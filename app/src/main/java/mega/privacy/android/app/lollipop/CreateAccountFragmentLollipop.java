@@ -325,7 +325,11 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
 
             if (e.getErrorCode() == MegaError.API_EEXIST) {
                 ((LoginActivityLollipop)context).showSnackbar(getString(R.string.error_email_registered));
-                ((LoginActivityLollipop)context).showFragment(Constants.LOGIN_FRAGMENT);
+                createAccountLayout.setVisibility(View.VISIBLE);
+                createAccountLoginLayout.setVisibility(View.VISIBLE);
+                creatingAccountLayout.setVisibility(View.GONE);
+                creatingAccountTextView.setVisibility(View.GONE);
+                createAccountProgressBar.setVisibility(View.GONE);
                 return;
             }
             else{
