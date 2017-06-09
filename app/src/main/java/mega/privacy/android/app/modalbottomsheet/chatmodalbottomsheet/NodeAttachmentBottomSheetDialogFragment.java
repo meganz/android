@@ -353,10 +353,6 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
             }
             case R.id.option_view_layout:{
                 log("View option");
-                if(node==null){
-                    log("The selected node is NULL");
-                    return;
-                }
                 Intent i = new Intent(context, NodeAttachmentActivityLollipop.class);
                 i.putExtra("chatId", chatId);
                 i.putExtra("messageId", messageId);
