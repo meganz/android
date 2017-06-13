@@ -1017,7 +1017,7 @@ public class ChatController {
     public void pickFileToSend(){
         log("pickFileToSend");
         Intent intent = new Intent(context, FileExplorerActivityLollipop.class);
-        intent.setAction(FileExplorerActivityLollipop.ACTION_SELECT_FILE);
+        intent.setAction(FileExplorerActivityLollipop.ACTION_MULTISELECT_FILE);
 //        ArrayList<String> longArray = new ArrayList<String>();
 //        for (int i=0; i<users.size(); i++){
 //            longArray.add(users.get(i).getEmail());

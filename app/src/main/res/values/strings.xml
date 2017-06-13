@@ -1181,7 +1181,7 @@
     <string name="import_success_error" context="Menu option">Error. Not added to Cloud Drive</string>
 
     <string name="chat_correctly_initialized" context="Label in login screen to inform about the chat initialization proccess">Chat correctly initialized</string>
-    <string name="chat_not_correctly_initialized" context="Label in login screen to inform about the chat initialization proccess">Error. Chat correctly initialized</string>
+    <string name="chat_not_correctly_initialized" context="Label in login screen to inform about the chat initialization proccess">Error. Chat not correctly initialized</string>
     <string name="chat_initializacion" context="Label in login screen to inform about the chat initialization proccess">Initializing chat&#8230;</string>
     <string name="chat_connecting" context="Label in login screen to inform about the chat initialization proccess">Connecting&#8230;</string>
 

@@ -88,8 +88,6 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 //	ImageView emptyImageViewFragment;
 //	TextView emptyTextViewFragment;
 	ActionBar aB;
-	HashMap<Long, MegaTransfer> mTHash = null;
-	MegaTransfer currentTransfer = null;
 	boolean incoming = false;
 	boolean inbox = false;
 	DatabaseHandler dbH = null;
