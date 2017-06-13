@@ -10374,7 +10374,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			final int multiselectIntent = intent.getIntExtra("MULTISELECT", -1);
 			final int sentToInbox = intent.getIntExtra("SEND_FILE", -1);
 
-			if (megaContacts){
+			//if (megaContacts){
 
 				if(sentToInbox==0){
 
@@ -10459,24 +10459,38 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						nC.sendToInbox(nodeHandles, contactsData);
 					}
 				}
-			}
-			else{
+			//}
+			//else{
+				//log("no contact");
+//				for (int i=0; i < contactsData.size();i++){
+//					String type = contactsData.get(i);
+//					if (type.compareTo(ContactsExplorerActivityLollipop.EXTRA_EMAIL) == 0){
+//						log("other email");
+//
+//						i++;
+//						Snackbar.make(fragmentContainer, getString(R.string.general_not_yet_implemented), Snackbar.LENGTH_LONG).show();
+////						Toast.makeText(this, "Sharing a folder: An email will be sent to the email address: " + contactsData.get(i) + ".\n", Toast.LENGTH_LONG).show();
+//					}
+//					else if (type.compareTo(ContactsExplorerActivityLollipop.EXTRA_PHONE) == 0){
+//						log("contact phone email");
+//
+//						i++;
+//						Snackbar.make(fragmentContainer, getString(R.string.general_not_yet_implemented), Snackbar.LENGTH_LONG).show();
+////						Toast.makeText(this, "Sharing a folder: A Text Message will be sent to the phone number: " + contactsData.get(i) , Toast.LENGTH_LONG).show();
+//					}
+//					else{
+//						log("else default!");
+//
+//						i++;
+//						Snackbar.make(fragmentContainer, "Probando!!", Snackbar.LENGTH_LONG).show();
+////						Toast.makeText(this, "Sharing a folder: A Text Message will be sent to the phone number: " + contactsData.get(i) , Toast.LENGTH_LONG).show();
+//					}
+//				}
 
-				for (int i=0; i < contactsData.size();i++){
-					String type = contactsData.get(i);
-					if (type.compareTo(ContactsExplorerActivityLollipop.EXTRA_EMAIL) == 0){
-						i++;
-						Snackbar.make(fragmentContainer, getString(R.string.general_not_yet_implemented), Snackbar.LENGTH_LONG).show();
-//						Toast.makeText(this, "Sharing a folder: An email will be sent to the email address: " + contactsData.get(i) + ".\n", Toast.LENGTH_LONG).show();
-					}
-					else if (type.compareTo(ContactsExplorerActivityLollipop.EXTRA_PHONE) == 0){
-						i++;
-						Snackbar.make(fragmentContainer, getString(R.string.general_not_yet_implemented), Snackbar.LENGTH_LONG).show();
-//						Toast.makeText(this, "Sharing a folder: A Text Message will be sent to the phone number: " + contactsData.get(i) , Toast.LENGTH_LONG).show();
-					}
-				}
 
-			}
+
+
+			//}
 		}
 		else if (requestCode == Constants.REQUEST_CODE_GET_LOCAL && resultCode == RESULT_OK) {
 
