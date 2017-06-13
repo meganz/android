@@ -80,6 +80,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 	public static String ACTION_SELECT_FILE = "ACTION_SELECT_FILE";
 	public static String ACTION_UPLOAD_SELFIE = "ACTION_UPLOAD_SELFIE";	
 	public static String ACTION_CHOOSE_MEGA_FOLDER_SYNC = "ACTION_CHOOSE_MEGA_FOLDER_SYNC";
+	public static String ACTION_MULTISELECT_FILE = "ACTION_MULTISELECT_FILE";
 
 	public static int UPLOAD = 0;
 	public static int MOVE = 1;
@@ -124,6 +125,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 	private MegaChatApiAndroid megaChatApi;
 
 	private int mode;
+	public boolean multiselect = false;
 	boolean selectFile = false;
 	
 	private long[] moveFromHandles;
@@ -480,6 +482,37 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 
 				mode = SELECT;
 				selectFile = true;
+				selectedContacts=intent.getStringArrayListExtra("SELECTED_CONTACTS");
+
+				cloudDriveFrameLayout = (FrameLayout) findViewById(R.id.cloudDriveFrameLayout);
+
+				if(cDriveExplorer==null){
+					cDriveExplorer = new CloudDriveExplorerFragmentLollipop();
+				}
+
+				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+				ft.replace(R.id.cloudDriveFrameLayout, cDriveExplorer, "cDriveExplorer");
+				ft.commitNow();
+
+				cloudDriveFrameLayout.setVisibility(View.VISIBLE);
+
+				if(fileExplorerSectionLayout!=null){
+					fileExplorerSectionLayout.setVisibility(View.GONE);
+				}
+				else{
+					fileExplorerSectionLayout= (LinearLayout)findViewById(R.id.tabhost_explorer);
+					fileExplorerSectionLayout.setVisibility(View.GONE);
+				}
+
+				tabShown=NO_TABS;
+			}
+			else if (intent.getAction().equals(ACTION_MULTISELECT_FILE)){
+				log("action = ACTION_MULTISELECT_FILE");
+				//Just show Cloud Drive, no INCOMING tab , no need of tabhost
+
+				mode = SELECT;
+				selectFile = true;
+				multiselect = true;
 				selectedContacts=intent.getStringArrayListExtra("SELECTED_CONTACTS");
 
 				cloudDriveFrameLayout = (FrameLayout) findViewById(R.id.cloudDriveFrameLayout);

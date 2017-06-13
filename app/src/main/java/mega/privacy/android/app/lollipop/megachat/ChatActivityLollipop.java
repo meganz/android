@@ -1378,18 +1378,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         setEmojiconFragment(false);
                     }
                 }
-
-
-//                editText.requestFocus();
-//                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-//                imm.showSoftInput(editText, InputMethodManager.SHOW_IMPLICIT);
-
-//                InputMethodManager imm = (InputMethodManager) getSystemService(this.INPUT_METHOD_SERVICE);
-//                imm.hideSoftInputFromWindow(editText.getWindowToken(), 0);
-
-//                Intent intent = new Intent(this, KeyboardActivityLollipop.class);
-//                this.startActivity(intent);
-
                 break;
             }
             case R.id.fab_chat:{

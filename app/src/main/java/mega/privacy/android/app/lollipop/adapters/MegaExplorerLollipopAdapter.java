@@ -3,24 +3,30 @@ package mega.privacy.android.app.lollipop.adapters;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
+import android.util.SparseBooleanArray;
 import android.util.TypedValue;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.lollipop.CloudDriveExplorerFragmentLollipop;
 import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.Util;
@@ -45,9 +51,14 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 
 	DatabaseHandler dbH = null;
 	private ArrayList<Long> disabledNodes;
+
+	Object fragment;
 	
 	long parentHandle = -1;
 	boolean selectFile = false;
+
+	boolean multipleSelect;
+	private SparseBooleanArray selectedItems;
 
 	OnItemClickListener mItemClickListener;
 	RecyclerView listFragment;
@@ -96,6 +107,24 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 		this.imageIds = new ArrayList<Integer>();
 		this.names = new ArrayList<String>();
 		
+		if (megaApi == null){
+			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
+		}
+
+		dbH = DatabaseHandler.getDbHandler(context);
+	}
+
+	public MegaExplorerLollipopAdapter(Context _context, Object fragment, ArrayList<MegaNode> _nodes, long _parentHandle, RecyclerView listView, boolean selectFile){
+		this.context = _context;
+		this.nodes = _nodes;
+		this.parentHandle = _parentHandle;
+		this.listFragment = listView;
+		this.selectFile = selectFile;
+		this.positionClicked = -1;
+		this.imageIds = new ArrayList<Integer>();
+		this.names = new ArrayList<String>();
+		this.fragment = fragment;
+
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
 		}
@@ -167,11 +196,21 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 			
 		if (node.isFolder()){
 
+			if(selectFile) {
+				if (multipleSelect) {
+					if(isMultipleSelect()){
+						((CloudDriveExplorerFragmentLollipop) fragment).hideMultipleSelect();
+					}
+				}
+			}
+
 			RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
 			params.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
 			params.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
 			params.setMargins(36, 0, 0, 0);
 			holder.imageView.setLayoutParams(params);
+
+			holder.itemLayout.setBackgroundColor(Color.WHITE);
 
 			holder.permissionsIcon.setVisibility(View.VISIBLE);
 			if (disabledNodes != null){
@@ -245,18 +284,6 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 		else{
 			holder.permissionsIcon.setVisibility(View.GONE);
 			
-			if(selectFile)
-			{
-				holder.imageView.setAlpha(1.0f);
-				holder.textViewFileName.setTextColor(context.getResources().getColor(android.R.color.black));
-				holder.itemView.setOnClickListener(holder);
-			}
-			else{
-				holder.imageView.setAlpha(.4f);
-				holder.textViewFileName.setTextColor(context.getResources().getColor(R.color.text_secondary));
-				holder.itemView.setOnClickListener(null);
-			}			
-			
 			long nodeSize = node.getSize();
 			holder.textViewFileSize.setText(Util.getSizeString(nodeSize));
 			holder.imageView.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
@@ -265,15 +292,44 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 			params.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
 			params.setMargins(36, 0, 0, 0);
 			holder.imageView.setLayoutParams(params);
-			
+
+			if(selectFile)
+			{
+				holder.imageView.setAlpha(1.0f);
+				holder.textViewFileName.setTextColor(context.getResources().getColor(android.R.color.black));
+				holder.itemView.setOnClickListener(holder);
+
+				if (multipleSelect) {
+					if(this.isItemChecked(position)){
+						holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.new_multiselect_color));
+						holder.imageView.setImageResource(R.drawable.ic_multiselect);
+						log("Do not show thumb");
+						return;
+					}
+					else{
+						holder.imageView.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
+						holder.itemLayout.setBackgroundColor(Color.WHITE);
+					}
+				}
+				else{
+					holder.imageView.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
+					holder.itemLayout.setBackgroundColor(Color.WHITE);
+				}
+			}
+			else{
+				holder.imageView.setAlpha(.4f);
+				holder.textViewFileName.setTextColor(context.getResources().getColor(R.color.text_secondary));
+				holder.itemView.setOnClickListener(null);
+			}
+
 			if (node.hasThumbnail()){
-				
+
 				RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
 				params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
 				params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
 				params1.setMargins(54, 0, 12, 0);
 				holder.imageView.setLayoutParams(params1);
-				
+
 				thumb = ThumbnailUtilsLollipop.getThumbnailFromCache(node);
 				if (thumb != null){
 					holder.imageView.setImageBitmap(thumb);
@@ -283,12 +339,12 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 					if (thumb != null){
 						holder.imageView.setImageBitmap(thumb);
 					}
-					else{ 
+					else{
 						try{
 							thumb = ThumbnailUtilsLollipop.getThumbnailFromMegaExplorerLollipop(node, context, holder, megaApi, this);
 						}
 						catch(Exception e){} //Too many AsyncTasks
-						
+
 						if (thumb != null){
 							holder.imageView.setImageBitmap(thumb);
 						}
@@ -312,19 +368,214 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 						params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
 						params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
 						params1.setMargins(54, 0, 12, 0);
-						
+
 						holder.imageView.setLayoutParams(params1);
 						holder.imageView.setImageBitmap(thumb);
 					}
-					else{ 
+					else{
 						try{
 							ThumbnailUtilsLollipop.createThumbnailExplorerLollipop(context, node, holder, megaApi, this);
 						}
 						catch(Exception e){} //Too many AsyncTasks
 					}
-				}			
+				}
 			}
+
+
 		}		
+	}
+
+	public void toggleAllSelection(int pos) {
+		log("toggleAllSelection: "+pos);
+		final int positionToflip = pos;
+
+		if (selectedItems.get(pos, false)) {
+			log("delete pos: "+pos);
+			selectedItems.delete(pos);
+		}
+		else {
+			log("PUT pos: "+pos);
+			selectedItems.put(pos, true);
+		}
+
+		MegaExplorerLollipopAdapter.ViewHolderExplorerLollipop view = (MegaExplorerLollipopAdapter.ViewHolderExplorerLollipop) listFragment.findViewHolderForLayoutPosition(pos);
+		if(view!=null){
+			log("Start animation: "+pos);
+			Animation flipAnimation = AnimationUtils.loadAnimation(context, R.anim.multiselect_flip);
+			flipAnimation.setAnimationListener(new Animation.AnimationListener() {
+				@Override
+				public void onAnimationStart(Animation animation) {
+
+				}
+
+				@Override
+				public void onAnimationEnd(Animation animation) {
+					log("onAnimationEnd");
+					if (selectedItems.size() <= 0){
+						log("toggleAllSelection: hideMultipleSelect");
+
+						((CloudDriveExplorerFragmentLollipop) fragment).hideMultipleSelect();
+
+					}
+					log("toggleAllSelection: notified item changed");
+					notifyItemChanged(positionToflip);
+				}
+
+				@Override
+				public void onAnimationRepeat(Animation animation) {
+
+				}
+			});
+			view.imageView.startAnimation(flipAnimation);
+		}
+		else{
+			log("NULL view pos: "+positionToflip);
+			notifyItemChanged(pos);
+		}
+
+	}
+
+	public void toggleSelection(int pos) {
+		log("toggleSelection: "+pos);
+
+		if (selectedItems.get(pos, false)) {
+			log("delete pos: "+pos);
+			selectedItems.delete(pos);
+		}
+		else {
+			log("PUT pos: "+pos);
+			selectedItems.put(pos, true);
+		}
+		notifyItemChanged(pos);
+
+
+		MegaExplorerLollipopAdapter.ViewHolderExplorerLollipop view = (MegaExplorerLollipopAdapter.ViewHolderExplorerLollipop) listFragment.findViewHolderForLayoutPosition(pos);
+		if(view!=null){
+			log("Start animation: "+pos);
+			Animation flipAnimation = AnimationUtils.loadAnimation(context, R.anim.multiselect_flip);
+			flipAnimation.setAnimationListener(new Animation.AnimationListener() {
+				@Override
+				public void onAnimationStart(Animation animation) {
+
+				}
+
+				@Override
+				public void onAnimationEnd(Animation animation) {
+					if (selectedItems.size() <= 0){
+							((CloudDriveExplorerFragmentLollipop) fragment).hideMultipleSelect();
+					}
+				}
+
+				@Override
+				public void onAnimationRepeat(Animation animation) {
+
+				}
+			});
+
+			view.imageView.startAnimation(flipAnimation);
+
+		}
+		else{
+			log("view is null - not animation");
+		}
+
+	}
+
+	public void selectAll(){
+		for (int i= 0; i<this.getItemCount();i++){
+			if(!isItemChecked(i)){
+				toggleAllSelection(i);
+			}
+		}
+	}
+
+	public void clearSelections() {
+		log("clearSelections");
+		for (int i= 0; i<this.getItemCount();i++){
+			if(isItemChecked(i)){
+				toggleAllSelection(i);
+			}
+		}
+	}
+
+	public void clearSelectedItems() {
+		log("clearSelectedItems");
+		selectedItems.clear();
+	}
+
+	//	public void clearSelections() {
+//		if(selectedItems!=null){
+//			selectedItems.clear();
+//			for (int i= 0; i<this.getItemCount();i++) {
+//				if (isItemChecked(i)) {
+//					toggleAllSelection(i);
+//				}
+//			}
+//		}
+//		notifyDataSetChanged();
+//	}
+//
+	private boolean isItemChecked(int position) {
+		return selectedItems.get(position);
+	}
+
+	public int getSelectedItemCount() {
+		if(selectedItems!=null){
+			return selectedItems.size();
+		}
+		return 0;
+	}
+
+	public List<Integer> getSelectedItems() {
+		List<Integer> items = new ArrayList<Integer>(selectedItems.size());
+		for (int i = 0; i < selectedItems.size(); i++) {
+			items.add(selectedItems.keyAt(i));
+		}
+		return items;
+	}
+
+	/*
+	 * Get list of all selected nodes
+	 */
+	public List<MegaNode> getSelectedNodes() {
+		ArrayList<MegaNode> nodes = new ArrayList<MegaNode>();
+
+		for (int i = 0; i < selectedItems.size(); i++) {
+			if (selectedItems.valueAt(i) == true) {
+				MegaNode document = getNodeAt(selectedItems.keyAt(i));
+				if (document != null){
+					nodes.add(document);
+				}
+			}
+		}
+		return nodes;
+	}
+
+	/*
+ * Get document at specified position
+ */
+	public MegaNode getNodeAt(int position) {
+		try {
+			if (nodes != null) {
+				return nodes.get(position);
+			}
+		} catch (IndexOutOfBoundsException e) {
+		}
+		return null;
+	}
+
+	public boolean isMultipleSelect() {
+		return multipleSelect;
+	}
+
+	public void setMultipleSelect(boolean multipleSelect) {
+		log("setMultipleSelect");
+		if (this.multipleSelect != multipleSelect) {
+			this.multipleSelect = multipleSelect;
+		}
+		if(this.multipleSelect){
+			selectedItems = new SparseBooleanArray();
+		}
 	}
 
 	public boolean isEnabled(int position) {
