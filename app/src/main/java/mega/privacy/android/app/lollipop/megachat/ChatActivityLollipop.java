@@ -1220,16 +1220,30 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }
 
 //            final ArrayList<String> selectedContacts = intent.getStringArrayListExtra("SELECTED_CONTACTS");
-            final long fileHandle = intent.getLongExtra("SELECT", 0);
-            MegaNode node = megaApi.getNodeByHandle(fileHandle);
-            if(node!=null){
-                log("Node to send: "+node.getName());
-                MegaNodeList nodeList = MegaNodeList.createInstance();
-                nodeList.addNode(node);
-                megaChatApi.attachNodes(idChat, nodeList, this);
+//            final long fileHandle = intent.getLongExtra("NODE_HANDLES", 0);
+//            MegaNode node = megaApi.getNodeByHandle(fileHandle);
+//            if(node!=null){
+//                log("Node to send: "+node.getName());
+//                MegaNodeList nodeList = MegaNodeList.createInstance();
+//                nodeList.addNode(node);
+//                megaChatApi.attachNodes(idChat, nodeList, this);
+//
+//            }
 
+
+            long handles[] = intent.getLongArrayExtra("NODE_HANDLES");
+            log("Number of files to send: "+handles.length);
+
+            MegaNodeList nodeList = MegaNodeList.createInstance();
+            for(int i=0; i<handles.length; i++){
+                MegaNode node = megaApi.getNodeByHandle(handles[i]);
+                if(node!=null){
+                    log("Node to send: "+node.getName());
+                    nodeList.addNode(node);
+                }
             }
-
+            megaChatApi.attachNodes(idChat, nodeList, this);
+            log("---- no more files to send");
         }
         else{
             log("Error onActivityResult");

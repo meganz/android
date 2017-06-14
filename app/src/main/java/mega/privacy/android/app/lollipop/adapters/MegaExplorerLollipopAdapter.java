@@ -551,6 +551,23 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 		return nodes;
 	}
 
+	public long[] getSelectedHandles() {
+
+		long handles[] = new long[selectedItems.size()];
+
+		int k=0;
+		for (int i = 0; i < selectedItems.size(); i++) {
+			if (selectedItems.valueAt(i) == true) {
+				MegaNode document = getNodeAt(selectedItems.keyAt(i));
+				if (document != null){
+					handles[k] = document.getHandle();
+					k++;
+				}
+			}
+		}
+		return handles;
+	}
+
 	/*
  * Get document at specified position
  */

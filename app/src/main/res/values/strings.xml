@@ -1216,4 +1216,6 @@
 
     <string name="camera_uploads_cellular_connection">Use cellular connection</string>
     <string name="camera_uploads_upload_videos">Upload videos</string>
+
+    <string name="no_files_selected_warning">No files selected</string>
 </resources>
