@@ -790,17 +790,19 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 	public void selectAll(){
 		log("selectAll");
 		if (adapter != null){
-			if(adapter.isMultipleSelect()){
-				adapter.selectAll();
-			}
-			else{
-				adapter.setMultipleSelect(true);
-				adapter.selectAll();
-
-                actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
-			}
+			adapter.selectAll();
 
 			updateActionModeTitle();
+		}
+	}
+
+	public boolean isFolder(int position){
+		MegaNode node = nodes.get(position);
+		if(node.isFolder()){
+			return true;
+		}
+		else{
+			return false;
 		}
 	}
 
@@ -815,10 +817,6 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 
 	private void updateActionModeTitle() {
 		log("updateActionModeTitle");
-		if (actionMode == null || getActivity() == null) {
-			log("RETURN");
-			return;
-		}
 
 		List<MegaNode> documents = adapter.getSelectedNodes();
 		int files = 0;
