@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -27,6 +28,7 @@ import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
+import android.util.TypedValue;
 import android.view.Display;
 import android.view.GestureDetector;
 import android.view.Menu;
@@ -392,6 +394,20 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         fragmentContainer = (CoordinatorLayout) findViewById(R.id.fragment_container_chat);
 
         writingContainerLayout = (RelativeLayout) findViewById(R.id.writing_container_layout_chat_layout);
+
+        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+            log("onCreate: Landscape configuration");
+            RelativeLayout.LayoutParams writingParams = (RelativeLayout.LayoutParams)writingContainerLayout.getLayoutParams();
+            writingParams.width = (int) getResources().getDimension(R.dimen.width_landscape_text_chat);
+            writingContainerLayout.setLayoutParams(writingParams);
+        }
+        else{
+            log("onCreate: Portrait configuration");
+            RelativeLayout.LayoutParams writingParams = (RelativeLayout.LayoutParams)writingContainerLayout.getLayoutParams();
+            writingParams.width = (int) getResources().getDimension(R.dimen.width_portrait_text_chat);
+            writingContainerLayout.setLayoutParams(writingParams);
+        }
+
         writingLayout = (RelativeLayout) findViewById(R.id.writing_linear_layout_chat);
         disabledWritingLayout = (RelativeLayout) findViewById(R.id.writing_disabled_linear_layout_chat);
 
