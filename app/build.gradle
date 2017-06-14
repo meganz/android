@@ -8,8 +8,8 @@ android {
         applicationId "mega.privacy.android.app"
         minSdkVersion 11
         targetSdkVersion 25
-        versionCode 136
-        versionName "3.1.6.1 (136)"
+        versionCode 137
+        versionName "3.1.7 (137)"
     }
 
     sourceSets.main {
