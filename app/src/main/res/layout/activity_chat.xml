@@ -12,7 +12,8 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:background="@color/participants_layout">
 
         <android.support.v7.widget.Toolbar
             android:id="@+id/toolbar_chat"
@@ -29,9 +30,11 @@
             xmlns:app="http://schemas.android.com/apk/res-auto"
             android:id="@+id/writing_container_layout_chat_layout"
             android:layout_alignParentBottom="true"
-            android:layout_width="match_parent"
+            android:layout_width="272dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginBottom="8dp"
             android:layout_height="wrap_content"
-            android:background="@color/participants_layout"
             android:orientation="vertical">
 
             <RelativeLayout
@@ -49,14 +52,14 @@
                     android:tint="@color/transparency_white"
                     android:src="@drawable/ic_insert_emoticon"
                     android:layout_centerVertical="true"
-                    android:layout_marginLeft="16dp"/>
+                    android:layout_marginLeft="10dp"/>
 
                 <ImageButton
                     android:id="@+id/send_message_icon_chat"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
-                    android:layout_marginRight="16dp"
+                    android:layout_marginRight="10dp"
                     android:background="@null"
                     android:layout_centerVertical="true"
                     android:tint="@color/accentColor"
@@ -68,10 +71,10 @@
                     android:layout_height="wrap_content"
                     android:background="@android:color/transparent"
                     android:layout_toRightOf="@+id/keyboard_icon_chat"
-                    android:layout_marginTop="10dp"
-                    android:layout_marginBottom="10dp"
-                    android:layout_marginLeft="16dp"
-                    android:layout_marginRight="16dp"
+                    android:layout_marginTop="6dp"
+                    android:layout_marginBottom="6dp"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"
                     android:layout_centerVertical="true"
                     android:textSize="14sp"
                     android:hint="@string/type_message_hint"
@@ -390,20 +393,22 @@
                     android:textSize="12sp"/>
             </RelativeLayout>
 
-            <android.support.design.widget.FloatingActionButton
-                android:id="@+id/fab_chat"
-                android:layout_width="@dimen/fab_button_small_diameter"
-                android:layout_height="@dimen/fab_button_small_diameter"
-                android:layout_alignParentBottom="true"
-                android:layout_alignParentRight="true"
-                app:elevation="6dp"
-                android:scaleType="center"
-                app:backgroundTint="@color/accentColor"
-                app:pressedTranslationZ="12dp"
-                android:layout_margin="16dp"
-                android:src="@drawable/ic_add_white" />
-
         </RelativeLayout>
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fab_chat"
+            android:layout_width="@dimen/fab_button_small_diameter"
+            android:layout_height="@dimen/fab_button_small_diameter"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            app:elevation="6dp"
+            android:scaleType="center"
+            app:backgroundTint="@color/accentColor"
+            app:pressedTranslationZ="12dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginBottom="12dp"
+            android:src="@drawable/ic_add_white" />
 
     </RelativeLayout>
 
