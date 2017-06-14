@@ -441,6 +441,14 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 				dbH.setLastCloudFolder(Long.toString(parentHandle));
 				if(((FileExplorerActivityLollipop)context).multiselect){
 					log("Send several files to chat");
+					if(adapter.getSelectedItemCount()>0){
+						long handles[] = adapter.getSelectedHandles();
+						((FileExplorerActivityLollipop) context).buttonClick(handles);
+					}
+					else{
+						((FileExplorerActivityLollipop) context).showSnackbar(getString(R.string.no_files_selected_warning));
+					}
+
 				}
 				else{
 					((FileExplorerActivityLollipop) context).buttonClick(parentHandle);
