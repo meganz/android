@@ -169,8 +169,6 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 		holder.itemLayout = (RelativeLayout) v.findViewById(R.id.file_explorer_item_layout);
 		holder.imageView = (ImageView) v.findViewById(R.id.file_explorer_thumbnail);
 		holder.textViewFileName = (TextView) v.findViewById(R.id.file_explorer_filename);
-		holder.textViewFileName.getLayoutParams().height = RelativeLayout.LayoutParams.WRAP_CONTENT;
-		holder.textViewFileName.getLayoutParams().width = Util.px2dp((225*scaleW), outMetrics);
 		holder.textViewFileSize = (TextView) v.findViewById(R.id.file_explorer_filesize);
 		holder.permissionsIcon = (ImageView) v.findViewById(R.id.file_explorer_permissions);
 
@@ -484,7 +482,9 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 	public void selectAll(){
 		for (int i= 0; i<this.getItemCount();i++){
 			if(!isItemChecked(i)){
-				toggleAllSelection(i);
+                if(!((CloudDriveExplorerFragmentLollipop) fragment).isFolder(i)){
+                    toggleAllSelection(i);
+                }
 			}
 		}
 	}
