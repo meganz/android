@@ -971,6 +971,16 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			}	
 		}
 	}
+
+    public void buttonClick(long[] handles){
+        log("buttonClick handles");
+
+        Intent intent = new Intent();
+        intent.putExtra("NODE_HANDLES", handles);
+        intent.putStringArrayListExtra("SELECTED_CONTACTS", selectedContacts);
+        setResult(RESULT_OK, intent);
+        finish();
+    }
 	
 	public void buttonClick(long handle){
 		log("buttonClick");
@@ -1103,7 +1113,6 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 				setResult(RESULT_OK, intent);
 				finish();
 			}
-			
 		}
 		else if (mode == SELECT_CAMERA_FOLDER){
 
@@ -1188,11 +1197,19 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		newFolderDialog.show();
 	}
 
+    public void showSnackbar(String s){
+        log("showSnackbar: "+s);
+        Snackbar snackbar = Snackbar.make(fragmentContainer, s, Snackbar.LENGTH_LONG);
+        TextView snackbarTextView = (TextView)snackbar.getView().findViewById(android.support.design.R.id.snackbar_text);
+        snackbarTextView.setMaxLines(5);
+        snackbar.show();
+    }
+
 	private void createFolder(String title) {
 	
 		log("createFolder");
 		if (!Util.isOnline(this)){
-			Snackbar.make(fragmentContainer,getString(R.string.error_server_connection_problem),Snackbar.LENGTH_LONG).show();
+            showSnackbar(getString(R.string.error_server_connection_problem));
 			return;
 		}
 		
