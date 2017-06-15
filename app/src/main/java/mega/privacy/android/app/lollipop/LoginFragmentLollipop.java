@@ -97,7 +97,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
     TextView loggingInText;
     TextView fetchingNodesText;
     TextView prepareNodesText;
-    TextView initizalizingChatText;
     TextView serversBusyText;
     ScrollView scrollView;
 
@@ -377,7 +376,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         loggingInText = (TextView) v.findViewById(R.id.login_logging_in_text);
         fetchingNodesText = (TextView) v.findViewById(R.id.login_fetch_nodes_text);
         prepareNodesText = (TextView) v.findViewById(R.id.login_prepare_nodes_text);
-        initizalizingChatText = (TextView) v.findViewById(R.id.login_initializing_chat_text);
         serversBusyText = (TextView) v.findViewById(R.id.login_servers_busy_text);
 
         loginLogin.setVisibility(View.VISIBLE);
@@ -388,7 +386,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         loggingInText.setVisibility(View.GONE);
         fetchingNodesText.setVisibility(View.GONE);
         prepareNodesText.setVisibility(View.GONE);
-        initizalizingChatText.setVisibility(View.GONE);
         loginProgressBar.setVisibility(View.GONE);
         queryingSignupLinkText.setVisibility(View.GONE);
         confirmingAccountText.setVisibility(View.GONE);
@@ -512,10 +509,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                         Util.showAlert(context, getString(R.string.email_verification_text_error), getString(R.string.general_error_word));
                         return v;
                     }
-                }
-                else if (action.equals(Constants.ACTION_OVERQUOTA_TRANSFER)) {
-                    ((LoginActivityLollipop)context).showTransferOverquotaDialog();
-
                 }
                 else if (action.equals(Constants.ACTION_CANCEL_DOWNLOAD)) {
                     ((LoginActivityLollipop)context).showConfirmationCancelAllTransfers();
@@ -745,7 +738,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         loggingInText.setVisibility(View.VISIBLE);
         fetchingNodesText.setVisibility(View.VISIBLE);
         prepareNodesText.setVisibility(View.GONE);
-        initizalizingChatText.setVisibility(View.GONE);
         serversBusyText.setVisibility(View.GONE);
         megaApi.fetchNodes(this);
     }
@@ -776,11 +768,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             loggingInText.setVisibility(View.VISIBLE);
             fetchingNodesText.setVisibility(View.GONE);
             prepareNodesText.setVisibility(View.GONE);
-            initizalizingChatText.setVisibility(View.GONE);
             serversBusyText.setVisibility(View.GONE);
-
-            initizalizingChatText.setText(getString(R.string.chat_initializacion));
-            initizalizingChatText.setVisibility(View.VISIBLE);
 
             if(Util.isChatEnabled()){
                 log("enableChat: Chat is ENABLED");
@@ -802,7 +790,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 {
                     log("enableChat: condition ret == MegaChatApi.INIT_ERROR");
                     // chat cannot initialize, disable chat completely
-                    initizalizingChatText.setText(getString(R.string.chat_not_correctly_initialized));
                     if(chatSettings==null) {
                         log("1 - enableChat: ERROR----> Switch OFF chat");
                         chatSettings = new ChatSettings(false+"", true + "", true + "",true + "");
@@ -816,7 +803,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 }
                 else{
                     log("enableChat: condition ret == OK -- chat correctly initialized");
-                    initizalizingChatText.setText(getString(R.string.chat_correctly_initialized));
                 }
             }
             else{
@@ -856,7 +842,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         loggingInText.setVisibility(View.VISIBLE);
         fetchingNodesText.setVisibility(View.GONE);
         prepareNodesText.setVisibility(View.GONE);
-        initizalizingChatText.setVisibility(View.GONE);
         serversBusyText.setVisibility(View.GONE);
 
         OldUserCredentials oldCredentials = OldPreferences.getOldCredentials(context);
@@ -885,7 +870,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         loggingInText.setVisibility(View.VISIBLE);
         fetchingNodesText.setVisibility(View.GONE);
         prepareNodesText.setVisibility(View.GONE);
-        initizalizingChatText.setVisibility(View.GONE);
         serversBusyText.setVisibility(View.GONE);
         resumeSesion = true;
 
@@ -905,8 +889,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 }
 
                 log("startFastLogin: result of init ---> "+ret);
-                initizalizingChatText.setVisibility(View.VISIBLE);
-                initizalizingChatText.setText("Chat getting session...");
                 chatSettings = dbH.getChatSettings();
                 if (ret == MegaChatApi.INIT_NO_CACHE)
                 {
@@ -918,7 +900,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 {
                     // chat cannot initialize, disable chat completely
                     log("startFastLogin: condition ret == MegaChatApi.INIT_ERROR");
-                    initizalizingChatText.setText(getString(R.string.chat_not_correctly_initialized));
                     if(chatSettings==null) {
                         log("1 - startFastLogin: ERROR----> Switch OFF chat");
                         chatSettings = new ChatSettings(false+"", true + "", true + "",true + "");
@@ -932,12 +913,10 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 }
                 else{
                     log("startFastLogin: condition ret == OK -- chat correctly initialized");
-                    initizalizingChatText.setText(getString(R.string.chat_correctly_initialized));
                 }
             }
             else{
                 log("startFastLogin: Chat is NOT ENABLED");
-                initizalizingChatText.setVisibility(View.GONE);
             }
             megaApi.fastLogin(gSession, this);
         }
@@ -968,7 +947,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             loggingInText.setVisibility(View.GONE);
             fetchingNodesText.setVisibility(View.GONE);
             prepareNodesText.setVisibility(View.GONE);
-            initizalizingChatText.setVisibility(View.GONE);
             serversBusyText.setVisibility(View.GONE);
 
             ((LoginActivityLollipop)context).showSnackbar(getString(R.string.error_server_connection_problem));
@@ -1013,7 +991,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             loggingInText.setVisibility(View.GONE);
             fetchingNodesText.setVisibility(View.GONE);
             prepareNodesText.setVisibility(View.GONE);
-            initizalizingChatText.setVisibility(View.GONE);
             serversBusyText.setVisibility(View.GONE);
 
             ((LoginActivityLollipop)context).showSnackbar(getString(R.string.error_server_connection_problem));
@@ -1068,7 +1045,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             confirmingAccountText.setVisibility(View.VISIBLE);
             fetchingNodesText.setVisibility(View.GONE);
             prepareNodesText.setVisibility(View.GONE);
-            initizalizingChatText.setVisibility(View.GONE);
             serversBusyText.setVisibility(View.GONE);
 
             log("fastConfirm");
@@ -1090,7 +1066,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             loggingInText.setVisibility(View.GONE);
             fetchingNodesText.setVisibility(View.GONE);
             prepareNodesText.setVisibility(View.GONE);
-            initizalizingChatText.setVisibility(View.GONE);
             serversBusyText.setVisibility(View.GONE);
 
             ((LoginActivityLollipop)context).showSnackbar(getString(R.string.error_server_connection_problem));
@@ -1100,7 +1075,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         loggingInText.setVisibility(View.VISIBLE);
         fetchingNodesText.setVisibility(View.GONE);
         prepareNodesText.setVisibility(View.GONE);
-        initizalizingChatText.setVisibility(View.GONE);
         serversBusyText.setVisibility(View.GONE);
 
         log("fastLogin con publicKey y privateKey");
@@ -1315,7 +1289,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         confirmingAccountText.setVisibility(View.GONE);
         fetchingNodesText.setVisibility(View.GONE);
         prepareNodesText.setVisibility(View.GONE);
-        initizalizingChatText.setVisibility(View.GONE);
         serversBusyText.setVisibility(View.GONE);
         loginProgressBar.setVisibility(View.VISIBLE);
         log("querySignupLink");
@@ -1396,7 +1369,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 if ((progressValue > 99) || (progressValue < 0)){
                     progressValue = 100;
                     prepareNodesText.setVisibility(View.VISIBLE);
-                    initizalizingChatText.setVisibility(View.VISIBLE);
                     loginProgressBar.setVisibility(View.VISIBLE);
                 }
 //				log("progressValue = " + (int)progressValue);
@@ -1627,7 +1599,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 loggingInText.setVisibility(View.GONE);
                 fetchingNodesText.setVisibility(View.GONE);
                 prepareNodesText.setVisibility(View.GONE);
-                initizalizingChatText.setVisibility(View.VISIBLE);
                 serversBusyText.setVisibility(View.GONE);
 
                 ((LoginActivityLollipop)context).showSnackbar(errorMessage);
@@ -1647,7 +1618,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 loggingInText.setVisibility(View.VISIBLE);
                 fetchingNodesText.setVisibility(View.VISIBLE);
                 prepareNodesText.setVisibility(View.GONE);
-                initizalizingChatText.setVisibility(View.VISIBLE);
                 serversBusyText.setVisibility(View.GONE);
 
                 gSession = megaApi.dumpSession();
@@ -1742,7 +1712,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 loggingInText.setVisibility(View.GONE);
                 fetchingNodesText.setVisibility(View.GONE);
                 prepareNodesText.setVisibility(View.GONE);
-                initizalizingChatText.setVisibility(View.GONE);
                 serversBusyText.setVisibility(View.GONE);
                 queryingSignupLinkText.setVisibility(View.GONE);
                 confirmingAccountText.setVisibility(View.GONE);
@@ -1765,7 +1734,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             confirmingAccountText.setVisibility(View.GONE);
             fetchingNodesText.setVisibility(View.GONE);
             prepareNodesText.setVisibility(View.GONE);
-            initizalizingChatText.setVisibility(View.GONE);
             serversBusyText.setVisibility(View.GONE);
 
             if(error.getErrorCode() == MegaError.API_OK){
@@ -1794,7 +1762,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 confirmingAccountText.setVisibility(View.GONE);
                 fetchingNodesText.setVisibility(View.GONE);
                 prepareNodesText.setVisibility(View.GONE);
-                initizalizingChatText.setVisibility(View.GONE);
                 serversBusyText.setVisibility(View.GONE);
 
                 if (error.getErrorCode() == MegaError.API_ENOENT){
@@ -2222,15 +2189,20 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         log("onChatInitStateUpdate: "+newState);
 
         if(isAdded()){
-            if (newState == MegaChatApi.INIT_ERROR)
-            {
-                initizalizingChatText.setText(getString(R.string.chat_not_correctly_initialized));
-            }
-            else if (newState == MegaChatApi.INIT_WAITING_NEW_SESSION || newState == MegaChatApi.INIT_NO_CACHE){
-                initizalizingChatText.setText(getString(R.string.chat_initializacion));
-            }
-            else{
-                initizalizingChatText.setText(getString(R.string.chat_correctly_initialized));
+            if (newState == MegaChatApi.INIT_ERROR) {
+                // chat cannot initialize, disable chat completely
+                log("newState == MegaChatApi.INIT_ERROR");
+                if (chatSettings == null) {
+                    log("1 - onChatInitStateUpdate: ERROR----> Switch OFF chat");
+                    chatSettings = new ChatSettings(false + "", true + "", true + "", true + "");
+                    dbH.setChatSettings(chatSettings);
+                } else {
+                    log("2 - onChatInitStateUpdate: ERROR----> Switch OFF chat");
+                    dbH.setEnabledChat(false + "");
+                }
+                if(megaChatApi!=null){
+                    megaChatApi.logout(null);
+                }
             }
         }
     }

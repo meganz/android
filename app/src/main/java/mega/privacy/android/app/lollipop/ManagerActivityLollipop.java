@@ -1215,10 +1215,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		}
 		log("Preferred View List: "+isList);
 
-
-		String language = Locale.getDefault().toString();
-		log("Language: "+language);
-
 		if(prefs!=null){
 			if(prefs.getPreferredSortCloud()!=null){
 				orderCloud = Integer.parseInt(prefs.getPreferredSortCloud());
@@ -2723,29 +2719,26 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				log("Fragment Index: " + index);
 				if(index == 1){
 					//Rubbish Bin TAB
-					MegaNode parentNode = megaApi.getNodeByHandle(parentHandleRubbish);
-					if (parentNode != null){
-						if (parentNode.getHandle() == megaApi.getRubbishNode().getHandle()){
-							aB.setTitle(getString(R.string.section_rubbish_bin));
+					String cloudTag = getFragmentTag(R.id.cloud_drive_tabs_pager, 1);
+					rubbishBinFLol = (RubbishBinFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cloudTag);
+					if (rubbishBinFLol != null){
+						log("parentHandleRubbish: "+ parentHandleRubbish);
+						if(parentHandleRubbish == megaApi.getRubbishNode().getHandle() || parentHandleRubbish == -1){
+							aB.setTitle(getResources().getString(R.string.section_rubbish_bin));
+							log("aB.setHomeAsUpIndicator_156");
 							aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+							rubbishBinFLol.setNodes(megaApi.getChildren(megaApi.getRubbishNode(), orderCloud));
 							firstNavigationLevel = true;
 						}
 						else{
-							aB.setTitle(parentNode.getName());
-							log("indicator_arrow_back_886");
+							MegaNode node = megaApi.getNodeByHandle(parentHandleRubbish);
+							aB.setTitle(node.getName());
+							log("indicator_arrow_back_969");
 							aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+							rubbishBinFLol.setNodes(megaApi.getChildren(node, orderCloud));
 							firstNavigationLevel = false;
 						}
 					}
-					else{
-						parentHandleRubbish = megaApi.getRubbishNode().getHandle();
-						parentNode = megaApi.getRootNode();
-						aB.setTitle(getString(R.string.section_rubbish_bin));
-						aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
-						firstNavigationLevel = true;
-					}
-					ArrayList<MegaNode> nodes = megaApi.getChildren(parentNode, orderCloud);
-					rubbishBinFLol.setNodes(nodes);
 				}
 				else{
 					//Cloud Drive TAB
@@ -11755,6 +11748,20 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				Util.showAlert(this, getString(R.string.email_verification_text_error), getString(R.string.general_error_word));
 			}
 		}
+		else if(request.getType() == MegaRequest.TYPE_GET_CANCEL_LINK){
+            log("TYPE_GET_CANCEL_LINK");
+
+			if (e.getErrorCode() == MegaError.API_OK){
+				log("cancelation link received!");
+				log(e.getErrorString() + "___" + e.getErrorCode());
+				Util.showAlert(this, getString(R.string.email_verification_text), getString(R.string.email_verification_title));
+			}
+			else{
+				log("Error when asking for the cancelation link");
+				log(e.getErrorString() + "___" + e.getErrorCode());
+				Util.showAlert(this, getString(R.string.email_verification_text_error), getString(R.string.general_error_word));
+			}
+        }
 		else if (request.getType() == MegaRequest.TYPE_REMOVE_CONTACT){
 
 			if (e.getErrorCode() == MegaError.API_OK){
@@ -12923,6 +12930,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	@Override
 	public void onTransferUpdate(MegaApiJava api, MegaTransfer transfer) {
 //		log("onTransferUpdate: " + transfer.getFileName() + " - " + transfer.getTag());
+
 		long now = Calendar.getInstance().getTimeInMillis();
 		if((now - lastTimeOnTransferUpdate)>Util.ONTRANSFERUPDATE_REFRESH_MILLIS){
 			log("Update onTransferUpdate: " + transfer.getFileName() + " - " + transfer.getTag()+ " - "+ transfer.getNotificationNumber());
@@ -12957,17 +12965,16 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	public void onTransferTemporaryError(MegaApiJava api, MegaTransfer transfer, MegaError e) {
 		log("onTransferTemporaryError: " + transfer.getFileName() + " - " + transfer.getTag());
 
-//		if(e.getErrorCode() == MegaError.API_EOVERQUOTA){
-//			log("API_EOVERQUOTA error!!");
-//			if(alertDialogTransferOverquota==null){
-//				showTransferOverquotaDialog();
-//			}
-//			else{
-//				if(!(alertDialogTransferOverquota.isShowing())){
-//					showTransferOverquotaDialog();
-//				}
-//			}
-//		}
+		if(e.getErrorCode() == MegaError.API_EOVERQUOTA){
+			log("API_EOVERQUOTA error!!");
+			String cloudTag = getFragmentTag(R.id.cloud_drive_tabs_pager, 0);
+			fbFLol = (FileBrowserFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cloudTag);
+			if (fbFLol != null){
+				if(fbFLol.isAdded()){
+					fbFLol.setOverviewLayout();
+				}
+			}
+		}
 	}
 
 	@Override
@@ -13601,7 +13608,22 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 	@Override
 	public void onChatInitStateUpdate(MegaChatApiJava api, int newState) {
-
+		log("onChatInitStateUpdate");
+		if (newState == MegaChatApi.INIT_ERROR) {
+			// chat cannot initialize, disable chat completely
+			log("newState == MegaChatApi.INIT_ERROR");
+			if (chatSettings == null) {
+				log("1 - onChatInitStateUpdate: ERROR----> Switch OFF chat");
+				chatSettings = new ChatSettings(false + "", true + "", true + "", true + "");
+				dbH.setChatSettings(chatSettings);
+			} else {
+				log("2 - onChatInitStateUpdate: ERROR----> Switch OFF chat");
+				dbH.setEnabledChat(false + "");
+			}
+			if(megaChatApi!=null){
+				megaChatApi.logout(null);
+			}
+		}
 	}
 
 	@Override

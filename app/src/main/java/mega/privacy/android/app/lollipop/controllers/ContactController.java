@@ -17,6 +17,7 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.listeners.ContactNameListener;
 import mega.privacy.android.app.lollipop.listeners.MultipleRequestListener;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
+import mega.privacy.android.app.lollipop.megachat.ContactAttachmentActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
@@ -251,6 +252,9 @@ public class ContactController {
         else if(context instanceof ChatActivityLollipop){
             megaApi.inviteContact(contactEmail, null, MegaContactRequest.INVITE_ACTION_ADD, (ChatActivityLollipop) context);
         }
+        else if(context instanceof ContactAttachmentActivityLollipop){
+            megaApi.inviteContact(contactEmail, null, MegaContactRequest.INVITE_ACTION_ADD, (ContactAttachmentActivityLollipop) context);
+        }
     }
 
     public void inviteMultipleContacts(ArrayList<String> contactEmails){
@@ -286,6 +290,22 @@ public class ContactController {
 
             if (contactEmails.size() == 1){
                 megaApi.inviteContact(contactEmails.get(0), null, MegaContactRequest.INVITE_ACTION_ADD, (ChatActivityLollipop) context);
+            }
+            else if (contactEmails.size() > 1){
+                inviteMultipleListener = new MultipleRequestListener(-1, context);
+                for(int i=0; i<contactEmails.size();i++) {
+                    megaApi.inviteContact(contactEmails.get(i), null, MegaContactRequest.INVITE_ACTION_ADD, inviteMultipleListener);
+                }
+            }
+        }
+        else if(context instanceof ContactAttachmentActivityLollipop){
+            if (!Util.isOnline(context)){
+                ((ContactAttachmentActivityLollipop) context).showSnackbar(context.getString(R.string.error_server_connection_problem));
+                return;
+            }
+
+            if (contactEmails.size() == 1){
+                megaApi.inviteContact(contactEmails.get(0), null, MegaContactRequest.INVITE_ACTION_ADD, (ContactAttachmentActivityLollipop) context);
             }
             else if (contactEmails.size() > 1){
                 inviteMultipleListener = new MultipleRequestListener(-1, context);
