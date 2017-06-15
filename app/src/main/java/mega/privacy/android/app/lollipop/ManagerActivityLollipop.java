@@ -13677,7 +13677,22 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 	@Override
 	public void onChatInitStateUpdate(MegaChatApiJava api, int newState) {
-
+		log("onChatInitStateUpdate");
+		if (newState == MegaChatApi.INIT_ERROR) {
+			// chat cannot initialize, disable chat completely
+			log("newState == MegaChatApi.INIT_ERROR");
+			if (chatSettings == null) {
+				log("1 - onChatInitStateUpdate: ERROR----> Switch OFF chat");
+				chatSettings = new ChatSettings(false + "", true + "", true + "", true + "");
+				dbH.setChatSettings(chatSettings);
+			} else {
+				log("2 - onChatInitStateUpdate: ERROR----> Switch OFF chat");
+				dbH.setEnabledChat(false + "");
+			}
+			if(megaChatApi!=null){
+				megaChatApi.logout(null);
+			}
+		}
 	}
 
 	@Override
