@@ -76,6 +76,7 @@ import mega.privacy.android.app.lollipop.PinActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.listeners.MultipleGroupChatRequestListener;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaChatLollipopAdapter;
+import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.AttachmentUploadBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ContactAttachmentBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.MessageNotSentBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.NodeAttachmentBottomSheetDialogFragment;
@@ -182,13 +183,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     ChatActivityLollipop chatActivity;
     String myMail;
-
-    RelativeLayout uploadPanel;
-    RelativeLayout uploadFromGalleryOption;
-    RelativeLayout uploadFromCloudOption;
-    RelativeLayout uploadAudioOption;
-    RelativeLayout uploadContactOption;
-    RelativeLayout uploadFromFilesystemOption;
 
     MenuItem callMenuItem;
     MenuItem videoMenuItem;
@@ -505,9 +499,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         textChat.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                if(uploadPanel.getVisibility()==View.VISIBLE){
-                    hideUploadPanel();
-                }
                 if (emojiKeyboardShown){
 //                    int inputType = textChat.getInputType();
 //                    textChat.setInputType(InputType.TYPE_NULL);
@@ -597,22 +588,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         fab = (FloatingActionButton) findViewById(R.id.fab_chat);
         fab.setOnClickListener(this);
 
-        uploadPanel = (RelativeLayout) findViewById(R.id.upload_panel_chat);
-        uploadFromGalleryOption = (RelativeLayout) findViewById(R.id.upload_from_gallery_chat);
-        uploadFromGalleryOption.setOnClickListener(this);
-
-        uploadFromCloudOption = (RelativeLayout) findViewById(R.id.upload_from_cloud_chat);
-        uploadFromCloudOption.setOnClickListener(this);
-
-        uploadFromFilesystemOption = (RelativeLayout) findViewById(R.id.upload_from_filesystem_chat);
-        uploadFromFilesystemOption.setOnClickListener(this);
-
-        uploadAudioOption = (RelativeLayout) findViewById(R.id.upload_audio_chat);
-        uploadAudioOption.setOnClickListener(this);
-
-        uploadContactOption = (RelativeLayout) findViewById(R.id.upload_contact_chat);
-        uploadContactOption.setOnClickListener(this);
-
         emojiKeyboardLayout = (FrameLayout) findViewById(R.id.chat_emoji_keyboard);
 
         if(megaChatApi.isSignalActivityRequired()){
@@ -664,8 +639,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         if (newIntent != null){
             intentAction = newIntent.getAction();
             if (intentAction != null){
-
-                fab.setVisibility(View.VISIBLE);
 
                 idChat = newIntent.getLongExtra("CHAT_ID", -1);
 //                    idChat=8179160514871859886L;
@@ -751,7 +724,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         if (intentAction.equals(Constants.ACTION_CHAT_NEW)) {
                             log("ACTION_CHAT_NEW");
 
-                            fab.setVisibility(View.VISIBLE);
                             listView.setVisibility(View.GONE);
                             chatRelativeLayout.setVisibility(View.GONE);
                             emptyScrollView.setVisibility(View.VISIBLE);
@@ -808,7 +780,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     log("Chat ID -1 error");
                 }
             }
-
         }
         else{
             log("INTENT is NULL");
@@ -1038,11 +1009,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         switch (item.getItemId()) {
             // Respond to the action bar's Up/Home button
             case android.R.id.home: {
-                if(uploadPanel.getVisibility()==View.VISIBLE){
-                    hideUploadPanel();
-                    break;
-                }
-
                 finish();
                 break;
             }
@@ -1317,11 +1283,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             megaChatApi.signalPresenceActivity();
         }
 
-        if(uploadPanel.getVisibility()==View.VISIBLE){
-            hideUploadPanel();
-            return;
-        }
-
         if (emojiKeyboardShown) {
             removeEmojiconFragment();
         }
@@ -1401,34 +1362,19 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 showUploadPanel();
                 break;
             }
-            case R.id.upload_from_gallery_chat:{
-                hideUploadPanel();
-                showSnackbar(getString(R.string.general_not_yet_implemented));
-                break;
-            }
-            case R.id.upload_from_cloud_chat:{
-                hideUploadPanel();
 
-                ChatController chatC = new ChatController(this);
-                chatC.pickFileToSend();
-                break;
-            }
-            case R.id.upload_audio_chat:{
-                hideUploadPanel();
-                showSnackbar(getString(R.string.general_not_yet_implemented));
-                break;
-            }
-            case R.id.upload_contact_chat:{
-                hideUploadPanel();
-                chooseContactsDialog();
-                break;
-            }
-            case R.id.upload_from_filesystem_chat:{
-                hideUploadPanel();
-                showSnackbar(getString(R.string.general_not_yet_implemented));
-                break;
-            }
 		}
+    }
+
+    public void attachFromCloud(){
+        log("attachFromCloud");
+        ChatController chatC = new ChatController(this);
+        chatC.pickFileToSend();
+    }
+
+    public void attachContact(){
+        log("attachContact");
+        chooseContactsDialog();
     }
 
     public void sendMessage(String text){
@@ -1661,20 +1607,17 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     }
 
     public void showUploadPanel(){
-        fab.setVisibility(View.GONE);
-        uploadPanel.setVisibility(View.VISIBLE);
-        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) messagesContainerLayout.getLayoutParams();
-        params.addRule(RelativeLayout.ABOVE, R.id.upload_panel_chat);
-        messagesContainerLayout.setLayoutParams(params);
+        AttachmentUploadBottomSheetDialogFragment bottomSheetDialogFragment = new AttachmentUploadBottomSheetDialogFragment();
+        bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
     }
 
-    public void hideUploadPanel(){
-        fab.setVisibility(View.VISIBLE);
-        uploadPanel.setVisibility(View.GONE);
-        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) messagesContainerLayout.getLayoutParams();
-        params.addRule(RelativeLayout.ABOVE, R.id.writing_container_layout_chat_layout);
-        messagesContainerLayout.setLayoutParams(params);
-    }
+//    public void hideUploadPanel(){
+//        fab.setVisibility(View.VISIBLE);
+//        uploadPanel.setVisibility(View.GONE);
+//        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) messagesContainerLayout.getLayoutParams();
+//        params.addRule(RelativeLayout.ABOVE, R.id.writing_container_layout_chat_layout);
+//        messagesContainerLayout.setLayoutParams(params);
+//    }
 
     /////Multiselect/////
     private class ActionBarCallBack implements ActionMode.Callback {

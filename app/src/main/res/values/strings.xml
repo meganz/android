@@ -1218,4 +1218,7 @@
     <string name="camera_uploads_upload_videos">Upload videos</string>
 
     <string name="no_files_selected_warning">No files selected</string>
+
+    <string name="attachment_upload_panel_from_cloud">From Cloud Drive</string>
+    <string name="attachment_upload_panel_contact">Contact</string>
 </resources>
