@@ -395,19 +395,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
         writingContainerLayout = (RelativeLayout) findViewById(R.id.writing_container_layout_chat_layout);
 
-        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-            log("onCreate: Landscape configuration");
-            RelativeLayout.LayoutParams writingParams = (RelativeLayout.LayoutParams)writingContainerLayout.getLayoutParams();
-            writingParams.width = (int) getResources().getDimension(R.dimen.width_landscape_text_chat);
-            writingContainerLayout.setLayoutParams(writingParams);
-        }
-        else{
-            log("onCreate: Portrait configuration");
-            RelativeLayout.LayoutParams writingParams = (RelativeLayout.LayoutParams)writingContainerLayout.getLayoutParams();
-            writingParams.width = (int) getResources().getDimension(R.dimen.width_portrait_text_chat);
-            writingContainerLayout.setLayoutParams(writingParams);
-        }
-
         writingLayout = (RelativeLayout) findViewById(R.id.writing_linear_layout_chat);
         disabledWritingLayout = (RelativeLayout) findViewById(R.id.writing_disabled_linear_layout_chat);
 
