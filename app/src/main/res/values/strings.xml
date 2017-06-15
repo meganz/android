@@ -740,9 +740,6 @@
 
     <string name="next_ime_action" context="Action to pass focus to the next field in a form">Next</string>
 
-    <string name="error_changing_user_attributes" context="Message when an error ocurred when changing an user attribute">Error when changing the account data.</string>
-    <string name="success_changing_user_attributes" context="Message when an user attribute has been changed successfully">Your account data has been correctly updated.</string>
-
     <string name="mail_already_used" context="Error shown when the user tries to change his mail to one that is already used">Error. This email address is already in use.</string>
 
     <string name="change_mail_text_last_step" context="Text shown in the last alert dialog to change the email associated to an account">This is the last step to change your email. Please enter your password below.</string>
@@ -1216,4 +1213,15 @@
 
     <string name="camera_uploads_cellular_connection">Use cellular connection</string>
     <string name="camera_uploads_upload_videos">Upload videos</string>
+
+    <string name="success_changing_user_avatar" context="Message when an user avatar has been changed successfully">Profile picture updated</string>
+    <string name="error_changing_user_avatar" context="Message when an error ocurred when changing an user avatar">Error when changing the profile picture</string>
+    <string name="success_deleting_user_avatar" context="Message when an user avatar has been deleted successfully">Profile picture deleted</string>
+    <string name="error_deleting_user_avatar" context="Message when an error ocurred when deleting an user avatar">Error when deleting the profile picture.</string>
+
+    <string name="error_changing_user_attributes" context="Message when an error ocurred when changing an user attribute">Error when changing the name</string>
+    <string name="success_changing_user_attributes" context="Message when an user attribute has been changed successfully">Your name has been correctly updated</string>
+
+
+
 </resources>
