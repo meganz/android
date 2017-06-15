@@ -108,8 +108,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 	TextView loggingInText;
 	TextView fetchingNodesText;
 	TextView prepareNodesText;
-	TextView initizalizingChatText;
-	
+
 	MenuItem createFolderMenuItem;
 
 	FrameLayout cloudDriveFrameLayout;
@@ -352,8 +351,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		loggingInText = (TextView) findViewById(R.id.file_login_logging_in_text);
 		fetchingNodesText = (TextView) findViewById(R.id.file_login_fetch_nodes_text);
 		prepareNodesText = (TextView) findViewById(R.id.file_login_prepare_nodes_text);
-		initizalizingChatText = (TextView) findViewById(R.id.file_login_initializing_chat_text);
-        		
+
 		intent = getIntent();
 		if (megaApi.getRootNode() == null){
 			log("hide action bar");
@@ -369,7 +367,6 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 				loginProgressBar.setVisibility(View.VISIBLE);
 				loginFetchNodesProgressBar.setVisibility(View.GONE);
 				loggingInText.setVisibility(View.VISIBLE);
-				initizalizingChatText.setVisibility(View.GONE);
 				fetchingNodesText.setVisibility(View.GONE);
 				prepareNodesText.setVisibility(View.GONE);
 				gSession = credentials.getSession();
@@ -381,8 +378,6 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 					}
 					int ret = megaChatApi.init(gSession);
 					log("onCreate: result of init ---> "+ret);
-					initizalizingChatText.setVisibility(View.VISIBLE);
-					initizalizingChatText.setText("Chat getting session...");
 					chatSettings = dbH.getChatSettings();
 					if (ret == MegaChatApi.INIT_NO_CACHE)
 					{
@@ -393,7 +388,6 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 					else if (ret == MegaChatApi.INIT_ERROR)
 					{
 						log("onCreate: condition ret == MegaChatApi.INIT_ERROR");
-						initizalizingChatText.setText("Chat error, not initialized");
 						if(chatSettings==null) {
 							log("1 - onCreate: ERROR----> Switch OFF chat");
 							chatSettings = new ChatSettings(false+"", true + "", true + "",true + "");
@@ -407,15 +401,12 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 					}
 					else{
 						log("onCreate: Chat correctly initialized");
-						initizalizingChatText.setText("Chat correctly initialized");
 					}
 				}
 
 				log("SESSION: " + gSession);
 				megaApi.fastLogin(gSession, this);
 			}
-
-			initizalizingChatText.setVisibility(View.GONE);
 		}
 		else{
 			afterLoginAndFetch();
@@ -1453,7 +1444,6 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 					boolean chatEnabled = Boolean.parseBoolean(chatSettings.getEnabled());
 					if(chatEnabled){
 						log("Chat enabled-->connect");
-						initizalizingChatText.setVisibility(View.VISIBLE);
 						megaChatApi.connect(this);
 						MegaApplication.setLoggingIn(false);
 						afterLoginAndFetch();
