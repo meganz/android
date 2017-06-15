@@ -2,6 +2,13 @@
 	xmlns:MEGA="http://schemas.android.com/apk/res-auto" >
 
 	<item
+		android:id="@+id/action_write_mail"
+		android:orderInCategory="100"
+		android:title="@string/action_select_all"
+		android:icon="@drawable/ic_add_contact"
+		MEGA:showAsAction="always"
+		android:visible="false"/>
+	<item
 		android:id="@+id/action_send_invitation"
 		android:orderInCategory="100"
 		android:title="@string/context_send"
