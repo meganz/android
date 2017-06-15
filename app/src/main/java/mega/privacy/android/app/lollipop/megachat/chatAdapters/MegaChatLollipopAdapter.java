@@ -1446,7 +1446,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                 ((ViewHolderMessageChat)holder).contentOwnMessageContactEmail.setText(email);
 
                                 setUserAvatar(((ViewHolderMessageChat)holder), message);
-                             }
+                            }
                             else{
                                 //Show default avatar with userCount
                                 StringBuilder name = new StringBuilder("");

@@ -11,6 +11,7 @@ import android.os.Handler;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
@@ -208,7 +209,7 @@ public class LoginActivityLollipop extends AppCompatActivity implements MegaGlob
                 break;
             }
             case Constants.CREATE_ACCOUNT_FRAGMENT: {
-
+                log("Show CREATE_ACCOUNT_FRAGMENT");
                 if (createAccountFragment == null) {
                     createAccountFragment = new CreateAccountFragmentLollipop();
                 }
@@ -286,47 +287,69 @@ public class LoginActivityLollipop extends AppCompatActivity implements MegaGlob
     public void showTransferOverquotaDialog() {
         log("showTransferOverquotaDialog");
 
-        android.support.v7.app.AlertDialog.Builder dialogBuilder = new android.support.v7.app.AlertDialog.Builder(this);
+        boolean show = true;
 
-        LayoutInflater inflater = this.getLayoutInflater();
-        View dialogView = inflater.inflate(R.layout.transfer_overquota_layout, null);
-        dialogBuilder.setView(dialogView);
-
-        TextView title = (TextView) dialogView.findViewById(R.id.transfer_overquota_title);
-        title.setText(getString(R.string.title_depleted_transfer_overquota));
-
-        ImageView icon = (ImageView) dialogView.findViewById(R.id.image_transfer_overquota);
-        icon.setImageDrawable(getDrawable(R.drawable.transfer_quota_empty));
-
-        TextView text = (TextView) dialogView.findViewById(R.id.text_transfer_overquota);
-        text.setText(getString(R.string.text_depleted_transfer_overquota));
-
-        Button continueButton = (Button) dialogView.findViewById(R.id.transfer_overquota_button_dissmiss);
-        continueButton.setText(getString(R.string.login_text));
-
-        Button paymentButton = (Button) dialogView.findViewById(R.id.transfer_overquota_button_payment);
-        paymentButton.setText(getString(R.string.continue_without_account_transfer_overquota));
-
-
-        alertDialogTransferOverquota = dialogBuilder.create();
-
-        continueButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                alertDialogTransferOverquota.dismiss();
+        if(alertDialogTransferOverquota!=null){
+            if(alertDialogTransferOverquota.isShowing()){
+                log("change show to false");
+                show = false;
             }
+        }
 
-        });
+        if(show){
+            android.support.v7.app.AlertDialog.Builder dialogBuilder = new android.support.v7.app.AlertDialog.Builder(this);
 
-        paymentButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                alertDialogTransferOverquota.dismiss();
-            }
+            LayoutInflater inflater = this.getLayoutInflater();
+            View dialogView = inflater.inflate(R.layout.transfer_overquota_layout_not_logged, null);
+            dialogBuilder.setView(dialogView);
 
-        });
+            TextView title = (TextView) dialogView.findViewById(R.id.not_logged_transfer_overquota_title);
+            title.setText(getString(R.string.title_depleted_transfer_overquota));
 
-        alertDialogTransferOverquota.setCancelable(false);
-        alertDialogTransferOverquota.setCanceledOnTouchOutside(false);
-        alertDialogTransferOverquota.show();
+            ImageView icon = (ImageView) dialogView.findViewById(R.id.not_logged_image_transfer_overquota);
+            icon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.transfer_quota_empty));
+
+            TextView text = (TextView) dialogView.findViewById(R.id.not_logged_text_transfer_overquota);
+            text.setText(getString(R.string.text_depleted_transfer_overquota));
+
+            Button continueButton = (Button) dialogView.findViewById(R.id.not_logged_transfer_overquota_button_dissmiss);
+            continueButton.setText(getString(R.string.login_text));
+
+            Button paymentButton = (Button) dialogView.findViewById(R.id.not_logged_transfer_overquota_button_payment);
+            paymentButton.setText(getString(R.string.continue_without_account_transfer_overquota));
+
+            Button cancelButton = (Button) dialogView.findViewById(R.id.not_logged_transfer_overquota_button_cancel);
+            cancelButton.setText(getString(R.string.menu_cancel_all_transfers));
+
+            alertDialogTransferOverquota = dialogBuilder.create();
+
+            continueButton.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View v) {
+                    alertDialogTransferOverquota.dismiss();
+                }
+
+            });
+
+            paymentButton.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View v) {
+                    alertDialogTransferOverquota.dismiss();
+                }
+
+            });
+
+            cancelButton.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View v) {
+                    alertDialogTransferOverquota.dismiss();
+                    showConfirmationCancelAllTransfers();
+
+                }
+
+            });
+
+            alertDialogTransferOverquota.setCancelable(false);
+            alertDialogTransferOverquota.setCanceledOnTouchOutside(false);
+            alertDialogTransferOverquota.show();
+        }
     }
 
     public void stopCameraSyncService() {
@@ -479,6 +502,10 @@ public class LoginActivityLollipop extends AppCompatActivity implements MegaGlob
                     }
                 } else if (intent.getAction().equals(Constants.ACTION_CANCEL_DOWNLOAD)) {
                     showConfirmationCancelAllTransfers();
+                }
+                else if (intent.getAction().equals(Constants.ACTION_OVERQUOTA_TRANSFER)) {
+                    showTransferOverquotaDialog();
+
                 }
                 intent.setAction(null);
             }
@@ -645,5 +672,12 @@ public class LoginActivityLollipop extends AppCompatActivity implements MegaGlob
     @Override
     public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) {
         log("onRequestTemporaryError - " + request.getRequestString());
+    }
+
+    @Override
+    protected void onPostResume() {
+        log("onPostResume");
+        super.onPostResume();
+
     }
 }

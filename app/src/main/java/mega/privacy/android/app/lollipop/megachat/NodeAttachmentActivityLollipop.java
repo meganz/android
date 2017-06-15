@@ -344,7 +344,7 @@ public class NodeAttachmentActivityLollipop extends PinActivityLollipop implemen
 			finish();
 		}
     	
-    	aB.setTitle("Files attached");
+    	aB.setTitle(getString(R.string.activity_title_files_attached));
 		if(message.getMessage().getUserHandle()==megaChatApi.getMyUserHandle()) {
 			aB.setSubtitle(megaChatApi.getMyFullname());
 		}

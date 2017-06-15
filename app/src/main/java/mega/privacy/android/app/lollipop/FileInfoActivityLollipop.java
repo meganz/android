@@ -1689,17 +1689,23 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 	}
 
 	public void showRenameDialog(){
+		log("showRenameDialog");
+
+		LinearLayout layout = new LinearLayout(this);
+		layout.setOrientation(LinearLayout.VERTICAL);
+		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+		params.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleHeightPx(20, outMetrics), Util.scaleWidthPx(17, outMetrics), 0);
+//	    layout.setLayoutParams(params);
 
 		final EditTextCursorWatcher input = new EditTextCursorWatcher(this, node.isFolder());
 //		input.setId(EDIT_TEXT_ID);
 		input.setSingleLine();
-		input.setText(node.getName());
-
+		input.setTextColor(getResources().getColor(R.color.text_secondary));
+//		input.setHint(getString(R.string.context_new_folder_name));
 		input.setImeOptions(EditorInfo.IME_ACTION_DONE);
 
-		input.setImeActionLabel(getString(R.string.context_rename),
-				KeyEvent.KEYCODE_ENTER);
-
+		input.setImeActionLabel(getString(R.string.context_rename),EditorInfo.IME_ACTION_DONE);
+		input.setText(node.getName());
 		input.setOnFocusChangeListener(new View.OnFocusChangeListener() {
 			@Override
 			public void onFocusChange(final View v, boolean hasFocus) {
@@ -1730,29 +1736,10 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 			}
 		});
 
-//		AlertDialog.Builder builder = Util.getCustomAlertBuilder(this, getString(R.string.context_rename) + " "	+ new String(node.getName()), null, input);
-
-		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-		builder.setTitle(getString(R.string.context_rename) + " "	+ new String(node.getName()));
-
-		builder.setPositiveButton(getString(R.string.context_rename),
-				new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int whichButton) {
-						String value = input.getText().toString().trim();
-						if (value.length() == 0) {
-							return;
-						}
-						rename(value);
-					}
-				});
-		builder.setNegativeButton(getString(android.R.string.cancel), null);
-		renameDialog = builder.create();
-		renameDialog.show();
-
 		input.setOnEditorActionListener(new OnEditorActionListener() {
 			@Override
 			public boolean onEditorAction(TextView v, int actionId,
-					KeyEvent event) {
+										  KeyEvent event) {
 				if (actionId == EditorInfo.IME_ACTION_DONE) {
 					renameDialog.dismiss();
 					String value = v.getText().toString().trim();
@@ -1765,6 +1752,26 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 				return false;
 			}
 		});
+
+		layout.addView(input, params);
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		builder.setTitle(getString(R.string.context_rename) + " "	+ new String(node.getName()));
+		builder.setPositiveButton(getString(R.string.context_rename),
+				new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int whichButton) {
+						String value = input.getText().toString().trim();
+						if (value.length() == 0) {
+							return;
+						}
+						rename(value);
+					}
+				});
+		builder.setNegativeButton(getString(android.R.string.cancel), null);
+		builder.setView(layout);
+		renameDialog = builder.create();
+		renameDialog.show();
+
 	}
 
 	private void rename(String newName){

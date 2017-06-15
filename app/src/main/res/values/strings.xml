@@ -2,9 +2,9 @@
 <resources>
 
     <string name="app_name" context="Not translate">MEGA</string>
-    <string name="app_version" context="Not translate">3.1.6.1 (136)</string>
+    <string name="app_version" context="Not translate">3.1.7 (137)</string>
     <string name="sdk_version" context="Not translate">bdfd535</string>
-    <string name="karere_version" context="Not translate">67f6719</string>
+    <string name="karere_version" context="Not translate">9ad01ef</string>
     
     <string name="full_description_text" context="Full description text of the app in the Google Play page of the app">MEGA is a secure cloud storage service that gives you 50 GB free storage space. Unlike other cloud storage providers, your data is encrypted and decrypted by your client devices only and never by us.\nUpload your files from your smartphone or tablet then search, store, download, stream, view, share, rename or delete your files any time, from any device, anywhere. Share folders with your contacts and see their updates in real time.\nThe encryption process means we cannot access or reset your password so you MUST remember it (unless you have your Master Key backed up) or you will lose access to your stored files.\nInside the app you can upgrade your storage space and transfer quota quota with a monthly or yearly subscription.\nPRO LITE subscription: 4.99 € per month or 49.99 € per year gives you 200 GB of storage space and 1 TB of transfer quota per month.\nPRO I subscription: 9.99 € per month or 99.99 € per year gives you 500 GB of storage space and 2 TB of transfer quota per month.\nPRO II subscription: 19.99 € per month or 199.99 € per year gives you 2 TB of storage space and 4 TB of transfer quota per month.\nPRO III subscription: 29.99 € per month or 299.99 € per year gives you 4 TB of storage space and 8 TB of transfer quota per month.\nSubscriptions are renewed automatically for successive subscription periods of the same duration and at the same price as the initial period chosen. To manage your subscriptions, simply click on the Play Store icon on your handset, sign in with your Google ID (if you haven\'t already done so) and then click on the MEGA app. You\'ll be able to manage your subscription there.\nFor more info, please check our website: \n https://mega.nz/mobile_terms.html \n https://mega.nz/mobile_privacy.html \nNew Terms of Service apply effective from 20 February 2016. See https://mega.nz/TermsOfService2016.pdf \n Note: For desktop access to your files Mega needs to use HTML5 compatible browsers to handle our advanced features. We recommend Mozilla Firefox and Google Chrome. However the mobile versions of browsers cannot access the Mega cloud storage system.</string>
     <string name="short_description_text" context="Short description text of the app in the Google Play page of the app">MEGA is Cloud Storage with Powerful Always-On Privacy. 50GB for free</string>
@@ -1188,7 +1188,7 @@
     <string name="import_success_error" context="Menu option">Error. Not added to Cloud Drive</string>
 
     <string name="chat_correctly_initialized" context="Label in login screen to inform about the chat initialization proccess">Chat correctly initialized</string>
-    <string name="chat_not_correctly_initialized" context="Label in login screen to inform about the chat initialization proccess">Error. Chat correctly initialized</string>
+    <string name="chat_not_correctly_initialized" context="Label in login screen to inform about the chat initialization proccess">Error. Chat not correctly initialized</string>
     <string name="chat_initializacion" context="Label in login screen to inform about the chat initialization proccess">Initializing chat&#8230;</string>
     <string name="chat_connecting" context="Label in login screen to inform about the chat initialization proccess">Connecting&#8230;</string>
 
@@ -1208,5 +1208,19 @@
 
     <string name="context_link_removal_error" context="error message">Link removal failed. Try again later.</string>
     <string name="context_link_action_error" context="error message">Link action failed. Try again later.</string>
+
     <string name ="title_write_user_email" context="title of the dialog shown when sending or sharing a folder">Write the user\'s e-mail</string>
+
+    <string name="activity_title_files_attached" context="title of the screen to see the details of several node attachments">Files attached</string>
+    <string name="activity_title_contacts_attached" context="title of the screen to see the details of several contact attachments">Contacts attached</string>
+
+    <string name="alert_user_is_not_contact">The user is not a contact</string>
+
+    <string name="camera_uploads_cellular_connection">Use cellular connection</string>
+    <string name="camera_uploads_upload_videos">Upload videos</string>
+
+    <string name="no_files_selected_warning">No files selected</string>
+
+    <string name="attachment_upload_panel_from_cloud">From Cloud Drive</string>
+    <string name="attachment_upload_panel_contact">Contact</string>
 </resources>

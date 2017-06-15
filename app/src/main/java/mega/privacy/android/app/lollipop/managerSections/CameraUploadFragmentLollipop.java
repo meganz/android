@@ -25,6 +25,7 @@ import android.support.v7.view.ActionMode;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SwitchCompat;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Display;
@@ -107,6 +108,9 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	RelativeLayout contentTextLayout;
 //	Button turnOnOff;
 	RelativeLayout transfersOverViewLayout;
+
+	SwitchCompat switchCellularConnection;
+	SwitchCompat switchUploadVideos;
 	
 	DatabaseHandler dbH;
 	MegaPreferences prefs;
@@ -146,17 +150,10 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 		public long handle2;
 		public long handle3;
 	}
-	
-//	private TourImageAdapter adapter;
-//	private LoopViewPager viewPager;
+
 	private ImageView initialImageView;
-//	private ImageView bar;
 	private TextView bOK;
 	private TextView bSkip;	
-	private RadioGroup camSyncRadioGroup;
-	private RadioButton camSyncData;
-	private RadioButton camSyncWifi;
-	private RelativeLayout layoutRadioGroup;
 	private RelativeLayout fragmentContainer;
 	
 	float scaleH, scaleW;
@@ -548,33 +545,15 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 				View v = inflater.inflate(R.layout.activity_cam_sync_initial, container, false);
 				
 				initialImageView = (ImageView) v.findViewById(R.id.cam_sync_image_view);
-				initialImageView.getLayoutParams().height = outMetrics.widthPixels;
+
 				bOK = (TextView) v.findViewById(R.id.cam_sync_button_ok);
 				bSkip = (TextView) v.findViewById(R.id.cam_sync_button_skip);
-				camSyncRadioGroup = (RadioGroup) v.findViewById(R.id.cam_sync_radio_group);
-				camSyncData = (RadioButton) v.findViewById(R.id.cam_sync_data);
-				camSyncWifi = (RadioButton) v.findViewById(R.id.cam_sync_wifi);
-				layoutRadioGroup = (RelativeLayout) v.findViewById(R.id.cam_sync_relative_radio);
-				
-				bSkip.setText(getString(R.string.cam_sync_skip).toUpperCase(Locale.getDefault()));
-				android.view.ViewGroup.LayoutParams paramsb2 = bSkip.getLayoutParams();		
-				paramsb2.height = Util.scaleHeightPx(48, outMetrics);
-				paramsb2.width = Util.scaleWidthPx(63, outMetrics);
-				bSkip.setLayoutParams(paramsb2);
-				//Left and Right margin
-				LinearLayout.LayoutParams textParamsLogin = (LinearLayout.LayoutParams)bSkip.getLayoutParams();
-				textParamsLogin.setMargins(Util.scaleWidthPx(6, outMetrics), 0, Util.scaleWidthPx(8, outMetrics), 0); 
-				bSkip.setLayoutParams(textParamsLogin);
-				
-				bOK.setText(getString(R.string.cam_sync_ok).toUpperCase(Locale.getDefault()));
-				android.view.ViewGroup.LayoutParams paramsb1 = bOK.getLayoutParams();		
-				paramsb1.height = Util.scaleHeightPx(48, outMetrics);
-				paramsb1.width = Util.scaleWidthPx(144, outMetrics);
-				bOK.setLayoutParams(paramsb1);
-				
-				bSkip.setTextSize(TypedValue.COMPLEX_UNIT_SP, (14*scaleText));
-				bOK.setTextSize(TypedValue.COMPLEX_UNIT_SP, (14*scaleText));
-				
+				switchCellularConnection = (SwitchCompat) v.findViewById(R.id.cellular_connection_switch);
+				switchUploadVideos = (SwitchCompat) v.findViewById(R.id.upload_videos_switch);
+
+				bSkip.setText(getString(R.string.cam_sync_skip));
+				bOK.setText(getString(R.string.cam_sync_ok));
+
 				bOK.setOnClickListener(this);
 				bSkip.setOnClickListener(this);
 				
@@ -1098,13 +1077,18 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 		String localPath = localFile.getAbsolutePath();
 		dbH.setCamSyncLocalPath(localPath);
 		dbH.setCameraFolderExternalSDCard(false);
-		if (camSyncData.isChecked()){
+		if (switchCellularConnection.isChecked()){
 			dbH.setCamSyncWifi(false);
 		}
 		else{
 			dbH.setCamSyncWifi(true);
 		}
-		dbH.setCamSyncFileUpload(MegaPreferences.ONLY_PHOTOS);
+		if(switchUploadVideos.isChecked()){
+			dbH.setCamSyncFileUpload(MegaPreferences.PHOTOS_AND_VIDEOS);
+		}
+		else{
+			dbH.setCamSyncFileUpload(MegaPreferences.ONLY_PHOTOS);
+		}
 		
 		context.startService(new Intent(context, CameraSyncService.class));
 		
