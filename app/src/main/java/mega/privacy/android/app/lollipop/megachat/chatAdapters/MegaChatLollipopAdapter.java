@@ -74,6 +74,9 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
     public static int LEFT_MARGIN_CONTACT_MSG_MANAGEMENT = 40;
     public static int RIGHT_MARGIN_CONTACT_MSG_MANAGEMENT = 68;
 
+    public static int START_MARGIN_MESSAGES = 16;
+    public static int END_MARGIN_MESSAGES = 108;
+
     public static int MULTISELECTION_LEFT_MARGIN_CONTACT_MSG_MANAGEMENT = 73;
 
     public static int LEFT_MARGIN_CONTACT_MSG_NORMAL = 73;
@@ -1235,7 +1238,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                             //Margins
                             RelativeLayout.LayoutParams ownMessageParams = (RelativeLayout.LayoutParams)((ViewHolderMessageChat)holder).contentOwnMessageText.getLayoutParams();
-                            ownMessageParams.setMargins(Util.scaleWidthPx(LEFT_MARGIN_CONTACT_MSG_NORMAL, outMetrics), 0, Util.scaleWidthPx(68, outMetrics), 0);
+                            ownMessageParams.setMargins(Util.scaleWidthPx(END_MARGIN_MESSAGES, outMetrics), 0, Util.scaleWidthPx(START_MARGIN_MESSAGES, outMetrics), 0);
                             ((ViewHolderMessageChat)holder).contentOwnMessageText.setLayoutParams(ownMessageParams);
 
                             if(message.getContent()!=null){
@@ -1872,6 +1875,27 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                             ((ViewHolderMessageChat)holder).contentContactMessageContactThumb.setVisibility(View.GONE);
                             ((ViewHolderMessageChat)holder).contentContactMessageContactName.setVisibility(View.GONE);
                             ((ViewHolderMessageChat)holder).contentContactMessageContactEmail.setVisibility(View.GONE);
+
+                            if(!multipleSelect){
+                                //Margins
+                                RelativeLayout.LayoutParams contactMessageParams = (RelativeLayout.LayoutParams)((ViewHolderMessageChat)holder).contentContactMessageText.getLayoutParams();
+                                contactMessageParams.setMargins(Util.scaleWidthPx(START_MARGIN_MESSAGES, outMetrics), 0, Util.scaleWidthPx(END_MARGIN_MESSAGES, outMetrics), 0);
+                                ((ViewHolderMessageChat)holder).contentContactMessageText.setLayoutParams(contactMessageParams);
+
+                                RelativeLayout.LayoutParams timeContactTextParams = (RelativeLayout.LayoutParams)((ViewHolderMessageChat)holder).timeContactText.getLayoutParams();
+                                timeContactTextParams.setMargins(Util.scaleWidthPx(START_MARGIN_MESSAGES, outMetrics), 0, Util.scaleWidthPx(END_MARGIN_MESSAGES, outMetrics), 0);
+                                ((ViewHolderMessageChat)holder).timeContactText.setLayoutParams(timeContactTextParams);
+                            }
+                            else{
+                                //Margins
+                                RelativeLayout.LayoutParams contactMessageParams = (RelativeLayout.LayoutParams)((ViewHolderMessageChat)holder).contactManagementMessageText.getLayoutParams();
+                                contactMessageParams.setMargins(Util.scaleWidthPx(LEFT_MARGIN_CONTACT_MSG_NORMAL, outMetrics), Util.scaleHeightPx(5, outMetrics), Util.scaleWidthPx(RIGHT_MARGIN_CONTACT_MSG_MANAGEMENT, outMetrics), Util.scaleHeightPx(5, outMetrics));
+                                ((ViewHolderMessageChat)holder).contentContactMessageText.setLayoutParams(contactMessageParams);
+
+                                RelativeLayout.LayoutParams timeContactTextParams = (RelativeLayout.LayoutParams)((ViewHolderMessageChat)holder).timeContactText.getLayoutParams();
+                                timeContactTextParams.setMargins(Util.scaleWidthPx(LEFT_MARGIN_CONTACT_MSG_NORMAL, outMetrics), 0, Util.scaleWidthPx(7, outMetrics), 0);
+                                ((ViewHolderMessageChat)holder).timeContactText.setLayoutParams(timeContactTextParams);
+                            }
 
                             if(message.getContent()!=null){
                                 messageContent = message.getContent();
