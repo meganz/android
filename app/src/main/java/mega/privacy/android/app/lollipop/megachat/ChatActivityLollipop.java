@@ -2395,6 +2395,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     emptyScrollView.setVisibility(View.GONE);
                     loadMessages();
                 }
+                else{
+                    log("Do not update screen yet: "+bufferMessages.size());
+                }
             }
         }
         else{
@@ -2748,6 +2751,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     }
 
     public void loadMessages(){
+        log("loadMessages");
         ListIterator<AndroidMegaChatMessage> itr = bufferMessages.listIterator();
         while (itr.hasNext()) {
             int currentIndex = itr.nextIndex();
@@ -2769,7 +2773,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             adapter.loadPreviousMessages(messages, bufferMessages.size());
 //            adapter.setMessages(messages, infoToShow);
 //            adapter.notifyDataSetChanged();
-            log("addMesagge: "+messages.size());
+            log("addMessage: "+messages.size());
         }
 
         log("AFTER updateMessagesLoaded: "+messages.size()+" messages in list");
