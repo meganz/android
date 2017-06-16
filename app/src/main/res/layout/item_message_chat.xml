@@ -128,7 +128,9 @@
                     android:id="@+id/content_own_message_thumb_portrait"
                     android:layout_width="160dp"
                     android:layout_height="220dp"
-                      android:layout_alignParentRight="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginRight="16dp"
                     android:scaleType="centerCrop"/>
 
                 <ImageView
@@ -136,6 +138,8 @@
                     android:layout_width="220dp"
                     android:layout_height="160dp"
                     android:layout_alignParentRight="true"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginRight="16dp"
                     android:scaleType="centerCrop"/>
 
                 <RelativeLayout
@@ -144,6 +148,10 @@
                     android:layout_height="wrap_content"
                     android:background="@drawable/rounded_text_view_chat_own_message"
                     android:layout_alignParentLeft="true"
+                    android:layout_marginStart="108dp"
+                    android:layout_marginLeft="108dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginRight="16dp"
                     android:gravity="left">
 
                     <ImageView
@@ -192,6 +200,10 @@
                     android:layout_height="wrap_content"
                     android:background="@drawable/rounded_text_view_chat_own_message"
                     android:layout_alignParentLeft="true"
+                    android:layout_marginStart="108dp"
+                    android:layout_marginLeft="108dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginRight="16dp"
                     android:gravity="left">
 
                     <RelativeLayout
@@ -371,6 +383,10 @@
                 android:layout_height="wrap_content"
                 android:background="@drawable/rounded_text_view_chat_contact_message"
                 android:layout_alignParentLeft="true"
+                android:layout_marginStart="16dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginEnd="108dp"
+                android:layout_marginRight="108dp"
                 android:gravity="left">
 
                 <TextView
@@ -378,7 +394,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textSize="14sp"
-                    android:layout_marginLeft="6dp"
+                    android:layout_marginLeft="12dp"
                     android:layout_marginTop="11dp"
                     android:layout_marginRight="8dp"
                     android:maxLines="2"
@@ -411,7 +427,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentLeft="true"
-                        android:layout_marginLeft="6dp"
+                        android:layout_marginLeft="4dp"
                         android:layout_centerVertical="true"/>
 
                     <TextView
@@ -422,7 +438,7 @@
                         android:layout_toRightOf="@+id/content_contact_message_file_thumb"
                         android:textSize="14sp"
                         android:layout_marginTop="11dp"
-                        android:layout_marginLeft="5dp"
+                        android:layout_marginLeft="4dp"
                         android:layout_marginRight="8dp"
                         android:singleLine="true"
                         android:maxLines="1"
@@ -438,7 +454,7 @@
                         android:layout_below="@+id/content_contact_message_file_name"
                         android:textSize="12sp"
                         android:layout_marginBottom="11dp"
-                        android:layout_marginLeft="5dp"
+                        android:layout_marginLeft="4dp"
                         android:layout_marginRight="8dp"
                         android:inputType="textMultiLine|textNoSuggestions"
                         android:gravity="left"/>
@@ -454,6 +470,10 @@
                 android:layout_height="wrap_content"
                 android:background="@drawable/rounded_text_view_chat_contact_message"
                 android:layout_alignParentLeft="true"
+                android:layout_marginStart="16dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginEnd="108dp"
+                android:layout_marginRight="108dp"
                 android:gravity="left">
 
                 <TextView
@@ -461,7 +481,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textSize="14sp"
-                    android:layout_marginLeft="6dp"
+                    android:layout_marginLeft="16dp"
                     android:layout_marginTop="11dp"
                     android:layout_marginRight="8dp"
                     android:gravity="left"/>
@@ -477,7 +497,7 @@
                         android:layout_height="40dp"
                         android:layout_alignParentLeft="true"
                         android:layout_centerInParent="true"
-                        android:layout_marginLeft="10dp">
+                        android:layout_marginLeft="16dp">
 
                         <mega.privacy.android.app.components.RoundedImageView
                             android:id="@+id/content_contact_message_contact_thumb"
@@ -505,7 +525,7 @@
                         android:layout_toRightOf="@+id/content_contact_message_contact_layout_avatar"
                         android:textSize="14sp"
                         android:layout_marginTop="11dp"
-                        android:layout_marginLeft="10dp"
+                        android:layout_marginLeft="13dp"
                         android:layout_marginRight="8dp"
                         android:singleLine="true"
                         android:maxLines="1"
@@ -521,7 +541,7 @@
                         android:layout_below="@+id/content_contact_message_contact_name"
                         android:textSize="12sp"
                         android:layout_marginBottom="11dp"
-                        android:layout_marginLeft="10dp"
+                        android:layout_marginLeft="13dp"
                         android:layout_marginRight="8dp"
                         android:singleLine="true"
                         android:maxLines="1"
