@@ -43,6 +43,10 @@
                 android:textSize="12sp"
                 android:textColor="@color/file_list_second_row"
                 android:gravity="right"
+                android:layout_marginStart="112dp"
+                android:layout_marginLeft="112dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginRight="16dp"
                 android:layout_centerVertical="true"/>
 
             <!--<TextView
@@ -67,29 +71,6 @@
             android:visibility="gone">
 
             <RelativeLayout
-                android:id="@+id/own_management_multiselection_layout"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_alignParentLeft="true"
-                android:layout_centerInParent="true"
-                android:gravity="left"
-                android:layout_marginRight="3dp">
-
-                <ImageView
-                    android:id="@+id/own_management_multiselection_image_view"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="@drawable/message_multiselection_empty"/>
-
-                <ImageView
-                    android:id="@+id/own_management_multiselection_tick_icon"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:src="@drawable/ic_done_white_18dp"/>
-
-            </RelativeLayout>
-
-            <RelativeLayout
                 android:id="@+id/own_text_layout"
                 android:layout_width="match_parent"
                 android:gravity="right"
@@ -102,6 +83,12 @@
                     android:layout_alignParentRight="true"
                     android:gravity="right"
                     android:textSize="14sp"
+                    android:layout_marginStart="112dp"
+                    android:layout_marginLeft="112dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginRight="16dp"
+                    android:layout_marginBottom="6dp"
+                    android:layout_marginTop="6dp"
                     android:textColor="@color/mail_my_account"/>
 
             </RelativeLayout>
@@ -112,30 +99,8 @@
             android:id="@+id/content_own_message_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="6dp"
             android:layout_below="@+id/title_own_message_layout">
-
-            <RelativeLayout
-                android:id="@+id/own_multiselection_layout"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_alignParentLeft="true"
-                android:layout_centerInParent="true"
-                android:gravity="left"
-                android:layout_marginRight="3dp">
-
-                <ImageView
-                    android:id="@+id/own_multiselection_image_view"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="@drawable/message_multiselection_empty"/>
-
-                <ImageView
-                    android:id="@+id/own_multiselection_tick_icon"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:src="@drawable/ic_done_white_18dp"/>
-
-            </RelativeLayout>
 
             <RelativeLayout
                 android:id="@+id/own_text_and_triangle_layout"
@@ -153,6 +118,10 @@
                     android:inputType="textMultiLine|textNoSuggestions"
                     android:background="@drawable/rounded_text_view_chat_own_message"
                     android:padding="9dp"
+                    android:layout_marginStart="108dp"
+                    android:layout_marginLeft="108dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginRight="16dp"
                     android:gravity="left"/>
 
                 <ImageView
@@ -341,6 +310,10 @@
                 android:layout_height="wrap_content"
                 android:textSize="12sp"
                 android:gravity="left"
+                android:layout_marginStart="16dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginEnd="112dp"
+                android:layout_marginRight="112dp"
                 android:textColor="@color/file_list_second_row"
                 android:layout_centerVertical="true"/>
 
@@ -354,34 +327,18 @@
             android:layout_below="@+id/title_contact_message_layout"
             android:visibility="gone">
 
-            <RelativeLayout
-                android:id="@+id/contact_management_multiselection_layout"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_centerVertical="true"
-                android:layout_alignParentLeft="true"
-                android:layout_marginRight="3dp">
-
-                <ImageView
-                    android:id="@+id/contact_management_multiselection_image_view"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="@drawable/message_multiselection_empty"/>
-
-                <ImageView
-                    android:id="@+id/contact_management_multiselection_tick_icon"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:src="@drawable/ic_done_white_18dp"/>
-
-            </RelativeLayout>
-
             <TextView
                 android:id="@+id/contact_management_message_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="14sp"
                 android:gravity="left"
+                android:layout_marginStart="16dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginEnd="112dp"
+                android:layout_marginRight="112dp"
+                android:layout_marginBottom="6dp"
+                android:layout_marginTop="6dp"
                 android:textColor="@color/mail_my_account"/>
 
         </RelativeLayout>
@@ -390,29 +347,8 @@
             android:id="@+id/content_contact_message_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="6dp"
             android:layout_below="@+id/title_contact_message_layout">
-
-            <RelativeLayout
-                android:id="@+id/contact_multiselection_layout"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_centerVertical="true"
-                android:layout_alignParentLeft="true"
-                android:layout_marginRight="3dp">
-
-                <ImageView
-                    android:id="@+id/contact_multiselection_image_view"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="@drawable/message_multiselection_empty"/>
-
-                <ImageView
-                    android:id="@+id/contact_multiselection_tick_icon"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:src="@drawable/ic_done_white_18dp"/>
-
-            </RelativeLayout>
 
             <mega.privacy.android.app.components.WrapTextView
                 android:id="@+id/content_contact_message_text"
@@ -423,6 +359,10 @@
                 android:inputType="textMultiLine|textNoSuggestions"
                 android:background="@drawable/rounded_text_view_chat_contact_message"
                 android:padding="9dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginEnd="108dp"
+                android:layout_marginRight="108dp"
                 android:gravity="left"/>
 
             <RelativeLayout
