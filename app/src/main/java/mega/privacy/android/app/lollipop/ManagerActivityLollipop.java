@@ -2959,9 +2959,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		else{
 			builder = new AlertDialog.Builder(this);
 		}
-
-		builder.setMessage(R.string.confirmation_to_reconnect).setPositiveButton(R.string.cam_sync_ok, dialogClickListener)
-				.setNegativeButton(R.string.general_cancel, dialogClickListener).show().setCanceledOnTouchOutside(false);
+		try {
+			builder.setMessage(R.string.confirmation_to_reconnect).setPositiveButton(R.string.cam_sync_ok, dialogClickListener)
+					.setNegativeButton(R.string.general_cancel, dialogClickListener).show().setCanceledOnTouchOutside(false);
+		}
+		catch (Exception e){}
 	}
 
 	public void showOfflineMode(){
@@ -3741,12 +3743,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 //			maFLol.setMKLayoutVisible(mkLayoutVisible);
 		}
 		log("show chats");
-
+		MegaApplication.setRecentChatsFragmentVisible(true);
 		drawerLayout.closeDrawer(Gravity.LEFT);
 	}
 	@SuppressLint("NewApi")
 	public void selectDrawerItemLollipop(DrawerItem item){
     	log("selectDrawerItemLollipop: "+item);
+		MegaApplication.setRecentChatsFragmentVisible(false);
 		aB.setSubtitle(null);
     	switch (item){
     		case CLOUD_DRIVE:{
@@ -11463,6 +11466,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 		}
 		else if (request.getType() == MegaChatRequest.TYPE_CONNECT){
+			if (MegaApplication.isFirstConnect()){
+				MegaApplication.setFirstConnect(false);
+			}
+
 			if(e.getErrorCode()==MegaChatError.ERROR_OK){
 				log("CONNECT CHAT finished ");
 				if(rChatFL!=null){
