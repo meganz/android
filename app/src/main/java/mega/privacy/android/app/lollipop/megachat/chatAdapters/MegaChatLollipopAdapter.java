@@ -362,12 +362,14 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                             break;
                         }
                         case Constants.CHAT_ADAPTER_SHOW_TIME:{
+                            log("CHAT_ADAPTER_SHOW_TIME");
                             ((ViewHolderMessageChat)holder).dateLayout.setVisibility(View.GONE);
                             ((ViewHolderMessageChat)holder).titleOwnMessage.setVisibility(View.VISIBLE);
                             ((ViewHolderMessageChat)holder).timeOwnText.setText(TimeChatUtils.formatTime(message));
                             break;
                         }
                         case Constants.CHAT_ADAPTER_SHOW_NOTHING:{
+                            log("CHAT_ADAPTER_SHOW_NOTHING");
                             ((ViewHolderMessageChat)holder).dateLayout.setVisibility(View.GONE);
                             ((ViewHolderMessageChat)holder).titleOwnMessage.setVisibility(View.GONE);
                             break;
@@ -474,12 +476,14 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                             break;
                         }
                         case Constants.CHAT_ADAPTER_SHOW_TIME:{
+                            log("CHAT_ADAPTER_SHOW_TIME");
                             ((ViewHolderMessageChat)holder).dateLayout.setVisibility(View.GONE);
                             ((ViewHolderMessageChat)holder).titleContactMessage.setVisibility(View.VISIBLE);
                             ((ViewHolderMessageChat)holder).timeContactText.setText(TimeChatUtils.formatTime(message));
                             break;
                         }
                         case Constants.CHAT_ADAPTER_SHOW_NOTHING:{
+                            log("CHAT_ADAPTER_SHOW_NOTHING");
                             ((ViewHolderMessageChat)holder).dateLayout.setVisibility(View.GONE);
                             ((ViewHolderMessageChat)holder).titleContactMessage.setVisibility(View.GONE);
                             break;
@@ -650,12 +654,14 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                             break;
                         }
                         case Constants.CHAT_ADAPTER_SHOW_TIME:{
+                            log("CHAT_ADAPTER_SHOW_TIME");
                             ((ViewHolderMessageChat)holder).dateLayout.setVisibility(View.GONE);
                             ((ViewHolderMessageChat)holder).titleOwnMessage.setVisibility(View.VISIBLE);
                             ((ViewHolderMessageChat)holder).timeOwnText.setText(TimeChatUtils.formatTime(message));
                             break;
                         }
                         case Constants.CHAT_ADAPTER_SHOW_NOTHING:{
+                            log("CHAT_ADAPTER_SHOW_NOTHING");
                             ((ViewHolderMessageChat)holder).dateLayout.setVisibility(View.GONE);
                             ((ViewHolderMessageChat)holder).titleOwnMessage.setVisibility(View.GONE);
                             break;
@@ -766,12 +772,14 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                             break;
                         }
                         case Constants.CHAT_ADAPTER_SHOW_TIME:{
+                            log("CHAT_ADAPTER_SHOW_TIME");
                             ((ViewHolderMessageChat)holder).dateLayout.setVisibility(View.GONE);
                             ((ViewHolderMessageChat)holder).titleContactMessage.setVisibility(View.VISIBLE);
                             ((ViewHolderMessageChat)holder).timeContactText.setText(TimeChatUtils.formatTime(message));
                             break;
                         }
                         case Constants.CHAT_ADAPTER_SHOW_NOTHING:{
+                            log("CHAT_ADAPTER_SHOW_NOTHING");
                             ((ViewHolderMessageChat)holder).dateLayout.setVisibility(View.GONE);
                             ((ViewHolderMessageChat)holder).titleContactMessage.setVisibility(View.GONE);
                             break;
@@ -910,12 +918,14 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                             break;
                         }
                         case Constants.CHAT_ADAPTER_SHOW_TIME:{
+                            log("CHAT_ADAPTER_SHOW_TIME");
                             ((ViewHolderMessageChat)holder).dateLayout.setVisibility(View.GONE);
                             ((ViewHolderMessageChat)holder).titleOwnMessage.setVisibility(View.VISIBLE);
                             ((ViewHolderMessageChat)holder).timeOwnText.setText(TimeChatUtils.formatTime(message));
                             break;
                         }
                         case Constants.CHAT_ADAPTER_SHOW_NOTHING:{
+                            log("CHAT_ADAPTER_SHOW_NOTHING");
                             ((ViewHolderMessageChat)holder).dateLayout.setVisibility(View.GONE);
                             ((ViewHolderMessageChat)holder).titleOwnMessage.setVisibility(View.GONE);
                             break;
@@ -1447,13 +1457,16 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                             break;
                         }
                         case Constants.CHAT_ADAPTER_SHOW_TIME:{
+                            log("CHAT_ADAPTER_SHOW_TIME");
                             ((ViewHolderMessageChat)holder).dateLayout.setVisibility(View.GONE);
                             ((ViewHolderMessageChat)holder).titleContactMessage.setVisibility(View.VISIBLE);
                             ((ViewHolderMessageChat)holder).timeContactText.setText(TimeChatUtils.formatTime(message));
                             break;
                         }
                         case Constants.CHAT_ADAPTER_SHOW_NOTHING:{
+                            log("CHAT_ADAPTER_SHOW_NOTHING");
                             ((ViewHolderMessageChat)holder).dateLayout.setVisibility(View.GONE);
+                            ((ViewHolderMessageChat)holder).timeContactText.setVisibility(View.GONE);
                             ((ViewHolderMessageChat)holder).titleContactMessage.setVisibility(View.GONE);
                             break;
                         }
