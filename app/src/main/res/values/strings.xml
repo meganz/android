@@ -740,9 +740,6 @@
 
     <string name="next_ime_action" context="Action to pass focus to the next field in a form">Next</string>
 
-    <string name="error_changing_user_attributes" context="Message when an error ocurred when changing an user attribute">Error when changing the account data.</string>
-    <string name="success_changing_user_attributes" context="Message when an user attribute has been changed successfully">Your account data has been correctly updated.</string>
-
     <string name="mail_already_used" context="Error shown when the user tries to change his mail to one that is already used">Error. This email address is already in use.</string>
 
     <string name="change_mail_text_last_step" context="Text shown in the last alert dialog to change the email associated to an account">This is the last step to change your email. Please enter your password below.</string>
@@ -958,12 +955,8 @@
     <string name="confirmation_clear_group_chat" context="Text of the confirmation dialog to clear a group chat history">All messages and media in this conversation will be cleared.</string>
     <string name="title_confirmation_clear_group_chat" context="Title of the confirmation dialog to clear a group chat history">Clear history?</string>
 
-    <string name="add_participant_success" context="Message show when a participant has been successfully invited to a group chat">The participant has been correctly invited</string>
-    <string name="add_participant_error" context="Message show when a participant hasn't been successfully invited to a group chat">Error. The participant has not been invited correctly</string>
-    <string name="add_participant_error_already_exists" context="Message show when a participant hasn't been successfully invited to a group chat">The participant is already included in this group chat</string>
 
-    <string name="remove_participant_success" context="Message show when a participant has been successfully removed from a group chat">The participant has been correctly removed</string>
-    <string name="remove_participant_error" context="Message show when a participant hasn't been successfully removed from a group chat">Error. The participant has not been removed correctly</string>
+    <string name="add_participant_error_already_exists" context="Message show when a participant hasn't been successfully invited to a group chat">The participant is already included in this group chat</string>
 
     <string name="number_correctly_add_participant" context="success message when inviting multiple contacts to a group chat">%d participants were correctly invited</string>
     <string name="number_no_add_participant_request" context="error message when inviting multiple contacts to a group chat">%1$d participants were successfully invited but %2$d participants were not invited.</string>
@@ -1219,7 +1212,21 @@
     <string name="camera_uploads_cellular_connection">Use cellular connection</string>
     <string name="camera_uploads_upload_videos">Upload videos</string>
 
-    <string name="no_files_selected_warning">No files selected</string>
+    <string name="success_changing_user_avatar" context="Message when an user avatar has been changed successfully">Profile picture updated</string>
+    <string name="error_changing_user_avatar" context="Message when an error ocurred when changing an user avatar">Error when changing the profile picture</string>
+    <string name="success_deleting_user_avatar" context="Message when an user avatar has been deleted successfully">Profile picture deleted</string>
+    <string name="error_deleting_user_avatar" context="Message when an error ocurred when deleting an user avatar">Error when deleting the profile picture.</string>
+
+    <string name="error_changing_user_attributes" context="Message when an error ocurred when changing an user attribute">Error when changing the name</string>
+    <string name="success_changing_user_attributes" context="Message when an user attribute has been changed successfully">Your name has been correctly updated</string>
+
+    <string name="add_participant_success" context="Message show when a participant has been successfully invited to a group chat">Participant added</string>
+    <string name="add_participant_error" context="Message show when a participant hasn't been successfully invited to a group chat">Error. Participant not added</string>
+
+    <string name="remove_participant_success" context="Message show when a participant has been successfully removed from a group chat">Participant removed</string>
+    <string name="remove_participant_error" context="Message show when a participant hasn't been successfully removed from a group chat">Error. Participant not removed</string>
+
+<string name="no_files_selected_warning">No files selected</string>
 
     <string name="attachment_upload_panel_from_cloud">From Cloud Drive</string>
     <string name="attachment_upload_panel_contact">Contact</string>

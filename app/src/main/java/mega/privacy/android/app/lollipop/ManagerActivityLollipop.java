@@ -2483,20 +2483,35 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		inputFirstName.setSingleLine();
 		inputFirstName.setText(myAccountInfo.getFirstNameText());
 		inputFirstName.setTextColor(getResources().getColor(R.color.text_secondary));
-		inputFirstName.setImeOptions(EditorInfo.IME_ACTION_NEXT);
+		inputFirstName.setImeOptions(EditorInfo.IME_ACTION_DONE);
 		inputFirstName.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
 		inputFirstName.setOnEditorActionListener(new OnEditorActionListener() {
 			@Override
 			public boolean onEditorAction(TextView v, int actionId,	KeyEvent event) {
-				if (actionId == EditorInfo.IME_ACTION_NEXT) {
-					String value = inputFirstName.getText().toString().trim();
-					if(value.equals("")||value.isEmpty()){
+
+				if (actionId == EditorInfo.IME_ACTION_DONE) {
+					String valueFirstName = inputFirstName.getText().toString().trim();
+					String valueLastName = inputLastName.getText().toString().trim();
+					String value = inputMail.getText().toString().trim();
+					String emailError = Util.getEmailError(value, managerActivity);
+					if (emailError != null) {
+						inputMail.setError(emailError);
+						inputMail.requestFocus();
+					}
+					else if(valueFirstName.equals("")||valueFirstName.isEmpty()){
 						log("input is empty");
 						inputFirstName.setError(getString(R.string.invalid_string));
 						inputFirstName.requestFocus();
-					} else {
-						log("action NEXT ime - change user attribute");
+					}
+					else if(valueLastName.equals("")||valueLastName.isEmpty()){
+						log("input is empty");
+						inputLastName.setError(getString(R.string.invalid_string));
 						inputLastName.requestFocus();
+					}
+					else {
+						log("positive button pressed - change user attribute");
+						countUserAttributes = aC.updateUserAttributes(myAccountInfo.getFirstNameText(), valueFirstName, myAccountInfo.getLastNameText(), valueLastName, myAccountInfo.getMyUser().getEmail(), value);
+						changeUserAttributeDialog.dismiss();
 					}
 				}
 				else{
@@ -2505,25 +2520,42 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				return false;
 			}
 		});
-		inputFirstName.setImeActionLabel(getString(R.string.next_ime_action),EditorInfo.IME_ACTION_NEXT);
+
+
+		inputFirstName.setImeActionLabel(getString(R.string.title_edit_profile_info),EditorInfo.IME_ACTION_DONE);
+
 		inputLastName.setSingleLine();
 		inputLastName.setText(myAccountInfo.getLastNameText());
 		inputLastName.setTextColor(getResources().getColor(R.color.text_secondary));
 		inputLastName.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
-		inputLastName.setImeOptions(EditorInfo.IME_ACTION_NEXT);
-
+		inputLastName.setImeOptions(EditorInfo.IME_ACTION_DONE);
 		inputLastName.setOnEditorActionListener(new OnEditorActionListener() {
 			@Override
 			public boolean onEditorAction(TextView v, int actionId,	KeyEvent event) {
-				if (actionId == EditorInfo.IME_ACTION_NEXT) {
-					String value = inputLastName.getText().toString().trim();
-					if(value.equals("")||value.isEmpty()){
+
+				if (actionId == EditorInfo.IME_ACTION_DONE) {
+					String valueFirstName = inputFirstName.getText().toString().trim();
+					String valueLastName = inputLastName.getText().toString().trim();
+					String value = inputMail.getText().toString().trim();
+					String emailError = Util.getEmailError(value, managerActivity);
+					if (emailError != null) {
+						inputMail.setError(emailError);
+						inputMail.requestFocus();
+					}
+					else if(valueFirstName.equals("")||valueFirstName.isEmpty()){
+						log("input is empty");
+						inputFirstName.setError(getString(R.string.invalid_string));
+						inputFirstName.requestFocus();
+					}
+					else if(valueLastName.equals("")||valueLastName.isEmpty()){
 						log("input is empty");
 						inputLastName.setError(getString(R.string.invalid_string));
 						inputLastName.requestFocus();
-					} else {
-						log("action NEXT ime - change user attribute");
-						inputMail.requestFocus();
+					}
+					else {
+						log("positive button pressed - change user attribute");
+						countUserAttributes = aC.updateUserAttributes(myAccountInfo.getFirstNameText(), valueFirstName, myAccountInfo.getLastNameText(), valueLastName, myAccountInfo.getMyUser().getEmail(), value);
+						changeUserAttributeDialog.dismiss();
 					}
 				}
 				else{
@@ -2532,7 +2564,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				return false;
 			}
 		});
-		inputLastName.setImeActionLabel(getString(R.string.next_ime_action),EditorInfo.IME_ACTION_NEXT);
+
+		inputLastName.setImeActionLabel(getString(R.string.title_edit_profile_info),EditorInfo.IME_ACTION_DONE);
+
 
 		inputMail.setSingleLine();
 		inputMail.setText(myAccountInfo.getMyUser().getEmail());
@@ -2579,8 +2613,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
 		builder.setTitle(getString(R.string.title_edit_profile_info));
 
-		builder.setPositiveButton(getString(R.string.title_edit_profile_info),
-				new DialogInterface.OnClickListener() {
+		builder.setPositiveButton(getString(R.string.title_edit_profile_info), new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int whichButton) {
 
 					}
@@ -11619,6 +11652,20 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					log("Error with first name");
 					errorUserAttibutes++;
 				}
+
+				if(countUserAttributes==0){
+					if(errorUserAttibutes==0){
+						log("All user attributes changed!");
+						showSnackbar(getString(R.string.success_changing_user_attributes));
+					}
+					else{
+						log("Some error ocurred when changing an attribute: "+errorUserAttibutes);
+						showSnackbar(getString(R.string.error_changing_user_attributes));
+					}
+					AccountController aC = new AccountController(this);
+					errorUserAttibutes=0;
+					aC.setCount(0);
+				}
 			}
 			else if(request.getParamType()==MegaApiJava.USER_ATTR_LASTNAME){
 				log("(2)request.getText(): "+request.getText());
@@ -11638,6 +11685,20 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				else{
 					log("Error with last name");
 					errorUserAttibutes++;
+				}
+
+				if(countUserAttributes==0){
+					if(errorUserAttibutes==0){
+						log("All user attributes changed!");
+						showSnackbar(getString(R.string.success_changing_user_attributes));
+					}
+					else{
+						log("Some error ocurred when changing an attribute: "+errorUserAttibutes);
+						showSnackbar(getString(R.string.error_changing_user_attributes));
+					}
+					AccountController aC = new AccountController(this);
+					errorUserAttibutes=0;
+					aC.setCount(0);
 				}
 			}
 			if (request.getParamType() == MegaApiJava.USER_ATTR_AVATAR) {
@@ -11661,6 +11722,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 								oldFile.renameTo(newFile);
 							}
 						}
+						log("User avatar changed!");
+						showSnackbar(getString(R.string.success_changing_user_avatar));
+					}
+					else{
+
+						log("User avatar deleted!");
+						showSnackbar(getString(R.string.success_deleting_user_avatar));
 					}
 					setProfileAvatar();
 
@@ -11671,25 +11739,26 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 							maFLol.updateAvatar(false);
 						}
 					}
+
+
 				}
 				else{
-					log("Error when changing avatar: "+e.getErrorString()+" "+e.getErrorCode());
+
+					if(request.getFile()!=null){
+
+						log("Some error ocurred when changing avatar: "+e.getErrorString()+" "+e.getErrorCode());
+						showSnackbar(getString(R.string.error_changing_user_avatar));
+					}
+					else{
+
+						log("Some error ocurred when deleting avatar: "+e.getErrorString()+" "+e.getErrorCode());
+						showSnackbar(getString(R.string.error_deleting_user_avatar));
+					}
+
 				}
 			}
 
-			if(countUserAttributes==0){
-				if(errorUserAttibutes==0){
-					log("All user attributes changed!");
-					showSnackbar(getString(R.string.success_changing_user_attributes));
-				}
-				else{
-					log("Some error ocurred when changing an attribute: "+errorUserAttibutes);
-					showSnackbar(getString(R.string.error_changing_user_attributes));
-				}
-				AccountController aC = new AccountController(this);
-				errorUserAttibutes=0;
-				aC.setCount(0);
-			}
+
 		}
 		if(request.getType() == MegaRequest.TYPE_GET_CHANGE_EMAIL_LINK) {
 			log("TYPE_GET_CHANGE_EMAIL_LINK: "+request.getEmail());
