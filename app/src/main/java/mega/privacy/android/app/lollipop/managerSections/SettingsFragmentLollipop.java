@@ -1995,14 +1995,14 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 		log("intentToPinLock");
 		Intent intent = new Intent(context, PinLockActivityLollipop.class);
 		intent.setAction(PinLockActivityLollipop.ACTION_SET_PIN_LOCK);
-		this.startActivityForResult(intent, Constants.SET_PIN);
+		startActivityForResult(intent, Constants.SET_PIN);
 	}
 
 	public void resetPinLock(){
 		log("resetPinLock");
 		Intent intent = new Intent(context, PinLockActivityLollipop.class);
 		intent.setAction(PinLockActivityLollipop.ACTION_RESET_PIN_LOCK);
-		this.startActivity(intent);
+		startActivity(intent);
 	}
 
 	public void updatePresenceConfigChat(boolean cancelled, MegaChatPresenceConfig config){
