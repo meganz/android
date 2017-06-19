@@ -66,8 +66,6 @@ import nz.mega.sdk.MegaTransfer;
 
 public class FileBrowserFragmentLollipop extends Fragment implements OnClickListener{
 
-	public static int GRID_WIDTH =400;
-
 	private static final String BUNDLE_RECYCLER_LAYOUT = "classname.recycler.layout";
 
 	Context context;

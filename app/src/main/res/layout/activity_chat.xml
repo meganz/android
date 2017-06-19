@@ -12,7 +12,8 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:background="@color/participants_layout">
 
         <android.support.v7.widget.Toolbar
             android:id="@+id/toolbar_chat"
@@ -30,15 +31,18 @@
             android:id="@+id/writing_container_layout_chat_layout"
             android:layout_alignParentBottom="true"
             android:layout_width="match_parent"
+            android:layout_marginTop="8dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginBottom="8dp"
+            android:layout_marginRight="72dp"
             android:layout_height="wrap_content"
-            android:background="@color/participants_layout"
             android:orientation="vertical">
 
             <RelativeLayout
                 android:id="@+id/writing_linear_layout_chat"
                 android:layout_width="match_parent"
                 android:focusableInTouchMode="true"
-                android:background="@color/white"
+                android:background="@drawable/rounded_text_view_chat_contact_message"
                 android:layout_height="wrap_content">
 
                 <ImageButton
@@ -49,14 +53,14 @@
                     android:tint="@color/transparency_white"
                     android:src="@drawable/ic_insert_emoticon"
                     android:layout_centerVertical="true"
-                    android:layout_marginLeft="16dp"/>
+                    android:layout_marginLeft="10dp"/>
 
                 <ImageButton
                     android:id="@+id/send_message_icon_chat"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
-                    android:layout_marginRight="16dp"
+                    android:layout_marginRight="10dp"
                     android:background="@null"
                     android:layout_centerVertical="true"
                     android:tint="@color/accentColor"
@@ -68,10 +72,10 @@
                     android:layout_height="wrap_content"
                     android:background="@android:color/transparent"
                     android:layout_toRightOf="@+id/keyboard_icon_chat"
-                    android:layout_marginTop="10dp"
-                    android:layout_marginBottom="10dp"
-                    android:layout_marginLeft="16dp"
-                    android:layout_marginRight="16dp"
+                    android:layout_marginTop="6dp"
+                    android:layout_marginBottom="6dp"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"
                     android:layout_centerVertical="true"
                     android:textSize="14sp"
                     android:hint="@string/type_message_hint"
@@ -97,98 +101,6 @@
                 android:layout_height="0dp"
                 android:layout_below="@id/writing_linear_layout_chat"
                 />
-
-        </RelativeLayout>
-
-        <RelativeLayout
-            android:id="@+id/upload_panel_chat"
-            android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:layout_above="@+id/writing_container_layout_chat_layout"
-            android:visibility="gone"
-            android:background="@color/accentColor">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="horizontal">
-
-                <RelativeLayout
-                    android:id="@+id/upload_from_gallery_chat"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:gravity="center"
-                    android:layout_weight="1">
-
-                    <ImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:tint="@color/white"
-                        android:src="@drawable/ic_chat_upload_media"/>
-
-                </RelativeLayout>
-
-                <RelativeLayout
-                    android:id="@+id/upload_audio_chat"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:gravity="center"
-                    android:layout_weight="1">
-
-                    <ImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:tint="@color/white"
-                        android:src="@drawable/ic_chat_upload_audio"/>
-
-                </RelativeLayout>
-
-                <RelativeLayout
-                    android:id="@+id/upload_from_cloud_chat"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:gravity="center"
-                    android:layout_weight="1">
-
-                    <ImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:tint="@color/white"
-                        android:src="@drawable/ic_chat_upload_cloud"/>
-
-                </RelativeLayout>
-
-                <RelativeLayout
-                    android:id="@+id/upload_from_filesystem_chat"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:gravity="center"
-                    android:layout_weight="1">
-
-                    <ImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:tint="@color/white"
-                        android:src="@drawable/ic_chat_upload_system"/>
-
-                </RelativeLayout>
-
-                <RelativeLayout
-                    android:id="@+id/upload_contact_chat"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:gravity="center"
-                    android:layout_weight="1">
-
-                    <ImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:tint="@color/white"
-                        android:src="@drawable/ic_send_contact"/>
-
-                </RelativeLayout>
-
-            </LinearLayout>
 
         </RelativeLayout>
 
@@ -390,20 +302,22 @@
                     android:textSize="12sp"/>
             </RelativeLayout>
 
-            <android.support.design.widget.FloatingActionButton
-                android:id="@+id/fab_chat"
-                android:layout_width="@dimen/fab_button_small_diameter"
-                android:layout_height="@dimen/fab_button_small_diameter"
-                android:layout_alignParentBottom="true"
-                android:layout_alignParentRight="true"
-                app:elevation="6dp"
-                android:scaleType="center"
-                app:backgroundTint="@color/accentColor"
-                app:pressedTranslationZ="12dp"
-                android:layout_margin="16dp"
-                android:src="@drawable/ic_add_white" />
-
         </RelativeLayout>
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fab_chat"
+            android:layout_width="@dimen/fab_button_small_diameter"
+            android:layout_height="@dimen/fab_button_small_diameter"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            app:elevation="6dp"
+            android:scaleType="center"
+            app:backgroundTint="@color/accentColor"
+            app:pressedTranslationZ="12dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginBottom="12dp"
+            android:src="@drawable/ic_add_white" />
 
     </RelativeLayout>
 

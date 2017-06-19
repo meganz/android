@@ -2992,9 +2992,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		else{
 			builder = new AlertDialog.Builder(this);
 		}
-
-		builder.setMessage(R.string.confirmation_to_reconnect).setPositiveButton(R.string.cam_sync_ok, dialogClickListener)
-				.setNegativeButton(R.string.general_cancel, dialogClickListener).show().setCanceledOnTouchOutside(false);
+		try {
+			builder.setMessage(R.string.confirmation_to_reconnect).setPositiveButton(R.string.cam_sync_ok, dialogClickListener)
+					.setNegativeButton(R.string.general_cancel, dialogClickListener).show().setCanceledOnTouchOutside(false);
+		}
+		catch (Exception e){}
 	}
 
 	public void showOfflineMode(){
@@ -3774,12 +3776,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 //			maFLol.setMKLayoutVisible(mkLayoutVisible);
 		}
 		log("show chats");
-
+		MegaApplication.setRecentChatsFragmentVisible(true);
 		drawerLayout.closeDrawer(Gravity.LEFT);
 	}
 	@SuppressLint("NewApi")
 	public void selectDrawerItemLollipop(DrawerItem item){
     	log("selectDrawerItemLollipop: "+item);
+		MegaApplication.setRecentChatsFragmentVisible(false);
 		aB.setSubtitle(null);
     	switch (item){
     		case CLOUD_DRIVE:{
@@ -10400,7 +10403,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			final int multiselectIntent = intent.getIntExtra("MULTISELECT", -1);
 			final int sentToInbox = intent.getIntExtra("SEND_FILE", -1);
 
-			if (megaContacts){
+			//if (megaContacts){
 
 				if(sentToInbox==0){
 
@@ -10485,24 +10488,38 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						nC.sendToInbox(nodeHandles, contactsData);
 					}
 				}
-			}
-			else{
+			//}
+			//else{
+				//log("no contact");
+//				for (int i=0; i < contactsData.size();i++){
+//					String type = contactsData.get(i);
+//					if (type.compareTo(ContactsExplorerActivityLollipop.EXTRA_EMAIL) == 0){
+//						log("other email");
+//
+//						i++;
+//						Snackbar.make(fragmentContainer, getString(R.string.general_not_yet_implemented), Snackbar.LENGTH_LONG).show();
+////						Toast.makeText(this, "Sharing a folder: An email will be sent to the email address: " + contactsData.get(i) + ".\n", Toast.LENGTH_LONG).show();
+//					}
+//					else if (type.compareTo(ContactsExplorerActivityLollipop.EXTRA_PHONE) == 0){
+//						log("contact phone email");
+//
+//						i++;
+//						Snackbar.make(fragmentContainer, getString(R.string.general_not_yet_implemented), Snackbar.LENGTH_LONG).show();
+////						Toast.makeText(this, "Sharing a folder: A Text Message will be sent to the phone number: " + contactsData.get(i) , Toast.LENGTH_LONG).show();
+//					}
+//					else{
+//						log("else default!");
+//
+//						i++;
+//						Snackbar.make(fragmentContainer, "Probando!!", Snackbar.LENGTH_LONG).show();
+////						Toast.makeText(this, "Sharing a folder: A Text Message will be sent to the phone number: " + contactsData.get(i) , Toast.LENGTH_LONG).show();
+//					}
+//				}
 
-				for (int i=0; i < contactsData.size();i++){
-					String type = contactsData.get(i);
-					if (type.compareTo(ContactsExplorerActivityLollipop.EXTRA_EMAIL) == 0){
-						i++;
-						Snackbar.make(fragmentContainer, getString(R.string.general_not_yet_implemented), Snackbar.LENGTH_LONG).show();
-//						Toast.makeText(this, "Sharing a folder: An email will be sent to the email address: " + contactsData.get(i) + ".\n", Toast.LENGTH_LONG).show();
-					}
-					else if (type.compareTo(ContactsExplorerActivityLollipop.EXTRA_PHONE) == 0){
-						i++;
-						Snackbar.make(fragmentContainer, getString(R.string.general_not_yet_implemented), Snackbar.LENGTH_LONG).show();
-//						Toast.makeText(this, "Sharing a folder: A Text Message will be sent to the phone number: " + contactsData.get(i) , Toast.LENGTH_LONG).show();
-					}
-				}
 
-			}
+
+
+			//}
 		}
 		else if (requestCode == Constants.REQUEST_CODE_GET_LOCAL && resultCode == RESULT_OK) {
 
@@ -11482,6 +11499,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 		}
 		else if (request.getType() == MegaChatRequest.TYPE_CONNECT){
+			if (MegaApplication.isFirstConnect()){
+				MegaApplication.setFirstConnect(false);
+			}
+
 			if(e.getErrorCode()==MegaChatError.ERROR_OK){
 				log("CONNECT CHAT finished ");
 				if(rChatFL!=null){
@@ -13663,7 +13684,22 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 	@Override
 	public void onChatInitStateUpdate(MegaChatApiJava api, int newState) {
-
+		log("onChatInitStateUpdate");
+		if (newState == MegaChatApi.INIT_ERROR) {
+			// chat cannot initialize, disable chat completely
+			log("newState == MegaChatApi.INIT_ERROR");
+			if (chatSettings == null) {
+				log("1 - onChatInitStateUpdate: ERROR----> Switch OFF chat");
+				chatSettings = new ChatSettings(false + "", true + "", true + "", true + "");
+				dbH.setChatSettings(chatSettings);
+			} else {
+				log("2 - onChatInitStateUpdate: ERROR----> Switch OFF chat");
+				dbH.setEnabledChat(false + "");
+			}
+			if(megaChatApi!=null){
+				megaChatApi.logout(null);
+			}
+		}
 	}
 
 	@Override
