@@ -177,6 +177,7 @@ public class NodeController {
     }
 
     public void sendToInbox(long fileHandle, ArrayList<String> selectedContacts){
+        log("sendToInbox");
 
         if(!Util.isOnline(context)){
             ((ManagerActivityLollipop) context).showSnackbar(context.getString(R.string.error_server_connection_problem));

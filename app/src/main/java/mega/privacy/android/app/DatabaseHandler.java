@@ -2065,6 +2065,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	}
 	
 	public void setPinLockType (String pinLockType){
+		log("setPinLockType");
 		String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
         ContentValues values = new ContentValues();
 		Cursor cursor = db.rawQuery(selectQuery, null);

@@ -102,7 +102,6 @@ public class ParticipantBottomSheetDialogFragment extends BottomSheetDialogFragm
 
             participantHandle = ((GroupChatInfoActivityLollipop) context).selectedHandleParticipant;
             log("Handle of the participant: "+participantHandle);
-
         }
     }
     @Override
@@ -216,12 +215,7 @@ public class ParticipantBottomSheetDialogFragment extends BottomSheetDialogFragm
             optionChangePermissionsChat.setVisibility(View.GONE);
             optionRemoveParticipantChat.setVisibility(View.GONE);
 
-            if(selectedChat.getOwnPrivilege()==MegaChatRoom.PRIV_MODERATOR){
-                optionInvite.setVisibility(View.VISIBLE);
-            }
-            else{
-                optionInvite.setVisibility(View.GONE);
-            }
+            optionInvite.setVisibility(View.GONE);
 
             addAvatarParticipantPanel(participantHandle, megaChatApi.getMyEmail(), myFullName);
         }
