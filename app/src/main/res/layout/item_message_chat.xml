@@ -357,7 +357,7 @@
 
         <RelativeLayout
             android:id="@+id/content_contact_message_layout"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="6dp"
             android:layout_below="@+id/title_contact_message_layout">
