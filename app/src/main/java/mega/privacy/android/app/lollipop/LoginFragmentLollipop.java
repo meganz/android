@@ -1777,7 +1777,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
     @Override
     public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e)
     {
-        log("onRequestTemporaryError: " + request.getRequestString());
+        log("onRequestTemporaryError: " + request.getRequestString() + e.getErrorCode());
 
 //		if (request.getType() == MegaRequest.TYPE_LOGIN){
 //
