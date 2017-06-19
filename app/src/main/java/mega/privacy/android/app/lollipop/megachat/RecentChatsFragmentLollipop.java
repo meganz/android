@@ -1057,6 +1057,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
     public void onPause() {
         log("onPause");
         lastFirstVisiblePosition = ((LinearLayoutManager)listView.getLayoutManager()).findFirstCompletelyVisibleItemPosition();
+        MegaApplication.setRecentChatsFragmentVisible(false);
         super.onPause();
     }
 
@@ -1069,6 +1070,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
             (listView.getLayoutManager()).scrollToPosition(0);
         }
         lastFirstVisiblePosition=0;
+        MegaApplication.setRecentChatsFragmentVisible(true);
         super.onResume();
     }
 

@@ -5,19 +5,33 @@ package mega.privacy.android.app;
 //import com.google.android.gms.analytics.Tracker;
 
 import android.app.Application;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.media.RingtoneManager;
+import android.net.Uri;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Locale;
 
+import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
+import mega.privacy.android.app.lollipop.megachat.RecentChatsFragmentLollipop;
+import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApiAndroid;
+import nz.mega.sdk.MegaChatApiJava;
+import nz.mega.sdk.MegaChatListItem;
+import nz.mega.sdk.MegaChatListenerInterface;
+import nz.mega.sdk.MegaChatPresenceConfig;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaListenerInterface;
@@ -28,7 +42,7 @@ import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaUser;
 
 
-public class MegaApplication extends Application implements MegaListenerInterface{
+public class MegaApplication extends Application implements MegaListenerInterface, MegaChatListenerInterface{
 	final String TAG = "MegaApplication";
 	static final String USER_AGENT = "MEGAAndroid/3.1.7_137";
 
@@ -278,6 +292,7 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 
 			if(Util.isChatEnabled()){
 				megaChatApi = new MegaChatApiAndroid(megaApi);
+				megaChatApi.addChatListener(this);
 			}
 
 			String language = Locale.getDefault().toString();
@@ -288,6 +303,7 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 				languageString = megaApi.setLanguage(language);
 				log("2--Result: "+languageString+" Language: "+language);
 			}
+
 		}
 		
 		return megaApi;
@@ -296,6 +312,14 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 	public static boolean isActivityVisible() {
 		log("isActivityVisible() => " + activityVisible);
 		return activityVisible;
+	}
+
+	public static void setFirstConnect(boolean firstConnect){
+		MegaApplication.firstConnect = firstConnect;
+	}
+
+	public static boolean isFirstConnect(){
+		return firstConnect;
 	}
 
 	public static void activityResumed() {
@@ -310,6 +334,9 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 
 	private static boolean activityVisible = false;
 	private static boolean isLoggingIn = false;
+	private static boolean firstConnect = true;
+	private static boolean recentChatsFragmentVisible = false;
+	private static long openChatId = -1;
 
 	public static boolean isLoggingIn() {
 		return isLoggingIn;
@@ -317,6 +344,14 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 
 	public static void setLoggingIn(boolean loggingIn) {
 		isLoggingIn = loggingIn;
+	}
+
+	public static void setRecentChatsFragmentVisible(boolean recentChatsFragmentVisible){
+		MegaApplication.recentChatsFragmentVisible = recentChatsFragmentVisible;
+	}
+
+	public static void setOpenChatId(long openChatId){
+		MegaApplication.openChatId = openChatId;
 	}
 	
 	
@@ -386,13 +421,60 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 
 	@Override
 	public void onUsersUpdate(MegaApiJava api, ArrayList<MegaUser> users) {
-		// TODO Auto-generated method stub
+		log("onUsersUpdate");
 	}
 
 	@Override
-	public void onNodesUpdate(MegaApiJava api, ArrayList<MegaNode> nodes) {
-		// TODO Auto-generated method stub
+	public void onNodesUpdate(MegaApiJava api, ArrayList<MegaNode> updatedNodes) {
+		if (megaApi == null){
+			megaApi = getMegaApi();
+		}
+
+		if (updatedNodes != null) {
+			log("updatedNodes: " + updatedNodes.size());
+
+			for (int i = 0; i < updatedNodes.size(); i++) {
+				MegaNode n = updatedNodes.get(i);
+				if (n.isInShare() && n.hasChanged(MegaNode.CHANGE_TYPE_INSHARE)){
+					log("updatedNodes name: " + n.getName() + " isInshared: " + n.isInShare() + " getchanges: " + n.getChanges() + " haschanged(TYPE_INSHARE): " + n.hasChanged(MegaNode.CHANGE_TYPE_INSHARE));
+
+					try {
+						String email = "";
+						if (megaApi.getMyUser() != null) {
+							if (megaApi.getMyUser().getEmail() != null) {
+								email = megaApi.getMyUser().getEmail();
+							}
+						}
+
+						String notificationTitle = "Cloud activity (" + email + ")";
+						String notificationContent = "A folder has been shared with you";
+						int notificationId = Constants.NOTIFICATION_PUSH_CLOUD_DRIVE;
+
+						Intent intent = new Intent(this, ManagerActivityLollipop.class);
+						intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+						PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
+								PendingIntent.FLAG_ONE_SHOT);
+
+						Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+						NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
+								.setSmallIcon(R.drawable.ic_stat_notify_download)
+								.setContentTitle(notificationTitle)
+								.setContentText(notificationContent)
+								.setAutoCancel(true)
+								.setSound(defaultSoundUri)
+								.setContentIntent(pendingIntent);
+
+						NotificationManager notificationManager =
+								(NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+						notificationManager.notify(notificationId, notificationBuilder.build());
+					}
+					catch(Exception e){}
+				}
+			}
+		}
 	}
+
 	@Override
 	public void onReloadNeeded(MegaApiJava api) {
 		// TODO Auto-generated method stub
@@ -434,7 +516,133 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 	@Override
 	public void onContactRequestsUpdate(MegaApiJava api,
 			ArrayList<MegaContactRequest> requests) {
-		// TODO Auto-generated method stub
+		log("onContactRequestUpdate");
+
+		try {
+			if (requests == null) {
+				return;
+			}
+
+			boolean showNotification = false;
+			for (int i = 0; i < requests.size(); i++) {
+				MegaContactRequest cr = requests.get(i);
+				if (cr != null) {
+					if ((cr.getStatus() == MegaContactRequest.STATUS_UNRESOLVED) && (!cr.isOutgoing())) {
+						showNotification = true;
+						log("onContactRequestUpdate: " + cr.getSourceEmail() + " cr.isOutgoing: " + cr.isOutgoing() + " cr.getStatus: " + cr.getStatus());
+					}
+				}
+			}
+
+
+			if (showNotification) {
+				String email = "";
+				if (megaApi != null) {
+					if (megaApi.getMyUser() != null) {
+						if (megaApi.getMyUser().getEmail() != null) {
+							email = megaApi.getMyUser().getEmail();
+						}
+					}
+				}
+
+				String notificationTitle = "Contact activity (" + email + ")";
+				String notificationContent = "You have a new contact request";
+				int notificationId = Constants.NOTIFICATION_PUSH_CONTACT;
+
+				Intent intent = new Intent(this, ManagerActivityLollipop.class);
+				intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+				PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
+						PendingIntent.FLAG_ONE_SHOT);
+
+				Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+				NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
+						.setSmallIcon(R.drawable.ic_stat_notify_download)
+						.setContentTitle(notificationTitle)
+						.setContentText(notificationContent)
+						.setAutoCancel(true)
+						.setSound(defaultSoundUri)
+						.setContentIntent(pendingIntent);
+
+				NotificationManager notificationManager =
+						(NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+				notificationManager.notify(notificationId, notificationBuilder.build());
+			}
+		}
+		catch(Exception e){}
+	}
+
+	@Override
+	public void onChatListItemUpdate(MegaChatApiJava api, MegaChatListItem item) {
+		if (megaApi == null){
+			megaApi = getMegaApi();
+		}
+
+		if (megaChatApi == null){
+			megaChatApi = getMegaChatApi();
+		}
+
+		if (item.hasChanged(MegaChatListItem.CHANGE_TYPE_LAST_MSG) && (item.getUnreadCount() > 0)){
+			try {
+				if (!recentChatsFragmentVisible) {
+					if (openChatId != item.getChatId()) {
+						if (isFirstConnect()) {
+							log("onChatListItemUpdateMegaApplication. FIRSTCONNECT " + item.getTitle() + "Unread count: " + item.getUnreadCount() + " hasChanged(CHANGE_TYPE_UNREAD_COUNT): " + item.hasChanged(MegaChatListItem.CHANGE_TYPE_UNREAD_COUNT) + " hasChanged(CHANGE_TYPE_LAST_TS):" + item.hasChanged(MegaChatListItem.CHANGE_TYPE_LAST_TS));
+						} else {
+							log("onChatListItemUpdateMegaApplication. NOTFIRSTCONNECT " + item.getTitle() + "Unread count: " + item.getUnreadCount() + " hasChanged(CHANGE_TYPE_UNREAD_COUNT): " + item.hasChanged(MegaChatListItem.CHANGE_TYPE_UNREAD_COUNT) + " hasChanged(CHANGE_TYPE_LAST_TS):" + item.hasChanged(MegaChatListItem.CHANGE_TYPE_LAST_TS));
+
+							String email = "";
+							if (megaApi != null) {
+								if (megaApi.getMyUser() != null) {
+									if (megaApi.getMyUser().getEmail() != null) {
+										email = megaApi.getMyUser().getEmail();
+									}
+								}
+							}
+
+							String notificationTitle = "Chat activity (" + email + ")";
+							String notificationContent = "You have received a message";
+							int notificationId = Constants.NOTIFICATION_PUSH_CHAT;
+
+							Intent intent = new Intent(this, ManagerActivityLollipop.class);
+							intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+							PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
+									PendingIntent.FLAG_ONE_SHOT);
+
+							Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+							NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
+									.setSmallIcon(R.drawable.ic_stat_notify_download)
+									.setContentTitle(notificationTitle)
+									.setContentText(notificationContent)
+									.setAutoCancel(true)
+									.setSound(defaultSoundUri)
+									.setContentIntent(pendingIntent);
+
+							NotificationManager notificationManager =
+									(NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+							notificationManager.notify(notificationId, notificationBuilder.build());
+						}
+					}
+				}
+			}
+			catch (Exception e){}
+		}
+	}
+
+	@Override
+	public void onChatInitStateUpdate(MegaChatApiJava api, int newState) {
+		log("onChatInitStateUpdate");
+	}
+
+	@Override
+	public void onChatOnlineStatusUpdate(MegaChatApiJava api, long userhandle, int status, boolean inProgress) {
+		log("onChatOnlineStatusUpdate");
+	}
+
+	@Override
+	public void onChatPresenceConfigUpdate(MegaChatApiJava api, MegaChatPresenceConfig config) {
+		log("onChatPresenceConfigUpdate");
 	}
 
 	public void sendSignalPresenceActivity(){
