@@ -1,21 +1,15 @@
 package mega.privacy.android.app.lollipop.megachat;
 
-import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
-import android.os.StatFs;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.app.ActionBar;
@@ -28,7 +22,6 @@ import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
-import android.util.TypedValue;
 import android.view.Display;
 import android.view.GestureDetector;
 import android.view.Menu;
@@ -48,23 +41,17 @@ import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
-import org.w3c.dom.NodeList;
-
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.Map;
 
 import io.github.rockerhieu.emojicon.EmojiconEditText;
 import io.github.rockerhieu.emojicon.EmojiconGridFragment;
 import io.github.rockerhieu.emojicon.EmojiconsFragment;
 import io.github.rockerhieu.emojicon.emoji.Emojicon;
 import mega.privacy.android.app.DatabaseHandler;
-import mega.privacy.android.app.DownloadService;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
@@ -81,7 +68,6 @@ import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ContactAtt
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.MessageNotSentBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.NodeAttachmentBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.TimeChatUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -2288,6 +2274,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             else{
                 if(msg.isDeleted()){
                     log("DELETED MESSAGE!!!!");
+                    return;
                 }
             }
 
@@ -2658,6 +2645,15 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
         log("---------------Index to change = "+indexToChange);
         if(indexToChange!=-1){
+
+            if(msg.getMessage().isDeleted()){
+                messages.remove(indexToChange);
+                log("Removed index: "+indexToChange);
+                log("modifyMessageReceived: messages size: "+messages.size());
+                adapter.notifyDataSetChanged();
+                return indexToChange;
+            }
+
             AndroidMegaChatMessage messageToUpdate = messages.get(indexToChange);
             if(messageToUpdate.getMessage().getMsgIndex()==msg.getMessage().getMsgIndex()){
                 log("modifyMessageReceived: The internal index not change");
@@ -2739,7 +2735,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 messages.remove(indexToChange);
                 log("Removed index: "+indexToChange);
                 log("modifyMessageReceived: messages size: "+messages.size());
-                adapter.removeMesage(indexToChange, messages);
+                adapter.removeMessage(indexToChange, messages);
                 int scrollToP = appendMessagePosition(msg);
                 if(scrollToP!=-1){
                     if(msg.getMessage().getStatus()==MegaChatMessage.STATUS_SERVER_RECEIVED){
@@ -3131,7 +3127,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     public void removeMsgNotSent(){
         log("removeMsgNotSent: "+selectedPosition);
         messages.remove(selectedPosition);
-        adapter.removeMesage(selectedPosition, messages);
+        adapter.removeMessage(selectedPosition, messages);
     }
 
     public void removeMsgNotSentAndUpdate(){

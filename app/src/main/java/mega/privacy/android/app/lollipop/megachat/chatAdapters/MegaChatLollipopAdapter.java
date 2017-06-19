@@ -2397,7 +2397,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         notifyItemInserted(position);
     }
 
-    public void removeMesage(int position, ArrayList<AndroidMegaChatMessage> messages){
+    public void removeMessage(int position, ArrayList<AndroidMegaChatMessage> messages){
+        log("removeMessage: size: "+messages.size());
         this.messages = messages;
         notifyItemRemoved(position);
     }

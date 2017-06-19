@@ -1226,7 +1226,7 @@
     <string name="remove_participant_success" context="Message show when a participant has been successfully removed from a group chat">Participant removed</string>
     <string name="remove_participant_error" context="Message show when a participant hasn't been successfully removed from a group chat">Error. Participant not removed</string>
 
-<string name="no_files_selected_warning">No files selected</string>
+    <string name="no_files_selected_warning">No files selected</string>
 
     <string name="attachment_upload_panel_from_cloud">From Cloud Drive</string>
     <string name="attachment_upload_panel_contact">Contact</string>
