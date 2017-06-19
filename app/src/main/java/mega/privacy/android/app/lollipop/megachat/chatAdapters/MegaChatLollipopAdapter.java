@@ -3,6 +3,7 @@ package mega.privacy.android.app.lollipop.megachat.chatAdapters;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Context;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -71,7 +72,11 @@ import nz.mega.sdk.MegaUser;
 
 public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
 
-    public static int MAX_WIDTH_NAME_SENDER_GROUP_THUMB=100;
+    public static int MAX_WIDTH_NAME_SENDER_GROUP_THUMB_LAND_PICTURE=194;
+    public static int MAX_WIDTH_NAME_SENDER_GROUP_THUMB_PORTRAIT_PICTURE=136;
+
+    public static int MAX_WIDTH_FILENAME_LAND=449;
+    public static int MAX_WIDTH_FILENAME_PORT=220;
 
     Context context;
     int positionClicked;
@@ -1094,6 +1099,20 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                 if(nodeList.size()==1) {
                                     MegaNode node = nodeList.get(0);
                                     log("Node Name: " + node.getName());
+
+                                    if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+                                        log("Landscape configuration");
+                                        float width = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MAX_WIDTH_FILENAME_LAND, context.getResources().getDisplayMetrics());
+                                        ((ViewHolderMessageChat)holder).contentOwnMessageFileName.setMaxWidth((int) width);
+                                        ((ViewHolderMessageChat)holder).contentOwnMessageFileSize.setMaxWidth((int) width);
+                                    }
+                                    else{
+                                        log("Portrait configuration");
+                                        float width = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MAX_WIDTH_FILENAME_PORT, context.getResources().getDisplayMetrics());
+                                        ((ViewHolderMessageChat)holder).contentOwnMessageFileName.setMaxWidth((int) width);
+                                        ((ViewHolderMessageChat)holder).contentOwnMessageFileSize.setMaxWidth((int) width);
+                                    }
+
                                     ((ViewHolderMessageChat) holder).contentOwnMessageFileName.setText(node.getName());
                                     long nodeSize = node.getSize();
                                     ((ViewHolderMessageChat) holder).contentOwnMessageFileSize.setText(Util.getSizeString(nodeSize));
@@ -1210,6 +1229,19 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                             ((ViewHolderMessageChat)holder).contentOwnMessageContactThumb.setVisibility(View.VISIBLE);
                             ((ViewHolderMessageChat)holder).contentOwnMessageContactName.setVisibility(View.VISIBLE);
                             ((ViewHolderMessageChat)holder).contentOwnMessageContactEmail.setVisibility(View.VISIBLE);
+
+                            if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+                                log("Landscape configuration");
+                                float width = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MAX_WIDTH_FILENAME_LAND, context.getResources().getDisplayMetrics());
+                                ((ViewHolderMessageChat)holder).contentOwnMessageContactName.setMaxWidth((int) width);
+                                ((ViewHolderMessageChat)holder).contentOwnMessageContactEmail.setMaxWidth((int) width);
+                            }
+                            else{
+                                log("Portrait configuration");
+                                float width = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MAX_WIDTH_FILENAME_PORT, context.getResources().getDisplayMetrics());
+                                ((ViewHolderMessageChat)holder).contentOwnMessageContactName.setMaxWidth((int) width);
+                                ((ViewHolderMessageChat)holder).contentOwnMessageContactEmail.setMaxWidth((int) width);
+                            }
 
                             long userCount  = message.getUsersCount();
 
@@ -1630,16 +1662,25 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                             ((ViewHolderMessageChat)holder).contentContactMessageContactName.setVisibility(View.GONE);
                             ((ViewHolderMessageChat)holder).contentContactMessageContactEmail.setVisibility(View.GONE);
 
-                            //Margins
-                            RelativeLayout.LayoutParams ownMessageParams = (RelativeLayout.LayoutParams)((ViewHolderMessageChat)holder).contentContactMessageFileLayout.getLayoutParams();
-                            ownMessageParams.width = RelativeLayout.LayoutParams.MATCH_PARENT;
-                            ((ViewHolderMessageChat)holder).contentContactMessageFileLayout.setLayoutParams(ownMessageParams);
-
                             MegaNodeList nodeList = message.getMegaNodeList();
                             if(nodeList != null){
                                 if(nodeList.size()==1){
                                     MegaNode node = nodeList.get(0);
                                     log("Node Name: "+node.getName());
+
+                                    if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+                                        log("Landscape configuration");
+                                        float width = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MAX_WIDTH_FILENAME_LAND, context.getResources().getDisplayMetrics());
+                                        ((ViewHolderMessageChat)holder).contentContactMessageFileName.setMaxWidth((int) width);
+                                        ((ViewHolderMessageChat)holder).contentContactMessageFileSize.setMaxWidth((int) width);
+                                    }
+                                    else{
+                                        log("Portrait configuration");
+                                        float width = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MAX_WIDTH_FILENAME_PORT, context.getResources().getDisplayMetrics());
+                                        ((ViewHolderMessageChat)holder).contentContactMessageFileName.setMaxWidth((int) width);
+                                        ((ViewHolderMessageChat)holder).contentContactMessageFileSize.setMaxWidth((int) width);
+                                    }
+
                                     ((ViewHolderMessageChat)holder).contentContactMessageFileName.setText(node.getName());
                                     long nodeSize = node.getSize();
                                     ((ViewHolderMessageChat)holder).contentContactMessageFileSize.setText(Util.getSizeString(nodeSize));
@@ -1669,7 +1710,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                                 ((ViewHolderMessageChat)holder).contentContactMessageThumbPort.setLayoutParams(contactThumbParams);
 
                                                 log("Max width to MAX_WIDTH_NAME_SENDER_GROUP_THUMB");
-                                                float width = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MAX_WIDTH_NAME_SENDER_GROUP_THUMB, context.getResources().getDisplayMetrics());
+                                                float width = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MAX_WIDTH_NAME_SENDER_GROUP_THUMB_PORTRAIT_PICTURE, context.getResources().getDisplayMetrics());
                                                 ((ViewHolderMessageChat)holder).contentContactMessageFileSender.setMaxWidth((int) width);
                                             }
                                             else{
@@ -1678,10 +1719,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                                 ((ViewHolderMessageChat)holder).contentContactMessageThumbPort.setLayoutParams(contactThumbParams);
                                             }
 
-                                            //Margins
-                                            RelativeLayout.LayoutParams contactImageParams = (RelativeLayout.LayoutParams)((ViewHolderMessageChat)holder).contentContactMessageFileLayout.getLayoutParams();
-                                            contactImageParams.width = RelativeLayout.LayoutParams.WRAP_CONTENT;
-                                            ((ViewHolderMessageChat)holder).contentContactMessageFileLayout.setLayoutParams(contactImageParams);
                                         } else {
                                             log("Landcape");
 
@@ -1699,7 +1736,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                                 ((ViewHolderMessageChat)holder).contentContactMessageThumbLand.setLayoutParams(contactThumbParams);
 
                                                 log("Max width to 220");
-                                                float width = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 220, context.getResources().getDisplayMetrics())- 8;
+                                                float width = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MAX_WIDTH_NAME_SENDER_GROUP_THUMB_LAND_PICTURE, context.getResources().getDisplayMetrics())- 8;
                                                 ((ViewHolderMessageChat)holder).contentContactMessageFileSender.setMaxWidth((int) width);
                                             }
                                             else{
@@ -1707,11 +1744,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                                 contactThumbParams.setMargins(0, 0 ,0, 0);
                                                 ((ViewHolderMessageChat)holder).contentContactMessageThumbLand.setLayoutParams(contactThumbParams);
                                             }
-
-                                            //Margins
-                                            RelativeLayout.LayoutParams contactImageParams = (RelativeLayout.LayoutParams)((ViewHolderMessageChat)holder).contentContactMessageFileLayout.getLayoutParams();
-                                            contactImageParams.width = RelativeLayout.LayoutParams.WRAP_CONTENT;
-                                            ((ViewHolderMessageChat)holder).contentContactMessageFileLayout.setLayoutParams(contactImageParams);
                                         }
                                     }
                                     else {
@@ -1736,7 +1768,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                                     ((ViewHolderMessageChat)holder).contentContactMessageThumbPort.setLayoutParams(contactThumbParams);
 
                                                     log("Max width to MAX_WIDTH_NAME_SENDER_GROUP_THUMB");
-                                                    float width = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MAX_WIDTH_NAME_SENDER_GROUP_THUMB, context.getResources().getDisplayMetrics());
+                                                    float width = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MAX_WIDTH_NAME_SENDER_GROUP_THUMB_PORTRAIT_PICTURE, context.getResources().getDisplayMetrics());
                                                     ((ViewHolderMessageChat)holder).contentContactMessageFileSender.setMaxWidth((int) width);
                                                 }
                                                 else{
@@ -1745,10 +1777,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                                     ((ViewHolderMessageChat)holder).contentContactMessageThumbPort.setLayoutParams(contactThumbParams);
                                                 }
 
-                                                //Margins
-                                                RelativeLayout.LayoutParams contactImageParams = (RelativeLayout.LayoutParams)((ViewHolderMessageChat)holder).contentContactMessageFileLayout.getLayoutParams();
-                                                contactImageParams.width = RelativeLayout.LayoutParams.WRAP_CONTENT;
-                                                ((ViewHolderMessageChat)holder).contentContactMessageFileLayout.setLayoutParams(contactImageParams);
                                             } else {
                                                 log("Landcape");
 
@@ -1766,7 +1794,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                                     ((ViewHolderMessageChat)holder).contentContactMessageThumbLand.setLayoutParams(contactThumbParams);
 
                                                     log("Max width to 220");
-                                                    float width = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 220, context.getResources().getDisplayMetrics())- 8;
+                                                    float width = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MAX_WIDTH_NAME_SENDER_GROUP_THUMB_LAND_PICTURE, context.getResources().getDisplayMetrics())- 8;
                                                     ((ViewHolderMessageChat)holder).contentContactMessageFileSender.setMaxWidth((int) width);
                                                 }
                                                 else{
@@ -1774,11 +1802,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                                     contactThumbParams.setMargins(0, 0 ,0, 0);
                                                     ((ViewHolderMessageChat)holder).contentContactMessageThumbLand.setLayoutParams(contactThumbParams);
                                                 }
-
-                                                //Margins
-                                                RelativeLayout.LayoutParams contactImageParams = (RelativeLayout.LayoutParams)((ViewHolderMessageChat)holder).contentContactMessageFileLayout.getLayoutParams();
-                                                contactImageParams.width = RelativeLayout.LayoutParams.WRAP_CONTENT;
-                                                ((ViewHolderMessageChat)holder).contentContactMessageFileLayout.setLayoutParams(contactImageParams);
                                             }
 
                                         } else {
@@ -1855,6 +1878,19 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                             ((ViewHolderMessageChat)holder).contentContactMessageContactThumb.setVisibility(View.VISIBLE);
                             ((ViewHolderMessageChat)holder).contentContactMessageContactName.setVisibility(View.VISIBLE);
                             ((ViewHolderMessageChat)holder).contentContactMessageContactEmail.setVisibility(View.VISIBLE);
+
+                            if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+                                log("Landscape configuration");
+                                float width = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MAX_WIDTH_FILENAME_LAND, context.getResources().getDisplayMetrics());
+                                ((ViewHolderMessageChat)holder).contentContactMessageContactName.setMaxWidth((int) width);
+                                ((ViewHolderMessageChat)holder).contentContactMessageContactEmail.setMaxWidth((int) width);
+                            }
+                            else{
+                                log("Portrait configuration");
+                                float width = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MAX_WIDTH_FILENAME_PORT, context.getResources().getDisplayMetrics());
+                                ((ViewHolderMessageChat)holder).contentContactMessageContactName.setMaxWidth((int) width);
+                                ((ViewHolderMessageChat)holder).contentContactMessageContactEmail.setMaxWidth((int) width);
+                            }
 
                             long userCount  = message.getUsersCount();
 
@@ -2410,7 +2446,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                     holder.contentContactMessageThumbPort.setLayoutParams(contactThumbParams);
 
                                     log("Max width to MAX_WIDTH_NAME_SENDER_GROUP_THUMB");
-                                    float width = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MAX_WIDTH_NAME_SENDER_GROUP_THUMB, context.getResources().getDisplayMetrics());
+                                    float width = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MAX_WIDTH_NAME_SENDER_GROUP_THUMB_PORTRAIT_PICTURE, context.getResources().getDisplayMetrics());
                                     holder.contentContactMessageFileSender.setMaxWidth((int) width);
                                 }
                                 else{
@@ -2418,11 +2454,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                     contactThumbParams.setMargins(0, 0 ,0, 0);
                                     holder.contentContactMessageThumbPort.setLayoutParams(contactThumbParams);
                                 }
-
-                                //Margins
-                                RelativeLayout.LayoutParams contactImageParams = (RelativeLayout.LayoutParams)holder.contentContactMessageFileLayout.getLayoutParams();
-                                contactImageParams.width = RelativeLayout.LayoutParams.WRAP_CONTENT;
-                                holder.contentContactMessageFileLayout.setLayoutParams(contactImageParams);
                             } else {
                                 log("Landcape");
 
@@ -2440,7 +2471,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                     holder.contentContactMessageThumbLand.setLayoutParams(contactThumbParams);
 
                                     log("Max width to 220");
-                                    float width = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 220, context.getResources().getDisplayMetrics());
+                                    float width = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MAX_WIDTH_NAME_SENDER_GROUP_THUMB_LAND_PICTURE, context.getResources().getDisplayMetrics());
                                     holder.contentContactMessageFileSender.setMaxWidth((int) width);
                                 }
                                 else{
@@ -2448,11 +2479,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                     contactThumbParams.setMargins(0, 0 ,0, 0);
                                     holder.contentContactMessageThumbLand.setLayoutParams(contactThumbParams);
                                 }
-
-                                //Margins
-                                RelativeLayout.LayoutParams contactImageParams = (RelativeLayout.LayoutParams)holder.contentContactMessageFileLayout.getLayoutParams();
-                                contactImageParams.width = RelativeLayout.LayoutParams.WRAP_CONTENT;
-                                holder.contentContactMessageFileLayout.setLayoutParams(contactImageParams);
                             }
                         }
                     }
