@@ -2706,8 +2706,14 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         }
                     } else {
                         //The last message is mine, the previous not
+                        log("Modify not my message");
                         if (compareDate(msg, previousMessage) == 0) {
-                            messages.get(indexToChange).setInfoToShow(Constants.CHAT_ADAPTER_SHOW_TIME);
+                            if (compareTime(msg, previousMessage) == 0) {
+                                messages.get(indexToChange).setInfoToShow(Constants.CHAT_ADAPTER_SHOW_NOTHING);
+                            } else {
+                                //Different minute
+                                messages.get(indexToChange).setInfoToShow(Constants.CHAT_ADAPTER_SHOW_TIME);
+                            }
                         } else {
                             //Different date
                             messages.get(indexToChange).setInfoToShow(Constants.CHAT_ADAPTER_SHOW_ALL);
@@ -3024,6 +3030,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     if (compareDate(msg, previousMessage) == 0) {
                         //Same date
                         if (compareTime(msg, previousMessage) == 0) {
+                            log("Add with show nothing - same userHandle");
                             msg.setInfoToShow(Constants.CHAT_ADAPTER_SHOW_NOTHING);
                         } else {
                             //Different minute
@@ -3035,8 +3042,15 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     }
                 } else {
                     //The last message is from contact, the previous not
+                    log("Different user handle");
                     if (compareDate(msg, previousMessage) == 0) {
-                        msg.setInfoToShow(Constants.CHAT_ADAPTER_SHOW_TIME);
+                        if (compareTime(msg, previousMessage) == 0) {
+                            log("Add with show nothing - same userHandle");
+                            msg.setInfoToShow(Constants.CHAT_ADAPTER_SHOW_NOTHING);
+                        } else {
+                            //Different minute
+                            msg.setInfoToShow(Constants.CHAT_ADAPTER_SHOW_TIME);
+                        }
                     } else {
                         //Different date
                         msg.setInfoToShow(Constants.CHAT_ADAPTER_SHOW_ALL);
