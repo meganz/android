@@ -687,6 +687,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         }
                     }
                     else{
+                        MegaApplication.setOpenChatId(idChat);
                         messages = new ArrayList<AndroidMegaChatMessage>();
                         bufferMessages = new ArrayList<AndroidMegaChatMessage>();
                         bufferManualSending = new ArrayList<AndroidMegaChatMessage>();
@@ -3300,6 +3301,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         log("onDestroy()");
 
         megaChatApi.closeChatRoom(idChat, this);
+
+        MegaApplication.setOpenChatId(-1);
 
         super.onDestroy();
     }

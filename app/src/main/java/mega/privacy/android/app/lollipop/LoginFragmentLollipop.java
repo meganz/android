@@ -1225,7 +1225,8 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                         }
                     }
                     else{
-                        log("ERROR attrs is NULL!!!");
+                        log("attrs is NULL");
+                        ((LoginActivityLollipop)context).showConfirmationEnableLogs();
                     }
                 }
             }

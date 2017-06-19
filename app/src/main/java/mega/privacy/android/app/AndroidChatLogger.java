@@ -25,48 +25,51 @@ public class AndroidChatLogger implements MegaChatLoggerInterface {
 			String currentDateandTime = sdf.format(new Date());
 
 			message = "(" + currentDateandTime + ") - " + message;
-		}
-		catch (Exception e){}
 
-		if (Util.DEBUG){
+
+			if (Util.DEBUG){
+				Log.d("AndroidChatLogger: ", message);
+	//			addRecordToLog("AndroidLogger: " + source + ": " + message);
+			}
+
+			File logFile=null;
+			boolean fileLogger = Util.getFileLogger();
+			if (fileLogger) {
+				//Send the log to a file
+
+				String dir = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.logDIR + "/";
+				//			String file = Environment.getExternalStorageDirectory().getAbsolutePath()+"/"+logDIR+"/log.txt";
+				File dirFile = new File(dir);
+				if (!dirFile.exists()) {
+					dirFile.mkdirs();
+					logFile = new File(dirFile, "log.txt");
+					if (!logFile.exists()) {
+						try {
+							logFile.createNewFile();
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}
+				} else {
+					logFile = new File(dirFile, "log.txt");
+					if (!logFile.exists()) {
+						try {
+							logFile.createNewFile();
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}
+				}
+
+				if (logFile != null && logFile.exists()) {
+					Util.appendStringToFile(message, logFile);
+				}
+			}
+		}
+		catch (Exception e){
 			Log.d("AndroidChatLogger: ", message);
-//			addRecordToLog("AndroidLogger: " + source + ": " + message);
-		}
-
-		File logFile=null;
-		boolean fileLogger = Util.getFileLogger();
-		if (fileLogger) {
-			//Send the log to a file
-
-			String dir = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.logDIR + "/";
-			//			String file = Environment.getExternalStorageDirectory().getAbsolutePath()+"/"+logDIR+"/log.txt";
-			File dirFile = new File(dir);
-			if (!dirFile.exists()) {
-				dirFile.mkdirs();
-				logFile = new File(dirFile, "log.txt");
-				if (!logFile.exists()) {
-					try {
-						logFile.createNewFile();
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-				}
-			} else {
-				logFile = new File(dirFile, "log.txt");
-				if (!logFile.exists()) {
-					try {
-						logFile.createNewFile();
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-				}
-			}
-
-			if (logFile != null && logFile.exists()) {
-				Util.appendStringToFile(message, logFile);
-			}
 		}
 
 	}

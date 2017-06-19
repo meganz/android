@@ -1,14 +1,17 @@
 package mega.privacy.android.app.lollipop;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
@@ -514,23 +517,41 @@ public class LoginActivityLollipop extends AppCompatActivity implements MegaGlob
         setIntent(null);
     }
 
+    boolean loggerPermission = false;
+
     public void showConfirmationEnableLogs() {
         log("showConfirmationEnableLogs");
 
         if (loginFragment != null) {
             loginFragment.numberOfClicks = 0;
         }
+
+        loginActivity = this;
+
         DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 switch (which) {
-                    case DialogInterface.BUTTON_POSITIVE:
-                        enableLogs();
+                    case DialogInterface.BUTTON_POSITIVE:{
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                            boolean hasStoragePermission = (ContextCompat.checkSelfPermission(loginActivity, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
+                            if (!hasStoragePermission) {
+                                loggerPermission = true;
+                                ActivityCompat.requestPermissions(loginActivity,
+                                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                                        Constants.REQUEST_WRITE_STORAGE);
+                            } else {
+                                enableLogs();
+                            }
+                        } else {
+                            enableLogs();
+                        }
                         break;
+                    }
 
-                    case DialogInterface.BUTTON_NEGATIVE:
-
+                    case DialogInterface.BUTTON_NEGATIVE: {
                         break;
+                    }
                 }
             }
         };
@@ -544,6 +565,22 @@ public class LoginActivityLollipop extends AppCompatActivity implements MegaGlob
 
         builder.setMessage(R.string.enable_log_text_dialog).setPositiveButton(R.string.general_enable, dialogClickListener)
                 .setNegativeButton(R.string.general_cancel, dialogClickListener).show().setCanceledOnTouchOutside(false);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        log("onRequestPermissionsResult");
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch(requestCode){
+            case Constants.REQUEST_WRITE_STORAGE:{
+                if (loggerPermission){
+                    loggerPermission = false;
+                    if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+                        enableLogs();
+                    }
+                }
+            }
+        }
     }
 
     public void enableLogs() {

@@ -1202,6 +1202,8 @@
     <string name="context_link_removal_error" context="error message">Link removal failed. Try again later.</string>
     <string name="context_link_action_error" context="error message">Link action failed. Try again later.</string>
 
+    <string name ="title_write_user_email" context="title of the dialog shown when sending or sharing a folder">Write the user\'s e-mail</string>
+
     <string name="activity_title_files_attached" context="title of the screen to see the details of several node attachments">Files attached</string>
     <string name="activity_title_contacts_attached" context="title of the screen to see the details of several contact attachments">Contacts attached</string>
 
@@ -1224,6 +1226,8 @@
     <string name="remove_participant_success" context="Message show when a participant has been successfully removed from a group chat">Participant removed</string>
     <string name="remove_participant_error" context="Message show when a participant hasn't been successfully removed from a group chat">Error. Participant not removed</string>
 
+<string name="no_files_selected_warning">No files selected</string>
 
-
+    <string name="attachment_upload_panel_from_cloud">From Cloud Drive</string>
+    <string name="attachment_upload_panel_contact">Contact</string>
 </resources>
