@@ -1482,6 +1482,33 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						finish();
 						return;
 					}
+					else if (getIntent().getAction().equals(Constants.ACTION_IPC)){
+						Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
+						intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
+						intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+						intent.setAction(Constants.ACTION_IPC);
+						startActivity(intent);
+						finish();
+						return;
+					}
+					else if (getIntent().getAction().equals(Constants.ACTION_CHAT_NOTIFICATION_MESSAGE)){
+						Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
+						intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
+						intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+						intent.setAction(Constants.ACTION_CHAT_NOTIFICATION_MESSAGE);
+						startActivity(intent);
+						finish();
+						return;
+					}
+					else if (getIntent().getAction().equals(Constants.ACTION_INCOMING_SHARED_FOLDER_NOTIFICATION)){
+						Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
+						intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
+						intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+						intent.setAction(Constants.ACTION_INCOMING_SHARED_FOLDER_NOTIFICATION);
+						startActivity(intent);
+						finish();
+						return;
+					}
 				}
 			}
 			Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
@@ -1675,6 +1702,19 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						log("IPC link - go to received request in Contacts");
 						drawerItem=DrawerItem.CONTACTS;
 						indexContacts=2;
+						selectDrawerItemLollipop(drawerItem);
+						selectDrawerItemPending=false;
+					}
+					else if(getIntent().getAction().equals(Constants.ACTION_CHAT_NOTIFICATION_MESSAGE)){
+						log("Chat notitificacion received");
+						drawerItem=DrawerItem.CHAT;
+						selectDrawerItemLollipop(drawerItem);
+						selectDrawerItemPending=false;
+					}
+					else if(getIntent().getAction().equals(Constants.ACTION_INCOMING_SHARED_FOLDER_NOTIFICATION)){
+						log("IPC link - go to received request in Contacts");
+						drawerItem=DrawerItem.SHARED_ITEMS;
+						indexShares=0;
 						selectDrawerItemLollipop(drawerItem);
 						selectDrawerItemPending=false;
 					}
@@ -2116,6 +2156,23 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					log("onPostResume: Intent SHOW_REPEATED_UPLOAD");
 					String message = intent.getStringExtra("MESSAGE");
 					showSnackbar(message);
+				}
+				else if(getIntent().getAction().equals(Constants.ACTION_IPC)){
+					log("IPC - go to received request in Contacts");
+					drawerItem=DrawerItem.CONTACTS;
+					indexContacts=2;
+					selectDrawerItemLollipop(drawerItem);
+				}
+				else if(getIntent().getAction().equals(Constants.ACTION_CHAT_NOTIFICATION_MESSAGE)){
+					log("Chat notification received");
+					drawerItem=DrawerItem.CHAT;
+					selectDrawerItemLollipop(drawerItem);
+				}
+				else if(getIntent().getAction().equals(Constants.ACTION_INCOMING_SHARED_FOLDER_NOTIFICATION)){
+					log("IPC - go to received request in Contacts");
+					drawerItem=DrawerItem.SHARED_ITEMS;
+					indexShares = 0;
+					selectDrawerItemLollipop(drawerItem);
 				}
 
     			intent.setAction(null);
