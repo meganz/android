@@ -26,8 +26,6 @@ import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -1457,10 +1455,11 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                             break;
                         }
                         case Constants.CHAT_ADAPTER_SHOW_TIME:{
-                            log("CHAT_ADAPTER_SHOW_TIME");
+                            log("CHAT_ADAPTER_SHOW_TIME--");
                             ((ViewHolderMessageChat)holder).dateLayout.setVisibility(View.GONE);
                             ((ViewHolderMessageChat)holder).titleContactMessage.setVisibility(View.VISIBLE);
                             ((ViewHolderMessageChat)holder).timeContactText.setText(TimeChatUtils.formatTime(message));
+                            ((ViewHolderMessageChat)holder).timeContactText.setVisibility(View.VISIBLE);
                             break;
                         }
                         case Constants.CHAT_ADAPTER_SHOW_NOTHING:{
@@ -2365,12 +2364,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
     @Override
     public long getItemId(int position) {
         return position;
-    }
-
-    public void setPositionClicked(int p){
-        log("setPositionClicked: "+p);
-        positionClicked = p;
-        notifyDataSetChanged();
     }
 
     public void setMessages (ArrayList<AndroidMegaChatMessage> messages){
