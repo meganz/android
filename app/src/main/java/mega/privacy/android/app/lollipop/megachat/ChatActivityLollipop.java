@@ -1307,8 +1307,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     actionMode.invalidate();
                 }
                 else{
+                    log("Call to send message: "+text);
                     sendMessage(text);
-                    log("Send message: "+text);
                 }
 
                 textChat.getText().clear();
@@ -1413,16 +1413,22 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 }
                 else{
                     //The last message is mine, the previous not
-                    if(compareDate(androidMsgSent, androidPreviousMessage)==0){
-                        messages.get(index).setInfoToShow(Constants.CHAT_ADAPTER_SHOW_TIME);
-                    }
-                    else{
+                    log("Modify not my message");
+                    if (compareDate(androidMsgSent, androidPreviousMessage) == 0) {
+                        if (compareTime(androidMsgSent, androidPreviousMessage) == 0) {
+                            messages.get(index).setInfoToShow(Constants.CHAT_ADAPTER_SHOW_NOTHING);
+                        } else {
+                            //Different minute
+                            messages.get(index).setInfoToShow(Constants.CHAT_ADAPTER_SHOW_TIME);
+                        }
+                    } else {
                         //Different date
                         messages.get(index).setInfoToShow(Constants.CHAT_ADAPTER_SHOW_ALL);
                     }
                 }
             }
             if (adapter == null){
+                log("adapter NULL");
                 adapter = new MegaChatLollipopAdapter(this, chatRoom, messages, listView);
                 adapter.setHasStableIds(true);
                 listView.setLayoutManager(mLayoutManager);
@@ -1435,7 +1441,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 }
             }
             else{
-                adapter.addMessage(messages, index);
+                log("adapter is NOT null");
                 final int indexToScroll = index;
 
                 if(adapter.getItemCount()>0){
@@ -1444,21 +1450,13 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     emptyScrollView.setVisibility(View.GONE);
                 }
 
-                mLayoutManager.scrollToPositionWithOffset(indexToScroll,20);
-//                Handler handler = new Handler();
-//                handler.postDelayed(new Runnable() {
-//
-//                    @Override
-//                    public void run() {
-//                        log("sendMessage: Now I update the recyclerview (send): "+indexToScroll);
-//
-//
-//                    }
-//                }, 100);
+                mLayoutManager.scrollToPositionWithOffset(indexToScroll-1,20);
+
+                adapter.addMessage(messages, index);
             }
         }
         else{
-            log("Error al enviar mensaje!");
+            log("Error sending message!");
             //EL mensaje no se ha enviado, mostrar error al usuario pero no cambiar interfaz
 
         }
@@ -1510,16 +1508,22 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 }
                 else{
                     //The last message is mine, the previous not
-                    if(compareDate(androidMsgSent, androidPreviousMessage)==0){
-                        messages.get(index).setInfoToShow(Constants.CHAT_ADAPTER_SHOW_TIME);
-                    }
-                    else{
+                    log("Modify not my message");
+                    if (compareDate(androidMsgSent, androidPreviousMessage) == 0) {
+                        if (compareTime(androidMsgSent, androidPreviousMessage) == 0) {
+                            messages.get(index).setInfoToShow(Constants.CHAT_ADAPTER_SHOW_NOTHING);
+                        } else {
+                            //Different minute
+                            messages.get(index).setInfoToShow(Constants.CHAT_ADAPTER_SHOW_TIME);
+                        }
+                    } else {
                         //Different date
                         messages.get(index).setInfoToShow(Constants.CHAT_ADAPTER_SHOW_ALL);
                     }
                 }
             }
             if (adapter == null){
+                log("adapter NULL");
                 adapter = new MegaChatLollipopAdapter(this, chatRoom, messages, listView);
                 adapter.setHasStableIds(true);
                 listView.setLayoutManager(mLayoutManager);
@@ -1532,6 +1536,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 }
             }
             else{
+                log("adapter is NOT null");
                 adapter.addMessage(messages, index);
                 final int indexToScroll = index;
 
@@ -1549,7 +1554,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }
         }
         else{
-            log("Error al enviar mensaje!");
+            log("Error sending message (2)!");
             //EL mensaje no se ha enviado, mostrar error al usuario pero no cambiar interfaz
 
         }
@@ -1980,6 +1985,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 else if(m.getMessage().getUserHandle()==megaChatApi.getMyUserHandle()) {
                     if(!(m.getMessage().isManagementMessage())){
                         log("selected message: "+m.getMessage().getContent());
+                        log("selected message handle: "+m.getMessage().getTempId());
+                        log("selected message rowId: "+m.getMessage().getRowId());
                         if((m.getMessage().getStatus()==MegaChatMessage.STATUS_SERVER_REJECTED)||(m.getMessage().getStatus()==MegaChatMessage.STATUS_SENDING_MANUAL)){
                             log("show not sent message panel");
                             showMsgNotSentPanel(m, position);

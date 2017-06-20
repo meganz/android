@@ -269,16 +269,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         holder.contentOwnMessageContactInitialLetter = (TextView)  v.findViewById(R.id.content_own_message_contact_initial_letter);
 
         holder.retryAlert = (TextView) v.findViewById(R.id.not_sent_own_message_text);
-        //Margins
-        RelativeLayout.LayoutParams ownRetryAlertParams = (RelativeLayout.LayoutParams)holder.retryAlert.getLayoutParams();
-        ownRetryAlertParams.setMargins(Util.scaleWidthPx(43, outMetrics), 0, Util.scaleWidthPx(68, outMetrics), 0);
-        holder.retryAlert.setLayoutParams(ownRetryAlertParams);
 
         holder.triangleIcon = (ImageView)  v.findViewById(R.id.own_triangle_icon);
-        //Margins
-        RelativeLayout.LayoutParams ownTriangleParams = (RelativeLayout.LayoutParams)holder.triangleIcon.getLayoutParams();
-        ownTriangleParams.setMargins(Util.scaleWidthPx(43, outMetrics), 0, Util.scaleWidthPx(4, outMetrics), 0);
-        holder.triangleIcon.setLayoutParams(ownTriangleParams);
 
         holder.ownManagementMessageLayout = (RelativeLayout) v.findViewById(R.id.own_management_message_layout);
         //Margins
@@ -2386,8 +2378,18 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
     }
 
     public void addMessage(ArrayList<AndroidMegaChatMessage> messages, int position){
+        log("addMessage: "+position);
         this.messages = messages;
         notifyItemInserted(position);
+        if(position==messages.size()-1){
+            log("No need to update more");
+        }
+        else{
+            log("Update until end");
+            int itemCount = messages.size()-position;
+            log("itemCount: "+itemCount);
+            notifyItemRangeChanged(position, itemCount);
+        }
     }
 
     public void removeMessage(int position, ArrayList<AndroidMegaChatMessage> messages){
