@@ -54,6 +54,7 @@ import io.github.rockerhieu.emojicon.emoji.Emojicon;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.components.NpaLinearLayoutManager;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.ChatFullScreenImageViewer;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
@@ -165,7 +166,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     FrameLayout emojiKeyboardLayout;
 
     RecyclerView listView;
-    LinearLayoutManager mLayoutManager;
+    NpaLinearLayoutManager mLayoutManager;
 
     ChatActivityLollipop chatActivity;
     String myMail;
@@ -521,7 +522,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         listView.setNestedScrollingEnabled(false);
         ((SimpleItemAnimator) listView.getItemAnimator()).setSupportsChangeAnimations(false);
 
-        mLayoutManager = new LinearLayoutManager(this);
+        mLayoutManager = new NpaLinearLayoutManager(this);
         mLayoutManager.setStackFromEnd(true);
         listView.setLayoutManager(mLayoutManager);
         listView.addOnItemTouchListener(this);
@@ -2650,7 +2651,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 messages.remove(indexToChange);
                 log("Removed index: "+indexToChange);
                 log("modifyMessageReceived: messages size: "+messages.size());
-                adapter.notifyDataSetChanged();
+//                adapter.notifyDataSetChanged();
+                adapter.removeMessage(indexToChange, messages);
                 return indexToChange;
             }
 
