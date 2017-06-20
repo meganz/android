@@ -264,7 +264,6 @@
                         android:ellipsize="end"
                         android:gravity="left"/>
 
-
                 </RelativeLayout>
                 <!--End RelativeLayout contact-->
 
@@ -274,6 +273,8 @@
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
                     android:gravity="right"
+                    android:layout_marginStart="78dp"
+                    android:layout_marginLeft="78dp"
                     android:background="@drawable/ic_input_warning"/>
 
             </RelativeLayout>
@@ -288,6 +289,8 @@
                 android:layout_alignParentRight="true"
                 android:text="@string/manual_retry_alert"
                 android:textSize="11sp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginRight="16dp"
                 android:inputType="textMultiLine|textNoSuggestions"
                 android:gravity="right"/>
 
