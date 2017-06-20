@@ -452,6 +452,7 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 
 						Intent intent = new Intent(this, ManagerActivityLollipop.class);
 						intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+						intent.setAction(Constants.ACTION_INCOMING_SHARED_FOLDER_NOTIFICATION);
 						PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
 								PendingIntent.FLAG_ONE_SHOT);
 
@@ -551,6 +552,7 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 
 				Intent intent = new Intent(this, ManagerActivityLollipop.class);
 				intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+				intent.setAction(Constants.ACTION_IPC);
 				PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
 						PendingIntent.FLAG_ONE_SHOT);
 
@@ -606,6 +608,7 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 
 							Intent intent = new Intent(this, ManagerActivityLollipop.class);
 							intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+							intent.setAction(Constants.ACTION_CHAT_NOTIFICATION_MESSAGE);
 							PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
 									PendingIntent.FLAG_ONE_SHOT);
 

@@ -184,8 +184,6 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
         log("sendNotification: " + type);
         Intent intent = new Intent(this, ManagerActivityLollipop.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
-                PendingIntent.FLAG_ONE_SHOT);
 
         String notificationContent = "";
         String notificationTitle = "";
@@ -208,21 +206,28 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
                     notificationTitle = "Cloud activity (" + email + ")";
                     notificationContent = "A folder has been shared with you";
                     notificationId = Constants.NOTIFICATION_PUSH_CLOUD_DRIVE;
+                    intent.setAction(Constants.ACTION_INCOMING_SHARED_FOLDER_NOTIFICATION);
                     break;
                 }
                 case 2:{
                     notificationTitle = "Chat activity (" + email + ")";
                     notificationContent = "You have received a message";
                     notificationId = Constants.NOTIFICATION_PUSH_CHAT;
+                    intent.setAction(Constants.ACTION_CHAT_NOTIFICATION_MESSAGE);
                     break;
                 }
                 case 3:{
                     notificationTitle = "Contact activity (" + email + ")";
                     notificationContent = "You have a new contact request";
                     notificationId = Constants.NOTIFICATION_PUSH_CONTACT;
+                    intent.setAction(Constants.ACTION_IPC);
                     break;
                 }
             }
+
+
+            PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
+                    PendingIntent.FLAG_ONE_SHOT);
 
             Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
             NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
