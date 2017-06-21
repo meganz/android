@@ -66,7 +66,6 @@
 
     <string name="confirmation_alert" context="confirmation message before removing a file">Please confirm</string>
 
-    <string name="delete_account" context="Button in My Account section where the user can delete permanently his account">Cancel your account</string>
     <string name="action_logout" context="Button where the user can sign off or logout">Logout</string>
     <string name="action_add" context="Menu item">Upload</string>
     <string name="action_create_folder" context="Menu item">Create new folder</string>
@@ -698,7 +697,6 @@
 
     <string name="edit_text_insert_mk" context="Hint of the text when the user can write his master key">recovery key goes here</string>
 
-    <string name="delete_account_text" context="Text shown in the alert dialog to confirm the cancellation of an account">If you cancel your account you will permanently lose all the data stored in the cloud. You will not be able to undo this action.</string>
     <string name="edit_text_insert_pass" context="Hint of the text where the user can write his password">password goes here</string>
     <string name="delete_account_text_last_step" context="Text shown in the last alert dialog to confirm the cancellation of an account">This is the last step to cancel your account. You will permanently lose all the data stored in the cloud. Please enter your password below.</string>
 
@@ -1227,4 +1225,8 @@
 
     <string name="attachment_upload_panel_from_cloud">From Cloud Drive</string>
     <string name="attachment_upload_panel_contact">Contact</string>
+
+    <string name="delete_account" context="Button in My Account section where the user can delete permanently his account">Delete account</string>
+    <string name="delete_account_text" context="Text shown in the alert dialog to confirm the cancellation of an account">If you delete your account you will permanently lose all the data stored in the cloud. You will not be able to undo this action.</string>
+    <string name="delete_button" context="Button in My Account section to confirm the account deletion">Delete</string>
 </resources>
