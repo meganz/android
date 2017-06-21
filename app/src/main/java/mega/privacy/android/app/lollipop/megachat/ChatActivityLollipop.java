@@ -77,7 +77,7 @@ import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatError;
-import nz.mega.sdk.MegaChatHandleList;
+import nz.mega.sdk.MegaHandleList;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatPeerList;
 import nz.mega.sdk.MegaChatRequest;
@@ -1155,11 +1155,11 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
             final ArrayList<String> contactsData = intent.getStringArrayListExtra(AddContactActivityLollipop.EXTRA_CONTACTS);
             if (contactsData != null) {
-                MegaChatHandleList handleList = MegaChatHandleList.createInstance();
+                MegaHandleList handleList = MegaHandleList.createInstance();
                 for(int i=0; i<contactsData.size();i++){
                     MegaUser user = megaApi.getContact(contactsData.get(i));
                     if (user != null) {
-                        handleList.addMegaChatHandle(user.getHandle());
+                        handleList.addMegaHandle(user.getHandle());
 
                     }
                 }
