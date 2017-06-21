@@ -2395,6 +2395,16 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         log("removeMessage: size: "+messages.size());
         this.messages = messages;
         notifyItemRemoved(position);
+
+        if(position==messages.size()-1){
+            log("No need to update more");
+        }
+        else{
+            log("Update until end");
+            int itemCount = messages.size()-position;
+            log("itemCount: "+itemCount);
+            notifyItemRangeChanged(position, itemCount);
+        }
     }
 
     public void loadPreviousMessage(ArrayList<AndroidMegaChatMessage> messages){
