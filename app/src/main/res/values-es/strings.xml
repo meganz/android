@@ -1082,8 +1082,8 @@
     <string name="attachment_upload_panel_from_cloud">Desde Disco</string>
     <string name="attachment_upload_panel_contact">Contacto</string>
 
-    <string name="delete_account" context="Button in My Account section where the user can delete permanently his account">Borrar cuenta</string>
-    <string name="delete_account_text" context="Text shown in the alert dialog to confirm the cancelation of an account">Si borras tu cuenta, perderás toda la información almacenada en la nube. Esta operación es irreversible.</string>
-    <string name="delete_button" context="Button in My Account section to confirm the account deletion">Borrar</string>
+    <string name="delete_account" context="Button in My Account section where the user can delete permanently his account">Eliminar cuenta</string>
+    <string name="delete_account_text" context="Text shown in the alert dialog to confirm the cancelation of an account">Si eliminas tu cuenta, perderás toda la información almacenada en la nube. Esta operación es irreversible.</string>
+    <string name="delete_button" context="Button in My Account section to confirm the account deletion">Eliminar</string>
 
 </resources>
