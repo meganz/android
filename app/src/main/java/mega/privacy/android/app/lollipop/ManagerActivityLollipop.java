@@ -11470,7 +11470,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		}
 	}
 
-
 	@Override
 	public void onRequestStart(MegaChatApiJava api, MegaChatRequest request) {
 //		if (request.getType() == MegaChatRequest.TYPE_INITIALIZE){

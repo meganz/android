@@ -546,7 +546,7 @@
 
     <string name="settings_camera_upload_only_photos" context="what kind of file are going to be uploaded. Needed for the settings summary">Solo Fotos</string>
     <string name="settings_camera_upload_only_videos" context="what kind of file are going to be uploaded. Needed for the settings summary">Solo Vídeos</string>
-    <string name="settings_camera_upload_photos_and_videos" context="what kind of file are going to be uploaded. Needed for the settings summary">Fotos y videos</string>
+    <string name="settings_camera_upload_photos_and_videos" context="what kind of file are going to be uploaded. Needed for the settings summary">Fotos y vídeos</string>
     
     <string name="settings_pin_lock_on" context="settings of the pin lock">Activar Bloqueo con PIN</string>
     <string name="settings_pin_lock_off" context="settings of the pin lock">Desactivar Bloqueo con PIN</string>
@@ -1081,6 +1081,7 @@
 
     <string name="attachment_upload_panel_from_cloud">Desde Disco</string>
     <string name="attachment_upload_panel_contact">Contacto</string>
+    <string name="attachment_upload_panel_photo">Foto o Vídeo</string>
 
     <string name="delete_account" context="Button in My Account section where the user can delete permanently his account">Eliminar cuenta</string>
     <string name="delete_account_text" context="Text shown in the alert dialog to confirm the cancelation of an account">Si eliminas tu cuenta, perderás toda la información almacenada en la nube. Esta operación es irreversible.</string>
