@@ -3145,7 +3145,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         log("showMsgNotSentPanel: "+position);
 
         this.selectedPosition = position;
-        this.selectedMessageId = message.getMessage().getTempId();
+        this.selectedMessageId = message.getMessage().getRowId();
+        log("Temporal id of MS message: "+message.getMessage().getTempId());
 
         if(message!=null){
             MessageNotSentBottomSheetDialogFragment bottomSheetDialogFragment = new MessageNotSentBottomSheetDialogFragment();
@@ -3181,12 +3182,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         log("removeMsgNotSent: "+selectedPosition);
         messages.remove(selectedPosition);
         adapter.removeMessage(selectedPosition, messages);
-    }
-
-    public void removeMsgNotSentAndUpdate(){
-        log("removeMsgNotSentAndUpdate: "+selectedPosition);
-        messages.remove(selectedPosition);
-        adapter.notifyDataSetChanged();
     }
 
     public void showSnackbar(String s){
