@@ -41,6 +41,7 @@ import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -54,16 +55,23 @@ import io.github.rockerhieu.emojicon.emoji.Emojicon;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.ShareInfo;
+import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.components.NpaLinearLayoutManager;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.ChatFullScreenImageViewer;
+import mega.privacy.android.app.lollipop.ContactFileListActivityLollipop;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PinActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.listeners.MultipleGroupChatRequestListener;
+import mega.privacy.android.app.lollipop.managerSections.IncomingSharesFragmentLollipop;
+import mega.privacy.android.app.lollipop.managerSections.MyAccountFragmentLollipop;
+import mega.privacy.android.app.lollipop.managerSections.OutgoingSharesFragmentLollipop;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaChatLollipopAdapter;
+import mega.privacy.android.app.lollipop.tasks.FilePrepareTask;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.AttachmentUploadBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ContactAttachmentBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.MessageNotSentBottomSheetDialogFragment;
@@ -91,6 +99,7 @@ import nz.mega.sdk.MegaNodeList;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUser;
+import nz.mega.sdk.MegaUtilsAndroid;
 
 public class ChatActivityLollipop extends PinActivityLollipop implements MegaChatRequestListenerInterface, MegaRequestListenerInterface, MegaChatRoomListenerInterface, RecyclerView.OnItemTouchListener, GestureDetector.OnGestureListener, View.OnClickListener, EmojiconGridFragment.OnEmojiconClickedListener, EmojiconsFragment.OnEmojiconBackspaceClickedListener {
 
@@ -1202,6 +1211,26 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             megaChatApi.attachNodes(idChat, nodeList, this);
             log("---- no more files to send");
         }
+        else if (requestCode == Constants.REQUEST_CODE_GET && resultCode == RESULT_OK) {
+            if (intent == null) {
+                log("Return.....");
+                return;
+            }
+
+            intent.setAction(Intent.ACTION_GET_CONTENT);
+            FilePrepareTask filePrepareTask = new FilePrepareTask(this);
+            filePrepareTask.execute(intent);
+            ProgressDialog temp = null;
+            try{
+                temp = new ProgressDialog(this);
+                temp.setMessage(getString(R.string.upload_prepare));
+                temp.show();
+            }
+            catch(Exception e){
+                return;
+            }
+            statusDialog = temp;
+        }
         else{
             log("Error onActivityResult");
         }
@@ -1363,6 +1392,18 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     public void attachContact(){
         log("attachContact");
         chooseContactsDialog();
+    }
+
+    public void attachPhotoVideo(){
+        log("attachPhotoVideo");
+        Intent intent = new Intent();
+        intent.setAction(Intent.ACTION_OPEN_DOCUMENT);
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+        intent.setType("*/*");
+
+
+        startActivityForResult(Intent.createChooser(intent, null), Constants.REQUEST_CODE_GET);
     }
 
     public void sendMessage(String text){
@@ -3537,6 +3578,41 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
         downloadConfirmationDialog = builder.create();
         downloadConfirmationDialog.show();
+    }
+
+    /*
+	 * Handle processed upload intent
+	 */
+    public void onIntentProcessed(List<ShareInfo> infos) {
+        log("onIntentProcessedLollipop");
+//		List<ShareInfo> infos = filePreparedInfos;
+        if (statusDialog != null) {
+            try {
+                statusDialog.dismiss();
+            }
+            catch(Exception ex){}
+        }
+
+        MegaNode parentNode = megaApi.getNodeByPath("/My chat files");
+        if(parentNode == null){
+            Snackbar.make(fragmentContainer, getString(R.string.error_temporary_unavaible), Snackbar.LENGTH_LONG).show();
+            return;
+        }
+
+        if (infos == null) {
+            Snackbar.make(fragmentContainer, getString(R.string.upload_can_not_open), Snackbar.LENGTH_LONG).show();
+        }
+        else {
+            Snackbar.make(fragmentContainer, getString(R.string.upload_began), Snackbar.LENGTH_LONG).show();
+            for (ShareInfo info : infos) {
+                Intent intent = new Intent(this, UploadService.class);
+                intent.putExtra(UploadService.EXTRA_FILEPATH, info.getFileAbsolutePath());
+                intent.putExtra(UploadService.EXTRA_NAME, info.getTitle());
+                intent.putExtra(UploadService.EXTRA_PARENT_HASH, parentNode.getHandle());
+                intent.putExtra(UploadService.EXTRA_SIZE, info.getSize());
+                startService(intent);
+            }
+        }
     }
 
 
