@@ -58,6 +58,7 @@ import mega.privacy.android.app.lollipop.adapters.MegaSharedFolderLollipopAdapte
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.lollipop.listeners.FileContactMultipleRequestListener;
+import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaContactsAttachedLollipopAdapter;
 import mega.privacy.android.app.modalbottomsheet.FileContactsListBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ContactAttachmentBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.NodeAttachmentBottomSheetDialogFragment;
@@ -94,10 +95,12 @@ public class ContactAttachmentActivityLollipop extends PinActivityLollipop imple
 	RelativeLayout container;
 	RecyclerView listView;
 	View separator;
-	Button inviteButton;
+	Button actionButton;
 	Button cancelButton;
 	LinearLayout optionsBar;
 	LinearLayoutManager mLayoutManager;
+
+	boolean inviteAction=false;
 
 	ChatController cC;
 
@@ -105,10 +108,9 @@ public class ContactAttachmentActivityLollipop extends PinActivityLollipop imple
 	public long chatId;
 	public long messageId;
 
-	ArrayList<MegaContactAdapter> contacts;
+	ArrayList<MegaContactDB> contacts;
 
-	MegaContactsLollipopAdapter adapter;
-
+	MegaContactsAttachedLollipopAdapter adapter;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -152,13 +154,13 @@ public class ContactAttachmentActivityLollipop extends PinActivityLollipop imple
 				}
 				String email = message.getMessage().getUserEmail(i);
 				log("Contact Name: " + name);
-				MegaUser contact = megaApi.getContact(email);
-				if (contact != null) {
-					MegaContactAdapter contactDB = new MegaContactAdapter(null, contact, name);
-					contacts.add(contactDB);
-				} else {
-					log("Error - this contact is NULL");
-				}
+
+				long handle = message.getMessage().getUserHandle(i);
+				log("Contact Name: " + name);
+				String handleString = megaApi.userHandleToBase64(handle);
+
+				MegaContactDB contactDB = new MegaContactDB(handleString, email, name, "");
+				contacts.add(contactDB);
 			}
 		}
 		else{
@@ -199,8 +201,43 @@ public class ContactAttachmentActivityLollipop extends PinActivityLollipop imple
 		optionsBar = (LinearLayout) findViewById(R.id.options_contact_attachment_chat_layout);
 		separator = (View) findViewById(R.id.contact_attachment_chat_separator_3);
 
-		inviteButton = (Button) findViewById(R.id.contact_attachment_chat_invite_button);
-		inviteButton.setOnClickListener(this);
+		actionButton = (Button) findViewById(R.id.contact_attachment_chat_option_button);
+		actionButton.setOnClickListener(this);
+
+		//Check owner of the message
+		if(message.getMessage().getUserHandle()==megaChatApi.getMyUserHandle()){
+			log("My message, show START CONVERSATION button");
+			actionButton.setText(R.string.group_chat_start_conversation_label);
+		}
+		else{
+			//Check if any contact is not my own contact
+
+			for(int i=0; i<contacts.size();i++){
+				MegaUser checkContact =  megaApi.getContact(contacts.get(i).getMail());
+				if(checkContact==null){
+					log("NULL contact - The user "+contacts.get(i).getMail()+" is NOT my CONTACT");
+					inviteAction = true;
+					break;
+				}
+				else{
+					if(checkContact.getVisibility()!=MegaUser.VISIBILITY_VISIBLE){
+						log("The user "+checkContact.getEmail()+" is NOT my CONTACT");
+						inviteAction = true;
+						break;
+					}
+				}
+
+			}
+
+			if(inviteAction){
+				log("NOT my message, show INVITE button");
+				actionButton.setText(R.string.contact_invite);
+			}
+			else{
+				log("NOT my message, show START CONVERSATION button");
+				actionButton.setText(R.string.group_chat_start_conversation_label);
+			}
+		}
 
 		cancelButton = (Button) findViewById(R.id.contact_attachment_chat_cancel_button);
 		cancelButton.setOnClickListener(this);
@@ -213,7 +250,7 @@ public class ContactAttachmentActivityLollipop extends PinActivityLollipop imple
 		listView.setItemAnimator(new DefaultItemAnimator());
 
 		if (adapter == null){
-			adapter = new MegaContactsLollipopAdapter(this, contacts, listView);
+			adapter = new MegaContactsAttachedLollipopAdapter(this, contacts, listView);
 		}
 
 		adapter.setPositionClicked(-1);
@@ -315,14 +352,14 @@ public class ContactAttachmentActivityLollipop extends PinActivityLollipop imple
 	public void itemClick(int position) {
 		log("itemClick");
 		((MegaApplication) getApplication()).sendSignalPresenceActivity();
-		MegaContactAdapter c = contacts.get(position);
+		MegaContactDB c = contacts.get(position);
 		if(c!=null){
-			MegaUser contact = megaApi.getContact(c.getMegaUser().getEmail());
+			MegaUser contact = megaApi.getContact(c.getMail());
 
 			if(contact!=null) {
 				if (contact.getVisibility() == MegaUser.VISIBILITY_VISIBLE) {
 					Intent i = new Intent(this, ContactInfoActivityLollipop.class);
-					i.putExtra("name", c.getMegaUser().getEmail());
+					i.putExtra("name", c.getMail());
 					this.startActivity(i);
 				}
 				else{
@@ -340,25 +377,45 @@ public class ContactAttachmentActivityLollipop extends PinActivityLollipop imple
 	public void onClick(View v) {
 		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 		switch (v.getId()){		
-			case R.id.contact_attachment_chat_invite_button:{
-				log("Click on Invite button");
+			case R.id.contact_attachment_chat_option_button:{
+				log("Click on ACTION button");
 
-				ArrayList<String> contactEmails = new ArrayList<>();
-				ContactController contactControllerC = new ContactController(this);
-				for(int i=0;i<contacts.size();i++){
-					MegaContactAdapter contact = contacts.get(i);
+				if(inviteAction){
+					ArrayList<String> contactEmails = new ArrayList<>();
+					ContactController contactControllerC = new ContactController(this);
+					for(int i=0;i<contacts.size();i++){
+						MegaContactDB contact = contacts.get(i);
+						MegaUser checkContact = megaApi.getContact(contact.getMail());
+						if(checkContact==null){
+							String userMail = contact.getMail();
+							contactEmails.add(userMail);
+						}
+						else{
+							if(checkContact.getVisibility()!=MegaUser.VISIBILITY_VISIBLE){
+								String userMail = contact.getMail();
+								contactEmails.add(userMail);
+							}
+						}
 
-					if(contact.getMegaUser().getVisibility()!=MegaUser.VISIBILITY_VISIBLE){
-						String userMail = contact.getMegaUser().getEmail();
-						contactEmails.add(userMail);
+					}
+					if(contactEmails!=null){
+						if(!contactEmails.isEmpty()){
+							contactControllerC.inviteMultipleContacts(contactEmails);
+						}
+					}
+				}
+				else{
+					ArrayList<Long> contactHandles = new ArrayList<>();
+
+					for(int i=0;i<contacts.size();i++){
+						String handle = contacts.get(i).getHandle();
+						long userHandle = megaApi.base64ToUserHandle(handle);
+						contactHandles.add(userHandle);
 					}
 
+					startGroupConversation(contactHandles);
 				}
-				if(contactEmails!=null){
-					if(!contactEmails.isEmpty()){
-						contactControllerC.inviteMultipleContacts(contactEmails);
-					}
-				}
+
 				break;
 			}
 			case R.id.contact_attachment_chat_cancel_button: {
@@ -406,6 +463,18 @@ public class ContactAttachmentActivityLollipop extends PinActivityLollipop imple
 			intentOpenChat.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 			this.startActivity(intentOpenChat);
 		}
+	}
+
+	public void startGroupConversation(ArrayList<Long> userHandles){
+		log("startGroupConversation");
+		MegaChatPeerList peers = MegaChatPeerList.createInstance();
+
+		for(int i=0;i<userHandles.size();i++){
+			long handle = userHandles.get(i);
+			peers.addPeer(handle, MegaChatPeerList.PRIV_STANDARD);
+		}
+
+		megaChatApi.createChat(false, peers, this);
 	}
 
 	@Override
