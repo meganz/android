@@ -52,6 +52,7 @@ import io.github.rockerhieu.emojicon.EmojiconEditText;
 import io.github.rockerhieu.emojicon.EmojiconGridFragment;
 import io.github.rockerhieu.emojicon.EmojiconsFragment;
 import io.github.rockerhieu.emojicon.emoji.Emojicon;
+import mega.privacy.android.app.ChatUploadService;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
@@ -3605,11 +3606,12 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         else {
             Snackbar.make(fragmentContainer, getString(R.string.upload_began), Snackbar.LENGTH_LONG).show();
             for (ShareInfo info : infos) {
-                Intent intent = new Intent(this, UploadService.class);
-                intent.putExtra(UploadService.EXTRA_FILEPATH, info.getFileAbsolutePath());
-                intent.putExtra(UploadService.EXTRA_NAME, info.getTitle());
-                intent.putExtra(UploadService.EXTRA_PARENT_HASH, parentNode.getHandle());
-                intent.putExtra(UploadService.EXTRA_SIZE, info.getSize());
+                Intent intent = new Intent(this, ChatUploadService.class);
+                intent.putExtra(ChatUploadService.EXTRA_FILEPATH, info.getFileAbsolutePath());
+                intent.putExtra(ChatUploadService.EXTRA_NAME, info.getTitle());
+                intent.putExtra(ChatUploadService.EXTRA_PARENT_HASH, parentNode.getHandle());
+                intent.putExtra(ChatUploadService.EXTRA_SIZE, info.getSize());
+                intent.putExtra(ChatUploadService.EXTRA_CHAT_ID, idChat);
                 startService(intent);
             }
         }
