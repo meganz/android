@@ -8616,6 +8616,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	}
 
 	public void showPresenceStatusDialog(){
+		log("showPresenceStatusDialog");
+
 		AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
 		final CharSequence[] items = {getString(R.string.online_status), getString(R.string.away_status), getString(R.string.busy_status), getString(R.string.offline_status)};
 		int statusToShow = megaChatApi.getOnlineStatus();
@@ -8633,7 +8635,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				break;
 			}
 			case MegaChatApi.STATUS_OFFLINE:{
-				statusToShow = 4;
+				statusToShow = 3;
 				break;
 			}
 		}
