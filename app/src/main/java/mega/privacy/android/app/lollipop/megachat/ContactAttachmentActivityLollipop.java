@@ -95,6 +95,7 @@ public class ContactAttachmentActivityLollipop extends PinActivityLollipop imple
 	RecyclerView listView;
 	View separator;
 	Button inviteButton;
+	Button cancelButton;
 	LinearLayout optionsBar;
 	LinearLayoutManager mLayoutManager;
 
@@ -200,6 +201,9 @@ public class ContactAttachmentActivityLollipop extends PinActivityLollipop imple
 
 		inviteButton = (Button) findViewById(R.id.contact_attachment_chat_invite_button);
 		inviteButton.setOnClickListener(this);
+
+		cancelButton = (Button) findViewById(R.id.contact_attachment_chat_cancel_button);
+		cancelButton.setOnClickListener(this);
 
 		listView = (RecyclerView) findViewById(R.id.contact_attachment_chat_view_browser);
 		listView.setClipToPadding(false);
@@ -356,6 +360,10 @@ public class ContactAttachmentActivityLollipop extends PinActivityLollipop imple
 					}
 				}
 				break;
+			}
+			case R.id.contact_attachment_chat_cancel_button: {
+				log("Click on Cancel button");
+				finish();
 			}
 		}
 	}
