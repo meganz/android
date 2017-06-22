@@ -2116,18 +2116,11 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                         return;
                     }
 
-                    MegaUser contact = megaApi.getContact(email);
-
-                    if(contact!=null){
-                        if (context.getExternalCacheDir() != null){
-                            megaApi.getUserAvatar(contact, context.getExternalCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);
-                        }
-                        else{
-                            megaApi.getUserAvatar(contact, context.getCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);
-                        }
+                    if (context.getExternalCacheDir() != null){
+                        megaApi.getUserAvatar(email, context.getExternalCacheDir().getAbsolutePath() + "/" + email + ".jpg", listener);
                     }
                     else{
-                        log("Contact is NULL");
+                        megaApi.getUserAvatar(email, context.getCacheDir().getAbsolutePath() + "/" + email + ".jpg", listener);
                     }
                 }
                 else{
@@ -2147,17 +2140,11 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     return;
                 }
 
-                MegaUser contact = megaApi.getContact(email);
-                if(contact!=null){
-                    if (context.getExternalCacheDir() != null){
-                        megaApi.getUserAvatar(contact, context.getExternalCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);
-                    }
-                    else{
-                        megaApi.getUserAvatar(contact, context.getCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);
-                    }
+                if (context.getExternalCacheDir() != null){
+                    megaApi.getUserAvatar(email, context.getExternalCacheDir().getAbsolutePath() + "/" + email + ".jpg", listener);
                 }
                 else{
-                    log("Contact is NULL");
+                    megaApi.getUserAvatar(email, context.getCacheDir().getAbsolutePath() + "/" + email + ".jpg", listener);
                 }
             }
         }
@@ -2167,17 +2154,11 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 return;
             }
 
-            MegaUser contact = megaApi.getContact(email);
-            if(contact!=null){
-                if (context.getExternalCacheDir() != null){
-                    megaApi.getUserAvatar(contact, context.getExternalCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);
-                }
-                else{
-                    megaApi.getUserAvatar(contact, context.getCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);
-                }
+            if (context.getExternalCacheDir() != null){
+                megaApi.getUserAvatar(email, context.getExternalCacheDir().getAbsolutePath() + "/" + email + ".jpg", listener);
             }
             else{
-                log("Contact is NULL");
+                megaApi.getUserAvatar(email, context.getCacheDir().getAbsolutePath() + "/" + email + ".jpg", listener);
             }
         }
     }
