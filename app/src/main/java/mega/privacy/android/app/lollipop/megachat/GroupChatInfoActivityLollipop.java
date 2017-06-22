@@ -1215,20 +1215,17 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
         }
         else if(request.getType() == MegaChatRequest.TYPE_REMOVE_FROM_CHATROOM){
-            log("Remove participant");
-            int index=-1;
-            MegaChatParticipant participantToUpdate=null;
+            log("Remove participant: "+request.getUserHandle());
+            log("My user handle: "+megaChatApi.getMyUserHandle());
 
             if(e.getErrorCode()==MegaChatError.ERROR_OK){
-                if(megaApi.getMyUser().getHandle()==request.getUserHandle()){
+                if(request.getUserHandle()==-1){
                     log("I left the chatroom");
-                        finish();
+                    finish();
                 }
                 else{
                     log("Removed from chat");
-                    //
 
-                    log("Changes in my chat");
                     chat = megaChatApi.getChatRoom(chatHandle);
                     log("Peers after onChatListItemUpdate: "+chat.getPeerCount());
 //                chat = megaChatApi.getChatRoom(chatHandle);
@@ -1255,8 +1252,15 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
                 }
             }
             else{
-                log("EEEERRRRROR WHEN TYPE_REMOVE_FROM_CHATROOM " + e.getErrorString());
-                showSnackbar(getString(R.string.remove_participant_error));
+
+                if(request.getUserHandle()==-1){
+                    log("EEEERRRRROR WHEN LEAVING CHAT" + e.getErrorString());
+                    showSnackbar("Error.Chat not left");
+                }
+                else{
+                    log("EEEERRRRROR WHEN TYPE_REMOVE_FROM_CHATROOM " + e.getErrorString());
+                    showSnackbar(getString(R.string.remove_participant_error));
+                }
             }
         }
         else if(request.getType() == MegaChatRequest.TYPE_EDIT_CHATROOM_NAME) {
@@ -1269,6 +1273,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
                 }
             }
             else{
+
                 log("EEEERRRRROR WHEN TYPE_EDIT_CHATROOM_NAME " + e.getErrorString());
             }
         }
