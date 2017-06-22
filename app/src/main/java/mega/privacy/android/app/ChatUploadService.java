@@ -20,9 +20,11 @@ import android.text.format.Formatter;
 import android.widget.RemoteViews;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.lollipop.megachat.PendingMessage;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.PreviewUtils;
 import mega.privacy.android.app.utils.ThumbnailUtils;
@@ -45,16 +47,14 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 	public static String EXTRA_NAME = "MEGA_FILE_NAME";
 	public static String EXTRA_SIZE = "MEGA_SIZE";
 	public static String EXTRA_PARENT_HASH = "MEGA_PARENT_HASH";
-
-	public static final int CHECK_FILE_TO_UPLOAD_UPLOAD = 1000;
-	public static final int CHECK_FILE_TO_UPLOAD_COPY = 1001;
-	public static final int CHECK_FILE_TO_UPLOAD_OVERWRITE = 1002;
-	public static final int CHECK_FILE_TO_UPLOAD_SAME_FILE_IN_FOLDER = 1003;
+	public static String EXTRA_CHAT_ID = "CHAT_ID";
 
 	private int errorCount = 0;
 
 	private boolean isForeground = false;
 	private boolean canceled;
+
+	ArrayList<PendingMessage> pendingMessages;
 
 	MegaApplication app;
 	MegaApiAndroid megaApi;
@@ -77,7 +77,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 	private int notificationId = Constants.NOTIFICATION_UPLOAD;
 	private int notificationIdFinal = Constants.NOTIFICATION_UPLOAD_FINAL;
 
-	private HashMap<String, String> transfersCopy;
+	private HashMap<Long, Integer> transfersInProgress;
 
 	@SuppressLint("NewApi")
 	@Override
@@ -90,7 +90,9 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 
 		megaApi.addTransferListener(this);
 
-		transfersCopy = new HashMap<String, String>();
+		transfersInProgress = new HashMap<Long, Integer>();
+
+		pendingMessages = new ArrayList<>();
 
 		dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 
@@ -156,9 +158,23 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 	protected void onHandleIntent(final Intent intent) {
 		log("onHandleIntent");
 
-		final File file = new File(intent.getStringExtra(EXTRA_FILEPATH));
+		String filePath = intent.getStringExtra(EXTRA_FILEPATH);
+		final File file = new File(filePath);
 
 		long parentHandle = intent.getLongExtra(EXTRA_PARENT_HASH, 0);
+
+		long chatId = intent.getLongExtra(EXTRA_PARENT_HASH, -1);
+
+		if(chatId!=-1){
+			PendingMessage newMessage = new PendingMessage(filePath, chatId);
+			pendingMessages.add(newMessage);
+			int index = pendingMessages.size()-1;
+//			transfersInProgress.p
+
+		}
+		else{
+
+		}
 
 		if (file.isDirectory()) {
 			String nameInMEGA = intent.getStringExtra(EXTRA_NAME);
@@ -170,89 +186,21 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 			}
 		}
 		else {
-			switch(checkFileToUpload(file, parentHandle)){
-				case CHECK_FILE_TO_UPLOAD_UPLOAD:{
-					log("CHECK_FILE_TO_UPLOAD_UPLOAD");
 
-					if(!wl.isHeld()){
-						wl.acquire();
-					}
-					if(!lock.isHeld()){
-						lock.acquire();
-					}
-
-					String nameInMEGA = intent.getStringExtra(EXTRA_NAME);
-					if (nameInMEGA != null){
-						megaApi.startUpload(file.getAbsolutePath(), megaApi.getNodeByHandle(parentHandle), nameInMEGA);
-					}
-					else{
-						megaApi.startUpload(file.getAbsolutePath(), megaApi.getNodeByHandle(parentHandle));
-					}
-					break;
-				}
-				case CHECK_FILE_TO_UPLOAD_COPY:{
-					log("CHECK_FILE_TO_UPLOAD_COPY");
-					break;
-				}
-				case CHECK_FILE_TO_UPLOAD_OVERWRITE:{
-					log("CHECK_FILE_TO_UPLOAD_OVERWRITE");
-					MegaNode nodeExistsInFolder = megaApi.getNodeByPath(file.getName(), megaApi.getNodeByHandle(parentHandle));
-					megaApi.remove(nodeExistsInFolder);
-
-					if(!wl.isHeld()){
-						wl.acquire();
-					}
-					if(!lock.isHeld()){
-						lock.acquire();
-					}
-
-					String nameInMEGA = intent.getStringExtra(EXTRA_NAME);
-					if (nameInMEGA != null){
-						megaApi.startUpload(file.getAbsolutePath(), megaApi.getNodeByHandle(parentHandle), nameInMEGA);
-					}
-					else{
-						megaApi.startUpload(file.getAbsolutePath(), megaApi.getNodeByHandle(parentHandle));
-					}
-					break;
-				}
-				case CHECK_FILE_TO_UPLOAD_SAME_FILE_IN_FOLDER:{
-					log("CHECK_FILE_TO_UPLOAD_SAME_FILE_IN_FOLDER");
-					String sShow=file.getName() + " " + getString(R.string.general_already_uploaded);
-//					Toast.makeText(getApplicationContext(), sShow,Toast.LENGTH_SHORT).show();
-
-					Intent i = new Intent(this, ManagerActivityLollipop.class);
-					i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-					i.setAction(Constants.SHOW_REPEATED_UPLOAD);
-					i.putExtra("MESSAGE", sShow);
-					startActivity(i);
-
-					return;
-				}
+			if(!wl.isHeld()){
+				wl.acquire();
 			}
-		}
-	}
 
-	int checkFileToUpload(File file, long parentHandle){
+			if(!lock.isHeld()){
+				lock.acquire();
+			}
 
-		MegaNode nodeExistsInFolder = megaApi.getNodeByPath(file.getName(), megaApi.getNodeByHandle(parentHandle));
-		if (nodeExistsInFolder == null){
-			String localFingerPrint = megaApi.getFingerprint(file.getAbsolutePath());
-			MegaNode nodeExists = megaApi.getNodeByFingerprint(localFingerPrint);
-			if (nodeExists == null){
-				return CHECK_FILE_TO_UPLOAD_UPLOAD;
+			String nameInMEGA = intent.getStringExtra(EXTRA_NAME);
+			if (nameInMEGA != null){
+				megaApi.startUpload(file.getAbsolutePath(), megaApi.getNodeByHandle(parentHandle), nameInMEGA);
 			}
 			else{
-				transfersCopy.put(localFingerPrint, file.getName());
-				megaApi.copyNode(nodeExists, megaApi.getNodeByHandle(parentHandle), this);
-				return CHECK_FILE_TO_UPLOAD_COPY;
-			}
-		}
-		else{
-			if (file.length() == nodeExistsInFolder.getSize()){
-				return CHECK_FILE_TO_UPLOAD_SAME_FILE_IN_FOLDER;
-			}
-			else{
-				return CHECK_FILE_TO_UPLOAD_OVERWRITE;
+				megaApi.startUpload(file.getAbsolutePath(), megaApi.getNodeByHandle(parentHandle));
 			}
 
 		}
@@ -630,13 +578,13 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 					String currentNodeName = n.getName();
 					String megaFingerPrint = megaApi.getFingerprint(n);
 					log("copy node");
-					String nameInMega = transfersCopy.get(megaFingerPrint);
+					String nameInMega = transfersInProgress.get(megaFingerPrint);
 					if (nameInMega != null){
 						if (nameInMega.compareTo(currentNodeName) != 0){
 							megaApi.renameNode(n, nameInMega);
 						}
 					}
-					transfersCopy.remove(megaFingerPrint);
+					transfersInProgress.remove(megaFingerPrint);
 
 					if (megaApi.getNumPendingUploads() == 0){
 						onQueueComplete();
