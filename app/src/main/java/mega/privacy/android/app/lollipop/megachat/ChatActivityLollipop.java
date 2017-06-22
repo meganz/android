@@ -2061,6 +2061,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             log("Permissions for the chat: "+chat.getOwnPrivilege());
             //Hide field to write
             writingContainerLayout.setVisibility(View.GONE);
+            fab.setVisibility(View.GONE);
         }
         else if(chat.hasChanged(MegaChatRoom.CHANGE_TYPE_STATUS)){
             log("CHANGE_TYPE_STATUS for the chat: "+chat.getChatId());
