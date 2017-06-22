@@ -59,8 +59,8 @@ public class MessageNotSentBottomSheetDialogFragment extends BottomSheetDialogFr
             chatId = savedInstanceState.getLong("chatId", -1);
             log("Handle of the chat: "+chatId);
             messageId = savedInstanceState.getLong("messageId", -1);
-            log("Handle of the message: "+messageId);
-            MegaChatMessage messageMega = megaChatApi.getMessage(chatId, messageId);
+            log("Row of the MS message: "+messageId);
+            MegaChatMessage messageMega = megaChatApi.getManualSendingMessage(chatId, messageId);
             if(messageMega!=null){
                 selectedMessage = new AndroidMegaChatMessage(messageMega);
             }
@@ -72,12 +72,21 @@ public class MessageNotSentBottomSheetDialogFragment extends BottomSheetDialogFr
             chatId = ((ChatActivityLollipop) context).idChat;
             log("Handle of the chat: "+chatId);
             messageId = ((ChatActivityLollipop) context).selectedMessageId;
-            MegaChatMessage messageMega = megaChatApi.getMessage(chatId, messageId);
-            log("Handle of the message: "+messageId);
+            MegaChatMessage messageMega = megaChatApi.getManualSendingMessage(chatId, messageId);
+            log("Row of the MS message: "+messageId);
             if(messageMega!=null){
                 selectedMessage = new AndroidMegaChatMessage(messageMega);
             }
             selectedChat = megaChatApi.getChatRoom(chatId);
+        }
+
+        if(selectedMessage!=null){
+            log("selectedMessage content: "+selectedMessage.getMessage().getContent());
+            log("Temporal id of MS message: "+selectedMessage.getMessage().getTempId());
+        }
+        else{
+            log("Error the selectedMessage is NULL");
+            return;
         }
     }
     @Override
@@ -133,6 +142,8 @@ public class MessageNotSentBottomSheetDialogFragment extends BottomSheetDialogFr
             case R.id.msg_not_sent_retry_layout: {
                 log("retry option click");
                 if(selectedMessage!=null&&selectedChat!=null){
+                    log("selectedMessage content: "+selectedMessage.getMessage().getContent());
+
                     ((ChatActivityLollipop) context).removeMsgNotSent();
                     megaChatApi.removeUnsentMessage(selectedChat.getChatId(), selectedMessage.getMessage().getRowId());
 
@@ -157,7 +168,7 @@ public class MessageNotSentBottomSheetDialogFragment extends BottomSheetDialogFr
             case R.id.msg_not_sent_delete_layout: {
                 log("delete option click");
                 if(selectedMessage!=null&&selectedChat!=null){
-                    ((ChatActivityLollipop) context).removeMsgNotSentAndUpdate();
+                    ((ChatActivityLollipop) context).removeMsgNotSent();
                     megaChatApi.removeUnsentMessage(selectedChat.getChatId(), selectedMessage.getMessage().getRowId());
                 }
                 else{
