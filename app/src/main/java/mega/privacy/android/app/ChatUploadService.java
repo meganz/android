@@ -570,56 +570,6 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 	public void onRequestFinish(MegaApiJava api, MegaRequest request,
 			MegaError e) {
 		log("UPLOAD: onRequestFinish "+request.getRequestString());
-		if (request.getType() == MegaRequest.TYPE_COPY){
-			log("TYPE_COPY finished");
-			if (e.getErrorCode() == MegaError.API_OK){
-				MegaNode n = megaApi.getNodeByHandle(request.getNodeHandle());
-				if (n != null){
-					String currentNodeName = n.getName();
-					String megaFingerPrint = megaApi.getFingerprint(n);
-					log("copy node");
-					String nameInMega = transfersInProgress.get(megaFingerPrint);
-					if (nameInMega != null){
-						if (nameInMega.compareTo(currentNodeName) != 0){
-							megaApi.renameNode(n, nameInMega);
-						}
-					}
-					transfersInProgress.remove(megaFingerPrint);
-
-					if (megaApi.getNumPendingUploads() == 0){
-						onQueueComplete();
-					}
-				}
-				else{
-					log("ERROR - node is NULL");
-//					Intent tempIntent = null;
-//					tempIntent = new Intent(this, UploadService.class);
-//					tempIntent.setAction(UploadService.ACTION_CANCEL);
-//					startService(tempIntent);
-				}
-			}
-			else if(e.getErrorCode()==MegaError.API_EOVERQUOTA){
-				log("OVERQUOTA ERROR: "+e.getErrorCode());
-
-				Intent intent;
-				intent = new Intent(this, ManagerActivityLollipop.class);
-				intent.setAction(Constants.ACTION_OVERQUOTA_ALERT);
-				intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-				startActivity(intent);
-
-				Intent tempIntent = null;
-				tempIntent = new Intent(this, ChatUploadService.class);
-				tempIntent.setAction(ChatUploadService.ACTION_CANCEL);
-				startService(tempIntent);
-			}
-			else{
-				log("ERROR: "+e.getErrorCode());
-//				Intent tempIntent = null;
-//				tempIntent = new Intent(this, UploadService.class);
-//				tempIntent.setAction(UploadService.ACTION_CANCEL);
-//				startService(tempIntent);
-			}
-		}
 	}
 
 	@Override
