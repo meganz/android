@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
@@ -78,6 +79,7 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.EditTextCursorWatcher;
+import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop.Mode;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.utils.Constants;
@@ -113,6 +115,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
 	RelativeLayout iconToolbarLayout;
 	ImageView iconToolbarView;
+	ImageView iconToolbarViewLink;
 
 	Drawable upArrow;
 	Drawable drawableRemoveLink;
@@ -144,9 +147,11 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 	RelativeLayout addedLayout;
 	RelativeLayout modifiedLayout;
 	RelativeLayout publicLinkLayout;
+	RelativeLayout publicLinkCopyLayout;
 	TextView publicLinkText;
 	ImageView shareIcon;
 	ImageView infoIcon;
+	TextView infoTittle;
 	RelativeLayout sharedLayout;
 	Button usersSharedWithTextButton;
 	View dividerSharedLayout;
@@ -168,10 +173,10 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 	TextView addedTextView;
 	TextView modifiedTextView;
 
-	RelativeLayout permissionsLayout;
-	TextView permissionLabel;
+	//RelativeLayout permissionsLayout;
+	//TextView permissionLabel;
 	TextView permissionInfo;
-	ImageView permissionsIcon;
+	//ImageView permissionsIcon;
 
 	boolean owner= true;
 	int typeExport = -1;
@@ -182,6 +187,8 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 	RelativeLayout ownerLayout;
 	TextView ownerLabel;
 	TextView ownerInfo;
+	ImageView ownerRoundeImage;
+	TextView ownerLetter;
 
 	MenuItem downloadMenuItem;
 	MenuItem shareMenuItem;
@@ -292,6 +299,9 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
 			setContentView(R.layout.activity_file_info);
 
+			permissionInfo = (TextView) findViewById(R.id.file_properties_permission_info);
+			permissionInfo.setVisibility(View.GONE);
+
 			fragmentContainer = (CoordinatorLayout) findViewById(R.id.file_info_fragment_container);
 
 			toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -299,7 +309,13 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 			aB = getSupportActionBar();
 			collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.file_info_collapse_toolbar);
 
-			collapsingToolbar.setExpandedTitleMarginBottom(Util.scaleHeightPx(33, outMetrics));
+			if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+				collapsingToolbar.setExpandedTitleMarginBottom(Util.scaleHeightPx(60, outMetrics));
+			}
+			else
+			{
+					collapsingToolbar.setExpandedTitleMarginBottom(Util.scaleHeightPx(35, outMetrics));
+			}
 			collapsingToolbar.setExpandedTitleMarginStart((int) getResources().getDimension(R.dimen.recycler_view_separator));
 			getSupportActionBar().setDisplayShowTitleEnabled(false);
 
@@ -320,6 +336,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
 			iconToolbarView = (ImageView) findViewById(R.id.file_info_toolbar_icon);
 			iconToolbarView.setImageResource(imageId);
+			iconToolbarViewLink=(ImageView) findViewById(R.id.file_properties_public_link_image_title);
 
 			imageToolbarLayout = (RelativeLayout) findViewById(R.id.file_info_image_layout);
 			imageToolbarView = (ImageView) findViewById(R.id.file_info_toolbar_image);
@@ -348,23 +365,27 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 			dividerSharedLayout = (View) findViewById(R.id.divider_shared_layout);
 
 			//Permissions Layout
-			permissionsLayout = (RelativeLayout) findViewById(R.id.file_properties_permissions_layout);
-			permissionsLayout.setVisibility(View.GONE);
+			//permissionsLayout = (RelativeLayout) findViewById(R.id.file_properties_permissions_layout);
+			//permissionsLayout.setVisibility(View.GONE);
 
-		    permissionsIcon = (ImageView) findViewById(R.id.file_properties_permissions_image);
 
-			permissionLabel = (TextView) findViewById(R.id.file_properties_permission_label);
-			permissionInfo = (TextView) findViewById(R.id.file_properties_permission_info);
+		    //permissionsIcon = (ImageView) findViewById(R.id.file_properties_permissions_image);
+
+			//permissionLabel = (TextView) findViewById(R.id.file_properties_permission_label);
+
 
 			//Owner Layout
 			ownerLayout = (RelativeLayout) findViewById(R.id.file_properties_owner_layout);
+			ownerRoundeImage= (RoundedImageView) findViewById(R.id.contact_list_thumbnail);
+			ownerLetter = (TextView) findViewById(R.id.contact_list_initial_letter);
 			ownerLabel =  (TextView) findViewById(R.id.file_properties_owner_label);
 			ownerInfo = (TextView) findViewById(R.id.file_properties_owner_info);
 			ownerLayout.setVisibility(View.GONE);
 
 			//Info Layout
+			infoTittle = (TextView) findViewById(R.id.file_properties_info_menu_info);
 
-		    infoIcon = (ImageView) findViewById(R.id.file_properties_size_image);
+		    infoIcon = (ImageView) findViewById(R.id.file_properties_info_image);
 
 			sizeLayout = (RelativeLayout) findViewById(R.id.file_properties_size_layout);
 			sizeTitleTextView  = (TextView) findViewById(R.id.file_properties_info_menu_size);
@@ -374,6 +395,8 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 			contentLayout = (RelativeLayout) findViewById(R.id.file_properties_content_layout);
 
 			publicLinkLayout = (RelativeLayout) findViewById(R.id.file_properties_link_layout);
+			publicLinkCopyLayout = (RelativeLayout) findViewById(R.id.file_properties_copy_layout);
+
 			publicLinkText = (TextView) findViewById(R.id.file_properties_link_text);
 			publicLinkIcon = (ImageView) findViewById(R.id.file_properties_public_link_image);
 			publicLinkButton = (Button) findViewById(R.id.file_properties_link_button);
@@ -544,8 +567,17 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
 			collapsingToolbar.setCollapsedTitleTextColor(ContextCompat.getColor(this, R.color.white));
 			collapsingToolbar.setExpandedTitleColor(ContextCompat.getColor(this, R.color.white));
-
 			collapsingToolbar.setStatusBarScrimColor(ContextCompat.getColor(this, R.color.lollipop_dark_primary_color));
+
+
+			if(iconToolbarViewLink.getVisibility()==View.VISIBLE){
+				iconToolbarViewLink.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.white), PorterDuff.Mode.SRC_ATOP);
+				iconToolbarViewLink.setAlpha(0.8f);
+			}
+
+
+
+
 //				collapsingToolbar.setStatusBarScrimColor(ContextCompat.getColor(this, R.color.transparent_black));
 		}
 		else{
@@ -775,11 +807,16 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 		if(node.isExported()){
 			publicLink=true;
 			publicLinkLayout.setVisibility(View.VISIBLE);
+			publicLinkCopyLayout.setVisibility(View.VISIBLE);
+			iconToolbarViewLink.setVisibility(View.VISIBLE);
 			publicLinkText.setText(node.getPublicLink());
 		}
 		else{
 			publicLink=false;
 			publicLinkLayout.setVisibility(View.GONE);
+			publicLinkCopyLayout.setVisibility(View.GONE);
+			iconToolbarViewLink.setVisibility(View.GONE);
+
 		}
 
 		if (node.isFile()){
@@ -928,7 +965,8 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
 //						permissionLabel.setVisibility(View.GONE);
 //						permissionInfo.setVisibility(View.GONE);
-						permissionsLayout.setVisibility(View.GONE);
+						//permissionsLayout.setVisibility(View.GONE);
+						permissionInfo.setVisibility(View.GONE);
 						//permissionInfo.setText(getResources().getString(R.string.file_properties_owner));
 
 					}
@@ -936,7 +974,8 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
 						owner = false;
 						//If I am not the owner
-						permissionsLayout.setVisibility(View.VISIBLE);
+						//permissionsLayout.setVisibility(View.VISIBLE);
+						permissionInfo.setVisibility(View.VISIBLE);
 //						permissionLabel.setVisibility(View.VISIBLE);
 //						permissionInfo.setVisibility(View.VISIBLE);
 
@@ -947,17 +986,17 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 							case MegaShare.ACCESS_OWNER:
 							case MegaShare.ACCESS_FULL:{
 								permissionInfo.setText(getResources().getString(R.string.file_properties_shared_folder_full_access));
-								permissionsIcon.setImageResource(R.drawable.ic_shared_fullaccess);
+								//permissionsIcon.setImageResource(R.drawable.ic_shared_fullaccess);
 								break;
 							}
 							case MegaShare.ACCESS_READ:{
 								permissionInfo.setText(getResources().getString(R.string.file_properties_shared_folder_read_only));
-								permissionsIcon.setImageResource(R.drawable.ic_shared_read);
+								//permissionsIcon.setImageResource(R.drawable.ic_shared_read);
 								break;
 							}
 							case MegaShare.ACCESS_READWRITE:{
 								permissionInfo.setText(getResources().getString(R.string.file_properties_shared_folder_read_write));
-								permissionsIcon.setImageResource(R.drawable.ic_shared_read_write);
+								//permissionsIcon.setImageResource(R.drawable.ic_shared_read_write);
 								break;
 							}
 						}
@@ -2190,12 +2229,17 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 			log("Node HAS public link");
 			publicLink=true;
 			publicLinkLayout.setVisibility(View.VISIBLE);
+			publicLinkCopyLayout.setVisibility(View.VISIBLE);
+			iconToolbarViewLink.setVisibility(View.VISIBLE);
 			publicLinkText.setText(node.getPublicLink());
 		}
 		else{
 			log("Node NOT public link");
 			publicLink=false;
 			publicLinkLayout.setVisibility(View.GONE);
+			publicLinkCopyLayout.setVisibility(View.GONE);
+			iconToolbarViewLink.setVisibility(View.GONE);
+
 		}
 
 		if (node.isFolder()){
@@ -2222,7 +2266,8 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
 //						permissionLabel.setVisibility(View.GONE);
 //						permissionInfo.setVisibility(View.GONE);
-						permissionsLayout.setVisibility(View.GONE);
+						//permissionsLayout.setVisibility(View.GONE);
+						permissionInfo.setVisibility(View.GONE);
 						//permissionInfo.setText(getResources().getString(R.string.file_properties_owner));
 
 					}
@@ -2230,7 +2275,8 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
 						//If I am not the owner
 						owner = false;
-						permissionsLayout.setVisibility(View.VISIBLE);
+						//permissionsLayout.setVisibility(View.VISIBLE);
+						permissionInfo.setVisibility(View.VISIBLE);
 //						permissionLabel.setVisibility(View.VISIBLE);
 //						permissionInfo.setVisibility(View.VISIBLE);
 
