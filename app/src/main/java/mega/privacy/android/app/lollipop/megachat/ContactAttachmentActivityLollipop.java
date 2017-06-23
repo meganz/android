@@ -90,7 +90,7 @@ public class ContactAttachmentActivityLollipop extends PinActivityLollipop imple
 	ActionBar aB;
 	Toolbar tB;
 	ContactAttachmentActivityLollipop contactAttachmentActivityLollipop = this;
-	public MegaUser selectedUser;
+	public String selectedEmail;
 
 	RelativeLayout container;
 	RecyclerView listView;
@@ -284,10 +284,10 @@ public class ContactAttachmentActivityLollipop extends PinActivityLollipop imple
     	}
     }
 
-	public void showOptionsPanel(MegaUser sUser){
+	public void showOptionsPanel(String email){
 		log("showNodeOptionsPanel-Offline");
-		if(sUser!=null){
-			this.selectedUser = sUser;
+		if(email!=null){
+			this.selectedEmail = email;
 			ContactAttachmentBottomSheetDialogFragment bottomSheetDialogFragment = new ContactAttachmentBottomSheetDialogFragment();
 			bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
 		}
