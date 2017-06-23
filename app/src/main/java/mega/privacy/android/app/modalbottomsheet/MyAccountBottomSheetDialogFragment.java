@@ -106,8 +106,8 @@ public class MyAccountBottomSheetDialogFragment extends BottomSheetDialogFragmen
             }
             case R.id.my_account_take_photo_layout:{
                 log("option take photo avatar");
-                AccountController aC = new AccountController(context);
-                aC.takeProfilePicture();
+
+                ((ManagerActivityLollipop)context).checkPermissions();
                 dismissAllowingStateLoss();
                 break;
             }

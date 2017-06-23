@@ -170,4 +170,7 @@ public class Constants {
 	public static int NOTIFICATION_PUSH_CLOUD_DRIVE = 7;
 	public static int NOTIFICATION_PUSH_CHAT = 8;
 	public static int NOTIFICATION_PUSH_CONTACT = 9;
+
+	public static int TAKE_PICTURE_OPTION = 0;
+	public static int TAKE_PROFILE_PICTURE = 1;
 }
