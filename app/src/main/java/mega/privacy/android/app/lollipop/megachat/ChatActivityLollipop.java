@@ -690,6 +690,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                             if(permission==MegaChatRoom.PRIV_RO) {
                                 log("Permission RO");
                                 writingContainerLayout.setVisibility(View.GONE);
+                                fab.setVisibility(View.GONE);
                                 aB.setSubtitle(getString(R.string.observer_permission_label_participants_panel));
                             }
                             else{
@@ -701,6 +702,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                             if(permission==MegaChatRoom.PRIV_RO) {
                                 log("Permission RO");
                                 writingContainerLayout.setVisibility(View.GONE);
+                                fab.setVisibility(View.GONE);
                                 aB.setSubtitle(getString(R.string.observer_permission_label_participants_panel));
                             }
                             else{
