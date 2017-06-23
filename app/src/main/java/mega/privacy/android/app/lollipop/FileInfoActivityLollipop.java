@@ -954,19 +954,26 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
 							if(contactDB!=null){
 								if(!contactDB.getName().equals("")){
-									ownerInfo.setText(contactDB.getName()+" "+contactDB.getLastName());
+									ownerLabel.setText(contactDB.getName()+" "+contactDB.getLastName());
+									ownerInfo.setText(user.getEmail());
 								}
 								else{
+									ownerLabel.setText(user.getEmail());
 									ownerInfo.setText(user.getEmail());
+
 								}
 							}
 							else{
 								log("The contactDB is null: ");
+								ownerLabel.setText(user.getEmail());
 								ownerInfo.setText(user.getEmail());
+
 							}
 						}
 						else{
+							ownerLabel.setText(mS.getUser());
 							ownerInfo.setText(mS.getUser());
+
 						}
 						ownerLayout.setVisibility(View.VISIBLE);
 
