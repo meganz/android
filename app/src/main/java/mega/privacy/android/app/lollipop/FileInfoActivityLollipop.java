@@ -380,6 +380,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 			ownerLetter = (TextView) findViewById(R.id.contact_list_initial_letter);
 			ownerLabel =  (TextView) findViewById(R.id.file_properties_owner_label);
 			ownerInfo = (TextView) findViewById(R.id.file_properties_owner_info);
+
 			ownerLayout.setVisibility(View.GONE);
 
 			//Info Layout
@@ -515,6 +516,10 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 						renameMenuItem.setVisible(true);
 						moveMenuItem.setVisible(false);
 						copyMenuItem.setVisible(true);
+
+						getLinkMenuItem.setVisible(false);
+						editLinkMenuItem.setVisible(false);
+						removeLinkMenuItem.setVisible(false);
 						break;
 					}
 					case MegaShare.ACCESS_READ:{
@@ -522,6 +527,11 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 						moveMenuItem.setVisible(false);
 						copyMenuItem.setVisible(true);
 						rubbishMenuItem.setVisible(false);
+
+						getLinkMenuItem.setVisible(false);
+						editLinkMenuItem.setVisible(false);
+						removeLinkMenuItem.setVisible(false);
+
 						break;
 					}
 					case MegaShare.ACCESS_READWRITE:{
@@ -529,6 +539,10 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 						moveMenuItem.setVisible(false);
 						copyMenuItem.setVisible(true);
 						rubbishMenuItem.setVisible(false);
+
+						getLinkMenuItem.setVisible(false);
+						editLinkMenuItem.setVisible(false);
+						removeLinkMenuItem.setVisible(false);
 						break;
 					}
 				}
@@ -725,6 +739,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 				AlertDialog removeLinkDialog;
 				AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
 
+
 				LayoutInflater inflater = getLayoutInflater();
 				View dialoglayout = inflater.inflate(R.layout.dialog_link, null);
 				TextView url = (TextView) dialoglayout.findViewById(R.id.dialog_link_link_url);
@@ -749,7 +764,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 				float scaleW = Util.getScaleW(outMetrics, density);
 				float scaleH = Util.getScaleH(outMetrics, density);
 
-				removeText.setTextSize(TypedValue.COMPLEX_UNIT_SP, (18*scaleW));
+				removeText.setTextSize(TypedValue.COMPLEX_UNIT_SP, (10*scaleW));
 
 				builder.setView(dialoglayout);
 
@@ -925,6 +940,10 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
 			if(from==FROM_INCOMING_SHARES){
 				//Show who is the owner
+
+				ownerRoundeImage.setImageBitmap(null);
+				ownerLetter.setText("");
+
 				ArrayList<MegaShare> sharesIncoming = megaApi.getInSharesList();
 				for(int j=0; j<sharesIncoming.size();j++){
 					MegaShare mS = sharesIncoming.get(j);
@@ -932,6 +951,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 						MegaUser user= megaApi.getContact(mS.getUser());
 						if(user!=null){
 							MegaContactDB contactDB = dbH.findContactByHandle(String.valueOf(user.getHandle()));
+
 							if(contactDB!=null){
 								if(!contactDB.getName().equals("")){
 									ownerInfo.setText(contactDB.getName()+" "+contactDB.getLastName());
@@ -949,6 +969,8 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 							ownerInfo.setText(mS.getUser());
 						}
 						ownerLayout.setVisibility(View.VISIBLE);
+
+
 					}
 				}
 			}
