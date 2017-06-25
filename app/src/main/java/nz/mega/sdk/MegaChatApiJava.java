@@ -887,6 +887,24 @@ public class MegaChatApiJava {
     }
 
     /**
+     * Returns the MegaChatMessage specified from manual sending queue.
+     *
+     * The identifier of messages in manual sending status is notified when the
+     * message is moved into that queue or while loading history. In both cases,
+     * the callback MegaChatRoomListener::onMessageLoaded will be received with a
+     * message object including the row id.
+     *
+     * You take the ownership of the returned value.
+     *
+     * @param chatid MegaChatHandle that identifies the chat room
+     * @param rowid Manual sending queue id of the message
+     * @return The MegaChatMessage object, or NULL if not found.
+     */
+    public MegaChatMessage getManualSendingMessage(long chatid, long rowid){
+        return megaChatApi.getManualSendingMessage(chatid, rowid);
+    }
+
+    /**
      * Sends a new message to the specified chatroom
      *
      * The MegaChatMessage object returned by this function includes a message transaction id,
@@ -934,7 +952,7 @@ public class MegaChatApiJava {
      * @param handles MegaChatHandleList with contacts to be attached
      * @return MegaChatMessage that will be sent. The message id is not definitive, but temporal.
      */
-    public MegaChatMessage attachContacts(long chatid, MegaChatHandleList handles){
+    public MegaChatMessage attachContacts(long chatid, MegaHandleList handles){
         return megaChatApi.attachContacts(chatid, handles);
     }
 

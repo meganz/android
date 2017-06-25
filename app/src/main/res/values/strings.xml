@@ -66,7 +66,6 @@
 
     <string name="confirmation_alert" context="confirmation message before removing a file">Please confirm</string>
 
-    <string name="delete_account" context="Button in My Account section where the user can delete permanently his account">Cancel your account</string>
     <string name="action_logout" context="Button where the user can sign off or logout">Logout</string>
     <string name="action_add" context="Menu item">Upload</string>
     <string name="action_create_folder" context="Menu item">Create new folder</string>
@@ -693,7 +692,6 @@
 
     <string name="edit_text_insert_mk" context="Hint of the text when the user can write his master key">recovery key goes here</string>
 
-    <string name="delete_account_text" context="Text shown in the alert dialog to confirm the cancellation of an account">If you cancel your account you will permanently lose all the data stored in the cloud. You will not be able to undo this action.</string>
     <string name="edit_text_insert_pass" context="Hint of the text where the user can write his password">password goes here</string>
     <string name="delete_account_text_last_step" context="Text shown in the last alert dialog to confirm the cancellation of an account">This is the last step to cancel your account. You will permanently lose all the data stored in the cloud. Please enter your password below.</string>
 
@@ -1207,7 +1205,7 @@
     <string name="success_changing_user_avatar" context="Message when an user avatar has been changed successfully">Profile picture updated</string>
     <string name="error_changing_user_avatar" context="Message when an error ocurred when changing an user avatar">Error when changing the profile picture</string>
     <string name="success_deleting_user_avatar" context="Message when an user avatar has been deleted successfully">Profile picture deleted</string>
-    <string name="error_deleting_user_avatar" context="Message when an error ocurred when deleting an user avatar">Error when deleting the profile picture.</string>
+    <string name="error_deleting_user_avatar" context="Message when an error ocurred when deleting an user avatar">Error when deleting the profile picture</string>
 
     <string name="error_changing_user_attributes" context="Message when an error ocurred when changing an user attribute">Error when changing the name</string>
     <string name="success_changing_user_attributes" context="Message when an user attribute has been changed successfully">Your name has been correctly updated</string>
@@ -1223,6 +1221,10 @@
     <string name="attachment_upload_panel_from_cloud">From Cloud Drive</string>
     <string name="attachment_upload_panel_contact">Contact</string>
 
+    <string name="delete_account" context="Button in My Account section where the user can delete permanently his account">Delete account</string>
+    <string name="delete_account_text" context="Text shown in the alert dialog to confirm the cancellation of an account">If you delete your account you will permanently lose all the data stored in the cloud. You will not be able to undo this action.</string>
+    <string name="delete_button" context="Button in My Account section to confirm the account deletion">Delete</string>
+
     <string name="file_properties_info_info_file">Info</string>
     <string name="file_properties_info_size" context="Refers to the size of a file.">Total size</string>
     <string name="file_properties_info_content" context="header of a status field for what content a user has shared to you">Contains</string>
@@ -1232,11 +1234,5 @@
     <string name="file_properties_shared_folder_full_access" context="Refers to access rights for a file folder.">FULL ACCESS</string>
     <string name="file_properties_shared_folder_read_only" context="Refers to access rights for a file folder.">READ-ONLY</string>
     <string name="file_properties_shared_folder_read_write" context="Refers to access rights for a file folder. (with the &amp; needed. Don\'t use the symbol itself. Use &amp;)">READ &amp; WRITE</string>
-
-
-
-
-
-
 
 </resources>

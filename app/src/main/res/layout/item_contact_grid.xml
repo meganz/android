@@ -57,13 +57,24 @@
 		android:layout_height="wrap_content"
 		android:layout_alignParentLeft="true"
 		android:layout_below="@id/contact_grid_separator"
-		android:layout_marginLeft="16dp"
+		android:layout_marginLeft="13dp"
 		android:layout_marginTop="16dp"
-		android:layout_toLeftOf="@id/contact_grid_three_dots"
 		android:textColor="@color/name_my_account"
 		android:ellipsize="end"
 		android:textSize="16sp"
-		android:maxLines="1" />
+		android:maxLines="1"
+		android:singleLine="true"/>
+
+	<ImageView
+		android:id="@+id/contact_grid_drawable_state"
+		android:layout_width="6dp"
+		android:layout_height="6dp"
+		android:layout_alignTop="@id/contact_grid_name"
+		android:layout_toRightOf="@id/contact_grid_name"
+		android:layout_marginTop="8dp"
+		android:layout_marginLeft="3dp"
+		android:background="@null"
+		android:src="@drawable/circle_status_contact_offline" />
 
 	<TextView
 		android:id="@+id/contact_grid_content"

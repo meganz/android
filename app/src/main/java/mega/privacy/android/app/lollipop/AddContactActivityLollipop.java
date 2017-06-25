@@ -46,6 +46,8 @@ import android.widget.TextView;
 
 import java.text.Collator;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 
@@ -741,6 +743,19 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements T
 //                    }
 //                }
             }
+
+            Collections.sort(visibleContactsMEGA, new Comparator<MegaContactAdapter>(){
+
+                public int compare(MegaContactAdapter c1, MegaContactAdapter c2) {
+                    String name1 = c1.getFullName();
+                    String name2 = c2.getFullName();
+                    int res = String.CASE_INSENSITIVE_ORDER.compare(name1, name2);
+                    if (res == 0) {
+                        res = name1.compareTo(name2);
+                    }
+                    return res;
+                }
+            });
 
             if (adapterMEGA == null) {
                 adapterMEGA = new MegaContactsLollipopAdapter(this, null, visibleContactsMEGA, emptyImageView, emptyTextView, recyclerView, MegaContactsLollipopAdapter.ITEM_VIEW_TYPE_LIST_ADD_CONTACT);

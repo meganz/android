@@ -77,7 +77,7 @@ import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatError;
-import nz.mega.sdk.MegaChatHandleList;
+import nz.mega.sdk.MegaHandleList;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatPeerList;
 import nz.mega.sdk.MegaChatRequest;
@@ -690,6 +690,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                             if(permission==MegaChatRoom.PRIV_RO) {
                                 log("Permission RO");
                                 writingContainerLayout.setVisibility(View.GONE);
+                                fab.setVisibility(View.GONE);
                                 aB.setSubtitle(getString(R.string.observer_permission_label_participants_panel));
                             }
                             else{
@@ -701,6 +702,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                             if(permission==MegaChatRoom.PRIV_RO) {
                                 log("Permission RO");
                                 writingContainerLayout.setVisibility(View.GONE);
+                                fab.setVisibility(View.GONE);
                                 aB.setSubtitle(getString(R.string.observer_permission_label_participants_panel));
                             }
                             else{
@@ -1155,11 +1157,11 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
             final ArrayList<String> contactsData = intent.getStringArrayListExtra(AddContactActivityLollipop.EXTRA_CONTACTS);
             if (contactsData != null) {
-                MegaChatHandleList handleList = MegaChatHandleList.createInstance();
+                MegaHandleList handleList = MegaHandleList.createInstance();
                 for(int i=0; i<contactsData.size();i++){
                     MegaUser user = megaApi.getContact(contactsData.get(i));
                     if (user != null) {
-                        handleList.addMegaChatHandle(user.getHandle());
+                        handleList.addMegaHandle(user.getHandle());
 
                     }
                 }
@@ -2061,6 +2063,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             log("Permissions for the chat: "+chat.getOwnPrivilege());
             //Hide field to write
             writingContainerLayout.setVisibility(View.GONE);
+            fab.setVisibility(View.GONE);
         }
         else if(chat.hasChanged(MegaChatRoom.CHANGE_TYPE_STATUS)){
             log("CHANGE_TYPE_STATUS for the chat: "+chat.getChatId());
@@ -3145,7 +3148,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         log("showMsgNotSentPanel: "+position);
 
         this.selectedPosition = position;
-        this.selectedMessageId = message.getMessage().getTempId();
+        this.selectedMessageId = message.getMessage().getRowId();
+        log("Temporal id of MS message: "+message.getMessage().getTempId());
 
         if(message!=null){
             MessageNotSentBottomSheetDialogFragment bottomSheetDialogFragment = new MessageNotSentBottomSheetDialogFragment();
@@ -3181,12 +3185,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         log("removeMsgNotSent: "+selectedPosition);
         messages.remove(selectedPosition);
         adapter.removeMessage(selectedPosition, messages);
-    }
-
-    public void removeMsgNotSentAndUpdate(){
-        log("removeMsgNotSentAndUpdate: "+selectedPosition);
-        messages.remove(selectedPosition);
-        adapter.notifyDataSetChanged();
     }
 
     public void showSnackbar(String s){

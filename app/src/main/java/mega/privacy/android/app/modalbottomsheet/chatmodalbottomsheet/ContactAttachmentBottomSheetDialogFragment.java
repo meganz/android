@@ -49,7 +49,7 @@ import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
-import nz.mega.sdk.MegaChatHandleList;
+import nz.mega.sdk.MegaHandleList;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaNodeList;
@@ -58,7 +58,7 @@ import nz.mega.sdk.MegaUser;
 public class ContactAttachmentBottomSheetDialogFragment extends BottomSheetDialogFragment implements View.OnClickListener {
 
     Context context;
-    MegaChatHandleList handleList;
+    MegaHandleList handleList;
     AndroidMegaChatMessage message = null;
     long chatId;
     long messageId;
@@ -127,7 +127,7 @@ public class ContactAttachmentBottomSheetDialogFragment extends BottomSheetDialo
             else{
                 chatId = ((ContactAttachmentActivityLollipop) context).chatId;
                 messageId = ((ContactAttachmentActivityLollipop) context).messageId;
-                email = ((ContactAttachmentActivityLollipop) context).selectedUser.getEmail();
+                email = ((ContactAttachmentActivityLollipop) context).selectedEmail;
             }
 
             log("Id Chat and Message id: "+chatId+ "___"+messageId);

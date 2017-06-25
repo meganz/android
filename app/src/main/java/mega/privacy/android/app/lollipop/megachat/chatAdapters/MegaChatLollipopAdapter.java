@@ -58,7 +58,6 @@ import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApiAndroid;
-import nz.mega.sdk.MegaChatHandleList;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaError;
@@ -2117,18 +2116,11 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                         return;
                     }
 
-                    MegaUser contact = megaApi.getContact(email);
-
-                    if(contact!=null){
-                        if (context.getExternalCacheDir() != null){
-                            megaApi.getUserAvatar(contact, context.getExternalCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);
-                        }
-                        else{
-                            megaApi.getUserAvatar(contact, context.getCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);
-                        }
+                    if (context.getExternalCacheDir() != null){
+                        megaApi.getUserAvatar(email, context.getExternalCacheDir().getAbsolutePath() + "/" + email + ".jpg", listener);
                     }
                     else{
-                        log("Contact is NULL");
+                        megaApi.getUserAvatar(email, context.getCacheDir().getAbsolutePath() + "/" + email + ".jpg", listener);
                     }
                 }
                 else{
@@ -2148,17 +2140,11 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     return;
                 }
 
-                MegaUser contact = megaApi.getContact(email);
-                if(contact!=null){
-                    if (context.getExternalCacheDir() != null){
-                        megaApi.getUserAvatar(contact, context.getExternalCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);
-                    }
-                    else{
-                        megaApi.getUserAvatar(contact, context.getCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);
-                    }
+                if (context.getExternalCacheDir() != null){
+                    megaApi.getUserAvatar(email, context.getExternalCacheDir().getAbsolutePath() + "/" + email + ".jpg", listener);
                 }
                 else{
-                    log("Contact is NULL");
+                    megaApi.getUserAvatar(email, context.getCacheDir().getAbsolutePath() + "/" + email + ".jpg", listener);
                 }
             }
         }
@@ -2168,17 +2154,11 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 return;
             }
 
-            MegaUser contact = megaApi.getContact(email);
-            if(contact!=null){
-                if (context.getExternalCacheDir() != null){
-                    megaApi.getUserAvatar(contact, context.getExternalCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);
-                }
-                else{
-                    megaApi.getUserAvatar(contact, context.getCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);
-                }
+            if (context.getExternalCacheDir() != null){
+                megaApi.getUserAvatar(email, context.getExternalCacheDir().getAbsolutePath() + "/" + email + ".jpg", listener);
             }
             else{
-                log("Contact is NULL");
+                megaApi.getUserAvatar(email, context.getCacheDir().getAbsolutePath() + "/" + email + ".jpg", listener);
             }
         }
     }
@@ -2396,6 +2376,16 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         log("removeMessage: size: "+messages.size());
         this.messages = messages;
         notifyItemRemoved(position);
+
+        if(position==messages.size()-1){
+            log("No need to update more");
+        }
+        else{
+            log("Update until end");
+            int itemCount = messages.size()-position;
+            log("itemCount: "+itemCount);
+            notifyItemRangeChanged(position, itemCount);
+        }
     }
 
     public void loadPreviousMessage(ArrayList<AndroidMegaChatMessage> messages){
