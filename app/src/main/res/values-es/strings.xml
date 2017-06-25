@@ -63,7 +63,6 @@
     
     <string name="confirmation_alert" context="confirmation message before removing a file">Confirmación necesaria</string>
 
-    <string name="delete_account" context="Button in My Account section where the user can delete permanently his account">Cancelar tu cuenta</string>
     <string name="action_logout" context="Button where the user can sign off or logout">Desconectar</string>
     <string name="action_add" context="Menu item">Subir</string>
     <string name="action_create_folder" context="Menu item">Nueva carpeta</string>
@@ -696,7 +695,6 @@
 
     <string name="edit_text_insert_mk" context="Hint of the text when the user can write his master key">escribe aquí la clave</string>
 
-    <string name="delete_account_text" context="Text shown in the alert dialog to confirm the cancelation of an account">Si cancelas tu cuenta, perderás toda la información almacenada en la nube. Esta operación es irreversible.</string>
     <string name="edit_text_insert_pass" context="Hint of the text where the user can write his password">escribe aquí la contraseña</string>
     <string name="delete_account_text_last_step" context="Text shown in the last alert dialog to confirm the cancelation of an account">Este es el último paso para cancelar la cuenta. Perderás toda la información almacenada en la nube. Por favor, introduce tu contraseña.</string>
 
@@ -925,7 +923,7 @@
 
     <string name="error_message_unrecognizable" context="Content of a normal message that cannot be recognized">Mensaje irreconocible</string>
 
-    <string name="settings_autoaway_title" context="Title of the settings section to configure the autoaway of chat presence">Auto-away</string>
+    <string name="settings_autoaway_title" context="Title of the settings section to configure the autoaway of chat presence">Inactividad automática</string>
     <string name="settings_autoaway_subtitle" context="Subtitle of the settings section to configure the autoaway of chat presence">Mostrarme ausente después de una inactividad de</string>
     <string name="settings_autoaway_value" context="Value in the settings section of the autoaway chat presence">%1d minutos</string>
 
@@ -963,12 +961,12 @@
     <string name="option_to_transfer_manager" context="Label of the modal bottom sheet to Transfer Manager section" formatted="false">Ver</string>
     <string name="option_to_pause_transfers" context="Label of the modal bottom sheet to pause all transfers">Pausar todas las transferencias</string>
     <string name="option_to_resume_transfers" context="Label of the modal bottom sheet to resume all transfers">Reanudar todas las transferencias</string>
-    <string name="option_to_clear_transfers" context="Label of the modal bottom sheet to clear completed transfers">Limpiar completadas</string>
-    <string name="menu_pause_individual_transfer" context="Dialog to confirm the action of pausing one transfer">Pausar transferencia?</string>
-    <string name="menu_resume_individual_transfer" context="Dialog to confirm the action of restarting one transfer">Reanudar transferencia?</string>
+    <string name="option_to_clear_transfers" context="Label of the modal bottom sheet to clear completed transfers">Eliminar completadas</string>
+    <string name="menu_pause_individual_transfer" context="Dialog to confirm the action of pausing one transfer">¿Pausar transferencia?</string>
+    <string name="menu_resume_individual_transfer" context="Dialog to confirm the action of restarting one transfer">¿Reanudar transferencia?</string>
     <string name="button_resume_individual_transfer" context="Button to confirm the action of restarting one transfer">Reanudar</string>
 
-    <string name="confirmation_to_clear_completed_transfers" context="Dialog to confirm before removing completed transfers">Limpiar las transferencias completadas?</string>
+    <string name="confirmation_to_clear_completed_transfers" context="Dialog to confirm before removing completed transfers">¿Eliminar las transferencias completadas?</string>
 
     <string name="title_tab_in_progress_transfers" context="Title of the tab section for transfers in progress">En progreso</string>
     <string name="title_tab_completed_transfers" context="Title of the tab section for completed transfers">Completada</string>
@@ -978,7 +976,7 @@
     <string name="transfer_canceled" context="Possible state of a transfer">Cancelada</string>
     <string name="transfer_unknown" context="Possible state of a transfer">Desconocido</string>
 
-    <string name="paused_transfers_title" context="Title of the panel where the progress of the transfers is shown">Paused transfers</string>
+    <string name="paused_transfers_title" context="Title of the panel where the progress of the transfers is shown">Transferencias pausadas</string>
 
     <string name="completed_transfers_empty" context="message shown in the screen when there are not any active transfer">No hay transferencias completadas</string>
 
@@ -990,36 +988,36 @@
     </plurals>
 
     <plurals name="upload_service_final_notification" context="Text of the notification shown when the upload service has finished">
-        <item context="Singular" quantity="one">Subidos %1$d fichero</item>
-        <item context="Plural" quantity="other">Subidos %1$d ficheros</item>
+        <item context="Singular" quantity="one">%1$d fichero subido</item>
+        <item context="Plural" quantity="other">%1$d ficheros subidos</item>
     </plurals>
 
     <string name="general_total_size" context="label for the total file size of multiple files and/or folders (no need to put the colon punctuation in the translation)" formatted="false">Tamaño total: %1$s</string>
 
     <plurals name="upload_service_failed" context="Text of the notification shown when the upload service has finished with any transfer error">
-        <item context="Singular" quantity="one">%1$d file not uploaded</item>
-        <item context="Plural" quantity="other">%1$d files not uploaded</item>
+        <item context="Singular" quantity="one">%1$d fichero no subido</item>
+        <item context="Plural" quantity="other">%1$d ficheros no subidos</item>
     </plurals>
 
     <plurals name="download_service_final_notification" context="Text of the notification shown when the download service has finished">
-        <item context="Singular" quantity="one">Downloaded %1$d file</item>
-        <item context="Plural" quantity="other">Downloaded %1$d files</item>
+        <item context="Singular" quantity="one">%1$d fichero descargado</item>
+        <item context="Plural" quantity="other">%1$d ficheros descargados</item>
     </plurals>
 
     <plurals name="download_service_failed" context="Text of the notification shown when the download service has finished with any transfer error">
-        <item context="Singular" quantity="one">%1$d file not downloaded</item>
-        <item context="Plural" quantity="other">%1$d files not downloaded</item>
+        <item context="Singular" quantity="one">%1$d fichero no descargado</item>
+        <item context="Plural" quantity="other">%1$d ficheros no descargados</item>
     </plurals>
 
     <plurals name="download_service_notification" context="Text of the notification shown when the download service is running">
-        <item context="Singular" quantity="one">Downloading %1$d of %2$d file</item>
-        <item context="Plural" quantity="other">Downloading %1$d of %2$d files</item>
+        <item context="Singular" quantity="one">Descargando %1$d de %2$d fichero</item>
+        <item context="Plural" quantity="other">Descargando %1$d de %2$d ficheros</item>
     </plurals>
 
-    <string name="title_depleted_transfer_overquota" context="Title of the alert when the transfer quota is depleted">Depleted transfer quota</string>
-    <string name="text_depleted_transfer_overquota" context="Text of the alert when the transfer quota is depleted">Your queued transfer exceeds the current transfer quota available for your IP address and may therefore be interrupted.</string>
-    <string name="plans_depleted_transfer_overquota" context="Button to show plans in the alert when the transfer quota is depleted">See our plans</string>
-    <string name="continue_without_account_transfer_overquota" context="Button option of the alert when the transfer quota is depleted">Continue without account</string>
+    <string name="title_depleted_transfer_overquota" context="Title of the alert when the transfer quota is depleted">Cuota de transferencia agotada</string>
+    <string name="text_depleted_transfer_overquota" context="Text of the alert when the transfer quota is depleted">Tus transferencias en cola exceden la cuota de transferencia disponible para tu IP y por tanto, podrían pausarse.</string>
+    <string name="plans_depleted_transfer_overquota" context="Button to show plans in the alert when the transfer quota is depleted">Ver nuestros planes</string>
+    <string name="continue_without_account_transfer_overquota" context="Button option of the alert when the transfer quota is depleted">Continuar sin cuenta</string>
 
     <plurals name="new_general_num_files" context="this is used for example when downloading 1 file or 2 files">
         <item context="Singular of file. 1 file" quantity="one">%1$d fichero</item>
@@ -1033,29 +1031,29 @@
 
     <string name="general_view_contacts" context="Menu option">Ver contactos</string>
 
-    <string name="import_success_message" context="Menu option">Succesfully added to Cloud Drive</string>
-    <string name="import_success_error" context="Menu option">Error. Not added to Cloud Drive</string>
+    <string name="import_success_message" context="Menu option">Añadido a Disco</string>
+    <string name="import_success_error" context="Menu option">Error. No añadido a Disco</string>
 
-    <string name="chat_connecting" context="Label in login screen to inform about the chat initialization proccess">Connecting&#8230;</string>
+    <string name="chat_connecting" context="Label in login screen to inform about the chat initialization proccess">Conectando&#8230;</string>
 
-    <string name="context_contact_already_invited" context="message when trying to invite a contact with a pending request">%s was already invited. Consult your pending requests.</string>
+    <string name="context_contact_already_invited" context="message when trying to invite a contact with a pending request">%s previamente invitado. Consulta tus invitaciones pendientes</string>
 
     <string name="confirm_email_misspelled" context="Hint text explaining that you can change the email and resend the create account link to the new email address">Si has escrito mail tu email, corrígelo y pulsa \'Reenviar\'</string>
     <string name="confirm_email_misspelled_resend" context="Button to resend the create account email to a new email address in case the previous email address was misspelled">Reenviar</string>
     <string name="confirm_email_misspelled_email_sent" context="Text shown after the confirmation email has been sent to the new email address">Email enviado</string>
 
-    <string name="copyright_alert_title" context="text_copyright_alert_title">Copyright warning to all users</string>
-    <string name="copyright_alert_first_paragraph" context="text_copyright_alert_first_paragraph">MEGA respects the copyrights of others and requires that users of the MEGA cloud service comply with the laws of copyright.</string>
-    <string name="copyright_alert_second_paragraph" context="text_copyright_alert_second_paragraph">You are strictly prohibited from using the MEGA cloud service to infringe copyrights. You may not upload, download, store, share, diplay, stream, distribute, email, link to, transmit or otherwise make available any files, data or content that infringes any copyright or other propriety rights of any person or entity.</string>
+    <string name="copyright_alert_title" context="text_copyright_alert_title">Aviso de copyright para usuarios</string>
+    <string name="copyright_alert_first_paragraph" context="text_copyright_alert_first_paragraph">MEGA respeta los derechos de propiedad intelectual de terceros y exige a todos los usuario de MEGA que respeten las leyes de propiedad intelectual.</string>
+    <string name="copyright_alert_second_paragraph" context="text_copyright_alert_second_paragraph">Esta terminantemente prohibido utilizar MEGA para infringir derechos de propiedad intelectual. No puedes subir, descargar, almacenar, compartir, mostrar, reproducir, distribuir, enviar, enlazar o pones a disposición de nadie cualquier archivo, dato o contenido que infrinja los derechos de propiedad intelectual de cualquier persona o entidad.</string>
     <string name="copyright_alert_agree_button" context="text of the Agree button">Acepto</string>
     <string name="copyright_alert_disagree_button" context="text of the Disagree button">No acepto</string>
 
     <string name="download_show_info" context="Hint how to cancel the download">Mostrar información</string>
 
-    <string name="context_link_removal_error" context="error message">Link removal failed. Try again later.</string>
-    <string name="context_link_action_error" context="error message">Link action failed. Try again later.</string>
+    <string name="context_link_removal_error" context="error message">Error al eliminar el link. Prueba más tarde.</string>
+    <string name="context_link_action_error" context="error message">Error con el link. Prueba más tarde.</string>
 
-    <string name ="title_write_user_email" context="title of the dialog shown when sending or sharing a folder">Write the user\'s e-mail</string>
+    <string name ="title_write_user_email" context="title of the dialog shown when sending or sharing a folder">Escribe el email</string>
 
     <string name="activity_title_files_attached" context="title of the screen to see the details of several node attachments">Ficheros adjuntos</string>
     <string name="activity_title_contacts_attached" context="title of the screen to see the details of several contact attachments">Contactos adjuntos</string>
@@ -1065,23 +1063,27 @@
     <string name="camera_uploads_cellular_connection">Plan de datos</string>
     <string name="camera_uploads_upload_videos">Subir vídeos</string>
 
-    <string name="success_changing_user_avatar" context="Message when an user avatar has been changed successfully">Profile picture updated</string>
-    <string name="error_changing_user_avatar" context="Message when an error ocurred when changing an user avatar">Error when changing the profile picture</string>
-    <string name="success_deleting_user_avatar" context="Message when an user avatar has been deleted successfully">Profile picture deleted</string>
-    <string name="error_deleting_user_avatar" context="Message when an error ocurred when deleting an user avatar">Error when deleting the profile picture.</string>
+    <string name="success_changing_user_avatar" context="Message when an user avatar has been changed successfully">Foto de perfil actualizada</string>
+    <string name="error_changing_user_avatar" context="Message when an error ocurred when changing an user avatar">Error al cambiar la foto de perfil</string>
+    <string name="success_deleting_user_avatar" context="Message when an user avatar has been deleted successfully">Foto de perfil eliminada</string>
+    <string name="error_deleting_user_avatar" context="Message when an error ocurred when deleting an user avatar">Error al eliminar la foto de perfil</string>
 
-    <string name="error_changing_user_attributes" context="Message when an error ocurred when changing an user attribute">Error when changing the name</string>
-    <string name="success_changing_user_attributes" context="Message when an user attribute has been changed successfully">Your name has been correctly updated</string>
+    <string name="error_changing_user_attributes" context="Message when an error ocurred when changing an user attribute">Error al cambiar el nombre</string>
+    <string name="success_changing_user_attributes" context="Message when an user attribute has been changed successfully">Tu nombre ha sido correctamente actualizado</string>
 
-    <string name="add_participant_success" context="Message show when a participant has been successfully invited to a group chat">Participant added</string>
-    <string name="add_participant_error" context="Message show when a participant hasn't been successfully invited to a group chat">Error. Participant not added</string>
+    <string name="add_participant_success" context="Message show when a participant has been successfully invited to a group chat">Participante añadido</string>
+    <string name="add_participant_error" context="Message show when a participant hasn't been successfully invited to a group chat">Error. Participante no añadidod</string>
 
-    <string name="remove_participant_success" context="Message show when a participant has been successfully removed from a group chat">Participant removed</string>
-    <string name="remove_participant_error" context="Message show when a participant hasn't been successfully removed from a group chat">Error. Participant not removed</string>
+    <string name="remove_participant_success" context="Message show when a participant has been successfully removed from a group chat">Participante eliminado</string>
+    <string name="remove_participant_error" context="Message show when a participant hasn't been successfully removed from a group chat">Error. Participante no eliminado</string>
 
     <string name="no_files_selected_warning">No hay ficheros seleccionados</string>
 
     <string name="attachment_upload_panel_from_cloud">Desde Disco</string>
     <string name="attachment_upload_panel_contact">Contacto</string>
+
+    <string name="delete_account" context="Button in My Account section where the user can delete permanently his account">Eliminar cuenta</string>
+    <string name="delete_account_text" context="Text shown in the alert dialog to confirm the cancelation of an account">Si eliminas tu cuenta, perderás toda la información almacenada en la nube. Esta operación es irreversible.</string>
+    <string name="delete_button" context="Button in My Account section to confirm the account deletion">Eliminar</string>
 
 </resources>
