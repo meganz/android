@@ -2527,6 +2527,76 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         log("------------------------------------------");
     }
 
+    public void sendAttachment(MegaChatMessage msg){
+        log("sendAttachment");
+        AndroidMegaChatMessage androidMsgSent = new AndroidMegaChatMessage(msg);
+        messages.add(androidMsgSent);
+        int index = messages.size()-1;
+
+        AndroidMegaChatMessage androidPreviousMessage = messages.get(index-1);
+        log("previous message: "+androidPreviousMessage.getMessage().getContent());
+        if(androidPreviousMessage.getMessage().getUserHandle()==myUserHandle) {
+            //The last two messages are mine
+            if(compareDate(androidMsgSent, androidPreviousMessage)==0){
+                //Same date
+                if(compareTime(androidMsgSent, androidPreviousMessage)==0){
+                    messages.get(index).setInfoToShow(Constants.CHAT_ADAPTER_SHOW_NOTHING);
+                }
+                else{
+                    //Different minute
+                    messages.get(index).setInfoToShow(Constants.CHAT_ADAPTER_SHOW_TIME);
+                }
+            }
+            else{
+                //Different date
+                messages.get(index).setInfoToShow(Constants.CHAT_ADAPTER_SHOW_ALL);
+            }
+        }
+        else{
+            //The last message is mine, the previous not
+            log("Modify not my message");
+            if (compareDate(androidMsgSent, androidPreviousMessage) == 0) {
+                if (compareTime(androidMsgSent, androidPreviousMessage) == 0) {
+                    messages.get(index).setInfoToShow(Constants.CHAT_ADAPTER_SHOW_NOTHING);
+                } else {
+                    //Different minute
+                    messages.get(index).setInfoToShow(Constants.CHAT_ADAPTER_SHOW_TIME);
+                }
+            } else {
+                //Different date
+                messages.get(index).setInfoToShow(Constants.CHAT_ADAPTER_SHOW_ALL);
+            }
+        }
+
+        if (adapter == null){
+            log("adapter NULL");
+            adapter = new MegaChatLollipopAdapter(this, chatRoom, messages, listView);
+            adapter.setHasStableIds(true);
+            listView.setLayoutManager(mLayoutManager);
+            listView.setAdapter(adapter);
+            adapter.setMessages(messages);
+            if(adapter.getItemCount()>0){
+                listView.setVisibility(View.VISIBLE);
+                chatRelativeLayout.setVisibility(View.VISIBLE);
+                emptyScrollView.setVisibility(View.GONE);
+            }
+        }
+        else{
+            log("adapter is NOT null");
+            final int indexToScroll = index;
+
+            if(adapter.getItemCount()>0){
+                listView.setVisibility(View.VISIBLE);
+                chatRelativeLayout.setVisibility(View.VISIBLE);
+                emptyScrollView.setVisibility(View.GONE);
+            }
+
+            mLayoutManager.scrollToPositionWithOffset(indexToScroll-1,20);
+
+            adapter.addMessage(messages, index);
+        }
+    }
+
     @Override
     public void onMessageUpdate(MegaChatApiJava api, MegaChatMessage msg) {
         log("onMessageUpdate!: "+ msg.getMsgId());
@@ -2539,59 +2609,64 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
         AndroidMegaChatMessage androidMsg = new AndroidMegaChatMessage(msg);
 
-        if(msg.getStatus()==MegaChatMessage.STATUS_SERVER_REJECTED){
-            log("Processing SERVER_REJECTED message");
-            MegaChatMessage oldMessage = megaChatApi.getMessage(idChat, msg.getMsgId());
-            if(oldMessage!=null){
-                log("content of the rejected message: "+oldMessage.getContent());
-            }
-        }
-
-        if(msg.hasChanged(MegaChatMessage.CHANGE_TYPE_CONTENT)){
-            log("Change content of the message");
-
-            if(msg.getType()==MegaChatMessage.TYPE_TRUNCATE){
-                log("TRUNCATE MESSAGE");
-                messages.clear();
-                androidMsg.setInfoToShow(Constants.CHAT_ADAPTER_SHOW_ALL);
-                messages.add(androidMsg);
-                adapter.setMessages(messages);
-                adapter.notifyDataSetChanged();
-                invalidateOptionsMenu();
-            }
-            else{
-                if(msg.isDeleted()){
-                    log("Message deleted!!");
-                }
-                modifyMessageReceived(androidMsg, false);
-            }
-
+        if(msg.getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT){
+            sendAttachment(msg);
         }
         else{
-            log("Status change");
-            log("Temporal id: "+msg.getTempId());
-            log("Final id: "+msg.getMsgId());
-
-
-            if(msg.getStatus()==MegaChatMessage.STATUS_SEEN){
-                log("STATUS_SEEN");
+            if(msg.getStatus()==MegaChatMessage.STATUS_SERVER_REJECTED){
+                log("Processing SERVER_REJECTED message");
+                MegaChatMessage oldMessage = megaChatApi.getMessage(idChat, msg.getMsgId());
+                if(oldMessage!=null){
+                    log("content of the rejected message: "+oldMessage.getContent());
+                }
             }
-            if(msg.getStatus()==MegaChatMessage.STATUS_SERVER_RECEIVED){
-                log("STATUS_SERVER_RECEIVED");
-                modifyMessageReceived(androidMsg, true);
-            }
-            else{
-                log("-----------Status : "+msg.getStatus());
-                log("-----------Timestamp: "+msg.getTimestamp());
-                log("-----------Content: "+msg.getContent());
 
-                if(msg.getStatus()==MegaChatMessage.STATUS_SERVER_REJECTED){
-                    log("onMessageLoaded: STATUS_SERVER_REJECTED----- "+msg.getStatus());
-                    //Buscar en la de sending por temporal id.
+            if(msg.hasChanged(MegaChatMessage.CHANGE_TYPE_CONTENT)){
+                log("Change content of the message");
 
+                if(msg.getType()==MegaChatMessage.TYPE_TRUNCATE){
+                    log("TRUNCATE MESSAGE");
+                    messages.clear();
+                    androidMsg.setInfoToShow(Constants.CHAT_ADAPTER_SHOW_ALL);
+                    messages.add(androidMsg);
+                    adapter.setMessages(messages);
+                    adapter.notifyDataSetChanged();
+                    invalidateOptionsMenu();
+                }
+                else{
+                    if(msg.isDeleted()){
+                        log("Message deleted!!");
+                    }
+                    modifyMessageReceived(androidMsg, false);
                 }
 
-                modifyMessageReceived(androidMsg, false);
+            }
+            else{
+                log("Status change");
+                log("Temporal id: "+msg.getTempId());
+                log("Final id: "+msg.getMsgId());
+
+
+                if(msg.getStatus()==MegaChatMessage.STATUS_SEEN){
+                    log("STATUS_SEEN");
+                }
+                if(msg.getStatus()==MegaChatMessage.STATUS_SERVER_RECEIVED){
+                    log("STATUS_SERVER_RECEIVED");
+                    modifyMessageReceived(androidMsg, true);
+                }
+                else{
+                    log("-----------Status : "+msg.getStatus());
+                    log("-----------Timestamp: "+msg.getTimestamp());
+                    log("-----------Content: "+msg.getContent());
+
+                    if(msg.getStatus()==MegaChatMessage.STATUS_SERVER_REJECTED){
+                        log("onMessageLoaded: STATUS_SERVER_REJECTED----- "+msg.getStatus());
+                        //Buscar en la de sending por temporal id.
+
+                    }
+
+                    modifyMessageReceived(androidMsg, false);
+                }
             }
         }
     }
@@ -3601,15 +3676,21 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
         else {
             Snackbar.make(fragmentContainer, getString(R.string.upload_began), Snackbar.LENGTH_LONG).show();
+            Intent intent = new Intent(this, ChatUploadService.class);
+            ArrayList<String> paths = new ArrayList<>();
             for (ShareInfo info : infos) {
-                Intent intent = new Intent(this, ChatUploadService.class);
-                intent.putExtra(ChatUploadService.EXTRA_FILEPATH, info.getFileAbsolutePath());
-                intent.putExtra(ChatUploadService.EXTRA_NAME, info.getTitle());
-                intent.putExtra(ChatUploadService.EXTRA_PARENT_HASH, parentNode.getHandle());
-                intent.putExtra(ChatUploadService.EXTRA_SIZE, info.getSize());
-                intent.putExtra(ChatUploadService.EXTRA_CHAT_ID, idChat);
-                startService(intent);
+                log("name of the file: "+info.getTitle());
+                log("size of the file: "+info.getSize());
+
+                paths.add(info.getFileAbsolutePath());
             }
+            intent.putStringArrayListExtra(ChatUploadService.EXTRA_FILEPATHS, paths);
+//                intent.putExtra(ChatUploadService.EXTRA_NAME, );
+            intent.putExtra(ChatUploadService.EXTRA_PARENT_HASH, parentNode.getHandle());
+//                intent.putExtra(ChatUploadService.EXTRA_SIZE, info.());
+            intent.putExtra(ChatUploadService.EXTRA_CHAT_ID, idChat);
+            log("Launch chat upload! "+paths.size());
+            startService(intent);
         }
     }
 
