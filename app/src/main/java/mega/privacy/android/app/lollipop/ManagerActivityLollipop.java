@@ -5760,34 +5760,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	        		megaApi.pauseTransfers(true, this);
 	        		pauseTransfersMenuIcon.setVisible(false);
 	        		playTransfersMenuIcon.setVisible(true);
-//    				if(!tranfersPaused)
-//    				{
-//    					tranfersPaused = true;
-//    					pauseTransfersMenuIcon.setVisible(false);
-//    					playTransfersMenuIcon.setVisible(true);
-//
-//    					//Update the progress in fragments
-//    					if (fbFLol != null){
-//    						fbFLol.updateProgressBar(progressPercent);
-//    					}
-//    					if (rubbishBinFLol != null){
-//    						rubbishBinFLol.updateProgressBar(progressPercent);
-//    					}
-//    					if (iFLol != null){
-//    						iFLol.updateProgressBar(progressPercent);
-//    					}
-//    					if (outSFLol != null){
-//    						outSFLol.updateProgressBar(progressPercent);
-//    					}
-//    					if (inSFLol != null){
-//    						inSFLol.updateProgressBar(progressPercent);
-//    					}
-//    					if (tFLol != null){
-//    						tFLol.updateProgressBar(progressPercent);
-//    					}
-//
-//    	    			megaApi.pauseTransfers(true, this);
-//    				}
 	        	}
 
 	        	return true;
