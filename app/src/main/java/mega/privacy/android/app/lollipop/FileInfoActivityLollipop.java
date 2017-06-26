@@ -730,7 +730,8 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 				startActivityForResult(intent, REQUEST_CODE_SELECT_CONTACT);
 				break;
 			}
-			case R.id.cab_menu_file_info_get_link: {
+			case R.id.cab_menu_file_info_get_link:
+			case R.id.cab_menu_file_info_edit_link:{
 				showGetLinkActivity(node.getHandle());
 				break;
 			}
