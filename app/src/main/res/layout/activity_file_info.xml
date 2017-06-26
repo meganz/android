@@ -88,7 +88,7 @@
                     android:src="@drawable/link_ic"
                     android:layout_gravity="left|bottom"
                     android:layout_marginLeft="16dp"
-                    android:layout_marginBottom="32dp" />
+                    android:layout_marginBottom="35dp" />
 
                 <TextView
                     android:id="@+id/file_properties_permission_info"
