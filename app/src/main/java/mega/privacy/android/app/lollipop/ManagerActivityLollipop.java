@@ -1436,10 +1436,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		this.registerReceiver(networkStateReceiver, new IntentFilter(android.net.ConnectivityManager.CONNECTIVITY_ACTION));
 
         if (!Util.isOnline(this)){
-        	log("No network: intent to OfflineActivityLollipop");
-//        	Intent offlineIntent = new Intent(this, OfflineActivityLollipop.class);
-//			startActivity(offlineIntent);
-//			finish();
+        	log("No network >> SHOW OFFLINE MODE");
+
+			if(drawerItem==null){
+				drawerItem = DrawerItem.SAVED_FOR_OFFLINE;
+			}
+
+			selectDrawerItemLollipop(drawerItem);
+
 			showOfflineMode();
 			if(Util.isChatEnabled()){
 				UserCredentials credentials = dbH.getCredentials();
@@ -1449,7 +1453,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					log("In Offline mode: init chat is: "+ret);
 				}
 			}
-        	return;
+			return;
         }
 
 		///Check the MK file
@@ -1464,7 +1468,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 		}
 
-        rootNode = megaApi.getRootNode();
+		rootNode = megaApi.getRootNode();
 		if (rootNode == null){
 			log("Root node is NULL");
 			 if (getIntent() != null){
