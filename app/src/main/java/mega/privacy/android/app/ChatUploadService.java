@@ -20,6 +20,7 @@ import android.text.format.Formatter;
 import android.widget.RemoteViews;
 
 import java.io.File;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -32,8 +33,11 @@ import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaChatApiAndroid;
+import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
+import nz.mega.sdk.MegaNodeList;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaTransfer;
@@ -42,7 +46,7 @@ import nz.mega.sdk.MegaTransferListenerInterface;
 public class ChatUploadService extends Service implements MegaTransferListenerInterface, MegaRequestListenerInterface {
 
 	public static String ACTION_CANCEL = "CANCEL_UPLOAD";
-	public static String EXTRA_FILEPATH = "MEGA_FILE_PATH";
+	public static String EXTRA_FILEPATHS = "MEGA_FILE_PATH";
 	public static String EXTRA_FOLDERPATH = "MEGA_FOLDER_PATH";
 	public static String EXTRA_NAME = "MEGA_FILE_NAME";
 	public static String EXTRA_SIZE = "MEGA_SIZE";
@@ -58,6 +62,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 
 	MegaApplication app;
 	MegaApiAndroid megaApi;
+	MegaChatApiAndroid megaChatApi;
 
 	WifiLock lock;
 	WakeLock wl;
@@ -77,8 +82,6 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 	private int notificationId = Constants.NOTIFICATION_UPLOAD;
 	private int notificationIdFinal = Constants.NOTIFICATION_UPLOAD_FINAL;
 
-	private HashMap<Long, Integer> transfersInProgress;
-
 	@SuppressLint("NewApi")
 	@Override
 	public void onCreate() {
@@ -86,11 +89,11 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 		log("onCreate");
 
 		app = (MegaApplication)getApplication();
+
 		megaApi = app.getMegaApi();
+		megaChatApi = app.getMegaChatApi();
 
 		megaApi.addTransferListener(this);
-
-		transfersInProgress = new HashMap<Long, Integer>();
 
 		pendingMessages = new ArrayList<>();
 
@@ -158,52 +161,51 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 	protected void onHandleIntent(final Intent intent) {
 		log("onHandleIntent");
 
-		String filePath = intent.getStringExtra(EXTRA_FILEPATH);
-		final File file = new File(filePath);
+		ArrayList<String> filePaths = intent.getStringArrayListExtra(EXTRA_FILEPATHS);
+		log("Number of files to upload: "+filePaths.size());
 
 		long parentHandle = intent.getLongExtra(EXTRA_PARENT_HASH, 0);
 
-		long chatId = intent.getLongExtra(EXTRA_PARENT_HASH, -1);
+		long chatId = intent.getLongExtra(EXTRA_CHAT_ID, -1);
 
 		if(chatId!=-1){
-			PendingMessage newMessage = new PendingMessage(filePath, chatId);
+
+			PendingMessage newMessage = new PendingMessage(chatId, filePaths);
 			pendingMessages.add(newMessage);
-			int index = pendingMessages.size()-1;
-//			transfersInProgress.p
+
+			for(int i=0; i<filePaths.size();i++){
+				File file = new File(filePaths.get(i));
+
+				if (file.isDirectory()) {
+//			String nameInMEGA = intent.getStringExtra(EXTRA_NAME);
+//			if (nameInMEGA != null){
+//				megaApi.startUpload(file.getAbsolutePath(), megaApi.getNodeByHandle(parentHandle), nameInMEGA);
+//			}
+//			else{
+//				megaApi.startUpload(file.getAbsolutePath(), megaApi.getNodeByHandle(parentHandle));
+//			}
+				}
+				else {
+					log("Chat file uploading...");
+
+					if(!wl.isHeld()){
+						wl.acquire();
+					}
+
+					if(!lock.isHeld()){
+						lock.acquire();
+					}
+
+					megaApi.startUpload(filePaths.get(i), megaApi.getNodeByHandle(parentHandle));
+
+				}
+			}
 
 		}
 		else{
-
+			log("Error the chatId is not correct: "+chatId);
 		}
 
-		if (file.isDirectory()) {
-			String nameInMEGA = intent.getStringExtra(EXTRA_NAME);
-			if (nameInMEGA != null){
-				megaApi.startUpload(file.getAbsolutePath(), megaApi.getNodeByHandle(parentHandle), nameInMEGA);
-			}
-			else{
-				megaApi.startUpload(file.getAbsolutePath(), megaApi.getNodeByHandle(parentHandle));
-			}
-		}
-		else {
-
-			if(!wl.isHeld()){
-				wl.acquire();
-			}
-
-			if(!lock.isHeld()){
-				lock.acquire();
-			}
-
-			String nameInMEGA = intent.getStringExtra(EXTRA_NAME);
-			if (nameInMEGA != null){
-				megaApi.startUpload(file.getAbsolutePath(), megaApi.getNodeByHandle(parentHandle), nameInMEGA);
-			}
-			else{
-				megaApi.startUpload(file.getAbsolutePath(), megaApi.getNodeByHandle(parentHandle));
-			}
-
-		}
 	}
 
 	/*
@@ -388,17 +390,6 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 
         transfersCount--;
 
-		if (!transfer.isFolderTransfer()) {
-
-            if (transfer.getState() == MegaTransfer.STATE_COMPLETED) {
-                String size = Util.getSizeString(transfer.getTotalBytes());
-                AndroidCompletedTransfer completedTransfer = new AndroidCompletedTransfer(transfer.getFileName(), transfer.getType(), transfer.getState(), size, transfer.getNodeHandle() + "");
-                dbH.setCompletedTransfer(completedTransfer);
-            }
-
-            updateProgressNotification();
-        }
-
         if (canceled) {
             log("Upload cancelled: " + transfer.getFileName());
 
@@ -452,6 +443,66 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
                 else{
                     log("NOT video!");
                 }
+
+                //Find the pending message
+				for(int i=0; i<pendingMessages.size();i++){
+					PendingMessage pendMsg = pendingMessages.get(i);
+
+					ArrayList<String> filePaths = pendMsg.getFilePaths();
+					for(int j=0; j<filePaths.size();j++){
+						if(filePaths.get(j).equals(transfer.getPath())){
+							log("the file to upload FOUND!!");
+
+							if(pendMsg.getFilePaths().size()==1){
+								log("Just one file to send in the message");
+								if(megaChatApi!=null){
+									log("Send the message to the chat");
+									MegaNodeList nodeList = MegaNodeList.createInstance();
+
+									MegaNode node = megaApi.getNodeByHandle(transfer.getNodeHandle());
+									if(node!=null){
+										log("Node to send: "+node.getName());
+										nodeList.addNode(node);
+									}
+									megaChatApi.attachNodes(pendMsg.getChatId(), nodeList, null);
+								}
+							}
+							else{
+								log("More than one to send in message");
+
+								pendMsg.addNodeHandle(transfer.getNodeHandle());
+
+								if(pendMsg.getNodeHandles().size()==pendMsg.getFilePaths().size()){
+									log("All files of the message uploaded! SEND!");
+									if(megaChatApi!=null){
+										log("Send the message to the chat");
+										MegaNodeList nodeList = MegaNodeList.createInstance();
+
+										for(int k=0; k<pendMsg.getNodeHandles().size();k++){
+											MegaNode node = megaApi.getNodeByHandle(pendMsg.getNodeHandles().get(k));
+											if(node!=null){
+												log("Node to send: "+node.getName());
+												nodeList.addNode(node);
+											}
+										}
+										megaChatApi.attachNodes(pendMsg.getChatId(), nodeList, null);
+									}
+								}
+								else{
+									log("Waiting for more messages...");
+								}
+							}
+
+							if (megaApi.getNumPendingUploads() == 0 && transfersCount==0){
+								onQueueComplete();
+							}
+
+							return;
+						}
+					}
+
+				}
+				log("The NOT found in messages");
             }
             else{
                 log("Upload Error: " + transfer.getFileName() + "_" + error.getErrorCode() + "___" + error.getErrorString());
@@ -499,16 +550,6 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
             }
 
             log("IN Finish: "+transfer.getFileName()+"path? "+transfer.getPath());
-            String pathSelfie = Environment.getExternalStorageDirectory().getAbsolutePath() +"/"+ Util.temporalPicDIR;
-            if(transfer.getPath()!=null){
-                if(transfer.getPath().startsWith(pathSelfie)){
-                    File f = new File(transfer.getPath());
-                    f.delete();
-                }
-            }
-            else{
-                log("transfer.getPath() is NULL");
-            }
 
         }
 
