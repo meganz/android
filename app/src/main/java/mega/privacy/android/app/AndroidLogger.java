@@ -74,7 +74,7 @@ public class AndroidLogger implements MegaLoggerInterface {
 				File dirFile = new File(dir);
 				if (!dirFile.exists()) {
 					dirFile.mkdirs();
-					logFile = new File(dirFile, "log.txt");
+					logFile = new File(dirFile, "logSDK.txt");
 					if (!logFile.exists()) {
 						try {
 							logFile.createNewFile();
@@ -84,7 +84,7 @@ public class AndroidLogger implements MegaLoggerInterface {
 						}
 					}
 				} else {
-					logFile = new File(dirFile, "log.txt");
+					logFile = new File(dirFile, "logSDK.txt");
 					if (!logFile.exists()) {
 						try {
 							logFile.createNewFile();
