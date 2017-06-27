@@ -1094,14 +1094,14 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			numberOfClicksSDK++;
 			if (numberOfClicksSDK == 5){
 				MegaAttributes attrs = dbH.getAttributes();
-				if (attrs.getFileLogger() != null){
+				if (attrs.getFileLoggerSDK() != null){
 					try {
-						if (Boolean.parseBoolean(attrs.getFileLogger()) == false) {
+						if (Boolean.parseBoolean(attrs.getFileLoggerSDK()) == false) {
 							((ManagerActivityLollipop)context).showConfirmationEnableLogs();
 						}
 						else{
-							dbH.setFileLogger(false);
-							Util.setFileLogger(false);
+							dbH.setFileLoggerSDK(false);
+							Util.setFileLoggerSDK(false);
 							numberOfClicksSDK = 0;
 							MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_FATAL);
                             ((ManagerActivityLollipop)context).showSnackbar(getString(R.string.settings_disable_logs));

@@ -40,6 +40,7 @@ import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaGlobalListenerInterface;
@@ -541,10 +542,10 @@ public class LoginActivityLollipop extends AppCompatActivity implements MegaGlob
                                         new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
                                         Constants.REQUEST_WRITE_STORAGE);
                             } else {
-                                enableLogs();
+                                enableLogsSDK();
                             }
                         } else {
-                            enableLogs();
+                            enableLogsSDK();
                         }
                         break;
                     }
@@ -576,19 +577,29 @@ public class LoginActivityLollipop extends AppCompatActivity implements MegaGlob
                 if (loggerPermission){
                     loggerPermission = false;
                     if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
-                        enableLogs();
+                        enableLogsSDK();
                     }
                 }
             }
         }
     }
 
-    public void enableLogs() {
-        log("enableLogs");
+    public void enableLogsSDK() {
+        log("enableLogsSDK");
 
-        dbH.setFileLogger(true);
-        Util.setFileLogger(true);
+        dbH.setFileLoggerSDK(true);
+        Util.setFileLoggerSDK(true);
         MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_MAX);
+        showSnackbar(getString(R.string.settings_enable_logs));
+        log("App Version: " + Util.getVersion(this));
+    }
+
+    public void enableLogsKarere() {
+        log("enableLogsKarere");
+
+        dbH.setFileLoggerKarere(true);
+        Util.setFileLoggerKarere(true);
+        MegaChatApiAndroid.setLogLevel(MegaChatApiAndroid.LOG_LEVEL_MAX);
         showSnackbar(getString(R.string.settings_enable_logs));
         log("App Version: " + Util.getVersion(this));
     }

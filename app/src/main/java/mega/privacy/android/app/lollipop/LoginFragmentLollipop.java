@@ -1203,14 +1203,14 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 if (numberOfClicks == 5){
                     MegaAttributes attrs = dbH.getAttributes();
                     if(attrs!=null){
-                        if (attrs.getFileLogger() != null){
+                        if (attrs.getFileLoggerSDK() != null){
                             try {
-                                if (Boolean.parseBoolean(attrs.getFileLogger()) == false) {
+                                if (Boolean.parseBoolean(attrs.getFileLoggerSDK()) == false) {
                                     ((LoginActivityLollipop)context).showConfirmationEnableLogs();
                                 }
                                 else{
-                                    dbH.setFileLogger(false);
-                                    Util.setFileLogger(false);
+                                    dbH.setFileLoggerSDK(false);
+                                    Util.setFileLoggerSDK(false);
                                     numberOfClicks = 0;
                                     MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_FATAL);
                                     ((LoginActivityLollipop)context).showSnackbar(getString(R.string.settings_disable_logs));

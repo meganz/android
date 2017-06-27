@@ -10353,7 +10353,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			public void onClick(DialogInterface dialog, int which) {
 				switch (which){
 					case DialogInterface.BUTTON_POSITIVE:
-						enableLogs();
+						enableLogsSDK();
 						break;
 
 					case DialogInterface.BUTTON_NEGATIVE:
@@ -10375,12 +10375,22 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				.setNegativeButton(R.string.general_cancel, dialogClickListener).show().setCanceledOnTouchOutside(false);
 	}
 
-	public void enableLogs(){
-		log("enableLogs");
+	public void enableLogsSDK(){
+		log("enableLogsSDK");
 
-		dbH.setFileLogger(true);
-		Util.setFileLogger(true);
+		dbH.setFileLoggerSDK(true);
+		Util.setFileLoggerSDK(true);
 		MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_MAX);
+		showSnackbar(getString(R.string.settings_enable_logs));
+		log("App Version: " + Util.getVersion(this));
+	}
+
+	public void enableLogsKarere(){
+		log("enableLogsKarere");
+
+		dbH.setFileLoggerKarere(true);
+		Util.setFileLoggerKarere(true);
+		MegaChatApiAndroid.setLogLevel(MegaChatApiAndroid.LOG_LEVEL_MAX);
 		showSnackbar(getString(R.string.settings_enable_logs));
 		log("App Version: " + Util.getVersion(this));
 	}
