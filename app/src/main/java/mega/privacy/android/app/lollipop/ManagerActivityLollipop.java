@@ -10342,8 +10342,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
 	}
 
-	public void showConfirmationEnableLogs(){
-		log("showConfirmationEnableLogs");
+	public void showConfirmationEnableLogsSDK(){
+		log("showConfirmationEnableLogsSDK");
 
 		if(sttFLol!=null){
 			sttFLol.numberOfClicksSDK = 0;
@@ -10354,6 +10354,39 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				switch (which){
 					case DialogInterface.BUTTON_POSITIVE:
 						enableLogsSDK();
+						break;
+
+					case DialogInterface.BUTTON_NEGATIVE:
+
+						break;
+				}
+			}
+		};
+
+		AlertDialog.Builder builder;
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+			builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		}
+		else{
+			builder = new AlertDialog.Builder(this);
+		}
+
+		builder.setMessage(R.string.enable_log_text_dialog).setPositiveButton(R.string.general_enable, dialogClickListener)
+				.setNegativeButton(R.string.general_cancel, dialogClickListener).show().setCanceledOnTouchOutside(false);
+	}
+
+	public void showConfirmationEnableLogsKarere(){
+		log("showConfirmationEnableLogsKarere");
+
+		if(sttFLol!=null){
+			sttFLol.numberOfClicksKarere = 0;
+		}
+		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				switch (which){
+					case DialogInterface.BUTTON_POSITIVE:
+						enableLogsKarere();
 						break;
 
 					case DialogInterface.BUTTON_NEGATIVE:
