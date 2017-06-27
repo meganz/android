@@ -12,6 +12,7 @@ import android.util.Base64;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import mega.privacy.android.app.lollipop.megachat.AndroidMegaChatMessage;
 import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.lollipop.megachat.NonContactInfo;
@@ -23,7 +24,7 @@ import nz.mega.sdk.MegaChatApi;
 
 public class DatabaseHandler extends SQLiteOpenHelper {
 	
-	private static final int DATABASE_VERSION = 32;
+	private static final int DATABASE_VERSION = 33;
     private static final String DATABASE_NAME = "megapreferences"; 
     private static final String TABLE_PREFERENCES = "preferences";
     private static final String TABLE_CREDENTIALS = "credentials";
@@ -35,6 +36,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	private static final String TABLE_CHAT_SETTINGS = "chatsettings";
 	private static final String TABLE_COMPLETED_TRANSFERS = "completedtransfers";
 	private static final String TABLE_EPHEMERAL = "ephemeral";
+	private static final String TABLE_PENDING_MSG = "pendingmsg";
+	private static final String TABLE_MSG_NODES = "msgnodes";
+	private static final String TABLE_NODE_ATTACHMENTS = "msgnodes";
 
     private static final String KEY_ID = "id";
     private static final String KEY_EMAIL = "email";
@@ -120,6 +124,18 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	private static final String KEY_TRANSFER_HANDLE = "transferhandle";
 
 	private static final String KEY_FIRST_LOGIN_CHAT = "firstloginchat";
+
+	private static final String KEY_ID_CHAT = "idchat";
+	private static final String KEY_MSG_TIMESTAMP = "timestamp";
+	private static final String KEY_ID_TEMP_KARERE = "idtempkarere";
+
+	private static final String KEY_ID_PENDING_MSG = "idpendingmsg";
+	private static final String KEY_ID_NODE = "idnode";
+
+	private static final String KEY_FILE_PATH = "filepath";
+	private static final String KEY_FILE_NAME = "filename";
+	private static final String KEY_FILE_FINGERPRINT = "filefingerprint";
+	private static final String KEY_NODE_HANDLE = "nodehandle";
 
 
     private static DatabaseHandler instance;
@@ -209,6 +225,18 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				+ KEY_ID + " INTEGER PRIMARY KEY, " +  KEY_EMAIL + " TEXT, "
 				+ KEY_PASSWORD + " TEXT, " + KEY_SESSION + " TEXT, " +  KEY_FIRST_NAME + " TEXT, " + KEY_LAST_NAME + " TEXT" + ")";
 		db.execSQL(CREATE_EPHEMERAL);
+
+		String CREATE_PENDING_MSG_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_PENDING_MSG + "("
+				+ KEY_ID + " INTEGER PRIMARY KEY," + KEY_ID_CHAT + " TEXT, " + KEY_MSG_TIMESTAMP + " TEXT, " +KEY_ID_TEMP_KARERE + " TEXT" + ")";
+		db.execSQL(CREATE_PENDING_MSG_TABLE);
+
+		String CREATE_MSG_NODE_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_MSG_NODES + "("
+				+ KEY_ID + " INTEGER PRIMARY KEY," + KEY_ID_PENDING_MSG+ " INTEGER, " + KEY_ID_NODE + " INTEGER" + ")";
+		db.execSQL(CREATE_MSG_NODE_TABLE);
+
+		String CREATE_NODE_ATTACHMENTS_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_NODE_ATTACHMENTS + "("
+				+ KEY_ID + " INTEGER PRIMARY KEY," + KEY_ID_NODE+ " INTEGER, " + KEY_FILE_PATH + " TEXT, " + KEY_FILE_NAME + " TEXT, " + KEY_FILE_FINGERPRINT + " TEXT, " + KEY_NODE_HANDLE + " TEXT" + ")";
+		db.execSQL(CREATE_NODE_ATTACHMENTS_TABLE);
 	}
 
 	@Override
@@ -473,6 +501,20 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 					+ KEY_PASSWORD + " TEXT, " + KEY_SESSION + " TEXT, " +  KEY_FIRST_NAME + " TEXT, " + KEY_LAST_NAME + " TEXT" + ")";
 			db.execSQL(CREATE_EPHEMERAL);
 		}
+
+		if (oldVersion <= 32){
+			String CREATE_PENDING_MSG_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_PENDING_MSG + "("
+					+ KEY_ID + " INTEGER PRIMARY KEY," + KEY_ID_CHAT + " TEXT, " + KEY_MSG_TIMESTAMP + " TEXT, " +KEY_ID_TEMP_KARERE + " TEXT" + ")";
+			db.execSQL(CREATE_PENDING_MSG_TABLE);
+
+			String CREATE_MSG_NODE_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_MSG_NODES + "("
+					+ KEY_ID + " INTEGER PRIMARY KEY," + KEY_ID_PENDING_MSG+ " INTEGER, " + KEY_ID_NODE + " INTEGER" + ")";
+			db.execSQL(CREATE_MSG_NODE_TABLE);
+
+			String CREATE_NODE_ATTACHMENTS_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_NODE_ATTACHMENTS + "("
+					+ KEY_ID + " INTEGER PRIMARY KEY," + KEY_ID_NODE+ " INTEGER, " + KEY_FILE_PATH + " TEXT, " + KEY_FILE_NAME + " TEXT, " + KEY_FILE_FINGERPRINT + " TEXT, " + KEY_NODE_HANDLE + " TEXT" + ")";
+			db.execSQL(CREATE_NODE_ATTACHMENTS_TABLE);
+		}
 	} 
 	
 //	public MegaOffline encrypt(MegaOffline off){
@@ -655,6 +697,71 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         return ephemeralCredentials;
     }
+
+	public void updatePendingMessage(long idMessage, String temporalId) {
+
+		String selectQuery = "SELECT * FROM " + TABLE_PENDING_MSG;
+		ContentValues values = new ContentValues();
+		Cursor cursor = db.rawQuery(selectQuery, null);
+		if (cursor.moveToFirst()){
+			String UPDATE_PENDING_MSG_TABLE = "UPDATE " + TABLE_PENDING_MSG + " SET " + KEY_ID_TEMP_KARERE + "= '" + encrypt(temporalId) + "' WHERE " + KEY_ID + " = " +idMessage;
+			db.execSQL(UPDATE_PENDING_MSG_TABLE);
+		}
+		else{
+			log("Not found messages in DB!");
+		}
+		cursor.close();
+	}
+
+	public long setPendingMessage(String idChat, String timestamp){
+		ContentValues values = new ContentValues();
+		values.put(KEY_ID_CHAT, encrypt(idChat));
+		values.put(KEY_MSG_TIMESTAMP, encrypt(timestamp));
+		values.put(KEY_ID_TEMP_KARERE, -1+"");
+
+		long id = db.insert(TABLE_PENDING_MSG, null, values);
+		return id;
+	}
+
+	public long setNodeAttachment(String path, String name, String fingerprint){
+		ContentValues values = new ContentValues();
+		values.put(KEY_FILE_PATH, encrypt(path));
+		values.put(KEY_FILE_NAME, encrypt(name));
+		values.put(KEY_FILE_FINGERPRINT, encrypt(fingerprint));
+		values.put(KEY_NODE_HANDLE, -1+"");
+
+		long id = db.insert(TABLE_NODE_ATTACHMENTS, null, values);
+		return id;
+	}
+
+	public long setMsgNode(long idMsg, long idNode){
+		ContentValues values = new ContentValues();
+		values.put(KEY_ID_PENDING_MSG, idMsg);
+		values.put(KEY_ID_NODE, idNode);
+
+		long id = db.insert(TABLE_NODE_ATTACHMENTS, null, values);
+		return id;
+	}
+
+	public int findPendingMessage(long idTemp){
+		log("findPendingMessage: "+idTemp);
+		String idPend = idTemp+"";
+
+		String selectQuery = "SELECT * FROM " + TABLE_PENDING_MSG + " WHERE " + KEY_ID_TEMP_KARERE + " = '" + encrypt(idPend) + "'";
+		log("QUERY: "+selectQuery);
+		Cursor cursor = db.rawQuery(selectQuery, null);
+
+		if (!cursor.equals(null)){
+			if (cursor.moveToFirst()){
+
+				int id = Integer.parseInt(cursor.getString(0));
+				return id;
+			}
+		}
+		cursor.close();
+		return -1;
+
+	}
 	
 	public void setPreferences (MegaPreferences prefs){
         ContentValues values = new ContentValues();
@@ -2475,6 +2582,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_COMPLETED_TRANSFERS);
         onCreate(db);
     }
+
+	public void clearPendingMessage(){
+		db.execSQL("DROP TABLE IF EXISTS " + TABLE_PENDING_MSG);
+		onCreate(db);
+	}
 	
 	private static void log(String log) {
 		Util.log("DatabaseHandler", log);

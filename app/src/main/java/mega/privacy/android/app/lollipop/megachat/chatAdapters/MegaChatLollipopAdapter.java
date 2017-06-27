@@ -349,16 +349,16 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             switch (messages.get(position).getInfoToShow()){
                 case Constants.CHAT_ADAPTER_SHOW_ALL:{
                     ((ViewHolderMessageChat)holder).dateLayout.setVisibility(View.VISIBLE);
-                    ((ViewHolderMessageChat)holder).dateText.setText(TimeChatUtils.formatDate(message.getUploadTimestamp(), TimeChatUtils.DATE_SHORT_FORMAT));
+                    ((ViewHolderMessageChat)holder).dateText.setText(TimeChatUtils.formatDate(message.getPendingMessage().getUploadTimestamp(), TimeChatUtils.DATE_SHORT_FORMAT));
                     ((ViewHolderMessageChat)holder).titleOwnMessage.setVisibility(View.VISIBLE);
-                    ((ViewHolderMessageChat)holder).timeOwnText.setText(TimeChatUtils.formatTime(message.getUploadTimestamp()));
+                    ((ViewHolderMessageChat)holder).timeOwnText.setText(TimeChatUtils.formatTime(message.getPendingMessage().getUploadTimestamp()));
                     break;
                 }
                 case Constants.CHAT_ADAPTER_SHOW_TIME:{
                     log("CHAT_ADAPTER_SHOW_TIME");
                     ((ViewHolderMessageChat)holder).dateLayout.setVisibility(View.GONE);
                     ((ViewHolderMessageChat)holder).titleOwnMessage.setVisibility(View.VISIBLE);
-                    ((ViewHolderMessageChat)holder).timeOwnText.setText(TimeChatUtils.formatTime(message.getUploadTimestamp()));
+                    ((ViewHolderMessageChat)holder).timeOwnText.setText(TimeChatUtils.formatTime(message.getPendingMessage().getUploadTimestamp()));
                     break;
                 }
                 case Constants.CHAT_ADAPTER_SHOW_NOTHING:{
@@ -388,8 +388,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         ((ViewHolderMessageChat)holder).contentOwnMessageContactName.setVisibility(View.GONE);
         ((ViewHolderMessageChat)holder).contentOwnMessageContactEmail.setVisibility(View.GONE);
 
-        ArrayList<String> paths = message.getPaths();
-        ArrayList<String> names = message.getNames();
+        ArrayList<String> paths = message.getPendingMessage().getFilePaths();
+        ArrayList<String> names = message.getPendingMessage().getNames();
         if(paths != null){
 
             if(paths.size()==1) {

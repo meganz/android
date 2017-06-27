@@ -1559,9 +1559,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 log("previous message: "+androidPreviousMessage.getMessage().getContent());
                 if(androidPreviousMessage.getMessage().getUserHandle()==myUserHandle) {
                     //The last two messages are mine
-                    if(compareDate(androidMsgSent.getUploadTimestamp(), androidPreviousMessage)==0){
+                    if(compareDate(androidMsgSent.getPendingMessage().getUploadTimestamp(), androidPreviousMessage)==0){
                         //Same date
-                        if(compareTime(androidMsgSent.getUploadTimestamp(), androidPreviousMessage)==0){
+                        if(compareTime(androidMsgSent.getPendingMessage().getUploadTimestamp(), androidPreviousMessage)==0){
                             messages.get(index).setInfoToShow(Constants.CHAT_ADAPTER_SHOW_NOTHING);
                         }
                         else{
@@ -1577,8 +1577,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 else{
                     //The last message is mine, the previous not
                     log("Modify not my message");
-                    if (compareDate(androidMsgSent.getUploadTimestamp(), androidPreviousMessage) == 0) {
-                        if (compareTime(androidMsgSent.getUploadTimestamp(), androidPreviousMessage) == 0) {
+                    if (compareDate(androidMsgSent.getPendingMessage().getUploadTimestamp(), androidPreviousMessage) == 0) {
+                        if (compareTime(androidMsgSent.getPendingMessage().getUploadTimestamp(), androidPreviousMessage) == 0) {
                             messages.get(index).setInfoToShow(Constants.CHAT_ADAPTER_SHOW_NOTHING);
                         } else {
                             //Different minute
@@ -2734,7 +2734,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         AndroidMegaChatMessage androidMsg = new AndroidMegaChatMessage(msg);
 
         if(msg.getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT){
-            modifyAttachmentReceived()
+//            modifyAttachmentReceived()
 
             sendAttachment(msg);
         }
@@ -2925,7 +2925,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             int found = -1;
 
             if(messageToCheck.isUploading()){
-                ArrayList<String> fingerprints = messageToCheck.getFingerPrints();
+                ArrayList<String> fingerprints = messageToCheck.getPendingMessage().getFingerPrints();
                 found = fingerprints.size()-1;
                 MegaNodeList nodeList = msg.getMessage().getMegaNodeList();
                 if(nodeList.size()==fingerprints.size()){
@@ -3873,26 +3873,49 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             ArrayList<String> fingerprints = new ArrayList<>();
             ArrayList<String> paths = new ArrayList<>();
             ArrayList<String> names = new ArrayList<>();
-            for (ShareInfo info : infos) {
-                log("name of the file: "+info.getTitle());
-                log("size of the file: "+info.getSize());
-                String fingerprint = megaApi.getFingerprint(info.getFileAbsolutePath());
-                names.add(info.getTitle());
-                paths.add(info.getFileAbsolutePath());
-                fingerprints.add(fingerprint);
+
+
+            long timestamp = System.currentTimeMillis()/1000;
+            long idPendingMsg = dbH.setPendingMessage(idChat+"", timestamp+"");
+            if(idPendingMsg!=-1){
+                intent.putExtra(ChatUploadService.EXTRA_ID_PEND_MSG, idPendingMsg);
+
+                for (ShareInfo info : infos) {
+                    log("name of the file: "+info.getTitle());
+                    log("size of the file: "+info.getSize());
+                    String fingerprint = megaApi.getFingerprint(info.getFileAbsolutePath());
+
+                    //Add node to db
+                    long idNode = dbH.setNodeAttachment(info.getFileAbsolutePath(), info.getTitle(), fingerprint);
+
+                    dbH.setMsgNode(idPendingMsg, idNode);
+
+                    names.add(info.getTitle());
+                    paths.add(info.getFileAbsolutePath());
+                    fingerprints.add(fingerprint);
+                }
+
+                PendingMessage newPendingMsg = new PendingMessage(idPendingMsg, idChat, paths, names, fingerprints, timestamp);
+                AndroidMegaChatMessage newNodeAttachmentMsg = new AndroidMegaChatMessage(newPendingMsg, true);
+                sendMessageUploading(newNodeAttachmentMsg);
+
+
+                intent.putStringArrayListExtra(ChatUploadService.EXTRA_FILEPATHS, paths);
+//                intent.putExtra(ChatUploadService.EXTRA_NAME, );
+                intent.putExtra(ChatUploadService.EXTRA_PARENT_HASH, parentNode.getHandle());
+//                intent.putExtra(ChatUploadService.EXTRA_SIZE, info.());
+                intent.putExtra(ChatUploadService.EXTRA_CHAT_ID, idChat);
+
+                log("Launch chat upload! "+paths.size());
+                startService(intent);
+            }
+            else{
+                log("Error when adding pending msg to the database");
             }
 
-            intent.putStringArrayListExtra(ChatUploadService.EXTRA_FILEPATHS, paths);
-//                intent.putExtra(ChatUploadService.EXTRA_NAME, );
-            intent.putExtra(ChatUploadService.EXTRA_PARENT_HASH, parentNode.getHandle());
-//                intent.putExtra(ChatUploadService.EXTRA_SIZE, info.());
-            intent.putExtra(ChatUploadService.EXTRA_CHAT_ID, idChat);
 
-            AndroidMegaChatMessage newNodeAttachmentMsg = new AndroidMegaChatMessage(fingerprints, names, true, System.currentTimeMillis()/1000);
-            sendMessageUploading(newNodeAttachmentMsg);
 
-            log("Launch chat upload! "+paths.size());
-            startService(intent);
+
         }
     }
 }
