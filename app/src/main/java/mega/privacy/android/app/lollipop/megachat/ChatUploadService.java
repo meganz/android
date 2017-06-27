@@ -34,6 +34,10 @@ import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApiAndroid;
+import nz.mega.sdk.MegaChatApiJava;
+import nz.mega.sdk.MegaChatError;
+import nz.mega.sdk.MegaChatRequest;
+import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaNodeList;
@@ -42,7 +46,7 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaTransferListenerInterface;
 
-public class ChatUploadService extends Service implements MegaTransferListenerInterface, MegaRequestListenerInterface {
+public class ChatUploadService extends Service implements MegaTransferListenerInterface, MegaRequestListenerInterface, MegaChatRequestListenerInterface {
 
 	public static String ACTION_CANCEL = "CANCEL_UPLOAD";
 	public static String EXTRA_FILEPATHS = "MEGA_FILE_PATH";
@@ -51,6 +55,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 	public static String EXTRA_SIZE = "MEGA_SIZE";
 	public static String EXTRA_PARENT_HASH = "MEGA_PARENT_HASH";
 	public static String EXTRA_CHAT_ID = "CHAT_ID";
+	public static String EXTRA_ID_PEND_MSG = "ID_PEND_MSG";
 
 	private int errorCount = 0;
 
@@ -167,9 +172,11 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 
 		long chatId = intent.getLongExtra(EXTRA_CHAT_ID, -1);
 
+		long idPendMsg = intent.getLongExtra(EXTRA_ID_PEND_MSG, -1);
+
 		if(chatId!=-1){
 
-			PendingMessage newMessage = new PendingMessage(chatId, filePaths);
+			PendingMessage newMessage = new PendingMessage(idPendMsg, chatId, filePaths);
 			pendingMessages.add(newMessage);
 
 			for(int i=0; i<filePaths.size();i++){
@@ -463,7 +470,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 										log("Node to send: "+node.getName());
 										nodeList.addNode(node);
 									}
-									megaChatApi.attachNodes(pendMsg.getChatId(), nodeList, null);
+									megaChatApi.attachNodes(pendMsg.getChatId(), nodeList, this);
 								}
 							}
 							else{
@@ -484,16 +491,12 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 												nodeList.addNode(node);
 											}
 										}
-										megaChatApi.attachNodes(pendMsg.getChatId(), nodeList, null);
+										megaChatApi.attachNodes(pendMsg.getChatId(), nodeList, this);
 									}
 								}
 								else{
 									log("Waiting for more messages...");
 								}
-							}
-
-							if (megaApi.getNumPendingUploads() == 0 && transfersCount==0){
-								onQueueComplete();
 							}
 
 							return;
@@ -542,10 +545,6 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
                     log("Delete file!: "+localFile.getAbsolutePath());
                     localFile.delete();
                 }
-            }
-
-            if (megaApi.getNumPendingUploads() == 0 && transfersCount==0){
-                onQueueComplete();
             }
 
             log("IN Finish: "+transfer.getFileName()+"path? "+transfer.getPath());
@@ -627,5 +626,64 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 	public boolean onTransferData(MegaApiJava api, MegaTransfer transfer, byte[] buffer)
 	{
 		return true;
+	}
+
+	@Override
+	public void onRequestStart(MegaChatApiJava api, MegaChatRequest request) {
+
+	}
+
+	@Override
+	public void onRequestUpdate(MegaChatApiJava api, MegaChatRequest request) {
+
+	}
+
+	@Override
+	public void onRequestFinish(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
+		if(request.getType() == MegaChatRequest.TYPE_ATTACH_NODE_MESSAGE){
+			if(e.getErrorCode()==MegaChatError.ERROR_OK){
+				log("File sent correctly");
+				MegaNodeList nodeList = request.getMegaNodeList();
+
+				//Find the pending message
+				for(int i=0; i<pendingMessages.size();i++){
+					PendingMessage pendMsg = pendingMessages.get(i);
+
+					//Check node handles - if match add to DB the karere temp id of the message
+
+					ArrayList<Long> nodeHandles = pendMsg.getNodeHandles();
+					if(nodeHandles.size()==1){
+						log("Just one file to send in the message");
+						MegaNode node = nodeList.get(0);
+						if(node.getHandle()==nodeHandles.get(0)){
+							log("The message MATCH!!");
+							long tempId = request.getMegaChatMessage().getTempId();
+							log("The tempId of the message is: "+tempId);
+							dbH.updatePendingMessage(pendMsg.getId(), tempId+"");
+						}
+					}
+					else{
+						log("More than one to send in message");
+
+
+					}
+
+				}
+
+
+			}
+			else{
+				log("File NOT sent: "+e.getErrorCode());
+			}
+		}
+
+		if (megaApi.getNumPendingUploads() == 0 && transfersCount==0){
+			onQueueComplete();
+		}
+	}
+
+	@Override
+	public void onRequestTemporaryError(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
+
 	}
 }
