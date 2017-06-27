@@ -220,6 +220,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 	String megaPathSecMediaFolder = "";
 
 	public int numberOfClicksSDK = 0;
+	public int numberOfClicksKarere = 0;
 	
 	@Override
     public void onCreate(Bundle savedInstanceState) {
@@ -377,6 +378,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 		aboutSDK = findPreference(KEY_ABOUT_SDK_VERSION);
 		aboutSDK.setOnPreferenceClickListener(this);
 		aboutKarere = findPreference(KEY_ABOUT_KARERE_VERSION);
+        aboutKarere.setOnPreferenceClickListener(this);
 
 		codeLink = findPreference(KEY_ABOUT_CODE_LINK);
 		codeLink.setOnPreferenceClickListener(this);
@@ -1097,7 +1099,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 				if (attrs.getFileLoggerSDK() != null){
 					try {
 						if (Boolean.parseBoolean(attrs.getFileLoggerSDK()) == false) {
-							((ManagerActivityLollipop)context).showConfirmationEnableLogs();
+							((ManagerActivityLollipop)context).showConfirmationEnableLogsSDK();
 						}
 						else{
 							dbH.setFileLoggerSDK(false);
@@ -1108,16 +1110,47 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 						}
 					}
 					catch(Exception e){
-						((ManagerActivityLollipop)context).showConfirmationEnableLogs();
+						((ManagerActivityLollipop)context).showConfirmationEnableLogsSDK();
 					}
 				}
 				else{
-					((ManagerActivityLollipop)context).showConfirmationEnableLogs();
+					((ManagerActivityLollipop)context).showConfirmationEnableLogsSDK();
 				}
 			}
 		}
 		else{
 			numberOfClicksSDK = 0;
+		}
+
+		if (preference.getKey().compareTo(KEY_ABOUT_KARERE_VERSION) == 0){
+			log("KEY_ABOUT_KARERE_VERSION pressed");
+			numberOfClicksKarere++;
+			if (numberOfClicksKarere == 5){
+				MegaAttributes attrs = dbH.getAttributes();
+				if (attrs.getFileLoggerKarere() != null){
+					try {
+						if (Boolean.parseBoolean(attrs.getFileLoggerKarere()) == false) {
+							((ManagerActivityLollipop)context).showConfirmationEnableLogsKarere();
+						}
+						else{
+							dbH.setFileLoggerKarere(false);
+							Util.setFileLoggerKarere(false);
+							numberOfClicksKarere = 0;
+							MegaChatApiAndroid.setLogLevel(MegaChatApiAndroid.LOG_LEVEL_ERROR);
+							((ManagerActivityLollipop)context).showSnackbar(getString(R.string.settings_disable_logs));
+						}
+					}
+					catch(Exception e){
+						((ManagerActivityLollipop)context).showConfirmationEnableLogsKarere();
+					}
+				}
+				else{
+					((ManagerActivityLollipop)context).showConfirmationEnableLogsKarere();
+				}
+			}
+		}
+		else{
+			numberOfClicksKarere = 0;
 		}
 
 		if (preference.getKey().compareTo(KEY_STORAGE_DOWNLOAD_LOCATION) == 0){
