@@ -1,23 +1,27 @@
 package mega.privacy.android.app.lollipop.megachat;
 
 
+import java.util.ArrayList;
+
 import nz.mega.sdk.MegaChatMessage;
 
 public class AndroidMegaChatMessage {
     MegaChatMessage message;
     int infoToShow=-1;
-    String path;
-    String name;
+    ArrayList<String> fingerprints;
+    ArrayList<String> names;
     boolean uploading;
+    long uploadTimestamp;
 
     public AndroidMegaChatMessage(MegaChatMessage message) {
         this.message = message;
     }
 
-    public AndroidMegaChatMessage(String path, boolean uploading)
-    {
-        this.path = path;
+    public AndroidMegaChatMessage(ArrayList<String> fingerprints, ArrayList<String> names, boolean uploading, long uploadTimestamp) {
+        this.fingerprints = fingerprints;
+        this.fingerprints = fingerprints;
         this.uploading = uploading;
+        this.uploadTimestamp = uploadTimestamp;
     }
 
     public int getInfoToShow() {
@@ -36,21 +40,33 @@ public class AndroidMegaChatMessage {
         this.message = message;
     }
 
-
-    public String getPath() {
-        return path;
+    public ArrayList<String> getFingerPrints() {
+        return fingerprints;
     }
 
-    public void setPath(String path) {
-        this.path = path;
+    public void setFingerprints(ArrayList<String> fingerprints) {
+        this.fingerprints = fingerprints;
     }
 
-    public String getName() {
-        return name;
+    public ArrayList<String> getNames() {
+        return fingerprints;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setNames(ArrayList<String> fingerprints) {
+        this.fingerprints = fingerprints;
+    }
+
+    public void addFingerprintAndName (String path, String name){
+        fingerprints.add(path);
+        fingerprints.add(name);
+    }
+
+    public long getUploadTimestamp() {
+        return uploadTimestamp;
+    }
+
+    public void setUploadTimestamp(long uploadTimestamp) {
+        this.uploadTimestamp = uploadTimestamp;
     }
 
     public boolean isUploading() {
