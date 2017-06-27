@@ -325,15 +325,122 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         log("onBindViewHolder: " + position);
 
-        ((ViewHolderMessageChat)holder).currentPosition = position;
+        AndroidMegaChatMessage androidMessage = messages.get(position);
 
-        ((ViewHolderMessageChat)holder).triangleIcon.setVisibility(View.GONE);
-        ((ViewHolderMessageChat)holder).retryAlert.setVisibility(View.GONE);
+        if(androidMessage.isUploading()){
+            onBindViewHolderUploading(holder, position);
+        }
+        else{
+            onBindViewHolderMessage(holder, position);
+        }
+    }
+
+    public void onBindViewHolderUploading(RecyclerView.ViewHolder holder, int position) {
+        log("onBindViewHolderUploading: " + position);
+
+        ((ViewHolderMessageChat) holder).currentPosition = position;
+
+        ((ViewHolderMessageChat) holder).triangleIcon.setVisibility(View.GONE);
+        ((ViewHolderMessageChat) holder).retryAlert.setVisibility(View.GONE);
+
+        AndroidMegaChatMessage message = messages.get(position);
+
+        if(messages.get(position).getInfoToShow()!=-1){
+            switch (messages.get(position).getInfoToShow()){
+                case Constants.CHAT_ADAPTER_SHOW_ALL:{
+                    ((ViewHolderMessageChat)holder).dateLayout.setVisibility(View.VISIBLE);
+                    ((ViewHolderMessageChat)holder).dateText.setText(TimeChatUtils.formatDate(message.getUploadTimestamp(), TimeChatUtils.DATE_SHORT_FORMAT));
+                    ((ViewHolderMessageChat)holder).titleOwnMessage.setVisibility(View.VISIBLE);
+                    ((ViewHolderMessageChat)holder).timeOwnText.setText(TimeChatUtils.formatTime(message.getUploadTimestamp()));
+                    break;
+                }
+                case Constants.CHAT_ADAPTER_SHOW_TIME:{
+                    log("CHAT_ADAPTER_SHOW_TIME");
+                    ((ViewHolderMessageChat)holder).dateLayout.setVisibility(View.GONE);
+                    ((ViewHolderMessageChat)holder).titleOwnMessage.setVisibility(View.VISIBLE);
+                    ((ViewHolderMessageChat)holder).timeOwnText.setText(TimeChatUtils.formatTime(message.getUploadTimestamp()));
+                    break;
+                }
+                case Constants.CHAT_ADAPTER_SHOW_NOTHING:{
+                    log("CHAT_ADAPTER_SHOW_NOTHING");
+                    ((ViewHolderMessageChat)holder).dateLayout.setVisibility(View.GONE);
+                    ((ViewHolderMessageChat)holder).titleOwnMessage.setVisibility(View.GONE);
+                    break;
+                }
+            }
+        }
+
+        ((ViewHolderMessageChat)holder).ownMessageLayout.setVisibility(View.VISIBLE);
+        ((ViewHolderMessageChat)holder).contactMessageLayout.setVisibility(View.GONE);
+
+        ((ViewHolderMessageChat)holder).contentOwnMessageText.setVisibility(View.GONE);
+        ((ViewHolderMessageChat)holder).contentOwnMessageThumbLand.setVisibility(View.GONE);
+        ((ViewHolderMessageChat)holder).contentOwnMessageThumbPort.setVisibility(View.GONE);
+
+        ((ViewHolderMessageChat)holder).contentOwnMessageFileLayout.setVisibility(View.VISIBLE);
+
+        ((ViewHolderMessageChat)holder).contentOwnMessageFileThumb.setVisibility(View.VISIBLE);
+        ((ViewHolderMessageChat)holder).contentOwnMessageFileName.setVisibility(View.VISIBLE);
+        ((ViewHolderMessageChat)holder).contentOwnMessageFileSize.setVisibility(View.VISIBLE);
+
+        ((ViewHolderMessageChat)holder).contentOwnMessageContactLayout.setVisibility(View.GONE);
+        ((ViewHolderMessageChat)holder).contentOwnMessageContactThumb.setVisibility(View.GONE);
+        ((ViewHolderMessageChat)holder).contentOwnMessageContactName.setVisibility(View.GONE);
+        ((ViewHolderMessageChat)holder).contentOwnMessageContactEmail.setVisibility(View.GONE);
+
+        ArrayList<String> paths = message.getPaths();
+        ArrayList<String> names = message.getNames();
+        if(paths != null){
+
+            if(paths.size()==1) {
+                log("One attachment in uploading message");
+
+                String path = paths.get(0);
+                String name = names.get(0);
+                log("Node Name: " + name);
+
+                if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+                    log("Landscape configuration");
+                    float width = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MAX_WIDTH_FILENAME_LAND, context.getResources().getDisplayMetrics());
+                    ((ViewHolderMessageChat)holder).contentOwnMessageFileName.setMaxWidth((int) width);
+                    ((ViewHolderMessageChat)holder).contentOwnMessageFileSize.setMaxWidth((int) width);
+                }
+                else{
+                    log("Portrait configuration");
+                    float width = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MAX_WIDTH_FILENAME_PORT, context.getResources().getDisplayMetrics());
+                    ((ViewHolderMessageChat)holder).contentOwnMessageFileName.setMaxWidth((int) width);
+                    ((ViewHolderMessageChat)holder).contentOwnMessageFileSize.setMaxWidth((int) width);
+                }
+
+                ((ViewHolderMessageChat) holder).contentOwnMessageFileName.setText(name);
+
+                ((ViewHolderMessageChat) holder).contentOwnMessageFileSize.setText("Uploading...");
+
+                ((ViewHolderMessageChat) holder).contentOwnMessageFileThumb.setImageResource(MimeTypeList.typeForName(name).getIconResourceId());
+
+            }
+            else{
+                log("Several attachments in uploading message");
+                ((ViewHolderMessageChat)holder).contentOwnMessageFileSize.setText("Uploading...");
+
+                ((ViewHolderMessageChat)holder).contentOwnMessageFileThumb.setImageResource(MimeTypeList.typeForName(names.get(0)).getIconResourceId());
+
+                ((ViewHolderMessageChat)holder).contentOwnMessageFileName.setText(context.getResources().getQuantityString(R.plurals.new_general_num_files, paths.size(), paths.size()));
+            }
+        }
+    }
+
+
+    public void onBindViewHolderMessage(RecyclerView.ViewHolder holder, int position) {
+        log("onBindViewHolderMessage: " + position);
+
+        ((ViewHolderMessageChat) holder).currentPosition = position;
+
+        ((ViewHolderMessageChat) holder).triangleIcon.setVisibility(View.GONE);
+        ((ViewHolderMessageChat) holder).retryAlert.setVisibility(View.GONE);
 
         MegaChatMessage message = messages.get(position).getMessage();
         ((ViewHolderMessageChat)holder).userHandle = message.getUserHandle();
-
-//        String myMail = ((ChatActivityLollipop) context).getMyMail();
 
         if(message.getType()==MegaChatMessage.TYPE_ALTER_PARTICIPANTS){
             log("ALTER PARTICIPANT MESSAGE!!");
