@@ -94,7 +94,7 @@ public class Util {
 	public static double percScreenLoginReturning = 0.8;
 	
 	// Debug flag to enable logging and some other things
-	public static boolean DEBUG = true;
+	public static boolean DEBUG = false;
 
 	public static String offlineDIR = "MEGA/MEGA Offline";
 	public static String downloadDIR ="MEGA/MEGA Downloads";
@@ -118,7 +118,8 @@ public class Util {
 	public static String base64EncodedPublicKey_5 = "YgjYKCXtjloP8QnKu0IGOoo79Cfs3Z9eC3sQ1fcLQsMM2wExlbnYI2KPTs0EGCmcMXrrO5MimGjYeW8GQlrKsbiZ0UwIDAQAB";
 	*/
 	public static DatabaseHandler dbH;
-	public static boolean fileLogger = false;
+	public static boolean fileLoggerSDK = false;
+	public static boolean fileLoggerKarere = false;
 	public static Context context;
 
 	public static HashMap<String, String> countryCodeDisplay;
@@ -630,14 +631,22 @@ public class Util {
 		dbH = d;
 	}
 
-	public static void setFileLogger(boolean fL){
-		fileLogger = fL;
+	public static void setFileLoggerSDK(boolean fL){
+		fileLoggerSDK = fL;
 	}
 
-	public static boolean getFileLogger(){
-		return fileLogger;
+	public static boolean getFileLoggerSDK(){
+		return fileLoggerSDK;
 	}
-	
+
+	public static void setFileLoggerKarere(boolean fL){
+		fileLoggerKarere = fL;
+	}
+
+    public static boolean getFileLoggerKarere(){
+        return fileLoggerKarere;
+    }
+
 	/*
 	 * Global log handler
 	 */
@@ -1731,9 +1740,9 @@ public class Util {
 		if (dbH != null) {
 			MegaAttributes attrs = dbH.getAttributes();
 			if (attrs != null) {
-				if (attrs.getFileLogger() != null) {
+				if (attrs.getFileLoggerSDK() != null) {
 					try {
-						fileLogger = Boolean.parseBoolean(attrs.getFileLogger());
+						fileLogger = Boolean.parseBoolean(attrs.getFileLoggerSDK());
 					} catch (Exception e) {
 						fileLogger = false;
 					}
@@ -1749,7 +1758,7 @@ public class Util {
 			MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_MAX);
 		}
 		else {
-			setFileLogger(fileLogger);
+			setFileLoggerSDK(fileLogger);
 			if (fileLogger) {
 				MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_MAX);
 			} else {

@@ -23,7 +23,7 @@ import nz.mega.sdk.MegaChatApi;
 
 public class DatabaseHandler extends SQLiteOpenHelper {
 	
-	private static final int DATABASE_VERSION = 32;
+	private static final int DATABASE_VERSION = 33;
     private static final String DATABASE_NAME = "megapreferences"; 
     private static final String TABLE_PREFERENCES = "preferences";
     private static final String TABLE_CREDENTIALS = "credentials";
@@ -87,7 +87,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	private static final String KEY_PREFERRED_SORT_CLOUD = "preferredsortcloud";
 	private static final String KEY_PREFERRED_SORT_CONTACTS = "preferredsortcontacts";
 	private static final String KEY_PREFERRED_SORT_OTHERS = "preferredsortothers";
-	private static final String KEY_FILE_LOGGER = "filelogger";
+	private static final String KEY_FILE_LOGGER_SDK = "filelogger";
+	private static final String KEY_FILE_LOGGER_KARERE = "fileloggerkarere";
 
 	private static final String KEY_ACCOUNT_DETAILS_TIMESTAMP = "accountdetailstimestamp";
 	private static final String KEY_PAYMENT_METHODS_TIMESTAMP = "paymentmethodsstimestamp";
@@ -176,8 +177,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         
         String CREATE_ATTRIBUTES_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_ATTRIBUTES + "("
         		+ KEY_ID + " INTEGER PRIMARY KEY, " + KEY_ATTR_ONLINE + " TEXT, " + KEY_ATTR_INTENTS + " TEXT, " + 
-        		KEY_ATTR_ASK_SIZE_DOWNLOAD+ "	BOOLEAN, "+KEY_ATTR_ASK_NOAPP_DOWNLOAD+ " BOOLEAN, " + KEY_FILE_LOGGER +" TEXT, " + KEY_ACCOUNT_DETAILS_TIMESTAMP +" TEXT, " +
-				KEY_PAYMENT_METHODS_TIMESTAMP +" TEXT, " + KEY_PRICING_TIMESTAMP +" TEXT, " + KEY_EXTENDED_ACCOUNT_DETAILS_TIMESTAMP +" TEXT, " + KEY_INVALIDATE_SDK_CACHE + " TEXT" + ")";
+        		KEY_ATTR_ASK_SIZE_DOWNLOAD+ "	BOOLEAN, "+KEY_ATTR_ASK_NOAPP_DOWNLOAD+ " BOOLEAN, " + KEY_FILE_LOGGER_SDK +" TEXT, " + KEY_ACCOUNT_DETAILS_TIMESTAMP +" TEXT, " +
+				KEY_PAYMENT_METHODS_TIMESTAMP +" TEXT, " + KEY_PRICING_TIMESTAMP +" TEXT, " + KEY_EXTENDED_ACCOUNT_DETAILS_TIMESTAMP +" TEXT, " + KEY_INVALIDATE_SDK_CACHE + " TEXT, " + KEY_FILE_LOGGER_KARERE +" TEXT" + ")";
         db.execSQL(CREATE_ATTRIBUTES_TABLE);
 
         String CREATE_CONTACTS_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_CONTACTS + "("
@@ -383,8 +384,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			db.execSQL("UPDATE " + TABLE_PREFERENCES + " SET " + KEY_PREFERRED_SORT_CONTACTS + " = '" + encrypt(String.valueOf(MegaApiJava.ORDER_DEFAULT_ASC)) + "';");
 			db.execSQL("UPDATE " + TABLE_PREFERENCES + " SET " + KEY_PREFERRED_SORT_OTHERS + " = '" + encrypt(String.valueOf(MegaApiJava.ORDER_DEFAULT_ASC)) + "';");
 
-			db.execSQL("ALTER TABLE " + TABLE_ATTRIBUTES + " ADD COLUMN " + KEY_FILE_LOGGER + " TEXT;");
-			db.execSQL("UPDATE " + TABLE_ATTRIBUTES + " SET " + KEY_FILE_LOGGER + " = '" + encrypt("false") + "';");
+			db.execSQL("ALTER TABLE " + TABLE_ATTRIBUTES + " ADD COLUMN " + KEY_FILE_LOGGER_SDK + " TEXT;");
+			db.execSQL("UPDATE " + TABLE_ATTRIBUTES + " SET " + KEY_FILE_LOGGER_SDK + " = '" + encrypt("false") + "';");
 		}
 
 		if(oldVersion <= 21){
@@ -472,6 +473,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 					+ KEY_ID + " INTEGER PRIMARY KEY, " +  KEY_EMAIL + " TEXT, "
 					+ KEY_PASSWORD + " TEXT, " + KEY_SESSION + " TEXT, " +  KEY_FIRST_NAME + " TEXT, " + KEY_LAST_NAME + " TEXT" + ")";
 			db.execSQL(CREATE_EPHEMERAL);
+		}
+
+		if (oldVersion <= 32){
+			db.execSQL("ALTER TABLE " + TABLE_ATTRIBUTES + " ADD COLUMN " + KEY_FILE_LOGGER_KARERE + " TEXT;");
+			db.execSQL("UPDATE " + TABLE_ATTRIBUTES + " SET " + KEY_FILE_LOGGER_KARERE + " = '" + encrypt("false") + "';");
 		}
 	} 
 	
@@ -1003,12 +1009,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         values.put(KEY_ATTR_INTENTS, encrypt(Integer.toString(attr.getAttemps())));
         values.put(KEY_ATTR_ASK_SIZE_DOWNLOAD, encrypt(attr.getAskSizeDownload()));
         values.put(KEY_ATTR_ASK_NOAPP_DOWNLOAD, encrypt(attr.getAskNoAppDownload()));
-		values.put(KEY_FILE_LOGGER, encrypt(attr.getFileLogger()));
+		values.put(KEY_FILE_LOGGER_SDK, encrypt(attr.getFileLoggerSDK()));
 		values.put(KEY_ACCOUNT_DETAILS_TIMESTAMP, encrypt(attr.getAccountDetailsTimeStamp()));
 		values.put(KEY_PAYMENT_METHODS_TIMESTAMP, encrypt(attr.getPaymentMethodsTimeStamp()));
 		values.put(KEY_PRICING_TIMESTAMP, encrypt(attr.getPricingTimeStamp()));
 		values.put(KEY_EXTENDED_ACCOUNT_DETAILS_TIMESTAMP, encrypt(attr.getExtendedAccountDetailsTimeStamp()));
 		values.put(KEY_INVALIDATE_SDK_CACHE, encrypt(attr.getInvalidateSdkCache()));
+		values.put(KEY_FILE_LOGGER_KARERE, encrypt(attr.getFileLoggerKarere()));
 		db.insert(TABLE_ATTRIBUTES, null, values);
 	}
 	
@@ -1023,17 +1030,18 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			String intents =  decrypt(cursor.getString(2));
 			String askSizeDownload = decrypt(cursor.getString(3));
 			String askNoAppDownload = decrypt(cursor.getString(4));
-			String fileLogger = decrypt(cursor.getString(5));
+			String fileLoggerSDK = decrypt(cursor.getString(5));
 			String accountDetailsTimeStamp = decrypt(cursor.getString(6));
 			String paymentMethodsTimeStamp = decrypt(cursor.getString(7));
 			String pricingTimeStamp = decrypt(cursor.getString(8));
 			String extendedAccountDetailsTimeStamp = decrypt(cursor.getString(9));
 			String invalidateSdkCache = decrypt(cursor.getString(10));
+			String fileLoggerKarere = decrypt(cursor.getString(11));
 			if(intents!=null){
-				attr = new MegaAttributes(online, Integer.parseInt(intents), askSizeDownload, askNoAppDownload, fileLogger, accountDetailsTimeStamp, paymentMethodsTimeStamp, pricingTimeStamp, extendedAccountDetailsTimeStamp, invalidateSdkCache);
+				attr = new MegaAttributes(online, Integer.parseInt(intents), askSizeDownload, askNoAppDownload, fileLoggerSDK, accountDetailsTimeStamp, paymentMethodsTimeStamp, pricingTimeStamp, extendedAccountDetailsTimeStamp, invalidateSdkCache, fileLoggerKarere);
 			}
 			else{
-				attr = new MegaAttributes(online, 0, askSizeDownload, askNoAppDownload, fileLogger, accountDetailsTimeStamp, paymentMethodsTimeStamp, pricingTimeStamp, extendedAccountDetailsTimeStamp, invalidateSdkCache);
+				attr = new MegaAttributes(online, 0, askSizeDownload, askNoAppDownload, fileLoggerSDK, accountDetailsTimeStamp, paymentMethodsTimeStamp, pricingTimeStamp, extendedAccountDetailsTimeStamp, invalidateSdkCache, fileLoggerKarere);
 			}
 		}
 		cursor.close();
@@ -2384,17 +2392,33 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		cursor.close();
 	}
 
-	public void setFileLogger (boolean fileLogger){
+	public void setFileLoggerSDK (boolean fileLoggerSDK){
 		String selectQuery = "SELECT * FROM " + TABLE_ATTRIBUTES;
 		ContentValues values = new ContentValues();
 		Cursor cursor = db.rawQuery(selectQuery, null);
 		if (cursor.moveToFirst()){
-			String UPDATE_ATTRIBUTES_TABLE = "UPDATE " + TABLE_ATTRIBUTES + " SET " + KEY_FILE_LOGGER + "='" + encrypt(fileLogger + "") + "' WHERE " + KEY_ID + " ='1'";
+			String UPDATE_ATTRIBUTES_TABLE = "UPDATE " + TABLE_ATTRIBUTES + " SET " + KEY_FILE_LOGGER_SDK + "='" + encrypt(fileLoggerSDK + "") + "' WHERE " + KEY_ID + " ='1'";
 			db.execSQL(UPDATE_ATTRIBUTES_TABLE);
 			log("UPDATE_ATTRIBUTES_TABLE : " + UPDATE_ATTRIBUTES_TABLE);
 		}
 		else{
-			values.put(KEY_FILE_LOGGER, encrypt(fileLogger + ""));
+			values.put(KEY_FILE_LOGGER_SDK, encrypt(fileLoggerSDK + ""));
+			db.insert(TABLE_ATTRIBUTES, null, values);
+		}
+		cursor.close();
+	}
+
+	public void setFileLoggerKarere (boolean fileLoggerKarere){
+		String selectQuery = "SELECT * FROM " + TABLE_ATTRIBUTES;
+		ContentValues values = new ContentValues();
+		Cursor cursor = db.rawQuery(selectQuery, null);
+		if (cursor.moveToFirst()){
+			String UPDATE_ATTRIBUTES_TABLE = "UPDATE " + TABLE_ATTRIBUTES + " SET " + KEY_FILE_LOGGER_KARERE + "='" + encrypt(fileLoggerKarere + "") + "' WHERE " + KEY_ID + " ='1'";
+			db.execSQL(UPDATE_ATTRIBUTES_TABLE);
+			log("UPDATE_ATTRIBUTES_TABLE : " + UPDATE_ATTRIBUTES_TABLE);
+		}
+		else{
+			values.put(KEY_FILE_LOGGER_KARERE, encrypt(fileLoggerKarere + ""));
 			db.insert(TABLE_ATTRIBUTES, null, values);
 		}
 		cursor.close();

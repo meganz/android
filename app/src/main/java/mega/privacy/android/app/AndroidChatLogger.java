@@ -33,7 +33,7 @@ public class AndroidChatLogger implements MegaChatLoggerInterface {
 			}
 
 			File logFile=null;
-			boolean fileLogger = Util.getFileLogger();
+			boolean fileLogger = Util.getFileLoggerKarere();
 			if (fileLogger) {
 				//Send the log to a file
 
