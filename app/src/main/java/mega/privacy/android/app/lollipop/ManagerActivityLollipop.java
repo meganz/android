@@ -209,6 +209,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 	public long transferCallback = 0;
 
+	boolean chatConnection = false;
+
 	TransfersBottomSheetDialogFragment transfersBottomSheet = null;
 
 	//OVERQUOTA WARNING
@@ -228,8 +230,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	MegaNode inboxNode = null;
 
 	boolean mkLayoutVisible = false;
-
-	int statusToConnect = -1;
 
 	private NetworkStateReceiver networkStateReceiver;
 	MegaNode rootNode = null;
@@ -1017,6 +1017,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		outState.putLong("parentHandleOutgoing", parentHandleOutgoing);
 		outState.putLong("parentHandleSearch", parentHandleSearch);
 		outState.putLong("parentHandleInbox", parentHandleInbox);
+		outState.putBoolean("chatConnection", chatConnection);
 		outState.putSerializable("drawerItem", drawerItem);
 
 		if(parentHandleIncoming!=-1){
@@ -1104,6 +1105,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			selectedAccountType = savedInstanceState.getInt("selectedAccountType", -1);
 			selectedPaymentMethod = savedInstanceState.getInt("selectedPaymentMethod", -1);
 			searchQuery = savedInstanceState.getString("searchQuery");
+			chatConnection = savedInstanceState.getBoolean("chatConnection");
 		}
 		else{
 			log("Bundle is NULL");
@@ -1113,6 +1115,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			parentHandleOutgoing = -1;
 			parentHandleSearch = -1;
 			parentHandleInbox = -1;
+
+			chatConnection = false;
 
 			this.setPathNavigationOffline("/");
 		}
@@ -1790,7 +1794,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			log("onCreate - Check if there any unread chat");
 			if(Util.isChatEnabled()){
 				log("Connect to chat!");
-				megaChatApi.connect(this);
+
+				if(!chatConnection){
+					log("Connection goes!!!");
+					megaChatApi.connect(this);
+				}
 
 				if (nV != null){
 					Menu nVMenu = nV.getMenu();
@@ -11662,6 +11670,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 		}
 		else if (request.getType() == MegaChatRequest.TYPE_CONNECT){
+			log("Connecting chat finished");
+			chatConnection = true;
+
 			if (MegaApplication.isFirstConnect()){
 				MegaApplication.setFirstConnect(false);
 			}
