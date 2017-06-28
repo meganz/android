@@ -181,6 +181,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
 	TextView addedTextView;
 	TextView modifiedTextView;
+	AppBarLayout appBarLayout;
 
 	//RelativeLayout permissionsLayout;
 	//TextView permissionLabel;
@@ -194,7 +195,9 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 	MegaOffline mOffDelete;
 
 	RelativeLayout ownerLayout;
+	LinearLayout ownerLinear;
 	TextView ownerLabel;
+	TextView ownerLabelowner;
 	TextView ownerInfo;
 	ImageView ownerRoundeImage;
 	TextView ownerLetter;
@@ -383,14 +386,30 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 		    //permissionsIcon = (ImageView) findViewById(R.id.file_properties_permissions_image);
 
 			//permissionLabel = (TextView) findViewById(R.id.file_properties_permission_label);
-
+			appBarLayout = (AppBarLayout) findViewById(R.id.app_bar);
 
 			//Owner Layout
 			ownerLayout = (RelativeLayout) findViewById(R.id.file_properties_owner_layout);
 			ownerRoundeImage= (RoundedImageView) findViewById(R.id.contact_list_thumbnail);
 			ownerLetter = (TextView) findViewById(R.id.contact_list_initial_letter);
+
+			ownerLinear = (LinearLayout) findViewById(R.id.file_properties_owner_linear);
 			ownerLabel =  (TextView) findViewById(R.id.file_properties_owner_label);
+			ownerLabelowner = (TextView) findViewById(R.id.file_properties_owner_label_owner);
+			String ownerString = "("+getString(R.string.file_properties_owner)+")";
+			ownerLabelowner.setText(ownerString);
 			ownerInfo = (TextView) findViewById(R.id.file_properties_owner_info);
+
+			if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+
+				ownerLabel.setMaxWidth(1300);
+				ownerInfo.setMaxWidth(1400);
+
+			}else{
+				ownerLabel.setMaxWidth(500);
+				ownerInfo.setMaxWidth(600);
+
+			}
 
 			ownerLayout.setVisibility(View.GONE);
 
@@ -562,6 +581,8 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 				downloadMenuItem.setVisible(true);
 				if (node.isFolder()){
 					shareMenuItem.setVisible(true);
+
+
 				}
 				else{
 					shareMenuItem.setVisible(false);
@@ -605,9 +626,9 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
 //				collapsingToolbar.setStatusBarScrimColor(ContextCompat.getColor(this, R.color.transparent_black));
 		}
+		/*Folder*/
 		else{
 
-			AppBarLayout appBarLayout = (AppBarLayout) findViewById(R.id.app_bar);
 			appBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
 				@Override
 				public void onOffsetChanged(AppBarLayout appBarLayout, int offset) {
