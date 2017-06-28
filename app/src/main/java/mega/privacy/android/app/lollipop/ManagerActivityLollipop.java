@@ -13148,9 +13148,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 							transfersBottomSheet.dismiss();
 						}
 					}
-					pauseTransfersMenuIcon.setVisible(false);
-					playTransfersMenuIcon.setVisible(false);
-					cancelAllTransfersMenuItem.setVisible(false);
+					if (pauseTransfersMenuIcon != null) {
+						pauseTransfersMenuIcon.setVisible(false);
+						playTransfersMenuIcon.setVisible(false);
+						cancelAllTransfersMenuItem.setVisible(false);
+					}
 
 //					showSnackbar(getString(R.string.message_transfers_completed));
 				}
