@@ -50,10 +50,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 
 	public static String ACTION_CANCEL = "CANCEL_UPLOAD";
 	public static String EXTRA_FILEPATHS = "MEGA_FILE_PATH";
-	public static String EXTRA_FOLDERPATH = "MEGA_FOLDER_PATH";
-	public static String EXTRA_NAME = "MEGA_FILE_NAME";
 	public static String EXTRA_SIZE = "MEGA_SIZE";
-	public static String EXTRA_PARENT_HASH = "MEGA_PARENT_HASH";
 	public static String EXTRA_CHAT_ID = "CHAT_ID";
 	public static String EXTRA_ID_PEND_MSG = "ID_PEND_MSG";
 
@@ -168,8 +165,6 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 		ArrayList<String> filePaths = intent.getStringArrayListExtra(EXTRA_FILEPATHS);
 		log("Number of files to upload: "+filePaths.size());
 
-		long parentHandle = intent.getLongExtra(EXTRA_PARENT_HASH, 0);
-
 		long chatId = intent.getLongExtra(EXTRA_CHAT_ID, -1);
 
 		long idPendMsg = intent.getLongExtra(EXTRA_ID_PEND_MSG, -1);
@@ -179,21 +174,11 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 			PendingMessage newMessage = new PendingMessage(idPendMsg, chatId, filePaths);
 			pendingMessages.add(newMessage);
 
-			for(int i=0; i<filePaths.size();i++){
-				File file = new File(filePaths.get(i));
-
-				if (file.isDirectory()) {
-//			String nameInMEGA = intent.getStringExtra(EXTRA_NAME);
-//			if (nameInMEGA != null){
-//				megaApi.startUpload(file.getAbsolutePath(), megaApi.getNodeByHandle(parentHandle), nameInMEGA);
-//			}
-//			else{
-//				megaApi.startUpload(file.getAbsolutePath(), megaApi.getNodeByHandle(parentHandle));
-//			}
-				}
-				else {
-					log("Chat file uploading...");
-
+			MegaNode parentNode = megaApi.getNodeByPath("/"+Constants.CHAT_FOLDER);
+			if(parentNode != null){
+				log("The destination "+Constants.CHAT_FOLDER+ " already exists");
+				for(int i=0; i<filePaths.size();i++){
+					File file = new File(filePaths.get(i));
 					if(!wl.isHeld()){
 						wl.acquire();
 					}
@@ -201,11 +186,20 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 					if(!lock.isHeld()){
 						lock.acquire();
 					}
-
-					megaApi.startUpload(filePaths.get(i), megaApi.getNodeByHandle(parentHandle));
-
+					log("Chat file uploading: "+filePaths.get(i));
+					megaApi.startUpload(filePaths.get(i), parentNode);
 				}
 			}
+			else{
+				log("Chat folder NOT exists --> STOP service");
+				isForeground = false;
+				stopForeground(true);
+				mNotificationManager.cancel(notificationId);
+				stopSelf();
+				log("after stopSelf");
+			}
+
+
 
 		}
 		else{
@@ -259,16 +253,6 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 		mNotificationManager.cancel(notificationId);
 		stopSelf();
 		log("after stopSelf");
-		String pathSelfie = Environment.getExternalStorageDirectory().getAbsolutePath() +"/"+ Util.temporalPicDIR;
-		File f = new File(pathSelfie);
-		//Delete recursively all files and folder
-		if (f.exists()) {
-			if (f.isDirectory()) {
-			    for (File c : f.listFiles())
-			      c.delete();
-			}
-			f.delete();
-		}
 	}
 
 	/*
