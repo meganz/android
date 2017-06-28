@@ -395,7 +395,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             if(paths.size()==1) {
                 log("One attachment in uploading message");
 
-                String path = paths.get(0);
                 String name = names.get(0);
                 log("Node Name: " + name);
 

@@ -16,6 +16,7 @@ public class AndroidMegaChatMessage {
     }
 
     public AndroidMegaChatMessage(PendingMessage pendingMessage, boolean uploading) {
+        this.pendingMessage = pendingMessage;
         this.uploading = uploading;
     }
 

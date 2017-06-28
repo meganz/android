@@ -72,11 +72,11 @@ public class PendingMessage {
     }
 
     public ArrayList<String> getNames() {
-        return fingerprints;
+        return names;
     }
 
     public void setNames(ArrayList<String> fingerprints) {
-        this.fingerprints = fingerprints;
+        this.names = names;
     }
 
     public void addFingerprintAndName (String fingerprint, String name){

@@ -462,13 +462,14 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 							if(pendMsg.getFilePaths().size()==1){
 								log("Just one file to send in the message");
 								if(megaChatApi!=null){
-									log("Send the message to the chat");
+									log("Send node to chat: "+transfer.getNodeHandle());
 									MegaNodeList nodeList = MegaNodeList.createInstance();
 
 									MegaNode node = megaApi.getNodeByHandle(transfer.getNodeHandle());
 									if(node!=null){
 										log("Node to send: "+node.getName());
 										nodeList.addNode(node);
+										pendMsg.addNodeHandle(transfer.getNodeHandle());
 									}
 									megaChatApi.attachNodes(pendMsg.getChatId(), nodeList, this);
 								}
@@ -652,8 +653,20 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 					//Check node handles - if match add to DB the karere temp id of the message
 
 					ArrayList<Long> nodeHandles = pendMsg.getNodeHandles();
+					log("Node handles list: "+nodeHandles.size());
+					for(int j=0; j<nodeHandles.size();j++){
+						MegaNode node = nodeList.get(j);
+						if(node!=null){
+							log("node name: "+node.getName());
+							log("node handle: "+node.getHandle());
+						}
+						else{
+							log("Node null");
+						}
+
+					}
 					if(nodeHandles.size()==1){
-						log("Just one file to send in the message");
+						log("nodeHandles one file to send in the message");
 						MegaNode node = nodeList.get(0);
 						if(node.getHandle()==nodeHandles.get(0)){
 							log("The message MATCH!!");
@@ -663,8 +676,15 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 						}
 					}
 					else{
-						log("More than one to send in message");
+						log("nodeHandles more than one to send in message");
 
+
+					}
+
+					if(pendMsg.getFilePaths().size()==1){
+
+					}
+					else{
 
 					}
 
