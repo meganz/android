@@ -3841,12 +3841,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             catch(Exception ex){}
         }
 
-        MegaNode parentNode = megaApi.getNodeByPath("/My chat files");
-        if(parentNode == null){
-            Snackbar.make(fragmentContainer, getString(R.string.error_temporary_unavaible), Snackbar.LENGTH_LONG).show();
-            return;
-        }
-
         if (infos == null) {
             Snackbar.make(fragmentContainer, getString(R.string.upload_can_not_open), Snackbar.LENGTH_LONG).show();
         }
@@ -3885,9 +3879,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 sendMessageUploading(newNodeAttachmentMsg);
 
                 intent.putStringArrayListExtra(ChatUploadService.EXTRA_FILEPATHS, paths);
-//                intent.putExtra(ChatUploadService.EXTRA_NAME, );
-                intent.putExtra(ChatUploadService.EXTRA_PARENT_HASH, parentNode.getHandle());
-//                intent.putExtra(ChatUploadService.EXTRA_SIZE, info.());
                 intent.putExtra(ChatUploadService.EXTRA_CHAT_ID, idChat);
 
                 log("Launch chat upload! "+paths.size());
