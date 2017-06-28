@@ -38,7 +38,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	private static final String TABLE_EPHEMERAL = "ephemeral";
 	private static final String TABLE_PENDING_MSG = "pendingmsg";
 	private static final String TABLE_MSG_NODES = "msgnodes";
-	private static final String TABLE_NODE_ATTACHMENTS = "msgnodes";
+	private static final String TABLE_NODE_ATTACHMENTS = "nodeattachments";
 
     private static final String KEY_ID = "id";
     private static final String KEY_EMAIL = "email";
@@ -235,7 +235,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		db.execSQL(CREATE_MSG_NODE_TABLE);
 
 		String CREATE_NODE_ATTACHMENTS_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_NODE_ATTACHMENTS + "("
-				+ KEY_ID + " INTEGER PRIMARY KEY," + KEY_ID_NODE+ " INTEGER, " + KEY_FILE_PATH + " TEXT, " + KEY_FILE_NAME + " TEXT, " + KEY_FILE_FINGERPRINT + " TEXT, " + KEY_NODE_HANDLE + " TEXT" + ")";
+				+ KEY_ID + " INTEGER PRIMARY KEY," + KEY_FILE_PATH + " TEXT, " + KEY_FILE_NAME + " TEXT, " + KEY_FILE_FINGERPRINT + " TEXT, " + KEY_NODE_HANDLE + " TEXT" + ")";
 		db.execSQL(CREATE_NODE_ATTACHMENTS_TABLE);
 	}
 
@@ -512,7 +512,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			db.execSQL(CREATE_MSG_NODE_TABLE);
 
 			String CREATE_NODE_ATTACHMENTS_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_NODE_ATTACHMENTS + "("
-					+ KEY_ID + " INTEGER PRIMARY KEY," + KEY_ID_NODE+ " INTEGER, " + KEY_FILE_PATH + " TEXT, " + KEY_FILE_NAME + " TEXT, " + KEY_FILE_FINGERPRINT + " TEXT, " + KEY_NODE_HANDLE + " TEXT" + ")";
+					+ KEY_ID + " INTEGER PRIMARY KEY," + KEY_FILE_PATH + " TEXT, " + KEY_FILE_NAME + " TEXT, " + KEY_FILE_FINGERPRINT + " TEXT, " + KEY_NODE_HANDLE + " TEXT" + ")";
 			db.execSQL(CREATE_NODE_ATTACHMENTS_TABLE);
 		}
 	} 
@@ -739,11 +739,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		values.put(KEY_ID_PENDING_MSG, idMsg);
 		values.put(KEY_ID_NODE, idNode);
 
-		long id = db.insert(TABLE_NODE_ATTACHMENTS, null, values);
+		long id = db.insert(TABLE_MSG_NODES, null, values);
 		return id;
 	}
 
-	public int findPendingMessage(long idTemp){
+	public long findPendingMessage(long idTemp){
 		log("findPendingMessage: "+idTemp);
 		String idPend = idTemp+"";
 
@@ -754,7 +754,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		if (!cursor.equals(null)){
 			if (cursor.moveToFirst()){
 
-				int id = Integer.parseInt(cursor.getString(0));
+				long id = cursor.getLong(0);
 				return id;
 			}
 		}
