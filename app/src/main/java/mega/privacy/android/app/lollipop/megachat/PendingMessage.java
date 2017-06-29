@@ -3,14 +3,21 @@ package mega.privacy.android.app.lollipop.megachat;
 import java.util.ArrayList;
 
 public class PendingMessage {
+
+    public static int STATE_SENDING = 0;
+    public static int STATE_SENT = 1;
+    public static int STATE_ERROR = -1;
+
     long chatId;
     ArrayList<PendingNodeAttachment> nodeAttachments = new ArrayList<>();
     long id;
     long uploadTimestamp;
+    int state;
 
-    public PendingMessage(long id, long chatId, ArrayList<String> filePaths) {
+    public PendingMessage(long id, long chatId, ArrayList<String> filePaths, int state) {
         this.id = id;
         this.chatId = chatId;
+        this.state = state;
         for(int i=0;i<filePaths.size();i++){
             PendingNodeAttachment nodeAttachment = new PendingNodeAttachment(filePaths.get(i));
             nodeAttachments.add(nodeAttachment);
@@ -28,11 +35,12 @@ public class PendingMessage {
         }
     }
 
-    public PendingMessage(long id, long chatId, ArrayList<PendingNodeAttachment> nodeAttachments, long uploadTimestamp) {
+    public PendingMessage(long id, long chatId, ArrayList<PendingNodeAttachment> nodeAttachments, long uploadTimestamp, int state) {
         this.chatId = chatId;
         this.nodeAttachments = nodeAttachments;
         this.id = id;
         this.uploadTimestamp = uploadTimestamp;
+        this.state = state;
     }
 
     public PendingMessage(long id, long chatId, long uploadTimestamp) {
@@ -104,5 +112,13 @@ public class PendingMessage {
             names.add(nodeAttachments.get(i).getName());
         }
         return names;
+    }
+
+    public int getState() {
+        return state;
+    }
+
+    public void setState(int state) {
+        this.state = state;
     }
 }

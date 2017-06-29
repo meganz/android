@@ -171,7 +171,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 
 		if(chatId!=-1){
 
-			PendingMessage newMessage = new PendingMessage(idPendMsg, chatId, filePaths);
+			PendingMessage newMessage = new PendingMessage(idPendMsg, chatId, filePaths, PendingMessage.STATE_SENDING);
 			pendingMessages.add(newMessage);
 
 			MegaNode parentNode = megaApi.getNodeByPath("/"+Constants.CHAT_FOLDER);
@@ -198,9 +198,6 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 				stopSelf();
 				log("after stopSelf");
 			}
-
-
-
 		}
 		else{
 			log("Error the chatId is not correct: "+chatId);
@@ -375,7 +372,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 
 	@Override
 	public void onTransferFinish(MegaApiJava api, MegaTransfer transfer,MegaError error) {
-		log("Upload finished: " + transfer.getFileName() + " size " + transfer.getTransferredBytes());
+		log("onTransferFinish: " + transfer.getFileName() + " size " + transfer.getTransferredBytes());
 		log("transfer.getPath:" + transfer.getPath());
 
         transfersCount--;
@@ -650,7 +647,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 							log("The message MATCH!!");
 							long tempId = request.getMegaChatMessage().getTempId();
 							log("The tempId of the message is: "+tempId);
-							dbH.updatePendingMessage(pendMsg.getId(), tempId+"", true);
+							dbH.updatePendingMessage(pendMsg.getId(), tempId+"", PendingMessage.STATE_SENT);
 						}
 					}
 					else{
@@ -675,7 +672,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 						MegaNode node = nodeList.get(0);
 						if(node.getHandle()==nodeHandles.get(0)){
 							log("The message MATCH!!");
-							dbH.updatePendingMessage(pendMsg.getId(), -1+"", false);
+							dbH.updatePendingMessage(pendMsg.getId(), -1+"", PendingMessage.STATE_ERROR);
 							//TODO sent warning to the ChatActivity
 
 						}
