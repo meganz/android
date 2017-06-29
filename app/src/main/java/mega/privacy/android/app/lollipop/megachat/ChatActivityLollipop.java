@@ -71,7 +71,6 @@ import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.MessageNot
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.NodeAttachmentBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.TimeChatUtils;
-import mega.privacy.android.app.lollipop.megachat.ChatUploadService;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -2738,10 +2737,11 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
         if(msg.getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT){
 
-            long idMsg =  dbH.findPendingMessage(msg.getTempId());
+            long idMsg =  dbH.findPendingMessageById(msg.getTempId());
             log("----The id of my pending message is: "+idMsg);
             if(idMsg!=-1){
                 modifyAttachmentReceived(androidMsg, idMsg);
+                dbH.removePendingMessageById(idMsg);
                 return;
             }
         }
@@ -3129,6 +3129,19 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         log("AFTER updateMessagesLoaded: "+messages.size()+" messages in list");
 
         bufferMessages.clear();
+
+        loadPendingMessages();
+    }
+
+    public void loadPendingMessages(){
+        log("loadPendingMessages");
+        ArrayList<AndroidMegaChatMessage> pendMsgs = dbH.findAndroidMessagesBySent(false, idChat);
+        if(pendMsgs!=null){
+            log("Number of pending: "+pendMsgs);
+        }
+        else{
+            log("Null pending messages");
+        }
     }
 
     public void loadMessage(AndroidMegaChatMessage messageToShow){
@@ -3137,10 +3150,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         log("Message to show: "+messageToShow.getMessage().getContent());
         messageToShow.setInfoToShow(Constants.CHAT_ADAPTER_SHOW_ALL);
         messages.add(0,messageToShow);
-
-//        for(int i=0; i<messages.size(); i++){
-//            log("Print i: "+i+" content: "+messages.get(i).getMessage().getContent());
-//        }
 
         if(messages.size()>1) {
             long userHandleToCompare = -1;
@@ -3848,14 +3857,14 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 //            Snackbar.make(fragmentContainer, getString(R.string.upload_began), Snackbar.LENGTH_LONG).show();
 
             Intent intent = new Intent(this, ChatUploadService.class);
-            ArrayList<String> fingerprints = new ArrayList<>();
-            ArrayList<String> paths = new ArrayList<>();
-            ArrayList<String> names = new ArrayList<>();
+            ArrayList<PendingNodeAttachment> nodeAttachments = new ArrayList<>();
 
             long timestamp = System.currentTimeMillis()/1000;
             long idPendingMsg = dbH.setPendingMessage(idChat+"", timestamp+"");
             if(idPendingMsg!=-1){
                 intent.putExtra(ChatUploadService.EXTRA_ID_PEND_MSG, idPendingMsg);
+
+                log("Launch chat upload with files "+infos.size());
 
                 for (ShareInfo info : infos) {
                     log("name of the file: "+info.getTitle());
@@ -3867,29 +3876,22 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
                     dbH.setMsgNode(idPendingMsg, idNode);
 
-                    names.add(info.getTitle());
-                    log("name of the file: "+info.getTitle());
-                    log("name of the file: "+names.get(0));
-                    paths.add(info.getFileAbsolutePath());
-                    fingerprints.add(fingerprint);
+                    PendingNodeAttachment nodeAttachment = new PendingNodeAttachment(info.getFileAbsolutePath(), fingerprint, info.getTitle());
+                    nodeAttachments.add(nodeAttachment);
                 }
 
-                PendingMessage newPendingMsg = new PendingMessage(idPendingMsg, idChat, paths, names, fingerprints, timestamp);
+                PendingMessage newPendingMsg = new PendingMessage(idPendingMsg, idChat, nodeAttachments, timestamp);
                 AndroidMegaChatMessage newNodeAttachmentMsg = new AndroidMegaChatMessage(newPendingMsg, true);
                 sendMessageUploading(newNodeAttachmentMsg);
 
-                intent.putStringArrayListExtra(ChatUploadService.EXTRA_FILEPATHS, paths);
+                intent.putStringArrayListExtra(ChatUploadService.EXTRA_FILEPATHS, newPendingMsg.getFilePaths());
                 intent.putExtra(ChatUploadService.EXTRA_CHAT_ID, idChat);
 
-                log("Launch chat upload! "+paths.size());
                 startService(intent);
             }
             else{
                 log("Error when adding pending msg to the database");
             }
-
-
-
 
         }
     }
