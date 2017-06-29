@@ -9,7 +9,7 @@ public class AndroidMegaChatMessage {
     MegaChatMessage message;
     PendingMessage pendingMessage;
     int infoToShow=-1;
-    boolean uploading;
+    boolean uploading = false;
 
     public AndroidMegaChatMessage(MegaChatMessage message) {
         this.message = message;

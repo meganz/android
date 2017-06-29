@@ -130,7 +130,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	private static final String KEY_ID_CHAT = "idchat";
 	private static final String KEY_MSG_TIMESTAMP = "timestamp";
 	private static final String KEY_ID_TEMP_KARERE = "idtempkarere";
-	private static final String KEY_SENT = "sent";
+	private static final String KEY_STATE = "state";
 
 	private static final String KEY_ID_PENDING_MSG = "idpendingmsg";
 	private static final String KEY_ID_NODE = "idnode";
@@ -230,7 +230,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		db.execSQL(CREATE_EPHEMERAL);
 
 		String CREATE_PENDING_MSG_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_PENDING_MSG + "("
-				+ KEY_ID + " INTEGER PRIMARY KEY," + KEY_ID_CHAT + " TEXT, " + KEY_MSG_TIMESTAMP + " TEXT, " +KEY_ID_TEMP_KARERE + " TEXT, " + KEY_SENT + " BOOLEAN" +")";
+				+ KEY_ID + " INTEGER PRIMARY KEY," + KEY_ID_CHAT + " TEXT, " + KEY_MSG_TIMESTAMP + " TEXT, " +KEY_ID_TEMP_KARERE + " TEXT, " + KEY_STATE + " INTEGER" +")";
 		db.execSQL(CREATE_PENDING_MSG_TABLE);
 
 		String CREATE_MSG_NODE_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_MSG_NODES + "("
@@ -507,7 +507,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 		if (oldVersion <= 32){
 			String CREATE_PENDING_MSG_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_PENDING_MSG + "("
-					+ KEY_ID + " INTEGER PRIMARY KEY," + KEY_ID_CHAT + " TEXT, " + KEY_MSG_TIMESTAMP + " TEXT, " +KEY_ID_TEMP_KARERE + " TEXT, " + KEY_SENT + " BOOLEAN" +")";
+					+ KEY_ID + " INTEGER PRIMARY KEY," + KEY_ID_CHAT + " TEXT, " + KEY_MSG_TIMESTAMP + " TEXT, " +KEY_ID_TEMP_KARERE + " TEXT, " + KEY_STATE + " INTEGER" +")";
 			db.execSQL(CREATE_PENDING_MSG_TABLE);
 
 			String CREATE_MSG_NODE_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_MSG_NODES + "("
@@ -701,11 +701,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return ephemeralCredentials;
     }
 
-	public void updatePendingMessage(long idMessage, String temporalId, boolean sent) {
+	public void updatePendingMessage(long idMessage, String temporalId, int sent) {
 
 		ContentValues values = new ContentValues();
 		values.put(KEY_ID_TEMP_KARERE, encrypt(temporalId));
-		values.put(KEY_SENT, sent);
+		values.put(KEY_STATE, sent);
 		String where = KEY_ID + "=" +idMessage;
 
 		int rows = db.update(TABLE_PENDING_MSG, values, where, null);
@@ -729,12 +729,12 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	}
 
 
-	public ArrayList<AndroidMegaChatMessage> findAndroidMessagesBySent(boolean sent, long idChat){
+	public ArrayList<AndroidMegaChatMessage> findAndroidMessagesBySent(int sent, long idChat){
 		log("findPendingMessageBySent");
 		ArrayList<AndroidMegaChatMessage> messages = new ArrayList<>();
 		String chat = idChat+"";
 
-		String selectQuery = "SELECT * FROM " + TABLE_PENDING_MSG + " WHERE " + KEY_SENT + " = " + sent + " AND "+ KEY_ID_CHAT + " =' "+ chat+"'";
+		String selectQuery = "SELECT * FROM " + TABLE_PENDING_MSG + " WHERE " + KEY_STATE + " = " + sent + " AND "+ KEY_ID_CHAT + " =' "+ chat+"'";
 		log("QUERY: "+selectQuery);
 		Cursor cursor = db.rawQuery(selectQuery, null);
 		ArrayList<Long> pendingIds = new ArrayList<>();
@@ -803,10 +803,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	}
 
 
-	public ArrayList<Long> findPendingMessagesBySent(boolean sent){
+	public ArrayList<Long> findPendingMessagesBySent(int sent){
 		log("findPendingMessageBySent");
 
-		String selectQuery = "SELECT * FROM " + TABLE_PENDING_MSG + " WHERE " + KEY_SENT + " = " + sent;
+		String selectQuery = "SELECT * FROM " + TABLE_PENDING_MSG + " WHERE " + KEY_STATE + " = " + sent;
 		log("QUERY: "+selectQuery);
 		Cursor cursor = db.rawQuery(selectQuery, null);
 		ArrayList<Long> pendingIds = new ArrayList<>();
@@ -820,58 +820,20 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		return pendingIds;
 	}
 
-//	public ArrayList<AndroidMegaChatMessage> findAndroidPendingMessages(long chatId, boolean sent){
-//		log("findPendingMessageBySent");
-//
-////		String selectQuery = "SELECT * FROM " + TABLE_PENDING_MSG + " WHERE " + KEY_SENT + " = " + sent + " AND " + KEY_ID_CHAT + " = '" + chatId +"'";
-////		log("QUERY: "+selectQuery);
-////		Cursor cursor = db.rawQuery(selectQuery, null);
-////		ArrayList<Long> pendingMessages = new ArrayList<>();
-////		if (!cursor.equals(null)){
-////			if (cursor.moveToFirst()){
-////
-////				long id = cursor.getLong(0);
-////				String timestamp = cursor.getString(2);
-////
-////				ArrayList<Long> msgNodes = findMsgNodes(id);
-////				if(msgNodes!=null){
-////					for(int j=0;j<msgNodes.size();j++){
-////
-////					}
-////				}
-////
-//////				PendingMessage pM = new PendingMessage();
-//////				AndroidMegaChatMessage newMessage = new
-////			}
-////		}
-////		cursor.close();
-////		return pendingMessages;
-//	}
-
-	public void findNodeAttachment(long nodeId){
-//		for (int i=0;i<nodes.size();i++){
-//			int rows = db.delete(TABLE_NODE_ATTACHMENTS, KEY_ID + "="+nodes.get(i), null);
-//			log("From TABLE_NODE_ATTACHMENTS deleted: "+rows);
-//		}
-	}
-
-	public void deleteNodeAttachments(ArrayList<Long> nodes){
-		for (int i=0;i<nodes.size();i++){
-			int rows = db.delete(TABLE_NODE_ATTACHMENTS, KEY_ID + "="+nodes.get(i), null);
-			log("From TABLE_NODE_ATTACHMENTS deleted: "+rows);
-		}
-	}
-
-	public void removeSentPendingMessages(int idMsg){
-
+	public void removeSentPendingMessages(){
+		log("removeSentPendingMessages");
 		ArrayList<Long> nodesToDelete = new ArrayList<>();
-		ArrayList<Long> messages = findPendingMessagesBySent(true);
+		ArrayList<Long> messages = findPendingMessagesBySent(PendingMessage.STATE_SENT);
 		if(messages!=null){
 			for(int i=0;i<messages.size();i++){
 				ArrayList<Long> nodes = findMsgNodes(messages.get(i));
 				if(nodes!=null){
 					nodesToDelete.addAll(nodes);
 				}
+				int rows = db.delete(TABLE_MSG_NODES, KEY_ID_PENDING_MSG + "="+messages.get(i), null);
+				log("From TABLE_MSG_NODES deleted: "+rows);
+				rows = db.delete(TABLE_PENDING_MSG, KEY_ID + "="+messages.get(i), null);
+				log("From TABLE_PENDING_MSG deleted: "+rows);
 
 			}
 		}
@@ -880,11 +842,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			int rows = db.delete(TABLE_NODE_ATTACHMENTS, KEY_ID + "="+nodesToDelete.get(i), null);
 			log("From TABLE_NODE_ATTACHMENTS deleted: "+rows);
 		}
-
-		int rows = db.delete(TABLE_MSG_NODES, KEY_ID_PENDING_MSG + "="+idMsg, null);
-		log("From TABLE_MSG_NODES deleted: "+rows);
-		rows = db.delete(TABLE_PENDING_MSG, KEY_ID + "="+idMsg, null);
-		log("From TABLE_PENDING_MSG deleted: "+rows);
 	}
 
 	public ArrayList<Long> findMsgNodes(long idMsg){
@@ -913,7 +870,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		values.put(KEY_ID_CHAT, encrypt(idChat));
 		values.put(KEY_MSG_TIMESTAMP, encrypt(timestamp));
 		values.put(KEY_ID_TEMP_KARERE, -1+"");
-		values.put(KEY_SENT, false);
+		values.put(KEY_STATE, PendingMessage.STATE_SENDING);
 
 		long id = db.insert(TABLE_PENDING_MSG, null, values);
 		return id;
