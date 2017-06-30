@@ -762,34 +762,47 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	public ArrayList<AndroidMegaChatMessage> findAndroidMessagesNotSent(long idChat){
 		log("findAndroidMessagesNotSent");
 		ArrayList<AndroidMegaChatMessage> messages = new ArrayList<>();
-		String chat = idChat+"";
 
-		String selectQuery = "SELECT * FROM " + TABLE_PENDING_MSG + " WHERE " + KEY_STATE + " < " + PendingMessage.STATE_SENT + " AND "+ KEY_ID_CHAT + " ='"+ encrypt(chat)+"'";
-		log("QUERY: "+selectQuery);
+		ArrayList<PendingMessage> pendMsgs = findPendingMessagesNotSent(idChat);
+
+		for(int i=0;i<pendMsgs.size();i++){
+			PendingMessage pendMsg = pendMsgs.get(i);
+			long id = pendMsg.getId();
+			ArrayList<PendingNodeAttachment> nodes = findPendingNodesByMsgId(id);
+			pendMsg.setState(PendingMessage.STATE_SENT);
+			pendMsg.setNodeAttachments(nodes);
+
+			AndroidMegaChatMessage androidMsg = new AndroidMegaChatMessage(pendMsg, true);
+			messages.add(androidMsg);
+		}
+
+		log("Found: "+ messages.size());
+		return messages;
+	}
+
+	public ArrayList<PendingMessage> findPendingMessagesNotSent(long idChat) {
+		log("findPendingMessagesNotSent");
+		ArrayList<PendingMessage> pendMsgs = new ArrayList<>();
+		String chat = idChat + "";
+
+		String selectQuery = "SELECT * FROM " + TABLE_PENDING_MSG + " WHERE " + KEY_STATE + " < " + PendingMessage.STATE_SENT + " AND " + KEY_ID_CHAT + " ='" + encrypt(chat) + "'";
+		log("QUERY: " + selectQuery);
 		Cursor cursor = db.rawQuery(selectQuery, null);
-		if (!cursor.equals(null)){
-			if (cursor.moveToFirst()){
-				do{
+		if (!cursor.equals(null)) {
+			if (cursor.moveToFirst()) {
+				do {
 					long id = cursor.getLong(0);
-					String timestamp = cursor.getString(2);
-					log("timeStamp: "+timestamp);
+					String timestamp = decrypt(cursor.getString(2));
 					long ts = Long.valueOf(timestamp);
-					log("timeStamp 2: "+ts);
 					PendingMessage pendMsg = new PendingMessage(id, idChat, ts);
-
-					ArrayList<PendingNodeAttachment> nodes = findPendingNodesByMsgId(id);
-					pendMsg.setState(PendingMessage.STATE_SENT);
-					pendMsg.setNodeAttachments(nodes);
-
-					AndroidMegaChatMessage androidMsg = new AndroidMegaChatMessage(pendMsg, true);
-					messages.add(androidMsg);
+					pendMsgs.add(pendMsg);
 
 				} while (cursor.moveToNext());
 			}
 		}
 		cursor.close();
-		log("Found: "+ messages.size());
-		return messages;
+		log("Found: "+pendMsgs.size());
+		return pendMsgs;
 	}
 
 	public ArrayList<PendingNodeAttachment> findPendingNodesByMsgId(long idMsg){
@@ -805,6 +818,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				pendingIds.add(cursor.getLong(2));
 			}
 		}
+		cursor.close();
 
 		for(int i=0;i<pendingIds.size();i++){
             PendingNodeAttachment node = findPendingNodeById(pendingIds.get(i));
@@ -816,14 +830,14 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 log("Error the node is NULL");
             }
 		}
-		cursor.close();
+
 		return nodes;
 	}
 
 	public PendingNodeAttachment findPendingNodeById(long idNode){
-		log("findPendingNodesByMsgId");
+		log("findPendingNodeById");
         PendingNodeAttachment node = null;
-        String selectQuery = "SELECT * FROM " + TABLE_NODE_ATTACHMENTS + " WHERE " + KEY_ID_PENDING_MSG + " = " + idNode;
+        String selectQuery = "SELECT * FROM " + TABLE_NODE_ATTACHMENTS + " WHERE " + KEY_ID + " = " + idNode;
 		log("QUERY: "+selectQuery);
 		Cursor cursor = db.rawQuery(selectQuery, null);
 		if (!cursor.equals(null)){
@@ -834,7 +848,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		cursor.close();
 		return node;
 	}
-
 
 	public ArrayList<Long> findPendingMessagesBySent(int sent){
 		log("findPendingMessageBySent");
