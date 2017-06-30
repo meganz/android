@@ -3305,7 +3305,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     public int appendMessagePosition(AndroidMegaChatMessage msg){
         log("appendMessagePosition: "+messages.size()+" messages");
-        log("status of message: "+msg.getMessage().getStatus());
+
         int lastIndex = messages.size()-1;
         if(messages.size()==0){
             msg.setInfoToShow(Constants.CHAT_ADAPTER_SHOW_ALL);
@@ -3318,6 +3318,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 log("The message is uploading add to index: "+lastIndex);
             }
             else{
+                log("status of message: "+msg.getMessage().getStatus());
                 while(messages.get(lastIndex).getMessage().getStatus()==MegaChatMessage.STATUS_SENDING_MANUAL){
                     log("one less index");
                     lastIndex--;
