@@ -4966,7 +4966,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						takePicture.setVisible(false);
 						refreshMenuItem.setVisible(false);
 						helpMenuItem.setVisible(false);
-						upgradeAccountMenuItem.setVisible(true);
+						upgradeAccountMenuItem.setVisible(false);
 						gridSmallLargeMenuItem.setVisible(false);
 						logoutMenuItem.setVisible(false);
 						forgotPassMenuItem.setVisible(false);
@@ -5640,6 +5640,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 								log("deepBrowserTree get from inSFlol: "+inSFLol.getDeepBrowserTree());
 		    					inSFLol.onBackPressed();
 		    				}
+
 		    			}
 		    		}
 		    		else if (drawerItem == DrawerItem.SAVED_FOR_OFFLINE){
