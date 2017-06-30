@@ -1,10 +1,12 @@
 package mega.privacy.android.app.lollipop;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -27,18 +29,22 @@ import android.support.v7.graphics.Palette;
 import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
+import android.util.TypedValue;
 import android.view.Display;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -63,6 +69,7 @@ import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatError;
@@ -114,6 +121,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 	RelativeLayout shareContactContentLayout;
 	TextView shareContactText;
 	ImageView shareContactIcon;
+	ImageView contactStateIcon;
 	View dividerShareContactLayout;
 
 	RelativeLayout clearChatLayout;
@@ -191,7 +199,13 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			setSupportActionBar(toolbar);
 			aB = getSupportActionBar();
 			imageLayout = (RelativeLayout) findViewById(R.id.chat_contact_properties_image_layout);
+
+
+
+			contactStateIcon = (ImageView) findViewById(R.id.contact_drawable_state);
+
 			collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.collapse_toolbar);
+
 			imageGradient = (View) findViewById(R.id.gradient_view);
 
 			collapsingToolbar.setExpandedTitleMarginBottom(Util.scaleHeightPx(24, outMetrics));
@@ -201,7 +215,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			collapsingToolbar.setCollapsedTitleTextColor(ContextCompat.getColor(this, R.color.white));
 			collapsingToolbar.setExpandedTitleColor(ContextCompat.getColor(this, R.color.white));
 
-			aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+						aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
 			aB.setHomeButtonEnabled(true);
 			aB.setDisplayHomeAsUpEnabled(true);
 
@@ -209,10 +223,11 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 
 			dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 
+
 			appBarLayout.post(new Runnable() {
 				@Override
 				public void run() {
-					setAppBarOffset(310);
+					setAppBarOffset(50);
 				}
 			});
 
@@ -233,7 +248,8 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 				chatPrefs = dbH.findChatPreferencesByHandle(String.valueOf(chatHandle));
 
 				collapsingToolbar.setTitle(chat.getTitle());
-				setDefaultAvatar(chat.getTitle());
+
+
 			}
 			else{
 				log("From contacts!!");
@@ -268,6 +284,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 						}
 
 						collapsingToolbar.setTitle(fullName);
+
 					}
 					else{
 						log("The contactDB is null: ");
@@ -280,6 +297,11 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 					if(chat!=null){
 						chatPrefs = dbH.findChatPreferencesByHandle(String.valueOf(chat.getChatId()));
 					}
+
+					if (megaChatApi == null){
+						megaChatApi = ((MegaApplication) ((Activity)this).getApplication()).getMegaChatApi();
+					}
+
 				}
 
 				setDefaultAvatar(fullName);
@@ -347,6 +369,29 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			//Clear chat Layout
 			clearChatLayout = (RelativeLayout) findViewById(R.id.chat_contact_properties_clear_layout);
 			clearChatLayout.setOnClickListener(this);
+
+			 if(Util.isChatEnabled()){
+				 contactStateIcon.setVisibility(View.VISIBLE);
+			 	if (megaChatApi != null){
+			 		int userStatus = megaChatApi.getUserOnlineStatus(user.getHandle());
+			 		if(userStatus == MegaChatApi.STATUS_ONLINE){
+			 			log("This user is connected");
+			 			contactStateIcon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_online));
+			 		}else if(userStatus == MegaChatApi.STATUS_AWAY){
+			 			log("This user is away");
+			 			contactStateIcon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_away));
+			 		} else if(userStatus == MegaChatApi.STATUS_BUSY){
+			 			log("This user is busy");
+			 			contactStateIcon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_busy));
+			 		} else{
+			 			log("This user status is: "+userStatus);
+			 			contactStateIcon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_offline));
+			 		}
+			 	}
+			 } else{
+			 	contactStateIcon.setVisibility(View.GONE);
+			 }
+
 
 			if(Util.isOnline(this)){
 				log("online -- network connection");
@@ -777,6 +822,11 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 		int dominantColor = Color.rgb(rgb[0], rgb[1], rgb[2]);
 
 		return dominantColor;
+	}
+
+	public static int convertSpToPixels(float sp, Context context) {
+		int px = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, sp, context.getResources().getDisplayMetrics());
+		return px;
 	}
 
 	public void setDefaultAvatar(String title) {
