@@ -734,7 +734,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		ArrayList<AndroidMegaChatMessage> messages = new ArrayList<>();
 		String chat = idChat+"";
 
-		String selectQuery = "SELECT * FROM " + TABLE_PENDING_MSG + " WHERE " + KEY_STATE + " = " + sent + " AND "+ KEY_ID_CHAT + " =' "+ chat+"'";
+		String selectQuery = "SELECT * FROM " + TABLE_PENDING_MSG + " WHERE " + KEY_STATE + " = " + sent + " AND "+ KEY_ID_CHAT + " ='"+ encrypt(chat)+"'";
 		log("QUERY: "+selectQuery);
 		Cursor cursor = db.rawQuery(selectQuery, null);
 		ArrayList<Long> pendingIds = new ArrayList<>();
@@ -746,6 +746,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     PendingMessage pendMsg = new PendingMessage(id, idChat, Long.valueOf(timestamp));
 
                     ArrayList<PendingNodeAttachment> nodes = findPendingNodesByMsgId(id);
+					pendMsg.setState(sent);
                     pendMsg.setNodeAttachments(nodes);
 
                     AndroidMegaChatMessage androidMsg = new AndroidMegaChatMessage(pendMsg, true);
@@ -755,6 +756,39 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			}
 		}
 		cursor.close();
+		return messages;
+	}
+
+	public ArrayList<AndroidMegaChatMessage> findAndroidMessagesNotSent(long idChat){
+		log("findAndroidMessagesNotSent");
+		ArrayList<AndroidMegaChatMessage> messages = new ArrayList<>();
+		String chat = idChat+"";
+
+		String selectQuery = "SELECT * FROM " + TABLE_PENDING_MSG + " WHERE " + KEY_STATE + " < " + PendingMessage.STATE_SENT + " AND "+ KEY_ID_CHAT + " ='"+ encrypt(chat)+"'";
+		log("QUERY: "+selectQuery);
+		Cursor cursor = db.rawQuery(selectQuery, null);
+		if (!cursor.equals(null)){
+			if (cursor.moveToFirst()){
+				do{
+					long id = cursor.getLong(0);
+					String timestamp = cursor.getString(2);
+					log("timeStamp: "+timestamp);
+					long ts = Long.valueOf(timestamp);
+					log("timeStamp 2: "+ts);
+					PendingMessage pendMsg = new PendingMessage(id, idChat, ts);
+
+					ArrayList<PendingNodeAttachment> nodes = findPendingNodesByMsgId(id);
+					pendMsg.setState(PendingMessage.STATE_SENT);
+					pendMsg.setNodeAttachments(nodes);
+
+					AndroidMegaChatMessage androidMsg = new AndroidMegaChatMessage(pendMsg, true);
+					messages.add(androidMsg);
+
+				} while (cursor.moveToNext());
+			}
+		}
+		cursor.close();
+		log("Found: "+ messages.size());
 		return messages;
 	}
 
@@ -795,7 +829,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		if (!cursor.equals(null)){
 			if (cursor.moveToFirst()){
 				node = new PendingNodeAttachment(cursor.getString(1), cursor.getString(3), cursor.getString(2), Long.valueOf(cursor.getString(4)));
-
 			}
 		}
 		cursor.close();
@@ -817,6 +850,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			}
 		}
 		cursor.close();
+		log("Found: "+pendingIds.size());
 		return pendingIds;
 	}
 
@@ -899,6 +933,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	public long findPendingMessageById(long idTemp){
 		log("findPendingMessageById: "+idTemp);
 		String idPend = idTemp+"";
+		long id = -1;
 
 		String selectQuery = "SELECT * FROM " + TABLE_PENDING_MSG + " WHERE " + KEY_ID_TEMP_KARERE + " = '" + encrypt(idPend) + "'";
 		log("QUERY: "+selectQuery);
@@ -907,12 +942,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		if (!cursor.equals(null)){
 			if (cursor.moveToFirst()){
 
-				long id = cursor.getLong(0);
-				return id;
+				id = cursor.getLong(0);
 			}
 		}
 		cursor.close();
-		return -1;
+		return id;
 	}
 
 	public void setPreferences (MegaPreferences prefs){

@@ -54,8 +54,6 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 	public static String EXTRA_CHAT_ID = "CHAT_ID";
 	public static String EXTRA_ID_PEND_MSG = "ID_PEND_MSG";
 
-	private int errorCount = 0;
-
 	private boolean isForeground = false;
 	private boolean canceled;
 
@@ -178,7 +176,6 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 			if(parentNode != null){
 				log("The destination "+Constants.CHAT_FOLDER+ " already exists");
 				for(int i=0; i<filePaths.size();i++){
-					File file = new File(filePaths.get(i));
 					if(!wl.isHeld()){
 						wl.acquire();
 					}
@@ -233,15 +230,11 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 		if((wl != null) && (wl.isHeld()))
 			try{ wl.release(); } catch(Exception ex) {}
 
-		showCompleteNotification();
-
 		int total = megaApi.getNumPendingUploads() + megaApi.getNumPendingDownloads();
-		log("onQueueComplete: total of files before reset " + total);
 		if(total <= 0){
 			log("onQueueComplete: reset total uploads/downloads");
 			megaApi.resetTotalUploads();
 			megaApi.resetTotalDownloads();
-			errorCount = 0;
 		}
 
 		log("stopping service!!!!!!!!!!:::::::::::::::!!!!!!!!!!!!");
@@ -255,33 +248,33 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 	/*
 	 * Show complete success notification
 	 */
-	private void showCompleteNotification() {
-		log("showCompleteNotification");
-		String notificationTitle, size;
-
-		int totalUploads = megaApi.getTotalUploads();
-		notificationTitle = getResources().getQuantityString(R.plurals.upload_service_final_notification, totalUploads, totalUploads);
-
-		if (errorCount > 0){
-			size = getResources().getQuantityString(R.plurals.upload_service_failed, errorCount, errorCount);
-		}
-		else{
-			String totalBytes = Formatter.formatFileSize(ChatUploadService.this, megaApi.getTotalUploadedBytes());
-			size = getString(R.string.general_total_size, totalBytes);
-		}
-
-		Intent intent = null;
-		intent = new Intent(ChatUploadService.this, ManagerActivityLollipop.class);
-
-		mBuilderCompat
-		.setSmallIcon(R.drawable.ic_stat_notify_upload)
-		.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
-		.setAutoCancel(true).setTicker(notificationTitle)
-		.setContentTitle(notificationTitle).setContentText(size)
-		.setOngoing(false);
-
-		mNotificationManager.notify(notificationIdFinal, mBuilderCompat.build());
-	}
+//	private void showCompleteNotification() {
+//		log("showCompleteNotification");
+//		String notificationTitle, size;
+//
+//		int totalUploads = megaApi.getTotalUploads();
+//		notificationTitle = getResources().getQuantityString(R.plurals.upload_service_final_notification, totalUploads, totalUploads);
+//
+//		if (errorCount > 0){
+//			size = getResources().getQuantityString(R.plurals.upload_service_failed, errorCount, errorCount);
+//		}
+//		else{
+//			String totalBytes = Formatter.formatFileSize(ChatUploadService.this, megaApi.getTotalUploadedBytes());
+//			size = getString(R.string.general_total_size, totalBytes);
+//		}
+//
+//		Intent intent = null;
+//		intent = new Intent(ChatUploadService.this, ManagerActivityLollipop.class);
+//
+//		mBuilderCompat
+//		.setSmallIcon(R.drawable.ic_stat_notify_upload)
+//		.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
+//		.setAutoCancel(true).setTicker(notificationTitle)
+//		.setContentTitle(notificationTitle).setContentText(size)
+//		.setOngoing(false);
+//
+//		mNotificationManager.notify(notificationIdFinal, mBuilderCompat.build());
+//	}
 
 	@SuppressLint("NewApi")
 	private void updateProgressNotification() {
@@ -387,15 +380,6 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 
             ChatUploadService.this.cancel();
             log("after cancel");
-            String pathSelfie = Environment.getExternalStorageDirectory().getAbsolutePath() +"/"+ Util.temporalPicDIR;
-            File f = new File(pathSelfie);
-            //Delete recursively all files and folder
-            if (f.isDirectory()) {
-                for (File c : f.listFiles())
-                  c.delete();
-            }
-            f.delete();
-
         }
         else{
             if (error.getErrorCode() == MegaError.API_OK) {
@@ -447,7 +431,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 
 								MegaNode node = megaApi.getNodeByHandle(transfer.getNodeHandle());
 								if(node!=null){
-									log("Node to send: "+node.getName());
+									log("Node to send: "+node.getName() + " handle: "+node.getHandle());
 									nodeList.addNode(node);
 									nodeAttachment.setNodeHandle(transfer.getNodeHandle());
 								}
@@ -496,10 +480,6 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
             else{
                 log("Upload Error: " + transfer.getFileName() + "_" + error.getErrorCode() + "___" + error.getErrorString());
 
-                if(!transfer.isFolderTransfer()){
-                    errorCount++;
-                }
-
                 if(error.getErrorCode() == MegaError.API_EINCOMPLETE){
                     log("API_EINCOMPLETE ERROR: "+error.getErrorCode());
                 }
@@ -535,9 +515,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
             }
 
             log("IN Finish: "+transfer.getFileName()+"path? "+transfer.getPath());
-
         }
-
 	}
 
 	@Override
@@ -658,7 +636,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 				}
 			}
 			else{
-				log("Attachment not correctly sent");
+				log("Attachment not correctly sent: "+e.getErrorCode()+" "+ e.getErrorString());
 				MegaNodeList nodeList = request.getMegaNodeList();
 
 				//Find the pending message
