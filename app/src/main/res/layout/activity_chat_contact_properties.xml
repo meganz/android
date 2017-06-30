@@ -18,7 +18,7 @@
             <android.support.design.widget.CollapsingToolbarLayout
                 android:id="@+id/collapse_toolbar"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:fitsSystemWindows="true"
                 app:collapsedTitleTextAppearance="@style/ToolbarTitle"
                 app:contentScrim="?attr/colorPrimary"
@@ -27,14 +27,14 @@
 
                 <FrameLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     app:layout_collapseMode="parallax"
                     android:fitsSystemWindows="true" >
 
                     <RelativeLayout
                         android:id="@+id/chat_contact_properties_image_layout"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
+                        android:layout_height="match_parent">
 
                         <ImageView
                             android:id="@+id/chat_contact_properties_toolbar_image"
@@ -52,6 +52,13 @@
                         android:background="@drawable/full_gradient_shape" />
 
                 </FrameLayout>
+
+                <ImageView
+                    android:id="@+id/contact_drawable_state"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@null"
+                    android:src="@drawable/ic_offline" />
 
                 <android.support.v7.widget.Toolbar
                     android:id="@+id/toolbar"
