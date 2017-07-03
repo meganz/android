@@ -40,6 +40,7 @@ import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaGlobalListenerInterface;
@@ -517,13 +518,14 @@ public class LoginActivityLollipop extends AppCompatActivity implements MegaGlob
         setIntent(null);
     }
 
-    boolean loggerPermission = false;
+    boolean loggerPermissionKarere = false;
+    boolean loggerPermissionSDK = false;
 
-    public void showConfirmationEnableLogs() {
-        log("showConfirmationEnableLogs");
+    public void showConfirmationEnableLogsKarere() {
+        log("showConfirmationEnableLogsKarere");
 
         if (loginFragment != null) {
-            loginFragment.numberOfClicks = 0;
+            loginFragment.numberOfClicksKarere = 0;
         }
 
         loginActivity = this;
@@ -536,15 +538,63 @@ public class LoginActivityLollipop extends AppCompatActivity implements MegaGlob
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                             boolean hasStoragePermission = (ContextCompat.checkSelfPermission(loginActivity, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
                             if (!hasStoragePermission) {
-                                loggerPermission = true;
+                                loggerPermissionKarere = true;
                                 ActivityCompat.requestPermissions(loginActivity,
                                         new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
                                         Constants.REQUEST_WRITE_STORAGE);
                             } else {
-                                enableLogs();
+                                enableLogsKarere();
                             }
                         } else {
-                            enableLogs();
+                            enableLogsKarere();
+                        }
+                        break;
+                    }
+
+                    case DialogInterface.BUTTON_NEGATIVE: {
+                        break;
+                    }
+                }
+            }
+        };
+
+        android.support.v7.app.AlertDialog.Builder builder;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+            builder = new android.support.v7.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+        } else {
+            builder = new android.support.v7.app.AlertDialog.Builder(this);
+        }
+
+        builder.setMessage(R.string.enable_log_text_dialog).setPositiveButton(R.string.general_enable, dialogClickListener)
+                .setNegativeButton(R.string.general_cancel, dialogClickListener).show().setCanceledOnTouchOutside(false);
+    }
+
+    public void showConfirmationEnableLogsSDK() {
+        log("showConfirmationEnableLogsSDK");
+
+        if (loginFragment != null) {
+            loginFragment.numberOfClicksSDK = 0;
+        }
+
+        loginActivity = this;
+
+        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                switch (which) {
+                    case DialogInterface.BUTTON_POSITIVE:{
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                            boolean hasStoragePermission = (ContextCompat.checkSelfPermission(loginActivity, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
+                            if (!hasStoragePermission) {
+                                loggerPermissionSDK = true;
+                                ActivityCompat.requestPermissions(loginActivity,
+                                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                                        Constants.REQUEST_WRITE_STORAGE);
+                            } else {
+                                enableLogsSDK();
+                            }
+                        } else {
+                            enableLogsSDK();
                         }
                         break;
                     }
@@ -573,22 +623,38 @@ public class LoginActivityLollipop extends AppCompatActivity implements MegaGlob
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         switch(requestCode){
             case Constants.REQUEST_WRITE_STORAGE:{
-                if (loggerPermission){
-                    loggerPermission = false;
+                if (loggerPermissionKarere){
+                    loggerPermissionKarere = false;
                     if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
-                        enableLogs();
+                        enableLogsKarere();
+                    }
+                }
+                else if (loggerPermissionSDK){
+                    loggerPermissionSDK = false;
+                    if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+                        enableLogsSDK();
                     }
                 }
             }
         }
     }
 
-    public void enableLogs() {
-        log("enableLogs");
+    public void enableLogsSDK() {
+        log("enableLogsSDK");
 
-        dbH.setFileLogger(true);
-        Util.setFileLogger(true);
+        dbH.setFileLoggerSDK(true);
+        Util.setFileLoggerSDK(true);
         MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_MAX);
+        showSnackbar(getString(R.string.settings_enable_logs));
+        log("App Version: " + Util.getVersion(this));
+    }
+
+    public void enableLogsKarere() {
+        log("enableLogsKarere");
+
+        dbH.setFileLoggerKarere(true);
+        Util.setFileLoggerKarere(true);
+        MegaChatApiAndroid.setLogLevel(MegaChatApiAndroid.LOG_LEVEL_MAX);
         showSnackbar(getString(R.string.settings_enable_logs));
         log("App Version: " + Util.getVersion(this));
     }

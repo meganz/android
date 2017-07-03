@@ -784,15 +784,15 @@ public class NodeController {
                         File destFile;
                         destDir.mkdirs();
                         if (destDir.isDirectory()){
-                            log("destDir is Directory");
-                            destFile = new File(destDir, megaApi.escapeFsIncompatible(node.getName()));
+                            destFile = new File(destDir, megaApi.escapeFsIncompatible(document.getName()));
+                            log("destDir is Directory. destFile: " + destFile.getAbsolutePath());
                         }
                         else{
                             log("destDir is File");
                             destFile = destDir;
                         }
 
-                        if(destFile.exists() && (node.getSize() == destFile.length())){
+                        if(destFile.exists() && (document.getSize() == destFile.length())){
                             numberOfNodesAlreadyDownloaded++;
                             log(destFile.getAbsolutePath() + " already downloaded");
                         }

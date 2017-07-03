@@ -167,21 +167,21 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 		MegaChatApiAndroid.setLogLevel(MegaChatApiAndroid.LOG_LEVEL_MAX);
 
 		Util.setContext(getApplicationContext());
-		boolean fileLogger = false;
+		boolean fileLoggerSDK = false;
 		if (dbH != null) {
 			MegaAttributes attrs = dbH.getAttributes();
 			if (attrs != null) {
-				if (attrs.getFileLogger() != null) {
+				if (attrs.getFileLoggerSDK() != null) {
 					try {
-						fileLogger = Boolean.parseBoolean(attrs.getFileLogger());
+						fileLoggerSDK = Boolean.parseBoolean(attrs.getFileLoggerSDK());
 					} catch (Exception e) {
-						fileLogger = false;
+						fileLoggerSDK = false;
 					}
 				} else {
-					fileLogger = false;
+					fileLoggerSDK = false;
 				}
 			} else {
-				fileLogger = false;
+				fileLoggerSDK = false;
 			}
 		}
 
@@ -189,11 +189,41 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 			MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_MAX);
 		}
 		else {
-			Util.setFileLogger(fileLogger);
-			if (fileLogger) {
+			Util.setFileLoggerSDK(fileLoggerSDK);
+			if (fileLoggerSDK) {
 				MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_MAX);
 			} else {
 				MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_FATAL);
+			}
+		}
+
+		boolean fileLoggerKarere = false;
+		if (dbH != null) {
+			MegaAttributes attrs = dbH.getAttributes();
+			if (attrs != null) {
+				if (attrs.getFileLoggerKarere() != null) {
+					try {
+						fileLoggerKarere = Boolean.parseBoolean(attrs.getFileLoggerKarere());
+					} catch (Exception e) {
+						fileLoggerKarere = false;
+					}
+				} else {
+					fileLoggerKarere = false;
+				}
+			} else {
+				fileLoggerKarere = false;
+			}
+		}
+
+		if (Util.DEBUG){
+			MegaChatApiAndroid.setLogLevel(MegaChatApiAndroid.LOG_LEVEL_MAX);
+		}
+		else {
+			Util.setFileLoggerKarere(fileLoggerKarere);
+			if (fileLoggerKarere) {
+				MegaChatApiAndroid.setLogLevel(MegaChatApiAndroid.LOG_LEVEL_MAX);
+			} else {
+				MegaChatApiAndroid.setLogLevel(MegaChatApiAndroid.LOG_LEVEL_ERROR);
 			}
 		}
 		
@@ -336,6 +366,7 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 	private static boolean isLoggingIn = false;
 	private static boolean firstConnect = true;
 	private static boolean recentChatsFragmentVisible = false;
+
 	private static long openChatId = -1;
 
 	public static boolean isLoggingIn() {
@@ -373,7 +404,11 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 //		return mTrackers.get(trackerId);
 //	}
 
-	
+
+	public static long getOpenChatId() {
+		return openChatId;
+	}
+
 	public String getLocalIpAddress(){
 		return localIpAddress;
 	}

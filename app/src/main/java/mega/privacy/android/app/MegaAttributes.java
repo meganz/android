@@ -6,24 +6,26 @@ public class MegaAttributes {
 	int attemps = 0;
 	String askSizeDownload = "true";
 	String askNoAppDownload = "true";
-	String fileLogger = "false";
+	String fileLoggerSDK = "false";
 	String accountDetailsTimeStamp="";
 	String paymentMethodsTimeStamp="";
 	String pricingTimeStamp ="";
 	String extendedAccountDetailsTimeStamp="";
 	String invalidateSdkCache = "false";
+	String fileLoggerKarere = "false";
 	
-	public MegaAttributes(String online, int attemps, String askSizeDownload, String askNoAppDownload, String fileLogger, String accountDetailsTimeStamp, String paymentMethodsTimeStamp, String pricingTimeStamp, String extendedAccountDetailsTimeStamp, String invalidateSdkCache) {
+	public MegaAttributes(String online, int attemps, String askSizeDownload, String askNoAppDownload, String fileLogger, String accountDetailsTimeStamp, String paymentMethodsTimeStamp, String pricingTimeStamp, String extendedAccountDetailsTimeStamp, String invalidateSdkCache, String fileLoggerKarere) {
 		this.online = online;
 		this.attemps = attemps;
 		this.askNoAppDownload = askNoAppDownload;
 		this.askSizeDownload = askSizeDownload;
-		this.fileLogger = fileLogger;
+		this.fileLoggerSDK = fileLogger;
 		this.accountDetailsTimeStamp = accountDetailsTimeStamp;
 		this.paymentMethodsTimeStamp = paymentMethodsTimeStamp;
 		this.pricingTimeStamp = pricingTimeStamp;
 		this.extendedAccountDetailsTimeStamp = extendedAccountDetailsTimeStamp;
 		this.invalidateSdkCache = invalidateSdkCache;
+		this.fileLoggerKarere = fileLoggerKarere;
 	}
 	
 	public String getOnline(){
@@ -58,12 +60,20 @@ public class MegaAttributes {
 		this.askNoAppDownload = askNoAppDownload;
 	}
 
-	public String getFileLogger(){
-		return fileLogger;
+	public String getFileLoggerSDK(){
+		return fileLoggerSDK;
 	}
 
-	public void setFileLogger(String fileLogger){
-		this.fileLogger = fileLogger;
+	public void setFileLoggerSDK(String fileLoggerSDK){
+		this.fileLoggerSDK = fileLoggerSDK;
+	}
+
+	public String getFileLoggerKarere(){
+		return this.fileLoggerKarere;
+	}
+
+	public void setFileLoggerKarere(String fileLoggerKarere){
+		this.fileLoggerKarere = fileLoggerKarere;
 	}
 
 	public String getAccountDetailsTimeStamp() {
