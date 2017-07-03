@@ -1225,9 +1225,13 @@
 
     <string name="attachment_upload_panel_from_cloud">From Cloud Drive</string>
     <string name="attachment_upload_panel_contact">Contact</string>
-    <string name="attachment_upload_panel_photo">Photo or Video</string>
+    <string name="attachment_upload_panel_photo">From device</string>
 
     <string name="delete_account" context="Button in My Account section where the user can delete permanently his account">Delete account</string>
     <string name="delete_account_text" context="Text shown in the alert dialog to confirm the cancellation of an account">If you delete your account you will permanently lose all the data stored in the cloud. You will not be able to undo this action.</string>
     <string name="delete_button" context="Button in My Account section to confirm the account deletion">Delete</string>
+
+    <string name="attachment_uploading_state_uploading">Uploading...</string>
+    <string name="attachment_uploading_state_error">Error. Not sent.</string>
+
 </resources>

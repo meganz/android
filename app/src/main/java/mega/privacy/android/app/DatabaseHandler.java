@@ -842,7 +842,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		Cursor cursor = db.rawQuery(selectQuery, null);
 		if (!cursor.equals(null)){
 			if (cursor.moveToFirst()){
-				node = new PendingNodeAttachment(cursor.getString(1), cursor.getString(3), cursor.getString(2), Long.valueOf(cursor.getString(4)));
+				node = new PendingNodeAttachment(decrypt(cursor.getString(1)), decrypt(cursor.getString(3)), decrypt(cursor.getString(2)), Long.valueOf(cursor.getString(4)));
 			}
 		}
 		cursor.close();

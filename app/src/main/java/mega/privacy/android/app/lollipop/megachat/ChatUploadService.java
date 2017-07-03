@@ -626,12 +626,35 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 							long tempId = request.getMegaChatMessage().getTempId();
 							log("The tempId of the message is: "+tempId);
 							dbH.updatePendingMessage(pendMsg.getId(), tempId+"", PendingMessage.STATE_SENT);
+							break;
 						}
 					}
 					else{
 						log("nodeHandles more than one to send in message");
-						//TODO
+						boolean found = false;
+						int counter = 0;
 
+						for(int j=0;j<nodeList.size();j++){
+							MegaNode node = nodeList.get(j);
+							for(int k=0;k<nodeHandles.get(k);k++){
+								if(node.getHandle()==nodeHandles.get(k)){
+									found = true;
+									counter++;
+									log("The node MATCH!! Counter: "+counter);
+									break;
+								}
+							}
+							if(!found){
+								break;
+							}
+						}
+
+						if(nodeList.size() == counter){
+							long tempId = request.getMegaChatMessage().getTempId();
+							log("The tempId of the message is: "+tempId);
+							dbH.updatePendingMessage(pendMsg.getId(), tempId+"", PendingMessage.STATE_SENT);
+							break;
+						}
 					}
 				}
 			}
@@ -657,7 +680,30 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 					}
 					else{
 						log("nodeHandles more than one to send in message");
-						//TODO
+						boolean found = false;
+						int counter = 0;
+
+						for(int j=0;j<nodeList.size();j++){
+							MegaNode node = nodeList.get(j);
+							for(int k=0;k<nodeHandles.get(k);k++){
+								if(node.getHandle()==nodeHandles.get(k)){
+									found = true;
+									counter++;
+									log("The node MATCH!! Counter: "+counter);
+									break;
+								}
+							}
+							if(!found){
+								break;
+							}
+						}
+
+						if(nodeList.size() == counter){
+							long tempId = request.getMegaChatMessage().getTempId();
+							log("The tempId of the message is: "+tempId);
+							dbH.updatePendingMessage(pendMsg.getId(), tempId+"", PendingMessage.STATE_ERROR);
+							break;
+						}
 
 					}
 				}
