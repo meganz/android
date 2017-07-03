@@ -1076,11 +1076,15 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 	}
 	
 	public void setCacheSize(String size){
-		advancedFeaturesCache.setSummary(getString(R.string.settings_advanced_features_size, size));
+		if(isAdded()){
+			advancedFeaturesCache.setSummary(getString(R.string.settings_advanced_features_size, size));
+		}
 	}
 	
 	public void setOfflineSize(String size){
-		advancedFeaturesOffline.setSummary(getString(R.string.settings_advanced_features_size, size));
+		if(isAdded()){
+			advancedFeaturesOffline.setSummary(getString(R.string.settings_advanced_features_size, size));
+		}
 	}
 
 
