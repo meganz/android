@@ -127,7 +127,7 @@ public class ContactAttachmentBottomSheetDialogFragment extends BottomSheetDialo
             else{
                 chatId = ((ContactAttachmentActivityLollipop) context).chatId;
                 messageId = ((ContactAttachmentActivityLollipop) context).messageId;
-                email = ((ContactAttachmentActivityLollipop) context).selectedUser.getEmail();
+                email = ((ContactAttachmentActivityLollipop) context).selectedEmail;
             }
 
             log("Id Chat and Message id: "+chatId+ "___"+messageId);

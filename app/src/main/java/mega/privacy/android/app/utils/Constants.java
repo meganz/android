@@ -172,4 +172,7 @@ public class Constants {
 	public static int NOTIFICATION_PUSH_CONTACT = 9;
 
 	public static String CHAT_FOLDER = "My chat files";
+
+	public static int TAKE_PICTURE_OPTION = 0;
+	public static int TAKE_PROFILE_PICTURE = 1;
 }

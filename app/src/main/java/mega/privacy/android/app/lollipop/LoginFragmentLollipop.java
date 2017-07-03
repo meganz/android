@@ -2020,7 +2020,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.AppCompatAlertDialogStyle);
         builder.setTitle(getResources().getString(R.string.park_account_dialog_title));
         String message= getResources().getString(R.string.park_account_text_last_step);
-        builder.setMessage(message).setPositiveButton(R.string.pin_lock_enter, dialogClickListener)
+        builder.setMessage(message).setPositiveButton(R.string.park_account_button, dialogClickListener)
                 .setNegativeButton(R.string.general_cancel, dialogClickListener).show();
     }
 

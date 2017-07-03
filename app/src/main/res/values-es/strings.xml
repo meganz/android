@@ -1089,4 +1089,7 @@
 
     <string name="attachment_uploading_state">Subiendo...</string>
     <string name="attachment_uploading_state_error">Error. No enviado.</string>
+
+    <string name="already_downloaded_multiple" context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that has already been downloaded and the number of files pending">%d ficheros ya descargados.</string>
+    <string name="pending_multiple" context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that has already been downloaded and the number of files pending">%d ficheros pendientes.</string>
 </resources>

@@ -225,24 +225,28 @@ public class GetLinkFragmentLollipop extends Fragment implements View.OnClickLis
                 linkWithoutKeyCheck.setChecked(true);
 				linkDecryptionKeyCheck.setChecked(false);
 				linkWithKeyCheck.setChecked(false);
-				String urlString="";
-				String [] s = link.split("!");
-				if (s.length == 3){
-					urlString = s[0] + "!" + s[1];
-				}
-				linkText.setText(urlString);
+                if(link!=null){
+                    String urlString="";
+                    String [] s = link.split("!");
+                    if (s.length == 3){
+                        urlString = s[0] + "!" + s[1];
+                    }
+                    linkText.setText(urlString);
+                }
                 break;
             }
             case R.id.link_decryption_key:{
                 linkWithoutKeyCheck.setChecked(false);
 				linkDecryptionKeyCheck.setChecked(true);
 				linkWithKeyCheck.setChecked(false);
-				String keyString="!";
-				String [] s = link.split("!");
-				if (s.length == 3){
-					keyString = keyString+s[2];
-				}
-				linkText.setText(keyString);
+                if(link!=null){
+                    String keyString="!";
+                    String [] s = link.split("!");
+                    if (s.length == 3){
+                        keyString = keyString+s[2];
+                    }
+                    linkText.setText(keyString);
+                }
                 break;
             }
             case R.id.link_with_key:{
@@ -331,7 +335,30 @@ public class GetLinkFragmentLollipop extends Fragment implements View.OnClickLis
             }
         } else {
             link = request.getLink();
-            linkText.setText(link);
+
+            if(linkWithoutKeyCheck.isChecked()){
+                if(link!=null){
+                    String urlString="";
+                    String [] s = link.split("!");
+                    if (s.length == 3){
+                        urlString = s[0] + "!" + s[1];
+                    }
+                    linkText.setText(urlString);
+                }
+            }
+            else if(linkDecryptionKeyCheck.isChecked()){
+                if(link!=null){
+                    String keyString="!";
+                    String [] s = link.split("!");
+                    if (s.length == 3){
+                        keyString = keyString+s[2];
+                    }
+                    linkText.setText(keyString);
+                }
+            }
+            else{
+                linkText.setText(link);
+            }
         }
         log("link: " + request.getLink());
 
