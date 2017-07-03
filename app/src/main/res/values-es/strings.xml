@@ -1087,4 +1087,6 @@
     <string name="delete_account_text" context="Text shown in the alert dialog to confirm the cancelation of an account">Si eliminas tu cuenta, perderás toda la información almacenada en la nube. Esta operación es irreversible.</string>
     <string name="delete_button" context="Button in My Account section to confirm the account deletion">Eliminar</string>
 
+    <string name="attachment_uploading_state">Subiendo...</string>
+    <string name="attachment_uploading_state_error">Error. No enviado.</string>
 </resources>

@@ -118,6 +118,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     Handler handlerReceive;
     Handler handlerSend;
 
+    boolean pendingMessagesLoaded = false;
+
 //    AndroidMegaChatMessage selectedMessage;
     int selectedPosition;
     public long selectedMessageId = -1;
@@ -727,7 +729,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                                 lastMessageSeen = null;
                                 lastSeenReceived = true;
                                 stateHistory = megaChatApi.loadMessages(idChat, NUMBER_MESSAGES_TO_LOAD);
-                                loadPendingMessages();
                             } else {
                                 lastMessageSeen = megaChatApi.getLastMessageSeen(idChat);
                                 if (lastMessageSeen != null) {
@@ -741,19 +742,15 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                                     log("A->Load history of " + chatRoom.getUnreadCount());
                                     long unreadAbs = Math.abs(unread);
                                     stateHistory = megaChatApi.loadMessages(idChat, (int) unreadAbs);
-                                    loadPendingMessages();
                                 } else if (unread >= 0 && unread <= NUMBER_MESSAGES_TO_LOAD) {
                                     log("B->Load history of " + chatRoom.getUnreadCount());
                                     stateHistory = megaChatApi.loadMessages(idChat, NUMBER_MESSAGES_TO_LOAD);
-                                    loadPendingMessages();
                                 } else if (unread < NUMBER_MESSAGES_TO_LOAD) {
                                     log("C->Load history of " + chatRoom.getUnreadCount());
                                     stateHistory = megaChatApi.loadMessages(idChat, chatRoom.getUnreadCount());
-                                    loadPendingMessages();
                                 } else {
                                     log("D->Load history of " + chatRoom.getUnreadCount());
                                     stateHistory = megaChatApi.loadMessages(idChat, NUMBER_MESSAGES_TO_LOAD);
-                                    loadPendingMessages();
                                 }
                                 listView.setVisibility(View.VISIBLE);
                             }
@@ -831,6 +828,25 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
     }
 
+    public int compareTime(long timeStamp, long previous){
+
+        if(previous!=-1){
+
+            Calendar cal = Util.calculateDateFromTimestamp(timeStamp);
+            Calendar previousCal =  Util.calculateDateFromTimestamp(previous);
+
+            TimeChatUtils tc = new TimeChatUtils(TimeChatUtils.TIME);
+
+            int result = tc.compare(cal, previousCal);
+            log("RESULTS compareTime: "+result);
+            return result;
+        }
+        else{
+            log("return -1");
+            return -1;
+        }
+    }
+
     public int compareDate(AndroidMegaChatMessage message, AndroidMegaChatMessage previous){
 
         if(previous!=null){
@@ -854,6 +870,24 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         if(previous!=null){
             Calendar cal = Util.calculateDateFromTimestamp(timeStamp);
             Calendar previousCal =  Util.calculateDateFromTimestamp(previous.getMessage().getTimestamp());
+
+            TimeChatUtils tc = new TimeChatUtils(TimeChatUtils.DATE);
+
+            int result = tc.compare(cal, previousCal);
+            log("RESULTS compareDate: "+result);
+            return result;
+        }
+        else{
+            log("return -1");
+            return -1;
+        }
+    }
+
+    public int compareDate(long timeStamp, long previous){
+
+        if(previous!=-1){
+            Calendar cal = Util.calculateDateFromTimestamp(timeStamp);
+            Calendar previousCal =  Util.calculateDateFromTimestamp(previous);
 
             TimeChatUtils tc = new TimeChatUtils(TimeChatUtils.DATE);
 
@@ -1450,8 +1484,17 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             else{
                 //Not first element
                 //Find where to add in the queue
-                while(messages.get(index).getMessage().getStatus()==MegaChatMessage.STATUS_SENDING_MANUAL){
+
+                AndroidMegaChatMessage msg = messages.get(index);
+
+                while(msg.isUploading()){
                     index--;
+                    msg = messages.get(index);
+                }
+
+                while(msg.getMessage().getStatus()==MegaChatMessage.STATUS_SENDING_MANUAL){
+                    index--;
+                    msg = messages.get(index);
                 }
                 index++;
                 log("Add in position: "+index);
@@ -2108,52 +2151,57 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             AndroidMegaChatMessage m = messages.get(position);
 //            showMsgNotSentPanel(m);
             if(m!=null){
-                if(m.getMessage().getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT){
-
-                    MegaNodeList nodeList = m.getMessage().getMegaNodeList();
-                    if(nodeList.size()==1){
-                        MegaNode node = nodeList.get(0);
-                        if(node.hasPreview()){
-                            log("Show full screen viewer");
-                            Intent intent = new Intent(this, ChatFullScreenImageViewer.class);
-                            intent.putExtra("position", 0);
-                            intent.putExtra("chatId", idChat);
-                            long [] messagesIds = {m.getMessage().getMsgId()};
-                            intent.putExtra("messageIds", messagesIds);
-                            startActivity(intent);
-                        }
-                        else{
-                            log("show node attachment panel for one node");
-                            showNodeAttachmentBottomSheet(m, position);
-                        }
-                    }
-                    else{
-                        log("show node attachment panel");
-                        showNodeAttachmentBottomSheet(m, position);
-                    }
+                if(m.isUploading()){
+                    showUploadingAttachmentBottomSheet(m, position);
                 }
-                if(m.getMessage().getType()==MegaChatMessage.TYPE_CONTACT_ATTACHMENT){
-                    log("show contact attachment panel");
-                    if (m != null) {
-                        if (m.getMessage().getUsersCount() == 1) {
-                            long userHandle = m.getMessage().getUserHandle(0);
-                            if(userHandle != megaApi.getMyUser().getHandle()){
-                                showContactAttachmentBottomSheet(m, position);
+                else{
+                    if(m.getMessage().getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT){
+
+                        MegaNodeList nodeList = m.getMessage().getMegaNodeList();
+                        if(nodeList.size()==1){
+                            MegaNode node = nodeList.get(0);
+                            if(node.hasPreview()){
+                                log("Show full screen viewer");
+                                Intent intent = new Intent(this, ChatFullScreenImageViewer.class);
+                                intent.putExtra("position", 0);
+                                intent.putExtra("chatId", idChat);
+                                long [] messagesIds = {m.getMessage().getMsgId()};
+                                intent.putExtra("messageIds", messagesIds);
+                                startActivity(intent);
+                            }
+                            else{
+                                log("show node attachment panel for one node");
+                                showNodeAttachmentBottomSheet(m, position);
                             }
                         }
                         else{
-                            showContactAttachmentBottomSheet(m, position);
+                            log("show node attachment panel");
+                            showNodeAttachmentBottomSheet(m, position);
                         }
                     }
-                }
-                else if(m.getMessage().getUserHandle()==megaChatApi.getMyUserHandle()) {
-                    if(!(m.getMessage().isManagementMessage())){
-                        log("selected message: "+m.getMessage().getContent());
-                        log("selected message handle: "+m.getMessage().getTempId());
-                        log("selected message rowId: "+m.getMessage().getRowId());
-                        if((m.getMessage().getStatus()==MegaChatMessage.STATUS_SERVER_REJECTED)||(m.getMessage().getStatus()==MegaChatMessage.STATUS_SENDING_MANUAL)){
-                            log("show not sent message panel");
-                            showMsgNotSentPanel(m, position);
+                    if(m.getMessage().getType()==MegaChatMessage.TYPE_CONTACT_ATTACHMENT){
+                        log("show contact attachment panel");
+                        if (m != null) {
+                            if (m.getMessage().getUsersCount() == 1) {
+                                long userHandle = m.getMessage().getUserHandle(0);
+                                if(userHandle != megaApi.getMyUser().getHandle()){
+                                    showContactAttachmentBottomSheet(m, position);
+                                }
+                            }
+                            else{
+                                showContactAttachmentBottomSheet(m, position);
+                            }
+                        }
+                    }
+                    else if(m.getMessage().getUserHandle()==megaChatApi.getMyUserHandle()) {
+                        if(!(m.getMessage().isManagementMessage())){
+                            log("selected message: "+m.getMessage().getContent());
+                            log("selected message handle: "+m.getMessage().getTempId());
+                            log("selected message rowId: "+m.getMessage().getRowId());
+                            if((m.getMessage().getStatus()==MegaChatMessage.STATUS_SERVER_REJECTED)||(m.getMessage().getStatus()==MegaChatMessage.STATUS_SENDING_MANUAL)){
+                                log("show not sent message panel");
+                                showMsgNotSentPanel(m, position);
+                            }
                         }
                     }
                 }
@@ -2604,6 +2652,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 }
             }
             getMoreHistory = true;
+            if(!pendingMessagesLoaded){
+                pendingMessagesLoaded = true;
+                loadPendingMessages();
+            }
         }
         log("END onMessageLoaded------------------------------------------");
     }
@@ -2976,24 +3028,30 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         while(itr.hasPrevious()) {
             AndroidMegaChatMessage messageToCheck = itr.previous();
             log("Index: "+itr.nextIndex());
-            log("Checking with Msg ID: "+messageToCheck.getMessage().getMsgId());
-            log("Checking with Msg TEMP ID: "+messageToCheck.getMessage().getTempId());
-            log("Content: " + messageToCheck.getMessage().getContent());
 
-            if(checkTempId){
-                log("Check temporal IDS----");
-                if (messageToCheck.getMessage().getTempId() == msg.getMessage().getTempId()) {
-                    log("modifyMessageReceived: " + messageToCheck.getMessage().getContent());
-                    indexToChange = itr.nextIndex();
-                    break;
+
+            if(!messageToCheck.isUploading()){
+                log("Checking with Msg ID: "+messageToCheck.getMessage().getMsgId());
+                log("Checking with Msg TEMP ID: "+messageToCheck.getMessage().getTempId());
+                log("Content: " + messageToCheck.getMessage().getContent());
+                if(checkTempId){
+                    log("Check temporal IDS----");
+                    if (messageToCheck.getMessage().getTempId() == msg.getMessage().getTempId()) {
+                        log("modifyMessageReceived: " + messageToCheck.getMessage().getContent());
+                        indexToChange = itr.nextIndex();
+                        break;
+                    }
+                }
+                else{
+                    if (messageToCheck.getMessage().getMsgId() == msg.getMessage().getMsgId()) {
+                        log("modifyMessageReceived: " + messageToCheck.getMessage().getContent());
+                        indexToChange = itr.nextIndex();
+                        break;
+                    }
                 }
             }
             else{
-                if (messageToCheck.getMessage().getMsgId() == msg.getMessage().getMsgId()) {
-                    log("modifyMessageReceived: " + messageToCheck.getMessage().getContent());
-                    indexToChange = itr.nextIndex();
-                    break;
-                }
+                log("This message is uploading");
             }
         }
 
@@ -3153,7 +3211,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     }
 
     public void loadMessage(AndroidMegaChatMessage messageToShow){
-        log("createInfoToSHOw");
+        log("loadMessage");
 
         log("Message to show: "+messageToShow.getMessage().getContent());
         messageToShow.setInfoToShow(Constants.CHAT_ADAPTER_SHOW_ALL);
@@ -3306,6 +3364,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     public int appendMessagePosition(AndroidMegaChatMessage msg){
         log("appendMessagePosition: "+messages.size()+" messages");
 
+        long userHandleToCompare = -1;
+        long previousUserHandleToCompare = -1;
+
         int lastIndex = messages.size()-1;
         if(messages.size()==0){
             msg.setInfoToShow(Constants.CHAT_ADAPTER_SHOW_ALL);
@@ -3315,12 +3376,18 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             log("Finding where to append the message");
 
             if(msg.isUploading()){
+                lastIndex++;
                 log("The message is uploading add to index: "+lastIndex);
+                userHandleToCompare = myUserHandle;
             }
             else{
                 log("status of message: "+msg.getMessage().getStatus());
+                while(messages.get(lastIndex).isUploading()){
+                    log("one less index is uploading");
+                    lastIndex--;
+                }
                 while(messages.get(lastIndex).getMessage().getStatus()==MegaChatMessage.STATUS_SENDING_MANUAL){
-                    log("one less index");
+                    log("one less index is MANUAL SENDING");
                     lastIndex--;
                 }
                 if(msg.getMessage().getStatus()==MegaChatMessage.STATUS_SERVER_RECEIVED||msg.getMessage().getStatus()==MegaChatMessage.STATUS_NOT_SEEN){
@@ -3331,98 +3398,201 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 }
                 lastIndex++;
                 log("Append in position: "+lastIndex);
+
+                if ((msg.getMessage().getType() == MegaChatMessage.TYPE_PRIV_CHANGE) || (msg.getMessage().getType() == MegaChatMessage.TYPE_ALTER_PARTICIPANTS)) {
+                    userHandleToCompare = msg.getMessage().getHandleOfAction();
+                } else {
+                    userHandleToCompare = msg.getMessage().getUserHandle();
+                }
             }
 
             messages.add(lastIndex, msg);
 
             AndroidMegaChatMessage previousMessage = messages.get(lastIndex-1);
 
-            long userHandleToCompare = -1;
-            if ((msg.getMessage().getType() == MegaChatMessage.TYPE_PRIV_CHANGE) || (msg.getMessage().getType() == MegaChatMessage.TYPE_ALTER_PARTICIPANTS)) {
-                userHandleToCompare = msg.getMessage().getHandleOfAction();
-            } else {
-                userHandleToCompare = msg.getMessage().getUserHandle();
-            }
+            if(previousMessage.isUploading()){
 
-            if (userHandleToCompare == myUserHandle) {
+                log("The previous message is uploading");
+                if(msg.isUploading()){
+                    log("The message is also uploading");
+                    if (compareDate(msg.getPendingMessage().getUploadTimestamp(), previousMessage.getPendingMessage().getUploadTimestamp()) == 0) {
+                        //Same date
+                        if (compareTime(msg.getPendingMessage().getUploadTimestamp(), previousMessage.getPendingMessage().getUploadTimestamp()) == 0) {
+                            msg.setInfoToShow(Constants.CHAT_ADAPTER_SHOW_NOTHING);
+                        } else {
+                            //Different minute
+                            msg.setInfoToShow(Constants.CHAT_ADAPTER_SHOW_TIME);
+                        }
+                    } else {
+                        //Different date
+                        msg.setInfoToShow(Constants.CHAT_ADAPTER_SHOW_ALL);
+                    }
+                }
+                else{
+                    if (compareDate(msg.getMessage().getTimestamp(), previousMessage.getPendingMessage().getUploadTimestamp()) == 0) {
+                        //Same date
+                        if (compareTime(msg.getMessage().getTimestamp(), previousMessage.getPendingMessage().getUploadTimestamp()) == 0) {
+                            msg.setInfoToShow(Constants.CHAT_ADAPTER_SHOW_NOTHING);
+                        } else {
+                            //Different minute
+                            msg.setInfoToShow(Constants.CHAT_ADAPTER_SHOW_TIME);
+                        }
+                    } else {
+                        //Different date
+                        msg.setInfoToShow(Constants.CHAT_ADAPTER_SHOW_ALL);
+                    }
+                }
+            }
+            else{
+                log("The previous message is NOT uploading");
+
+                if (userHandleToCompare == myUserHandle) {
 //                log("MY message!!: "+messageToShow.getContent());
-                long previousUserHandleToCompare = -1;
-                if ((previousMessage.getMessage().getType() == MegaChatMessage.TYPE_PRIV_CHANGE) || (msg.getMessage().getType() == MegaChatMessage.TYPE_ALTER_PARTICIPANTS)) {
-                    previousUserHandleToCompare = previousMessage.getMessage().getHandleOfAction();
-                } else {
-                    previousUserHandleToCompare = previousMessage.getMessage().getUserHandle();
-                }
+                    if ((previousMessage.getMessage().getType() == MegaChatMessage.TYPE_PRIV_CHANGE) || (previousMessage.getMessage().getType() == MegaChatMessage.TYPE_ALTER_PARTICIPANTS)) {
+                        previousUserHandleToCompare = previousMessage.getMessage().getHandleOfAction();
+                    } else {
+                        previousUserHandleToCompare = previousMessage.getMessage().getUserHandle();
+                    }
 
 //                    log("previous message: "+previousMessage.getContent());
-                if (previousUserHandleToCompare == myUserHandle) {
-                    log("Last message and previous is mine");
-                    //The last two messages are mine
-                    if (compareDate(msg, previousMessage) == 0) {
-                        //Same date
-                        if (compareTime(msg, previousMessage) == 0) {
-                            msg.setInfoToShow(Constants.CHAT_ADAPTER_SHOW_NOTHING);
-                        } else {
-                            //Different minute
-                            msg.setInfoToShow(Constants.CHAT_ADAPTER_SHOW_TIME);
+                    if (previousUserHandleToCompare == myUserHandle) {
+                        log("Last message and previous is mine");
+                        //The last two messages are mine
+                        if(msg.isUploading()){
+                            log("The msg to append is uploading");
+                            if (compareDate(msg.getPendingMessage().getUploadTimestamp(), previousMessage) == 0) {
+                                //Same date
+                                if (compareTime(msg.getPendingMessage().getUploadTimestamp(), previousMessage) == 0) {
+                                    msg.setInfoToShow(Constants.CHAT_ADAPTER_SHOW_NOTHING);
+                                } else {
+                                    //Different minute
+                                    msg.setInfoToShow(Constants.CHAT_ADAPTER_SHOW_TIME);
+                                }
+                            } else {
+                                //Different date
+                                msg.setInfoToShow(Constants.CHAT_ADAPTER_SHOW_ALL);
+                            }
                         }
-                    } else {
-                        //Different date
-                        msg.setInfoToShow(Constants.CHAT_ADAPTER_SHOW_ALL);
-                    }
-                } else {
-                    //The last message is mine, the previous not
-                    log("Last message is mine, NOT previous");
-                    if (compareDate(msg, previousMessage) == 0) {
-                        msg.setInfoToShow(Constants.CHAT_ADAPTER_SHOW_TIME);
-                    } else {
-                        //Different date
-                        msg.setInfoToShow(Constants.CHAT_ADAPTER_SHOW_ALL);
-                    }
-                }
+                        else{
+                            if (compareDate(msg, previousMessage) == 0) {
+                                //Same date
+                                if (compareTime(msg, previousMessage) == 0) {
+                                    msg.setInfoToShow(Constants.CHAT_ADAPTER_SHOW_NOTHING);
+                                } else {
+                                    //Different minute
+                                    msg.setInfoToShow(Constants.CHAT_ADAPTER_SHOW_TIME);
+                                }
+                            } else {
+                                //Different date
+                                msg.setInfoToShow(Constants.CHAT_ADAPTER_SHOW_ALL);
+                            }
+                        }
 
-            } else {
-                log("NOT MY message!! - CONTACT");
+                    } else {
+                        //The last message is mine, the previous not
+                        log("Last message is mine, NOT previous");
+                        if(msg.isUploading()) {
+                            log("The msg to append is uploading");
+                            if (compareDate(msg.getPendingMessage().getUploadTimestamp(), previousMessage) == 0) {
+                                msg.setInfoToShow(Constants.CHAT_ADAPTER_SHOW_TIME);
+                            } else {
+                                //Different date
+                                msg.setInfoToShow(Constants.CHAT_ADAPTER_SHOW_ALL);
+                            }
+                        }
+                        else{
+                            if (compareDate(msg, previousMessage) == 0) {
+                                msg.setInfoToShow(Constants.CHAT_ADAPTER_SHOW_TIME);
+                            } else {
+                                //Different date
+                                msg.setInfoToShow(Constants.CHAT_ADAPTER_SHOW_ALL);
+                            }
+                        }
+
+                    }
+
+                } else {
+                    log("NOT MY message!! - CONTACT");
 //                    log("previous message: "+previousMessage.getContent());
-                long previousUserHandleToCompare = -1;
-                if ((previousMessage.getMessage().getType() == MegaChatMessage.TYPE_PRIV_CHANGE) || (msg.getMessage().getType() == MegaChatMessage.TYPE_ALTER_PARTICIPANTS)) {
-                    previousUserHandleToCompare = previousMessage.getMessage().getHandleOfAction();
-                } else {
-                    previousUserHandleToCompare = previousMessage.getMessage().getUserHandle();
+
+                    if ((previousMessage.getMessage().getType() == MegaChatMessage.TYPE_PRIV_CHANGE) || (previousMessage.getMessage().getType() == MegaChatMessage.TYPE_ALTER_PARTICIPANTS)) {
+                        previousUserHandleToCompare = previousMessage.getMessage().getHandleOfAction();
+                    } else {
+                        previousUserHandleToCompare = previousMessage.getMessage().getUserHandle();
+                    }
+
+                    if (previousUserHandleToCompare == userHandleToCompare) {
+                        //The last message is also a contact's message
+                        if(msg.isUploading()) {
+                            if (compareDate(msg.getPendingMessage().getUploadTimestamp(), previousMessage) == 0) {
+                                //Same date
+                                if (compareTime(msg.getPendingMessage().getUploadTimestamp(), previousMessage) == 0) {
+                                    log("Add with show nothing - same userHandle");
+                                    msg.setInfoToShow(Constants.CHAT_ADAPTER_SHOW_NOTHING);
+                                } else {
+                                    //Different minute
+                                    msg.setInfoToShow(Constants.CHAT_ADAPTER_SHOW_TIME);
+                                }
+                            } else {
+                                //Different date
+                                msg.setInfoToShow(Constants.CHAT_ADAPTER_SHOW_ALL);
+                            }
+                        }
+                        else{
+                            if (compareDate(msg, previousMessage) == 0) {
+                                //Same date
+                                if (compareTime(msg, previousMessage) == 0) {
+                                    log("Add with show nothing - same userHandle");
+                                    msg.setInfoToShow(Constants.CHAT_ADAPTER_SHOW_NOTHING);
+                                } else {
+                                    //Different minute
+                                    msg.setInfoToShow(Constants.CHAT_ADAPTER_SHOW_TIME);
+                                }
+                            } else {
+                                //Different date
+                                msg.setInfoToShow(Constants.CHAT_ADAPTER_SHOW_ALL);
+                            }
+                        }
+
+                    } else {
+                        //The last message is from contact, the previous not
+                        log("Different user handle");
+                        if(msg.isUploading()) {
+                            if (compareDate(msg.getPendingMessage().getUploadTimestamp(), previousMessage) == 0) {
+                                if (compareTime(msg.getPendingMessage().getUploadTimestamp(), previousMessage) == 0) {
+                                    log("Add with show nothing - same userHandle");
+                                    msg.setInfoToShow(Constants.CHAT_ADAPTER_SHOW_NOTHING);
+                                } else {
+                                    //Different minute
+                                    msg.setInfoToShow(Constants.CHAT_ADAPTER_SHOW_TIME);
+                                }
+                            } else {
+                                //Different date
+                                msg.setInfoToShow(Constants.CHAT_ADAPTER_SHOW_ALL);
+                            }
+                        }
+                        else{
+                            if (compareDate(msg, previousMessage) == 0) {
+                                if (compareTime(msg, previousMessage) == 0) {
+                                    log("Add with show nothing - same userHandle");
+                                    msg.setInfoToShow(Constants.CHAT_ADAPTER_SHOW_NOTHING);
+                                } else {
+                                    //Different minute
+                                    msg.setInfoToShow(Constants.CHAT_ADAPTER_SHOW_TIME);
+                                }
+                            } else {
+                                //Different date
+                                msg.setInfoToShow(Constants.CHAT_ADAPTER_SHOW_ALL);
+                            }
+                        }
+
+                    }
                 }
 
-                if (previousUserHandleToCompare == userHandleToCompare) {
-                    //The last message is also a contact's message
-                    if (compareDate(msg, previousMessage) == 0) {
-                        //Same date
-                        if (compareTime(msg, previousMessage) == 0) {
-                            log("Add with show nothing - same userHandle");
-                            msg.setInfoToShow(Constants.CHAT_ADAPTER_SHOW_NOTHING);
-                        } else {
-                            //Different minute
-                            msg.setInfoToShow(Constants.CHAT_ADAPTER_SHOW_TIME);
-                        }
-                    } else {
-                        //Different date
-                        msg.setInfoToShow(Constants.CHAT_ADAPTER_SHOW_ALL);
-                    }
-                } else {
-                    //The last message is from contact, the previous not
-                    log("Different user handle");
-                    if (compareDate(msg, previousMessage) == 0) {
-                        if (compareTime(msg, previousMessage) == 0) {
-                            log("Add with show nothing - same userHandle");
-                            msg.setInfoToShow(Constants.CHAT_ADAPTER_SHOW_NOTHING);
-                        } else {
-                            //Different minute
-                            msg.setInfoToShow(Constants.CHAT_ADAPTER_SHOW_TIME);
-                        }
-                    } else {
-                        //Different date
-                        msg.setInfoToShow(Constants.CHAT_ADAPTER_SHOW_ALL);
-                    }
-                }
             }
+
         }
+
 
         //Create adapter
         if(adapter==null){
@@ -3479,6 +3649,19 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             NodeAttachmentBottomSheetDialogFragment bottomSheetDialogFragment = new NodeAttachmentBottomSheetDialogFragment();
             bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
         }
+    }
+
+    public void showUploadingAttachmentBottomSheet(AndroidMegaChatMessage message, int position){
+        log("showUploadingAttachmentBottomSheet: "+position);
+        this.selectedPosition = position;
+
+        log("Cooming soon");
+//        if(message!=null){
+//            this.selectedMessageId = message.getMessage().getMsgId();
+////            this.selectedChatItem = chat;
+//            NodeAttachmentBottomSheetDialogFragment bottomSheetDialogFragment = new NodeAttachmentBottomSheetDialogFragment();
+//            bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
+//        }
     }
 
     public void showContactAttachmentBottomSheet(AndroidMegaChatMessage message, int position){
