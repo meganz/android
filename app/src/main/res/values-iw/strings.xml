@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     
-    <string name="full_description_text" context="Full description text of the app in the Google Play page of the app">MEGA הינו שירות אחסון בענן מאובטח אשר נותן לך 50 ג\'יגה בייט במתנה. לא כמו בשירותי ענן אחרים, המידע שלך מוצפן ומפוענח על ידי הלקוח בלבד ולא על ידינו.המידע שלך נגיש בכל זמן, מכל מכשיר, בכל מקום. שתף תיקיות עם אנשי קשר שלך וצפה בעדכונים שלהם בזמן אמת.הענן בכיס שלך. גש והזרם את כל הקבצים שלך מהטלפון החכם שלך או טאבלט. העלה וסנכרן את המדיה שלך לענן.חפש, שמור, הורד, הזרם, צפה, שתף, שנה שם או מחק את הקבצים שלך. הכל שם - בכף ידך.למידע נוסף, אנא הכנס לאתר האינטרנט שלנו: https://mega.nz/</string>
-    <string name="short_description_text" context="Short description text of the app in the Google Play page of the app">MEGA הינו שירות אחסון בענן בעל פרטיות מושלמת. 50 ג\'יגה בייט בחינם.</string>
+    <!--<string name="full_description_text" context="Full description text of the app in the Google Play page of the app">MEGA הינו שירות אחסון בענן מאובטח אשר נותן לך 50 ג\'יגה בייט במתנה. לא כמו בשירותי ענן אחרים, המידע שלך מוצפן ומפוענח על ידי הלקוח בלבד ולא על ידינו.המידע שלך נגיש בכל זמן, מכל מכשיר, בכל מקום. שתף תיקיות עם אנשי קשר שלך וצפה בעדכונים שלהם בזמן אמת.הענן בכיס שלך. גש והזרם את כל הקבצים שלך מהטלפון החכם שלך או טאבלט. העלה וסנכרן את המדיה שלך לענן.חפש, שמור, הורד, הזרם, צפה, שתף, שנה שם או מחק את הקבצים שלך. הכל שם - בכף ידך.למידע נוסף, אנא הכנס לאתר האינטרנט שלנו: https://mega.nz/</string>-->
+    <!--<string name="short_description_text" context="Short description text of the app in the Google Play page of the app">MEGA הינו שירות אחסון בענן בעל פרטיות מושלמת. 50 ג\'יגה בייט בחינם.</string>-->
 
     <string name="general_x_of_x" context="Showing progress of elements. Example: 2 of 10.">מתוך</string>
     <string name="general_yes" context="Answer for confirmation dialog.">כן</string>
@@ -10,22 +10,26 @@
     <string name="general_cancel" context="Answer for confirmation dialog.">בטל</string>
     <string name="general_move_to" context="When moving a file to a location in MEGA. This is the text of the button after selection the destination">העבר אל</string>
     <string name="general_copy_to" context="When copying a file to a location in MEGA. This is the text of the button after selection the destination">העתק אל</string>
+    <!--
     <string name="general_import_to" context="When importing a file to a location in MEGA. This is the text of the button after selection the destination">ייבא אל</string>
+    -->
     <string name="general_select" context="Selecting a specific location in MEGA. This is the text of the button">בחר</string>
     <string name="general_select_to_upload" context="Selecting a specific location in MEGA. This is the text of the button">בחר קבצים</string>
     <string name="general_select_to_download" context="Selecting a specific location in MEGA. This is the text of the button">בחר תיקייה</string>
     <string name="general_create" context="This is the final button when creating a folder in the dialog where the user inserts the folder name">צור</string>
+    <!--
     <string name="general_upload" context="Button text when uploading a file to a previously selected location in MEGA">העלה קובץ</string>
+    -->
     <string name="general_download" context="Item menu option upon right click on one or multiple files.">הורד</string>
     <string name="general_add" context="button">הוסף</string>
-    <string name="general_empty" context="Button to delete the contents of the trashbin. Can also be translated as &quot;clear&quot;">ריק</string>
+    <!--<string name="general_empty" context="Button to delete the contents of the trashbin. Can also be translated as &quot;clear&quot;">ריק</string>-->
     <string name="general_loading" context="state previous to import a file">טוען...</string>
     <string name="general_importing" context="state while importing the file">מייבא...</string>
     <string name="general_import" context="Import button. When the user clicks this button the file will be imported to his account.">ייבוא</string>
     <string name="general_storage" context="Text listed before the amount of storage a user gets with a certain package. For example: &quot;1TB Storage&quot;.">אחסון</string>
     <string name="general_bandwidth" context="Text listed before the amount of bandwidth a user gets with a certain package. For example: &quot;8TB Bandwidth&quot;. Can also be translated as data transfer.">פס רחב</string>
     <string name="general_subscribe" context="Text placed inside the button the user clicks when upgrading to PRO. Meaning: subscribe to this plan">הירשם</string>
-    <string name="general_continue" context="Text placed inside the button the user clicks when clicking into the FREE account. Meaning: Continue to the main screen">המשך</string>  
+    <!--<string name="general_continue" context="Text placed inside the button the user clicks when clicking into the FREE account. Meaning: Continue to the main screen">המשך</string>  -->
     <string name="general_error_word" context="It will be followed by the error message">שגיאה</string> 
     <string name="general_error_file_not_found" context="Message shown when a file doesn't exist">קישור לקובץ לא נמצא</string>
     <string name="general_error_folder_not_found" context="Message shown when a folder doesn't exist">קישור לתיקייה לא נמצא</string>
@@ -35,32 +39,32 @@
     <string name="general_already_uploaded" context="when trying to upload a file that is already uploaded in the folder">כבר הועלה</string>
     <string name="general_file_info" context="Label of the option menu. When clicking this button, the app shows the info of the file">מידע על הקובץ</string>
     <string name="general_folder_info" context="Label of the option menu. When clicking this button, the app shows the info of the folder">מידע על התיקייה</string>
-    <string name="general_menu" context="Title when the left menu is opened">תפריט</string>
+    <!--<string name="general_menu" context="Title when the left menu is opened">תפריט</string>-->
  
     <string name="secondary_media_service_error_local_folder" context="Local folder error in Sync Service. There are two syncs for images and videos. This error appears when the secondary media local folder doesn't exist">תיקיית מדיה משנית לא קיימת, אנא בחר תיקייה חדשה.</string>   
     <string name="no_external_SD_card_detected" context="when no external card exists">לא נמצא כרטיס זכרון חיצוני</string>
     <string name="no_permissions_upload" context="On clicking menu item upload in a incoming shared folder read only">התיקייה לצפייה בלבד. אין לך הרשאות להעלות אליה.</string>
     
     <string name="remove_key_confirmation" context="confirmation message before removing the previously downloaded MasterKey file">הינך הולך למחוק את ייצוא המפתח הראשי</string>  
-    <string name="export_key_confirmation" context="confirmation message before downloading to the device the MasterKey file">התראת אבטחה! זוהי פעולה בעלת סיכון גבוה. האם ברצונך להמשיך?</string> 
+    <!--<string name="export_key_confirmation" context="confirmation message before downloading to the device the MasterKey file">התראת אבטחה! זוהי פעולה בעלת סיכון גבוה. האם ברצונך להמשיך?</string> -->
      
-    <string name="more_options_overflow" context="title of the menu for more options for each file (rename, share, copy, move, etc)">עוד אפשרויות...</string> 
-    <string name="confirmation_remove_contact" context="confirmation message before removing a contact. Do not write question mark">האם ברצונך למחוק את איש הקשר</string>    
-    <string name="confirmation_remove_multiple_contacts" context="confirmation message before removing mutiple contacts">האם תרצה את אנשי הקשר הללו?</string>  
+    <!--<string name="more_options_overflow" context="title of the menu for more options for each file (rename, share, copy, move, etc)">עוד אפשרויות...</string> -->
+    <!--<string name="confirmation_remove_contact" context="confirmation message before removing a contact. Do not write question mark">האם ברצונך למחוק את איש הקשר</string>    -->
+    <!--<string name="confirmation_remove_multiple_contacts" context="confirmation message before removing mutiple contacts">האם תרצה את אנשי הקשר הללו?</string>  -->
     <string name="confirmation_move_to_rubbish" context="confirmation message before removing a file">להעביר אל פח האשפה?</string>
     <string name="confirmation_move_to_rubbish_plural" context="confirmation message before removing a file">האם אתה בטוח שברצונך להעביר קבצים אלו לפח האשפה?</string>
     <string name="confirmation_delete_from_mega" context="confirmation message before removing a file">למחוק מ-MEGA?</string>
-    <string name="confirmation_delete_from_mega_plural" context="confirmation message before removing a file">האם אתה בטוח שאתה רוצה למחוק את הקבצים לצמיתות?</string>
-    <string name="title_delete_from_mega" context="confirmation message before removing a file">מחק מ-MEGA</string>
+    <!--<string name="confirmation_delete_from_mega_plural" context="confirmation message before removing a file">האם אתה בטוח שאתה רוצה למחוק את הקבצים לצמיתות?</string>-->
+    <!--<string name="title_delete_from_mega" context="confirmation message before removing a file">מחק מ-MEGA</string>-->
     <string name="confirmation_leave_share_folder" context="confirmation message before leaving an incoming shared folder">אם תעזוב את התיקייה הזאת, לא תוכל לצפות בה שוב</string>
     
-    <string name="confirmation_alert" context="confirmation message before removing a file">אנא אשר</string>
+    <!--<string name="confirmation_alert" context="confirmation message before removing a file">אנא אשר</string>-->
     
     <string name="action_logout" context="Button where the user can sign off or logout">התנתק</string>
     <string name="action_add" context="Menu item">העלאה...</string>
     <string name="action_create_folder" context="Menu item">צור תיקייה חדשה</string>
     <string name="action_open_link" context="Menu item">פתח קישור...</string>
-    <string name="action_upload" context="Button text when choosing the destination location in MEGA">העלה אל</string>
+    <!--<string name="action_upload" context="Button text when choosing the destination location in MEGA">העלה אל</string>-->
     <string name="action_settings" context="Menu item">הגדרות</string>
     <string name="action_search" context="Search button">חפש</string>
     <string name="action_play" context="Search button">הפעל</string>
@@ -113,19 +117,19 @@
         <item quantity="other" context="Title of the incoming shared folders of a user in plural.">תיקיות משותפות</item>
     </plurals>
     
-    <plurals name="general_num_downloads" context="in the notification. When downloading the notification is like 3 downloads.">
+    <!--<plurals name="general_num_downloads" context="in the notification. When downloading the notification is like 3 downloads.">
         <item quantity="one" context="Item menu option upon clicking on one or multiple files. Singular">הורד</item>
         <item quantity="two" context="Item menu option upon clicking on one or multiple files. Plural">הורדות</item>
         <item quantity="many" context="Item menu option upon clicking on one or multiple files. Plural">הורדות</item>
         <item quantity="other" context="Item menu option upon clicking on one or multiple files. Plural">הורדות</item>
-    </plurals>
+    </plurals>-->
     
-    <plurals name="general_num_uploads">
+    <!--<plurals name="general_num_uploads">
         <item quantity="one" context="Transfer type description in the active file transfer panel, can either be upload or download. Singular">העלה</item>
         <item quantity="two" context="Transfer type description in the active file transfer panel, can either be upload or download. Plural">העלאות</item>
         <item quantity="many" context="Transfer type description in the active file transfer panel, can either be upload or download. Plural">העלאות</item>
         <item quantity="other" context="Transfer type description in the active file transfer panel, can either be upload or download. Plural">העלאות</item>
-    </plurals>
+    </plurals>-->
     
      <plurals name="general_num_users" context="used for example when a folder is shared with 1 user or 2 users">
         <item quantity="one" context="used for example when a folder is shared with 1 user">משתמש</item>
@@ -140,7 +144,7 @@
     <string name="password_text" context="password label">סיסמא</string>
     <string name="confirm_password_text" context="label shown in the confirmation of the password when creating an account">אשר סיסמא</string>
     <string name="abc" context="in the password edittext the user can see the password or asterisks. ABC shows the letters of the password">אבג</string>
-    <string name="dots" context="in the password edittext the user can see the password or asterisks. ··· shows asterisks instead of letters">···</string>
+    <!--<string name="dots" context="in the password edittext the user can see the password or asterisks. ··· shows asterisks instead of letters">···</string>-->
     <string name="new_to_mega" context="This question applies to users that do not have an account on MEGA yet">חדש ב-MEGA?</string>
     <string name="create_account" context="label and text button when creating the account">צור חשבון</string>
     <string name="error_enter_email" context="when the user tries to log in MEGA without typing the email">אנא הזן את כתובת הדוא\"ל שלך</string>
@@ -157,7 +161,7 @@
     <string name="login_confirming_account" context="Attempting to activate a MEGA account for a user.">מפעיל חשבון</string>
     <string name="login_preparing_filelist" context="After login, updating the file list, the file list should be processed before showing it to the user">מכין רשימת קבצים</string>
     <string name="login_before_share" context="when the user tries to share something to MEGA without being logged">אנא התחבר על מנת לשתף עם MEGA.</string>
-    <string name="session_problem" context="if a link to a folder cannot be fetched">שגיאה בקבלת קבצים מהתיקייה.</string>
+    <!--<string name="session_problem" context="if a link to a folder cannot be fetched">שגיאה בקבלת קבצים מהתיקייה.</string>-->
     
     <string name="tour_space_title">חלל MEGA</string>
     <string name="tour_speed_title">מהירות MEGA</string>
@@ -179,11 +183,11 @@
     <string name="error_passwords_dont_match" context="when creating the account">סיסמאות לא תואמות</string>
     <string name="error_email_registered" contect="when creating the account">כבר קיים חשבון בעל אותו דואר אלקטרני בMEGA</string>
     
-    <string name="create_account_confirm_title" context="Title that is shown when e-mail confirmation is still required for the account">אימות נדרש</string>
-    <string name="create_account_confirm" context="">אנא בדוק את תיבת הדוא\"ל שלך ולחץ על הקישור להתחברות ואימות החשבון</string>
+    <!--<string name="create_account_confirm_title" context="Title that is shown when e-mail confirmation is still required for the account">אימות נדרש</string>-->
+    <!--<string name="create_account_confirm" context="">אנא בדוק את תיבת הדוא\"ל שלך ולחץ על הקישור להתחברות ואימות החשבון</string>-->
     <string name="create_account_creating_account">מתחבר לשרת: יוצר חשבון. </string>
     
-    <string name="cancel_transfer_title">בטל העברה</string>
+    <!--<string name="cancel_transfer_title">בטל העברה</string>-->
     <string name="cancel_transfer_confirmation">ההעברה תבוטל, האם אתה בטוח שברצונך להמשיך?</string>
     <string name="cancel_all_transfer_confirmation">כל ההעברות יבוטלו, האם אתה בטוח שברצונך להמשיך?</string>
 
@@ -191,7 +195,7 @@
 	<string name="section_secondary_media_uploads" context="title of the screen where the secondary media images are uploaded">העלאות מדיה</string>
 	<string name="section_inbox" context="title of the screen that show the inbox">תיבת דואר נכנס</string>
 	<string name="section_saved_for_offline" context="title of the screen that shows the files saved for offline in the device">נשמר עבור שימוש באופן לא מקוון</string>
-	<string name="section_shared_with_me" context="title of the screen that shows all the folders that the user shares with other users and viceversa">תיקיות משותפות איתי</string>
+	<!--<string name="section_shared_with_me" context="title of the screen that shows all the folders that the user shares with other users and viceversa">תיקיות משותפות איתי</string>-->
 	<string name="section_shared_items" context="title of the screen that shows all the shared items">פריטים משותפים</string>
 	<string name="section_rubbish_bin" context="The title of the trash bin in the tree of the file manager.">אשפתון</string>
 	<string name="section_contacts" context="Title of the contact list">אנשי קשר</string>
@@ -203,35 +207,35 @@
 
 	<string name="section_account" context="button to the settings of the user\'s account">החשבון שלי</string>
 	<string name="section_photo_sync" context="title of the screen where the camera images are uploaded">העלאות מצלמה</string>
-	<string name="used_space" context="Used space &quot;5MB of 100MB&quot;.">%1$s מתוך %2$s</string>
+	<!--<string name="used_space" context="Used space &quot;5MB of 100MB&quot;.">%1$s מתוך %2$s</string>-->
 	<string name="tab_incoming_shares" context="Capital letters. Incoming shared folders. The title of a tab">נכנס</string>
 	<string name="tab_outgoing_shares" context="Capital letters. Outgoing shared folders. The title of a tab">יוצא</string>
 	
 	<string name="title_incoming_shares_explorer" context="Title of the file explorer in tab INCOMING">שיתופים נכנסים</string>
-	<string name="choose_folder_explorer" context="Title of the button in Incoming Shares tabs">בחר תיקייה</string>
+	<!--<string name="choose_folder_explorer" context="Title of the button in Incoming Shares tabs">בחר תיקייה</string>-->
 	
 	<string name="file_browser_empty_cloud_drive" context="message when there are no files in the Cloud Drive">אין קבצים בכונן הענן שלך</string>
-	<string name="file_browser_empty_rubbish_bin" context="message when there are no files in the Rubbish Bin">רוקן את פח המחזור</string>
+	<!--<string name="file_browser_empty_rubbish_bin" context="message when there are no files in the Rubbish Bin">רוקן את פח המחזור</string>-->
 	<string name="file_browser_empty_incoming_shares" context="message when there are no incoming shared folders">אין תיקיות שיתוף נכנסות</string>
 	<string name="file_browser_empty_outgoing_shares" context="message when there are no outgoing shared folders">אין תיקיות שיתוף יוצאות</string>
     <string name="file_browser_empty_folder" context="Text that indicates that a folder is currently empty">תיקייה ריקה</string>
     
-    <string name="choose_account_activity" context="Title of the activity Choose Account">בחר חשבון</string>
+    <!--<string name="choose_account_activity" context="Title of the activity Choose Account">בחר חשבון</string>-->
 	
-	<string name="file_properties_activity" context="Menu item to show the properties dialog of files and or folders.">תכונות</string>
+	<!--<string name="file_properties_activity" context="Menu item to show the properties dialog of files and or folders.">תכונות</string>-->
 	<string name="file_properties_available_offline" context="The files are available &quot;offline&quot; (without a network Wi-Fi mobile data connection)">זמינים  באופן לא מקוון</string>
-	<string name="file_properties_available_offline_on" context="Button state when a file can be saved for offline.(Capital letters)">לא מקוון</string>
-	<string name="file_properties_available_offline_off" context="Button state when a file is already saved for offline. (Capital letters)">לא מקוון</string>
+	<!--<string name="file_properties_available_offline_on" context="Button state when a file can be saved for offline.(Capital letters)">לא מקוון</string>-->
+	<!--<string name="file_properties_available_offline_off" context="Button state when a file is already saved for offline. (Capital letters)">לא מקוון</string>-->
 	<string name="file_properties_info_size_file" context="Refers to the size of a file.">גודל:</string>
 	<string name="file_properties_info_content" context="header of a status field for what content a user has shared to you">תוכן:</string>
 	<string name="file_properties_info_added" context="when was the file added in MEGA">הוסף:</string>
 	<string name="file_properties_info_modified" context="when was the file modified">שונה:</string>
-	<string name="file_properties_shared_folder_private_folder" context="the folder is private. A public user can\'t access the folder">לא נמצא קישור ציבורי</string>
+	<!--<string name="file_properties_shared_folder_private_folder" context="the folder is private. A public user can\'t access the folder">לא נמצא קישור ציבורי</string>-->
 	<string name="file_properties_shared_folder_public_link" context="the label when a folder can be accesed by public users">קישור פומבי</string>
 	<string name="file_properties_shared_folder_full_access" context="Refers to access rights for a file folder.">הרשאות מלאות</string>
 	<string name="file_properties_shared_folder_read_write" context="Refers to access rights for a file folder. (with the &amp; needed. Don\'t use the symbol itself. Use &amp;)">קריאה וכתיבה</string>
 	<string name="file_properties_shared_folder_read_only" context="Refers to access rights for a file folder.">לקריאה בלבד</string>
-	<string name="file_properties_shared_folder_shared_with" context="title of the screen that shows the users with whom the user has shared a folder">משותף עם:</string>
+	<!--<string name="file_properties_shared_folder_shared_with" context="title of the screen that shows the users with whom the user has shared a folder">משותף עם:</string>-->
 	<string name="file_properties_shared_folder_permissions" context="Item menu option upon clicking on a file folder. Refers to the permissions of a file folder in the file manager.">הרשאות:</string>
 	<string name="dialog_select_permissions" context="Title of the dialog to choose permissions when sharing.">הרשאות שיתוף</string>
 	<string name="file_properties_shared_folder_change_permissions" context="menu item">שנה הרשאות</string>
@@ -243,10 +247,10 @@
 	<string name="contact_decline" context="option to decline a contact invitation">דחה</string>
 	<string name="contact_accept" context="option to accept a contact invitation">אשר</string>
 	<string name="contact_properties_activity" context="title of the contact properties screen">מידע הודות איש קשר</string>	
-	<string name="contact_file_list_activity" context="header of a status field for what content a user has shared to you">תוכן</string>	
+	<!--<string name="contact_file_list_activity" context="header of a status field for what content a user has shared to you">תוכן</string>	-->
 	<string name="contact_shared_files" context="title of the screen where the folders are shown with the contact owner of those folders">תיקיות משותפות עם:</string>	
 	<string name="contacts_list_empty_text" context="Adding new relationships (contacts) using the actions.">הוסף אנשי קשר חדשים בעזרת הכפתור שלמטה</string>	
-	<string name="no_contacts" context="When an user wants to share a folder but has not any contact yet">אין אנשי קשר בחשבון. אנא הוסף אותם במסך אנשי קשר.</string>
+	<!--<string name="no_contacts" context="When an user wants to share a folder but has not any contact yet">אין אנשי קשר בחשבון. אנא הוסף אותם במסך אנשי קשר.</string>-->
 	
 	<string name="error_not_enough_free_space" context="Error message">אין מספיק מקום פנוי</string>
 	
@@ -254,13 +258,13 @@
 	<string name="option_link_without_key" context="Alert Dialog to get link">קישור ללא מפתח</string>
 	<string name="option_decryption_key" context="Alert Dialog to get link">מפתח פיענוח</string>
 	
-	<string name="download_failed" context="Error message">ההורדה נכשלה</string>
-	<string name="download_downloaded" context="notification message. Example: 1 file downloaded">ירד</string>
-	<string name="download_downloading" context="Title header on the download page while the file is downloading.">מוריד</string>
-	<string name="text_downloading" context="Text located in each fragment when a download is in progress. Keep the … symbol">מעביר...</string>
+	<!--<string name="download_failed" context="Error message">ההורדה נכשלה</string>-->
+	<!--<string name="download_downloaded" context="notification message. Example: 1 file downloaded">ירד</string>-->
+	<!--<string name="download_downloading" context="Title header on the download page while the file is downloading.">מוריד</string>-->
+	<!--<string name="text_downloading" context="Text located in each fragment when a download is in progress. Keep the … symbol">מעביר...</string>-->
 	<string name="download_preparing_files" context="message before the download or upload start ">מכין קבצים</string>
     <string name="download_began" context="message when the download starts">ההורדה החלה</string>
-    <string name="download_cancel_downloading" context="Confirmation text when attempting to cancel the download">האם ברצונך לבטל את ההורדה?</string>
+    <!--<string name="download_cancel_downloading" context="Confirmation text when attempting to cancel the download">האם ברצונך לבטל את ההורדה?</string>-->
     <string name="download_touch_to_cancel" context="Hint how to cancel the download">גע בכדי לבטל את ההורדה</string>
     <string name="download_touch_to_show" context="Hint how to cancel the download">לחץ על מנת לראות את כל ההעברות</string>
     <string name="error_file_size_greater_than_4gb" context="Warning message">רוב המכשירים אינם תומכים בהורדה מעל 4 ג\'יגה בייט.ככל הנראה פעולה זו תיכשל.</string>
@@ -269,7 +273,7 @@
     <string name="context_share_image" context="to share an image using Facebook, Whatsapp, etc">שתף תמונה בעזרת</string>
     <string name="context_get_link" context="create a link of a file and send it using an app from the device">שתף קישור</string>
     <string name="context_get_link_menu" context="Item menu option upon right click on one or multiple files.">קבל קישור</string>
-    <string name="context_manage_link_menu" context="Item menu option upon right click on one or multiple files.">נהל קישור</string>
+    <!--<string name="context_manage_link_menu" context="Item menu option upon right click on one or multiple files.">נהל קישור</string>-->
     <string name="context_leave_menu" context="Item menu option upon right click on one or multiple files.">עזוב</string>
     <string name="alert_leave_share" context="Title alert before leaving a share.">בטל שיתוף</string>
     <string name="context_clean_shares_menu" context="Item menu option upon right click on one or multiple files.">מחק</string>
@@ -281,46 +285,46 @@
     <string name="context_renaming" context="while renaming a file or folder">משנה שם</string>
     <string name="context_preparing_provider" context="while file provider is downloading a file. Keep the … symbol">מכין קובץ...</string>
     <string name="context_download" context="Item menu option upon right click on one or multiple files.">הורד</string>
-    <string name="download_folder" context="Item menu option upon right click on one or multiple files.">תיקיית הורדות</string>
-    <string name="import_folder" context="Item menu option upon right click on one or multiple files.">ייבא תיקייה</string>
+    <!--<string name="download_folder" context="Item menu option upon right click on one or multiple files.">תיקיית הורדות</string>-->
+    <!--<string name="import_folder" context="Item menu option upon right click on one or multiple files.">ייבא תיקייה</string>-->
     <string name="context_move" context="Item menu option upon right click on one or multiple files.">העבר</string>
     <string name="context_moving" context="while moving a file or folder">מעביר</string>
-    <string name="context_sharing" context="while sharing a folder">משתף תיקייה</string>
+    <!--<string name="context_sharing" context="while sharing a folder">משתף תיקייה</string>-->
     <string name="context_copy" context="Item menu option upon right click on one or multiple files.">העתק</string>
     <string name="context_upload" context="Item menu option upon right click on one or multiple files.">העלאה</string>
     <string name="context_copying" context="while copying a file or folder">מעתיק</string>
-    <string name="context_creating_link" context="status text">יוצר קישור</string>
-    <string name="context_moving_to_trash" context="status text">מעביר לסל המחזור</string>
+    <!--<string name="context_creating_link" context="status text">יוצר קישור</string>-->
+    <!--<string name="context_moving_to_trash" context="status text">מעביר לסל המחזור</string>-->
     <string name="context_move_to_trash" context="menu item">העבר לסל המחזור</string>
     <string name="context_delete_from_mega" context="menu item">מחק מ-MEGA</string>
     <string name="context_new_folder_name" context="Input field description in the create folder dialog.">שם תיקייה</string>
     <string name="context_new_contact_name" context="when adding a new contact. in the dialog">מייל איש קשר</string>
     <string name="context_creating_folder" context="status dialog when performing the action. Keep the … symbol">יוצר תיקייה...</string>
-    <string name="context_adding_contact" context="Adding a new relationship (contact)">מוסיף איש קשר</string>
+    <!--<string name="context_adding_contact" context="Adding a new relationship (contact)">מוסיף איש קשר</string>-->
     <string name="context_download_to" context="Menu item">שמור ב...</string>
     <string name="context_clear_rubbish" context="Menu option title">רוקן את האשפתון</string>
     <string name="clear_rubbish_confirmation" context="Ask for confirmation before removing all the elements of the rubbish bin">כל הקבצים בפח האשפה יימחקו</string>
-    <string name="context_send_link" context="get the link and send it">שלח קישור</string>
+    <!--<string name="context_send_link" context="get the link and send it">שלח קישור</string>-->
     <string name="context_send" context="get the link and send it">שלח</string>
     <string name="context_send_file_inbox" context="send the file to inbox">שלח לדוא\"ל הנכנס</string>
-    <string name="context_copy_link" context="get the link and copy it">העתק קישור</string>
+    <!--<string name="context_copy_link" context="get the link and copy it">העתק קישור</string>-->
     <string name="context_remove" context="Menu option to delete one or multiple selected items.">מחק</string>
     <string name="context_delete_offline" context="Menu option to delete selected items of the offline state">מחק משימוש לא מקוון</string>
     <string name="context_share_folder" context="menu item">שתף תיקייה</string>
     <string name="context_send_file" context="menu item">שלח קובץ</string>
     <string name="context_view_shared_folders" context="open a shared folder">צה בתיקיות משותפות</string>
     <string name="context_sharing_folder" context="Item menu option upon clicking on one or multiple files.">שיתוף</string>
-    <string name="remove_all_sharing" context="status text">מוחק כל אנשי קשר המשתפים</string>
-	<string name="leave_incoming_share" context="status text">עוזב תיקייה משותפת</string>
-    <string name="context_camera_folder" context="The location of where the user has the photos/videos stored.">תיקיית מצלמה</string>
-    <string name="context_mega_contacts" context="when sharing a folder, the user can choose a contact from MEGA">אנשי קשר של MEGA</string>
-    <string name="context_phone_contacts" context="when sharing a folder, the user chan choose a contact from the device">אנשי קשר מהטלפון</string>
+    <!--<string name="remove_all_sharing" context="status text">מוחק כל אנשי קשר המשתפים</string>-->
+	<!--<string name="leave_incoming_share" context="status text">עוזב תיקייה משותפת</string>-->
+    <!--<string name="context_camera_folder" context="The location of where the user has the photos/videos stored.">תיקיית מצלמה</string>-->
+    <!--<string name="context_mega_contacts" context="when sharing a folder, the user can choose a contact from MEGA">אנשי קשר של MEGA</string>-->
+    <!--<string name="context_phone_contacts" context="when sharing a folder, the user chan choose a contact from the device">אנשי קשר מהטלפון</string>-->
     <string name="context_delete" context="menu item">מחק</string>
-    <string name="context_more" context="menu item">עוד</string>
-    <string name="context_contact_added" context="success message when adding a contact">איש קשר התווסף</string>
+    <!--<string name="context_more" context="menu item">עוד</string>-->
+    <!--<string name="context_contact_added" context="success message when adding a contact">איש קשר התווסף</string>-->
     <string name="context_contact_invitation_deleted" context="success message when removing a contact request">בקשה נמחקה</string>
     <string name="context_contact_invitation_resent" context="success message when reinvite a contact">הבקשה נשלחה מחדש</string>
-    <string name="context_invitacion_reply" context="success message when adding a contact">נשלחה התשובה להזמנה</string>
+    <!--<string name="context_invitacion_reply" context="success message when adding a contact">נשלחה התשובה להזמנה</string>-->
     <string name="context_contact_removed" context="success message when removing a contact">איש קשר נמחק</string>
     <string name="context_contact_not_removed" context="error message">שגיאה. איש קשר לא נמחק</string>
     <string name="context_permissions_changed" context="success message when chaning the permissionss">הרשאות שונו</string>
@@ -332,8 +336,8 @@
     <string name="context_correctly_renamed" context="success message when renaming a node">השם שונה בהצלחה</string>
     <string name="context_no_renamed" context="error message">שגיאה. לא שונה השם</string>
     <string name="context_correctly_copied" context="success message when copying a node">הועתק בהצלחה</string>
-    <string name="context_correctly_sent" context="success message when sending a file">הקובץ נשלח בהצלחה</string>
-    <string name="context_no_sent" context="error message when sending a file">שגיאה. הקובץ לא נשלח</string>
+    <!--<string name="context_correctly_sent" context="success message when sending a file">הקובץ נשלח בהצלחה</string>-->
+    <!--<string name="context_no_sent" context="error message when sending a file">שגיאה. הקובץ לא נשלח</string>-->
     <string name="context_no_copied" context="error message">שגיאה. לא הועתק</string>
     <string name="context_no_destination_folder" context="message that appears when a user tries to move/copy/upload a file but doesn't choose a destination folder">אנא בחר תיקיית יעד.</string>
     <string name="context_correctly_moved" context="success message when moving a node">הועבר בהצלחה</string>
@@ -376,18 +380,18 @@
     
     <string name="dialog_cancel_subscriptions" context="dialog cancel subscriptions">אתה עומד לבטל את המנוי ל-MEGA. אנא אומר לנו, האם יש דרך לעזור לך לשנות את החלטתך.</string>
     <string name="hint_cancel_subscriptions" context="hint cancel subscriptions dialog.Keep the … symbol">הכנס משוב כאן...</string>
-    <string name="dismiss_cancel_subscriptions" context="dismiss cancel subscriptions dialog">בטל</string>
+    <!--<string name="dismiss_cancel_subscriptions" context="dismiss cancel subscriptions dialog">בטל</string>-->
     <string name="send_cancel_subscriptions" context="send cancel subscriptions dialog">שלח</string>
-    <string name="title_cancel_subscriptions" context="title cancel subscriptions dialog">בטל מנוי</string>
+    <!--<string name="title_cancel_subscriptions" context="title cancel subscriptions dialog">בטל מנוי</string>-->
     <string name="confirmation_cancel_subscriptions" context="confirmation cancel subscriptions dialog">תודה על המשוב! האם אתה בטוח שאתה רוצה לבטל את המנוי ל-MEGA?</string>
     <string name="reason_cancel_subscriptions" context="provide a reason to cancel subscriptions dialog">המנוי שלך לא בוטל. אנא, הכנס סיבה לביטול.</string>
     
     <string name="context_node_private" context="success message after removing the public link of a folder">התיקייה כעת פרטית</string>
-    <string name="context_share_correctly_removed" context="success message after removing a share of a folder. a contact has no access to the folder now">שיתוף נמחק בהצלחה</string>
+    <!--<string name="context_share_correctly_removed" context="success message after removing a share of a folder. a contact has no access to the folder now">שיתוף נמחק בהצלחה</string>-->
   
     <string name="menu_new_folder" context="Menu option to create a new folder in the file manager.">תיקייה חדשה</string>
     <string name="menu_add_contact" context="Menu option to add a contact to your contact list.">הוסף איש קשר</string>
-    <string name="menu_download_from_link" context="Text that is displayed in the dialog to download a MEGA link inside the app">הורדה מ-MEGA link</string>
+    <!--<string name="menu_download_from_link" context="Text that is displayed in the dialog to download a MEGA link inside the app">הורדה מ-MEGA link</string>-->
     
     <string name="alert_decryption_key" context="Title of the alert to introduce the decryption key">מפתח לפיענוח</string>
     <string name="message_decryption_key" context="Message of the alert to introduce the decryption key">אנא הכנס את מפתח הפיענוח עבור הקישור.</string>
@@ -395,14 +399,14 @@
     <string name="upload_to_image" context="upload to. Then choose an Image file">תמונה</string>
 	<string name="upload_to_audio" context="upload to. Then choose an Audio file">אודיו</string>
 	<string name="upload_to_video" context="upload to. Then choose a Video file">וידאו</string>
-	<string name="upload_to_other" context="upload to. Then choose a file which is not an Image, an Audio or a Video">קובץ אחר</string>
+	<!--<string name="upload_to_other" context="upload to. Then choose a file which is not an Image, an Audio or a Video">קובץ אחר</string>-->
 	<string name="upload_to_filesystem" context="upload to. Then choose to browse the file system to choose a file">בחר מאחסון המכשיר</string>
-	<string name="upload_select_file_type" context="title of the dialog for choosing if a user wants to upload an image, an audio, a video or a file from the system">בחר סוג קובץ</string>
-	<string name="upload_uploading" context="status text">מעלה</string>
-	<string name="upload_touch_to_cancel" context="hint to how to cancel the upload (by touching the notification)">גע בכדי לבטל את ההעלאה</string>
-	<string name="upload_failed" context="error message">העלאה נכשלה</string>
+	<!--<string name="upload_select_file_type" context="title of the dialog for choosing if a user wants to upload an image, an audio, a video or a file from the system">בחר סוג קובץ</string>-->
+	<!--<string name="upload_uploading" context="status text">מעלה</string>-->
+	<!--<string name="upload_touch_to_cancel" context="hint to how to cancel the upload (by touching the notification)">גע בכדי לבטל את ההעלאה</string>-->
+	<!--<string name="upload_failed" context="error message">העלאה נכשלה</string>-->
 	<string name="upload_uploaded" context="Label for the current uploaded size of a file. For example, 3 files, 50KB uploaded">הועלה</string>
-	<string name="upload_cancel_uploading" context="Confirmation text for cancelling an upload">האם ברצונך לבטל את ההעלאה?</string>
+	<!--<string name="upload_cancel_uploading" context="Confirmation text for cancelling an upload">האם ברצונך לבטל את ההעלאה?</string>-->
 	<string name="upload_prepare" context="Status text at the beginning of an upload">מעבד קובץ</string>
 	<string name="error_temporary_unavaible" context="error message when downloading a file">המשאב איננו זמין זמנית, אנא נסה מאוחר יותר</string>
 	<string name="upload_can_not_open" context="Error message when the selected file cannot be opened">לא ניתן לפתוח את הקובץ שנבחר</string>
@@ -414,20 +418,20 @@
 	
 	<string name="full_screen_image_viewer_label" context="title of the image gallery">צפה בתמונות</string>
 	
-	<string name="manager_download_from_link_incorrect" context="Error message when the user entered an incorrect MEGA link format for importing">הפורמט של הקישור איננו תקין</string>
+	<!--<string name="manager_download_from_link_incorrect" context="Error message when the user entered an incorrect MEGA link format for importing">הפורמט של הקישור איננו תקין</string>-->
 	
-	<string name="my_account_activity" context="Title of the screen where the user account information is shown">חשבון</string>
-    <string name="my_account_total_space" context="Headline for the amount of total storage space">שטח אחסון</string>
-    <string name="my_account_free_space" context="Headline for the amount of storage space is remaining">שטח פנוי</string>
+	<!--<string name="my_account_activity" context="Title of the screen where the user account information is shown">חשבון</string>-->
+    <!--<string name="my_account_total_space" context="Headline for the amount of total storage space">שטח אחסון</string>-->
+    <!--<string name="my_account_free_space" context="Headline for the amount of storage space is remaining">שטח פנוי</string>-->
     <string name="my_account_used_space" context="Headline for the amount of storage space is used">מקום בשימוש</string>
     <string name="my_account_upgrade_pro" context="Button to upgrade the account to PRO account">שדרג עכשיו!</string>
     <string name="my_account_change_password" context="menu item">שנה סיסמה</string>
-    <string name="warning_out_space" context="Warning in Cloud Drive when the user is runningut of space">נגמר לך המקום בקרוב!האם אתה רוצה לשדרג את חשבונך?</string>
+    <!--<string name="warning_out_space" context="Warning in Cloud Drive when the user is runningut of space">נגמר לך המקום בקרוב!האם אתה רוצה לשדרג את חשבונך?</string>-->
     <string name="get_pro_account" context="Message to promote PRO accounts">אתה יכול להיות משתמש PRO!האם אתה רוצה לשדרג את חשבונך?</string>
     <string name="overquota_alert_title" context="Title dialog overquota error">אזהרת זכרון!</string>
      <string name="overquota_alert_text" context="Dialod text overquota error">פעולה לא מאושרת, תעבור את מכסת הזכרון של חשבונך. האם אתה רוצה לשדרג את החשבון שלך?</string>
     
-    <string name="op_not_allowed" context="Dialod text overquota error">פעולה לא מורשית</string>
+    <!--<string name="op_not_allowed" context="Dialod text overquota error">פעולה לא מורשית</string>-->
     <string name="my_account_last_session" context="when did the last session happen">חיבור אחרון:</string>
     <string name="my_account_connections" context="header for the social connections, showing the number of contacts the user has">חיבורים:</string>
     
@@ -435,15 +439,15 @@
     <string name="my_account_change_password_oldPassword" context="when changing the password, the first edittext is to enter the current password">סיסמה נוכחית</string>
     <string name="my_account_change_password_newPassword1" context="when changing the password">סיסמה חדשה</string>
     <string name="my_account_change_password_newPassword2" context="when changing the password">אמת את הסיסמה החדשה</string>
-    <string name="my_account_change_password_error" context="Error message when the user attempts to change his password (two potential reasons in one error message).">הסיסמא הנוכחית שגויה או שהסיסמאות החדשות אינן תואמות. אנא נסה שוב.</string>
-    <string name="my_account_change_password_error_2" context="Error message when the user attempts to change his password (two potential reasons in one error message).">הסיסמא הנוכחית שגויה. אנא נסה שוב.</string>
-    <string name="my_account_change_password_OK" context="Success text">הסיסמא שונתה בהצלחה</string>
+    <!--<string name="my_account_change_password_error" context="Error message when the user attempts to change his password (two potential reasons in one error message).">הסיסמא הנוכחית שגויה או שהסיסמאות החדשות אינן תואמות. אנא נסה שוב.</string>-->
+    <!--<string name="my_account_change_password_error_2" context="Error message when the user attempts to change his password (two potential reasons in one error message).">הסיסמא הנוכחית שגויה. אנא נסה שוב.</string>-->
+    <!--<string name="my_account_change_password_OK" context="Success text">הסיסמא שונתה בהצלחה</string>-->
     <string name="my_account_change_password_dont_match" context="when changing the password or creating the account, the password is required twice and check that both times are the same">סיסמאות לא תואמות</string> 
     
-    <string name="upgrade_activity" context="title of the Upgrade screen">משתמש PRO</string>
+    <!--<string name="upgrade_activity" context="title of the Upgrade screen">משתמש PRO</string>-->
     <string name="upgrade_select_pricing" context="title of the selection of the pro account wanted">בחר מנוי</string>
     <string name="select_membership_1" context="the user has to decide the way of payment">חיוב חודשי או שנתי</string>
-    <string name="select_membership_2" context="button to go to Google Play">מנוי דרך גוגל פליי</string>
+    <!--<string name="select_membership_2" context="button to go to Google Play">מנוי דרך גוגל פליי</string>-->
     
     <string name="select_payment_method" context="after choosing one PRO plan, the user have to choose the payment method: credit card, fortumo, etc">בחר שיטת תשלום</string>
     <string name="no_available_payment_method" context="choose the payment method option when no method is available">ברגע זה, אין שיטת תשלום זמינה עבור תכנית זו</string>
@@ -458,16 +462,16 @@
     <string name="upgrade_comment" context="the meaning of the asterisk in monthly* and annually* payment">החיוב ניתן לביטול לפני כל חידוש של המנוי.</string>
     
     <string name="file_properties_get_link" context="the user can get the link and it\'s copied to the clipboard">הקישור הועתק ללוח המקשים</string>
-    <string name="file_properties_remove_link" context="the user can remove the public link">הקישור נמחק</string>
+    <!--<string name="file_properties_remove_link" context="the user can remove the public link">הקישור נמחק</string>-->
     
     <string name="full_image_viewer_not_preview" context="before sharing an image, the preview has to be downloaded">ההדגמה עוד לא ירדה. אנא המתן.</string>
     
-    <string name="import_correct" context="success message after import a file">ייבוא התבצע בהצלחה</string>
+    <!--<string name="import_correct" context="success message after import a file">ייבוא התבצע בהצלחה</string>-->
     
     <string name="transfers_empty" context="message shown in the screen when there are not any active transfer">אין העברות פעילות</string>
-    <string name="transfers_pause" context="File uploading or downloading has been paused (until the user continues at a later stage)">כל ההעברות הושהו</string>
+    <!--<string name="transfers_pause" context="File uploading or downloading has been paused (until the user continues at a later stage)">כל ההעברות הושהו</string>-->
     <string name="menu_pause_transfers" context="menu item">השהה העברות</string>
-    <string name="menu_restart_transfers" context="menu item">אתחל מחדש העברות</string>
+    <!--<string name="menu_restart_transfers" context="menu item">אתחל מחדש העברות</string>-->
     <string name="menu_cancel_all_transfers" context="menu item">בטל את כל ההעברות</string>
     <string name="menu_take_picture" context="menu item">צלם תמונה</string>
     
@@ -477,9 +481,9 @@
     <string name="cam_sync_skip" context="skip the step of camera upload">דלג</string>
     <string name="cam_sync_syncing" context="The upload of the user\'s photos orvideos from their specified album is in progress.">מתבצעת העלאת תמונות מצלמה</string>
     <string name="cam_sync_cancel_sync" context="confirmation question for cancelling the camera uploads">האם ברצונך לבטל העלאת תמונות מצלמה?</string>
-    <string name="settings_camera_notif_error_no_folder" context="Error message when an unavailable destination folder was selected">תקיית היעד איננה זמינה</string>
+    <!--<string name="settings_camera_notif_error_no_folder" context="Error message when an unavailable destination folder was selected">תקיית היעד איננה זמינה</string>-->
     <string name="settings_camera_notif_title" context="title of the notification when camera upload is enabled">העלה קבצים מתיקיות המדיה</string>
-    <string name="settings_camera_notif_error" context="notification error">בעייה בהעלאת תמונות מצלמה</string>
+    <!--<string name="settings_camera_notif_error" context="notification error">בעייה בהעלאת תמונות מצלמה</string>-->
     <string name="settings_camera_notif_complete" context="notification camera uploads complete">העלאת תמונות מצלמה הסתיימה</string>
     
     <string name="settings_storage" context="Text listed before the amount of storage a user gets with a certain package. For example: &quot;1TB Storage&quot;.">אחסון</string>
@@ -532,9 +536,9 @@
     <string name="settings_camera_upload_only_videos" context="what kind of file are going to be uploaded. Needed for the settings summary">סרטונים בלבד</string>
     <string name="settings_camera_upload_photos_and_videos" context="what kind of file are going to be uploaded. Needed for the settings summary">תמונות וסרטים</string>
     
-    <string name="settings_pin_lock_on" context="settings of the pin lock">אפשר נעילת קוד</string>
-    <string name="settings_pin_lock_off" context="settings of the pin lock">בטל נעילת PIN</string>
-    <string name="settings_pin_lock_code" context="settings of the pin lock">קוד סודי</string> 
+    <!--<string name="settings_pin_lock_on" context="settings of the pin lock">אפשר נעילת קוד</string>-->
+    <!--<string name="settings_pin_lock_off" context="settings of the pin lock">בטל נעילת PIN</string>-->
+    <!--<string name="settings_pin_lock_code" context="settings of the pin lock">קוד סודי</string> -->
     <string name="settings_pin_lock_code_not_set" context="status text when no custom photo sync folder has been set">לא הוגדר</string>
     <string name="settings_reset_lock_code" context="settings of the pin lock">איפוס קוד סודי</string> 
     <string name="settings_pin_lock_switch" context="settings of the pin lock">נעילת קוד</string>
@@ -571,7 +575,7 @@
     
     <string name="zip_browser_activity" context="title of the screen that shows the ZIP files">צפייה בקבצי ZIP</string>
     
-    <string name="new_account" context="in login screen to create a new account">צור חשבון עכשיו!</string>
+    <!--<string name="new_account" context="in login screen to create a new account">צור חשבון עכשיו!</string>-->
     
     <string name="my_account_title" context="title of the My Account screen">סוג חשבון:</string>
     <string name="expires_on" context="title of the Expiration Date">פג תוקף ב</string>
@@ -581,13 +585,13 @@
     <string name="pro2_account" context="Not translate">Pro II</string>
     <string name="pro3_account" context="Not translate">Pro III</string>
     
-    <string name="free_storage" context="Not translate">50 GB</string>   
-    <string name="free_bandwidth" context="Free bandwich account details">מוגבל</string>
+    <!--<string name="free_storage" context="Not translate">50 GB</string>   -->
+    <!--<string name="free_bandwidth" context="Free bandwich account details">מוגבל</string>-->
     
     <string name="camera_uploads_created" context="info message shown to the user when the Camera Uploads folder has been created">תיקיית תמונות מצלמה נוצרה</string>
     
-    <string name="ZIP_download_permission" context="A compressed file will be downloaded and decompressed.">קובץ הזיפ יורד וייפרס</string>
-    <string name="ZIP_unzip_permission" context="A compressed file will be decompressed.">קובץ הזיפ ייפרס</string>
+    <!--<string name="ZIP_download_permission" context="A compressed file will be downloaded and decompressed.">קובץ הזיפ יורד וייפרס</string>-->
+    <!--<string name="ZIP_unzip_permission" context="A compressed file will be decompressed.">קובץ הזיפ ייפרס</string>-->
     
     <string name="sortby_name" context="category in sort by action">לפי שם</string>
     <string name="sortby_name_ascending" context="sort files alphabetically ascending">עולה</string>
@@ -625,16 +629,16 @@
     <string name="account_successfully_upgraded" context="Message shown when the payment of an upgrade has been correct">החשבון שודרג בהצלחה!</string>
     <string name="account_error_upgraded" context="Message shown when the payment of an upgrade has not been correct">התהליך לא הסתיים בהצלחה. כרטיס האשראי לא יוחוייב.</string>
     <string name="credit_card_information_error" context="Message shown when the credit card information is not correct">פרטי כרטיס אשראי אינם נכונים. כרטיס האשראי לא יחוייב.</string>
-    <string name="not_upgrade_is_possible" context="Message shown when the user wants to upgrade an account that cannot be upgraded">לא הצלחנו לשדרג את חשבונך מהאפליקציה. אנא צור קשר עם support@mega.nz לשדרג את חשבונך.</string>
+    <!--<string name="not_upgrade_is_possible" context="Message shown when the user wants to upgrade an account that cannot be upgraded">לא הצלחנו לשדרג את חשבונך מהאפליקציה. אנא צור קשר עם support@mega.nz לשדרג את חשבונך.</string>-->
 
     <string name="menu_add_contact_and_share" context="Menu option to add a contact to your contact list.">הוסף איש קשר ושתף</string>
     <string name="general_share" context="button">שתף</string>
     <string name="general_remove" context="button">מחק</string>
-    <string name="general_confirm" context="button">אשר</string>
+    <!--<string name="general_confirm" context="button">אשר</string>-->
     <string name="general_leave" context="button">עזוב</string>
     <string name="general_decryp" context="button">פענח</string>
     <string name="general_export" context="button">ייצא</string>
-    <string name="confirmation_required" context="Alert title before download">אימות נדרש</string>
+    <!--<string name="confirmation_required" context="Alert title before download">אימות נדרש</string>-->
     <string name="alert_larger_file" context="Alert text before download">תחל הורדה של %s. האם אתה בטוח?</string>
     <string name="alert_no_app" context="Alert text before download">לא קיימת אפליקציה לפתיחה הקובץ %s. האם תרצה להמשיך עם ההורדה?</string>
     <string name="checkbox_not_show_again" context="Alert checkbox before download">אל תציג שוב</string>
@@ -657,7 +661,7 @@
     <string name="empty_inbox" context="Text that indicates that Inbox is empty">תיקייה ריקה</string>
     <string name="context_correctly_sent_node" context="success message when sending a node to Inbox">נשלח בהצלחה</string>
     <string name="context_no_sent_node" context="error message when sending a node to Inbox">שגיאה: השליחה לא הצליחה</string>
-    <string name="context_contact_invitation_sent" context="success message when sending a contact request">בקשה נשלחה</string>
+    <!--<string name="context_contact_invitation_sent" context="success message when sending a contact request">בקשה נשלחה</string>-->
     <string name="sortby_creation_date" context="category in sort by action">תאריך יצירה</string>
     <string name="sortby_modification_date" context="category in sort by action">תאריך שינוי</string>
     <string name="contact_invite" context="positive button on dialog to invite a contact">הזמן</string>
