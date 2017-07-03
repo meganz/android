@@ -1599,7 +1599,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
         log("Name of the file uploading: "+androidMsgSent.getPendingMessage().getNames().get(0));
 
-        int index = messages.size()-1;
+        int index = messages.size();
         if(androidMsgSent!=null){
 
             if(index==-1){
@@ -1609,23 +1609,14 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 messages.get(0).setInfoToShow(Constants.CHAT_ADAPTER_SHOW_ALL);
             }
             else{
-                //Not first element
-                //Find where to add in the queue
-                while(messages.get(index).getMessage().getStatus()==MegaChatMessage.STATUS_SENDING_MANUAL){
-                    index--;
-                }
-                index++;
-                log("Add in position: "+index);
 
                 messages.add(index, androidMsgSent);
-
+                log("Add to index: "+index);
                 AndroidMegaChatMessage androidPreviousMessage = messages.get(index-1);
-                log("previous message: "+androidPreviousMessage.getMessage().getContent());
-                if(androidPreviousMessage.getMessage().getUserHandle()==myUserHandle) {
-                    //The last two messages are mine
-                    if(compareDate(androidMsgSent.getPendingMessage().getUploadTimestamp(), androidPreviousMessage)==0){
+                if(androidPreviousMessage.isUploading()){
+                    if(compareDate(androidMsgSent.getPendingMessage().getUploadTimestamp(), androidPreviousMessage.getPendingMessage().getUploadTimestamp())==0){
                         //Same date
-                        if(compareTime(androidMsgSent.getPendingMessage().getUploadTimestamp(), androidPreviousMessage)==0){
+                        if(compareTime(androidMsgSent.getPendingMessage().getUploadTimestamp(), androidPreviousMessage.getPendingMessage().getUploadTimestamp())==0){
                             messages.get(index).setInfoToShow(Constants.CHAT_ADAPTER_SHOW_NOTHING);
                         }
                         else{
@@ -1639,18 +1630,37 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     }
                 }
                 else{
-                    //The last message is mine, the previous not
-                    log("Modify not my message");
-                    if (compareDate(androidMsgSent.getPendingMessage().getUploadTimestamp(), androidPreviousMessage) == 0) {
-                        if (compareTime(androidMsgSent.getPendingMessage().getUploadTimestamp(), androidPreviousMessage) == 0) {
-                            messages.get(index).setInfoToShow(Constants.CHAT_ADAPTER_SHOW_NOTHING);
-                        } else {
-                            //Different minute
-                            messages.get(index).setInfoToShow(Constants.CHAT_ADAPTER_SHOW_TIME);
+                    if(androidPreviousMessage.getMessage().getUserHandle()==myUserHandle) {
+                        //The last two messages are mine
+                        if(compareDate(androidMsgSent.getPendingMessage().getUploadTimestamp(), androidPreviousMessage)==0){
+                            //Same date
+                            if(compareTime(androidMsgSent.getPendingMessage().getUploadTimestamp(), androidPreviousMessage)==0){
+                                messages.get(index).setInfoToShow(Constants.CHAT_ADAPTER_SHOW_NOTHING);
+                            }
+                            else{
+                                //Different minute
+                                messages.get(index).setInfoToShow(Constants.CHAT_ADAPTER_SHOW_TIME);
+                            }
                         }
-                    } else {
-                        //Different date
-                        messages.get(index).setInfoToShow(Constants.CHAT_ADAPTER_SHOW_ALL);
+                        else{
+                            //Different date
+                            messages.get(index).setInfoToShow(Constants.CHAT_ADAPTER_SHOW_ALL);
+                        }
+                    }
+                    else{
+                        //The last message is mine, the previous not
+                        log("Modify not my message");
+                        if (compareDate(androidMsgSent.getPendingMessage().getUploadTimestamp(), androidPreviousMessage) == 0) {
+                            if (compareTime(androidMsgSent.getPendingMessage().getUploadTimestamp(), androidPreviousMessage) == 0) {
+                                messages.get(index).setInfoToShow(Constants.CHAT_ADAPTER_SHOW_NOTHING);
+                            } else {
+                                //Different minute
+                                messages.get(index).setInfoToShow(Constants.CHAT_ADAPTER_SHOW_TIME);
+                            }
+                        } else {
+                            //Different date
+                            messages.get(index).setInfoToShow(Constants.CHAT_ADAPTER_SHOW_ALL);
+                        }
                     }
                 }
             }
@@ -3882,6 +3892,41 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     log("Intent to Clear history");
                     showConfirmationClearChat(chatRoom);
                 }
+                else if(intent.getAction().equals(Constants.ACTION_UPDATE_ATTACHMENT)){
+                    log("Intent to update an attachment with error");
+
+                    long idPendMsg = intent.getLongExtra("ID_MSG", -1);
+                    if(idPendMsg!=-1){
+                        int indexToChange = -1;
+                        ListIterator<AndroidMegaChatMessage> itr = messages.listIterator(messages.size());
+
+                        // Iterate in reverse.
+                        while(itr.hasPrevious()) {
+                            AndroidMegaChatMessage messageToCheck = itr.previous();
+
+                            if(messageToCheck.isUploading()){
+                                if(messageToCheck.getPendingMessage().getId()==idPendMsg){
+                                    indexToChange = itr.nextIndex();
+                                    log("Found index to change: "+indexToChange);
+                                    break;
+                                }
+                            }
+                        }
+
+                        if(indexToChange!=-1){
+                            log("Index modified: "+indexToChange);
+                            messages.get(indexToChange).getPendingMessage().setState(PendingMessage.STATE_ERROR);
+                            adapter.modifyMessage(messages, indexToChange);
+                        }
+                        else{
+                            log("Error, id pending message message not found!!");
+                        }
+                    }
+                    else{
+                        log("Error. The idPendMsg is -1");
+                    }
+                    return;
+                }
                 else{
                     log("Other intent");
                 }
@@ -4060,13 +4105,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 	 */
     public void onIntentProcessed(List<ShareInfo> infos) {
         log("onIntentProcessedLollipop");
-//		List<ShareInfo> infos = filePreparedInfos;
-        if (statusDialog != null) {
-            try {
-                statusDialog.dismiss();
-            }
-            catch(Exception ex){}
-        }
 
         if (infos == null) {
             Snackbar.make(fragmentContainer, getString(R.string.upload_can_not_open), Snackbar.LENGTH_LONG).show();
@@ -4103,6 +4141,13 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
                 intent.putStringArrayListExtra(ChatUploadService.EXTRA_FILEPATHS, newPendingMsg.getFilePaths());
                 intent.putExtra(ChatUploadService.EXTRA_CHAT_ID, idChat);
+
+                if (statusDialog != null) {
+                    try {
+                        statusDialog.dismiss();
+                    }
+                    catch(Exception ex){}
+                }
 
                 startService(intent);
             }

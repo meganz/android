@@ -245,37 +245,6 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 		log("after stopSelf");
 	}
 
-	/*
-	 * Show complete success notification
-	 */
-//	private void showCompleteNotification() {
-//		log("showCompleteNotification");
-//		String notificationTitle, size;
-//
-//		int totalUploads = megaApi.getTotalUploads();
-//		notificationTitle = getResources().getQuantityString(R.plurals.upload_service_final_notification, totalUploads, totalUploads);
-//
-//		if (errorCount > 0){
-//			size = getResources().getQuantityString(R.plurals.upload_service_failed, errorCount, errorCount);
-//		}
-//		else{
-//			String totalBytes = Formatter.formatFileSize(ChatUploadService.this, megaApi.getTotalUploadedBytes());
-//			size = getString(R.string.general_total_size, totalBytes);
-//		}
-//
-//		Intent intent = null;
-//		intent = new Intent(ChatUploadService.this, ManagerActivityLollipop.class);
-//
-//		mBuilderCompat
-//		.setSmallIcon(R.drawable.ic_stat_notify_upload)
-//		.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
-//		.setAutoCancel(true).setTicker(notificationTitle)
-//		.setContentTitle(notificationTitle).setContentText(size)
-//		.setOngoing(false);
-//
-//		mNotificationManager.notify(notificationIdFinal, mBuilderCompat.build());
-//	}
-
 	@SuppressLint("NewApi")
 	private void updateProgressNotification() {
 
@@ -674,8 +643,19 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 						if(node.getHandle()==nodeHandles.get(0)){
 							log("The message MATCH!!");
 							dbH.updatePendingMessage(pendMsg.getId(), -1+"", PendingMessage.STATE_ERROR);
-							//TODO sent warning to the ChatActivity
 
+							long openChatId = MegaApplication.getOpenChatId();
+							if(pendMsg.getChatId()==openChatId){
+								log("Error update activity");
+
+								Intent intent;
+								intent = new Intent(this, ChatActivityLollipop.class);
+								intent.setAction(Constants.ACTION_UPDATE_ATTACHMENT);
+								intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+								intent.putExtra("ID_MSG", pendMsg.getId());
+								startActivity(intent);
+							}
+							break;
 						}
 					}
 					else{
@@ -699,14 +679,27 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 						}
 
 						if(nodeList.size() == counter){
-							long tempId = request.getMegaChatMessage().getTempId();
-							log("The tempId of the message is: "+tempId);
-							dbH.updatePendingMessage(pendMsg.getId(), tempId+"", PendingMessage.STATE_ERROR);
+							log("The message MATCH for multiple nodes!!");
+							dbH.updatePendingMessage(pendMsg.getId(), -1+"", PendingMessage.STATE_ERROR);
+
+							long openChatId = MegaApplication.getOpenChatId();
+							if(pendMsg.getChatId()==openChatId){
+								log("Error update activity");
+								Intent intent;
+								intent = new Intent(this, ChatActivityLollipop.class);
+								intent.setAction(Constants.ACTION_UPDATE_ATTACHMENT);
+								intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+								intent.putExtra("ID_MSG", pendMsg.getId());
+								startActivity(intent);
+							}
+
 							break;
 						}
 
 					}
 				}
+
+
 			}
 		}
 
