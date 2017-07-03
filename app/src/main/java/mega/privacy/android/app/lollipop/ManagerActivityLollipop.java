@@ -2794,6 +2794,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
     protected void onDestroy(){
 		log("onDestroy()");
 
+//		dbH.removeSentPendingMessages();
+
     	if (megaApi.getRootNode() != null){
     		megaApi.removeGlobalListener(this);
     		megaApi.removeTransferListener(this);
@@ -3842,6 +3844,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 	public void selectDrawerItemChat(){
 		log("selectDrawerItemChat");
+
+		MegaNode parentNode = megaApi.getNodeByPath("/"+Constants.CHAT_FOLDER);
+		if(parentNode == null){
+			log("Create folder: "+Constants.CHAT_FOLDER);
+			megaApi.createFolder(Constants.CHAT_FOLDER, megaApi.getRootNode(), null);
+		}
 
 		tB.setVisibility(View.VISIBLE);
 
@@ -11592,7 +11600,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 		}
 	}
-
 
 	@Override
 	public void onRequestStart(MegaChatApiJava api, MegaChatRequest request) {
