@@ -44,7 +44,7 @@ import nz.mega.sdk.MegaUser;
 
 public class MegaApplication extends Application implements MegaListenerInterface, MegaChatListenerInterface{
 	final String TAG = "MegaApplication";
-	static final String USER_AGENT = "MEGAAndroid/3.1.8_138";
+	static final String USER_AGENT = "MEGAAndroid/3.1.8.1_139";
 
 	DatabaseHandler dbH;
 	MegaApiAndroid megaApi;
@@ -366,6 +366,7 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 	private static boolean isLoggingIn = false;
 	private static boolean firstConnect = true;
 	private static boolean recentChatsFragmentVisible = false;
+
 	private static long openChatId = -1;
 
 	public static boolean isLoggingIn() {
@@ -403,7 +404,11 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 //		return mTrackers.get(trackerId);
 //	}
 
-	
+
+	public static long getOpenChatId() {
+		return openChatId;
+	}
+
 	public String getLocalIpAddress(){
 		return localIpAddress;
 	}

@@ -1068,6 +1068,16 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			outState.putString("searchQuery", searchQuery);
 		}
 	}
+
+	@Override
+	public void onStart(){
+		log("onStart");
+		super.onStart();
+		networkStateReceiver = new NetworkStateReceiver();
+		networkStateReceiver.addListener(this);
+		this.registerReceiver(networkStateReceiver, new IntentFilter(android.net.ConnectivityManager.CONNECTIVITY_ACTION));
+	}
+
 	@SuppressLint("NewApi") @Override
     protected void onCreate(Bundle savedInstanceState) {
 		log("onCreate");
@@ -1435,9 +1445,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		tabLayoutTransfers =  (TabLayout) findViewById(R.id.sliding_tabs_transfers);
 		viewPagerTransfers = (ViewPager) findViewById(R.id.transfers_tabs_pager);
 
-		networkStateReceiver = new NetworkStateReceiver();
-		networkStateReceiver.addListener(this);
-		this.registerReceiver(networkStateReceiver, new IntentFilter(android.net.ConnectivityManager.CONNECTIVITY_ACTION));
 
         if (!Util.isOnline(this)){
         	log("No network >> SHOW OFFLINE MODE");
@@ -2787,6 +2794,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
     protected void onDestroy(){
 		log("onDestroy()");
 
+//		dbH.removeSentPendingMessages();
+
     	if (megaApi.getRootNode() != null){
     		megaApi.removeGlobalListener(this);
     		megaApi.removeTransferListener(this);
@@ -3072,7 +3081,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		}
 		else{
 			log("showOnlineMode - Root is NULL");
-			showConfirmationConnect();
+			if(getApplicationContext()!=null){
+				showConfirmationConnect();
+			}
 		}
 	}
 
@@ -3833,6 +3844,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 	public void selectDrawerItemChat(){
 		log("selectDrawerItemChat");
+
+		MegaNode parentNode = megaApi.getNodeByPath("/"+Constants.CHAT_FOLDER);
+		if(parentNode == null){
+			log("Create folder: "+Constants.CHAT_FOLDER);
+			megaApi.createFolder(Constants.CHAT_FOLDER, megaApi.getRootNode(), null);
+		}
 
 		tB.setVisibility(View.VISIBLE);
 
@@ -11627,7 +11644,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		}
 	}
 
-
 	@Override
 	public void onRequestStart(MegaChatApiJava api, MegaChatRequest request) {
 //		if (request.getType() == MegaChatRequest.TYPE_INITIALIZE){
@@ -13191,9 +13207,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 							transfersBottomSheet.dismiss();
 						}
 					}
-					pauseTransfersMenuIcon.setVisible(false);
-					playTransfersMenuIcon.setVisible(false);
-					cancelAllTransfersMenuItem.setVisible(false);
+					if (pauseTransfersMenuIcon != null) {
+						pauseTransfersMenuIcon.setVisible(false);
+						playTransfersMenuIcon.setVisible(false);
+						cancelAllTransfersMenuItem.setVisible(false);
+					}
 
 //					showSnackbar(getString(R.string.message_transfers_completed));
 				}
