@@ -2457,10 +2457,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
     public void modifyMessage(ArrayList<AndroidMegaChatMessage> messages, int position){
         this.messages = messages;
-
-        if(messages.get(position).getMessage().isDeleted()){
-            log("Deleted the position message");
-        }
         notifyItemChanged(position);
     }
 
