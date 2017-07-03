@@ -685,32 +685,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
                         log("Result of open chat: " + result);
 
-                        int permission = chatRoom.getOwnPrivilege();
                         aB.setTitle(chatRoom.getTitle());
-
-                        if (chatRoom.isGroup()) {
-                            log("Check permissions group chat");
-                            if(permission==MegaChatRoom.PRIV_RO) {
-                                log("Permission RO");
-                                writingContainerLayout.setVisibility(View.GONE);
-                                aB.setSubtitle(getString(R.string.observer_permission_label_participants_panel));
-                            }
-                            else{
-                                log("permission: "+permission);
-                            }
-                        }
-                        else{
-                            log("Check permissions one to one chat");
-                            if(permission==MegaChatRoom.PRIV_RO) {
-                                log("Permission RO");
-                                writingContainerLayout.setVisibility(View.GONE);
-                                aB.setSubtitle(getString(R.string.observer_permission_label_participants_panel));
-                            }
-                            else{
-                                long userHandle = chatRoom.getPeerHandle(0);
-                                setStatus(userHandle);
-                            }
-                        }
+                        setChatPermissions();
 
                         if (intentAction.equals(Constants.ACTION_CHAT_NEW)) {
                             log("ACTION_CHAT_NEW");
@@ -765,6 +741,53 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
         else{
             log("INTENT is NULL");
+        }
+    }
+
+    public void setChatPermissions(){
+        log("setChatPermissions");
+        int permission = chatRoom.getOwnPrivilege();
+        if (chatRoom.isGroup()) {
+            log("Check permissions group chat");
+            if(permission==MegaChatRoom.PRIV_RO) {
+                log("Permission RO");
+                writingContainerLayout.setVisibility(View.GONE);
+                fab.setVisibility(View.GONE);
+                aB.setSubtitle(getString(R.string.observer_permission_label_participants_panel));
+            }
+            else if(permission==MegaChatRoom.PRIV_RM) {
+                log("Permission RM");
+                writingContainerLayout.setVisibility(View.GONE);
+                fab.setVisibility(View.GONE);
+                aB.setSubtitle(null);
+            }
+            else{
+                log("permission: "+permission);
+                aB.setSubtitle(null);
+                writingContainerLayout.setVisibility(View.VISIBLE);
+                fab.setVisibility(View.VISIBLE);
+            }
+        }
+        else{
+            log("Check permissions one to one chat");
+            if(permission==MegaChatRoom.PRIV_RO) {
+                log("Permission RO");
+                writingContainerLayout.setVisibility(View.GONE);
+                fab.setVisibility(View.GONE);
+                aB.setSubtitle(getString(R.string.observer_permission_label_participants_panel));
+            }
+            else if(permission==MegaChatRoom.PRIV_RM) {
+                log("Permission RM");
+                writingContainerLayout.setVisibility(View.GONE);
+                fab.setVisibility(View.GONE);
+                aB.setSubtitle(null);
+            }
+            else{
+                long userHandle = chatRoom.getPeerHandle(0);
+                setStatus(userHandle);
+                writingContainerLayout.setVisibility(View.VISIBLE);
+                fab.setVisibility(View.VISIBLE);
+            }
         }
     }
 
@@ -2272,8 +2295,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             log("CHANGE_TYPE_CLOSED for the chat: "+chat.getChatId());
             log("Permissions for the chat: "+chat.getOwnPrivilege());
             //Hide field to write
-            writingContainerLayout.setVisibility(View.GONE);
-            fab.setVisibility(View.GONE);
+            setChatPermissions();
         }
         else if(chat.hasChanged(MegaChatRoom.CHANGE_TYPE_STATUS)){
             log("CHANGE_TYPE_STATUS for the chat: "+chat.getChatId());
@@ -2290,6 +2312,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
         else if(chat.hasChanged(MegaChatRoom.CHANGE_TYPE_PARTICIPANTS)){
             log("CHANGE_TYPE_PARTICIPANTS for the chat: "+chat.getChatId());
+            setChatPermissions();
         }
         else if(chat.hasChanged(MegaChatRoom.CHANGE_TYPE_TITLE)){
             log("CHANGE_TYPE_TITLE for the chat: "+chat.getChatId());
@@ -2459,7 +2482,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     }
                     case 1:{
                         String userTyping = getResources().getQuantityString(R.plurals.user_typing, 1);
-                        userTypingText.setText(" "+userTyping);
+                        userTypingText.setText(userTyping);
                         userTypingName.setText(usersTypingSync.get(0).getParticipantTyping().getFirstName()+" ");
                         break;
                     }

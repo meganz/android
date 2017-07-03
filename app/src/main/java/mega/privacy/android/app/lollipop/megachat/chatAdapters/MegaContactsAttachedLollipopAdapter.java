@@ -884,7 +884,7 @@ public class MegaContactsAttachedLollipopAdapter extends RecyclerView.Adapter<Me
 		if(adapterType == MegaContactsAttachedLollipopAdapter.ITEM_VIEW_TYPE_CHAT_LIST){
 			ViewHolderContacts holder = (ViewHolderContacts) v.getTag();
 			int currentPosition = holder.getAdapterPosition();
-			MegaContactAdapter c = (MegaContactAdapter) getItem(currentPosition);
+			MegaContactDB c = (MegaContactDB) getItem(currentPosition);
 
 			switch (v.getId()){
 				case R.id.contact_list_three_dots:
@@ -896,7 +896,7 @@ public class MegaContactsAttachedLollipopAdapter extends RecyclerView.Adapter<Me
 //						}
 					}
 					else{
-						((ContactAttachmentActivityLollipop) context).showOptionsPanel(c.getMegaUser());
+						((ContactAttachmentActivityLollipop) context).showOptionsPanel(c.getMail());
 					}
 					break;
 				}

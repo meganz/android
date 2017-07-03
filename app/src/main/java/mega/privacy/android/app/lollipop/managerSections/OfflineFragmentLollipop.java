@@ -577,8 +577,6 @@ public class OfflineFragmentLollipop extends Fragment{
 			sortByNameAscending();
 		}
 
-		contentText.setText(getInfoFolder(mOffList));
-
 		if(adapter!=null){
 			adapter.setNodes(mOffList);
 

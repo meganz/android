@@ -209,6 +209,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 	public long transferCallback = 0;
 
+	boolean chatConnection = false;
+
 	TransfersBottomSheetDialogFragment transfersBottomSheet = null;
 
 	//OVERQUOTA WARNING
@@ -228,8 +230,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	MegaNode inboxNode = null;
 
 	boolean mkLayoutVisible = false;
-
-	int statusToConnect = -1;
 
 	private NetworkStateReceiver networkStateReceiver;
 	MegaNode rootNode = null;
@@ -476,7 +476,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	private MenuItem setStatusMenuItem;
 	private MenuItem clearCompletedTransfers;
 
-	boolean fromTakePicture = false;
+	int fromTakePicture = -1;
 
 	//Billing
 
@@ -871,24 +871,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				break;
 			}
 	        case Constants.REQUEST_CAMERA:{
-//	        	if (firstTimeCam){
-//	        		if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
-//		        		boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
-//		        		if (hasStoragePermission){
-//		        			if (firstTimeCam){
-//		        				firstTimeCam = false;
-//		        			}
-//		        		}
-//		        		else{
-//		        			ActivityCompat.requestPermissions(this,
-//					                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-//					                ManagerActivityLollipop.REQUEST_WRITE_STORAGE);
-//		        		}
-//		        	}
-//	        	}
+				log("REQUEST_CAMERA PERMISSIONS");
 
-
-	        	if (fromTakePicture){
+	        	if (fromTakePicture==Constants.TAKE_PICTURE_OPTION){
+					log("TAKE_PICTURE_OPTION");
 		        	if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
 		        		boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
 		        		if (!hasStoragePermission){
@@ -898,41 +884,99 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		        		}
 		        		else{
 		        			this.takePicture();
-		        			fromTakePicture = false;
+		        			fromTakePicture = -1;
 		        		}
 		        	}
 	        	}
+				else if (fromTakePicture==Constants.TAKE_PROFILE_PICTURE){
+					log("TAKE_PROFILE_PICTURE");
+					if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+						boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
+						if (!hasStoragePermission){
+							ActivityCompat.requestPermissions(this,
+									new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+									Constants.REQUEST_WRITE_STORAGE);
+						}
+						else{
+							this.takeProfilePicture();
+							fromTakePicture = -1;
+						}
+					}
+				}
 	        	break;
 	        }
 	        case Constants.REQUEST_WRITE_STORAGE:{
+				log("REQUEST_WRITE_STORAGE PERMISSIONS");
 	        	if (firstTimeCam){
+					log("The first time");
 	        		if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
-//		        		boolean hasCameraPermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED);
-//		        		if (hasCameraPermission){
-		        			if (firstTimeCam){
-		        				firstTimeCam = false;
-		        			}
 
-		        			if (fromTakePicture){
-		        				boolean hasCameraPermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED);
-				        		if (!hasCameraPermission){
-				        			ActivityCompat.requestPermissions(this,
-							                new String[]{Manifest.permission.CAMERA},
-											Constants.REQUEST_CAMERA);
-				        		}
-				        		else{
-				        			this.takePicture();
-				        			fromTakePicture = false;
-				        		}
-		        			}
-//		        		}
-//		        		else{
-//		        			ActivityCompat.requestPermissions(this,
-//					                new String[]{Manifest.permission.CAMERA},
-//					                ManagerActivityLollipop.REQUEST_CAMERA);
-//		        		}
+						if (firstTimeCam){
+							firstTimeCam = false;
+						}
+
+						if (fromTakePicture==Constants.TAKE_PICTURE_OPTION){
+							log("TAKE_PICTURE_OPTION");
+							boolean hasCameraPermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED);
+							if (!hasCameraPermission){
+								ActivityCompat.requestPermissions(this,
+										new String[]{Manifest.permission.CAMERA},
+										Constants.REQUEST_CAMERA);
+							}
+							else{
+								this.takePicture();
+								fromTakePicture = -1;
+							}
+						}
+						else if (fromTakePicture==Constants.TAKE_PROFILE_PICTURE){
+							log("TAKE_PROFILE_PICTURE");
+							boolean hasCameraPermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED);
+							if (!hasCameraPermission){
+								ActivityCompat.requestPermissions(this,
+										new String[]{Manifest.permission.CAMERA},
+										Constants.REQUEST_CAMERA);
+							}
+							else{
+								this.takeProfilePicture();
+								fromTakePicture = -1;
+							}
+						}
+						else{
+							log("No option fromTakePicture: "+fromTakePicture);
+						}
 		        	}
 	        	}
+	        	else{
+					if (fromTakePicture==Constants.TAKE_PICTURE_OPTION){
+						log("TAKE_PICTURE_OPTION");
+						boolean hasCameraPermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED);
+						if (!hasCameraPermission){
+							ActivityCompat.requestPermissions(this,
+									new String[]{Manifest.permission.CAMERA},
+									Constants.REQUEST_CAMERA);
+						}
+						else{
+							this.takePicture();
+							fromTakePicture = -1;
+						}
+					}
+					else if (fromTakePicture==Constants.TAKE_PROFILE_PICTURE){
+						log("TAKE_PROFILE_PICTURE");
+						boolean hasCameraPermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED);
+						if (!hasCameraPermission){
+							ActivityCompat.requestPermissions(this,
+									new String[]{Manifest.permission.CAMERA},
+									Constants.REQUEST_CAMERA);
+						}
+						else{
+							this.takeProfilePicture();
+							fromTakePicture = -1;
+						}
+					}
+					else{
+						log("No option fromTakePicture: "+fromTakePicture);
+					}
+				}
 	        	break;
 	        }
         }
@@ -973,6 +1017,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		outState.putLong("parentHandleOutgoing", parentHandleOutgoing);
 		outState.putLong("parentHandleSearch", parentHandleSearch);
 		outState.putLong("parentHandleInbox", parentHandleInbox);
+		outState.putBoolean("chatConnection", chatConnection);
 		outState.putSerializable("drawerItem", drawerItem);
 
 		if(parentHandleIncoming!=-1){
@@ -1023,6 +1068,16 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			outState.putString("searchQuery", searchQuery);
 		}
 	}
+
+	@Override
+	public void onStart(){
+		log("onStart");
+		super.onStart();
+		networkStateReceiver = new NetworkStateReceiver();
+		networkStateReceiver.addListener(this);
+		this.registerReceiver(networkStateReceiver, new IntentFilter(android.net.ConnectivityManager.CONNECTIVITY_ACTION));
+	}
+
 	@SuppressLint("NewApi") @Override
     protected void onCreate(Bundle savedInstanceState) {
 		log("onCreate");
@@ -1060,6 +1115,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			selectedAccountType = savedInstanceState.getInt("selectedAccountType", -1);
 			selectedPaymentMethod = savedInstanceState.getInt("selectedPaymentMethod", -1);
 			searchQuery = savedInstanceState.getString("searchQuery");
+			chatConnection = savedInstanceState.getBoolean("chatConnection");
 		}
 		else{
 			log("Bundle is NULL");
@@ -1069,6 +1125,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			parentHandleOutgoing = -1;
 			parentHandleSearch = -1;
 			parentHandleInbox = -1;
+
+			chatConnection = false;
 
 			this.setPathNavigationOffline("/");
 		}
@@ -1387,15 +1445,16 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		tabLayoutTransfers =  (TabLayout) findViewById(R.id.sliding_tabs_transfers);
 		viewPagerTransfers = (ViewPager) findViewById(R.id.transfers_tabs_pager);
 
-		networkStateReceiver = new NetworkStateReceiver();
-		networkStateReceiver.addListener(this);
-		this.registerReceiver(networkStateReceiver, new IntentFilter(android.net.ConnectivityManager.CONNECTIVITY_ACTION));
 
         if (!Util.isOnline(this)){
-        	log("No network: intent to OfflineActivityLollipop");
-//        	Intent offlineIntent = new Intent(this, OfflineActivityLollipop.class);
-//			startActivity(offlineIntent);
-//			finish();
+        	log("No network >> SHOW OFFLINE MODE");
+
+			if(drawerItem==null){
+				drawerItem = DrawerItem.SAVED_FOR_OFFLINE;
+			}
+
+			selectDrawerItemLollipop(drawerItem);
+
 			showOfflineMode();
 			if(Util.isChatEnabled()){
 				UserCredentials credentials = dbH.getCredentials();
@@ -1405,7 +1464,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					log("In Offline mode: init chat is: "+ret);
 				}
 			}
-        	return;
+			return;
         }
 
 		///Check the MK file
@@ -1420,7 +1479,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 		}
 
-        rootNode = megaApi.getRootNode();
+		rootNode = megaApi.getRootNode();
 		if (rootNode == null){
 			log("Root node is NULL");
 			 if (getIntent() != null){
@@ -1742,7 +1801,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			log("onCreate - Check if there any unread chat");
 			if(Util.isChatEnabled()){
 				log("Connect to chat!");
-				megaChatApi.connect(this);
+
+				if(!chatConnection){
+					log("Connection goes!!!");
+					megaChatApi.connect(this);
+				}
 
 				if (nV != null){
 					Menu nVMenu = nV.getMenu();
@@ -3018,7 +3081,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		}
 		else{
 			log("showOnlineMode - Root is NULL");
-			showConfirmationConnect();
+			if(getApplicationContext()!=null){
+				showConfirmationConnect();
+			}
 		}
 	}
 
@@ -5526,7 +5591,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 	@Override
     public boolean onOptionsItemSelected(MenuItem item) {
-		fromTakePicture = false;
+		fromTakePicture = -1;
 		log("onOptionsItemSelectedLollipop");
 		if (megaApi == null){
 			megaApi = ((MegaApplication)getApplication()).getMegaApi();
@@ -5684,7 +5749,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		    	return true;
 		    }
 		    case R.id.action_take_picture:{
-		    	fromTakePicture = true;
+		    	fromTakePicture = Constants.TAKE_PICTURE_OPTION;
 		    	if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 					boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
 					if (!hasStoragePermission) {
@@ -8571,6 +8636,62 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
         cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, outputFileUri);
 		cameraIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         startActivityForResult(cameraIntent, Constants.TAKE_PHOTO_CODE);
+	}
+
+	public void checkPermissions(){
+		log("checkPermissions");
+
+		fromTakePicture = Constants.TAKE_PROFILE_PICTURE;
+
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+			boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
+			if (!hasStoragePermission) {
+				ActivityCompat.requestPermissions(this,
+						new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+						Constants.REQUEST_WRITE_STORAGE);
+			}
+
+			boolean hasCameraPermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED);
+			if (!hasCameraPermission) {
+				ActivityCompat.requestPermissions(this,
+						new String[]{Manifest.permission.CAMERA},
+						Constants.REQUEST_CAMERA);
+			}
+
+			if (hasStoragePermission && hasCameraPermission){
+				this.takeProfilePicture();
+			}
+		}
+		else{
+			this.takeProfilePicture();
+		}
+	}
+
+	public void takeProfilePicture(){
+		log("takeProfilePicture");
+		String path = Environment.getExternalStorageDirectory().getAbsolutePath() +"/"+ Util.profilePicDIR;
+		File newFolder = new File(path);
+		newFolder.mkdirs();
+
+		String file = path + "/picture.jpg";
+		File newFile = new File(file);
+		try {
+			newFile.createNewFile();
+		} catch (IOException e) {}
+
+		Uri outputFileUri;
+
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+			outputFileUri = FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", newFile);
+		}
+		else{
+			outputFileUri = Uri.fromFile(newFile);
+		}
+
+		Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+		cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, outputFileUri);
+		cameraIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+		startActivityForResult(cameraIntent, Constants.TAKE_PICTURE_PROFILE_CODE);
 	}
 
 	public void showCancelMessage(){
@@ -11565,6 +11686,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 		}
 		else if (request.getType() == MegaChatRequest.TYPE_CONNECT){
+			log("Connecting chat finished");
+			chatConnection = true;
+
 			if (MegaApplication.isFirstConnect()){
 				MegaApplication.setFirstConnect(false);
 			}
@@ -13040,9 +13164,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 							transfersBottomSheet.dismiss();
 						}
 					}
-					pauseTransfersMenuIcon.setVisible(false);
-					playTransfersMenuIcon.setVisible(false);
-					cancelAllTransfersMenuItem.setVisible(false);
+					if (pauseTransfersMenuIcon != null) {
+						pauseTransfersMenuIcon.setVisible(false);
+						playTransfersMenuIcon.setVisible(false);
+						cancelAllTransfersMenuItem.setVisible(false);
+					}
 
 //					showSnackbar(getString(R.string.message_transfers_completed));
 				}

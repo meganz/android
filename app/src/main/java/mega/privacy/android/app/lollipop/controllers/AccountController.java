@@ -89,34 +89,6 @@ public class AccountController {
         megaApi.confirmChangeEmail(link, pass, (ManagerActivityLollipop)context);
     }
 
-    public void takeProfilePicture(){
-        log("takePicture");
-
-        String path = Environment.getExternalStorageDirectory().getAbsolutePath() +"/"+ Util.profilePicDIR;
-        File newFolder = new File(path);
-        newFolder.mkdirs();
-
-        String file = path + "/picture.jpg";
-        File newFile = new File(file);
-        try {
-            newFile.createNewFile();
-        } catch (IOException e) {}
-
-        Uri outputFileUri;
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            outputFileUri = FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", newFile);
-        }
-        else{
-            outputFileUri = Uri.fromFile(newFile);
-        }
-
-        Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, outputFileUri);
-        cameraIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-        ((ManagerActivityLollipop)context).startActivityForResult(cameraIntent, Constants.TAKE_PICTURE_PROFILE_CODE);
-    }
-
     public boolean existsAvatar(){
         MegaUser myContact = ((ManagerActivityLollipop)context).getMyAccountInfo().getMyUser();
         String myEmail = myContact.getEmail();
