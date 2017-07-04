@@ -12,6 +12,7 @@ extern JavaVM *MEGAjvm;
 extern jstring strEncodeUTF8;
 extern jclass clsString;
 extern jmethodID ctorString;
+extern jmethodID getBytes;
 extern int sdkVersion;
 #endif
 
@@ -51,6 +52,47 @@ extern int sdkVersion;
 #endif
         {
             $result = jenv->NewStringUTF($1);
+        }
+    }
+%}
+
+%typemap(in) char*
+%{
+#ifdef __ANDROID__
+    jbyteArray $1_array;
+#endif
+
+    $1 = 0;
+    if ($input)
+    {
+#ifdef __ANDROID__
+        if (sdkVersion < 23)
+        {
+            $1_array = (jbyteArray) jenv->CallObjectMethod($input, getBytes, strEncodeUTF8);
+            $1 = (char*) jenv->GetByteArrayElements($1_array, NULL);
+        }
+        else
+#endif
+        {
+            $1 = (char *)jenv->GetStringUTFChars($input, 0);
+        }
+    }
+%}
+
+%typemap(freearg) char*
+%{
+    if ($1)
+    {
+#ifdef __ANDROID__
+        if (sdkVersion < 23)
+        {
+            jenv->ReleaseByteArrayElements($1_array, (jbyte*) $1, JNI_ABORT);
+            jenv->DeleteLocalRef($1_array);
+        }
+        else
+#endif
+        {
+            jenv->ReleaseStringUTFChars($input, (const char *)$1);
         }
     }
 %}
