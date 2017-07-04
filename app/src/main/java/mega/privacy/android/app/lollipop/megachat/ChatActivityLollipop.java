@@ -3903,6 +3903,21 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     }
                     return;
                 }
+                else if(intent.getAction().equals(Constants.ACTION_NEW_CHAT)){
+                    log("Intent to open new chat");
+                    finish();
+                    long chatIdIntent = intent.getLongExtra("CHAT_ID", -1);
+                    if(chatIdIntent!=-1){
+                        Intent intentOpenChat = new Intent(this, ChatActivityLollipop.class);
+                        intentOpenChat.setAction(Constants.ACTION_CHAT_SHOW_MESSAGES);
+                        intentOpenChat.putExtra("CHAT_ID", chatIdIntent);
+                        this.startActivity(intentOpenChat);
+                    }
+                    else{
+                        log("Error the chat Id is not valid: "+chatIdIntent);
+                    }
+
+                }
                 else{
                     log("Other intent");
                 }
