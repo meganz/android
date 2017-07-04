@@ -120,6 +120,14 @@ public class ContactsFragmentLollipop extends Fragment{
 					}										
 					break;
 				}
+				case R.id.cab_menu_start_conversation:{
+					/*if(users.get(0)==null){
+						log("Selected contact NULL");
+						break;
+					}
+					((ManagerActivityLollipop) context).startOneToOneChat(users.get(0).getMegaUser());*/
+					break;
+				}
 				case R.id.cab_menu_delete:{
 					((ManagerActivityLollipop)context).showConfirmationRemoveContacts(users);
 					break;
@@ -162,7 +170,15 @@ public class ContactsFragmentLollipop extends Fragment{
 			if (selected.size() != 0) {
 				menu.findItem(R.id.cab_menu_delete).setVisible(true);
 				menu.findItem(R.id.cab_menu_share_folder).setVisible(true);
-				
+				menu.findItem(R.id.cab_menu_share_folder).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+
+				menu.findItem(R.id.cab_menu_send_file).setVisible(true);
+				menu.findItem(R.id.cab_menu_send_file).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+
+
+				menu.findItem(R.id.cab_menu_start_conversation).setVisible(true);
+				menu.findItem(R.id.cab_menu_start_conversation).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+
 				if(selected.size()==adapter.getItemCount()){
 					menu.findItem(R.id.cab_menu_select_all).setVisible(false);
 					unselect.setTitle(getString(R.string.action_unselect_all));
@@ -230,9 +246,9 @@ public class ContactsFragmentLollipop extends Fragment{
 		List<MegaUser> users = adapter.getSelectedUsers();
 		
 		Resources res = getResources();
-		String format = "%d %s";
+		String format = "%d";
 		
-		actionMode.setTitle(String.format(format, users.size(),res.getQuantityString(R.plurals.general_num_contacts, users.size())));
+		actionMode.setTitle(String.format(format, users.size()));
 
 		try {
 			actionMode.invalidate();

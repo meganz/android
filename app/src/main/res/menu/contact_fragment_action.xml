@@ -14,11 +14,20 @@
         android:showAsAction="never"
         android:title="@string/action_unselect_all"
         MEGA:showAsAction="never" />
+    <item
+        android:id="@+id/cab_menu_start_conversation"
+        android:orderInCategory="100"
+        android:icon="@drawable/ic_start_chat"
+        android:showAsAction="never"
+        android:title="@string/group_chat_start_conversation_label"
+        MEGA:showAsAction="never" />
+
     
     <item
         android:id="@+id/cab_menu_share_folder"
         android:orderInCategory="110"
         android:title="@string/context_share_folder"
+        android:icon="@drawable/ic_share_white"
         android:showAsAction="never"
         MEGA:showAsAction="never" />
     
@@ -27,6 +36,7 @@
         android:orderInCategory="115"
         android:title="@string/context_send_file"
         android:showAsAction="never"
+        android:icon="@drawable/ic_send_file_w"
         MEGA:showAsAction="never" />
     
     <item

@@ -11914,8 +11914,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 							maFLol.updateAvatar(false);
 						}
 					}
-
-
 				}
 				else{
 
