@@ -769,7 +769,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			PendingMessage pendMsg = pendMsgs.get(i);
 			long id = pendMsg.getId();
 			ArrayList<PendingNodeAttachment> nodes = findPendingNodesByMsgId(id);
-			pendMsg.setState(PendingMessage.STATE_SENT);
 			pendMsg.setNodeAttachments(nodes);
 
 			AndroidMegaChatMessage androidMsg = new AndroidMegaChatMessage(pendMsg, true);
@@ -795,6 +794,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 					String timestamp = decrypt(cursor.getString(2));
 					long ts = Long.valueOf(timestamp);
 					PendingMessage pendMsg = new PendingMessage(id, idChat, ts);
+					pendMsg.setState(cursor.getInt(4));
 					pendMsgs.add(pendMsg);
 
 				} while (cursor.moveToNext());

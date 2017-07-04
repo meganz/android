@@ -4115,6 +4115,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 AndroidMegaChatMessage newNodeAttachmentMsg = new AndroidMegaChatMessage(newPendingMsg, true);
                 sendMessageUploading(newNodeAttachmentMsg);
 
+//                ArrayList<String> filePaths = newPendingMsg.getFilePaths();
+//                filePaths.add("/home/jfjf.jpg");
+
                 intent.putStringArrayListExtra(ChatUploadService.EXTRA_FILEPATHS, newPendingMsg.getFilePaths());
                 intent.putExtra(ChatUploadService.EXTRA_CHAT_ID, idChat);
 
