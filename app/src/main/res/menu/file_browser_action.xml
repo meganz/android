@@ -54,14 +54,14 @@
         android:id="@+id/cab_menu_copy"
         android:orderInCategory="130"
         android:icon="@drawable/ic_copy_white"
-        android:title="@string/general_copy_to"
+        android:title="@string/context_copy"
         MEGA:showAsAction="never" />
     
     <item
         android:id="@+id/cab_menu_move"
         android:orderInCategory="120"
         android:icon="@drawable/ic_move_white"
-        android:title="@string/general_move_to"
+        android:title="@string/context_move"
         MEGA:showAsAction="never" />
     
     <item
@@ -70,9 +70,26 @@
         android:icon="@drawable/ic_link_white"
         android:tint="@color/white"
         android:title="@string/context_get_link_menu"
+        android:visible="false"
         MEGA:showAsAction="never" />
 
+    <item
+        android:id="@+id/cab_menu_share_link_remove"
+        android:orderInCategory="127"
+        android:icon="@drawable/ic_remove_link_w"
+        android:tint="@color/white"
+        android:title="@string/context_remove_link_menu"
+        android:visible="false"
+        MEGA:showAsAction="never" />
 
+    <item
+        android:id="@+id/cab_menu_edit_link"
+        android:orderInCategory="109"
+        android:tint="@color/white"
+        android:icon="@drawable/ic_link_white"
+        android:title="@string/edit_link_option"
+        android:visible="false"
+        MEGA:showAsAction="never" />
     
     <item
         android:id="@+id/cab_menu_trash"

@@ -281,6 +281,28 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 
 					break;
 				}
+
+				case R.id.cab_menu_share_link_remove:{
+
+					clearSelections();
+					hideMultipleSelect();
+					if(adapterList!=null){
+						if (documentsList.size()==1){
+							MegaNode n = megaApi.getNodeByHandle(documentsList.get(0).handle);
+							NodeController nC = new NodeController(context);
+							nC.removeLink(n);
+						}
+					}
+					else if(adapterGrid != null){
+						if (documentsGrid.size()==1){
+							MegaNode n = megaApi.getNodeByHandle(documentsGrid.get(0).getHandle());
+							NodeController nC = new NodeController(context);
+							nC.removeLink(n);
+						}
+					}
+
+					break;
+				}
 				case R.id.cab_menu_trash:{
 					ArrayList<Long> handleList = new ArrayList<Long>();
 
@@ -343,6 +365,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			boolean showMove = false;
 			boolean showLink = false;
 			boolean showTrash = false;
+			boolean showRemoveLink = false;
 
 			if(adapterList!=null){
 				log("LIST onPrepareActionMode");
@@ -351,11 +374,18 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 
 				// Link
 				if ((selected.size() == 1) && (megaApi.checkAccess(megaApi.getNodeByHandle(selected.get(0).handle), MegaShare.ACCESS_OWNER).getErrorCode() == MegaError.API_OK)) {
-					showLink = true;
-				}
 
-				if(showLink){
-					menu.findItem(R.id.cab_menu_share_link).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+					if(megaApi.getNodeByHandle(selected.get(0).handle).isExported()){
+						//Node has public link
+						showRemoveLink=true;
+						showLink=false;
+
+					}
+					else{
+						showRemoveLink=false;
+						showLink=true;
+					}
+
 				}
 
 				if (selected.size() > 0) {
@@ -399,11 +429,16 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 
 				// Link
 				if ((selected.size() == 1) && (megaApi.checkAccess(megaApi.getNodeByHandle(selected.get(0).getHandle()), MegaShare.ACCESS_OWNER).getErrorCode() == MegaError.API_OK)) {
-					showLink = true;
-				}
+					if(megaApi.getNodeByHandle(selected.get(0).getHandle()).isExported()){
+						//Node has public link
+						showRemoveLink=true;
+						showLink=false;
 
-				if(showLink){
-					menu.findItem(R.id.cab_menu_share_link).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+					}
+					else{
+						showRemoveLink=false;
+						showLink=true;
+					}
 				}
 
 				if (selected.size() > 0) {
@@ -437,6 +472,16 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 					menu.findItem(R.id.cab_menu_copy).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 				}
 
+				if(showMove){
+					if(selected.size()==1){
+						menu.findItem(R.id.cab_menu_move).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+
+					}else{
+						menu.findItem(R.id.cab_menu_move).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+
+					}
+				}
+
 				if(showDownload){
 					menu.findItem(R.id.cab_menu_download).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 				}
@@ -445,10 +490,22 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 				log("NULL adapters");
 			}
 			menu.findItem(R.id.cab_menu_download).setVisible(showDownload);
+			if(showDownload){
+				menu.findItem(R.id.cab_menu_download).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+			}
 			menu.findItem(R.id.cab_menu_rename).setVisible(showRename);
 			menu.findItem(R.id.cab_menu_copy).setVisible(showCopy);
+			if(showCopy){
+				menu.findItem(R.id.cab_menu_copy).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+			}
 			menu.findItem(R.id.cab_menu_move).setVisible(showMove);
+			if(showMove){
+					menu.findItem(R.id.cab_menu_move).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+			}
+
 			menu.findItem(R.id.cab_menu_share_link).setVisible(showLink);
+			menu.findItem(R.id.cab_menu_share_link_remove).setVisible(showRemoveLink);
+
 			menu.findItem(R.id.cab_menu_trash).setVisible(showTrash);
 			menu.findItem(R.id.cab_menu_leave_multiple_share).setVisible(false);
 
@@ -1477,20 +1534,18 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 		}
 
 		Resources res = getActivity().getResources();
-		String format = "%d %s";
-		String filesStr = String.format(format, files,
-				res.getQuantityString(R.plurals.general_num_files, files));
-		String foldersStr = String.format(format, folders,
-				res.getQuantityString(R.plurals.general_num_folders, folders));
+
 		String title;
+		int sum=files+folders;
+
 		if (files == 0 && folders == 0) {
-			title = "";
+			title = Integer.toString(sum);
 		} else if (files == 0) {
-			title = foldersStr;
+			title = Integer.toString(folders);
 		} else if (folders == 0) {
-			title = filesStr;
+			title = Integer.toString(files);
 		} else {
-			title = foldersStr + ", " + filesStr;
+			title = Integer.toString(sum);
 		}
 		actionMode.setTitle(title);
 		try {
