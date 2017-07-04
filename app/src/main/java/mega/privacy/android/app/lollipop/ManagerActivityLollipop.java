@@ -2794,7 +2794,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
     protected void onDestroy(){
 		log("onDestroy()");
 
-//		dbH.removeSentPendingMessages();
+		dbH.removeSentPendingMessages();
 
     	if (megaApi.getRootNode() != null){
     		megaApi.removeGlobalListener(this);
