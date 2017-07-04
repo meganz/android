@@ -436,7 +436,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 									}
 								}
 								else{
-									log("Waiting for more messages...");
+									log("Waiting for more nodes...");
 									return;
 								}
 							}
