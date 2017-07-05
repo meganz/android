@@ -180,8 +180,8 @@
     <string name="create_account_creating_account">Conectando con el servidor: creando cuenta.</string>
     
     <string name="cancel_transfer_title">Cancelar Transferencia</string>
-    <string name="cancel_transfer_confirmation">La transferencia será cancelada.</string>
-        <string name="cancel_all_transfer_confirmation">Se cancelarán todas las transferencias.</string>
+    <string name="cancel_transfer_confirmation">Borrar esta transferencia?</string>
+    <string name="cancel_all_transfer_confirmation">Se cancelarán todas las transferencias.</string>
 
     <string name="section_cloud_drive" context="The name of every users root drive in the cloud of MEGA.">Disco</string>
     <string name="section_secondary_media_uploads" context="title of the screen where the secondary media images are uploaded">Media Uploads</string>
