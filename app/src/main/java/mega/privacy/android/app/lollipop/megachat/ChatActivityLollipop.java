@@ -450,42 +450,45 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             public void onTextChanged(CharSequence s, int start,
                                       int before, int count) {
                 log("onTextChanged: " + s + ", " + start + ", " + before + ", " + count);
-
-                if (s != null) {
-                    if (s.length() > 0) {
-                        String temp = s.toString();
-                        if(temp.trim().length()>0){
-                            sendIcon.setVisibility(View.VISIBLE);
+                if(getCurrentFocus() == textChat)
+                {
+                    // is only executed if the EditText was directly changed by the user
+                    if (s != null) {
+                        if (s.length() > 0) {
+                            String temp = s.toString();
+                            if(temp.trim().length()>0){
+                                sendIcon.setVisibility(View.VISIBLE);
+                            }
+                            else{
+                                sendIcon.setVisibility(View.GONE);
+                            }
                         }
-                        else{
+                        else {
                             sendIcon.setVisibility(View.GONE);
                         }
                     }
-                    else {
+                    else{
                         sendIcon.setVisibility(View.GONE);
                     }
-                }
-                else{
-                    sendIcon.setVisibility(View.GONE);
-                }
 
-                if(sendIsTyping){
-                    log("Send is typing notification");
-                    sendIsTyping=false;
-                    megaChatApi.sendTypingNotification(chatRoom.getChatId());
+                    if(sendIsTyping){
+                        log("Send is typing notification");
+                        sendIsTyping=false;
+                        megaChatApi.sendTypingNotification(chatRoom.getChatId());
 
-                    int interval = 4000;
-                    Runnable runnable = new Runnable(){
-                        public void run() {
-                            sendIsTyping=true;
-                        }
-                    };
-                    handlerSend = new Handler();
-                    handlerSend.postDelayed(runnable, interval);
-                }
+                        int interval = 4000;
+                        Runnable runnable = new Runnable(){
+                            public void run() {
+                                sendIsTyping=true;
+                            }
+                        };
+                        handlerSend = new Handler();
+                        handlerSend.postDelayed(runnable, interval);
+                    }
 
-                if(megaChatApi.isSignalActivityRequired()){
-                    megaChatApi.signalPresenceActivity();
+                    if(megaChatApi.isSignalActivityRequired()){
+                        megaChatApi.signalPresenceActivity();
+                    }
                 }
             }
         });
