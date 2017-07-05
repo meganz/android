@@ -10800,7 +10800,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			log("hashes size: "+hashes.length);
 
 			nC.checkSizeBeforeDownload(parentPath, url, size, hashes);
-			Snackbar.make(fragmentContainer, getString(R.string.download_began), Snackbar.LENGTH_LONG).show();
+//			Snackbar.make(fragmentContainer, getString(R.string.download_began), Snackbar.LENGTH_LONG).show();
 		}
 		else if (requestCode == Constants.REQUEST_CODE_REFRESH && resultCode == RESULT_OK) {
 			log("Resfresh DONE onActivityResult");

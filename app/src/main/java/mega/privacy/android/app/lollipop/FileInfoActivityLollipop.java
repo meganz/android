@@ -1930,7 +1930,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
 
 			downloadTo (parentPath, url, size, hashes);
-			Util.showToast(this, R.string.download_began);
+//			Util.showToast(this, R.string.download_began);
 		}
 		else if (requestCode == REQUEST_CODE_SELECT_MOVE_FOLDER && resultCode == RESULT_OK) {
 
@@ -2396,6 +2396,10 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 				}
 			}
 
+			int numberOfNodesToDownload = 0;
+			int numberOfNodesAlreadyDownloaded = 0;
+			int numberOfNodesPending = 0;
+
 			for (long hash : hashes) {
 				MegaNode node = megaApi.getNodeByHandle(hash);
 				if(node != null){
@@ -2415,12 +2419,36 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 							continue;
 						}
 
-						Intent service = new Intent(this, DownloadService.class);
-						service.putExtra(DownloadService.EXTRA_HASH, document.getHandle());
-						service.putExtra(DownloadService.EXTRA_URL, url);
-						service.putExtra(DownloadService.EXTRA_SIZE, document.getSize());
-						service.putExtra(DownloadService.EXTRA_PATH, path);
-						startService(service);
+						log("path of the file: "+path);
+						numberOfNodesToDownload++;
+
+						File destDir = new File(path);
+						File destFile;
+						destDir.mkdirs();
+						if (destDir.isDirectory()){
+							destFile = new File(destDir, megaApi.escapeFsIncompatible(document.getName()));
+							log("destDir is Directory. destFile: " + destFile.getAbsolutePath());
+						}
+						else{
+							log("destDir is File");
+							destFile = destDir;
+						}
+
+						if(destFile.exists() && (document.getSize() == destFile.length())){
+							numberOfNodesAlreadyDownloaded++;
+							log(destFile.getAbsolutePath() + " already downloaded");
+						}
+						else {
+							numberOfNodesPending++;
+							log("start service");
+
+							Intent service = new Intent(this, DownloadService.class);
+							service.putExtra(DownloadService.EXTRA_HASH, document.getHandle());
+							service.putExtra(DownloadService.EXTRA_URL, url);
+							service.putExtra(DownloadService.EXTRA_SIZE, document.getSize());
+							service.putExtra(DownloadService.EXTRA_PATH, path);
+							startService(service);
+						}
 					}
 				}
 				else if(url != null) {
@@ -2438,6 +2466,14 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 				}
 				else {
 					log("node not found");
+				}
+				log("Total: " + numberOfNodesToDownload + " Already: " + numberOfNodesAlreadyDownloaded + " Pending: " + numberOfNodesPending);
+				if (numberOfNodesAlreadyDownloaded > 0){
+					String msg = getString(R.string.already_downloaded_multiple, numberOfNodesAlreadyDownloaded);
+					if (numberOfNodesPending > 0){
+						msg = msg + getString(R.string.pending_multiple, numberOfNodesPending);
+					}
+					showSnackbar(msg);
 				}
 			}
 		}
