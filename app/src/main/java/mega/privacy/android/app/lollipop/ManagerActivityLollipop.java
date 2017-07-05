@@ -3839,6 +3839,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 		firstNavigationLevel = true;
 
+		showFabButton();
+
 		drawerLayout.closeDrawer(Gravity.LEFT);
 	}
 
@@ -13024,8 +13026,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		if(cancel){
 
 			builder.setMessage(getResources().getString(R.string.cancel_transfer_confirmation));
-			builder.setPositiveButton(R.string.general_cancel, dialogClickListener);
-			builder.setNegativeButton(R.string.general_dismiss, dialogClickListener);
+			builder.setPositiveButton(R.string.context_delete, dialogClickListener);
+			builder.setNegativeButton(R.string.general_cancel, dialogClickListener);
 		}
 		else {
 
