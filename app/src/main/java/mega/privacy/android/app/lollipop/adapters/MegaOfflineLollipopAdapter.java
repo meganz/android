@@ -356,6 +356,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 			if (pathNav.equals("/")){
 				if (mOffList != null){
 					if(!mOffList.isEmpty()) {
+						log("List not empty");
 						MegaOffline lastItem = mOffList.get(mOffList.size()-1);
 						if(!(lastItem.getHandle().equals("0"))){
 							String path = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;

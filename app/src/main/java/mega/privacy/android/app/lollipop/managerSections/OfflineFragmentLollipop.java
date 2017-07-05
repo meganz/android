@@ -1155,7 +1155,6 @@ public class OfflineFragmentLollipop extends Fragment{
 				mOffListNavigation=dbH.findByPath(pathNavigation);
 				
 				contentText.setText(getInfoFolder(mOffListNavigation));
-				this.setNodes(mOffListNavigation);
 				
 				if(orderGetChildren == MegaApiJava.ORDER_DEFAULT_DESC){
 					sortByNameDescending();
@@ -1163,6 +1162,8 @@ public class OfflineFragmentLollipop extends Fragment{
 				else{
 					sortByNameAscending();
 				}
+
+				setNodes(mOffListNavigation);
 
 				int lastVisiblePosition = 0;
 				if(!lastPositionStack.empty()){
