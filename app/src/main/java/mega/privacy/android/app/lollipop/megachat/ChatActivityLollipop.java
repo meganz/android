@@ -2762,19 +2762,22 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
         AndroidMegaChatMessage androidMsg = new AndroidMegaChatMessage(msg);
 
-        if(msg.getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT){
+        if(msg.getUserHandle()==megaChatApi.getMyUserHandle()){
+            if(msg.getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT){
+                log("Modify my message and node attachment");
 
-            long idMsg =  dbH.findPendingMessageByIdTempKarere(msg.getTempId());
-            log("----The id of my pending message is: "+idMsg);
-            if(idMsg!=-1){
-                resultModify = modifyAttachmentReceived(androidMsg, idMsg);
-                dbH.removePendingMessageById(idMsg);
-                if(resultModify==-1){
-                    log("Node attachment message not in list - add");
-                    AndroidMegaChatMessage msgToAppend = new AndroidMegaChatMessage(msg);
-                    appendMessagePosition(msgToAppend);
+                long idMsg =  dbH.findPendingMessageByIdTempKarere(msg.getTempId());
+                log("----The id of my pending message is: "+idMsg);
+                if(idMsg!=-1){
+                    resultModify = modifyAttachmentReceived(androidMsg, idMsg);
+                    dbH.removePendingMessageById(idMsg);
+                    if(resultModify==-1){
+                        log("Node attachment message not in list - add");
+                        AndroidMegaChatMessage msgToAppend = new AndroidMegaChatMessage(msg);
+                        appendMessagePosition(msgToAppend);
+                    }
+                    return;
                 }
-                return;
             }
         }
 
