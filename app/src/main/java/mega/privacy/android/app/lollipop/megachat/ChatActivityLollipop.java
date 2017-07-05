@@ -69,6 +69,7 @@ import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.Attachment
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ContactAttachmentBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.MessageNotSentBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.NodeAttachmentBottomSheetDialogFragment;
+import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.PendingMessageBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.TimeChatUtils;
 import mega.privacy.android.app.utils.Util;
@@ -650,6 +651,11 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 }
 
                 if(idChat!=-1) {
+
+                    if(megaApi.getNumPendingUploads()<=0){
+                        dbH.setFinishedPendingMessages();
+                    }
+
                     //REcover chat
                     log("Recover chat with id: " + idChat);
                     chatRoom = megaChatApi.getChatRoom(idChat);
@@ -2122,7 +2128,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
             if(m!=null){
                 if(m.isUploading()){
-                    showUploadingAttachmentBottomSheet(m, position);
+                    if(m.getPendingMessage().getState()==PendingMessage.STATE_ERROR){
+                        showUploadingAttachmentBottomSheet(m, position);
+                    }
                 }
                 else{
                     if(m.getMessage().getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT){
@@ -2756,7 +2764,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
         if(msg.getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT){
 
-            long idMsg =  dbH.findPendingMessageById(msg.getTempId());
+            long idMsg =  dbH.findPendingMessageByIdTempKarere(msg.getTempId());
             log("----The id of my pending message is: "+idMsg);
             if(idMsg!=-1){
                 resultModify = modifyAttachmentReceived(androidMsg, idMsg);
@@ -3663,14 +3671,12 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     public void showUploadingAttachmentBottomSheet(AndroidMegaChatMessage message, int position){
         log("showUploadingAttachmentBottomSheet: "+position);
         this.selectedPosition = position;
+        if(message!=null){
+            this.selectedMessageId = message.getPendingMessage().getId();
 
-        log("Cooming soon");
-//        if(message!=null){
-//            this.selectedMessageId = message.getMessage().getMsgId();
-////            this.selectedChatItem = chat;
-//            NodeAttachmentBottomSheetDialogFragment bottomSheetDialogFragment = new NodeAttachmentBottomSheetDialogFragment();
-//            bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
-//        }
+            PendingMessageBottomSheetDialogFragment pendingMsgSheetDialogFragment = new PendingMessageBottomSheetDialogFragment();
+            pendingMsgSheetDialogFragment.show(getSupportFragmentManager(), pendingMsgSheetDialogFragment.getTag());
+        }
     }
 
     public void showContactAttachmentBottomSheet(AndroidMegaChatMessage message, int position){
@@ -3687,6 +3693,13 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     public void removeMsgNotSent(){
         log("removeMsgNotSent: "+selectedPosition);
+        messages.remove(selectedPosition);
+        adapter.removeMessage(selectedPosition, messages);
+    }
+
+    public void removePendingMsg(long id){
+        log("removePendingMsg: "+selectedMessageId);
+        dbH.removePendingMessageById(id);
         messages.remove(selectedPosition);
         adapter.removeMessage(selectedPosition, messages);
     }
