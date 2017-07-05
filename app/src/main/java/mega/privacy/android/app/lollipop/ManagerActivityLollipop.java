@@ -13972,6 +13972,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	@Override
 	public void networkAvailable() {
 		log("networkAvailable");
+		if(megaApi!=null){
+			megaApi.retryPendingConnections();
+		}
 		showOnlineMode();
 	}
 
