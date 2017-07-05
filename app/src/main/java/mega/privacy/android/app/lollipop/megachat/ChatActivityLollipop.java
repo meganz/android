@@ -1920,6 +1920,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     else{
                         MegaChatMessage messageSelected= megaChatApi.getMessage(idChat, selected.get(0).getMessage().getMsgId());
 
+                        menu.findItem(R.id.chat_cab_menu_copy).setVisible(true);
+
                         if(messageSelected.getUserHandle()==myUserHandle){
                             if(messageSelected.isEditable()){
                                 log("Message EDITABLE");
@@ -1944,32 +1946,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         }
                     }
                 }
-                else if (selected.size()==adapter.getItemCount()){
-                    menu.findItem(R.id.chat_cab_menu_edit).setVisible(false);
-                    menu.findItem(R.id.chat_cab_menu_copy).setVisible(true);
-                    menu.findItem(R.id.chat_cab_menu_delete).setVisible(true);
-                    for(int i=0; i<selected.size();i++){
-                        if(selected.get(i).getMessage().getUserHandle()==myUserHandle){
-                            if(!(selected.get(i).getMessage().isDeletable())){
-                                menu.findItem(R.id.chat_cab_menu_delete).setVisible(false);
-                                break;
-                            }
-                        }
-                        else{
-                            menu.findItem(R.id.chat_cab_menu_delete).setVisible(false);
-                        }
-                    }
-
-                    for(int i=0; i<selected.size();i++){
-                        if(selected.get(i).getMessage().getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT||selected.get(i).getMessage().getType()==MegaChatMessage.TYPE_CONTACT_ATTACHMENT){
-                            menu.findItem(R.id.chat_cab_menu_copy).setVisible(false);
-                        }
-                        else{
-                            menu.findItem(R.id.chat_cab_menu_copy).setVisible(true);
-                        }
-                    }
-
-                }
                 else{
                     menu.findItem(R.id.chat_cab_menu_edit).setVisible(false);
                     menu.findItem(R.id.chat_cab_menu_copy).setVisible(true);
@@ -1992,6 +1968,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     for(int i=0; i<selected.size();i++){
                         if(selected.get(i).getMessage().getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT||selected.get(i).getMessage().getType()==MegaChatMessage.TYPE_CONTACT_ATTACHMENT){
                             menu.findItem(R.id.chat_cab_menu_copy).setVisible(false);
+                            break;
                         }
                         else{
                             menu.findItem(R.id.chat_cab_menu_copy).setVisible(true);
@@ -1999,7 +1976,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     }
                 }
             }
-
             return false;
         }
 
