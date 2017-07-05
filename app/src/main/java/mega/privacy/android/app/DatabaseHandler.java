@@ -712,6 +712,18 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		log("Rows updated: "+rows);
 	}
 
+	public void setFinishedPendingMessages() {
+		log("setFinishedPendingMessages");
+
+		ContentValues values = new ContentValues();
+		values.put(KEY_STATE, PendingMessage.STATE_ERROR);
+		String where = KEY_STATE + "=" +PendingMessage.STATE_SENDING;
+
+		int rows = db.update(TABLE_PENDING_MSG, values, where, null);
+		log("Rows updated: "+rows);
+	}
+
+
 	public void removePendingMessageById(long idMsg){
 
 		ArrayList<Long> nodes = findMsgNodes(idMsg);
@@ -778,6 +790,26 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		log("Found: "+ messages.size());
 		return messages;
 	}
+
+//	public ArrayList<AndroidMegaChatMessage> findPendingMessageById(long idMsg){
+//		log("findPendingMessagesById");
+////		ArrayList<AndroidMegaChatMessage> messages = new ArrayList<>();
+////
+////		ArrayList<PendingMessage> pendMsgs = findPendingMessagesNotSent(idChat);
+////
+////		for(int i=0;i<pendMsgs.size();i++){
+////			PendingMessage pendMsg = pendMsgs.get(i);
+////			long id = pendMsg.getId();
+////			ArrayList<PendingNodeAttachment> nodes = findPendingNodesByMsgId(id);
+////			pendMsg.setNodeAttachments(nodes);
+////
+////			AndroidMegaChatMessage androidMsg = new AndroidMegaChatMessage(pendMsg, true);
+////			messages.add(androidMsg);
+////		}
+////
+////		log("Found: "+ messages.size());
+//		return messages;
+//	}
 
 	public ArrayList<PendingMessage> findPendingMessagesNotSent(long idChat) {
 		log("findPendingMessagesNotSent");
@@ -943,7 +975,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		return id;
 	}
 
-	public long findPendingMessageById(long idTemp){
+	public long findPendingMessageByIdTempKarere(long idTemp){
 		log("findPendingMessageById: "+idTemp);
 		String idPend = idTemp+"";
 		long id = -1;
