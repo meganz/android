@@ -896,8 +896,11 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 		ViewHolderOffline holder = (ViewHolderOffline) view.getTag();
 		int currentPosition = holder.getAdapterPosition();
 
-		fragment.activateActionMode();
-		fragment.itemClick(currentPosition);
+		MegaOffline item = mOffList.get(currentPosition);
+		if(!(item.getHandle().equals("0"))){
+			fragment.activateActionMode();
+			fragment.itemClick(currentPosition);
+		}
 
 		return true;
 	}
