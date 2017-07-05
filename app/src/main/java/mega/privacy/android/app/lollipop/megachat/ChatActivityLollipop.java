@@ -2816,9 +2816,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
 
         if(resultModify == -1){
-            log("Modify not found match --> add to messages");
-            AndroidMegaChatMessage msgToAppend = new AndroidMegaChatMessage(msg);
-            appendMessagePosition(msgToAppend);
+            log("ERROR: Modify not found match");
+//            AndroidMegaChatMessage msgToAppend = new AndroidMegaChatMessage(msg);
+//            appendMessagePosition(msgToAppend);
         }
     }
 
