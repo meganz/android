@@ -840,10 +840,13 @@ public class OfflineFragmentLollipop extends Fragment{
 
 		if (adapter.isMultipleSelect()){
 			log("multiselect");
-			adapter.toggleSelection(position);
-			List<MegaOffline> selectedNodes = adapter.getSelectedOfflineNodes();
-			if (selectedNodes.size() > 0){
-				updateActionModeTitle();
+			MegaOffline item = mOffList.get(position);
+			if(!(item.getHandle().equals("0"))){
+				adapter.toggleSelection(position);
+				List<MegaOffline> selectedNodes = adapter.getSelectedOfflineNodes();
+				if (selectedNodes.size() > 0){
+					updateActionModeTitle();
+				}
 			}
 		}
 		else{
