@@ -285,7 +285,7 @@ public class ContactAttachmentActivityLollipop extends PinActivityLollipop imple
     }
 
 	public void showOptionsPanel(String email){
-		log("showNodeOptionsPanel-Offline");
+		log("showOptionsPanel");
 		if(email!=null){
 			this.selectedEmail = email;
 			ContactAttachmentBottomSheetDialogFragment bottomSheetDialogFragment = new ContactAttachmentBottomSheetDialogFragment();
