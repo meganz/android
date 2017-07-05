@@ -181,7 +181,7 @@
     
     <string name="cancel_transfer_title">Cancelar Transferencia</string>
     <string name="cancel_transfer_confirmation">Borrar esta transferencia?</string>
-    <string name="cancel_all_transfer_confirmation">Se cancelarán todas las transferencias.</string>
+    <string name="cancel_all_transfer_confirmation">Borrar todas las transferencias?</string>
 
     <string name="section_cloud_drive" context="The name of every users root drive in the cloud of MEGA.">Disco</string>
     <string name="section_secondary_media_uploads" context="title of the screen where the secondary media images are uploaded">Media Uploads</string>
@@ -474,7 +474,7 @@
     <string name="transfers_pause" context="File uploading or downloading has been paused (until the user continues at a later stage)">Todas las transferencias están pausadas</string>
     <string name="menu_pause_transfers" context="menu item">Pausar transferencias</string>
     <string name="menu_restart_transfers" context="menu item">Reiniciar transferencias</string>
-    <string name="menu_cancel_all_transfers" context="menu item">Cancelar todas las transferencias</string>
+    <string name="menu_cancel_all_transfers" context="menu item">Borrar todas las transferencias</string>
     <string name="menu_take_picture" context="menu item">Hacer foto</string>
     
     <string name="cam_sync_wifi" context="how to upload the camera images. only when Wi-Fi connected">Solo Wi-fi</string>

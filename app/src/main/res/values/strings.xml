@@ -184,7 +184,7 @@
 
     <string name="cancel_transfer_title">Delete Transfer</string>
     <string name="cancel_transfer_confirmation">Delete this transfer?</string>
-    <string name="cancel_all_transfer_confirmation">Cancel all transfers?</string>
+    <string name="cancel_all_transfer_confirmation">Delete all transfers?</string>
 
     <string name="section_cloud_drive" context="The name of every users root drive in the cloud of MEGA. The term \'cloud\' is a new computer term and can probably not be translated. Do not translate &quot;cloud&quot; literal unless your language allows this. Please see http://en.wikipedia.org/wiki/Cloud_computing for your reference.">Cloud Drive</string>
     <string name="section_secondary_media_uploads" context="title of the screen where the secondary media images are uploaded">Media Uploads</string>
@@ -476,7 +476,7 @@
     <string name="transfers_pause" context="File uploading or downloading has been paused (until the user continues at a later stage)">All transfers are paused</string>
     <string name="menu_pause_transfers" context="menu item">Pause transfers</string>
     <string name="menu_restart_transfers" context="menu item">Restart transfers</string>
-    <string name="menu_cancel_all_transfers" context="menu item">Cancel all transfers</string>
+    <string name="menu_cancel_all_transfers" context="menu item">Delete all transfers</string>
     <string name="menu_take_picture" context="menu item">Take picture</string>
 
     <string name="cam_sync_wifi" context="how to upload the camera images. only when Wi-Fi connected">WiFi only</string>
