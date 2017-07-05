@@ -1237,4 +1237,5 @@
     <string name="already_downloaded_multiple" context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that has already been downloaded and the number of files pending">%d files already downloaded.</string>
     <string name="pending_multiple" context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that has already been downloaded and the number of files pending">%d files pending.</string>
 
+    <string name="contact_is_me">No options available, the selected contact is you</string>
 </resources>
