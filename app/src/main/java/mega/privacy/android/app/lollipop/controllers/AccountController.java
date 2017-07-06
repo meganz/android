@@ -143,6 +143,10 @@ public class AccountController {
 
         BufferedWriter out;
         try {
+            String mainDirPath = Environment.getExternalStorageDirectory().getAbsolutePath() + Util.mainDIR;
+            File mainDir = new File(mainDirPath);
+            log("Path main Dir: " + mainDirPath);
+            mainDir.mkdirs();
 
             final String path = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
             log("Export in: "+path);
