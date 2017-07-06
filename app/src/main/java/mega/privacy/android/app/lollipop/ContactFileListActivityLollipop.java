@@ -1905,4 +1905,8 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 		}
 		return -1;
 	}
+
+	public void refreshAfterMovingToRubbish(){
+		cflF.refresh();
+	}
 }
