@@ -284,7 +284,7 @@
         <activity
             android:name="mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop"
             android:label="@string/app_name"
-            android:launchMode="singleTop">
+            android:launchMode="singleTask">
         </activity>
 
         <activity
