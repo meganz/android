@@ -450,26 +450,28 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             public void onTextChanged(CharSequence s, int start,
                                       int before, int count) {
                 log("onTextChanged: " + s + ", " + start + ", " + before + ", " + count);
-                if(getCurrentFocus() == textChat)
-                {
-                    // is only executed if the EditText was directly changed by the user
-                    if (s != null) {
-                        if (s.length() > 0) {
-                            String temp = s.toString();
-                            if(temp.trim().length()>0){
-                                sendIcon.setVisibility(View.VISIBLE);
-                            }
-                            else{
-                                sendIcon.setVisibility(View.GONE);
-                            }
+
+                if (s != null) {
+                    if (s.length() > 0) {
+                        String temp = s.toString();
+                        if(temp.trim().length()>0){
+                            sendIcon.setVisibility(View.VISIBLE);
                         }
-                        else {
+                        else{
                             sendIcon.setVisibility(View.GONE);
                         }
                     }
-                    else{
+                    else {
                         sendIcon.setVisibility(View.GONE);
                     }
+                }
+                else{
+                    sendIcon.setVisibility(View.GONE);
+                }
+
+                if(getCurrentFocus() == textChat)
+                {
+                    // is only executed if the EditText was directly changed by the user
 
                     if(sendIsTyping){
                         log("Send is typing notification");
