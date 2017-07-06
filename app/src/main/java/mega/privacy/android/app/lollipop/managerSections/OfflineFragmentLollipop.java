@@ -835,7 +835,7 @@ public class OfflineFragmentLollipop extends Fragment{
     }
 
     public void itemClick(int position) {
-		log("onItemClick");
+		log("itemClick");
 		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
 		if (adapter.isMultipleSelect()){
