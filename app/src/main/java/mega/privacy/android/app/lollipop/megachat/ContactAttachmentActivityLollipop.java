@@ -285,7 +285,7 @@ public class ContactAttachmentActivityLollipop extends PinActivityLollipop imple
     }
 
 	public void showOptionsPanel(String email){
-		log("showNodeOptionsPanel-Offline");
+		log("showOptionsPanel");
 		if(email!=null){
 			this.selectedEmail = email;
 			ContactAttachmentBottomSheetDialogFragment bottomSheetDialogFragment = new ContactAttachmentBottomSheetDialogFragment();
@@ -457,10 +457,10 @@ public class ContactAttachmentActivityLollipop extends PinActivityLollipop imple
 		else{
 			log("There is already a chat, open it!");
 			Intent intentOpenChat = new Intent(this, ChatActivityLollipop.class);
-			intentOpenChat.setAction(Constants.ACTION_CHAT_SHOW_MESSAGES);
+			intentOpenChat.setAction(Constants.ACTION_NEW_CHAT);
 			intentOpenChat.putExtra("CHAT_ID", chat.getChatId());
 			finish();
-			intentOpenChat.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+//			intentOpenChat.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 			this.startActivity(intentOpenChat);
 		}
 	}

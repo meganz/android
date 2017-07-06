@@ -33,6 +33,7 @@ public class AttachmentUploadBottomSheetDialogFragment extends BottomSheetDialog
     public TextView titleText;
     public LinearLayout optionFromCloud;
     public LinearLayout optionContact;
+    public LinearLayout optionPhoto;
 
     DisplayMetrics outMetrics;
 
@@ -65,9 +66,11 @@ public class AttachmentUploadBottomSheetDialogFragment extends BottomSheetDialog
 
         optionFromCloud= (LinearLayout) contentView.findViewById(R.id.attachment_upload_cloud_layout);
         optionContact = (LinearLayout) contentView.findViewById(R.id.attachment_upload_contact_layout);
+        optionPhoto = (LinearLayout) contentView.findViewById(R.id.attachment_upload_photo_layout);
 
         optionFromCloud.setOnClickListener(this);
         optionContact.setOnClickListener(this);
+        optionPhoto.setOnClickListener(this);
 
         dialog.setContentView(contentView);
         mBehavior = BottomSheetBehavior.from((View) mainLinearLayout.getParent());
@@ -89,6 +92,13 @@ public class AttachmentUploadBottomSheetDialogFragment extends BottomSheetDialog
             case R.id.attachment_upload_contact_layout:{
                 log("option attach contact");
                 ((ChatActivityLollipop)context).attachContact();
+                dismissAllowingStateLoss();
+                break;
+            }
+
+            case R.id.attachment_upload_photo_layout:{
+                log("option attach photo");
+                ((ChatActivityLollipop)context).attachPhotoVideo();
                 dismissAllowingStateLoss();
                 break;
             }

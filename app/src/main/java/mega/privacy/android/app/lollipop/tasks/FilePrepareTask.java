@@ -10,6 +10,7 @@ import java.util.List;
 import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.lollipop.ContactFileListActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.utils.Util;
 
 /*
@@ -35,6 +36,9 @@ public class FilePrepareTask extends AsyncTask<Intent, Void, List<ShareInfo>> {
 //        filePreparedInfos = info;
         if(context instanceof ManagerActivityLollipop){
             ((ManagerActivityLollipop)context).onIntentProcessed(info);
+        }
+        if(context instanceof ChatActivityLollipop){
+            ((ChatActivityLollipop)context).onIntentProcessed(info);
         }
         else if(context instanceof ContactFileListActivityLollipop){
             ((ContactFileListActivityLollipop)context).onIntentProcessed(info);
