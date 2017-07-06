@@ -757,6 +757,10 @@ public class NodeController {
                 }
             }
 
+            int numberOfNodesToDownload = 0;
+            int numberOfNodesAlreadyDownloaded = 0;
+            int numberOfNodesPending = 0;
+
             for (long hash : hashes) {
                 log("hashes.length more than 1");
                 MegaNode node = megaApi.getNodeByHandle(hash);
@@ -772,16 +776,36 @@ public class NodeController {
                     }
 
                     for (MegaNode document : dlFiles.keySet()) {
-
                         String path = dlFiles.get(document);
                         log("path of the file: "+path);
-                        log("start service");
-                        Intent service = new Intent(context, DownloadService.class);
-                        service.putExtra(DownloadService.EXTRA_HASH, document.getHandle());
-                        service.putExtra(DownloadService.EXTRA_URL, url);
-                        service.putExtra(DownloadService.EXTRA_SIZE, document.getSize());
-                        service.putExtra(DownloadService.EXTRA_PATH, path);
-                        context.startService(service);
+                        numberOfNodesToDownload++;
+
+                        File destDir = new File(path);
+                        File destFile;
+                        destDir.mkdirs();
+                        if (destDir.isDirectory()){
+                            destFile = new File(destDir, megaApi.escapeFsIncompatible(document.getName()));
+                            log("destDir is Directory. destFile: " + destFile.getAbsolutePath());
+                        }
+                        else{
+                            log("destDir is File");
+                            destFile = destDir;
+                        }
+
+                        if(destFile.exists() && (document.getSize() == destFile.length())){
+                            numberOfNodesAlreadyDownloaded++;
+                            log(destFile.getAbsolutePath() + " already downloaded");
+                        }
+                        else {
+                            numberOfNodesPending++;
+                            log("start service");
+                            Intent service = new Intent(context, DownloadService.class);
+                            service.putExtra(DownloadService.EXTRA_HASH, document.getHandle());
+                            service.putExtra(DownloadService.EXTRA_URL, url);
+                            service.putExtra(DownloadService.EXTRA_SIZE, document.getSize());
+                            service.putExtra(DownloadService.EXTRA_PATH, path);
+                            context.startService(service);
+                        }
                     }
                 }
                 else if(url != null) {
@@ -797,6 +821,14 @@ public class NodeController {
                 else {
                     log("node NOT fOUND!!!!!");
                 }
+            }
+            log("Total: " + numberOfNodesToDownload + " Already: " + numberOfNodesAlreadyDownloaded + " Pending: " + numberOfNodesPending);
+            if (numberOfNodesAlreadyDownloaded > 0){
+                String msg = context.getString(R.string.already_downloaded_multiple, numberOfNodesAlreadyDownloaded);
+                if (numberOfNodesPending > 0){
+                    msg = msg + context.getString(R.string.pending_multiple, numberOfNodesPending);
+                }
+                ((ManagerActivityLollipop) context).showSnackbar(msg);
             }
         }
     }

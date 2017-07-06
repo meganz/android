@@ -268,15 +268,15 @@
                     android:id="@+id/messages_chat_list_view"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:choiceMode="multipleChoice"/>
+                    android:choiceMode="multipleChoice"
+                    android:paddingBottom="24dp"/>
 
             </RelativeLayout>
 
             <RelativeLayout
                 android:id="@+id/user_typing_layout"
                 android:layout_width="match_parent"
-                android:layout_height="24dp"
-                android:layout_marginLeft="16dp"
+                android:layout_height="22dp"
                 android:layout_alignParentBottom="true"
                 android:background="@color/participants_layout">
 
@@ -284,8 +284,9 @@
                     android:id="@+id/user_typing_name"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginLeft="16dp"
                     android:textColor="@color/name_my_account"
-                    android:layout_centerVertical="true"
+                    android:layout_marginTop="4dp"
                     android:ellipsize="end"
                     android:singleLine="true"
                     android:lines="1"
@@ -295,7 +296,7 @@
                     android:id="@+id/user_typing_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
+                    android:layout_marginTop="6dp"
                     android:ellipsize="end"
                     android:layout_toRightOf="@+id/user_typing_name"
                     android:textSize="12sp"/>
@@ -303,21 +304,22 @@
 
         </RelativeLayout>
 
-        <android.support.design.widget.FloatingActionButton
-            android:id="@+id/fab_chat"
-            android:layout_width="@dimen/fab_button_small_diameter"
-            android:layout_height="@dimen/fab_button_small_diameter"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentRight="true"
-            app:elevation="6dp"
-            android:scaleType="center"
-            app:backgroundTint="@color/accentColor"
-            app:pressedTranslationZ="12dp"
-            android:layout_marginLeft="16dp"
-            android:layout_marginRight="16dp"
-            android:layout_marginBottom="12dp"
-            android:src="@drawable/ic_add_white" />
-
     </RelativeLayout>
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab_chat"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:fabSize="mini"
+        android:layout_gravity="bottom|end"
+        app:elevation="6dp"
+        app:borderWidth="0dp"
+        android:scaleType="center"
+        app:backgroundTint="@color/accentColor"
+        app:pressedTranslationZ="12dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginBottom="12dp"
+        android:src="@drawable/ic_add_white" />
 
 </android.support.design.widget.CoordinatorLayout>

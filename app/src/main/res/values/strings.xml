@@ -2,9 +2,9 @@
 <resources>
 
     <string name="app_name" context="Not translate">MEGA</string>
-    <string name="app_version" context="Not translate">3.1.7 (137)</string>
-    <string name="sdk_version" context="Not translate">bdfd535</string>
-    <string name="karere_version" context="Not translate">9ad01ef</string>
+    <string name="app_version" context="Not translate">3.2 (140)</string>
+    <string name="sdk_version" context="Not translate">168f65a</string>
+    <string name="karere_version" context="Not translate">5ec5121</string>
     
     <string name="full_description_text" context="Full description text of the app in the Google Play page of the app">MEGA is a secure cloud storage service that gives you 50 GB free storage space. Unlike other cloud storage providers, your data is encrypted and decrypted by your client devices only and never by us.\nUpload your files from your smartphone or tablet then search, store, download, stream, view, share, rename or delete your files any time, from any device, anywhere. Share folders with your contacts and see their updates in real time.\nThe encryption process means we cannot access or reset your password so you MUST remember it (unless you have your Master Key backed up) or you will lose access to your stored files.\nInside the app you can upgrade your storage space and transfer quota quota with a monthly or yearly subscription.\nPRO LITE subscription: 4.99 € per month or 49.99 € per year gives you 200 GB of storage space and 1 TB of transfer quota per month.\nPRO I subscription: 9.99 € per month or 99.99 € per year gives you 500 GB of storage space and 2 TB of transfer quota per month.\nPRO II subscription: 19.99 € per month or 199.99 € per year gives you 2 TB of storage space and 4 TB of transfer quota per month.\nPRO III subscription: 29.99 € per month or 299.99 € per year gives you 4 TB of storage space and 8 TB of transfer quota per month.\nSubscriptions are renewed automatically for successive subscription periods of the same duration and at the same price as the initial period chosen. To manage your subscriptions, simply click on the Play Store icon on your handset, sign in with your Google ID (if you haven\'t already done so) and then click on the MEGA app. You\'ll be able to manage your subscription there.\nFor more info, please check our website: \n https://mega.nz/mobile_terms.html \n https://mega.nz/mobile_privacy.html \nNew Terms of Service apply effective from 20 February 2016. See https://mega.nz/TermsOfService2016.pdf \n Note: For desktop access to your files Mega needs to use HTML5 compatible browsers to handle our advanced features. We recommend Mozilla Firefox and Google Chrome. However the mobile versions of browsers cannot access the Mega cloud storage system.</string>
     <string name="short_description_text" context="Short description text of the app in the Google Play page of the app">MEGA is Cloud Storage with Powerful Always-On Privacy. 50GB for free</string>
@@ -182,9 +182,9 @@
     <string name="create_account_confirm" context="">Please check your e-mail and click the link to login and confirm your account</string>
     <string name="create_account_creating_account">Connecting to the server: Creating account</string>
 
-    <string name="cancel_transfer_title">Cancel Transfer</string>
-    <string name="cancel_transfer_confirmation">Cancel this transfer?</string>
-    <string name="cancel_all_transfer_confirmation">Cancel all transfers?</string>
+    <string name="cancel_transfer_title">Delete Transfer</string>
+    <string name="cancel_transfer_confirmation">Delete this transfer?</string>
+    <string name="cancel_all_transfer_confirmation">Delete all transfers?</string>
 
     <string name="section_cloud_drive" context="The name of every users root drive in the cloud of MEGA. The term \'cloud\' is a new computer term and can probably not be translated. Do not translate &quot;cloud&quot; literal unless your language allows this. Please see http://en.wikipedia.org/wiki/Cloud_computing for your reference.">Cloud Drive</string>
     <string name="section_secondary_media_uploads" context="title of the screen where the secondary media images are uploaded">Media Uploads</string>
@@ -471,7 +471,7 @@
     <string name="transfers_pause" context="File uploading or downloading has been paused (until the user continues at a later stage)">All transfers are paused</string>
     <string name="menu_pause_transfers" context="menu item">Pause transfers</string>
     <string name="menu_restart_transfers" context="menu item">Restart transfers</string>
-    <string name="menu_cancel_all_transfers" context="menu item">Cancel all transfers</string>
+    <string name="menu_cancel_all_transfers" context="menu item">Delete all transfers</string>
     <string name="menu_take_picture" context="menu item">Take picture</string>
 
     <string name="cam_sync_wifi" context="how to upload the camera images. only when Wi-Fi connected">WiFi only</string>
@@ -1220,6 +1220,7 @@
 
     <string name="attachment_upload_panel_from_cloud">From Cloud Drive</string>
     <string name="attachment_upload_panel_contact">Contact</string>
+    <string name="attachment_upload_panel_photo">From device</string>
 
     <string name="delete_account" context="Button in My Account section where the user can delete permanently his account">Delete account</string>
     <string name="delete_account_text" context="Text shown in the alert dialog to confirm the cancellation of an account">If you delete your account you will permanently lose all the data stored in the cloud. You will not be able to undo this action.</string>
@@ -1235,4 +1236,11 @@
     <string name="file_properties_shared_folder_read_only" context="Refers to access rights for a file folder.">READ-ONLY</string>
     <string name="file_properties_shared_folder_read_write" context="Refers to access rights for a file folder. (with the &amp; needed. Don\'t use the symbol itself. Use &amp;)">READ &amp; WRITE</string>
 
+    <string name="attachment_uploading_state_uploading">Uploading...</string>
+    <string name="attachment_uploading_state_error">Error. Not sent.</string>
+
+    <string name="already_downloaded_multiple" context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that has already been downloaded and the number of files pending">%d files already downloaded.</string>
+    <string name="pending_multiple" context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that has already been downloaded and the number of files pending">%d files pending.</string>
+
+    <string name="contact_is_me">No options available, the selected contact is you</string>
 </resources>

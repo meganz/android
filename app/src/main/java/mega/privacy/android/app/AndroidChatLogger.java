@@ -42,7 +42,7 @@ public class AndroidChatLogger implements MegaChatLoggerInterface {
 				File dirFile = new File(dir);
 				if (!dirFile.exists()) {
 					dirFile.mkdirs();
-					logFile = new File(dirFile, "log.txt");
+					logFile = new File(dirFile, "logKarere.txt");
 					if (!logFile.exists()) {
 						try {
 							logFile.createNewFile();
@@ -52,7 +52,7 @@ public class AndroidChatLogger implements MegaChatLoggerInterface {
 						}
 					}
 				} else {
-					logFile = new File(dirFile, "log.txt");
+					logFile = new File(dirFile, "logKarere.txt");
 					if (!logFile.exists()) {
 						try {
 							logFile.createNewFile();
