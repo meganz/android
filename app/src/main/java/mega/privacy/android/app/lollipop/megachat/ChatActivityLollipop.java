@@ -631,9 +631,15 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 }
             });
         }
+
+        if(savedInstanceState!=null) {
+            log("Bundle is NOT NULL");
+
+        }
         Intent newIntent = getIntent();
 
         if (newIntent != null){
+            log("Intent is not null");
             intentAction = newIntent.getAction();
             if (intentAction != null){
 
@@ -4035,7 +4041,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     public void onSaveInstanceState(Bundle outState){
         log("onSaveInstanceState");
         super.onSaveInstanceState(outState);
-
+        outState.putLong("idChat", idChat);
         outState.putLong("selectedMessageId", selectedMessageId);
         outState.putInt("selectedPosition", selectedPosition);
     }
