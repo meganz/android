@@ -594,7 +594,7 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 			log("URL: " + url + "___SIZE: " + size);
 			
 			downloadTo (parentPath, url, size, hashes);
-			Snackbar.make(fragmentContainer, getString(R.string.download_began), Snackbar.LENGTH_LONG).show();
+//			Snackbar.make(fragmentContainer, getString(R.string.download_began), Snackbar.LENGTH_LONG).show();
 		}
 		else if (requestCode == Constants.REQUEST_CODE_SELECT_IMPORT_FOLDER && resultCode == RESULT_OK) {
 			log("onActivityResult REQUEST_CODE_SELECT_IMPORT_FOLDER OK");

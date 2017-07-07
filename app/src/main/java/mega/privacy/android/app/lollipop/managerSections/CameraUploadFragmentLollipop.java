@@ -657,6 +657,11 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 				bSkip.setText(getString(R.string.cam_sync_skip));
 				bOK.setText(getString(R.string.cam_sync_ok));
 
+				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+					bSkip.setBackground(ContextCompat.getDrawable(context, R.drawable.white_rounded_corners_button));
+					bOK.setBackground(ContextCompat.getDrawable(context, R.drawable.ripple_upgrade));
+				}
+
 				bOK.setOnClickListener(this);
 				bSkip.setOnClickListener(this);
 				

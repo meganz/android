@@ -45,7 +45,7 @@ public class AndroidLogger implements MegaLoggerInterface {
 			}
 
 			File logFile = null;
-			boolean fileLogger = Util.getFileLogger();
+			boolean fileLogger = Util.getFileLoggerSDK();
 			if (fileLogger) {
 				//Send the log to a file
 

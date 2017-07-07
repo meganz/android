@@ -142,6 +142,17 @@
                     android:layout_marginRight="16dp"
                     android:scaleType="centerCrop"/>
 
+                <ProgressBar
+                    android:id="@+id/uploadingProgressBar"
+                    android:indeterminate="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignParentBottom="true"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="18dp"
+                    android:layout_marginBottom="2dp">
+                </ProgressBar>
+
                 <RelativeLayout
                     android:id="@+id/content_own_message_file_layout"
                     android:layout_width="wrap_content"

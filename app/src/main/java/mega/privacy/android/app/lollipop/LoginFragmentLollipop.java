@@ -137,7 +137,8 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
     private MegaChatApiAndroid megaChatApi;
     private String confirmLink;
 
-    int numberOfClicks = 0;
+    int numberOfClicksKarere = 0;
+    int numberOfClicksSDK = 0;
 
     boolean firstTime = true;
 
@@ -352,6 +353,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         textnewToMega.setMargins(Util.scaleWidthPx(65, outMetrics), Util.scaleHeightPx(20, outMetrics), 0, Util.scaleHeightPx(30, outMetrics));
         newToMega.setLayoutParams(textnewToMega);
         newToMega.setTextSize(TypedValue.COMPLEX_UNIT_SP, (20*scaleText));
+        newToMega.setOnClickListener(this);
 
         bRegister = (TextView) v.findViewById(R.id.button_create_account_login);
 
@@ -1199,36 +1201,70 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 break;
             }
             case R.id.login_text_view:{
-                numberOfClicks++;
-                if (numberOfClicks == 5){
+                numberOfClicksKarere++;
+                if (numberOfClicksKarere == 5){
                     MegaAttributes attrs = dbH.getAttributes();
                     if(attrs!=null){
-                        if (attrs.getFileLogger() != null){
+                        if (attrs.getFileLoggerKarere() != null){
                             try {
-                                if (Boolean.parseBoolean(attrs.getFileLogger()) == false) {
-                                    ((LoginActivityLollipop)context).showConfirmationEnableLogs();
+                                if (Boolean.parseBoolean(attrs.getFileLoggerKarere()) == false) {
+                                    ((LoginActivityLollipop)context).showConfirmationEnableLogsKarere();
                                 }
                                 else{
-                                    dbH.setFileLogger(false);
-                                    Util.setFileLogger(false);
-                                    numberOfClicks = 0;
+                                    dbH.setFileLoggerKarere(false);
+                                    Util.setFileLoggerKarere(false);
+                                    numberOfClicksKarere = 0;
+                                    MegaChatApiAndroid.setLogLevel(MegaChatApiAndroid.LOG_LEVEL_ERROR);
+                                    ((LoginActivityLollipop)context).showSnackbar(getString(R.string.settings_disable_logs));
+                                }
+                            }
+                            catch(Exception e){
+                                ((LoginActivityLollipop)context).showConfirmationEnableLogsKarere();
+                            }
+                        }
+                        else{
+                            ((LoginActivityLollipop)context).showConfirmationEnableLogsKarere();
+                        }
+                    }
+                    else{
+                        log("attrs is NULL");
+                        ((LoginActivityLollipop)context).showConfirmationEnableLogsKarere();
+                    }
+                }
+                break;
+            }
+            case R.id.text_newToMega:{
+                numberOfClicksSDK++;
+                if (numberOfClicksSDK == 5){
+                    MegaAttributes attrs = dbH.getAttributes();
+                    if(attrs!=null){
+                        if (attrs.getFileLoggerSDK() != null){
+                            try {
+                                if (Boolean.parseBoolean(attrs.getFileLoggerSDK()) == false) {
+                                    ((LoginActivityLollipop)context).showConfirmationEnableLogsSDK();
+                                }
+                                else{
+                                    dbH.setFileLoggerSDK(false);
+                                    Util.setFileLoggerSDK(false);
+                                    numberOfClicksSDK = 0;
                                     MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_FATAL);
                                     ((LoginActivityLollipop)context).showSnackbar(getString(R.string.settings_disable_logs));
                                 }
                             }
                             catch(Exception e){
-                                ((LoginActivityLollipop)context).showConfirmationEnableLogs();
+                                ((LoginActivityLollipop)context).showConfirmationEnableLogsSDK();
                             }
                         }
                         else{
-                            ((LoginActivityLollipop)context).showConfirmationEnableLogs();
+                            ((LoginActivityLollipop)context).showConfirmationEnableLogsSDK();
                         }
                     }
                     else{
                         log("attrs is NULL");
-                        ((LoginActivityLollipop)context).showConfirmationEnableLogs();
+                        ((LoginActivityLollipop)context).showConfirmationEnableLogsSDK();
                     }
                 }
+                break;
             }
         }
     }

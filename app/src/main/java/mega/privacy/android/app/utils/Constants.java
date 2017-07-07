@@ -121,8 +121,10 @@ public class Constants {
 
 	public static String ACTION_CHAT_NEW = "CHAT_NEW";
 	public static String ACTION_CHAT_SHOW_MESSAGES = "CHAT_SHOW_MESSAGES";
-	public static String ACTION_CHAT_INVITE = "CHAT_INVITE";
-	public static String ACTION_CLEAR_CHAT = "ACTION_CLEAR_CHAT";
+	public static String ACTION_NEW_CHAT = "NEW_CHAT";
+	public static String ACTION_CLEAR_CHAT = "CLEAR_CHAT";
+
+	public static String ACTION_UPDATE_ATTACHMENT = "UPDATE_ATTACHMENT";
 
 	public static String ACTION_OVERQUOTA_TRANSFER = "OVERQUOTA_TRANSFER";
 
@@ -170,6 +172,8 @@ public class Constants {
 	public static int NOTIFICATION_PUSH_CLOUD_DRIVE = 7;
 	public static int NOTIFICATION_PUSH_CHAT = 8;
 	public static int NOTIFICATION_PUSH_CONTACT = 9;
+
+	public static String CHAT_FOLDER = "My chat files";
 
 	public static int TAKE_PICTURE_OPTION = 0;
 	public static int TAKE_PROFILE_PICTURE = 1;
