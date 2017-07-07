@@ -262,20 +262,33 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 					break;
 				}
 				case R.id.cab_menu_share_link:{
+					log("Public link option");
 					clearSelections();
 					hideMultipleSelect();
 					if(adapterList!=null){
 						if (documentsList.size()==1){
-							MegaNode n = megaApi.getNodeByHandle(documentsList.get(0).handle);
-							NodeController nC = new NodeController(context);
-							nC.exportLink(n);
+							//MegaNode n = megaApi.getNodeByHandle(documentsList.get(0).handle);
+							//NodeController nC = new NodeController(context);
+							//nC.exportLink(n);
+							if(documentsList.get(0)==null){
+								log("The selected node is NULL");
+								break;
+							}
+							((ManagerActivityLollipop) context).showGetLinkActivity(documentsList.get(0).handle);
 						}
 					}
 					else if(adapterGrid != null){
 						if (documentsGrid.size()==1){
-							MegaNode n = megaApi.getNodeByHandle(documentsGrid.get(0).getHandle());
-							NodeController nC = new NodeController(context);
-							nC.exportLink(n);
+
+							if(documentsGrid.get(0)==null){
+								log("The selected node is NULL");
+								break;
+							}
+							((ManagerActivityLollipop) context).showGetLinkActivity(documentsGrid.get(0).getHandle());
+
+							//MegaNode n = megaApi.getNodeByHandle(documentsGrid.get(0).getHandle());
+							//NodeController nC = new NodeController(context);
+							//nC.exportLink(n);
 						}
 					}
 
@@ -284,20 +297,35 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 
 				case R.id.cab_menu_share_link_remove:{
 
+					log("Remove public link option");
+
 					clearSelections();
 					hideMultipleSelect();
 					if(adapterList!=null){
 						if (documentsList.size()==1){
 							MegaNode n = megaApi.getNodeByHandle(documentsList.get(0).handle);
-							NodeController nC = new NodeController(context);
-							nC.removeLink(n);
+							//NodeController nC = new NodeController(context);
+							//nC.removeLink(n);
+
+							if(documentsList.get(0)==null){
+								log("The selected node is NULL");
+								break;
+							}
+							((ManagerActivityLollipop) context).showConfirmationRemovePublicLink(n);
 						}
 					}
 					else if(adapterGrid != null){
 						if (documentsGrid.size()==1){
 							MegaNode n = megaApi.getNodeByHandle(documentsGrid.get(0).getHandle());
-							NodeController nC = new NodeController(context);
-							nC.removeLink(n);
+							//NodeController nC = new NodeController(context);
+							//nC.removeLink(n);
+
+							if(documentsGrid.get(0)==null){
+								log("The selected node is NULL");
+								break;
+							}
+							((ManagerActivityLollipop) context).showConfirmationRemovePublicLink(n);
+
 						}
 					}
 
@@ -409,6 +437,23 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 						menu.findItem(R.id.cab_menu_download).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 					}
 
+					if(showLink){
+						menu.findItem(R.id.cab_menu_share_link_remove).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+						menu.findItem(R.id.cab_menu_share_link).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+					}
+					if(showRemoveLink){
+						menu.findItem(R.id.cab_menu_share_link).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+						menu.findItem(R.id.cab_menu_share_link_remove).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+					}
+
+					if(showMove){
+						if(selected.size()==1){
+							menu.findItem(R.id.cab_menu_move).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+						}else{
+							menu.findItem(R.id.cab_menu_move).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+						}
+					}
+
 					if(selected.size() == nodes.size()){
 						menu.findItem(R.id.cab_menu_select_all).setVisible(false);
 						menu.findItem(R.id.cab_menu_unselect_all).setVisible(true);
@@ -472,36 +517,37 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 					menu.findItem(R.id.cab_menu_copy).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 				}
 
-				if(showMove){
-					if(selected.size()==1){
-						menu.findItem(R.id.cab_menu_move).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
-
-					}else{
-						menu.findItem(R.id.cab_menu_move).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-
-					}
-				}
-
 				if(showDownload){
 					menu.findItem(R.id.cab_menu_download).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 				}
+
+				if(showLink){
+					menu.findItem(R.id.cab_menu_share_link_remove).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+					menu.findItem(R.id.cab_menu_share_link).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+				}
+				if(showRemoveLink){
+					menu.findItem(R.id.cab_menu_share_link).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+					menu.findItem(R.id.cab_menu_share_link_remove).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+				}
+
+				if(showMove){
+					if(selected.size()==1){
+						menu.findItem(R.id.cab_menu_move).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+					}else{
+						menu.findItem(R.id.cab_menu_move).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+					}
+				}
+
+
 			}
 			else{
 				log("NULL adapters");
 			}
+
 			menu.findItem(R.id.cab_menu_download).setVisible(showDownload);
-			if(showDownload){
-				menu.findItem(R.id.cab_menu_download).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-			}
 			menu.findItem(R.id.cab_menu_rename).setVisible(showRename);
 			menu.findItem(R.id.cab_menu_copy).setVisible(showCopy);
-			if(showCopy){
-				menu.findItem(R.id.cab_menu_copy).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-			}
 			menu.findItem(R.id.cab_menu_move).setVisible(showMove);
-			if(showMove){
-					menu.findItem(R.id.cab_menu_move).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-			}
 
 			menu.findItem(R.id.cab_menu_share_link).setVisible(showLink);
 			menu.findItem(R.id.cab_menu_share_link_remove).setVisible(showRemoveLink);

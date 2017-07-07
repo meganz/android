@@ -137,8 +137,13 @@ public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaP
 					clearSelections();
 					hideMultipleSelect();
 					if (documents.size()==1){
-						NodeController nC = new NodeController(context);
-						nC.exportLink(documents.get(0));
+						//NodeController nC = new NodeController(context);
+						//nC.exportLink(documents.get(0));
+						if(documents.get(0)==null){
+							log("The selected node is NULL");
+							break;
+						}
+						((ManagerActivityLollipop) context).showGetLinkActivity(documents.get(0).getHandle());
 					}
 					break;
 				}
@@ -147,8 +152,14 @@ public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaP
 					clearSelections();
 					hideMultipleSelect();
 					if (documents.size()==1){
-						NodeController nC = new NodeController(context);
-						nC.removeLink(documents.get(0));
+						//NodeController nC = new NodeController(context);
+						//nC.removeLink(documents.get(0));
+						if(documents.get(0)==null){
+							log("The selected node is NULL");
+							break;
+						}
+						((ManagerActivityLollipop) context).showConfirmationRemovePublicLink(documents.get(0));
+
 					}
 					break;
 
@@ -253,8 +264,22 @@ public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaP
 			if(showDownload){
 				menu.findItem(R.id.cab_menu_download).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 			}
+
+			if(showLink){
+				menu.findItem(R.id.cab_menu_share_link_remove).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+				menu.findItem(R.id.cab_menu_share_link).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+			}
+			if(showRemoveLink){
+				menu.findItem(R.id.cab_menu_share_link).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+				menu.findItem(R.id.cab_menu_share_link_remove).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+			}
+
 			if(showMove){
-				menu.findItem(R.id.cab_menu_move).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+				if(selected.size()==1){
+					menu.findItem(R.id.cab_menu_move).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+				}else{
+					menu.findItem(R.id.cab_menu_move).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+				}
 			}
 			
 			menu.findItem(R.id.cab_menu_download).setVisible(showDownload);

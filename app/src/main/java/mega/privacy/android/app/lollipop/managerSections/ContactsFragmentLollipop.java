@@ -37,10 +37,12 @@ import mega.privacy.android.app.MegaContactAdapter;
 import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
+import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaContactsLollipopAdapter;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
+import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -52,8 +54,8 @@ public class ContactsFragmentLollipop extends Fragment{
 	
 	public static final String ARG_OBJECT = "object";
 	
-	MegaApiAndroid megaApi;	
-	
+	MegaApiAndroid megaApi;
+
 	Context context;
 	ActionBar aB;
 	RecyclerView recyclerView;
@@ -73,7 +75,7 @@ public class ContactsFragmentLollipop extends Fragment{
 	Display display;
 	
 	boolean isList = true;
-	
+
 	ContactsFragmentLollipop contactsFragment = this;
 	
 	ArrayList<MegaUser> contacts;
@@ -121,11 +123,25 @@ public class ContactsFragmentLollipop extends Fragment{
 					break;
 				}
 				case R.id.cab_menu_start_conversation:{
-					/*if(users.get(0)==null){
+
+					if(users.get(0)==null){
 						log("Selected contact NULL");
 						break;
 					}
-					((ManagerActivityLollipop) context).startOneToOneChat(users.get(0).getMegaUser());*/
+					((ManagerActivityLollipop) context).startOneToOneChat(users.get(0));
+
+					break;
+				}
+				case R.id.cab_menu_start_conversation_more:{
+
+					ArrayList<Long> contactHandles = new ArrayList<>();
+
+					for(int i=0;i<users.size();i++){
+						contactHandles.add(users.get(i).getHandle());
+					}
+
+					((ManagerActivityLollipop)context).startGroupConversation(contactHandles);
+
 					break;
 				}
 				case R.id.cab_menu_delete:{
@@ -175,9 +191,19 @@ public class ContactsFragmentLollipop extends Fragment{
 				menu.findItem(R.id.cab_menu_send_file).setVisible(true);
 				menu.findItem(R.id.cab_menu_send_file).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
+				if(selected.size() ==1){
+					menu.findItem(R.id.cab_menu_start_conversation_more).setVisible(false);
+					menu.findItem(R.id.cab_menu_start_conversation_more).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+					menu.findItem(R.id.cab_menu_start_conversation).setVisible(true);
+					menu.findItem(R.id.cab_menu_start_conversation).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+				}else{
+					menu.findItem(R.id.cab_menu_start_conversation).setVisible(false);
+					menu.findItem(R.id.cab_menu_start_conversation).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+					menu.findItem(R.id.cab_menu_start_conversation_more).setVisible(true);
+					menu.findItem(R.id.cab_menu_start_conversation_more).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+				}
 
-				menu.findItem(R.id.cab_menu_start_conversation).setVisible(true);
-				menu.findItem(R.id.cab_menu_start_conversation).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+
 
 				if(selected.size()==adapter.getItemCount()){
 					menu.findItem(R.id.cab_menu_select_all).setVisible(false);
@@ -464,7 +490,7 @@ public class ContactsFragmentLollipop extends Fragment{
 			return v;
 		}			
 	}
-	
+
 	public void setContacts(ArrayList<MegaUser> contacts){
 		this.contacts = contacts;
 

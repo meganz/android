@@ -17,7 +17,14 @@
     <item
         android:id="@+id/cab_menu_start_conversation"
         android:orderInCategory="100"
-        android:icon="@drawable/ic_start_chat"
+        android:icon="@drawable/ic_chat_w"
+        android:showAsAction="never"
+        android:title="@string/group_chat_start_conversation_label"
+        MEGA:showAsAction="never" />
+    <item
+        android:id="@+id/cab_menu_start_conversation_more"
+        android:orderInCategory="100"
+        android:icon="@drawable/ic_chat_w"
         android:showAsAction="never"
         android:title="@string/group_chat_start_conversation_label"
         MEGA:showAsAction="never" />
@@ -25,7 +32,7 @@
     
     <item
         android:id="@+id/cab_menu_share_folder"
-        android:orderInCategory="110"
+        android:orderInCategory="116"
         android:title="@string/context_share_folder"
         android:icon="@drawable/ic_share_white"
         android:showAsAction="never"
