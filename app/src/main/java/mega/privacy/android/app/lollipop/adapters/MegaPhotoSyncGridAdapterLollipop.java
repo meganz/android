@@ -137,10 +137,32 @@ public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaP
 					clearSelections();
 					hideMultipleSelect();
 					if (documents.size()==1){
-						NodeController nC = new NodeController(context);
-						nC.exportLink(documents.get(0));
+						//NodeController nC = new NodeController(context);
+						//nC.exportLink(documents.get(0));
+						if(documents.get(0)==null){
+							log("The selected node is NULL");
+							break;
+						}
+						((ManagerActivityLollipop) context).showGetLinkActivity(documents.get(0).getHandle());
 					}
 					break;
+				}
+				case R.id.cab_menu_share_link_remove:{
+
+					clearSelections();
+					hideMultipleSelect();
+					if (documents.size()==1){
+						//NodeController nC = new NodeController(context);
+						//nC.removeLink(documents.get(0));
+						if(documents.get(0)==null){
+							log("The selected node is NULL");
+							break;
+						}
+						((ManagerActivityLollipop) context).showConfirmationRemovePublicLink(documents.get(0));
+
+					}
+					break;
+
 				}
 				case R.id.cab_menu_trash:{
 					ArrayList<Long> handleList = new ArrayList<Long>();
@@ -191,22 +213,28 @@ public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaP
 			boolean showMove = false;
 			boolean showLink = false;
 			boolean showTrash = false;
-			
+			boolean showRemoveLink = false;
+
+
 			// Link
 			if ((selected.size() == 1) && (megaApi.checkAccess(selected.get(0), MegaShare.ACCESS_OWNER).getErrorCode() == MegaError.API_OK)) {
-				showLink = true;
-			}
+				if(selected.get(0).isExported()){
+					//Node has public link
+					showRemoveLink=true;
+					showLink=false;
 
-			if(showLink){
-				menu.findItem(R.id.cab_menu_share_link).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-			}
-			
+				}
+				else{
+					showRemoveLink=false;
+					showLink=true;
+				}			}
+
 			if (selected.size() != 0) {
 				showDownload = true;
 				showTrash = true;
 				showMove = true;
 				showCopy = true;
-				
+
 				for(int i=0; i<selected.size();i++)	{
 					if(megaApi.checkMove(selected.get(i), megaApi.getRubbishNode()).getErrorCode() != MegaError.API_OK)	{
 						showTrash = false;
@@ -236,12 +264,31 @@ public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaP
 			if(showDownload){
 				menu.findItem(R.id.cab_menu_download).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 			}
+
+			if(showLink){
+				menu.findItem(R.id.cab_menu_share_link_remove).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+				menu.findItem(R.id.cab_menu_share_link).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+			}
+			if(showRemoveLink){
+				menu.findItem(R.id.cab_menu_share_link).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+				menu.findItem(R.id.cab_menu_share_link_remove).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+			}
+
+			if(showMove){
+				if(selected.size()==1){
+					menu.findItem(R.id.cab_menu_move).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+				}else{
+					menu.findItem(R.id.cab_menu_move).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+				}
+			}
 			
 			menu.findItem(R.id.cab_menu_download).setVisible(showDownload);
 			menu.findItem(R.id.cab_menu_rename).setVisible(showRename);
 			menu.findItem(R.id.cab_menu_copy).setVisible(showCopy);
 			menu.findItem(R.id.cab_menu_move).setVisible(showMove);
 			menu.findItem(R.id.cab_menu_share_link).setVisible(showLink);
+			menu.findItem(R.id.cab_menu_share_link_remove).setVisible(showRemoveLink);
+
 			menu.findItem(R.id.cab_menu_trash).setVisible(showTrash);
 			menu.findItem(R.id.cab_menu_leave_multiple_share).setVisible(false);
 			
@@ -523,20 +570,17 @@ public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaP
 			}
 		}
 		Resources res = context.getResources();
-		String format = "%d %s";
-		String filesStr = String.format(format, files,
-				res.getQuantityString(R.plurals.general_num_files, files));
-		String foldersStr = String.format(format, folders,
-				res.getQuantityString(R.plurals.general_num_folders, folders));
 		String title;
+		int sum=files+folders;
+
 		if (files == 0 && folders == 0) {
-			title = "";
+			title = Integer.toString(sum);
 		} else if (files == 0) {
-			title = foldersStr;
+			title = Integer.toString(folders);
 		} else if (folders == 0) {
-			title = filesStr;
+			title = Integer.toString(files);
 		} else {
-			title = foldersStr + ", " + filesStr;
+			title = Integer.toString(sum);
 		}
 		actionMode.setTitle(title);
 		try {
