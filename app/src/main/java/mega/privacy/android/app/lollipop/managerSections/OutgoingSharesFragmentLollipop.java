@@ -104,9 +104,13 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 		
 		boolean showRename = false;
 		boolean showMove = false;
+		boolean showCopy = false;
 		boolean showLink = false;
+		boolean showRemoveLink = false;
 		boolean showTrash = false;
 		boolean showShare = false;
+		boolean showEditLink = false;
+
 
 		@Override
 		public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
@@ -166,10 +170,32 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 				}
 				case R.id.cab_menu_share_link:{
 
-					if (documents.size()==1){
-						NodeController nC = new NodeController(context);
-						nC.exportLink(documents.get(0));
+					if(documents.get(0)==null){
+						log("The selected node is NULL");
+						break;
 					}
+					((ManagerActivityLollipop) context).showGetLinkActivity(documents.get(0).getHandle());
+					break;
+				}
+				case R.id.cab_menu_share_link_remove:{
+
+					log("Remove public link option");
+					if(documents.get(0)==null){
+						log("The selected node is NULL");
+						break;
+					}
+					((ManagerActivityLollipop) context).showConfirmationRemovePublicLink(documents.get(0));
+
+					break;
+				}
+				case R.id.cab_menu_edit_link:{
+
+					log("Edit link option");
+					if(documents.get(0)==null){
+						log("The selected node is NULL");
+						break;
+					}
+					((ManagerActivityLollipop) context).showGetLinkActivity(documents.get(0).getHandle());
 					break;
 				}
 				case R.id.cab_menu_trash:{
@@ -215,10 +241,30 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 			List<MegaNode> selected = adapter.getSelectedNodes();
 			MenuItem unselect = menu.findItem(R.id.cab_menu_unselect_all);
 
+			// Link
+			if ((selected.size() == 1) && (megaApi.checkAccess(selected.get(0), MegaShare.ACCESS_OWNER).getErrorCode() == MegaError.API_OK)) {
+
+				if(selected.get(0).isExported()){
+					//Node has public link
+					showRemoveLink=true;
+					showLink=false;
+					showEditLink = true;
+
+				}
+				else{
+					showRemoveLink=false;
+					showLink=true;
+					showEditLink = false;
+				}
+
+			}
 			if (selected.size() != 0) {
 				showTrash = true;
 				showMove = true;
 				showShare = true;
+				showCopy = true;
+
+
 
 				for(int i=0; i<selected.size();i++)	{
 					if(megaApi.checkMove(selected.get(i), megaApi.getRubbishNode()).getErrorCode() != MegaError.API_OK)	{
@@ -233,10 +279,12 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 					unselect.setTitle(getString(R.string.action_unselect_all));
 					unselect.setVisible(true);
 					showLink=false;
+					showRemoveLink=false;
+					showEditLink=false;
 					showRename=false;
 				}
 				else if(selected.size()==1){
-					showLink=true;
+					//showLink=true;
 					showRename=true;
 					menu.findItem(R.id.cab_menu_select_all).setVisible(true);
 					unselect.setTitle(getString(R.string.action_unselect_all));
@@ -247,7 +295,9 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 					unselect.setTitle(getString(R.string.action_unselect_all));
 					unselect.setVisible(true);
 					showLink=false;
+					showRemoveLink=false;
 					showRename=false;
+					showEditLink=false;
 				}
 			}
 			else{
@@ -256,11 +306,44 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 			}
 			
 			menu.findItem(R.id.cab_menu_download).setVisible(true);
+			menu.findItem(R.id.cab_menu_download).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+
 			menu.findItem(R.id.cab_menu_rename).setVisible(showRename);
-			menu.findItem(R.id.cab_menu_copy).setVisible(true);
+			menu.findItem(R.id.cab_menu_copy).setVisible(showCopy);
+
+			if(showCopy){
+				if(selected.size()>1){
+					menu.findItem(R.id.cab_menu_copy).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+
+				}else{
+					menu.findItem(R.id.cab_menu_copy).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+
+				}
+			}
 			menu.findItem(R.id.cab_menu_move).setVisible(showMove);
 			menu.findItem(R.id.cab_menu_share).setVisible(showShare);
+			menu.findItem(R.id.cab_menu_share).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+			menu.findItem(R.id.cab_menu_edit_link).setVisible(showEditLink);
+
+
+
+
 			menu.findItem(R.id.cab_menu_share_link).setVisible(showLink);
+			if(showLink){
+				menu.findItem(R.id.cab_menu_share_link).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+			}else{
+				menu.findItem(R.id.cab_menu_share_link).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+
+			}
+
+			menu.findItem(R.id.cab_menu_share_link_remove).setVisible(showRemoveLink);
+			if(showRemoveLink){
+				menu.findItem(R.id.cab_menu_share_link_remove).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+			}else{
+				menu.findItem(R.id.cab_menu_share_link_remove).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+
+			}
+
 			menu.findItem(R.id.cab_menu_trash).setVisible(showTrash);
 			menu.findItem(R.id.cab_menu_leave_multiple_share).setVisible(false);
 			return false;
@@ -861,20 +944,17 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 			}
 		}
 		Resources res = getActivity().getResources();
-		String format = "%d %s";
-		String filesStr = String.format(format, files,
-				res.getQuantityString(R.plurals.general_num_files, files));
-		String foldersStr = String.format(format, folders,
-				res.getQuantityString(R.plurals.general_num_folders, folders));
 		String title;
+		int sum=files+folders;
+
 		if (files == 0 && folders == 0) {
-			title = foldersStr + ", " + filesStr;
+			title = Integer.toString(sum);
 		} else if (files == 0) {
-			title = foldersStr;
+			title = Integer.toString(folders);
 		} else if (folders == 0) {
-			title = filesStr;
+			title = Integer.toString(files);
 		} else {
-			title = foldersStr + ", " + filesStr;
+			title = Integer.toString(sum);
 		}
 		actionMode.setTitle(title);
 		try {

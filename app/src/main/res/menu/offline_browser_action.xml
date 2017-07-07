@@ -66,7 +66,7 @@
    
     <item
         android:id="@+id/cab_menu_delete"
-        android:icon="@drawable/ic_rubbish_bin"
+        android:icon="@drawable/ic_close_white"
         android:orderInCategory="130"
         android:showAsAction="never"
         android:title="@string/context_delete_offline"
