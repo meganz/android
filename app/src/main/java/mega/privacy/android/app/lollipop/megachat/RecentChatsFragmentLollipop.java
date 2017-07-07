@@ -467,7 +467,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
         }
         List<MegaChatListItem> chats = adapterList.getSelectedChats();
 
-        actionMode.setTitle(context.getString(R.string.selected_chat_contact, chats.size()));
+        actionMode.setTitle(chats.size()+"");
 
         try {
             actionMode.invalidate();
