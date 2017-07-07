@@ -2,6 +2,7 @@ package mega.privacy.android.app.lollipop.adapters;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -39,6 +40,7 @@ import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.ContactFileListActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.managerSections.ContactsFragmentLollipop;
+import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ContactAttachmentActivityLollipop;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
@@ -47,6 +49,8 @@ import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
+import nz.mega.sdk.MegaChatPeerList;
+import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
@@ -1123,6 +1127,24 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 //			holderGrid = (ViewHolderContactsGrid) listFragment.findViewHolderForAdapterPosition(position);
 //		}
 	}
+
+	/*public void startOneToOneChat(MegaUser user){
+		log("startOneToOneChat");
+		MegaChatRoom chat = megaChatApi.getChatRoomByUser(user.getHandle());
+		MegaChatPeerList peers = MegaChatPeerList.createInstance();
+		if(chat==null){
+			log("No chat, create it!");
+			peers.addPeer(user.getHandle(), MegaChatPeerList.PRIV_STANDARD);
+			megaChatApi.createChat(false, peers, this);
+		}
+		else{
+			log("There is already a chat, open it!");
+			Intent intentOpenChat = new Intent(this, ChatActivityLollipop.class);
+			intentOpenChat.setAction(Constants.ACTION_CHAT_SHOW_MESSAGES);
+			intentOpenChat.putExtra("CHAT_ID", chat.getChatId());
+			this.startActivity(intentOpenChat);
+		}
+	}*/
 
 	private static void log(String log) {
 		Util.log("MegaContactsLollipopAdapter", log);

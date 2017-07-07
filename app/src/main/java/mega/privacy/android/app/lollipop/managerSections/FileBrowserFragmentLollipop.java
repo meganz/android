@@ -386,6 +386,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 
 			menu.findItem(R.id.cab_menu_share_link).setVisible(showLink);
 			if(showLink){
+				menu.findItem(R.id.cab_menu_share_link_remove).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
 				menu.findItem(R.id.cab_menu_share_link).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 			}else{
 				menu.findItem(R.id.cab_menu_share_link).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
@@ -394,6 +395,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 
 			menu.findItem(R.id.cab_menu_share_link_remove).setVisible(showRemoveLink);
 			if(showRemoveLink){
+				menu.findItem(R.id.cab_menu_share_link).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
 				menu.findItem(R.id.cab_menu_share_link_remove).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 			}else{
 				menu.findItem(R.id.cab_menu_share_link_remove).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);

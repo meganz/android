@@ -232,7 +232,10 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
                 }
                 else{
                     adapterList.setChats(chats);
+                    log("*****");
+
                 }
+
                 listView.setAdapter(adapterList);
                 adapterList.setPositionClicked(-1);
 
@@ -464,7 +467,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
         }
         List<MegaChatListItem> chats = adapterList.getSelectedChats();
 
-        actionMode.setTitle(context.getString(R.string.selected_items, chats.size()));
+        actionMode.setTitle(context.getString(R.string.selected_chat_contact, chats.size()));
 
         try {
             actionMode.invalidate();

@@ -73,6 +73,7 @@
 			android:textColor="@color/accentColor"
 			android:gravity="center_vertical|center_horizontal"
 			android:stateListAnimator="@null"
+			android:layout_marginRight="4dp"
 			android:background="@color/participants_layout"/>
 
     </LinearLayout>
