@@ -21,6 +21,7 @@ import java.util.ArrayList;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.MimeTypeInfo;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.MimeTypeMime;
 import mega.privacy.android.app.R;
@@ -287,7 +288,7 @@ public class ContactFileListBottomSheetDialogFragment extends BottomSheetDialogF
                     }
                 }
                 else {
-                    i.putExtra("imageId", MimeTypeMime.typeForName(node.getName()).getIconResourceId());
+                    i.putExtra("imageId", MimeTypeInfo.typeForName(node.getName()).getIconResourceId());
                 }
                 i.putExtra("name", node.getName());
                 context.startActivity(i);

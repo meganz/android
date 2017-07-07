@@ -2794,7 +2794,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
     protected void onDestroy(){
 		log("onDestroy()");
 
-//		dbH.removeSentPendingMessages();
+		dbH.removeSentPendingMessages();
 
     	if (megaApi.getRootNode() != null){
     		megaApi.removeGlobalListener(this);
@@ -3838,6 +3838,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		aB.setTitle(getString(R.string.section_transfers));
 		aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 		firstNavigationLevel = true;
+
+		showFabButton();
 
 		drawerLayout.closeDrawer(Gravity.LEFT);
 	}
@@ -5789,34 +5791,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	        		megaApi.pauseTransfers(true, this);
 	        		pauseTransfersMenuIcon.setVisible(false);
 	        		playTransfersMenuIcon.setVisible(true);
-//    				if(!tranfersPaused)
-//    				{
-//    					tranfersPaused = true;
-//    					pauseTransfersMenuIcon.setVisible(false);
-//    					playTransfersMenuIcon.setVisible(true);
-//
-//    					//Update the progress in fragments
-//    					if (fbFLol != null){
-//    						fbFLol.updateProgressBar(progressPercent);
-//    					}
-//    					if (rubbishBinFLol != null){
-//    						rubbishBinFLol.updateProgressBar(progressPercent);
-//    					}
-//    					if (iFLol != null){
-//    						iFLol.updateProgressBar(progressPercent);
-//    					}
-//    					if (outSFLol != null){
-//    						outSFLol.updateProgressBar(progressPercent);
-//    					}
-//    					if (inSFLol != null){
-//    						inSFLol.updateProgressBar(progressPercent);
-//    					}
-//    					if (tFLol != null){
-//    						tFLol.updateProgressBar(progressPercent);
-//    					}
-//
-//    	    			megaApi.pauseTransfers(true, this);
-//    				}
 	        	}
 
 	        	return true;
@@ -10841,7 +10815,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			log("hashes size: "+hashes.length);
 
 			nC.checkSizeBeforeDownload(parentPath, url, size, hashes);
-			Snackbar.make(fragmentContainer, getString(R.string.download_began), Snackbar.LENGTH_LONG).show();
+//			Snackbar.make(fragmentContainer, getString(R.string.download_began), Snackbar.LENGTH_LONG).show();
 		}
 		else if (requestCode == Constants.REQUEST_CODE_REFRESH && resultCode == RESULT_OK) {
 			log("Resfresh DONE onActivityResult");
@@ -13067,8 +13041,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		if(cancel){
 
 			builder.setMessage(getResources().getString(R.string.cancel_transfer_confirmation));
-			builder.setPositiveButton(R.string.general_cancel, dialogClickListener);
-			builder.setNegativeButton(R.string.general_dismiss, dialogClickListener);
+			builder.setPositiveButton(R.string.context_delete, dialogClickListener);
+			builder.setNegativeButton(R.string.general_cancel, dialogClickListener);
 		}
 		else {
 
@@ -13112,8 +13086,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 //		builder.setTitle(getResources().getString(R.string.cancel_transfer_title));
 
 		builder.setMessage(getResources().getString(R.string.cancel_all_transfer_confirmation));
-		builder.setPositiveButton(R.string.general_cancel, dialogClickListener);
-		builder.setNegativeButton(R.string.general_dismiss, dialogClickListener);
+		builder.setPositiveButton(R.string.context_delete, dialogClickListener);
+		builder.setNegativeButton(R.string.general_cancel, dialogClickListener);
 
 		builder.show();
 	}
@@ -14013,6 +13987,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	@Override
 	public void networkAvailable() {
 		log("networkAvailable");
+		if(megaApi!=null){
+			megaApi.retryPendingConnections();
+		}
 		showOnlineMode();
 	}
 
