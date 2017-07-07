@@ -405,6 +405,10 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 									nodeAttachment.setNodeHandle(transfer.getNodeHandle());
 								}
 								megaChatApi.attachNodes(pendMsg.getChatId(), nodeList, this);
+								deleteLocalFile(transfer.getFileName());
+								if (megaApi.getNumPendingUploads() == 0 && transfersCount==0){
+									onQueueComplete();
+								}
 								return;
 							}
 						}
@@ -418,26 +422,33 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 							if(nodeAttachment.getFilePath().equals(transfer.getPath())){
 								nodeAttachment.setNodeHandle(transfer.getNodeHandle());
 
-								if(pendMsg.isNodeHandlesCompleted()){
-									log("All files of the message uploaded! SEND!");
-									if(megaChatApi!=null){
-										log("Send the message to the chat");
-										MegaNodeList nodeList = MegaNodeList.createInstance();
+								if(!(pendMsg.getState()==PendingMessage.STATE_ERROR)){
+									if(pendMsg.isNodeHandlesCompleted()){
+										log("All files of the message uploaded! SEND!");
+										if(megaChatApi!=null){
+											log("Send the message to the chat");
+											MegaNodeList nodeList = MegaNodeList.createInstance();
 
-										for(int k=0; k<nodesAttached.size();k++){
-											MegaNode node = megaApi.getNodeByHandle(nodesAttached.get(k).getNodeHandle());
-											if(node!=null){
-												log("Node to send: "+node.getName());
-												nodeList.addNode(node);
+											for(int k=0; k<nodesAttached.size();k++){
+												MegaNode node = megaApi.getNodeByHandle(nodesAttached.get(k).getNodeHandle());
+												if(node!=null){
+													log("Node to send: "+node.getName());
+													nodeList.addNode(node);
+												}
 											}
+											megaChatApi.attachNodes(pendMsg.getChatId(), nodeList, this);
+											deleteLocalFile(transfer.getFileName());
+											return;
 										}
-										megaChatApi.attachNodes(pendMsg.getChatId(), nodeList, this);
+									}
+									else{
+										log("Waiting for more nodes...");
+										deleteLocalFile(transfer.getFileName());
+										if (megaApi.getNumPendingUploads() == 0 && transfersCount==0){
+											onQueueComplete();
+										}
 										return;
 									}
-								}
-								else{
-									log("Waiting for more messages...");
-									return;
 								}
 							}
 
@@ -449,10 +460,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
             else{
                 log("Upload Error: " + transfer.getFileName() + "_" + error.getErrorCode() + "___" + error.getErrorString());
 
-                if(error.getErrorCode() == MegaError.API_EINCOMPLETE){
-                    log("API_EINCOMPLETE ERROR: "+error.getErrorCode());
-                }
-                else if(error.getErrorCode()==MegaError.API_EOVERQUOTA){
+                if(error.getErrorCode()==MegaError.API_EOVERQUOTA){
                     log("OVERQUOTA ERROR: "+error.getErrorCode());
                     Intent intent;
                     intent = new Intent(this, ManagerActivityLollipop.class);
@@ -466,25 +474,80 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
                     tempIntent.setAction(ChatUploadService.ACTION_CANCEL);
                     startService(tempIntent);
                 }
+
+				//Find the pending message
+				for(int i=0; i<pendingMessages.size();i++){
+					PendingMessage pendMsg = pendingMessages.get(i);
+
+					ArrayList<PendingNodeAttachment> nodesAttached = pendMsg.getNodeAttachments();
+					if(nodesAttached.size()==1){
+						log("Just one file to send in the message");
+						PendingNodeAttachment nodeAttachment = nodesAttached.get(0);
+
+						if(nodeAttachment.getFilePath().equals(transfer.getPath())){
+							if(nodeAttachment.getFilePath().equals(transfer.getPath())){
+
+								dbH.updatePendingMessage(pendMsg.getId(), -1+"", PendingMessage.STATE_ERROR);
+								launchErrorToChat(pendMsg);
+								deleteLocalFile(transfer.getFileName());
+								if (megaApi.getNumPendingUploads() == 0 && transfersCount==0){
+									onQueueComplete();
+								}
+								return;
+							}
+						}
+					}
+					else{
+						log("More than one to send in message");
+						for(int j=0; j<nodesAttached.size();j++) {
+							PendingNodeAttachment nodeAttachment = nodesAttached.get(j);
+
+							if(nodeAttachment.getFilePath().equals(transfer.getPath())){
+								nodeAttachment.setNodeHandle(transfer.getNodeHandle());
+
+								if(nodeAttachment.getFilePath().equals(transfer.getPath())){
+
+									dbH.updatePendingMessage(pendMsg.getId(), -1+"", PendingMessage.STATE_ERROR);
+									pendMsg.setState(PendingMessage.STATE_ERROR);
+									launchErrorToChat(pendMsg);
+									deleteLocalFile(transfer.getFileName());
+									if (megaApi.getNumPendingUploads() == 0 && transfersCount==0){
+										onQueueComplete();
+									}
+									return;
+								}
+							}
+						}
+					}
+				}
             }
 
-            if (getApplicationContext().getExternalCacheDir() != null){
-                File localFile = new File (getApplicationContext().getExternalCacheDir(), transfer.getFileName());
-                if (localFile.exists()){
-                    log("Delete file!: "+localFile.getAbsolutePath());
-                    localFile.delete();
-                }
-            }
-            else{
-                File localFile = new File (getApplicationContext().getCacheDir(), transfer.getFileName());
-                if (localFile.exists()){
-                    log("Delete file!: "+localFile.getAbsolutePath());
-                    localFile.delete();
-                }
-            }
+            deleteLocalFile(transfer.getFileName());
 
             log("IN Finish: "+transfer.getFileName()+"path? "+transfer.getPath());
         }
+
+		if (megaApi.getNumPendingUploads() == 0 && transfersCount==0){
+			onQueueComplete();
+		}
+	}
+
+	public void deleteLocalFile(String fileName){
+		log("deleteLocalFile");
+		if (getApplicationContext().getExternalCacheDir() != null){
+			File localFile = new File (getApplicationContext().getExternalCacheDir(), fileName);
+			if (localFile.exists()){
+				log("Delete file!: "+localFile.getAbsolutePath());
+				localFile.delete();
+			}
+		}
+		else{
+			File localFile = new File (getApplicationContext().getCacheDir(), fileName);
+			if (localFile.exists()){
+				log("Delete file!: "+localFile.getAbsolutePath());
+				localFile.delete();
+			}
+		}
 	}
 
 	@Override
@@ -644,17 +707,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 							log("The message MATCH!!");
 							dbH.updatePendingMessage(pendMsg.getId(), -1+"", PendingMessage.STATE_ERROR);
 
-							long openChatId = MegaApplication.getOpenChatId();
-							if(pendMsg.getChatId()==openChatId){
-								log("Error update activity");
-
-								Intent intent;
-								intent = new Intent(this, ChatActivityLollipop.class);
-								intent.setAction(Constants.ACTION_UPDATE_ATTACHMENT);
-								intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-								intent.putExtra("ID_MSG", pendMsg.getId());
-								startActivity(intent);
-							}
+							launchErrorToChat(pendMsg);
 							break;
 						}
 					}
@@ -682,17 +735,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 							log("The message MATCH for multiple nodes!!");
 							dbH.updatePendingMessage(pendMsg.getId(), -1+"", PendingMessage.STATE_ERROR);
 
-							long openChatId = MegaApplication.getOpenChatId();
-							if(pendMsg.getChatId()==openChatId){
-								log("Error update activity");
-								Intent intent;
-								intent = new Intent(this, ChatActivityLollipop.class);
-								intent.setAction(Constants.ACTION_UPDATE_ATTACHMENT);
-								intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-								intent.putExtra("ID_MSG", pendMsg.getId());
-								startActivity(intent);
-							}
-
+							launchErrorToChat(pendMsg);
 							break;
 						}
 
@@ -705,6 +748,21 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 
 		if (megaApi.getNumPendingUploads() == 0 && transfersCount==0){
 			onQueueComplete();
+		}
+	}
+
+	public void launchErrorToChat(PendingMessage pendMsg){
+		log("launchErrorToChat");
+
+		long openChatId = MegaApplication.getOpenChatId();
+		if(pendMsg.getChatId()==openChatId){
+			log("Error update activity");
+			Intent intent;
+			intent = new Intent(this, ChatActivityLollipop.class);
+			intent.setAction(Constants.ACTION_UPDATE_ATTACHMENT);
+			intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+			intent.putExtra("ID_MSG", pendMsg.getId());
+			startActivity(intent);
 		}
 	}
 

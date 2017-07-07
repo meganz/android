@@ -11,6 +11,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.media.ExifInterface;
+import android.os.AsyncTask;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
@@ -27,6 +28,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -44,6 +46,7 @@ import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.WrapTextView;
 import mega.privacy.android.app.lollipop.adapters.MegaBrowserLollipopAdapter;
 import mega.privacy.android.app.lollipop.adapters.MegaFullScreenImageAdapterLollipop;
+import mega.privacy.android.app.lollipop.adapters.MegaOfflineFullScreenImageAdapterLollipop;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.listeners.ChatAttachmentAvatarListener;
 import mega.privacy.android.app.lollipop.listeners.ChatNonContactNameListener;
@@ -53,6 +56,7 @@ import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.PendingMessage;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.PreviewUtils;
+import mega.privacy.android.app.utils.ThumbnailUtils;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.TimeChatUtils;
 import mega.privacy.android.app.utils.Util;
@@ -96,6 +100,62 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
     MegaChatRoom chatRoom;
 
     private ArrayList<Long> pendingPreviews = new ArrayList<Long>();
+
+    private class ChatUploadingPreviewAsyncTask extends AsyncTask<String, Void, Bitmap> {
+
+        MegaChatLollipopAdapter.ViewHolderMessageChat holder;
+        String filePath;
+
+        public ChatUploadingPreviewAsyncTask(MegaChatLollipopAdapter.ViewHolderMessageChat holder) {
+            this.holder = holder;
+        }
+
+        @Override
+        protected Bitmap doInBackground(String... params) {
+            log("doInBackground ChatUploadingPreviewAsyncTask");
+            filePath = params[0];
+            File currentFile = new File(filePath);
+
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inJustDecodeBounds = true;
+            Bitmap preview = BitmapFactory.decodeFile(currentFile.getAbsolutePath(), options);
+
+            ExifInterface exif;
+            int orientation = ExifInterface.ORIENTATION_NORMAL;
+            try {
+                exif = new ExifInterface(currentFile.getAbsolutePath());
+                orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_UNDEFINED);
+            } catch (IOException e) {}
+
+            // Calculate inSampleSize
+            options.inSampleSize = Util.calculateInSampleSize(options, 1000, 1000);
+
+            // Decode bitmap with inSampleSize set
+            options.inJustDecodeBounds = false;
+
+            preview = BitmapFactory.decodeFile(currentFile.getAbsolutePath(), options);
+            if (preview != null){
+                preview = Util.rotateBitmap(preview, orientation);
+
+                long fingerprintCache = MegaApiAndroid.base64ToHandle(megaApi.getFingerprint(filePath));
+                PreviewUtils.setPreviewCache(fingerprintCache, preview);
+                return preview;
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Bitmap preview){
+            log("onPostExecute ChatUploadingPreviewAsyncTask");
+            if (preview != null){
+                if (holder.filePathUploading.equals(filePath)){
+                    setUploadingPreview(holder, preview);
+                }
+            }
+        }
+    }
+
 
     public MegaChatLollipopAdapter(Context _context, MegaChatRoom chatRoom, ArrayList<AndroidMegaChatMessage> _messages, RecyclerView _listView) {
         log("new adapter");
@@ -164,6 +224,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         public TextView contentOwnMessageContactEmail;
         TextView contentOwnMessageContactInitialLetter;
 
+        ProgressBar uploadingProgressBar;
+
         TextView retryAlert;
         ImageView triangleIcon;
 
@@ -196,6 +258,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         TextView contactManagementMessageText;
         RelativeLayout contactManagementMessageLayout;
 
+        public String filePathUploading;
 
         public long getUserHandle (){
             return userHandle;
@@ -271,6 +334,9 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         holder.retryAlert = (TextView) v.findViewById(R.id.not_sent_own_message_text);
 
         holder.triangleIcon = (ImageView)  v.findViewById(R.id.own_triangle_icon);
+
+        holder.uploadingProgressBar = (ProgressBar) v.findViewById(R.id.uploadingProgressBar);
+        holder.uploadingProgressBar.setVisibility(View.GONE);
 
         holder.ownManagementMessageLayout = (RelativeLayout) v.findViewById(R.id.own_management_message_layout);
         //Margins
@@ -396,6 +462,29 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             if(paths.size()==1) {
                 log("One attachment in uploading message");
 
+                Bitmap preview = null;
+                ((ViewHolderMessageChat)holder).filePathUploading = paths.get(0);
+                long fingerprintCache = MegaApiAndroid.base64ToHandle(megaApi.getFingerprint(paths.get(0)));
+
+                if (MimeTypeList.typeForName(paths.get(0)).isImage()){
+
+                    try{
+                        preview = PreviewUtils.getPreviewFromCache(fingerprintCache);
+                        if (preview != null){
+                            setUploadingPreview((ViewHolderMessageChat)holder, preview);
+                        }
+
+                        try{
+                            new MegaChatLollipopAdapter.ChatUploadingPreviewAsyncTask(((ViewHolderMessageChat)holder)).execute(paths.get(0));
+                        }
+                        catch(Exception e){
+                            //Too many AsyncTasks
+                        }
+
+                    }
+                    catch(Exception e){}
+                }
+
                 String name = names.get(0);
                 log("Node Name: " + name);
 
@@ -426,11 +515,12 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 ((ViewHolderMessageChat)holder).contentOwnMessageFileName.setText(context.getResources().getQuantityString(R.plurals.new_general_num_files, paths.size(), paths.size()));
             }
 
-            if(message.getPendingMessage().getState()== PendingMessage.STATE_SENDING){
-                ((ViewHolderMessageChat)holder).contentOwnMessageFileSize.setText(R.string.attachment_uploading_state_uploading);
+            log("State of the message: "+message.getPendingMessage().getState());
+            if(message.getPendingMessage().getState()== PendingMessage.STATE_ERROR){
+                ((ViewHolderMessageChat)holder).contentOwnMessageFileSize.setText(R.string.attachment_uploading_state_error);
             }
             else{
-                ((ViewHolderMessageChat)holder).contentOwnMessageFileSize.setText(R.string.attachment_uploading_state_error);
+                ((ViewHolderMessageChat)holder).contentOwnMessageFileSize.setText(R.string.attachment_uploading_state_uploading);
             }
         }
     }
@@ -443,6 +533,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
         ((ViewHolderMessageChat) holder).triangleIcon.setVisibility(View.GONE);
         ((ViewHolderMessageChat) holder).retryAlert.setVisibility(View.GONE);
+
+        ((ViewHolderMessageChat) holder).uploadingProgressBar.setVisibility(View.GONE);
 
         MegaChatMessage message = messages.get(position).getMessage();
         ((ViewHolderMessageChat)holder).userHandle = message.getUserHandle();
@@ -2593,6 +2685,30 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             }
             else{
                 log("Preview not exists");
+            }
+        }
+    }
+
+    private void setUploadingPreview(MegaChatLollipopAdapter.ViewHolderMessageChat holder, Bitmap bitmap){
+        log("setUploadingPreview: "+holder.filePathUploading);
+        if(holder!=null){
+            if(bitmap!=null){
+                log("Update uploading my preview");
+                ((ViewHolderMessageChat) holder).uploadingProgressBar.setVisibility(View.VISIBLE);
+                if (bitmap.getWidth() < bitmap.getHeight()) {
+                    log("Portrait");
+                    holder.contentOwnMessageThumbPort.setImageBitmap(bitmap);
+                    holder.contentOwnMessageThumbPort.setVisibility(View.VISIBLE);
+                    holder.contentOwnMessageFileLayout.setVisibility(View.GONE);
+                    holder.contentOwnMessageThumbLand.setVisibility(View.GONE);
+                }
+                else {
+                    log("Landcape");
+                    holder.contentOwnMessageThumbLand.setImageBitmap(bitmap);
+                    holder.contentOwnMessageThumbLand.setVisibility(View.VISIBLE);
+                    holder.contentOwnMessageFileLayout.setVisibility(View.GONE);
+                    holder.contentOwnMessageThumbPort.setVisibility(View.GONE);
+                }
             }
         }
     }

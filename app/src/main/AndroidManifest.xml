@@ -2,8 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="mega.privacy.android.app"
     android:installLocation="auto"
-    android:versionCode="139"
-    android:versionName="3.1.8.1 (139)" >
+    android:versionCode="141"
+    android:versionName="3.2 (141)" >
 
     <uses-sdk
         android:minSdkVersion="11"
@@ -284,7 +284,7 @@
         <activity
             android:name="mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop"
             android:label="@string/app_name"
-            android:launchMode="singleTop">
+            android:launchMode="singleTask">
         </activity>
 
         <activity

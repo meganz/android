@@ -186,10 +186,10 @@
     <!-- <string name="create_account_confirm_title" context="Title that is shown when e-mail confirmation is still required for the account">Se requiere confirmación</string> -->
     <!-- <string name="create_account_confirm" context="">Por favor, comprueba tu correo electrónico y haz clic en el enlace para iniciar sesión y confirmar tu cuenta</string> -->
     <string name="create_account_creating_account">Conectando con el servidor: creando cuenta.</string>
-    
+
     <!-- <string name="cancel_transfer_title">Cancelar Transferencia</string> -->
-    <string name="cancel_transfer_confirmation">La transferencia será cancelada.</string>
-        <string name="cancel_all_transfer_confirmation">Se cancelarán todas las transferencias.</string>
+    <string name="cancel_transfer_confirmation">Borrar esta transferencia?</string>
+    <string name="cancel_all_transfer_confirmation">Borrar todas las transferencias?</string>
 
     <string name="section_cloud_drive" context="The name of every users root drive in the cloud of MEGA.">Disco</string>
     <string name="section_secondary_media_uploads" context="title of the screen where the secondary media images are uploaded">Media Uploads</string>
@@ -482,7 +482,7 @@
     <!-- <string name="transfers_pause" context="File uploading or downloading has been paused (until the user continues at a later stage)">Todas las transferencias están pausadas</string> -->
     <string name="menu_pause_transfers" context="menu item">Pausar transferencias</string>
     <!-- <string name="menu_restart_transfers" context="menu item">Reiniciar transferencias</string> -->
-    <string name="menu_cancel_all_transfers" context="menu item">Cancelar todas las transferencias</string>
+    <string name="menu_cancel_all_transfers" context="menu item">Borrar todas las transferencias</string>
     <string name="menu_take_picture" context="menu item">Hacer foto</string>
     
     <string name="cam_sync_wifi" context="how to upload the camera images. only when Wi-Fi connected">Solo Wi-fi</string>
@@ -1106,4 +1106,6 @@
 
     <string name="already_downloaded_multiple" context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that has already been downloaded and the number of files pending">%d ficheros ya descargados.</string>
     <string name="pending_multiple" context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that has already been downloaded and the number of files pending">%d ficheros pendientes.</string>
+
+    <string name="contact_is_me">No hay opciones disponibles, el contacto seleccionada eres tu</string>
 </resources>

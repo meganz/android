@@ -96,6 +96,7 @@ public class Util {
 	// Debug flag to enable logging and some other things
 	public static boolean DEBUG = false;
 
+	public static String mainDIR = "/MEGA";
 	public static String offlineDIR = "MEGA/MEGA Offline";
 	public static String downloadDIR ="MEGA/MEGA Downloads";
 	public static String temporalPicDIR ="MEGA/MEGA Selfies";

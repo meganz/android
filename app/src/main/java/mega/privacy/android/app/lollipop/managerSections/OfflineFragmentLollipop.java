@@ -835,15 +835,18 @@ public class OfflineFragmentLollipop extends Fragment{
     }
 
     public void itemClick(int position) {
-		log("onItemClick");
+		log("itemClick");
 		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
 		if (adapter.isMultipleSelect()){
 			log("multiselect");
-			adapter.toggleSelection(position);
-			List<MegaOffline> selectedNodes = adapter.getSelectedOfflineNodes();
-			if (selectedNodes.size() > 0){
-				updateActionModeTitle();
+			MegaOffline item = mOffList.get(position);
+			if(!(item.getHandle().equals("0"))){
+				adapter.toggleSelection(position);
+				List<MegaOffline> selectedNodes = adapter.getSelectedOfflineNodes();
+				if (selectedNodes.size() > 0){
+					updateActionModeTitle();
+				}
 			}
 		}
 		else{
@@ -1155,7 +1158,6 @@ public class OfflineFragmentLollipop extends Fragment{
 				mOffListNavigation=dbH.findByPath(pathNavigation);
 				
 				contentText.setText(getInfoFolder(mOffListNavigation));
-				this.setNodes(mOffListNavigation);
 				
 				if(orderGetChildren == MegaApiJava.ORDER_DEFAULT_DESC){
 					sortByNameDescending();
@@ -1163,6 +1165,8 @@ public class OfflineFragmentLollipop extends Fragment{
 				else{
 					sortByNameAscending();
 				}
+
+				setNodes(mOffListNavigation);
 
 				int lastVisiblePosition = 0;
 				if(!lastPositionStack.empty()){

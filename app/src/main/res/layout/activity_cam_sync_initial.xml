@@ -59,7 +59,7 @@
 				android:background="@color/white"
 				android:layout_marginLeft="16dp"
                 android:layout_marginRight="8dp"
-				android:layout_marginBottom="38dp"
+				android:layout_marginBottom="32dp"
 				android:orientation="horizontal" >
 
 				<TextView
@@ -99,10 +99,10 @@
 			android:layout_height="wrap_content"
 			android:layout_alignParentRight="true"
 			android:textColor="@color/name_my_account"
-			android:text="@string/action_export_master_key"
 			android:background="@color/white"
 			android:layout_marginRight="8dp"
 			android:layout_marginBottom="16dp"
+			android:layout_marginTop="6dp"
 			android:elevation="@dimen/elevation_upgrade_low"
 			android:stateListAnimator="@anim/button_upgrade_elevation"/>
 
@@ -112,9 +112,9 @@
 			android:layout_height="wrap_content"
 			android:layout_alignParentRight="true"
 			android:textColor="@color/white"
-			android:text="@string/my_account_upgrade_pro"
 			android:background="@color/accentColor"
 			android:elevation="@dimen/elevation_upgrade_low"
+			android:layout_marginTop="6dp"
 			android:layout_marginBottom="16dp"
 			android:layout_marginRight="16dp"
 			android:stateListAnimator="@anim/button_upgrade_elevation"
