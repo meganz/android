@@ -157,6 +157,11 @@ public class ContactFileListFragmentLollipop extends Fragment{
                     ((ContactFileListActivityLollipop)(context)).askConfirmationMoveToRubbish(handleList);
                     break;
                 }
+				case R.id.cab_menu_rename: {
+					MegaNode aux = documents.get(0);
+					((ContactFileListActivityLollipop) context).showRenameDialog(aux, aux.getName());
+					break;
+				}
 			}
 			return false;
 		}
@@ -223,7 +228,7 @@ public class ContactFileListFragmentLollipop extends Fragment{
 					}
 				}
 
-				if(!((ContactFileListActivityLollipop)context).isEmptyParentHandleStack() && selected.size() > 1){
+				if(!((ContactFileListActivityLollipop)context).isEmptyParentHandleStack()){
 					showTrash = true;
 				}
 				for(int i=0; i<selected.size(); i++){
