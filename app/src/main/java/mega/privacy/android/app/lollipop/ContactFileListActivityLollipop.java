@@ -956,7 +956,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 			else{
 				log("MOVE single");
 				megaApi.moveNode(megaApi.getNodeByHandle(handleList.get(0)), megaApi.getRubbishNode(), this);
-				cflF.refresh();
+
 			}
 		}
 		else{
@@ -1010,7 +1010,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 					return;
 				}
 				rename(document, value);
-				cflF.refresh();
+
 			}
 		});
 		builder.setNegativeButton(getString(android.R.string.cancel), null);
@@ -1654,6 +1654,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_RENAME){
+
 			try { 
 				statusDialog.dismiss();	
 			} 
@@ -1663,6 +1664,8 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 
 				CoordinatorLayout coordinatorFragment = (CoordinatorLayout) fragmentContainer.findViewById(R.id.contact_file_list_coordinator_layout);
 				if(cflF!=null && cflF.isVisible()){
+					cflF.clearSelections();
+					cflF.hideMultipleSelect();
 					if(coordinatorFragment!=null){
 						showSnackbar(getString(R.string.context_correctly_renamed), coordinatorFragment);
 					}
@@ -1674,6 +1677,8 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 			else{
 				CoordinatorLayout coordinatorFragment = (CoordinatorLayout) fragmentContainer.findViewById(R.id.contact_file_list_coordinator_layout);
 				if(cflF!=null && cflF.isVisible()){
+					cflF.clearSelections();
+					cflF.hideMultipleSelect();
 					if(coordinatorFragment!=null){
 						showSnackbar(getString(R.string.context_no_renamed), coordinatorFragment);
 					}
@@ -1696,6 +1701,8 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 
 					CoordinatorLayout coordinatorFragment = (CoordinatorLayout) fragmentContainer.findViewById(R.id.contact_file_list_coordinator_layout);
 					if(cflF!=null && cflF.isVisible()){
+						cflF.clearSelections();
+						cflF.hideMultipleSelect();
 						if(coordinatorFragment!=null){
 							showSnackbar(getString(R.string.context_correctly_sent_node), coordinatorFragment);
 						}
@@ -1707,6 +1714,8 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 				else{
 					CoordinatorLayout coordinatorFragment = (CoordinatorLayout) fragmentContainer.findViewById(R.id.contact_file_list_coordinator_layout);
 					if(cflF!=null && cflF.isVisible()){
+						cflF.clearSelections();
+						cflF.hideMultipleSelect();
 						if(coordinatorFragment!=null){
 							showSnackbar(getString(R.string.context_no_sent_node), coordinatorFragment);
 						}
@@ -1721,6 +1730,8 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 
 					CoordinatorLayout coordinatorFragment = (CoordinatorLayout) fragmentContainer.findViewById(R.id.contact_file_list_coordinator_layout);
 					if(cflF!=null && cflF.isVisible()){
+						cflF.clearSelections();
+						cflF.hideMultipleSelect();
 						if(coordinatorFragment!=null){
 							showSnackbar(getString(R.string.context_correctly_copied), coordinatorFragment);
 						}
@@ -1732,6 +1743,8 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 				else{
 					CoordinatorLayout coordinatorFragment = (CoordinatorLayout) fragmentContainer.findViewById(R.id.contact_file_list_coordinator_layout);
 					if(cflF!=null && cflF.isVisible()){
+						cflF.clearSelections();
+						cflF.hideMultipleSelect();
 						if(coordinatorFragment!=null){
 							showSnackbar(getString(R.string.context_no_copied), coordinatorFragment);
 						}
@@ -1756,6 +1769,8 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 
 					CoordinatorLayout coordinatorFragment = (CoordinatorLayout) fragmentContainer.findViewById(R.id.contact_file_list_coordinator_layout);
 					if(cflF!=null && cflF.isVisible()){
+						cflF.clearSelections();
+						cflF.hideMultipleSelect();
 						if(coordinatorFragment!=null){
 							showSnackbar(getString(R.string.context_correctly_moved_to_rubbish), coordinatorFragment);
 						}
@@ -1767,6 +1782,8 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 				else{
 					CoordinatorLayout coordinatorFragment = (CoordinatorLayout) fragmentContainer.findViewById(R.id.contact_file_list_coordinator_layout);
 					if(cflF!=null && cflF.isVisible()){
+						cflF.clearSelections();
+						cflF.hideMultipleSelect();
 						if(coordinatorFragment!=null){
 							showSnackbar(getString(R.string.context_no_moved), coordinatorFragment);
 						}
@@ -1781,6 +1798,8 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 
 					CoordinatorLayout coordinatorFragment = (CoordinatorLayout) fragmentContainer.findViewById(R.id.contact_file_list_coordinator_layout);
 					if(cflF!=null && cflF.isVisible()){
+						cflF.clearSelections();
+						cflF.hideMultipleSelect();
 						if(coordinatorFragment!=null){
 							showSnackbar(getString(R.string.context_correctly_moved), coordinatorFragment);
 						}
@@ -1792,6 +1811,8 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 				else{
 					CoordinatorLayout coordinatorFragment = (CoordinatorLayout) fragmentContainer.findViewById(R.id.contact_file_list_coordinator_layout);
 					if(cflF!=null && cflF.isVisible()){
+						cflF.clearSelections();
+						cflF.hideMultipleSelect();
 						if(coordinatorFragment!=null){
 							showSnackbar(getString(R.string.context_no_moved), coordinatorFragment);
 						}
@@ -1802,7 +1823,6 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 				}
 			}
 			moveToRubbish=false;
-
 			log("move request finished");
 		}
 		else if (request.getType() == MegaRequest.TYPE_SHARE){
@@ -1812,10 +1832,14 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 			catch (Exception ex) {}
 
 			if (e.getErrorCode() == MegaError.API_OK){
+				cflF.clearSelections();
+				cflF.hideMultipleSelect();
 				log("Shared folder correctly: "+request.getNodeHandle());
 				Toast.makeText(this, getString(R.string.context_correctly_shared), Toast.LENGTH_SHORT).show();
 			}
 			else{
+				cflF.clearSelections();
+				cflF.hideMultipleSelect();
 				Toast.makeText(this, getString(R.string.context_no_shared), Toast.LENGTH_LONG).show();
 			}
 		}
@@ -1909,6 +1933,9 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 	}
 
 	public void refreshAfterMovingToRubbish(){
-		cflF.refresh();
+		if(cflF!=null && cflF.isVisible()){
+			cflF.clearSelections();
+			cflF.hideMultipleSelect();
+		}
 	}
 }

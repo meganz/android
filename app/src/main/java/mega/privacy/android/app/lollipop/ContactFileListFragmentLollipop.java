@@ -234,6 +234,7 @@ public class ContactFileListFragmentLollipop extends Fragment{
 				for(int i=0; i<selected.size(); i++){
 					if((megaApi.checkAccess(selected.get(i), MegaShare.ACCESS_FULL).getErrorCode() != MegaError.API_OK)){
 						showTrash = false;
+						break;
 					}
 				}
 				
@@ -683,7 +684,7 @@ public class ContactFileListFragmentLollipop extends Fragment{
 	/*
 	 * Clear all selected items
 	 */
-	private void clearSelections() {
+	public void clearSelections() {
 		if(adapter.isMultipleSelect()){
 			adapter.clearSelections();
 		}
@@ -769,10 +770,6 @@ public class ContactFileListFragmentLollipop extends Fragment{
 
 	public boolean isEmptyParentHandleStack() {
 		return parentHandleStack.isEmpty();
-	}
-
-	public void refresh(){
-		clearSelections();
 	}
 
 }
