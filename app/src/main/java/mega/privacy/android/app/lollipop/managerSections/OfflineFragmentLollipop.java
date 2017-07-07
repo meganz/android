@@ -138,7 +138,7 @@ public class OfflineFragmentLollipop extends Fragment{
 
 					if (documents.size()==1){
 						String path = documents.get(0).getPath() + documents.get(0).getName();
-						MegaNode n = megaApi.getNodeByPath(path);	
+						MegaNode n = megaApi.getNodeByPath(path);
 						if(n == null)
 						{
 							break;
@@ -146,7 +146,7 @@ public class OfflineFragmentLollipop extends Fragment{
 						NodeController nC = new NodeController(context);
 						nC.exportLink(n);
 					}
-					
+
 					break;
 				}
 				case R.id.cab_menu_share:{
@@ -154,7 +154,7 @@ public class OfflineFragmentLollipop extends Fragment{
 					ArrayList<Long> handleList = new ArrayList<Long>();
 					for (int i=0;i<documents.size();i++){
 						String path = documents.get(i).getPath() + documents.get(i).getName();
-						MegaNode n = megaApi.getNodeByPath(path);			
+						MegaNode n = megaApi.getNodeByPath(path);
 						if(n == null)
 						{
 							continue;
@@ -242,8 +242,8 @@ public class OfflineFragmentLollipop extends Fragment{
 			if (Util.isOnline(context)){
 				if (selected.size() != 0) {
 					
-					menu.findItem(R.id.cab_menu_download).setVisible(true);
-					menu.findItem(R.id.cab_menu_share).setVisible(true);
+					menu.findItem(R.id.cab_menu_download).setVisible(false);
+					menu.findItem(R.id.cab_menu_share).setVisible(false);
 					
 					if(selected.size()==adapter.getItemCount()){
 						menu.findItem(R.id.cab_menu_select_all).setVisible(false);
@@ -260,7 +260,7 @@ public class OfflineFragmentLollipop extends Fragment{
 				}
 				
 				if (selected.size() == 1) {
-					menu.findItem(R.id.cab_menu_share_link).setVisible(true);
+					menu.findItem(R.id.cab_menu_share_link).setVisible(false);
 				}
 				else{
 					menu.findItem(R.id.cab_menu_share_link).setVisible(false);
@@ -269,13 +269,17 @@ public class OfflineFragmentLollipop extends Fragment{
 				menu.findItem(R.id.cab_menu_copy).setVisible(false);
 				menu.findItem(R.id.cab_menu_move).setVisible(false);				
 				menu.findItem(R.id.cab_menu_delete).setVisible(true);
+				menu.findItem(R.id.cab_menu_delete).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+
 				menu.findItem(R.id.cab_menu_rename).setVisible(false);
 			}
 			else{
 				if (selected.size() != 0) {
 					
 					menu.findItem(R.id.cab_menu_delete).setVisible(true);
-				
+					menu.findItem(R.id.cab_menu_delete).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+
+
 					if(selected.size()==adapter.getItemCount()){
 						menu.findItem(R.id.cab_menu_select_all).setVisible(false);
 						menu.findItem(R.id.cab_menu_unselect_all).setVisible(true);			
@@ -1071,7 +1075,7 @@ public class OfflineFragmentLollipop extends Fragment{
 		}
 		
 		Resources res = getActivity().getResources();
-		String format = "%d %s";
+		/*String format = "%d %s";
 		String filesStr = String.format(format, files,
 				res.getQuantityString(R.plurals.general_num_files, files));
 		String foldersStr = String.format(format, folders,
@@ -1085,6 +1089,19 @@ public class OfflineFragmentLollipop extends Fragment{
 			title = filesStr;
 		} else {
 			title = foldersStr + ", " + filesStr;
+		}*/
+
+		String title;
+		int sum=files+folders;
+
+		if (files == 0 && folders == 0) {
+			title = Integer.toString(sum);
+		} else if (files == 0) {
+			title = Integer.toString(folders);
+		} else if (folders == 0) {
+			title = Integer.toString(files);
+		} else {
+			title = Integer.toString(sum);
 		}
 		actionMode.setTitle(title);
 		try {

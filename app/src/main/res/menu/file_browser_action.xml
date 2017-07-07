@@ -42,19 +42,26 @@
         android:orderInCategory="110"
         android:title="@string/context_rename"
         MEGA:showAsAction="never" />
+
+    <item
+        android:id="@+id/cab_menu_leave_multiple_share"
+        android:orderInCategory="115"
+        android:icon="@drawable/ic_leave_share_w"
+        android:title="@string/context_leave_menu"
+        MEGA:showAsAction="never" />
     
     <item
         android:id="@+id/cab_menu_copy"
-        android:orderInCategory="115"
+        android:orderInCategory="130"
         android:icon="@drawable/ic_copy_white"
-        android:title="@string/general_copy_to"
+        android:title="@string/context_copy"
         MEGA:showAsAction="never" />
     
     <item
         android:id="@+id/cab_menu_move"
         android:orderInCategory="120"
         android:icon="@drawable/ic_move_white"
-        android:title="@string/general_move_to"
+        android:title="@string/context_move"
         MEGA:showAsAction="never" />
     
     <item
@@ -63,13 +70,25 @@
         android:icon="@drawable/ic_link_white"
         android:tint="@color/white"
         android:title="@string/context_get_link_menu"
+        android:visible="false"
         MEGA:showAsAction="never" />
 
-     <item
-        android:id="@+id/cab_menu_leave_multiple_share"
-        android:orderInCategory="130"
-        android:icon="@drawable/leave_share_ic"
-        android:title="@string/context_leave_menu"
+    <item
+        android:id="@+id/cab_menu_share_link_remove"
+        android:orderInCategory="127"
+        android:icon="@drawable/ic_remove_link_w"
+        android:tint="@color/white"
+        android:title="@string/context_remove_link_menu"
+        android:visible="false"
+        MEGA:showAsAction="never" />
+
+    <item
+        android:id="@+id/cab_menu_edit_link"
+        android:orderInCategory="109"
+        android:tint="@color/white"
+        android:icon="@drawable/ic_link_white"
+        android:title="@string/edit_link_option"
+        android:visible="false"
         MEGA:showAsAction="never" />
     
     <item
