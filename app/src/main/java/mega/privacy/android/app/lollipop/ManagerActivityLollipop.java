@@ -4985,7 +4985,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						takePicture.setVisible(false);
 						refreshMenuItem.setVisible(false);
 						helpMenuItem.setVisible(false);
-						upgradeAccountMenuItem.setVisible(true);
+						upgradeAccountMenuItem.setVisible(false);
 						gridSmallLargeMenuItem.setVisible(false);
 						logoutMenuItem.setVisible(false);
 						forgotPassMenuItem.setVisible(false);
@@ -5659,6 +5659,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 								log("deepBrowserTree get from inSFlol: "+inSFLol.getDeepBrowserTree());
 		    					inSFLol.onBackPressed();
 		    				}
+
 		    			}
 		    		}
 		    		else if (drawerItem == DrawerItem.SAVED_FOR_OFFLINE){
@@ -8261,6 +8262,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		linkIntent.putExtra("handle", handle);
 		linkIntent.putExtra("account", myAccountInfo.getAccountType());
 		startActivity(linkIntent);
+
+		refreshAfterMovingToRubbish();
 	}
 
 	/*
@@ -9174,7 +9177,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		log("chooseAddContactDialog");
 
 		Intent in = new Intent(this, AddContactActivityLollipop.class);
-//		in.putExtra("contactType", Constants.CONTACT_TYPE_MEGA);
 		if(isMegaContact){
 			in.putExtra("contactType", Constants.CONTACT_TYPE_MEGA);
 			startActivityForResult(in, Constants.REQUEST_CREATE_CHAT);
@@ -9530,7 +9532,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		String message= getResources().getString(R.string.context_remove_link_warning_text);
 		builder.setMessage(message).setPositiveButton(R.string.general_remove, dialogClickListener)
 				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
-		}
+
+		refreshAfterMovingToRubbish();
+
+	}
 
 	public void showConfirmationLeaveIncomingShare (final MegaNode n){
 		log("showConfirmationLeaveIncomingShare");
@@ -9556,6 +9561,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		String message= getResources().getString(R.string.confirmation_leave_share_folder);
 		builder.setMessage(message).setPositiveButton(R.string.general_leave, dialogClickListener)
 	    	.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
+
 	}
 
 	public void showConfirmationLeaveChat (final MegaChatRoom c){
@@ -11068,6 +11074,19 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		}
 	}
 
+	public void startGroupConversation(ArrayList<Long> userHandles){
+		log("startGroupConversation");
+		MegaChatPeerList peers = MegaChatPeerList.createInstance();
+
+		for(int i=0;i<userHandles.size();i++){
+			long handle = userHandles.get(i);
+			peers.addPeer(handle, MegaChatPeerList.PRIV_STANDARD);
+		}
+
+		megaChatApi.createChat(false, peers, this);
+	}
+
+
 	/*
 	 * Background task to get files on a folder for uploading
 	 */
@@ -11946,8 +11965,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 							maFLol.updateAvatar(false);
 						}
 					}
-
-
 				}
 				else{
 
