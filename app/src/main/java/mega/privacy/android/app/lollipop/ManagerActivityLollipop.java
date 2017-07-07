@@ -1068,6 +1068,16 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			outState.putString("searchQuery", searchQuery);
 		}
 	}
+
+	@Override
+	public void onStart(){
+		log("onStart");
+		super.onStart();
+		networkStateReceiver = new NetworkStateReceiver();
+		networkStateReceiver.addListener(this);
+		this.registerReceiver(networkStateReceiver, new IntentFilter(android.net.ConnectivityManager.CONNECTIVITY_ACTION));
+	}
+
 	@SuppressLint("NewApi") @Override
     protected void onCreate(Bundle savedInstanceState) {
 		log("onCreate");
@@ -1435,9 +1445,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		tabLayoutTransfers =  (TabLayout) findViewById(R.id.sliding_tabs_transfers);
 		viewPagerTransfers = (ViewPager) findViewById(R.id.transfers_tabs_pager);
 
-		networkStateReceiver = new NetworkStateReceiver();
-		networkStateReceiver.addListener(this);
-		this.registerReceiver(networkStateReceiver, new IntentFilter(android.net.ConnectivityManager.CONNECTIVITY_ACTION));
 
         if (!Util.isOnline(this)){
         	log("No network >> SHOW OFFLINE MODE");
@@ -2787,6 +2794,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
     protected void onDestroy(){
 		log("onDestroy()");
 
+		dbH.removeSentPendingMessages();
+
     	if (megaApi.getRootNode() != null){
     		megaApi.removeGlobalListener(this);
     		megaApi.removeTransferListener(this);
@@ -3072,7 +3081,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		}
 		else{
 			log("showOnlineMode - Root is NULL");
-			showConfirmationConnect();
+			if(getApplicationContext()!=null){
+				showConfirmationConnect();
+			}
 		}
 	}
 
@@ -3828,11 +3839,19 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 		firstNavigationLevel = true;
 
+		showFabButton();
+
 		drawerLayout.closeDrawer(Gravity.LEFT);
 	}
 
 	public void selectDrawerItemChat(){
 		log("selectDrawerItemChat");
+
+		MegaNode parentNode = megaApi.getNodeByPath("/"+Constants.CHAT_FOLDER);
+		if(parentNode == null){
+			log("Create folder: "+Constants.CHAT_FOLDER);
+			megaApi.createFolder(Constants.CHAT_FOLDER, megaApi.getRootNode(), null);
+		}
 
 		tB.setVisibility(View.VISIBLE);
 
@@ -5773,34 +5792,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	        		megaApi.pauseTransfers(true, this);
 	        		pauseTransfersMenuIcon.setVisible(false);
 	        		playTransfersMenuIcon.setVisible(true);
-//    				if(!tranfersPaused)
-//    				{
-//    					tranfersPaused = true;
-//    					pauseTransfersMenuIcon.setVisible(false);
-//    					playTransfersMenuIcon.setVisible(true);
-//
-//    					//Update the progress in fragments
-//    					if (fbFLol != null){
-//    						fbFLol.updateProgressBar(progressPercent);
-//    					}
-//    					if (rubbishBinFLol != null){
-//    						rubbishBinFLol.updateProgressBar(progressPercent);
-//    					}
-//    					if (iFLol != null){
-//    						iFLol.updateProgressBar(progressPercent);
-//    					}
-//    					if (outSFLol != null){
-//    						outSFLol.updateProgressBar(progressPercent);
-//    					}
-//    					if (inSFLol != null){
-//    						inSFLol.updateProgressBar(progressPercent);
-//    					}
-//    					if (tFLol != null){
-//    						tFLol.updateProgressBar(progressPercent);
-//    					}
-//
-//    	    			megaApi.pauseTransfers(true, this);
-//    				}
 	        	}
 
 	        	return true;
@@ -10348,8 +10339,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
 	}
 
-	public void showConfirmationEnableLogs(){
-		log("showConfirmationEnableLogs");
+	public void showConfirmationEnableLogsSDK(){
+		log("showConfirmationEnableLogsSDK");
 
 		if(sttFLol!=null){
 			sttFLol.numberOfClicksSDK = 0;
@@ -10359,7 +10350,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			public void onClick(DialogInterface dialog, int which) {
 				switch (which){
 					case DialogInterface.BUTTON_POSITIVE:
-						enableLogs();
+						enableLogsSDK();
 						break;
 
 					case DialogInterface.BUTTON_NEGATIVE:
@@ -10381,12 +10372,55 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				.setNegativeButton(R.string.general_cancel, dialogClickListener).show().setCanceledOnTouchOutside(false);
 	}
 
-	public void enableLogs(){
-		log("enableLogs");
+	public void showConfirmationEnableLogsKarere(){
+		log("showConfirmationEnableLogsKarere");
 
-		dbH.setFileLogger(true);
-		Util.setFileLogger(true);
+		if(sttFLol!=null){
+			sttFLol.numberOfClicksKarere = 0;
+		}
+		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				switch (which){
+					case DialogInterface.BUTTON_POSITIVE:
+						enableLogsKarere();
+						break;
+
+					case DialogInterface.BUTTON_NEGATIVE:
+
+						break;
+				}
+			}
+		};
+
+		AlertDialog.Builder builder;
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+			builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		}
+		else{
+			builder = new AlertDialog.Builder(this);
+		}
+
+		builder.setMessage(R.string.enable_log_text_dialog).setPositiveButton(R.string.general_enable, dialogClickListener)
+				.setNegativeButton(R.string.general_cancel, dialogClickListener).show().setCanceledOnTouchOutside(false);
+	}
+
+	public void enableLogsSDK(){
+		log("enableLogsSDK");
+
+		dbH.setFileLoggerSDK(true);
+		Util.setFileLoggerSDK(true);
 		MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_MAX);
+		showSnackbar(getString(R.string.settings_enable_logs));
+		log("App Version: " + Util.getVersion(this));
+	}
+
+	public void enableLogsKarere(){
+		log("enableLogsKarere");
+
+		dbH.setFileLoggerKarere(true);
+		Util.setFileLoggerKarere(true);
+		MegaChatApiAndroid.setLogLevel(MegaChatApiAndroid.LOG_LEVEL_MAX);
 		showSnackbar(getString(R.string.settings_enable_logs));
 		log("App Version: " + Util.getVersion(this));
 	}
@@ -10787,7 +10821,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			log("hashes size: "+hashes.length);
 
 			nC.checkSizeBeforeDownload(parentPath, url, size, hashes);
-			Snackbar.make(fragmentContainer, getString(R.string.download_began), Snackbar.LENGTH_LONG).show();
+//			Snackbar.make(fragmentContainer, getString(R.string.download_began), Snackbar.LENGTH_LONG).show();
 		}
 		else if (requestCode == Constants.REQUEST_CODE_REFRESH && resultCode == RESULT_OK) {
 			log("Resfresh DONE onActivityResult");
@@ -11602,7 +11636,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 		}
 	}
-
 
 	@Override
 	public void onRequestStart(MegaChatApiJava api, MegaChatRequest request) {
@@ -13025,8 +13058,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		if(cancel){
 
 			builder.setMessage(getResources().getString(R.string.cancel_transfer_confirmation));
-			builder.setPositiveButton(R.string.general_cancel, dialogClickListener);
-			builder.setNegativeButton(R.string.general_dismiss, dialogClickListener);
+			builder.setPositiveButton(R.string.context_delete, dialogClickListener);
+			builder.setNegativeButton(R.string.general_cancel, dialogClickListener);
 		}
 		else {
 
@@ -13070,8 +13103,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 //		builder.setTitle(getResources().getString(R.string.cancel_transfer_title));
 
 		builder.setMessage(getResources().getString(R.string.cancel_all_transfer_confirmation));
-		builder.setPositiveButton(R.string.general_cancel, dialogClickListener);
-		builder.setNegativeButton(R.string.general_dismiss, dialogClickListener);
+		builder.setPositiveButton(R.string.context_delete, dialogClickListener);
+		builder.setNegativeButton(R.string.general_cancel, dialogClickListener);
 
 		builder.show();
 	}
@@ -13971,6 +14004,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	@Override
 	public void networkAvailable() {
 		log("networkAvailable");
+		if(megaApi!=null){
+			megaApi.retryPendingConnections();
+		}
 		showOnlineMode();
 	}
 
