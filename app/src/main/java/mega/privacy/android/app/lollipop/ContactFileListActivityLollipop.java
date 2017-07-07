@@ -956,6 +956,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 			else{
 				log("MOVE single");
 				megaApi.moveNode(megaApi.getNodeByHandle(handleList.get(0)), megaApi.getRubbishNode(), this);
+				cflF.refresh();
 			}
 		}
 		else{
@@ -998,6 +999,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 						// showKeyboardDelayed(v);
 					}
 				}
+				cflF.refresh();
 			}
 		});
 
