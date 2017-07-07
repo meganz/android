@@ -999,7 +999,6 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 						// showKeyboardDelayed(v);
 					}
 				}
-				cflF.refresh();
 			}
 		});
 
@@ -1011,6 +1010,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 					return;
 				}
 				rename(document, value);
+				cflF.refresh();
 			}
 		});
 		builder.setNegativeButton(getString(android.R.string.cancel), null);
