@@ -390,7 +390,7 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
                 }
 
                 if(context instanceof ChatActivityLollipop){
-                    ((ChatActivityLollipop)context).revoke();
+                    ((ChatActivityLollipop)context).showConfirmationDeleteMessage(messageId, chatId);
                 }
                 else if(context instanceof NodeAttachmentActivityLollipop){
                     ((NodeAttachmentActivityLollipop)context).revoke();

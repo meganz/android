@@ -2744,9 +2744,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     log("Preview ImageView width: "+width);
                     holder.errorUploadingLayout.setLayoutParams(params);
                 }
-
-
-
             }
             else{
                 log("Bitmap is NULL");

@@ -1131,8 +1131,8 @@
     <string name="text_deleted_message_by" context="Text shown when a message has been deleted in the chat"><![CDATA[<font color=\'#00BFA5\'>This message has been deleted by </font><font color=\'#060000\'>%1$s</font>]]></string>
     <string name="history_cleared_by" context="Text shown when the chat history was cleared by someone"><![CDATA[<font color=\'#00BFA5\'>Chat history cleared by </font><font color=\'#060000\'>%1$s</font>]]></string>
 
-    <string name="confirmation_delete_several_messages" context="Confirmation before deleting messages">Delete messages?</string>
-    <string name="confirmation_delete_one_message" context="Confirmation before deleting one message">Delete message?</string>
+    <string name="confirmation_delete_several_messages" context="Confirmation before deleting messages">Remove messages?</string>
+    <string name="confirmation_delete_one_message" context="Confirmation before deleting one message">Remove message?</string>
 
     <!--
     <string name="text_cleared_history" context="Text shown when a user cleared the history of a chat"><![CDATA[<font color=\'#060000\'>%1$s</font> <font color=\'#868686\'> cleared the chat history</font>]]></string>
@@ -1408,7 +1408,6 @@
     <string name="general_view" context="Menu option">View files</string>
     <string name="add_to_cloud" context="Menu option">Add to Cloud Drive</string>
     <string name="save_for_offline" context="Menu option">Save for Offline</string>
-    <string name="general_revoke" context="Menu option">Revoke</string>
 
     <string name="general_view_contacts" context="Menu option">View contacts</string>
 

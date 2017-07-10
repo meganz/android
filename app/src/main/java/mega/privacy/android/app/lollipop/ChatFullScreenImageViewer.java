@@ -227,7 +227,7 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 				if(message.getUserHandle()==megaChatApi.getMyUserHandle()){
 					menuOptions = new String[2];
 					menuOptions[0] = getString(R.string.save_for_offline);
-					menuOptions[1] = getString(R.string.general_revoke);
+					menuOptions[1] = getString(R.string.context_remove);
 				}
 				else{
 					menuOptions = new String[1];
