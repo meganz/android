@@ -361,6 +361,13 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
                     Toast.makeText(context, "Not yet implemented! Delete: "+chats.size()+" chats",Toast.LENGTH_SHORT).show();
                     break;
                 }
+                case R.id.chat_list_leave_chat_layout:{
+                  //Leave group chat
+                    ((ManagerActivityLollipop)context).showConfirmationLeaveChats(chats);
+                    hideMultipleSelect();
+
+                    break;
+                }
             }
             return false;
         }
@@ -385,6 +392,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
             List<MegaChatListItem> selected = adapterList.getSelectedChats();
             boolean showMute = false;
             boolean showUnmute = false;
+            boolean showLeaveChat =false;
 
             if (selected.size() != 0) {
 
@@ -401,6 +409,19 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
                     menu.findItem(R.id.cab_menu_select_all).setVisible(true);
                     unselect.setTitle(getString(R.string.action_unselect_all));
                     unselect.setVisible(true);
+                }
+
+                for(int i=0;i<selected.size();i++){
+                    MegaChatListItem chat = selected.get(i);
+                    if(chat!=null){
+                        if (chat.isGroup()) {
+                            log("Chat Group");
+                            showLeaveChat=true;
+                        }else{
+                            showLeaveChat=false;
+                            break;
+                        }
+                    }
                 }
 
                 for(int i=0;i<selected.size();i++){
@@ -431,12 +452,21 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
 
                 menu.findItem(R.id.cab_menu_mute).setVisible(showUnmute);
                 menu.findItem(R.id.cab_menu_unmute).setVisible(showMute);
+                menu.findItem(R.id.chat_list_leave_chat_layout).setVisible(showLeaveChat);
+                if(showLeaveChat){
+                    menu.findItem(R.id.chat_list_leave_chat_layout).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+
+                }
+
             }
             else{
                 menu.findItem(R.id.cab_menu_select_all).setVisible(true);
                 menu.findItem(R.id.cab_menu_unselect_all).setVisible(false);
                 menu.findItem(R.id.cab_menu_mute).setVisible(false);
                 menu.findItem(R.id.cab_menu_unmute).setVisible(false);
+
+                menu.findItem(R.id.chat_list_leave_chat_layout).setVisible(false);
+
             }
 
             return false;

@@ -1474,9 +1474,9 @@
     <string name="file_properties_info_added" context="when was the file added in MEGA">Created</string>
     <string name="file_properties_shared_folder_public_link_name">Link</string>
 
-    <string name="file_properties_shared_folder_full_access" context="Refers to access rights for a file folder.">FULL ACCESS</string>
-    <string name="file_properties_shared_folder_read_only" context="Refers to access rights for a file folder.">READ-ONLY</string>
-    <string name="file_properties_shared_folder_read_write" context="Refers to access rights for a file folder. (with the &amp; needed. Don\'t use the symbol itself. Use &amp;)">READ &amp; WRITE</string>
+    <string name="file_properties_shared_folder_full_access" context="Refers to access rights for a file folder.">Full access</string>
+    <string name="file_properties_shared_folder_read_only" context="Refers to access rights for a file folder.">Read-only</string>
+    <string name="file_properties_shared_folder_read_write" context="Refers to access rights for a file folder. (with the &amp; needed. Don\'t use the symbol itself. Use &amp;)">Read &amp; write</string>
 
     <string name="attachment_uploading_state_uploading">Uploading...</string>
     <string name="attachment_uploading_state_error">Error. Not sent.</string>
