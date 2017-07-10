@@ -405,7 +405,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 									nodeAttachment.setNodeHandle(transfer.getNodeHandle());
 								}
 								megaChatApi.attachNodes(pendMsg.getChatId(), nodeList, this);
-								deleteLocalFile(transfer.getFileName());
+
 								if (megaApi.getNumPendingUploads() == 0 && transfersCount==0){
 									onQueueComplete();
 								}
@@ -437,13 +437,13 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 												}
 											}
 											megaChatApi.attachNodes(pendMsg.getChatId(), nodeList, this);
-											deleteLocalFile(transfer.getFileName());
+
 											return;
 										}
 									}
 									else{
 										log("Waiting for more nodes...");
-										deleteLocalFile(transfer.getFileName());
+
 										if (megaApi.getNumPendingUploads() == 0 && transfersCount==0){
 											onQueueComplete();
 										}
@@ -489,7 +489,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 
 								dbH.updatePendingMessage(pendMsg.getId(), -1+"", PendingMessage.STATE_ERROR);
 								launchErrorToChat(pendMsg);
-								deleteLocalFile(transfer.getFileName());
+
 								if (megaApi.getNumPendingUploads() == 0 && transfersCount==0){
 									onQueueComplete();
 								}
@@ -510,7 +510,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 									dbH.updatePendingMessage(pendMsg.getId(), -1+"", PendingMessage.STATE_ERROR);
 									pendMsg.setState(PendingMessage.STATE_ERROR);
 									launchErrorToChat(pendMsg);
-									deleteLocalFile(transfer.getFileName());
+
 									if (megaApi.getNumPendingUploads() == 0 && transfersCount==0){
 										onQueueComplete();
 									}
@@ -522,31 +522,11 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 				}
             }
 
-            deleteLocalFile(transfer.getFileName());
-
             log("IN Finish: "+transfer.getFileName()+"path? "+transfer.getPath());
         }
 
 		if (megaApi.getNumPendingUploads() == 0 && transfersCount==0){
 			onQueueComplete();
-		}
-	}
-
-	public void deleteLocalFile(String fileName){
-		log("deleteLocalFile");
-		if (getApplicationContext().getExternalCacheDir() != null){
-			File localFile = new File (getApplicationContext().getExternalCacheDir(), fileName);
-			if (localFile.exists()){
-				log("Delete file!: "+localFile.getAbsolutePath());
-				localFile.delete();
-			}
-		}
-		else{
-			File localFile = new File (getApplicationContext().getCacheDir(), fileName);
-			if (localFile.exists()){
-				log("Delete file!: "+localFile.getAbsolutePath());
-				localFile.delete();
-			}
 		}
 	}
 

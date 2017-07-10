@@ -2722,6 +2722,13 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     holder.contentOwnMessageThumbPort.setVisibility(View.VISIBLE);
                     holder.contentOwnMessageFileLayout.setVisibility(View.GONE);
                     holder.contentOwnMessageThumbLand.setVisibility(View.GONE);
+
+                    RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams)holder.errorUploadingLayout.getLayoutParams();
+                    float width = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 160, context.getResources().getDisplayMetrics());
+
+                    params.width = (int)width;
+                    log("Preview ImageView width: "+width);
+                    holder.errorUploadingLayout.setLayoutParams(params);
                 }
                 else {
                     log("Landcape");
@@ -2729,7 +2736,17 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     holder.contentOwnMessageThumbLand.setVisibility(View.VISIBLE);
                     holder.contentOwnMessageFileLayout.setVisibility(View.GONE);
                     holder.contentOwnMessageThumbPort.setVisibility(View.GONE);
+
+                    RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams)holder.errorUploadingLayout.getLayoutParams();
+                    float width = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 220, context.getResources().getDisplayMetrics());
+
+                    params.width = (int)width;
+                    log("Preview ImageView width: "+width);
+                    holder.errorUploadingLayout.setLayoutParams(params);
                 }
+
+
+
             }
             else{
                 log("Bitmap is NULL");
