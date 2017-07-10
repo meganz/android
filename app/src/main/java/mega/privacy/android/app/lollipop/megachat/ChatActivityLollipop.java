@@ -750,6 +750,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                                 }
                                 listView.setVisibility(View.VISIBLE);
                             }
+                            log("On create: stateHistory: "+stateHistory);
                         }
                     }
 
