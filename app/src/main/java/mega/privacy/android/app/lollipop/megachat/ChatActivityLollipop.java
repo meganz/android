@@ -1913,8 +1913,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     }
                     else if(selected.get(0).getMessage().getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT){
                         menu.findItem(R.id.chat_cab_menu_copy).setVisible(false);
-                        menu.findItem(R.id.chat_cab_menu_delete).setVisible(false);
                         menu.findItem(R.id.chat_cab_menu_edit).setVisible(false);
+                        menu.findItem(R.id.chat_cab_menu_delete).setVisible(true);
                     }
                     else if(selected.get(0).getMessage().getType()==MegaChatMessage.TYPE_CONTACT_ATTACHMENT){
                         menu.findItem(R.id.chat_cab_menu_copy).setVisible(false);
@@ -2034,7 +2034,40 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         else{
             builder.setMessage(R.string.confirmation_delete_several_messages);
         }
-        builder.setPositiveButton(R.string.context_delete, dialogClickListener)
+        builder.setPositiveButton(R.string.context_remove, dialogClickListener)
+                .setNegativeButton(R.string.general_cancel, dialogClickListener).show();
+    }
+
+    public void showConfirmationDeleteMessage(final long messageId, final long chatId){
+        log("showConfirmationDeleteMessage");
+
+        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                switch (which){
+                    case DialogInterface.BUTTON_POSITIVE:
+                        ChatController cC = new ChatController(chatActivity);
+                        cC.deleteMessageById(messageId, chatId);
+                        break;
+
+                    case DialogInterface.BUTTON_NEGATIVE:
+                        //No button clicked
+                        break;
+                }
+            }
+        };
+
+        AlertDialog.Builder builder;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+            builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+        }
+        else{
+            builder = new AlertDialog.Builder(this);
+        }
+
+        builder.setMessage(R.string.confirmation_delete_one_message);
+
+        builder.setPositiveButton(R.string.context_remove, dialogClickListener)
                 .setNegativeButton(R.string.general_cancel, dialogClickListener).show();
     }
 
@@ -2461,15 +2494,47 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             log("TIMESTAMP: "+msg.getTimestamp());
             log("TYPE: "+msg.getType());
 //            log("ROW id: "+msg.getR)
-            if(msg.getContent()!=null){
-                log("CONTENT: "+msg.getContent());
+
+            if(msg.isDeleted()){
+                log("DELETED MESSAGE!!!!");
+                return;
             }
-            else{
-                if(msg.isDeleted()){
-                    log("DELETED MESSAGE!!!!");
+
+            if(msg.getType()==MegaChatMessage.TYPE_REVOKE_NODE_ATTACHMENT) {
+                log("TYPE_REVOKE_NODE_ATTACHMENT MESSAGE!!!!");
+                return;
+            }
+
+            if(msg.getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT){
+                log("TYPE_NODE_ATTACHMENT MESSAGE!!!!");
+                MegaNodeList nodeList = msg.getMegaNodeList();
+                boolean hideRevoked = true;
+
+                for(int i=0; i<nodeList.size(); i++){
+                    MegaNode node = nodeList.get(i);
+                    boolean revoked = megaChatApi.isRevoked(idChat, node.getHandle());
+                    if(!revoked){
+                        log("The node is not revoked: "+node.getName());
+                        hideRevoked = false;
+                        break;
+                    }
+                    else{
+                        log("Node revoked: "+node.getName());
+                    }
+                }
+
+                if(hideRevoked){
+                    log("RETURN");
                     return;
                 }
             }
+
+//            if(msg.getContent()!=null){
+//                log("CONTENT: "+msg.getContent());
+//            }
+//            else{
+//
+//            }
 
             if(msg.getStatus()==MegaChatMessage.STATUS_SERVER_REJECTED){
                 log("onMessageLoaded: STATUS_SERVER_REJECTED----- "+msg.getStatus());
@@ -2608,12 +2673,16 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 else{
                     log("onMessageLoaded: last message seen received");
                     if(positionToScroll>0){
-                        log("onMessageLoaded: message position to scroll: "+positionToScroll+" content: "+messages.get(positionToScroll).getMessage().getContent());
                         log("onMessageLoaded: Scroll to position: "+positionToScroll);
-                        messages.get(positionToScroll).setInfoToShow(Constants.CHAT_ADAPTER_SHOW_ALL);
-                        adapter.notifyItemChanged(positionToScroll);
-                        mLayoutManager.scrollToPositionWithOffset(positionToScroll,20);
-
+                        if(positionToScroll<messages.size()){
+                            log("onMessageLoaded: message position to scroll: "+positionToScroll+" content: "+messages.get(positionToScroll).getMessage().getContent());
+                            messages.get(positionToScroll).setInfoToShow(Constants.CHAT_ADAPTER_SHOW_ALL);
+                            adapter.notifyItemChanged(positionToScroll);
+                            mLayoutManager.scrollToPositionWithOffset(positionToScroll,20);
+                        }
+                        else{
+                            log("Error, the position to scroll is more than size of messages");
+                        }
                     }
                 }
             }
@@ -2637,6 +2706,11 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         log("TYPE: "+msg.getType());
         if(msg.getContent()!=null){
             log("CONTENT: "+msg.getContent());
+        }
+
+        if(msg.getType()==MegaChatMessage.TYPE_REVOKE_NODE_ATTACHMENT) {
+            log("TYPE_REVOKE_NODE_ATTACHMENT MESSAGE!!!!");
+            return;
         }
 
         if(msg.getStatus()==MegaChatMessage.STATUS_SERVER_REJECTED){
@@ -2750,34 +2824,34 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
         AndroidMegaChatMessage androidMsg = new AndroidMegaChatMessage(msg);
 
-        if(msg.getUserHandle()==megaChatApi.getMyUserHandle()){
-            if(msg.getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT){
-                log("Modify my message and node attachment");
+        if(msg.hasChanged(MegaChatMessage.CHANGE_TYPE_ACCESS)){
+            log("Change access of the message");
 
-                long idMsg =  dbH.findPendingMessageByIdTempKarere(msg.getTempId());
-                log("----The id of my pending message is: "+idMsg);
-                if(idMsg!=-1){
-                    resultModify = modifyAttachmentReceived(androidMsg, idMsg);
-                    dbH.removePendingMessageById(idMsg);
-                    if(resultModify==-1){
-                        log("Node attachment message not in list - add");
-                        AndroidMegaChatMessage msgToAppend = new AndroidMegaChatMessage(msg);
-                        appendMessagePosition(msgToAppend);
-                    }
-                    return;
+            MegaNodeList nodeList = msg.getMegaNodeList();
+            int revokedCount = 0;
+
+            for(int i=0; i<nodeList.size(); i++){
+                MegaNode node = nodeList.get(i);
+                boolean revoked = megaChatApi.isRevoked(idChat, node.getHandle());
+                if(revoked){
+                    log("The node is revoked: "+node.getName());
+                    revokedCount++;
+                }
+                else{
+                    log("Node not revoked: "+node.getName());
                 }
             }
-        }
 
-        if(msg.getStatus()==MegaChatMessage.STATUS_SERVER_REJECTED){
-            log("Processing SERVER_REJECTED message");
-            MegaChatMessage oldMessage = megaChatApi.getMessage(idChat, msg.getMsgId());
-            if(oldMessage!=null){
-                log("content of the rejected message: "+oldMessage.getContent());
+            if(revokedCount==nodeList.size()){
+                log("All the attachments have been revoked");
+                deleteMessage(msg);
+            }
+            else{
+                log("One attachment revoked, modify message");
+                resultModify = modifyMessageReceived(androidMsg, false);
             }
         }
-
-        if(msg.hasChanged(MegaChatMessage.CHANGE_TYPE_CONTENT)){
+        else if(msg.hasChanged(MegaChatMessage.CHANGE_TYPE_CONTENT)){
             log("Change content of the message");
 
             if(msg.getType()==MegaChatMessage.TYPE_TRUNCATE){
@@ -2801,6 +2875,24 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             log("Temporal id: "+msg.getTempId());
             log("Final id: "+msg.getMsgId());
 
+            if(msg.getUserHandle()==megaChatApi.getMyUserHandle()){
+                if(msg.getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT){
+                    log("Modify my message and node attachment");
+
+                    long idMsg =  dbH.findPendingMessageByIdTempKarere(msg.getTempId());
+                    log("----The id of my pending message is: "+idMsg);
+                    if(idMsg!=-1){
+                        resultModify = modifyAttachmentReceived(androidMsg, idMsg);
+                        dbH.removePendingMessageById(idMsg);
+                        if(resultModify==-1){
+                            log("Node attachment message not in list -> resultModify -1");
+//                            AndroidMegaChatMessage msgToAppend = new AndroidMegaChatMessage(msg);
+//                            appendMessagePosition(msgToAppend);
+                        }
+                        return;
+                    }
+                }
+            }
 
             if(msg.getStatus()==MegaChatMessage.STATUS_SEEN){
                 log("STATUS_SEEN");
@@ -3234,7 +3326,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }
 
             AndroidMegaChatMessage previousMessage = messages.get(1);
-            log("Previous message: "+previousMessage.getMessage().getContent());
             if (userHandleToCompare == myUserHandle) {
 //                log("MY message!!: "+messageToShow.getContent());
                 long previousUserHandleToCompare = -1;
@@ -3819,7 +3910,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
         else if(request.getType() == MegaChatRequest.TYPE_REVOKE_NODE_MESSAGE){
             if(e.getErrorCode()==MegaChatError.ERROR_OK){
-                log("Node revoked correctly");
+                log("Node revoked correctly, msg id: "+request.getMegaChatMessage().getMsgId());
             }
             else{
                 log("NOT revoked correctly");
