@@ -9615,6 +9615,38 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		builder.setMessage(message).setPositiveButton(R.string.general_leave, dialogClickListener)
 				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
 	}
+	public void showConfirmationLeaveChats (final  ArrayList<MegaChatListItem> cs){
+		log("showConfirmationLeaveChat");
+
+		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				switch (which){
+					case DialogInterface.BUTTON_POSITIVE: {
+						ChatController chatC = new ChatController(managerActivity);
+
+						for(int i=0;i<cs.size();i++){
+							MegaChatListItem chat = cs.get(i);
+							if(chat!=null){
+								chatC.leaveChat(chat.getChatId());
+							}
+						}
+
+						break;
+					}
+					case DialogInterface.BUTTON_NEGATIVE:
+						//No button clicked
+						break;
+				}
+			}
+		};
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		builder.setTitle(getResources().getString(R.string.title_confirmation_leave_group_chat));
+		String message= getResources().getString(R.string.confirmation_leave_group_chat);
+		builder.setMessage(message).setPositiveButton(R.string.general_leave, dialogClickListener)
+				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
+	}
 
 	public void showConfirmationClearChat(final MegaChatListItem c){
 		log("showConfirmationClearChat");
