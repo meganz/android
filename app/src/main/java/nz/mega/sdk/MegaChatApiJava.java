@@ -1023,6 +1023,28 @@ public class MegaChatApiJava {
         megaChatApi.revokeAttachment(chatid, nodeHandle, createDelegateRequestListener(listener));
     }
 
+    /** Returns whether the logged in user has been granted access to the node
+     *
+     * Access to attached nodes received in chatrooms is granted when the message
+     * is sent, but it can be revoked afterwards.
+     *
+     * This convenience method allows to check if you still have access to a node
+     * or it was revoked. Usually, apps will show the attachment differently when
+     * access has been revoked.
+     *
+     * @note The returned value will be valid only for nodes attached to messages
+     * already loaded in an opened chatroom. The list of revoked nodes is updated
+     * accordingly while the chatroom is open, based on new messages received.
+     *
+     * @param chatid MegaChatHandle that identifies the chat room
+     * @param nodeHandle MegaChatHandle that identifies the node to check its access
+     *
+     * @return True if the user has access to the node in this chat.
+     */
+    public boolean isRevoked(long chatid, long nodeHandle){
+        return megaChatApi.isRevoked(chatid, nodeHandle);
+    }
+
     /**
      * Edits an existing message
      *

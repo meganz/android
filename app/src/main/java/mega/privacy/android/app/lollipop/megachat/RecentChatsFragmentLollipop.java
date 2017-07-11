@@ -690,7 +690,13 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
                     }
                     if(indexToReplace!=-1){
                         log("Index to replace: "+indexToReplace);
-                        log("New title: "+item.getTitle());
+
+                        if(item.getLastMessage()!=null){
+                            log("New last content: "+item.getLastMessage());
+                        }
+                        else{
+                            log("New last content is NULL");
+                        }
 
                         chats.set(indexToReplace, item);
                         onLastMessageChange(indexToReplace);

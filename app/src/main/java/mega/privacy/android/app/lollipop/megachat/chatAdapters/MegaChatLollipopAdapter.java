@@ -1390,16 +1390,24 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                 }
                                 else{
                                     long totalSize = 0;
+                                    int count = 0;
                                     for(int i=0; i<nodeList.size(); i++){
                                         MegaNode temp = nodeList.get(i);
-                                        log("Node Name: "+temp.getName());
-                                        totalSize = totalSize + temp.getSize();
+                                        if(!(megaChatApi.isRevoked(chatRoom.getChatId(), temp.getHandle()))){
+                                            count++;
+                                            log("Node Name: "+temp.getName());
+                                            totalSize = totalSize + temp.getSize();
+                                        }
                                     }
                                     ((ViewHolderMessageChat)holder).contentOwnMessageFileSize.setText(Util.getSizeString(totalSize));
                                     MegaNode node = nodeList.get(0);
                                     ((ViewHolderMessageChat)holder).contentOwnMessageFileThumb.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
-
-                                    ((ViewHolderMessageChat)holder).contentOwnMessageFileName.setText(context.getResources().getQuantityString(R.plurals.new_general_num_files, nodeList.size(), nodeList.size()));
+                                    if(count==1){
+                                        ((ViewHolderMessageChat)holder).contentOwnMessageFileName.setText(node.getName());
+                                    }
+                                    else{
+                                        ((ViewHolderMessageChat)holder).contentOwnMessageFileName.setText(context.getResources().getQuantityString(R.plurals.new_general_num_files, count, count));
+                                    }
                                 }
                             }
                         }
@@ -2044,16 +2052,24 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                 }
                                 else{
                                     long totalSize = 0;
+                                    int count = 0;
                                     for(int i=0; i<nodeList.size(); i++){
                                         MegaNode temp = nodeList.get(i);
-                                        log("Node Name: "+temp.getName());
-                                        totalSize = totalSize + temp.getSize();
+                                        if(!(megaChatApi.isRevoked(chatRoom.getChatId(), temp.getHandle()))){
+                                            count++;
+                                            log("Node Name: "+temp.getName());
+                                            totalSize = totalSize + temp.getSize();
+                                        }
                                     }
                                     ((ViewHolderMessageChat)holder).contentContactMessageFileSize.setText(Util.getSizeString(totalSize));
                                     MegaNode node = nodeList.get(0);
                                     ((ViewHolderMessageChat)holder).contentContactMessageFileThumb.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
-
-                                    ((ViewHolderMessageChat)holder).contentContactMessageFileName.setText(context.getResources().getQuantityString(R.plurals.new_general_num_files, nodeList.size(), nodeList.size()));
+                                    if(count==1){
+                                        ((ViewHolderMessageChat)holder).contentContactMessageFileName.setText(node.getName());
+                                    }
+                                    else{
+                                        ((ViewHolderMessageChat)holder).contentContactMessageFileName.setText(context.getResources().getQuantityString(R.plurals.new_general_num_files, count, count));
+                                    }
                                 }
                             }
                         }
@@ -2744,9 +2760,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     log("Preview ImageView width: "+width);
                     holder.errorUploadingLayout.setLayoutParams(params);
                 }
-
-
-
             }
             else{
                 log("Bitmap is NULL");
