@@ -624,8 +624,8 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 						pro1PriceDecimal.setText("." + s[1] + " €");
 					}
 
-					pro1StorageInteger.setText("" + account.getStorage());
-					pro1StorageGb.setText(" GB");
+					pro1StorageInteger.setText("" + account.getStorage() / 1024);
+					pro1StorageGb.setText(" TB");
 
 					pro1BandwidthInteger.setText("" + account.getTransfer() / 1024);
 					pro1BandwidthTb.setText(" TB");
