@@ -326,8 +326,8 @@ public class MonthlyAnnualyFragmentLollipop extends Fragment implements OnClickL
 							priceMonthlyDecimal.setText("." + s[1] + " €");
 						}
 
-						storageInteger.setText(""+account.getStorage());
-						storageGb.setText(" GB");
+						storageInteger.setText(""+account.getStorage()/1024);
+						storageGb.setText(" TB");
 
 						bandwidthInteger.setText(""+account.getTransfer()/1024);
 						bandwidthTb.setText(" TB");
