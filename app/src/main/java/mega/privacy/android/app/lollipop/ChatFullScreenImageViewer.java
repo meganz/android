@@ -75,7 +75,11 @@ import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApiAndroid;
+import nz.mega.sdk.MegaChatApiJava;
+import nz.mega.sdk.MegaChatError;
 import nz.mega.sdk.MegaChatMessage;
+import nz.mega.sdk.MegaChatRequest;
+import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaNodeList;
@@ -83,7 +87,7 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaShare;
 
-public class ChatFullScreenImageViewer extends PinActivityLollipop implements OnPageChangeListener, OnClickListener, MegaRequestListenerInterface, OnItemClickListener{
+public class ChatFullScreenImageViewer extends PinActivityLollipop implements OnPageChangeListener, OnClickListener, MegaRequestListenerInterface, OnItemClickListener, MegaChatRequestListenerInterface {
 
 	private DisplayMetrics outMetrics;
 
@@ -572,10 +576,44 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 				break;
 			}
 			case 1:{
-				showSnackbar("Coming soon...");
+				MegaNode node = nodes.get(positionG);
+				showConfirmationDeleteNode(chatId, node.getHandle());
 				break;
 			}
 		}
+	}
+
+	public void showConfirmationDeleteNode(final long chatId, final long nodeHandle){
+		log("showConfirmationDeleteNode");
+
+		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				switch (which){
+					case DialogInterface.BUTTON_POSITIVE:
+						ChatController cC = new ChatController(fullScreenImageViewer);
+						cC.deleteNodeAttachment(chatId, nodeHandle);
+						break;
+
+					case DialogInterface.BUTTON_NEGATIVE:
+						//No button clicked
+						break;
+				}
+			}
+		};
+
+		android.support.v7.app.AlertDialog.Builder builder;
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+			builder = new android.support.v7.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		}
+		else{
+			builder = new android.support.v7.app.AlertDialog.Builder(this);
+		}
+
+		builder.setMessage(R.string.confirmation_delete_one_attachment);
+
+		builder.setPositiveButton(R.string.context_remove, dialogClickListener)
+				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
 	}
 	
 	@Override
@@ -788,5 +826,34 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 			}
 		}
 		super.onBackPressed();
+	}
+
+	@Override
+	public void onRequestStart(MegaChatApiJava api, MegaChatRequest request) {
+
+	}
+
+	@Override
+	public void onRequestUpdate(MegaChatApiJava api, MegaChatRequest request) {
+
+	}
+
+	@Override
+	public void onRequestFinish(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
+		log("onRequestFinish: "+request.getRequestString());
+		if(request.getType() == MegaChatRequest.TYPE_REVOKE_NODE_MESSAGE){
+			if(e.getErrorCode()==MegaChatError.ERROR_OK){
+				log("Node revoked correctly, msg id: "+request.getMegaChatMessage().getMsgId());
+				finish();
+			}
+			else{
+				log("NOT revoked correctly");
+			}
+		}
+	}
+
+	@Override
+	public void onRequestTemporaryError(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
+
 	}
 }

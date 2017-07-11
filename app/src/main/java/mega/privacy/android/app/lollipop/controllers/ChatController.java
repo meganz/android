@@ -152,8 +152,18 @@ public class ChatController {
         if(message!=null){
             deleteMessage(message, chatId);
         }
-
     }
+
+    public void deleteNodeAttachment(long chatId, long nodeHandle) {
+        log("deleteNodeAttachment");
+        if(context instanceof ChatFullScreenImageViewer){
+            megaChatApi.revokeAttachment(chatId, nodeHandle, (ChatFullScreenImageViewer) context);
+        }
+        else if(context instanceof NodeAttachmentActivityLollipop){
+            megaChatApi.revokeAttachment(chatId, nodeHandle, (NodeAttachmentActivityLollipop) context);
+        }
+    }
+
     public void deleteMessage(MegaChatMessage message, long chatId){
         log("deleteMessage");
         MegaChatMessage messageToDelete;
@@ -166,7 +176,7 @@ public class ChatController {
                 for(int j=0; j<nodeList.size(); j++){
                     MegaNode node = nodeList.get(j);
                     if(context instanceof ChatActivityLollipop){
-                        megaChatApi.revokeAttachment(chatId,node.getHandle(), (ChatActivityLollipop) context);
+                        megaChatApi.revokeAttachment(chatId, node.getHandle(), (ChatActivityLollipop) context);
                     }
                 }
             }

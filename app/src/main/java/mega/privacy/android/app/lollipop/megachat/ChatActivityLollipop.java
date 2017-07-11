@@ -2673,12 +2673,16 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 else{
                     log("onMessageLoaded: last message seen received");
                     if(positionToScroll>0){
-                        log("onMessageLoaded: message position to scroll: "+positionToScroll+" content: "+messages.get(positionToScroll).getMessage().getContent());
                         log("onMessageLoaded: Scroll to position: "+positionToScroll);
-                        messages.get(positionToScroll).setInfoToShow(Constants.CHAT_ADAPTER_SHOW_ALL);
-                        adapter.notifyItemChanged(positionToScroll);
-                        mLayoutManager.scrollToPositionWithOffset(positionToScroll,20);
-
+                        if(positionToScroll<messages.size()){
+                            log("onMessageLoaded: message position to scroll: "+positionToScroll+" content: "+messages.get(positionToScroll).getMessage().getContent());
+                            messages.get(positionToScroll).setInfoToShow(Constants.CHAT_ADAPTER_SHOW_ALL);
+                            adapter.notifyItemChanged(positionToScroll);
+                            mLayoutManager.scrollToPositionWithOffset(positionToScroll,20);
+                        }
+                        else{
+                            log("Error, the position to scroll is more than size of messages");
+                        }
                     }
                 }
             }
@@ -2824,25 +2828,27 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             log("Change access of the message");
 
             MegaNodeList nodeList = msg.getMegaNodeList();
-            boolean hideRevoked = true;
+            int revokedCount = 0;
 
             for(int i=0; i<nodeList.size(); i++){
                 MegaNode node = nodeList.get(i);
                 boolean revoked = megaChatApi.isRevoked(idChat, node.getHandle());
-                if(!revoked){
-                    log("The node is not revoked: "+node.getName());
-                    hideRevoked = false;
-                    break;
+                if(revoked){
+                    log("The node is revoked: "+node.getName());
+                    revokedCount++;
                 }
                 else{
-                    log("Node revoked: "+node.getName());
+                    log("Node not revoked: "+node.getName());
                 }
             }
 
-            if(hideRevoked){
-                log("The attachments have been revoked");
+            if(revokedCount==nodeList.size()){
+                log("All the attachments have been revoked");
                 deleteMessage(msg);
-                return;
+            }
+            else{
+                log("One attachment revoked, modify message");
+                resultModify = modifyMessageReceived(androidMsg, false);
             }
         }
         else if(msg.hasChanged(MegaChatMessage.CHANGE_TYPE_CONTENT)){
@@ -2879,9 +2885,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         resultModify = modifyAttachmentReceived(androidMsg, idMsg);
                         dbH.removePendingMessageById(idMsg);
                         if(resultModify==-1){
-                            log("Node attachment message not in list - add");
-                            AndroidMegaChatMessage msgToAppend = new AndroidMegaChatMessage(msg);
-                            appendMessagePosition(msgToAppend);
+                            log("Node attachment message not in list -> resultModify -1");
+//                            AndroidMegaChatMessage msgToAppend = new AndroidMegaChatMessage(msg);
+//                            appendMessagePosition(msgToAppend);
                         }
                         return;
                     }
@@ -3320,7 +3326,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }
 
             AndroidMegaChatMessage previousMessage = messages.get(1);
-            log("Previous message: "+previousMessage.getMessage().getContent());
             if (userHandleToCompare == myUserHandle) {
 //                log("MY message!!: "+messageToShow.getContent());
                 long previousUserHandleToCompare = -1;
