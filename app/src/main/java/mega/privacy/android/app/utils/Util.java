@@ -1711,18 +1711,18 @@ public class Util {
 		if(chatSettings!=null){
 			if(chatSettings.getEnabled()!=null){
 				chatEnabled = Boolean.parseBoolean(chatSettings.getEnabled());
-				log("chatEnabled: " + chatEnabled);
+				log("A - chatEnabled: " + chatEnabled);
 				return chatEnabled;
 			}
 			else{
 				chatEnabled=true;
-				log("chatEnabled: " + chatEnabled);
+				log("B - chatEnabled: " + chatEnabled);
 				return chatEnabled;
 			}
 		}
 		else{
 			chatEnabled=true;
-			log("chatEnabled: " + chatEnabled);
+			log("C - chatEnabled: " + chatEnabled);
 			return chatEnabled;
 		}
 	}
