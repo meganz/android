@@ -42,6 +42,7 @@ import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaContactsLollipopAdapter;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
+import mega.privacy.android.app.lollipop.megachat.calls.CallsChat;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -551,7 +552,10 @@ public class ContactsFragmentLollipop extends Fragment{
 		}
 		else{
 	
-			Intent i = new Intent(context, ContactInfoActivityLollipop.class);
+			/*Intent i = new Intent(context, ContactInfoActivityLollipop.class);
+			i.putExtra("name", visibleContacts.get(position).getMegaUser().getEmail());
+			startActivity(i);*/
+			Intent i = new Intent(context, CallsChat.class);
 			i.putExtra("name", visibleContacts.get(position).getMegaUser().getEmail());
 			startActivity(i);
 		}
