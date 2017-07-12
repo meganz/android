@@ -1884,7 +1884,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
             MenuInflater inflater = mode.getMenuInflater();
             inflater.inflate(R.menu.messages_chat_action, menu);
-            fab.setVisibility(View.GONE);
             return true;
         }
 
@@ -1895,7 +1894,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             textChat.getText().clear();
             editingMessage = false;
             clearSelections();
-            fab.setVisibility(View.VISIBLE);
         }
 
         @Override
