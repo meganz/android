@@ -1198,4 +1198,6 @@
     <string name="confirmation_delete_one_attachment" context="Confirmation before deleting one attachment">Eliminar adjunto?</string>
 
     <string name="general_view_with_revoke" formatted="false" context="Menu option">Ver ficheros (%1d eliminado)</string>
+
+    <string name="error_attaching_node_from_cloud" context="Error message when the attachment cannot be sent">Error. El fichero no se ha enviado</string>
 </resources>

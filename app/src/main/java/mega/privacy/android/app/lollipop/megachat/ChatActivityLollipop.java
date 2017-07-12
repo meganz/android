@@ -4233,6 +4233,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }
             else{
                 log("File NOT sent: "+e.getErrorCode());
+                showSnackbar(getString(R.string.error_attaching_node_from_cloud));
             }
         }
         else if(request.getType() == MegaChatRequest.TYPE_REVOKE_NODE_MESSAGE){
