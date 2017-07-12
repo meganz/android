@@ -440,12 +440,13 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
                 log("Continue");
                 continue;
             }
+
             long peerHandle = chat.getPeerHandle(i);
 
             String fullName = getParticipantFullName(i);
             String participantEmail = chat.getPeerEmail(i);
 
-            log("FullName of the peer: "+fullName);
+            log("FullName of the peer: "+fullName + " privilege: "+peerPrivilege);
 
             int status = megaChatApi.getUserOnlineStatus(peerHandle);
 
