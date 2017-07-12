@@ -228,8 +228,6 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 
 		DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 
-
-
 		if (savedInstanceState != null){
 			folderSelected = savedInstanceState.getBoolean("folderSelected", false);
 			incParentHandle = savedInstanceState.getLong("incParentHandle", -1);
@@ -272,7 +270,6 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 			loginProgressBar.setVisibility(View.GONE);
 			queryingSignupLinkText.setVisibility(View.GONE);
 			confirmingAccountText.setVisibility(View.GONE);
-
 		}
 		else{
 			log("dbH.getCredentials() NOT null");
