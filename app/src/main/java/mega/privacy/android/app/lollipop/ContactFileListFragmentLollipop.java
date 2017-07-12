@@ -563,7 +563,7 @@ public class ContactFileListFragmentLollipop extends Fragment{
 			  			startActivity(mediaIntent);
 			  		}
 			  		else{
-						((ManagerActivityLollipop) context).showSnackbar(context.getResources().getString(R.string.intent_not_available));
+						((ContactFileListActivityLollipop) context).showSnackbar(context.getResources().getString(R.string.intent_not_available));
 						adapter.notifyDataSetChanged();
 						ArrayList<Long> handleList = new ArrayList<Long>();
 						handleList.add(contactNodes.get(position).getHandle());
