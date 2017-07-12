@@ -1019,7 +1019,23 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			Uri defaultRingtoneUri = RingtoneManager.getActualDefaultRingtoneUri(getApplicationContext(), RingtoneManager.TYPE_RINGTONE);
 			Uri defaultSoundUri = RingtoneManager.getActualDefaultRingtoneUri(getApplicationContext(), RingtoneManager.TYPE_NOTIFICATION);
 
-			chatPrefs = new ChatItemPreferences(Long.toString(chatHandle), Boolean.toString(isChecked), defaultRingtoneUri.toString(), defaultSoundUri.toString());
+			String defaultRingtone;
+			String defaultSound;
+			if(defaultRingtoneUri==null){
+				defaultRingtone="";
+			}
+			else{
+				defaultRingtone = defaultRingtoneUri.toString();
+			}
+
+			if(defaultSoundUri==null){
+				defaultSound="";
+			}
+			else{
+				defaultSound = defaultSoundUri.toString();
+			}
+
+			chatPrefs = new ChatItemPreferences(Long.toString(chatHandle), Boolean.toString(isChecked), defaultRingtone, defaultSound);
 			dbH.setChatItemPreferences(chatPrefs);
 		}
 		else{
