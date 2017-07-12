@@ -2495,6 +2495,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             log("TYPE: "+msg.getType());
 //            log("ROW id: "+msg.getR)
 
+            boolean markAsRead = megaChatApi.setMessageSeen(idChat, msg.getMsgId());
+            log("Result of markAsRead: "+markAsRead);
+
             if(msg.isDeleted()){
                 log("DELETED MESSAGE!!!!");
                 return;
@@ -2508,22 +2511,21 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             if(msg.getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT){
                 log("TYPE_NODE_ATTACHMENT MESSAGE!!!!");
                 MegaNodeList nodeList = msg.getMegaNodeList();
-                boolean hideRevoked = true;
+                int revokedCount = 0;
 
                 for(int i=0; i<nodeList.size(); i++){
                     MegaNode node = nodeList.get(i);
                     boolean revoked = megaChatApi.isRevoked(idChat, node.getHandle());
-                    if(!revoked){
-                        log("The node is not revoked: "+node.getName());
-                        hideRevoked = false;
-                        break;
+                    if(revoked){
+                        log("The node is revoked: "+node.getName());
+                        revokedCount++;
                     }
                     else{
-                        log("Node revoked: "+node.getName());
+                        log("Node NOT revoked: "+node.getName());
                     }
                 }
 
-                if(hideRevoked){
+                if(revokedCount==nodeList.size()){
                     log("RETURN");
                     return;
                 }
@@ -2617,7 +2619,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     }
                 }
 
-                megaChatApi.setMessageSeen(idChat, msg.getMsgId());
+//                megaChatApi.setMessageSeen(idChat, msg.getMsgId());
 
                 if(positionToScroll>=0){
                     log("onMessageLoaded: Position to scroll up!");
@@ -2649,6 +2651,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         else{
             log("onMessageLoaded: The message is null");
             log("----> REACH FINAL HISTORY: onMessageLoaded");
+
+            log("Status of the history: "+stateHistory);
 
             if(bufferSending.size()!=0){
                 for(int i=0;i<bufferSending.size();i++){
@@ -2691,6 +2695,17 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 pendingMessagesLoaded = true;
                 loadPendingMessages();
             }
+
+            if(messages.size()<NUMBER_MESSAGES_BEFORE_LOAD){
+                log("Less than 8 messages in UI: "+messages.size()+ " stateHistory is: "+stateHistory);
+                if((stateHistory!=MegaChatApi.SOURCE_NONE)&&(stateHistory!=MegaChatApi.SOURCE_ERROR)){
+                    log("But more history exists --> get more history");
+                    stateHistory = megaChatApi.loadMessages(idChat, NUMBER_MESSAGES_TO_LOAD);
+                    log("New state of history: "+stateHistory);
+                    getMoreHistory = false;
+                }
+            }
+
         }
         log("END onMessageLoaded------------------------------------------");
     }
