@@ -228,6 +228,8 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 
 		DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 
+
+
 		if (savedInstanceState != null){
 			folderSelected = savedInstanceState.getBoolean("folderSelected", false);
 			incParentHandle = savedInstanceState.getLong("incParentHandle", -1);
@@ -440,6 +442,13 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 
 				getWindow().setFlags(WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH, WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH);
 				getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL, WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL);
+
+				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+					Window window = this.getWindow();
+					window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+					window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+					window.setStatusBarColor(ContextCompat.getColor(this, R.color.lollipop_dark_primary_color));
+				}
 			}
 		}
 	}
