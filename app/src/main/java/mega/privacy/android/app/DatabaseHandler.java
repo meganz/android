@@ -746,6 +746,38 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		log("From TABLE_PENDING_MSG deleted: "+rows);
 	}
 
+	public void removePendingMessageByChatId(long idChat){
+		log("removePendingMessageByChatId");
+		ArrayList<Long> messages = findIdPendingMessagesByChatId(idChat);
+		if(messages!=null){
+			for(int i=0;i<messages.size();i++){
+				removePendingMessageById(messages.get(i));
+			}
+		}
+	}
+
+	public ArrayList<Long> findIdPendingMessagesByChatId(long idChat){
+		log("findPendingMessageBySent");
+		ArrayList<Long> idMessages = new ArrayList<>();
+		String chat = idChat+"";
+
+		String selectQuery = "SELECT * FROM " + TABLE_PENDING_MSG + " WHERE " +KEY_ID_CHAT + " ='"+ encrypt(chat)+"'";
+		log("QUERY: "+selectQuery);
+		Cursor cursor = db.rawQuery(selectQuery, null);
+		ArrayList<Long> pendingIds = new ArrayList<>();
+		if (!cursor.equals(null)){
+			if (cursor.moveToFirst()){
+				do{
+					long id = cursor.getLong(0);
+
+					idMessages.add(id);
+
+				} while (cursor.moveToNext());
+			}
+		}
+		cursor.close();
+		return idMessages;
+	}
 
 	public ArrayList<AndroidMegaChatMessage> findAndroidMessagesBySent(int sent, long idChat){
 		log("findPendingMessageBySent");
