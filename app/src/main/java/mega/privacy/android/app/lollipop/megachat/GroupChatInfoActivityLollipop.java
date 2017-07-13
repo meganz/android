@@ -1426,6 +1426,9 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
                 log("Changes NOT interested in");
             }
         }
+        else if(item.hasChanged(MegaChatListItem.CHANGE_TYPE_OWN_PRIV)){
+            log("listItemUpdate: Change status: MegaChatListItem.CHANGE_TYPE_OWN_PRIV");
+        }
         else if(item.hasChanged(MegaChatListItem.CHANGE_TYPE_TITLE)) {
             chat = megaChatApi.getChatRoom(chatHandle);
             if(chat!=null){

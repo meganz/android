@@ -212,40 +212,49 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 		imageHandles = new ArrayList<Long>();
 		paths = new ArrayList<String>();
 
-		if(messageIds.length==1){
-			log("One message");
-			MegaChatMessage message = megaChatApi.getMessage(chatId, messageIds[0]);
+		if(messageIds==null){
+			return;
+		}
+
+		for(int j=0; j<messageIds.length; j++){
+			MegaChatMessage message = megaChatApi.getMessage(chatId, messageIds[j]);
 			if(message!=null){
 				MegaNodeList list = message.getMegaNodeList();
 				if(list.size()==1){
 					MegaNode node = list.get(0);
-					nodes.add(node);
+					if(MimeTypeList.typeForName(node.getName()).isImage()){
+						nodes.add(node);
+					}
 				}
 				else{
 					for(int i=0; i<list.size(); i++){
 						MegaNode node = list.get(i);
-						nodes.add(node);
+						if(MimeTypeList.typeForName(node.getName()).isImage()){
+							nodes.add(node);
+						}
 					}
 				}
-
-				if(message.getUserHandle()==megaChatApi.getMyUserHandle()){
-					menuOptions = new String[2];
-					menuOptions[0] = getString(R.string.save_for_offline);
-					menuOptions[1] = getString(R.string.context_remove);
-				}
-				else{
-					menuOptions = new String[1];
-					menuOptions[0] = getString(R.string.save_for_offline);
-				}
-
 			}
 			else{
 				log("ERROR - the message is NULL");
 			}
 		}
-		else{
-			log("Several messages");
-		}
+
+		menuOptions = new String[2];
+		menuOptions[0] = getString(R.string.save_for_offline);
+		menuOptions[1] = getString(R.string.context_remove);
+
+
+
+//		if(message.getUserHandle()==megaChatApi.getMyUserHandle()){
+//			menuOptions = new String[2];
+//			menuOptions[0] = getString(R.string.save_for_offline);
+//			menuOptions[1] = getString(R.string.context_remove);
+//		}
+//		else{
+//			menuOptions = new String[1];
+//			menuOptions[0] = getString(R.string.save_for_offline);
+//		}
 
 		int imageNumber = 0;
 		for (int i=0;i<nodes.size();i++){
@@ -355,6 +364,14 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 
 		MegaNode node = nodes.get(positionG);
+		if(node.isForeign()){
+			log("The node is not mine");
+		}
+
+
+		int accessLevel = megaApi.getAccess(node);
+		log("Access level: "+accessLevel);
+
 		switch (v.getId()){
 			case R.id.chat_full_image_viewer_icon:{
 				finish();
