@@ -7,6 +7,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.hardware.Camera;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -23,6 +24,9 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
+import android.view.Surface;
+import android.view.SurfaceHolder;
+import android.view.SurfaceView;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -63,7 +67,7 @@ import static mega.privacy.android.app.utils.Util.context;
  * Created by mega on 10/07/17.
  */
 
-public class CallsChat extends PinActivityLollipop implements MegaRequestListenerInterface, View.OnTouchListener {
+public class CallsChat extends PinActivityLollipop implements MegaRequestListenerInterface, View.OnTouchListener, SurfaceHolder.Callback {
 
     DatabaseHandler dbH = null;
     ChatItemPreferences chatPrefs = null;
@@ -97,6 +101,13 @@ public class CallsChat extends PinActivityLollipop implements MegaRequestListene
     FloatingActionButton firstFAB;
     FloatingActionButton secondFAB;
     FloatingActionButton thirdFAB;
+
+    /************************************/
+    Camera camera;
+    SurfaceView surfaceView;
+    SurfaceHolder surfaceHolder;
+
+    /**********************************************/
 
 
 
@@ -147,7 +158,7 @@ public class CallsChat extends PinActivityLollipop implements MegaRequestListene
     protected void onCreate(Bundle savedInstanceState) {
         log("onCreate");
         super.onCreate(savedInstanceState);
-
+        setContentView(R.layout.activity_calls_chat);
 
         display = getWindowManager().getDefaultDisplay();
         outMetrics = new DisplayMetrics();
@@ -173,7 +184,6 @@ public class CallsChat extends PinActivityLollipop implements MegaRequestListene
 
         dbH = DatabaseHandler.getDbHandler(getApplicationContext());
         handler = new Handler();
-        setContentView(R.layout.activity_calls_chat);
 
         tB = (Toolbar) findViewById(R.id.call_toolbar);
         if (tB == null) {
@@ -189,6 +199,14 @@ public class CallsChat extends PinActivityLollipop implements MegaRequestListene
         aB.setHomeButtonEnabled(true);
         aB.setDisplayHomeAsUpEnabled(true);
 
+        /*********************************************/
+        surfaceView = (SurfaceView)findViewById(R.id.surfaceView1);
+        surfaceHolder = surfaceView.getHolder();
+        surfaceHolder.addCallback(this);
+        surfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+
+        /*********************************************/
+
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
 
@@ -199,17 +217,21 @@ public class CallsChat extends PinActivityLollipop implements MegaRequestListene
                 window.setStatusBarColor(ContextCompat.getColor(this, R.color.very_transparent_black));
             }
 
+            myImageLayout = (RelativeLayout) findViewById(R.id.call_chat_my_image_layout);
+            myImage = (ImageView) findViewById(R.id.call_chat_my_image);
+
             imageLayout = (RelativeLayout) findViewById(R.id.call_chat_contact_image_layout);
             imageLayout.setOnTouchListener(this);
-            myImageLayout = (RelativeLayout) findViewById(R.id.call_chat_my_image_layout);
-
             contactImage = (ImageView) findViewById(R.id.call_chat_contact_image);
-            myImage = (ImageView) findViewById(R.id.call_chat_my_image);
+
 
             firstFAB = (FloatingActionButton) findViewById(R.id.first_fab);
             firstFAB.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View v) {
                     log("***First FAB");
+                    myImageLayout.setVisibility(View.GONE);
+                    surfaceView.setVisibility(View.VISIBLE);
+                   start_camera();
                 }
             });
             secondFAB = (FloatingActionButton) findViewById(R.id.second_fab);
@@ -224,6 +246,7 @@ public class CallsChat extends PinActivityLollipop implements MegaRequestListene
                     log("***Third FAB");
                 }
             });
+
 
 
             /*My avatar*/
@@ -413,7 +436,6 @@ public class CallsChat extends PinActivityLollipop implements MegaRequestListene
                         else{
 
                             contactImage.setImageBitmap(bitmap);
-                            //imageGradient.setVisibility(View.VISIBLE);
 
                             if (bitmap != null && !bitmap.isRecycled()) {
                                 Palette palette = Palette.from(bitmap).generate();
@@ -463,15 +485,9 @@ public class CallsChat extends PinActivityLollipop implements MegaRequestListene
                     }
                 }
             }
-
-
-            }
-
         }
 
-
-
-
+    }
 
 
     @Override
@@ -498,6 +514,7 @@ public class CallsChat extends PinActivityLollipop implements MegaRequestListene
 
         contactImage.setImageBitmap(defaultAvatar);
     }
+
     public void createMyDefaultAvatar(String myHandle) {
         log("setMyDefaultAvatar");
 
@@ -522,8 +539,6 @@ public class CallsChat extends PinActivityLollipop implements MegaRequestListene
 
     @Override
     public boolean onTouch(View v, MotionEvent event) {
-
-
         if (event.getAction() == MotionEvent.ACTION_DOWN) {
             if(aB.isShowing()){
                 hideActionBar();
@@ -560,6 +575,15 @@ public class CallsChat extends PinActivityLollipop implements MegaRequestListene
         }
     }
 
+    /********/
+    @Override public void onPause(){
+        super.onPause();
+        if (camera != null) {
+            camera.stopPreview();
+        }
+    }
+    /*******/
+
     @Override
     protected void onResume() {
         log("onResume-CallsChat");
@@ -567,6 +591,17 @@ public class CallsChat extends PinActivityLollipop implements MegaRequestListene
 
         ((MegaApplication) getApplication()).sendSignalPresenceActivity();
     }
+    /********/
+    @Override public void onDestroy(){
+        super.onDestroy();
+        if (camera != null) {
+            camera.stopPreview();
+            camera.release();
+            camera = null;
+        }
+    }
+    /********/
+
 
     @Override
     public void onBackPressed() {
@@ -578,6 +613,92 @@ public class CallsChat extends PinActivityLollipop implements MegaRequestListene
 //		}
         super.onBackPressed();
     }
+/****************************************/
 
 
+    private void start_camera() {
+
+
+        /*****/
+
+        int cameraCount = 0;
+        Camera.CameraInfo cameraInfo = new Camera.CameraInfo();
+        cameraCount = Camera.getNumberOfCameras();
+        for (int camIdx = 0; camIdx < cameraCount; camIdx++) {
+            Camera.getCameraInfo(camIdx, cameraInfo);
+            if (cameraInfo.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
+                try {
+                    camera = Camera.open(camIdx);
+                } catch (RuntimeException e) {
+                }
+            }
+        }
+        /****/
+
+
+        Camera.Parameters param;
+        param = camera.getParameters();
+        param.setPreviewFrameRate(20);
+        param.setPreviewSize(176, 144);
+        camera.setParameters(param);
+        try {
+            /*Display display = ((WindowManager)getSystemService(WINDOW_SERVICE)).getDefaultDisplay();
+
+            if(display.getRotation() == Surface.ROTATION_0) {
+                camera.setDisplayOrientation(90);
+            }else if(display.getRotation() == Surface.ROTATION_270) {
+                camera.setDisplayOrientation(180);
+            }*/
+            camera.setDisplayOrientation(90);
+
+            camera.setPreviewDisplay(surfaceHolder);
+            camera.startPreview();
+
+        } catch (Exception e) {
+            log("init_camera: " + e);
+            return;
+        }
+    }
+
+
+    /*public static void setCameraDisplayOrientation(Activity activity,
+                                                   int cameraId, android.hardware.Camera camera) {
+        android.hardware.Camera.CameraInfo info =
+                new android.hardware.Camera.CameraInfo();
+        android.hardware.Camera.getCameraInfo(cameraId, info);
+        int rotation = activity.getWindowManager().getDefaultDisplay()
+                .getRotation();
+        int degrees = 0;
+        switch (rotation) {
+            case Surface.ROTATION_0: degrees = 0; break;
+            case Surface.ROTATION_90: degrees = 90; break;
+            case Surface.ROTATION_180: degrees = 180; break;
+            case Surface.ROTATION_270: degrees = 270; break;
+        }
+
+        int result;
+        if (info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
+            result = (info.orientation + degrees) % 360;
+            result = (360 - result) % 360;  // compensate the mirror
+        } else {  // back-facing
+            result = (info.orientation - degrees + 360) % 360;
+        }
+        camera.setDisplayOrientation(result);
+    }*/
+//************************************/
+
+    @Override
+    public void surfaceCreated(SurfaceHolder holder) {
+        try {
+            camera.setPreviewDisplay(surfaceHolder);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {}
+
+    @Override
+    public void surfaceDestroyed(SurfaceHolder holder) {}
 }

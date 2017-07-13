@@ -45,6 +45,17 @@
                     app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
                     android:fitsSystemWindows="true"/>
 
+                <SurfaceView
+                    android:id="@+id/surfaceView1"
+                    android:layout_width="60dp"
+                    android:layout_height="90dp"
+                    android:layout_above="@+id/linear_buttons"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginRight="20dp"
+                    android:layout_marginBottom="25dp"
+                    android:visibility="gone"/>
+
+
                 <!-- My avatar -->
 
                 <RelativeLayout
@@ -54,7 +65,8 @@
                     android:layout_above="@+id/linear_buttons"
                     android:layout_alignParentRight="true"
                     android:layout_marginRight="20dp"
-                    android:layout_marginBottom="25dp">
+                    android:layout_marginBottom="25dp"
+                    android:visibility="visible">
 
                     <ImageView
                         android:id="@+id/call_chat_my_image"
