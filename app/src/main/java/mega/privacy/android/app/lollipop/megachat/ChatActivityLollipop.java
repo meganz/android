@@ -40,7 +40,10 @@ import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import org.w3c.dom.NodeList;
+
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
@@ -52,6 +55,7 @@ import io.github.rockerhieu.emojicon.EmojiconsFragment;
 import io.github.rockerhieu.emojicon.emoji.Emojicon;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.components.NpaLinearLayoutManager;
@@ -2159,12 +2163,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                             MegaNode node = nodeList.get(0);
                             if(node.hasPreview()){
                                 log("Show full screen viewer");
-                                Intent intent = new Intent(this, ChatFullScreenImageViewer.class);
-                                intent.putExtra("position", 0);
-                                intent.putExtra("chatId", idChat);
-                                long [] messagesIds = {m.getMessage().getMsgId()};
-                                intent.putExtra("messageIds", messagesIds);
-                                startActivity(intent);
+                                showFullScreenViewer(m.getMessage().getMsgId());
                             }
                             else{
                                 log("show node attachment panel for one node");
@@ -2206,8 +2205,47 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
         }
     }
-    /////END Multiselect/////
 
+
+    public void showFullScreenViewer(long msgId){
+        log("showFullScreenViewer");
+        int position = 0;
+        boolean positionFound = false;
+        List<Long> ids = new ArrayList<>();
+        for(int i=0; i<messages.size();i++){
+            MegaChatMessage msg = messages.get(i).getMessage();
+            if(msg.getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT){
+                ids.add(msg.getMsgId());
+
+                if(msg.getMsgId()==msgId){
+                    positionFound=true;
+                }
+                if(!positionFound){
+                    MegaNodeList nodeList = msg.getMegaNodeList();
+                    for(int j=0;j<nodeList.size();j++){
+                        MegaNode node = nodeList.get(j);
+                        if(!(megaChatApi.isRevoked(idChat, node.getHandle()))){
+                            if(MimeTypeList.typeForName(node.getName()).isImage()){
+                                position++;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        Intent intent = new Intent(this, ChatFullScreenImageViewer.class);
+        intent.putExtra("position", position);
+        intent.putExtra("chatId", idChat);
+//        Long [] messagesIds = ids.toArray(new Long[ids.size()]);
+        long[] array = new long[ids.size()];
+        for(int i = 0; i < ids.size(); i++) {
+            array[i] = ids.get(i);
+        }
+        intent.putExtra("messageIds", array);
+        startActivity(intent);
+
+    }
     @Override
     public boolean onDown(MotionEvent e) {
         return false;

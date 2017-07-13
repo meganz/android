@@ -586,6 +586,9 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
         if(item.hasChanged(MegaChatListItem.CHANGE_TYPE_STATUS)){
             log("listItemUpdate: Change status: MegaChatListItem.CHANGE_TYPE_STATUS");
         }
+        else if(item.hasChanged(MegaChatListItem.CHANGE_TYPE_OWN_PRIV)){
+            log("listItemUpdate: Change status: MegaChatListItem.CHANGE_TYPE_OWN_PRIV");
+        }
         else if(item.hasChanged(MegaChatListItem.CHANGE_TYPE_PARTICIPANTS)){
             log("listItemUpdate: Change participants");
             MegaChatRoom chatToCheck = megaChatApi.getChatRoom(item.getChatId());
