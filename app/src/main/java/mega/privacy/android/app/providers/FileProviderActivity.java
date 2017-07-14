@@ -252,7 +252,6 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 		checkLogin();
 		UserCredentials credentials = dbH.getCredentials();
 		if (credentials == null){
-
 			loginLogin.setVisibility(View.VISIBLE);
 			if(scrollView!=null){
 				scrollView.setBackgroundColor(getResources().getColor(R.color.background_create_account));
@@ -272,8 +271,11 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 			confirmingAccountText.setVisibility(View.GONE);
 		}
 		else{
+
 			log("dbH.getCredentials() NOT null");
+
 			if (megaApi.getRootNode() == null){
+
 				log("megaApi.getRootNode() == null");
 
 				lastEmail = credentials.getEmail();
@@ -298,10 +300,12 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 					prepareNodesText.setVisibility(View.GONE);
 					if(serversBusyText!=null){
 						serversBusyText.setVisibility(View.GONE);
+
 					}
 
 					if(Util.isChatEnabled()){
 						log("onCreate: Chat is ENABLED");
+
 						if (megaChatApi == null){
 							megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
 						}
@@ -313,31 +317,38 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 							log("onCreate: condition ret == MegaChatApi.INIT_NO_CACHE");
 							megaApi.invalidateCache();
 
+
 						}
 						else if (ret == MegaChatApi.INIT_ERROR)
 						{
+
 							log("onCreate: condition ret == MegaChatApi.INIT_ERROR");
 							if(chatSettings==null) {
 								log("1 - onCreate: ERROR----> Switch OFF chat");
 								chatSettings = new ChatSettings(false+"", true + "", true + "",true + "");
 								dbH.setChatSettings(chatSettings);
+
 							}
 							else{
 								log("2 - onCreate: ERROR----> Switch OFF chat");
 								dbH.setEnabledChat(false + "");
+
 							}
 							megaChatApi.logout(this);
 						}
 						else{
+
 							log("onCreate: Chat correctly initialized");
 						}
 					}
 
 					megaApi.fastLogin(gSession, this);
 				}
+
 			}
 			else{
 				setContentView(R.layout.activity_file_provider);
+
 				log("megaApi.getRootNode() NOT null");
 
 				//Set toolbar
@@ -372,6 +383,7 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 				providerSectionLayout.setVisibility(View.VISIBLE);
 
 				if (mTabsAdapterProvider == null){
+
 					log("mTabsAdapterProvider == null");
 					log("tabShown: "+tabShown);
 					log("parentHandle INCOMING: "+incParentHandle);
@@ -386,6 +398,7 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 					viewPagerProvider.setCurrentItem(tabShown);
 				}
 				else{
+
 					log("mTabsAdapterProvider NOOOT null");
 					log("tabShown: "+tabShown);
 					log("parentHandle INCOMING: "+incParentHandle);
@@ -1041,25 +1054,32 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 
 		if (request.getType() == MegaRequest.TYPE_LOGIN){
 			log("REQUEST LOGIN");
+
+
 			try { 
 				statusDialog.dismiss();	
 			} 
 			catch (Exception ex) {}
 			
 			if (e.getErrorCode() != MegaError.API_OK) {
+
 				MegaApplication.setLoggingIn(false);
 
 				String errorMessage;
 				if (e.getErrorCode() == MegaError.API_ENOENT) {
+
 					errorMessage = getString(R.string.error_incorrect_email_or_password);
 				}
 				else if (e.getErrorCode() == MegaError.API_ENOENT) {
+
 					errorMessage = getString(R.string.error_server_connection_problem);
 				}
 				else if (e.getErrorCode() == MegaError.API_ESID){
+
 					errorMessage = getString(R.string.error_server_expired_session);
 				}
 				else{
+
 					errorMessage = e.getErrorString();
 				}
 				loginLoggingIn.setVisibility(View.GONE);
@@ -1103,6 +1123,7 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 				}
 				
 				gSession = megaApi.dumpSession();
+
 //				if (lastEmail != null){
 //					credentials = new UserCredentials(lastEmail, gSession, "", "");
 //				}
@@ -1118,7 +1139,9 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 		}
 		else if (request.getType() == MegaRequest.TYPE_FETCH_NODES){
 
+
 			if (e.getErrorCode() != MegaError.API_OK) {
+
 				String errorMessage;
 				errorMessage = e.getErrorString();
 				loginLoggingIn.setVisibility(View.GONE);
@@ -1141,7 +1164,7 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 				Util.showErrorAlertDialog(errorMessage, false, this);
 			}
 			else{
-				
+
 				if (credentials != null){
 					DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 					dbH.clearCredentials();
@@ -1155,20 +1178,40 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 				DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 				chatSettings = dbH.getChatSettings();
 				if(chatSettings!=null) {
+
 					boolean chatEnabled = Boolean.parseBoolean(chatSettings.getEnabled());
 					if(chatEnabled){
 						log("Chat enabled-->connect");
 						megaChatApi.connect(this);
 						MegaApplication.setLoggingIn(false);
                         afterFetchNodes();
+						viewPagerProvider.setCurrentItem(tabShown);
+						if(tabShown==-1){
+							tabShown=CLOUD_TAB;
+						}
+						mTabsAdapterProvider = new ProviderPageAdapter(getSupportFragmentManager(),this);
+						viewPagerProvider.setAdapter(mTabsAdapterProvider);
+						tabLayoutProvider.setupWithViewPager(viewPagerProvider);
+						viewPagerProvider.setCurrentItem(tabShown);
+						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+							Window window = this.getWindow();
+							window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+							window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+							window.setStatusBarColor(ContextCompat.getColor(this, R.color.lollipop_dark_primary_color));
+						}
+
+
 					}
 					else{
+
 						log("Chat NOT enabled - readyToManager");
 						MegaApplication.setLoggingIn(false);
 						afterFetchNodes();
+
 					}
 				}
 				else{
+
 					log("chatSettings NULL - readyToManager");
 					MegaApplication.setLoggingIn(false);
 					afterFetchNodes();
@@ -1182,7 +1225,7 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 		tB = (Toolbar) findViewById(R.id.toolbar_provider);
 
 		RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) tB.getLayoutParams();
-		params.setMargins(0, getStatusBarHeight(), 0, 0);
+		params.setMargins(0, 0, 0, 0);
 
 		setSupportActionBar(tB);
 		aB = getSupportActionBar();
@@ -1259,6 +1302,12 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH, WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH);
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL, WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL);
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+			Window window = this.getWindow();
+			window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+			window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+			window.setStatusBarColor(ContextCompat.getColor(this, R.color.lollipop_dark_primary_color));
+		}
 	}
 
 	@Override
