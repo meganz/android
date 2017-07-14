@@ -2237,15 +2237,14 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         Intent intent = new Intent(this, ChatFullScreenImageViewer.class);
         intent.putExtra("position", position);
         intent.putExtra("chatId", idChat);
-//        Long [] messagesIds = ids.toArray(new Long[ids.size()]);
         long[] array = new long[ids.size()];
         for(int i = 0; i < ids.size(); i++) {
             array[i] = ids.get(i);
         }
         intent.putExtra("messageIds", array);
         startActivity(intent);
-
     }
+
     @Override
     public boolean onDown(MotionEvent e) {
         return false;
@@ -4278,6 +4277,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }
             else{
                 log("NOT revoked correctly");
+                showSnackbar(getString(R.string.error_revoking_node));
             }
         }
         else if(request.getType() == MegaChatRequest.TYPE_CREATE_CHATROOM){

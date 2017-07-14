@@ -240,22 +240,6 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 			}
 		}
 
-		menuOptions = new String[2];
-		menuOptions[0] = getString(R.string.save_for_offline);
-		menuOptions[1] = getString(R.string.context_remove);
-
-
-
-//		if(message.getUserHandle()==megaChatApi.getMyUserHandle()){
-//			menuOptions = new String[2];
-//			menuOptions[0] = getString(R.string.save_for_offline);
-//			menuOptions[1] = getString(R.string.context_remove);
-//		}
-//		else{
-//			menuOptions = new String[1];
-//			menuOptions[0] = getString(R.string.save_for_offline);
-//		}
-
 		int imageNumber = 0;
 		for (int i=0;i<nodes.size();i++){
 			MegaNode n = nodes.get(i);
@@ -303,11 +287,7 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 		importIcon.setVisibility(View.VISIBLE);
 		importIcon.setOnClickListener(this);
 
-		ArrayAdapter<String> arrayAdapter;
-
 		overflowMenuList = (ListView) findViewById(R.id.chat_image_viewer_overflow_menu_list);
-		arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, menuOptions);
-		overflowMenuList.setAdapter(arrayAdapter);
 
 		overflowMenuList.setOnItemClickListener(this);
 		if (overflowVisible){
@@ -364,13 +344,21 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 
 		MegaNode node = nodes.get(positionG);
-		if(node.isForeign()){
+
+		if((megaApi.getNodeByHandle(node.getHandle()))==null){
 			log("The node is not mine");
+			menuOptions = new String[1];
+			menuOptions[0] = getString(R.string.save_for_offline);
+		}
+		else{
+			menuOptions = new String[2];
+			menuOptions[0] = getString(R.string.save_for_offline);
+			menuOptions[1] = getString(R.string.context_remove);
 		}
 
-
-		int accessLevel = megaApi.getAccess(node);
-		log("Access level: "+accessLevel);
+		ArrayAdapter<String> arrayAdapter;
+		arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, menuOptions);
+		overflowMenuList.setAdapter(arrayAdapter);
 
 		switch (v.getId()){
 			case R.id.chat_full_image_viewer_icon:{
@@ -865,6 +853,7 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 			}
 			else{
 				log("NOT revoked correctly");
+				showSnackbar(getString(R.string.error_revoking_node));
 			}
 		}
 	}
