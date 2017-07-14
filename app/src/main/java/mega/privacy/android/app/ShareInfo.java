@@ -198,12 +198,15 @@ public class ShareInfo {
 		}
 		ArrayList<ShareInfo> result = new ArrayList<ShareInfo>();
 		for (Uri uri : imageUris) {
-			if (uri == null)
+			if (uri == null) {
+				log("continue --> uri null");
 				continue;
+			}
 			log("----: "+uri.toString());
 			ShareInfo info = new ShareInfo();
 			info.processUri(uri, context);
 			if (info.file == null) {
+				log("continue -->info.file null");
 				continue;
 			}
 			result.add(info);
@@ -213,7 +216,7 @@ public class ShareInfo {
 
 		return result;
 	}
-	
+
 	/*
 	 * Get info from Uri
 	 */
@@ -246,60 +249,68 @@ public class ShareInfo {
 		}
 
 		if (inputStream != null) {
-			log("inputStream != null");
-			try {
-				file = null;
-				String path = uri.getPath();
-				log("processUri-path: "+path);
-				try{ 
-					file = new File(path); 
-				}
-				catch(Exception e){
-					log("error when creating File!");
+			log("processUri inputStream != null");
+
+			file = null;
+			String path = uri.getPath();
+			log("processUri-path: "+path);
+			try{
+				file = new File(path);
+			}
+			catch(Exception e){
+				log("error when creating File!");
 //					log(e.getMessage());
-				}
-				if((file != null) && file.exists() && file.canRead())
-				{
-					size = file.length();
-					log("The file is accesible!");
-					return;
-				}
-				
-				file = null;
-				path = getRealPathFromURI(context, uri);
+			}
+
+			if((file != null) && file.exists() && file.canRead())
+			{
+				size = file.length();
+				log("The file is accesible!");
+				return;
+			}
+
+			file = null;
+			path = getRealPathFromURI(context, uri);
+			if(path!=null){
+				log("RealPath: "+path);
 				try
-				{ 
-					file = new File(path); 				
-					log("Real path from URI: "+path);
+				{
+					file = new File(path);
 				}
 				catch(Exception e){
-					log("No real path from URI");
+					log("EXCEPTION: No real path from URI");
 				}
-				
-				if((file != null) && file.exists() && file.canRead())
-				{
-					size = file.length();
-					return;
-				}
-				
-				if (context.getExternalCacheDir() != null){
-					if (title != null){
-						file = new File(context.getExternalCacheDir(), title);
-					}
-					else{
-						return;
-					}
+			}
+			else{
+				log("Real path is NULL");
+			}
+
+			if((file != null) && file.exists() && file.canRead())
+			{
+				size = file.length();
+				log("Return here");
+				return;
+			}
+
+			if (context.getExternalCacheDir() != null){
+				if (title != null){
+					file = new File(context.getExternalCacheDir(), title);
 				}
 				else{
-					if (title != null){
-						file = new File(context.getCacheDir(), title);
-					}
-					else{
-						return;
-					}
+					return;
 				}
-				log("Start copy to: "+file.getAbsolutePath());
-				
+			}
+			else{
+				if (title != null){
+					file = new File(context.getCacheDir(), title);
+				}
+				else{
+					return;
+				}
+			}
+			log("Start copy to: "+file.getAbsolutePath());
+
+			try {
 				OutputStream stream = new BufferedOutputStream(new FileOutputStream(file));
 				int bufferSize = 1024;
 				byte[] buffer = new byte[bufferSize];
@@ -313,8 +324,10 @@ public class ShareInfo {
 
 				inputStream = new FileInputStream(file);
 				size = file.length();
-			} 
+				log("File size: "+size);
+			}
 			catch (IOException e) {
+				log("Catch IO exception");
 				inputStream = null;
 				if (file != null) {
 					file.delete();
@@ -376,10 +389,12 @@ public class ShareInfo {
 		}
 		if(cursor!=null){
 			if(cursor.getCount()==0){
+				log("RETURN - Cursor get count is 0");
 				return;
 			}
 		}
 		else{
+			log("RETURN - Cursor is NULL");
 			return;
 		}
 		cursor.moveToFirst();
@@ -392,16 +407,19 @@ public class ShareInfo {
 			if(sizeString!=null){
 				long size = Long.valueOf(sizeString);
 				if (size > 0) {
+					log("Size: "+size);
 					this.size = size;
 				}
 			}
 		}
 
 		if (size == -1 || inputStream == null) {
+			log("Keep going");
 			int dataIndex = cursor.getColumnIndex("_data");
 			if (dataIndex != -1) {
 				String data = cursor.getString(dataIndex);
 				if (data == null){
+					log("RETURN - data is NULL");
 					return;
 				}
 				File dataFile = new File(data);
@@ -409,21 +427,34 @@ public class ShareInfo {
 					if (size == -1) {
 						long size = dataFile.length();
 						if (size > 0) {
+							log("Size is: "+size);
 							this.size = size;
 						}
 					}
+					else{
+						log("Not valid size");
+					}
+
 					if (inputStream == null) {
 						try {
 							inputStream = new FileInputStream(dataFile);
 						} catch (FileNotFoundException e) {
+							log("Exception FileNotFoundException");
 						}
+
+					}
+					else{
+						log("inputStream is NULL");
 					}
 				}
 			}
 		}
+		else{
+			log("Nothing done!");
+		}
 	
 		client.release();
-		 
+		log("---- END process content----");
 	}
 	
 	/*
