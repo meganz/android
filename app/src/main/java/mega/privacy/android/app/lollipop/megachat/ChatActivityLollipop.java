@@ -1902,6 +1902,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
         @Override
         public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+            log("onPrepareActionMode");
             List<AndroidMegaChatMessage> selected = adapter.getSelectedMessages();
 
             if (selected.size() !=0) {
@@ -1923,11 +1924,11 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         menu.findItem(R.id.chat_cab_menu_edit).setVisible(false);
 
                         if(selected.get(0).getMessage().isDeletable()){
-                            log("Message DELETABLE");
+                            log("one message Message DELETABLE");
                             menu.findItem(R.id.chat_cab_menu_delete).setVisible(true);
                         }
                         else{
-                            log("Message NOT DELETABLE");
+                            log("one message Message NOT DELETABLE");
                             menu.findItem(R.id.chat_cab_menu_delete).setVisible(false);
                         }
                     }
@@ -1961,14 +1962,24 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     }
                 }
                 else{
+                    log("Many items selected");
+                    boolean showDelete = true;
                     menu.findItem(R.id.chat_cab_menu_edit).setVisible(false);
                     menu.findItem(R.id.chat_cab_menu_copy).setVisible(true);
                     menu.findItem(R.id.chat_cab_menu_delete).setVisible(true);
-                    menu.findItem(R.id.chat_cab_menu_delete).setVisible(true);
+
                     for(int i=0; i<selected.size();i++){
                         if(selected.get(i).getMessage().getUserHandle()==myUserHandle){
-                            if(!(selected.get(i).getMessage().isDeletable())){
-                                log("onPrepareActionMode: not deletable");
+
+                            if(selected.get(i).getMessage().getType()==MegaChatMessage.TYPE_NORMAL){
+                               log("Message TYPE_NORMAL");
+                                if(!(selected.get(i).getMessage().isDeletable())){
+                                    log("onPrepareActionMode: not deletable");
+                                    menu.findItem(R.id.chat_cab_menu_delete).setVisible(false);
+                                    break;
+                                }
+                            }
+                            else if(selected.get(i).getMessage().getType()==MegaChatMessage.TYPE_TRUNCATE){
                                 menu.findItem(R.id.chat_cab_menu_delete).setVisible(false);
                                 break;
                             }
