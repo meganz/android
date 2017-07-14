@@ -10506,6 +10506,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	        DocumentFile pickedDir = DocumentFile.fromTreeUri(this, treeUri);
 		}
 		else if (requestCode == Constants.REQUEST_CODE_GET && resultCode == RESULT_OK) {
+			log("REQUEST_CODE_GET");
 			if (intent == null) {
 				log("Return.....");
 				return;
@@ -11569,6 +11570,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		if (drawerItem == DrawerItem.CLOUD_DRIVE){
 			parentHandle = fbFLol.getParentHandle();
 			parentNode = megaApi.getNodeByHandle(parentHandle);
+			if (parentNode == null){
+				parentNode = megaApi.getRootNode();
+			}
 		}
 		else if (drawerItem == DrawerItem.SHARED_ITEMS){
 			int index = viewPagerShares.getCurrentItem();

@@ -139,6 +139,8 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		log("onStartCommand");
 
+		canceled = false;
+
 		if(intent == null){
 			return START_NOT_STICKY;
 		}

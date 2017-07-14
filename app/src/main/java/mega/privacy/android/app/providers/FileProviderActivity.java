@@ -14,6 +14,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.StatFs;
+import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -244,6 +245,7 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 		}
 
 		megaApi = ((MegaApplication)getApplication()).getMegaApi();
+		megaChatApi = ((MegaApplication)getApplication()).getMegaChatApi();
 
 		megaApi.addGlobalListener(this);
 		megaApi.addTransferListener(this);
@@ -992,9 +994,31 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 			serversBusyText.setVisibility(View.GONE);
 		}
 		log("fastLogin con publicKey y privateKey");
-		if (!MegaApplication.isLoggingIn()){
-			MegaApplication.setLoggingIn(true);
-			megaApi.fastLogin(lastEmail, publicKey, privateKey, this);
+		if(Util.isChatEnabled()){
+			log("onKeysGeneratedLogin: Chat is ENABLED");
+			if (megaChatApi == null){
+				megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
+			}
+			int ret = megaChatApi.init(null);
+			log("onKeysGeneratedLogin: result of init ---> "+ret);
+			if (ret ==MegaChatApi.INIT_WAITING_NEW_SESSION){
+				log("startFastLogin: condition ret == MegaChatApi.INIT_WAITING_NEW_SESSION");
+				if (!MegaApplication.isLoggingIn()){
+					MegaApplication.setLoggingIn(true);
+					megaApi.fastLogin(lastEmail, publicKey, privateKey, this);
+				}
+			}
+			else{
+				log("ERROR INIT CHAT: " + ret);
+				megaChatApi.logout(this);
+			}
+		}
+		else{
+			log("onKeysGeneratedLogin: Chat is NOT ENABLED");
+			if (!MegaApplication.isLoggingIn()){
+				MegaApplication.setLoggingIn(true);
+				megaApi.fastLogin(lastEmail, publicKey, privateKey, this);
+			}
 		}
 	}
 	
@@ -1140,8 +1164,7 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 		else if (request.getType() == MegaRequest.TYPE_FETCH_NODES){
 
 			if (e.getErrorCode() != MegaError.API_OK) {
-				String errorMessage;
-				errorMessage = e.getErrorString();
+
 				loginLoggingIn.setVisibility(View.GONE);
 				loginLogin.setVisibility(View.VISIBLE);
 				if(scrollView!=null){
@@ -1159,20 +1182,34 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 				queryingSignupLinkText.setVisibility(View.GONE);
 				confirmingAccountText.setVisibility(View.GONE);
 
-				Util.showErrorAlertDialog(errorMessage, false, this);
+				String errorMessage;
+				if (e.getErrorCode() == MegaError.API_ESID){
+					errorMessage = getString(R.string.error_server_expired_session);
+				}
+				else if (e.getErrorCode() == MegaError.API_ETOOMANY){
+					errorMessage = getString(R.string.too_many_attempts_login);
+				}
+				else if (e.getErrorCode() == MegaError.API_EINCOMPLETE){
+					errorMessage = getString(R.string.account_not_validated_login);
+				}
+				else if (e.getErrorCode() == MegaError.API_EBLOCKED){
+					errorMessage = getString(R.string.error_account_suspended);
+				}
+				else{
+					errorMessage = e.getErrorString();
+				}
+				showSnackbar(errorMessage);
 			}
 			else{
-				if (credentials != null){
-					DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
-					dbH.clearCredentials();
-					dbH.saveCredentials(credentials);
-				}
+
+				UserCredentials credentials = new UserCredentials(lastEmail, gSession, "", "", megaApi.getMyUserHandle());
+				DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
+				dbH.saveCredentials(credentials);
 				
 				setContentView(R.layout.activity_file_provider);
 				tabShown = CLOUD_TAB;
 				log("megaApi.getRootNode() NOT null");
 
-				DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 				chatSettings = dbH.getChatSettings();
 				if(chatSettings!=null) {
 					boolean chatEnabled = Boolean.parseBoolean(chatSettings.getEnabled());
@@ -1203,6 +1240,16 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 					afterFetchNodes();
 				}
 			}
+		}
+	}
+
+
+	public void showSnackbar(String message) {
+		if(scrollView!=null){
+			Snackbar snackbar = Snackbar.make(scrollView, message, Snackbar.LENGTH_LONG);
+			TextView snackbarTextView = (TextView) snackbar.getView().findViewById(android.support.design.R.id.snackbar_text);
+			snackbarTextView.setMaxLines(5);
+			snackbar.show();
 		}
 	}
 
