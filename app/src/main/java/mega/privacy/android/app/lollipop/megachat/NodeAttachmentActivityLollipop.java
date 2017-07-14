@@ -793,6 +793,7 @@ public class NodeAttachmentActivityLollipop extends PinActivityLollipop implemen
 			}
 			else{
 				log("NOT revoked correctly");
+				showSnackbar(getString(R.string.error_revoking_node));
 			}
 		}
 	}
@@ -915,7 +916,7 @@ public class NodeAttachmentActivityLollipop extends PinActivityLollipop implemen
 			}
 		}
 	}
-	
+
 	@Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);

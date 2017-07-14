@@ -40,7 +40,10 @@ import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import org.w3c.dom.NodeList;
+
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
@@ -52,6 +55,7 @@ import io.github.rockerhieu.emojicon.EmojiconsFragment;
 import io.github.rockerhieu.emojicon.emoji.Emojicon;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.components.NpaLinearLayoutManager;
@@ -1884,7 +1888,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
             MenuInflater inflater = mode.getMenuInflater();
             inflater.inflate(R.menu.messages_chat_action, menu);
-            fab.setVisibility(View.GONE);
             return true;
         }
 
@@ -1895,11 +1898,11 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             textChat.getText().clear();
             editingMessage = false;
             clearSelections();
-            fab.setVisibility(View.VISIBLE);
         }
 
         @Override
         public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+            log("onPrepareActionMode");
             List<AndroidMegaChatMessage> selected = adapter.getSelectedMessages();
 
             if (selected.size() !=0) {
@@ -1921,11 +1924,11 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         menu.findItem(R.id.chat_cab_menu_edit).setVisible(false);
 
                         if(selected.get(0).getMessage().isDeletable()){
-                            log("Message DELETABLE");
+                            log("one message Message DELETABLE");
                             menu.findItem(R.id.chat_cab_menu_delete).setVisible(true);
                         }
                         else{
-                            log("Message NOT DELETABLE");
+                            log("one message Message NOT DELETABLE");
                             menu.findItem(R.id.chat_cab_menu_delete).setVisible(false);
                         }
                     }
@@ -1959,14 +1962,24 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     }
                 }
                 else{
+                    log("Many items selected");
+                    boolean showDelete = true;
                     menu.findItem(R.id.chat_cab_menu_edit).setVisible(false);
                     menu.findItem(R.id.chat_cab_menu_copy).setVisible(true);
                     menu.findItem(R.id.chat_cab_menu_delete).setVisible(true);
-                    menu.findItem(R.id.chat_cab_menu_delete).setVisible(true);
+
                     for(int i=0; i<selected.size();i++){
                         if(selected.get(i).getMessage().getUserHandle()==myUserHandle){
-                            if(!(selected.get(i).getMessage().isDeletable())){
-                                log("onPrepareActionMode: not deletable");
+
+                            if(selected.get(i).getMessage().getType()==MegaChatMessage.TYPE_NORMAL){
+                               log("Message TYPE_NORMAL");
+                                if(!(selected.get(i).getMessage().isDeletable())){
+                                    log("onPrepareActionMode: not deletable");
+                                    menu.findItem(R.id.chat_cab_menu_delete).setVisible(false);
+                                    break;
+                                }
+                            }
+                            else if(selected.get(i).getMessage().getType()==MegaChatMessage.TYPE_TRUNCATE){
                                 menu.findItem(R.id.chat_cab_menu_delete).setVisible(false);
                                 break;
                             }
@@ -2161,12 +2174,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                             MegaNode node = nodeList.get(0);
                             if(node.hasPreview()){
                                 log("Show full screen viewer");
-                                Intent intent = new Intent(this, ChatFullScreenImageViewer.class);
-                                intent.putExtra("position", 0);
-                                intent.putExtra("chatId", idChat);
-                                long [] messagesIds = {m.getMessage().getMsgId()};
-                                intent.putExtra("messageIds", messagesIds);
-                                startActivity(intent);
+                                showFullScreenViewer(m.getMessage().getMsgId());
                             }
                             else{
                                 log("show node attachment panel for one node");
@@ -2208,7 +2216,45 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
         }
     }
-    /////END Multiselect/////
+
+
+    public void showFullScreenViewer(long msgId){
+        log("showFullScreenViewer");
+        int position = 0;
+        boolean positionFound = false;
+        List<Long> ids = new ArrayList<>();
+        for(int i=0; i<messages.size();i++){
+            MegaChatMessage msg = messages.get(i).getMessage();
+            if(msg.getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT){
+                ids.add(msg.getMsgId());
+
+                if(msg.getMsgId()==msgId){
+                    positionFound=true;
+                }
+                if(!positionFound){
+                    MegaNodeList nodeList = msg.getMegaNodeList();
+                    for(int j=0;j<nodeList.size();j++){
+                        MegaNode node = nodeList.get(j);
+                        if(!(megaChatApi.isRevoked(idChat, node.getHandle()))){
+                            if(MimeTypeList.typeForName(node.getName()).isImage()){
+                                position++;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        Intent intent = new Intent(this, ChatFullScreenImageViewer.class);
+        intent.putExtra("position", position);
+        intent.putExtra("chatId", idChat);
+        long[] array = new long[ids.size()];
+        for(int i = 0; i < ids.size(); i++) {
+            array[i] = ids.get(i);
+        }
+        intent.putExtra("messageIds", array);
+        startActivity(intent);
+    }
 
     @Override
     public boolean onDown(MotionEvent e) {
@@ -2288,6 +2334,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
         else if(chat.hasChanged(MegaChatRoom.CHANGE_TYPE_PARTICIPANTS)){
             log("CHANGE_TYPE_PARTICIPANTS for the chat: "+chat.getChatId());
+        }
+        else if(chat.hasChanged(MegaChatRoom.CHANGE_TYPE_OWN_PRIV)){
+            log("CHANGE_TYPE_OWN_PRIV for the chat: "+chat.getChatId());
             setChatPermissions();
         }
         else if(chat.hasChanged(MegaChatRoom.CHANGE_TYPE_TITLE)){
@@ -4233,6 +4282,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }
             else{
                 log("File NOT sent: "+e.getErrorCode());
+                showSnackbar(getString(R.string.error_attaching_node_from_cloud));
             }
         }
         else if(request.getType() == MegaChatRequest.TYPE_REVOKE_NODE_MESSAGE){
@@ -4241,6 +4291,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }
             else{
                 log("NOT revoked correctly");
+                showSnackbar(getString(R.string.error_revoking_node));
             }
         }
         else if(request.getType() == MegaChatRequest.TYPE_CREATE_CHATROOM){

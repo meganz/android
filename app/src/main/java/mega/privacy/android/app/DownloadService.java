@@ -181,6 +181,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId){
 		log("onStartCommand");
+		canceled = false;
 
 		if(intent == null){
 			log("intent==null");

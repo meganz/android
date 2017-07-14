@@ -107,18 +107,7 @@ public class ChatController {
 
     public void clearHistory(MegaChatRoom chat){
         log("clearHistory: "+chat.getTitle());
-        if(context instanceof ManagerActivityLollipop){
-            megaChatApi.clearChatHistory(chat.getChatId(), (ManagerActivityLollipop) context);
-        }
-        else if(context instanceof ChatActivityLollipop){
-            megaChatApi.clearChatHistory(chat.getChatId(), (ChatActivityLollipop) context);
-        }
-        else if(context instanceof ContactInfoActivityLollipop){
-            megaChatApi.clearChatHistory(chat.getChatId(), (ContactInfoActivityLollipop) context);
-        }
-        else if(context instanceof GroupChatInfoActivityLollipop){
-            megaChatApi.clearChatHistory(chat.getChatId(), (GroupChatInfoActivityLollipop) context);
-        }
+        clearHistory(chat.getChatId());
     }
 
     public void clearHistory(long chatId){
@@ -135,6 +124,8 @@ public class ChatController {
         else if(context instanceof GroupChatInfoActivityLollipop){
             megaChatApi.clearChatHistory(chatId, (GroupChatInfoActivityLollipop) context);
         }
+
+        dbH.removePendingMessageByChatId(chatId);
     }
 
     public void deleteMessages(ArrayList<AndroidMegaChatMessage> messages, MegaChatRoom chat){

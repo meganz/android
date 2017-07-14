@@ -315,19 +315,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             paramsLeaveChat.leftMargin = Util.scaleWidthPx(72, outMetrics);
             leaveChatLayout.setLayoutParams(paramsLeaveChat);
 
-            if(chat.getOwnPrivilege()==MegaChatRoom.PRIV_MODERATOR){
-                editImageView.setVisibility(View.VISIBLE);
-                dividerClearLayout.setVisibility(View.VISIBLE);
-                clearChatLayout.setVisibility(View.VISIBLE);
-            }
-            else{
-                if(chat.getOwnPrivilege()==MegaChatRoom.PRIV_RM){
-                    leaveChatLayout.setVisibility(View.GONE);
-                }
-                editImageView.setVisibility(View.GONE);
-                dividerClearLayout.setVisibility(View.GONE);
-                clearChatLayout.setVisibility(View.GONE);
-            }
+            setChatPermissions();
 
             participantsTitle = (TextView) findViewById(R.id.chat_group_contact_properties_title_text);
             RelativeLayout.LayoutParams paramsPartTitle = (RelativeLayout.LayoutParams) participantsTitle.getLayoutParams();
@@ -407,6 +395,23 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             participants = new ArrayList<>();
 
             setParticipants();
+        }
+    }
+
+    public void setChatPermissions(){
+        log("setChatPermissions");
+        if(chat.getOwnPrivilege()==MegaChatRoom.PRIV_MODERATOR){
+            editImageView.setVisibility(View.VISIBLE);
+            dividerClearLayout.setVisibility(View.VISIBLE);
+            clearChatLayout.setVisibility(View.VISIBLE);
+        }
+        else{
+            if(chat.getOwnPrivilege()==MegaChatRoom.PRIV_RM){
+                leaveChatLayout.setVisibility(View.GONE);
+            }
+            editImageView.setVisibility(View.GONE);
+            dividerClearLayout.setVisibility(View.GONE);
+            clearChatLayout.setVisibility(View.GONE);
         }
     }
 
@@ -1410,25 +1415,23 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
     public void onChatListItemUpdate(MegaChatApiJava api, MegaChatListItem item) {
         log("onChatListItemUpdate");
 
-        if(item.hasChanged(MegaChatListItem.CHANGE_TYPE_PARTICIPANTS)){
-            log("Change participants");
-            if(item.getChatId()==chatHandle){
-                log("Changes in my chat");
-                chat = megaChatApi.getChatRoom(chatHandle);
-                log("Peers after onChatListItemUpdate: "+chat.getPeerCount());
-//                chat = megaChatApi.getChatRoom(chatHandle);
+        if(item.getChatId()==chatHandle){
+            log("Changes in my chat");
+            chat = megaChatApi.getChatRoom(chatHandle);
+
+            if(item.hasChanged(MegaChatListItem.CHANGE_TYPE_PARTICIPANTS)){
+                log("Change participants");
                 participants.clear();
                 setParticipants();
-//                scrollView.invalidate();
-//                scrollView.setFillViewport(false);
             }
-            else{
-                log("Changes NOT interested in");
+            else if(item.hasChanged(MegaChatListItem.CHANGE_TYPE_OWN_PRIV)){
+                log("listItemUpdate: Change status: MegaChatListItem.CHANGE_TYPE_OWN_PRIV");
+                setChatPermissions();
+                participants.clear();
+                setParticipants();
             }
-        }
-        else if(item.hasChanged(MegaChatListItem.CHANGE_TYPE_TITLE)) {
-            chat = megaChatApi.getChatRoom(chatHandle);
-            if(chat!=null){
+            else if(item.hasChanged(MegaChatListItem.CHANGE_TYPE_TITLE)) {
+
                 log("NEW title: "+chat.getTitle());
                 infoTitleChatText.setText(chat.getTitle());
                 aB.setTitle(chat.getTitle());
@@ -1442,16 +1445,21 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
                 createGroupChatAvatar();
             }
-        }
-        else if(item.hasChanged(MegaChatListItem.CHANGE_TYPE_CLOSED)) {
-            log("CHANGE_TYPE_CLOSED");
-        }
-        else if(item.hasChanged(MegaChatListItem.CHANGE_TYPE_UNREAD_COUNT)) {
-            log("CHANGE_TYPE_UNREAD_COUNT");
+            else if(item.hasChanged(MegaChatListItem.CHANGE_TYPE_CLOSED)) {
+                log("CHANGE_TYPE_CLOSED");
+            }
+            else if(item.hasChanged(MegaChatListItem.CHANGE_TYPE_UNREAD_COUNT)) {
+                log("CHANGE_TYPE_UNREAD_COUNT");
+            }
+            else{
+                log("Changes other: "+item.getChanges());
+                log("Chat title: "+item.getTitle());
+            }
+
+
         }
         else{
-            log("Changes other: "+item.getChanges());
-            log("Chat title: "+item.getTitle());
+            log("Changes NOT interested in");
         }
 
     }
