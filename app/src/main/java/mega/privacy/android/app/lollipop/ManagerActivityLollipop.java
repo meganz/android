@@ -10506,6 +10506,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	        DocumentFile pickedDir = DocumentFile.fromTreeUri(this, treeUri);
 		}
 		else if (requestCode == Constants.REQUEST_CODE_GET && resultCode == RESULT_OK) {
+			log("REQUEST_CODE_GET");
 			if (intent == null) {
 				log("Return.....");
 				return;
