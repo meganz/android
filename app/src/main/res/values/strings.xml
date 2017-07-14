@@ -1490,4 +1490,5 @@
     <string name="general_view_with_revoke" formatted="false" context="Menu option">View files (%1d deleted)</string>
 
     <string name="error_attaching_node_from_cloud" context="Error message when the attachment cannot be sent">Error. The file has not been sent</string>
+    <string name="error_revoking_node" context="Error message when the attachment cannot be revoked">Error. The attachment has not been removed</string>
 </resources>
