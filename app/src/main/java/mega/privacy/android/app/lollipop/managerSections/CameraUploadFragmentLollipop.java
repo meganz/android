@@ -629,9 +629,11 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	    }
 		
 	    if(type==TYPE_MEDIA){
+			log("Media Uploads");
 	    	aB.setTitle(getString(R.string.section_secondary_media_uploads));
 	    }
 	    else{
+			log("CAMERA Uploads");
 	    	aB.setTitle(getString(R.string.section_photo_sync));
 	    }
 			
@@ -682,37 +684,42 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			listView.setItemAnimator(new DefaultItemAnimator()); 
 
 			final TextView turnOnOff = (TextView) v.findViewById(R.id.file_list_browser_camera_upload_on_off);
-			turnOnOff.setVisibility(View.VISIBLE);
-			turnOnOff.setText(getString(R.string.settings_camera_upload_turn_on).toUpperCase(Locale.getDefault()));		    
-		    
-			android.view.ViewGroup.LayoutParams paramsb2 = turnOnOff.getLayoutParams();		
-			paramsb2.height = Util.scaleHeightPx(48, outMetrics);
-			turnOnOff.setLayoutParams(paramsb2);
-			
-			turnOnOff.setGravity(Gravity.CENTER);
+			if(type==TYPE_CAMERA){
+				turnOnOff.setVisibility(View.VISIBLE);
+				turnOnOff.setText(getString(R.string.settings_camera_upload_turn_on).toUpperCase(Locale.getDefault()));
 
-			turnOnOff.setTextSize(TypedValue.COMPLEX_UNIT_SP, (14*scaleText));
+				android.view.ViewGroup.LayoutParams paramsb2 = turnOnOff.getLayoutParams();
+				paramsb2.height = Util.scaleHeightPx(48, outMetrics);
+				turnOnOff.setLayoutParams(paramsb2);
 
-			transfersOverViewLayout = (RelativeLayout) v.findViewById(R.id.transfers_overview_item_layout);
-			transfersOverViewLayout.setVisibility(View.GONE);
-			
-			boolean camEnabled = false;
-			prefs=dbH.getPreferences();
-			if (prefs != null){
-				if (prefs.getCamSyncEnabled() != null){
-					if (Boolean.parseBoolean(prefs.getCamSyncEnabled())){
-						log("Hide option Turn on Camera Uploads");
-						turnOnOff.setVisibility(View.GONE);
-						camEnabled = true;
-					}
-					else{
-						log("SHOW option Turn on Camera Uploads");
-						turnOnOff.setVisibility(View.VISIBLE);
-						camEnabled = false;
+				turnOnOff.setGravity(Gravity.CENTER);
+
+				turnOnOff.setTextSize(TypedValue.COMPLEX_UNIT_SP, (14*scaleText));
+
+				transfersOverViewLayout = (RelativeLayout) v.findViewById(R.id.transfers_overview_item_layout);
+				transfersOverViewLayout.setVisibility(View.GONE);
+
+				boolean camEnabled = false;
+				prefs=dbH.getPreferences();
+				if (prefs != null){
+					if (prefs.getCamSyncEnabled() != null){
+						if (Boolean.parseBoolean(prefs.getCamSyncEnabled())){
+							log("Hide option Turn on Camera Uploads");
+							turnOnOff.setVisibility(View.GONE);
+							camEnabled = true;
+						}
+						else{
+							log("SHOW option Turn on Camera Uploads");
+							turnOnOff.setVisibility(View.VISIBLE);
+							camEnabled = false;
+						}
 					}
 				}
+				turnOnOff.setOnClickListener(this);
 			}
-			turnOnOff.setOnClickListener(this);
+			else{
+				turnOnOff.setVisibility(View.GONE);
+			}
 	
 			contentTextLayout = (RelativeLayout) v.findViewById(R.id.content_text_layout);
 			contentTextLayout.setVisibility(View.GONE);
@@ -856,33 +863,39 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			listView.addOnItemTouchListener(this);
 			listView.setItemAnimator(new DefaultItemAnimator()); 
 
-			final TextView turnOnOff = (TextView) v.findViewById(R.id.file_grid_browser_camera_upload_on_off);
-			turnOnOff.setVisibility(View.VISIBLE);
-			turnOnOff.setText(getString(R.string.settings_camera_upload_turn_on).toUpperCase(Locale.getDefault()));		    
-		    
-			android.view.ViewGroup.LayoutParams paramsb2 = turnOnOff.getLayoutParams();		
-			paramsb2.height = Util.scaleHeightPx(48, outMetrics);
-			turnOnOff.setLayoutParams(paramsb2);
-			
-			turnOnOff.setGravity(Gravity.CENTER);
 
-			turnOnOff.setTextSize(TypedValue.COMPLEX_UNIT_SP, (14*scaleText));			
-			
-			boolean camEnabled = false;
-			prefs=dbH.getPreferences();
-			if (prefs != null){
-				if (prefs.getCamSyncEnabled() != null){
-					if (Boolean.parseBoolean(prefs.getCamSyncEnabled())){
-						turnOnOff.setVisibility(View.GONE);
-						camEnabled = true;
-					}
-					else{
-						camEnabled = false;
-						turnOnOff.setVisibility(View.VISIBLE);
+			final TextView turnOnOff = (TextView) v.findViewById(R.id.file_grid_browser_camera_upload_on_off);
+			if(type==TYPE_CAMERA){
+				turnOnOff.setVisibility(View.VISIBLE);
+				turnOnOff.setText(getString(R.string.settings_camera_upload_turn_on).toUpperCase(Locale.getDefault()));
+
+				android.view.ViewGroup.LayoutParams paramsb2 = turnOnOff.getLayoutParams();
+				paramsb2.height = Util.scaleHeightPx(48, outMetrics);
+				turnOnOff.setLayoutParams(paramsb2);
+
+				turnOnOff.setGravity(Gravity.CENTER);
+
+				turnOnOff.setTextSize(TypedValue.COMPLEX_UNIT_SP, (14*scaleText));
+
+				boolean camEnabled = false;
+				prefs=dbH.getPreferences();
+				if (prefs != null){
+					if (prefs.getCamSyncEnabled() != null){
+						if (Boolean.parseBoolean(prefs.getCamSyncEnabled())){
+							turnOnOff.setVisibility(View.GONE);
+							camEnabled = true;
+						}
+						else{
+							camEnabled = false;
+							turnOnOff.setVisibility(View.VISIBLE);
+						}
 					}
 				}
+				turnOnOff.setOnClickListener(this);
 			}
-			turnOnOff.setOnClickListener(this);
+			else{
+				turnOnOff.setVisibility(View.GONE);
+			}
 	
 			contentTextLayout = (RelativeLayout) v.findViewById(R.id.content_grid_text_layout);		
 			contentTextLayout.setVisibility(View.GONE);

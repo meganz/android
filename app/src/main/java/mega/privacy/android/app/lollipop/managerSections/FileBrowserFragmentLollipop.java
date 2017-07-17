@@ -39,6 +39,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
 
+import mega.privacy.android.app.CameraSyncService;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
@@ -962,18 +963,38 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 				if ((n.getHandle()==Long.parseLong(secondaryMediaHandle))){
 					log("Click on Media Uploads");
 					((ManagerActivityLollipop)context).secondaryMediaUploadsClicked();
+					log("aB.setTitle "+n.getName());
+					if(aB==null){
+						aB = ((AppCompatActivity)context).getSupportActionBar();
+					}
+					if(aB==null){
+						log("AB still is NULL");
+					}
+
+					aB.setTitle(n.getName());
+					log("indicator_arrow_back_003");
 					return;
 				}
 			}
 		}
 		else{
-			if(n.getName().equals("Media Uploads")){
+			if(n.getName().equals(CameraSyncService.SECONDARY_UPLOADS)){
 				if (prefs != null){
 					prefs.setMegaHandleSecondaryFolder(String.valueOf(n.getHandle()));
 				}
 				dbH.setSecondaryFolderHandle(n.getHandle());
 				log("FOUND Media Uploads!!: "+n.getHandle());
 				((ManagerActivityLollipop)context).secondaryMediaUploadsClicked();
+				log("aB.setTitle "+n.getName());
+				if(aB==null){
+					aB = ((AppCompatActivity)context).getSupportActionBar();
+				}
+				if(aB==null){
+					log("AB still is NULL");
+				}
+
+				aB.setTitle(n.getName());
+				log("indicator_arrow_back_696");
 				return;
 			}
 		}
