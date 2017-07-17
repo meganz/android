@@ -4310,6 +4310,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
     	}
 	}
 
+	public void moveToSettingsSection(){
+		drawerItem=DrawerItem.SETTINGS;
+		selectDrawerItemLollipop(drawerItem);
+	}
+
 	private String getFragmentTag(int viewPagerId, int fragmentPosition){
 	     return "android:switcher:" + viewPagerId + ":" + fragmentPosition;
 	}
