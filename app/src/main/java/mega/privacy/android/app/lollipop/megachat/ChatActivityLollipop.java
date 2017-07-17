@@ -502,6 +502,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         textChat.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
+                if(adapter.isMultipleSelect()){
+                    hideMultipleSelect();
+                }
                 if (emojiKeyboardShown){
 //                    int inputType = textChat.getInputType();
 //                    textChat.setInputType(InputType.TYPE_NULL);
@@ -1489,6 +1492,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 break;
             }
             case R.id.fab_chat:{
+                if(adapter.isMultipleSelect()){
+                    hideMultipleSelect();
+                }
                 showUploadPanel();
                 break;
             }
@@ -2100,7 +2106,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 //        }
         List<AndroidMegaChatMessage> messages = adapter.getSelectedMessages();
 
-        actionMode.setTitle(getString(R.string.selected_items, messages.size()));
+        actionMode.setTitle(messages.size()+"");
 
         try {
             actionMode.invalidate();
