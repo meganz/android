@@ -4044,6 +4044,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
     			tB.setVisibility(View.VISIBLE);
 
+				if (nV != null){
+					Menu nVMenu = nV.getMenu();
+					MenuItem hidden = nVMenu.findItem(R.id.navigation_item_hidden);
+					resetNavigationViewMenu(nVMenu);
+					hidden.setChecked(true);
+				}
+
     			if (muFLol == null){
 //    				cuF = new CameraUploadFragmentLollipop(CameraUploadFragmentLollipop.TYPE_MEDIA);
     				muFLol = CameraUploadFragmentLollipop.newInstance(CameraUploadFragmentLollipop.TYPE_MEDIA);
@@ -4083,7 +4090,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					fragTransaction.commitNowAllowingStateLoss();
 				}
 				else{
-					fragTransaction.replace(R.id.fragment_container, muFLol, "cuFLol");
+					fragTransaction.replace(R.id.fragment_container, muFLol, "muFLol");
 					fragTransaction.commitNowAllowingStateLoss();
 				}
 
@@ -5742,7 +5749,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 								return true;
 							}
 						}
-
 
 //						if (tFLol != null){
 //							if (tFLol.onBackPressed() == 0){
