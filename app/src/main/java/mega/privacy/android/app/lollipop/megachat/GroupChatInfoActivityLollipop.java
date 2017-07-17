@@ -648,21 +648,21 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         View dialoglayout = inflater.inflate(R.layout.change_permissions_dialog, null);
 
         final CheckedTextView administratorCheck = (CheckedTextView) dialoglayout.findViewById(R.id.change_permissions_dialog_administrator);
-        administratorCheck.setText(getString(R.string.file_properties_shared_folder_full_access));
+        administratorCheck.setText(getString(R.string.administrator_permission_label_participants_panel));
         administratorCheck.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16*scaleText));
         administratorCheck.setCompoundDrawablePadding(Util.scaleWidthPx(10, outMetrics));
         ViewGroup.MarginLayoutParams administratorMLP = (ViewGroup.MarginLayoutParams) administratorCheck.getLayoutParams();
         administratorMLP.setMargins(Util.scaleWidthPx(15, outMetrics), Util.scaleHeightPx(10, outMetrics), 0, Util.scaleHeightPx(10, outMetrics));
 
         final CheckedTextView memberCheck = (CheckedTextView) dialoglayout.findViewById(R.id.change_permissions_dialog_member);
-        memberCheck.setText(getString(R.string.file_properties_shared_folder_read_write));
+        memberCheck.setText(getString(R.string.standard_permission_label_participants_panel));
         memberCheck.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16*scaleText));
         memberCheck.setCompoundDrawablePadding(Util.scaleWidthPx(10, outMetrics));
         ViewGroup.MarginLayoutParams memberMLP = (ViewGroup.MarginLayoutParams) memberCheck.getLayoutParams();
         memberMLP.setMargins(Util.scaleWidthPx(15, outMetrics), Util.scaleHeightPx(10, outMetrics), 0, Util.scaleHeightPx(10, outMetrics));
 
         final CheckedTextView observerCheck = (CheckedTextView) dialoglayout.findViewById(R.id.change_permissions_dialog_observer);
-        observerCheck.setText(getString(R.string.file_properties_shared_folder_read_only));
+        observerCheck.setText(getString(R.string.observer_permission_label_participants_panel));
         observerCheck.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16*scaleText));
         observerCheck.setCompoundDrawablePadding(Util.scaleWidthPx(10, outMetrics));
         ViewGroup.MarginLayoutParams observerMLP = (ViewGroup.MarginLayoutParams) observerCheck.getLayoutParams();
