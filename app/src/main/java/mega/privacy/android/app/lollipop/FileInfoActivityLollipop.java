@@ -450,7 +450,6 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 			log("Extras is NULL");
 		}
 
-
 		refreshProperties();
 		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 	}
@@ -621,10 +620,6 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 				iconToolbarViewLink.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.white), PorterDuff.Mode.SRC_ATOP);
 				iconToolbarViewLink.setAlpha(0.8f);
 			}
-
-
-
-
 //				collapsingToolbar.setStatusBarScrimColor(ContextCompat.getColor(this, R.color.transparent_black));
 		}
 		/*Folder*/
@@ -1040,11 +1035,6 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 							}
 						}
 						ownerLayout.setVisibility(View.VISIBLE);
-
-
-
-
-
 					}
 				}
 			}
@@ -1147,10 +1137,6 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 				sharedLayout.setVisibility(View.GONE);
 				dividerSharedLayout.setVisibility(View.GONE);
 			}
-
-
-
-
 		}
 
 		//Choose the button offlineSwitch
@@ -2033,7 +2019,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 	@Override
 	public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
 
-		node = megaApi.getNodeByHandle(request.getNodeHandle());
+//		node = megaApi.getNodeByHandle(request.getNodeHandle());
 
 		log("onRequestFinish: "+request.getType() + "__" + request.getRequestString());
 
