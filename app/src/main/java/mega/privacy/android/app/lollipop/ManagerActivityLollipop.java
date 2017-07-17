@@ -4068,9 +4068,24 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 				fragmentContainer.setVisibility(View.VISIBLE);
 
-				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-				ft.replace(R.id.fragment_container, muFLol, "muFLol");
-    			ft.commitNow();
+//				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+//				ft.replace(R.id.fragment_container, muFLol, "muFLol");
+//    			ft.commitNow();
+
+				FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
+				Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("muFLol");
+				if (currentFragment != null) {
+					fragTransaction.detach(currentFragment);
+					fragTransaction.commitNowAllowingStateLoss();
+
+					fragTransaction = getSupportFragmentManager().beginTransaction();
+					fragTransaction.attach(currentFragment);
+					fragTransaction.commitNowAllowingStateLoss();
+				}
+				else{
+					fragTransaction.replace(R.id.fragment_container, muFLol, "cuFLol");
+					fragTransaction.commitNowAllowingStateLoss();
+				}
 
 				drawerLayout.closeDrawer(Gravity.LEFT);
 
