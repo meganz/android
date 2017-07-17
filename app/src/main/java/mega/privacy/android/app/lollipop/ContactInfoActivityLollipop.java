@@ -531,7 +531,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			ArrayList<MegaNode> shares = megaApi.getInShares(user);
 			if(shares!=null){
 				if(shares.size()>0){
-					viewFoldersMenuItem.setVisible(true);
+					//viewFoldersMenuItem.setVisible(true);
 				}
 				else{
 					viewFoldersMenuItem.setVisible(false);
