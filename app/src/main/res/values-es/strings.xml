@@ -899,7 +899,7 @@
     <!--
     <string name="member_permission_label_participants_panel" context="Label to show the participant permission in the options panel of the group info screen">Member</string>
     -->
-    <string name="standard_permission_label_participants_panel" context="Label to show the participant permission in the options panel of the group info screen">Normal</string>
+    <string name="standard_permission_label_participants_panel" context="Label to show the participant permission in the options panel of the group info screen">Estándar</string>
     <string name="administrator_permission_label_participants_panel" context="Label to show the participant permission in the options panel of the group info screen">Moderador</string>
 
     <string name="edited_message_text" context="Text appended to a edited message.">(editado)</string>
@@ -1200,4 +1200,6 @@
     <string name="general_view_with_revoke" formatted="false" context="Menu option">Ver ficheros (%1d eliminado)</string>
 
     <string name="error_attaching_node_from_cloud" context="Error message when the attachment cannot be sent">Error. El fichero no se ha enviado</string>
+
+    <string name="settings_set_up_automatic_uploads" context="settings option">Configurar subidas automáticas</string>
 </resources>
