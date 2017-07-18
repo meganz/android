@@ -1202,4 +1202,6 @@
     <string name="error_attaching_node_from_cloud" context="Error message when the attachment cannot be sent">Error. El fichero no se ha enviado</string>
 
     <string name="settings_set_up_automatic_uploads" context="settings option">Configurar subidas automáticas</string>
+
+    <string name="settings_chat_silent_sound_not" context="settings option for chat notification">Silencio</string>
 </resources>

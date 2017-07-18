@@ -3,6 +3,7 @@ package mega.privacy.android.app.lollipop.megachat;
 
 import android.app.Activity;
 import android.content.Context;
+import android.database.Cursor;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
@@ -11,7 +12,10 @@ import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.SwitchPreference;
+import android.provider.OpenableColumns;
 import android.widget.Toast;
+
+import java.io.File;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
@@ -83,6 +87,7 @@ public class SettingsChatFragment extends PreferenceFragment implements Preferen
         }
 
         if(chatSettings==null){
+            log("Chat settings is NULL");
             dbH.setNotificationEnabledChat(true+"");
             dbH.setVibrationEnabledChat(true+"");
             dbH.setNotificationSoundChat("");
@@ -103,7 +108,7 @@ public class SettingsChatFragment extends PreferenceFragment implements Preferen
             chatSoundPreference.setSummary(defaultSound.getTitle(context));
         }
         else{
-
+            log("There is chat settings");
             if (chatSettings.getNotificationsEnabled() == null){
                 dbH.setNotificationEnabledChat(true+"");
                 chatNotifications = true;
@@ -144,27 +149,60 @@ public class SettingsChatFragment extends PreferenceFragment implements Preferen
                 }
             }
 
-            if (chatSettings.getNotificationsSound() == null){
+//            Uri defaultSoundUri2 = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+//            Ringtone defaultSound2 = RingtoneManager.getRingtone(context, defaultSoundUri2);
+//            chatSoundPreference.setSummary(defaultSound2.getTitle(context));
+//            log("---Notification sound: "+defaultSound2.getTitle(context));
 
+            if (chatSettings.getNotificationsSound() == null){
+                log("Notification sound is NULL");
                 Uri defaultSoundUri = RingtoneManager.getActualDefaultRingtoneUri(context, RingtoneManager.TYPE_NOTIFICATION);
                 Ringtone defaultSound = RingtoneManager.getRingtone(context, defaultSoundUri);
                 chatSoundPreference.setSummary(defaultSound.getTitle(context));
             }
+            else if(chatSettings.getNotificationsSound().equals("-1")){
+                chatSoundPreference.setSummary(getString(R.string.settings_chat_silent_sound_not));
+            }
             else{
                 if(chatSettings.getNotificationsSound().equals("")){
-
+                    log("Notification sound is EMPTY");
                     Uri defaultSoundUri = RingtoneManager.getActualDefaultRingtoneUri(context, RingtoneManager.TYPE_NOTIFICATION);
                     Ringtone defaultSound = RingtoneManager.getRingtone(context, defaultSoundUri);
                     chatSoundPreference.setSummary(defaultSound.getTitle(context));
                 }
                 else{
                     String soundString = chatSettings.getNotificationsSound();
-                    Ringtone sound = RingtoneManager.getRingtone(context, Uri.parse(soundString));
-                    String titleSound = sound.getTitle(context);
-                    chatSoundPreference.setSummary(titleSound);
+                    log("Sound stored in DB: "+soundString);
+                    Uri uri = Uri.parse(soundString);
+                    log("Uri: "+uri);
+
+                    if(soundString.equals("true")){
+
+                        Uri defaultSoundUri2 = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+                        Ringtone defaultSound2 = RingtoneManager.getRingtone(context, defaultSoundUri2);
+                        chatSoundPreference.setSummary(defaultSound2.getTitle(context));
+                        log("---Notification sound: "+defaultSound2.getTitle(context));
+                        dbH.setNotificationSoundChat(defaultSoundUri2.toString());
+                    }
+                    else{
+                        Ringtone sound = RingtoneManager.getRingtone(context, Uri.parse(soundString));
+                        if(sound==null){
+                            log("Sound is null");
+                            chatSoundPreference.setSummary("None");
+                        }
+                        else{
+                            String titleSound = sound.getTitle(context);
+                            log("Notification sound: "+titleSound);
+                            chatSoundPreference.setSummary(titleSound);
+                        }
+                    }
+
                 }
             }
         }
+
+        setChatPreferences();
+
         if(megaChatApi.isSignalActivityRequired()){
             megaChatApi.signalPresenceActivity();
         }
@@ -180,57 +218,72 @@ public class SettingsChatFragment extends PreferenceFragment implements Preferen
         if (preference.getKey().compareTo(KEY_CHAT_NOTIFICATIONS) == 0){
             log("KEY_CHAT_NOTIFICATIONS");
             chatNotifications = !chatNotifications;
-            if (chatNotifications){
-                Toast.makeText(context, "Not implemented yet: ENABLE NOTIFICATIONS", Toast.LENGTH_SHORT).show();
-                dbH.setNotificationEnabledChat(true+"");
-            }
-            else{
-                dbH.setNotificationEnabledChat(false+"");
-                Toast.makeText(context, "Not implemented yet: DISABLE NOTIFICATIONS", Toast.LENGTH_SHORT).show();
-            }
+            setChatPreferences();
         }
         else if (preference.getKey().compareTo(KEY_CHAT_VIBRATE) == 0){
             log("KEY_CHAT_VIBRATE");
             chatVibration = !chatVibration;
             if (chatVibration){
-                Toast.makeText(context, "Not implemented yet: ENABLE VIBRATION", Toast.LENGTH_SHORT).show();
                 dbH.setVibrationEnabledChat(true+"");
             }
             else{
                 dbH.setVibrationEnabledChat(false+"");
-                Toast.makeText(context, "Not implemented yet: DISABLE VIBRATION", Toast.LENGTH_SHORT).show();
             }
         }
         else if (preference.getKey().compareTo(KEY_CHAT_SOUND) == 0){
             log("KEY_CHAT_SOUND");
-//            chatVibration = !chatVibration;
-//            if (chatVibration){
-//                Toast.makeText(context, "Not implemented yet: ENABLE VIBRATION", Toast.LENGTH_SHORT).show();
-//                dbH.setNotificationEnabledChat(true+"");
-//            }
-//            else{
-//                dbH.setNotificationEnabledChat(false+"");
-//                Toast.makeText(context, "Not implemented yet: DISABLE VIBRATION", Toast.LENGTH_SHORT).show();
-//            }
 
             ((ChatPreferencesActivity) context).changeSound();
         }
         return true;
     }
 
+    public void setChatPreferences(){
+        if (chatNotifications){
+            dbH.setNotificationEnabledChat(true+"");
+            getPreferenceScreen().addPreference(chatSoundPreference);
 
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                getPreferenceScreen().addPreference(chatVibrateSwitch);
+
+            }
+            else{
+                getPreferenceScreen().addPreference(chatNotificationsCheck);
+            }
+        }
+        else{
+            dbH.setNotificationEnabledChat(false+"");
+            getPreferenceScreen().removePreference(chatSoundPreference);
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                getPreferenceScreen().removePreference(chatVibrateSwitch);
+
+            }
+            else{
+                getPreferenceScreen().removePreference(chatNotificationsCheck);
+            }
+        }
+    }
 
     public void setNotificationSound (Uri uri){
-        Ringtone sound = RingtoneManager.getRingtone(context, uri);
 
-        String title = sound.getTitle(context);
+        String chosenSound = "-1";
+        if(uri!=null){
+            Ringtone sound = RingtoneManager.getRingtone(context, uri);
 
-        if(title!=null){
-            log("Title sound notification: "+title);
-            chatSoundPreference.setSummary(title);
+            String title = sound.getTitle(context);
+
+            if(title!=null){
+                log("Title sound notification: "+title);
+                chatSoundPreference.setSummary(title);
+            }
+
+            chosenSound = uri.toString();
+        }
+        else{
+            chatSoundPreference.setSummary(getString(R.string.settings_chat_silent_sound_not));
         }
 
-        String chosenSound = uri.toString();
         if(chatSettings==null){
             chatSettings = new ChatSettings(Boolean.toString(true), Boolean.toString(true), chosenSound, Boolean.toString(true));
             dbH.setChatSettings(chatSettings);
@@ -239,6 +292,7 @@ public class SettingsChatFragment extends PreferenceFragment implements Preferen
             chatSettings.setNotificationsSound(chosenSound);
             dbH.setNotificationSoundChat(chosenSound);
         }
+
     }
 
     @Override
