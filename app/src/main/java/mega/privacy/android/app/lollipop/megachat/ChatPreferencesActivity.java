@@ -84,18 +84,12 @@ public class ChatPreferencesActivity extends AppCompatActivity {
             log("Selected notification sound OK");
 
             Uri uri = intent.getParcelableExtra(RingtoneManager.EXTRA_RINGTONE_PICKED_URI);
-            if (uri != null) {
-                if(sttChat!=null){
-                    if(sttChat.isAdded()){
-                        sttChat.setNotificationSound(uri);
-                    }
+
+            if(sttChat!=null){
+                if(sttChat.isAdded()){
+                    sttChat.setNotificationSound(uri);
                 }
-
             }
-            else{
-                log("Error uri NULL");
-            }
-
         }
         super.onActivityResult(requestCode, resultCode, intent);
     }

@@ -12,6 +12,7 @@ import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.support.v4.app.NotificationCompat;
@@ -22,6 +23,7 @@ import java.util.Locale;
 
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
+import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.lollipop.megachat.RecentChatsFragmentLollipop;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
@@ -637,35 +639,84 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 								}
 							}
 
-							String notificationTitle = "Chat activity (" + email + ")";
-							String notificationContent = "You have received a message";
-							int notificationId = Constants.NOTIFICATION_PUSH_CHAT;
+							ChatSettings chatSettings = dbH.getChatSettings();
+							if(chatSettings!=null){
+								if(chatSettings.getNotificationsEnabled().equals("true")){
+									log("Notifications ON");
 
-							Intent intent = new Intent(this, ManagerActivityLollipop.class);
-							intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-							intent.setAction(Constants.ACTION_CHAT_NOTIFICATION_MESSAGE);
-							PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
-									PendingIntent.FLAG_ONE_SHOT);
+									String soundString = chatSettings.getNotificationsSound();
+									Uri uri = Uri.parse(soundString);
+									log("Uri: "+uri);
 
-							Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-							NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
-									.setSmallIcon(R.drawable.ic_stat_notify_download)
-									.setContentTitle(notificationTitle)
-									.setContentText(notificationContent)
-									.setAutoCancel(true)
-									.setSound(defaultSoundUri)
-									.setContentIntent(pendingIntent);
+									if(soundString.equals("true")){
 
-							NotificationManager notificationManager =
-									(NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+										Uri defaultSoundUri2 = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+										showNotification(defaultSoundUri2, email, chatSettings.getVibrationEnabled());
+									}
+									else if(soundString.equals("-1")){
+										log("Silent notification");
+										showNotification(null, email, chatSettings.getVibrationEnabled());
+									}
+									else{
+										Ringtone sound = RingtoneManager.getRingtone(this, uri);
+										if(sound==null){
+											log("Sound is null");
+											showNotification(null, email, chatSettings.getVibrationEnabled());
+										}
+										else{
+											showNotification(uri, email, chatSettings.getVibrationEnabled());
+										}
+									}
+								}
+								else{
+									log("Notifications OFF");
+								}
+							}
+							else{
+								log("Notifications DEFAULT ON");
 
-							notificationManager.notify(notificationId, notificationBuilder.build());
+								Uri defaultSoundUri2 = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+								showNotification(defaultSoundUri2, email, "true");
+							}
+
 						}
 					}
 				}
 			}
 			catch (Exception e){}
 		}
+	}
+
+	public void showNotification(Uri uriParameter, String email, String vibration){
+		String notificationTitle = "Chat activity (" + email + ")";
+		String notificationContent = "You have received a message";
+		int notificationId = Constants.NOTIFICATION_PUSH_CHAT;
+
+		Intent intent = new Intent(this, ManagerActivityLollipop.class);
+		intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+		intent.setAction(Constants.ACTION_CHAT_NOTIFICATION_MESSAGE);
+		PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
+				PendingIntent.FLAG_ONE_SHOT);
+
+		Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+		NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
+				.setSmallIcon(R.drawable.ic_stat_notify_download)
+				.setContentTitle(notificationTitle)
+				.setContentText(notificationContent)
+				.setAutoCancel(true)
+				.setSound(defaultSoundUri)
+				.setContentIntent(pendingIntent);
+
+		NotificationManager notificationManager =
+				(NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+		notificationBuilder.setSound(uriParameter);
+		if(vibration!=null){
+			if(vibration.equals("true")){
+				notificationBuilder.setVibrate(new long[] {0, 1000});
+			}
+		}
+
+		notificationManager.notify(notificationId, notificationBuilder.build());
 	}
 
 	@Override
