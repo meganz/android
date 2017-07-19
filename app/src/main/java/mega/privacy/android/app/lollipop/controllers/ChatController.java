@@ -42,6 +42,7 @@ import mega.privacy.android.app.lollipop.ZipBrowserActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.AndroidMegaChatMessage;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
+import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.NodeAttachmentActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.NonContactInfo;
@@ -209,11 +210,20 @@ public class ChatController {
         log("muteChat");
         ChatItemPreferences chatPrefs = dbH.findChatPreferencesByHandle(Long.toString(chatHandle));
         if(chatPrefs==null){
-            Uri defaultRingtoneUri = RingtoneManager.getActualDefaultRingtoneUri(context, RingtoneManager.TYPE_RINGTONE);
-            Uri defaultSoundUri = RingtoneManager.getActualDefaultRingtoneUri(context, RingtoneManager.TYPE_NOTIFICATION);
 
-            chatPrefs = new ChatItemPreferences(Long.toString(chatHandle), Boolean.toString(false), defaultRingtoneUri.toString(), defaultSoundUri.toString());
-            dbH.setChatItemPreferences(chatPrefs);
+            ChatSettings chatSettings = dbH.getChatSettings();
+            if(chatSettings==null){
+
+                chatPrefs = new ChatItemPreferences(Long.toString(chatHandle), Boolean.toString(false), "", "");
+                dbH.setChatItemPreferences(chatPrefs);
+            }
+            else{
+                String sound = chatSettings.getNotificationsSound();
+                Uri defaultRingtoneUri = RingtoneManager.getActualDefaultRingtoneUri(context, RingtoneManager.TYPE_RINGTONE);
+
+                chatPrefs = new ChatItemPreferences(Long.toString(chatHandle), Boolean.toString(false), defaultRingtoneUri.toString(), sound);
+                dbH.setChatItemPreferences(chatPrefs);
+            }
         }
         else{
             chatPrefs.setNotificationsEnabled(Boolean.toString(false));
@@ -242,10 +252,7 @@ public class ChatController {
         log("UNmuteChat");
         ChatItemPreferences chatPrefs = dbH.findChatPreferencesByHandle(Long.toString(chatHandle));
         if(chatPrefs==null){
-            Uri defaultRingtoneUri = RingtoneManager.getActualDefaultRingtoneUri(context, RingtoneManager.TYPE_RINGTONE);
-            Uri defaultSoundUri = RingtoneManager.getActualDefaultRingtoneUri(context, RingtoneManager.TYPE_NOTIFICATION);
-
-            chatPrefs = new ChatItemPreferences(Long.toString(chatHandle), Boolean.toString(true), defaultRingtoneUri.toString(), defaultSoundUri.toString());
+            chatPrefs = new ChatItemPreferences(Long.toString(chatHandle), Boolean.toString(true), "", "");
             dbH.setChatItemPreferences(chatPrefs);
         }
         else{

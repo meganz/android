@@ -243,7 +243,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 							log("condition ret == MegaChatApi.INIT_ERROR");
 							if (chatSettings == null) {
 								log("ERROR----> Switch OFF chat");
-								chatSettings = new ChatSettings(false + "", true + "", true + "", true + "");
+								chatSettings = new ChatSettings(false + "", true + "", "", true + "");
 								dbH.setChatSettings(chatSettings);
 							} else {
 								log("ERROR----> Switch OFF chat");
