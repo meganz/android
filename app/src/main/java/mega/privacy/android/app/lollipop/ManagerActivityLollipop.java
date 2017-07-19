@@ -13978,7 +13978,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			log("newState == MegaChatApi.INIT_ERROR");
 			if (chatSettings == null) {
 				log("1 - onChatInitStateUpdate: ERROR----> Switch OFF chat");
-				chatSettings = new ChatSettings(false + "", true + "", true + "", true + "");
+				chatSettings = new ChatSettings(false + "", true + "", "", true + "");
 				dbH.setChatSettings(chatSettings);
 			} else {
 				log("2 - onChatInitStateUpdate: ERROR----> Switch OFF chat");
