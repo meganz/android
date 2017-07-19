@@ -222,7 +222,7 @@ fi
 echo "* Setting up MEGAchat"
 if [ ! -d megachat/karere-native ]; then
 echo "* Getting MEGAchat source code"
-git clone --recursive -b develop https://code.developers.mega.co.nz/messenger/karere-native.git megachat/karere-native
+git clone --recursive -b develop https://github.com/meganz/MEGAchat.git megachat/karere-native
 else
 echo "* MEGAchat source code already available"
 fi
