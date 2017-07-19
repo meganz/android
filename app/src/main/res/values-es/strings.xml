@@ -835,7 +835,12 @@
 
     <string name="recent_chat_empty" context="Message shown when the user has no archived chats">No hay conversaciones</string>
 
+    <string name="recent_chat_enable_chat" context="Message shown when the user has no archived chats">Chat deshabilitado</string>
+    <string name="recent_chat_enable_chat_button" context="Message shown when the user has no archived chats">Habilitar chat</string>
+
     <string name="recent_chat_empty_invite" context="Message shown when the user has no recent chats">Invita a tus amigos a unirse al Chat y disfruta de nuestra plataforma encriptada con privacidad y seguridad.</string>
+
+    <string name="recent_chat_empty_enable_chat" context="Message shown when the user has no recent chats">Habilita el chat\ny disfruta de nuestra plataforma encriptada con privacidad y seguridad.</string>
 
     <!-- <string name="videocall_title" context="Title shown in the list of main chat screen for a videocall">Videollamada</string> -->
 
@@ -859,8 +864,54 @@
         <item quantity="other" context="Plural of seconds. 2 second">segundos</item>
     </plurals>
     -->
+    <string name="initial_hour" context="Initial of the word hour to show the duration of a video or audio call">h</string>
+    <string name="initial_minute" context="Initial of the word minute to show the duration of a video or audio call">m</string>
+    <string name="initial_second" context="Initial of the word second to show the duration of a video or audio call">s</string>
+
+    <!--
+    <string name="videocall_item" context="Info shown about the last action in a chat is a videocall">Video call</string>
+    -->
+
+    <string name="selected_items" context="Title shown when multiselection is enable in chat tabs">%d seleccionados</string>
 
     <string name="contacts_list_empty_text_loading" context="Message shown while the contact list from the device is being read and then shown to the user">Cargando los contactos del teléfono...</string>
+
+    <string name="number_correctly_invite_contact_request" context="success message when reinviting multiple contacts">%d invite requests sent successfully. </string>
+    <string name="number_no_invite_contact_request" context="error message when reinviting multiple contacts">%1$d invite requests successfully sent but %2$d requests were not sent.</string>
+
+    <string name="chat_me_text" context="Word next to own user's message in chat screen">Yo</string>
+    <string name="chat_me_text_bracket" context="Word next to own user's message in chat screen">%1s (Yo)</string>
+    <string name="chat_I_text" context="Word next to own user's message in chat message">Yo</string>
+    <string name="type_message_hint" context="Hint shown in the field to write a message in the chat screen">Escribe un mensaje</string>
+
+    <string name="general_mute" context="button">Silenciar</string>
+    <string name="general_unmute" context="button">No silenciar</string>
+
+    <string name="title_properties_contact_notifications_for_chat" context="Title of the section to enable notifications in the Contact Properties screen">Notificaciones chat</string>
+    <string name="title_properties_chat_contact_notifications" context="Title of the section to enable notifications in the Contact Properties screen">Notificaciones</string>
+    <string name="title_properties_chat_contact_message_sound" context="Title of the section to choose the sound of incoming messages in the Contact Properties screen">Sonido mensajes</string>
+    <string name="title_properties_chat_clear_chat" context="Title of the section to clear the chat content in the Contact Properties screen">Limpiar historial</string>
+    <string name="title_properties_chat_share_contact" context="Title of the section to share the contact in the Contact Properties screen">Compartir contacto</string>
+
+    <string name="call_ringtone_title" context="Title of the screen to select the ringtone of the calls">Sonido llamadas</string>
+    <string name="notification_sound_title" context="Title of the screen to select the sound of the notifications">Sonido notificaciones</string>
+
+    <string name="confirmation_clear_chat" context="Text of the confirmation dialog to clear the chat history">Después de limpiar el chat, ni %s ni tú podréis ver los mensajes de este chat.</string>
+    <string name="general_clear" context="Button to clear the chat history">Limpiar</string>
+
+    <string name="clear_history_success" context="Message show when the history of a chat has been successfully deleted">El historial del chat se ha limpiado</string>
+    <string name="clear_history_error" context="Message show when the history of a chat hasn't been successfully deleted">Error. El historial del chat se ha limpiado correctamente</string>
+
+    <string name="add_participants_menu_item" context="Menu item to add participants to a chat">Añadir participantes</string>
+    <string name="remove_participant_menu_item" context="Menu item to remove a participants from a chat">Eliminar participantes</string>
+
+    <string name="mega_info_empty_screen" context="Message about MEGA when there are no message in the chat screen">protege tus comunicaciones con cifrado punto a punto (controlado por el usuario), proporcionando garantías esenciales de seguridad:</string>
+    <string name="mega_authenticity_empty_screen" context="Message about MEGA when there are no message in the chat screen">El sistema asegura que los datos recibidos proceden del remitente que aparece, y su contenido no ha sido manipulado durante la transmisión.</string>
+    <string name="mega_confidentiality_empty_screen" context="Message about MEGA when there are no message in the chat screen">Sólo el autor y los destinatarios puede descrifrar y ver el contenido.</string>
+
+    <string name="title_mega_info_empty_screen" context="Message about MEGA when there are no message in the chat screen">MEGA</string>
+    <string name="title_mega_authenticity_empty_screen" context="Message about MEGA when there are no message in the chat screen">Autenticidad</string>
+    <string name="title_mega_confidentiality_empty_screen" context="Message about MEGA when there are no message in the chat screen">Confidencialidad</string>
 
     <string name="remove_contact_shared_folder" context="Message to confirm if the user wants to delete a contact from a shared folder">El contacto %s se eliminará de la carpeta compartida.</string>
     <string name="remove_multiple_contacts_shared_folder" context="Message to confirm if the user wants to delete a multiple contacts from a shared folder">%d contactos se eliminarán de la carpeta compartida.</string>
@@ -883,8 +934,8 @@
     <string name="text_deleted_message_by" context="Text shown when a message has been deleted in the chat"><![CDATA[<font color=\'#00BFA5\'>This message has been deleted by </font><font color=\'#060000\'>%1$s</font>]]></string>
     <string name="history_cleared_by" context="Text shown when the chat history was cleared by someone"><![CDATA[<font color=\'#060000\'>%1$s</font><font color=\'#00BFA5\'>limpio el historial del chat</font>]]></string>
 
-    <string name="confirmation_delete_several_messages" context="Confirmation before deleting messages">Eliminar mensajes?</string>
-    <string name="confirmation_delete_one_message" context="Confirmation before deleting one message">Eliminar mensaje?</string>
+    <string name="confirmation_delete_several_messages" context="Confirmation before deleting messages">¿Eliminar mensajes?</string>
+    <string name="confirmation_delete_one_message" context="Confirmation before deleting one message">¿Eliminar mensaje?</string>
 
     <string name="group_chat_label" context="Label for the sliding panel of a group chat">Chat grupal</string>
     <string name="group_chat_info_label" context="Label for the option of the sliding panel to show the info of a chat group">Info del grupo</string>

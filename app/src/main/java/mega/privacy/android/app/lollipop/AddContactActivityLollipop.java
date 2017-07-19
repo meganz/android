@@ -677,7 +677,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements T
 
         //Get MEGA contacts and phone contacts: first name, last name and email
         if (contactType == Constants.CONTACT_TYPE_MEGA) {
-            aB.setTitle("Choose contact");
+            aB.setTitle(getString(R.string.menu_choose_contact));
 
             if (sendInvitationMenuItem != null){
                 sendInvitationMenuItem.setVisible(false);
