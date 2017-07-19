@@ -46,3 +46,5 @@ captures
 /app/src/main/java/nz/mega/sdk/MegaChatPresenceConfig.java
 /app/src/main/java/nz/mega/sdk/MegaChatHandleList.java
 /app/src/main/java/nz/mega/sdk/MegaHandleList.java
+/app/src/main/java/nz/mega/sdk/SWIGTYPE_p_std__string.java
+/app/src/main/java/nz/mega/sdk/SWIGTYPE_p_long_long.java

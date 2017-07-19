@@ -364,8 +364,6 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
                 case R.id.chat_list_leave_chat_layout:{
                   //Leave group chat
                     ((ManagerActivityLollipop)context).showConfirmationLeaveChats(chats);
-                    hideMultipleSelect();
-
                     break;
                 }
             }
@@ -485,7 +483,8 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
     /*
      * Clear all selected items
      */
-    private void clearSelections() {
+    public void clearSelections() {
+        log("clearSelections");
         if(adapterList.isMultipleSelect()){
             adapterList.clearSelections();
         }

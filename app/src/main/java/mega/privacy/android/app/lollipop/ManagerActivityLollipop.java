@@ -9642,7 +9642,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
 	}
 	public void showConfirmationLeaveChats (final  ArrayList<MegaChatListItem> cs){
-		log("showConfirmationLeaveChat");
+		log("showConfirmationLeaveChats");
 
 		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
 			@Override
@@ -9662,6 +9662,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					}
 					case DialogInterface.BUTTON_NEGATIVE:
 						//No button clicked
+						if(rChatFL!=null){
+							if(rChatFL.isAdded()){
+								rChatFL.clearSelections();
+								rChatFL.hideMultipleSelect();
+							}
+						}
 						break;
 				}
 			}
