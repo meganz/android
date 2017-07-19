@@ -5083,6 +5083,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			else if (drawerItem == DrawerItem.CONTACTS){
 				log("createOptions CONTACTS");
 				int index = viewPagerContacts.getCurrentItem();
+				newChatMenuItem.setVisible(false);
+				setStatusMenuItem.setVisible(false);
 				if (index == 0){
 					log("createOptions TAB CONTACTS");
 					//Show
@@ -5092,8 +5094,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					thumbViewMenuItem.setVisible(true);
 					upgradeAccountMenuItem.setVisible(true);
 					searchMenuItem.setVisible(true);
-					newChatMenuItem.setVisible(true);
-					setStatusMenuItem.setVisible(false);
 
 					//Hide
 					pauseTransfersMenuIcon.setVisible(false);
