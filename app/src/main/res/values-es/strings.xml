@@ -888,7 +888,7 @@
 
     <string name="group_chat_label" context="Label for the sliding panel of a group chat">Chat grupal</string>
     <string name="group_chat_info_label" context="Label for the option of the sliding panel to show the info of a chat group">Info del grupo</string>
-    <string name="group_chat_start_conversation_label" context="Label for the option of the sliding panel to start a one to one chat">Iniciar conversacion</string>
+    <string name="group_chat_start_conversation_label" context="Label for the option of the sliding panel to start a one to one chat">Iniciar conversación</string>
     <string name="group_chat_edit_profile_label" context="Label for the option of the sliding panel to edit the profile">Editar perfil</string>
     <string name="title_properties_chat_leave_chat" context="Title of the section to leave a group content in the Contact Properties screen">Salir del chat</string>
     <string name="participants_chat_label" context="Label for participants of a group chat">Participantes</string>
@@ -1160,7 +1160,7 @@
 
     <string name="alert_user_is_not_contact">El usuario no es un contacto</string>
 
-    <string name="camera_uploads_cellular_connection">Plan de datos</string>
+    <string name="camera_uploads_cellular_connection">Usar datos móviles</string>
     <string name="camera_uploads_upload_videos">Subir vídeos</string>
 
     <string name="success_changing_user_avatar" context="Message when an user avatar has been changed successfully">Foto de perfil actualizada</string>
@@ -1172,7 +1172,7 @@
     <string name="success_changing_user_attributes" context="Message when an user attribute has been changed successfully">Tu nombre ha sido correctamente actualizado</string>
 
     <string name="add_participant_success" context="Message show when a participant has been successfully invited to a group chat">Participante añadido</string>
-    <string name="add_participant_error" context="Message show when a participant hasn't been successfully invited to a group chat">Error. Participante no añadidod</string>
+    <string name="add_participant_error" context="Message show when a participant hasn't been successfully invited to a group chat">Error. Participante no añadido</string>
 
     <string name="remove_participant_success" context="Message show when a participant has been successfully removed from a group chat">Participante eliminado</string>
     <string name="remove_participant_error" context="Message show when a participant hasn't been successfully removed from a group chat">Error. Participante no eliminado</string>

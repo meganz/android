@@ -12,10 +12,19 @@ import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.graphics.Typeface;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.content.ContextCompat;
+import android.text.Html;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.style.ForegroundColorSpan;
+import android.text.style.RelativeSizeSpan;
+import android.text.style.StyleSpan;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -26,6 +35,7 @@ import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.lollipop.megachat.RecentChatsFragmentLollipop;
+import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaChatLollipopAdapter;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -369,6 +379,7 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 	private static boolean isLoggingIn = false;
 	private static boolean firstConnect = true;
 	private static boolean recentChatsFragmentVisible = false;
+	public static boolean isFireBaseConnection = false;
 
 	private static long openChatId = -1;
 
@@ -614,6 +625,7 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 
 	@Override
 	public void onChatListItemUpdate(MegaChatApiJava api, MegaChatListItem item) {
+		log("onChatListItemUpdate");
 		if (megaApi == null){
 			megaApi = getMegaApi();
 		}
@@ -624,110 +636,118 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 
 		if (item.hasChanged(MegaChatListItem.CHANGE_TYPE_LAST_MSG) && (item.getUnreadCount() > 0)){
 			try {
-				if (!recentChatsFragmentVisible) {
-					if (openChatId != item.getChatId()) {
-						if (isFirstConnect()) {
-							log("onChatListItemUpdateMegaApplication. FIRSTCONNECT " + item.getTitle() + "Unread count: " + item.getUnreadCount() + " hasChanged(CHANGE_TYPE_UNREAD_COUNT): " + item.hasChanged(MegaChatListItem.CHANGE_TYPE_UNREAD_COUNT) + " hasChanged(CHANGE_TYPE_LAST_TS):" + item.hasChanged(MegaChatListItem.CHANGE_TYPE_LAST_TS));
-						} else {
-							log("onChatListItemUpdateMegaApplication. NOTFIRSTCONNECT " + item.getTitle() + "Unread count: " + item.getUnreadCount() + " hasChanged(CHANGE_TYPE_UNREAD_COUNT): " + item.hasChanged(MegaChatListItem.CHANGE_TYPE_UNREAD_COUNT) + " hasChanged(CHANGE_TYPE_LAST_TS):" + item.hasChanged(MegaChatListItem.CHANGE_TYPE_LAST_TS));
-
-							String email = "";
-							if (megaApi != null) {
-								if (megaApi.getMyUser() != null) {
-									if (megaApi.getMyUser().getEmail() != null) {
-										email = megaApi.getMyUser().getEmail();
-									}
-								}
-							}
-
-							ChatSettings chatSettings = dbH.getChatSettings();
-							if(chatSettings!=null){
-								if(chatSettings.getNotificationsEnabled().equals("true")){
-									log("Notifications ON for all chats");
-
-									ChatItemPreferences chatItemPreferences = dbH.findChatPreferencesByHandle(String.valueOf(item.getChatId()));
-
-									if(chatItemPreferences==null){
-										log("No preferences for this item");
-										String soundString = chatSettings.getNotificationsSound();
-										Uri uri = Uri.parse(soundString);
-										log("Uri: "+uri);
-
-										if(soundString.equals("true")){
-
-											Uri defaultSoundUri2 = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-											showNotification(defaultSoundUri2, email, chatSettings.getVibrationEnabled());
-										}
-										else if(soundString.equals("-1")){
-											log("Silent notification");
-											showNotification(null, email, chatSettings.getVibrationEnabled());
-										}
-										else{
-											Ringtone sound = RingtoneManager.getRingtone(this, uri);
-											if(sound==null){
-												log("Sound is null");
-												showNotification(null, email, chatSettings.getVibrationEnabled());
-											}
-											else{
-												showNotification(uri, email, chatSettings.getVibrationEnabled());
-											}
-										}
-									}
-									else{
-										log("Preferences FOUND for this item");
-										if(chatItemPreferences.getNotificationsEnabled().equals("true")){
-											log("Notifications ON for this chat");
-											String soundString = chatItemPreferences.getNotificationsSound();
-											Uri uri = Uri.parse(soundString);
-											log("Uri: "+uri);
-
-											if(soundString.equals("true")){
-
-												Uri defaultSoundUri2 = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-												showNotification(defaultSoundUri2, email, chatSettings.getVibrationEnabled());
-											}
-											else if(soundString.equals("-1")){
-												log("Silent notification");
-												showNotification(null, email, chatSettings.getVibrationEnabled());
-											}
-											else{
-												Ringtone sound = RingtoneManager.getRingtone(this, uri);
-												if(sound==null){
-													log("Sound is null");
-													showNotification(null, email, chatSettings.getVibrationEnabled());
-												}
-												else{
-													showNotification(uri, email, chatSettings.getVibrationEnabled());
-												}
-											}
-										}
-										else{
-											log("Notifications OFF for this chats");
-										}
-									}
-								}
-								else{
-									log("Notifications OFF");
-								}
-							}
-							else{
-								log("Notifications DEFAULT ON");
-
-								Uri defaultSoundUri2 = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-								showNotification(defaultSoundUri2, email, "true");
+				if(isFireBaseConnection){
+					log("Show notification ALWAYS");
+					isFireBaseConnection=false;
+					showNotification(item);
+				}
+				else{
+					if (!recentChatsFragmentVisible) {
+						if (openChatId != item.getChatId()) {
+							if (isFirstConnect()) {
+								log("onChatListItemUpdateMegaApplication. FIRSTCONNECT " + item.getTitle() + "Unread count: " + item.getUnreadCount() + " hasChanged(CHANGE_TYPE_UNREAD_COUNT): " + item.hasChanged(MegaChatListItem.CHANGE_TYPE_UNREAD_COUNT) + " hasChanged(CHANGE_TYPE_LAST_TS):" + item.hasChanged(MegaChatListItem.CHANGE_TYPE_LAST_TS));
+							} else {
+								log("onChatListItemUpdateMegaApplication. NOTFIRSTCONNECT " + item.getTitle() + "Unread count: " + item.getUnreadCount() + " hasChanged(CHANGE_TYPE_UNREAD_COUNT): " + item.hasChanged(MegaChatListItem.CHANGE_TYPE_UNREAD_COUNT) + " hasChanged(CHANGE_TYPE_LAST_TS):" + item.hasChanged(MegaChatListItem.CHANGE_TYPE_LAST_TS));
+								showNotification(item);
 							}
 
 						}
 					}
 				}
+
 			}
 			catch (Exception e){}
 		}
 	}
 
-	public void showNotification(Uri uriParameter, String email, String vibration){
-		String notificationTitle = "Chat activity (" + email + ")";
-		String notificationContent = "You have received a message";
+	public void showNotification(MegaChatListItem item){
+		log("showNotification: "+item.getTitle()+ "message: "+item.getLastMessage());
+
+		ChatSettings chatSettings = dbH.getChatSettings();
+		if(chatSettings!=null){
+			if(chatSettings.getNotificationsEnabled().equals("true")){
+				log("Notifications ON for all chats");
+
+				ChatItemPreferences chatItemPreferences = dbH.findChatPreferencesByHandle(String.valueOf(item.getChatId()));
+
+				if(chatItemPreferences==null){
+					log("No preferences for this item");
+					String soundString = chatSettings.getNotificationsSound();
+					Uri uri = Uri.parse(soundString);
+					log("Uri: "+uri);
+
+					if(soundString.equals("true")||soundString.equals("")){
+
+						Uri defaultSoundUri2 = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+						showCustomizedNotification(defaultSoundUri2, item, chatSettings.getVibrationEnabled());
+					}
+					else if(soundString.equals("-1")){
+						log("Silent notification");
+						showCustomizedNotification(null, item, chatSettings.getVibrationEnabled());
+					}
+					else{
+						Ringtone sound = RingtoneManager.getRingtone(this, uri);
+						if(sound==null){
+							log("Sound is null");
+							showCustomizedNotification(null, item, chatSettings.getVibrationEnabled());
+						}
+						else{
+							showCustomizedNotification(uri, item, chatSettings.getVibrationEnabled());
+						}
+					}
+				}
+				else{
+					log("Preferences FOUND for this item");
+					if(chatItemPreferences.getNotificationsEnabled().equals("true")){
+						log("Notifications ON for this chat");
+						String soundString = chatItemPreferences.getNotificationsSound();
+						Uri uri = Uri.parse(soundString);
+						log("Uri: "+uri);
+
+						if(soundString.equals("true")){
+
+							Uri defaultSoundUri2 = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+							showCustomizedNotification(defaultSoundUri2, item, chatSettings.getVibrationEnabled());
+						}
+						else if(soundString.equals("-1")){
+							log("Silent notification");
+							showCustomizedNotification(null, item, chatSettings.getVibrationEnabled());
+						}
+						else{
+							Ringtone sound = RingtoneManager.getRingtone(this, uri);
+							if(sound==null){
+								log("Sound is null");
+								showCustomizedNotification(null, item, chatSettings.getVibrationEnabled());
+							}
+							else{
+								showCustomizedNotification(uri, item, chatSettings.getVibrationEnabled());
+							}
+						}
+					}
+					else{
+						log("Notifications OFF for this chats");
+					}
+				}
+			}
+			else{
+				log("Notifications OFF");
+			}
+		}
+		else{
+			log("Notifications DEFAULT ON");
+
+			Uri defaultSoundUri2 = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+			showCustomizedNotification(defaultSoundUri2, item, "true");
+		}
+	}
+
+	public void showCustomizedNotification(Uri uriParameter, MegaChatListItem item, String vibration){
+		log("showCustomizedNotification");
+		String notificationTitle = "Chat activity";
+		String source = "<b>"+item.getTitle()+": </b>"+item.getLastMessage();
+
+		Spanned notificationContent = Html.fromHtml(source,0);
+
 		int notificationId = Constants.NOTIFICATION_PUSH_CHAT;
 
 		Intent intent = new Intent(this, ManagerActivityLollipop.class);
@@ -741,9 +761,28 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 				.setSmallIcon(R.drawable.ic_stat_notify_download)
 				.setContentTitle(notificationTitle)
 				.setContentText(notificationContent)
+				.setColor(ContextCompat.getColor(getApplicationContext(),R.color.mega))
 				.setAutoCancel(true)
 				.setSound(defaultSoundUri)
 				.setContentIntent(pendingIntent);
+
+
+		NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
+
+//		StringBuilder[] events = {notificationContent, new StringBuilder("y trooo"), new StringBuilder("y moreee"), new StringBuilder("y yaaaa")};
+// Sets a title for the Inbox in expanded layout
+//		inboxStyle.setBigContentTitle("New messages:");
+
+		String[] events = {"y trooo", "y moreee", "y yaaaa"};
+// Moves events into the expanded layout
+		inboxStyle.addLine(notificationContent);
+		for (int i=0; i < events.length; i++) {
+			inboxStyle.addLine(events[i]);
+
+		}
+// Moves the expanded layout object into the notification object.
+		notificationBuilder.setStyle(inboxStyle);
+
 
 		NotificationManager notificationManager =
 				(NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
