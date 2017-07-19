@@ -73,7 +73,7 @@
     <string name="action_open_link" context="Menu item">Abrir link</string>
     
     <!-- <string name="action_upload" context="Button text when choosing the destination location in MEGA">Subir a</string> -->
-    <string name="action_settings" context="Menu item">Configuración</string>
+    <string name="action_settings" context="Menu item">Ajustes</string>
     <string name="action_search" context="Search button">Buscar</string>
     <string name="action_play" context="Search button">Play</string>
     <string name="action_pause" context="Search button">Pausa</string>
@@ -191,10 +191,10 @@
     <string name="cancel_transfer_confirmation">Borrar esta transferencia?</string>
     <string name="cancel_all_transfer_confirmation">Borrar todas las transferencias?</string>
 
-    <string name="section_cloud_drive" context="The name of every users root drive in the cloud of MEGA.">Disco</string>
+    <string name="section_cloud_drive" context="The name of every users root drive in the cloud of MEGA.">Mi nube</string>
     <string name="section_secondary_media_uploads" context="title of the screen where the secondary media images are uploaded">Media Uploads</string>
     <string name="section_inbox" context="title of the screen that show the inbox">Buzón de entrada</string>
-	<string name="section_saved_for_offline" context="title of the screen that shows the files saved for offline in the device">Disponible sin conexión</string>
+	<string name="section_saved_for_offline" context="title of the screen that shows the files saved for offline in the device">Sin conexión</string>
 	<!-- <string name="section_shared_with_me" context="title of the screen that shows all the folders that the user shares with other users and viceversa">Compartida</string> -->
 	<string name="section_shared_items" context="title of the screen that shows all the shared items">Carpetas compartidas</string>
 	<string name="section_rubbish_bin" context="The title of the trash bin in the tree of the file manager.">Papelera</string>
@@ -740,7 +740,7 @@
     <string name="my_account_upgrade_pro" context="Button to upgrade the account to PRO account">Hazte PRO</string>
     <string name="my_account_upgrade_pro_panel" context="Button to upgrade the account to PRO account in the panel that appears randomly">¡Hazte PRO!</string>
     <string name="get_pro_account" context="Message to promote PRO accounts">Aumenta la capacidad de tu almacenamiento en la nube!\n Más espacio &amp; ancho de banda con una cuenta PRO!</string>
-    <string name="toast_master_key" context="success message when the MasterKey file has been downloaded">Tu Clave de recuperación ha sido exportada en: %1s.\nMientras el fichero esté en esta ruta, lo encontrarás también la sección Disponible Sin Conexión.\nNota: El fichero se eliminará si cierras la sesión, por favor, guárdalo en un lugar seguro.</string>
+    <string name="toast_master_key" context="success message when the MasterKey file has been downloaded">Tu Clave de recuperación ha sido exportada en: %1s.\nMientras el fichero esté en esta ruta, lo encontrarás también la sección Sin conexión.\nNota: El fichero se eliminará si cierras la sesión, por favor, guárdalo en un lugar seguro.</string>
 
     <!-- <string name="next_ime_action" context="Action to pass focus to the next field in a form">Siguiente</string> -->
 
@@ -1061,7 +1061,7 @@
 
     <string name="my_account_of_string" context="String to show the transfer quota and the used space in My Account section"><![CDATA[%1$s <font color=\'#777777\'>de %2$s</font>]]></string>
 
-    <string name="confirmation_delete_from_save_for_offline" context="confirmation message before removing a something for the Save for Offline section">¿Eliminar de Disponible sin conexión?</string>
+    <string name="confirmation_delete_from_save_for_offline" context="confirmation message before removing a something for the Save for Offline section">¿Eliminar de Sin conexión?</string>
 
     <string name="recent_chat_empty_no_connection_text" context="Text of chat section when the app has no connection">El chat esta deshabilitado y no puede habilitarse sin conexión</string>
 
@@ -1177,13 +1177,13 @@
     </plurals>
 
     <string name="general_view" context="Menu option">Ver ficheros</string>
-    <string name="add_to_cloud" context="Menu option">Añadir a Disco</string>
+    <string name="add_to_cloud" context="Menu option">Añadir a Mi nube</string>
     <string name="save_for_offline" context="Menu option">Disponible sin conexión</string>
 
     <string name="general_view_contacts" context="Menu option">Ver contactos</string>
 
-    <string name="import_success_message" context="Menu option">Añadido a Disco</string>
-    <string name="import_success_error" context="Menu option">Error. No añadido a Disco</string>
+    <string name="import_success_message" context="Menu option">Añadido a Mi nube</string>
+    <string name="import_success_error" context="Menu option">Error. No añadido a Mi nube</string>
 
     <string name="chat_connecting" context="Label in login screen to inform about the chat initialization proccess">Conectando&#8230;</string>
 
@@ -1230,13 +1230,17 @@
 
     <string name="no_files_selected_warning">No hay ficheros seleccionados</string>
 
-    <string name="attachment_upload_panel_from_cloud">Desde Disco</string>
+    <string name="attachment_upload_panel_from_cloud">Desde Mi nube</string>
     <string name="attachment_upload_panel_contact">Contacto</string>
     <string name="attachment_upload_panel_photo">Desde dispositivo</string>
 
     <string name="delete_account" context="Button in My Account section where the user can delete permanently his account">Eliminar cuenta</string>
     <string name="delete_account_text" context="Text shown in the alert dialog to confirm the cancelation of an account">Si eliminas tu cuenta, perderás toda la información almacenada en la nube. Esta operación es irreversible.</string>
     <string name="delete_button" context="Button in My Account section to confirm the account deletion">Eliminar</string>
+
+    <string name="file_properties_info_info_file">Info</string>
+    <string name="file_properties_info_size" context="Refers to the size of a file.">Tamaño total</string>
+    <string name="file_properties_shared_folder_public_link_name">Enlace</string>
 
     <string name="attachment_uploading_state">Subiendo...</string>
     <string name="attachment_uploading_state_error">Error. No enviado.</string>
