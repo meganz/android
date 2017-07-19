@@ -62,6 +62,7 @@
 			android:layout_height="wrap_content"
 			android:layout_gravity="right"
 			android:layout_marginRight="16dp"
+			android:layout_marginBottom="8dp"
 			android:orientation="horizontal">
 
 			<Button
