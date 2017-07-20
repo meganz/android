@@ -4,6 +4,7 @@ package mega.privacy.android.app;
 //import com.google.android.gms.analytics.Logger.LogLevel;
 //import com.google.android.gms.analytics.Tracker;
 
+import android.app.Activity;
 import android.app.Application;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -12,6 +13,15 @@ import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
+import android.graphics.Rect;
+import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
@@ -25,8 +35,12 @@ import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.StyleSpan;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Display;
+import android.view.View;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Locale;
 
@@ -36,6 +50,7 @@ import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.lollipop.megachat.RecentChatsFragmentLollipop;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaChatLollipopAdapter;
+import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaListChatLollipopAdapter;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -756,6 +771,7 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 		PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
 				PendingIntent.FLAG_ONE_SHOT);
 
+
 		Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 		NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
 				.setSmallIcon(R.drawable.ic_stat_notify_download)
@@ -766,6 +782,11 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 				.setSound(defaultSoundUri)
 				.setContentIntent(pendingIntent);
 
+		Bitmap largeIcon = setUserAvatar(item);
+		if(largeIcon!=null){
+			log("There is avatar!");
+			notificationBuilder.setLargeIcon(largeIcon);
+		}
 
 		NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
 
@@ -795,6 +816,201 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 
 		notificationManager.notify(notificationId, notificationBuilder.build());
 	}
+
+	public Bitmap setUserAvatar(MegaChatListItem item){
+		log("setUserAvatar");
+
+		if(item.isGroup()){
+			return createGroupChatAvatar(item);
+		}
+		else{
+			if(megaChatApi==null){
+				return createDefaultAvatar(item);
+			}
+			String contactMail = megaChatApi.getContactEmail(item.getPeerHandle());
+			File avatar = null;
+			if (getExternalCacheDir() != null){
+				avatar = new File(getExternalCacheDir().getAbsolutePath(), contactMail + ".jpg");
+			}
+			else{
+				avatar = new File(getCacheDir().getAbsolutePath(), contactMail + ".jpg");
+			}
+			Bitmap bitmap = null;
+			if (avatar.exists()){
+				if (avatar.length() > 0){
+					BitmapFactory.Options bOpts = new BitmapFactory.Options();
+					bOpts.inPurgeable = true;
+					bOpts.inInputShareable = true;
+					bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
+					if (bitmap == null) {
+						return createDefaultAvatar(item);
+					}
+					else{
+						return getCircleBitmap(bitmap);
+					}
+				}
+				else{
+					return createDefaultAvatar(item);
+				}
+			}
+			else{
+				return createDefaultAvatar(item);
+			}
+
+		}
+	}
+
+	private Bitmap getCircleBitmap(Bitmap bitmap) {
+		final Bitmap output = Bitmap.createBitmap(bitmap.getWidth(),
+				bitmap.getHeight(), Bitmap.Config.ARGB_8888);
+		final Canvas canvas = new Canvas(output);
+
+		final int color = Color.RED;
+		final Paint paint = new Paint();
+		final Rect rect = new Rect(0, 0, bitmap.getWidth(), bitmap.getHeight());
+		final RectF rectF = new RectF(rect);
+
+		paint.setAntiAlias(true);
+		canvas.drawARGB(0, 0, 0, 0);
+		paint.setColor(color);
+		canvas.drawOval(rectF, paint);
+
+		paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
+		canvas.drawBitmap(bitmap, rect, rect, paint);
+
+		bitmap.recycle();
+
+		return output;
+	}
+
+	public Bitmap createDefaultAvatar(MegaChatListItem item){
+		log("createDefaultAvatar()");
+
+		Bitmap defaultAvatar = Bitmap.createBitmap(Constants.DEFAULT_AVATAR_WIDTH_HEIGHT,Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
+		Canvas c = new Canvas(defaultAvatar);
+		Paint p = new Paint();
+		p.setAntiAlias(true);
+
+		String color = megaApi.getUserAvatarColor(MegaApiAndroid.userHandleToBase64(item.getPeerHandle()));
+		if(color!=null){
+			log("The color to set the avatar is "+color);
+			p.setColor(Color.parseColor(color));
+		}
+		else{
+			log("Default color to the avatar");
+			p.setColor(getResources().getColor(R.color.lollipop_primary_color));
+		}
+
+		int radius;
+		if (defaultAvatar.getWidth() < defaultAvatar.getHeight())
+			radius = defaultAvatar.getWidth()/2;
+		else
+			radius = defaultAvatar.getHeight()/2;
+
+		c.drawCircle(defaultAvatar.getWidth()/2, defaultAvatar.getHeight()/2, radius, p);
+		p.setColor(getResources().getColor(R.color.white));
+		c.drawText("P", 10, 10, p);
+
+		return defaultAvatar;
+//		holder.imageView.setImageBitmap(defaultAvatar);
+//
+//		boolean setInitialByMail = false;
+//
+//		if (holder.fullName != null){
+//			if (holder.fullName.trim().length() > 0){
+//				String firstLetter = holder.fullName.charAt(0) + "";
+//				firstLetter = firstLetter.toUpperCase(Locale.getDefault());
+//				holder.contactInitialLetter.setText(firstLetter);
+//				holder.contactInitialLetter.setTextColor(Color.WHITE);
+//				holder.contactInitialLetter.setVisibility(View.VISIBLE);
+//			}else{
+//				setInitialByMail=true;
+//			}
+//		}
+//		else{
+//			setInitialByMail=true;
+//		}
+//		if(setInitialByMail){
+//			if (holder.contactMail != null){
+//				if (holder.contactMail.length() > 0){
+//					log("email TEXT: " + holder.contactMail);
+//					log("email TEXT AT 0: " + holder.contactMail.charAt(0));
+//					String firstLetter = holder.contactMail.charAt(0) + "";
+//					firstLetter = firstLetter.toUpperCase(Locale.getDefault());
+//					holder.contactInitialLetter.setText(firstLetter);
+//					holder.contactInitialLetter.setTextColor(Color.WHITE);
+//					holder.contactInitialLetter.setVisibility(View.VISIBLE);
+//				}
+//			}
+//		}
+//		holder.contactInitialLetter.setTextSize(24);
+	}
+
+	public Bitmap createGroupChatAvatar(MegaChatListItem item){
+		log("createGroupChatAvatar()");
+
+		Bitmap defaultAvatar = Bitmap.createBitmap(Constants.DEFAULT_AVATAR_WIDTH_HEIGHT,Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
+		Canvas c = new Canvas(defaultAvatar);
+		Paint p = new Paint();
+		p.setAntiAlias(true);
+		p.setColor(ContextCompat.getColor(this,R.color.divider_upgrade_account));
+
+		int radius;
+		if (defaultAvatar.getWidth() < defaultAvatar.getHeight())
+			radius = defaultAvatar.getWidth()/2;
+		else
+			radius = defaultAvatar.getHeight()/2;
+
+		c.drawCircle(defaultAvatar.getWidth()/2, defaultAvatar.getHeight()/2, radius, p);
+
+		if(item.getTitle()!=null){
+			if(!item.getTitle().isEmpty()){
+				char title = item.getTitle().charAt(0);
+				String firstLetter = new String(title+"");
+
+				if(!firstLetter.equals("(")){
+
+                    log("Draw letter: "+firstLetter);
+					Paint text = new Paint();
+					Typeface face = Typeface.SANS_SERIF;
+					text.setTypeface(face);
+					text.setAntiAlias(true);
+					text.setSubpixelText(true);
+					text.setStyle(Paint.Style.FILL);
+					text.setColor(Color.WHITE);
+					text.setTextSize(150);
+					text.setTextAlign(Paint.Align.CENTER);
+
+					text.setColor(ContextCompat.getColor(this,R.color.black));
+                    Rect bounds = new Rect();
+					text.getTextBounds(firstLetter, 0, firstLetter.length(), bounds);
+                    int x = (defaultAvatar.getWidth() - bounds.width())/2;
+                    int y = (defaultAvatar.getHeight() + bounds.height())/2;
+                    c.drawText(firstLetter.toUpperCase(Locale.getDefault()), x, y, text);
+				}
+
+			}
+		}
+		return defaultAvatar;
+//		String firstLetter = holder.contactInitialLetter.getText().toString();
+//
+//		if(firstLetter.trim().isEmpty()){
+//			holder.contactInitialLetter.setVisibility(View.INVISIBLE);
+//		}
+//		else{
+//			log("Group chat initial letter is: "+firstLetter);
+//			if(firstLetter.equals("(")){
+//				holder.contactInitialLetter.setVisibility(View.INVISIBLE);
+//			}
+//			else{
+//				holder.contactInitialLetter.setText(firstLetter);
+//				holder.contactInitialLetter.setTextColor(Color.WHITE);
+//				holder.contactInitialLetter.setVisibility(View.VISIBLE);
+//				holder.contactInitialLetter.setTextSize(24);
+//			}
+//		}
+	}
+
 
 	@Override
 	public void onChatInitStateUpdate(MegaChatApiJava api, int newState) {
