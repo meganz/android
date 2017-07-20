@@ -489,19 +489,19 @@
     <string name="cam_sync_data" context="how to upload the camera images. when Wi-Fi connected and using data plan">Wi-fi o tarifa de datos</string>
     <string name="cam_sync_ok" context="Answer for confirmation dialog.">Aceptar</string>
     <string name="cam_sync_skip" context="skip the step of camera upload">Saltar</string>
-    <string name="cam_sync_syncing" context="The upload of the user\'s photos orvideos from their specified album is in progress.">Subidas de la Cámara en progreso</string>
-    <string name="cam_sync_cancel_sync" context="confirmation question for cancelling the camera uploads">¿Quieres cancelar las subidas de la Cámara?</string>
+    <string name="cam_sync_syncing" context="The upload of the user\'s photos orvideos from their specified album is in progress.">Subidas de la cámara en progreso</string>
+    <string name="cam_sync_cancel_sync" context="confirmation question for cancelling the camera uploads">¿Quieres cancelar las subidas de la cámara?</string>
     <!-- <string name="settings_camera_notif_error_no_folder" context="Error message when an unavailable destination folder was selected">Carpeta de destino no disponible</string> -->
     <string name="settings_camera_notif_title" context="title of the notification when camera upload is enabled">Subiendo ficheros multimedia</string>
     <!-- <string name="settings_camera_notif_error" context="notification error">Existe un problema con las subidas de la Cámara</string> -->
-    <string name="settings_camera_notif_complete" context="notification camera uploads complete">Subidas de la Cámara completadas</string>
+    <string name="settings_camera_notif_complete" context="notification camera uploads complete">Subidas de la cámara completadas</string>
    
     <string name="settings_storage" context="Text listed before the amount of storage a user gets with a certain package. For example: &quot;1TB Storage&quot;.">Almacenamiento</string>
     <string name="settings_pin_lock" context="settings category title. Below this title, the pin lock settings start">Bloqueo PIN</string>
     
     <string name="settings_advanced_features" context="Settings category title for cache and offline files">Opciones avanzadas</string>
-    <string name="settings_advanced_features_cache" context="Settings preference title for cache">Limpiar Caché</string>
-    <string name="settings_advanced_features_offline" context="Settings preference title for offline files">Limpiar Ficheros Disponibles sin Conexión</string>
+    <string name="settings_advanced_features_cache" context="Settings preference title for cache">Limpiar caché</string>
+    <string name="settings_advanced_features_offline" context="Settings preference title for offline files">Limpiar ficheros disponibles sin conexión</string>
     
     <string name="settings_advanced_features_size" context="Size of files in offline or cache folders">Actuamente en uso %s</string>
     <string name="settings_advanced_features_calculating" context="Calculating Size of files in offline or cache folders">Calculando</string>
@@ -520,13 +520,13 @@
         <item context="import from phone option">Importar desde el dispositivo</item>
     </string-array>
     
-    <string name="settings_camera_upload_on" context="settings option">Activar Subidas de la Cámara</string>
-    <string name="settings_camera_upload_turn_on" context="settings option">Activar Subidas de la Cámara</string>
-    <string name="settings_camera_upload_off" context="settings option">Desactivar las Subidas de la Cámara</string>
+    <string name="settings_camera_upload_on" context="settings option">Activar subidas de la cámara</string>
+    <string name="settings_camera_upload_turn_on" context="settings option">Activar subidas de la cámara</string>
+    <string name="settings_camera_upload_off" context="settings option">Desactivar las subidas de la cámara</string>
     <string name="settings_camera_upload_how_to_upload" context="settings option. How to upload the camera images: via Wi-Fi only or via Wi-Fi and data plan">Como subir</string>
     
-    <string name="settings_secondary_upload_on" context="settings option">Activar Subida Multimedia Secundaria</string>
-    <string name="settings_secondary_upload_off" context="settings option">Desactivar Subida Multimedia Secundaria</string>
+    <string name="settings_secondary_upload_on" context="settings option">Activar subida multimedia secundaria</string>
+    <string name="settings_secondary_upload_off" context="settings option">Desactivar subida multimedia secundaria</string>
 
     <string name="settings_empty_folder" context="settings option">Elija carpeta</string>
 
@@ -535,7 +535,7 @@
         <item context="how to upload the camera images. only when Wi-Fi connected">Solo Wi-fi</item>
     </string-array>
     
-    <string name="settings_camera_upload_what_to_upload" context="What kind of files are going to be uploaded: images, videos or both">Subir Archivo(s)</string>
+    <string name="settings_camera_upload_what_to_upload" context="What kind of files are going to be uploaded: images, videos or both">Subir archivo(s)</string>
     
     <string-array name="settings_camera_upload_file_upload_entries" context="the options of what to upload in an array. Needed for the settings">
         <item context="the options of what to upload.">Solo Fotos</item>
@@ -577,9 +577,9 @@
     <string name="settings_about" context="Caption of a title, in the context of &quot;About MEGA&quot; or &quot;About us&quot;">Sobre nosotros</string>    
     <string name="settings_about_privacy_policy" context="App means &quot;Application&quot;">Política de privacidad</string>
     <string name="settings_about_terms_of_service" context="App means &quot;Application&quot;">Términos de uso</string>
-    <string name="settings_about_app_version" context="App means &quot;Application&quot;">Versión de App</string>
+    <string name="settings_about_app_version" context="App means &quot;Application&quot;">Versión de app</string>
     <string name="settings_about_sdk_version" context="App means &quot;Application&quot;">Versión del SDK de MEGA</string>
-
+    <string name="settings_about_karere_version" context="Title of the label where the karere version is shown">Versión de Karere de MEGA</string>
     <string name="settings_about_code_link_title" context="Link to the public code of the app">Ver código fuente</string>
 
     <string name="january">Enero</string>
@@ -599,7 +599,7 @@
     
     <!-- <string name="new_account" context="in login screen to create a new account">Crea una cuenta ahora!</string> -->
     
-    <string name="my_account_title" context="title of the My Account screen">Tipo de Cuenta</string>
+    <string name="my_account_title" context="title of the My Account screen">Tipo de cuenta</string>
     <string name="expires_on" context="title of the Expiration Date">Expira el </string>
     <string name="free_account">Gratis</string>
     <string name="pro1_account" context="Not translate">PRO I</string>
@@ -609,7 +609,7 @@
     <!-- <string name="free_storage" context="Not translate">50 GB</string> -->
     <!-- <string name="free_bandwidth" context="Free bandwich account details">Limitado</string> -->
     
-    <string name="camera_uploads_created" context="info message shown to the user when the Camera Uploads folder has been created">Carpeta para Subidas de la cámara creada</string>
+    <string name="camera_uploads_created" context="info message shown to the user when the Camera Uploads folder has been created">Carpeta para subidas de la cámara creada</string>
     
     <!-- <string name="ZIP_download_permission" context="A compressed file will be downloaded and decompressed.">El fichero zip será descargado y descomprimido</string> -->
     <!-- <string name="ZIP_unzip_permission" context="A compressed file will be decompressed.">El fichero zip será descomprimido</string> -->
