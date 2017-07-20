@@ -126,8 +126,8 @@ function createMEGAchatBindings
 {
     echo "* Creating MEGAchat Java bindings"
     mkdir -p ../java/nz/mega/sdk
-    swig -c++ -Imega/sdk/include -Imegachat/karere-native/src/ -java -package nz.mega.sdk -outdir ${JAVA_OUTPUT_PATH}/nz/mega/sdk/ -o bindings/megachat.cpp megachat/megachatapi.i &> ${LOG_FILE}
-    pushd megachat/karere-native/src &> ${LOG_FILE}
+    swig -c++ -Imega/sdk/include -Imegachat/sdk/src/ -java -package nz.mega.sdk -outdir ${JAVA_OUTPUT_PATH}/nz/mega/sdk/ -o bindings/megachat.cpp megachat/megachatapi.i &> ${LOG_FILE}
+    pushd megachat/sdk/src &> ${LOG_FILE}
     cmake -P genDbSchema.cmake
     popd &> ${LOG_FILE}
 }
@@ -159,7 +159,7 @@ if [ "$1" == "clean_mega" ]; then
     rm -rf megachat/megachat.cpp megachat/megachat.h
     
     echo "* Deleting source folders"
-    rm -rf megachat/karere-native
+    rm -rf megachat/sdk
 
     echo "* Deleting tarballs"
 	rm -rf ../obj/local/armeabi/
@@ -189,7 +189,7 @@ if [ "$1" == "clean" ]; then
     rm -rf ${LIBUV}/${LIBUV}
     rm -rf ${LIBEXPAT}/${LIBEXPAT}
     rm -rf ${LIBEXPAT}/${LIBEXPAT_SOURCE_FOLDER}
-    rm -rf megachat/karere-native
+    rm -rf megachat/sdk
 
     echo "* Deleting tarballs"
     rm -rf ${CRYPTOPP}/${CRYPTOPP_SOURCE_FILE}
