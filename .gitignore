@@ -33,18 +33,3 @@ captures
 ## File-based project format:
 *.ipr
 *.iws
-/app/src/main/java/nz/mega/sdk/MegaStringMap.java
-/app/src/main/java/nz/mega/sdk/MegaTextChat.java
-/app/src/main/java/nz/mega/sdk/MegaTextChatList.java
-/app/src/main/java/nz/mega/sdk/MegaTextChatPeerList.java
-/app/src/main/java/nz/mega/sdk/MegaChatMessage.java
-/app/src/main/java/nz/mega/sdk/MegaChatRoomListener.java
-/app/src/main/java/nz/mega/sdk/MegaChatLogger.java
-/app/src/main/java/nz/mega/sdk/MegaChatListItemList.java
-/app/src/main/java/nz/mega/sdk/MegaTransferData.java
-/app/src/main/java/nz/mega/sdk/MegaEvent.java
-/app/src/main/java/nz/mega/sdk/MegaChatPresenceConfig.java
-/app/src/main/java/nz/mega/sdk/MegaChatHandleList.java
-/app/src/main/java/nz/mega/sdk/MegaHandleList.java
-/app/src/main/java/nz/mega/sdk/SWIGTYPE_p_std__string.java
-/app/src/main/java/nz/mega/sdk/SWIGTYPE_p_long_long.java
