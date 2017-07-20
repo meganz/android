@@ -192,7 +192,7 @@
     <string name="cancel_all_transfer_confirmation">Borrar todas las transferencias?</string>
 
     <string name="section_cloud_drive" context="The name of every users root drive in the cloud of MEGA.">Mi nube</string>
-    <string name="section_secondary_media_uploads" context="title of the screen where the secondary media images are uploaded">Media Uploads</string>
+    <string name="section_secondary_media_uploads" context="title of the screen where the secondary media images are uploaded">Media uploads</string>
     <string name="section_inbox" context="title of the screen that show the inbox">Buzón de entrada</string>
 	<string name="section_saved_for_offline" context="title of the screen that shows the files saved for offline in the device">Sin conexión</string>
 	<!-- <string name="section_shared_with_me" context="title of the screen that shows all the folders that the user shares with other users and viceversa">Compartida</string> -->
@@ -206,7 +206,7 @@
 	<string name="section_transfers" context="Title for the file transfer screen (with the up &amp; download)">Transferencias</string>
 
 	<string name="section_account" context="button to the settings of the user\'s account">Mi Cuenta</string>
-	<string name="section_photo_sync" context="title of the screen where the camera images are uploaded">Camera Uploads</string>
+	<string name="section_photo_sync" context="title of the screen where the camera images are uploaded">Camera uploads</string>
 	<!-- <string name="used_space" context="Used space &quot;5MB of 100MB&quot;.">%1$s de %2$s</string> -->
 	<string name="tab_incoming_shares" context="Capital letters. Incoming shared folders. The title of a tab">Entrantes</string>
 	<string name="tab_outgoing_shares" context="Capital letters. Outgoing shared folders. The title of a tab">Salientes</string>
@@ -609,7 +609,7 @@
     <!-- <string name="free_storage" context="Not translate">50 GB</string> -->
     <!-- <string name="free_bandwidth" context="Free bandwich account details">Limitado</string> -->
     
-    <string name="camera_uploads_created" context="info message shown to the user when the Camera Uploads folder has been created">Carpeta para Subidas de la Cámara creada</string>
+    <string name="camera_uploads_created" context="info message shown to the user when the Camera Uploads folder has been created">Carpeta para Subidas de la cámara creada</string>
     
     <!-- <string name="ZIP_download_permission" context="A compressed file will be downloaded and decompressed.">El fichero zip será descargado y descomprimido</string> -->
     <!-- <string name="ZIP_unzip_permission" context="A compressed file will be decompressed.">El fichero zip será descomprimido</string> -->

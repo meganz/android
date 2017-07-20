@@ -229,14 +229,14 @@
     <string name="cancel_transfer_confirmation">Delete this transfer?</string>
     <string name="cancel_all_transfer_confirmation">Delete all transfers?</string>
 
-    <string name="section_cloud_drive" context="The name of every users root drive in the cloud of MEGA. The term \'cloud\' is a new computer term and can probably not be translated. Do not translate &quot;cloud&quot; literal unless your language allows this. Please see http://en.wikipedia.org/wiki/Cloud_computing for your reference.">Cloud Drive</string>
-    <string name="section_secondary_media_uploads" context="title of the screen where the secondary media images are uploaded">Media Uploads</string>
+    <string name="section_cloud_drive" context="The name of every users root drive in the cloud of MEGA. The term \'cloud\' is a new computer term and can probably not be translated. Do not translate &quot;cloud&quot; literal unless your language allows this. Please see http://en.wikipedia.org/wiki/Cloud_computing for your reference.">Cloud drive</string>
+    <string name="section_secondary_media_uploads" context="title of the screen where the secondary media images are uploaded">Media uploads</string>
     <string name="section_inbox" context="title of the screen that show the inbox">Inbox</string>
     <string name="section_saved_for_offline" context="title of the screen that shows the files saved for offline in the device">Saved for Offline</string>
     <!--
     <string name="section_shared_with_me" context="title of the screen that shows all the folders that the user shares with other users and viceversa">Shared with me</string>
     -->
-    <string name="section_shared_items" context="title of the screen that shows all the shared items">Shared items</string>
+    <string name="section_shared_items" context="title of the screen that shows all the shared items">Shared folders</string>
     <string name="section_rubbish_bin" context="The title of the trash bin in the tree of the file manager.">Rubbish Bin</string>
     <string name="section_contacts" context="Title of the contact list">Contacts</string>
     <string name="tab_sent_requests" context="Title of the sent requests tab. Capital letters">&#160;SENT REQUESTS&#160;</string>
@@ -246,7 +246,7 @@
     <string name="section_transfers" context="Title for the file transfer screen (with the up &amp; download)">Transfers</string>
 
     <string name="section_account" context="button to the settings of the user\'s account">My Account</string>
-    <string name="section_photo_sync" context="title of the screen where the camera images are uploaded">Camera Uploads</string>
+    <string name="section_photo_sync" context="title of the screen where the camera images are uploaded">Camera uploads</string>
     <!--
     <string name="used_space" context="Used space &quot;5MB of 100MB&quot;.">%1$s of %2$s</string>
     -->
@@ -258,7 +258,7 @@
     <string name="choose_folder_explorer" context="Title of the button in Incoming Shares tabs">Choose folder</string>
     -->
 
-    <string name="file_browser_empty_cloud_drive" context="message when there are no files in the Cloud Drive">No files in your Cloud Drive</string>
+    <string name="file_browser_empty_cloud_drive" context="message when there are no files in the Cloud drive">No files in your Cloud drive</string>
     <!--
     <string name="file_browser_empty_rubbish_bin" context="option to empty rubbish bin">Empty Rubbish Bin</string>
     -->
@@ -564,7 +564,7 @@
     <string name="my_account_used_space" context="Headline for the amount of storage space is used">Used Space</string>
     <string name="my_account_change_password" context="menu item">Change password</string>
     <!--
-    <string name="warning_out_space" context="Warning in Cloud Drive when the user is runningut of space">You\'re running out of space!\n Do you want to upgrade your account?</string>
+    <string name="warning_out_space" context="Warning in Cloud drive when the user is runningut of space">You\'re running out of space!\n Do you want to upgrade your account?</string>
     -->
     <string name="overquota_alert_title" context="Title dialog overquota error">Overquota Alert!</string>
     <string name="overquota_alert_text" context="Dialod text overquota error">Operation not allowed, you will exceed the storage limit of your account. Do you want to upgrade your account?</string>
@@ -641,7 +641,7 @@
     <string name="cam_sync_ok" context="Answer for confirmation dialog.">OK</string>
     <string name="cam_sync_skip" context="skip the step of camera upload">Skip</string>
     <string name="cam_sync_syncing" context="The upload of the user\'s photos orvideos from their specified album is in progress.">Camera Upload in progress</string>
-    <string name="cam_sync_cancel_sync" context="confirmation question for cancelling the camera uploads">Do you want to cancel Camera Uploads?</string>
+    <string name="cam_sync_cancel_sync" context="confirmation question for cancelling the camera uploads">Do you want to cancel Camera uploads?</string>
     <!--
     <string name="settings_camera_notif_error_no_folder" context="Error message when an unavailable destination folder was selected">Destination folder is unavailable</string>
     -->
@@ -649,7 +649,7 @@
     <!--
     <string name="settings_camera_notif_error" context="notification error">Camera Uploads problem</string>
     -->
-    <string name="settings_camera_notif_complete" context="notification camera uploads complete">Camera Uploads complete</string>
+    <string name="settings_camera_notif_complete" context="notification camera uploads complete">Camera uploads complete</string>
 
     <string name="settings_storage" context="Text listed before the amount of storage a user gets with a certain package. For example: &quot;1TB Storage&quot;.">Storage</string>
     <string name="settings_pin_lock" context="settings category title. Below this title, the pin lock settings start">PIN Lock</string>
@@ -675,13 +675,13 @@
         <item context="import from phone option">Import from device</item>
     </string-array>
 
-    <string name="settings_camera_upload_on" context="settings option">Enable Camera Uploads</string>
-    <string name="settings_camera_upload_turn_on" context="settings option">Turn on Camera Uploads</string>
-    <string name="settings_camera_upload_off" context="settings option">Disable Camera Uploads</string>
+    <string name="settings_camera_upload_on" context="settings option">Enable Camera uploads</string>
+    <string name="settings_camera_upload_turn_on" context="settings option">Turn on Camera uploads</string>
+    <string name="settings_camera_upload_off" context="settings option">Disable Camera uploads</string>
     <string name="settings_camera_upload_how_to_upload" context="settings option. How to upload the camera images: via Wi-Fi only or via Wi-Fi and data plan">How to upload</string>
 
-    <string name="settings_secondary_upload_on" context="The Secondary Media Uploads allows to create a second Camera Folder synchronization. Enabling it would imply to choose a new local folder and then, a new destination folder in MEGA. This is the text that appears in the settings option to enable the second synchronization.">Enable Secondary Media Uploads</string>
-    <string name="settings_secondary_upload_off" context="The Secondary Media Uploads allows to create a second Camera Folder synchronization. Disabling it would imply that the current second sync won't be running anymore. This is the text that appears in the settings option to disable the second synchronization.">Disable Secondary Media Uploads</string>
+    <string name="settings_secondary_upload_on" context="The Secondary Media uploads allows to create a second Camera Folder synchronization. Enabling it would imply to choose a new local folder and then, a new destination folder in MEGA. This is the text that appears in the settings option to enable the second synchronization.">Enable Secondary Media uploads</string>
+    <string name="settings_secondary_upload_off" context="The Secondary Media uploads allows to create a second Camera Folder synchronization. Disabling it would imply that the current second sync won't be running anymore. This is the text that appears in the settings option to disable the second synchronization.">Disable Secondary Media uploads</string>
 
     <string name="settings_empty_folder" context="settings option">Choose folder</string>
 
@@ -702,10 +702,10 @@
     <string name="settings_keep_file_names" context="Option to choose that the camera sync will maintain the local file names when uploading">Keep file names as in the device</string>
 
     <string name="settings_local_camera_upload_folder" context="The location of where the user photos or videos are stored in the device.">Local Camera folder</string>
-    <string name="settings_mega_camera_upload_folder" context="The location of where the user photos or videos are stored in MEGA.">MEGA Camera Uploads Folder</string>
+    <string name="settings_mega_camera_upload_folder" context="The location of where the user photos or videos are stored in MEGA.">MEGA Camera uploads folder</string>
 
     <string name="settings_local_secondary_folder" context="The location of where the user photos or videos of the secondary sync are stored in the device.">Local Secondary folder</string>
-    <string name="settings_mega_secondary_folder" context="The location of where the user photos or videos of the secondary sync are stored in MEGA.">MEGA Secondary Folder</string>
+    <string name="settings_mega_secondary_folder" context="The location of where the user photos or videos of the secondary sync are stored in MEGA.">MEGA Secondary folder</string>
 
     <string name="settings_camera_upload_only_photos" context="what kind of file are going to be uploaded. Needed for the settings summary">Photos only</string>
     <string name="settings_camera_upload_only_videos" context="what kind of file are going to be uploaded. Needed for the settings summary">Videos only</string>
@@ -1284,7 +1284,7 @@
 
     <string name="my_account_of_string" context="String to show the transfer quota and the used space in My Account section"><![CDATA[%1$s <font color=\'#777777\'>of %2$s</font>]]></string>
 
-    <string name="confirmation_delete_from_save_for_offline" context="confirmation message before removing a something for the Save for Offline section">Remove from Save for Offline?</string>
+    <string name="confirmation_delete_from_save_for_offline" context="confirmation message before removing a something for the Save for offline section">Remove from Save for offline?</string>
 
     <string name="recent_chat_empty_no_connection_text" context="Text of chat section when the app has no connection">Chat is disabled and it cannot be enabled without connection.</string>
 
@@ -1406,13 +1406,13 @@
     </plurals>
 
     <string name="general_view" context="Menu option">View files</string>
-    <string name="add_to_cloud" context="Menu option">Add to Cloud Drive</string>
-    <string name="save_for_offline" context="Menu option">Save for Offline</string>
+    <string name="add_to_cloud" context="Menu option">Add to Cloud drive</string>
+    <string name="save_for_offline" context="Menu option">Save for offline</string>
 
     <string name="general_view_contacts" context="Menu option">View contacts</string>
 
-    <string name="import_success_message" context="Menu option">Succesfully added to Cloud Drive</string>
-    <string name="import_success_error" context="Menu option">Error. Not added to Cloud Drive</string>
+    <string name="import_success_message" context="Menu option">Succesfully added to Cloud drive</string>
+    <string name="import_success_error" context="Menu option">Error. Not added to Cloud drive</string>
 
     <string name="chat_connecting" context="Label in login screen to inform about the chat initialization proccess">Connecting&#8230;</string>
 
@@ -1459,7 +1459,7 @@
 
     <string name="no_files_selected_warning">No files selected</string>
 
-    <string name="attachment_upload_panel_from_cloud">From Cloud Drive</string>
+    <string name="attachment_upload_panel_from_cloud">From Cloud drive</string>
     <string name="attachment_upload_panel_contact">Contact</string>
     <string name="attachment_upload_panel_photo">From device</string>
 
