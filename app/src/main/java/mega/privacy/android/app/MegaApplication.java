@@ -23,6 +23,8 @@ import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Typeface;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
@@ -46,6 +48,7 @@ import java.util.Locale;
 
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
+import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.lollipop.megachat.NotificationBuilder;
@@ -67,6 +70,7 @@ import nz.mega.sdk.MegaListenerInterface;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
+import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaUser;
 
@@ -256,7 +260,7 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 			}
 		}
 
-		notificationBuilder =  NotificationBuilder.newInstance(this);
+		notificationBuilder =  NotificationBuilder.newInstance(this, megaApi);
 		
 //		initializeGA();
 		
@@ -506,15 +510,37 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 					log("updatedNodes name: " + n.getName() + " isInshared: " + n.isInShare() + " getchanges: " + n.getChanges() + " haschanged(TYPE_INSHARE): " + n.hasChanged(MegaNode.CHANGE_TYPE_INSHARE));
 
 					try {
-						String email = "";
-						if (megaApi.getMyUser() != null) {
-							if (megaApi.getMyUser().getEmail() != null) {
-								email = megaApi.getMyUser().getEmail();
+						ArrayList<MegaShare> sharesIncoming = megaApi.getInSharesList();
+						String name = "";
+						for(int j=0; j<sharesIncoming.size();j++) {
+							MegaShare mS = sharesIncoming.get(j);
+							if (mS.getNodeHandle() == n.getHandle()) {
+								MegaUser user = megaApi.getContact(mS.getUser());
+								if (user != null) {
+									MegaContactDB contactDB = dbH.findContactByHandle(String.valueOf(user.getHandle()));
+
+									if (contactDB != null) {
+										if (!contactDB.getName().equals("")) {
+											name = contactDB.getName() + " " + contactDB.getLastName();
+
+										} else {
+											name = user.getEmail();
+
+										}
+									} else {
+										log("The contactDB is null: ");
+										name = user.getEmail();
+
+									}
+								} else {
+									name = user.getEmail();
+								}
 							}
 						}
 
-						String notificationTitle = "Cloud activity (" + email + ")";
-						String notificationContent = "A folder has been shared with you";
+						String source = "<b>"+n.getName()+"</b> "+getString(R.string.incoming_folder_notification)+" "+name;
+						Spanned notificationContent = Html.fromHtml(source,0);
+
 						int notificationId = Constants.NOTIFICATION_PUSH_CLOUD_DRIVE;
 
 						Intent intent = new Intent(this, ManagerActivityLollipop.class);
@@ -526,18 +552,26 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 						Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 						NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
 								.setSmallIcon(R.drawable.ic_stat_notify_download)
-								.setContentTitle(notificationTitle)
+								.setContentTitle(getString(R.string.title_incoming_folder_notification))
 								.setContentText(notificationContent)
+								.setStyle(new NotificationCompat.BigTextStyle()
+										.bigText(notificationContent))
 								.setAutoCancel(true)
 								.setSound(defaultSoundUri)
+								.setColor(ContextCompat.getColor(this,R.color.mega))
 								.setContentIntent(pendingIntent);
+
+						Drawable d = getDrawable(R.drawable.ic_folder_incoming);
+							notificationBuilder.setLargeIcon(((BitmapDrawable)d).getBitmap());
 
 						NotificationManager notificationManager =
 								(NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
 						notificationManager.notify(notificationId, notificationBuilder.build());
 					}
-					catch(Exception e){}
+					catch(Exception e){
+						log("Exception: "+e.toString());
+					}
 				}
 			}
 		}
@@ -582,39 +616,38 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 	}
 
 	@Override
-	public void onContactRequestsUpdate(MegaApiJava api,
-			ArrayList<MegaContactRequest> requests) {
+	public void onContactRequestsUpdate(MegaApiJava api, ArrayList<MegaContactRequest> requests) {
 		log("onContactRequestUpdate");
 
 		try {
 			if (requests == null) {
+				log("Return REQUESTS are NULL");
 				return;
 			}
-
+			MegaContactRequest crToShow = null;
 			boolean showNotification = false;
 			for (int i = 0; i < requests.size(); i++) {
 				MegaContactRequest cr = requests.get(i);
 				if (cr != null) {
 					if ((cr.getStatus() == MegaContactRequest.STATUS_UNRESOLVED) && (!cr.isOutgoing())) {
 						showNotification = true;
+						crToShow = cr;
 						log("onContactRequestUpdate: " + cr.getSourceEmail() + " cr.isOutgoing: " + cr.isOutgoing() + " cr.getStatus: " + cr.getStatus());
 					}
 				}
 			}
 
-
 			if (showNotification) {
-				String email = "";
-				if (megaApi != null) {
-					if (megaApi.getMyUser() != null) {
-						if (megaApi.getMyUser().getEmail() != null) {
-							email = megaApi.getMyUser().getEmail();
-						}
-					}
+
+				String notificationContent;
+				if(crToShow!=null){
+					notificationContent = crToShow.getSourceEmail();
+				}
+				else{
+					log("Return because the request is NULL");
+					return;
 				}
 
-				String notificationTitle = "Contact activity (" + email + ")";
-				String notificationContent = "You have a new contact request";
 				int notificationId = Constants.NOTIFICATION_PUSH_CONTACT;
 
 				Intent intent = new Intent(this, ManagerActivityLollipop.class);
@@ -626,11 +659,21 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 				Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 				NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
 						.setSmallIcon(R.drawable.ic_stat_notify_download)
-						.setContentTitle(notificationTitle)
+						.setContentTitle(getString(R.string.title_contact_request_notification))
 						.setContentText(notificationContent)
+						.setStyle(new NotificationCompat.BigTextStyle()
+								.bigText(notificationContent))
 						.setAutoCancel(true)
 						.setSound(defaultSoundUri)
+						.setColor(ContextCompat.getColor(this,R.color.mega))
 						.setContentIntent(pendingIntent);
+
+				if(crToShow!=null){
+					Bitmap largeIcon = createDefaultAvatar(crToShow.getSourceEmail());
+					if(largeIcon!=null){
+						notificationBuilder.setLargeIcon(largeIcon);
+					}
+				}
 
 				NotificationManager notificationManager =
 						(NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
@@ -638,7 +681,78 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 				notificationManager.notify(notificationId, notificationBuilder.build());
 			}
 		}
-		catch(Exception e){}
+		catch(Exception e){
+			log("Exception when showing IPC request: "+e.getMessage());
+		}
+	}
+
+	public Bitmap createDefaultAvatar(String email){
+		log("createDefaultAvatar()");
+
+		Bitmap defaultAvatar = Bitmap.createBitmap(Constants.DEFAULT_AVATAR_WIDTH_HEIGHT,Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
+		Canvas c = new Canvas(defaultAvatar);
+		Paint p = new Paint();
+		p.setAntiAlias(true);
+
+		String color = megaApi.getUserAvatarColor(email);
+		if(color!=null){
+			log("The color to set the avatar is "+color);
+			p.setColor(Color.parseColor(color));
+		}
+		else{
+			log("Default color to the avatar");
+			p.setColor(ContextCompat.getColor(this, R.color.lollipop_primary_color));
+		}
+
+		int radius;
+		if (defaultAvatar.getWidth() < defaultAvatar.getHeight())
+			radius = defaultAvatar.getWidth()/2;
+		else
+			radius = defaultAvatar.getHeight()/2;
+
+		c.drawCircle(defaultAvatar.getWidth()/2, defaultAvatar.getHeight()/2, radius, p);
+
+		if(email!=null){
+			if(!email.isEmpty()){
+				char title = email.charAt(0);
+				String firstLetter = new String(title+"");
+
+				if(!firstLetter.equals("(")){
+
+					log("Draw letter: "+firstLetter);
+					Paint text = new Paint();
+					Typeface face = Typeface.SANS_SERIF;
+					text.setTypeface(face);
+					text.setAntiAlias(true);
+					text.setSubpixelText(true);
+					text.setStyle(Paint.Style.FILL);
+					text.setColor(Color.WHITE);
+					text.setTextSize(150);
+					text.setTextAlign(Paint.Align.CENTER);
+
+					Rect r = new Rect();
+					c.getClipBounds(r);
+					int cHeight = r.height();
+					int cWidth = r.width();
+					text.setTextAlign(Paint.Align.LEFT);
+					text.getTextBounds(firstLetter, 0, firstLetter.length(), r);
+					float x = 0;
+					float y = 0;
+					if(firstLetter.toUpperCase(Locale.getDefault()).equals("A")){
+						x = cWidth / 2f - r.width() / 2f - r.left - 10;
+						y = cHeight / 2f + r.height() / 2f - r.bottom + 10;
+					}
+					else{
+						x = cWidth / 2f - r.width() / 2f - r.left;
+						y = cHeight / 2f + r.height() / 2f - r.bottom;
+					}
+
+					c.drawText(firstLetter.toUpperCase(Locale.getDefault()), x, y, text);
+				}
+
+			}
+		}
+		return defaultAvatar;
 	}
 
 	@Override
@@ -668,13 +782,14 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 								log("onChatListItemUpdateMegaApplication. NOTFIRSTCONNECT " + item.getTitle() + "Unread count: " + item.getUnreadCount() + " hasChanged(CHANGE_TYPE_UNREAD_COUNT): " + item.hasChanged(MegaChatListItem.CHANGE_TYPE_UNREAD_COUNT) + " hasChanged(CHANGE_TYPE_LAST_TS):" + item.hasChanged(MegaChatListItem.CHANGE_TYPE_LAST_TS));
 								showNotification(item);
 							}
-
 						}
 					}
 				}
 
 			}
-			catch (Exception e){}
+			catch (Exception e){
+				log("Exception when trying to show chat notification");
+			}
 		}
 	}
 
@@ -684,7 +799,6 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 		ChatSettings chatSettings = dbH.getChatSettings();
 		String email = megaChatApi.getContactEmail(item.getPeerHandle());
 
-		String color = megaApi.getUserAvatarColor(MegaApiAndroid.userHandleToBase64(item.getPeerHandle()));
 		if(chatSettings!=null){
 			if(chatSettings.getNotificationsEnabled().equals("true")){
 				log("Notifications ON for all chats");
@@ -700,20 +814,20 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 					if(soundString.equals("true")||soundString.equals("")){
 
 						Uri defaultSoundUri2 = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-						notificationBuilder.sendBundledNotification(defaultSoundUri2, item, chatSettings.getVibrationEnabled(), email, color);
+						notificationBuilder.sendBundledNotification(defaultSoundUri2, item, chatSettings.getVibrationEnabled(), email);
 					}
 					else if(soundString.equals("-1")){
 						log("Silent notification");
-						notificationBuilder.sendBundledNotification(null, item, chatSettings.getVibrationEnabled(), email, color);
+						notificationBuilder.sendBundledNotification(null, item, chatSettings.getVibrationEnabled(), email);
 					}
 					else{
 						Ringtone sound = RingtoneManager.getRingtone(this, uri);
 						if(sound==null){
 							log("Sound is null");
-							notificationBuilder.sendBundledNotification(null, item, chatSettings.getVibrationEnabled(), email, color);
+							notificationBuilder.sendBundledNotification(null, item, chatSettings.getVibrationEnabled(), email);
 						}
 						else{
-							notificationBuilder.sendBundledNotification(uri, item, chatSettings.getVibrationEnabled(), email, color);
+							notificationBuilder.sendBundledNotification(uri, item, chatSettings.getVibrationEnabled(), email);
 						}
 					}
 				}
@@ -728,20 +842,20 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 						if(soundString.equals("true")){
 
 							Uri defaultSoundUri2 = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-							notificationBuilder.sendBundledNotification(defaultSoundUri2, item, chatSettings.getVibrationEnabled(), email, color);
+							notificationBuilder.sendBundledNotification(defaultSoundUri2, item, chatSettings.getVibrationEnabled(), email);
 						}
 						else if(soundString.equals("-1")){
 							log("Silent notification");
-							notificationBuilder.sendBundledNotification(null, item, chatSettings.getVibrationEnabled(), email, color);
+							notificationBuilder.sendBundledNotification(null, item, chatSettings.getVibrationEnabled(), email);
 						}
 						else{
 							Ringtone sound = RingtoneManager.getRingtone(this, uri);
 							if(sound==null){
 								log("Sound is null");
-								notificationBuilder.sendBundledNotification(null, item, chatSettings.getVibrationEnabled(), email, color);
+								notificationBuilder.sendBundledNotification(null, item, chatSettings.getVibrationEnabled(), email);
 							}
 							else{
-								notificationBuilder.sendBundledNotification(uri, item, chatSettings.getVibrationEnabled(), email, color);
+								notificationBuilder.sendBundledNotification(uri, item, chatSettings.getVibrationEnabled(), email);
 
 							}
 						}
@@ -759,7 +873,7 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 			log("Notifications DEFAULT ON");
 
 			Uri defaultSoundUri2 = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-			notificationBuilder.sendBundledNotification(defaultSoundUri2, item, "true", email, color);
+			notificationBuilder.sendBundledNotification(defaultSoundUri2, item, "true", email);
 		}
 	}
 
