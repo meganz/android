@@ -91,7 +91,7 @@ public final class NotificationBuilder {
 
         Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 
-        String title = "Chat activity";
+        String title;
         int unreadMessages = item.getUnreadCount();
         log("Unread messages: "+unreadMessages);
         if(unreadMessages!=0){
@@ -104,12 +104,18 @@ public final class NotificationBuilder {
                     String numberString = "+"+unreadMessages;
                     title = item.getTitle() + " (" + numberString + " " + context.getString(R.string.messages_chat_notification) + ")";
                 }
+                else{
+                    title = item.getTitle();
+                }
             }
             else{
 
                 if(unreadMessages>1){
                     String numberString = unreadMessages+"";
                     title = item.getTitle() + " (" + numberString + " " + context.getString(R.string.messages_chat_notification) + ")";
+                }
+                else{
+                    title = item.getTitle();
                 }
             }
         }
@@ -131,8 +137,7 @@ public final class NotificationBuilder {
 
             long lastMsgSender = item.getLastMessageSender();
             String nameAction = getParticipantShortName(lastMsgSender);
-//            ChatController cC = new ChatController(context);
-//            String fullNameAction = cC.getFullName(item.getLastMessageSender(), item.getChatId());
+
             if(nameAction.isEmpty()){
                 notificationBuilder.setContentText(item.getLastMessage());
             }
@@ -371,7 +376,7 @@ public final class NotificationBuilder {
                     text.getTextBounds(firstLetter, 0, firstLetter.length(), r);
                     float x = 0;
                     float y = 0;
-                    if(firstLetter.toUpperCase(Locale.getDefault()).equals("A")){
+                    if(firstLetter.toUpperCase(Locale.getDefault()).equals("A")||firstLetter.toUpperCase(Locale.getDefault()).equals("V")||firstLetter.toUpperCase(Locale.getDefault()).equals("R")){
                         x = cWidth / 2f - r.width() / 2f - r.left - 10;
                         y = cHeight / 2f + r.height() / 2f - r.bottom + 10;
                     }
@@ -389,6 +394,12 @@ public final class NotificationBuilder {
     }
 
     public Notification buildSummary(String groupKey) {
+        Intent intent = new Intent(context, ManagerActivityLollipop.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        intent.setAction(Constants.ACTION_CHAT_NOTIFICATION_MESSAGE);
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0 /* Request code */, intent,
+                PendingIntent.FLAG_ONE_SHOT);
+
         return new NotificationCompat.Builder(context)
                 .setSmallIcon(R.drawable.ic_stat_notify_download)
                 .setShowWhen(true)
@@ -396,6 +407,7 @@ public final class NotificationBuilder {
                 .setGroupSummary(true)
                 .setColor(ContextCompat.getColor(context,R.color.mega))
                 .setAutoCancel(true)
+                .setContentIntent(pendingIntent)
                 .build();
     }
 

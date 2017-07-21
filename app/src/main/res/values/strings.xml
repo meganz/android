@@ -82,8 +82,8 @@
     <!--
     <string name="confirmation_remove_multiple_contacts" context="confirmation message before removing mutiple contacts">Remove these %d contacts?</string>
     -->
-    <string name="confirmation_move_to_rubbish" context="confirmation message before removing a file">Move to Rubbish Bin?</string>
-    <string name="confirmation_move_to_rubbish_plural" context="confirmation message before removing a file">Move to Rubbish Bin?</string>
+    <string name="confirmation_move_to_rubbish" context="confirmation message before removing a file">Move to rubbish bin?</string>
+    <string name="confirmation_move_to_rubbish_plural" context="confirmation message before removing a file">Move to rubbish bin?</string>
     <string name="confirmation_delete_from_mega" context="confirmation message before removing a file">Delete from MEGA?</string>
     <string name="confirmation_leave_share_folder" context="confirmation message before leaving an incoming shared folder">If you leave the folder, you will not be able to see it again</string>
 
@@ -237,7 +237,7 @@
     <string name="section_shared_with_me" context="title of the screen that shows all the folders that the user shares with other users and viceversa">Shared with me</string>
     -->
     <string name="section_shared_items" context="title of the screen that shows all the shared items">Shared folders</string>
-    <string name="section_rubbish_bin" context="The title of the trash bin in the tree of the file manager.">Rubbish Bin</string>
+    <string name="section_rubbish_bin" context="The title of the trash bin in the tree of the file manager.">Rubbish bin</string>
     <string name="section_contacts" context="Title of the contact list">Contacts</string>
     <string name="tab_sent_requests" context="Title of the sent requests tab. Capital letters">&#160;SENT REQUESTS&#160;</string>
     <string name="tab_received_requests" context="Title of the received requests tab. Capital letters">RECEIVED REQUESTS</string>
@@ -262,7 +262,7 @@
     <!--
     <string name="file_browser_empty_rubbish_bin" context="option to empty rubbish bin">Empty Rubbish Bin</string>
     -->
-    <string name="empty_rubbish_bin" context="message when there are no files in the Rubbish Bin">Empty Rubbish Bin</string>
+    <string name="empty_rubbish_bin" context="message when there are no files in the Rubbish Bin">Empty rubbish bin</string>
     <string name="file_browser_empty_incoming_shares" context="message when there are no incoming shared folders">No incoming shared folders</string>
     <string name="file_browser_empty_outgoing_shares" context="message when there are no outgoing shared folders">No outgoing shared folders</string>
     <string name="file_browser_empty_folder" context="Text that indicates that a folder is currently empty">Empty Folder</string>
@@ -377,7 +377,7 @@
     <!--
     <string name="context_moving_to_trash" context="status text">Moving to Rubbish Bin</string>
     -->
-    <string name="context_move_to_trash" context="menu item">Move to Rubbish Bin</string>
+    <string name="context_move_to_trash" context="menu item">Move to rubbish bin</string>
     <string name="context_delete_from_mega" context="menu item">Delete from MEGA</string>
     <string name="context_new_folder_name" context="Input field description in the create folder dialog.">Folder Name</string>
     <string name="context_new_contact_name" context="when adding a new contact. in the dialog">Contact email</string>
@@ -386,8 +386,8 @@
     <string name="context_adding_contact" context="Adding a new relationship (contact)">Adding contact</string>
     -->
     <string name="context_download_to" context="Menu item">Save to</string>
-    <string name="context_clear_rubbish" context="Menu option title">Empty Rubbish Bin</string>
-    <string name="clear_rubbish_confirmation" context="Ask for confirmation before removing all the elements of the rubbish bin">All items inside Rubbish Bin will be deleted.</string>
+    <string name="context_clear_rubbish" context="Menu option title">Empty rubbish bin</string>
+    <string name="clear_rubbish_confirmation" context="Ask for confirmation before removing all the elements of the rubbish bin">All items inside rubbish bin will be deleted.</string>
 
     <!--<string name="context_send_link" context="get the link and send it">Send link</string>-->
 
@@ -453,8 +453,8 @@
     <string name="context_correctly_moved" context="success message when moving a node">Moved successfully</string>
     <string name="number_correctly_moved" context="success message when moving a node">%d items moved successfully</string>
     <string name="number_incorrectly_moved" context="success message when moving a node">%d items were not moved successfully</string>
-    <string name="context_correctly_moved_to_rubbish" context="success message when moving a node">Moved to the Rubbish Bin successfully</string>
-    <string name="number_correctly_moved_to_rubbish" context="success message when moving a node">%d items moved to the Rubbish Bin successfully</string>
+    <string name="context_correctly_moved_to_rubbish" context="success message when moving a node">Moved to the rubbish bin successfully</string>
+    <string name="number_correctly_moved_to_rubbish" context="success message when moving a node">%d items moved to the rubbish bin successfully</string>
     <string name="number_incorrectly_moved_to_rubbish" context="success message when moving a node"> and %d items were not sent successfully</string>
     <string name="context_no_moved" context="error message">Error. Not moved</string>
     <string name="context_correctly_shared" context="success message when sharing a folder">Shared successfully</string>
@@ -487,8 +487,8 @@
     <string name="context_correctly_removed_sharing_contacts" context="success message when removing all the contacts of a shared folder">The folder is no longer shared</string>
     <string name="context_no_removed_sharing_contacts" context="error message when removing all the contacts of a shared folder">Error, the folder is still shared with another contact</string>
     <string name="context_select_one_file" context="option available for just one file">Select just one file</string>
-    <string name="rubbish_bin_emptied" context="success message when emptying the RB">Rubbish Bin emptied successfully</string>
-    <string name="rubbish_bin_no_emptied" context="error message when emptying the RB">Error. The Rubbish Bin has not be emptied</string>
+    <string name="rubbish_bin_emptied" context="success message when emptying the RB">Rubbish bin emptied successfully</string>
+    <string name="rubbish_bin_no_emptied" context="error message when emptying the RB">Error. The rubbish bin has not be emptied</string>
 
     <string name="dialog_cancel_subscriptions" context="dialog cancel subscriptions">You are about to cancel your MEGA subscription. Please let us know if there is anything we can do to help you change your mind</string>
     <string name="hint_cancel_subscriptions" context="hint cancel subscriptions dialog">Type feedback here</string>

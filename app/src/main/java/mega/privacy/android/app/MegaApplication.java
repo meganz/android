@@ -693,16 +693,7 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 		Canvas c = new Canvas(defaultAvatar);
 		Paint p = new Paint();
 		p.setAntiAlias(true);
-
-		String color = megaApi.getUserAvatarColor(email);
-		if(color!=null){
-			log("The color to set the avatar is "+color);
-			p.setColor(Color.parseColor(color));
-		}
-		else{
-			log("Default color to the avatar");
-			p.setColor(ContextCompat.getColor(this, R.color.lollipop_primary_color));
-		}
+		p.setColor(ContextCompat.getColor(this, R.color.lollipop_primary_color));
 
 		int radius;
 		if (defaultAvatar.getWidth() < defaultAvatar.getHeight())
@@ -757,7 +748,12 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 
 	@Override
 	public void onChatListItemUpdate(MegaChatApiJava api, MegaChatListItem item) {
-		log("onChatListItemUpdate");
+
+		if(item==null){
+			log("onChatListItemUpdate: item is NULL --> return");
+		}
+
+		log("onChatListItemUpdate: "+item.getTitle());
 		if (megaApi == null){
 			megaApi = getMegaApi();
 		}
@@ -766,7 +762,8 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 			megaChatApi = getMegaChatApi();
 		}
 
-		if (item.hasChanged(MegaChatListItem.CHANGE_TYPE_LAST_MSG) && (item.getUnreadCount() > 0)){
+		log("Unread count is: "+item.getUnreadCount());
+		if (item.hasChanged(MegaChatListItem.CHANGE_TYPE_LAST_MSG) && (item.getUnreadCount() != 0)){
 			try {
 				if(isFireBaseConnection){
 					log("Show notification ALWAYS");
@@ -794,7 +791,7 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 	}
 
 	public void showNotification(MegaChatListItem item){
-		log("showNotification: "+item.getTitle()+ "message: "+item.getLastMessage());
+		log("showNotification: "+item.getTitle()+ " message: "+item.getLastMessage());
 
 		ChatSettings chatSettings = dbH.getChatSettings();
 		String email = megaChatApi.getContactEmail(item.getPeerHandle());

@@ -59,8 +59,8 @@
     <string name="confirmation_add_contact" context="confirmation message before sending an invitation to a contact">¿Quieres enviar una invitación a %s?</string>
     <!-- <string name="confirmation_remove_contact" context="confirmation message before removing a contact. Do not write question mark">¿Quieres borrar el contacto %s?</string> -->
     <!-- <string name="confirmation_remove_multiple_contacts" context="confirmation message before removing mutiple contacts">¿Deseas borrar estos %d contactos?</string> -->
-    <string name="confirmation_move_to_rubbish" context="confirmation message before removing a file">¿Enviar este elemento a la Papelera?</string>
-    <string name="confirmation_move_to_rubbish_plural" context="confirmation message before removing a file">¿Enviar estos elementos a la Papelera?</string>
+    <string name="confirmation_move_to_rubbish" context="confirmation message before removing a file">¿Enviar este elemento a la papelera?</string>
+    <string name="confirmation_move_to_rubbish_plural" context="confirmation message before removing a file">¿Enviar estos elementos a la papelera?</string>
     <string name="confirmation_delete_from_mega" context="confirmation message before removing a file">¿Eliminar completamente este elemento de MEGA?</string>
     <!-- <string name="confirmation_delete_from_mega_plural" context="confirmation message before removing a file">¿Eliminar completamente estos elementos de MEGA?</string> -->
     <string name="confirmation_leave_share_folder" context="confirmation message before leaving an incoming shared folder">Si abandonas la carpeta, no podrás acceder a ella de nuevo</string>
@@ -299,14 +299,14 @@
     <string name="context_copying" context="while copying a file or folder">Copiando</string>
     <!-- <string name="context_creating_link" context="status text">Creando enlace</string> -->
     <!--<string name="context_moving_to_trash" context="status text">Moviendo a la Papelera</string> -->
-    <string name="context_move_to_trash" context="menu item">Mover a la Papelera</string>
+    <string name="context_move_to_trash" context="menu item">Mover a la papelera</string>
     <string name="context_delete_from_mega" context="menu item">Borrar de MEGA</string>
     <string name="context_new_folder_name" context="Input field description in the create folder dialog.">Nombre de Carpeta</string>
     <string name="context_new_contact_name" context="when adding a new contact. in the dialog">Correo electrónico del contacto</string>
     <string name="context_creating_folder" context="status">Creando carpeta...</string>
     <!-- <string name="context_adding_contact" context="Adding a new relationship (contact)">Añadiendo contacto</string> -->
     <string name="context_download_to" context="Menu item">Guardar en</string>
-    <string name="context_clear_rubbish" context="Menu option">Vaciar la Papelera</string>    
+    <string name="context_clear_rubbish" context="Menu option">Vaciar la papelera</string>
     <string name="clear_rubbish_confirmation" context="Ask for confirmation before removing all the elements of the rubbish bin">Todos los elementos de la papelera se eliminarán.</string>
     <!--<string name="context_send_link" context="get the link and send it">Enviar enlace</string>-->
     <string name="context_send" context="get the link and send it">Enviar</string>
@@ -350,9 +350,9 @@
     <string name="context_correctly_moved" context="success message when moving a node">Movido correctamente</string>
     <string name="number_correctly_moved" context="success message when moving a node">%d ficheros movidos correctamente</string>
     <string name="number_incorrectly_moved" context="success message when moving a node">, %d ficheros no se han movido</string>
-    <string name="context_correctly_moved_to_rubbish" context="success message when moving a node">Enviado correctamente a la Papelera</string>
+    <string name="context_correctly_moved_to_rubbish" context="success message when moving a node">Enviado correctamente a la papelera</string>
     <string name="context_no_destination_folder" context="message that appears when a user tries to move/copy/upload a file but doesn't choose a destination folder">Elija la carpeta de destino</string>
-    <string name="number_correctly_moved_to_rubbish" context="success message when moving a node">%d ficheros enviados a la Papelera correctamente</string>
+    <string name="number_correctly_moved_to_rubbish" context="success message when moving a node">%d ficheros enviados a la papelera correctamente</string>
     <string name="number_incorrectly_moved_to_rubbish" context="success message when moving a node">, %d ficheros no se han enviado correctamente</string>
     <string name="context_no_moved" context="error message">Error. No se pudo mover</string>
     <string name="context_correctly_shared" context="success message when sharing a folder">Carpeta compartida correctamente</string>
@@ -385,8 +385,8 @@
     <string name="context_correctly_removed_sharing_contacts" context="success message when removing all the contacts of a shared folder">La carpeta ya no está compartida</string>
     <string name="context_no_removed_sharing_contacts" context="error message when removing all the contacts of a shared folder">Error, la carpeta todavía está compartida</string>
     <string name="context_select_one_file" context="option available for just one file">Seleccione sólo un fichero.</string>
-    <string name="rubbish_bin_emptied" context="success message when emptying the RB">Se ha vaciado correctamente la Papelera</string>
-    <string name="rubbish_bin_no_emptied" context="error message when emptying the RB">Error. La Papelera no se ha vaciado</string>
+    <string name="rubbish_bin_emptied" context="success message when emptying the RB">Se ha vaciado correctamente la papelera</string>
+    <string name="rubbish_bin_no_emptied" context="error message when emptying the RB">Error. La papelera no se ha vaciado</string>
     
     <string name="dialog_cancel_subscriptions" context="dialog cancel subscriptions">Estás a punto de cancelar tu subscripción a Mega. Por favor, indicanos en qué podemos mejorar.</string>
     <string name="hint_cancel_subscriptions" context="hint cancel subscriptions dialog">Escribe aquí las posibles mejoras...</string>
@@ -932,7 +932,7 @@
     <string name="text_deleted_message" context="Text shown when a message has been deleted in the chat">Mensaje eliminado</string>
     <string name="history_cleared_message" context="Text shown when the chat history was cleared by me">La historia del chat ha sido eliminada</string>
     <string name="text_deleted_message_by" context="Text shown when a message has been deleted in the chat"><![CDATA[<font color=\'#00BFA5\'>This message has been deleted by </font><font color=\'#060000\'>%1$s</font>]]></string>
-    <string name="history_cleared_by" context="Text shown when the chat history was cleared by someone"><![CDATA[<font color=\'#060000\'>%1$s</font><font color=\'#00BFA5\'>limpio el historial del chat</font>]]></string>
+    <string name="history_cleared_by" context="Text shown when the chat history was cleared by someone"><![CDATA[<font color=\'#060000\'>%1$s</font><font color=\'#00BFA5\'> limpió el historial del chat</font>]]></string>
 
     <string name="confirmation_delete_several_messages" context="Confirmation before deleting messages">¿Eliminar mensajes?</string>
     <string name="confirmation_delete_one_message" context="Confirmation before deleting one message">¿Eliminar mensaje?</string>
