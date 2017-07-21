@@ -249,12 +249,11 @@ public final class NotificationBuilder {
 
     public Notification buildSummary(String groupKey) {
         return new NotificationCompat.Builder(context)
-                .setContentTitle("Nougat Messenger")
-                .setContentText("You have unread messages")
                 .setSmallIcon(R.drawable.ic_stat_notify_download)
                 .setShowWhen(true)
                 .setGroup(groupKey)
                 .setGroupSummary(true)
+                .setColor(ContextCompat.getColor(context,R.color.mega))
                 .build();
     }
 
