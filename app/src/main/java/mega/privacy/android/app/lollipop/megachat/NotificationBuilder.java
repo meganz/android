@@ -1,5 +1,6 @@
 package mega.privacy.android.app.lollipop.megachat;
 
+import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -28,25 +29,32 @@ import android.text.Spanned;
 import java.io.File;
 import java.util.Locale;
 
+import mega.privacy.android.app.DatabaseHandler;
+import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.lollipop.controllers.ChatController;
+import mega.privacy.android.app.lollipop.listeners.ChatListNonContactNameListener;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatListItem;
+import nz.mega.sdk.MegaUser;
 
 public final class NotificationBuilder {
 
-    private static final String GROUP_KEY = "Messenger";
-    private static final String NOTIFICATION_ID = "com.stylingandroid.nougat.NOTIFICATION_ID";
+    private static final String GROUP_KEY = "Karere";
     private static final int SUMMARY_ID = 0;
 
     private final Context context;
     private final NotificationManagerCompat notificationManager;
     private final SharedPreferences sharedPreferences;
+    DatabaseHandler dbH;
+    MegaApiAndroid megaApi;
 
-    public static NotificationBuilder newInstance(Context context) {
+    public static NotificationBuilder newInstance(Context context, MegaApiAndroid megaApi) {
         Context appContext = context.getApplicationContext();
         Context safeContext = ContextCompat.createDeviceProtectedStorageContext(appContext);
         if (safeContext == null) {
@@ -54,27 +62,27 @@ public final class NotificationBuilder {
         }
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(safeContext);
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(safeContext);
-        return new NotificationBuilder(safeContext, notificationManager, sharedPreferences);
+        return new NotificationBuilder(safeContext, notificationManager, sharedPreferences, megaApi);
     }
 
-    public NotificationBuilder(Context context,
-                                NotificationManagerCompat notificationManager,
-                                SharedPreferences sharedPreferences) {
+    public NotificationBuilder(Context context, NotificationManagerCompat notificationManager, SharedPreferences sharedPreferences, MegaApiAndroid megaApi) {
         this.context = context.getApplicationContext();
         this.notificationManager = notificationManager;
         this.sharedPreferences = sharedPreferences;
+        dbH = DatabaseHandler.getDbHandler(context);
+        this.megaApi = megaApi;
     }
 
 
-    public void sendBundledNotification(Uri uriParameter, MegaChatListItem item, String vibration, String email, String color) {
-        Notification notification = buildNotification(uriParameter, item, vibration, GROUP_KEY, email, color);
+    public void sendBundledNotification(Uri uriParameter, MegaChatListItem item, String vibration, String email) {
+        Notification notification = buildNotification(uriParameter, item, vibration, GROUP_KEY, email);
         log("Notification id: "+getNotificationIdByHandle(item.getChatId()));
         notificationManager.notify(getNotificationIdByHandle(item.getChatId()), notification);
         Notification summary = buildSummary(GROUP_KEY);
         notificationManager.notify(SUMMARY_ID, summary);
     }
 
-    public Notification buildNotification(Uri uriParameter, MegaChatListItem item, String vibration, String groupKey, String email, String color) {
+    public Notification buildNotification(Uri uriParameter, MegaChatListItem item, String vibration, String groupKey, String email) {
         Intent intent = new Intent(context, ManagerActivityLollipop.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         intent.setAction(Constants.ACTION_CHAT_NOTIFICATION_MESSAGE);
@@ -83,16 +91,61 @@ public final class NotificationBuilder {
 
         Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 
+        String title = "Chat activity";
+        int unreadMessages = item.getUnreadCount();
+        log("Unread messages: "+unreadMessages);
+        if(unreadMessages!=0){
+
+            if(unreadMessages<0){
+                unreadMessages = Math.abs(unreadMessages);
+                log("unread number: "+unreadMessages);
+
+                if(unreadMessages>1){
+                    String numberString = "+"+unreadMessages;
+                    title = item.getTitle() + " (" + numberString + " " + context.getString(R.string.messages_chat_notification) + ")";
+                }
+            }
+            else{
+
+                if(unreadMessages>1){
+                    String numberString = unreadMessages+"";
+                    title = item.getTitle() + " (" + numberString + " " + context.getString(R.string.messages_chat_notification) + ")";
+                }
+            }
+        }
+        else{
+            title = item.getTitle();
+        }
+
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context)
                 .setSmallIcon(R.drawable.ic_stat_notify_download)
-                .setContentTitle(item.getTitle())
-                .setContentText(item.getLastMessage())
+                .setContentTitle(title)
                 .setColor(ContextCompat.getColor(context,R.color.mega))
                 .setAutoCancel(true)
                 .setShowWhen(true)
                 .setGroup(groupKey)
                 .setSound(defaultSoundUri)
                 .setContentIntent(pendingIntent);
+
+        if(item.isGroup()){
+
+            long lastMsgSender = item.getLastMessageSender();
+            String nameAction = getParticipantShortName(lastMsgSender);
+//            ChatController cC = new ChatController(context);
+//            String fullNameAction = cC.getFullName(item.getLastMessageSender(), item.getChatId());
+            if(nameAction.isEmpty()){
+                notificationBuilder.setContentText(item.getLastMessage());
+            }
+            else{
+                String source = "<b>"+nameAction+": </b>"+item.getLastMessage();
+
+                Spanned notificationContent = Html.fromHtml(source,0);
+                notificationBuilder.setContentText(notificationContent);
+            }
+        }
+        else{
+            notificationBuilder.setContentText(item.getLastMessage());
+        }
 
         //		NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
 
@@ -110,7 +163,7 @@ public final class NotificationBuilder {
         // Moves the expanded layout object into the notification object.
         //		notificationBuilder.setStyle(inboxStyle);
 
-        Bitmap largeIcon = setUserAvatar(item, email, color);
+        Bitmap largeIcon = setUserAvatar(item, email);
         if(largeIcon!=null){
             log("There is avatar!");
             notificationBuilder.setLargeIcon(largeIcon);
@@ -126,11 +179,85 @@ public final class NotificationBuilder {
         return notificationBuilder.build();
     }
 
-    public Bitmap setUserAvatar(MegaChatListItem item, String contactMail, String color){
+    public String getParticipantShortName(long userHandle){
+        log("getParticipantShortName");
+
+        MegaContactDB contactDB = dbH.findContactByHandle(String.valueOf(userHandle));
+        if (contactDB != null) {
+
+            String participantFirstName = contactDB.getName();
+
+            if(participantFirstName==null){
+                participantFirstName="";
+            }
+
+            if (participantFirstName.trim().length() <= 0){
+                String participantLastName = contactDB.getLastName();
+
+                if(participantLastName == null){
+                    participantLastName="";
+                }
+
+                if (participantLastName.trim().length() <= 0){
+                    String stringHandle = MegaApiJava.handleToBase64(userHandle);
+                    MegaUser megaContact = megaApi.getContact(stringHandle);
+                    if(megaContact!=null){
+                        return megaContact.getEmail();
+                    }
+                    else{
+                        return "Unknown name";
+                    }
+                }
+                else{
+                    return participantLastName;
+                }
+            }
+            else{
+                return participantFirstName;
+            }
+        } else {
+            log("Find non contact!");
+
+            NonContactInfo nonContact = dbH.findNonContactByHandle(userHandle+"");
+
+            if(nonContact!=null){
+                String nonContactFirstName = nonContact.getFirstName();
+
+                if(nonContactFirstName==null){
+                    nonContactFirstName="";
+                }
+
+                if (nonContactFirstName.trim().length() <= 0){
+                    String nonContactLastName = nonContact.getLastName();
+
+                    if(nonContactLastName == null){
+                        nonContactLastName="";
+                    }
+
+                    if (nonContactLastName.trim().length() <= 0){
+                        log("Ask for email of a non contact");
+                    }
+                    else{
+                        return nonContactLastName;
+                    }
+                }
+                else{
+                    return nonContactFirstName;
+                }
+            }
+            else{
+                log("Ask for non contact info");
+            }
+
+            return "";
+        }
+    }
+
+    public Bitmap setUserAvatar(MegaChatListItem item, String contactMail){
         log("setUserAvatar");
 
         if(item.isGroup()){
-            return createDefaultAvatar(item, color);
+            return createDefaultAvatar(item);
         }
         else{
             File avatar = null;
@@ -148,18 +275,18 @@ public final class NotificationBuilder {
                     bOpts.inInputShareable = true;
                     bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
                     if (bitmap == null) {
-                        return createDefaultAvatar(item, color);
+                        return createDefaultAvatar(item);
                     }
                     else{
                         return getCircleBitmap(bitmap);
                     }
                 }
                 else{
-                    return createDefaultAvatar(item, color);
+                    return createDefaultAvatar(item);
                 }
             }
             else{
-                return createDefaultAvatar(item, color);
+                return createDefaultAvatar(item);
             }
         }
     }
@@ -187,7 +314,7 @@ public final class NotificationBuilder {
         return output;
     }
 
-    public Bitmap createDefaultAvatar(MegaChatListItem item, String color){
+    public Bitmap createDefaultAvatar(MegaChatListItem item){
         log("createDefaultAvatar()");
 
         Bitmap defaultAvatar = Bitmap.createBitmap(Constants.DEFAULT_AVATAR_WIDTH_HEIGHT,Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
@@ -199,13 +326,14 @@ public final class NotificationBuilder {
             p.setColor(ContextCompat.getColor(context,R.color.divider_upgrade_account));
         }
         else{
+            String color = megaApi.getUserAvatarColor(MegaApiAndroid.userHandleToBase64(item.getPeerHandle()));
             if(color!=null){
                 log("The color to set the avatar is "+color);
                 p.setColor(Color.parseColor(color));
             }
             else{
                 log("Default color to the avatar");
-                p.setColor(context.getResources().getColor(R.color.lollipop_primary_color));
+                p.setColor(ContextCompat.getColor(context, R.color.lollipop_primary_color));
             }
         }
 
@@ -235,10 +363,23 @@ public final class NotificationBuilder {
                     text.setTextSize(150);
                     text.setTextAlign(Paint.Align.CENTER);
 
-                    Rect bounds = new Rect();
-                    text.getTextBounds(firstLetter, 0, firstLetter.length(), bounds);
-                    int x = (defaultAvatar.getWidth() - bounds.width())/2;
-                    int y = (defaultAvatar.getHeight() + bounds.height())/2;
+                    Rect r = new Rect();
+                    c.getClipBounds(r);
+                    int cHeight = r.height();
+                    int cWidth = r.width();
+                    text.setTextAlign(Paint.Align.LEFT);
+                    text.getTextBounds(firstLetter, 0, firstLetter.length(), r);
+                    float x = 0;
+                    float y = 0;
+                    if(firstLetter.toUpperCase(Locale.getDefault()).equals("A")){
+                        x = cWidth / 2f - r.width() / 2f - r.left - 10;
+                        y = cHeight / 2f + r.height() / 2f - r.bottom + 10;
+                    }
+                    else{
+                        x = cWidth / 2f - r.width() / 2f - r.left;
+                        y = cHeight / 2f + r.height() / 2f - r.bottom;
+                    }
+
                     c.drawText(firstLetter.toUpperCase(Locale.getDefault()), x, y, text);
                 }
 
@@ -254,6 +395,7 @@ public final class NotificationBuilder {
                 .setGroup(groupKey)
                 .setGroupSummary(true)
                 .setColor(ContextCompat.getColor(context,R.color.mega))
+                .setAutoCancel(true)
                 .build();
     }
 

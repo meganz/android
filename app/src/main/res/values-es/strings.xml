@@ -1259,4 +1259,10 @@
     <string name="settings_set_up_automatic_uploads" context="settings option">Configurar subidas automáticas</string>
 
     <string name="settings_chat_silent_sound_not" context="settings option for chat notification">Silencio</string>
+
+    <string name="messages_chat_notification" context="messages string in chat notification">mensajes</string>
+    <string name="incoming_folder_notification" context="part of the string in incoming shared folder notification">desde</string>
+    <string name="title_incoming_folder_notification" context="title of incoming shared folder notification">Nueva carpeta compartida</string>
+    <string name="title_contact_request_notification" context="title of contact request notification">Nueva solicitud de contacto</string>
+
 </resources>
