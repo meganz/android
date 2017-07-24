@@ -464,11 +464,12 @@ public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaP
 						if(accountInfo!=null){
 							intent.putExtra("typeAccount", accountInfo.getAccountType());
 						}
-						if (megaApi.getParentNode(nodes.get(position)).getType() == MegaNode.TYPE_ROOT){
+						log("Position in nodes: "+positionInNodes);
+						if (megaApi.getParentNode(nodes.get(positionInNodes)).getType() == MegaNode.TYPE_ROOT){
 							intent.putExtra("parentNodeHandle", -1L);
 						}
 						else{
-							intent.putExtra("parentNodeHandle", megaApi.getParentNode(nodes.get(position)).getHandle());
+							intent.putExtra("parentNodeHandle", megaApi.getParentNode(nodes.get(positionInNodes)).getHandle());
 						}
 						context.startActivity(intent);
 					}
