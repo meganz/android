@@ -12,6 +12,7 @@ extern JavaVM *MEGAjvm;
 extern jstring strEncodeUTF8;
 extern jclass clsString;
 extern jmethodID ctorString;
+extern jmethodID getBytes;
 extern int sdkVersion;
 #endif
 
@@ -38,20 +39,37 @@ extern int sdkVersion;
 %{
     if ($1)
     {
-#ifdef __ANDROID__
-        if (sdkVersion < 23)
+        int len = strlen($1);
+        jbyteArray $1_array = jenv->NewByteArray(len);
+        jenv->SetByteArrayRegion($1_array, 0, len, (const jbyte*)$1);
+        $result = (jstring) jenv->NewObject(clsString, ctorString, $1_array, strEncodeUTF8);
+        jenv->DeleteLocalRef($1_array);
+    }
+%}
+
+%typemap(in) char*
+%{
+    jbyteArray $1_array;
+    $1 = 0;
+    if ($input)
+    {
+        $1_array = (jbyteArray) jenv->CallObjectMethod($input, getBytes, strEncodeUTF8);
+        jsize $1_size = jenv->GetArrayLength($1_array);
+        $1 = new char[$1_size + 1];
+        if ($1_size)
         {
-            int len = strlen($1);
-            jbyteArray $1_array = jenv->NewByteArray(len);
-            jenv->SetByteArrayRegion($1_array, 0, len, (const jbyte*)$1);
-            $result = (jstring) jenv->NewObject(clsString, ctorString, $1_array, strEncodeUTF8);
-            jenv->DeleteLocalRef($1_array);
+            jenv->GetByteArrayRegion($1_array, 0, $1_size, (jbyte*)$1);
         }
-        else
-#endif
-        {
-            $result = jenv->NewStringUTF($1);
-        }
+        $1[$1_size] = '\0';
+    }
+%}
+
+%typemap(freearg) char*
+%{
+    if ($1)
+    {
+        delete [] $1;
+        jenv->DeleteLocalRef($1_array);
     }
 %}
 
@@ -60,20 +78,11 @@ extern int sdkVersion;
     $input = 0;
     if ($1)
     {
-#ifdef __ANDROID__
-        if (sdkVersion < 23)
-        {
-            int len = strlen($1);
-            jbyteArray $1_array = jenv->NewByteArray(len);
-            jenv->SetByteArrayRegion($1_array, 0, len, (const jbyte*)$1);
-            $input = (jstring) jenv->NewObject(clsString, ctorString, $1_array, strEncodeUTF8);
-            jenv->DeleteLocalRef($1_array);
-        }
-        else
-#endif
-        {
-            $input = jenv->NewStringUTF($1);
-        }
+        int len = strlen($1);
+        jbyteArray $1_array = jenv->NewByteArray(len);
+        jenv->SetByteArrayRegion($1_array, 0, len, (const jbyte*)$1);
+        $input = (jstring) jenv->NewObject(clsString, ctorString, $1_array, strEncodeUTF8);
+        jenv->DeleteLocalRef($1_array);
     }
     Swig::LocalRefGuard $1_refguard(jenv, $input);
 %}

@@ -38,6 +38,7 @@ import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.lollipop.megachat.AndroidMegaChatMessage;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.NodeAttachmentActivityLollipop;
+import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaChatLollipopAdapter;
 import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.ThumbnailUtils;
 import mega.privacy.android.app.utils.Util;
@@ -71,6 +72,7 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
     RelativeLayout nodeIconLayout;
     ImageView nodeIcon;
     LinearLayout optionView;
+    TextView optionViewText;
     LinearLayout optionDownload;
     LinearLayout optionImport;
     LinearLayout optionSaveOffline;
@@ -155,6 +157,7 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
         nodeIcon = (ImageView) contentView.findViewById(R.id.node_attachment_icon);
         optionDownload = (LinearLayout) contentView.findViewById(R.id.option_download_layout);
         optionView = (LinearLayout) contentView.findViewById(R.id.option_view_layout);
+        optionViewText = (TextView) contentView.findViewById(R.id.option_view_text);
         optionRevoke = (LinearLayout) contentView.findViewById(R.id.option_revoke_layout);
         optionSaveOffline = (LinearLayout) contentView.findViewById(R.id.option_save_offline_layout);
         optionImport = (LinearLayout) contentView.findViewById(R.id.option_import_layout);
@@ -237,17 +240,32 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
                         log("Several nodes in the message");
                         optionView.setVisibility(View.VISIBLE);
 
-                        nodeName.setText(context.getResources().getQuantityString(R.plurals.new_general_num_files, nodeList.size(), nodeList.size()));
-
                         long totalSize = 0;
+                        int count = 0;
                         for(int i=0; i<nodeList.size(); i++){
                             MegaNode temp = nodeList.get(i);
-                            log("Node Name: "+temp.getName());
-                            totalSize = totalSize + temp.getSize();
+                            if(!(megaChatApi.isRevoked(chatId, temp.getHandle()))){
+                                count++;
+                                log("Node Name: "+temp.getName());
+                                totalSize = totalSize + temp.getSize();
+                            }
                         }
                         nodeInfo.setText(Util.getSizeString(totalSize));
-
+                        MegaNode node = nodeList.get(0);
                         nodeThumb.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
+                        if(count==1){
+                            nodeName.setText(node.getName());
+                        }
+                        else{
+                            nodeName.setText(context.getResources().getQuantityString(R.plurals.new_general_num_files, count, count));
+                        }
+
+                        if(nodeList.size()==count){
+                            optionViewText.setText(getString(R.string.general_view));
+                        }
+                        else{
+                            optionViewText.setText(getString(R.string.general_view_with_revoke, nodeList.size()-count));
+                        }
                     }
                 }
                 else{
@@ -390,10 +408,10 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
                 }
 
                 if(context instanceof ChatActivityLollipop){
-                    ((ChatActivityLollipop)context).revoke();
+                    ((ChatActivityLollipop)context).showConfirmationDeleteMessage(messageId, chatId);
                 }
                 else if(context instanceof NodeAttachmentActivityLollipop){
-                    ((NodeAttachmentActivityLollipop)context).revoke();
+                    ((NodeAttachmentActivityLollipop)context).showConfirmationDeleteNode(chatId, ((NodeAttachmentActivityLollipop) context).selectedNode.getHandle());
                 }
 
                 break;

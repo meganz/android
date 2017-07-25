@@ -42,6 +42,7 @@ import mega.privacy.android.app.lollipop.ZipBrowserActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.AndroidMegaChatMessage;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
+import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.NodeAttachmentActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.NonContactInfo;
@@ -107,18 +108,7 @@ public class ChatController {
 
     public void clearHistory(MegaChatRoom chat){
         log("clearHistory: "+chat.getTitle());
-        if(context instanceof ManagerActivityLollipop){
-            megaChatApi.clearChatHistory(chat.getChatId(), (ManagerActivityLollipop) context);
-        }
-        else if(context instanceof ChatActivityLollipop){
-            megaChatApi.clearChatHistory(chat.getChatId(), (ChatActivityLollipop) context);
-        }
-        else if(context instanceof ContactInfoActivityLollipop){
-            megaChatApi.clearChatHistory(chat.getChatId(), (ContactInfoActivityLollipop) context);
-        }
-        else if(context instanceof GroupChatInfoActivityLollipop){
-            megaChatApi.clearChatHistory(chat.getChatId(), (GroupChatInfoActivityLollipop) context);
-        }
+        clearHistory(chat.getChatId());
     }
 
     public void clearHistory(long chatId){
@@ -135,14 +125,56 @@ public class ChatController {
         else if(context instanceof GroupChatInfoActivityLollipop){
             megaChatApi.clearChatHistory(chatId, (GroupChatInfoActivityLollipop) context);
         }
+
+        dbH.removePendingMessageByChatId(chatId);
     }
 
     public void deleteMessages(ArrayList<AndroidMegaChatMessage> messages, MegaChatRoom chat){
         log("deleteMessages: "+messages.size());
-        MegaChatMessage messageToDelete;
         if(messages!=null){
             for(int i=0; i<messages.size();i++){
-                messageToDelete = megaChatApi.deleteMessage(chat.getChatId(), messages.get(i).getMessage().getMsgId());
+                deleteMessage(messages.get(i).getMessage(), chat.getChatId());
+            }
+        }
+    }
+
+    public void deleteMessageById(long messageId, long chatId) {
+        log("deleteMessage");
+        MegaChatMessage message = megaChatApi.getMessage(chatId, messageId);
+        if(message!=null){
+            deleteMessage(message, chatId);
+        }
+    }
+
+    public void deleteNodeAttachment(long chatId, long nodeHandle) {
+        log("deleteNodeAttachment");
+        if(context instanceof ChatFullScreenImageViewer){
+            megaChatApi.revokeAttachment(chatId, nodeHandle, (ChatFullScreenImageViewer) context);
+        }
+        else if(context instanceof NodeAttachmentActivityLollipop){
+            megaChatApi.revokeAttachment(chatId, nodeHandle, (NodeAttachmentActivityLollipop) context);
+        }
+    }
+
+    public void deleteMessage(MegaChatMessage message, long chatId){
+        log("deleteMessage");
+        MegaChatMessage messageToDelete;
+        if(message!=null){
+
+            if(message.getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT){
+                log("Delete node attachment message");
+                MegaNodeList nodeList = message.getMegaNodeList();
+
+                for(int j=0; j<nodeList.size(); j++){
+                    MegaNode node = nodeList.get(j);
+                    if(context instanceof ChatActivityLollipop){
+                        megaChatApi.revokeAttachment(chatId, node.getHandle(), (ChatActivityLollipop) context);
+                    }
+                }
+            }
+            else{
+                log("Delete normal message");
+                messageToDelete = megaChatApi.deleteMessage(chatId, message.getMsgId());
                 if(messageToDelete==null){
                     log("The message cannot be deleted");
                 }
@@ -178,11 +210,20 @@ public class ChatController {
         log("muteChat");
         ChatItemPreferences chatPrefs = dbH.findChatPreferencesByHandle(Long.toString(chatHandle));
         if(chatPrefs==null){
-            Uri defaultRingtoneUri = RingtoneManager.getActualDefaultRingtoneUri(context, RingtoneManager.TYPE_RINGTONE);
-            Uri defaultSoundUri = RingtoneManager.getActualDefaultRingtoneUri(context, RingtoneManager.TYPE_NOTIFICATION);
 
-            chatPrefs = new ChatItemPreferences(Long.toString(chatHandle), Boolean.toString(false), defaultRingtoneUri.toString(), defaultSoundUri.toString());
-            dbH.setChatItemPreferences(chatPrefs);
+            ChatSettings chatSettings = dbH.getChatSettings();
+            if(chatSettings==null){
+
+                chatPrefs = new ChatItemPreferences(Long.toString(chatHandle), Boolean.toString(false), "", "");
+                dbH.setChatItemPreferences(chatPrefs);
+            }
+            else{
+                String sound = chatSettings.getNotificationsSound();
+                Uri defaultRingtoneUri = RingtoneManager.getActualDefaultRingtoneUri(context, RingtoneManager.TYPE_RINGTONE);
+
+                chatPrefs = new ChatItemPreferences(Long.toString(chatHandle), Boolean.toString(false), defaultRingtoneUri.toString(), sound);
+                dbH.setChatItemPreferences(chatPrefs);
+            }
         }
         else{
             chatPrefs.setNotificationsEnabled(Boolean.toString(false));
@@ -211,10 +252,7 @@ public class ChatController {
         log("UNmuteChat");
         ChatItemPreferences chatPrefs = dbH.findChatPreferencesByHandle(Long.toString(chatHandle));
         if(chatPrefs==null){
-            Uri defaultRingtoneUri = RingtoneManager.getActualDefaultRingtoneUri(context, RingtoneManager.TYPE_RINGTONE);
-            Uri defaultSoundUri = RingtoneManager.getActualDefaultRingtoneUri(context, RingtoneManager.TYPE_NOTIFICATION);
-
-            chatPrefs = new ChatItemPreferences(Long.toString(chatHandle), Boolean.toString(true), defaultRingtoneUri.toString(), defaultSoundUri.toString());
+            chatPrefs = new ChatItemPreferences(Long.toString(chatHandle), Boolean.toString(true), "", "");
             dbH.setChatItemPreferences(chatPrefs);
         }
         else{

@@ -137,7 +137,8 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
     private MegaChatApiAndroid megaChatApi;
     private String confirmLink;
 
-    int numberOfClicks = 0;
+    int numberOfClicksKarere = 0;
+    int numberOfClicksSDK = 0;
 
     boolean firstTime = true;
 
@@ -210,7 +211,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         chatSettings = dbH.getChatSettings();
         if(chatSettings==null){
             log("chatSettings is null --> enable chat by default");
-            chatSettings = new ChatSettings(true+"", true + "", true + "",true + "");
+            chatSettings = new ChatSettings(true+"", true + "", "",true + "");
             dbH.setChatSettings(chatSettings);
         }
         else{
@@ -219,14 +220,14 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 if (prefs.getFirstTimeChat() != null){
                     if (Boolean.parseBoolean(prefs.getFirstTimeChat()) == true){
                         log("firstTimeChat true --> enable chat by default");
-                        chatSettings = new ChatSettings(true+"", true + "", true + "",true + "");
+                        chatSettings = new ChatSettings(true+"", true + "", "",true + "");
                         dbH.setChatSettings(chatSettings);
                         dbH.setFirstTimeChat(false);
                     }
                 }
                 else{
                     log("firstTimeChat is null --> enable chat by default");
-                    chatSettings = new ChatSettings(true+"", true + "", true + "",true + "");
+                    chatSettings = new ChatSettings(true+"", true + "", "",true + "");
                     dbH.setChatSettings(chatSettings);
                     dbH.setFirstTimeChat(false);
                 }
@@ -352,6 +353,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         textnewToMega.setMargins(Util.scaleWidthPx(65, outMetrics), Util.scaleHeightPx(20, outMetrics), 0, Util.scaleHeightPx(30, outMetrics));
         newToMega.setLayoutParams(textnewToMega);
         newToMega.setTextSize(TypedValue.COMPLEX_UNIT_SP, (20*scaleText));
+        newToMega.setOnClickListener(this);
 
         bRegister = (TextView) v.findViewById(R.id.button_create_account_login);
 
@@ -792,7 +794,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     // chat cannot initialize, disable chat completely
                     if(chatSettings==null) {
                         log("1 - enableChat: ERROR----> Switch OFF chat");
-                        chatSettings = new ChatSettings(false+"", true + "", true + "",true + "");
+                        chatSettings = new ChatSettings(false+"", true + "", "",true + "");
                         dbH.setChatSettings(chatSettings);
                     }
                     else{
@@ -817,7 +819,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             log("enableChat:isLogginIn true");
             if(chatSettings==null) {
                 log("3 - enableChat: ERROR----> Switch OFF chat");
-                chatSettings = new ChatSettings(false+"", true + "", true + "",true + "");
+                chatSettings = new ChatSettings(false+"", true + "", "",true + "");
                 dbH.setChatSettings(chatSettings);
             }
             else{
@@ -902,7 +904,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     log("startFastLogin: condition ret == MegaChatApi.INIT_ERROR");
                     if(chatSettings==null) {
                         log("1 - startFastLogin: ERROR----> Switch OFF chat");
-                        chatSettings = new ChatSettings(false+"", true + "", true + "",true + "");
+                        chatSettings = new ChatSettings(false+"", true + "", "",true + "");
                         dbH.setChatSettings(chatSettings);
                     }
                     else{
@@ -1199,36 +1201,70 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 break;
             }
             case R.id.login_text_view:{
-                numberOfClicks++;
-                if (numberOfClicks == 5){
+                numberOfClicksKarere++;
+                if (numberOfClicksKarere == 5){
                     MegaAttributes attrs = dbH.getAttributes();
                     if(attrs!=null){
-                        if (attrs.getFileLogger() != null){
+                        if (attrs.getFileLoggerKarere() != null){
                             try {
-                                if (Boolean.parseBoolean(attrs.getFileLogger()) == false) {
-                                    ((LoginActivityLollipop)context).showConfirmationEnableLogs();
+                                if (Boolean.parseBoolean(attrs.getFileLoggerKarere()) == false) {
+                                    ((LoginActivityLollipop)context).showConfirmationEnableLogsKarere();
                                 }
                                 else{
-                                    dbH.setFileLogger(false);
-                                    Util.setFileLogger(false);
-                                    numberOfClicks = 0;
+                                    dbH.setFileLoggerKarere(false);
+                                    Util.setFileLoggerKarere(false);
+                                    numberOfClicksKarere = 0;
+                                    MegaChatApiAndroid.setLogLevel(MegaChatApiAndroid.LOG_LEVEL_ERROR);
+                                    ((LoginActivityLollipop)context).showSnackbar(getString(R.string.settings_disable_logs));
+                                }
+                            }
+                            catch(Exception e){
+                                ((LoginActivityLollipop)context).showConfirmationEnableLogsKarere();
+                            }
+                        }
+                        else{
+                            ((LoginActivityLollipop)context).showConfirmationEnableLogsKarere();
+                        }
+                    }
+                    else{
+                        log("attrs is NULL");
+                        ((LoginActivityLollipop)context).showConfirmationEnableLogsKarere();
+                    }
+                }
+                break;
+            }
+            case R.id.text_newToMega:{
+                numberOfClicksSDK++;
+                if (numberOfClicksSDK == 5){
+                    MegaAttributes attrs = dbH.getAttributes();
+                    if(attrs!=null){
+                        if (attrs.getFileLoggerSDK() != null){
+                            try {
+                                if (Boolean.parseBoolean(attrs.getFileLoggerSDK()) == false) {
+                                    ((LoginActivityLollipop)context).showConfirmationEnableLogsSDK();
+                                }
+                                else{
+                                    dbH.setFileLoggerSDK(false);
+                                    Util.setFileLoggerSDK(false);
+                                    numberOfClicksSDK = 0;
                                     MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_FATAL);
                                     ((LoginActivityLollipop)context).showSnackbar(getString(R.string.settings_disable_logs));
                                 }
                             }
                             catch(Exception e){
-                                ((LoginActivityLollipop)context).showConfirmationEnableLogs();
+                                ((LoginActivityLollipop)context).showConfirmationEnableLogsSDK();
                             }
                         }
                         else{
-                            ((LoginActivityLollipop)context).showConfirmationEnableLogs();
+                            ((LoginActivityLollipop)context).showConfirmationEnableLogsSDK();
                         }
                     }
                     else{
                         log("attrs is NULL");
-                        ((LoginActivityLollipop)context).showConfirmationEnableLogs();
+                        ((LoginActivityLollipop)context).showConfirmationEnableLogsSDK();
                     }
                 }
+                break;
             }
         }
     }
@@ -2020,7 +2056,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.AppCompatAlertDialogStyle);
         builder.setTitle(getResources().getString(R.string.park_account_dialog_title));
         String message= getResources().getString(R.string.park_account_text_last_step);
-        builder.setMessage(message).setPositiveButton(R.string.pin_lock_enter, dialogClickListener)
+        builder.setMessage(message).setPositiveButton(R.string.park_account_button, dialogClickListener)
                 .setNegativeButton(R.string.general_cancel, dialogClickListener).show();
     }
 
@@ -2195,7 +2231,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 log("newState == MegaChatApi.INIT_ERROR");
                 if (chatSettings == null) {
                     log("1 - onChatInitStateUpdate: ERROR----> Switch OFF chat");
-                    chatSettings = new ChatSettings(false + "", true + "", true + "", true + "");
+                    chatSettings = new ChatSettings(false + "", true + "", "", true + "");
                     dbH.setChatSettings(chatSettings);
                 } else {
                     log("2 - onChatInitStateUpdate: ERROR----> Switch OFF chat");

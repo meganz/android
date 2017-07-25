@@ -8,13 +8,14 @@ android {
         applicationId "mega.privacy.android.app"
         minSdkVersion 11
         targetSdkVersion 25
-        versionCode 139
-        versionName "3.1.8.1 (139)"
+        versionCode 144
+        versionName "3.2.1 (144)"
     }
 
     sourceSets.main {
         java {
             srcDirs += 'src/main/jni/mega/sdk/bindings/java/nz/mega/sdk'
+            srcDirs += 'src/main/jni/megachat/sdk/bindings/java/nz/mega/sdk'
             exclude '**/MegaApiSwing.java'
         }
         jni.srcDirs = [] //disable automatic ndk-build

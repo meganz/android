@@ -226,7 +226,7 @@
                             android:id="@+id/chat_group_contact_properties_ringtone_label"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="@string/title_properties_chat_contact_call_sound"
+                            android:text="@string/call_ringtone_title"
                             android:textSize="16dp"
                             android:textColor="@color/name_my_account"/>
 
