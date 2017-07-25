@@ -23,7 +23,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:fitsSystemWindows="true"
-                android:background="@color/content_text_background"
+                android:background="@drawable/full_gradient_shape_2"
                 app:contentScrim="@color/lollipop_primary_color"
                 app:collapsedTitleTextAppearance="@style/ToolbarTitle"
                 app:layout_scrollFlags="scroll|exitUntilCollapsed"
@@ -36,8 +36,8 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="65dp"
                     android:layout_marginTop="12dp"
+                    android:background="@android:color/transparent"
                     android:layout_gravity="center_vertical|left"
-                    android:background="@color/content_text_background"
                     app:layout_collapseMode="parallax"
                     android:fitsSystemWindows="true">
 
@@ -45,7 +45,6 @@
                       android:id="@+id/file_info_toolbar_icon"
                       android:layout_width="wrap_content"
                       android:layout_height="wrap_content"
-                      android:background="@color/content_text_background"
                       android:adjustViewBounds="true"
                       android:scaleType="fitCenter" />
 
@@ -106,7 +105,7 @@
                     android:id="@+id/toolbar"
                     android:layout_width="match_parent"
                     android:layout_height="?attr/actionBarSize"
-                    app:layout_collapseMode="pin" />
+                    app:layout_collapseMode="pin"/>
 
                 <!--android:background="@drawable/gradient_shape"-->
 

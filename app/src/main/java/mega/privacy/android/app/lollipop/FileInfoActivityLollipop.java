@@ -345,7 +345,6 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 			}
 
 			iconToolbarLayout = (RelativeLayout) findViewById(R.id.file_info_icon_layout);
-			iconToolbarLayout.setBackgroundColor(ContextCompat.getColor(this, R.color.white));
 
 			iconToolbarView = (ImageView) findViewById(R.id.file_info_toolbar_icon);
 			iconToolbarView.setImageResource(imageId);
@@ -462,7 +461,8 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 		drawableDots = drawableDots.mutate();
 		upArrow = ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_arrow_back_white);
 		upArrow = upArrow.mutate();
-		drawableRemoveLink = ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_remove_link);
+
+		drawableRemoveLink = ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_remove_link_w);
 		drawableRemoveLink = drawableRemoveLink.mutate();
 		drawableLink = ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_link_white);
 		drawableLink = drawableLink.mutate();
@@ -508,19 +508,27 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
 			if(node.isExported()){
 				getLinkMenuItem.setVisible(false);
+				menu.findItem(R.id.cab_menu_file_info_get_link).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
 				editLinkMenuItem.setVisible(true);
 				removeLinkMenuItem.setVisible(true);
+				menu.findItem(R.id.cab_menu_file_info_remove_link).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+
 			}
 			else{
 				getLinkMenuItem.setVisible(true);
+				menu.findItem(R.id.cab_menu_file_info_get_link).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 				editLinkMenuItem.setVisible(false);
 				removeLinkMenuItem.setVisible(false);
+				menu.findItem(R.id.cab_menu_file_info_remove_link).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+
 			}
 
 			if(from==FROM_INCOMING_SHARES){
 
 				downloadMenuItem.setVisible(true);
 				shareMenuItem.setVisible(false);
+				menu.findItem(R.id.cab_menu_file_info_share_folder).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+
 				deleteMenuItem.setVisible(false);
 
 				if(firstIncomingLevel){
@@ -548,8 +556,12 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 						copyMenuItem.setVisible(true);
 
 						getLinkMenuItem.setVisible(false);
+						menu.findItem(R.id.cab_menu_file_info_get_link).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+
 						editLinkMenuItem.setVisible(false);
 						removeLinkMenuItem.setVisible(false);
+						menu.findItem(R.id.cab_menu_file_info_remove_link).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+
 						break;
 					}
 					case MegaShare.ACCESS_READ:{
@@ -559,8 +571,12 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 						rubbishMenuItem.setVisible(false);
 
 						getLinkMenuItem.setVisible(false);
+						menu.findItem(R.id.cab_menu_file_info_get_link).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+
 						editLinkMenuItem.setVisible(false);
 						removeLinkMenuItem.setVisible(false);
+						menu.findItem(R.id.cab_menu_file_info_remove_link).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+
 
 						break;
 					}
@@ -571,8 +587,12 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 						rubbishMenuItem.setVisible(false);
 
 						getLinkMenuItem.setVisible(false);
+						menu.findItem(R.id.cab_menu_file_info_get_link).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+
 						editLinkMenuItem.setVisible(false);
 						removeLinkMenuItem.setVisible(false);
+						menu.findItem(R.id.cab_menu_file_info_remove_link).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+
 						break;
 					}
 				}
@@ -581,11 +601,15 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 				downloadMenuItem.setVisible(true);
 				if (node.isFolder()){
 					shareMenuItem.setVisible(true);
+					menu.findItem(R.id.cab_menu_file_info_share_folder).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+
 
 
 				}
 				else{
 					shareMenuItem.setVisible(false);
+					menu.findItem(R.id.cab_menu_file_info_share_folder).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+
 				}
 
 				rubbishMenuItem.setVisible(true);
@@ -610,6 +634,10 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 				drawableRemoveLink.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.white), PorterDuff.Mode.SRC_ATOP);
 				removeLinkMenuItem.setIcon(drawableRemoveLink);
 			}
+			if(getLinkMenuItem!=null){
+				drawableLink.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.white), PorterDuff.Mode.SRC_ATOP);
+				getLinkMenuItem.setIcon(drawableLink);
+			}
 
 			collapsingToolbar.setCollapsedTitleTextColor(ContextCompat.getColor(this, R.color.white));
 			collapsingToolbar.setExpandedTitleColor(ContextCompat.getColor(this, R.color.white));
@@ -620,7 +648,6 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 				iconToolbarViewLink.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.white), PorterDuff.Mode.SRC_ATOP);
 				iconToolbarViewLink.setAlpha(0.8f);
 			}
-//				collapsingToolbar.setStatusBarScrimColor(ContextCompat.getColor(this, R.color.transparent_black));
 		}
 		/*Folder*/
 		else{
@@ -631,44 +658,13 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 					if (offset < -200) {
 						upArrow.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.white), PorterDuff.Mode.SRC_ATOP);
 						getSupportActionBar().setHomeAsUpIndicator(upArrow);
-
-						if(getLinkMenuItem!=null){
-
-							drawableLink.setColorFilter(null);
-							getLinkMenuItem.setIcon(drawableLink);
-
-							drawableShare.setColorFilter(null);
-							shareMenuItem.setIcon(drawableShare);
-						}
-
-						if(removeLinkMenuItem!=null){
-							drawableRemoveLink.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.white), PorterDuff.Mode.SRC_ATOP);
-							removeLinkMenuItem.setIcon(drawableRemoveLink);
-						}
-
 						drawableDots.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.white), PorterDuff.Mode.SRC_ATOP);
 						toolbar.setOverflowIcon(drawableDots);
 					} else {
-
-						upArrow.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.transparent_black), PorterDuff.Mode.SRC_ATOP);
+						upArrow.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.white), PorterDuff.Mode.SRC_ATOP);
 						getSupportActionBar().setHomeAsUpIndicator(upArrow);
 						getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
-						if(getLinkMenuItem!=null){
-
-							drawableLink.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.transparent_black), PorterDuff.Mode.SRC_ATOP);
-							getLinkMenuItem.setIcon(drawableLink);
-
-							drawableShare.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.transparent_black), PorterDuff.Mode.SRC_ATOP);
-							shareMenuItem.setIcon(drawableShare);
-						}
-
-						if(removeLinkMenuItem!=null){
-							drawableRemoveLink.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.filter_icon), PorterDuff.Mode.SRC_ATOP);
-							removeLinkMenuItem.setIcon(drawableRemoveLink);
-						}
-
-						drawableDots.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.transparent_black), PorterDuff.Mode.SRC_ATOP);
+						drawableDots.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.white), PorterDuff.Mode.SRC_ATOP);
 						toolbar.setOverflowIcon(drawableDots);
 					}
 				}
