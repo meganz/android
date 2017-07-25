@@ -95,6 +95,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 	ContactInfoActivityLollipop contactInfoActivityLollipop;
 	CoordinatorLayout fragmentContainer;
 	CollapsingToolbarLayout collapsingToolbar;
+
 	View imageGradient;
 	ImageView contactPropertiesImage;
 	LinearLayout optionsLayout;
@@ -122,6 +123,8 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 	TextView shareContactText;
 	ImageView shareContactIcon;
 	ImageView contactStateIcon;
+
+	TextView nameLength;
 	View dividerShareContactLayout;
 
 	RelativeLayout clearChatLayout;
@@ -204,8 +207,9 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 
 			contactStateIcon = (ImageView) findViewById(R.id.contact_drawable_state);
 
-			collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.collapse_toolbar);
+			nameLength = (TextView) findViewById(R.id.namelength);
 
+			collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.collapse_toolbar);
 			imageGradient = (View) findViewById(R.id.gradient_view);
 
 			collapsingToolbar.setExpandedTitleMarginBottom(Util.scaleHeightPx(24, outMetrics));
@@ -215,7 +219,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			collapsingToolbar.setCollapsedTitleTextColor(ContextCompat.getColor(this, R.color.white));
 			collapsingToolbar.setExpandedTitleColor(ContextCompat.getColor(this, R.color.white));
 
-						aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+			aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
 			aB.setHomeButtonEnabled(true);
 			aB.setDisplayHomeAsUpEnabled(true);
 
@@ -248,7 +252,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 				chatPrefs = dbH.findChatPreferencesByHandle(String.valueOf(chatHandle));
 
 				collapsingToolbar.setTitle(chat.getTitle());
-
+				nameLength.setText(collapsingToolbar.getTitle());
 
 			}
 			else{
@@ -284,6 +288,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 						}
 
 						collapsingToolbar.setTitle(fullName);
+						nameLength.setText(collapsingToolbar.getTitle());
 
 					}
 					else{

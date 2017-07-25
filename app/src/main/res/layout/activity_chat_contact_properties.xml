@@ -52,16 +52,33 @@
                         android:background="@drawable/full_gradient_shape" />
 
                 </FrameLayout>
-
-                <ImageView
-                    android:id="@+id/contact_drawable_state"
+                <LinearLayout android:layout_height="wrap_content"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@null"
-                    android:src="@drawable/ic_offline"
-                    android:layout_gravity="bottom|right"
-                    android:layout_marginBottom="50dp"
-                    android:layout_marginRight="50dp"/>
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="20dp"
+                    android:layout_gravity="bottom"
+                    android:layout_marginLeft="72dp">
+
+                    <TextView android:id="@+id/namelength"
+                        android:visibility="invisible"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="33sp"
+                        android:maxLength="17" />
+
+                    <ImageView
+                        android:id="@+id/contact_drawable_state"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@null"
+                        android:layout_marginLeft="7dp"
+                        android:src="@drawable/ic_offline"
+                        android:layout_gravity="top"
+                        android:layout_marginTop="5dp"/>
+
+                    </LinearLayout>
+
+
 
                 <android.support.v7.widget.Toolbar
                     android:id="@+id/toolbar"
