@@ -32,7 +32,7 @@
                 android:layout_gravity="left|center_vertical"
                 android:textColor="@color/name_my_account"
                 android:layout_weight="5"
-                android:text="@string/title_properties_chat_contact_notifications"
+                android:text="@string/title_properties_contact_notifications_for_chat"
                 android:textSize="16dp" />
 
             <android.support.v7.widget.SwitchCompat
@@ -113,7 +113,7 @@
                     android:id="@+id/chat_contact_properties_ringtone_label"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/title_properties_chat_contact_call_sound"
+                    android:text="@string/call_ringtone_title"
                     android:textSize="16dp"
                     android:textColor="@color/name_my_account"/>
 

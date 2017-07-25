@@ -397,7 +397,7 @@ public class CreditCardFragmentLollipop extends Fragment implements MegaRequestL
 	
 						if (paymentMonth == 1){
 							if(account.getMonths()==1){
-								storage.setText(account.getStorage()+"GB");		            
+								storage.setText(account.getStorage()/1024+" TB");
 								
 								double perMonthF=account.getAmount()/100.00;
 								String perMonthString =df.format(perMonthF);
@@ -410,7 +410,7 @@ public class CreditCardFragmentLollipop extends Fragment implements MegaRequestL
 								bandwidth.setText(account.getTransfer()/1024 + " TB");
 							}
 							if(account.getMonths()==12){
-								storage.setText(account.getStorage()+"GB");		            
+								storage.setText(account.getStorage()/1024+" TB");
 								
 								double perMonthF=account.getAmount()/100.00;
 								String perMonthString =df.format(perMonthF);

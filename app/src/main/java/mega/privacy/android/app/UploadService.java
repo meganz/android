@@ -141,6 +141,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		log("onStartCommand");
+		canceled = false;
 		
 		if(intent == null){
 			return START_NOT_STICKY;
@@ -370,9 +371,17 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 			message = getString(R.string.download_preparing_files);
 		}
 		else{
-			int inProgress = totalTransfers - pendingTransfers + 1;
+			int inProgress = 0;
+			if(pendingTransfers==0){
+				inProgress = totalTransfers - pendingTransfers;
+			}
+			else{
+				inProgress = totalTransfers - pendingTransfers + 1;
+			}
 			message = getResources().getQuantityString(R.plurals.upload_service_notification, totalTransfers, inProgress, totalTransfers);
 		}
+
+		log("updateProgressNotification: "+message);
 
 		String info = Util.getProgressSize(UploadService.this, totalSizeTransferred, totalSizePendingTransfer);
 

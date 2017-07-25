@@ -236,13 +236,27 @@ public class InboxFragmentLollipop extends Fragment{
 			}
 
 			menu.findItem(R.id.cab_menu_download).setVisible(showDownload);
+			if(showDownload){
+				menu.findItem(R.id.cab_menu_download).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+			}
+
 			menu.findItem(R.id.cab_menu_rename).setVisible(showRename);
+
 			menu.findItem(R.id.cab_menu_copy).setVisible(showCopy);
+			if(showCopy){
+				menu.findItem(R.id.cab_menu_copy).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+			}
+
 			menu.findItem(R.id.cab_menu_move).setVisible(showMove);
+			if(showMove){
+				menu.findItem(R.id.cab_menu_move).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+			}
+
 			menu.findItem(R.id.cab_menu_share_link).setVisible(showLink);
 			if (showTrash){
 				menu.findItem(R.id.cab_menu_trash).setTitle(context.getString(R.string.context_move_to_trash));
 			}
+
 			menu.findItem(R.id.cab_menu_trash).setVisible(showTrash);
 			menu.findItem(R.id.cab_menu_leave_multiple_share).setVisible(false);
 			
@@ -609,7 +623,27 @@ public class InboxFragmentLollipop extends Fragment{
 			}
 		}
 		Resources res = getActivity().getResources();
-		String format = "%d %s";
+
+		String title;
+		int sum=files+folders;
+
+		if (files == 0 && folders == 0) {
+			title = Integer.toString(sum);
+		} else if (files == 0) {
+			title = Integer.toString(folders);
+		} else if (folders == 0) {
+			title = Integer.toString(files);
+		} else {
+			title = Integer.toString(sum);
+		}
+		actionMode.setTitle(title);
+		try {
+			actionMode.invalidate();
+		} catch (NullPointerException e) {
+			e.printStackTrace();
+			log("oninvalidate error");
+		}
+		/*String format = "%d %s";
 		String filesStr = String.format(format, files,
 				res.getQuantityString(R.plurals.general_num_files, files));
 		String foldersStr = String.format(format, folders,
@@ -630,7 +664,8 @@ public class InboxFragmentLollipop extends Fragment{
 		} catch (NullPointerException e) {
 			e.printStackTrace();
 			log("oninvalidate error");
-		}
+		}*/
+
 	}
 
 	/*

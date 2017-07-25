@@ -136,7 +136,7 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
                                 log("condition ret == MegaChatApi.INIT_ERROR");
                                 if (chatSettings == null) {
                                     log("ERROR----> Switch OFF chat");
-                                    chatSettings = new ChatSettings(false + "", true + "", true + "", true + "");
+                                    chatSettings = new ChatSettings(false + "", true + "", "", true + "");
                                     dbH.setChatSettings(chatSettings);
                                 } else {
                                     log("ERROR----> Switch OFF chat");
@@ -182,70 +182,70 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
      */
     private void sendNotification(String type) {
         log("sendNotification: " + type);
-        Intent intent = new Intent(this, ManagerActivityLollipop.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-
-        String notificationContent = "";
-        String notificationTitle = "";
-        int notificationId = 0;
-
-        try{
-            String email = "";
-            if (megaApi != null) {
-                if (megaApi.getMyUser() != null) {
-                    if (megaApi.getMyUser().getEmail() != null) {
-                        email = megaApi.getMyUser().getEmail();
-                    }
-                }
-            }
-
-
-            int typeInt = Integer.parseInt(type);
-            switch (typeInt){
-                case 1:{
-                    notificationTitle = "Cloud activity (" + email + ")";
-                    notificationContent = "A folder has been shared with you";
-                    notificationId = Constants.NOTIFICATION_PUSH_CLOUD_DRIVE;
-                    intent.setAction(Constants.ACTION_INCOMING_SHARED_FOLDER_NOTIFICATION);
-                    break;
-                }
-                case 2:{
-                    notificationTitle = "Chat activity (" + email + ")";
-                    notificationContent = "You have received a message";
-                    notificationId = Constants.NOTIFICATION_PUSH_CHAT;
-                    intent.setAction(Constants.ACTION_CHAT_NOTIFICATION_MESSAGE);
-                    break;
-                }
-                case 3:{
-                    notificationTitle = "Contact activity (" + email + ")";
-                    notificationContent = "You have a new contact request";
-                    notificationId = Constants.NOTIFICATION_PUSH_CONTACT;
-                    intent.setAction(Constants.ACTION_IPC);
-                    break;
-                }
-            }
-
-
-            PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
-                    PendingIntent.FLAG_ONE_SHOT);
-
-            Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-            NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
-                    .setSmallIcon(R.drawable.ic_stat_notify_download)
-                    .setContentTitle(notificationTitle)
-                    .setContentText(notificationContent)
-                    .setAutoCancel(true)
-                    .setSound(defaultSoundUri)
-                    .setContentIntent(pendingIntent);
-
-            NotificationManager notificationManager =
-                    (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-
-            notificationManager.notify(notificationId, notificationBuilder.build());
-
-
-        }
-        catch(Exception e){}
+//        Intent intent = new Intent(this, ManagerActivityLollipop.class);
+//        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+//
+//        String notificationContent = "";
+//        String notificationTitle = "";
+//        int notificationId = 0;
+//
+//        try{
+//            String email = "";
+//            if (megaApi != null) {
+//                if (megaApi.getMyUser() != null) {
+//                    if (megaApi.getMyUser().getEmail() != null) {
+//                        email = megaApi.getMyUser().getEmail();
+//                    }
+//                }
+//            }
+//
+//
+//            int typeInt = Integer.parseInt(type);
+//            switch (typeInt){
+//                case 1:{
+//                    notificationTitle = "Cloud activity (" + email + ")";
+//                    notificationContent = "A folder has been shared with you";
+//                    notificationId = Constants.NOTIFICATION_PUSH_CLOUD_DRIVE;
+//                    intent.setAction(Constants.ACTION_INCOMING_SHARED_FOLDER_NOTIFICATION);
+//                    break;
+//                }
+//                case 2:{
+//                    notificationTitle = "Chat activity (" + email + ")";
+//                    notificationContent = "You have received a message";
+//                    notificationId = Constants.NOTIFICATION_PUSH_CHAT;
+//                    intent.setAction(Constants.ACTION_CHAT_NOTIFICATION_MESSAGE);
+//                    break;
+//                }
+//                case 3:{
+//                    notificationTitle = "Contact activity (" + email + ")";
+//                    notificationContent = "You have a new contact request";
+//                    notificationId = Constants.NOTIFICATION_PUSH_CONTACT;
+//                    intent.setAction(Constants.ACTION_IPC);
+//                    break;
+//                }
+//            }
+//
+//
+//            PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
+//                    PendingIntent.FLAG_ONE_SHOT);
+//
+//            Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+//            NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
+//                    .setSmallIcon(R.drawable.ic_stat_notify_download)
+//                    .setContentTitle(notificationTitle)
+//                    .setContentText(notificationContent)
+//                    .setAutoCancel(true)
+//                    .setSound(defaultSoundUri)
+//                    .setContentIntent(pendingIntent);
+//
+//            NotificationManager notificationManager =
+//                    (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+//
+//            notificationManager.notify(notificationId, notificationBuilder.build());
+//
+//
+//        }
+//        catch(Exception e){}
     }
 
     public static void log(String message) {
@@ -286,6 +286,7 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
                 log("OK fetch nodes");
                 if (Util.isChatEnabled()) {
                         log("Chat enabled-->connect");
+                    MegaApplication.isFireBaseConnection=true;
                         megaChatApi.connect(this);
                 }
                 else{
@@ -316,6 +317,11 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
 
     @Override
     public void onRequestFinish(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
+        log("onRequestFinish: "+request.getRequestString()+ " result: "+e.getErrorString());
+
+        if(request.getType()==MegaChatRequest.TYPE_CONNECT){
+//            MegaApplication.isFireBaseConnection=false;
+        }
 
     }
 

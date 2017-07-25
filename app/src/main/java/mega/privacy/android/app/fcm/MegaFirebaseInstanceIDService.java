@@ -66,6 +66,7 @@ public class MegaFirebaseInstanceIDService extends FirebaseInstanceIdService {
         }
 
         log("TOKEN: " + token);
+        //TODO Check if dbH.getCredentials() != null && ¿rootNode != null? (if not, login & fetchnodes)
         megaApi.registerPushNotifications(Constants.DEVICE_ANDROID, token);
     }
 

@@ -394,15 +394,14 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		button.setOnClickListener(this);
 
 		if(fromSettings){
-			button.setText(getString(R.string.general_select));
+			button.setText(getString(R.string.general_select).toUpperCase(Locale.getDefault()));
 		}
 		else{
 			if (mode == Mode.PICK_FOLDER) {
-				button.setText(getString(R.string.general_download));
-				
+				button.setText(getString(R.string.general_download).toUpperCase(Locale.getDefault()));
 			}
 			else{
-				button.setText(getString(R.string.context_upload));
+				button.setText(getString(R.string.context_upload).toUpperCase(Locale.getDefault()));
 			}
 		}		
 		emptyImageView = (ImageView) findViewById(R.id.file_storage_empty_image);

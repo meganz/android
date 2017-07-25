@@ -1068,6 +1068,16 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			outState.putString("searchQuery", searchQuery);
 		}
 	}
+
+	@Override
+	public void onStart(){
+		log("onStart");
+		super.onStart();
+		networkStateReceiver = new NetworkStateReceiver();
+		networkStateReceiver.addListener(this);
+		this.registerReceiver(networkStateReceiver, new IntentFilter(android.net.ConnectivityManager.CONNECTIVITY_ACTION));
+	}
+
 	@SuppressLint("NewApi") @Override
     protected void onCreate(Bundle savedInstanceState) {
 		log("onCreate");
@@ -1435,9 +1445,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		tabLayoutTransfers =  (TabLayout) findViewById(R.id.sliding_tabs_transfers);
 		viewPagerTransfers = (ViewPager) findViewById(R.id.transfers_tabs_pager);
 
-		networkStateReceiver = new NetworkStateReceiver();
-		networkStateReceiver.addListener(this);
-		this.registerReceiver(networkStateReceiver, new IntentFilter(android.net.ConnectivityManager.CONNECTIVITY_ACTION));
 
         if (!Util.isOnline(this)){
         	log("No network >> SHOW OFFLINE MODE");
@@ -1798,6 +1805,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				if(!chatConnection){
 					log("Connection goes!!!");
 					megaChatApi.connect(this);
+                    MegaApplication.setFirstTs(System.currentTimeMillis()/1000);
 				}
 
 				if (nV != null){
@@ -2787,6 +2795,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
     protected void onDestroy(){
 		log("onDestroy()");
 
+		dbH.removeSentPendingMessages();
+
     	if (megaApi.getRootNode() != null){
     		megaApi.removeGlobalListener(this);
     		megaApi.removeTransferListener(this);
@@ -3072,7 +3082,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		}
 		else{
 			log("showOnlineMode - Root is NULL");
-			showConfirmationConnect();
+			if(getApplicationContext()!=null){
+				showConfirmationConnect();
+			}
 		}
 	}
 
@@ -3828,11 +3840,19 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 		firstNavigationLevel = true;
 
+		showFabButton();
+
 		drawerLayout.closeDrawer(Gravity.LEFT);
 	}
 
 	public void selectDrawerItemChat(){
 		log("selectDrawerItemChat");
+
+		MegaNode parentNode = megaApi.getNodeByPath("/"+Constants.CHAT_FOLDER);
+		if(parentNode == null){
+			log("Create folder: "+Constants.CHAT_FOLDER);
+			megaApi.createFolder(Constants.CHAT_FOLDER, megaApi.getRootNode(), null);
+		}
 
 		tB.setVisibility(View.VISIBLE);
 
@@ -4025,6 +4045,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
     			tB.setVisibility(View.VISIBLE);
 
+				if (nV != null){
+					Menu nVMenu = nV.getMenu();
+					MenuItem hidden = nVMenu.findItem(R.id.navigation_item_hidden);
+					resetNavigationViewMenu(nVMenu);
+					hidden.setChecked(true);
+				}
+
     			if (muFLol == null){
 //    				cuF = new CameraUploadFragmentLollipop(CameraUploadFragmentLollipop.TYPE_MEDIA);
     				muFLol = CameraUploadFragmentLollipop.newInstance(CameraUploadFragmentLollipop.TYPE_MEDIA);
@@ -4049,9 +4076,24 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 				fragmentContainer.setVisibility(View.VISIBLE);
 
-				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-				ft.replace(R.id.fragment_container, muFLol, "muFLol");
-    			ft.commitNow();
+//				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+//				ft.replace(R.id.fragment_container, muFLol, "muFLol");
+//    			ft.commitNow();
+
+				FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
+				Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("muFLol");
+				if (currentFragment != null) {
+					fragTransaction.detach(currentFragment);
+					fragTransaction.commitNowAllowingStateLoss();
+
+					fragTransaction = getSupportFragmentManager().beginTransaction();
+					fragTransaction.attach(currentFragment);
+					fragTransaction.commitNowAllowingStateLoss();
+				}
+				else{
+					fragTransaction.replace(R.id.fragment_container, muFLol, "muFLol");
+					fragTransaction.commitNowAllowingStateLoss();
+				}
 
 				drawerLayout.closeDrawer(Gravity.LEFT);
 
@@ -4267,6 +4309,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				break;
 			}
     	}
+	}
+
+	public void moveToSettingsSection(){
+		drawerItem=DrawerItem.SETTINGS;
+		selectDrawerItemLollipop(drawerItem);
 	}
 
 	private String getFragmentTag(int viewPagerId, int fragmentPosition){
@@ -4966,7 +5013,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						takePicture.setVisible(false);
 						refreshMenuItem.setVisible(false);
 						helpMenuItem.setVisible(false);
-						upgradeAccountMenuItem.setVisible(true);
+						upgradeAccountMenuItem.setVisible(false);
 						gridSmallLargeMenuItem.setVisible(false);
 						logoutMenuItem.setVisible(false);
 						forgotPassMenuItem.setVisible(false);
@@ -5037,6 +5084,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			else if (drawerItem == DrawerItem.CONTACTS){
 				log("createOptions CONTACTS");
 				int index = viewPagerContacts.getCurrentItem();
+				newChatMenuItem.setVisible(false);
+				setStatusMenuItem.setVisible(false);
 				if (index == 0){
 					log("createOptions TAB CONTACTS");
 					//Show
@@ -5046,8 +5095,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					thumbViewMenuItem.setVisible(true);
 					upgradeAccountMenuItem.setVisible(true);
 					searchMenuItem.setVisible(true);
-					newChatMenuItem.setVisible(true);
-					setStatusMenuItem.setVisible(false);
 
 					//Hide
 					pauseTransfersMenuIcon.setVisible(false);
@@ -5640,6 +5687,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 								log("deepBrowserTree get from inSFlol: "+inSFLol.getDeepBrowserTree());
 		    					inSFLol.onBackPressed();
 		    				}
+
 		    			}
 		    		}
 		    		else if (drawerItem == DrawerItem.SAVED_FOR_OFFLINE){
@@ -5708,7 +5756,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 							}
 						}
 
-
 //						if (tFLol != null){
 //							if (tFLol.onBackPressed() == 0){
 //								drawerItem = DrawerItem.CLOUD_DRIVE;
@@ -5772,34 +5819,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	        		megaApi.pauseTransfers(true, this);
 	        		pauseTransfersMenuIcon.setVisible(false);
 	        		playTransfersMenuIcon.setVisible(true);
-//    				if(!tranfersPaused)
-//    				{
-//    					tranfersPaused = true;
-//    					pauseTransfersMenuIcon.setVisible(false);
-//    					playTransfersMenuIcon.setVisible(true);
-//
-//    					//Update the progress in fragments
-//    					if (fbFLol != null){
-//    						fbFLol.updateProgressBar(progressPercent);
-//    					}
-//    					if (rubbishBinFLol != null){
-//    						rubbishBinFLol.updateProgressBar(progressPercent);
-//    					}
-//    					if (iFLol != null){
-//    						iFLol.updateProgressBar(progressPercent);
-//    					}
-//    					if (outSFLol != null){
-//    						outSFLol.updateProgressBar(progressPercent);
-//    					}
-//    					if (inSFLol != null){
-//    						inSFLol.updateProgressBar(progressPercent);
-//    					}
-//    					if (tFLol != null){
-//    						tFLol.updateProgressBar(progressPercent);
-//    					}
-//
-//    	    			megaApi.pauseTransfers(true, this);
-//    				}
 	        	}
 
 	        	return true;
@@ -8270,6 +8289,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		linkIntent.putExtra("handle", handle);
 		linkIntent.putExtra("account", myAccountInfo.getAccountType());
 		startActivity(linkIntent);
+
+		refreshAfterMovingToRubbish();
 	}
 
 	/*
@@ -9183,7 +9204,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		log("chooseAddContactDialog");
 
 		Intent in = new Intent(this, AddContactActivityLollipop.class);
-//		in.putExtra("contactType", Constants.CONTACT_TYPE_MEGA);
 		if(isMegaContact){
 			in.putExtra("contactType", Constants.CONTACT_TYPE_MEGA);
 			startActivityForResult(in, Constants.REQUEST_CREATE_CHAT);
@@ -9539,7 +9559,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		String message= getResources().getString(R.string.context_remove_link_warning_text);
 		builder.setMessage(message).setPositiveButton(R.string.general_remove, dialogClickListener)
 				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
-		}
+
+		refreshAfterMovingToRubbish();
+
+	}
 
 	public void showConfirmationLeaveIncomingShare (final MegaNode n){
 		log("showConfirmationLeaveIncomingShare");
@@ -9565,6 +9588,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		String message= getResources().getString(R.string.confirmation_leave_share_folder);
 		builder.setMessage(message).setPositiveButton(R.string.general_leave, dialogClickListener)
 	    	.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
+
 	}
 
 	public void showConfirmationLeaveChat (final MegaChatRoom c){
@@ -9607,6 +9631,44 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					}
 					case DialogInterface.BUTTON_NEGATIVE:
 						//No button clicked
+						break;
+				}
+			}
+		};
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		builder.setTitle(getResources().getString(R.string.title_confirmation_leave_group_chat));
+		String message= getResources().getString(R.string.confirmation_leave_group_chat);
+		builder.setMessage(message).setPositiveButton(R.string.general_leave, dialogClickListener)
+				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
+	}
+	public void showConfirmationLeaveChats (final  ArrayList<MegaChatListItem> cs){
+		log("showConfirmationLeaveChats");
+
+		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				switch (which){
+					case DialogInterface.BUTTON_POSITIVE: {
+						ChatController chatC = new ChatController(managerActivity);
+
+						for(int i=0;i<cs.size();i++){
+							MegaChatListItem chat = cs.get(i);
+							if(chat!=null){
+								chatC.leaveChat(chat.getChatId());
+							}
+						}
+
+						break;
+					}
+					case DialogInterface.BUTTON_NEGATIVE:
+						//No button clicked
+						if(rChatFL!=null){
+							if(rChatFL.isAdded()){
+								rChatFL.clearSelections();
+								rChatFL.hideMultipleSelect();
+							}
+						}
 						break;
 				}
 			}
@@ -10342,8 +10404,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
 	}
 
-	public void showConfirmationEnableLogs(){
-		log("showConfirmationEnableLogs");
+	public void showConfirmationEnableLogsSDK(){
+		log("showConfirmationEnableLogsSDK");
 
 		if(sttFLol!=null){
 			sttFLol.numberOfClicksSDK = 0;
@@ -10353,7 +10415,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			public void onClick(DialogInterface dialog, int which) {
 				switch (which){
 					case DialogInterface.BUTTON_POSITIVE:
-						enableLogs();
+						enableLogsSDK();
 						break;
 
 					case DialogInterface.BUTTON_NEGATIVE:
@@ -10375,12 +10437,55 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				.setNegativeButton(R.string.general_cancel, dialogClickListener).show().setCanceledOnTouchOutside(false);
 	}
 
-	public void enableLogs(){
-		log("enableLogs");
+	public void showConfirmationEnableLogsKarere(){
+		log("showConfirmationEnableLogsKarere");
 
-		dbH.setFileLogger(true);
-		Util.setFileLogger(true);
+		if(sttFLol!=null){
+			sttFLol.numberOfClicksKarere = 0;
+		}
+		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				switch (which){
+					case DialogInterface.BUTTON_POSITIVE:
+						enableLogsKarere();
+						break;
+
+					case DialogInterface.BUTTON_NEGATIVE:
+
+						break;
+				}
+			}
+		};
+
+		AlertDialog.Builder builder;
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+			builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		}
+		else{
+			builder = new AlertDialog.Builder(this);
+		}
+
+		builder.setMessage(R.string.enable_log_text_dialog).setPositiveButton(R.string.general_enable, dialogClickListener)
+				.setNegativeButton(R.string.general_cancel, dialogClickListener).show().setCanceledOnTouchOutside(false);
+	}
+
+	public void enableLogsSDK(){
+		log("enableLogsSDK");
+
+		dbH.setFileLoggerSDK(true);
+		Util.setFileLoggerSDK(true);
 		MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_MAX);
+		showSnackbar(getString(R.string.settings_enable_logs));
+		log("App Version: " + Util.getVersion(this));
+	}
+
+	public void enableLogsKarere(){
+		log("enableLogsKarere");
+
+		dbH.setFileLoggerKarere(true);
+		Util.setFileLoggerKarere(true);
+		MegaChatApiAndroid.setLogLevel(MegaChatApiAndroid.LOG_LEVEL_MAX);
 		showSnackbar(getString(R.string.settings_enable_logs));
 		log("App Version: " + Util.getVersion(this));
 	}
@@ -10434,6 +10539,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	        DocumentFile pickedDir = DocumentFile.fromTreeUri(this, treeUri);
 		}
 		else if (requestCode == Constants.REQUEST_CODE_GET && resultCode == RESULT_OK) {
+			log("REQUEST_CODE_GET");
 			if (intent == null) {
 				log("Return.....");
 				return;
@@ -10781,7 +10887,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			log("hashes size: "+hashes.length);
 
 			nC.checkSizeBeforeDownload(parentPath, url, size, hashes);
-			Snackbar.make(fragmentContainer, getString(R.string.download_began), Snackbar.LENGTH_LONG).show();
+//			Snackbar.make(fragmentContainer, getString(R.string.download_began), Snackbar.LENGTH_LONG).show();
 		}
 		else if (requestCode == Constants.REQUEST_CODE_REFRESH && resultCode == RESULT_OK) {
 			log("Resfresh DONE onActivityResult");
@@ -11033,6 +11139,19 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			this.startActivity(intentOpenChat);
 		}
 	}
+
+	public void startGroupConversation(ArrayList<Long> userHandles){
+		log("startGroupConversation");
+		MegaChatPeerList peers = MegaChatPeerList.createInstance();
+
+		for(int i=0;i<userHandles.size();i++){
+			long handle = userHandles.get(i);
+			peers.addPeer(handle, MegaChatPeerList.PRIV_STANDARD);
+		}
+
+		megaChatApi.createChat(false, peers, this);
+	}
+
 
 	/*
 	 * Background task to get files on a folder for uploading
@@ -11484,6 +11603,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		if (drawerItem == DrawerItem.CLOUD_DRIVE){
 			parentHandle = fbFLol.getParentHandle();
 			parentNode = megaApi.getNodeByHandle(parentHandle);
+			if (parentNode == null){
+				parentNode = megaApi.getRootNode();
+			}
 		}
 		else if (drawerItem == DrawerItem.SHARED_ITEMS){
 			int index = viewPagerShares.getCurrentItem();
@@ -11584,7 +11706,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		}
 	}
 
-
 	@Override
 	public void onRequestStart(MegaChatApiJava api, MegaChatRequest request) {
 //		if (request.getType() == MegaChatRequest.TYPE_INITIALIZE){
@@ -11674,6 +11795,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			chatConnection = true;
 
 			if (MegaApplication.isFirstConnect()){
+				log("Set first connect to false");
 				MegaApplication.setFirstConnect(false);
 			}
 
@@ -11913,8 +12035,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 							maFLol.updateAvatar(false);
 						}
 					}
-
-
 				}
 				else{
 
@@ -13008,8 +13128,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		if(cancel){
 
 			builder.setMessage(getResources().getString(R.string.cancel_transfer_confirmation));
-			builder.setPositiveButton(R.string.general_cancel, dialogClickListener);
-			builder.setNegativeButton(R.string.general_dismiss, dialogClickListener);
+			builder.setPositiveButton(R.string.context_delete, dialogClickListener);
+			builder.setNegativeButton(R.string.general_cancel, dialogClickListener);
 		}
 		else {
 
@@ -13053,8 +13173,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 //		builder.setTitle(getResources().getString(R.string.cancel_transfer_title));
 
 		builder.setMessage(getResources().getString(R.string.cancel_all_transfer_confirmation));
-		builder.setPositiveButton(R.string.general_cancel, dialogClickListener);
-		builder.setNegativeButton(R.string.general_dismiss, dialogClickListener);
+		builder.setPositiveButton(R.string.context_delete, dialogClickListener);
+		builder.setNegativeButton(R.string.general_cancel, dialogClickListener);
 
 		builder.show();
 	}
@@ -13148,9 +13268,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 							transfersBottomSheet.dismiss();
 						}
 					}
-					pauseTransfersMenuIcon.setVisible(false);
-					playTransfersMenuIcon.setVisible(false);
-					cancelAllTransfersMenuItem.setVisible(false);
+					if (pauseTransfersMenuIcon != null) {
+						pauseTransfersMenuIcon.setVisible(false);
+						playTransfersMenuIcon.setVisible(false);
+						cancelAllTransfersMenuItem.setVisible(false);
+					}
 
 //					showSnackbar(getString(R.string.message_transfers_completed));
 				}
@@ -13864,7 +13986,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			log("newState == MegaChatApi.INIT_ERROR");
 			if (chatSettings == null) {
 				log("1 - onChatInitStateUpdate: ERROR----> Switch OFF chat");
-				chatSettings = new ChatSettings(false + "", true + "", true + "", true + "");
+				chatSettings = new ChatSettings(false + "", true + "", "", true + "");
 				dbH.setChatSettings(chatSettings);
 			} else {
 				log("2 - onChatInitStateUpdate: ERROR----> Switch OFF chat");
@@ -13952,6 +14074,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	@Override
 	public void networkAvailable() {
 		log("networkAvailable");
+		if(megaApi!=null){
+			megaApi.retryPendingConnections();
+		}
 		showOnlineMode();
 	}
 

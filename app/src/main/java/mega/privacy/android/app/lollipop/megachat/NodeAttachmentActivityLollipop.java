@@ -269,6 +269,8 @@ public class NodeAttachmentActivityLollipop extends PinActivityLollipop implemen
 		
 		nodeAttachmentActivity = this;
 
+		nodes = new ArrayList<MegaNode>();
+
 		cC = new ChatController(this);
 
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -336,8 +338,7 @@ public class NodeAttachmentActivityLollipop extends PinActivityLollipop implemen
     	}
 
     	if(message!=null){
-			nodeList = message.getMessage().getMegaNodeList();
-			nodes = MegaApiJava.nodeListToArray(nodeList);
+			setNodes();
 		}
 		else{
 			finish();
@@ -374,6 +375,19 @@ public class NodeAttachmentActivityLollipop extends PinActivityLollipop implemen
 
 		((MegaApplication) getApplication()).sendSignalPresenceActivity();
     }
+
+    public void setNodes(){
+		log("setNodes");
+//        nodes.clear();
+		nodeList = message.getMessage().getMegaNodeList();
+		ArrayList<MegaNode> nodesTemp = MegaApiJava.nodeListToArray(nodeList);
+		for(int i=0;i<nodesTemp.size();i++){
+			boolean isRevoked = megaChatApi.isRevoked(chatId, nodesTemp.get(i).getHandle());
+			if(!isRevoked){
+				nodes.add(nodesTemp.get(i));
+			}
+		}
+	}
 
 	public void askSizeConfirmationBeforeChatDownload(String parentPath, ArrayList<MegaNode> nodeList, long size){
 		log("askSizeConfirmationBeforeChatDownload");
@@ -439,7 +453,6 @@ public class NodeAttachmentActivityLollipop extends PinActivityLollipop implemen
 
 	public void revoke(){
 		log("revoke");
-
 		megaChatApi.revokeAttachment(chatId,selectedNode.getHandle(),this);
 	}
 
@@ -745,16 +758,42 @@ public class NodeAttachmentActivityLollipop extends PinActivityLollipop implemen
 
 	}
 
+	public void removeNodeFromList(long handle){
+		log("removeNodeFromList");
+		int position = -1;
+		for(int i=0; i<nodes.size();i++){
+			MegaNode node = nodes.get(i);
+			if(node.getHandle()==handle){
+				position = i;
+			}
+		}
+
+		if(position!=-1){
+			log("Remove node position: "+position);
+			nodes.remove(position);
+		}
+
+		if(nodes.size()==0){
+			finish();
+		}
+		else{
+			adapterList.setNodes(nodes);
+		}
+	}
+
 	@Override
 	public void onRequestFinish(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
 		log("onRequestFinish CHAT");
 
 		if(request.getType() == MegaChatRequest.TYPE_REVOKE_NODE_MESSAGE){
 			if(e.getErrorCode()==MegaChatError.ERROR_OK){
-				log("Node revoked correctly");
+				log("Node revoked correctly: "+request.getUserHandle());
+
+				removeNodeFromList(request.getUserHandle());
 			}
 			else{
 				log("NOT revoked correctly");
+				showSnackbar(getString(R.string.error_revoking_node));
 			}
 		}
 	}
@@ -877,7 +916,7 @@ public class NodeAttachmentActivityLollipop extends PinActivityLollipop implemen
 			}
 		}
 	}
-	
+
 	@Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -910,6 +949,39 @@ public class NodeAttachmentActivityLollipop extends PinActivityLollipop implemen
 		ArrayList<Long> handleList = new ArrayList<Long>();
 		handleList.add(selectedNode.getHandle());
 //		onFileClick(handleList);
+	}
+
+	public void showConfirmationDeleteNode(final long chatId, final long nodeHandle){
+		log("showConfirmationDeleteNode");
+
+		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				switch (which){
+					case DialogInterface.BUTTON_POSITIVE:
+						ChatController cC = new ChatController(nodeAttachmentActivity);
+						cC.deleteNodeAttachment(chatId, nodeHandle);
+						break;
+
+					case DialogInterface.BUTTON_NEGATIVE:
+						//No button clicked
+						break;
+				}
+			}
+		};
+
+		android.support.v7.app.AlertDialog.Builder builder;
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+			builder = new android.support.v7.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		}
+		else{
+			builder = new android.support.v7.app.AlertDialog.Builder(this);
+		}
+
+		builder.setMessage(R.string.confirmation_delete_one_attachment);
+
+		builder.setPositiveButton(R.string.context_remove, dialogClickListener)
+				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
 	}
 
 	@Override

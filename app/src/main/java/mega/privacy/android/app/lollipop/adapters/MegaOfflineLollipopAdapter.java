@@ -147,11 +147,13 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 			log("OfflineThumbnailAsyncTask::onPostExecute");
 			if (thumb != null){
 				if (holder.currentPath.compareTo(currentPath) == 0){
-					RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
-					params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-					params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-					params1.setMargins(56, 0, 12, 0);
-					holder.imageView.setLayoutParams(params1);
+					if (adapterType == MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_LIST){
+						RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
+						params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
+						params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
+						params1.setMargins(56, 0, 12, 0);
+						holder.imageView.setLayoutParams(params1);
+					}
 					holder.imageView.setImageBitmap(thumb);
 					Animation fadeInAnimation = AnimationUtils.loadAnimation(context, R.anim.fade_in);
 					holder.imageView.startAnimation(fadeInAnimation);
@@ -356,6 +358,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 			if (pathNav.equals("/")){
 				if (mOffList != null){
 					if(!mOffList.isEmpty()) {
+						log("List not empty");
 						MegaOffline lastItem = mOffList.get(mOffList.size()-1);
 						if(!(lastItem.getHandle().equals("0"))){
 							String path = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
@@ -444,6 +447,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 			holder.separator = (View) v.findViewById(R.id.offline_grid_separator);
 		
 			holder.itemLayout.setOnClickListener(this);
+			holder.itemLayout.setOnLongClickListener(this);
 			holder.itemLayout.setTag(holder);
 			
 			v.setTag(holder);
@@ -895,8 +899,11 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 		ViewHolderOffline holder = (ViewHolderOffline) view.getTag();
 		int currentPosition = holder.getAdapterPosition();
 
-		fragment.activateActionMode();
-		fragment.itemClick(currentPosition);
+		MegaOffline item = mOffList.get(currentPosition);
+		if(!(item.getHandle().equals("0"))){
+			fragment.activateActionMode();
+			fragment.itemClick(currentPosition);
+		}
 
 		return true;
 	}
