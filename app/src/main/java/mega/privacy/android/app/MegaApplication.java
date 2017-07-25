@@ -387,6 +387,15 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 		return firstConnect;
 	}
 
+
+	public static long getFirstTs() {
+		return firstTs;
+	}
+
+	public static void setFirstTs(long firstTs) {
+		MegaApplication.firstTs = firstTs;
+	}
+
 	public static void activityResumed() {
 		log("activityResumed()");
 		activityVisible = true;
@@ -402,6 +411,7 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 	private static boolean firstConnect = true;
 	private static boolean recentChatsFragmentVisible = false;
 	public static boolean isFireBaseConnection = false;
+	private static long firstTs = -1;
 
 	private static long openChatId = -1;
 
@@ -769,6 +779,7 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 					log("Show notification ALWAYS");
 					isFireBaseConnection=false;
 					showNotification(item);
+					firstTs=-1;
 				}
 				else{
 					if (!recentChatsFragmentVisible) {
@@ -777,7 +788,21 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 								log("onChatListItemUpdateMegaApplication. FIRSTCONNECT " + item.getTitle() + "Unread count: " + item.getUnreadCount() + " hasChanged(CHANGE_TYPE_UNREAD_COUNT): " + item.hasChanged(MegaChatListItem.CHANGE_TYPE_UNREAD_COUNT) + " hasChanged(CHANGE_TYPE_LAST_TS):" + item.hasChanged(MegaChatListItem.CHANGE_TYPE_LAST_TS));
 							} else {
 								log("onChatListItemUpdateMegaApplication. NOTFIRSTCONNECT " + item.getTitle() + "Unread count: " + item.getUnreadCount() + " hasChanged(CHANGE_TYPE_UNREAD_COUNT): " + item.hasChanged(MegaChatListItem.CHANGE_TYPE_UNREAD_COUNT) + " hasChanged(CHANGE_TYPE_LAST_TS):" + item.hasChanged(MegaChatListItem.CHANGE_TYPE_LAST_TS));
-								showNotification(item);
+
+								if(firstTs==-1){
+									log("First TS is -1 -- SHOW NOTIF");
+									showNotification(item);
+								}
+								else{
+									if(firstTs>item.getLastTimestamp()){
+										log("DO NOT SHOW NOTIF - FirstTS when logging "+firstTs+ " > item timestamp: "+item.getLastTimestamp());
+									}
+									else{
+										log("FirstTS when logging "+firstTs+ " < item timestamp: "+item.getLastTimestamp());
+										showNotification(item);
+										firstTs=-1;
+									}
+								}
 							}
 						}
 					}

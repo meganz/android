@@ -1805,6 +1805,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				if(!chatConnection){
 					log("Connection goes!!!");
 					megaChatApi.connect(this);
+                    MegaApplication.setFirstTs(System.currentTimeMillis()/1000);
 				}
 
 				if (nV != null){
@@ -11794,6 +11795,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			chatConnection = true;
 
 			if (MegaApplication.isFirstConnect()){
+				log("Set first connect to false");
 				MegaApplication.setFirstConnect(false);
 			}
 
