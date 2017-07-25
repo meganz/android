@@ -1174,6 +1174,18 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 				        AlertDialog.Builder b=new AlertDialog.Builder(this);
 	
 						b.setTitle(getResources().getString(R.string.settings_storage_download_location));
+						if (hashesM == null){
+							if (document != null) {
+								hashesM = new long[1];
+								hashesM[0] = document.getHandle();
+								sizeM = document.getSize();
+								documentM = document;
+							}
+							else{
+								return;
+							}
+						}
+
 						final long sizeFinal = sizeM;
 						final long[] hashesFinal = new long[hashesM.length];
 						for (int i=0; i< hashesM.length; i++){
