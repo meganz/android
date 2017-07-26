@@ -132,7 +132,7 @@ public class Constants {
 	final public static int CHAT_ADAPTER_SHOW_ALL = 2;
 	final public static int CHAT_ADAPTER_SHOW_TIME = 1;
 	final public static int CHAT_ADAPTER_SHOW_NOTHING = 0;
-	final public static int CHAT_ADAPTER_SHOW_NAME = 3;
+	final public static int CHAT_ADAPTER_SHOW_NOTHING_NO_NAME = 3;
 
 	final public static int FILE_BROWSER_ADAPTER = 2000;
 	final public static int CONTACT_FILE_ADAPTER = 2001;
