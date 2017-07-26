@@ -12,7 +12,7 @@
         <android.support.design.widget.AppBarLayout
         android:id="@+id/app_bar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="350dp"
         android:fitsSystemWindows="true">
 
             <android.support.design.widget.CollapsingToolbarLayout
@@ -20,10 +20,12 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:fitsSystemWindows="true"
+                android:background="@color/content_text_background"
                 app:collapsedTitleTextAppearance="@style/ToolbarTitle"
                 app:contentScrim="?attr/colorPrimary"
                 app:theme="@style/CollapsingToolbarContactInfo"
-                app:layout_scrollFlags="scroll|exitUntilCollapsed">
+                app:layout_scrollFlags="scroll|exitUntilCollapsed"
+                app:expandedTitleTextAppearance="@style/CollapsingToolbarContactInfo.TitleText">>
 
                 <FrameLayout
                     android:layout_width="match_parent"
@@ -52,39 +54,48 @@
                         android:background="@drawable/full_gradient_shape" />
 
                 </FrameLayout>
-                <LinearLayout android:layout_height="wrap_content"
+
+                <RelativeLayout
                     android:layout_width="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_marginBottom="20dp"
+                    android:layout_height="wrap_content"
                     android:layout_gravity="bottom"
                     android:layout_marginLeft="72dp">
 
-                    <TextView android:id="@+id/namelength"
+                    <TextView android:id="@+id/name_length"
                         android:visibility="invisible"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textSize="33sp"
-                        android:maxLength="17" />
+                        android:layout_marginBottom="28dp"/>
 
                     <ImageView
                         android:id="@+id/contact_drawable_state"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:background="@null"
-                        android:layout_marginLeft="7dp"
+                        android:layout_marginLeft="2dp"
                         android:src="@drawable/ic_offline"
                         android:layout_gravity="top"
-                        android:layout_marginTop="5dp"/>
+                        android:layout_marginTop="2dp"
+                        android:layout_toRightOf="@+id/name_length" />
 
-                    </LinearLayout>
+                </RelativeLayout>
 
-
+             <TextView android:id="@+id/email_contact"
+                    android:layout_height="wrap_content"
+                    android:layout_width="wrap_content"
+                    android:text="email@holaa.com"
+                    android:maxLength="25"
+                    android:textSize="14sp"
+                    android:textColor="@color/white"
+                    android:layout_gravity="bottom"
+                    android:layout_marginLeft="72dp"
+                    android:layout_marginBottom="7dp"/>
 
                 <android.support.v7.widget.Toolbar
                     android:id="@+id/toolbar"
                     android:layout_width="match_parent"
                     android:layout_height="?attr/actionBarSize"
-                    app:layout_collapseMode="pin" />
+                    app:layout_collapseMode="pin"/>
                 <!--android:background="@drawable/gradient_shape"-->
 
             </android.support.design.widget.CollapsingToolbarLayout>
