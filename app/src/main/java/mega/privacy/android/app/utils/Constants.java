@@ -117,6 +117,7 @@ public class Constants {
 	public static String ACTION_IPC = "IPC";
 	public static String ACTION_SHOW_MY_ACCOUNT = "ACTION_SHOW_MY_ACCOUNT";
 	public static String ACTION_CHAT_NOTIFICATION_MESSAGE = "ACTION_CHAT_MESSAGE";
+	public static String ACTION_CHAT_SUMMARY = "ACTION_CHAT_SUMMARY";
 	public static String ACTION_INCOMING_SHARED_FOLDER_NOTIFICATION = "ACTION_INCOMING_SHARED_FOLDER_NOTIFICATION";
 
 	public static String ACTION_CHAT_NEW = "CHAT_NEW";
@@ -131,6 +132,7 @@ public class Constants {
 	final public static int CHAT_ADAPTER_SHOW_ALL = 2;
 	final public static int CHAT_ADAPTER_SHOW_TIME = 1;
 	final public static int CHAT_ADAPTER_SHOW_NOTHING = 0;
+	final public static int CHAT_ADAPTER_SHOW_NAME = 3;
 
 	final public static int FILE_BROWSER_ADAPTER = 2000;
 	final public static int CONTACT_FILE_ADAPTER = 2001;

@@ -87,7 +87,7 @@ public final class NotificationBuilder {
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         intent.setAction(Constants.ACTION_CHAT_NOTIFICATION_MESSAGE);
         intent.putExtra("CHAT_ID", item.getChatId());
-        PendingIntent pendingIntent = PendingIntent.getActivity(context, (int)item.getChatId() , intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, (int)item.getChatId() , intent, PendingIntent.FLAG_ONE_SHOT);
 
         Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 
@@ -398,7 +398,7 @@ public final class NotificationBuilder {
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         intent.setAction(Constants.ACTION_CHAT_SUMMARY);
         intent.putExtra("CHAT_ID", -1);
-        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0 , intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0 , intent, PendingIntent.FLAG_ONE_SHOT);
 
         return new NotificationCompat.Builder(context)
                 .setSmallIcon(R.drawable.ic_stat_notify_download)
