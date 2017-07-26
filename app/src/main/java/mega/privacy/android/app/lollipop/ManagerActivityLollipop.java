@@ -1790,9 +1790,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						setIntent(null);
 					}
 					else if(getIntent().getAction().equals(Constants.ACTION_CHAT_SUMMARY)) {
-						log("onPostResume: ACTION_CHAT_SUMMARY");
+						log("Chat notification: ACTION_CHAT_SUMMARY");
 						drawerItem=DrawerItem.CHAT;
 						selectDrawerItemLollipop(drawerItem);
+						selectDrawerItemPending=false;
 						getIntent().setAction(null);
 						setIntent(null);
 					}
