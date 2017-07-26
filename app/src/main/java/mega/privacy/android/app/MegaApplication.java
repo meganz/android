@@ -56,6 +56,7 @@ import mega.privacy.android.app.lollipop.megachat.RecentChatsFragmentLollipop;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaChatLollipopAdapter;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaListChatLollipopAdapter;
 import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.TimeChatUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -368,7 +369,6 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 				languageString = megaApi.setLanguage(language);
 				log("2--Result: "+languageString+" Language: "+language);
 			}
-
 		}
 		
 		return megaApi;
@@ -763,7 +763,7 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 			log("onChatListItemUpdate: item is NULL --> return");
 		}
 
-		log("onChatListItemUpdate: "+item.getTitle());
+		log("onChatListItemUpdate: "+item.getTitle()+ " chat id: "+item.getChatId());
 		if (megaApi == null){
 			megaApi = getMegaApi();
 		}
@@ -773,11 +773,10 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 		}
 
 		log("Unread count is: "+item.getUnreadCount());
-		if (item.hasChanged(MegaChatListItem.CHANGE_TYPE_LAST_MSG) && (item.getUnreadCount() != 0)){
+		if (item.hasChanged(MegaChatListItem.CHANGE_TYPE_LAST_TS) && (item.getUnreadCount() != 0)){
 			try {
 				if(isFireBaseConnection){
 					log("Show notification ALWAYS");
-					isFireBaseConnection=false;
 					showNotification(item);
 					firstTs=-1;
 				}
@@ -813,6 +812,7 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 				log("Exception when trying to show chat notification");
 			}
 		}
+
 	}
 
 	public void showNotification(MegaChatListItem item){
