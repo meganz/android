@@ -434,7 +434,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     ((ViewHolderMessageChat)holder).timeOwnText.setText(TimeChatUtils.formatTime(message.getPendingMessage().getUploadTimestamp()));
                     break;
                 }
-                case Constants.CHAT_ADAPTER_SHOW_NOTHING:{
+                case Constants.CHAT_ADAPTER_SHOW_NOTHING:
+                case Constants.CHAT_ADAPTER_SHOW_NOTHING_NO_NAME:{
                     log("CHAT_ADAPTER_SHOW_NOTHING");
                     ((ViewHolderMessageChat)holder).dateLayout.setVisibility(View.GONE);
                     ((ViewHolderMessageChat)holder).titleOwnMessage.setVisibility(View.GONE);
@@ -568,7 +569,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                             ((ViewHolderMessageChat)holder).timeOwnText.setText(TimeChatUtils.formatTime(message));
                             break;
                         }
-                        case Constants.CHAT_ADAPTER_SHOW_NOTHING:{
+                        case Constants.CHAT_ADAPTER_SHOW_NOTHING:
+                        case Constants.CHAT_ADAPTER_SHOW_NOTHING_NO_NAME:{
                             log("CHAT_ADAPTER_SHOW_NOTHING");
                             ((ViewHolderMessageChat)holder).dateLayout.setVisibility(View.GONE);
                             ((ViewHolderMessageChat)holder).titleOwnMessage.setVisibility(View.GONE);
@@ -682,7 +684,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                             ((ViewHolderMessageChat)holder).timeContactText.setText(TimeChatUtils.formatTime(message));
                             break;
                         }
-                        case Constants.CHAT_ADAPTER_SHOW_NOTHING:{
+                        case Constants.CHAT_ADAPTER_SHOW_NOTHING:
+                        case Constants.CHAT_ADAPTER_SHOW_NOTHING_NO_NAME:{
                             log("CHAT_ADAPTER_SHOW_NOTHING");
                             ((ViewHolderMessageChat)holder).dateLayout.setVisibility(View.GONE);
                             ((ViewHolderMessageChat)holder).titleContactMessage.setVisibility(View.GONE);
@@ -860,7 +863,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                             ((ViewHolderMessageChat)holder).timeOwnText.setText(TimeChatUtils.formatTime(message));
                             break;
                         }
-                        case Constants.CHAT_ADAPTER_SHOW_NOTHING:{
+                        case Constants.CHAT_ADAPTER_SHOW_NOTHING:
+                        case Constants.CHAT_ADAPTER_SHOW_NOTHING_NO_NAME:{
                             log("CHAT_ADAPTER_SHOW_NOTHING");
                             ((ViewHolderMessageChat)holder).dateLayout.setVisibility(View.GONE);
                             ((ViewHolderMessageChat)holder).titleOwnMessage.setVisibility(View.GONE);
@@ -978,7 +982,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                             ((ViewHolderMessageChat)holder).timeContactText.setText(TimeChatUtils.formatTime(message));
                             break;
                         }
-                        case Constants.CHAT_ADAPTER_SHOW_NOTHING:{
+                        case Constants.CHAT_ADAPTER_SHOW_NOTHING:
+                        case Constants.CHAT_ADAPTER_SHOW_NOTHING_NO_NAME:{
                             log("CHAT_ADAPTER_SHOW_NOTHING");
                             ((ViewHolderMessageChat)holder).dateLayout.setVisibility(View.GONE);
                             ((ViewHolderMessageChat)holder).titleContactMessage.setVisibility(View.GONE);
@@ -1124,7 +1129,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                             ((ViewHolderMessageChat)holder).timeOwnText.setText(TimeChatUtils.formatTime(message));
                             break;
                         }
-                        case Constants.CHAT_ADAPTER_SHOW_NOTHING:{
+                        case Constants.CHAT_ADAPTER_SHOW_NOTHING:
+                        case Constants.CHAT_ADAPTER_SHOW_NOTHING_NO_NAME:{
                             log("CHAT_ADAPTER_SHOW_NOTHING");
                             ((ViewHolderMessageChat)holder).dateLayout.setVisibility(View.GONE);
                             ((ViewHolderMessageChat)holder).titleOwnMessage.setVisibility(View.GONE);
@@ -1672,7 +1678,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                             ((ViewHolderMessageChat)holder).timeContactText.setVisibility(View.VISIBLE);
                             break;
                         }
-                        case Constants.CHAT_ADAPTER_SHOW_NOTHING:{
+                        case Constants.CHAT_ADAPTER_SHOW_NOTHING:
+                        case Constants.CHAT_ADAPTER_SHOW_NOTHING_NO_NAME:{
                             log("CHAT_ADAPTER_SHOW_NOTHING");
                             ((ViewHolderMessageChat)holder).dateLayout.setVisibility(View.GONE);
                             ((ViewHolderMessageChat)holder).timeContactText.setVisibility(View.GONE);
@@ -1693,19 +1700,24 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                         String color = megaApi.getUserAvatarColor(handleString);
 
                         if(message.getType()==MegaChatMessage.TYPE_NORMAL){
-                            Spannable name = new SpannableString(((ViewHolderMessageChat)holder).fullNameTitle+"\n");
-                            if(color!=null){
-                                log("The color to set the avatar is "+color);
-                                name.setSpan(new ForegroundColorSpan(Color.parseColor(color)), 0, name.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                            }
-                            else{
-                                log("Default color to the avatar");
-                                name.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.accentColor)), 0, name.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+                            if(messages.get(position).getInfoToShow()==Constants.CHAT_ADAPTER_SHOW_NOTHING_NO_NAME){
+                                ((ViewHolderMessageChat)holder).contentContactMessageText.setText("");
+                            }else{
+                                Spannable name = new SpannableString(((ViewHolderMessageChat)holder).fullNameTitle+"\n");
+                                if(color!=null){
+                                    log("The color to set the avatar is "+color);
+                                    name.setSpan(new ForegroundColorSpan(Color.parseColor(color)), 0, name.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                                }
+                                else{
+                                    log("Default color to the avatar");
+                                    name.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.accentColor)), 0, name.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                                }
+                                ((ViewHolderMessageChat)holder).contentContactMessageText.setText(name);
+                                ((ViewHolderMessageChat)holder).contentContactMessageFileSender.setVisibility(View.GONE);
                             }
 
-//                    name.setSpan(new android.text.style.StyleSpan(Typeface.ITALIC), 0, name.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                            ((ViewHolderMessageChat)holder).contentContactMessageText.setText(name);
-                            ((ViewHolderMessageChat)holder).contentContactMessageFileSender.setVisibility(View.GONE);
+
                         }
                         else if(message.getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT){
                             ((ViewHolderMessageChat)holder).contentContactMessageFileSender.setVisibility(View.VISIBLE);
