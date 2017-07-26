@@ -189,7 +189,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
-            android:layout_marginBottom="4dp"
             android:gravity="left" >
             <ImageView
                 android:id="@+id/file_properties_info_image"
@@ -225,7 +224,7 @@
             android:id="@+id/file_properties_size_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="4dp"
+            android:layout_marginTop="16dp"
             android:gravity="left" >
 
             <RelativeLayout
@@ -266,9 +265,9 @@
             android:id="@+id/file_properties_content_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="4dp"
             android:gravity="left"
-            android:orientation="horizontal" >
+            android:orientation="horizontal"
+            android:layout_marginTop="16dp">
 
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -309,7 +308,7 @@
             android:id="@+id/file_properties_added_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="4dp"
+            android:layout_marginTop="16dp"
             android:gravity="left"
             android:orientation="horizontal" >
 
@@ -354,6 +353,7 @@
             android:layout_height="wrap_content"
             android:gravity="left"
             android:orientation="horizontal"
+            android:layout_marginTop="16dp"
             android:layout_marginBottom="18dp">
 
             <RelativeLayout
@@ -420,7 +420,7 @@
                     android:layout_height="wrap_content"
                     android:text="@string/file_properties_shared_folder_public_link_name"
                     android:textColor="@color/name_my_account"
-                    android:textSize="16sp"/>
+                    android:textSize="16sp" />
 
                 <TextView
                     android:id="@+id/file_properties_link_text"
@@ -428,6 +428,8 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@id/file_properties_link_label"
                     android:layout_marginRight="20dp"
+                    android:layout_marginTop="16dp"
+                    android:maxWidth="250dp"
                     android:textSize="16sp"
                     android:textColor="@color/mail_my_account" />
 
