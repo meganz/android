@@ -607,7 +607,7 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 		} else {
 
 			if(this.isItemChecked(position)){
-				holder.imageView.setImageResource(R.drawable.ic_multiselect);
+				holder.imageView.setImageResource(R.drawable.ic_select_avatar);
 				holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.new_multiselect_color));
 			}
 			else{
