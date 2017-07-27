@@ -130,17 +130,19 @@ public class CloudDriveProviderFragmentLollipop extends Fragment implements Recy
 		}
 	
 		if (parentHandle == -1)
-		{			
+		{
+			//QA Report #6608 - do not remember last folder
 			//Find in the database the last parentHandle
-			prefs = dbH.getPreferences();
-			if (prefs != null) {
-				String lastFolder = prefs.getLastFolderCloud();
-				if(lastFolder != null) {
-					if (lastFolder.compareTo("") != 0){
-						parentHandle = Long.parseLong(lastFolder);
-					}
-				}
-			}
+//			prefs = dbH.getPreferences();
+//			if (prefs != null) {
+//				String lastFolder = prefs.getLastFolderCloud();
+//				if(lastFolder != null) {
+//					if (lastFolder.compareTo("") != 0){
+//						parentHandle = Long.parseLong(lastFolder);
+//					}
+//				}
+//			}
+			parentHandle = megaApi.getRootNode().getHandle();
 		}			
 		
 		MegaNode chosenNode = megaApi.getNodeByHandle(parentHandle);
