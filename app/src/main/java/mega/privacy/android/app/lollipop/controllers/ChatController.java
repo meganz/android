@@ -16,6 +16,8 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
+import android.text.Html;
+import android.text.Spanned;
 import android.widget.Toast;
 
 import org.w3c.dom.NodeList;
@@ -285,7 +287,7 @@ public class ChatController {
                 log("me alter participant");
 
                 StringBuilder builder = new StringBuilder();
-                builder.append(context.getString(R.string.chat_me_text) + ": ");
+                builder.append(megaChatApi.getMyFullname() + ": ");
 
                 int privilege = message.getPrivilege();
                 log("Privilege of me: " + privilege);
@@ -312,15 +314,15 @@ public class ChatController {
 
                 if (privilege != MegaChatRoom.PRIV_RM) {
                     log("I was added");
-                    textToShow = String.format(context.getString(R.string.non_format_message_add_participant), context.getString(R.string.chat_I_text), fullNameAction);
+                    textToShow = String.format(context.getString(R.string.non_format_message_add_participant), megaChatApi.getMyFullname(), fullNameAction);
                 } else {
                     log("I was removed or left");
                     if (message.getUserHandle() == message.getHandleOfAction()) {
                         log("I left the chat");
-                        textToShow = String.format(context.getString(R.string.non_format_message_participant_left_group_chat), context.getString(R.string.chat_I_text));
+                        textToShow = String.format(context.getString(R.string.non_format_message_participant_left_group_chat), megaChatApi.getMyFullname());
 
                     } else {
-                        textToShow = String.format(context.getString(R.string.non_format_message_remove_participant), context.getString(R.string.chat_I_text), fullNameAction);
+                        textToShow = String.format(context.getString(R.string.non_format_message_remove_participant), megaChatApi.getMyFullname(), fullNameAction);
                     }
                 }
 
@@ -358,7 +360,7 @@ public class ChatController {
                     log("Participant was added");
                     if (message.getUserHandle() == megaApi.getMyUser().getHandle()) {
                         log("By me");
-                        textToShow = String.format(context.getString(R.string.non_format_message_add_participant), fullNameTitle, context.getString(R.string.chat_me_text));
+                        textToShow = String.format(context.getString(R.string.non_format_message_add_participant), fullNameTitle, megaChatApi.getMyFullname());
                     } else {
 //                        textToShow = String.format(context.getString(R.string.message_add_participant), message.getHandleOfAction()+"");
                         log("By other");
@@ -387,7 +389,7 @@ public class ChatController {
                 else {
                     log("Participant was removed or left");
                     if (message.getUserHandle() == megaApi.getMyUser().getHandle()) {
-                        textToShow = String.format(context.getString(R.string.non_format_message_remove_participant), fullNameTitle, context.getString(R.string.chat_me_text));
+                        textToShow = String.format(context.getString(R.string.non_format_message_remove_participant), fullNameTitle, megaChatApi.getMyFullname());
                     } else {
 
                         if (message.getUserHandle() == message.getHandleOfAction()) {
@@ -433,7 +435,7 @@ public class ChatController {
                 log("Privilege of the user: " + privilege);
 
                 StringBuilder builder = new StringBuilder();
-                builder.append(context.getString(R.string.chat_me_text) + ": ");
+                builder.append(megaChatApi.getMyFullname() + ": ");
 
                 String privilegeString = "";
                 if (privilege == MegaChatRoom.PRIV_MODERATOR) {
@@ -451,7 +453,7 @@ public class ChatController {
 
                 if (message.getUserHandle() == megaApi.getMyUser().getHandle()) {
                     log("I changed my Own permission");
-                    textToShow = String.format(context.getString(R.string.non_format_message_permissions_changed), context.getString(R.string.chat_I_text), privilegeString, context.getString(R.string.chat_me_text));
+                    textToShow = String.format(context.getString(R.string.non_format_message_permissions_changed), megaChatApi.getMyFullname(), privilegeString, megaChatApi.getMyFullname());
                 } else {
                     log("I was change by someone");
                     String fullNameAction = getFullName(message.getUserHandle(), chatRoom);
@@ -472,7 +474,7 @@ public class ChatController {
                         }
                     }
 
-                    textToShow = String.format(context.getString(R.string.non_format_message_permissions_changed), context.getString(R.string.chat_I_text), privilegeString, fullNameAction);
+                    textToShow = String.format(context.getString(R.string.non_format_message_permissions_changed), megaChatApi.getMyFullname(), privilegeString, fullNameAction);
                 }
 
                 builder.append(textToShow);
@@ -517,7 +519,7 @@ public class ChatController {
                 String textToShow = "";
                 if (message.getUserHandle() == megaApi.getMyUser().getHandle()) {
                     log("The privilege was change by me");
-                    textToShow = String.format(context.getString(R.string.non_format_message_permissions_changed), fullNameTitle, privilegeString, context.getString(R.string.chat_me_text));
+                    textToShow = String.format(context.getString(R.string.non_format_message_permissions_changed), fullNameTitle, privilegeString, megaChatApi.getMyFullname());
 
                 } else {
                     log("By other");
@@ -551,7 +553,7 @@ public class ChatController {
                 log("MY message handle!!: " + message.getMsgId());
 
                 StringBuilder builder = new StringBuilder();
-                builder.append(context.getString(R.string.chat_me_text) + ": ");
+                builder.append(megaChatApi.getMyFullname() + ": ");
 
                 if (message.getType() == MegaChatMessage.TYPE_NORMAL) {
                     log("Message type NORMAL: " + message.getMsgId());
@@ -580,14 +582,20 @@ public class ChatController {
                 } else if (message.getType() == MegaChatMessage.TYPE_TRUNCATE) {
                     log("Message type TRUNCATE");
 
-                    String textToShow = context.getString(R.string.history_cleared_message);
-                    builder.append(textToShow);
+                    String textToShow = String.format(context.getString(R.string.history_cleared_by), megaChatApi.getMyFullname());
+                    Spanned result = null;
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                        result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
+                    } else {
+                        result = Html.fromHtml(textToShow);
+                    }
+                    builder.append(result);
                     return builder.toString();
                 } else if (message.getType() == MegaChatMessage.TYPE_CHAT_TITLE) {
                     log("Message type TITLE CHANGE: " + message.getContent());
 
                     String messageContent = message.getContent();
-                    String textToShow = String.format(context.getString(R.string.non_format_change_title_messages), context.getString(R.string.chat_I_text), messageContent);
+                    String textToShow = String.format(context.getString(R.string.non_format_change_title_messages), megaChatApi.getMyFullname(), messageContent);
                     builder.append(textToShow);
                     return builder.toString();
 
