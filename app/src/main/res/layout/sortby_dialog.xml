@@ -14,7 +14,10 @@
 	        android:id="@+id/sortby_dialog_name_text"
 	        android:layout_width="match_parent"
 	        android:layout_height="wrap_content"
-	        android:textStyle="bold"/>
+			android:textSize="16sp"
+			android:fontFamily="sans-serif"
+			android:textStyle="normal"
+			/>
 	    
 	    <CheckedTextView
 		    android:id="@+id/sortby_dialog_ascending_check"
@@ -23,7 +26,9 @@
 		    android:drawableLeft="?android:attr/listChoiceIndicatorSingle"
 		    android:ellipsize="marquee"
 		    android:gravity="center_vertical"
-		    android:textAppearance="?android:attr/textAppearanceMedium"/>	    
+		    android:textAppearance="?android:attr/textAppearanceMedium"
+			android:fontFamily="sans-serif"
+			android:textColor="#de000000"/>
 	    
 	    <CheckedTextView
 		    android:id="@+id/sortby_dialog_descending_check"
@@ -32,14 +37,18 @@
 		    android:drawableLeft="?android:attr/listChoiceIndicatorSingle"
 		    android:ellipsize="marquee"
 		    android:gravity="center_vertical"
-		    android:textAppearance="?android:attr/textAppearanceMedium"/>
+		    android:textAppearance="?android:attr/textAppearanceMedium"
+			android:fontFamily="sans-serif"
+			android:textColor="#de000000"/>
 	    
 	    
 	    <TextView 
 	        android:id="@+id/sortby_dialog_date_text"
 	        android:layout_width="match_parent"
 	        android:layout_height="wrap_content"
-	        android:textStyle="bold"/>	    
+			android:textSize="16sp"
+			android:fontFamily="sans-serif"
+			android:textStyle="normal"/>
 	    
 	    <CheckedTextView
 		    android:id="@+id/sortby_dialog_newest_check"
@@ -48,7 +57,9 @@
 		    android:drawableLeft="?android:attr/listChoiceIndicatorSingle"
 		    android:ellipsize="marquee"
 		    android:gravity="center_vertical"
-		    android:textAppearance="?android:attr/textAppearanceMedium"/>
+		    android:textAppearance="?android:attr/textAppearanceMedium"
+			android:fontFamily="sans-serif"
+			android:textColor="#de000000"/>
 	    
 	    <CheckedTextView
 		    android:id="@+id/sortby_dialog_oldest_check"
@@ -57,8 +68,11 @@
 		    android:drawableLeft="?android:attr/listChoiceIndicatorSingle"
 		    android:ellipsize="marquee"
 		    android:gravity="center_vertical"
-		    android:textAppearance="?android:attr/textAppearanceMedium"/>
+		    android:textAppearance="?android:attr/textAppearanceMedium"
+			android:fontFamily="sans-serif"
+			android:textColor="#de000000"/>
 
+		<!--
 		<TextView
 			android:id="@+id/sortby_dialog_date_modification_text"
 			android:layout_width="match_parent"
@@ -83,11 +97,15 @@
 			android:gravity="center_vertical"
 			android:textAppearance="?android:attr/textAppearanceMedium"/>
 
+		-->
+
 		<TextView 
 	        android:id="@+id/sortby_dialog_size_text"
 	        android:layout_width="match_parent"
 	        android:layout_height="wrap_content"
-	        android:textStyle="bold"/>
+			android:textSize="16sp"
+			android:fontFamily="sans-serif"
+			android:textStyle="normal"/>
 	    
 	    <CheckedTextView
 		    android:id="@+id/sortby_dialog_largest_first_check"
@@ -96,7 +114,9 @@
 		    android:drawableLeft="?android:attr/listChoiceIndicatorSingle"
 		    android:ellipsize="marquee"
 		    android:gravity="center_vertical"
-		    android:textAppearance="?android:attr/textAppearanceMedium"/>
+		    android:textAppearance="?android:attr/textAppearanceMedium"
+			android:fontFamily="sans-serif"
+			android:textColor="#de000000"/>
 	    
 	    <CheckedTextView
 		    android:id="@+id/sortby_dialog_smallest_first_check"
@@ -105,7 +125,11 @@
 		    android:drawableLeft="?android:attr/listChoiceIndicatorSingle"
 		    android:ellipsize="marquee"
 		    android:gravity="center_vertical"
-		    android:textAppearance="?android:attr/textAppearanceMedium"/>
-	    -->
+		    android:textAppearance="?android:attr/textAppearanceMedium"
+			android:fontFamily="sans-serif"
+			android:textColor="#de000000"
+			android:layout_marginBottom="22dp"
+			/>
+
 	</LinearLayout>
 </ScrollView>
