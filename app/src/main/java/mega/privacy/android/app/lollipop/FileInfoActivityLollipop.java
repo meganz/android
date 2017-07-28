@@ -932,7 +932,6 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 			}
 		}
 		else{ //Folder
-
 			contentTextView.setVisibility(View.VISIBLE);
 			contentTitleTextView.setVisibility(View.VISIBLE);
 
@@ -945,7 +944,6 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
 			if(from==FROM_INCOMING_SHARES){
 				//Show who is the owner
-
 				ownerRoundeImage.setImageBitmap(null);
 				ownerLetter.setText("");
 
@@ -1041,6 +1039,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 			if (sl != null){
 
 				if (sl.size() == 0){
+
 					sharedLayout.setVisibility(View.GONE);
 					dividerSharedLayout.setVisibility(View.GONE);
 //					If I am the owner
@@ -1086,32 +1085,10 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 					}
 				}
 				else{
-					if(publicLink){
-//						publicLinkTextView.setText(getResources().getString(R.string.file_properties_shared_folder_public_link));
-//
-//						publicLinkTextView.setVisibility(View.VISIBLE);
+					sharedLayout.setVisibility(View.VISIBLE);
+					dividerSharedLayout.setVisibility(View.VISIBLE);
+					usersSharedWithTextButton.setText(sl.size()+" "+getResources().getQuantityString(R.plurals.general_num_users,sl.size()));
 
-						if(sl.size()>1){
-							//It is public and shared
-							sharedLayout.setVisibility(View.VISIBLE);
-							dividerSharedLayout.setVisibility(View.VISIBLE);
-							usersSharedWithTextButton.setText(sl.size()+" "+getResources().getQuantityString(R.plurals.general_num_users,sl.size()));
-						}
-						else{
-							//It is just public
-							sharedLayout.setVisibility(View.GONE);
-							dividerSharedLayout.setVisibility(View.GONE);
-//							sharedWithButton.setText(R.string.file_properties_shared_folder_public_link);
-						}
-
-					}
-					else{
-//						publicLinkTextView.setText(getResources().getString(R.string.file_properties_shared_folder_private_folder));
-						//It is private and shared
-						sharedLayout.setVisibility(View.VISIBLE);
-						dividerSharedLayout.setVisibility(View.VISIBLE);
-						usersSharedWithTextButton.setText(sl.size()+" "+getResources().getQuantityString(R.plurals.general_num_users,sl.size()));
-					}
 				}
 
 				if (node.getCreationTime() != 0){
@@ -1130,6 +1107,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 				}
 			}
 			else{
+
 				sharedLayout.setVisibility(View.GONE);
 				dividerSharedLayout.setVisibility(View.GONE);
 			}
@@ -2491,32 +2469,11 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
 				}
 				else{
-					if(publicLink){
-//						publicLinkTextView.setText(getResources().getString(R.string.file_properties_shared_folder_public_link));
-//
-//						publicLinkTextView.setVisibility(View.VISIBLE);
 
-						if(sl.size()>1){
-							//It is public and shared
-							sharedLayout.setVisibility(View.VISIBLE);
-							dividerSharedLayout.setVisibility(View.VISIBLE);
-							usersSharedWithTextButton.setText((sl.size()-1)+" "+getResources().getQuantityString(R.plurals.general_num_users,(sl.size()-1)));
-						}
-						else{
-							//It is just public
-							sharedLayout.setVisibility(View.GONE);
-							dividerSharedLayout.setVisibility(View.GONE);
-							usersSharedWithTextButton.setText(R.string.file_properties_shared_folder_public_link);
-						}
+					sharedLayout.setVisibility(View.VISIBLE);
+					dividerSharedLayout.setVisibility(View.VISIBLE);
+					usersSharedWithTextButton.setText((sl.size()-1)+" "+getResources().getQuantityString(R.plurals.general_num_users,(sl.size()-1)));
 
-					}
-					else{
-//						publicLinkTextView.setText(getResources().getString(R.string.file_properties_shared_folder_private_folder));
-						//It is private and shared
-						sharedLayout.setVisibility(View.VISIBLE);
-						dividerSharedLayout.setVisibility(View.VISIBLE);
-						usersSharedWithTextButton.setText(sl.size()+" "+getResources().getQuantityString(R.plurals.general_num_users,sl.size()));
-					}
 				}
 
 
