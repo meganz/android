@@ -57,8 +57,8 @@
 
     <ImageView
         android:id="@+id/contact_list_drawable_state"
-        android:layout_width="6dp"
-        android:layout_height="6dp"
+        android:layout_width="10dp"
+        android:layout_height="10dp"
         android:layout_alignTop="@id/contact_list_name"
         android:layout_toRightOf="@id/contact_list_name"
         android:layout_marginTop="8dp"
