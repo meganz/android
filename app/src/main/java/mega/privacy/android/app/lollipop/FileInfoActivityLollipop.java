@@ -112,6 +112,12 @@ import nz.mega.sdk.MegaUser;
 @SuppressLint("NewApi")
 public class FileInfoActivityLollipop extends PinActivityLollipop implements OnClickListener, MegaRequestListenerInterface, MegaGlobalListenerInterface{
 
+	public static int MAX_WIDTH_FILENAME_LAND=400;
+	public static int MAX_WIDTH_FILENAME_LAND_2=400;
+
+	public static int MAX_WIDTH_FILENAME_PORT=200;
+	public static int MAX_WIDTH_FILENAME_PORT_2=200;
+
 	static int TYPE_EXPORT_GET = 0;
 	static int TYPE_EXPORT_REMOVE = 1;
 	static int TYPE_EXPORT_MANAGE = 2;
@@ -399,15 +405,25 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 			ownerLabelowner.setText(ownerString);
 			ownerInfo = (TextView) findViewById(R.id.file_properties_owner_info);
 
+
 			if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+				log("Landscape configuration");
+				float width1 = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MAX_WIDTH_FILENAME_LAND, getResources().getDisplayMetrics());
+				float width2 = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MAX_WIDTH_FILENAME_LAND_2, getResources().getDisplayMetrics());
 
-				ownerLabel.setMaxWidth(1300);
-				ownerInfo.setMaxWidth(1400);
+				ownerLabel.setMaxWidth((int) width1);
+				ownerInfo.setMaxWidth((int) width2);
 
-			}else{
-				ownerLabel.setMaxWidth(500);
-				ownerInfo.setMaxWidth(600);
 
+
+			}
+			else{
+				log("Portrait configuration");
+				float width1 = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MAX_WIDTH_FILENAME_PORT, getResources().getDisplayMetrics());
+				float width2 = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MAX_WIDTH_FILENAME_PORT_2, getResources().getDisplayMetrics());
+
+				ownerLabel.setMaxWidth((int) width1);
+				ownerInfo.setMaxWidth((int) width2);
 			}
 
 			ownerLayout.setVisibility(View.GONE);
