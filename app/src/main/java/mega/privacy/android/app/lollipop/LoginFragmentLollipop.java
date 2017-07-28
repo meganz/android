@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.PorterDuff;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -14,7 +15,9 @@ import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.SwitchCompat;
+import android.text.Editable;
 import android.text.InputType;
+import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Display;
@@ -155,6 +158,11 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
     String emailTemp = null;
     String passwdTemp = null;
 
+    private RelativeLayout login_email_error_layout;
+    private RelativeLayout login_password_error_layout;
+    private TextView login_email_error_text;
+    private TextView login_password_error_text;
+
     @Override
     public void onSaveInstanceState(Bundle outState) {
         log("onSaveInstanceState");
@@ -274,6 +282,15 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
         et_user.setCursorVisible(true);
 
+        login_email_error_layout = (RelativeLayout) v.findViewById(R.id.login_email_text_error);
+        login_email_error_layout.setLayoutParams(paramsb1);
+        LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams)login_email_error_layout.getLayoutParams();
+        layoutParams.setMargins(Util.scaleWidthPx(60, outMetrics), 0, 0, Util.scaleHeightPx(10, outMetrics));
+        login_email_error_layout.setLayoutParams(layoutParams);
+        login_email_error_layout.setVisibility(View.GONE);
+
+        login_email_error_text = (TextView) v.findViewById(R.id.login_email_text_error_text);
+
         et_password = (EditText) v.findViewById(R.id.login_password_text);
         et_password.setLayoutParams(paramsb1);
         et_password.setLayoutParams(textParams);
@@ -291,6 +308,15 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 return false;
             }
         });
+
+        login_password_error_layout = (RelativeLayout) v.findViewById(R.id.login_password_text_error);
+        login_password_error_layout.setVisibility(View.GONE);
+        login_password_error_text = (TextView) v.findViewById(R.id.login_password_text_error_text);
+        login_password_error_layout.setLayoutParams(paramsb1);
+        layoutParams = (LinearLayout.LayoutParams)login_password_error_layout.getLayoutParams();
+        layoutParams.setMargins(Util.scaleWidthPx(60, outMetrics), 0, 0, Util.scaleHeightPx(10, outMetrics));
+        login_password_error_layout.setLayoutParams(layoutParams);
+
         loginThreeDots = (ImageView) v.findViewById(R.id.login_three_dots);
         LinearLayout.LayoutParams textThreeDots = (LinearLayout.LayoutParams)loginThreeDots.getLayoutParams();
         textThreeDots.setMargins(Util.scaleWidthPx(0, outMetrics), 0, Util.scaleWidthPx(10, outMetrics), 0);
@@ -1117,8 +1143,10 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         String emailError = getEmailError();
         String passwordError = getPasswordError();
 
-        et_user.setError(emailError);
-        et_password.setError(passwordError);
+//        et_user.setError(emailError);
+        setError(et_user, emailError);
+//        et_password.setError(passwordError);
+        setError(et_password, passwordError);
 
         if (emailError != null) {
             et_user.requestFocus();
@@ -2252,6 +2280,79 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
     @Override
     public void onChatPresenceConfigUpdate(MegaChatApiJava api, MegaChatPresenceConfig config) {
 
+    }
+
+    private void setError(final EditText editText, String error){
+        if(error == null || error.equals("")){
+            return;
+        }
+        switch (editText.getId()){
+            case R.id.login_email_text:{
+                    login_email_error_layout.setVisibility(View.VISIBLE);
+                    login_email_error_text.setText(error);
+                    editText.getBackground().setColorFilter(0xFFFF333A, PorterDuff.Mode.SRC_IN);
+                    editText.addTextChangedListener(new TextWatcher() {
+                        @Override
+                        public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                            quitError(editText);
+                            editText.removeTextChangedListener(this);
+                        }
+
+                        @Override
+                        public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+                        }
+
+                        @Override
+                        public void afterTextChanged(Editable editable) {
+
+                        }
+                    });
+                }
+                break;
+            case R.id.login_password_text:{
+                    login_password_error_layout.setVisibility(View.VISIBLE);
+                    login_password_error_text.setText(error);
+                    editText.getBackground().setColorFilter(0xFFFF333A, PorterDuff.Mode.SRC_IN);
+                    editText.addTextChangedListener(new TextWatcher() {
+                        @Override
+                        public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                            quitError(editText);
+                            editText.removeTextChangedListener(this);
+                        }
+
+                        @Override
+                        public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+                        }
+
+                        @Override
+                        public void afterTextChanged(Editable editable) {
+
+                        }
+                    });
+                }
+                break;
+        }
+    }
+
+    private void quitError(EditText editText){
+        switch (editText.getId()){
+            case R.id.login_email_text:{
+                if(login_email_error_layout.getVisibility() != View.GONE){
+                    login_email_error_layout.setVisibility(View.GONE);
+                    editText.getBackground().clearColorFilter();
+                }
+            }
+            break;
+            case R.id.login_password_text:{
+                if(login_password_error_layout.getVisibility() != View.GONE){
+                    login_password_error_layout.setVisibility(View.GONE);
+                    editText.getBackground().clearColorFilter();
+                }
+            }
+            break;
+        }
     }
 
     private static void log(String log) {
