@@ -221,36 +221,58 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 				window.setStatusBarColor(ContextCompat.getColor(this, R.color.transparent_black));
 			}
 
-			contactStateIcon = (ImageView) findViewById(R.id.contact_drawable_state);
 
-			nameLength = (TextView) findViewById(R.id.name_length);
-			emailLength =(TextView) findViewById(R.id.email_length);
-
-			//SUBTITLE*********
-			emailContact = (TextView) findViewById(R.id.email_contact);
-			nameContact = (TextView) findViewById(R.id.name_contact);
 
 			collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.collapse_toolbar);
+			contactStateIcon = (ImageView) findViewById(R.id.contact_drawable_state);
 
-		/*	if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-				collapsingToolbar.setExpandedTitleMarginBottom(Util.scaleHeightPx(48, outMetrics));
-				nameLength.setTextSize(21);
-				nameLength.setFilters(new InputFilter[]{new InputFilter.LengthFilter(48)});
+			/*TITLE*/
+			nameContact = (TextView) findViewById(R.id.name_contact);
+			nameLength = (TextView) findViewById(R.id.name_length);
+
+			/*SUBTITLE*/
+			emailContact = (TextView) findViewById(R.id.email_contact);
+			emailLength =(TextView) findViewById(R.id.email_length);
+
+			if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+				//nameContact.setFilters(new InputFilter[]{new InputFilter.LengthFilter(48)});
+				//nameLength.setFilters(new InputFilter[]{new InputFilter.LengthFilter(48)});
+				//emailContact.setFilters(new InputFilter[]{new InputFilter.LengthFilter(48)});
+				//emailLength.setFilters(new InputFilter[]{new InputFilter.LengthFilter(48)});
+				//android:maxWidth="250dp"
+				nameContact.setMaxWidth(1700);
+				nameLength.setMaxWidth(1700);
+				emailContact.setMaxWidth(1700);
+				emailLength.setMaxWidth(1700);
+
+
+
+				emailContact.setPadding(0,0,0,5);
+				emailLength.setPadding(0,0,0,5);
+
+
+
 
 			} else {
-				collapsingToolbar.setExpandedTitleMarginBottom(Util.scaleHeightPx(28, outMetrics));
-				nameLength.setTextSize(21);
-				nameLength.setFilters(new InputFilter[]{new InputFilter.LengthFilter(23)});
+
+				nameContact.setMaxWidth(850);
+				nameLength.setMaxWidth(850);
+				emailContact.setMaxWidth(850);
+				emailLength.setMaxWidth(850);
+
+
+				//nameContact.setFilters(new InputFilter[]{new InputFilter.LengthFilter(23)});
+				//nameLength.setFilters(new InputFilter[]{new InputFilter.LengthFilter(23)});
+				//emailContact.setFilters(new InputFilter[]{new InputFilter.LengthFilter(23)});
+				//emailLength.setFilters(new InputFilter[]{new InputFilter.LengthFilter(23)});
+
+				emailContact.setPadding(0,0,0,11);
+				emailLength.setPadding(0,0,0,11);
+
 
 			}
-			collapsingToolbar.setExpandedTitleMarginStart((int) getResources().getDimension(R.dimen.recycler_view_separator));*/
-			//getSupportActionBar().setDisplayShowTitleEnabled(false);
 
 			imageGradient = (View) findViewById(R.id.gradient_view);
-
-
-			//collapsingToolbar.setCollapsedTitleTextColor(ContextCompat.getColor(this, R.color.white));
-			//collapsingToolbar.setExpandedTitleColor(ContextCompat.getColor(this, R.color.white));
 
 			setTitle(null);
 			aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
