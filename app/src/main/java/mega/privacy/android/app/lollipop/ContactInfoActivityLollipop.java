@@ -54,6 +54,8 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import org.w3c.dom.Text;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -128,9 +130,12 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 	//ImageView shareContactIcon;
 
 	TextView emailContact;
+	TextView nameContact;
 	ImageView contactStateIcon;
 
 	TextView nameLength;
+	TextView emailLength;
+
 	//View dividerShareContactLayout;
 
 	RelativeLayout clearChatLayout;
@@ -213,19 +218,21 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 				Window window = this.getWindow();
 				window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
 				window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-				window.setStatusBarColor(ContextCompat.getColor(this, R.color.transparent_transparent_black));
+				window.setStatusBarColor(ContextCompat.getColor(this, R.color.transparent_black));
 			}
 
 			contactStateIcon = (ImageView) findViewById(R.id.contact_drawable_state);
 
 			nameLength = (TextView) findViewById(R.id.name_length);
+			emailLength =(TextView) findViewById(R.id.email_length);
 
 			//SUBTITLE*********
 			emailContact = (TextView) findViewById(R.id.email_contact);
+			nameContact = (TextView) findViewById(R.id.name_contact);
 
 			collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.collapse_toolbar);
 
-			if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+		/*	if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
 				collapsingToolbar.setExpandedTitleMarginBottom(Util.scaleHeightPx(48, outMetrics));
 				nameLength.setTextSize(21);
 				nameLength.setFilters(new InputFilter[]{new InputFilter.LengthFilter(48)});
@@ -236,15 +243,16 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 				nameLength.setFilters(new InputFilter[]{new InputFilter.LengthFilter(23)});
 
 			}
-			collapsingToolbar.setExpandedTitleMarginStart((int) getResources().getDimension(R.dimen.recycler_view_separator));
-			getSupportActionBar().setDisplayShowTitleEnabled(false);
+			collapsingToolbar.setExpandedTitleMarginStart((int) getResources().getDimension(R.dimen.recycler_view_separator));*/
+			//getSupportActionBar().setDisplayShowTitleEnabled(false);
 
 			imageGradient = (View) findViewById(R.id.gradient_view);
 
 
-			collapsingToolbar.setCollapsedTitleTextColor(ContextCompat.getColor(this, R.color.white));
-			collapsingToolbar.setExpandedTitleColor(ContextCompat.getColor(this, R.color.white));
+			//collapsingToolbar.setCollapsedTitleTextColor(ContextCompat.getColor(this, R.color.white));
+			//collapsingToolbar.setExpandedTitleColor(ContextCompat.getColor(this, R.color.white));
 
+			setTitle(null);
 			aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
 			aB.setHomeButtonEnabled(true);
 			aB.setDisplayHomeAsUpEnabled(true);
@@ -277,8 +285,8 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 
 				chatPrefs = dbH.findChatPreferencesByHandle(String.valueOf(chatHandle));
 
-				collapsingToolbar.setTitle(chat.getTitle());
-				nameLength.setText(collapsingToolbar.getTitle());
+				nameContact.setText(chat.getTitle());
+				nameLength.setText(chat.getTitle());
 
 			}
 			else{
@@ -313,8 +321,9 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 							fullName = splitEmail[0];
 						}
 
-						collapsingToolbar.setTitle(fullName);
-						nameLength.setText(collapsingToolbar.getTitle());
+						nameContact.setText(fullName);
+						nameLength.setText(fullName);
+
 
 					}
 					else{
@@ -438,6 +447,8 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 					sharedFoldersButton.setText(getDescription(megaApi.getInShares(user)));
 					//shareContactText.setText(user.getEmail());
 					emailContact.setText(user.getEmail());
+					emailLength.setText(user.getEmail());
+
 
 
 					if(Util.isChatEnabled()){
@@ -463,6 +474,8 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 						if(chat!=null){
 							//shareContactText.setText(chat.getPeerEmail(0));
 							emailContact.setText(chat.getPeerEmail(0));
+							emailLength.setText(chat.getPeerEmail(0));
+
 
 							clearChatLayout.setVisibility(View.VISIBLE);
 							//dividerShareContactLayout.setVisibility(View.VISIBLE);
@@ -485,6 +498,8 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 					setOfflineAvatar(userEmail);
 				//	shareContactText.setText(userEmail);
 					emailContact.setText(userEmail);
+					emailLength.setText(userEmail);
+
 
 				}
 				sharedFoldersLayout.setVisibility(View.GONE);
@@ -497,8 +512,8 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 
 			if(Util.isChatEnabled()){
 				//SET Preferences (if exist)
-				if(chatPrefs!=null){
 
+				if(chatPrefs!=null){
 					boolean notificationsEnabled = true;
 					if (chatPrefs.getNotificationsEnabled() != null){
 						notificationsEnabled = Boolean.parseBoolean(chatPrefs.getNotificationsEnabled());
@@ -520,8 +535,8 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 					String titleSound = sound.getTitle(this);
 					messageSoundText.setText(titleSound);
 
-				}
-				else{
+				} else{
+
 					Uri defaultRingtoneUri = RingtoneManager.getActualDefaultRingtoneUri(getApplicationContext(), RingtoneManager.TYPE_RINGTONE);
 					Ringtone defaultRingtone = RingtoneManager.getRingtone(this, defaultRingtoneUri);
 					ringtoneText.setText(defaultRingtone.getTitle(this));
@@ -539,8 +554,9 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 				dividerRingtoneLayout.setVisibility(View.VISIBLE);
 				messageSoundLayout.setVisibility(View.VISIBLE);
 				dividerMessageSoundLayout.setVisibility(View.VISIBLE);
-			}
-			else{
+
+			}else{
+
 				notificationsLayout.setVisibility(View.GONE);
 				dividerNotificationsLayout.setVisibility(View.GONE);
 				ringtoneLayout.setVisibility(View.GONE);
@@ -1094,10 +1110,17 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 		notificationsSwitch.setChecked(isChecked);
 
 		if(!isChecked){
-			ringtoneText.setTextColor(ContextCompat.getColor(this, R.color.accentColorTransparent));
-			messageSoundText.setTextColor(ContextCompat.getColor(this, R.color.accentColorTransparent));
+			messageSoundLayout.setVisibility(View.GONE);
+			ringtoneLayout.setVisibility(View.GONE);
+			dividerMessageSoundLayout.setVisibility(View.GONE);
+			dividerRingtoneLayout.setVisibility(View.GONE);
 		}
 		else{
+			messageSoundLayout.setVisibility(View.VISIBLE);
+			ringtoneLayout.setVisibility(View.VISIBLE);
+			dividerMessageSoundLayout.setVisibility(View.VISIBLE);
+			dividerRingtoneLayout.setVisibility(View.VISIBLE);
+
 			ringtoneText.setTextColor(ContextCompat.getColor(this, R.color.accentColor));
 			messageSoundText.setTextColor(ContextCompat.getColor(this, R.color.accentColor));
 		}

@@ -39,7 +39,7 @@
                     android:layout_gravity="left|center_vertical"
                     android:textColor="@color/name_my_account"
                     android:layout_weight="5"
-                    android:text="@string/title_properties_chat_contact_notifications"
+                    android:text="@string/title_properties_chat_notifications_contact"
                     android:textSize="16dp" />
 
             </RelativeLayout>
@@ -131,7 +131,6 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/chat_contact_properties_ringtone_label"
-                    android:text="Probando"
                     android:textColor="@color/accentColor"
                     android:textSize="14dp" />
 
