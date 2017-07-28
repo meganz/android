@@ -57,10 +57,6 @@
 
                 </FrameLayout>
 
-
-
-
-
               <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -75,10 +71,10 @@
                       android:layout_marginLeft="72dp"
                       android:textSize="20sp"
                       android:paddingTop="6dp"
-                      android:textColor="@color/black"
-                      android:textAppearance="@style/ToolbarTitle"
-                      android:maxLength="17"
-                      android:text="Anna Bruns"/>
+                      android:ellipsize="end"
+                      android:maxLines="1"
+                      android:singleLine="true"
+                      android:textAppearance="@style/ToolbarTitle"/>
 
                   <TextView
                       android:id="@+id/email_length"
@@ -88,9 +84,8 @@
                       android:textSize="14sp"
                       android:layout_below="@+id/name_length"
                       android:layout_marginLeft="72dp"
-                      android:textColor="@color/black"
+                      android:maxLines="1"
                       android:textAppearance="@style/ToolbarTitle"
-                      android:maxLength="30"
                       android:paddingBottom="9dp"/>
 
 
@@ -131,8 +126,10 @@
                         android:textSize="20sp"
                         android:paddingTop="6dp"
                         android:textColor="@color/white"
-                        android:textAppearance="@style/ToolbarTitle"
-                        android:maxLength="17" />
+                        android:ellipsize="end"
+                        android:maxLines="1"
+                        android:singleLine="true"
+                        android:textAppearance="@style/ToolbarTitle" />
 
                     <TextView
                         android:id="@+id/email_contact"
@@ -142,8 +139,8 @@
                         android:layout_below="@+id/name_contact"
                         android:layout_marginLeft="72dp"
                         android:textColor="@color/white"
+                        android:maxLines="1"
                         android:textAppearance="@style/ToolbarTitle"
-                        android:maxLength="30"
                         android:paddingBottom="9dp"/>
                 </RelativeLayout>
 
