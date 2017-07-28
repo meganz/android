@@ -71,6 +71,7 @@ import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
+import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaChatLollipopAdapter;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -93,6 +94,10 @@ import nz.mega.sdk.MegaUser;
 
 @SuppressLint("NewApi")
 public class ContactInfoActivityLollipop extends PinActivityLollipop implements MegaChatRequestListenerInterface, OnClickListener, MegaRequestListenerInterface, OnCheckedChangeListener, OnItemClickListener {
+
+
+	public static int MAX_WIDTH_FILENAME_LAND=470;
+	public static int MAX_WIDTH_FILENAME_PORT=190;
 
 	RelativeLayout imageLayout;
 	android.app.AlertDialog permissionsDialog;
@@ -235,42 +240,30 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			emailLength =(TextView) findViewById(R.id.email_length);
 
 			if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-				//nameContact.setFilters(new InputFilter[]{new InputFilter.LengthFilter(48)});
-				//nameLength.setFilters(new InputFilter[]{new InputFilter.LengthFilter(48)});
-				//emailContact.setFilters(new InputFilter[]{new InputFilter.LengthFilter(48)});
-				//emailLength.setFilters(new InputFilter[]{new InputFilter.LengthFilter(48)});
-				//android:maxWidth="250dp"
-				nameContact.setMaxWidth(1700);
-				nameLength.setMaxWidth(1700);
-				emailContact.setMaxWidth(1700);
-				emailLength.setMaxWidth(1700);
-
-
+				log("Landscape configuration");
+				float width = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MAX_WIDTH_FILENAME_LAND, getResources().getDisplayMetrics());
+				nameContact.setMaxWidth((int) width);
+				nameLength.setMaxWidth((int) width);
+				emailContact.setMaxWidth((int) width);
+				emailLength.setMaxWidth((int) width);
 
 				emailContact.setPadding(0,0,0,5);
 				emailLength.setPadding(0,0,0,5);
 
-
-
-
-			} else {
-
-				nameContact.setMaxWidth(850);
-				nameLength.setMaxWidth(850);
-				emailContact.setMaxWidth(850);
-				emailLength.setMaxWidth(850);
-
-
-				//nameContact.setFilters(new InputFilter[]{new InputFilter.LengthFilter(23)});
-				//nameLength.setFilters(new InputFilter[]{new InputFilter.LengthFilter(23)});
-				//emailContact.setFilters(new InputFilter[]{new InputFilter.LengthFilter(23)});
-				//emailLength.setFilters(new InputFilter[]{new InputFilter.LengthFilter(23)});
+			}
+			else{
+				log("Portrait configuration");
+				float width = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MAX_WIDTH_FILENAME_PORT, getResources().getDisplayMetrics());
+				nameContact.setMaxWidth((int) width);
+				nameLength.setMaxWidth((int) width);
+				emailContact.setMaxWidth((int) width);
+				emailLength.setMaxWidth((int) width);
 
 				emailContact.setPadding(0,0,0,11);
 				emailLength.setPadding(0,0,0,11);
-
-
 			}
+
+
 
 			imageGradient = (View) findViewById(R.id.gradient_view);
 
@@ -1231,6 +1224,10 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			else{
 				showSnackbar(getString(R.string.context_no_shared));
 			}
+		}
+		else if(request.getType() == MegaRequest.TYPE_REMOVE_CONTACT){
+			log("Contact removed");
+			finish();
 		}
 	}
 

@@ -84,7 +84,9 @@
                       android:textSize="14sp"
                       android:layout_below="@+id/name_length"
                       android:layout_marginLeft="72dp"
+                      android:ellipsize="end"
                       android:maxLines="1"
+                      android:singleLine="true"
                       android:textAppearance="@style/ToolbarTitle"
                       android:paddingBottom="9dp"/>
 
@@ -140,6 +142,8 @@
                         android:layout_marginLeft="72dp"
                         android:textColor="@color/white"
                         android:maxLines="1"
+                        android:ellipsize="end"
+                        android:singleLine="true"
                         android:textAppearance="@style/ToolbarTitle"
                         android:paddingBottom="9dp"/>
                 </RelativeLayout>
