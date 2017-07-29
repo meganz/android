@@ -261,7 +261,7 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 			}
 		}
 
-		notificationBuilder =  NotificationBuilder.newInstance(this, megaApi);
+		notificationBuilder =  NotificationBuilder.newInstance(this, megaApi, megaChatApi);
 		
 //		initializeGA();
 		
