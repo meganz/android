@@ -19,6 +19,7 @@ import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.media.RingtoneManager;
 import android.net.Uri;
+import android.os.Build;
 import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
@@ -27,6 +28,7 @@ import android.text.Html;
 import android.text.Spanned;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Locale;
 
 import mega.privacy.android.app.DatabaseHandler;
@@ -40,6 +42,7 @@ import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaUser;
 
@@ -53,8 +56,9 @@ public final class NotificationBuilder {
     private final SharedPreferences sharedPreferences;
     DatabaseHandler dbH;
     MegaApiAndroid megaApi;
+    MegaChatApiAndroid megaChatApi;
 
-    public static NotificationBuilder newInstance(Context context, MegaApiAndroid megaApi) {
+    public static NotificationBuilder newInstance(Context context, MegaApiAndroid megaApi, MegaChatApiAndroid megaChatApi) {
         Context appContext = context.getApplicationContext();
         Context safeContext = ContextCompat.createDeviceProtectedStorageContext(appContext);
         if (safeContext == null) {
@@ -62,24 +66,38 @@ public final class NotificationBuilder {
         }
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(safeContext);
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(safeContext);
-        return new NotificationBuilder(safeContext, notificationManager, sharedPreferences, megaApi);
+        return new NotificationBuilder(safeContext, notificationManager, sharedPreferences, megaApi, megaChatApi);
     }
 
-    public NotificationBuilder(Context context, NotificationManagerCompat notificationManager, SharedPreferences sharedPreferences, MegaApiAndroid megaApi) {
+    public NotificationBuilder(Context context, NotificationManagerCompat notificationManager, SharedPreferences sharedPreferences, MegaApiAndroid megaApi, MegaChatApiAndroid megaChatApi) {
         this.context = context.getApplicationContext();
         this.notificationManager = notificationManager;
         this.sharedPreferences = sharedPreferences;
         dbH = DatabaseHandler.getDbHandler(context);
         this.megaApi = megaApi;
+        this.megaChatApi = megaChatApi;
     }
-
 
     public void sendBundledNotification(Uri uriParameter, MegaChatListItem item, String vibration, String email) {
         Notification notification = buildNotification(uriParameter, item, vibration, GROUP_KEY, email);
         log("Notification id: "+getNotificationIdByHandle(item.getChatId()));
         notificationManager.notify(getNotificationIdByHandle(item.getChatId()), notification);
-        Notification summary = buildSummary(GROUP_KEY);
-        notificationManager.notify(SUMMARY_ID, summary);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            Notification summary = buildSummary(GROUP_KEY);
+            notificationManager.notify(SUMMARY_ID, summary);
+        }
+
+        ArrayList<MegaChatListItem> unreadChats = megaChatApi.getUnreadChatListItems();
+        log("Size od unread: "+unreadChats.size());
+        for(int i=0;i<unreadChats.size();i++){
+            log("UNREAD chat: "+unreadChats.get(i).getTitle());
+        }
+
+    }
+
+    public void buildNotificationPreN(Uri uriParameter, MegaChatListItem item, String vibration, String groupKey, String email){
+
+//        notificationManager.
     }
 
     public Notification buildNotification(Uri uriParameter, MegaChatListItem item, String vibration, String groupKey, String email) {
@@ -144,7 +162,12 @@ public final class NotificationBuilder {
             else{
                 String source = "<b>"+nameAction+": </b>"+item.getLastMessage();
 
-                Spanned notificationContent = Html.fromHtml(source,0);
+                Spanned notificationContent;
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                    notificationContent = Html.fromHtml(source,Html.FROM_HTML_MODE_LEGACY);
+                } else {
+                    notificationContent = Html.fromHtml(source);
+                }
                 notificationBuilder.setContentText(notificationContent);
             }
         }
