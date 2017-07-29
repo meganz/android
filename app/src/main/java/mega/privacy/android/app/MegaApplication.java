@@ -64,6 +64,7 @@ import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatListenerInterface;
+import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatPresenceConfig;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
@@ -773,7 +774,9 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 		}
 
 		log("Unread count is: "+item.getUnreadCount());
+
 		if (item.hasChanged(MegaChatListItem.CHANGE_TYPE_LAST_TS) && (item.getUnreadCount() != 0)){
+
 			try {
 				if(isFireBaseConnection){
 					log("Show notification ALWAYS");
@@ -806,13 +809,12 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 						}
 					}
 				}
-
 			}
 			catch (Exception e){
 				log("Exception when trying to show chat notification");
 			}
-		}
 
+		}
 	}
 
 	public void showNotification(MegaChatListItem item){

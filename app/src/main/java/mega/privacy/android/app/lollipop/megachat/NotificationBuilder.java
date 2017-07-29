@@ -19,12 +19,14 @@ import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.media.RingtoneManager;
 import android.net.Uri;
+import android.os.Build;
 import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.content.ContextCompat;
 import android.text.Html;
 import android.text.Spanned;
+import android.widget.RemoteViews;
 
 import java.io.File;
 import java.util.Locale;
@@ -73,13 +75,15 @@ public final class NotificationBuilder {
         this.megaApi = megaApi;
     }
 
-
     public void sendBundledNotification(Uri uriParameter, MegaChatListItem item, String vibration, String email) {
         Notification notification = buildNotification(uriParameter, item, vibration, GROUP_KEY, email);
         log("Notification id: "+getNotificationIdByHandle(item.getChatId()));
         notificationManager.notify(getNotificationIdByHandle(item.getChatId()), notification);
-        Notification summary = buildSummary(GROUP_KEY);
-        notificationManager.notify(SUMMARY_ID, summary);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            Notification summary = buildSummary(GROUP_KEY);
+            notificationManager.notify(SUMMARY_ID, summary);
+        }
     }
 
     public Notification buildNotification(Uri uriParameter, MegaChatListItem item, String vibration, String groupKey, String email) {
@@ -88,8 +92,6 @@ public final class NotificationBuilder {
         intent.setAction(Constants.ACTION_CHAT_NOTIFICATION_MESSAGE);
         intent.putExtra("CHAT_ID", item.getChatId());
         PendingIntent pendingIntent = PendingIntent.getActivity(context, (int)item.getChatId() , intent, PendingIntent.FLAG_ONE_SHOT);
-
-        Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 
         String title;
         int unreadMessages = item.getUnreadCount();
@@ -123,65 +125,114 @@ public final class NotificationBuilder {
             title = item.getTitle();
         }
 
-        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context)
-                .setSmallIcon(R.drawable.ic_stat_notify_download)
-                .setContentTitle(title)
-                .setColor(ContextCompat.getColor(context,R.color.mega))
-                .setAutoCancel(true)
-                .setShowWhen(true)
-                .setGroup(groupKey)
-                .setSound(defaultSoundUri)
-                .setContentIntent(pendingIntent);
+        if (android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP)
+        {
+            log("Notification pre lollipop");
 
-        if(item.isGroup()){
+            NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context)
+                    .setSmallIcon(R.drawable.ic_stat_notify_download)
+                    .setContentTitle(title)
+                    .setContentIntent(pendingIntent);
 
-            long lastMsgSender = item.getLastMessageSender();
-            String nameAction = getParticipantShortName(lastMsgSender);
+            if(item.isGroup()){
 
-            if(nameAction.isEmpty()){
-                notificationBuilder.setContentText(item.getLastMessage());
+                long lastMsgSender = item.getLastMessageSender();
+                String nameAction = getParticipantShortName(lastMsgSender);
+
+                if(nameAction.isEmpty()){
+                    notificationBuilder.setContentText(item.getLastMessage());
+                }
+                else{
+                    String source = nameAction+": "+item.getLastMessage();
+                    notificationBuilder.setContentText(source);
+                }
             }
             else{
-                String source = "<b>"+nameAction+": </b>"+item.getLastMessage();
 
-                Spanned notificationContent = Html.fromHtml(source,0);
-                notificationBuilder.setContentText(notificationContent);
+                notificationBuilder.setContentText(item.getLastMessage());
             }
+
+            notificationBuilder.setSound(uriParameter);
+            if(vibration!=null){
+                if(vibration.equals("true")){
+                    notificationBuilder.setVibrate(new long[] {0, 1000});
+                }
+            }
+
+            return notificationBuilder.build();
         }
         else{
-            notificationBuilder.setContentText(item.getLastMessage());
-        }
 
-        //		NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
+            log("Notification POST lollipop");
 
-        //		StringBuilder[] events = {notificationContent, new StringBuilder("y trooo"), new StringBuilder("y moreee"), new StringBuilder("y yaaaa")};
-        // Sets a title for the Inbox in expanded layout
-        //		inboxStyle.setBigContentTitle("New messages:");
+            Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 
-        //		String[] events = {"y trooo", "y moreee", "y yaaaa"};
-        //// Moves events into the expanded layout
-        //		inboxStyle.addLine(notificationContent);
-        //		for (int i=0; i < events.length; i++) {
-        //			inboxStyle.addLine(events[i]);
-        //
-        //		}
-        // Moves the expanded layout object into the notification object.
-        //		notificationBuilder.setStyle(inboxStyle);
+            Spanned notificationContent;
 
-        Bitmap largeIcon = setUserAvatar(item, email);
-        if(largeIcon!=null){
-            log("There is avatar!");
-            notificationBuilder.setLargeIcon(largeIcon);
-        }
+            NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context)
+                    .setSmallIcon(R.drawable.ic_stat_notify_download)
+                    .setContentTitle(title)
+                    .setColor(ContextCompat.getColor(context,R.color.mega))
+                    .setAutoCancel(true)
+                    .setShowWhen(true)
+                    .setGroup(groupKey)
+                    .setSound(defaultSoundUri)
+                    .setContentIntent(pendingIntent);
 
-        notificationBuilder.setSound(uriParameter);
-        if(vibration!=null){
-            if(vibration.equals("true")){
-                notificationBuilder.setVibrate(new long[] {0, 1000});
+            if(item.isGroup()){
+
+                long lastMsgSender = item.getLastMessageSender();
+                String nameAction = getParticipantShortName(lastMsgSender);
+
+                if(nameAction.isEmpty()){
+                    notificationBuilder.setContentText(item.getLastMessage());
+                }
+                else{
+                    String source = "<b>"+nameAction+": </b>"+item.getLastMessage();
+
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                        notificationContent = Html.fromHtml(source,Html.FROM_HTML_MODE_LEGACY);
+                    } else {
+                        notificationContent = Html.fromHtml(source);
+                    }
+                    notificationBuilder.setContentText(notificationContent);
+                }
             }
-        }
+            else{
+                notificationBuilder.setContentText(item.getLastMessage());
+            }
 
-        return notificationBuilder.build();
+            //		NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
+
+            //		StringBuilder[] events = {notificationContent, new StringBuilder("y trooo"), new StringBuilder("y moreee"), new StringBuilder("y yaaaa")};
+            // Sets a title for the Inbox in expanded layout
+            //		inboxStyle.setBigContentTitle("New messages:");
+
+            //		String[] events = {"y trooo", "y moreee", "y yaaaa"};
+            //// Moves events into the expanded layout
+            //		inboxStyle.addLine(notificationContent);
+            //		for (int i=0; i < events.length; i++) {
+            //			inboxStyle.addLine(events[i]);
+            //
+            //		}
+            // Moves the expanded layout object into the notification object.
+            //		notificationBuilder.setStyle(inboxStyle);
+
+            Bitmap largeIcon = setUserAvatar(item, email);
+            if(largeIcon!=null){
+                log("There is avatar!");
+                notificationBuilder.setLargeIcon(largeIcon);
+            }
+
+            notificationBuilder.setSound(uriParameter);
+            if(vibration!=null){
+                if(vibration.equals("true")){
+                    notificationBuilder.setVibrate(new long[] {0, 1000});
+                }
+            }
+
+            return notificationBuilder.build();
+        }
     }
 
     public String getParticipantShortName(long userHandle){
