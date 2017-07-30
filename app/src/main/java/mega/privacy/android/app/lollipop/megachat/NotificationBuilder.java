@@ -132,6 +132,7 @@ public final class NotificationBuilder {
             NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context)
                     .setSmallIcon(R.drawable.ic_stat_notify_download)
                     .setContentTitle(title)
+                    .setAutoCancel(true)
                     .setContentIntent(pendingIntent);
 
             if(item.isGroup()){
