@@ -131,6 +131,8 @@ public final class NotificationBuilder {
                     .setGroup(groupKey)
                     .setSound(defaultSoundUri);
 
+            Spanned firstLine = null;
+
             for(int i =0; i<unreadChats.size();i++){
 
                 MegaChatListItem itemToAdd = unreadChats.get(i);
@@ -154,6 +156,10 @@ public final class NotificationBuilder {
                 }
 
                 inboxStyle.addLine(notificationContent);
+
+                if(i==0){
+                    firstLine = notificationContent;
+                }
             }
 
             notificationBuilder.setSound(uriParameter);
@@ -164,6 +170,11 @@ public final class NotificationBuilder {
             }
             String textToShow = String.format(context.getString(R.string.number_messages_chat_notification), unreadChats.size());
             inboxStyle.setBigContentTitle(textToShow);
+
+            if(Build.VERSION.SDK_INT < Build.VERSION_CODES.M){
+                notificationBuilder.setContentTitle(textToShow);
+                notificationBuilder.setContentText(firstLine);
+            }
 
             //Moves the expanded layout object into the notification object.
             notificationBuilder.setStyle(inboxStyle);
