@@ -6612,42 +6612,42 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
         		final CheckedTextView ascendingCheck = (CheckedTextView) dialoglayout.findViewById(R.id.sortby_dialog_ascending_check);
         		ascendingCheck.setText(getString(R.string.sortby_name_ascending));
         		ascendingCheck.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16*scaleText));
-        		ascendingCheck.setCompoundDrawablePadding(Util.scaleWidthPx(10, outMetrics));
+        		ascendingCheck.setCompoundDrawablePadding(Util.scaleWidthPx(34, outMetrics));
         		ViewGroup.MarginLayoutParams ascendingMLP = (ViewGroup.MarginLayoutParams) ascendingCheck.getLayoutParams();
         		ascendingMLP.setMargins(Util.scaleWidthPx(15, outMetrics), Util.scaleHeightPx(10, outMetrics), 0, Util.scaleHeightPx(10, outMetrics));
 
         		final CheckedTextView descendingCheck = (CheckedTextView) dialoglayout.findViewById(R.id.sortby_dialog_descending_check);
         		descendingCheck.setText(getString(R.string.sortby_name_descending));
         		descendingCheck.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16*scaleText));
-        		descendingCheck.setCompoundDrawablePadding(Util.scaleWidthPx(10, outMetrics));
+        		descendingCheck.setCompoundDrawablePadding(Util.scaleWidthPx(34, outMetrics));
         		ViewGroup.MarginLayoutParams descendingMLP = (ViewGroup.MarginLayoutParams) descendingCheck.getLayoutParams();
         		descendingMLP.setMargins(Util.scaleWidthPx(15, outMetrics), Util.scaleHeightPx(10, outMetrics), 0, Util.scaleHeightPx(10, outMetrics));
 
         		final CheckedTextView newestCheck = (CheckedTextView) dialoglayout.findViewById(R.id.sortby_dialog_newest_check);
         		newestCheck.setText(getString(R.string.sortby_date_newest));
         		newestCheck.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16*scaleText));
-        		newestCheck.setCompoundDrawablePadding(Util.scaleWidthPx(10, outMetrics));
+        		newestCheck.setCompoundDrawablePadding(Util.scaleWidthPx(34, outMetrics));
         		ViewGroup.MarginLayoutParams newestMLP = (ViewGroup.MarginLayoutParams) newestCheck.getLayoutParams();
         		newestMLP.setMargins(Util.scaleWidthPx(15, outMetrics), Util.scaleHeightPx(10, outMetrics), 0, Util.scaleHeightPx(10, outMetrics));
 
         		final CheckedTextView oldestCheck = (CheckedTextView) dialoglayout.findViewById(R.id.sortby_dialog_oldest_check);
         		oldestCheck.setText(getString(R.string.sortby_date_oldest));
         		oldestCheck.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16*scaleText));
-        		oldestCheck.setCompoundDrawablePadding(Util.scaleWidthPx(10, outMetrics));
+        		oldestCheck.setCompoundDrawablePadding(Util.scaleWidthPx(34, outMetrics));
         		ViewGroup.MarginLayoutParams oldestMLP = (ViewGroup.MarginLayoutParams) oldestCheck.getLayoutParams();
         		oldestMLP.setMargins(Util.scaleWidthPx(15, outMetrics), Util.scaleHeightPx(10, outMetrics), 0, Util.scaleHeightPx(10, outMetrics));
 
         		final CheckedTextView largestCheck = (CheckedTextView) dialoglayout.findViewById(R.id.sortby_dialog_largest_first_check);
         		largestCheck.setText(getString(R.string.sortby_size_largest_first));
         		largestCheck.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16*scaleText));
-        		largestCheck.setCompoundDrawablePadding(Util.scaleWidthPx(10, outMetrics));
+        		largestCheck.setCompoundDrawablePadding(Util.scaleWidthPx(34, outMetrics));
         		ViewGroup.MarginLayoutParams largestMLP = (ViewGroup.MarginLayoutParams) largestCheck.getLayoutParams();
         		largestMLP.setMargins(Util.scaleWidthPx(15, outMetrics), Util.scaleHeightPx(10, outMetrics), 0, Util.scaleHeightPx(10, outMetrics));
 
         		final CheckedTextView smallestCheck = (CheckedTextView) dialoglayout.findViewById(R.id.sortby_dialog_smallest_first_check);
         		smallestCheck.setText(getString(R.string.sortby_size_smallest_first));
         		smallestCheck.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16*scaleText));
-        		smallestCheck.setCompoundDrawablePadding(Util.scaleWidthPx(10, outMetrics));
+        		smallestCheck.setCompoundDrawablePadding(Util.scaleWidthPx(34, outMetrics));
         		ViewGroup.MarginLayoutParams smallestMLP = (ViewGroup.MarginLayoutParams) smallestCheck.getLayoutParams();
         		smallestMLP.setMargins(Util.scaleWidthPx(15, outMetrics), Util.scaleHeightPx(10, outMetrics), 0, Util.scaleHeightPx(10, outMetrics));
 
