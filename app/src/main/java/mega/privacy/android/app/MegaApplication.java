@@ -550,7 +550,12 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 						}
 
 						String source = "<b>"+n.getName()+"</b> "+getString(R.string.incoming_folder_notification)+" "+name;
-						Spanned notificationContent = Html.fromHtml(source,0);
+						Spanned notificationContent;
+						if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+							notificationContent = Html.fromHtml(source,Html.FROM_HTML_MODE_LEGACY);
+						} else {
+							notificationContent = Html.fromHtml(source);
+						}
 
 						int notificationId = Constants.NOTIFICATION_PUSH_CLOUD_DRIVE;
 
@@ -777,7 +782,7 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 
 		if (item.hasChanged(MegaChatListItem.CHANGE_TYPE_LAST_TS) && (item.getUnreadCount() != 0)){
 
-			try {
+//			try {
 				if(isFireBaseConnection){
 					log("Show notification ALWAYS");
 					showNotification(item);
@@ -809,10 +814,10 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 						}
 					}
 				}
-			}
-			catch (Exception e){
-				log("Exception when trying to show chat notification");
-			}
+//			}
+//			catch (Exception e){
+//				log("Exception when trying to show chat notification");
+//			}
 
 		}
 	}
