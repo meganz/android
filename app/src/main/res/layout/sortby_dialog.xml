@@ -28,7 +28,9 @@
 		    android:gravity="center_vertical"
 		    android:textAppearance="?android:attr/textAppearanceMedium"
 			android:fontFamily="sans-serif"
-			android:textColor="#de000000"/>
+			android:textColor="#de000000"
+			android:drawablePadding="34dp"
+			android:paddingLeft="0dp"/>
 	    
 	    <CheckedTextView
 		    android:id="@+id/sortby_dialog_descending_check"
@@ -39,7 +41,9 @@
 		    android:gravity="center_vertical"
 		    android:textAppearance="?android:attr/textAppearanceMedium"
 			android:fontFamily="sans-serif"
-			android:textColor="#de000000"/>
+			android:textColor="#de000000"
+			android:drawablePadding="34dp"
+			android:paddingLeft="0dp"/>
 	    
 	    
 	    <TextView 
