@@ -80,28 +80,147 @@ public final class NotificationBuilder {
     }
 
     public void sendBundledNotification(Uri uriParameter, MegaChatListItem item, String vibration, String email) {
-        Notification notification = buildNotification(uriParameter, item, vibration, GROUP_KEY, email);
-        log("Notification id: "+getNotificationIdByHandle(item.getChatId()));
-        notificationManager.notify(getNotificationIdByHandle(item.getChatId()), notification);
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            log("more than Build.VERSION_CODES.N");
+            Notification notification = buildNotification(uriParameter, item, vibration, GROUP_KEY, email);
+            log("Notification id: "+getNotificationIdByHandle(item.getChatId()));
+            notificationManager.notify(getNotificationIdByHandle(item.getChatId()), notification);
             Notification summary = buildSummary(GROUP_KEY);
             notificationManager.notify(SUMMARY_ID, summary);
         }
-
-        ArrayList<MegaChatListItem> unreadChats = megaChatApi.getUnreadChatListItems();
-        log("Size od unread: "+unreadChats.size());
-        for(int i=0;i<unreadChats.size();i++){
-            log("UNREAD chat: "+unreadChats.get(i).getTitle());
+        else if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN){
+            log("more than Build.VERSION_CODES.JELLY_BEAN");
+            Notification notification = buildNotificationPreN(uriParameter, item, vibration, GROUP_KEY, email);
+            log("Notification id: "+getNotificationIdByHandle(item.getChatId()));
+            if(notification!=null){
+                notificationManager.notify(getNotificationIdByHandle(item.getChatId()), notification);
+            }
         }
-
+        else{
+            log("Android 4 - no bundled - no inbox style");
+            Notification notification = buildNotification(uriParameter, item, vibration, GROUP_KEY, email);
+            log("Notification id: "+getNotificationIdByHandle(item.getChatId()));
+            notificationManager.notify(getNotificationIdByHandle(item.getChatId()), notification);
+        }
     }
 
-    public void buildNotificationPreN(Uri uriParameter, MegaChatListItem item, String vibration, String groupKey, String email){
+    public Notification buildNotificationPreN(Uri uriParameter, MegaChatListItem item, String vibration, String groupKey, String email){
+        log("buildNotificationPreN");
 
 
+
+        ArrayList<MegaChatListItem> unreadChats = megaChatApi.getUnreadChatListItems();
+        log("Size of unread: "+unreadChats.size());
+        if(unreadChats.size()>1){
+            Intent intent = new Intent(context, ManagerActivityLollipop.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            intent.setAction(Constants.ACTION_CHAT_SUMMARY);
+            intent.putExtra("CHAT_ID", -1);
+            PendingIntent pendingIntent = PendingIntent.getActivity(context, (int)item.getChatId() , intent, PendingIntent.FLAG_ONE_SHOT);
+
+            NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context)
+                    .setSmallIcon(R.drawable.ic_stat_notify_download)
+                    .setContentIntent(pendingIntent)
+                    .setAutoCancel(true);
+
+            NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
+
+            if (android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP)
+            {
+                log("Notification pre lollipop but more than 4.0");
+
+                for(int i =0; i<unreadChats.size();i++){
+
+                    long lastMsgSender = item.getLastMessageSender();
+                    String nameAction = getParticipantShortName(lastMsgSender);
+
+                    String lineToShow;
+                    if(nameAction.isEmpty()){
+                        lineToShow = item.getTitle()+": "+item.getLastMessage();
+                    }
+                    else{
+                        lineToShow = item.getTitle()+": "+nameAction+": "+item.getLastMessage();
+                    }
+                    inboxStyle.addLine(lineToShow);
+                }
+
+                notificationBuilder.setSound(uriParameter);
+                if(vibration!=null){
+                    if(vibration.equals("true")){
+                        notificationBuilder.setVibrate(new long[] {0, 1000});
+                    }
+
+                }
+                String textToShow = String.format(context.getString(R.string.number_messages_chat_notification), unreadChats.size());
+                inboxStyle.setBigContentTitle(textToShow);
+
+                //Moves the expanded layout object into the notification object.
+                notificationBuilder.setStyle(inboxStyle);
+
+                return notificationBuilder.build();
+            }
+            else{
+
+                log("Notification POST lollipop");
+
+                Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+
+                notificationBuilder.setColor(ContextCompat.getColor(context,R.color.mega))
+                        .setShowWhen(true)
+                        .setGroup(groupKey)
+                        .setSound(defaultSoundUri);
+
+                for(int i =0; i<unreadChats.size();i++){
+
+                    MegaChatListItem itemToAdd = unreadChats.get(i);
+
+                    long lastMsgSender = itemToAdd.getLastMessageSender();
+                    String nameAction = getParticipantShortName(lastMsgSender);
+
+                    String lineToShow;
+                    if(nameAction.isEmpty()){
+                        lineToShow = "<b>"+itemToAdd.getTitle()+": </b>"+itemToAdd.getLastMessage();
+                    }
+                    else{
+                        lineToShow = "<b>"+itemToAdd.getTitle()+": </b>"+nameAction+": "+itemToAdd.getLastMessage();
+                    }
+
+                    Spanned notificationContent;
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                        notificationContent = Html.fromHtml(lineToShow,Html.FROM_HTML_MODE_LEGACY);
+                    } else {
+                        notificationContent = Html.fromHtml(lineToShow);
+                    }
+
+                    inboxStyle.addLine(notificationContent);
+                }
+
+                notificationBuilder.setSound(uriParameter);
+                if(vibration!=null){
+                    if(vibration.equals("true")){
+                        notificationBuilder.setVibrate(new long[] {0, 1000});
+                    }
+                }
+                String textToShow = String.format(context.getString(R.string.number_messages_chat_notification), unreadChats.size());
+                inboxStyle.setBigContentTitle(textToShow);
+
+                //Moves the expanded layout object into the notification object.
+                notificationBuilder.setStyle(inboxStyle);
+
+                return notificationBuilder.build();
+            }
+        }
+        else if (unreadChats.size()==1){
+            return buildNotification(uriParameter, item, vibration, GROUP_KEY, email);
+        }
+        else{
+            return null;
+        }
     }
 
     public Notification buildNotification(Uri uriParameter, MegaChatListItem item, String vibration, String groupKey, String email) {
+        log("buildNotification");
         Intent intent = new Intent(context, ManagerActivityLollipop.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         intent.setAction(Constants.ACTION_CHAT_NOTIFICATION_MESSAGE);
