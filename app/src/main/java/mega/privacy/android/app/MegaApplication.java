@@ -782,7 +782,7 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 
 		if (item.hasChanged(MegaChatListItem.CHANGE_TYPE_LAST_TS) && (item.getUnreadCount() != 0)){
 
-//			try {
+			try {
 				if(isFireBaseConnection){
 					log("Show notification ALWAYS");
 					showNotification(item);
@@ -814,10 +814,10 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 						}
 					}
 				}
-//			}
-//			catch (Exception e){
-//				log("Exception when trying to show chat notification");
-//			}
+			}
+			catch (Exception e){
+				log("Exception when trying to show chat notification");
+			}
 
 		}
 	}
