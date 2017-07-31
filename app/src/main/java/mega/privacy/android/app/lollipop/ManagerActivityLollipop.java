@@ -12727,12 +12727,20 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 							}
 						}
 					}
+
+					if(cFLol!=null){
+						if(cFLol.isAdded()){
+							updateContactsView(true, false, false);
+						}
+					}
 				}
 				else{
 					log("Continue...");
 					continue;
 				}
 			}
+
+
 		}
 	}
 

@@ -292,7 +292,7 @@
             android:layout_marginLeft="72dp"
             android:background="@color/separator_grey" />
 
-        <!-- REMOVE CONTACT -->
+        <!-- REMOVE CONTACT LAYOUT -->
 
         <RelativeLayout
             android:id="@+id/chat_contact_properties_remove_contact_layout"

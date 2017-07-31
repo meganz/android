@@ -68,6 +68,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
+import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
@@ -91,10 +92,13 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 
+import static mega.privacy.android.app.utils.Util.context;
+
 
 @SuppressLint("NewApi")
 public class ContactInfoActivityLollipop extends PinActivityLollipop implements MegaChatRequestListenerInterface, OnClickListener, MegaRequestListenerInterface, OnCheckedChangeListener, OnItemClickListener {
 
+	ContactController cC;
 
 	public static int MAX_WIDTH_FILENAME_LAND=470;
 	public static int MAX_WIDTH_FILENAME_PORT=190;
@@ -144,6 +148,8 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 	//View dividerShareContactLayout;
 
 	RelativeLayout clearChatLayout;
+	RelativeLayout removeContactChatLayout;
+
 
 	Toolbar toolbar;
 	ActionBar aB;
@@ -199,6 +205,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 		}
 
 		handler = new Handler();
+		cC = new ContactController(this);
 
 		display = getWindowManager().getDefaultDisplay();
 		outMetrics = new DisplayMetrics();
@@ -427,6 +434,10 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			//Clear chat Layout
 			clearChatLayout = (RelativeLayout) findViewById(R.id.chat_contact_properties_clear_layout);
 			clearChatLayout.setOnClickListener(this);
+
+			//Remove contact Layout
+			removeContactChatLayout = (RelativeLayout) findViewById(R.id.chat_contact_properties_remove_contact_layout);
+			removeContactChatLayout.setOnClickListener(this);
 
 			 if(Util.isChatEnabled()){
 				 contactStateIcon.setVisibility(View.VISIBLE);
@@ -939,6 +950,16 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 
 				break;
 			}
+			case R.id.chat_contact_properties_remove_contact_layout: {
+				log("Remove contact chat option");
+
+				if(user!=null){
+					showConfirmationRemoveContact(user);
+				}
+				break;
+
+
+			}
 			/*case R.id.chat_contact_properties_share_contact_layout: {
 				log("Share contact option");
 				showSnackbar("Coming soon...");
@@ -1162,6 +1183,32 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 				imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT);
 			}
 		}, 50);
+	}
+
+	public void showConfirmationRemoveContact(final MegaUser c){
+		log("showConfirmationRemoveContact");
+		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				switch (which){
+					case DialogInterface.BUTTON_POSITIVE:
+						cC.removeContact(c);
+						break;
+
+					case DialogInterface.BUTTON_NEGATIVE:
+						//No button clicked
+						break;
+				}
+			}
+		};
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(contactInfoActivityLollipop, R.style.AppCompatAlertDialogStyle);
+		String title = getResources().getQuantityString(R.plurals.title_confirmation_remove_contact, 1);
+		builder.setTitle(title);
+		String message= getResources().getQuantityString(R.plurals.confirmation_remove_contact, 1);
+		builder.setMessage(message).setPositiveButton(R.string.general_remove, dialogClickListener)
+				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
+
 	}
 
 	@Override
