@@ -1185,9 +1185,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         String emailError = getEmailError();
         String passwordError = getPasswordError();
 
-//        et_user.setError(emailError);
         setError(et_user, emailError);
-//        et_password.setError(passwordError);
         setError(et_password, passwordError);
 
         if (emailError != null) {
