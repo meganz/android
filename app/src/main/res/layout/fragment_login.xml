@@ -64,6 +64,7 @@
                     android:textColor="#FFFF333A"
                     android:layout_toLeftOf="@id/login_email_text_error_icon"
                     android:layout_alignParentLeft="true"
+                    android:layout_alignParentTop="true"
                     />
 
             </RelativeLayout>
@@ -101,7 +102,7 @@
                     android:textColor="#FFFF333A"
                     android:layout_toLeftOf="@id/login_password_text_error_icon"
                     android:layout_alignParentLeft="true"
-                    android:layout_centerVertical="true"
+                    android:layout_alignParentTop="true"
                     />
 
             </RelativeLayout>
