@@ -54,14 +54,14 @@
                     android:id="@+id/login_email_text_error_icon"
                     android:layout_alignParentRight="true"
                     android:src="@drawable/ic_input_warning"
-                    android:tint="#FFFF333A"
+                    android:tint="@color/login_warning"
                     />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:id="@+id/login_email_text_error_text"
-                    android:textColor="#FFFF333A"
+                    android:textColor="@color/login_warning"
                     android:layout_toLeftOf="@id/login_email_text_error_icon"
                     android:layout_alignParentLeft="true"
                     android:layout_alignParentTop="true"
@@ -92,14 +92,14 @@
                     android:id="@+id/login_password_text_error_icon"
                     android:layout_alignParentRight="true"
                     android:src="@drawable/ic_input_warning"
-                    android:tint="#FFFF333A"
+                    android:tint="@color/login_warning"
                     />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:id="@+id/login_password_text_error_text"
-                    android:textColor="#FFFF333A"
+                    android:textColor="@color/login_warning"
                     android:layout_toLeftOf="@id/login_password_text_error_icon"
                     android:layout_alignParentLeft="true"
                     android:layout_alignParentTop="true"

@@ -45,7 +45,37 @@
                 android:textSize="16sp"
                 android:imeOptions="actionNext"
                 android:inputType="text" />
-            
+
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/create_account_name_error"
+                android:layout_marginLeft="32dp"
+                android:layout_marginRight="32dp"
+                android:layout_marginBottom="10dp">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:id="@+id/create_account_name_error_icon"
+                    android:layout_alignParentRight="true"
+                    android:src="@drawable/ic_input_warning"
+                    android:tint="@color/login_warning"
+                    />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/create_account_name_error_text"
+                    android:textColor="@color/login_warning"
+                    android:layout_toLeftOf="@id/create_account_name_error_icon"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentTop="true"
+                    android:paddingLeft="3dp"
+                    />
+
+            </RelativeLayout>
+
              <EditText
                 android:id="@+id/create_account_last_name_text"
                 android:layout_width="fill_parent"
@@ -72,6 +102,36 @@
                 android:imeOptions="actionNext"
                 android:inputType="textEmailAddress" />
 
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/create_account_email_error"
+                android:layout_marginLeft="32dp"
+                android:layout_marginRight="32dp"
+                android:layout_marginBottom="10dp">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:id="@+id/create_account_email_error_icon"
+                    android:layout_alignParentRight="true"
+                    android:src="@drawable/ic_input_warning"
+                    android:tint="@color/login_warning"
+                    />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/create_account_email_error_text"
+                    android:textColor="@color/login_warning"
+                    android:layout_toLeftOf="@id/create_account_email_error_icon"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentTop="true"
+                    android:paddingLeft="3dp"
+                    />
+
+            </RelativeLayout>
+
             <EditText
                 android:id="@+id/create_account_password_text"
                 android:layout_width="fill_parent"
@@ -86,6 +146,36 @@
                 android:fontFamily="sans-serif"
                 android:inputType="textPassword" />
 
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/create_account_password_error"
+                android:layout_marginLeft="32dp"
+                android:layout_marginRight="32dp"
+                android:layout_marginBottom="10dp">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:id="@+id/create_account_password_error_icon"
+                    android:layout_alignParentRight="true"
+                    android:src="@drawable/ic_input_warning"
+                    android:tint="@color/login_warning"
+                    />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/create_account_password_error_text"
+                    android:textColor="@color/login_warning"
+                    android:layout_toLeftOf="@id/create_account_password_error_icon"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentTop="true"
+                    android:paddingLeft="3dp"
+                    />
+
+            </RelativeLayout>
+
             <EditText
                 android:id="@+id/create_account_password_text_confirm"
                 android:layout_width="fill_parent"
@@ -99,6 +189,36 @@
                 android:textSize="16sp"
                 android:fontFamily="sans-serif"
                 android:inputType="textPassword" />
+
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/create_account_password_confirm_error"
+                android:layout_marginLeft="32dp"
+                android:layout_marginRight="32dp"
+                android:layout_marginBottom="10dp">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:id="@+id/create_account_password_confirm_error_icon"
+                    android:layout_alignParentRight="true"
+                    android:src="@drawable/ic_input_warning"
+                    android:tint="@color/login_warning"
+                    />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/create_account_password_confirm_error_text"
+                    android:textColor="@color/login_warning"
+                    android:layout_toLeftOf="@id/create_account_password_confirm_error_icon"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentTop="true"
+                    android:paddingLeft="3dp"
+                    />
+
+            </RelativeLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"

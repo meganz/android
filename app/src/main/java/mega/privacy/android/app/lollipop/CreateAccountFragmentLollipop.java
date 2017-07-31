@@ -4,10 +4,13 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.graphics.PorterDuff;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.LayoutInflater;
@@ -19,6 +22,7 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
@@ -38,30 +42,39 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 
 public class CreateAccountFragmentLollipop extends Fragment implements View.OnClickListener, MegaRequestListenerInterface {
 
-    Context context;
+    private Context context;
 
-    Button bRegister;
-    Button bLogin;
-    TextView createAccountTitle;
-    TextView textAlreadyAccount;
-    EditText userName;
-    EditText userLastName;
-    EditText userEmail;
-    EditText userPassword;
-    EditText userPasswordConfirm;
-    ScrollView scrollView;
+    private Button bRegister;
+    private Button bLogin;
+    private TextView createAccountTitle;
+    private TextView textAlreadyAccount;
+    private EditText userName;
+    private EditText userLastName;
+    private EditText userEmail;
+    private EditText userPassword;
+    private EditText userPasswordConfirm;
+    private ScrollView scrollView;
 
-    CheckBox chkTOS;
-    TextView tos;
+    private CheckBox chkTOS;
+    private TextView tos;
 
-    MegaApiAndroid megaApi;
+    private MegaApiAndroid megaApi;
 
-    LinearLayout createAccountLayout;
-    LinearLayout creatingAccountLayout;
-    LinearLayout createAccountLoginLayout;
+    private LinearLayout createAccountLayout;
+    private LinearLayout creatingAccountLayout;
+    private LinearLayout createAccountLoginLayout;
 
-    TextView creatingAccountTextView;
-    ProgressBar createAccountProgressBar;
+    private TextView creatingAccountTextView;
+    private ProgressBar createAccountProgressBar;
+
+    private RelativeLayout email_error_layout;
+    private RelativeLayout password_confirm_error_layout;
+    private RelativeLayout name_error_layout;
+    private RelativeLayout password_error_layout;
+    private TextView email_error_text;
+    private TextView password_confirm_error_text;
+    private TextView name_error_text;
+    private TextView password_error_text;
 
 
      /*
@@ -116,6 +129,88 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
         userEmail = (EditText) v.findViewById(R.id.create_account_email_text);
         userPassword = (EditText) v.findViewById(R.id.create_account_password_text);
         userPasswordConfirm = (EditText) v.findViewById(R.id.create_account_password_text_confirm);
+
+        userName.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                quitError(userName);
+            }
+        });
+
+        userEmail.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                quitError(userEmail);
+            }
+        });
+
+        userPassword.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                quitError(userPassword);
+            }
+        });
+
+        userPasswordConfirm.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                quitError(userPasswordConfirm);
+            }
+        });
+
+
+        email_error_layout = (RelativeLayout) v.findViewById(R.id.create_account_email_error);
+        email_error_layout.setVisibility(View.GONE);
+        email_error_text = (TextView) v.findViewById(R.id.create_account_email_error_text);
+        password_confirm_error_layout = (RelativeLayout) v.findViewById(R.id.create_account_password_confirm_error);
+        password_confirm_error_layout.setVisibility(View.GONE);
+        password_confirm_error_text = (TextView) v.findViewById(R.id.create_account_password_confirm_error_text);
+        name_error_layout = (RelativeLayout) v.findViewById(R.id.create_account_name_error);
+        name_error_layout.setVisibility(View.GONE);
+        name_error_text = (TextView) v.findViewById(R.id.create_account_name_error_text);
+        password_error_layout = (RelativeLayout) v.findViewById(R.id.create_account_password_error);
+        password_error_layout.setVisibility(View.GONE);
+        password_error_text = (TextView) v.findViewById(R.id.create_account_password_error_text);
 
         TextView tos = (TextView)v.findViewById(R.id.tos);
         tos.setTextColor(getResources().getColor(R.color.mega));
@@ -231,10 +326,10 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
         String passwordConfirmError = getPasswordConfirmError();
 
         // Set or remove errors
-        userName.setError(usernameError);
-        userEmail.setError(emailError);
-        userPassword.setError(passwordError);
-        userPasswordConfirm.setError(passwordConfirmError);
+        setError(userName, usernameError);
+        setError(userEmail, emailError);
+        setError(userPassword, passwordError);
+        setError(userPasswordConfirm, passwordConfirmError);
 
         // Return false on any error or true on success
         if (usernameError != null) {
@@ -395,6 +490,101 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
 
         if (megaApi == null){
             megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
+        }
+    }
+
+    private void setError(final EditText editText, String error){
+        if(error == null || error.equals("")){
+            return;
+        }
+        Display  display = ((Activity)context).getWindowManager().getDefaultDisplay();
+        DisplayMetrics outMetrics = new DisplayMetrics ();
+        display.getMetrics(outMetrics);
+        switch (editText.getId()){
+            case R.id.create_account_email_text:{
+                email_error_layout.setVisibility(View.VISIBLE);
+                email_error_text.setText(error);
+                userEmail.getBackground().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_IN);
+                LinearLayout.LayoutParams textParamsEditText = (LinearLayout.LayoutParams) userEmail.getLayoutParams();
+                textParamsEditText.setMargins(Util.scaleWidthPx(32, outMetrics), 0, Util.scaleWidthPx(32, outMetrics), Util.scaleWidthPx(3, outMetrics));
+                userEmail.setLayoutParams(textParamsEditText);
+            }
+            break;
+            case R.id.create_account_password_text_confirm:{
+                password_confirm_error_layout.setVisibility(View.VISIBLE);
+                password_confirm_error_text.setText(error);
+                userPasswordConfirm.getBackground().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_IN);
+                LinearLayout.LayoutParams textParamsEditText = (LinearLayout.LayoutParams) userPasswordConfirm.getLayoutParams();
+                textParamsEditText.setMargins(Util.scaleWidthPx(32, outMetrics), 0, Util.scaleWidthPx(32, outMetrics), Util.scaleWidthPx(3, outMetrics));
+                userPasswordConfirm.setLayoutParams(textParamsEditText);
+            }
+            break;
+            case R.id.create_account_name_text:{
+                name_error_layout.setVisibility(View.VISIBLE);
+                name_error_text.setText(error);
+                userName.getBackground().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_IN);
+                LinearLayout.LayoutParams textParamsEditText = (LinearLayout.LayoutParams) userName.getLayoutParams();
+                textParamsEditText.setMargins(Util.scaleWidthPx(32, outMetrics), 0, Util.scaleWidthPx(32, outMetrics), Util.scaleWidthPx(3, outMetrics));
+                userName.setLayoutParams(textParamsEditText);
+            }
+            break;
+            case R.id.create_account_password_text:{
+                password_error_layout.setVisibility(View.VISIBLE);
+                password_error_text.setText(error);
+                userPassword.getBackground().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_IN);
+                LinearLayout.LayoutParams textParamsEditText = (LinearLayout.LayoutParams) userPassword.getLayoutParams();
+                textParamsEditText.setMargins(Util.scaleWidthPx(32, outMetrics), 0, Util.scaleWidthPx(32, outMetrics), Util.scaleWidthPx(3, outMetrics));
+                userPassword.setLayoutParams(textParamsEditText);
+            }
+            break;
+        }
+    }
+
+    private void quitError(EditText editText){
+        Display  display = ((Activity)context).getWindowManager().getDefaultDisplay();
+        DisplayMetrics outMetrics = new DisplayMetrics ();
+        display.getMetrics(outMetrics);
+        switch (editText.getId()){
+            case R.id.create_account_email_text:{
+                if(email_error_layout.getVisibility() != View.GONE){
+                    email_error_layout.setVisibility(View.GONE);
+                    userEmail.getBackground().clearColorFilter();
+                    LinearLayout.LayoutParams textParamsEditText = (LinearLayout.LayoutParams)userEmail.getLayoutParams();
+                    textParamsEditText.setMargins(Util.scaleWidthPx(32, outMetrics), 0, Util.scaleWidthPx(32, outMetrics), Util.scaleWidthPx(10, outMetrics));
+                    userEmail.setLayoutParams(textParamsEditText);
+                }
+            }
+            break;
+            case R.id.create_account_password_text_confirm:{
+                if(password_confirm_error_layout.getVisibility() != View.GONE){
+                    password_confirm_error_layout.setVisibility(View.GONE);
+                    userPasswordConfirm.getBackground().clearColorFilter();
+                    LinearLayout.LayoutParams textParamsEditText = (LinearLayout.LayoutParams) userPasswordConfirm.getLayoutParams();
+                    textParamsEditText.setMargins(Util.scaleWidthPx(32, outMetrics), 0, Util.scaleWidthPx(32, outMetrics), Util.scaleWidthPx(10, outMetrics));
+                    userPasswordConfirm.setLayoutParams(textParamsEditText);
+                }
+            }
+            break;
+            case R.id.create_account_name_text:{
+                if(name_error_layout.getVisibility() != View.GONE){
+                    name_error_layout.setVisibility(View.GONE);
+                    userName.getBackground().clearColorFilter();
+                    LinearLayout.LayoutParams textParamsEditText = (LinearLayout.LayoutParams)userName.getLayoutParams();
+                    textParamsEditText.setMargins(Util.scaleWidthPx(32, outMetrics), 0, Util.scaleWidthPx(32, outMetrics), Util.scaleWidthPx(10, outMetrics));
+                    userName.setLayoutParams(textParamsEditText);
+                }
+            }
+            break;
+            case R.id.create_account_password_text:{
+                if(password_error_layout.getVisibility() != View.GONE){
+                    password_error_layout.setVisibility(View.GONE);
+                    userPassword.getBackground().clearColorFilter();
+                    LinearLayout.LayoutParams textParamsEditText = (LinearLayout.LayoutParams) userPassword.getLayoutParams();
+                    textParamsEditText.setMargins(Util.scaleWidthPx(32, outMetrics), 0, Util.scaleWidthPx(32, outMetrics), Util.scaleWidthPx(10, outMetrics));
+                    userPassword.setLayoutParams(textParamsEditText);
+                }
+            }
+            break;
         }
     }
 
