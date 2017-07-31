@@ -297,7 +297,6 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 			if(from==FROM_INCOMING_SHARES){
 				firstIncomingLevel = extras.getBoolean("firstLevel");
 			}
-//			String name = extras.getString("name");
 			accountType = extras.getInt("typeAccount", MegaAccountDetails.ACCOUNT_TYPE_FREE);
 			handle = extras.getLong("handle", -1);
 			log("Handle of the selected node: "+handle);
@@ -513,6 +512,9 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 				removeLinkMenuItem.setVisible(true);
 				menu.findItem(R.id.cab_menu_file_info_remove_link).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
+
+
+
 			}
 			else{
 				getLinkMenuItem.setVisible(true);
@@ -526,6 +528,8 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 			if(from==FROM_INCOMING_SHARES){
 
 				downloadMenuItem.setVisible(true);
+				menu.findItem(R.id.cab_menu_file_info_download).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+
 				shareMenuItem.setVisible(false);
 				menu.findItem(R.id.cab_menu_file_info_share_folder).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
 
@@ -533,9 +537,13 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
 				if(firstIncomingLevel){
 					leaveMenuItem.setVisible(true);
+					menu.findItem(R.id.cab_menu_file_info_leave).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+
 				}
 				else{
 					leaveMenuItem.setVisible(false);
+					menu.findItem(R.id.cab_menu_file_info_leave).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+
 				}
 
 		    	int accessLevel= megaApi.getAccess(node);
@@ -554,6 +562,8 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 						renameMenuItem.setVisible(true);
 						moveMenuItem.setVisible(false);
 						copyMenuItem.setVisible(true);
+						menu.findItem(R.id.cab_menu_file_info_copy).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+
 
 						getLinkMenuItem.setVisible(false);
 						menu.findItem(R.id.cab_menu_file_info_get_link).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
@@ -568,6 +578,8 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 						renameMenuItem.setVisible(false);
 						moveMenuItem.setVisible(false);
 						copyMenuItem.setVisible(true);
+						menu.findItem(R.id.cab_menu_file_info_copy).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+
 						rubbishMenuItem.setVisible(false);
 
 						getLinkMenuItem.setVisible(false);
@@ -584,6 +596,8 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 						renameMenuItem.setVisible(false);
 						moveMenuItem.setVisible(false);
 						copyMenuItem.setVisible(true);
+						menu.findItem(R.id.cab_menu_file_info_copy).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+
 						rubbishMenuItem.setVisible(false);
 
 						getLinkMenuItem.setVisible(false);
@@ -599,6 +613,8 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 		    }
 			else{
 				downloadMenuItem.setVisible(true);
+				menu.findItem(R.id.cab_menu_file_info_download).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+
 				if (node.isFolder()){
 					shareMenuItem.setVisible(true);
 					menu.findItem(R.id.cab_menu_file_info_share_folder).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
@@ -615,6 +631,8 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 				rubbishMenuItem.setVisible(true);
 				deleteMenuItem.setVisible(false);
 				leaveMenuItem.setVisible(false);
+				menu.findItem(R.id.cab_menu_file_info_leave).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+
 
 				renameMenuItem.setVisible(true);
 				moveMenuItem.setVisible(true);
@@ -1068,6 +1086,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 							case MegaShare.ACCESS_OWNER:
 							case MegaShare.ACCESS_FULL:{
 								permissionInfo.setText(getResources().getString(R.string.file_properties_shared_folder_full_access).toUpperCase(Locale.getDefault()));
+
 								//permissionsIcon.setImageResource(R.drawable.ic_shared_fullaccess);
 								break;
 							}
@@ -2458,6 +2477,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 							}
 							case MegaShare.ACCESS_READ:{
 								permissionInfo.setText(getResources().getString(R.string.file_properties_shared_folder_read_only));
+
 								break;
 							}
 							case MegaShare.ACCESS_READWRITE:{
