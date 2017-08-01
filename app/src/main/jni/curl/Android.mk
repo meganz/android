@@ -9,7 +9,14 @@ LOCAL_SRC_FILES := $(addprefix curl/lib/,$(CSOURCES))
 LOCAL_C_INCLUDES += $(LOCAL_PATH)/curl/include $(LOCAL_PATH)/curl/lib $(LOCAL_PATH)/include
 LOCAL_EXPORT_C_INCLUDES := $(LOCAL_PATH)/curl/include $(LOCAL_PATH)/include 
 LOCAL_CFLAGS += $(CFLAGS) -DHAVE_CONFIG_H -fexceptions -frtti -fvisibility=hidden -fdata-sections -ffunction-sections
+
+ifeq ($(DISABLE_WEBRTC),true)
 LOCAL_STATIC_LIBRARIES := ares ssl crypto
+else
+# WebRTC contains BoringSSL
+LOCAL_STATIC_LIBRARIES := ares webrtc
+endif
+
 include $(BUILD_STATIC_LIBRARY)
 
 include $(CLEAR_VARS)
@@ -19,7 +26,13 @@ LOCAL_SRC_FILES := $(addprefix ares/,$(CSOURCES))
 LOCAL_EXPORT_C_INCLUDES := $(LOCAL_PATH)/ares $(LOCAL_PATH)/include
 LOCAL_C_INCLUDES += $(LOCAL_PATH)/ares $(LOCAL_PATH)/include 
 LOCAL_CFLAGS += $(CFLAGS) -DHAVE_CONFIG_H -fexceptions -frtti -fvisibility=hidden -fdata-sections -ffunction-sections
-LOCAL_STATIC_LIBRARIES := crypto ssl
-include $(BUILD_STATIC_LIBRARY)
 
+ifeq ($(DISABLE_WEBRTC),true)
+LOCAL_STATIC_LIBRARIES := crypto ssl
+else
+# WebRTC contains BoringSSL
+LOCAL_STATIC_LIBRARIES := webrtc 
+endif
+
+include $(BUILD_STATIC_LIBRARY)
 
