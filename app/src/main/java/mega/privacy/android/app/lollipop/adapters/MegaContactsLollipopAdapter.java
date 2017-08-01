@@ -64,20 +64,20 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 	public static final int ITEM_VIEW_TYPE_GRID = 1;
 	public static final int ITEM_VIEW_TYPE_LIST_ADD_CONTACT = 2;
 
-	Context context;
-	int positionClicked;
-	ArrayList<MegaContactAdapter> contacts;
-	ImageView emptyImageViewFragment;
-	TextView emptyTextViewFragment;
-	RecyclerView listFragment;
-	MegaApiAndroid megaApi;
-	MegaChatApiAndroid megaChatApi;
-	boolean multipleSelect;
-	DatabaseHandler dbH = null;
+	private Context context;
+	private int positionClicked;
+	private ArrayList<MegaContactAdapter> contacts;
+	private ImageView emptyImageViewFragment;
+	private TextView emptyTextViewFragment;
+	private RecyclerView listFragment;
+	private MegaApiAndroid megaApi;
+	private MegaChatApiAndroid megaChatApi;
+	private boolean multipleSelect;
+	private DatabaseHandler dbH = null;
 	private SparseBooleanArray selectedItems;
-	ContactsFragmentLollipop fragment;
-	int adapterType;
-	SparseBooleanArray selectedContacts;
+	private ContactsFragmentLollipop fragment;
+	private int adapterType;
+	private SparseBooleanArray selectedContacts;
 	
 	private class UserAvatarListenerList implements MegaRequestListenerInterface{
 
