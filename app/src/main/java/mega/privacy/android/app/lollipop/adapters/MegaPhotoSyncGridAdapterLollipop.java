@@ -62,33 +62,33 @@ public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaP
 		public long timestamp;
 	}
 	
-	ViewHolderPhotoSyncGrid holder = null;
+	private ViewHolderPhotoSyncGrid holder = null;
 
-	Context context;
-	MegaApplication app;
-	MegaApiAndroid megaApi;
+	private Context context;
+	private MegaApplication app;
+	private MegaApiAndroid megaApi;
 
-	ArrayList<MegaMonthPicLollipop> monthPics;
-	ArrayList<MegaNode> nodes;
-	
-	long photosyncHandle = -1;
-	
-	RecyclerView listFragment;
-	ImageView emptyImageViewFragment;
-	TextView emptyTextViewFragment;
-	ActionBar aB;
-	
-	int numberOfCells;
-	int gridWidth;
-	
-	boolean multipleSelect;
-	
-	SparseBooleanArray checkedItems = new SparseBooleanArray();
-	
-	int orderGetChildren = MegaApiJava.ORDER_MODIFICATION_DESC;
-	
-	Object fragment;
-	int type = Constants.CAMERA_UPLOAD_ADAPTER;
+	private ArrayList<MegaMonthPicLollipop> monthPics;
+	private ArrayList<MegaNode> nodes;
+
+	private long photosyncHandle = -1;
+
+	private RecyclerView listFragment;
+	private ImageView emptyImageViewFragment;
+	private TextView emptyTextViewFragment;
+	private ActionBar aB;
+
+	private int numberOfCells;
+	private int gridWidth;
+
+	private boolean multipleSelect;
+
+	private SparseBooleanArray checkedItems = new SparseBooleanArray();
+
+	private int orderGetChildren = MegaApiJava.ORDER_MODIFICATION_DESC;
+
+	private Object fragment;
+	private int type = Constants.CAMERA_UPLOAD_ADAPTER;
 	
 	private ActionMode actionMode;
 	
