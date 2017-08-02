@@ -54,7 +54,7 @@
                     android:src="@drawable/ic_insert_emoticon"
                     android:layout_alignBottom="@+id/edit_text_chat"
                     android:layout_marginLeft="10dp"
-                    android:layout_marginBottom="3dp"/>
+                    android:layout_marginBottom="2dp"/>
 
                 <ImageButton
                     android:id="@+id/send_message_icon_chat"
@@ -75,7 +75,7 @@
                     android:background="@android:color/transparent"
                     android:layout_toRightOf="@+id/keyboard_icon_chat"
                     android:layout_marginTop="6dp"
-                    android:layout_marginBottom="6dp"
+                    android:layout_marginBottom="12dp"
                     android:layout_marginLeft="10dp"
                     android:layout_marginRight="10dp"
                     android:layout_centerVertical="true"
