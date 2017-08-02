@@ -63,7 +63,7 @@ public class TourImageAdapter extends PagerAdapter {
 
         imgDisplay.setImageResource(mImages[position]);
 
-		/****************************/
+		/*Rounded corners of image*/
 
 		Bitmap bitmap = ((BitmapDrawable)imgDisplay.getDrawable()).getBitmap();
 			int w = bitmap.getWidth();
@@ -91,9 +91,6 @@ public class TourImageAdapter extends PagerAdapter {
 
 			imgDisplay.setImageBitmap(output);
 
-
-
-		/******************************/
 
 
         ((ViewPager) container).addView(viewLayout);
