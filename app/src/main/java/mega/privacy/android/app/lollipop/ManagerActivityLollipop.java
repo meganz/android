@@ -4022,16 +4022,27 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 				log("FirstTimeCam: " + firstTimeCam);
     			if (cuFL == null){
-    				cuFL = new CameraUploadFragmentLollipop();
-    				cuFL.setIsList(isListCameraUploads);
-    				cuFL.setIsLargeGrid(isLargeGridCameraUploads);
-    				cuFL.setFirstTimeCam(firstTimeCam);
+                    Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("cuFLol");
+                    if(currentFragment != null && currentFragment instanceof CameraUploadFragmentLollipop){
+                        cuFL = ((CameraUploadFragmentLollipop) currentFragment);
+                        isListCameraUploads = cuFL.getIsList();
+                        isLargeGridCameraUploads = cuFL.getIsLargeGrid();
+                        firstTimeCam = cuFL.getFirstTimeCam();
+                    }
+                    else{
+                        cuFL = new CameraUploadFragmentLollipop();
+                        cuFL.setIsList(isListCameraUploads);
+                        cuFL.setIsLargeGrid(isLargeGridCameraUploads);
+                        cuFL.setFirstTimeCam(firstTimeCam);
+                    }
 				}
 				else{
 					cuFL.setIsList(isListCameraUploads);
 					cuFL.setIsLargeGrid(isLargeGridCameraUploads);
 					cuFL.setFirstTimeCam(firstTimeCam);
 				}
+
+				invalidateOptionsMenu();
 
     			tabLayoutCloud.setVisibility(View.GONE);
     			viewPagerCDrive.setVisibility(View.GONE);
@@ -4103,15 +4114,25 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				}
 
     			if (muFLol == null){
-//    				cuF = new CameraUploadFragmentLollipop(CameraUploadFragmentLollipop.TYPE_MEDIA);
-    				muFLol = CameraUploadFragmentLollipop.newInstance(CameraUploadFragmentLollipop.TYPE_MEDIA);
-    				muFLol.setIsList(isListCameraUploads);
-    				muFLol.setIsLargeGrid(isLargeGridCameraUploads);
+                    Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("muFLol");
+                    if(currentFragment != null && currentFragment instanceof CameraUploadFragmentLollipop){
+                        muFLol = (CameraUploadFragmentLollipop) currentFragment;
+                        isListCameraUploads = muFLol.getIsList();
+                        isLargeGridCameraUploads = muFLol.getIsLargeGrid();
+                    }
+                    else {
+//    					cuF = new CameraUploadFragmentLollipop(CameraUploadFragmentLollipop.TYPE_MEDIA);
+                        muFLol = CameraUploadFragmentLollipop.newInstance(CameraUploadFragmentLollipop.TYPE_MEDIA);
+                        muFLol.setIsList(isListCameraUploads);
+                        muFLol.setIsLargeGrid(isLargeGridCameraUploads);
+                    }
 				}
 				else{
 					muFLol.setIsList(isListCameraUploads);
 					muFLol.setIsLargeGrid(isLargeGridCameraUploads);
 				}
+
+				invalidateOptionsMenu();
 
     			tabLayoutCloud.setVisibility(View.GONE);
     			viewPagerCDrive.setVisibility(View.GONE);
