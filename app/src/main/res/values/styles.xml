@@ -151,6 +151,12 @@
         <item name="textAllCaps">true</item>
     </style>
 
+   <style name="TabLayout_Themes">
+        <item name="android:singleLine">false</item>
+    </style>
+
+
+
     <style name="Theme.Megaactionbar.FullScreen" parent="Theme.AppCompat.Light.NoActionBar">
         <!-- Customize your theme here. -->
 
