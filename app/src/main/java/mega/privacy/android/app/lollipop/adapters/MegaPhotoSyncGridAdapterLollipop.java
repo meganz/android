@@ -61,6 +61,9 @@ public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaP
 		public String filePath;
 		public long timestamp;
 	}
+
+	public static int PADDING_GRID_LARGE = 6;
+	public static int PADDING_GRID_SMALL = 3;
 	
 	private ViewHolderPhotoSyncGrid holder = null;
 
@@ -1006,7 +1009,31 @@ public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaP
 			
 			ImageView iV = (ImageView) rLView.findViewById(R.id.cell_photosync_grid_thumbnail);
 			iV.setLayoutParams(new RelativeLayout.LayoutParams(gridWidth, gridWidth));
-			iV.setPadding(2, 2, 2, 2);
+			if(numberOfCells == CameraUploadFragmentLollipop.GRID_LARGE){
+				log("numOfCells is GRID_LARGE");
+
+				int padding = PADDING_GRID_LARGE;
+				ViewGroup.MarginLayoutParams layoutParams = (ViewGroup.MarginLayoutParams)  iV.getLayoutParams();
+				layoutParams.setMargins(padding, padding, padding, padding);
+				iV.requestLayout();
+//				iV.setPadding(padding, padding, padding, padding);
+			}
+			else if (numberOfCells == CameraUploadFragmentLollipop.GRID_SMALL){
+				log("numOfCells is GRID_SMALL");
+				int padding = PADDING_GRID_SMALL;
+				ViewGroup.MarginLayoutParams layoutParams = (ViewGroup.MarginLayoutParams)  iV.getLayoutParams();
+				layoutParams.setMargins(padding, padding, padding, padding);
+				iV.requestLayout();
+//				iV.setPadding(padding, padding, padding, padding);
+			}
+			else{
+				log("numOfCells is "+numberOfCells);
+				int padding = 2;
+				ViewGroup.MarginLayoutParams layoutParams = (ViewGroup.MarginLayoutParams)  iV.getLayoutParams();
+				layoutParams.setMargins(padding, padding, padding, padding);
+				iV.requestLayout();
+//				iV.setPadding(padding, padding, padding, padding);
+			}
 			holder.imageViews.add(iV);
 			
 			LinearLayout lcLS = (LinearLayout) rLView.findViewById(R.id.cell_photosync_menu_long_click_selected);

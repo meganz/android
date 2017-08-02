@@ -96,46 +96,46 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	
 	public static int TYPE_CAMERA= 0;
 	public static int TYPE_MEDIA = 1;
-	
-	Context context;
-	ActionBar aB;
-	RecyclerView listView;
-	GestureDetectorCompat detector;
-	RecyclerView.LayoutManager mLayoutManager;
 
-	ImageView emptyImageView;
-	TextView emptyTextView;
-	RelativeLayout contentTextLayout;
+	private Context context;
+	private ActionBar aB;
+	private RecyclerView listView;
+	private GestureDetectorCompat detector;
+	private RecyclerView.LayoutManager mLayoutManager;
+
+	private ImageView emptyImageView;
+	private TextView emptyTextView;
+	private RelativeLayout contentTextLayout;
 //	Button turnOnOff;
-	RelativeLayout transfersOverViewLayout;
+	private RelativeLayout transfersOverViewLayout;
 
-	SwitchCompat switchCellularConnection;
-	SwitchCompat switchUploadVideos;
-	
-	DatabaseHandler dbH;
-	MegaPreferences prefs;
-	
-	MegaPhotoSyncListAdapterLollipop adapterList;
-	MegaPhotoSyncGridAdapterLollipop adapterGrid;
-	MegaApiAndroid megaApi;
+	private SwitchCompat switchCellularConnection;
+	private SwitchCompat switchUploadVideos;
+
+	private DatabaseHandler dbH;
+	private MegaPreferences prefs;
+
+	private MegaPhotoSyncListAdapterLollipop adapterList;
+	private MegaPhotoSyncGridAdapterLollipop adapterGrid;
+	private MegaApiAndroid megaApi;
 		
 //	long parentHandle = -1;
-	boolean isList = false;
-	boolean isLargeGridCameraUploads;
-	boolean firstTimeCam = false;
-	int orderGetChildren = MegaApiJava.ORDER_MODIFICATION_DESC;
-	
-	int type = 0;
-	
-	ArrayList<MegaNode> nodes;
-	ArrayList<PhotoSyncHolder> nodesArray = new ArrayList<CameraUploadFragmentLollipop.PhotoSyncHolder>();
-	ArrayList<PhotoSyncGridHolder> nodesArrayGrid = new ArrayList<CameraUploadFragmentLollipop.PhotoSyncGridHolder>();
-	ArrayList<MegaMonthPicLollipop> monthPics = new ArrayList<MegaMonthPicLollipop>();
+	private boolean isList = false;
+	private boolean isLargeGridCameraUploads;
+	private boolean firstTimeCam = false;
+	private int orderGetChildren = MegaApiJava.ORDER_MODIFICATION_DESC;
+
+	private int type = 0;
+
+	private ArrayList<MegaNode> nodes;
+	private ArrayList<PhotoSyncHolder> nodesArray = new ArrayList<CameraUploadFragmentLollipop.PhotoSyncHolder>();
+	private ArrayList<PhotoSyncGridHolder> nodesArrayGrid = new ArrayList<CameraUploadFragmentLollipop.PhotoSyncGridHolder>();
+	private ArrayList<MegaMonthPicLollipop> monthPics = new ArrayList<MegaMonthPicLollipop>();
 
 	private ActionMode actionMode;
 
-	ProgressDialog statusDialog;
-	long photosyncHandle = -1;
+	private ProgressDialog statusDialog;
+	private long photosyncHandle = -1;
 	
 	public class PhotoSyncHolder{
 		public boolean isNode;
@@ -965,13 +965,19 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 		    int totalWidth = outMetrics.widthPixels;
 		    		    
 		    int gridWidth = 0;
+			int realGridWidth = 0;
 		    int numberOfCells = 0;
+			int padding = 0;
 		    if (isLargeGridCameraUploads){
-		    	gridWidth = totalWidth / GRID_LARGE;
+				realGridWidth = totalWidth / GRID_LARGE;
+				padding = MegaPhotoSyncGridAdapterLollipop.PADDING_GRID_LARGE;
+				gridWidth = realGridWidth - padding * 2;
 		    	numberOfCells = GRID_LARGE;
 		    }
 		    else{
-		    	gridWidth = totalWidth / GRID_SMALL;
+				realGridWidth = totalWidth / GRID_SMALL;
+				padding = MegaPhotoSyncGridAdapterLollipop.PADDING_GRID_SMALL;
+				gridWidth = realGridWidth - padding * 2;
 		    	numberOfCells = GRID_SMALL;
 		    }
 		    
