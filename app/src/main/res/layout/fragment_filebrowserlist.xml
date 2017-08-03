@@ -10,7 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="36dp"
         android:background="@color/new_background_fragment"
-		android:layout_centerHorizontal="true">
+		>
 
 			<TextView
 				android:id="@+id/content_text"
