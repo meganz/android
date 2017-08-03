@@ -971,13 +971,13 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 		    if (isLargeGridCameraUploads){
 				realGridWidth = totalWidth / GRID_LARGE;
 				padding = MegaPhotoSyncGridAdapterLollipop.PADDING_GRID_LARGE;
-				gridWidth = realGridWidth - padding * 2;
+				gridWidth = realGridWidth - (padding * 2);
 		    	numberOfCells = GRID_LARGE;
 		    }
 		    else{
 				realGridWidth = totalWidth / GRID_SMALL;
 				padding = MegaPhotoSyncGridAdapterLollipop.PADDING_GRID_SMALL;
-				gridWidth = realGridWidth - padding * 2;
+				gridWidth = realGridWidth - (padding * 2);
 		    	numberOfCells = GRID_SMALL;
 		    }
 		    
