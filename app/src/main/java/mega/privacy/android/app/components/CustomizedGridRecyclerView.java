@@ -18,6 +18,7 @@ import android.graphics.Rect;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.view.View;
+import android.view.ViewGroup;
 
 import mega.privacy.android.app.utils.Util;
 
@@ -25,7 +26,6 @@ public class CustomizedGridRecyclerView extends RecyclerView {
 
 	private CustomizedGridLayoutManager manager;
 	private int columnWidth = -1;
-	private CustomizedGridRecyclerItemDecoration itemDecoration;
 
 	public CustomizedGridRecyclerView(Context context) {
 		super(context);
@@ -59,15 +59,12 @@ public class CustomizedGridRecyclerView extends RecyclerView {
 	@Override
 	protected void onMeasure(int widthSpec, int heightSpec) {
 		super.onMeasure(widthSpec, heightSpec);
+		ViewGroup.LayoutParams params = getLayoutParams();
 		if (columnWidth > 0) {
 			int spanCount = Math.max(1, getMeasuredWidth() / columnWidth);
-			if(itemDecoration != null){
-				this.removeItemDecoration(itemDecoration);
-				itemDecoration = null;
-			}
-			itemDecoration = new CustomizedGridRecyclerItemDecoration(spanCount, columnWidth, getMeasuredWidth());
-			this.addItemDecoration(itemDecoration);
 			manager.setSpanCount(spanCount);
+			params.width = ViewGroup.LayoutParams.WRAP_CONTENT;
+			setLayoutParams(params);
 		}
 	}
 
@@ -82,46 +79,6 @@ public class CustomizedGridRecyclerView extends RecyclerView {
 	@Override
 	public CustomizedGridLayoutManager getLayoutManager() {
 		return manager;
-	}
-
-	private class CustomizedGridRecyclerItemDecoration extends RecyclerView.ItemDecoration{
-
-		private int spanCount = 0;
-		private int columnWidth = 0;
-		private int totalWidth = 0;
-		private double difference = 0;
-
-		public CustomizedGridRecyclerItemDecoration(int spanCount, int columnWidth, int totalWidth) {
-			this.spanCount = spanCount;
-			this.columnWidth = columnWidth;
-			this.totalWidth = totalWidth;
-			log("ItemDecoration: spanCount-> "+spanCount);
-
-			int difference = totalWidth % columnWidth;
-			this.difference = difference / ((spanCount + 1) * 2);
-		}
-
-		@Override
-		public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
-			int position = parent.getChildAdapterPosition(view); // item position
-			int column = position % spanCount; // item column
-
-
-
-			outRect.left = (int) difference;
-			outRect.right = (int) difference;
-
-//			if(column == 0){
-//				outRect.left = difference;
-////			}
-//			if(column == spanCount - 1){
-//				outRect.right = difference * 2;
-//			}
-
-
-			outRect.top = 0; // item top
-			outRect.bottom = 0; // item bottom
-		}
 	}
 
 	private static void log(String txt){

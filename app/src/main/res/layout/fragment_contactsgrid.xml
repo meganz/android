@@ -27,6 +27,7 @@
         android:layout_height="match_parent"
         android:choiceMode="multipleChoice"
         android:layout_below="@id/contact_content_grid_text_layout"
+        android:layout_centerHorizontal="true"
         android:columnWidth="178dp"/>
 
     <ImageView

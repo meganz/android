@@ -27,7 +27,8 @@
         android:layout_height="match_parent" 
         android:choiceMode="multipleChoice"
         android:layout_below="@id/offline_content_grid_text_layout"
-        android:columnWidth="172dp"/>
+        android:columnWidth="172dp"
+        android:layout_centerHorizontal="true"/>
     
     <ImageView
         android:id="@+id/offline_empty_image_grid"
