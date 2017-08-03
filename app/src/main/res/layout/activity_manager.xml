@@ -45,22 +45,60 @@
                         android:background="@color/mega"
                         style="@style/MyCustomTabLayout"/>
 
-                    <!--<android.support.design.widget.TabLayout
+                <!-- origin -->
+
+                   <!--<android.support.design.widget.TabLayout
                         android:id="@+id/sliding_tabs_contacts"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:background="@color/mega"
                         style="@style/MyCustomTabLayout"/>-->
 
-                <android.support.design.widget.TabLayout
-                       android:id="@+id/sliding_tabs_contacts"
-                       android:layout_width="match_parent"
-                       android:layout_height="wrap_content"
+                <!-- without padding -->
+
+               <android.support.design.widget.TabLayout
+                    android:id="@+id/sliding_tabs_contacts"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal|center_vertical"
+                    app:tabPaddingStart="5dp"
+                    app:tabPaddingEnd="5dp"
+                    app:tabMode="fixed"
                     style="@style/MyCustomTabLayout"
-                    app:tabMode="scrollable"
-                    android:theme="@style/TabLayout_Themes"
                     app:tabGravity="center"/>
-                <!-- android:theme="@style/TabLayout_Themes" -->
+                <!--   with scroller -->
+
+                <!--app:tabMode="scroller"-->
+
+                <!-- with ... -->
+
+                <!-- whit Theme:-->
+
+                <!--TabLayout_Themes-->
+
+                <!-- test -->
+               <!-- <android.support.design.widget.TabLayout
+                       android:id="@+id/sliding_tabs_contacts"
+                       android:layout_width="wrap_content"
+                       android:layout_height="wrap_content"
+                       android:layout_gravity="center_horizontal|center_vertical"
+                    style="@style/MyCustomTabLayout"
+                    app:tabPaddingStart="6dp"
+                    app:tabPaddingEnd="6dp"
+                    app:tabGravity="center"/>-->
+
+               <!-- <android.support.design.widget.TabLayout
+                    android:id="@+id/sliding_tabs_contacts"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="-3dp"
+                    android:paddingRight="-3dp"
+                    android:background="@color/mega"
+                    android:layout_gravity="center_horizontal|center_vertical"
+                    style="@style/MyCustomTabLayout"
+                    app:tabPaddingStart="-1dp"
+                    app:tabPaddingEnd="-1dp"
+                    app:tabGravity="center"/>-->
 
 
                     <android.support.design.widget.TabLayout
