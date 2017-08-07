@@ -86,7 +86,7 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
 		log("onCreateView");
-		
+
 		Display display = getActivity().getWindowManager().getDefaultDisplay();
 		
 		DisplayMetrics outMetrics = new DisplayMetrics();
@@ -128,7 +128,7 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 
 		emptyImageView = (ImageView) v.findViewById(R.id.file_list_empty_image);
 		emptyTextView = (TextView) v.findViewById(R.id.file_list_empty_text);
-		
+
 		emptyImageView.setImageResource(R.drawable.incoming_shares_empty);			
 		emptyTextView.setText(R.string.file_browser_empty_incoming_shares);
 

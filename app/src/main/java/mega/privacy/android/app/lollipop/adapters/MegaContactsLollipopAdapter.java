@@ -1150,9 +1150,6 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 				notifyItemChanged(position);
 			}
 		}
-//		else if (adapterType == MegaContactsLollipopAdapter.ITEM_VIEW_TYPE_GRID){
-//			holderGrid = (ViewHolderContactsGrid) listFragment.findViewHolderForAdapterPosition(position);
-//		}
 	}
 
 	/*public void startOneToOneChat(MegaUser user){
