@@ -306,7 +306,20 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 			}
 			
 			menu.findItem(R.id.action_file_contact_list_permissions).setVisible(permissions);
+			if(permissions == true){
+				menu.findItem(R.id.action_file_contact_list_permissions).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+			}else{
+				menu.findItem(R.id.action_file_contact_list_permissions).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+
+			}
+
 			menu.findItem(R.id.action_file_contact_list_delete).setVisible(deleteShare);
+			if(deleteShare == true){
+				menu.findItem(R.id.action_file_contact_list_delete).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+			}else{
+				menu.findItem(R.id.action_file_contact_list_delete).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+
+			}
 			
 			return false;
 		}
@@ -475,6 +488,8 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 //	    permissionButton.setVisible(false);
 //	    deleteShareButton.setVisible(false);
 	    addSharingContact.setVisible(true);
+		menu.findItem(R.id.action_folder_contacts_list_share_folder).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+
 	    
 	    selectMenuItem = menu.findItem(R.id.action_select);
 		unSelectMenuItem = menu.findItem(R.id.action_unselect);
