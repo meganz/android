@@ -112,6 +112,12 @@ import nz.mega.sdk.MegaUser;
 @SuppressLint("NewApi")
 public class FileInfoActivityLollipop extends PinActivityLollipop implements OnClickListener, MegaRequestListenerInterface, MegaGlobalListenerInterface{
 
+	public static int MAX_WIDTH_FILENAME_LAND=400;
+	public static int MAX_WIDTH_FILENAME_LAND_2=400;
+
+	public static int MAX_WIDTH_FILENAME_PORT=200;
+	public static int MAX_WIDTH_FILENAME_PORT_2=200;
+
 	static int TYPE_EXPORT_GET = 0;
 	static int TYPE_EXPORT_REMOVE = 1;
 	static int TYPE_EXPORT_MANAGE = 2;
@@ -297,7 +303,6 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 			if(from==FROM_INCOMING_SHARES){
 				firstIncomingLevel = extras.getBoolean("firstLevel");
 			}
-//			String name = extras.getString("name");
 			accountType = extras.getInt("typeAccount", MegaAccountDetails.ACCOUNT_TYPE_FREE);
 			handle = extras.getLong("handle", -1);
 			log("Handle of the selected node: "+handle);
@@ -398,15 +403,25 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 			ownerLabelowner.setText(ownerString);
 			ownerInfo = (TextView) findViewById(R.id.file_properties_owner_info);
 
+
 			if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+				log("Landscape configuration");
+				float width1 = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MAX_WIDTH_FILENAME_LAND, getResources().getDisplayMetrics());
+				float width2 = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MAX_WIDTH_FILENAME_LAND_2, getResources().getDisplayMetrics());
 
-				ownerLabel.setMaxWidth(1300);
-				ownerInfo.setMaxWidth(1400);
+				ownerLabel.setMaxWidth((int) width1);
+				ownerInfo.setMaxWidth((int) width2);
 
-			}else{
-				ownerLabel.setMaxWidth(500);
-				ownerInfo.setMaxWidth(600);
 
+
+			}
+			else{
+				log("Portrait configuration");
+				float width1 = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MAX_WIDTH_FILENAME_PORT, getResources().getDisplayMetrics());
+				float width2 = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MAX_WIDTH_FILENAME_PORT_2, getResources().getDisplayMetrics());
+
+				ownerLabel.setMaxWidth((int) width1);
+				ownerInfo.setMaxWidth((int) width2);
 			}
 
 			ownerLayout.setVisibility(View.GONE);
@@ -513,6 +528,9 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 				removeLinkMenuItem.setVisible(true);
 				menu.findItem(R.id.cab_menu_file_info_remove_link).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
+
+
+
 			}
 			else{
 				getLinkMenuItem.setVisible(true);
@@ -526,6 +544,8 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 			if(from==FROM_INCOMING_SHARES){
 
 				downloadMenuItem.setVisible(true);
+				menu.findItem(R.id.cab_menu_file_info_download).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+
 				shareMenuItem.setVisible(false);
 				menu.findItem(R.id.cab_menu_file_info_share_folder).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
 
@@ -533,9 +553,13 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
 				if(firstIncomingLevel){
 					leaveMenuItem.setVisible(true);
+					menu.findItem(R.id.cab_menu_file_info_leave).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+
 				}
 				else{
 					leaveMenuItem.setVisible(false);
+					menu.findItem(R.id.cab_menu_file_info_leave).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+
 				}
 
 		    	int accessLevel= megaApi.getAccess(node);
@@ -554,6 +578,8 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 						renameMenuItem.setVisible(true);
 						moveMenuItem.setVisible(false);
 						copyMenuItem.setVisible(true);
+						menu.findItem(R.id.cab_menu_file_info_copy).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+
 
 						getLinkMenuItem.setVisible(false);
 						menu.findItem(R.id.cab_menu_file_info_get_link).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
@@ -568,6 +594,8 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 						renameMenuItem.setVisible(false);
 						moveMenuItem.setVisible(false);
 						copyMenuItem.setVisible(true);
+						menu.findItem(R.id.cab_menu_file_info_copy).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+
 						rubbishMenuItem.setVisible(false);
 
 						getLinkMenuItem.setVisible(false);
@@ -584,6 +612,8 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 						renameMenuItem.setVisible(false);
 						moveMenuItem.setVisible(false);
 						copyMenuItem.setVisible(true);
+						menu.findItem(R.id.cab_menu_file_info_copy).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+
 						rubbishMenuItem.setVisible(false);
 
 						getLinkMenuItem.setVisible(false);
@@ -599,6 +629,8 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 		    }
 			else{
 				downloadMenuItem.setVisible(true);
+				menu.findItem(R.id.cab_menu_file_info_download).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+
 				if (node.isFolder()){
 					shareMenuItem.setVisible(true);
 					menu.findItem(R.id.cab_menu_file_info_share_folder).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
@@ -615,6 +647,8 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 				rubbishMenuItem.setVisible(true);
 				deleteMenuItem.setVisible(false);
 				leaveMenuItem.setVisible(false);
+				menu.findItem(R.id.cab_menu_file_info_leave).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+
 
 				renameMenuItem.setVisible(true);
 				moveMenuItem.setVisible(true);
@@ -1068,6 +1102,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 							case MegaShare.ACCESS_OWNER:
 							case MegaShare.ACCESS_FULL:{
 								permissionInfo.setText(getResources().getString(R.string.file_properties_shared_folder_full_access).toUpperCase(Locale.getDefault()));
+
 								//permissionsIcon.setImageResource(R.drawable.ic_shared_fullaccess);
 								break;
 							}
@@ -2458,6 +2493,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 							}
 							case MegaShare.ACCESS_READ:{
 								permissionInfo.setText(getResources().getString(R.string.file_properties_shared_folder_read_only));
+
 								break;
 							}
 							case MegaShare.ACCESS_READWRITE:{

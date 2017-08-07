@@ -30,6 +30,8 @@ import android.widget.RemoteViews;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Locale;
 
 import mega.privacy.android.app.DatabaseHandler;
@@ -132,6 +134,17 @@ public final class NotificationBuilder {
                     .setSound(defaultSoundUri);
 
             Spanned firstLine = null;
+
+            Collections.sort(unreadChats, new Comparator<MegaChatListItem>(){
+
+                public int compare(MegaChatListItem c1, MegaChatListItem c2) {
+                    long timestamp1 = c1.getLastTimestamp();
+                    long timestamp2 = c2.getLastTimestamp();
+
+                    long result = timestamp2 - timestamp1;
+                    return (int)result;
+                }
+            });
 
             for(int i =0; i<unreadChats.size();i++){
 

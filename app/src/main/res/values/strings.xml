@@ -788,18 +788,18 @@
 
     <string name="sortby_owner_mail" context="category in sort by action">Owner\'s E-mail</string>
     <string name="sortby_name" context="category in sort by action">Name</string>
-    <string name="sortby_name_ascending" context="sort files alphabetically ascending">ascending</string>
-    <string name="sortby_name_descending" context="sort files alphabetically descending">descending</string>
+    <string name="sortby_name_ascending" context="sort files alphabetically ascending">Ascending</string>
+    <string name="sortby_name_descending" context="sort files alphabetically descending">Descending</string>
 
     <string name="sortby_date" context="category in sort by action">Date</string>
     <string name="sortby_creation_date" context="category in sort by action">Creation Date</string>
     <string name="sortby_modification_date" context="category in sort by action">Modification Date</string>
-    <string name="sortby_date_newest" context="sort files by date newest first">newest</string>
-    <string name="sortby_date_oldest" context="sort files by date oldest first">oldest</string>
+    <string name="sortby_date_newest" context="sort files by date newest first">Newest</string>
+    <string name="sortby_date_oldest" context="sort files by date oldest first">Oldest</string>
 
     <string name="sortby_size" context="category in sort by action">Size</string>
-    <string name="sortby_size_largest_first" context="sort files by size largest first">largest</string>
-    <string name="sortby_size_smallest_first" context="sort files by size smallest first">smallest</string>
+    <string name="sortby_size_largest_first" context="sort files by size largest first">Largest</string>
+    <string name="sortby_size_smallest_first" context="sort files by size smallest first">Smallest</string>
 
     <string name="per_month" context="in payments, for example: 4.99€ per month">per month</string>
     <string name="per_year" context="in payments, for example: 49.99€ per year">per year</string>
@@ -1084,7 +1084,6 @@
     <string name="general_mute" context="button">Mute</string>
     <string name="general_unmute" context="button">Unmute</string>
 
-    <string name="title_properties_contact_notifications_for_chat" context="Title of the section to enable notifications in the Contact Properties screen">Chat notifications</string>
     <string name="title_properties_chat_contact_notifications" context="Title of the section to enable notifications in the Contact Properties screen">Notifications</string>
     <string name="title_properties_chat_contact_message_sound" context="Title of the section to choose the sound of incoming messages in the Contact Properties screen">Message sound</string>
     <string name="title_properties_chat_clear_chat" context="Title of the section to clear the chat content in the Contact Properties screen">Clear chat</string>
@@ -1498,6 +1497,10 @@
     <string name="title_incoming_folder_notification" context="title of incoming shared folder notification">New shared folder</string>
     <string name="title_contact_request_notification" context="title of contact request notification">New contact request</string>
 
+    <string name="title_properties_chat_clear" context="Title of the section to clear the chat content in the Contact Properties screen">Clear chat history</string>
+    <string name="title_properties_remove_contact" context="Title of the section to remove contact in the Contact Properties screen">Remove contact</string>
+
+    <string name="title_properties_chat_notifications_contact" context="Title of the section to enable notifications in the Contact Properties screen">Chat notifications</string>
     <string name="history_cleared_by" context="Text shown when the chat history was cleared by someone"><![CDATA[<font color=\'#060000\'>%1$s</font><font color=\'#00BFA5\'> cleared the chat history</font>]]></string>
 
     <string name="number_messages_chat_notification" formatted="false" context="messages string in chat notification">%1$d unread chats</string>
