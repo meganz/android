@@ -6598,16 +6598,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
         		nameMLP.setMargins(Util.scaleWidthPx(25, outMetrics), Util.scaleHeightPx(15, outMetrics), 0, Util.scaleHeightPx(10, outMetrics));
 
         		TextView sortByDateTV = (TextView) dialoglayout.findViewById(R.id.sortby_dialog_date_text);
-        		sortByDateTV.setText(getString(R.string.sortby_creation_date));
+        		sortByDateTV.setText(getString(R.string.sortby_modification_date));
         		ViewGroup.MarginLayoutParams dateMLP = (ViewGroup.MarginLayoutParams) sortByDateTV.getLayoutParams();
         		sortByDateTV.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16*scaleText));
         		dateMLP.setMargins(Util.scaleWidthPx(25, outMetrics), Util.scaleHeightPx(15, outMetrics), 0, Util.scaleHeightPx(10, outMetrics));
-
-				TextView sortByModificationDateTV = (TextView) dialoglayout.findViewById(R.id.sortby_dialog_date_modification_text);
-				sortByModificationDateTV.setText(getString(R.string.sortby_modification_date));
-				ViewGroup.MarginLayoutParams dateModMLP = (ViewGroup.MarginLayoutParams) sortByModificationDateTV.getLayoutParams();
-				sortByModificationDateTV.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16*scaleText));
-				dateModMLP.setMargins(Util.scaleWidthPx(25, outMetrics), Util.scaleHeightPx(15, outMetrics), 0, Util.scaleHeightPx(10, outMetrics));
 
         		TextView sortBySizeTV = (TextView) dialoglayout.findViewById(R.id.sortby_dialog_size_text);
         		sortBySizeTV.setText(getString(R.string.sortby_size));
@@ -6618,62 +6612,53 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
         		final CheckedTextView ascendingCheck = (CheckedTextView) dialoglayout.findViewById(R.id.sortby_dialog_ascending_check);
         		ascendingCheck.setText(getString(R.string.sortby_name_ascending));
         		ascendingCheck.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16*scaleText));
-        		ascendingCheck.setCompoundDrawablePadding(Util.scaleWidthPx(10, outMetrics));
+        		ascendingCheck.setCompoundDrawablePadding(Util.scaleWidthPx(34, outMetrics));
         		ViewGroup.MarginLayoutParams ascendingMLP = (ViewGroup.MarginLayoutParams) ascendingCheck.getLayoutParams();
         		ascendingMLP.setMargins(Util.scaleWidthPx(15, outMetrics), Util.scaleHeightPx(10, outMetrics), 0, Util.scaleHeightPx(10, outMetrics));
 
         		final CheckedTextView descendingCheck = (CheckedTextView) dialoglayout.findViewById(R.id.sortby_dialog_descending_check);
         		descendingCheck.setText(getString(R.string.sortby_name_descending));
         		descendingCheck.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16*scaleText));
-        		descendingCheck.setCompoundDrawablePadding(Util.scaleWidthPx(10, outMetrics));
+        		descendingCheck.setCompoundDrawablePadding(Util.scaleWidthPx(34, outMetrics));
         		ViewGroup.MarginLayoutParams descendingMLP = (ViewGroup.MarginLayoutParams) descendingCheck.getLayoutParams();
         		descendingMLP.setMargins(Util.scaleWidthPx(15, outMetrics), Util.scaleHeightPx(10, outMetrics), 0, Util.scaleHeightPx(10, outMetrics));
 
         		final CheckedTextView newestCheck = (CheckedTextView) dialoglayout.findViewById(R.id.sortby_dialog_newest_check);
         		newestCheck.setText(getString(R.string.sortby_date_newest));
         		newestCheck.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16*scaleText));
-        		newestCheck.setCompoundDrawablePadding(Util.scaleWidthPx(10, outMetrics));
+        		newestCheck.setCompoundDrawablePadding(Util.scaleWidthPx(34, outMetrics));
         		ViewGroup.MarginLayoutParams newestMLP = (ViewGroup.MarginLayoutParams) newestCheck.getLayoutParams();
         		newestMLP.setMargins(Util.scaleWidthPx(15, outMetrics), Util.scaleHeightPx(10, outMetrics), 0, Util.scaleHeightPx(10, outMetrics));
 
         		final CheckedTextView oldestCheck = (CheckedTextView) dialoglayout.findViewById(R.id.sortby_dialog_oldest_check);
         		oldestCheck.setText(getString(R.string.sortby_date_oldest));
         		oldestCheck.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16*scaleText));
-        		oldestCheck.setCompoundDrawablePadding(Util.scaleWidthPx(10, outMetrics));
+        		oldestCheck.setCompoundDrawablePadding(Util.scaleWidthPx(34, outMetrics));
         		ViewGroup.MarginLayoutParams oldestMLP = (ViewGroup.MarginLayoutParams) oldestCheck.getLayoutParams();
         		oldestMLP.setMargins(Util.scaleWidthPx(15, outMetrics), Util.scaleHeightPx(10, outMetrics), 0, Util.scaleHeightPx(10, outMetrics));
-
-				final CheckedTextView newestModificationCheck = (CheckedTextView) dialoglayout.findViewById(R.id.sortby_dialog_newest_modification_check);
-				newestModificationCheck.setText(getString(R.string.sortby_date_newest));
-				newestModificationCheck.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16*scaleText));
-				newestModificationCheck.setCompoundDrawablePadding(Util.scaleWidthPx(10, outMetrics));
-				ViewGroup.MarginLayoutParams newestModMLP = (ViewGroup.MarginLayoutParams) newestModificationCheck.getLayoutParams();
-				newestModMLP.setMargins(Util.scaleWidthPx(15, outMetrics), Util.scaleHeightPx(10, outMetrics), 0, Util.scaleHeightPx(10, outMetrics));
-
-				final CheckedTextView oldestModificationCheck = (CheckedTextView) dialoglayout.findViewById(R.id.sortby_dialog_oldest_modification_check);
-				oldestModificationCheck.setText(getString(R.string.sortby_date_oldest));
-				oldestModificationCheck.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16*scaleText));
-				oldestModificationCheck.setCompoundDrawablePadding(Util.scaleWidthPx(10, outMetrics));
-				ViewGroup.MarginLayoutParams oldestModMLP = (ViewGroup.MarginLayoutParams) oldestModificationCheck.getLayoutParams();
-				oldestModMLP.setMargins(Util.scaleWidthPx(15, outMetrics), Util.scaleHeightPx(10, outMetrics), 0, Util.scaleHeightPx(10, outMetrics));
 
         		final CheckedTextView largestCheck = (CheckedTextView) dialoglayout.findViewById(R.id.sortby_dialog_largest_first_check);
         		largestCheck.setText(getString(R.string.sortby_size_largest_first));
         		largestCheck.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16*scaleText));
-        		largestCheck.setCompoundDrawablePadding(Util.scaleWidthPx(10, outMetrics));
+        		largestCheck.setCompoundDrawablePadding(Util.scaleWidthPx(34, outMetrics));
         		ViewGroup.MarginLayoutParams largestMLP = (ViewGroup.MarginLayoutParams) largestCheck.getLayoutParams();
         		largestMLP.setMargins(Util.scaleWidthPx(15, outMetrics), Util.scaleHeightPx(10, outMetrics), 0, Util.scaleHeightPx(10, outMetrics));
 
         		final CheckedTextView smallestCheck = (CheckedTextView) dialoglayout.findViewById(R.id.sortby_dialog_smallest_first_check);
         		smallestCheck.setText(getString(R.string.sortby_size_smallest_first));
         		smallestCheck.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16*scaleText));
-        		smallestCheck.setCompoundDrawablePadding(Util.scaleWidthPx(10, outMetrics));
+        		smallestCheck.setCompoundDrawablePadding(Util.scaleWidthPx(34, outMetrics));
         		ViewGroup.MarginLayoutParams smallestMLP = (ViewGroup.MarginLayoutParams) smallestCheck.getLayoutParams();
         		smallestMLP.setMargins(Util.scaleWidthPx(15, outMetrics), Util.scaleHeightPx(10, outMetrics), 0, Util.scaleHeightPx(10, outMetrics));
 
         		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
         		builder.setView(dialoglayout);
-        		builder.setTitle(getString(R.string.action_sort_by));
+				TextView textViewTitle = new TextView(ManagerActivityLollipop.this);
+				textViewTitle.setText(getString(R.string.action_sort_by));
+				textViewTitle.setTextSize(20);
+				textViewTitle.setTextColor(0xde000000);
+				textViewTitle.setPadding(Util.scaleWidthPx(23, outMetrics), Util.scaleHeightPx(20, outMetrics), 0, 0);
+        		builder.setCustomTitle(textViewTitle);
 
         		sortByDialog = builder.create();
         		sortByDialog.show();
@@ -6734,8 +6719,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		        			descendingCheck.setChecked(false);
 		        			newestCheck.setChecked(false);
 		        			oldestCheck.setChecked(false);
-							newestModificationCheck.setChecked(false);
-							oldestModificationCheck.setChecked(false);
 		        			largestCheck.setChecked(false);
 		        			smallestCheck.setChecked(false);
 		        			break;
@@ -6745,8 +6728,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		        			descendingCheck.setChecked(true);
 		        			newestCheck.setChecked(false);
 		        			oldestCheck.setChecked(false);
-							newestModificationCheck.setChecked(false);
-							oldestModificationCheck.setChecked(false);
 		        			largestCheck.setChecked(false);
 		        			smallestCheck.setChecked(false);
 		        			break;
@@ -6756,8 +6737,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		        			descendingCheck.setChecked(false);
 		        			newestCheck.setChecked(true);
 		        			oldestCheck.setChecked(false);
-							newestModificationCheck.setChecked(false);
-							oldestModificationCheck.setChecked(false);
 		        			largestCheck.setChecked(false);
 		        			smallestCheck.setChecked(false);
 		        			break;
@@ -6767,8 +6746,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		        			descendingCheck.setChecked(false);
 		        			newestCheck.setChecked(false);
 		        			oldestCheck.setChecked(true);
-							newestModificationCheck.setChecked(false);
-							oldestModificationCheck.setChecked(false);
 		        			largestCheck.setChecked(false);
 		        			smallestCheck.setChecked(false);
 		        			break;
@@ -6778,8 +6755,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 							descendingCheck.setChecked(false);
 							newestCheck.setChecked(false);
 							oldestCheck.setChecked(false);
-							newestModificationCheck.setChecked(false);
-							oldestModificationCheck.setChecked(true);
 							largestCheck.setChecked(false);
 							smallestCheck.setChecked(false);
 							break;
@@ -6789,8 +6764,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 							descendingCheck.setChecked(false);
 							newestCheck.setChecked(false);
 							oldestCheck.setChecked(false);
-							newestModificationCheck.setChecked(true);
-							oldestModificationCheck.setChecked(false);
 							largestCheck.setChecked(false);
 							smallestCheck.setChecked(false);
 							break;
@@ -6800,8 +6773,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		        			descendingCheck.setChecked(false);
 		        			newestCheck.setChecked(false);
 		        			oldestCheck.setChecked(false);
-							newestModificationCheck.setChecked(false);
-							oldestModificationCheck.setChecked(false);
 		        			largestCheck.setChecked(false);
 		        			smallestCheck.setChecked(true);
 		        			break;
@@ -6811,8 +6782,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		        			descendingCheck.setChecked(false);
 		        			newestCheck.setChecked(false);
 		        			oldestCheck.setChecked(false);
-							newestModificationCheck.setChecked(false);
-							oldestModificationCheck.setChecked(false);
 		        			largestCheck.setChecked(true);
 		        			smallestCheck.setChecked(false);
 		        			break;
@@ -6827,9 +6796,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						sortByDateTV.setVisibility(View.VISIBLE);
 		        		newestCheck.setVisibility(View.VISIBLE);
 		        		oldestCheck.setVisibility(View.VISIBLE);
-						sortByModificationDateTV.setVisibility(View.GONE);
-						newestModificationCheck.setVisibility(View.GONE);
-						oldestModificationCheck.setVisibility(View.GONE);
 		        		sortBySizeTV.setVisibility(View.GONE);
 		        		largestCheck.setVisibility(View.GONE);
 		        		smallestCheck.setVisibility(View.GONE);
@@ -6917,9 +6883,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		        		sortByDateTV.setVisibility(View.GONE);
 		        		newestCheck.setVisibility(View.GONE);
 		        		oldestCheck.setVisibility(View.GONE);
-						sortByModificationDateTV.setVisibility(View.GONE);
-						newestModificationCheck.setVisibility(View.GONE);
-						oldestModificationCheck.setVisibility(View.GONE);
 		        		sortBySizeTV.setVisibility(View.GONE);
 		        		largestCheck.setVisibility(View.GONE);
 		        		smallestCheck.setVisibility(View.GONE);
@@ -6962,9 +6925,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		        		sortByDateTV.setVisibility(View.GONE);
 		        		newestCheck.setVisibility(View.GONE);
 		        		oldestCheck.setVisibility(View.GONE);
-						sortByModificationDateTV.setVisibility(View.GONE);
-						newestModificationCheck.setVisibility(View.GONE);
-						oldestModificationCheck.setVisibility(View.GONE);
 		        		sortBySizeTV.setVisibility(View.GONE);
 		        		largestCheck.setVisibility(View.GONE);
 		        		smallestCheck.setVisibility(View.GONE);
@@ -7065,62 +7025,15 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 							}
 						});
 
-		        		newestCheck.setOnClickListener(new OnClickListener() {
 
-							@Override
-							public void onClick(View v) {
-								ascendingCheck.setChecked(false);
-			        			descendingCheck.setChecked(false);
-			        			newestCheck.setChecked(true);
-			        			oldestCheck.setChecked(false);
-			        			largestCheck.setChecked(false);
-			        			smallestCheck.setChecked(false);
-			        			if(drawerItem==DrawerItem.CLOUD_DRIVE){
-			        				selectSortByCloudDrive(MegaApiJava.ORDER_CREATION_DESC);
-			        			}
-			        			else{
-			        				selectSortByInbox(MegaApiJava.ORDER_CREATION_DESC);
-			        			}
-
-			        			if (dialog != null){
-			        				dialog.dismiss();
-			        			}
-							}
-						});
-
-		        		oldestCheck.setOnClickListener(new OnClickListener() {
-
-							@Override
-							public void onClick(View v) {
-								ascendingCheck.setChecked(false);
-			        			descendingCheck.setChecked(false);
-			        			newestCheck.setChecked(false);
-			        			oldestCheck.setChecked(true);
-			        			largestCheck.setChecked(false);
-			        			smallestCheck.setChecked(false);
-			        			if(drawerItem==DrawerItem.CLOUD_DRIVE){
-			        				selectSortByCloudDrive(MegaApiJava.ORDER_CREATION_ASC);
-			        			}
-			        			else{
-			        				selectSortByInbox(MegaApiJava.ORDER_CREATION_ASC);
-			        			}
-
-			        			if (dialog != null){
-			        				dialog.dismiss();
-			        			}
-							}
-						});
-
-						newestModificationCheck.setOnClickListener(new OnClickListener() {
+						newestCheck.setOnClickListener(new OnClickListener() {
 
 							@Override
 							public void onClick(View v) {
 								ascendingCheck.setChecked(false);
 								descendingCheck.setChecked(false);
-								newestCheck.setChecked(false);
+								newestCheck.setChecked(true);
 								oldestCheck.setChecked(false);
-								newestModificationCheck.setChecked(true);
-								oldestModificationCheck.setChecked(false);
 								largestCheck.setChecked(false);
 								smallestCheck.setChecked(false);
 								if(drawerItem==DrawerItem.CLOUD_DRIVE){
@@ -7136,16 +7049,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 							}
 						});
 
-						oldestModificationCheck.setOnClickListener(new OnClickListener() {
+						oldestCheck.setOnClickListener(new OnClickListener() {
 
 							@Override
 							public void onClick(View v) {
 								ascendingCheck.setChecked(false);
-								descendingCheck.setChecked(false);
+								descendingCheck.setChecked(false);;
 								newestCheck.setChecked(false);
-								oldestCheck.setChecked(false);
-								newestModificationCheck.setChecked(false);
-								oldestModificationCheck.setChecked(true);
+								oldestCheck.setChecked(true);
 								largestCheck.setChecked(false);
 								smallestCheck.setChecked(false);
 								if(drawerItem==DrawerItem.CLOUD_DRIVE){
@@ -7160,6 +7071,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 								}
 							}
 						});
+
 
 		        		largestCheck.setOnClickListener(new OnClickListener() {
 
