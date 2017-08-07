@@ -124,23 +124,78 @@
                     android:layout_marginRight="16dp"
                     android:gravity="left"/>
 
-                <ImageView
-                    android:id="@+id/content_own_message_thumb_portrait"
-                    android:layout_width="160dp"
-                    android:layout_height="220dp"
-                    android:layout_alignParentRight="true"
-                    android:layout_marginEnd="16dp"
-                    android:layout_marginRight="16dp"
-                    android:scaleType="centerCrop"/>
 
-                <ImageView
-                    android:id="@+id/content_own_message_thumb_landscape"
-                    android:layout_width="220dp"
-                    android:layout_height="160dp"
-                    android:layout_alignParentRight="true"
-                    android:layout_marginEnd="16dp"
-                    android:layout_marginRight="16dp"
-                    android:scaleType="centerCrop"/>
+                <RelativeLayout
+                    android:id="@+id/preview_frame_portrait"
+                    android:layout_width="wrap_content"
+                    android:layout_height="225dp"
+                    android:background="@android:color/transparent">
+                    <RelativeLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:layout_marginEnd="16dp"
+                        android:layout_marginRight="16dp"
+                        android:background="@drawable/shape_images_chat_2"
+                        android:elevation="2dp">
+                        <ImageView
+                            android:id="@+id/content_own_message_thumb_portrait"
+                            android:layout_width="160dp"
+                            android:layout_height="220dp"
+                            android:layout_gravity="center_horizontal|center_vertical"
+                            android:padding="3dp"
+                            android:scaleType="centerCrop"
+                            android:cropToPadding="true"
+                            android:background="@drawable/shape_images_chat" />
+                        <ImageView
+                            android:layout_width="160dp"
+                            android:layout_height="220dp"
+                            android:padding="3dp"
+                            android:scaleType="centerCrop"
+                            android:layout_gravity="center_horizontal|center_vertical"
+                            android:cropToPadding="true"
+                            android:background="@drawable/shape_images_chat"/>
+                    </RelativeLayout>
+                </RelativeLayout>
+
+
+
+                <RelativeLayout
+                    android:id="@+id/preview_frame_landscape"
+                    android:layout_width="wrap_content"
+                    android:layout_height="165dp"
+                    android:background="@android:color/transparent">
+                    <RelativeLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:layout_marginEnd="16dp"
+                        android:layout_marginRight="16dp"
+                        android:background="@drawable/shape_images_chat_2"
+                        android:elevation="2dp">
+
+                        <ImageView
+                            android:id="@+id/content_own_message_thumb_landscape"
+                            android:layout_width="220dp"
+                            android:layout_height="160dp"
+                            android:layout_gravity="center_horizontal|center_vertical"
+                            android:padding="3dp"
+                            android:scaleType="centerCrop"
+                            android:cropToPadding="true"
+                            android:background="@drawable/shape_images_chat"/>
+
+                        <ImageView
+                            android:layout_width="220dp"
+                            android:layout_height="160dp"
+                            android:padding="3dp"
+                            android:scaleType="centerCrop"
+                            android:layout_gravity="center_horizontal|center_vertical"
+                            android:cropToPadding="true"
+                            android:background="@drawable/shape_images_chat"/>
+                    </RelativeLayout>
+                </RelativeLayout>
+
+
 
                 <ProgressBar
                     android:id="@+id/uploadingProgressBar"
@@ -434,6 +489,8 @@
                     android:maxLines="2"
                     android:ellipsize="end"
                     android:gravity="left"/>
+
+
 
                 <ImageView
                     android:id="@+id/content_contact_message_thumb_portrait"
