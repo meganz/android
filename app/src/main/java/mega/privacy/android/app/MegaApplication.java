@@ -56,6 +56,7 @@ import mega.privacy.android.app.lollipop.megachat.RecentChatsFragmentLollipop;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaChatLollipopAdapter;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaListChatLollipopAdapter;
 import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.TimeChatUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -63,6 +64,7 @@ import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatListenerInterface;
+import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatPresenceConfig;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
@@ -77,7 +79,7 @@ import nz.mega.sdk.MegaUser;
 
 public class MegaApplication extends Application implements MegaListenerInterface, MegaChatListenerInterface{
 	final String TAG = "MegaApplication";
-	static final String USER_AGENT = "MEGAAndroid/3.2.1_144";
+	static final String USER_AGENT = "MEGAAndroid/3.2.2_145";
 
 	DatabaseHandler dbH;
 	MegaApiAndroid megaApi;
@@ -260,7 +262,7 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 			}
 		}
 
-		notificationBuilder =  NotificationBuilder.newInstance(this, megaApi);
+		notificationBuilder =  NotificationBuilder.newInstance(this, megaApi, megaChatApi);
 		
 //		initializeGA();
 		
@@ -368,7 +370,6 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 				languageString = megaApi.setLanguage(language);
 				log("2--Result: "+languageString+" Language: "+language);
 			}
-
 		}
 		
 		return megaApi;
@@ -549,7 +550,12 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 						}
 
 						String source = "<b>"+n.getName()+"</b> "+getString(R.string.incoming_folder_notification)+" "+name;
-						Spanned notificationContent = Html.fromHtml(source,0);
+						Spanned notificationContent;
+						if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+							notificationContent = Html.fromHtml(source,Html.FROM_HTML_MODE_LEGACY);
+						} else {
+							notificationContent = Html.fromHtml(source);
+						}
 
 						int notificationId = Constants.NOTIFICATION_PUSH_CLOUD_DRIVE;
 
@@ -763,7 +769,7 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 			log("onChatListItemUpdate: item is NULL --> return");
 		}
 
-		log("onChatListItemUpdate: "+item.getTitle());
+		log("onChatListItemUpdate: "+item.getTitle()+ " chat id: "+item.getChatId());
 		if (megaApi == null){
 			megaApi = getMegaApi();
 		}
@@ -773,11 +779,12 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 		}
 
 		log("Unread count is: "+item.getUnreadCount());
-		if (item.hasChanged(MegaChatListItem.CHANGE_TYPE_LAST_MSG) && (item.getUnreadCount() != 0)){
+
+		if (item.hasChanged(MegaChatListItem.CHANGE_TYPE_LAST_TS) && (item.getUnreadCount() != 0)){
+
 			try {
 				if(isFireBaseConnection){
 					log("Show notification ALWAYS");
-					isFireBaseConnection=false;
 					showNotification(item);
 					firstTs=-1;
 				}
@@ -807,11 +814,11 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 						}
 					}
 				}
-
 			}
 			catch (Exception e){
 				log("Exception when trying to show chat notification");
 			}
+
 		}
 	}
 

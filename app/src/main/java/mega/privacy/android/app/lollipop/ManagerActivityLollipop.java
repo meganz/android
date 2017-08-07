@@ -1769,6 +1769,33 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						drawerItem=DrawerItem.CHAT;
 						selectDrawerItemLollipop(drawerItem);
 						selectDrawerItemPending=false;
+						long chatId = getIntent().getLongExtra("CHAT_ID", -1);
+						if(chatId!=-1){
+							MegaChatRoom chat = megaChatApi.getChatRoom(chatId);
+							if(chat!=null){
+								log("open chat with id: " + chatId);
+								Intent intentToChat = new Intent(this, ChatActivityLollipop.class);
+								intentToChat.setAction(Constants.ACTION_CHAT_SHOW_MESSAGES);
+								intentToChat.putExtra("CHAT_ID", chatId);
+								this.startActivity(intentToChat);
+							}
+							else{
+								log("Error, chat is NULL");
+							}
+						}
+						else{
+							log("Error, chat id is -1");
+						}
+						getIntent().setAction(null);
+						setIntent(null);
+					}
+					else if(getIntent().getAction().equals(Constants.ACTION_CHAT_SUMMARY)) {
+						log("Chat notification: ACTION_CHAT_SUMMARY");
+						drawerItem=DrawerItem.CHAT;
+						selectDrawerItemLollipop(drawerItem);
+						selectDrawerItemPending=false;
+						getIntent().setAction(null);
+						setIntent(null);
 					}
 					else if(getIntent().getAction().equals(Constants.ACTION_INCOMING_SHARED_FOLDER_NOTIFICATION)){
 						log("IPC link - go to received request in Contacts");
@@ -1805,6 +1832,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				if(!chatConnection){
 					log("Connection goes!!!");
 					megaChatApi.connect(this);
+					log("timestamp: "+System.currentTimeMillis()/1000);
                     MegaApplication.setFirstTs(System.currentTimeMillis()/1000);
 				}
 
@@ -2228,7 +2256,29 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					selectDrawerItemLollipop(drawerItem);
 				}
 				else if(getIntent().getAction().equals(Constants.ACTION_CHAT_NOTIFICATION_MESSAGE)){
-					log("Chat notification received");
+					log("onPostResume: ACTION_CHAT_NOTIFICATION_MESSAGE");
+					drawerItem=DrawerItem.CHAT;
+					selectDrawerItemLollipop(drawerItem);
+					long chatId = getIntent().getLongExtra("CHAT_ID", -1);
+					if(chatId!=-1){
+						MegaChatRoom chat = megaChatApi.getChatRoom(chatId);
+						if(chat!=null){
+							log("open chat with id: " + chatId);
+							Intent intentToChat = new Intent(this, ChatActivityLollipop.class);
+							intentToChat.setAction(Constants.ACTION_CHAT_SHOW_MESSAGES);
+							intentToChat.putExtra("CHAT_ID", chatId);
+							this.startActivity(intentToChat);
+						}
+						else{
+							log("Error, chat is NULL");
+						}
+					}
+					else{
+						log("Error, chat id is -1");
+					}
+				}
+				else if(getIntent().getAction().equals(Constants.ACTION_CHAT_SUMMARY)) {
+					log("onPostResume: ACTION_CHAT_SUMMARY");
 					drawerItem=DrawerItem.CHAT;
 					selectDrawerItemLollipop(drawerItem);
 				}
@@ -11796,6 +11846,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 			if (MegaApplication.isFirstConnect()){
 				log("Set first connect to false");
+				MegaApplication.isFireBaseConnection=false;
 				MegaApplication.setFirstConnect(false);
 			}
 
