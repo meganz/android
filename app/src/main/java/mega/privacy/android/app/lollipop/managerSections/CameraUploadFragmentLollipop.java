@@ -25,6 +25,7 @@ import android.support.v7.view.ActionMode;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.SwitchCompat;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
@@ -72,6 +73,7 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.MegaMonthPicLollipop;
 import mega.privacy.android.app.lollipop.MyAccountInfo;
 import mega.privacy.android.app.lollipop.adapters.MegaPhotoSyncGridAdapterLollipop;
+import mega.privacy.android.app.lollipop.adapters.MegaPhotoSyncGridTitleAdapterLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaPhotoSyncListAdapterLollipop;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.utils.Constants;
@@ -116,7 +118,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	private MegaPreferences prefs;
 
 	private MegaPhotoSyncListAdapterLollipop adapterList;
-	private MegaPhotoSyncGridAdapterLollipop adapterGrid;
+	private MegaPhotoSyncGridTitleAdapterLollipop adapterGrid;
 	private MegaApiAndroid megaApi;
 		
 //	long parentHandle = -1;
@@ -856,11 +858,9 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			detector = new GestureDetectorCompat(getActivity(), new RecyclerViewOnGestureListener());
 			
 			listView = (RecyclerView) v.findViewById(R.id.file_grid_view_browser);
-//			listView.addItemDecoration(new SimpleDividerItemDecoration(context));
-			mLayoutManager = new MegaLinearLayoutManager(context);
-			listView.setLayoutManager(mLayoutManager);
+//			listView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
 			listView.addOnItemTouchListener(this);
-			listView.setItemAnimator(new DefaultItemAnimator()); 
+//			listView.setItemAnimator(new DefaultItemAnimator());
 
 
 			final TextView turnOnOff = (TextView) v.findViewById(R.id.file_grid_browser_camera_upload_on_off);
@@ -992,6 +992,9 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 //					numberOfCells = 3;
 //				}	
 //		    }
+
+			mLayoutManager = new StaggeredGridLayoutManager(numberOfCells, StaggeredGridLayoutManager.HORIZONTAL | StaggeredGridLayoutManager.VERTICAL);
+			listView.setLayoutManager(mLayoutManager);
 		    
 			
 			if (monthPics != null){
@@ -1019,20 +1022,23 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 						month = d.getMonth();
 						year = d.getYear();
 						monthPic.monthYearString = getImageDateString(month, year);
-						monthPics.add(monthPic);
-						monthPic = new MegaMonthPicLollipop();
-						i--;
+						monthPic.nodeHandles.add(nodes.get(i).getHandle());
+						monthPic.setPosition(nodes.get(i), i);
+//						monthPics.add(monthPic);
+//						monthPic = new MegaMonthPicLollipop();
+//						i--;
 					}
 					else if ((month == d.getMonth()) && (year == d.getYear())){
 						thereAreImages = true;
-						if (monthPic.nodeHandles.size() == numberOfCells){
-							monthPics.add(monthPic);
-							monthPic = new MegaMonthPicLollipop();
+//						if (monthPic.nodeHandles.size() == numberOfCells){
+//							monthPics.add(monthPic);
+//							monthPic = new MegaMonthPicLollipop();
+//							monthPic.nodeHandles.add(nodes.get(i).getHandle());
+//						}
+//						else{
 							monthPic.nodeHandles.add(nodes.get(i).getHandle());
-						}
-						else{
-							monthPic.nodeHandles.add(nodes.get(i).getHandle());
-						}
+							monthPic.setPosition(nodes.get(i), i);
+//						}
 					}
 					else{
 						month = d.getMonth();
@@ -1040,9 +1046,11 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 						monthPics.add(monthPic);
 						monthPic = new MegaMonthPicLollipop();
 						monthPic.monthYearString = getImageDateString(month, year);
-						monthPics.add(monthPic);
-						monthPic = new MegaMonthPicLollipop();
-						i--;						
+						monthPic.nodeHandles.add(nodes.get(i).getHandle());
+						monthPic.setPosition(nodes.get(i), i);
+//						monthPics.add(monthPic);
+//						monthPic = new MegaMonthPicLollipop();
+//						i--;
 					}
 				}
 				if (nodes.size() > 0){
@@ -1066,7 +1074,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			
 			if (adapterGrid == null){
 				log("ADAPTERGRID.MONTHPICS(NEW) = " + monthPics.size());
-				adapterGrid = new MegaPhotoSyncGridAdapterLollipop(context, monthPics, photosyncHandle, listView, emptyImageView, emptyTextView, aB, nodes, numberOfCells, gridWidth, this, Constants.CAMERA_UPLOAD_ADAPTER);
+				adapterGrid = new MegaPhotoSyncGridTitleAdapterLollipop(context, monthPics, photosyncHandle, listView, emptyImageView, emptyTextView, aB, nodes, numberOfCells, gridWidth, this, Constants.CAMERA_UPLOAD_ADAPTER);
 			}
 			else{
 				log("ADAPTERGRID.MONTHPICS = " + monthPics.size());
@@ -1848,34 +1856,77 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			int year = 0;
 			MegaMonthPicLollipop monthPic = new MegaMonthPicLollipop();
 			boolean thereAreImages = false;
+//			for (int i=0;i<nodes.size();i++){
+//				if (nodes.get(i).isFolder()){
+//					continue;
+//				}
+//
+//				if (!MimeTypeList.typeForName(nodes.get(i).getName()).isImage() && (!MimeTypeList.typeForName(nodes.get(i).getName()).isVideo())){
+//					continue;
+//				}
+//
+//				Date d = new Date(nodes.get(i).getModificationTime()*1000);
+//				if ((month == 0) && (year == 0)){
+//					month = d.getMonth();
+//					year = d.getYear();
+//					monthPic.monthYearString = getImageDateString(month, year);
+//					monthPics.add(monthPic);
+//					monthPic = new MegaMonthPicLollipop();
+//					i--;
+//				}
+//				else if ((month == d.getMonth()) && (year == d.getYear())){
+//					thereAreImages = true;
+//					if (monthPic.nodeHandles.size() == numberOfCells){
+//						monthPics.add(monthPic);
+//						monthPic = new MegaMonthPicLollipop();
+//						monthPic.nodeHandles.add(nodes.get(i).getHandle());
+//					}
+//					else{
+//						monthPic.nodeHandles.add(nodes.get(i).getHandle());
+//					}
+//				}
+//				else{
+//					month = d.getMonth();
+//					year = d.getYear();
+//					monthPics.add(monthPic);
+//					monthPic = new MegaMonthPicLollipop();
+//					monthPic.monthYearString = getImageDateString(month, year);
+//					monthPics.add(monthPic);
+//					monthPic = new MegaMonthPicLollipop();
+//					i--;
+//				}
+//			}
 			for (int i=0;i<nodes.size();i++){
 				if (nodes.get(i).isFolder()){
 					continue;
 				}
-				
+
 				if (!MimeTypeList.typeForName(nodes.get(i).getName()).isImage() && (!MimeTypeList.typeForName(nodes.get(i).getName()).isVideo())){
 					continue;
 				}
-				
+
 				Date d = new Date(nodes.get(i).getModificationTime()*1000);
 				if ((month == 0) && (year == 0)){
 					month = d.getMonth();
 					year = d.getYear();
 					monthPic.monthYearString = getImageDateString(month, year);
-					monthPics.add(monthPic);
-					monthPic = new MegaMonthPicLollipop();
-					i--;
+					monthPic.nodeHandles.add(nodes.get(i).getHandle());
+					monthPic.setPosition(nodes.get(i), i);
+//						monthPics.add(monthPic);
+//						monthPic = new MegaMonthPicLollipop();
+//						i--;
 				}
 				else if ((month == d.getMonth()) && (year == d.getYear())){
 					thereAreImages = true;
-					if (monthPic.nodeHandles.size() == numberOfCells){
-						monthPics.add(monthPic);
-						monthPic = new MegaMonthPicLollipop();
-						monthPic.nodeHandles.add(nodes.get(i).getHandle());
-					}
-					else{
-						monthPic.nodeHandles.add(nodes.get(i).getHandle());
-					}
+//						if (monthPic.nodeHandles.size() == numberOfCells){
+//							monthPics.add(monthPic);
+//							monthPic = new MegaMonthPicLollipop();
+//							monthPic.nodeHandles.add(nodes.get(i).getHandle());
+//						}
+//						else{
+					monthPic.nodeHandles.add(nodes.get(i).getHandle());
+					monthPic.setPosition(nodes.get(i), i);
+//						}
 				}
 				else{
 					month = d.getMonth();
@@ -1883,9 +1934,11 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 					monthPics.add(monthPic);
 					monthPic = new MegaMonthPicLollipop();
 					monthPic.monthYearString = getImageDateString(month, year);
-					monthPics.add(monthPic);
-					monthPic = new MegaMonthPicLollipop();
-					i--;						
+					monthPic.nodeHandles.add(nodes.get(i).getHandle());
+					monthPic.setPosition(nodes.get(i), i);
+//						monthPics.add(monthPic);
+//						monthPic = new MegaMonthPicLollipop();
+//						i--;
 				}
 			}
 			if (nodes.size() > 0){
