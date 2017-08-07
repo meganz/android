@@ -69,8 +69,7 @@
         android:layout_height="match_parent"
         android:layout_below="@id/content_grid_text_layout"
         android:choiceMode="multipleChoice"
-        android:columnWidth="172dp"
-        android:layout_centerHorizontal="true"/>
+        android:columnWidth="172dp" />
 
     <TextView
         android:id="@+id/file_grid_browser_camera_upload_on_off"
