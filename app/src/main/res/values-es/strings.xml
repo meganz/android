@@ -879,9 +879,7 @@
     <string name="number_correctly_invite_contact_request" context="success message when reinviting multiple contacts">%d invite requests sent successfully. </string>
     <string name="number_no_invite_contact_request" context="error message when reinviting multiple contacts">%1$d invite requests successfully sent but %2$d requests were not sent.</string>
 
-    <string name="chat_me_text" context="Word next to own user's message in chat screen">Yo</string>
     <string name="chat_me_text_bracket" context="Word next to own user's message in chat screen">%1s (Yo)</string>
-    <string name="chat_I_text" context="Word next to own user's message in chat message">Yo</string>
     <string name="type_message_hint" context="Hint shown in the field to write a message in the chat screen">Escribe un mensaje</string>
 
     <string name="general_mute" context="button">Silenciar</string>
@@ -1252,7 +1250,7 @@
 
     <string name="confirmation_delete_one_attachment" context="Confirmation before deleting one attachment">Eliminar adjunto?</string>
 
-    <string name="general_view_with_revoke" formatted="false" context="Menu option">Ver ficheros (%1d eliminado)</string>
+    <string name="general_view_with_revoke" formatted="false" context="Menu option">Ver ficheros (%1$d eliminado)</string>
 
     <string name="error_attaching_node_from_cloud" context="Error message when the attachment cannot be sent">Error. El fichero no se ha enviado</string>
 
@@ -1265,4 +1263,5 @@
     <string name="title_incoming_folder_notification" context="title of incoming shared folder notification">Nueva carpeta compartida</string>
     <string name="title_contact_request_notification" context="title of contact request notification">Nueva solicitud de contacto</string>
 
+    <string name="number_messages_chat_notification" formatted="false" context="messages string in chat notification">%1$d chats sin leer</string>
 </resources>

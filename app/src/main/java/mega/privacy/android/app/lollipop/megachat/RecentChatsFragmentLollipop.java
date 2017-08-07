@@ -228,12 +228,11 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
                 });
 
                 if (adapterList == null){
+                    log("adapterList is NULL");
                     adapterList = new MegaListChatLollipopAdapter(context, this, chats, listView, MegaListChatLollipopAdapter.ADAPTER_RECENT_CHATS);
                 }
                 else{
                     adapterList.setChats(chats);
-                    log("*****");
-
                 }
 
                 listView.setAdapter(adapterList);

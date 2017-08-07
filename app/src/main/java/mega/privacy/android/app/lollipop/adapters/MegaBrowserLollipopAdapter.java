@@ -886,6 +886,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 
 		if (node.isFolder()) {
 
+			log("Node is folder");
 			holder.itemLayout.setBackgroundColor(Color.WHITE);
 			RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
 			params.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
@@ -907,13 +908,13 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 
 					if(this.isItemChecked(position)){
 						RelativeLayout.LayoutParams paramsMultiselect = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
-						paramsMultiselect.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 40, context.getResources().getDisplayMetrics());
-						paramsMultiselect.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 40, context.getResources().getDisplayMetrics());
-						paramsMultiselect.setMargins(16, 0, 8, 0);
+						paramsMultiselect.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
+						paramsMultiselect.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
+						paramsMultiselect.setMargins(0, 0, 0, 0);
 						holder.imageView.setLayoutParams(paramsMultiselect);
 
 						holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.new_multiselect_color));
-						holder.imageView.setImageResource(R.drawable.ic_multiselect);
+						holder.imageView.setImageResource(R.drawable.ic_select_folder);
 					}
 					else{
 						holder.itemLayout.setBackgroundColor(Color.WHITE);
@@ -931,11 +932,11 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 					if(this.isItemChecked(position)){
 						holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.new_multiselect_color));
 						RelativeLayout.LayoutParams paramsMultiselect = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
-						paramsMultiselect.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 40, context.getResources().getDisplayMetrics());
-						paramsMultiselect.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 40, context.getResources().getDisplayMetrics());
-						paramsMultiselect.setMargins(16, 0, 8, 0);
+						paramsMultiselect.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
+						paramsMultiselect.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
+						paramsMultiselect.setMargins(0, 0, 0, 0);
 						holder.imageView.setLayoutParams(paramsMultiselect);
-						holder.imageView.setImageResource(R.drawable.ic_multiselect);
+						holder.imageView.setImageResource(R.drawable.ic_select_folder);
 					}
 					else{
 						holder.itemLayout.setBackgroundColor(Color.WHITE);
@@ -974,11 +975,11 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 					if(this.isItemChecked(position)){
 						holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.new_multiselect_color));
 						RelativeLayout.LayoutParams paramsMultiselect = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
-						paramsMultiselect.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 40, context.getResources().getDisplayMetrics());
-						paramsMultiselect.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 40, context.getResources().getDisplayMetrics());
-						paramsMultiselect.setMargins(16, 0, 8, 0);
+						paramsMultiselect.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
+						paramsMultiselect.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
+						paramsMultiselect.setMargins(0, 0, 0, 0);
 						holder.imageView.setLayoutParams(paramsMultiselect);
-						holder.imageView.setImageResource(R.drawable.ic_multiselect);
+						holder.imageView.setImageResource(R.drawable.ic_select_folder);
 					}
 					else{
 						holder.itemLayout.setBackgroundColor(Color.WHITE);
@@ -1044,11 +1045,11 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 					if(this.isItemChecked(position)){
 						holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.new_multiselect_color));
 						RelativeLayout.LayoutParams paramsMultiselect = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
-						paramsMultiselect.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 40, context.getResources().getDisplayMetrics());
-						paramsMultiselect.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 40, context.getResources().getDisplayMetrics());
-						paramsMultiselect.setMargins(16, 0, 8, 0);
+						paramsMultiselect.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
+						paramsMultiselect.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
+						paramsMultiselect.setMargins(0, 0, 0, 0);
 						holder.imageView.setLayoutParams(paramsMultiselect);
-						holder.imageView.setImageResource(R.drawable.ic_multiselect);
+						holder.imageView.setImageResource(R.drawable.ic_select_folder);
 					}
 					else{
 						holder.itemLayout.setBackgroundColor(Color.WHITE);
@@ -1082,11 +1083,11 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 					if(this.isItemChecked(position)){
 						holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.new_multiselect_color));
 						RelativeLayout.LayoutParams paramsMultiselect = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
-						paramsMultiselect.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 40, context.getResources().getDisplayMetrics());
-						paramsMultiselect.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 40, context.getResources().getDisplayMetrics());
-						paramsMultiselect.setMargins(16, 0, 8, 0);
+						paramsMultiselect.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
+						paramsMultiselect.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
+						paramsMultiselect.setMargins(0, 0, 0, 0);
 						holder.imageView.setLayoutParams(paramsMultiselect);
-						holder.imageView.setImageResource(R.drawable.ic_multiselect);
+						holder.imageView.setImageResource(R.drawable.ic_select_folder);
 					}
 					else{
 						holder.itemLayout.setBackgroundColor(Color.WHITE);
@@ -1104,12 +1105,13 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 			}			
 		} 
 		else {
-			
+			log("Node is file");
 //			holder.propertiesText.setText(R.string.general_file_info);
 			long nodeSize = node.getSize();
 			holder.textViewFileSize.setText(Util.getSizeString(nodeSize));	
 
 			if (!multipleSelect) {
+				log("Not multiselect");
 				holder.itemLayout.setBackgroundColor(Color.WHITE);
 				holder.imageView.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
 
@@ -1186,15 +1188,15 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 				}
 			}
 			else {
-
+				log("Multiselection ON");
 				if(this.isItemChecked(position)){
 					holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.new_multiselect_color));
 					RelativeLayout.LayoutParams paramsMultiselect = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
-					paramsMultiselect.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 40, context.getResources().getDisplayMetrics());
-					paramsMultiselect.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 40, context.getResources().getDisplayMetrics());
-					paramsMultiselect.setMargins(16, 0, 8, 0);
+					paramsMultiselect.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
+					paramsMultiselect.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
+					paramsMultiselect.setMargins(0, 0, 0, 0);
 					holder.imageView.setLayoutParams(paramsMultiselect);
-					holder.imageView.setImageResource(R.drawable.ic_multiselect);
+					holder.imageView.setImageResource(R.drawable.ic_select_folder);
 				}
 				else{
 					holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.white));
