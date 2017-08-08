@@ -2742,43 +2742,49 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                 log("State of the message: "+message.getPendingMessage().getState());
 
-                if(message.getPendingMessage().getState()== PendingMessage.STATE_ERROR){
-                    holder.uploadingProgressBar.setVisibility(View.GONE);
-                    holder.errorUploadingLayout.setVisibility(View.VISIBLE);
+                if(message.getPendingMessage()!=null){
+                    if(message.getPendingMessage().getState()== PendingMessage.STATE_ERROR){
+                        holder.uploadingProgressBar.setVisibility(View.GONE);
+                        holder.errorUploadingLayout.setVisibility(View.VISIBLE);
+                    }
+                    else{
+                        holder.uploadingProgressBar.setVisibility(View.VISIBLE);
+                        holder.errorUploadingLayout.setVisibility(View.GONE);
+                    }
+
+                    if (bitmap.getWidth() < bitmap.getHeight()) {
+                        log("Portrait");
+                        holder.contentOwnMessageThumbPort.setImageBitmap(bitmap);
+                        holder.contentOwnMessageThumbPort.setVisibility(View.VISIBLE);
+                        holder.contentOwnMessageFileLayout.setVisibility(View.GONE);
+                        holder.contentOwnMessageThumbLand.setVisibility(View.GONE);
+
+                        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams)holder.errorUploadingLayout.getLayoutParams();
+                        float width = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 160, context.getResources().getDisplayMetrics());
+
+                        params.width = (int)width;
+                        log("Preview ImageView width: "+width);
+                        holder.errorUploadingLayout.setLayoutParams(params);
+                    }
+                    else {
+                        log("Landcape");
+                        holder.contentOwnMessageThumbLand.setImageBitmap(bitmap);
+                        holder.contentOwnMessageThumbLand.setVisibility(View.VISIBLE);
+                        holder.contentOwnMessageFileLayout.setVisibility(View.GONE);
+                        holder.contentOwnMessageThumbPort.setVisibility(View.GONE);
+
+                        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams)holder.errorUploadingLayout.getLayoutParams();
+                        float width = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 220, context.getResources().getDisplayMetrics());
+
+                        params.width = (int)width;
+                        log("Preview ImageView width: "+width);
+                        holder.errorUploadingLayout.setLayoutParams(params);
+                    }
                 }
                 else{
-                    holder.uploadingProgressBar.setVisibility(View.VISIBLE);
-                    holder.errorUploadingLayout.setVisibility(View.GONE);
+                    log("The pending message is NULL-- cannot set preview");
                 }
 
-                if (bitmap.getWidth() < bitmap.getHeight()) {
-                    log("Portrait");
-                    holder.contentOwnMessageThumbPort.setImageBitmap(bitmap);
-                    holder.contentOwnMessageThumbPort.setVisibility(View.VISIBLE);
-                    holder.contentOwnMessageFileLayout.setVisibility(View.GONE);
-                    holder.contentOwnMessageThumbLand.setVisibility(View.GONE);
-
-                    RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams)holder.errorUploadingLayout.getLayoutParams();
-                    float width = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 160, context.getResources().getDisplayMetrics());
-
-                    params.width = (int)width;
-                    log("Preview ImageView width: "+width);
-                    holder.errorUploadingLayout.setLayoutParams(params);
-                }
-                else {
-                    log("Landcape");
-                    holder.contentOwnMessageThumbLand.setImageBitmap(bitmap);
-                    holder.contentOwnMessageThumbLand.setVisibility(View.VISIBLE);
-                    holder.contentOwnMessageFileLayout.setVisibility(View.GONE);
-                    holder.contentOwnMessageThumbPort.setVisibility(View.GONE);
-
-                    RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams)holder.errorUploadingLayout.getLayoutParams();
-                    float width = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 220, context.getResources().getDisplayMetrics());
-
-                    params.width = (int)width;
-                    log("Preview ImageView width: "+width);
-                    holder.errorUploadingLayout.setLayoutParams(params);
-                }
             }
             else{
                 log("Bitmap is NULL");
