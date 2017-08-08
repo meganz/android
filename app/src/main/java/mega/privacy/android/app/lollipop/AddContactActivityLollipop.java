@@ -233,6 +233,12 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements T
         sendInvitationMenuItem = menu.findItem(R.id.action_send_invitation);
         writeMailMenuItem = menu.findItem(R.id.action_write_mail);
 
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        log("onPrepareOptionsMenu");
         if(sendToInbox==0){
             if (writeMailMenuItem != null){
                 writeMailMenuItem.setVisible(true);
@@ -242,11 +248,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements T
                 writeMailMenuItem.setVisible(false);
             }
         }
-
-
-
-        return super.onCreateOptionsMenu(menu);
-
+        return super.onPrepareOptionsMenu(menu);
 
     }
 
@@ -267,6 +269,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements T
                     inviteContacts(selectedContactsPhone);
                 }
                 else if (contactType == Constants.CONTACT_TYPE_MEGA){
+                    writeMailMenuItem.setVisible(false);
                     setResultContacts(selectedContactsMEGA, true);
                 }
                 break;
@@ -674,7 +677,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements T
 
         //Get MEGA contacts and phone contacts: first name, last name and email
         if (contactType == Constants.CONTACT_TYPE_MEGA) {
-            aB.setTitle("Choose contact");
+            aB.setTitle(getString(R.string.menu_choose_contact));
 
             if (sendInvitationMenuItem != null){
                 sendInvitationMenuItem.setVisible(false);
@@ -1467,6 +1470,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements T
     }
 
     private void setResultContacts(SparseBooleanArray selectedContacts, boolean megaContacts){
+        log("setResultContacts");
         ArrayList<String> contactsSelected = new ArrayList<String>();
 
         if (selectedContacts != null){
@@ -1496,35 +1500,18 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements T
         Intent intent = new Intent();
         intent.putStringArrayListExtra(EXTRA_CONTACTS, contactsSelected);
 
-        if(contactsSelected!=null){
-            for(int i=0; i<contactsSelected.size();i++){
-                log("setResultContacts: "+contactsSelected.get(i));
-            }
-        }
-
         if(multipleSelectIntent==0){
-            log("multiselectIntent == 0");
             intent.putExtra(EXTRA_NODE_HANDLE, nodeHandle);
             intent.putExtra("MULTISELECT", 0);
         }
         else if(multipleSelectIntent==1){
-            log("multiselectIntent == 1");
-            if(nodeHandles!=null){
-                log("number of items selected: "+nodeHandles.length);
-            }
             intent.putExtra(EXTRA_NODE_HANDLE, nodeHandles);
             intent.putExtra("MULTISELECT", 1);
         }
 
         if(sendToInbox==0){
-            if (writeMailMenuItem != null){
-                writeMailMenuItem.setVisible(true);
-            }
             intent.putExtra("SEND_FILE",0);
         } else {
-            if (writeMailMenuItem != null){
-                writeMailMenuItem.setVisible(false);
-            }
             intent.putExtra("SEND_FILE",1);
         }
         intent.putExtra(EXTRA_MEGA_CONTACTS, megaContacts);

@@ -75,7 +75,11 @@ import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApiAndroid;
+import nz.mega.sdk.MegaChatApiJava;
+import nz.mega.sdk.MegaChatError;
 import nz.mega.sdk.MegaChatMessage;
+import nz.mega.sdk.MegaChatRequest;
+import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaNodeList;
@@ -83,7 +87,7 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaShare;
 
-public class ChatFullScreenImageViewer extends PinActivityLollipop implements OnPageChangeListener, OnClickListener, MegaRequestListenerInterface, OnItemClickListener{
+public class ChatFullScreenImageViewer extends PinActivityLollipop implements OnPageChangeListener, OnClickListener, MegaRequestListenerInterface, OnItemClickListener, MegaChatRequestListenerInterface {
 
 	private DisplayMetrics outMetrics;
 
@@ -208,39 +212,32 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 		imageHandles = new ArrayList<Long>();
 		paths = new ArrayList<String>();
 
-		if(messageIds.length==1){
-			log("One message");
-			MegaChatMessage message = megaChatApi.getMessage(chatId, messageIds[0]);
+		if(messageIds==null){
+			return;
+		}
+
+		for(int j=0; j<messageIds.length; j++){
+			MegaChatMessage message = megaChatApi.getMessage(chatId, messageIds[j]);
 			if(message!=null){
 				MegaNodeList list = message.getMegaNodeList();
 				if(list.size()==1){
 					MegaNode node = list.get(0);
-					nodes.add(node);
+					if(MimeTypeList.typeForName(node.getName()).isImage()){
+						nodes.add(node);
+					}
 				}
 				else{
 					for(int i=0; i<list.size(); i++){
 						MegaNode node = list.get(i);
-						nodes.add(node);
+						if(MimeTypeList.typeForName(node.getName()).isImage()){
+							nodes.add(node);
+						}
 					}
 				}
-
-				if(message.getUserHandle()==megaChatApi.getMyUserHandle()){
-					menuOptions = new String[2];
-					menuOptions[0] = getString(R.string.save_for_offline);
-					menuOptions[1] = getString(R.string.general_revoke);
-				}
-				else{
-					menuOptions = new String[1];
-					menuOptions[0] = getString(R.string.save_for_offline);
-				}
-
 			}
 			else{
 				log("ERROR - the message is NULL");
 			}
-		}
-		else{
-			log("Several messages");
 		}
 
 		int imageNumber = 0;
@@ -290,11 +287,7 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 		importIcon.setVisibility(View.VISIBLE);
 		importIcon.setOnClickListener(this);
 
-		ArrayAdapter<String> arrayAdapter;
-
 		overflowMenuList = (ListView) findViewById(R.id.chat_image_viewer_overflow_menu_list);
-		arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, menuOptions);
-		overflowMenuList.setAdapter(arrayAdapter);
 
 		overflowMenuList.setOnItemClickListener(this);
 		if (overflowVisible){
@@ -351,6 +344,22 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 
 		MegaNode node = nodes.get(positionG);
+
+		if((megaApi.getNodeByHandle(node.getHandle()))==null){
+			log("The node is not mine");
+			menuOptions = new String[1];
+			menuOptions[0] = getString(R.string.save_for_offline);
+		}
+		else{
+			menuOptions = new String[2];
+			menuOptions[0] = getString(R.string.save_for_offline);
+			menuOptions[1] = getString(R.string.context_remove);
+		}
+
+		ArrayAdapter<String> arrayAdapter;
+		arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, menuOptions);
+		overflowMenuList.setAdapter(arrayAdapter);
+
 		switch (v.getId()){
 			case R.id.chat_full_image_viewer_icon:{
 				finish();
@@ -572,10 +581,44 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 				break;
 			}
 			case 1:{
-				showSnackbar("Coming soon...");
+				MegaNode node = nodes.get(positionG);
+				showConfirmationDeleteNode(chatId, node.getHandle());
 				break;
 			}
 		}
+	}
+
+	public void showConfirmationDeleteNode(final long chatId, final long nodeHandle){
+		log("showConfirmationDeleteNode");
+
+		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				switch (which){
+					case DialogInterface.BUTTON_POSITIVE:
+						ChatController cC = new ChatController(fullScreenImageViewer);
+						cC.deleteNodeAttachment(chatId, nodeHandle);
+						break;
+
+					case DialogInterface.BUTTON_NEGATIVE:
+						//No button clicked
+						break;
+				}
+			}
+		};
+
+		android.support.v7.app.AlertDialog.Builder builder;
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+			builder = new android.support.v7.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		}
+		else{
+			builder = new android.support.v7.app.AlertDialog.Builder(this);
+		}
+
+		builder.setMessage(R.string.confirmation_delete_one_attachment);
+
+		builder.setPositiveButton(R.string.context_remove, dialogClickListener)
+				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
 	}
 	
 	@Override
@@ -594,7 +637,7 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 			log("URL: " + url + "___SIZE: " + size);
 			
 			downloadTo (parentPath, url, size, hashes);
-			Snackbar.make(fragmentContainer, getString(R.string.download_began), Snackbar.LENGTH_LONG).show();
+//			Snackbar.make(fragmentContainer, getString(R.string.download_began), Snackbar.LENGTH_LONG).show();
 		}
 		else if (requestCode == Constants.REQUEST_CODE_SELECT_IMPORT_FOLDER && resultCode == RESULT_OK) {
 			log("onActivityResult REQUEST_CODE_SELECT_IMPORT_FOLDER OK");
@@ -788,5 +831,35 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 			}
 		}
 		super.onBackPressed();
+	}
+
+	@Override
+	public void onRequestStart(MegaChatApiJava api, MegaChatRequest request) {
+
+	}
+
+	@Override
+	public void onRequestUpdate(MegaChatApiJava api, MegaChatRequest request) {
+
+	}
+
+	@Override
+	public void onRequestFinish(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
+		log("onRequestFinish: "+request.getRequestString());
+		if(request.getType() == MegaChatRequest.TYPE_REVOKE_NODE_MESSAGE){
+			if(e.getErrorCode()==MegaChatError.ERROR_OK){
+				log("Node revoked correctly, msg id: "+request.getMegaChatMessage().getMsgId());
+				finish();
+			}
+			else{
+				log("NOT revoked correctly");
+				showSnackbar(getString(R.string.error_revoking_node));
+			}
+		}
+	}
+
+	@Override
+	public void onRequestTemporaryError(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
+
 	}
 }

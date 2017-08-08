@@ -219,11 +219,18 @@ public class RubbishBinFragmentLollipop extends Fragment {
 
 			menu.findItem(R.id.cab_menu_download).setVisible(showDownload);
 			menu.findItem(R.id.cab_menu_rename).setVisible(showRename);
+
 			menu.findItem(R.id.cab_menu_copy).setVisible(showCopy);
+
+			if(showCopy){
+				menu.findItem(R.id.cab_menu_copy).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+			}
+
+			menu.findItem(R.id.cab_menu_move).setVisible(showMove);
+
 			if(showMove){
 				menu.findItem(R.id.cab_menu_move).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 			}
-			menu.findItem(R.id.cab_menu_move).setVisible(showMove);
 
 			menu.findItem(R.id.cab_menu_share_link).setVisible(showLink);
 			if (showTrash){
@@ -603,7 +610,7 @@ public class RubbishBinFragmentLollipop extends Fragment {
 		}
 		
 		Resources res = getActivity().getResources();
-		String format = "%d %s";
+		/*String format = "%d %s";
 		String filesStr = String.format(format, files,
 				res.getQuantityString(R.plurals.general_num_files, files));
 		String foldersStr = String.format(format, folders,
@@ -617,7 +624,21 @@ public class RubbishBinFragmentLollipop extends Fragment {
 			title = filesStr;
 		} else {
 			title = foldersStr + ", " + filesStr;
+		}*/
+
+		String title;
+		int sum=files+folders;
+
+		if (files == 0 && folders == 0) {
+			title = Integer.toString(sum);
+		} else if (files == 0) {
+			title = Integer.toString(folders);
+		} else if (folders == 0) {
+			title = Integer.toString(files);
+		} else {
+			title = Integer.toString(sum);
 		}
+
 		actionMode.setTitle(title);
 		try {
 			actionMode.invalidate();

@@ -139,6 +139,8 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		log("onStartCommand");
 
+		canceled = false;
+
 		if(intent == null){
 			return START_NOT_STICKY;
 		}
@@ -262,7 +264,13 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 			message = getString(R.string.download_preparing_files);
 		}
 		else{
-			int inProgress = totalTransfers - pendingTransfers + 1;
+			int inProgress = 0;
+			if(pendingTransfers==0){
+				inProgress = totalTransfers - pendingTransfers;
+			}
+			else{
+				inProgress = totalTransfers - pendingTransfers + 1;
+			}
 			message = getResources().getQuantityString(R.plurals.upload_service_notification, totalTransfers, inProgress, totalTransfers);
 		}
 
@@ -394,65 +402,57 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 						PendingNodeAttachment nodeAttachment = nodesAttached.get(0);
 
 						if(nodeAttachment.getFilePath().equals(transfer.getPath())){
+                            nodeAttachment.setNodeHandle(transfer.getNodeHandle());
 							if(megaChatApi!=null){
-								log("Send node to chat: "+transfer.getNodeHandle());
-								MegaNodeList nodeList = MegaNodeList.createInstance();
+                                log("Send node to chat: "+transfer.getNodeHandle());
+								megaChatApi.attachNode(pendMsg.getChatId(), transfer.getNodeHandle(), this);
 
-								MegaNode node = megaApi.getNodeByHandle(transfer.getNodeHandle());
-								if(node!=null){
-									log("Node to send: "+node.getName() + " handle: "+node.getHandle());
-									nodeList.addNode(node);
-									nodeAttachment.setNodeHandle(transfer.getNodeHandle());
-								}
-								megaChatApi.attachNodes(pendMsg.getChatId(), nodeList, this);
-								deleteLocalFile(transfer.getFileName());
 								if (megaApi.getNumPendingUploads() == 0 && transfersCount==0){
 									onQueueComplete();
 								}
 								return;
 							}
 						}
-
 					}
 					else{
 						log("More than one to send in message");
-						for(int j=0; j<nodesAttached.size();j++) {
-							PendingNodeAttachment nodeAttachment = nodesAttached.get(j);
+//						for(int j=0; j<nodesAttached.size();j++) {
+//							PendingNodeAttachment nodeAttachment = nodesAttached.get(j);
+//
+//							if(nodeAttachment.getFilePath().equals(transfer.getPath())){
+//								nodeAttachment.setNodeHandle(transfer.getNodeHandle());
+//
+//								if(!(pendMsg.getState()==PendingMessage.STATE_ERROR)){
+//									if(pendMsg.isNodeHandlesCompleted()){
+//										log("All files of the message uploaded! SEND!");
+//										if(megaChatApi!=null){
+//											log("Send the message to the chat");
+//											MegaNodeList nodeList = MegaNodeList.createInstance();
+//
+//											for(int k=0; k<nodesAttached.size();k++){
+//												MegaNode node = megaApi.getNodeByHandle(nodesAttached.get(k).getNodeHandle());
+//												if(node!=null){
+//													log("Node to send: "+node.getName());
+//													nodeList.addNode(node);
+//												}
+//											}
+//											megaChatApi.attachNodes(pendMsg.getChatId(), nodeList, this);
+//
+//											return;
+//										}
+//									}
+//									else{
+//										log("Waiting for more nodes...");
+//
+//										if (megaApi.getNumPendingUploads() == 0 && transfersCount==0){
+//											onQueueComplete();
+//										}
+//										return;
+//									}
+//								}
+//							}
 
-							if(nodeAttachment.getFilePath().equals(transfer.getPath())){
-								nodeAttachment.setNodeHandle(transfer.getNodeHandle());
-
-								if(!(pendMsg.getState()==PendingMessage.STATE_ERROR)){
-									if(pendMsg.isNodeHandlesCompleted()){
-										log("All files of the message uploaded! SEND!");
-										if(megaChatApi!=null){
-											log("Send the message to the chat");
-											MegaNodeList nodeList = MegaNodeList.createInstance();
-
-											for(int k=0; k<nodesAttached.size();k++){
-												MegaNode node = megaApi.getNodeByHandle(nodesAttached.get(k).getNodeHandle());
-												if(node!=null){
-													log("Node to send: "+node.getName());
-													nodeList.addNode(node);
-												}
-											}
-											megaChatApi.attachNodes(pendMsg.getChatId(), nodeList, this);
-											deleteLocalFile(transfer.getFileName());
-											return;
-										}
-									}
-									else{
-										log("Waiting for more nodes...");
-										deleteLocalFile(transfer.getFileName());
-										if (megaApi.getNumPendingUploads() == 0 && transfersCount==0){
-											onQueueComplete();
-										}
-										return;
-									}
-								}
-							}
-
-						}
+//						}
 					}
 				}
 				log("The NOT found in messages");
@@ -489,7 +489,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 
 								dbH.updatePendingMessage(pendMsg.getId(), -1+"", PendingMessage.STATE_ERROR);
 								launchErrorToChat(pendMsg);
-								deleteLocalFile(transfer.getFileName());
+
 								if (megaApi.getNumPendingUploads() == 0 && transfersCount==0){
 									onQueueComplete();
 								}
@@ -499,54 +499,34 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 					}
 					else{
 						log("More than one to send in message");
-						for(int j=0; j<nodesAttached.size();j++) {
-							PendingNodeAttachment nodeAttachment = nodesAttached.get(j);
-
-							if(nodeAttachment.getFilePath().equals(transfer.getPath())){
-								nodeAttachment.setNodeHandle(transfer.getNodeHandle());
-
-								if(nodeAttachment.getFilePath().equals(transfer.getPath())){
-
-									dbH.updatePendingMessage(pendMsg.getId(), -1+"", PendingMessage.STATE_ERROR);
-									pendMsg.setState(PendingMessage.STATE_ERROR);
-									launchErrorToChat(pendMsg);
-									deleteLocalFile(transfer.getFileName());
-									if (megaApi.getNumPendingUploads() == 0 && transfersCount==0){
-										onQueueComplete();
-									}
-									return;
-								}
-							}
-						}
+//						for(int j=0; j<nodesAttached.size();j++) {
+//							PendingNodeAttachment nodeAttachment = nodesAttached.get(j);
+//
+//							if(nodeAttachment.getFilePath().equals(transfer.getPath())){
+//								nodeAttachment.setNodeHandle(transfer.getNodeHandle());
+//
+//								if(nodeAttachment.getFilePath().equals(transfer.getPath())){
+//
+//									dbH.updatePendingMessage(pendMsg.getId(), -1+"", PendingMessage.STATE_ERROR);
+//									pendMsg.setState(PendingMessage.STATE_ERROR);
+//									launchErrorToChat(pendMsg);
+//
+//									if (megaApi.getNumPendingUploads() == 0 && transfersCount==0){
+//										onQueueComplete();
+//									}
+//									return;
+//								}
+//							}
+//						}
 					}
 				}
             }
-
-            deleteLocalFile(transfer.getFileName());
 
             log("IN Finish: "+transfer.getFileName()+"path? "+transfer.getPath());
         }
 
 		if (megaApi.getNumPendingUploads() == 0 && transfersCount==0){
 			onQueueComplete();
-		}
-	}
-
-	public void deleteLocalFile(String fileName){
-		log("deleteLocalFile");
-		if (getApplicationContext().getExternalCacheDir() != null){
-			File localFile = new File (getApplicationContext().getExternalCacheDir(), fileName);
-			if (localFile.exists()){
-				log("Delete file!: "+localFile.getAbsolutePath());
-				localFile.delete();
-			}
-		}
-		else{
-			File localFile = new File (getApplicationContext().getCacheDir(), fileName);
-			if (localFile.exists()){
-				log("Delete file!: "+localFile.getAbsolutePath());
-				localFile.delete();
-			}
 		}
 	}
 

@@ -36,11 +36,14 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaContactAdapter;
 import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.components.CustomizedGridRecyclerView;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
+import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaContactsLollipopAdapter;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
+import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -52,8 +55,8 @@ public class ContactsFragmentLollipop extends Fragment{
 	
 	public static final String ARG_OBJECT = "object";
 	
-	MegaApiAndroid megaApi;	
-	
+	MegaApiAndroid megaApi;
+
 	Context context;
 	ActionBar aB;
 	RecyclerView recyclerView;
@@ -73,7 +76,7 @@ public class ContactsFragmentLollipop extends Fragment{
 	Display display;
 	
 	boolean isList = true;
-	
+
 	ContactsFragmentLollipop contactsFragment = this;
 	
 	ArrayList<MegaUser> contacts;
@@ -120,6 +123,28 @@ public class ContactsFragmentLollipop extends Fragment{
 					}										
 					break;
 				}
+				case R.id.cab_menu_start_conversation:{
+
+					if(users.get(0)==null){
+						log("Selected contact NULL");
+						break;
+					}
+					((ManagerActivityLollipop) context).startOneToOneChat(users.get(0));
+
+					break;
+				}
+				case R.id.cab_menu_start_conversation_more:{
+
+					ArrayList<Long> contactHandles = new ArrayList<>();
+
+					for(int i=0;i<users.size();i++){
+						contactHandles.add(users.get(i).getHandle());
+					}
+
+					((ManagerActivityLollipop)context).startGroupConversation(contactHandles);
+
+					break;
+				}
 				case R.id.cab_menu_delete:{
 					((ManagerActivityLollipop)context).showConfirmationRemoveContacts(users);
 					break;
@@ -162,7 +187,25 @@ public class ContactsFragmentLollipop extends Fragment{
 			if (selected.size() != 0) {
 				menu.findItem(R.id.cab_menu_delete).setVisible(true);
 				menu.findItem(R.id.cab_menu_share_folder).setVisible(true);
-				
+				menu.findItem(R.id.cab_menu_share_folder).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+
+				menu.findItem(R.id.cab_menu_send_file).setVisible(true);
+				menu.findItem(R.id.cab_menu_send_file).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+
+				if(selected.size() ==1){
+					menu.findItem(R.id.cab_menu_start_conversation_more).setVisible(false);
+					menu.findItem(R.id.cab_menu_start_conversation_more).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+					menu.findItem(R.id.cab_menu_start_conversation).setVisible(true);
+					menu.findItem(R.id.cab_menu_start_conversation).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+				}else{
+					menu.findItem(R.id.cab_menu_start_conversation).setVisible(false);
+					menu.findItem(R.id.cab_menu_start_conversation).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+					menu.findItem(R.id.cab_menu_start_conversation_more).setVisible(true);
+					menu.findItem(R.id.cab_menu_start_conversation_more).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+				}
+
+
+
 				if(selected.size()==adapter.getItemCount()){
 					menu.findItem(R.id.cab_menu_select_all).setVisible(false);
 					unselect.setTitle(getString(R.string.action_unselect_all));
@@ -230,9 +273,9 @@ public class ContactsFragmentLollipop extends Fragment{
 		List<MegaUser> users = adapter.getSelectedUsers();
 		
 		Resources res = getResources();
-		String format = "%d %s";
+		String format = "%d";
 		
-		actionMode.setTitle(String.format(format, users.size(),res.getQuantityString(R.plurals.general_num_contacts, users.size())));
+		actionMode.setTitle(String.format(format, users.size()));
 
 		try {
 			actionMode.invalidate();
@@ -384,6 +427,7 @@ public class ContactsFragmentLollipop extends Fragment{
 			recyclerView.setPadding(0, 0, 0, Util.scaleHeightPx(80, outMetrics));
 			recyclerView.setClipToPadding(false);
 			recyclerView.setHasFixedSize(true);
+			((CustomizedGridRecyclerView) recyclerView).setWrapContent();
 			final GridLayoutManager gridLayoutManager = (GridLayoutManager) recyclerView.getLayoutManager();
 			gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
 				@Override
@@ -448,7 +492,7 @@ public class ContactsFragmentLollipop extends Fragment{
 			return v;
 		}			
 	}
-	
+
 	public void setContacts(ArrayList<MegaUser> contacts){
 		this.contacts = contacts;
 

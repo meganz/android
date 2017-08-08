@@ -143,6 +143,10 @@ public class AccountController {
 
         BufferedWriter out;
         try {
+            String mainDirPath = Environment.getExternalStorageDirectory().getAbsolutePath() + Util.mainDIR;
+            File mainDir = new File(mainDirPath);
+            log("Path main Dir: " + mainDirPath);
+            mainDir.mkdirs();
 
             final String path = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
             log("Export in: "+path);
@@ -376,6 +380,8 @@ public class AccountController {
         dbH.clearChatItems();
 
         dbH.clearCompletedTransfers();
+
+        dbH.clearPendingMessage();
 
         if (!isManagerActivityLollipop){
             Intent tourIntent = new Intent(context, LoginActivityLollipop.class);

@@ -2,6 +2,7 @@ package mega.privacy.android.app.lollipop.adapters;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
@@ -27,6 +28,7 @@ import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.CloudDriveExplorerFragmentLollipop;
+import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaChatLollipopAdapter;
 import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.Util;
@@ -40,6 +42,9 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 	
 	final public static int CLOUD_EXPLORER = 0;
 	final public static int INCOMING_SHARES_EXPLORER = 1;
+
+	public static int MAX_WIDTH_FILENAME_LAND=500;
+	public static int MAX_WIDTH_FILENAME_PORT=235;
 
 	Context context;
 	MegaApiAndroid megaApi;
@@ -169,8 +174,24 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 		holder.itemLayout = (RelativeLayout) v.findViewById(R.id.file_explorer_item_layout);
 		holder.imageView = (ImageView) v.findViewById(R.id.file_explorer_thumbnail);
 		holder.textViewFileName = (TextView) v.findViewById(R.id.file_explorer_filename);
+
 		holder.textViewFileSize = (TextView) v.findViewById(R.id.file_explorer_filesize);
 		holder.permissionsIcon = (ImageView) v.findViewById(R.id.file_explorer_permissions);
+
+		if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+			log("Landscape configuration");
+			float width = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MAX_WIDTH_FILENAME_LAND, context.getResources().getDisplayMetrics());
+			holder.textViewFileName.setMaxWidth((int) width);
+			holder.textViewFileSize.setMaxWidth((int) width);
+
+		}
+		else{
+			log("Portrait configuration");
+			float width = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MAX_WIDTH_FILENAME_PORT, context.getResources().getDisplayMetrics());
+			holder.textViewFileName.setMaxWidth((int) width);
+			holder.textViewFileSize.setMaxWidth((int) width);
+
+		}
 
 		v.setTag(holder);
 		return holder;
@@ -300,7 +321,7 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 				if (multipleSelect) {
 					if(this.isItemChecked(position)){
 						holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.new_multiselect_color));
-						holder.imageView.setImageResource(R.drawable.ic_multiselect);
+						holder.imageView.setImageResource(R.drawable.ic_select_folder);
 						log("Do not show thumb");
 						return;
 					}
