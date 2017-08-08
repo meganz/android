@@ -2920,13 +2920,13 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                         holder.contentOwnMessageThumbLand.setVisibility(View.GONE);
 
                         RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) holder.errorUploadingLayout.getLayoutParams();
-                        float width = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 160, context.getResources().getDisplayMetrics());
+                        float width = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 152, context.getResources().getDisplayMetrics());
 
                         params.width = (int) width;
                         log("Preview ImageView width: " + width);
                         holder.errorUploadingLayout.setLayoutParams(params);
                     } else {
-                        log("Landcape");
+                        log("Landscape");
                         holder.contentOwnMessageThumbLand.setImageBitmap(bitmap);
                         holder.previewFrameLand.setVisibility(View.VISIBLE);
                         holder.contentOwnMessageThumbLand.setVisibility(View.VISIBLE);
@@ -2935,7 +2935,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                         holder.contentOwnMessageThumbPort.setVisibility(View.GONE);
 
                         RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) holder.errorUploadingLayout.getLayoutParams();
-                        float width = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 220, context.getResources().getDisplayMetrics());
+                        float width = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 212, context.getResources().getDisplayMetrics());
 
                         params.width = (int) width;
                         log("Preview ImageView width: " + width);
