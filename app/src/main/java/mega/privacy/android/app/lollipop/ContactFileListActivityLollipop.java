@@ -120,7 +120,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 
 	private int orderGetChildren = MegaApiJava.ORDER_DEFAULT_ASC;
 
-	private AlertDialog renameDialog;
+	private android.support.v7.app.AlertDialog renameDialog;
 	ProgressDialog statusDialog;
 
 	long lastTimeOnTransferUpdate = -1;
@@ -1001,62 +1001,58 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 		}
 	}
 
-	public void showRenameDialog(final MegaNode document, String text) {
+	public void showRenameDialog(final MegaNode document, String text){
+		log("showRenameDialog");
+
+		LinearLayout layout = new LinearLayout(this);
+		layout.setOrientation(LinearLayout.VERTICAL);
+		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+		params.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleHeightPx(20, outMetrics), Util.scaleWidthPx(17, outMetrics), 0);
+//	    layout.setLayoutParams(params);
 
 		final EditTextCursorWatcher input = new EditTextCursorWatcher(this, document.isFolder());
+//		input.setId(EDIT_TEXT_ID);
 		input.setSingleLine();
+		input.setTextColor(getResources().getColor(R.color.text_secondary));
+//		input.setHint(getString(R.string.context_new_folder_name));
 		input.setImeOptions(EditorInfo.IME_ACTION_DONE);
 
-		input.setImeActionLabel(getString(R.string.context_rename), KeyEvent.KEYCODE_ENTER);
+		input.setImeActionLabel(getString(R.string.context_rename),EditorInfo.IME_ACTION_DONE);
 		input.setText(text);
 		input.setOnFocusChangeListener(new View.OnFocusChangeListener() {
 			@Override
 			public void onFocusChange(final View v, boolean hasFocus) {
 				if (hasFocus) {
-					if (document.isFolder()) {
+					if (document.isFolder()){
 						input.setSelection(0, input.getText().length());
-					} else {
-						String[] s = document.getName().split("\\.");
-						if (s != null) {
+					}
+					else{
+						String [] s = document.getName().split("\\.");
+						if (s != null){
 							int numParts = s.length;
 							int lastSelectedPos = 0;
-							if (numParts == 1) {
+							if (numParts == 1){
 								input.setSelection(0, input.getText().length());
-							} else if (numParts > 1) {
-								for (int i = 0; i < (numParts - 1); i++) {
+							}
+							else if (numParts > 1){
+								for (int i=0; i<(numParts-1);i++){
 									lastSelectedPos += s[i].length();
 									lastSelectedPos++;
 								}
-								lastSelectedPos--; // The last point should not
-								// be selected)
+								lastSelectedPos--; //The last point should not be selected)
 								input.setSelection(0, lastSelectedPos);
 							}
 						}
-						// showKeyboardDelayed(v);
+						showKeyboardDelayed(v);
 					}
 				}
 			}
 		});
 
-		AlertDialog.Builder builder = Util.getCustomAlertBuilder(this, getString(R.string.context_rename) + " " + new String(document.getName()), null, input);
-		builder.setPositiveButton(getString(R.string.context_rename), new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int whichButton) {
-				String value = input.getText().toString().trim();
-				if (value.length() == 0) {
-					return;
-				}
-				rename(document, value);
-
-			}
-		});
-		builder.setNegativeButton(getString(android.R.string.cancel), null);
-		renameDialog = builder.create();
-		renameDialog.show();
-
 		input.setOnEditorActionListener(new OnEditorActionListener() {
 			@Override
 			public boolean onEditorAction(TextView v, int actionId,
-					KeyEvent event) {
+										  KeyEvent event) {
 				if (actionId == EditorInfo.IME_ACTION_DONE) {
 					renameDialog.dismiss();
 					String value = v.getText().toString().trim();
@@ -1069,6 +1065,26 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 				return false;
 			}
 		});
+
+		layout.addView(input, params);
+
+		android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		builder.setTitle(getString(R.string.context_rename) + " "	+ new String(document.getName()));
+		builder.setPositiveButton(getString(R.string.context_rename),
+				new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int whichButton) {
+						String value = input.getText().toString().trim();
+						if (value.length() == 0) {
+							return;
+						}
+						rename(document, value);
+					}
+				});
+		builder.setNegativeButton(getString(android.R.string.cancel), null);
+		builder.setView(layout);
+		renameDialog = builder.create();
+		renameDialog.show();
+
 	}
 
 	private void rename(MegaNode document, String newName) {
