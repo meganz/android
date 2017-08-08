@@ -12,6 +12,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.listeners.ContactNameListener;
@@ -80,7 +81,13 @@ public class ContactController {
             }
         }
 
-        megaApi.removeContact(c, (ManagerActivityLollipop) context);
+        if(context instanceof ManagerActivityLollipop){
+            megaApi.removeContact(c, (ManagerActivityLollipop) context);
+        }
+        else if(context instanceof ContactInfoActivityLollipop){
+            megaApi.removeContact(c, (ContactInfoActivityLollipop) context);
+        }
+
     }
 
 

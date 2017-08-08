@@ -550,7 +550,12 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 						}
 
 						String source = "<b>"+n.getName()+"</b> "+getString(R.string.incoming_folder_notification)+" "+name;
-						Spanned notificationContent = Html.fromHtml(source,0);
+						Spanned notificationContent;
+						if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+							notificationContent = Html.fromHtml(source,Html.FROM_HTML_MODE_LEGACY);
+						} else {
+							notificationContent = Html.fromHtml(source);
+						}
 
 						int notificationId = Constants.NOTIFICATION_PUSH_CLOUD_DRIVE;
 
@@ -775,7 +780,7 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 
 		log("Unread count is: "+item.getUnreadCount());
 
-		if (item.hasChanged(MegaChatListItem.CHANGE_TYPE_LAST_TS) && (item.getUnreadCount() != 0)){
+		if (item.hasChanged(MegaChatListItem.CHANGE_TYPE_LAST_MSG) && (item.getUnreadCount() != 0)){
 
 			try {
 				if(isFireBaseConnection){
@@ -796,13 +801,17 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 									showNotification(item);
 								}
 								else{
-									if(firstTs>item.getLastTimestamp()){
-										log("DO NOT SHOW NOTIF - FirstTS when logging "+firstTs+ " > item timestamp: "+item.getLastTimestamp());
-									}
-									else{
-										log("FirstTS when logging "+firstTs+ " < item timestamp: "+item.getLastTimestamp());
-										showNotification(item);
-										firstTs=-1;
+
+									MegaChatMessage lastMessage = megaChatApi.getMessage(item.getChatId(), item.getLastMessageId());
+									if(lastMessage!=null){
+										if(firstTs>lastMessage.getTimestamp()){
+											log("DO NOT SHOW NOTIF - FirstTS when logging "+firstTs+ " > last message timestamp: "+lastMessage.getTimestamp());
+										}
+										else{
+											log("FirstTS when logging "+firstTs+ " < last message timestamp: "+lastMessage.getTimestamp());
+											showNotification(item);
+											firstTs=-1;
+										}
 									}
 								}
 							}
