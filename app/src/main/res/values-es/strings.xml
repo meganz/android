@@ -1264,4 +1264,7 @@
     <string name="title_contact_request_notification" context="title of contact request notification">Nueva solicitud de contacto</string>
 
     <string name="number_messages_chat_notification" formatted="false" context="messages string in chat notification">%1$d chats sin leer</string>
+
+    <string name="context_permissions_changing_folder" context="Item menu option upon clicking on one or multiple files.">Cambiando permisos</string>
+    <string name="context_removing_contact_folder" context="Item menu option upon clicking on one or multiple files.">Eliminando contacto de la carpeta compartida</string>
 </resources>
