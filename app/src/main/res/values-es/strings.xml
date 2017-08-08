@@ -1267,4 +1267,5 @@
 
     <string name="context_permissions_changing_folder" context="Item menu option upon clicking on one or multiple files.">Cambiando permisos</string>
     <string name="context_removing_contact_folder" context="Item menu option upon clicking on one or multiple files.">Eliminando contacto de la carpeta compartida</string>
+
 </resources>
