@@ -124,11 +124,11 @@
                     android:layout_marginRight="16dp"
                     android:gravity="left"/>
 
-
+<!-- own portrait -->
                 <RelativeLayout
                     android:id="@+id/preview_frame_portrait"
                     android:layout_width="wrap_content"
-                    android:layout_height="225dp"
+                    android:layout_height="wrap_content"
                     android:background="@android:color/transparent">
                     <RelativeLayout
                         android:layout_width="wrap_content"
@@ -136,6 +136,8 @@
                         android:layout_alignParentRight="true"
                         android:layout_marginEnd="16dp"
                         android:layout_marginRight="16dp"
+                        android:layout_marginTop="2dp"
+                        android:layout_marginBottom="7dp"
                         android:background="@drawable/shape_images_chat_2"
                         android:elevation="2dp">
                         <ImageView
@@ -159,11 +161,11 @@
                 </RelativeLayout>
 
 
-
+<!-- own landscape -->
                 <RelativeLayout
                     android:id="@+id/preview_frame_landscape"
                     android:layout_width="wrap_content"
-                    android:layout_height="165dp"
+                    android:layout_height="wrap_content"
                     android:background="@android:color/transparent">
                     <RelativeLayout
                         android:layout_width="wrap_content"
@@ -171,6 +173,8 @@
                         android:layout_alignParentRight="true"
                         android:layout_marginEnd="16dp"
                         android:layout_marginRight="16dp"
+                        android:layout_marginTop="2dp"
+                        android:layout_marginBottom="7dp"
                         android:background="@drawable/shape_images_chat_2"
                         android:elevation="2dp">
 
@@ -194,6 +198,7 @@
                             android:background="@drawable/shape_images_chat"/>
                     </RelativeLayout>
                 </RelativeLayout>
+
 
 
 
@@ -467,92 +472,158 @@
                 android:gravity="left"/>
 
             <RelativeLayout
-                android:id="@+id/content_contact_message_file_layout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@drawable/rounded_text_view_chat_contact_message"
-                android:layout_alignParentLeft="true"
-                android:layout_marginStart="16dp"
-                android:layout_marginLeft="16dp"
-                android:layout_marginEnd="108dp"
-                android:layout_marginRight="108dp"
-                android:gravity="left">
-
-                <TextView
-                    android:id="@+id/content_contact_message_file_sender"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="14sp"
-                    android:layout_marginLeft="12dp"
-                    android:layout_marginTop="11dp"
-                    android:layout_marginRight="12dp"
-                    android:maxLines="2"
-                    android:ellipsize="end"
-                    android:gravity="left"/>
-
-
-
-                <ImageView
-                    android:id="@+id/content_contact_message_thumb_portrait"
-                    android:layout_height="220dp"
-                    android:layout_width="160dp"
-                    android:layout_alignParentLeft="true"
-                    android:layout_below="@+id/content_contact_message_file_sender"
-                    android:scaleType="centerCrop"/>
-
-                <ImageView
-                    android:id="@+id/content_contact_message_thumb_landscape"
-                    android:layout_width="220dp"
-                    android:layout_height="160dp"
-                    android:layout_alignParentLeft="true"
-                    android:layout_below="@+id/content_contact_message_file_sender"
-                    android:scaleType="centerCrop"/>
+                android:background="@android:color/transparent">
 
                 <RelativeLayout
+                    android:id="@+id/content_contact_message_file_layout"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_below="@+id/content_contact_message_file_sender">
-
-                    <ImageView
-                        android:id="@+id/content_contact_message_file_thumb"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentLeft="true"
-                        android:layout_marginLeft="4dp"
-                        android:layout_centerVertical="true"/>
+                    android:background="@drawable/shape_images_chat_2"
+                    android:layout_alignParentLeft="true"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginEnd="108dp"
+                    android:layout_marginRight="108dp"
+                    android:layout_marginBottom="7dp"
+                    android:layout_marginTop="2dp"
+                    android:gravity="left"
+                    android:elevation="2dp">
 
                     <TextView
-                        android:id="@+id/content_contact_message_file_name"
+                        android:id="@+id/content_contact_message_file_sender"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textColor="@color/name_my_account"
-                        android:layout_toRightOf="@+id/content_contact_message_file_thumb"
                         android:textSize="14sp"
+                        android:layout_marginLeft="12dp"
                         android:layout_marginTop="11dp"
-                        android:layout_marginLeft="4dp"
-                        android:layout_marginRight="8dp"
-                        android:singleLine="true"
-                        android:maxLines="1"
-                        android:ellipsize="middle"
+                        android:layout_marginRight="12dp"
+                        android:maxLines="2"
+                        android:ellipsize="end"
                         android:gravity="left"/>
 
-                    <TextView
-                        android:id="@+id/content_contact_message_file_size"
+                    <!-- origin -->
+                    <!-- <ImageView
+                        android:id="@+id/content_contact_message_thumb_portrait"
+                        android:layout_height="220dp"
+                        android:layout_width="160dp"
+                        android:layout_alignParentLeft="true"
+                        android:layout_below="@+id/content_contact_message_file_sender"
+                        android:scaleType="centerCrop"/> -->
+<!-- contact portrait-->
+                    <RelativeLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textColor="@color/mail_my_account"
-                        android:layout_toRightOf="@+id/content_contact_message_file_thumb"
-                        android:layout_below="@+id/content_contact_message_file_name"
-                        android:textSize="12sp"
-                        android:layout_marginBottom="11dp"
-                        android:layout_marginLeft="4dp"
-                        android:layout_marginRight="8dp"
-                        android:inputType="textMultiLine|textNoSuggestions"
-                        android:gravity="left"/>
+                        android:layout_below="@+id/content_contact_message_file_sender">
+                        <ImageView
+                            android:id="@+id/content_contact_message_thumb_portrait"
+                            android:layout_width="160dp"
+                            android:layout_height="220dp"
+                            android:layout_gravity="center_horizontal|center_vertical"
+                            android:padding="3dp"
+                            android:scaleType="centerCrop"
+                            android:cropToPadding="true"/>
+
+                        <ImageView
+                            android:id="@+id/content_contact_message_thumb_portrait_framework"
+                            android:layout_width="160dp"
+                            android:layout_height="220dp"
+                            android:padding="3dp"
+                            android:scaleType="centerCrop"
+                            android:layout_gravity="center_horizontal|center_vertical"
+                            android:cropToPadding="true"/>
+                    </RelativeLayout>
+
+
+<!-- contact landscape -->
+
+                    <RelativeLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/content_contact_message_file_sender">
+                        <ImageView
+                            android:id="@+id/content_contact_message_thumb_landscape"
+                            android:layout_width="220dp"
+                            android:layout_height="160dp"
+                            android:layout_gravity="center_horizontal|center_vertical"
+                            android:padding="3dp"
+                            android:scaleType="centerCrop"
+                            android:cropToPadding="true"/>
+
+                        <ImageView
+                            android:id="@+id/content_contact_message_thumb_landscape_framework"
+                            android:layout_width="220dp"
+                            android:layout_height="160dp"
+                            android:padding="3dp"
+                            android:scaleType="centerCrop"
+                            android:layout_gravity="center_horizontal|center_vertical"
+                            android:cropToPadding="true"/>
+                    </RelativeLayout>
+
+                    <!--origin-->
+                    <!--<ImageView
+                        android:id="@+id/content_contact_message_thumb_landscape"
+                        android:layout_width="220dp"
+                        android:layout_height="160dp"
+                        android:layout_alignParentLeft="true"
+                        android:layout_below="@+id/content_contact_message_file_sender"
+                        android:scaleType="centerCrop"/>-->
+
+                    <RelativeLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/content_contact_message_file_sender">
+
+                        <ImageView
+                            android:id="@+id/content_contact_message_file_thumb"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentLeft="true"
+                            android:layout_marginLeft="4dp"
+                            android:layout_centerVertical="true"/>
+
+                        <TextView
+                            android:id="@+id/content_contact_message_file_name"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/name_my_account"
+                            android:layout_toRightOf="@+id/content_contact_message_file_thumb"
+                            android:textSize="14sp"
+                            android:layout_marginTop="11dp"
+                            android:layout_marginLeft="4dp"
+                            android:layout_marginRight="8dp"
+                            android:singleLine="true"
+                            android:maxLines="1"
+                            android:ellipsize="middle"
+                            android:gravity="left"/>
+
+                        <TextView
+                            android:id="@+id/content_contact_message_file_size"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/mail_my_account"
+                            android:layout_toRightOf="@+id/content_contact_message_file_thumb"
+                            android:layout_below="@+id/content_contact_message_file_name"
+                            android:textSize="12sp"
+                            android:layout_marginBottom="11dp"
+                            android:layout_marginLeft="4dp"
+                            android:layout_marginRight="8dp"
+                            android:inputType="textMultiLine|textNoSuggestions"
+                            android:gravity="left"/>
+
+                    </RelativeLayout>
+
+
+
+
 
                 </RelativeLayout>
 
+
             </RelativeLayout>
+
+
             <!--End RelativeLayout file-->
 
             <RelativeLayout
