@@ -2740,9 +2740,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 int currentPosition = holder.getAdapterPosition();
                 AndroidMegaChatMessage message = messages.get(currentPosition);
 
-                log("State of the message: "+message.getPendingMessage().getState());
-
                 if(message.getPendingMessage()!=null){
+                    log("State of the message: "+message.getPendingMessage().getState());
                     if(message.getPendingMessage().getState()== PendingMessage.STATE_ERROR){
                         holder.uploadingProgressBar.setVisibility(View.GONE);
                         holder.errorUploadingLayout.setVisibility(View.VISIBLE);
