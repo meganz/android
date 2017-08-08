@@ -52,8 +52,9 @@
                     android:background="@null"
                     android:tint="@color/transparency_white"
                     android:src="@drawable/ic_insert_emoticon"
-                    android:layout_centerVertical="true"
-                    android:layout_marginLeft="10dp"/>
+                    android:layout_alignBottom="@+id/edit_text_chat"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginBottom="2dp"/>
 
                 <ImageButton
                     android:id="@+id/send_message_icon_chat"
@@ -62,18 +63,19 @@
                     android:layout_alignParentRight="true"
                     android:layout_marginRight="10dp"
                     android:background="@null"
-                    android:layout_centerVertical="true"
+                    android:layout_alignBottom="@+id/edit_text_chat"
                     android:tint="@color/accentColor"
-                    android:src="@drawable/ic_send_black" />
+                    android:src="@drawable/ic_send_black"
+                    android:layout_marginBottom="3dp"/>
 
                 <io.github.rockerhieu.emojicon.EmojiconEditText
-                    android:id="@+id/edit_text_chat"
+                    android:id="@id/edit_text_chat"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@android:color/transparent"
                     android:layout_toRightOf="@+id/keyboard_icon_chat"
                     android:layout_marginTop="6dp"
-                    android:layout_marginBottom="6dp"
+                    android:layout_marginBottom="12dp"
                     android:layout_marginLeft="10dp"
                     android:layout_marginRight="10dp"
                     android:layout_centerVertical="true"
