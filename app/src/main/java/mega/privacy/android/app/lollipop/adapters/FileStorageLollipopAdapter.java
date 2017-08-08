@@ -144,7 +144,7 @@ public class FileStorageLollipopAdapter extends RecyclerView.Adapter<FileStorage
 					if (multipleSelect) {
 						if(this.isItemChecked(position)){
 							holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.new_multiselect_color));
-							holder.imageView.setImageResource(R.drawable.ic_multiselect);
+							holder.imageView.setImageResource(R.drawable.ic_select_folder);
 						}
 						else{
 							holder.imageView.setImageResource(R.drawable.ic_folder_list);
@@ -162,7 +162,7 @@ public class FileStorageLollipopAdapter extends RecyclerView.Adapter<FileStorage
 					if (multipleSelect) {
 						if(this.isItemChecked(position)){
 							holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.new_multiselect_color));
-							holder.imageView.setImageResource(R.drawable.ic_multiselect);
+							holder.imageView.setImageResource(R.drawable.ic_select_folder);
 						}
 						else{
 							holder.imageView.setImageResource(MimeTypeList.typeForName(document.getName()).getIconResourceId());

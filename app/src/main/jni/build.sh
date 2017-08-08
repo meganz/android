@@ -126,8 +126,8 @@ function createMEGAchatBindings
 {
     echo "* Creating MEGAchat Java bindings"
     mkdir -p ../java/nz/mega/sdk
-    swig -c++ -Imega/sdk/include -Imegachat/karere-native/src/ -java -package nz.mega.sdk -outdir ${JAVA_OUTPUT_PATH}/nz/mega/sdk/ -o bindings/megachat.cpp megachat/megachatapi.i &> ${LOG_FILE}
-    pushd megachat/karere-native/src &> ${LOG_FILE}
+    swig -c++ -Imega/sdk/include -Imegachat/sdk/src/ -java -package nz.mega.sdk -outdir ${JAVA_OUTPUT_PATH}/nz/mega/sdk/ -o bindings/megachat.cpp megachat/megachatapi.i &> ${LOG_FILE}
+    pushd megachat/sdk/src &> ${LOG_FILE}
     cmake -P genDbSchema.cmake
     popd &> ${LOG_FILE}
 }
@@ -138,7 +138,7 @@ if [ ! -d "${NDK_ROOT}" ]; then
 fi
 
 if (( $# != 1 )); then
-    echo "Usage: $0 <all | bindings | clean>";
+    echo "Usage: $0 <all | bindings | clean | clean_mega>";
     exit 0 
 fi
 
@@ -149,6 +149,22 @@ if [ "$1" == "bindings" ]; then
     echo "* Running ndk-build"
     ${NDK_BUILD} -j8
     echo "* ndk-build finished"
+    echo "* Task finished OK"
+    exit 0
+fi
+
+if [ "$1" == "clean_mega" ]; then
+    echo "* Deleting Java bindings"
+    make -C mega -f MakefileBindings clean JAVA_BASE_OUTPUT_PATH=${JAVA_OUTPUT_PATH} &> ${LOG_FILE}
+    rm -rf megachat/megachat.cpp megachat/megachat.h
+    
+    echo "* Deleting source folders"
+    rm -rf megachat/sdk
+
+    echo "* Deleting tarballs"
+	rm -rf ../obj/local/armeabi/
+	rm -rf ../obj/local/x86
+        
     echo "* Task finished OK"
     exit 0
 fi
@@ -173,7 +189,7 @@ if [ "$1" == "clean" ]; then
     rm -rf ${LIBUV}/${LIBUV}
     rm -rf ${LIBEXPAT}/${LIBEXPAT}
     rm -rf ${LIBEXPAT}/${LIBEXPAT_SOURCE_FOLDER}
-    rm -rf megachat/karere-native
+    rm -rf megachat/sdk
 
     echo "* Deleting tarballs"
     rm -rf ${CRYPTOPP}/${CRYPTOPP_SOURCE_FILE}
@@ -199,16 +215,8 @@ if [ "$1" == "clean" ]; then
 fi
 
 if [ "$1" != "all" ]; then
-    echo "Usage: $0 <all | bindings | clean>";
+    echo "Usage: $0 <all | bindings | clean | clean_mega>";
     exit 1
-fi
-
-echo "* Setting up MEGAchat"
-if [ ! -d megachat/karere-native ]; then
-echo "* Getting MEGAchat source code"
-git clone --recursive -b develop https://code.developers.mega.co.nz/messenger/karere-native.git megachat/karere-native
-else
-echo "* MEGAchat source code already available"
 fi
 
 createMEGAchatBindings

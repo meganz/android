@@ -2,6 +2,7 @@
 <android.support.v4.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:rounded="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
@@ -14,6 +15,91 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical" >
+
+
+        <!-- OWNER LAYOUT -->
+
+        <RelativeLayout
+            android:id="@+id/file_properties_owner_layout"
+            android:layout_width="match_parent"
+            android:layout_height="72dp"
+            android:gravity="left"
+            android:background="@color/content_text_background">
+
+            <RelativeLayout
+                android:id="@+id/contact_list_relative_layout_avatar"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginLeft="18dp"
+                android:layout_centerVertical="true">
+
+                <mega.privacy.android.app.components.RoundedImageView
+                    android:id="@+id/contact_list_thumbnail"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:scaleType="fitCenter"
+                    android:layout_centerInParent="true"
+                    rounded:border_color="@color/border_file_properties"
+                    rounded:border_width="0dp"
+                    rounded:corner_radius="20dp" />
+
+                <TextView
+                    android:id="@+id/contact_list_initial_letter"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:layout_centerInParent="true"
+                    android:gravity="center_horizontal|center_vertical"
+                    android:paddingBottom="3dp" />
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="72dp"
+                android:layout_gravity="left">
+
+                <LinearLayout
+                    android:id="@+id/file_properties_owner_linear"
+                    android:orientation="horizontal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/file_properties_owner_label"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginRight="3dp"
+                        android:textColor="@color/name_my_account"
+                        android:ellipsize="end"
+                        android:textSize="16sp"
+                        android:maxLines="1"
+                        android:singleLine="true"/>
+
+                    <TextView
+                        android:id="@+id/file_properties_owner_label_owner"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="16sp"
+                        android:textColor="@color/accentColor"
+                        android:maxLines="1" />
+
+                    </LinearLayout>
+
+
+                <TextView
+                    android:id="@+id/file_properties_owner_info"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/file_properties_owner_linear"
+                    android:textSize="16sp"
+                    android:textColor="@color/mail_my_account"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:singleLine="true"/>
+
+            </RelativeLayout>
+        </RelativeLayout>
 
         <!-- AVAILABLE OFFLINE LAYOUT -->
 
@@ -95,92 +181,17 @@
             android:layout_marginLeft="72dp"
             android:background="@color/separator_grey" />
 
-        <!-- PERMISSIONS LAYOUT -->
+
+        <!-- INFO LAYOUT -->
 
         <RelativeLayout
-            android:id="@+id/file_properties_permissions_layout"
+            android:id="@+id/file_properties_info_layout"
             android:layout_width="match_parent"
-            android:layout_height="72dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
             android:gravity="left" >
-
             <ImageView
-                android:id="@+id/file_properties_permissions_image"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:alpha="0.35"
-                android:layout_marginLeft="16dp" />
-
-            <RelativeLayout
-                android:id="@+id/file_properties_child_permissions_layout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_gravity="left"
-                android:layout_marginLeft="32dp"
-                android:layout_toRightOf="@id/file_properties_permissions_image" >
-
-                <TextView
-                    android:id="@+id/file_properties_permission_label"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/file_properties_shared_folder_permissions"
-                    android:textSize="16sp"
-                    android:textColor="@color/name_my_account"/>
-
-                <TextView
-                    android:id="@+id/file_properties_permission_info"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@id/file_properties_permission_label"
-                    android:textSize="16sp"
-                    android:textColor="@color/mail_my_account"/>
-            </RelativeLayout>
-        </RelativeLayout>
-
-        <!-- OWNER LAYOUT -->
-
-        <RelativeLayout
-            android:id="@+id/file_properties_owner_layout"
-            android:layout_width="match_parent"
-            android:layout_height="72dp"
-            android:gravity="left">
-
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_marginLeft="72dp"
-                android:layout_gravity="left">
-
-                <TextView
-                    android:id="@+id/file_properties_owner_label"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/file_properties_owner"
-                    android:textSize="16sp"
-                    android:textColor="@color/name_my_account"/>
-
-                <TextView
-                    android:id="@+id/file_properties_owner_info"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@id/file_properties_owner_label"
-                    android:textSize="16sp"
-                    android:textColor="@color/mail_my_account"/>
-            </RelativeLayout>
-        </RelativeLayout>
-
-        <!-- SIZE LAYOUT -->
-
-        <RelativeLayout
-            android:id="@+id/file_properties_size_layout"
-            android:layout_width="match_parent"
-            android:layout_height="72dp"
-            android:gravity="left" >
-
-            <ImageView
-                android:id="@+id/file_properties_size_image"
+                android:id="@+id/file_properties_info_image"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="16dp"
@@ -193,81 +204,59 @@
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
                 android:layout_gravity="left|center_vertical"
-                android:layout_marginLeft="32dp"
-                android:layout_toRightOf="@id/file_properties_size_image" >
+                android:layout_marginLeft="31dp"
+                android:layout_toRightOf="@id/file_properties_info_image" >
 
                 <TextView
-                    android:id="@+id/file_properties_info_menu_size"
+                    android:id="@+id/file_properties_info_menu_info"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/file_properties_info_size_file"
+                    android:text="@string/file_properties_info_info_file"
                     android:textSize="16sp"
                     android:textColor="@color/name_my_account"/>
 
-                <TextView
-                    android:id="@+id/file_properties_info_data_size"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@id/file_properties_info_menu_size"
-                    android:textSize="16sp"
-                    android:textColor="@color/mail_my_account" />
             </RelativeLayout>
         </RelativeLayout>
 
-        <!-- LINK LAYOUT -->
+        <!-- SIZE LAYOUT -->
 
         <RelativeLayout
-            android:id="@+id/file_properties_link_layout"
+            android:id="@+id/file_properties_size_layout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <ImageView
-                android:id="@+id/file_properties_public_link_image"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
-                android:layout_alignParentLeft="true"
-                android:layout_marginLeft="16dp"
-                android:alpha="0.30"
-                android:src="@drawable/link_ic"/>
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:gravity="left" >
 
             <RelativeLayout
-                android:layout_width="200dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
-                android:layout_gravity="left"
-                android:layout_marginLeft="32dp"
-                android:layout_marginTop="12dp"
-                android:layout_marginBottom="12dp"
-                android:layout_toRightOf="@id/file_properties_public_link_image">
-
-                <TextView
-                    android:id="@+id/file_properties_link_label"
+                android:layout_gravity="left|center_vertical"
+                android:layout_marginLeft="70dp">
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/file_properties_shared_folder_public_link"
-                    android:textColor="@color/name_my_account"
-                    android:textSize="16dp"/>
+                    android:orientation="horizontal">
 
-                <TextView
-                    android:id="@+id/file_properties_link_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@id/file_properties_link_label"
-                    android:textSize="16sp"
-                    android:textColor="@color/mail_my_account" />
+                    <TextView
+                        android:id="@+id/file_properties_info_menu_size"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/file_properties_info_size"
+                        android:textSize="14sp"
+                        android:textColor="@color/name_my_account"
+                        android:layout_marginRight="10dp"/>
+
+                    <TextView
+                        android:id="@+id/file_properties_info_data_size"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/file_properties_info_menu_size"
+                        android:textSize="14sp"
+                        android:textColor="@color/mail_my_account" />
+                </LinearLayout>
+
             </RelativeLayout>
-
-            <Button
-                android:id="@+id/file_properties_link_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_centerVertical="true"
-                android:minWidth="0dp"
-                android:layout_marginRight="12dp"
-                android:background="@android:color/transparent"
-                android:textColor="@color/accentColor" />
         </RelativeLayout>
 
         <!-- CONTENT LAYOUT -->
@@ -275,32 +264,41 @@
         <RelativeLayout
             android:id="@+id/file_properties_content_layout"
             android:layout_width="match_parent"
-            android:layout_height="72dp"
+            android:layout_height="wrap_content"
             android:gravity="left"
-            android:orientation="horizontal" >
+            android:orientation="horizontal"
+            android:layout_marginTop="16dp">
 
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="72dp"
+                android:layout_marginLeft="71dp"
                 android:layout_centerVertical="true"
                 android:gravity="left" >
 
-                <TextView
-                    android:id="@+id/file_properties_info_menu_content"
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/file_properties_info_content"
-                    android:textSize="16sp"
-                    android:textColor="@color/name_my_account"/>
+                    android:orientation="horizontal">
 
-                <TextView
-                    android:id="@+id/file_properties_info_data_content"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@id/file_properties_info_menu_content"
-                    android:textSize="16sp"
-                    android:textColor="@color/mail_my_account"/>
+                    <TextView
+                        android:id="@+id/file_properties_info_menu_content"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/file_properties_info_content"
+                        android:textSize="14sp"
+                        android:textColor="@color/name_my_account"
+                        android:layout_marginRight="8dp"/>
+
+                    <TextView
+                        android:id="@+id/file_properties_info_data_content"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/file_properties_info_menu_content"
+                        android:textSize="14sp"
+                        android:textColor="@color/mail_my_account" />
+                </LinearLayout>
+
             </RelativeLayout>
         </RelativeLayout>
 
@@ -309,32 +307,41 @@
         <RelativeLayout
             android:id="@+id/file_properties_added_layout"
             android:layout_width="match_parent"
-            android:layout_height="72dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
             android:gravity="left"
             android:orientation="horizontal" >
 
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="72dp"
+                android:layout_marginLeft="71dp"
                 android:layout_centerVertical="true"
                 android:gravity="left" >
 
-                <TextView
-                    android:id="@+id/file_properties_info_menu_added"
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/file_properties_info_added"
-                    android:textSize="16sp"
-                    android:textColor="@color/name_my_account" />
+                    android:orientation="horizontal">
 
-                <TextView
-                    android:id="@+id/file_properties_info_data_added"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@id/file_properties_info_menu_added"
-                    android:textSize="16sp"
-                    android:textColor="@color/mail_my_account" />
+                    <TextView
+                        android:id="@+id/file_properties_info_menu_added"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/file_properties_info_added"
+                        android:textSize="14sp"
+                        android:textColor="@color/name_my_account"
+                        android:layout_marginRight="8dp"/>
+
+                    <TextView
+                        android:id="@+id/file_properties_info_data_added"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/file_properties_info_menu_added"
+                        android:textSize="14sp"
+                        android:textColor="@color/mail_my_account" />
+                </LinearLayout>
+
             </RelativeLayout>
         </RelativeLayout>
 
@@ -343,34 +350,110 @@
         <RelativeLayout
             android:id="@+id/file_properties_modified_layout"
             android:layout_width="match_parent"
-            android:layout_height="72dp"
+            android:layout_height="wrap_content"
             android:gravity="left"
-            android:orientation="horizontal" >
+            android:orientation="horizontal"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="18dp">
 
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="72dp"
+                android:layout_marginLeft="71dp"
                 android:layout_centerVertical="true"
                 android:gravity="left" >
 
-                <TextView
-                    android:id="@+id/file_properties_info_menu_modified"
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/file_properties_info_modified"
-                    android:textSize="16sp"
-                    android:textColor="@color/name_my_account" />
+                    android:orientation="horizontal">
 
-                <TextView
-                    android:id="@+id/file_properties_info_data_modified"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@id/file_properties_info_menu_modified"
-                    android:textSize="16sp"
-                    android:textColor="@color/mail_my_account" />
+                    <TextView
+                        android:id="@+id/file_properties_info_menu_modified"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/file_properties_info_modified"
+                        android:textSize="14sp"
+                        android:textColor="@color/name_my_account"
+                        android:layout_marginRight="8dp"/>
+
+                    <TextView
+                        android:id="@+id/file_properties_info_data_modified"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/file_properties_info_menu_modified"
+                        android:textSize="14sp"
+                        android:textColor="@color/mail_my_account" />
+                </LinearLayout>
+
             </RelativeLayout>
         </RelativeLayout>
+
+        <!-- LINK LAYOUT -->
+
+        <RelativeLayout
+            android:id="@+id/file_properties_link_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:gravity="left" >
+            <ImageView
+                android:id="@+id/file_properties_public_link_image"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:layout_alignParentTop="true"
+                android:alpha="0.30"
+                android:src="@drawable/link_ic"/>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_gravity="left"
+                android:layout_marginLeft="31dp"
+                android:layout_toRightOf="@id/file_properties_public_link_image">
+
+                <TextView
+                    android:id="@+id/file_properties_link_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/file_properties_shared_folder_public_link_name"
+                    android:textColor="@color/name_my_account"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:id="@+id/file_properties_link_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/file_properties_link_label"
+                    android:layout_marginRight="20dp"
+                    android:layout_marginTop="16dp"
+                    android:maxWidth="250dp"
+                    android:textSize="16sp"
+                    android:textColor="@color/mail_my_account" />
+
+        </RelativeLayout>
+
+    </RelativeLayout>
+
+        <!-- COPY LINK LAYOUT -->
+        <RelativeLayout
+            android:id="@+id/file_properties_copy_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <Button
+                android:id="@+id/file_properties_link_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_marginRight="20dp"
+                android:minWidth="0dp"
+                android:background="@android:color/transparent"
+                android:textColor="@color/accentColor"/>
+        </RelativeLayout>
+
     </LinearLayout>
 
 </android.support.v4.widget.NestedScrollView>

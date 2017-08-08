@@ -228,11 +228,13 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
                 });
 
                 if (adapterList == null){
+                    log("adapterList is NULL");
                     adapterList = new MegaListChatLollipopAdapter(context, this, chats, listView, MegaListChatLollipopAdapter.ADAPTER_RECENT_CHATS);
                 }
                 else{
                     adapterList.setChats(chats);
                 }
+
                 listView.setAdapter(adapterList);
                 adapterList.setPositionClicked(-1);
 
@@ -358,6 +360,11 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
                     Toast.makeText(context, "Not yet implemented! Delete: "+chats.size()+" chats",Toast.LENGTH_SHORT).show();
                     break;
                 }
+                case R.id.chat_list_leave_chat_layout:{
+                  //Leave group chat
+                    ((ManagerActivityLollipop)context).showConfirmationLeaveChats(chats);
+                    break;
+                }
             }
             return false;
         }
@@ -382,6 +389,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
             List<MegaChatListItem> selected = adapterList.getSelectedChats();
             boolean showMute = false;
             boolean showUnmute = false;
+            boolean showLeaveChat =false;
 
             if (selected.size() != 0) {
 
@@ -398,6 +406,19 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
                     menu.findItem(R.id.cab_menu_select_all).setVisible(true);
                     unselect.setTitle(getString(R.string.action_unselect_all));
                     unselect.setVisible(true);
+                }
+
+                for(int i=0;i<selected.size();i++){
+                    MegaChatListItem chat = selected.get(i);
+                    if(chat!=null){
+                        if (chat.isGroup()) {
+                            log("Chat Group");
+                            showLeaveChat=true;
+                        }else{
+                            showLeaveChat=false;
+                            break;
+                        }
+                    }
                 }
 
                 for(int i=0;i<selected.size();i++){
@@ -428,12 +449,21 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
 
                 menu.findItem(R.id.cab_menu_mute).setVisible(showUnmute);
                 menu.findItem(R.id.cab_menu_unmute).setVisible(showMute);
+                menu.findItem(R.id.chat_list_leave_chat_layout).setVisible(showLeaveChat);
+                if(showLeaveChat){
+                    menu.findItem(R.id.chat_list_leave_chat_layout).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+
+                }
+
             }
             else{
                 menu.findItem(R.id.cab_menu_select_all).setVisible(true);
                 menu.findItem(R.id.cab_menu_unselect_all).setVisible(false);
                 menu.findItem(R.id.cab_menu_mute).setVisible(false);
                 menu.findItem(R.id.cab_menu_unmute).setVisible(false);
+
+                menu.findItem(R.id.chat_list_leave_chat_layout).setVisible(false);
+
             }
 
             return false;
@@ -452,7 +482,8 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
     /*
      * Clear all selected items
      */
-    private void clearSelections() {
+    public void clearSelections() {
+        log("clearSelections");
         if(adapterList.isMultipleSelect()){
             adapterList.clearSelections();
         }
@@ -464,7 +495,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
         }
         List<MegaChatListItem> chats = adapterList.getSelectedChats();
 
-        actionMode.setTitle(context.getString(R.string.selected_items, chats.size()));
+        actionMode.setTitle(chats.size()+"");
 
         try {
             actionMode.invalidate();
@@ -552,6 +583,9 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
 
         if(item.hasChanged(MegaChatListItem.CHANGE_TYPE_STATUS)){
             log("listItemUpdate: Change status: MegaChatListItem.CHANGE_TYPE_STATUS");
+        }
+        else if(item.hasChanged(MegaChatListItem.CHANGE_TYPE_OWN_PRIV)){
+            log("listItemUpdate: Change status: MegaChatListItem.CHANGE_TYPE_OWN_PRIV");
         }
         else if(item.hasChanged(MegaChatListItem.CHANGE_TYPE_PARTICIPANTS)){
             log("listItemUpdate: Change participants");
@@ -687,7 +721,13 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
                     }
                     if(indexToReplace!=-1){
                         log("Index to replace: "+indexToReplace);
-                        log("New title: "+item.getTitle());
+
+                        if(item.getLastMessage()!=null){
+                            log("New last content: "+item.getLastMessage());
+                        }
+                        else{
+                            log("New last content is NULL");
+                        }
 
                         chats.set(indexToReplace, item);
                         onLastMessageChange(indexToReplace);

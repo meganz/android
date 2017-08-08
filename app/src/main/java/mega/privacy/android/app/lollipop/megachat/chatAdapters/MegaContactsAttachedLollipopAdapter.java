@@ -157,6 +157,10 @@ public class MegaContactsAttachedLollipopAdapter extends RecyclerView.Adapter<Me
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
 		}
 
+		if (megaChatApi == null) {
+			megaChatApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaChatApi();
+		}
+
 		listFragment = _listView;
 	}
 
@@ -484,7 +488,7 @@ public class MegaContactsAttachedLollipopAdapter extends RecyclerView.Adapter<Me
 		} else {
 
 			if(this.isItemChecked(position)){
-				holder.imageView.setImageResource(R.drawable.ic_multiselect);
+				holder.imageView.setImageResource(R.drawable.ic_select_avatar);
 				holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.new_multiselect_color));
 			}
 			else{
@@ -896,7 +900,12 @@ public class MegaContactsAttachedLollipopAdapter extends RecyclerView.Adapter<Me
 //						}
 					}
 					else{
-						((ContactAttachmentActivityLollipop) context).showOptionsPanel(c.getMail());
+						if((c.getMail().equals(megaChatApi.getMyEmail()))){
+							((ContactAttachmentActivityLollipop) context).showSnackbar(context.getString(R.string.contact_is_me));
+						}
+						else{
+							((ContactAttachmentActivityLollipop) context).showOptionsPanel(c.getMail());
+						}
 					}
 					break;
 				}

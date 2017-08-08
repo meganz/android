@@ -5,24 +5,25 @@
         android:id="@+id/cab_menu_file_info_download"
         android:orderInCategory="100"
         android:title="@string/general_download"
+        android:icon="@drawable/ic_download_white"
         MEGA:showAsAction="never" />
 
     <item
         android:id="@+id/cab_menu_file_info_share_folder"
-        android:icon="@drawable/ic_share_white"
         android:tint="@color/white"
         android:orderInCategory="100"
         android:title="@string/context_share_folder"
+        android:icon="@drawable/ic_share_white"
         android:visible="false"
-        MEGA:showAsAction="ifRoom" />
+        MEGA:showAsAction="never" />
 
     <item
         android:id="@+id/cab_menu_file_info_get_link"
         android:orderInCategory="100"
-        android:icon="@drawable/ic_link_white"
         android:tint="@color/white"
         android:title="@string/context_get_link_menu"
-        MEGA:showAsAction="ifRoom"  />
+        android:icon="@drawable/link_ic_white"
+        MEGA:showAsAction="never"  />
 
     <item
         android:id="@+id/cab_menu_file_info_edit_link"
@@ -34,8 +35,8 @@
         android:id="@+id/cab_menu_file_info_remove_link"
         android:orderInCategory="100"
         android:title="@string/context_remove_link_menu"
-        android:icon="@drawable/ic_remove_link"
-        MEGA:showAsAction="ifRoom" />
+        android:icon="@drawable/ic_remove_link_w"
+        MEGA:showAsAction="never" />
 
     <item
         android:id="@+id/cab_menu_file_info_rename"
@@ -53,6 +54,7 @@
         android:id="@+id/cab_menu_file_info_copy"
         android:orderInCategory="110"
         android:title="@string/context_copy"
+        android:icon="@drawable/ic_copy_white"
         MEGA:showAsAction="never" />
 
     <item
@@ -63,8 +65,9 @@
 
     <item
         android:id="@+id/cab_menu_file_info_leave"
-        android:orderInCategory="110"
+        android:orderInCategory="109"
         android:title="@string/general_leave"
+        android:icon="@drawable/ic_leave_share_w"
         MEGA:showAsAction="never" />
 
     <item

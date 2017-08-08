@@ -861,7 +861,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 			log("URL: " + url + "___SIZE: " + size);
 			
 			downloadTo (parentPath, url, size, hashes);
-			Snackbar.make(fragmentContainer, getString(R.string.download_began), Snackbar.LENGTH_LONG).show();
+//			Snackbar.make(fragmentContainer, getString(R.string.download_began), Snackbar.LENGTH_LONG).show();
 		}
 		else if (requestCode == Constants.REQUEST_CODE_SELECT_IMPORT_FOLDER && resultCode == RESULT_OK){
 			if(!Util.isOnline(this)) {
@@ -904,10 +904,115 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 		}
 	}
 
-	int numberOfNodesToDownload = 0;
-	int numberOfNodesAlreadyDownloaded = 0;
-	int numberOfNodesPending = 0;
-	
+//	int numberOfNodesToDownload = 0;
+//	int numberOfNodesAlreadyDownloaded = 0;
+//	int numberOfNodesPending = 0;
+//
+//	public void downloadTo(String parentPath, String url, long size, long [] hashes){
+//		log("downloadTo");
+//		double availableFreeSpace = Double.MAX_VALUE;
+//		try{
+//			StatFs stat = new StatFs(parentPath);
+//			availableFreeSpace = (double)stat.getAvailableBlocks() * (double)stat.getBlockSize();
+//		}
+//		catch(Exception ex){}
+//
+//		if (documentM != null){
+//			return;
+//		}
+//		else if (document != null){
+//			if(document.getType() == MegaNode.TYPE_FILE){
+//				log("ISFILE");
+//				String localPath = Util.getLocalFile(this, document.getName(), document.getSize(), parentPath);
+//				if(localPath != null){
+//					try {
+//						Util.copyFile(new File(localPath), new File(parentPath, document.getName()));
+//					}
+//					catch(Exception e) {}
+//
+//					try {
+//						Intent viewIntent = new Intent(Intent.ACTION_VIEW);
+//						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+//							viewIntent.setDataAndType(FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", new File(localPath)), MimeTypeList.typeForName(document.getName()).getType());
+//						} else {
+//							viewIntent.setDataAndType(Uri.fromFile(new File(localPath)), MimeTypeList.typeForName(document.getName()).getType());
+//						}
+//						viewIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+//						if (MegaApiUtils.isIntentAvailable(this, viewIntent))
+//							startActivity(viewIntent);
+//						else {
+//							Intent intentShare = new Intent(Intent.ACTION_SEND);
+//							if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+//								intentShare.setDataAndType(FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", new File(localPath)), MimeTypeList.typeForName(document.getName()).getType());
+//							} else {
+//								intentShare.setDataAndType(Uri.fromFile(new File(localPath)), MimeTypeList.typeForName(document.getName()).getType());
+//							}
+//							intentShare.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+//							if (MegaApiUtils.isIntentAvailable(this, intentShare))
+//								startActivity(intentShare);
+//							String toastMessage = getString(R.string.general_already_downloaded) + ": " + localPath;
+//							Snackbar.make(fragmentContainer, toastMessage, Snackbar.LENGTH_LONG).show();
+//						}
+//					}
+//					catch (Exception e){
+//						String toastMessage = getString(R.string.general_already_downloaded) + ": " + localPath;
+//						Snackbar.make(fragmentContainer, toastMessage, Snackbar.LENGTH_LONG).show();
+//					}
+//					log("Finish");
+//					finish();
+//					return;
+//				}
+//				else{
+//					log("LocalPath is NULL");
+//				}
+//
+//				log("path of the file: "+parentPath);
+//				numberOfNodesToDownload++;
+//
+//				File destDir = new File(parentPath);
+//				File destFile;
+//				destDir.mkdirs();
+//				if (destDir.isDirectory()){
+//					destFile = new File(destDir, megaApi.escapeFsIncompatible(document.getName()));
+//					log("destDir is Directory. destFile: " + destFile.getAbsolutePath());
+//				}
+//				else{
+//					log("destDir is File");
+//					destFile = destDir;
+//				}
+//
+//				if(destFile.exists() && (document.getSize() == destFile.length())){
+//					numberOfNodesAlreadyDownloaded++;
+//					log(destFile.getAbsolutePath() + " already downloaded");
+//				}
+//				else {
+//					numberOfNodesPending++;
+//					log("start service");
+//					Intent service = new Intent(this, DownloadService.class);
+//					service.putExtra(DownloadService.EXTRA_HASH, hash);
+//					service.putExtra(DownloadService.EXTRA_URL, url);
+//					service.putExtra(DownloadService.EXTRA_SIZE, size);
+//					service.putExtra(DownloadService.EXTRA_PATH, parentPath);
+//					startService(service);
+//
+//					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+//						log("Build.VERSION_CODES.LOLLIPOP --> Finish this!!!");
+//						finish();
+//					}
+//				}
+//
+//				log("Total: " + numberOfNodesToDownload + " Already: " + numberOfNodesAlreadyDownloaded + " Pending: " + numberOfNodesPending);
+//				if (numberOfNodesAlreadyDownloaded > 0){
+//					String msg = getString(R.string.already_downloaded_multiple, numberOfNodesAlreadyDownloaded);
+//					if (numberOfNodesPending > 0){
+//						msg = msg + getString(R.string.pending_multiple, numberOfNodesPending);
+//					}
+//					showSnackbar(msg);
+//				}
+//			}
+//		}
+//	}
+
 	public void downloadTo(String parentPath, String url, long size, long [] hashes){
 		log("downloadTo");
 		double availableFreeSpace = Double.MAX_VALUE;
@@ -917,99 +1022,117 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 		}
 		catch(Exception ex){}
 
-		if (documentM != null){
-			return;
-		}
-		else if (document != null){
-			if(document.getType() == MegaNode.TYPE_FILE){
-				log("ISFILE");
-				String localPath = Util.getLocalFile(this, document.getName(), document.getSize(), parentPath);
-				if(localPath != null){
-					try {
-						Util.copyFile(new File(localPath), new File(parentPath, document.getName()));
-					}
-					catch(Exception e) {}
 
-					try {
-						Intent viewIntent = new Intent(Intent.ACTION_VIEW);
-						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-							viewIntent.setDataAndType(FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", new File(localPath)), MimeTypeList.typeForName(document.getName()).getType());
-						} else {
-							viewIntent.setDataAndType(Uri.fromFile(new File(localPath)), MimeTypeList.typeForName(document.getName()).getType());
+		if (hashes == null){
+			if(url != null) {
+				if(availableFreeSpace < size) {
+					Snackbar.make(fragmentContainer, getString(R.string.error_not_enough_free_space), Snackbar.LENGTH_LONG).show();
+					return;
+				}
+
+				Intent service = new Intent(this, DownloadService.class);
+				service.putExtra(DownloadService.EXTRA_URL, url);
+				service.putExtra(DownloadService.EXTRA_SIZE, size);
+				service.putExtra(DownloadService.EXTRA_PATH, parentPath);
+				startService(service);
+			}
+		}
+		else{
+			if(hashes.length == 1){
+				MegaNode tempNode = megaApi.getNodeByHandle(hashes[0]);
+				if((tempNode != null) && tempNode.getType() == MegaNode.TYPE_FILE){
+					log("ISFILE");
+					String localPath = Util.getLocalFile(this, tempNode.getName(), tempNode.getSize(), parentPath);
+					if(localPath != null){
+						try {
+							Util.copyFile(new File(localPath), new File(parentPath, tempNode.getName()));
 						}
-						viewIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-						if (MegaApiUtils.isIntentAvailable(this, viewIntent))
-							startActivity(viewIntent);
-						else {
-							Intent intentShare = new Intent(Intent.ACTION_SEND);
+						catch(Exception e) {}
+
+						try {
+							Intent viewIntent = new Intent(Intent.ACTION_VIEW);
 							if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-								intentShare.setDataAndType(FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", new File(localPath)), MimeTypeList.typeForName(document.getName()).getType());
+								viewIntent.setDataAndType(FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", new File(localPath)), MimeTypeList.typeForName(tempNode.getName()).getType());
 							} else {
-								intentShare.setDataAndType(Uri.fromFile(new File(localPath)), MimeTypeList.typeForName(document.getName()).getType());
+								viewIntent.setDataAndType(Uri.fromFile(new File(localPath)), MimeTypeList.typeForName(tempNode.getName()).getType());
 							}
-							intentShare.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-							if (MegaApiUtils.isIntentAvailable(this, intentShare))
-								startActivity(intentShare);
+							viewIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+							if (MegaApiUtils.isIntentAvailable(this, viewIntent))
+								startActivity(viewIntent);
+							else {
+								Intent intentShare = new Intent(Intent.ACTION_SEND);
+								if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+									intentShare.setDataAndType(FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", new File(localPath)), MimeTypeList.typeForName(tempNode.getName()).getType());
+								} else {
+									intentShare.setDataAndType(Uri.fromFile(new File(localPath)), MimeTypeList.typeForName(tempNode.getName()).getType());
+								}
+								intentShare.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+								if (MegaApiUtils.isIntentAvailable(this, intentShare))
+									startActivity(intentShare);
+								String toastMessage = getString(R.string.general_already_downloaded) + ": " + localPath;
+								Snackbar.make(fragmentContainer, toastMessage, Snackbar.LENGTH_LONG).show();
+							}
+						}
+						catch (Exception e){
 							String toastMessage = getString(R.string.general_already_downloaded) + ": " + localPath;
 							Snackbar.make(fragmentContainer, toastMessage, Snackbar.LENGTH_LONG).show();
 						}
+						log("Finish");
+						finish();
+						return;
 					}
-					catch (Exception e){
-						String toastMessage = getString(R.string.general_already_downloaded) + ": " + localPath;
-						Snackbar.make(fragmentContainer, toastMessage, Snackbar.LENGTH_LONG).show();
+					else{
+						log("LocalPath is NULL");
 					}
-					log("Finish");
-					finish();
-					return;
 				}
-				else{
-					log("LocalPath is NULL");
-				}
+			}
 
-				log("path of the file: "+parentPath);
-				numberOfNodesToDownload++;
+			for (long hash : hashes) {
+				MegaNode node = megaApi.getNodeByHandle(hash);
+				if(node != null){
+					log("Node!=null: "+node.getName());
+					Map<MegaNode, String> dlFiles = new HashMap<MegaNode, String>();
+					dlFiles.put(node, parentPath);
 
-				File destDir = new File(parentPath);
-				File destFile;
-				destDir.mkdirs();
-				if (destDir.isDirectory()){
-					destFile = new File(destDir, megaApi.escapeFsIncompatible(document.getName()));
-					log("destDir is Directory. destFile: " + destFile.getAbsolutePath());
-				}
-				else{
-					log("destDir is File");
-					destFile = destDir;
-				}
+					for (MegaNode document : dlFiles.keySet()) {
 
-				if(destFile.exists() && (document.getSize() == destFile.length())){
-					numberOfNodesAlreadyDownloaded++;
-					log(destFile.getAbsolutePath() + " already downloaded");
+						String path = dlFiles.get(document);
+
+						if(availableFreeSpace < document.getSize()){
+							Snackbar.make(fragmentContainer, getString(R.string.error_not_enough_free_space), Snackbar.LENGTH_LONG).show();
+							continue;
+						}
+
+						Intent service = new Intent(this, DownloadService.class);
+						service.putExtra(DownloadService.EXTRA_HASH, document.getHandle());
+						service.putExtra(DownloadService.EXTRA_URL, url);
+						service.putExtra(DownloadService.EXTRA_SIZE, document.getSize());
+						service.putExtra(DownloadService.EXTRA_PATH, path);
+						log("intent to DownloadService");
+						startService(service);
+					}
 				}
-				else {
-					numberOfNodesPending++;
-					log("start service");
+				else if(url != null) {
+					if(availableFreeSpace < size) {
+						Snackbar.make(fragmentContainer, getString(R.string.error_not_enough_free_space), Snackbar.LENGTH_LONG).show();
+						continue;
+					}
+
 					Intent service = new Intent(this, DownloadService.class);
-					service.putExtra(DownloadService.EXTRA_HASH, hashes[0]);
+					service.putExtra(DownloadService.EXTRA_HASH, hash);
 					service.putExtra(DownloadService.EXTRA_URL, url);
 					service.putExtra(DownloadService.EXTRA_SIZE, size);
 					service.putExtra(DownloadService.EXTRA_PATH, parentPath);
 					startService(service);
-
-					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-						log("Build.VERSION_CODES.LOLLIPOP --> Finish this!!!");
-						finish();
-					}
 				}
-
-				log("Total: " + numberOfNodesToDownload + " Already: " + numberOfNodesAlreadyDownloaded + " Pending: " + numberOfNodesPending);
-				if (numberOfNodesAlreadyDownloaded > 0){
-					String msg = getString(R.string.already_downloaded_multiple, numberOfNodesAlreadyDownloaded);
-					if (numberOfNodesPending > 0){
-						msg = msg + getString(R.string.pending_multiple, numberOfNodesPending);
-					}
-					showSnackbar(msg);
+				else {
+					log("node not found. Let's try the document");
 				}
 			}
+		}
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+			log("Build.VERSION_CODES.LOLLIPOP --> Finish this!!!");
+			finish();
 		}
 	}
 
@@ -1051,6 +1174,18 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 				        AlertDialog.Builder b=new AlertDialog.Builder(this);
 	
 						b.setTitle(getResources().getString(R.string.settings_storage_download_location));
+						if (hashesM == null){
+							if (document != null) {
+								hashesM = new long[1];
+								hashesM[0] = document.getHandle();
+								sizeM = document.getSize();
+								documentM = document;
+							}
+							else{
+								return;
+							}
+						}
+
 						final long sizeFinal = sizeM;
 						final long[] hashesFinal = new long[hashesM.length];
 						for (int i=0; i< hashesM.length; i++){

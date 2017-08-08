@@ -1769,6 +1769,33 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						drawerItem=DrawerItem.CHAT;
 						selectDrawerItemLollipop(drawerItem);
 						selectDrawerItemPending=false;
+						long chatId = getIntent().getLongExtra("CHAT_ID", -1);
+						if(chatId!=-1){
+							MegaChatRoom chat = megaChatApi.getChatRoom(chatId);
+							if(chat!=null){
+								log("open chat with id: " + chatId);
+								Intent intentToChat = new Intent(this, ChatActivityLollipop.class);
+								intentToChat.setAction(Constants.ACTION_CHAT_SHOW_MESSAGES);
+								intentToChat.putExtra("CHAT_ID", chatId);
+								this.startActivity(intentToChat);
+							}
+							else{
+								log("Error, chat is NULL");
+							}
+						}
+						else{
+							log("Error, chat id is -1");
+						}
+						getIntent().setAction(null);
+						setIntent(null);
+					}
+					else if(getIntent().getAction().equals(Constants.ACTION_CHAT_SUMMARY)) {
+						log("Chat notification: ACTION_CHAT_SUMMARY");
+						drawerItem=DrawerItem.CHAT;
+						selectDrawerItemLollipop(drawerItem);
+						selectDrawerItemPending=false;
+						getIntent().setAction(null);
+						setIntent(null);
 					}
 					else if(getIntent().getAction().equals(Constants.ACTION_INCOMING_SHARED_FOLDER_NOTIFICATION)){
 						log("IPC link - go to received request in Contacts");
@@ -1805,6 +1832,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				if(!chatConnection){
 					log("Connection goes!!!");
 					megaChatApi.connect(this);
+					log("timestamp: "+System.currentTimeMillis()/1000);
+                    MegaApplication.setFirstTs(System.currentTimeMillis()/1000);
 				}
 
 				if (nV != null){
@@ -2227,7 +2256,29 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					selectDrawerItemLollipop(drawerItem);
 				}
 				else if(getIntent().getAction().equals(Constants.ACTION_CHAT_NOTIFICATION_MESSAGE)){
-					log("Chat notification received");
+					log("onPostResume: ACTION_CHAT_NOTIFICATION_MESSAGE");
+					drawerItem=DrawerItem.CHAT;
+					selectDrawerItemLollipop(drawerItem);
+					long chatId = getIntent().getLongExtra("CHAT_ID", -1);
+					if(chatId!=-1){
+						MegaChatRoom chat = megaChatApi.getChatRoom(chatId);
+						if(chat!=null){
+							log("open chat with id: " + chatId);
+							Intent intentToChat = new Intent(this, ChatActivityLollipop.class);
+							intentToChat.setAction(Constants.ACTION_CHAT_SHOW_MESSAGES);
+							intentToChat.putExtra("CHAT_ID", chatId);
+							this.startActivity(intentToChat);
+						}
+						else{
+							log("Error, chat is NULL");
+						}
+					}
+					else{
+						log("Error, chat id is -1");
+					}
+				}
+				else if(getIntent().getAction().equals(Constants.ACTION_CHAT_SUMMARY)) {
+					log("onPostResume: ACTION_CHAT_SUMMARY");
 					drawerItem=DrawerItem.CHAT;
 					selectDrawerItemLollipop(drawerItem);
 				}
@@ -3839,6 +3890,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 		firstNavigationLevel = true;
 
+		showFabButton();
+
 		drawerLayout.closeDrawer(Gravity.LEFT);
 	}
 
@@ -3969,16 +4022,27 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 				log("FirstTimeCam: " + firstTimeCam);
     			if (cuFL == null){
-    				cuFL = new CameraUploadFragmentLollipop();
-    				cuFL.setIsList(isListCameraUploads);
-    				cuFL.setIsLargeGrid(isLargeGridCameraUploads);
-    				cuFL.setFirstTimeCam(firstTimeCam);
+                    Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("cuFLol");
+                    if(currentFragment != null && currentFragment instanceof CameraUploadFragmentLollipop){
+                        cuFL = ((CameraUploadFragmentLollipop) currentFragment);
+                        isListCameraUploads = cuFL.getIsList();
+                        isLargeGridCameraUploads = cuFL.getIsLargeGrid();
+                        firstTimeCam = cuFL.getFirstTimeCam();
+                    }
+                    else{
+                        cuFL = new CameraUploadFragmentLollipop();
+                        cuFL.setIsList(isListCameraUploads);
+                        cuFL.setIsLargeGrid(isLargeGridCameraUploads);
+                        cuFL.setFirstTimeCam(firstTimeCam);
+                    }
 				}
 				else{
 					cuFL.setIsList(isListCameraUploads);
 					cuFL.setIsLargeGrid(isLargeGridCameraUploads);
 					cuFL.setFirstTimeCam(firstTimeCam);
 				}
+
+				invalidateOptionsMenu();
 
     			tabLayoutCloud.setVisibility(View.GONE);
     			viewPagerCDrive.setVisibility(View.GONE);
@@ -4042,16 +4106,33 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
     			tB.setVisibility(View.VISIBLE);
 
+				if (nV != null){
+					Menu nVMenu = nV.getMenu();
+					MenuItem hidden = nVMenu.findItem(R.id.navigation_item_hidden);
+					resetNavigationViewMenu(nVMenu);
+					hidden.setChecked(true);
+				}
+
     			if (muFLol == null){
-//    				cuF = new CameraUploadFragmentLollipop(CameraUploadFragmentLollipop.TYPE_MEDIA);
-    				muFLol = CameraUploadFragmentLollipop.newInstance(CameraUploadFragmentLollipop.TYPE_MEDIA);
-    				muFLol.setIsList(isListCameraUploads);
-    				muFLol.setIsLargeGrid(isLargeGridCameraUploads);
+                    Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("muFLol");
+                    if(currentFragment != null && currentFragment instanceof CameraUploadFragmentLollipop){
+                        muFLol = (CameraUploadFragmentLollipop) currentFragment;
+                        isListCameraUploads = muFLol.getIsList();
+                        isLargeGridCameraUploads = muFLol.getIsLargeGrid();
+                    }
+                    else {
+//    					cuF = new CameraUploadFragmentLollipop(CameraUploadFragmentLollipop.TYPE_MEDIA);
+                        muFLol = CameraUploadFragmentLollipop.newInstance(CameraUploadFragmentLollipop.TYPE_MEDIA);
+                        muFLol.setIsList(isListCameraUploads);
+                        muFLol.setIsLargeGrid(isLargeGridCameraUploads);
+                    }
 				}
 				else{
 					muFLol.setIsList(isListCameraUploads);
 					muFLol.setIsLargeGrid(isLargeGridCameraUploads);
 				}
+
+				invalidateOptionsMenu();
 
     			tabLayoutCloud.setVisibility(View.GONE);
     			viewPagerCDrive.setVisibility(View.GONE);
@@ -4066,9 +4147,24 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 				fragmentContainer.setVisibility(View.VISIBLE);
 
-				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-				ft.replace(R.id.fragment_container, muFLol, "muFLol");
-    			ft.commitNow();
+//				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+//				ft.replace(R.id.fragment_container, muFLol, "muFLol");
+//    			ft.commitNow();
+
+				FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
+				Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("muFLol");
+				if (currentFragment != null) {
+					fragTransaction.detach(currentFragment);
+					fragTransaction.commitNowAllowingStateLoss();
+
+					fragTransaction = getSupportFragmentManager().beginTransaction();
+					fragTransaction.attach(currentFragment);
+					fragTransaction.commitNowAllowingStateLoss();
+				}
+				else{
+					fragTransaction.replace(R.id.fragment_container, muFLol, "muFLol");
+					fragTransaction.commitNowAllowingStateLoss();
+				}
 
 				drawerLayout.closeDrawer(Gravity.LEFT);
 
@@ -4284,6 +4380,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				break;
 			}
     	}
+	}
+
+	public void moveToSettingsSection(){
+		drawerItem=DrawerItem.SETTINGS;
+		selectDrawerItemLollipop(drawerItem);
 	}
 
 	private String getFragmentTag(int viewPagerId, int fragmentPosition){
@@ -4983,7 +5084,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						takePicture.setVisible(false);
 						refreshMenuItem.setVisible(false);
 						helpMenuItem.setVisible(false);
-						upgradeAccountMenuItem.setVisible(true);
+						upgradeAccountMenuItem.setVisible(false);
 						gridSmallLargeMenuItem.setVisible(false);
 						logoutMenuItem.setVisible(false);
 						forgotPassMenuItem.setVisible(false);
@@ -5054,6 +5155,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			else if (drawerItem == DrawerItem.CONTACTS){
 				log("createOptions CONTACTS");
 				int index = viewPagerContacts.getCurrentItem();
+				newChatMenuItem.setVisible(false);
+				setStatusMenuItem.setVisible(false);
 				if (index == 0){
 					log("createOptions TAB CONTACTS");
 					//Show
@@ -5063,8 +5166,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					thumbViewMenuItem.setVisible(true);
 					upgradeAccountMenuItem.setVisible(true);
 					searchMenuItem.setVisible(true);
-					newChatMenuItem.setVisible(true);
-					setStatusMenuItem.setVisible(false);
 
 					//Hide
 					pauseTransfersMenuIcon.setVisible(false);
@@ -5657,6 +5758,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 								log("deepBrowserTree get from inSFlol: "+inSFLol.getDeepBrowserTree());
 		    					inSFLol.onBackPressed();
 		    				}
+
 		    			}
 		    		}
 		    		else if (drawerItem == DrawerItem.SAVED_FOR_OFFLINE){
@@ -5725,7 +5827,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 							}
 						}
 
-
 //						if (tFLol != null){
 //							if (tFLol.onBackPressed() == 0){
 //								drawerItem = DrawerItem.CLOUD_DRIVE;
@@ -5789,34 +5890,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	        		megaApi.pauseTransfers(true, this);
 	        		pauseTransfersMenuIcon.setVisible(false);
 	        		playTransfersMenuIcon.setVisible(true);
-//    				if(!tranfersPaused)
-//    				{
-//    					tranfersPaused = true;
-//    					pauseTransfersMenuIcon.setVisible(false);
-//    					playTransfersMenuIcon.setVisible(true);
-//
-//    					//Update the progress in fragments
-//    					if (fbFLol != null){
-//    						fbFLol.updateProgressBar(progressPercent);
-//    					}
-//    					if (rubbishBinFLol != null){
-//    						rubbishBinFLol.updateProgressBar(progressPercent);
-//    					}
-//    					if (iFLol != null){
-//    						iFLol.updateProgressBar(progressPercent);
-//    					}
-//    					if (outSFLol != null){
-//    						outSFLol.updateProgressBar(progressPercent);
-//    					}
-//    					if (inSFLol != null){
-//    						inSFLol.updateProgressBar(progressPercent);
-//    					}
-//    					if (tFLol != null){
-//    						tFLol.updateProgressBar(progressPercent);
-//    					}
-//
-//    	    			megaApi.pauseTransfers(true, this);
-//    				}
 	        	}
 
 	        	return true;
@@ -6546,16 +6619,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
         		nameMLP.setMargins(Util.scaleWidthPx(25, outMetrics), Util.scaleHeightPx(15, outMetrics), 0, Util.scaleHeightPx(10, outMetrics));
 
         		TextView sortByDateTV = (TextView) dialoglayout.findViewById(R.id.sortby_dialog_date_text);
-        		sortByDateTV.setText(getString(R.string.sortby_creation_date));
+        		sortByDateTV.setText(getString(R.string.sortby_modification_date));
         		ViewGroup.MarginLayoutParams dateMLP = (ViewGroup.MarginLayoutParams) sortByDateTV.getLayoutParams();
         		sortByDateTV.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16*scaleText));
         		dateMLP.setMargins(Util.scaleWidthPx(25, outMetrics), Util.scaleHeightPx(15, outMetrics), 0, Util.scaleHeightPx(10, outMetrics));
-
-				TextView sortByModificationDateTV = (TextView) dialoglayout.findViewById(R.id.sortby_dialog_date_modification_text);
-				sortByModificationDateTV.setText(getString(R.string.sortby_modification_date));
-				ViewGroup.MarginLayoutParams dateModMLP = (ViewGroup.MarginLayoutParams) sortByModificationDateTV.getLayoutParams();
-				sortByModificationDateTV.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16*scaleText));
-				dateModMLP.setMargins(Util.scaleWidthPx(25, outMetrics), Util.scaleHeightPx(15, outMetrics), 0, Util.scaleHeightPx(10, outMetrics));
 
         		TextView sortBySizeTV = (TextView) dialoglayout.findViewById(R.id.sortby_dialog_size_text);
         		sortBySizeTV.setText(getString(R.string.sortby_size));
@@ -6566,62 +6633,53 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
         		final CheckedTextView ascendingCheck = (CheckedTextView) dialoglayout.findViewById(R.id.sortby_dialog_ascending_check);
         		ascendingCheck.setText(getString(R.string.sortby_name_ascending));
         		ascendingCheck.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16*scaleText));
-        		ascendingCheck.setCompoundDrawablePadding(Util.scaleWidthPx(10, outMetrics));
+        		ascendingCheck.setCompoundDrawablePadding(Util.scaleWidthPx(34, outMetrics));
         		ViewGroup.MarginLayoutParams ascendingMLP = (ViewGroup.MarginLayoutParams) ascendingCheck.getLayoutParams();
         		ascendingMLP.setMargins(Util.scaleWidthPx(15, outMetrics), Util.scaleHeightPx(10, outMetrics), 0, Util.scaleHeightPx(10, outMetrics));
 
         		final CheckedTextView descendingCheck = (CheckedTextView) dialoglayout.findViewById(R.id.sortby_dialog_descending_check);
         		descendingCheck.setText(getString(R.string.sortby_name_descending));
         		descendingCheck.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16*scaleText));
-        		descendingCheck.setCompoundDrawablePadding(Util.scaleWidthPx(10, outMetrics));
+        		descendingCheck.setCompoundDrawablePadding(Util.scaleWidthPx(34, outMetrics));
         		ViewGroup.MarginLayoutParams descendingMLP = (ViewGroup.MarginLayoutParams) descendingCheck.getLayoutParams();
         		descendingMLP.setMargins(Util.scaleWidthPx(15, outMetrics), Util.scaleHeightPx(10, outMetrics), 0, Util.scaleHeightPx(10, outMetrics));
 
         		final CheckedTextView newestCheck = (CheckedTextView) dialoglayout.findViewById(R.id.sortby_dialog_newest_check);
         		newestCheck.setText(getString(R.string.sortby_date_newest));
         		newestCheck.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16*scaleText));
-        		newestCheck.setCompoundDrawablePadding(Util.scaleWidthPx(10, outMetrics));
+        		newestCheck.setCompoundDrawablePadding(Util.scaleWidthPx(34, outMetrics));
         		ViewGroup.MarginLayoutParams newestMLP = (ViewGroup.MarginLayoutParams) newestCheck.getLayoutParams();
         		newestMLP.setMargins(Util.scaleWidthPx(15, outMetrics), Util.scaleHeightPx(10, outMetrics), 0, Util.scaleHeightPx(10, outMetrics));
 
         		final CheckedTextView oldestCheck = (CheckedTextView) dialoglayout.findViewById(R.id.sortby_dialog_oldest_check);
         		oldestCheck.setText(getString(R.string.sortby_date_oldest));
         		oldestCheck.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16*scaleText));
-        		oldestCheck.setCompoundDrawablePadding(Util.scaleWidthPx(10, outMetrics));
+        		oldestCheck.setCompoundDrawablePadding(Util.scaleWidthPx(34, outMetrics));
         		ViewGroup.MarginLayoutParams oldestMLP = (ViewGroup.MarginLayoutParams) oldestCheck.getLayoutParams();
         		oldestMLP.setMargins(Util.scaleWidthPx(15, outMetrics), Util.scaleHeightPx(10, outMetrics), 0, Util.scaleHeightPx(10, outMetrics));
-
-				final CheckedTextView newestModificationCheck = (CheckedTextView) dialoglayout.findViewById(R.id.sortby_dialog_newest_modification_check);
-				newestModificationCheck.setText(getString(R.string.sortby_date_newest));
-				newestModificationCheck.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16*scaleText));
-				newestModificationCheck.setCompoundDrawablePadding(Util.scaleWidthPx(10, outMetrics));
-				ViewGroup.MarginLayoutParams newestModMLP = (ViewGroup.MarginLayoutParams) newestModificationCheck.getLayoutParams();
-				newestModMLP.setMargins(Util.scaleWidthPx(15, outMetrics), Util.scaleHeightPx(10, outMetrics), 0, Util.scaleHeightPx(10, outMetrics));
-
-				final CheckedTextView oldestModificationCheck = (CheckedTextView) dialoglayout.findViewById(R.id.sortby_dialog_oldest_modification_check);
-				oldestModificationCheck.setText(getString(R.string.sortby_date_oldest));
-				oldestModificationCheck.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16*scaleText));
-				oldestModificationCheck.setCompoundDrawablePadding(Util.scaleWidthPx(10, outMetrics));
-				ViewGroup.MarginLayoutParams oldestModMLP = (ViewGroup.MarginLayoutParams) oldestModificationCheck.getLayoutParams();
-				oldestModMLP.setMargins(Util.scaleWidthPx(15, outMetrics), Util.scaleHeightPx(10, outMetrics), 0, Util.scaleHeightPx(10, outMetrics));
 
         		final CheckedTextView largestCheck = (CheckedTextView) dialoglayout.findViewById(R.id.sortby_dialog_largest_first_check);
         		largestCheck.setText(getString(R.string.sortby_size_largest_first));
         		largestCheck.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16*scaleText));
-        		largestCheck.setCompoundDrawablePadding(Util.scaleWidthPx(10, outMetrics));
+        		largestCheck.setCompoundDrawablePadding(Util.scaleWidthPx(34, outMetrics));
         		ViewGroup.MarginLayoutParams largestMLP = (ViewGroup.MarginLayoutParams) largestCheck.getLayoutParams();
         		largestMLP.setMargins(Util.scaleWidthPx(15, outMetrics), Util.scaleHeightPx(10, outMetrics), 0, Util.scaleHeightPx(10, outMetrics));
 
         		final CheckedTextView smallestCheck = (CheckedTextView) dialoglayout.findViewById(R.id.sortby_dialog_smallest_first_check);
         		smallestCheck.setText(getString(R.string.sortby_size_smallest_first));
         		smallestCheck.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16*scaleText));
-        		smallestCheck.setCompoundDrawablePadding(Util.scaleWidthPx(10, outMetrics));
+        		smallestCheck.setCompoundDrawablePadding(Util.scaleWidthPx(34, outMetrics));
         		ViewGroup.MarginLayoutParams smallestMLP = (ViewGroup.MarginLayoutParams) smallestCheck.getLayoutParams();
         		smallestMLP.setMargins(Util.scaleWidthPx(15, outMetrics), Util.scaleHeightPx(10, outMetrics), 0, Util.scaleHeightPx(10, outMetrics));
 
         		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
         		builder.setView(dialoglayout);
-        		builder.setTitle(getString(R.string.action_sort_by));
+				TextView textViewTitle = new TextView(ManagerActivityLollipop.this);
+				textViewTitle.setText(getString(R.string.action_sort_by));
+				textViewTitle.setTextSize(20);
+				textViewTitle.setTextColor(0xde000000);
+				textViewTitle.setPadding(Util.scaleWidthPx(23, outMetrics), Util.scaleHeightPx(20, outMetrics), 0, 0);
+        		builder.setCustomTitle(textViewTitle);
 
         		sortByDialog = builder.create();
         		sortByDialog.show();
@@ -6682,8 +6740,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		        			descendingCheck.setChecked(false);
 		        			newestCheck.setChecked(false);
 		        			oldestCheck.setChecked(false);
-							newestModificationCheck.setChecked(false);
-							oldestModificationCheck.setChecked(false);
 		        			largestCheck.setChecked(false);
 		        			smallestCheck.setChecked(false);
 		        			break;
@@ -6693,8 +6749,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		        			descendingCheck.setChecked(true);
 		        			newestCheck.setChecked(false);
 		        			oldestCheck.setChecked(false);
-							newestModificationCheck.setChecked(false);
-							oldestModificationCheck.setChecked(false);
 		        			largestCheck.setChecked(false);
 		        			smallestCheck.setChecked(false);
 		        			break;
@@ -6704,8 +6758,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		        			descendingCheck.setChecked(false);
 		        			newestCheck.setChecked(true);
 		        			oldestCheck.setChecked(false);
-							newestModificationCheck.setChecked(false);
-							oldestModificationCheck.setChecked(false);
 		        			largestCheck.setChecked(false);
 		        			smallestCheck.setChecked(false);
 		        			break;
@@ -6715,8 +6767,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		        			descendingCheck.setChecked(false);
 		        			newestCheck.setChecked(false);
 		        			oldestCheck.setChecked(true);
-							newestModificationCheck.setChecked(false);
-							oldestModificationCheck.setChecked(false);
 		        			largestCheck.setChecked(false);
 		        			smallestCheck.setChecked(false);
 		        			break;
@@ -6726,8 +6776,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 							descendingCheck.setChecked(false);
 							newestCheck.setChecked(false);
 							oldestCheck.setChecked(false);
-							newestModificationCheck.setChecked(false);
-							oldestModificationCheck.setChecked(true);
 							largestCheck.setChecked(false);
 							smallestCheck.setChecked(false);
 							break;
@@ -6737,8 +6785,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 							descendingCheck.setChecked(false);
 							newestCheck.setChecked(false);
 							oldestCheck.setChecked(false);
-							newestModificationCheck.setChecked(true);
-							oldestModificationCheck.setChecked(false);
 							largestCheck.setChecked(false);
 							smallestCheck.setChecked(false);
 							break;
@@ -6748,8 +6794,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		        			descendingCheck.setChecked(false);
 		        			newestCheck.setChecked(false);
 		        			oldestCheck.setChecked(false);
-							newestModificationCheck.setChecked(false);
-							oldestModificationCheck.setChecked(false);
 		        			largestCheck.setChecked(false);
 		        			smallestCheck.setChecked(true);
 		        			break;
@@ -6759,8 +6803,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		        			descendingCheck.setChecked(false);
 		        			newestCheck.setChecked(false);
 		        			oldestCheck.setChecked(false);
-							newestModificationCheck.setChecked(false);
-							oldestModificationCheck.setChecked(false);
 		        			largestCheck.setChecked(true);
 		        			smallestCheck.setChecked(false);
 		        			break;
@@ -6775,9 +6817,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						sortByDateTV.setVisibility(View.VISIBLE);
 		        		newestCheck.setVisibility(View.VISIBLE);
 		        		oldestCheck.setVisibility(View.VISIBLE);
-						sortByModificationDateTV.setVisibility(View.GONE);
-						newestModificationCheck.setVisibility(View.GONE);
-						oldestModificationCheck.setVisibility(View.GONE);
 		        		sortBySizeTV.setVisibility(View.GONE);
 		        		largestCheck.setVisibility(View.GONE);
 		        		smallestCheck.setVisibility(View.GONE);
@@ -6865,9 +6904,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		        		sortByDateTV.setVisibility(View.GONE);
 		        		newestCheck.setVisibility(View.GONE);
 		        		oldestCheck.setVisibility(View.GONE);
-						sortByModificationDateTV.setVisibility(View.GONE);
-						newestModificationCheck.setVisibility(View.GONE);
-						oldestModificationCheck.setVisibility(View.GONE);
 		        		sortBySizeTV.setVisibility(View.GONE);
 		        		largestCheck.setVisibility(View.GONE);
 		        		smallestCheck.setVisibility(View.GONE);
@@ -6910,9 +6946,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		        		sortByDateTV.setVisibility(View.GONE);
 		        		newestCheck.setVisibility(View.GONE);
 		        		oldestCheck.setVisibility(View.GONE);
-						sortByModificationDateTV.setVisibility(View.GONE);
-						newestModificationCheck.setVisibility(View.GONE);
-						oldestModificationCheck.setVisibility(View.GONE);
 		        		sortBySizeTV.setVisibility(View.GONE);
 		        		largestCheck.setVisibility(View.GONE);
 		        		smallestCheck.setVisibility(View.GONE);
@@ -7013,62 +7046,15 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 							}
 						});
 
-		        		newestCheck.setOnClickListener(new OnClickListener() {
 
-							@Override
-							public void onClick(View v) {
-								ascendingCheck.setChecked(false);
-			        			descendingCheck.setChecked(false);
-			        			newestCheck.setChecked(true);
-			        			oldestCheck.setChecked(false);
-			        			largestCheck.setChecked(false);
-			        			smallestCheck.setChecked(false);
-			        			if(drawerItem==DrawerItem.CLOUD_DRIVE){
-			        				selectSortByCloudDrive(MegaApiJava.ORDER_CREATION_DESC);
-			        			}
-			        			else{
-			        				selectSortByInbox(MegaApiJava.ORDER_CREATION_DESC);
-			        			}
-
-			        			if (dialog != null){
-			        				dialog.dismiss();
-			        			}
-							}
-						});
-
-		        		oldestCheck.setOnClickListener(new OnClickListener() {
-
-							@Override
-							public void onClick(View v) {
-								ascendingCheck.setChecked(false);
-			        			descendingCheck.setChecked(false);
-			        			newestCheck.setChecked(false);
-			        			oldestCheck.setChecked(true);
-			        			largestCheck.setChecked(false);
-			        			smallestCheck.setChecked(false);
-			        			if(drawerItem==DrawerItem.CLOUD_DRIVE){
-			        				selectSortByCloudDrive(MegaApiJava.ORDER_CREATION_ASC);
-			        			}
-			        			else{
-			        				selectSortByInbox(MegaApiJava.ORDER_CREATION_ASC);
-			        			}
-
-			        			if (dialog != null){
-			        				dialog.dismiss();
-			        			}
-							}
-						});
-
-						newestModificationCheck.setOnClickListener(new OnClickListener() {
+						newestCheck.setOnClickListener(new OnClickListener() {
 
 							@Override
 							public void onClick(View v) {
 								ascendingCheck.setChecked(false);
 								descendingCheck.setChecked(false);
-								newestCheck.setChecked(false);
+								newestCheck.setChecked(true);
 								oldestCheck.setChecked(false);
-								newestModificationCheck.setChecked(true);
-								oldestModificationCheck.setChecked(false);
 								largestCheck.setChecked(false);
 								smallestCheck.setChecked(false);
 								if(drawerItem==DrawerItem.CLOUD_DRIVE){
@@ -7084,16 +7070,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 							}
 						});
 
-						oldestModificationCheck.setOnClickListener(new OnClickListener() {
+						oldestCheck.setOnClickListener(new OnClickListener() {
 
 							@Override
 							public void onClick(View v) {
 								ascendingCheck.setChecked(false);
-								descendingCheck.setChecked(false);
+								descendingCheck.setChecked(false);;
 								newestCheck.setChecked(false);
-								oldestCheck.setChecked(false);
-								newestModificationCheck.setChecked(false);
-								oldestModificationCheck.setChecked(true);
+								oldestCheck.setChecked(true);
 								largestCheck.setChecked(false);
 								smallestCheck.setChecked(false);
 								if(drawerItem==DrawerItem.CLOUD_DRIVE){
@@ -7108,6 +7092,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 								}
 							}
 						});
+
 
 		        		largestCheck.setOnClickListener(new OnClickListener() {
 
@@ -8287,6 +8272,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		linkIntent.putExtra("handle", handle);
 		linkIntent.putExtra("account", myAccountInfo.getAccountType());
 		startActivity(linkIntent);
+
+		refreshAfterMovingToRubbish();
 	}
 
 	/*
@@ -9200,7 +9187,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		log("chooseAddContactDialog");
 
 		Intent in = new Intent(this, AddContactActivityLollipop.class);
-//		in.putExtra("contactType", Constants.CONTACT_TYPE_MEGA);
 		if(isMegaContact){
 			in.putExtra("contactType", Constants.CONTACT_TYPE_MEGA);
 			startActivityForResult(in, Constants.REQUEST_CREATE_CHAT);
@@ -9556,7 +9542,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		String message= getResources().getString(R.string.context_remove_link_warning_text);
 		builder.setMessage(message).setPositiveButton(R.string.general_remove, dialogClickListener)
 				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
-		}
+
+		refreshAfterMovingToRubbish();
+
+	}
 
 	public void showConfirmationLeaveIncomingShare (final MegaNode n){
 		log("showConfirmationLeaveIncomingShare");
@@ -9582,6 +9571,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		String message= getResources().getString(R.string.confirmation_leave_share_folder);
 		builder.setMessage(message).setPositiveButton(R.string.general_leave, dialogClickListener)
 	    	.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
+
 	}
 
 	public void showConfirmationLeaveChat (final MegaChatRoom c){
@@ -9624,6 +9614,44 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					}
 					case DialogInterface.BUTTON_NEGATIVE:
 						//No button clicked
+						break;
+				}
+			}
+		};
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		builder.setTitle(getResources().getString(R.string.title_confirmation_leave_group_chat));
+		String message= getResources().getString(R.string.confirmation_leave_group_chat);
+		builder.setMessage(message).setPositiveButton(R.string.general_leave, dialogClickListener)
+				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
+	}
+	public void showConfirmationLeaveChats (final  ArrayList<MegaChatListItem> cs){
+		log("showConfirmationLeaveChats");
+
+		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				switch (which){
+					case DialogInterface.BUTTON_POSITIVE: {
+						ChatController chatC = new ChatController(managerActivity);
+
+						for(int i=0;i<cs.size();i++){
+							MegaChatListItem chat = cs.get(i);
+							if(chat!=null){
+								chatC.leaveChat(chat.getChatId());
+							}
+						}
+
+						break;
+					}
+					case DialogInterface.BUTTON_NEGATIVE:
+						//No button clicked
+						if(rChatFL!=null){
+							if(rChatFL.isAdded()){
+								rChatFL.clearSelections();
+								rChatFL.hideMultipleSelect();
+							}
+						}
 						break;
 				}
 			}
@@ -10359,8 +10387,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
 	}
 
-	public void showConfirmationEnableLogs(){
-		log("showConfirmationEnableLogs");
+	public void showConfirmationEnableLogsSDK(){
+		log("showConfirmationEnableLogsSDK");
 
 		if(sttFLol!=null){
 			sttFLol.numberOfClicksSDK = 0;
@@ -10370,7 +10398,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			public void onClick(DialogInterface dialog, int which) {
 				switch (which){
 					case DialogInterface.BUTTON_POSITIVE:
-						enableLogs();
+						enableLogsSDK();
 						break;
 
 					case DialogInterface.BUTTON_NEGATIVE:
@@ -10392,12 +10420,55 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				.setNegativeButton(R.string.general_cancel, dialogClickListener).show().setCanceledOnTouchOutside(false);
 	}
 
-	public void enableLogs(){
-		log("enableLogs");
+	public void showConfirmationEnableLogsKarere(){
+		log("showConfirmationEnableLogsKarere");
 
-		dbH.setFileLogger(true);
-		Util.setFileLogger(true);
+		if(sttFLol!=null){
+			sttFLol.numberOfClicksKarere = 0;
+		}
+		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				switch (which){
+					case DialogInterface.BUTTON_POSITIVE:
+						enableLogsKarere();
+						break;
+
+					case DialogInterface.BUTTON_NEGATIVE:
+
+						break;
+				}
+			}
+		};
+
+		AlertDialog.Builder builder;
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+			builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		}
+		else{
+			builder = new AlertDialog.Builder(this);
+		}
+
+		builder.setMessage(R.string.enable_log_text_dialog).setPositiveButton(R.string.general_enable, dialogClickListener)
+				.setNegativeButton(R.string.general_cancel, dialogClickListener).show().setCanceledOnTouchOutside(false);
+	}
+
+	public void enableLogsSDK(){
+		log("enableLogsSDK");
+
+		dbH.setFileLoggerSDK(true);
+		Util.setFileLoggerSDK(true);
 		MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_MAX);
+		showSnackbar(getString(R.string.settings_enable_logs));
+		log("App Version: " + Util.getVersion(this));
+	}
+
+	public void enableLogsKarere(){
+		log("enableLogsKarere");
+
+		dbH.setFileLoggerKarere(true);
+		Util.setFileLoggerKarere(true);
+		MegaChatApiAndroid.setLogLevel(MegaChatApiAndroid.LOG_LEVEL_MAX);
 		showSnackbar(getString(R.string.settings_enable_logs));
 		log("App Version: " + Util.getVersion(this));
 	}
@@ -10451,6 +10522,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	        DocumentFile pickedDir = DocumentFile.fromTreeUri(this, treeUri);
 		}
 		else if (requestCode == Constants.REQUEST_CODE_GET && resultCode == RESULT_OK) {
+			log("REQUEST_CODE_GET");
 			if (intent == null) {
 				log("Return.....");
 				return;
@@ -10798,7 +10870,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			log("hashes size: "+hashes.length);
 
 			nC.checkSizeBeforeDownload(parentPath, url, size, hashes);
-			Snackbar.make(fragmentContainer, getString(R.string.download_began), Snackbar.LENGTH_LONG).show();
+//			Snackbar.make(fragmentContainer, getString(R.string.download_began), Snackbar.LENGTH_LONG).show();
 		}
 		else if (requestCode == Constants.REQUEST_CODE_REFRESH && resultCode == RESULT_OK) {
 			log("Resfresh DONE onActivityResult");
@@ -11050,6 +11122,19 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			this.startActivity(intentOpenChat);
 		}
 	}
+
+	public void startGroupConversation(ArrayList<Long> userHandles){
+		log("startGroupConversation");
+		MegaChatPeerList peers = MegaChatPeerList.createInstance();
+
+		for(int i=0;i<userHandles.size();i++){
+			long handle = userHandles.get(i);
+			peers.addPeer(handle, MegaChatPeerList.PRIV_STANDARD);
+		}
+
+		megaChatApi.createChat(false, peers, this);
+	}
+
 
 	/*
 	 * Background task to get files on a folder for uploading
@@ -11501,6 +11586,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		if (drawerItem == DrawerItem.CLOUD_DRIVE){
 			parentHandle = fbFLol.getParentHandle();
 			parentNode = megaApi.getNodeByHandle(parentHandle);
+			if (parentNode == null){
+				parentNode = megaApi.getRootNode();
+			}
 		}
 		else if (drawerItem == DrawerItem.SHARED_ITEMS){
 			int index = viewPagerShares.getCurrentItem();
@@ -11690,6 +11778,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			chatConnection = true;
 
 			if (MegaApplication.isFirstConnect()){
+				log("Set first connect to false");
+				MegaApplication.isFireBaseConnection=false;
 				MegaApplication.setFirstConnect(false);
 			}
 
@@ -11929,8 +12019,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 							maFLol.updateAvatar(false);
 						}
 					}
-
-
 				}
 				else{
 
@@ -12623,12 +12711,20 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 							}
 						}
 					}
+
+					if(cFLol!=null){
+						if(cFLol.isAdded()){
+							updateContactsView(true, false, false);
+						}
+					}
 				}
 				else{
 					log("Continue...");
 					continue;
 				}
 			}
+
+
 		}
 	}
 
@@ -13024,8 +13120,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		if(cancel){
 
 			builder.setMessage(getResources().getString(R.string.cancel_transfer_confirmation));
-			builder.setPositiveButton(R.string.general_cancel, dialogClickListener);
-			builder.setNegativeButton(R.string.general_dismiss, dialogClickListener);
+			builder.setPositiveButton(R.string.context_delete, dialogClickListener);
+			builder.setNegativeButton(R.string.general_cancel, dialogClickListener);
 		}
 		else {
 
@@ -13069,8 +13165,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 //		builder.setTitle(getResources().getString(R.string.cancel_transfer_title));
 
 		builder.setMessage(getResources().getString(R.string.cancel_all_transfer_confirmation));
-		builder.setPositiveButton(R.string.general_cancel, dialogClickListener);
-		builder.setNegativeButton(R.string.general_dismiss, dialogClickListener);
+		builder.setPositiveButton(R.string.context_delete, dialogClickListener);
+		builder.setNegativeButton(R.string.general_cancel, dialogClickListener);
 
 		builder.show();
 	}
@@ -13882,7 +13978,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			log("newState == MegaChatApi.INIT_ERROR");
 			if (chatSettings == null) {
 				log("1 - onChatInitStateUpdate: ERROR----> Switch OFF chat");
-				chatSettings = new ChatSettings(false + "", true + "", true + "", true + "");
+				chatSettings = new ChatSettings(false + "", true + "", "", true + "");
 				dbH.setChatSettings(chatSettings);
 			} else {
 				log("2 - onChatInitStateUpdate: ERROR----> Switch OFF chat");
@@ -13970,6 +14066,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	@Override
 	public void networkAvailable() {
 		log("networkAvailable");
+		if(megaApi!=null){
+			megaApi.retryPendingConnections();
+		}
 		showOnlineMode();
 	}
 

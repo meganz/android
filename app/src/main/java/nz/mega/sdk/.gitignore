@@ -40,6 +40,7 @@
 /MegaContactRequestList.java
 /MegaInputStream.java
 /MegaStringList.java
+/MegaChildrenLists.java
 
 /MegaChatApi.java
 /MegaChatCall.java
@@ -56,3 +57,15 @@
 /megachat.java
 /megachatJNI.java
 
+/MegaChatListItemList.java
+/MegaChatLogger.java
+/MegaChatMessage.java
+/MegaChatPresenceConfig.java
+/MegaChatRoomListener.java
+/MegaEvent.java
+/MegaHandleList.java
+/MegaStringMap.java
+/MegaTextChat.java
+/MegaTextChatList.java
+/MegaTextChatPeerList.java
+/MegaTransferData.java

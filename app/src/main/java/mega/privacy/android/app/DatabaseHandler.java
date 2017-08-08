@@ -26,7 +26,7 @@ import nz.mega.sdk.MegaChatApi;
 
 public class DatabaseHandler extends SQLiteOpenHelper {
 	
-	private static final int DATABASE_VERSION = 33;
+	private static final int DATABASE_VERSION = 34;
     private static final String DATABASE_NAME = "megapreferences"; 
     private static final String TABLE_PREFERENCES = "preferences";
     private static final String TABLE_CREDENTIALS = "credentials";
@@ -93,7 +93,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	private static final String KEY_PREFERRED_SORT_CLOUD = "preferredsortcloud";
 	private static final String KEY_PREFERRED_SORT_CONTACTS = "preferredsortcontacts";
 	private static final String KEY_PREFERRED_SORT_OTHERS = "preferredsortothers";
-	private static final String KEY_FILE_LOGGER = "filelogger";
+	private static final String KEY_FILE_LOGGER_SDK = "filelogger";
+	private static final String KEY_FILE_LOGGER_KARERE = "fileloggerkarere";
 
 	private static final String KEY_ACCOUNT_DETAILS_TIMESTAMP = "accountdetailstimestamp";
 	private static final String KEY_PAYMENT_METHODS_TIMESTAMP = "paymentmethodsstimestamp";
@@ -195,8 +196,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         
         String CREATE_ATTRIBUTES_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_ATTRIBUTES + "("
         		+ KEY_ID + " INTEGER PRIMARY KEY, " + KEY_ATTR_ONLINE + " TEXT, " + KEY_ATTR_INTENTS + " TEXT, " + 
-        		KEY_ATTR_ASK_SIZE_DOWNLOAD+ "	BOOLEAN, "+KEY_ATTR_ASK_NOAPP_DOWNLOAD+ " BOOLEAN, " + KEY_FILE_LOGGER +" TEXT, " + KEY_ACCOUNT_DETAILS_TIMESTAMP +" TEXT, " +
-				KEY_PAYMENT_METHODS_TIMESTAMP +" TEXT, " + KEY_PRICING_TIMESTAMP +" TEXT, " + KEY_EXTENDED_ACCOUNT_DETAILS_TIMESTAMP +" TEXT, " + KEY_INVALIDATE_SDK_CACHE + " TEXT" + ")";
+        		KEY_ATTR_ASK_SIZE_DOWNLOAD+ "	BOOLEAN, "+KEY_ATTR_ASK_NOAPP_DOWNLOAD+ " BOOLEAN, " + KEY_FILE_LOGGER_SDK +" TEXT, " + KEY_ACCOUNT_DETAILS_TIMESTAMP +" TEXT, " +
+				KEY_PAYMENT_METHODS_TIMESTAMP +" TEXT, " + KEY_PRICING_TIMESTAMP +" TEXT, " + KEY_EXTENDED_ACCOUNT_DETAILS_TIMESTAMP +" TEXT, " + KEY_INVALIDATE_SDK_CACHE + " TEXT, " + KEY_FILE_LOGGER_KARERE +" TEXT" + ")";
         db.execSQL(CREATE_ATTRIBUTES_TABLE);
 
         String CREATE_CONTACTS_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_CONTACTS + "("
@@ -414,8 +415,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			db.execSQL("UPDATE " + TABLE_PREFERENCES + " SET " + KEY_PREFERRED_SORT_CONTACTS + " = '" + encrypt(String.valueOf(MegaApiJava.ORDER_DEFAULT_ASC)) + "';");
 			db.execSQL("UPDATE " + TABLE_PREFERENCES + " SET " + KEY_PREFERRED_SORT_OTHERS + " = '" + encrypt(String.valueOf(MegaApiJava.ORDER_DEFAULT_ASC)) + "';");
 
-			db.execSQL("ALTER TABLE " + TABLE_ATTRIBUTES + " ADD COLUMN " + KEY_FILE_LOGGER + " TEXT;");
-			db.execSQL("UPDATE " + TABLE_ATTRIBUTES + " SET " + KEY_FILE_LOGGER + " = '" + encrypt("false") + "';");
+			db.execSQL("ALTER TABLE " + TABLE_ATTRIBUTES + " ADD COLUMN " + KEY_FILE_LOGGER_SDK + " TEXT;");
+			db.execSQL("UPDATE " + TABLE_ATTRIBUTES + " SET " + KEY_FILE_LOGGER_SDK + " = '" + encrypt("false") + "';");
 		}
 
 		if(oldVersion <= 21){
@@ -517,6 +518,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			String CREATE_NODE_ATTACHMENTS_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_NODE_ATTACHMENTS + "("
 					+ KEY_ID + " INTEGER PRIMARY KEY," + KEY_FILE_PATH + " TEXT, " + KEY_FILE_NAME + " TEXT, " + KEY_FILE_FINGERPRINT + " TEXT, " + KEY_NODE_HANDLE + " TEXT" + ")";
 			db.execSQL(CREATE_NODE_ATTACHMENTS_TABLE);
+		}
+
+		if (oldVersion <= 33){
+			db.execSQL("ALTER TABLE " + TABLE_ATTRIBUTES + " ADD COLUMN " + KEY_FILE_LOGGER_KARERE + " TEXT;");
+			db.execSQL("UPDATE " + TABLE_ATTRIBUTES + " SET " + KEY_FILE_LOGGER_KARERE + " = '" + encrypt("false") + "';");
 		}
 	} 
 	
@@ -712,6 +718,18 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		log("Rows updated: "+rows);
 	}
 
+	public void setFinishedPendingMessages() {
+		log("setFinishedPendingMessages");
+
+		ContentValues values = new ContentValues();
+		values.put(KEY_STATE, PendingMessage.STATE_ERROR);
+		String where = KEY_STATE + "=" +PendingMessage.STATE_SENDING;
+
+		int rows = db.update(TABLE_PENDING_MSG, values, where, null);
+		log("Rows updated: "+rows);
+	}
+
+
 	public void removePendingMessageById(long idMsg){
 
 		ArrayList<Long> nodes = findMsgNodes(idMsg);
@@ -728,6 +746,38 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		log("From TABLE_PENDING_MSG deleted: "+rows);
 	}
 
+	public void removePendingMessageByChatId(long idChat){
+		log("removePendingMessageByChatId");
+		ArrayList<Long> messages = findIdPendingMessagesByChatId(idChat);
+		if(messages!=null){
+			for(int i=0;i<messages.size();i++){
+				removePendingMessageById(messages.get(i));
+			}
+		}
+	}
+
+	public ArrayList<Long> findIdPendingMessagesByChatId(long idChat){
+		log("findPendingMessageBySent");
+		ArrayList<Long> idMessages = new ArrayList<>();
+		String chat = idChat+"";
+
+		String selectQuery = "SELECT * FROM " + TABLE_PENDING_MSG + " WHERE " +KEY_ID_CHAT + " ='"+ encrypt(chat)+"'";
+		log("QUERY: "+selectQuery);
+		Cursor cursor = db.rawQuery(selectQuery, null);
+		ArrayList<Long> pendingIds = new ArrayList<>();
+		if (!cursor.equals(null)){
+			if (cursor.moveToFirst()){
+				do{
+					long id = cursor.getLong(0);
+
+					idMessages.add(id);
+
+				} while (cursor.moveToNext());
+			}
+		}
+		cursor.close();
+		return idMessages;
+	}
 
 	public ArrayList<AndroidMegaChatMessage> findAndroidMessagesBySent(int sent, long idChat){
 		log("findPendingMessageBySent");
@@ -778,6 +828,26 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		log("Found: "+ messages.size());
 		return messages;
 	}
+
+//	public ArrayList<AndroidMegaChatMessage> findPendingMessageById(long idMsg){
+//		log("findPendingMessagesById");
+////		ArrayList<AndroidMegaChatMessage> messages = new ArrayList<>();
+////
+////		ArrayList<PendingMessage> pendMsgs = findPendingMessagesNotSent(idChat);
+////
+////		for(int i=0;i<pendMsgs.size();i++){
+////			PendingMessage pendMsg = pendMsgs.get(i);
+////			long id = pendMsg.getId();
+////			ArrayList<PendingNodeAttachment> nodes = findPendingNodesByMsgId(id);
+////			pendMsg.setNodeAttachments(nodes);
+////
+////			AndroidMegaChatMessage androidMsg = new AndroidMegaChatMessage(pendMsg, true);
+////			messages.add(androidMsg);
+////		}
+////
+////		log("Found: "+ messages.size());
+//		return messages;
+//	}
 
 	public ArrayList<PendingMessage> findPendingMessagesNotSent(long idChat) {
 		log("findPendingMessagesNotSent");
@@ -943,7 +1013,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		return id;
 	}
 
-	public long findPendingMessageById(long idTemp){
+	public long findPendingMessageByIdTempKarere(long idTemp){
 		log("findPendingMessageById: "+idTemp);
 		String idPend = idTemp+"";
 		long id = -1;
@@ -1309,12 +1379,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         values.put(KEY_ATTR_INTENTS, encrypt(Integer.toString(attr.getAttemps())));
         values.put(KEY_ATTR_ASK_SIZE_DOWNLOAD, encrypt(attr.getAskSizeDownload()));
         values.put(KEY_ATTR_ASK_NOAPP_DOWNLOAD, encrypt(attr.getAskNoAppDownload()));
-		values.put(KEY_FILE_LOGGER, encrypt(attr.getFileLogger()));
+		values.put(KEY_FILE_LOGGER_SDK, encrypt(attr.getFileLoggerSDK()));
 		values.put(KEY_ACCOUNT_DETAILS_TIMESTAMP, encrypt(attr.getAccountDetailsTimeStamp()));
 		values.put(KEY_PAYMENT_METHODS_TIMESTAMP, encrypt(attr.getPaymentMethodsTimeStamp()));
 		values.put(KEY_PRICING_TIMESTAMP, encrypt(attr.getPricingTimeStamp()));
 		values.put(KEY_EXTENDED_ACCOUNT_DETAILS_TIMESTAMP, encrypt(attr.getExtendedAccountDetailsTimeStamp()));
 		values.put(KEY_INVALIDATE_SDK_CACHE, encrypt(attr.getInvalidateSdkCache()));
+		values.put(KEY_FILE_LOGGER_KARERE, encrypt(attr.getFileLoggerKarere()));
 		db.insert(TABLE_ATTRIBUTES, null, values);
 	}
 	
@@ -1329,17 +1400,18 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			String intents =  decrypt(cursor.getString(2));
 			String askSizeDownload = decrypt(cursor.getString(3));
 			String askNoAppDownload = decrypt(cursor.getString(4));
-			String fileLogger = decrypt(cursor.getString(5));
+			String fileLoggerSDK = decrypt(cursor.getString(5));
 			String accountDetailsTimeStamp = decrypt(cursor.getString(6));
 			String paymentMethodsTimeStamp = decrypt(cursor.getString(7));
 			String pricingTimeStamp = decrypt(cursor.getString(8));
 			String extendedAccountDetailsTimeStamp = decrypt(cursor.getString(9));
 			String invalidateSdkCache = decrypt(cursor.getString(10));
+			String fileLoggerKarere = decrypt(cursor.getString(11));
 			if(intents!=null){
-				attr = new MegaAttributes(online, Integer.parseInt(intents), askSizeDownload, askNoAppDownload, fileLogger, accountDetailsTimeStamp, paymentMethodsTimeStamp, pricingTimeStamp, extendedAccountDetailsTimeStamp, invalidateSdkCache);
+				attr = new MegaAttributes(online, Integer.parseInt(intents), askSizeDownload, askNoAppDownload, fileLoggerSDK, accountDetailsTimeStamp, paymentMethodsTimeStamp, pricingTimeStamp, extendedAccountDetailsTimeStamp, invalidateSdkCache, fileLoggerKarere);
 			}
 			else{
-				attr = new MegaAttributes(online, 0, askSizeDownload, askNoAppDownload, fileLogger, accountDetailsTimeStamp, paymentMethodsTimeStamp, pricingTimeStamp, extendedAccountDetailsTimeStamp, invalidateSdkCache);
+				attr = new MegaAttributes(online, 0, askSizeDownload, askNoAppDownload, fileLoggerSDK, accountDetailsTimeStamp, paymentMethodsTimeStamp, pricingTimeStamp, extendedAccountDetailsTimeStamp, invalidateSdkCache, fileLoggerKarere);
 			}
 		}
 		cursor.close();
@@ -2690,17 +2762,33 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		cursor.close();
 	}
 
-	public void setFileLogger (boolean fileLogger){
+	public void setFileLoggerSDK (boolean fileLoggerSDK){
 		String selectQuery = "SELECT * FROM " + TABLE_ATTRIBUTES;
 		ContentValues values = new ContentValues();
 		Cursor cursor = db.rawQuery(selectQuery, null);
 		if (cursor.moveToFirst()){
-			String UPDATE_ATTRIBUTES_TABLE = "UPDATE " + TABLE_ATTRIBUTES + " SET " + KEY_FILE_LOGGER + "='" + encrypt(fileLogger + "") + "' WHERE " + KEY_ID + " ='1'";
+			String UPDATE_ATTRIBUTES_TABLE = "UPDATE " + TABLE_ATTRIBUTES + " SET " + KEY_FILE_LOGGER_SDK + "='" + encrypt(fileLoggerSDK + "") + "' WHERE " + KEY_ID + " ='1'";
 			db.execSQL(UPDATE_ATTRIBUTES_TABLE);
 			log("UPDATE_ATTRIBUTES_TABLE : " + UPDATE_ATTRIBUTES_TABLE);
 		}
 		else{
-			values.put(KEY_FILE_LOGGER, encrypt(fileLogger + ""));
+			values.put(KEY_FILE_LOGGER_SDK, encrypt(fileLoggerSDK + ""));
+			db.insert(TABLE_ATTRIBUTES, null, values);
+		}
+		cursor.close();
+	}
+
+	public void setFileLoggerKarere (boolean fileLoggerKarere){
+		String selectQuery = "SELECT * FROM " + TABLE_ATTRIBUTES;
+		ContentValues values = new ContentValues();
+		Cursor cursor = db.rawQuery(selectQuery, null);
+		if (cursor.moveToFirst()){
+			String UPDATE_ATTRIBUTES_TABLE = "UPDATE " + TABLE_ATTRIBUTES + " SET " + KEY_FILE_LOGGER_KARERE + "='" + encrypt(fileLoggerKarere + "") + "' WHERE " + KEY_ID + " ='1'";
+			db.execSQL(UPDATE_ATTRIBUTES_TABLE);
+			log("UPDATE_ATTRIBUTES_TABLE : " + UPDATE_ATTRIBUTES_TABLE);
+		}
+		else{
+			values.put(KEY_FILE_LOGGER_KARERE, encrypt(fileLoggerKarere + ""));
 			db.insert(TABLE_ATTRIBUTES, null, values);
 		}
 		cursor.close();

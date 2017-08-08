@@ -213,7 +213,7 @@ public class ContactFileListFragmentLollipop extends Fragment{
 					}
 					else if(megaApi.checkAccess(selected.get(0), MegaShare.ACCESS_READWRITE).getErrorCode() == MegaError.API_OK){
 						showMove = false;
-						showRename = true;
+						showRename = false;
 					}		
 				}
 				else{
@@ -253,9 +253,14 @@ public class ContactFileListFragmentLollipop extends Fragment{
 			}
 			
 			menu.findItem(R.id.cab_menu_download).setVisible(true);
+			menu.findItem(R.id.cab_menu_download).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+
 			menu.findItem(R.id.cab_menu_leave_multiple_share).setVisible(true);
+			menu.findItem(R.id.cab_menu_leave_multiple_share).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+
 			menu.findItem(R.id.cab_menu_rename).setVisible(showRename);
 			menu.findItem(R.id.cab_menu_copy).setVisible(true);
+
 			menu.findItem(R.id.cab_menu_move).setVisible(showMove);
 			menu.findItem(R.id.cab_menu_share_link).setVisible(false);
 			menu.findItem(R.id.cab_menu_trash).setVisible(showTrash);
@@ -583,7 +588,7 @@ public class ContactFileListFragmentLollipop extends Fragment{
 			  			startActivity(mediaIntent);
 			  		}
 			  		else{
-						((ManagerActivityLollipop) context).showSnackbar(context.getResources().getString(R.string.intent_not_available));
+						((ContactFileListActivityLollipop) context).showSnackbar(context.getResources().getString(R.string.intent_not_available));
 						adapter.notifyDataSetChanged();
 						ArrayList<Long> handleList = new ArrayList<Long>();
 						handleList.add(contactNodes.get(position).getHandle());
@@ -705,20 +710,17 @@ public class ContactFileListFragmentLollipop extends Fragment{
 			}
 		}
 		Resources res = getResources();
-		String format = "%d %s";
-		String filesStr = String.format(format, files,
-				res.getQuantityString(R.plurals.general_num_files, files));
-		String foldersStr = String.format(format, folders,
-				res.getQuantityString(R.plurals.general_num_folders, folders));
 		String title;
+		int sum=files+folders;
+
 		if (files == 0 && folders == 0) {
-			title = foldersStr + ", " + filesStr;
+			title = Integer.toString(sum);
 		} else if (files == 0) {
-			title = foldersStr;
+			title = Integer.toString(folders);
 		} else if (folders == 0) {
-			title = filesStr;
+			title = Integer.toString(files);
 		} else {
-			title = foldersStr + ", " + filesStr;
+			title = Integer.toString(sum);
 		}
 		actionMode.setTitle(title);
 		try {

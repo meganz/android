@@ -738,7 +738,11 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 			StatFs stat = new StatFs(parentPath);
 			availableFreeSpace = (double)stat.getAvailableBlocks() * (double)stat.getBlockSize();
 		}
-		catch(Exception ex){}		
+		catch(Exception ex){}
+
+		int numberOfNodesToDownload = 0;
+		int numberOfNodesAlreadyDownloaded = 0;
+		int numberOfNodesPending = 0;
 			
 		for (long hash : hashes) {
 			MegaNode node = megaApiFolder.getNodeByHandle(hash);
@@ -753,20 +757,43 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 				for (MegaNode document : dlFiles.keySet()) {
 
 					String path = dlFiles.get(document);
+					log("path of the file: "+path);
+					numberOfNodesToDownload++;
 
 					if(availableFreeSpace < document.getSize()){
 						Snackbar.make(fragmentContainer, getString(R.string.error_not_enough_free_space), Snackbar.LENGTH_LONG).show();
 						continue;
 					}
 
-					log("EXTRA_HASH: " + document.getHandle());
-					Intent service = new Intent(this, DownloadService.class);
-					service.putExtra(DownloadService.EXTRA_HASH, document.getHandle());
-					service.putExtra(DownloadService.EXTRA_URL, url);
-					service.putExtra(DownloadService.EXTRA_SIZE, document.getSize());
-					service.putExtra(DownloadService.EXTRA_PATH, path);
-					service.putExtra(DownloadService.EXTRA_FOLDER_LINK, true);
-					startService(service);
+					File destDir = new File(path);
+					File destFile;
+					destDir.mkdirs();
+
+					if (destDir.isDirectory()){
+						destFile = new File(destDir, megaApi.escapeFsIncompatible(document.getName()));
+						log("destDir is Directory. destFile: " + destFile.getAbsolutePath());
+					}
+					else{
+						log("destDir is File");
+						destFile = destDir;
+					}
+
+					if(destFile.exists() && (document.getSize() == destFile.length())){
+						numberOfNodesAlreadyDownloaded++;
+						log(destFile.getAbsolutePath() + " already downloaded");
+					}
+					else {
+						numberOfNodesPending++;
+						log("start service");
+						log("EXTRA_HASH: " + document.getHandle());
+						Intent service = new Intent(this, DownloadService.class);
+						service.putExtra(DownloadService.EXTRA_HASH, document.getHandle());
+						service.putExtra(DownloadService.EXTRA_URL, url);
+						service.putExtra(DownloadService.EXTRA_SIZE, document.getSize());
+						service.putExtra(DownloadService.EXTRA_PATH, path);
+						service.putExtra(DownloadService.EXTRA_FOLDER_LINK, true);
+						startService(service);
+					}
 				}
 			}
 			else if(url != null) {
@@ -784,6 +811,16 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 			}
 			else {
 				log("node not found");
+			}
+			log("Total: " + numberOfNodesToDownload + " Already: " + numberOfNodesAlreadyDownloaded + " Pending: " + numberOfNodesPending);
+			if (numberOfNodesAlreadyDownloaded > 0){
+				String msg = getString(R.string.already_downloaded_multiple, numberOfNodesAlreadyDownloaded);
+				if (numberOfNodesPending > 0){
+					msg = msg + getString(R.string.pending_multiple, numberOfNodesPending);
+				}
+
+				showSnackbar(msg);
+
 			}
 		}
 	}
@@ -827,7 +864,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 			log("URL: " + url + "___SIZE: " + size);
 	
 			downloadTo (parentPath, url, size, hashes);
-			Snackbar.make(fragmentContainer, getResources().getString(R.string.download_began), Snackbar.LENGTH_LONG).show();
+//			Snackbar.make(fragmentContainer, getResources().getString(R.string.download_began), Snackbar.LENGTH_LONG).show();
 		}
 		else if (requestCode == Constants.REQUEST_CODE_SELECT_IMPORT_FOLDER && resultCode == RESULT_OK){
 			log("REQUEST_CODE_SELECT_IMPORT_FOLDER");
@@ -993,6 +1030,9 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 			}else{
 				log("OK");
 				Snackbar.make(fragmentContainer, getString(R.string.context_correctly_copied), Snackbar.LENGTH_LONG).show();
+				clearSelections();
+				hideMultipleSelect();
+
 //				Intent intent = new Intent(this, ManagerActivityLollipop.class);
 //		        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
 //		        	intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -1199,7 +1239,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 			}
 		}
 		Resources res = getResources();
-		String format = "%d %s";
+		/*String format = "%d %s";
 		String filesStr = String.format(format, files,
 				res.getQuantityString(R.plurals.general_num_files, files));
 		String foldersStr = String.format(format, folders,
@@ -1214,6 +1254,20 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 		} else {
 			title = foldersStr + ", " + filesStr;
 		}
+		actionMode.setTitle(title);*/
+
+		String title;
+		int sum=files+folders;
+
+		if (files == 0 && folders == 0) {
+			title = Integer.toString(sum);
+		} else if (files == 0) {
+			title = Integer.toString(folders);
+		} else if (folders == 0) {
+			title = Integer.toString(files);
+		} else {
+			title = Integer.toString(sum);
+		}
 		actionMode.setTitle(title);
 		try {
 			actionMode.invalidate();
@@ -1221,7 +1275,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 			e.printStackTrace();
 			log("oninvalidate error");
 		}
-		// actionMode.
+
 	}
 	
 	ArrayList<Long> handleListM = new ArrayList<Long>();

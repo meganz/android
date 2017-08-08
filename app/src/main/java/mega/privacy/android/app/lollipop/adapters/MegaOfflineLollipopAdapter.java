@@ -147,11 +147,13 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 			log("OfflineThumbnailAsyncTask::onPostExecute");
 			if (thumb != null){
 				if (holder.currentPath.compareTo(currentPath) == 0){
-					RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
-					params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-					params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-					params1.setMargins(56, 0, 12, 0);
-					holder.imageView.setLayoutParams(params1);
+					if (adapterType == MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_LIST){
+						RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
+						params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
+						params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
+						params1.setMargins(56, 0, 12, 0);
+						holder.imageView.setLayoutParams(params1);
+					}
 					holder.imageView.setImageBitmap(thumb);
 					Animation fadeInAnimation = AnimationUtils.loadAnimation(context, R.anim.fade_in);
 					holder.imageView.startAnimation(fadeInAnimation);
@@ -356,6 +358,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 			if (pathNav.equals("/")){
 				if (mOffList != null){
 					if(!mOffList.isEmpty()) {
+						log("List not empty");
 						MegaOffline lastItem = mOffList.get(mOffList.size()-1);
 						if(!(lastItem.getHandle().equals("0"))){
 							String path = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
@@ -444,6 +447,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 			holder.separator = (View) v.findViewById(R.id.offline_grid_separator);
 		
 			holder.itemLayout.setOnClickListener(this);
+			holder.itemLayout.setOnLongClickListener(this);
 			holder.itemLayout.setTag(holder);
 			
 			v.setTag(holder);
@@ -680,6 +684,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 		int files=0;
 		if (currentFile.isDirectory()){
 
+			log("Directory offline");
 			RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
 			params.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
 			params.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
@@ -717,11 +722,11 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 				if(this.isItemChecked(position)){
 					holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.new_multiselect_color));
 					RelativeLayout.LayoutParams paramsMultiselect = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
-					paramsMultiselect.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 40, context.getResources().getDisplayMetrics());
-					paramsMultiselect.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 40, context.getResources().getDisplayMetrics());
-					paramsMultiselect.setMargins(52, 0, 8, 0);
+					paramsMultiselect.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
+					paramsMultiselect.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
+					paramsMultiselect.setMargins(36, 0, 0, 0);
 					holder.imageView.setLayoutParams(paramsMultiselect);
-					holder.imageView.setImageResource(R.drawable.ic_multiselect);
+					holder.imageView.setImageResource(R.drawable.ic_select_folder);
 				}
 				else{
 					holder.itemLayout.setBackgroundColor(Color.WHITE);
@@ -731,6 +736,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 
 		}
 		else{
+			log("File offline");
 			long nodeSize = currentFile.length();
 			holder.textViewFileSize.setText(Util.getSizeString(nodeSize));
 
@@ -741,7 +747,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 				RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
 				params.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
 				params.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
-				params.setMargins(36, 0, 0, 0);
+				params.setMargins(36, 0, 4, 0);
 				holder.imageView.setLayoutParams(params);
 
 				log("Check the thumb");
@@ -754,7 +760,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 							RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
 							params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
 							params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-							params1.setMargins(56, 0, 12, 0);
+							params1.setMargins(56, 0, 16, 0);
 							holder.imageView.setLayoutParams(params1);
 							holder.imageView.setImageBitmap(thumb);
 						}
@@ -774,11 +780,11 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 				if(this.isItemChecked(position)){
 					holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.new_multiselect_color));
 					RelativeLayout.LayoutParams paramsMultiselect = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
-					paramsMultiselect.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 40, context.getResources().getDisplayMetrics());
-					paramsMultiselect.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 40, context.getResources().getDisplayMetrics());
-					paramsMultiselect.setMargins(52, 0, 8, 0);
+					paramsMultiselect.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
+					paramsMultiselect.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
+					paramsMultiselect.setMargins(36, 0, 0, 0);
 					holder.imageView.setLayoutParams(paramsMultiselect);
-					holder.imageView.setImageResource(R.drawable.ic_multiselect);
+					holder.imageView.setImageResource(R.drawable.ic_select_folder);
 				}
 				else{
 					holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.white));
@@ -800,7 +806,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 								RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
 								params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
 								params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-								params1.setMargins(56, 0, 12, 0);
+								params1.setMargins(56, 0, 16, 0);
 								holder.imageView.setLayoutParams(params1);
 								holder.imageView.setImageBitmap(thumb);
 							}
@@ -895,8 +901,11 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 		ViewHolderOffline holder = (ViewHolderOffline) view.getTag();
 		int currentPosition = holder.getAdapterPosition();
 
-		fragment.activateActionMode();
-		fragment.itemClick(currentPosition);
+		MegaOffline item = mOffList.get(currentPosition);
+		if(!(item.getHandle().equals("0"))){
+			fragment.activateActionMode();
+			fragment.itemClick(currentPosition);
+		}
 
 		return true;
 	}
