@@ -1314,15 +1314,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             long handles[] = intent.getLongArrayExtra("NODE_HANDLES");
             log("Number of files to send: "+handles.length);
 
-            MegaNodeList nodeList = MegaNodeList.createInstance();
             for(int i=0; i<handles.length; i++){
-                MegaNode node = megaApi.getNodeByHandle(handles[i]);
-                if(node!=null){
-                    log("Node to send: "+node.getName());
-                    nodeList.addNode(node);
-                }
+                megaChatApi.attachNode(idChat, handles[i], this);
             }
-            megaChatApi.attachNodes(idChat, nodeList, this);
             log("---- no more files to send");
         }
         else if (requestCode == Constants.REQUEST_CODE_GET && resultCode == RESULT_OK) {
@@ -4012,18 +4006,15 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             Snackbar.make(fragmentContainer, getString(R.string.upload_can_not_open), Snackbar.LENGTH_LONG).show();
         }
         else {
+            log("Launch chat upload with files "+infos.size());
+            for (ShareInfo info : infos) {
+                Intent intent = new Intent(this, ChatUploadService.class);
 
-            Intent intent = new Intent(this, ChatUploadService.class);
-            ArrayList<PendingNodeAttachment> nodeAttachments = new ArrayList<>();
+                long timestamp = System.currentTimeMillis()/1000;
+                long idPendingMsg = dbH.setPendingMessage(idChat+"", Long.toString(timestamp));
+                if(idPendingMsg!=-1){
+                    intent.putExtra(ChatUploadService.EXTRA_ID_PEND_MSG, idPendingMsg);
 
-            long timestamp = System.currentTimeMillis()/1000;
-            long idPendingMsg = dbH.setPendingMessage(idChat+"", Long.toString(timestamp));
-            if(idPendingMsg!=-1){
-                intent.putExtra(ChatUploadService.EXTRA_ID_PEND_MSG, idPendingMsg);
-
-                log("Launch chat upload with files "+infos.size());
-
-                for (ShareInfo info : infos) {
                     log("name of the file: "+info.getTitle());
                     log("size of the file: "+info.getSize());
                     String fingerprint = megaApi.getFingerprint(info.getFileAbsolutePath());
@@ -4034,18 +4025,23 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     dbH.setMsgNode(idPendingMsg, idNode);
 
                     PendingNodeAttachment nodeAttachment = new PendingNodeAttachment(info.getFileAbsolutePath(), fingerprint, info.getTitle());
+                    ArrayList<PendingNodeAttachment> nodeAttachments = new ArrayList<>();
                     nodeAttachments.add(nodeAttachment);
-                }
-
-                PendingMessage newPendingMsg = new PendingMessage(idPendingMsg, idChat, nodeAttachments, timestamp, PendingMessage.STATE_SENDING);
-                AndroidMegaChatMessage newNodeAttachmentMsg = new AndroidMegaChatMessage(newPendingMsg, true);
-                sendMessageUploading(newNodeAttachmentMsg);
+                    PendingMessage newPendingMsg = new PendingMessage(idPendingMsg, idChat, nodeAttachments, timestamp, PendingMessage.STATE_SENDING);
+                    AndroidMegaChatMessage newNodeAttachmentMsg = new AndroidMegaChatMessage(newPendingMsg, true);
+                    sendMessageUploading(newNodeAttachmentMsg);
 
 //                ArrayList<String> filePaths = newPendingMsg.getFilePaths();
 //                filePaths.add("/home/jfjf.jpg");
 
-                intent.putStringArrayListExtra(ChatUploadService.EXTRA_FILEPATHS, newPendingMsg.getFilePaths());
-                intent.putExtra(ChatUploadService.EXTRA_CHAT_ID, idChat);
+                    intent.putStringArrayListExtra(ChatUploadService.EXTRA_FILEPATHS, newPendingMsg.getFilePaths());
+                    intent.putExtra(ChatUploadService.EXTRA_CHAT_ID, idChat);
+
+                    startService(intent);
+                }
+                else{
+                    log("Error when adding pending msg to the database");
+                }
 
                 if (statusDialog != null) {
                     try {
@@ -4053,13 +4049,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     }
                     catch(Exception ex){}
                 }
-
-                startService(intent);
             }
-            else{
-                log("Error when adding pending msg to the database");
-            }
-
         }
     }
 }
