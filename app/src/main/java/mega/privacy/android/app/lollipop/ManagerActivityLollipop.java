@@ -1440,9 +1440,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			tabLayoutContacts.setTabMode(TabLayout.MODE_FIXED);
 		}
 		else{
-			//tabLayoutContacts.setTabMode(TabLayout.MODE_SCROLLABLE);
-			tabLayoutContacts.setTabMode(TabLayout.MODE_FIXED);
 
+			tabLayoutContacts.setTabMode(TabLayout.MODE_SCROLLABLE);
 		}
 
 		//TABS section Shared Items
