@@ -293,6 +293,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 
 			chatHandle = extras.getLong("handle",-1);
 			if (chatHandle != -1) {
+
 				log("From chat!!");
 				fromContacts = false;
 				chat = megaChatApi.getChatRoom(chatHandle);
@@ -309,10 +310,14 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 
 				nameContact.setText(chat.getTitle());
 				nameLength.setText(chat.getTitle());
+				String fullname = (String)nameContact.getText();
+				setDefaultAvatar(fullname);
+
 
 			}
 			else{
 				log("From contacts!!");
+
 				fromContacts = true;
 				userEmailExtra = extras.getString("name");
 				user = megaApi.getContact(userEmailExtra);
@@ -365,7 +370,6 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 					}
 
 				}
-
 				setDefaultAvatar(fullName);
 			}
 
@@ -912,6 +916,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 
 	public void setDefaultAvatar(String title) {
 		log("setDefaultAvatar");
+
 
 		Bitmap defaultAvatar = Bitmap.createBitmap(outMetrics.widthPixels, outMetrics.widthPixels, Bitmap.Config.ARGB_8888);
 		Canvas c = new Canvas(defaultAvatar);
