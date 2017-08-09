@@ -18,6 +18,8 @@ import android.graphics.BitmapShader;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Point;
+import android.graphics.Rect;
 import android.graphics.Shader.TileMode;
 import android.net.Uri;
 import android.os.Build;
@@ -25,6 +27,8 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.provider.MediaStore;
+import android.support.design.widget.BottomSheetDialog;
+import android.support.design.widget.BottomSheetDialogFragment;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -1116,6 +1120,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			selectedPaymentMethod = savedInstanceState.getInt("selectedPaymentMethod", -1);
 			searchQuery = savedInstanceState.getString("searchQuery");
 			chatConnection = savedInstanceState.getBoolean("chatConnection");
+
 		}
 		else{
 			log("Bundle is NULL");
@@ -2018,6 +2023,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				selectDrawerItemLollipop(drawerItem);
 			}
 		}
+
 		log("END onCreate");
 //		showTransferOverquotaDialog();
 	}
@@ -9819,6 +9825,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		if(node!=null){
 			this.selectedNode = node;
 			NodeOptionsBottomSheetDialogFragment bottomSheetDialogFragment = new NodeOptionsBottomSheetDialogFragment();
+			final Rect r = new Rect();
+			fragmentContainer.getWindowVisibleDisplayFrame(r);
+			bottomSheetDialogFragment.setHeight(aB.getHeight() + tabLayoutCloud.getHeight());
+			bottomSheetDialogFragment.setRectScreen(r, getResources().getConfiguration().orientation);
 			bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
 		}
 	}
@@ -14076,5 +14086,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	public void networkUnavailable() {
 		log("networkUnavailable: network NOT available");
 		showOfflineMode();
+	}
+
+	public void quitDialog(){
+
 	}
 }

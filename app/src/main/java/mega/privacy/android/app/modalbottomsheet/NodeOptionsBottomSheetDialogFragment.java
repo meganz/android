@@ -6,7 +6,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
+import android.graphics.Point;
+import android.graphics.Rect;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.BottomSheetDialogFragment;
 import android.support.design.widget.CoordinatorLayout;
@@ -15,6 +18,7 @@ import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Display;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -79,6 +83,9 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
     LinearLayout optionRemove;
     LinearLayout optionOpenFolder;
 
+    private LinearLayout items_layout;
+    private RelativeLayout node_head;
+
     DisplayMetrics outMetrics;
 
     static ManagerActivityLollipop.DrawerItem drawerItem = null;
@@ -86,6 +93,29 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
 
     MegaApiAndroid megaApi;
     DatabaseHandler dbH;
+
+    private int height = -1;
+
+    private View contentView;
+    private int heightPortrait;
+    private int heightLandscape;
+
+    public void setHeight(int height) {
+        this.height = height;
+    }
+
+    public void setRectScreen(Rect r, int orientation) {
+        if(r != null){
+            if(orientation == Configuration.ORIENTATION_LANDSCAPE){
+                heightLandscape = r.height();
+                heightPortrait = r.width();
+            }
+            else if(orientation == Configuration.ORIENTATION_PORTRAIT){
+                heightPortrait = r.height();
+                heightLandscape = r.width();
+            }
+        }
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -99,6 +129,9 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
         if(savedInstanceState!=null) {
             log("Bundle is NOT NULL");
             long handle = savedInstanceState.getLong("handle", -1);
+            height = savedInstanceState.getInt("height", -1);
+            heightPortrait = savedInstanceState.getInt("heightPortrait", -1);
+            heightLandscape = savedInstanceState.getInt("heightLandscape", -1);
             log("Handle of the node: "+handle);
             node = megaApi.getNodeByHandle(handle);
             if(context instanceof ManagerActivityLollipop){
@@ -127,9 +160,12 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
         outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
 
-        View contentView = View.inflate(getContext(), R.layout.bottom_sheet_node_item, null);
+        contentView = View.inflate(getContext(), R.layout.bottom_sheet_node_item, null);
 
         mainLinearLayout = (LinearLayout) contentView.findViewById(R.id.node_bottom_sheet);
+
+        items_layout = (LinearLayout) contentView.findViewById(R.id.items_layout_bottom_sheet_node);
+        node_head = (RelativeLayout) contentView.findViewById(R.id.node_title_layout);
 
         nodeThumb = (ImageView) contentView.findViewById(R.id.node_thumbnail);
         nodeName = (TextView) contentView.findViewById(R.id.node_name_text);
@@ -589,7 +625,29 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
             dialog.setContentView(contentView);
 
             mBehavior = BottomSheetBehavior.from((View) contentView.getParent());
-            mBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+            mBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+
+            if(height != -1 && heightPortrait != -1 && heightLandscape != -1){
+                int numSons = 0;
+                int num = items_layout.getChildCount();
+                for(int i=0; i<num; i++){
+                    View v = items_layout.getChildAt(i);
+                    if(v.getVisibility() == View.VISIBLE){
+                        numSons++;
+                    }
+                }
+                if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE && numSons > 3){
+
+                    ViewGroup.LayoutParams params = contentView.getLayoutParams();
+                    params.height = heightLandscape - height;
+                    contentView.setLayoutParams(params);
+                }
+                else if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT && numSons > 9){
+                    ViewGroup.LayoutParams params = contentView.getLayoutParams();
+                    params.height = heightPortrait - height;
+                    contentView.setLayoutParams(params);
+                }
+            }
         }
         else{
             log("Node NULL");
@@ -836,6 +894,42 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
         long handle = node.getHandle();
         log("Handle of the node: "+handle);
         outState.putLong("handle", handle);
+        if(height != -1){
+            outState.putInt("height", height);
+        }
+        if(heightPortrait != -1){
+            outState.putInt("heightPortrait", heightPortrait);
+        }
+        if(heightLandscape != -1){
+            outState.putInt("heightLandscape", heightLandscape);
+        }
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        log("onConfigurationChanged");
+        super.onConfigurationChanged(newConfig);
+        if(height != -1){
+            int numSons = 0;
+            int num = items_layout.getChildCount();
+            for(int i=0; i<num; i++){
+                View v = items_layout.getChildAt(i);
+                if(v.getVisibility() == View.VISIBLE){
+                    numSons++;
+                }
+            }
+            if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE && numSons > 3){
+
+                ViewGroup.LayoutParams params = contentView.getLayoutParams();
+                params.height = outMetrics.heightPixels - height;
+                contentView.setLayoutParams(params);
+            }
+            else if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT && numSons > 9){
+                ViewGroup.LayoutParams params = contentView.getLayoutParams();
+                params.height = outMetrics.heightPixels - height;
+                contentView.setLayoutParams(params);
+            }
+        }
     }
 
     private static void log(String log) {
