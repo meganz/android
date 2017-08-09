@@ -149,10 +149,6 @@
         <item name="textAllCaps">true</item>
     </style>
 
-   <style name="TabLayout_Themes">
-        <item name="android:singleLine">true</item>
-    </style>
-
 
 
 
