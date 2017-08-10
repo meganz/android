@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
@@ -347,7 +348,7 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
             padding = 2;
 //				iV.setPadding(padding, padding, padding, padding);
         }
-        holder = new MegaPhotoSyncGridTitleAdapterLollipop.ViewHolderPhotoTitleSyncGridTitle(v, gridWidth, padding);
+        holder = new MegaPhotoSyncGridTitleAdapterLollipop.ViewHolderPhotoTitleSyncGridTitle(v, gridWidth, padding, this);
         holder.setDocument(-1l);
 //		//Margins
 //		RelativeLayout.LayoutParams contentTextParams = (RelativeLayout.LayoutParams)holder.textView.getLayoutParams();
@@ -389,7 +390,7 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
 //                    }
 //                }
                 holder.setMegaMonthPicLollipop(getMegaMonthPicOfPosition(position));
-                holder.setDataImage(n, isChecked((int) getNodesPositionOfPosition(position)), multipleSelect);
+                holder.setDataImage(n, isChecked((int) getNodesPositionOfPosition(position)), multipleSelect, position);
                 StaggeredGridLayoutManager.LayoutParams layoutParams = (StaggeredGridLayoutManager.LayoutParams) holder.itemView.getLayoutParams();
                 layoutParams.setFullSpan(false);
 
@@ -405,7 +406,7 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
 //                    }
 //                }
                 holder.setMegaMonthPicLollipop(getMegaMonthPicOfPosition(position));
-                holder.setDataVideo(n, isChecked((int) getNodesPositionOfPosition(position)), multipleSelect, numberOfCells);
+                holder.setDataVideo(n, isChecked((int) getNodesPositionOfPosition(position)), multipleSelect, numberOfCells, position);
                 StaggeredGridLayoutManager.LayoutParams layoutParams = (StaggeredGridLayoutManager.LayoutParams) holder.itemView.getLayoutParams();
                 layoutParams.setFullSpan(false);
                 break;
@@ -429,11 +430,11 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
         return monthPics.size() + nodes.size();
     }
 
-    public class ViewHolderPhotoTitleSyncGridTitle extends RecyclerView.ViewHolder{
+    public class ViewHolderPhotoTitleSyncGridTitle extends RecyclerView.ViewHolder implements ThumbnailUtilsLollipop.ThumbnailInterface{
 
         private RelativeLayout layout_title;
         private TextView title;
-        private ImageView photo;
+        ImageView photo;
         private RelativeLayout layout_videoInfo;
         private TextView videoDuration;
         private ImageView videoIcon;
@@ -443,8 +444,11 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
         private RelativeLayout content_layout;
         private long document;
         private MegaMonthPicLollipop megaMonthPicLollipop;
+        private int position;
+        private RecyclerView.Adapter adapter;
+        private int type = MegaPhotoSyncGridTitleAdapterLollipop.TYPE_NO_TYPE;
 
-        public ViewHolderPhotoTitleSyncGridTitle(View itemView, int gridWidth, int margins) {
+        public ViewHolderPhotoTitleSyncGridTitle(View itemView, int gridWidth, int margins, RecyclerView.Adapter adapter) {
             super(itemView);
             layout_title = (RelativeLayout) itemView.findViewById(R.id.cell_photosync_grid_title_layout);
             layout_title.setVisibility(View.GONE);
@@ -462,86 +466,27 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
             videoIcon = (ImageView) itemView.findViewById(R.id.cell_photosync_grid_title_video_icon);
             content_layout = (RelativeLayout) itemView.findViewById(R.id.cell_item_grid_title_layout);
             content_layout.setVisibility(View.GONE);
-            ViewGroup.LayoutParams params = content_layout.getLayoutParams();
-            params.height = gridWidth;
-            params.width = gridWidth;
-            content_layout.setLayoutParams(params);
+
             ViewGroup.MarginLayoutParams marginParams = (ViewGroup.MarginLayoutParams) content_layout.getLayoutParams();
             marginParams.setMargins(margins, margins, margins, margins);
             content_layout.setLayoutParams(marginParams);
-        }
 
-        public void setDataTitle(String txt){
-            layout_title.setVisibility(View.VISIBLE);
-            content_layout.setVisibility(View.GONE);
-            title.setText(txt);
-        }
+            ViewGroup.LayoutParams params = (ViewGroup.LayoutParams) content_layout.getLayoutParams();
+            params.height = gridWidth;
+            params.width = gridWidth;
+            content_layout.setLayoutParams(params);
 
-        public void setDataImage(MegaNode n, boolean checked, boolean multipleSelect){
-            layout_title.setVisibility(View.GONE);
-            content_layout.setVisibility(View.VISIBLE);
-            layout_videoInfo.setVisibility(View.GONE);
-            gradient_effect.setVisibility(View.GONE);
+            this.adapter = adapter;
 
-            if (multipleSelect){
-                if (checked){
-                    click_icon.setVisibility(View.VISIBLE);
-                    click_unselected.setVisibility(View.GONE);
-                }
-                else{
-                    click_icon.setVisibility(View.GONE);
-                    click_unselected.setVisibility(View.VISIBLE);
-                }
-            }
-            else{
-                click_icon.setVisibility(View.GONE);
-                click_unselected.setVisibility(View.GONE);
-            }
-
-            if(n == null){
-                log("n is null");
-                return;
-            }
-
-            document = n.getHandle();
-
-            Bitmap thumb = null;
-            photo.setImageResource(MimeTypeThumbnail.typeForName(n.getName()).getIconResourceId());
-            if (n.hasThumbnail()){
-                thumb = ThumbnailUtilsLollipop.getThumbnailFromCache(n);
-                if (thumb != null){
-                    photo.setImageBitmap(thumb);
-                }
-                else{
-                    thumb = ThumbnailUtilsLollipop.getThumbnailFromFolder(n, context);
-                    if (thumb != null){
-                        photo.setImageBitmap(thumb);
-                    }
-                    else{
-                        try{
-//                            thumb = ThumbnailUtilsLollipop.getThumbnailFromMegaPhotoSyncGrid(n, context, holder, megaApi, this, i);
-                        }
-                        catch(Exception e){} //Too many AsyncTasks
-
-                        if (thumb != null){
-                            photo.setImageBitmap(thumb);
-                        }
-                        else{
-                            photo.setImageResource(MimeTypeThumbnail.typeForName(n.getName()).getIconResourceId());
-                        }
-                    }
-                }
-            }
-            else{
-                log(n.getName()+" NO ThUMB!!");
-            }
-
+            position = -1;
             final MegaPhotoSyncGridTitleAdapterLollipop.ViewHolderPhotoTitleSyncGridTitle thisClass = this;
-
             photo.setOnClickListener(new View.OnClickListener() {
 
                 @Override
                 public void onClick(View v) {
+                    if(type == MegaPhotoSyncGridTitleAdapterLollipop.TYPE_NO_TYPE || type == MegaPhotoSyncGridTitleAdapterLollipop.TYPE_ITEM_TITLE){
+                        return;
+                    }
                     MegaPhotoSyncGridAdapterLollipop.ViewHolderPhotoSyncGrid holder= (MegaPhotoSyncGridAdapterLollipop.ViewHolderPhotoSyncGrid) v.getTag();
 
                     long handle = document;
@@ -565,8 +510,10 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
 
                 @Override
                 public boolean onLongClick(View v) {
+                    if(type == MegaPhotoSyncGridTitleAdapterLollipop.TYPE_NO_TYPE || type == MegaPhotoSyncGridTitleAdapterLollipop.TYPE_ITEM_TITLE){
+                        return true;
+                    }
                     MegaPhotoSyncGridAdapterLollipop.ViewHolderPhotoSyncGrid holder= (MegaPhotoSyncGridAdapterLollipop.ViewHolderPhotoSyncGrid) v.getTag();
-
                     long handle = document;
 
                     MegaNode n = megaApi.getNodeByHandle(handle);
@@ -587,12 +534,23 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
             });
         }
 
-        public void setDataVideo(MegaNode n, boolean checked, boolean multipleSelect, int numberOfColumns){
+        public void setDataTitle(String txt){
+            layout_title.setVisibility(View.VISIBLE);
+            content_layout.setVisibility(View.GONE);
+            title.setText(txt);
+
+            type = MegaPhotoSyncGridTitleAdapterLollipop.TYPE_ITEM_TITLE;
+        }
+
+        public void setDataImage(MegaNode n, boolean checked, boolean multipleSelect, int position){
             layout_title.setVisibility(View.GONE);
             content_layout.setVisibility(View.VISIBLE);
-            layout_videoInfo.setVisibility(View.VISIBLE);
-            videoDuration.setVisibility(View.VISIBLE);
-            gradient_effect.setVisibility(View.VISIBLE);
+            layout_videoInfo.setVisibility(View.GONE);
+            gradient_effect.setVisibility(View.GONE);
+
+            this.position = position;
+
+            type = MegaPhotoSyncGridTitleAdapterLollipop.TYPE_ITEM_IMAGE;
 
             if (multipleSelect){
                 if (checked){
@@ -616,120 +574,168 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
 
             document = n.getHandle();
 
-            Bitmap thumb = null;
-            photo.setImageResource(MimeTypeThumbnail.typeForName(n.getName()).getIconResourceId());
-            if (n.hasThumbnail()){
-                thumb = ThumbnailUtilsLollipop.getThumbnailFromCache(n);
-                if (thumb != null){
-                    photo.setImageBitmap(thumb);
-                }
-                else{
-                    thumb = ThumbnailUtilsLollipop.getThumbnailFromFolder(n, context);
-                    if (thumb != null){
-                        photo.setImageBitmap(thumb);
-                    }
-                    else{
-                        try{
-//                            thumb = ThumbnailUtilsLollipop.getThumbnailFromMegaPhotoSyncGrid(n, context, holder, megaApi, this, i);
-                        }
-                        catch(Exception e){} //Too many AsyncTasks
+//            Bitmap thumb = null;
+//            photo.setImageResource(MimeTypeThumbnail.typeForName(n.getName()).getIconResourceId());
+//            postSetImageView();
 
-                        if (thumb != null){
-                            photo.setImageBitmap(thumb);
-                        }
-                        else{
-                            photo.setImageResource(MimeTypeThumbnail.typeForName(n.getName()).getIconResourceId());
-                        }
-                    }
-                }
-            }
-            else{
-                log(n.getName()+" NO ThUMB!!");
-            }
+            LoadImage task = new LoadImage(n, type, 0);
+            task.execute(holder);
 
-            if(numberOfColumns == CameraUploadFragmentLollipop.GRID_LARGE){
-                videoIcon.setImageResource(R.drawable.ic_play_arrow_white_24dp);
-                log(n.getName()+" DURATION: "+n.getDuration());
-                int duration = n.getDuration();
-                if(duration>0){
-                    int hours = duration / 3600;
-                    int minutes = (duration % 3600) / 60;
-                    int seconds = duration % 60;
-
-                    String timeString;
-                    if(hours>0){
-                        timeString = String.format("%d:%d:%02d", hours, minutes, seconds);
-                    }
-                    else{
-                        timeString = String.format("%d:%02d", minutes, seconds);
-                    }
-
-                    log("The duration is: "+hours+" "+minutes+" "+seconds);
-
-                    videoDuration.setText(timeString);
-                }
-                else{
-                    videoDuration.setVisibility(View.GONE);
-                }
-            }
-            else{
-                videoIcon.setImageResource(R.drawable.ic_play_arrow_white_18dp);
-                videoDuration.setVisibility(View.GONE);
-            }
-
-            final MegaPhotoSyncGridTitleAdapterLollipop.ViewHolderPhotoTitleSyncGridTitle thisClass = this;
-
-            photo.setOnClickListener(new View.OnClickListener() {
-
-                @Override
-                public void onClick(View v) {
-                    MegaPhotoSyncGridAdapterLollipop.ViewHolderPhotoSyncGrid holder= (MegaPhotoSyncGridAdapterLollipop.ViewHolderPhotoSyncGrid) v.getTag();
-
-                    long handle = document;
-
-                    MegaNode n = megaApi.getNodeByHandle(handle);
-                    if (n != null){
-                        int positionInNodes = 0;
-                        for (int i=0;i<nodes.size();i++){
-                            if(nodes.get(i).getHandle() == n.getHandle()){
-                                positionInNodes = i;
-                                break;
-                            }
-                        }
-
-                        onNodeClick(thisClass, positionInNodes);
-                    }
-                }
-            } );
-
-            photo.setOnLongClickListener(new View.OnLongClickListener() {
-
-                @Override
-                public boolean onLongClick(View v) {
-                    MegaPhotoSyncGridAdapterLollipop.ViewHolderPhotoSyncGrid holder= (MegaPhotoSyncGridAdapterLollipop.ViewHolderPhotoSyncGrid) v.getTag();
-
-                    long handle = document;
-
-                    MegaNode n = megaApi.getNodeByHandle(handle);
-                    if (n != null){
-//                        int positionInNodes = 0;
-//                        for (int i=0;i<nodes.size();i++){
-//                            if(nodes.get(i).getHandle() == n.getHandle()){
-//                                positionInNodes = i;
-//                                break;
-//                            }
+//            if (n.hasThumbnail()){
+//                thumb = ThumbnailUtilsLollipop.getThumbnailFromCache(n);
+//                if (thumb != null){
+//                    photo.setImageBitmap(thumb);
+//                    postSetImageView();
+//                }
+//                else{
+//                    thumb = ThumbnailUtilsLollipop.getThumbnailFromFolder(n, context);
+//                    if (thumb != null){
+//                        photo.setImageBitmap(thumb);
+//                        postSetImageView();
+//                    }
+//                    else{
+//                        try{
+//                            thumb = ThumbnailUtilsLollipop.getThumbnailFromThumbnailInterface(n, context, this, megaApi, adapter);
 //                        }
+//                        catch(Exception e){} //Too many AsyncTasks
+//
+//                        if (thumb != null){
+//                            photo.setImageBitmap(thumb);
+//                            postSetImageView();
+//                        }
+//                        else{
+//                            photo.setImageResource(MimeTypeThumbnail.typeForName(n.getName()).getIconResourceId());
+//                            postSetImageView();
+//                        }
+//                    }
+//                }
+//            }
+//            else{
+//                log(n.getName()+" NO ThUMB!!");
+//            }
 
-                        onNodeLongClick(thisClass, (int) megaMonthPicLollipop.getPosition(n));
-                    }
 
-                    return true;
+        }
+
+        public void setDataVideo(MegaNode n, boolean checked, boolean multipleSelect, int numberOfColumns, int position){
+            layout_title.setVisibility(View.GONE);
+            content_layout.setVisibility(View.VISIBLE);
+            layout_videoInfo.setVisibility(View.VISIBLE);
+            videoDuration.setVisibility(View.VISIBLE);
+            gradient_effect.setVisibility(View.VISIBLE);
+
+            this.position = position;
+
+            type = MegaPhotoSyncGridTitleAdapterLollipop.TYPE_ITEM_VIDEO;
+
+            if (multipleSelect){
+                if (checked){
+                    click_icon.setVisibility(View.VISIBLE);
+                    click_unselected.setVisibility(View.GONE);
                 }
-            });
+                else{
+                    click_icon.setVisibility(View.GONE);
+                    click_unselected.setVisibility(View.VISIBLE);
+                }
+            }
+            else{
+                click_icon.setVisibility(View.GONE);
+                click_unselected.setVisibility(View.GONE);
+            }
+
+            if(n == null){
+                log("n is null");
+                return;
+            }
+
+            document = n.getHandle();
+
+            LoadImage task = new LoadImage(n, type, numberOfColumns);
+
+//            Bitmap thumb = null;
+//            photo.setImageResource(MimeTypeThumbnail.typeForName(n.getName()).getIconResourceId());
+//            if (n.hasThumbnail()){
+//                thumb = ThumbnailUtilsLollipop.getThumbnailFromCache(n);
+//                if (thumb != null){
+//                    photo.setImageBitmap(thumb);
+//                }
+//                else{
+//                    thumb = ThumbnailUtilsLollipop.getThumbnailFromFolder(n, context);
+//                    if (thumb != null){
+//                        photo.setImageBitmap(thumb);
+//                    }
+//                    else{
+//                        try{
+//                            thumb = ThumbnailUtilsLollipop.getThumbnailFromThumbnailInterface(n, context, this, megaApi, adapter);
+//                        }
+//                        catch(Exception e){} //Too many AsyncTasks
+//
+//                        if (thumb != null){
+//                            photo.setImageBitmap(thumb);
+//                        }
+//                        else{
+//                            photo.setImageResource(MimeTypeThumbnail.typeForName(n.getName()).getIconResourceId());
+//                        }
+//                    }
+//                }
+//            }
+//            else{
+//                log(n.getName()+" NO ThUMB!!");
+//            }
+//
+//            if(numberOfColumns == CameraUploadFragmentLollipop.GRID_LARGE){
+//                videoIcon.setImageResource(R.drawable.ic_play_arrow_white_24dp);
+//                log(n.getName()+" DURATION: "+n.getDuration());
+//                int duration = n.getDuration();
+//                if(duration>0){
+//                    int hours = duration / 3600;
+//                    int minutes = (duration % 3600) / 60;
+//                    int seconds = duration % 60;
+//
+//                    String timeString;
+//                    if(hours>0){
+//                        timeString = String.format("%d:%d:%02d", hours, minutes, seconds);
+//                    }
+//                    else{
+//                        timeString = String.format("%d:%02d", minutes, seconds);
+//                    }
+//
+//                    log("The duration is: "+hours+" "+minutes+" "+seconds);
+//
+//                    videoDuration.setText(timeString);
+//                }
+//                else{
+//                    videoDuration.setVisibility(View.GONE);
+//                }
+//            }
+//            else{
+//                videoIcon.setImageResource(R.drawable.ic_play_arrow_white_18dp);
+//                videoDuration.setVisibility(View.GONE);
+//            }
         }
 
         public long getDocument() {
             return document;
+        }
+
+        @Override
+        public ImageView getImageView() {
+            return photo;
+        }
+
+        @Override
+        public int getPositionOnAdapter() {
+            return position;
+        }
+
+        @Override
+        public void postSetImageView() {
+
+//            photo.setScaleType(ImageView.ScaleType.FIT_CENTER);
+//            ViewGroup.LayoutParams params = photo.getLayoutParams();
+//            params.height = gridWidth;
+//            params.width = gridWidth;
+//            photo.setLayoutParams(params);
         }
 
         public void setDocument(long document) {
@@ -739,6 +745,139 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
         public void setMegaMonthPicLollipop(MegaMonthPicLollipop megaMonthPicLollipop) {
             this.megaMonthPicLollipop = megaMonthPicLollipop;
         }
+
+        private class LoadImage extends AsyncTask<ViewHolderPhotoTitleSyncGridTitle, Void, Bitmap> {
+
+            private MegaNode n;
+            private int type;
+            private int numberOfColumns;
+
+            public LoadImage(MegaNode n, int type, int numberOfColumns) {
+                this.n = n;
+                this.type = type;
+                this.numberOfColumns = numberOfColumns;
+            }
+
+            @Override
+            protected void onPreExecute(){
+                if(type == TYPE_ITEM_IMAGE){
+                    photo.setImageResource(MimeTypeThumbnail.typeForName(n.getName()).getIconResourceId());
+                }
+                else{
+                    photo.setImageResource(MimeTypeThumbnail.typeForName(n.getName()).getIconResourceId());
+                    if(numberOfColumns == CameraUploadFragmentLollipop.GRID_LARGE){
+                        videoIcon.setImageResource(R.drawable.ic_play_arrow_white_24dp);
+                        log(n.getName()+" DURATION: "+n.getDuration());
+                        int duration = n.getDuration();
+                        if(duration>0){
+                            int hours = duration / 3600;
+                            int minutes = (duration % 3600) / 60;
+                            int seconds = duration % 60;
+
+                            String timeString;
+                            if(hours>0){
+                                timeString = String.format("%d:%d:%02d", hours, minutes, seconds);
+                            }
+                            else{
+                                timeString = String.format("%d:%02d", minutes, seconds);
+                            }
+
+                            log("The duration is: "+hours+" "+minutes+" "+seconds);
+
+                            videoDuration.setText(timeString);
+                        }
+                        else{
+                            videoDuration.setVisibility(View.GONE);
+                        }
+                    }
+                    else{
+                        videoIcon.setImageResource(R.drawable.ic_play_arrow_white_18dp);
+                        videoDuration.setVisibility(View.GONE);
+                    }
+                }
+            }
+
+            @Override
+            protected Bitmap doInBackground(ViewHolderPhotoTitleSyncGridTitle... holders) {
+                if (n.hasThumbnail()){
+                    Bitmap thumb = ThumbnailUtilsLollipop.getThumbnailFromCache(n);
+                    if (thumb != null){
+                        return thumb;
+                    }
+                    else{
+                        thumb = ThumbnailUtilsLollipop.getThumbnailFromFolder(n, context);
+                        if (thumb != null){
+                            return thumb;
+                        }
+                        else{
+                            try{
+                                thumb = ThumbnailUtilsLollipop.getThumbnailFromThumbnailInterface(n, context, holders[0], megaApi, adapter);
+                            }
+                            catch(Exception e){} //Too many AsyncTasks
+
+                            if (thumb != null){
+                                return thumb;
+                            }
+                        }
+                    }
+                }
+                else{
+                    log(n.getName()+" NO ThUMB!!");
+                }
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Bitmap result){
+                if(result != null){
+                    photo.setImageBitmap(result);
+                    postSetImageView();
+                }
+//                else{
+//                    if(type == TYPE_ITEM_IMAGE){
+//                        photo.setImageResource(MimeTypeThumbnail.typeForName(n.getName()).getIconResourceId());
+//                    }
+//                    else if(type == TYPE_ITEM_VIDEO){
+//                        photo.setImageResource(MimeTypeThumbnail.typeForName(n.getName()).getIconResourceId());
+//                        if(numberOfColumns == CameraUploadFragmentLollipop.GRID_LARGE){
+//                            videoIcon.setImageResource(R.drawable.ic_play_arrow_white_24dp);
+//                            log(n.getName()+" DURATION: "+n.getDuration());
+//                            int duration = n.getDuration();
+//                            if(duration>0){
+//                                int hours = duration / 3600;
+//                                int minutes = (duration % 3600) / 60;
+//                                int seconds = duration % 60;
+//
+//                                String timeString;
+//                                if(hours>0){
+//                                    timeString = String.format("%d:%d:%02d", hours, minutes, seconds);
+//                                }
+//                                else{
+//                                    timeString = String.format("%d:%02d", minutes, seconds);
+//                                }
+//
+//                                log("The duration is: "+hours+" "+minutes+" "+seconds);
+//
+//                                videoDuration.setText(timeString);
+//                            }
+//                            else{
+//                                videoDuration.setVisibility(View.GONE);
+//                            }
+//                        }
+//                        else{
+//                            videoIcon.setImageResource(R.drawable.ic_play_arrow_white_18dp);
+//                            videoDuration.setVisibility(View.GONE);
+//                        }
+//                    }
+//                }
+            }
+
+//            @Override
+//            protected void onCancelled (){
+//                photo.setImageResource(MimeTypeThumbnail.typeForName(n.getName()).getIconResourceId());
+//            }
+        };
+
     }
 
     public MegaPhotoSyncGridTitleAdapterLollipop(Context _context, ArrayList<MegaMonthPicLollipop> _monthPics, long _photosyncHandle, RecyclerView listView, ImageView emptyImageView, TextView emptyTextView, ActionBar aB, ArrayList<MegaNode> _nodes, int numberOfCells, int gridWidth, Object fragment, int type) {
