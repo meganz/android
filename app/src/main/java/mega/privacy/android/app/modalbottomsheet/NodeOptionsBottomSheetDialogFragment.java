@@ -95,27 +95,10 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
     DatabaseHandler dbH;
 
     private int height = -1;
+    private boolean heightseted = false;
 
     private View contentView;
-    private int heightPortrait;
-    private int heightLandscape;
 
-    public void setHeight(int height) {
-        this.height = height;
-    }
-
-    public void setRectScreen(Rect r, int orientation) {
-        if(r != null){
-            if(orientation == Configuration.ORIENTATION_LANDSCAPE){
-                heightLandscape = r.height();
-                heightPortrait = r.width();
-            }
-            else if(orientation == Configuration.ORIENTATION_PORTRAIT){
-                heightPortrait = r.height();
-                heightLandscape = r.width();
-            }
-        }
-    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -130,8 +113,6 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
             log("Bundle is NOT NULL");
             long handle = savedInstanceState.getLong("handle", -1);
             height = savedInstanceState.getInt("height", -1);
-            heightPortrait = savedInstanceState.getInt("heightPortrait", -1);
-            heightLandscape = savedInstanceState.getInt("heightLandscape", -1);
             log("Handle of the node: "+handle);
             node = megaApi.getNodeByHandle(handle);
             if(context instanceof ManagerActivityLollipop){
@@ -627,27 +608,46 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
             mBehavior = BottomSheetBehavior.from((View) contentView.getParent());
             mBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
 
-            if(height != -1 && heightPortrait != -1 && heightLandscape != -1){
-                int numSons = 0;
-                int num = items_layout.getChildCount();
-                for(int i=0; i<num; i++){
-                    View v = items_layout.getChildAt(i);
-                    if(v.getVisibility() == View.VISIBLE){
-                        numSons++;
+
+            final NodeOptionsBottomSheetDialogFragment thisclass = this;
+
+            mBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
+                @Override
+                public void onStateChanged(@NonNull View bottomSheet, int newState) {
+
+                }
+
+                @Override
+                public void onSlide(@NonNull View bottomSheet, float slideOffset) {
+                    if(slideOffset> 0 && !heightseted){
+                        heightseted = true;
+                        if(context instanceof CustomHeight){
+                            height = ((CustomHeight) context).getHeightToPanel(thisclass);
+                        }
+                        if(height != -1){
+                            int numSons = 0;
+                            int num = items_layout.getChildCount();
+                            for(int i=0; i<num; i++){
+                                View v = items_layout.getChildAt(i);
+                                if(v.getVisibility() == View.VISIBLE){
+                                    numSons++;
+                                }
+                            }
+                            if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE && numSons > 3){
+
+                                ViewGroup.LayoutParams params = bottomSheet.getLayoutParams();
+                                params.height = height;
+                                bottomSheet.setLayoutParams(params);
+                            }
+                            else if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT && numSons > 9){
+                                ViewGroup.LayoutParams params = bottomSheet.getLayoutParams();
+                                params.height = height;
+                                bottomSheet.setLayoutParams(params);
+                            }
+                        }
                     }
                 }
-                if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE && numSons > 3){
-
-                    ViewGroup.LayoutParams params = contentView.getLayoutParams();
-                    params.height = heightLandscape - height;
-                    contentView.setLayoutParams(params);
-                }
-                else if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT && numSons > 9){
-                    ViewGroup.LayoutParams params = contentView.getLayoutParams();
-                    params.height = heightPortrait - height;
-                    contentView.setLayoutParams(params);
-                }
-            }
+            });
         }
         else{
             log("Node NULL");
@@ -894,45 +894,13 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
         long handle = node.getHandle();
         log("Handle of the node: "+handle);
         outState.putLong("handle", handle);
-        if(height != -1){
-            outState.putInt("height", height);
-        }
-        if(heightPortrait != -1){
-            outState.putInt("heightPortrait", heightPortrait);
-        }
-        if(heightLandscape != -1){
-            outState.putInt("heightLandscape", heightLandscape);
-        }
-    }
-
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        log("onConfigurationChanged");
-        super.onConfigurationChanged(newConfig);
-        if(height != -1){
-            int numSons = 0;
-            int num = items_layout.getChildCount();
-            for(int i=0; i<num; i++){
-                View v = items_layout.getChildAt(i);
-                if(v.getVisibility() == View.VISIBLE){
-                    numSons++;
-                }
-            }
-            if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE && numSons > 3){
-
-                ViewGroup.LayoutParams params = contentView.getLayoutParams();
-                params.height = outMetrics.heightPixels - height;
-                contentView.setLayoutParams(params);
-            }
-            else if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT && numSons > 9){
-                ViewGroup.LayoutParams params = contentView.getLayoutParams();
-                params.height = outMetrics.heightPixels - height;
-                contentView.setLayoutParams(params);
-            }
-        }
     }
 
     private static void log(String log) {
         Util.log("NodeOptionsBottomSheetDialogFragment", log);
+    }
+
+    public interface CustomHeight{
+        int getHeightToPanel(BottomSheetDialogFragment dialog);
     }
 }

@@ -201,7 +201,8 @@ import nz.mega.sdk.MegaTransferListenerInterface;
 import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUtilsAndroid;
 
-public class ManagerActivityLollipop extends PinActivityLollipop implements NetworkStateReceiver.NetworkStateReceiverListener, MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatRequestListenerInterface, OnNavigationItemSelectedListener, MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener  {
+public class ManagerActivityLollipop extends PinActivityLollipop implements NetworkStateReceiver.NetworkStateReceiverListener, MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatRequestListenerInterface, OnNavigationItemSelectedListener, MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener,
+			NodeOptionsBottomSheetDialogFragment.CustomHeight, ContactsBottomSheetDialogFragment.CustomHeight{
 
 	public int accountFragment;
 
@@ -9825,10 +9826,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		if(node!=null){
 			this.selectedNode = node;
 			NodeOptionsBottomSheetDialogFragment bottomSheetDialogFragment = new NodeOptionsBottomSheetDialogFragment();
-			final Rect r = new Rect();
-			fragmentContainer.getWindowVisibleDisplayFrame(r);
-			bottomSheetDialogFragment.setHeight(aB.getHeight() + tabLayoutCloud.getHeight());
-			bottomSheetDialogFragment.setRectScreen(r, getResources().getConfiguration().orientation);
 			bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
 		}
 	}
@@ -9889,6 +9886,24 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 		UploadBottomSheetDialogFragment bottomSheetDialogFragment = new UploadBottomSheetDialogFragment();
 		bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
+	}
+
+	public int getHeightToPanel(BottomSheetDialogFragment dialog){
+		if(dialog instanceof NodeOptionsBottomSheetDialogFragment){
+			if(fragmentContainer != null && aB != null && tabLayoutCloud != null){
+				final Rect r = new Rect();
+				fragmentContainer.getWindowVisibleDisplayFrame(r);
+				return (r.height() - aB.getHeight() - tabLayoutCloud.getHeight());
+			}
+		}
+		else if(dialog instanceof ContactsBottomSheetDialogFragment){
+			if(fragmentContainer != null && aB != null && tabLayoutContacts != null){
+				final Rect r = new Rect();
+				fragmentContainer.getWindowVisibleDisplayFrame(r);
+				return (r.height() - aB.getHeight() - tabLayoutContacts.getHeight());
+			}
+		}
+		return -1;
 	}
 
 	private void showOverquotaAlert(){
