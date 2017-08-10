@@ -859,8 +859,10 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			
 			listView = (RecyclerView) v.findViewById(R.id.file_grid_view_browser);
 //			listView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
-			listView.addOnItemTouchListener(this);
+//			listView.addOnItemTouchListener(this);
 //			listView.setItemAnimator(new DefaultItemAnimator());
+			listView.setDrawingCacheEnabled(true);
+			listView.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
 
 
 			final TextView turnOnOff = (TextView) v.findViewById(R.id.file_grid_browser_camera_upload_on_off);
@@ -1067,14 +1069,15 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 					listView.setVisibility(View.VISIBLE);
 				}
 			}
-			else{
+			else {
 				emptyImageView.setVisibility(View.VISIBLE);
 				listView.setVisibility(View.GONE);
 			}
-			
+
 			if (adapterGrid == null){
 				log("ADAPTERGRID.MONTHPICS(NEW) = " + monthPics.size());
 				adapterGrid = new MegaPhotoSyncGridTitleAdapterLollipop(context, monthPics, photosyncHandle, listView, emptyImageView, emptyTextView, aB, nodes, numberOfCells, gridWidth, this, Constants.CAMERA_UPLOAD_ADAPTER);
+				adapterGrid.setHasStableIds(true);
 			}
 			else{
 				log("ADAPTERGRID.MONTHPICS = " + monthPics.size());
