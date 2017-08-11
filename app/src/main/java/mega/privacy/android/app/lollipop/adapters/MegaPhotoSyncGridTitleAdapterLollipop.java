@@ -105,6 +105,12 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
 
     private ActionMode actionMode;
 
+    private class ItemInformation{
+        public int type;
+        public String name;
+        public MegaNode n;
+    }
+
     private class ActionBarCallBack implements ActionMode.Callback {
 
         @Override
@@ -376,8 +382,8 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
             case TYPE_ITEM_TITLE:{
                 String title = (String) getItemOfPosition(position);
                 holder.setDataTitle(title);
-                StaggeredGridLayoutManager.LayoutParams layoutParams = (StaggeredGridLayoutManager.LayoutParams) holder.itemView.getLayoutParams();
-                layoutParams.setFullSpan(true);
+//                StaggeredGridLayoutManager.LayoutParams layoutParams = (StaggeredGridLayoutManager.LayoutParams) holder.itemView.getLayoutParams();
+//                layoutParams.setFullSpan(true);
                 break;
             }
             case TYPE_ITEM_IMAGE:{
@@ -391,8 +397,8 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
 //                }
                 holder.setMegaMonthPicLollipop(getMegaMonthPicOfPosition(position));
                 holder.setDataImage(n, isChecked((int) getNodesPositionOfPosition(position)), multipleSelect, position);
-                StaggeredGridLayoutManager.LayoutParams layoutParams = (StaggeredGridLayoutManager.LayoutParams) holder.itemView.getLayoutParams();
-                layoutParams.setFullSpan(false);
+//                StaggeredGridLayoutManager.LayoutParams layoutParams = (StaggeredGridLayoutManager.LayoutParams) holder.itemView.getLayoutParams();
+//                layoutParams.setFullSpan(false);
 
                 break;
             }
@@ -407,8 +413,8 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
 //                }
                 holder.setMegaMonthPicLollipop(getMegaMonthPicOfPosition(position));
                 holder.setDataVideo(n, isChecked((int) getNodesPositionOfPosition(position)), multipleSelect, numberOfCells, position);
-                StaggeredGridLayoutManager.LayoutParams layoutParams = (StaggeredGridLayoutManager.LayoutParams) holder.itemView.getLayoutParams();
-                layoutParams.setFullSpan(false);
+//                StaggeredGridLayoutManager.LayoutParams layoutParams = (StaggeredGridLayoutManager.LayoutParams) holder.itemView.getLayoutParams();
+//                layoutParams.setFullSpan(false);
                 break;
             }
             case TYPE_NO_TYPE:
@@ -1172,8 +1178,6 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
     private int getTypeOfPosition(int position){
         for(MegaMonthPicLollipop temp : monthPics){
             log("size of temp: "+temp.nodeHandles);
-            if(temp.nodeHandles.size() == 0)
-                continue;
             if(position == 0){
                 return TYPE_ITEM_TITLE;
             }
@@ -1229,6 +1233,24 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
             position -= (temp.nodeHandles.size() + 1);
         }
         return null;
+    }
+
+    public int getSpanSizeOfPosition(int position){
+        int type = getTypeOfPosition(position);
+        log("type is "+type+" position: "+position);
+        switch (type){
+            case TYPE_ITEM_TITLE:{
+                return numberOfCells;
+            }
+            case TYPE_ITEM_IMAGE:
+            case TYPE_ITEM_VIDEO:{
+                return 1;
+            }
+            case TYPE_NO_TYPE:
+                log("Error, NO TYPE");
+                break;
+        }
+        return 0;
     }
     
     private static void log(String log) {
