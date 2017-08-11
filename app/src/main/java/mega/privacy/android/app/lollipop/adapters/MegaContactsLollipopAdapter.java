@@ -64,20 +64,20 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 	public static final int ITEM_VIEW_TYPE_GRID = 1;
 	public static final int ITEM_VIEW_TYPE_LIST_ADD_CONTACT = 2;
 
-	Context context;
-	int positionClicked;
-	ArrayList<MegaContactAdapter> contacts;
-	ImageView emptyImageViewFragment;
-	TextView emptyTextViewFragment;
-	RecyclerView listFragment;
-	MegaApiAndroid megaApi;
-	MegaChatApiAndroid megaChatApi;
-	boolean multipleSelect;
-	DatabaseHandler dbH = null;
+	private Context context;
+	private int positionClicked;
+	private ArrayList<MegaContactAdapter> contacts;
+	private ImageView emptyImageViewFragment;
+	private TextView emptyTextViewFragment;
+	private RecyclerView listFragment;
+	private MegaApiAndroid megaApi;
+	private MegaChatApiAndroid megaChatApi;
+	private boolean multipleSelect;
+	private DatabaseHandler dbH = null;
 	private SparseBooleanArray selectedItems;
-	ContactsFragmentLollipop fragment;
-	int adapterType;
-	SparseBooleanArray selectedContacts;
+	private ContactsFragmentLollipop fragment;
+	private int adapterType;
+	private SparseBooleanArray selectedContacts;
 	
 	private class UserAvatarListenerList implements MegaRequestListenerInterface{
 
@@ -336,19 +336,19 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 				int userStatus = megaChatApi.getUserOnlineStatus(contact.getMegaUser().getHandle());
 				if(userStatus == MegaChatApi.STATUS_ONLINE){
 					log("This user is connected");
-					holder.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_online));
+					holder.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_online_grid));
 				}
 				else if(userStatus == MegaChatApi.STATUS_AWAY){
 					log("This user is away");
-					holder.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_away));
+					holder.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_away_grid));
 				}
 				else if(userStatus == MegaChatApi.STATUS_BUSY){
 					log("This user is busy");
-					holder.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_busy));
+					holder.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_busy_grid));
 				}
 				else{
 					log("This user status is: "+userStatus);
-					holder.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_offline));
+					holder.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_offline_grid));
 				}
 			}
 		}
@@ -1129,19 +1129,19 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 
 				if(state == MegaChatApi.STATUS_ONLINE){
 					log("This user is connected");
-					holderGrid.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_online));
+					holderGrid.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_online_grid));
 				}
 				else if(state == MegaChatApi.STATUS_AWAY){
 					log("This user is away");
-					holderGrid.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_away));
+					holderGrid.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_away_grid));
 				}
 				else if(state == MegaChatApi.STATUS_BUSY){
 					log("This user is busy");
-					holderGrid.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_busy));
+					holderGrid.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_busy_grid));
 				}
 				else{
 					log("This user status is: "+state);
-					holderGrid.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_offline));
+					holderGrid.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_offline_grid));
 				}
 
 			}

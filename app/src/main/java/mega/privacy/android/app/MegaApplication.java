@@ -780,7 +780,7 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 
 		log("Unread count is: "+item.getUnreadCount());
 
-		if (item.hasChanged(MegaChatListItem.CHANGE_TYPE_LAST_TS) && (item.getUnreadCount() != 0)){
+		if (item.hasChanged(MegaChatListItem.CHANGE_TYPE_LAST_MSG) && (item.getUnreadCount() != 0)){
 
 			try {
 				if(isFireBaseConnection){
@@ -801,13 +801,17 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 									showNotification(item);
 								}
 								else{
-									if(firstTs>item.getLastTimestamp()){
-										log("DO NOT SHOW NOTIF - FirstTS when logging "+firstTs+ " > item timestamp: "+item.getLastTimestamp());
-									}
-									else{
-										log("FirstTS when logging "+firstTs+ " < item timestamp: "+item.getLastTimestamp());
-										showNotification(item);
-										firstTs=-1;
+
+									MegaChatMessage lastMessage = megaChatApi.getMessage(item.getChatId(), item.getLastMessageId());
+									if(lastMessage!=null){
+										if(firstTs>lastMessage.getTimestamp()){
+											log("DO NOT SHOW NOTIF - FirstTS when logging "+firstTs+ " > last message timestamp: "+lastMessage.getTimestamp());
+										}
+										else{
+											log("FirstTS when logging "+firstTs+ " < last message timestamp: "+lastMessage.getTimestamp());
+											showNotification(item);
+											firstTs=-1;
+										}
 									}
 								}
 							}
