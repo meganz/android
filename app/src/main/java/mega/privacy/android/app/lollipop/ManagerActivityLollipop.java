@@ -14102,8 +14102,4 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		log("networkUnavailable: network NOT available");
 		showOfflineMode();
 	}
-
-	public void quitDialog(){
-
-	}
 }
