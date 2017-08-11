@@ -200,7 +200,7 @@ public class ContactsBottomSheetDialogFragment extends BottomSheetDialogFragment
 
             dialog.setContentView(contentView);
             mBehavior = BottomSheetBehavior.from((View) mainLinearLayout.getParent());
-            mBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+            mBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
 
             final ContactsBottomSheetDialogFragment thisclass = this;
 
