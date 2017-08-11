@@ -606,7 +606,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
             dialog.setContentView(contentView);
 
             mBehavior = BottomSheetBehavior.from((View) contentView.getParent());
-            mBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+            mBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
 
 
             final NodeOptionsBottomSheetDialogFragment thisclass = this;
@@ -614,7 +614,9 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
             mBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
                 @Override
                 public void onStateChanged(@NonNull View bottomSheet, int newState) {
-
+                    if(newState == BottomSheetBehavior.STATE_HIDDEN){
+                        dismiss();
+                    }
                 }
 
                 @Override
