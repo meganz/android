@@ -23,6 +23,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
@@ -994,9 +995,6 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 //					numberOfCells = 3;
 //				}	
 //		    }
-
-			mLayoutManager = new StaggeredGridLayoutManager(numberOfCells, StaggeredGridLayoutManager.HORIZONTAL | StaggeredGridLayoutManager.VERTICAL);
-			listView.setLayoutManager(mLayoutManager);
 		    
 			
 			if (monthPics != null){
@@ -1084,6 +1082,19 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 				adapterGrid.setNumberOfCells(numberOfCells, gridWidth);
 				adapterGrid.setNodes(monthPics, nodes);
 			}
+
+//			mLayoutManager = new StaggeredGridLayoutManager(numberOfCells, StaggeredGridLayoutManager.HORIZONTAL | StaggeredGridLayoutManager.VERTICAL);
+//			listView.setLayoutManager(mLayoutManager);
+
+			mLayoutManager = new GridLayoutManager(context, numberOfCells);
+			((GridLayoutManager) mLayoutManager).setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+				@Override
+				public int getSpanSize(int position) {
+					 return adapterGrid.getSpanSizeOfPosition(position);
+				}
+			});
+
+			listView.setLayoutManager(mLayoutManager);
 			
 			listView.setAdapter(adapterGrid);
 			
