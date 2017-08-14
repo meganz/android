@@ -25,14 +25,43 @@
                 <RelativeLayout
                     android:id="@+id/call_chat_contact_image_layout"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent">
+                    android:layout_height="match_parent"
+                    android:background="@color/black">
 
                     <ImageView
-                        android:id="@+id/call_chat_contact_image"
+                        android:id="@+id/call_chat_contact_video"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:adjustViewBounds="true"
-                        android:scaleType="centerCrop" />
+                        android:background="@color/blue"
+                        android:visibility="gone"/>
+
+                    <RelativeLayout
+                        android:id="@+id/call_chat_contact_image_rl"
+                        android:layout_centerInParent="true"
+                        android:layout_width="120dp"
+                        android:layout_height="120dp"
+                        android:gravity="center_horizontal|center_vertical"
+                        android:background="@android:color/transparent">
+                        <mega.privacy.android.app.components.RoundedImageView
+                            android:id="@+id/call_chat_contact_image"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:scaleType="fitCenter"
+                            android:layout_centerInParent="true"
+                            rounded:border_color="#4DFFFFFF"
+                            rounded:border_width="3dp"
+                            rounded:corner_radius="60dp" />
+                        <TextView
+                            android:id="@+id/call_chat_contact_image_initial_letter"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_centerInParent="true"
+                            android:gravity="center_horizontal|center_vertical"
+                            android:paddingBottom="3dp"
+                            android:visibility="gone"/>
+                    </RelativeLayout>
+
                 </RelativeLayout>
 
                 <!-- Toolbar -->
@@ -80,25 +109,9 @@
                     </RelativeLayout>
 
 
-                  <!--  <RelativeLayout
-                        android:id="@+id/call_chat_my_image_border"
-                        android:layout_width="80dp"
-                        android:layout_height="80dp"
-                        android:background="@drawable/shape_call_chat">
-
-
-                        <ImageView
-                            android:id="@+id/call_chat_my_image"
-                            android:padding="10dp"
-                            android:layout_width="80dp"
-                            android:layout_height="80dp"
-                            android:adjustViewBounds="true"
-                            android:background="@android:color/transparent"/>
-
-                    </RelativeLayout>-->
 
                     <RelativeLayout
-                        android:id="@+id/call_chat_my_image_border"
+                        android:id="@+id/call_chat_my_image_rl"
                         android:layout_width="80dp"
                         android:layout_height="80dp"
                         android:background="@drawable/shape_call_chat">
@@ -110,8 +123,7 @@
                             android:layout_height="match_parent"
                             android:scaleType="fitCenter"
                             android:layout_centerInParent="true"
-                            rounded:border_color="@color/very_transparent_black"
-
+                            rounded:border_color="#4DFFFFFF"
                             rounded:border_width="3dp"
                             rounded:corner_radius="40dp" />
 
