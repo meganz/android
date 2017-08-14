@@ -1,5 +1,6 @@
     <android.support.design.widget.CoordinatorLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:rounded="http://schemas.android.com/apk/res-auto"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
@@ -60,20 +61,72 @@
 
                 <RelativeLayout
                     android:id="@+id/call_chat_my_image_layout"
-                    android:layout_width="60dp"
-                    android:layout_height="90dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:layout_above="@+id/linear_buttons"
                     android:layout_alignParentRight="true"
                     android:layout_marginRight="20dp"
                     android:layout_marginBottom="25dp"
+                    android:background="@android:color/transparent"
                     android:visibility="visible">
 
-                    <ImageView
-                        android:id="@+id/call_chat_my_image"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:adjustViewBounds="true"
-                        android:scaleType="centerCrop" />
+                    <RelativeLayout
+                        android:id="@+id/call_chat_my_video"
+                        android:layout_width="60dp"
+                        android:layout_height="90dp"
+                        android:background="@drawable/shape_call_chat_video"
+                        android:visibility="gone">
+
+                    </RelativeLayout>
+
+
+                  <!--  <RelativeLayout
+                        android:id="@+id/call_chat_my_image_border"
+                        android:layout_width="80dp"
+                        android:layout_height="80dp"
+                        android:background="@drawable/shape_call_chat">
+
+
+                        <ImageView
+                            android:id="@+id/call_chat_my_image"
+                            android:padding="10dp"
+                            android:layout_width="80dp"
+                            android:layout_height="80dp"
+                            android:adjustViewBounds="true"
+                            android:background="@android:color/transparent"/>
+
+                    </RelativeLayout>-->
+
+                    <RelativeLayout
+                        android:id="@+id/call_chat_my_image_border"
+                        android:layout_width="80dp"
+                        android:layout_height="80dp"
+                        android:background="@drawable/shape_call_chat">
+
+
+                        <mega.privacy.android.app.components.RoundedImageView
+                            android:id="@+id/call_chat_my_image"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:scaleType="fitCenter"
+                            android:layout_centerInParent="true"
+                            rounded:border_color="@color/very_transparent_black"
+
+                            rounded:border_width="3dp"
+                            rounded:corner_radius="40dp" />
+
+                        <TextView
+                            android:id="@+id/call_chat_my_image_initial_letter"
+                            android:layout_width="fill_parent"
+                            android:layout_height="fill_parent"
+                            android:layout_centerInParent="true"
+                            android:gravity="center_horizontal|center_vertical"
+                            android:paddingBottom="3dp" />
+                    </RelativeLayout>
+
+
+
+
                 </RelativeLayout>
 
                 <!-- Buttons -->
@@ -99,7 +152,7 @@
                         app:backgroundTint="@color/accentColor"
                         app:borderWidth="0dp"
                         app:elevation="6dp"
-                        app:fabSize="mini"
+                        app:fabSize="normal"
                         app:pressedTranslationZ="12dp" />
 
 
@@ -116,7 +169,7 @@
                         app:backgroundTint="@color/accentColor"
                         app:borderWidth="0dp"
                         app:elevation="6dp"
-                        app:fabSize="mini"
+                        app:fabSize="normal"
                         app:pressedTranslationZ="12dp" />
 
 
@@ -133,7 +186,7 @@
                         app:backgroundTint="@color/delete_account"
                         app:borderWidth="0dp"
                         app:elevation="6dp"
-                        app:fabSize="mini"
+                        app:fabSize="normal"
                         app:pressedTranslationZ="12dp" />
 
                 </LinearLayout>
