@@ -148,13 +148,6 @@ public class ChatController {
         }
     }
 
-    public void deleteNodeAttachment(long chatId, long nodeHandle) {
-        log("deleteNodeAttachment");
-        if(context instanceof ChatFullScreenImageViewer){
-            megaChatApi.revokeAttachment(chatId, nodeHandle, (ChatFullScreenImageViewer) context);
-        }
-    }
-
     public void deleteMessage(MegaChatMessage message, long chatId){
         log("deleteMessage");
         MegaChatMessage messageToDelete;
