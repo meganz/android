@@ -1828,7 +1828,14 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     else if(selected.get(0).getMessage().getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT){
                         menu.findItem(R.id.chat_cab_menu_copy).setVisible(false);
                         menu.findItem(R.id.chat_cab_menu_edit).setVisible(false);
-                        menu.findItem(R.id.chat_cab_menu_delete).setVisible(true);
+                        if(selected.get(0).getMessage().isDeletable()){
+                            log("one message Message DELETABLE");
+                            menu.findItem(R.id.chat_cab_menu_delete).setVisible(true);
+                        }
+                        else{
+                            log("one message Message NOT DELETABLE");
+                            menu.findItem(R.id.chat_cab_menu_delete).setVisible(false);
+                        }
                     }
                     else if(selected.get(0).getMessage().getType()==MegaChatMessage.TYPE_CONTACT_ATTACHMENT){
                         menu.findItem(R.id.chat_cab_menu_copy).setVisible(false);
@@ -1882,7 +1889,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     for(int i=0; i<selected.size();i++){
                         if(selected.get(i).getMessage().getUserHandle()==myUserHandle){
 
-                            if(selected.get(i).getMessage().getType()==MegaChatMessage.TYPE_NORMAL){
+                            if(selected.get(i).getMessage().getType()==MegaChatMessage.TYPE_NORMAL||selected.get(i).getMessage().getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT||selected.get(i).getMessage().getType()==MegaChatMessage.TYPE_CONTACT_ATTACHMENT){
                                log("Message TYPE_NORMAL");
                                 if(!(selected.get(i).getMessage().isDeletable())){
                                     log("onPrepareActionMode: not deletable");
@@ -2144,12 +2151,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 }
                 if(!positionFound){
                     MegaNodeList nodeList = msg.getMegaNodeList();
-                    for(int j=0;j<nodeList.size();j++){
-                        MegaNode node = nodeList.get(j);
-                        if(!(megaChatApi.isRevoked(idChat, node.getHandle()))){
-                            if(MimeTypeList.typeForName(node.getName()).isImage()){
-                                position++;
-                            }
+                    if(nodeList.size()==1){
+                        MegaNode node = nodeList.get(0);
+                        if(MimeTypeList.typeForName(node.getName()).isImage()){
+                            position++;
                         }
                     }
                 }
