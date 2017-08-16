@@ -504,8 +504,6 @@ public final class NotificationBuilder {
         paintText.setSubpixelText(true);
         paintText.setStyle(Paint.Style.FILL);
 
-
-
         if(item.isGroup()){
             paintCircle.setColor(ContextCompat.getColor(context,R.color.divider_upgrade_account));
         }
@@ -520,10 +518,8 @@ public final class NotificationBuilder {
                 log("Default color to the avatar");
                 paintCircle.setColor(ContextCompat.getColor(context, R.color.lollipop_primary_color));
                 paintCircle.setAntiAlias(true);
-
             }
         }
-
 
         int radius;
         if (defaultAvatar.getWidth() < defaultAvatar.getHeight())
@@ -532,8 +528,6 @@ public final class NotificationBuilder {
             radius = defaultAvatar.getHeight()/2;
 
         c.drawCircle(defaultAvatar.getWidth()/2, defaultAvatar.getHeight()/2, radius,paintCircle);
-
-
 
         if(item.getTitle()!=null){
             if(!item.getTitle().isEmpty()){
@@ -553,84 +547,8 @@ public final class NotificationBuilder {
 
             }
         }
-
         return defaultAvatar;
     }
-
-    //origin
-    /*public Bitmap createDefaultAvatar(MegaChatListItem item){
-        log("createDefaultAvatar()");
-
-        Bitmap defaultAvatar = Bitmap.createBitmap(Constants.DEFAULT_AVATAR_WIDTH_HEIGHT,Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
-        Canvas c = new Canvas(defaultAvatar);
-        Paint p = new Paint();
-        p.setAntiAlias(true);
-
-        if(item.isGroup()){
-            p.setColor(ContextCompat.getColor(context,R.color.divider_upgrade_account));
-        }
-        else{
-            String color = megaApi.getUserAvatarColor(MegaApiAndroid.userHandleToBase64(item.getPeerHandle()));
-            if(color!=null){
-                log("The color to set the avatar is "+color);
-                p.setColor(Color.parseColor(color));
-            }
-            else{
-                log("Default color to the avatar");
-                p.setColor(ContextCompat.getColor(context, R.color.lollipop_primary_color));
-            }
-        }
-
-        int radius;
-        if (defaultAvatar.getWidth() < defaultAvatar.getHeight())
-            radius = defaultAvatar.getWidth()/2;
-        else
-            radius = defaultAvatar.getHeight()/2;
-
-        c.drawCircle(defaultAvatar.getWidth()/2, defaultAvatar.getHeight()/2, radius, p);
-
-        if(item.getTitle()!=null){
-            if(!item.getTitle().isEmpty()){
-                char title = item.getTitle().charAt(0);
-                String firstLetter = new String(title+"");
-
-                if(!firstLetter.equals("(")){
-
-                    log("Draw letter: "+firstLetter);
-                    Paint text = new Paint();
-                    Typeface face = Typeface.SANS_SERIF;
-                    text.setTypeface(face);
-                    text.setAntiAlias(true);
-                    text.setSubpixelText(true);
-                    text.setStyle(Paint.Style.FILL);
-                    text.setColor(Color.WHITE);
-                    text.setTextSize(150);
-                    text.setTextAlign(Paint.Align.CENTER);
-
-                    Rect r = new Rect();
-                    c.getClipBounds(r);
-                    int cHeight = r.height();
-                    int cWidth = r.width();
-                    text.setTextAlign(Paint.Align.LEFT);
-                    text.getTextBounds(firstLetter, 0, firstLetter.length(), r);
-                    float x = 0;
-                    float y = 0;
-                    if(firstLetter.toUpperCase(Locale.getDefault()).equals("A")||firstLetter.toUpperCase(Locale.getDefault()).equals("V")||firstLetter.toUpperCase(Locale.getDefault()).equals("R")){
-                        x = cWidth / 2f - r.width() / 2f - r.left - 10;
-                        y = cHeight / 2f + r.height() / 2f - r.bottom + 10;
-                    }
-                    else{
-                        x = cWidth / 2f - r.width() / 2f - r.left;
-                        y = cHeight / 2f + r.height() / 2f - r.bottom;
-                    }
-
-                    c.drawText(firstLetter.toUpperCase(Locale.getDefault()), x, y, text);
-                }
-
-            }
-        }
-        return defaultAvatar;
-    }*/
 
     public Notification buildSummary(String groupKey) {
         Intent intent = new Intent(context, ManagerActivityLollipop.class);
