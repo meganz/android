@@ -25,7 +25,6 @@
             android:background="@color/white"
             android:orientation="horizontal" >
 
-            <!-- Lo nuevo -->
 
             <RelativeLayout
                 android:layout_width="wrap_content"
