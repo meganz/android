@@ -438,7 +438,6 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 
 			dividerClearChatLayout = (View) findViewById(R.id.divider_clear_chat_layout);
 
-
 			//Remove contact Layout
 			removeContactChatLayout = (RelativeLayout) findViewById(R.id.chat_contact_properties_remove_contact_layout);
 			removeContactChatLayout.setOnClickListener(this);
@@ -465,7 +464,6 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			 	contactStateIcon.setVisibility(View.GONE);
 			 }
 
-
 			if(Util.isOnline(this)){
 				log("online -- network connection");
 				setAvatar();
@@ -479,8 +477,6 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 					emailContact.setText(user.getEmail());
 					emailLength.setText(user.getEmail());
 
-
-
 					if(Util.isChatEnabled()){
 						if(chat!=null){
 							clearChatLayout.setVisibility(View.VISIBLE);
@@ -490,14 +486,12 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 						else{
 							clearChatLayout.setVisibility(View.GONE);
 							dividerClearChatLayout.setVisibility(View.GONE);
-
 							//dividerShareContactLayout.setVisibility(View.GONE);
 						}
 					}
 					else{
 						clearChatLayout.setVisibility(View.GONE);
 						dividerClearChatLayout.setVisibility(View.GONE);
-
 						//dividerShareContactLayout.setVisibility(View.GONE);
 					}
 				}
@@ -511,23 +505,19 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 							emailContact.setText(chat.getPeerEmail(0));
 							emailLength.setText(chat.getPeerEmail(0));
 
-
 							clearChatLayout.setVisibility(View.VISIBLE);
 							dividerClearChatLayout.setVisibility(View.VISIBLE);
-
 							//dividerShareContactLayout.setVisibility(View.VISIBLE);
 						}
 						else{
 							clearChatLayout.setVisibility(View.GONE);
 							dividerClearChatLayout.setVisibility(View.GONE);
-
 							//dividerShareContactLayout.setVisibility(View.GONE);
 						}
 					}
 					else{
 						clearChatLayout.setVisibility(View.GONE);
 						dividerClearChatLayout.setVisibility(View.GONE);
-
 						//dividerShareContactLayout.setVisibility(View.GONE);
 					}
 				}
@@ -540,8 +530,6 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 				//	shareContactText.setText(userEmail);
 					emailContact.setText(userEmail);
 					emailLength.setText(userEmail);
-
-
 				}
 				sharedFoldersLayout.setVisibility(View.GONE);
 				dividerSharedFoldersLayout.setVisibility(View.GONE);
