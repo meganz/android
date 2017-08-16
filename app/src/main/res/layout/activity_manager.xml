@@ -45,15 +45,13 @@
                         android:background="@color/mega"
                         style="@style/MyCustomTabLayout"/>
 
-               <android.support.design.widget.TabLayout
-                    android:id="@+id/sliding_tabs_contacts"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal|center_vertical"
-                    app:tabPaddingStart="6dp"
-                    app:tabPaddingEnd="6dp"
-                    style="@style/MyCustomTabLayout"
-                    app:tabGravity="center"/>
+                    <android.support.design.widget.TabLayout
+                        android:id="@+id/sliding_tabs_contacts"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@color/mega"
+                        style="@style/MyCustomTabLayout"/>
+
 
                     <android.support.design.widget.TabLayout
                         android:id="@+id/sliding_tabs_shares"
