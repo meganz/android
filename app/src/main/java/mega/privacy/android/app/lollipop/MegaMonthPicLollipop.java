@@ -2,6 +2,8 @@ package mega.privacy.android.app.lollipop;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.TreeMap;
 
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaNode;
@@ -11,7 +13,7 @@ public class MegaMonthPicLollipop {
 
 	public String monthYearString;
 	public ArrayList<Long> nodeHandles;
-	private HashMap<Long, Long> nodesSite = new HashMap<>();
+	private Map<Long, Long> nodesSite = new TreeMap<>();
 	int numRows;
 
 	MegaMonthPicLollipop(String monthYearString, ArrayList<Long> nodeHandles){
@@ -37,6 +39,12 @@ public class MegaMonthPicLollipop {
 		log("node is "+node);
 		log("getPostion return null "+(nodesSite.get(new Long(node)) == null));
 		return nodesSite.get(new Long(node));
+	}
+
+	public long getPosition(Long node){
+		log("node is "+node);
+		log("getPostion return null "+(nodesSite.get(node) == null));
+		return nodesSite.get(node);
 	}
 
 	private static void log(String txt){
