@@ -243,7 +243,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	MegaOffline selectedOfflineNode;
 	MegaContactAdapter selectedUser;
 	MegaContactRequest selectedRequest;
-	MegaChatListItem selectedChatItem;
+
+	public long selectedChatItemId;
 //	String fullNameChat;
 
 	//COLLECTION FAB BUTTONS
@@ -2952,6 +2953,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					if (parentNode != null){
 						if (parentNode.getHandle() == megaApi.getRootNode().getHandle()){
 							aB.setTitle(getString(R.string.section_cloud_drive));
+							//aB.setTitle(getString());
+
 							aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 							firstNavigationLevel = true;
 						}
@@ -4780,6 +4783,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					if (fbFLol!=null){
 						log("in CloudDrive");
 						//Cloud Drive
+
+						aB.setTitle(getString(R.string.section_cloud_drive));
+
 						//Show
 						addMenuItem.setEnabled(true);
 						addMenuItem.setVisible(true);
@@ -13513,7 +13519,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		log("showChatPanel");
 
 		if(chat!=null){
-			this.selectedChatItem = chat;
+			this.selectedChatItemId = chat.getChatId();
 			ChatBottomSheetDialogFragment bottomSheetDialogFragment = new ChatBottomSheetDialogFragment();
 			bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
 		}
@@ -13878,14 +13884,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 	public void setDisplayedAccountType(int displayedAccountType) {
 		this.displayedAccountType = displayedAccountType;
-	}
-
-	public MegaChatListItem getSelectedChat() {
-		return selectedChatItem;
-	}
-
-	public void setSelectedChat(MegaChatListItem selectedChatItem) {
-		this.selectedChatItem = selectedChatItem;
 	}
 
 	public void enableChat(){
