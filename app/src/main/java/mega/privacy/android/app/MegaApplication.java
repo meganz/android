@@ -28,6 +28,7 @@ import android.graphics.drawable.Drawable;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
+import android.os.Build;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
 import android.text.Html;
@@ -577,8 +578,15 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 								.setColor(ContextCompat.getColor(this,R.color.mega))
 								.setContentIntent(pendingIntent);
 
-						Drawable d = getDrawable(R.drawable.ic_folder_incoming);
-							notificationBuilder.setLargeIcon(((BitmapDrawable)d).getBitmap());
+						Drawable d;
+
+						if(android.os.Build.VERSION.SDK_INT >=  Build.VERSION_CODES.LOLLIPOP){
+							d = getResources().getDrawable(R.drawable.ic_folder_incoming, getTheme());
+						} else {
+							d = getResources().getDrawable(R.drawable.ic_folder_incoming);
+						}
+
+						notificationBuilder.setLargeIcon(((BitmapDrawable)d).getBitmap());
 
 						NotificationManager notificationManager =
 								(NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
