@@ -148,16 +148,6 @@ public class ChatController {
         }
     }
 
-    public void deleteNodeAttachment(long chatId, long nodeHandle) {
-        log("deleteNodeAttachment");
-        if(context instanceof ChatFullScreenImageViewer){
-            megaChatApi.revokeAttachment(chatId, nodeHandle, (ChatFullScreenImageViewer) context);
-        }
-        else if(context instanceof NodeAttachmentActivityLollipop){
-            megaChatApi.revokeAttachment(chatId, nodeHandle, (NodeAttachmentActivityLollipop) context);
-        }
-    }
-
     public void deleteMessage(MegaChatMessage message, long chatId){
         log("deleteMessage");
         MegaChatMessage messageToDelete;
@@ -165,14 +155,7 @@ public class ChatController {
 
             if(message.getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT){
                 log("Delete node attachment message");
-                MegaNodeList nodeList = message.getMegaNodeList();
-
-                for(int j=0; j<nodeList.size(); j++){
-                    MegaNode node = nodeList.get(j);
-                    if(context instanceof ChatActivityLollipop){
-                        megaChatApi.revokeAttachment(chatId, node.getHandle(), (ChatActivityLollipop) context);
-                    }
-                }
+                megaChatApi.revokeAttachmentMessage(chatId, message.getMsgId());
             }
             else{
                 log("Delete normal message");

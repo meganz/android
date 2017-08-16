@@ -1475,7 +1475,6 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 				}
 				else if(type==Constants.NODE_ATTACHMENT_ADAPTER){
 					log("Node attachment adapter");
-					((NodeAttachmentActivityLollipop) context).itemClick(currentPosition);
 				}
 				else{
 					log("click layout FileBrowserFragmentLollipop!");
@@ -1524,8 +1523,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 			((SearchFragmentLollipop) fragment).itemClick(currentPosition);
 		}
 		else if(type==Constants.NODE_ATTACHMENT_ADAPTER){
-			((NodeAttachmentActivityLollipop) context).activateActionMode();
-			((NodeAttachmentActivityLollipop) context).itemClick(currentPosition);
+			log("NODE_ATTACHMENT_ADAPTER - no multiselect");
 		}
 		else{
 			log("click layout FileBrowserFragmentLollipop!");
