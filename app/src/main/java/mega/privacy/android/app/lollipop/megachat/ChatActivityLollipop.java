@@ -3856,16 +3856,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     public void revoke(){
         log("revoke");
-
-        MegaChatMessage message = megaChatApi.getMessage(idChat, selectedMessageId);
-
-        if(message!=null) {
-            MegaNodeList nodeList = message.getMegaNodeList();
-            for (int i = 0; i < nodeList.size(); i++) {
-                MegaNode document = nodeList.get(i);
-                megaChatApi.revokeAttachment(idChat,document.getHandle(),this);
-            }
-        }
+        megaChatApi.revokeAttachmentMessage(idChat, selectedMessageId);
     }
 
     @Override
