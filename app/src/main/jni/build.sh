@@ -158,9 +158,6 @@ if [ "$1" == "clean_mega" ]; then
     make -C mega -f MakefileBindings clean JAVA_BASE_OUTPUT_PATH=${JAVA_OUTPUT_PATH} &> ${LOG_FILE}
     rm -rf megachat/megachat.cpp megachat/megachat.h
     
-    echo "* Deleting source folders"
-    rm -rf megachat/sdk
-
     echo "* Deleting tarballs"
 	rm -rf ../obj/local/armeabi/
 	rm -rf ../obj/local/x86
@@ -189,7 +186,6 @@ if [ "$1" == "clean" ]; then
     rm -rf ${LIBUV}/${LIBUV}
     rm -rf ${LIBEXPAT}/${LIBEXPAT}
     rm -rf ${LIBEXPAT}/${LIBEXPAT_SOURCE_FOLDER}
-    rm -rf megachat/sdk
 
     echo "* Deleting tarballs"
     rm -rf ${CRYPTOPP}/${CRYPTOPP_SOURCE_FILE}
