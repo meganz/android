@@ -2953,6 +2953,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					if (parentNode != null){
 						if (parentNode.getHandle() == megaApi.getRootNode().getHandle()){
 							aB.setTitle(getString(R.string.section_cloud_drive));
+							//aB.setTitle(getString());
+
 							aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 							firstNavigationLevel = true;
 						}
@@ -4781,6 +4783,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					if (fbFLol!=null){
 						log("in CloudDrive");
 						//Cloud Drive
+
+						aB.setTitle(getString(R.string.section_cloud_drive));
+
 						//Show
 						addMenuItem.setEnabled(true);
 						addMenuItem.setVisible(true);
