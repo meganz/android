@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Build;
@@ -82,6 +83,7 @@ import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaChildren;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
@@ -1000,10 +1002,15 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			if (monthPics != null){
 				monthPics.clear();
 			}
-			
+
+			List<Integer> spanSizePosition = null;
+			int countTitles = 0;
 			if (megaApi.getNodeByHandle(photosyncHandle) != null){
 				
 				nodes = megaApi.getChildren(megaApi.getNodeByHandle(photosyncHandle), MegaApiJava.ORDER_MODIFICATION_DESC);
+//				MegaChildren children = megaApi.getFileFolderChildren(megaApi.getNodeByHandle(photosyncHandle), MegaApiJava.ORDER_MODIFICATION_DESC);
+//				nodes = children.getFileList();
+				spanSizePosition =  new ArrayList<>(this.nodes.size());
 				int month = 0;
 				int year = 0;
 				MegaMonthPicLollipop monthPic = new MegaMonthPicLollipop();
@@ -1022,8 +1029,11 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 						month = d.getMonth();
 						year = d.getYear();
 						monthPic.monthYearString = getImageDateString(month, year);
+						spanSizePosition.add(MegaPhotoSyncGridTitleAdapterLollipop.TYPE_ITEM_TITLE);
+						countTitles++;
 						monthPic.nodeHandles.add(nodes.get(i).getHandle());
 						monthPic.setPosition(nodes.get(i), i);
+						spanSizePosition.add(MegaPhotoSyncGridTitleAdapterLollipop.TYPE_ITEM_IMAGE);
 //						monthPics.add(monthPic);
 //						monthPic = new MegaMonthPicLollipop();
 //						i--;
@@ -1038,6 +1048,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 //						else{
 							monthPic.nodeHandles.add(nodes.get(i).getHandle());
 							monthPic.setPosition(nodes.get(i), i);
+						spanSizePosition.add(MegaPhotoSyncGridTitleAdapterLollipop.TYPE_ITEM_IMAGE);
 //						}
 					}
 					else{
@@ -1046,8 +1057,11 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 						monthPics.add(monthPic);
 						monthPic = new MegaMonthPicLollipop();
 						monthPic.monthYearString = getImageDateString(month, year);
+						spanSizePosition.add(MegaPhotoSyncGridTitleAdapterLollipop.TYPE_ITEM_TITLE);
+						countTitles++;
 						monthPic.nodeHandles.add(nodes.get(i).getHandle());
 						monthPic.setPosition(nodes.get(i), i);
+						spanSizePosition.add(MegaPhotoSyncGridTitleAdapterLollipop.TYPE_ITEM_IMAGE);
 //						monthPics.add(monthPic);
 //						monthPic = new MegaMonthPicLollipop();
 //						i--;
@@ -1072,15 +1086,24 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 				listView.setVisibility(View.GONE);
 			}
 
+			if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT && numberOfCells == GRID_SMALL){
+				log("the device is portrait and the grid is small");
+				listView.setItemViewCacheSize(numberOfCells * 20);
+			}
+
 			if (adapterGrid == null){
 				log("ADAPTERGRID.MONTHPICS(NEW) = " + monthPics.size());
-				adapterGrid = new MegaPhotoSyncGridTitleAdapterLollipop(context, monthPics, photosyncHandle, listView, emptyImageView, emptyTextView, aB, nodes, numberOfCells, gridWidth, this, Constants.CAMERA_UPLOAD_ADAPTER);
+				Integer[] array = new Integer[spanSizePosition.size()];
+				spanSizePosition.toArray(array);
+				adapterGrid = new MegaPhotoSyncGridTitleAdapterLollipop(context, monthPics, photosyncHandle, listView, emptyImageView, emptyTextView, aB, nodes, numberOfCells, gridWidth, this, Constants.CAMERA_UPLOAD_ADAPTER, spanSizePosition.size(), array, countTitles);
 				adapterGrid.setHasStableIds(true);
 			}
 			else{
 				log("ADAPTERGRID.MONTHPICS = " + monthPics.size());
 				adapterGrid.setNumberOfCells(numberOfCells, gridWidth);
-				adapterGrid.setNodes(monthPics, nodes);
+				Integer[] array = new Integer[spanSizePosition.size()];
+				spanSizePosition.toArray(array);
+				adapterGrid.setNodes(monthPics, nodes, spanSizePosition.size(), array, countTitles);
 			}
 
 //			mLayoutManager = new StaggeredGridLayoutManager(numberOfCells, StaggeredGridLayoutManager.HORIZONTAL | StaggeredGridLayoutManager.VERTICAL);
@@ -1090,7 +1113,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			((GridLayoutManager) mLayoutManager).setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
 				@Override
 				public int getSpanSize(int position) {
-					 return adapterGrid.getSpanSizeOfPosition(position);
+					return adapterGrid.getSpanSizeOfPosition(position);
 				}
 			});
 
@@ -1793,9 +1816,6 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			int month = 0;
 			int year = 0;
 			for (int i=0;i<nodes.size();i++){
-				if (nodes.get(i).isFolder()){
-					continue;
-				}
 				PhotoSyncHolder psh = new PhotoSyncHolder();
 				Date d = new Date(nodes.get(i).getModificationTime()*1000);
 				if ((month == d.getMonth()) && (year == d.getYear())){
@@ -1910,10 +1930,13 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 //					i--;
 //				}
 //			}
+			List<Integer> spanSizePosition = new ArrayList<>(nodes.size());
+			int countTitles = 0;
 			for (int i=0;i<nodes.size();i++){
 				if (nodes.get(i).isFolder()){
 					continue;
 				}
+
 
 				if (!MimeTypeList.typeForName(nodes.get(i).getName()).isImage() && (!MimeTypeList.typeForName(nodes.get(i).getName()).isVideo())){
 					continue;
@@ -1924,8 +1947,10 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 					month = d.getMonth();
 					year = d.getYear();
 					monthPic.monthYearString = getImageDateString(month, year);
+					spanSizePosition.add(MegaPhotoSyncGridTitleAdapterLollipop.TYPE_ITEM_TITLE);
 					monthPic.nodeHandles.add(nodes.get(i).getHandle());
 					monthPic.setPosition(nodes.get(i), i);
+					spanSizePosition.add(MegaPhotoSyncGridTitleAdapterLollipop.TYPE_ITEM_IMAGE);
 //						monthPics.add(monthPic);
 //						monthPic = new MegaMonthPicLollipop();
 //						i--;
@@ -1940,6 +1965,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 //						else{
 					monthPic.nodeHandles.add(nodes.get(i).getHandle());
 					monthPic.setPosition(nodes.get(i), i);
+					spanSizePosition.add(MegaPhotoSyncGridTitleAdapterLollipop.TYPE_ITEM_IMAGE);
 //						}
 				}
 				else{
@@ -1948,8 +1974,11 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 					monthPics.add(monthPic);
 					monthPic = new MegaMonthPicLollipop();
 					monthPic.monthYearString = getImageDateString(month, year);
+					spanSizePosition.add(MegaPhotoSyncGridTitleAdapterLollipop.TYPE_ITEM_TITLE);
+					countTitles++;
 					monthPic.nodeHandles.add(nodes.get(i).getHandle());
 					monthPic.setPosition(nodes.get(i), i);
+					spanSizePosition.add(MegaPhotoSyncGridTitleAdapterLollipop.TYPE_ITEM_IMAGE);
 //						monthPics.add(monthPic);
 //						monthPic = new MegaMonthPicLollipop();
 //						i--;
@@ -1972,7 +2001,9 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			if (adapterGrid != null){
 				log("ADAPTERGRID.MONTHPICS = " + monthPics.size());
 				adapterGrid.setNumberOfCells(numberOfCells, gridWidth);
-				adapterGrid.setNodes(monthPics, nodes);
+				Integer[] array = new Integer[spanSizePosition.size()];
+				spanSizePosition.toArray(array);
+				adapterGrid.setNodes(monthPics, nodes, spanSizePosition.size(), array, countTitles);
 			}
 		}
 	}

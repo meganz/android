@@ -1477,7 +1477,7 @@ public class ThumbnailUtilsLollipop {
 									Animation fadeInAnimation = AnimationUtils.loadAnimation(context, R.anim.fade_in);
 									holder.getImageView().startAnimation(fadeInAnimation);
 									holder.postSetImageView();
-//									adapter.notifyItemChanged(holder.getPositionOnAdapter());
+									adapter.notifyItemChanged(holder.getPositionOnAdapter());
 //									adapter.notifyDataSetChanged();
 									log("Thumbnail update");
 								}
