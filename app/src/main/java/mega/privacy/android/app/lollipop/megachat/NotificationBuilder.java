@@ -491,21 +491,33 @@ public final class NotificationBuilder {
 
         Bitmap defaultAvatar = Bitmap.createBitmap(Constants.DEFAULT_AVATAR_WIDTH_HEIGHT,Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
         Canvas c = new Canvas(defaultAvatar);
-        Paint p = new Paint();
-        p.setAntiAlias(true);
+        Paint paintText = new Paint();
+        Paint paintCircle = new Paint();
+
+        paintText.setColor(Color.WHITE);
+        paintText.setTextSize(150);
+        paintText.setAntiAlias(true);
+        paintText.setTextAlign(Paint.Align.CENTER);
+        Typeface face = Typeface.SANS_SERIF;
+        paintText.setTypeface(face);
+        paintText.setAntiAlias(true);
+        paintText.setSubpixelText(true);
+        paintText.setStyle(Paint.Style.FILL);
 
         if(item.isGroup()){
-            p.setColor(ContextCompat.getColor(context,R.color.divider_upgrade_account));
+            paintCircle.setColor(ContextCompat.getColor(context,R.color.divider_upgrade_account));
         }
         else{
             String color = megaApi.getUserAvatarColor(MegaApiAndroid.userHandleToBase64(item.getPeerHandle()));
             if(color!=null){
                 log("The color to set the avatar is "+color);
-                p.setColor(Color.parseColor(color));
+                paintCircle.setColor(Color.parseColor(color));
+                paintCircle.setAntiAlias(true);
             }
             else{
                 log("Default color to the avatar");
-                p.setColor(ContextCompat.getColor(context, R.color.lollipop_primary_color));
+                paintCircle.setColor(ContextCompat.getColor(context, R.color.lollipop_primary_color));
+                paintCircle.setAntiAlias(true);
             }
         }
 
@@ -515,7 +527,7 @@ public final class NotificationBuilder {
         else
             radius = defaultAvatar.getHeight()/2;
 
-        c.drawCircle(defaultAvatar.getWidth()/2, defaultAvatar.getHeight()/2, radius, p);
+        c.drawCircle(defaultAvatar.getWidth()/2, defaultAvatar.getHeight()/2, radius,paintCircle);
 
         if(item.getTitle()!=null){
             if(!item.getTitle().isEmpty()){
@@ -525,34 +537,12 @@ public final class NotificationBuilder {
                 if(!firstLetter.equals("(")){
 
                     log("Draw letter: "+firstLetter);
-                    Paint text = new Paint();
-                    Typeface face = Typeface.SANS_SERIF;
-                    text.setTypeface(face);
-                    text.setAntiAlias(true);
-                    text.setSubpixelText(true);
-                    text.setStyle(Paint.Style.FILL);
-                    text.setColor(Color.WHITE);
-                    text.setTextSize(150);
-                    text.setTextAlign(Paint.Align.CENTER);
+                    Rect bounds = new Rect();
 
-                    Rect r = new Rect();
-                    c.getClipBounds(r);
-                    int cHeight = r.height();
-                    int cWidth = r.width();
-                    text.setTextAlign(Paint.Align.LEFT);
-                    text.getTextBounds(firstLetter, 0, firstLetter.length(), r);
-                    float x = 0;
-                    float y = 0;
-                    if(firstLetter.toUpperCase(Locale.getDefault()).equals("A")||firstLetter.toUpperCase(Locale.getDefault()).equals("V")||firstLetter.toUpperCase(Locale.getDefault()).equals("R")){
-                        x = cWidth / 2f - r.width() / 2f - r.left - 10;
-                        y = cHeight / 2f + r.height() / 2f - r.bottom + 10;
-                    }
-                    else{
-                        x = cWidth / 2f - r.width() / 2f - r.left;
-                        y = cHeight / 2f + r.height() / 2f - r.bottom;
-                    }
-
-                    c.drawText(firstLetter.toUpperCase(Locale.getDefault()), x, y, text);
+                    paintText.getTextBounds(firstLetter,0,firstLetter.length(),bounds);
+                    int xPos = (c.getWidth()/2);
+                    int yPos = (int)((c.getHeight()/2)-((paintText.descent()+paintText.ascent()/2))+20);
+                    c.drawText(firstLetter.toUpperCase(Locale.getDefault()), xPos, yPos, paintText);
                 }
 
             }
