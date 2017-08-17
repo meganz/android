@@ -169,10 +169,12 @@ public class SentRequestsFragmentLollipop extends Fragment {
 	/*
 	 * Clear all selected items
 	 */
-	private void clearSelections() {
-		if(adapterList.isMultipleSelect()){
-			adapterList.clearSelections();
-		}
+	public void clearSelections() {
+        if(adapterList!=null){
+            if(adapterList.isMultipleSelect()){
+                adapterList.clearSelections();
+            }
+        }
 	}
 
 	private void updateActionModeTitle() {

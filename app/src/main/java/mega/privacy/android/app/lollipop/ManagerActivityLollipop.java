@@ -3131,7 +3131,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					sttFLol.setOnlineOptions(true);
 				}
 			}
-			invalidateOptionsMenu();
+			supportInvalidateOptionsMenu();
 		}
 		else{
 			log("showOnlineMode - Root is NULL");
@@ -3267,7 +3267,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 		}
 
-		invalidateOptionsMenu();
+		supportInvalidateOptionsMenu();
 
 	}
 
@@ -3650,11 +3650,30 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 			@Override
 			public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-
+				log("onPageScrolled");
 			}
 
 			@Override
 			public void onPageSelected(int position) {
+				log("onPageSelected");
+				String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);
+				cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
+				if(cFLol!=null){
+					cFLol.hideMultipleSelect();
+					cFLol.clearSelectionsNoAnimations();
+				}
+				cFTag = getFragmentTag(R.id.contact_tabs_pager, 1);
+				sRFLol = (SentRequestsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
+				if(sRFLol!=null){
+					sRFLol.clearSelections();
+					sRFLol.hideMultipleSelect();
+				}
+				cFTag = getFragmentTag(R.id.contact_tabs_pager, 2);
+				rRFLol = (ReceivedRequestsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
+				if(rRFLol!=null){
+					rRFLol.clearSelections();
+					rRFLol.hideMultipleSelect();
+				}
 				supportInvalidateOptionsMenu();
 				showFabButton();
 			}
@@ -4596,7 +4615,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		}
 		fragmentContainer.setVisibility(View.VISIBLE);
 
-		invalidateOptionsMenu();
+		supportInvalidateOptionsMenu();
 		showFabButton();
 	}
 
@@ -13074,7 +13093,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 								completedTFLol.updateCompletedTransfers();
 							}
 						}
-						invalidateOptionsMenu();
+						supportInvalidateOptionsMenu();
 						break;
 					}
 					case DialogInterface.BUTTON_NEGATIVE: {
