@@ -125,7 +125,7 @@
                     android:layout_marginRight="16dp"
                     android:gravity="left"/>
 
-<!-- own portrait -->
+                <!-- own portrait -->
                 <RelativeLayout
                     android:id="@+id/preview_frame_portrait"
                     android:layout_width="wrap_content"
@@ -162,7 +162,7 @@
                 </RelativeLayout>
 
 
-<!-- own landscape -->
+                <!-- own landscape -->
                 <RelativeLayout
                     android:id="@+id/preview_frame_landscape"
                     android:layout_width="wrap_content"
@@ -461,6 +461,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="6dp"
+            android:background="@android:color/transparent"
             android:layout_below="@+id/title_contact_message_layout">
 
             <mega.privacy.android.app.components.WrapTextView
@@ -497,6 +498,7 @@
                     android:layout_marginTop="2dp"
                     android:gravity="left"
                     android:elevation="2dp">
+
 
                     <TextView
                         android:id="@+id/content_contact_message_file_sender"
