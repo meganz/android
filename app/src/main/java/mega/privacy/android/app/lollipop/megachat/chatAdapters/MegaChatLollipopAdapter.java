@@ -1451,6 +1451,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                             }
                                         }
                                     }
+                                    ((ViewHolderMessageChat)holder).contentContactMessageFileLayout.setElevation(0);
+
                                 }
                                 else{
                                     long totalSize = 0;
@@ -1786,6 +1788,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                 }
                                 ((ViewHolderMessageChat)holder).contentContactMessageText.setText(name);
                                 ((ViewHolderMessageChat)holder).contentContactMessageFileSender.setVisibility(View.GONE);
+
                             }
 
 
@@ -1829,12 +1832,12 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                         }
 
                         ((ViewHolderMessageChat) holder).contentContactMessageText.setVisibility(View.VISIBLE);
+                        ((ViewHolderMessageChat) holder).contentContactMessageFileLayout.setVisibility(View.GONE);
                         ((ViewHolderMessageChat) holder).contentContactMessageThumbLand.setVisibility(View.GONE);
                         ((ViewHolderMessageChat) holder).contentContactMessageThumbLandFramework.setVisibility(View.GONE);
                         ((ViewHolderMessageChat) holder).previewFrameContactPort.setVisibility(View.GONE);
                         ((ViewHolderMessageChat) holder).contentContactMessageThumbPort.setVisibility(View.GONE);
                         ((ViewHolderMessageChat) holder).contentContactMessageThumbPortFramework.setVisibility(View.GONE);
-                        ((ViewHolderMessageChat) holder).contentContactMessageFileLayout.setVisibility(View.GONE);
                         ((ViewHolderMessageChat) holder).contentContactMessageContactLayout.setVisibility(View.GONE);
 
                         Spannable content = new SpannableString(messageContent);
@@ -2189,6 +2192,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                             }
                                             else{
                                                 log("Node has NO preview!!!");
+                                                ((ViewHolderMessageChat)holder).contentContactMessageFileLayout.setElevation(0);
+
                                             }
                                         }
                                     }
