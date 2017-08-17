@@ -130,6 +130,7 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
         userPassword = (EditText) v.findViewById(R.id.create_account_password_text);
         userPasswordConfirm = (EditText) v.findViewById(R.id.create_account_password_text_confirm);
 
+        userName.getBackground().clearColorFilter();
         userName.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -147,6 +148,9 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
             }
         });
 
+        userLastName.getBackground().clearColorFilter();
+
+        userEmail.getBackground().clearColorFilter();
         userEmail.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -164,6 +168,7 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
             }
         });
 
+        userPassword.getBackground().clearColorFilter();
         userPassword.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -181,6 +186,7 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
             }
         });
 
+        userPasswordConfirm.getBackground().clearColorFilter();
         userPasswordConfirm.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
