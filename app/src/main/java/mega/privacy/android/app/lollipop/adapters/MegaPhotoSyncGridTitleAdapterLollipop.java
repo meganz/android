@@ -502,8 +502,6 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
 
             content_layout.setVisibility(View.GONE);
 
-            photo.setScaleType(ImageView.ScaleType.FIT_CENTER);
-
             this.adapter = adapter;
 
             positionAdapter = -1;
@@ -779,7 +777,7 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
 //            params.width = gridWidth;
 //            content_layout.setLayoutParams(params);
 
-//            photo.setScaleType(ImageView.ScaleType.FIT_CENTER);
+            photo.setScaleType(ImageView.ScaleType.CENTER_CROP);
         }
 
         public void setDocument(long document) {
