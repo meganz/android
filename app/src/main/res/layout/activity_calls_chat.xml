@@ -70,7 +70,7 @@
                     android:id="@+id/call_toolbar"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@color/very_very_transparent_black"
+                    android:background="@drawable/gradient_shape_callschat"
                     app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
                     app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
                     android:fitsSystemWindows="true"/>

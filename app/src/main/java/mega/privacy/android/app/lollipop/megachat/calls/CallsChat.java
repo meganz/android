@@ -101,13 +101,13 @@ public class CallsChat extends PinActivityLollipop implements MegaRequestListene
     Toolbar tB;
     ActionBar aB;
 
-    /*my avatar*/
+    //my avatar
     RelativeLayout callChatMyVideo;
     RelativeLayout myImageBorder;
     RoundedImageView myImage;
     TextView myInitialLetter;
 
-    /*contact avatar*/
+    //contact avatar
     RelativeLayout imageLayout;
     RoundedImageView contactImage;
     TextView contactInitialLetter;
@@ -120,13 +120,11 @@ public class CallsChat extends PinActivityLollipop implements MegaRequestListene
     FloatingActionButton secondFAB;
     FloatingActionButton thirdFAB;
 
-    /************************************/
     Camera camera;
     SurfaceView surfaceView;
     SurfaceHolder surfaceHolder;
 
-    /**********************************************/
-int var1=0;
+    int var1=0;
     int var2=0;
 
 
@@ -221,13 +219,10 @@ int var1=0;
         aB.setHomeButtonEnabled(true);
         aB.setDisplayHomeAsUpEnabled(true);
 
-        /*********************************************/
-        /*surfaceView = (SurfaceView)findViewById(R.id.surfaceView1);
-        surfaceHolder = surfaceView.getHolder();
-        surfaceHolder.addCallback(this);
-        surfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);*/
-
-        /*********************************************/
+        //surfaceView = (SurfaceView)findViewById(R.id.surfaceView1);
+        //surfaceHolder = surfaceView.getHolder();
+        //surfaceHolder.addCallback(this);
+        //surfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);*/
 
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
@@ -255,7 +250,7 @@ int var1=0;
             firstFAB = (FloatingActionButton) findViewById(R.id.first_fab);
             firstFAB.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View v) {
-                    log("***First FAB");
+                    log("First FAB");
                     if(callChatMyVideo.isShown()){
                         callChatMyVideo.setVisibility(View.GONE);
                         myImageBorder.setVisibility(View.VISIBLE);
@@ -299,7 +294,7 @@ int var1=0;
 
 
 
-            /*My avatar*/
+            //My avatar
             myUserMail = megaApi.getMyEmail();
             myUserHandle = megaApi.getMyUserHandle();
 
@@ -326,7 +321,7 @@ int var1=0;
         }
 
 
-        /*Contact's avatar*/
+        //Contact's avatar
         chatHandle = extras.getLong("handle", -1);
 
         if (chatHandle == -1) {
@@ -415,32 +410,32 @@ int var1=0;
                 else{
                     avatar = new File(context.getCacheDir().getAbsolutePath(), request.getEmail() + ".jpg");
                 }
-/*
-                Bitmap bitmap = null;
-                if (avatar.exists()){
-                    if (avatar.length() > 0){
-                        BitmapFactory.Options bOpts = new BitmapFactory.Options();
-                        bOpts.inPurgeable = true;
-                        bOpts.inInputShareable = true;
-                        bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
-                        if (bitmap == null) {
-                            avatar.delete();
-                        }
-                        else{
+//
+                //   Bitmap bitmap = null;
+                //  if (avatar.exists()){
+                //  if (avatar.length() > 0){
+                //    BitmapFactory.Options bOpts = new BitmapFactory.Options();
+                //      bOpts.inPurgeable = true;
+                //       bOpts.inInputShareable = true;
+                //      bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
+                //       if (bitmap == null) {
+                //           avatar.delete();
+                //       }
+                //       else{
 
-                            contactImage.setImageBitmap(bitmap);
-                            contactInitialLetter.setVisibility(View.GONE);
+                //           contactImage.setImageBitmap(bitmap);
+                //            contactInitialLetter.setVisibility(View.GONE);
 
-                            if (bitmap != null && !bitmap.isRecycled()) {
-                                Palette palette = Palette.from(bitmap).generate();
-                                Palette.Swatch swatch =  palette.getDarkVibrantSwatch();
+                //           if (bitmap != null && !bitmap.isRecycled()) {
+                //               Palette palette = Palette.from(bitmap).generate();
+                //               Palette.Swatch swatch =  palette.getDarkVibrantSwatch();
+//
+                //               contactImage.setBackgroundColor(swatch.getBodyTextColor());
+                //           }
 
-                                contactImage.setBackgroundColor(swatch.getBodyTextColor());
-                            }
-
-                        }
-                    }
-                }*/
+                //       }
+                //     }
+                //  }
                 setProfileAvatar(avatar);
 
             }else if (myUserMail.compareTo(request.getEmail()) == 0){
@@ -452,30 +447,30 @@ int var1=0;
                     myavatar = new File(context.getCacheDir().getAbsolutePath(), request.getEmail() + ".jpg");
                 }
                 setProfileMyAvatar(myavatar);
-                /*Bitmap mybitmap = null;
-                if (myavatar.exists()){
-                    if (myavatar.length() > 0){
-                        BitmapFactory.Options bOpts = new BitmapFactory.Options();
-                        bOpts.inPurgeable = true;
-                        bOpts.inInputShareable = true;
-                        mybitmap = BitmapFactory.decodeFile(myavatar.getAbsolutePath(), bOpts);
-                        if (mybitmap == null) {
-                            myavatar.delete();
-                        }
-                        else{
+                //Bitmap mybitmap = null;
+                //if (myavatar.exists()){
+                //  if (myavatar.length() > 0){
+                //      BitmapFactory.Options bOpts = new BitmapFactory.Options();
+                //      bOpts.inPurgeable = true;
+                //      bOpts.inInputShareable = true;
+                //      mybitmap = BitmapFactory.decodeFile(myavatar.getAbsolutePath(), bOpts);
+                //      if (mybitmap == null) {
+                //          myavatar.delete();
+                //      }
+                //      else{
 
-                            myImage.setImageBitmap(mybitmap);
-                            myInitialLetter.setVisibility(View.GONE);
+                //                          myImage.setImageBitmap(mybitmap);
+                //          myInitialLetter.setVisibility(View.GONE);
 
-                            if (mybitmap != null && !mybitmap.isRecycled()) {
-                                Palette palette = Palette.from(mybitmap).generate();
-                                Palette.Swatch swatch =  palette.getDarkVibrantSwatch();
-                               myImage.setBackgroundColor(swatch.getBodyTextColor());
-                            }
+                //                          if (mybitmap != null && !mybitmap.isRecycled()) {
+                //              Palette palette = Palette.from(mybitmap).generate();
+                //              Palette.Swatch swatch =  palette.getDarkVibrantSwatch();
+                //             myImage.setBackgroundColor(swatch.getBodyTextColor());
+                //          }
 
-                        }
-                    }
-                }*/
+                //     }
+                //                  }
+                //}
             }
         }
 
@@ -657,11 +652,11 @@ int var1=0;
                 secondFAB.show();
                 thirdFAB.show();
             }
-            /*if(firstFAB.isShown()){
-                hideFabButton();
-            }else{
-                showFabButton();
-            }*/
+            //if(firstFAB.isShown()){
+            //    hideFabButton();
+            //}else{
+            //   showFabButton();
+            // }
         }
         return false;
     }
@@ -693,45 +688,13 @@ int var1=0;
             }
         }
     }
-    /*protected void hideFabButton(final FloatingActionButton fab){
-        if (fab != null && fab.isShown()) {
-            if(fab != null) {
-                fab.animate().translationY(320).setDuration(800L)
-                        .withEndAction(new Runnable() {
-                            @Override
-                            public void run() {
-                                fab.hide();
-                            }
-                        }).start();
-            } else {
-                fab.hide();
-            }
-        }
-    }
 
-    protected void showFabButton(FloatingActionButton fab2){
-        log("**1");
-        if (fab2 != null && !fab2.isShown()) {
-            log("**2");
-
-            fab2.show();
-            if(fab2 != null) {
-                log("**3");
-
-                fab2.animate().translationY(-320).setDuration(800L).start();
-                fab2.setVisibility(View.VISIBLE);
-            }
-        }
-    }*/
-
-    /********/
     @Override public void onPause(){
         super.onPause();
         if (camera != null) {
             camera.stopPreview();
         }
     }
-    /*******/
 
     @Override
     protected void onResume() {
@@ -740,7 +703,6 @@ int var1=0;
 
         ((MegaApplication) getApplication()).sendSignalPresenceActivity();
     }
-    /********/
     @Override public void onDestroy(){
         super.onDestroy();
         if (camera != null) {
@@ -749,7 +711,6 @@ int var1=0;
             camera = null;
         }
     }
-    /********/
 
 
     @Override
@@ -762,13 +723,11 @@ int var1=0;
 //		}
         super.onBackPressed();
     }
-/****************************************/
 
 
     private void start_camera() {
 
 
-        /*****/
 
         int cameraCount = 0;
         Camera.CameraInfo cameraInfo = new Camera.CameraInfo();
@@ -782,7 +741,6 @@ int var1=0;
                 }
             }
         }
-        /****/
 
 
         Camera.Parameters param;
@@ -791,13 +749,13 @@ int var1=0;
         param.setPreviewSize(176, 144);
         camera.setParameters(param);
         try {
-            /*Display display = ((WindowManager)getSystemService(WINDOW_SERVICE)).getDefaultDisplay();
+            //Display display = ((WindowManager)getSystemService(WINDOW_SERVICE)).getDefaultDisplay();
 
-            if(display.getRotation() == Surface.ROTATION_0) {
-                camera.setDisplayOrientation(90);
-            }else if(display.getRotation() == Surface.ROTATION_270) {
-                camera.setDisplayOrientation(180);
-            }*/
+            //  if(display.getRotation() == Surface.ROTATION_0) {
+            //     camera.setDisplayOrientation(90);
+            // }else if(display.getRotation() == Surface.ROTATION_270) {
+            //      camera.setDisplayOrientation(180);
+            //   }
             camera.setDisplayOrientation(90);
 
             camera.setPreviewDisplay(surfaceHolder);
@@ -810,31 +768,6 @@ int var1=0;
     }
 
 
-    /*public static void setCameraDisplayOrientation(Activity activity,
-                                                   int cameraId, android.hardware.Camera camera) {
-        android.hardware.Camera.CameraInfo info =
-                new android.hardware.Camera.CameraInfo();
-        android.hardware.Camera.getCameraInfo(cameraId, info);
-        int rotation = activity.getWindowManager().getDefaultDisplay()
-                .getRotation();
-        int degrees = 0;
-        switch (rotation) {
-            case Surface.ROTATION_0: degrees = 0; break;
-            case Surface.ROTATION_90: degrees = 90; break;
-            case Surface.ROTATION_180: degrees = 180; break;
-            case Surface.ROTATION_270: degrees = 270; break;
-        }
-
-        int result;
-        if (info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
-            result = (info.orientation + degrees) % 360;
-            result = (360 - result) % 360;  // compensate the mirror
-        } else {  // back-facing
-            result = (info.orientation - degrees + 360) % 360;
-        }
-        camera.setDisplayOrientation(result);
-    }*/
-//************************************/
 
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
@@ -851,48 +784,47 @@ int var1=0;
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {}
 
-    private Bitmap getRoundedCornerBitmap(Bitmap bitmap){
+    //  private Bitmap getRoundedCornerBitmap(Bitmap bitmap){
 
-        int w = bitmap.getWidth();
-        int h = bitmap.getHeight();
-        int radius = 40;
+    //     int w = bitmap.getWidth();
+    //    int h = bitmap.getHeight();
+    //     int radius = 40;
 
-        Bitmap output = Bitmap.createBitmap(w,h,Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(output);
+    //   Bitmap output = Bitmap.createBitmap(w,h,Bitmap.Config.ARGB_8888);
+    //    Canvas canvas = new Canvas(output);
 
-        final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        final RectF rectF = new RectF(0,0,w,h);
+    //    final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    //    final RectF rectF = new RectF(0,0,w,h);
 
-        canvas.drawRoundRect(rectF,radius,radius,paint);
-        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
-        canvas.drawBitmap(bitmap, null, rectF, paint);
+    //    canvas.drawRoundRect(rectF,radius,radius,paint);
+    //   paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
+    //  canvas.drawBitmap(bitmap, null, rectF, paint);
 
 
-        return output;
-    }
+    //    return output;
+    // }
 
-    public static Bitmap getRoundedCroppedBitmap(Bitmap bitmap) {
-        int radius=40;
+    // public static Bitmap getRoundedCroppedBitmap(Bitmap bitmap) {
+    //     int radius=40;
 
-        Bitmap output = Bitmap.createBitmap(bitmap.getWidth(),
-                bitmap.getHeight(), Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(output);
+    //   Bitmap output = Bitmap.createBitmap(bitmap.getWidth(),
+    //          bitmap.getHeight(), Bitmap.Config.ARGB_8888);
+    //   Canvas canvas = new Canvas(output);
 
-        final Paint paint = new Paint();
-        final Rect rect = new Rect(0, 0, bitmap.getWidth(),
-                bitmap.getHeight());
+    //   final Paint paint = new Paint();
+    //   final Rect rect = new Rect(0, 0, bitmap.getWidth(),bitmap.getHeight());
 
-        paint.setAntiAlias(true);
-        paint.setFilterBitmap(true);
-        paint.setDither(true);
-        canvas.drawARGB(0, 0, 0, 0);
-        paint.setColor(Color.parseColor("#BAB399"));
-        canvas.drawCircle(bitmap.getWidth()/2, bitmap.getHeight()/2, radius, paint);
-        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
-        canvas.drawBitmap(bitmap, rect, rect, paint);
+    //    paint.setAntiAlias(true);
+    //  paint.setFilterBitmap(true);
+    //  paint.setDither(true);
+    //  canvas.drawARGB(0, 0, 0, 0);
+    //  paint.setColor(Color.parseColor("#BAB399"));
+    //  canvas.drawCircle(bitmap.getWidth()/2, bitmap.getHeight()/2, radius, paint);
+    //  paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
+    //  canvas.drawBitmap(bitmap, rect, rect, paint);
 
-        return output;
-    }
+//        return output;
+    //  }
 
 
 }
