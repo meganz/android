@@ -281,6 +281,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         et_user.setLayoutParams(textParamsEditText);
 
         et_user.setCursorVisible(true);
+        et_user.getBackground().clearColorFilter();
 
         et_user.addTextChangedListener(new TextWatcher() {
             @Override
@@ -320,6 +321,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         et_password.setLayoutParams(textParamsEditText);
 
         et_password.setCursorVisible(true);
+        et_password.getBackground().clearColorFilter();
 
         et_password.setOnEditorActionListener(new TextView.OnEditorActionListener() {
 
@@ -1957,10 +1959,62 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         params.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleHeightPx(20, outMetrics), Util.scaleWidthPx(17, outMetrics), 0);
 
+        LinearLayout.LayoutParams params1 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        params1.setMargins(Util.scaleWidthPx(20, outMetrics), 0, Util.scaleWidthPx(17, outMetrics), 0);
+
         final EditText input = new EditText(context);
         layout.addView(input, params);
 
+        final RelativeLayout error_layout = new RelativeLayout(context);
+        layout.addView(error_layout, params1);
+
+        final ImageView error_icon = new ImageView(context);
+        error_icon.setImageDrawable(context.getDrawable(R.drawable.ic_input_warning));
+        error_layout.addView(error_icon);
+        RelativeLayout.LayoutParams params_icon = (RelativeLayout.LayoutParams) error_icon.getLayoutParams();
+
+        params_icon.width = Util.scaleWidthPx(24, outMetrics);
+        params_icon.height = Util.scaleHeightPx(24, outMetrics);
+        params_icon.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+        error_icon.setLayoutParams(params_icon);
+
+        error_icon.setColorFilter(ContextCompat.getColor(context, R.color.login_warning));
+
+        final TextView textError = new TextView(context);
+        error_layout.addView(textError);
+        RelativeLayout.LayoutParams params_text_error = (RelativeLayout.LayoutParams) textError.getLayoutParams();
+        params_text_error.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+        params_text_error.width = ViewGroup.LayoutParams.WRAP_CONTENT;
+        params_text_error.addRule(RelativeLayout.ALIGN_PARENT_TOP);
+        params_text_error.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+        params_text_error.setMargins(Util.scaleWidthPx(5, outMetrics), 0,0,0);
+        textError.setLayoutParams(params_text_error);
+
+        textError.setTextColor(ContextCompat.getColor(context, R.color.login_warning));
+
+        error_layout.setVisibility(View.GONE);
+
 //		input.setId(EDIT_TEXT_ID);
+        input.getBackground().clearColorFilter();
+        input.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                if(error_layout.getVisibility() == View.VISIBLE){
+                    error_layout.setVisibility(View.GONE);
+                    input.getBackground().clearColorFilter();
+                }
+            }
+        });
         input.setSingleLine();
         input.setHint(getString(R.string.edit_text_insert_mail));
         input.setTextColor(getResources().getColor(R.color.text_secondary));
@@ -1977,7 +2031,10 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     String emailError = Util.getEmailError(value, context);
                     if (emailError != null) {
                         log("mail incorrect");
-                        input.setError(emailError);
+//                        input.setError(emailError);
+                        input.getBackground().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_IN);
+                        textError.setText(emailError);
+                        error_layout.setVisibility(View.VISIBLE);
                         input.requestFocus();
                     } else {
                         if(reset){
@@ -2053,7 +2110,11 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 String emailError = Util.getEmailError(value, context);
                 if (emailError != null) {
                     log("mail incorrect");
-                    input.setError(emailError);
+//                    input.setError(emailError);
+                    input.getBackground().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_IN);
+                    textError.setText(emailError);
+                    error_layout.setVisibility(View.VISIBLE);
+                    input.requestFocus();
                 } else {
                     if(reset){
                         log("ask for link to reset pass");
