@@ -260,10 +260,15 @@ public class ContactsFragmentLollipop extends Fragment{
 	/*
 	 * Clear all selected items
 	 */
-	private void clearSelections() {
+	public void clearSelections() {
 		if(adapter.isMultipleSelect()){
 			adapter.clearSelections();
 		}
+	}
+
+	public void clearSelectionsNoAnimations() {
+		adapter.clearSelectionsNoAnimations();
+
 	}
 	
 	private void updateActionModeTitle() {
