@@ -32,7 +32,7 @@
             android:id="@+id/cell_photosync_grid_title_thumbnail"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:scaleType="fitCenter"
+            android:scaleType="centerCrop"
             android:background="@color/blue"
             android:adjustViewBounds="true"/>
 
