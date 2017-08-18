@@ -315,7 +315,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 				}
 				else{
 					createFolder(value);
-					renameDialog.dismiss();
+					newFolderDialog.dismiss();
 				}
 			}
 		});
