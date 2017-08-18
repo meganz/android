@@ -1957,7 +1957,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 		params_text_error.width = ViewGroup.LayoutParams.WRAP_CONTENT;
 		params_text_error.addRule(RelativeLayout.ALIGN_PARENT_TOP);
 		params_text_error.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
-		params_text_error.setMargins(Util.scaleWidthPx(5, outMetrics), 0,0,0);
+		params_text_error.setMargins(Util.scaleWidthPx(3, outMetrics), 0,0,0);
 		textError.setLayoutParams(params_text_error);
 
 		textError.setTextColor(ContextCompat.getColor(FileInfoActivityLollipop.this, R.color.login_warning));
