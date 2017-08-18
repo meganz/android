@@ -1973,8 +1973,8 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         error_layout.addView(error_icon);
         RelativeLayout.LayoutParams params_icon = (RelativeLayout.LayoutParams) error_icon.getLayoutParams();
 
-        params_icon.width = Util.scaleWidthPx(24, outMetrics);
-        params_icon.height = Util.scaleHeightPx(24, outMetrics);
+        params_icon.width = 80;
+        params_icon.height = 80;
         params_icon.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
         error_icon.setLayoutParams(params_icon);
 
@@ -2098,7 +2098,12 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 }
             }
         });
-        builder.setNegativeButton(getString(android.R.string.cancel), null);
+        builder.setNegativeButton(getString(android.R.string.cancel), new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                input.getBackground().clearColorFilter();
+            }
+        });
         builder.setView(layout);
         insertMailDialog = builder.create();
         insertMailDialog.show();
