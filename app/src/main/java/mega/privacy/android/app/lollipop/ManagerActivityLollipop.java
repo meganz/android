@@ -2677,7 +2677,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		params_text_error_firtName.width = ViewGroup.LayoutParams.WRAP_CONTENT;
 		params_text_error_firtName.addRule(RelativeLayout.ALIGN_PARENT_TOP);
 		params_text_error_firtName.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
-		params_text_error_firtName.setMargins(Util.scaleWidthPx(5, outMetrics), 0,0,0);
+		params_text_error_firtName.setMargins(Util.scaleWidthPx(3, outMetrics), 0,0,0);
 		textError_firtName.setLayoutParams(params_text_error_firtName);
 
 		textError_firtName.setTextColor(ContextCompat.getColor(ManagerActivityLollipop.this, R.color.login_warning));
@@ -2710,7 +2710,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		params_text_error_lastName.width = ViewGroup.LayoutParams.WRAP_CONTENT;
 		params_text_error_lastName.addRule(RelativeLayout.ALIGN_PARENT_TOP);
 		params_text_error_lastName.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
-		params_text_error_lastName.setMargins(Util.scaleWidthPx(5, outMetrics), 0,0,0);
+		params_text_error_lastName.setMargins(Util.scaleWidthPx(3, outMetrics), 0,0,0);
 		textError_lastName.setLayoutParams(params_text_error_lastName);
 
 		textError_lastName.setTextColor(ContextCompat.getColor(ManagerActivityLollipop.this, R.color.login_warning));
@@ -2743,7 +2743,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		params_text_error_email.width = ViewGroup.LayoutParams.WRAP_CONTENT;
 		params_text_error_email.addRule(RelativeLayout.ALIGN_PARENT_TOP);
 		params_text_error_email.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
-		params_text_error_email.setMargins(Util.scaleWidthPx(5, outMetrics), 0,0,0);
+		params_text_error_email.setMargins(Util.scaleWidthPx(3, outMetrics), 0,0,0);
 		textError_email.setLayoutParams(params_text_error_email);
 
 		textError_email.setTextColor(ContextCompat.getColor(ManagerActivityLollipop.this, R.color.login_warning));
@@ -8524,7 +8524,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		params_text_error.width = ViewGroup.LayoutParams.WRAP_CONTENT;
 		params_text_error.addRule(RelativeLayout.ALIGN_PARENT_TOP);
 		params_text_error.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
-		params_text_error.setMargins(Util.scaleWidthPx(5, outMetrics), 0,0,0);
+		params_text_error.setMargins(Util.scaleWidthPx(3, outMetrics), 0,0,0);
 		textError.setLayoutParams(params_text_error);
 
 		textError.setTextColor(ContextCompat.getColor(ManagerActivityLollipop.this, R.color.login_warning));
@@ -9194,7 +9194,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		params_text_error.width = ViewGroup.LayoutParams.WRAP_CONTENT;
 		params_text_error.addRule(RelativeLayout.ALIGN_PARENT_TOP);
 		params_text_error.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
-		params_text_error.setMargins(Util.scaleWidthPx(5, outMetrics), 0,0,0);
+		params_text_error.setMargins(Util.scaleWidthPx(3, outMetrics), 0,0,0);
 		textError.setLayoutParams(params_text_error);
 
 		textError.setTextColor(ContextCompat.getColor(ManagerActivityLollipop.this, R.color.login_warning));
@@ -9751,7 +9751,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		params_text_error.width = ViewGroup.LayoutParams.WRAP_CONTENT;
 		params_text_error.addRule(RelativeLayout.ALIGN_PARENT_TOP);
 		params_text_error.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
-		params_text_error.setMargins(Util.scaleWidthPx(5, outMetrics), 0,0,0);
+		params_text_error.setMargins(Util.scaleWidthPx(3, outMetrics), 0,0,0);
 		textError_email.setLayoutParams(params_text_error);
 
 		textError_email.setTextColor(ContextCompat.getColor(ManagerActivityLollipop.this, R.color.login_warning));
