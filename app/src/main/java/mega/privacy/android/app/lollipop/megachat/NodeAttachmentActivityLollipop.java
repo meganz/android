@@ -451,11 +451,6 @@ public class NodeAttachmentActivityLollipop extends PinActivityLollipop implemen
 		startActivityForResult(intent, Constants.REQUEST_CODE_IMPORT_CHAT_NODE_LIST);
 	}
 
-	public void revoke(){
-		log("revoke");
-		megaChatApi.revokeAttachment(chatId,selectedNode.getHandle(),this);
-	}
-
 	@Override
 	protected void onPause() {
     	nodeAttachmentActivity = null;
@@ -886,37 +881,6 @@ public class NodeAttachmentActivityLollipop extends PinActivityLollipop implemen
 	
 	ArrayList<Long> handleListM = new ArrayList<Long>();
 
-	public void itemClick(int position) {
-		((MegaApplication) getApplication()).sendSignalPresenceActivity();
-
-		if (adapterList.isMultipleSelect()){
-			log("multiselect ON");
-//			adapterList.toggleSelection(position);
-//
-//			List<MegaNode> selectedNodes = adapterList.getSelectedNodes();
-//			if (selectedNodes.size() > 0){
-//				updateActionModeTitle();
-//			}
-		}
-		else{
-			MegaNode node = nodes.get(position);
-
-			if(node.hasPreview()){
-				log("Show full screen viewer");
-				Intent intent = new Intent(this, ChatFullScreenImageViewer.class);
-				intent.putExtra("position", position);
-				intent.putExtra("chatId", chatId);
-				long [] messagesIds = {message.getMessage().getMsgId()};
-				intent.putExtra("messageIds", messagesIds);
-				startActivity(intent);
-			}
-			else{
-				log("the node has no preview");
-//				showNodeAttachmentBottomSheet(message, position);
-			}
-		}
-	}
-
 	@Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -949,39 +913,6 @@ public class NodeAttachmentActivityLollipop extends PinActivityLollipop implemen
 		ArrayList<Long> handleList = new ArrayList<Long>();
 		handleList.add(selectedNode.getHandle());
 //		onFileClick(handleList);
-	}
-
-	public void showConfirmationDeleteNode(final long chatId, final long nodeHandle){
-		log("showConfirmationDeleteNode");
-
-		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				switch (which){
-					case DialogInterface.BUTTON_POSITIVE:
-						ChatController cC = new ChatController(nodeAttachmentActivity);
-						cC.deleteNodeAttachment(chatId, nodeHandle);
-						break;
-
-					case DialogInterface.BUTTON_NEGATIVE:
-						//No button clicked
-						break;
-				}
-			}
-		};
-
-		android.support.v7.app.AlertDialog.Builder builder;
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-			builder = new android.support.v7.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-		}
-		else{
-			builder = new android.support.v7.app.AlertDialog.Builder(this);
-		}
-
-		builder.setMessage(R.string.confirmation_delete_one_attachment);
-
-		builder.setPositiveButton(R.string.context_remove, dialogClickListener)
-				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
 	}
 
 	@Override

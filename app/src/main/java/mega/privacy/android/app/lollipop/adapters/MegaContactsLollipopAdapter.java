@@ -1,5 +1,7 @@
 package mega.privacy.android.app.lollipop.adapters;
 
+import android.animation.Animator;
+import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -64,20 +66,20 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 	public static final int ITEM_VIEW_TYPE_GRID = 1;
 	public static final int ITEM_VIEW_TYPE_LIST_ADD_CONTACT = 2;
 
-	Context context;
-	int positionClicked;
-	ArrayList<MegaContactAdapter> contacts;
-	ImageView emptyImageViewFragment;
-	TextView emptyTextViewFragment;
-	RecyclerView listFragment;
-	MegaApiAndroid megaApi;
-	MegaChatApiAndroid megaChatApi;
-	boolean multipleSelect;
-	DatabaseHandler dbH = null;
+	private Context context;
+	private int positionClicked;
+	private ArrayList<MegaContactAdapter> contacts;
+	private ImageView emptyImageViewFragment;
+	private TextView emptyTextViewFragment;
+	private RecyclerView listFragment;
+	private MegaApiAndroid megaApi;
+	private MegaChatApiAndroid megaChatApi;
+	private boolean multipleSelect;
+	private DatabaseHandler dbH = null;
 	private SparseBooleanArray selectedItems;
-	ContactsFragmentLollipop fragment;
-	int adapterType;
-	SparseBooleanArray selectedContacts;
+	private ContactsFragmentLollipop fragment;
+	private int adapterType;
+	private SparseBooleanArray selectedContacts;
 	
 	private class UserAvatarListenerList implements MegaRequestListenerInterface{
 
@@ -336,19 +338,19 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 				int userStatus = megaChatApi.getUserOnlineStatus(contact.getMegaUser().getHandle());
 				if(userStatus == MegaChatApi.STATUS_ONLINE){
 					log("This user is connected");
-					holder.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_online));
+					holder.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_online_grid));
 				}
 				else if(userStatus == MegaChatApi.STATUS_AWAY){
 					log("This user is away");
-					holder.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_away));
+					holder.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_away_grid));
 				}
 				else if(userStatus == MegaChatApi.STATUS_BUSY){
 					log("This user is busy");
-					holder.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_busy));
+					holder.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_busy_grid));
 				}
 				else{
 					log("This user status is: "+userStatus);
-					holder.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_offline));
+					holder.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_offline_grid));
 				}
 			}
 		}
@@ -829,59 +831,75 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 		}
 	}
 
-	public void toggleAllSelection(int pos) {
-		log("toggleSelection: "+pos);
-		final int positionToflip = pos;
-
-		if (selectedItems.get(pos, false)) {
-			log("delete pos: "+pos);
-			selectedItems.delete(pos);
-		}
-		else {
-			log("PUT pos: "+pos);
-			selectedItems.put(pos, true);
-		}
-
-		if (adapterType == MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST){
-			log("adapter type is LIST");
-			MegaContactsLollipopAdapter.ViewHolderContactsList view = (MegaContactsLollipopAdapter.ViewHolderContactsList) listFragment.findViewHolderForLayoutPosition(pos);
-			if(view!=null){
-				log("Start animation: "+pos);
-				Animation flipAnimation = AnimationUtils.loadAnimation(context, R.anim.multiselect_flip);
-				flipAnimation.setAnimationListener(new Animation.AnimationListener() {
-					@Override
-					public void onAnimationStart(Animation animation) {
-
-					}
-
-					@Override
-					public void onAnimationEnd(Animation animation) {
-						if (selectedItems.size() <= 0){
-							((ContactsFragmentLollipop) fragment).hideMultipleSelect();
-						}
-						notifyItemChanged(positionToflip);
-					}
-
-					@Override
-					public void onAnimationRepeat(Animation animation) {
-
-					}
-				});
-				view.imageView.startAnimation(flipAnimation);
-			}
-			else{
-				log("NULL view pos: "+positionToflip);
-				notifyItemChanged(pos);
-			}
-		}
-		else {
-			log("adapter type is GRID");
-			if (selectedItems.size() <= 0){
-				((ContactsFragmentLollipop) fragment).hideMultipleSelect();
-			}
-			notifyItemChanged(positionToflip);
-		}
-	}
+//	public void toggleAllSelection(int pos) {
+//		log("toggleAllSelection: "+pos);
+//		final int positionToflip = pos;
+//
+//		if (selectedItems.get(pos, false)) {
+//			log("delete pos: "+pos);
+//			selectedItems.delete(pos);
+//		}
+//		else {
+//			log("PUT pos: "+pos);
+//			selectedItems.put(pos, true);
+//		}
+//		notifyItemChanged(positionToflip);
+//
+//		if (adapterType == MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST){
+//			log("adapter type is LIST");
+//			MegaContactsLollipopAdapter.ViewHolderContactsList view = (MegaContactsLollipopAdapter.ViewHolderContactsList) listFragment.findViewHolderForLayoutPosition(pos);
+//			if(view!=null){
+//				log("Start animation: "+pos);
+////				Animation flipAnimation = AnimationUtils.loadAnimation(context, R.anim.multiselect_flip);
+//
+////				view.imageView.startAnimation(flipAnimation);
+//				ObjectAnimator imageViewObjectAnimator = ObjectAnimator.ofFloat(view.imageView ,
+//						"rotationY", 360f, 0f);
+//				imageViewObjectAnimator.setDuration(500);
+//
+//				imageViewObjectAnimator.addListener(new Animator.AnimatorListener() {
+//					@Override
+//					public void onAnimationStart(Animator animation) {
+//						log("START animation--");
+//					}
+//
+//					@Override
+//					public void onAnimationEnd(Animator animation) {
+//						if (selectedItems.size() <= 0){
+//							log("Force hideMultiselect");
+//							((ContactsFragmentLollipop) fragment).hideMultipleSelect();
+//						}
+//						log("END animation--");
+//
+//					}
+//
+//					@Override
+//					public void onAnimationCancel(Animator animation) {
+//
+//					}
+//
+//					@Override
+//					public void onAnimationRepeat(Animator animation) {
+//
+//					}
+//				});
+//
+//				imageViewObjectAnimator.start();
+//			}
+//			else{
+//				log("NULL view pos: "+positionToflip);
+//                log("multiselect: "+isMultipleSelect());
+//				notifyItemChanged(pos);
+//			}
+//		}
+//		else {
+//			log("adapter type is GRID");
+//			if (selectedItems.size() <= 0){
+//				((ContactsFragmentLollipop) fragment).hideMultipleSelect();
+//			}
+//			notifyItemChanged(positionToflip);
+//		}
+//	}
 	
 	public void toggleSelection(int pos) {
 		log("toggleSelection");
@@ -943,13 +961,26 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 		log("clearSelections");
 		for (int i= 0; i<this.getItemCount();i++){
 			if(isItemChecked(i)){
-				toggleAllSelection(i);
+				toggleSelection(i);
 			}
 		}
 	}
-	
+
+	public void clearSelectionsNoAnimations() {
+		log("clearSelections");
+		for (int i= 0; i<this.getItemCount();i++){
+			if(isItemChecked(i)){
+				selectedItems.delete(i);
+				notifyItemChanged(i);
+			}
+		}
+	}
+
 	private boolean isItemChecked(int position) {
-        return selectedItems.get(position);
+		if(selectedItems!=null){
+			return selectedItems.get(position);
+		}
+		return false;
     }
 
 	public int getSelectedItemCount() {
@@ -1129,19 +1160,19 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 
 				if(state == MegaChatApi.STATUS_ONLINE){
 					log("This user is connected");
-					holderGrid.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_online));
+					holderGrid.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_online_grid));
 				}
 				else if(state == MegaChatApi.STATUS_AWAY){
 					log("This user is away");
-					holderGrid.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_away));
+					holderGrid.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_away_grid));
 				}
 				else if(state == MegaChatApi.STATUS_BUSY){
 					log("This user is busy");
-					holderGrid.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_busy));
+					holderGrid.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_busy_grid));
 				}
 				else{
 					log("This user status is: "+state);
-					holderGrid.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_offline));
+					holderGrid.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_offline_grid));
 				}
 
 			}
@@ -1150,9 +1181,6 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 				notifyItemChanged(position);
 			}
 		}
-//		else if (adapterType == MegaContactsLollipopAdapter.ITEM_VIEW_TYPE_GRID){
-//			holderGrid = (ViewHolderContactsGrid) listFragment.findViewHolderForAdapterPosition(position);
-//		}
 	}
 
 	/*public void startOneToOneChat(MegaUser user){
