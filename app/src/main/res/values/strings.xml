@@ -2,9 +2,9 @@
 <resources>
 
     <string name="app_name" context="Not translate">MEGA</string>
-    <string name="app_version" context="Not translate">3.2.2 (145)</string>
+    <string name="app_version" context="Not translate">3.2.2 (148)</string>
     <string name="sdk_version" context="Not translate">57a6ee2</string>
-    <string name="karere_version" context="Not translate">4b08d6c</string>
+    <string name="karere_version" context="Not translate">3eaeba7</string>
     <!--
     <string name="full_description_text" context="Full description text of the app in the Google Play page of the app">MEGA is a secure cloud storage service that gives you 50 GB free storage space. Unlike other cloud storage providers, your data is encrypted and decrypted by your client devices only and never by us.\nUpload your files from your smartphone or tablet then search, store, download, stream, view, share, rename or delete your files any time, from any device, anywhere. Share folders with your contacts and see their updates in real time.\nThe encryption process means we cannot access or reset your password so you MUST remember it (unless you have your Master Key backed up) or you will lose access to your stored files.\nInside the app you can upgrade your storage space and transfer quota quota with a monthly or yearly subscription.\nPRO LITE subscription: 4.99 € per month or 49.99 € per year gives you 200 GB of storage space and 1 TB of transfer quota per month.\nPRO I subscription: 9.99 € per month or 99.99 € per year gives you 500 GB of storage space and 2 TB of transfer quota per month.\nPRO II subscription: 19.99 € per month or 199.99 € per year gives you 2 TB of storage space and 4 TB of transfer quota per month.\nPRO III subscription: 29.99 € per month or 299.99 € per year gives you 4 TB of storage space and 8 TB of transfer quota per month.\nSubscriptions are renewed automatically for successive subscription periods of the same duration and at the same price as the initial period chosen. To manage your subscriptions, simply click on the Play Store icon on your handset, sign in with your Google ID (if you haven\'t already done so) and then click on the MEGA app. You\'ll be able to manage your subscription there.\nFor more info, please check our website: \n https://mega.nz/mobile_terms.html \n https://mega.nz/mobile_privacy.html \nNew Terms of Service apply effective from 20 February 2016. See https://mega.nz/TermsOfService2016.pdf \n Note: For desktop access to your files Mega needs to use HTML5 compatible browsers to handle our advanced features. We recommend Mozilla Firefox and Google Chrome. However the mobile versions of browsers cannot access the Mega cloud storage system.</string>
     -->
@@ -81,13 +81,13 @@
     <string name="confirmation_add_contact" context="confirmation message before sending an invitation to a contact">Do you want to send an invitation to %s?</string>
     <!--
     <string name="confirmation_remove_multiple_contacts" context="confirmation message before removing mutiple contacts">Remove these %d contacts?</string>
-    -->
+
     <string name="confirmation_move_to_rubbish" context="confirmation message before removing a file">Move to rubbish bin?</string>
     <string name="confirmation_move_to_rubbish_plural" context="confirmation message before removing a file">Move to rubbish bin?</string>
+
     <string name="confirmation_delete_from_mega" context="confirmation message before removing a file">Delete from MEGA?</string>
     <string name="confirmation_leave_share_folder" context="confirmation message before leaving an incoming shared folder">If you leave the folder, you will not be able to see it again</string>
 
-    <!--
     <string name="confirmation_alert" context="confirmation message before removing a file">Please confirm</string>
     -->
 
@@ -788,18 +788,18 @@
 
     <string name="sortby_owner_mail" context="category in sort by action">Owner\'s E-mail</string>
     <string name="sortby_name" context="category in sort by action">Name</string>
-    <string name="sortby_name_ascending" context="sort files alphabetically ascending">ascending</string>
-    <string name="sortby_name_descending" context="sort files alphabetically descending">descending</string>
+    <string name="sortby_name_ascending" context="sort files alphabetically ascending">Ascending</string>
+    <string name="sortby_name_descending" context="sort files alphabetically descending">Descending</string>
 
     <string name="sortby_date" context="category in sort by action">Date</string>
     <string name="sortby_creation_date" context="category in sort by action">Creation Date</string>
     <string name="sortby_modification_date" context="category in sort by action">Modification Date</string>
-    <string name="sortby_date_newest" context="sort files by date newest first">newest</string>
-    <string name="sortby_date_oldest" context="sort files by date oldest first">oldest</string>
+    <string name="sortby_date_newest" context="sort files by date newest first">Newest</string>
+    <string name="sortby_date_oldest" context="sort files by date oldest first">Oldest</string>
 
     <string name="sortby_size" context="category in sort by action">Size</string>
-    <string name="sortby_size_largest_first" context="sort files by size largest first">largest</string>
-    <string name="sortby_size_smallest_first" context="sort files by size smallest first">smallest</string>
+    <string name="sortby_size_largest_first" context="sort files by size largest first">Largest</string>
+    <string name="sortby_size_smallest_first" context="sort files by size smallest first">Smallest</string>
 
     <string name="per_month" context="in payments, for example: 4.99€ per month">per month</string>
     <string name="per_year" context="in payments, for example: 49.99€ per year">per year</string>
@@ -1084,7 +1084,6 @@
     <string name="general_mute" context="button">Mute</string>
     <string name="general_unmute" context="button">Unmute</string>
 
-    <string name="title_properties_contact_notifications_for_chat" context="Title of the section to enable notifications in the Contact Properties screen">Chat notifications</string>
     <string name="title_properties_chat_contact_notifications" context="Title of the section to enable notifications in the Contact Properties screen">Notifications</string>
     <string name="title_properties_chat_contact_message_sound" context="Title of the section to choose the sound of incoming messages in the Contact Properties screen">Message sound</string>
     <string name="title_properties_chat_clear_chat" context="Title of the section to clear the chat content in the Contact Properties screen">Clear chat</string>
@@ -1484,7 +1483,7 @@
 
     <string name="confirmation_delete_one_attachment" context="Confirmation before deleting one attachment">Remove attachment?</string>
 
-    <string name="general_view_with_revoke" formatted="false" context="Menu option">View files (%1d deleted)</string>
+    <string name="general_view_with_revoke" formatted="false" context="Menu option">View files (%1$d deleted)</string>
 
     <string name="error_attaching_node_from_cloud" context="Error message when the attachment cannot be sent">Error. The file has not been sent</string>
     <string name="error_revoking_node" context="Error message when the attachment cannot be revoked">Error. The attachment has not been removed</string>
@@ -1498,5 +1497,23 @@
     <string name="title_incoming_folder_notification" context="title of incoming shared folder notification">New shared folder</string>
     <string name="title_contact_request_notification" context="title of contact request notification">New contact request</string>
 
+    <string name="title_properties_chat_clear" context="Title of the section to clear the chat content in the Contact Properties screen">Clear chat history</string>
+    <string name="title_properties_remove_contact" context="Title of the section to remove contact in the Contact Properties screen">Remove contact</string>
+
+    <string name="title_properties_chat_notifications_contact" context="Title of the section to enable notifications in the Contact Properties screen">Chat notifications</string>
     <string name="history_cleared_by" context="Text shown when the chat history was cleared by someone"><![CDATA[<font color=\'#060000\'>%1$s</font><font color=\'#00BFA5\'> cleared the chat history</font>]]></string>
+
+    <string name="number_messages_chat_notification" formatted="false" context="messages string in chat notification">%1$d unread chats</string>
+
+    <string name="context_permissions_changing_folder" context="Item menu option upon clicking on one or multiple files.">Changing permissions</string>
+    <string name="context_removing_contact_folder" context="Item menu option upon clicking on one or multiple files.">Removing contact from shared folder</string>
+
+    <string name="confirmation_move_to_rubbish" context="confirmation message before removing a file">Move to rubbish bin?</string>
+    <string name="confirmation_move_to_rubbish_plural" context="confirmation message before removing a file">Move to rubbish bin?</string>
+    <string name="confirmation_delete_from_mega" context="confirmation message before removing a file">Delete from MEGA?</string>
+    <string name="confirmation_leave_share_folder" context="confirmation message before leaving an incoming shared folder">If you leave the folder, you will not be able to see it again</string>
+    <string name="attachment_uploading_state">Uploading...</string>
+
+    <string name="title_properties_contact_notifications_for_chat" context="Title of the section to enable notifications in the Contact Properties screen">Chat notifications</string>
+
 </resources>

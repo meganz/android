@@ -97,6 +97,8 @@
     <color name="status_invisible_layout">#bfbfbf</color>
 
     <color name="sliding_panel_separator">#dcdcdcdc</color>
-
     <color name="login_warning">#FFFF333A</color>
+
+    <color name="transparent_transparent_black">#35000000</color>
+
 </resources>
