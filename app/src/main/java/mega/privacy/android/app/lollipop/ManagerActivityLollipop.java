@@ -9250,7 +9250,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				}
 				else{
 					createFolder(value);
-					renameDialog.dismiss();
+					newFolderDialog.dismiss();
 				}
 			}
 		});
