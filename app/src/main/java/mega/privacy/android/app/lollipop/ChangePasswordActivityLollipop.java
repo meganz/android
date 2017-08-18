@@ -5,13 +5,16 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
 import android.text.InputType;
+import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.MenuItem;
@@ -58,14 +61,16 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 	boolean changePassword = true;
 	
 	private EditText oldPasswordView, newPassword1View, newPassword2View;
+	private RelativeLayout oldPasswordErrorView, newPassword1ErrorView, newPassword2ErrorView;
+	private TextView oldPasswordErrorText, newPassword1ErrorText, newPassword2ErrorText;
 	private TextView changePasswordButton;
-	ImageView loginThreeDots;
-	SwitchCompat loginSwitch;
-	TextView loginABC;
-    RelativeLayout fragmentContainer;
-	TextView title;
-	String linkToReset;
-	String mk;
+	private ImageView loginThreeDots;
+	private SwitchCompat loginSwitch;
+	private TextView loginABC;
+    private RelativeLayout fragmentContainer;
+	private TextView title;
+	private String linkToReset;
+	private String mk;
 
 	private ActionBar aB;
 	Toolbar tB;
@@ -116,15 +121,116 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 		//Left margin
 		LinearLayout.LayoutParams textParams = (LinearLayout.LayoutParams)oldPasswordView.getLayoutParams();
 		textParams.setMargins(Util.scaleWidthPx(60, outMetrics), 0, 0, Util.scaleHeightPx(10, outMetrics));
-		oldPasswordView.setLayoutParams(textParams);		
+		oldPasswordView.setLayoutParams(textParams);
+
+		oldPasswordView.getBackground().clearColorFilter();
+
+		oldPasswordErrorView = (RelativeLayout) findViewById(R.id.login_oldPassword_text_error);
+		paramsb1 = oldPasswordErrorView.getLayoutParams();
+		paramsb1.width = Util.scaleWidthPx(280, outMetrics);
+		oldPasswordErrorView.setLayoutParams(paramsb1);
+		//Left margin
+		textParams = (LinearLayout.LayoutParams)oldPasswordErrorView.getLayoutParams();
+		textParams.setMargins(Util.scaleWidthPx(60, outMetrics), 0, 0, Util.scaleHeightPx(10, outMetrics));
+		oldPasswordErrorView.setLayoutParams(textParams);
+		oldPasswordErrorView.setPadding(Util.scaleWidthPx(3, outMetrics), 0, 0, 0);
+
+		oldPasswordErrorText = (TextView) findViewById(R.id.login_oldPassword_text_error_text);
+
+		oldPasswordView.addTextChangedListener(new TextWatcher() {
+			@Override
+			public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+			}
+
+			@Override
+			public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+			}
+
+			@Override
+			public void afterTextChanged(Editable editable) {
+				quitError(oldPasswordView);
+			}
+		});
 		
 		newPassword1View = (EditText) findViewById(R.id.change_password_newPassword1);
+		paramsb1 = newPassword1View.getLayoutParams();
+		paramsb1.width = Util.scaleWidthPx(280, outMetrics);
 		newPassword1View.setLayoutParams(paramsb1);
+		textParams = (LinearLayout.LayoutParams) newPassword1View.getLayoutParams();
+		textParams.setMargins(Util.scaleWidthPx(60, outMetrics), 0, 0, Util.scaleHeightPx(10, outMetrics));
 		newPassword1View.setLayoutParams(textParams);
+
+		newPassword1View.getBackground().clearColorFilter();
+
+		newPassword1ErrorView = (RelativeLayout) findViewById(R.id.login_newPassword1_text_error);
+		paramsb1 = newPassword1ErrorView.getLayoutParams();
+		paramsb1.width = Util.scaleWidthPx(280, outMetrics);
+		newPassword1ErrorView.setLayoutParams(paramsb1);
+		//Left margin
+		textParams = (LinearLayout.LayoutParams)newPassword1ErrorView.getLayoutParams();
+		textParams.setMargins(Util.scaleWidthPx(60, outMetrics), 0, 0, Util.scaleHeightPx(10, outMetrics));
+		newPassword1ErrorView.setLayoutParams(textParams);
+		newPassword1ErrorView.setPadding(Util.scaleWidthPx(3, outMetrics), 0, 0, 0);
+
+		newPassword1ErrorText = (TextView) findViewById(R.id.login_newPassword1_text_error_text);
+
+		newPassword1View.addTextChangedListener(new TextWatcher() {
+			@Override
+			public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+			}
+
+			@Override
+			public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+			}
+
+			@Override
+			public void afterTextChanged(Editable editable) {
+				quitError(newPassword1View);
+			}
+		});
 		
 		newPassword2View = (EditText) findViewById(R.id.change_password_newPassword2);
+		paramsb1 = newPassword2View.getLayoutParams();
+		paramsb1.width = Util.scaleWidthPx(280, outMetrics);
 		newPassword2View.setLayoutParams(paramsb1);
+		textParams = (LinearLayout.LayoutParams) newPassword2View.getLayoutParams();
+		textParams.setMargins(Util.scaleWidthPx(60, outMetrics), 0, 0, Util.scaleHeightPx(10, outMetrics));
 		newPassword2View.setLayoutParams(textParams);
+
+		newPassword2View.getBackground().clearColorFilter();
+
+		newPassword2ErrorView = (RelativeLayout) findViewById(R.id.login_newPassword2_text_error);
+		paramsb1 = newPassword2ErrorView.getLayoutParams();
+		paramsb1.width = Util.scaleWidthPx(280, outMetrics);
+		newPassword2ErrorView.setLayoutParams(paramsb1);
+		//Left margin
+		textParams = (LinearLayout.LayoutParams)newPassword2ErrorView.getLayoutParams();
+		textParams.setMargins(Util.scaleWidthPx(60, outMetrics), 0, 0, Util.scaleHeightPx(10, outMetrics));
+		newPassword2ErrorView.setLayoutParams(textParams);
+		newPassword2ErrorView.setPadding(Util.scaleWidthPx(3, outMetrics), 0, 0, 0);
+
+		newPassword2ErrorText = (TextView) findViewById(R.id.login_newPassword2_text_error_text);
+
+		newPassword2View.addTextChangedListener(new TextWatcher() {
+			@Override
+			public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+			}
+
+			@Override
+			public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+			}
+
+			@Override
+			public void afterTextChanged(Editable editable) {
+				quitError(newPassword2View);
+			}
+		});
 		
 		loginThreeDots = (ImageView) findViewById(R.id.change_pass_three_dots);
 		LinearLayout.LayoutParams textThreeDots = (LinearLayout.LayoutParams)loginThreeDots.getLayoutParams();
@@ -286,7 +392,8 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 
 		if (!newPassword1.equals(newPassword2)){
 			log("no new password repeat");
-			newPassword2View.setError(getString(R.string.my_account_change_password_dont_match));
+//			newPassword2View.setError(getString(R.string.my_account_change_password_dont_match));
+			setError(newPassword2View, getString(R.string.my_account_change_password_dont_match));
 			return;
 		}
 
@@ -328,7 +435,8 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 		
 		if (!newPassword1.equals(newPassword2)){
 			log("no new password repeat");
-			newPassword2View.setError(getString(R.string.my_account_change_password_dont_match));
+//			newPassword2View.setError(getString(R.string.my_account_change_password_dont_match));
+			setError(newPassword2View, getString(R.string.my_account_change_password_dont_match));
 			return;
 		}
 		
@@ -383,9 +491,12 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 			String newPassword1Error = getNewPassword1Error();
 			String newPassword2Error = getNewPassword2Error();
 
-			oldPasswordView.setError(oldPasswordError);
-			newPassword1View.setError(newPassword1Error);
-			newPassword2View.setError(newPassword2Error);
+//			oldPasswordView.setError(oldPasswordError);
+			setError(oldPasswordView, oldPasswordError);
+//			newPassword1View.setError(newPassword1Error);
+			setError(newPassword1View, newPassword1Error);
+//			newPassword2View.setError(newPassword2Error);
+			setError(newPassword2View, newPassword2Error);
 
 			if (oldPasswordError != null) {
 				oldPasswordView.requestFocus();
@@ -404,8 +515,10 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 			String newPassword1Error = getNewPassword1Error();
 			String newPassword2Error = getNewPassword2Error();
 
-			newPassword1View.setError(newPassword1Error);
-			newPassword2View.setError(newPassword2Error);
+//			newPassword1View.setError(newPassword1Error);
+			setError(newPassword1View, newPassword1Error);
+//			newPassword2View.setError(newPassword2Error);
+			setError(newPassword2View, newPassword2Error);
 
 			if(newPassword1Error != null) {
 				newPassword1View.requestFocus();
@@ -583,6 +696,77 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 				}
 
 			}
+		}
+	}
+
+	private void setError(final EditText editText, String error){
+		log("setError");
+		if(error == null || error.equals("")){
+			return;
+		}
+		switch (editText.getId()){
+			case R.id.change_password_oldPassword:{
+				oldPasswordErrorView.setVisibility(View.VISIBLE);
+				oldPasswordErrorText.setText(error);
+				oldPasswordView.getBackground().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_IN);
+				LinearLayout.LayoutParams textParamsEditText = (LinearLayout.LayoutParams)oldPasswordView.getLayoutParams();
+				textParamsEditText.setMargins(Util.scaleWidthPx(60, outMetrics), 0, 0, 0);
+				oldPasswordView.setLayoutParams(textParamsEditText);
+			}
+			break;
+			case R.id.change_password_newPassword1:{
+				newPassword1ErrorView.setVisibility(View.VISIBLE);
+				newPassword1ErrorText.setText(error);
+				newPassword1View.getBackground().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_IN);
+				LinearLayout.LayoutParams textParamsEditText = (LinearLayout.LayoutParams) newPassword1View.getLayoutParams();
+				textParamsEditText.setMargins(Util.scaleWidthPx(60, outMetrics), 0, 0, 0);
+				newPassword1View.setLayoutParams(textParamsEditText);
+			}
+			break;
+			case R.id.change_password_newPassword2:{
+				newPassword2ErrorView.setVisibility(View.VISIBLE);
+				newPassword2ErrorText.setText(error);
+				newPassword2View.getBackground().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_IN);
+				LinearLayout.LayoutParams textParamsEditText = (LinearLayout.LayoutParams) newPassword2View.getLayoutParams();
+				textParamsEditText.setMargins(Util.scaleWidthPx(60, outMetrics), 0, 0, 0);
+				newPassword2View.setLayoutParams(textParamsEditText);
+			}
+			break;
+		}
+	}
+
+	private void quitError(EditText editText){
+		switch (editText.getId()){
+			case R.id.change_password_oldPassword:{
+				if(oldPasswordErrorView.getVisibility() != View.GONE){
+					oldPasswordErrorView.setVisibility(View.GONE);
+					oldPasswordView.getBackground().clearColorFilter();
+					LinearLayout.LayoutParams textParamsEditText = (LinearLayout.LayoutParams)oldPasswordView.getLayoutParams();
+					textParamsEditText.setMargins(Util.scaleWidthPx(60, outMetrics), 0, 0, Util.scaleWidthPx(10, outMetrics));
+					oldPasswordView.setLayoutParams(textParamsEditText);
+				}
+			}
+			break;
+			case R.id.change_password_newPassword1:{
+				if(newPassword1ErrorView.getVisibility() != View.GONE){
+					newPassword1ErrorView.setVisibility(View.GONE);
+					newPassword1View.getBackground().clearColorFilter();
+					LinearLayout.LayoutParams textParamsEditText = (LinearLayout.LayoutParams) newPassword1View.getLayoutParams();
+					textParamsEditText.setMargins(Util.scaleWidthPx(60, outMetrics), 0, 0, Util.scaleWidthPx(10, outMetrics));
+					newPassword1View.setLayoutParams(textParamsEditText);
+				}
+			}
+			break;
+			case R.id.change_password_newPassword2:{
+				if(newPassword2ErrorView.getVisibility() != View.GONE){
+					newPassword2ErrorView.setVisibility(View.GONE);
+					newPassword2View.getBackground().clearColorFilter();
+					LinearLayout.LayoutParams textParamsEditText = (LinearLayout.LayoutParams) newPassword2View.getLayoutParams();
+					textParamsEditText.setMargins(Util.scaleWidthPx(60, outMetrics), 0, 0, Util.scaleWidthPx(10, outMetrics));
+					newPassword2View.setLayoutParams(textParamsEditText);
+				}
+			}
+			break;
 		}
 	}
 

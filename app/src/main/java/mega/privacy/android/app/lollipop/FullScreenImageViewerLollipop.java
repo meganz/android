@@ -10,6 +10,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.PorterDuff;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -24,6 +25,8 @@ import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.SwitchCompat;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Display;
@@ -1306,7 +1309,13 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	}
 
 	public void showRenameDialog(){
-		
+
+		LinearLayout layout = new LinearLayout(this);
+		layout.setOrientation(LinearLayout.VERTICAL);
+		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+		params.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleHeightPx(20, outMetrics), Util.scaleWidthPx(17, outMetrics), 0);
+//	    layout.setLayoutParams(params);
+
 		final EditTextCursorWatcher input = new EditTextCursorWatcher(this, node.isFolder());
 //		input.setId(EDIT_TEXT_ID);
 		input.setSingleLine();
@@ -1315,7 +1324,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		input.setImeOptions(EditorInfo.IME_ACTION_DONE);
 
 		input.setImeActionLabel(getString(R.string.context_rename),
-				KeyEvent.KEYCODE_ENTER);
+				EditorInfo.IME_ACTION_DONE);
 		
 		input.setOnFocusChangeListener(new View.OnFocusChangeListener() {
 			@Override
@@ -1347,7 +1356,85 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			}
 		});
 
-		AlertDialog.Builder builder = Util.getCustomAlertBuilder(this, getString(R.string.context_rename) + " "	+ new String(node.getName()), null, input);
+		layout.addView(input, params);
+
+		LinearLayout.LayoutParams params1 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+		params1.setMargins(Util.scaleWidthPx(20, outMetrics), 0, Util.scaleWidthPx(17, outMetrics), 0);
+
+		final RelativeLayout error_layout = new RelativeLayout(FullScreenImageViewerLollipop.this);
+		layout.addView(error_layout, params1);
+
+		final ImageView error_icon = new ImageView(FullScreenImageViewerLollipop.this);
+		error_icon.setImageDrawable(FullScreenImageViewerLollipop.this.getDrawable(R.drawable.ic_input_warning));
+		error_layout.addView(error_icon);
+		RelativeLayout.LayoutParams params_icon = (RelativeLayout.LayoutParams) error_icon.getLayoutParams();
+
+//		params_icon.width = Util.scaleWidthPx(24, outMetrics);
+		params_icon.width = 80;
+//		params_icon.height = Util.scaleHeightPx(24, outMetrics);
+		params_icon.height = 80;
+		params_icon.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+		error_icon.setLayoutParams(params_icon);
+
+		error_icon.setColorFilter(ContextCompat.getColor(FullScreenImageViewerLollipop.this, R.color.login_warning));
+
+		final TextView textError = new TextView(FullScreenImageViewerLollipop.this);
+		error_layout.addView(textError);
+		RelativeLayout.LayoutParams params_text_error = (RelativeLayout.LayoutParams) textError.getLayoutParams();
+		params_text_error.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+		params_text_error.width = ViewGroup.LayoutParams.WRAP_CONTENT;
+		params_text_error.addRule(RelativeLayout.ALIGN_PARENT_TOP);
+		params_text_error.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+		params_text_error.setMargins(Util.scaleWidthPx(5, outMetrics), 0,0,0);
+		textError.setLayoutParams(params_text_error);
+
+		textError.setTextColor(ContextCompat.getColor(FullScreenImageViewerLollipop.this, R.color.login_warning));
+
+		error_layout.setVisibility(View.GONE);
+
+		input.getBackground().clearColorFilter();
+		input.addTextChangedListener(new TextWatcher() {
+			@Override
+			public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+			}
+
+			@Override
+			public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+			}
+
+			@Override
+			public void afterTextChanged(Editable editable) {
+				if(error_layout.getVisibility() == View.VISIBLE){
+					error_layout.setVisibility(View.GONE);
+					input.getBackground().clearColorFilter();
+				}
+			}
+		});
+
+		input.setOnEditorActionListener(new OnEditorActionListener() {
+			@Override
+			public boolean onEditorAction(TextView v, int actionId,
+										  KeyEvent event) {
+				if (actionId == EditorInfo.IME_ACTION_DONE) {
+					String value = v.getText().toString().trim();
+					if (value.length() == 0) {
+						input.getBackground().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_IN);
+						textError.setText(getString(R.string.invalid_string));
+						error_layout.setVisibility(View.VISIBLE);
+						input.requestFocus();
+						return true;
+					}
+					rename(value);
+					renameDialog.dismiss();
+					return true;
+				}
+				return false;
+			}
+		});
+
+		AlertDialog.Builder builder = Util.getCustomAlertBuilder(this, getString(R.string.context_rename) + " "	+ new String(node.getName()), null, layout);
 		builder.setPositiveButton(getString(R.string.context_rename),
 				new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int whichButton) {
@@ -1358,24 +1445,30 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 						rename(value);
 					}
 				});
-		builder.setNegativeButton(getString(android.R.string.cancel), null);
+		builder.setNegativeButton(getString(android.R.string.cancel), new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialogInterface, int i) {
+				input.getBackground().clearColorFilter();
+			}
+		});
 		renameDialog = builder.create();
 		renameDialog.show();
-
-		input.setOnEditorActionListener(new OnEditorActionListener() {
+		renameDialog.getButton(android.support.v7.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener(new   View.OnClickListener()
+		{
 			@Override
-			public boolean onEditorAction(TextView v, int actionId,
-					KeyEvent event) {
-				if (actionId == EditorInfo.IME_ACTION_DONE) {
-					renameDialog.dismiss();
-					String value = v.getText().toString().trim();
-					if (value.length() == 0) {
-						return true;
-					}
-					rename(value);
-					return true;
+			public void onClick(View v)
+			{
+				String value = input.getText().toString().trim();
+				if (value.length() == 0) {
+					input.getBackground().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_IN);
+					textError.setText(getString(R.string.invalid_string));
+					error_layout.setVisibility(View.VISIBLE);
+					input.requestFocus();
 				}
-				return false;
+				else{
+					rename(value);
+					renameDialog.dismiss();
+				}
 			}
 		});
 	}

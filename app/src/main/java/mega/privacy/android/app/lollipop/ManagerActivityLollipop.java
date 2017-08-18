@@ -18,6 +18,7 @@ import android.graphics.BitmapShader;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.PorterDuff;
 import android.graphics.Shader.TileMode;
 import android.net.Uri;
 import android.os.Build;
@@ -45,9 +46,11 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
 import android.text.Html;
 import android.text.InputType;
 import android.text.Spanned;
+import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Display;
@@ -2641,16 +2644,132 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 		LinearLayout layout = new LinearLayout(this);
 		layout.setOrientation(LinearLayout.VERTICAL);
+        layout.setNestedScrollingEnabled(true);
 		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
 		params.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleHeightPx(20, outMetrics), Util.scaleWidthPx(17, outMetrics), 0);
 
+		LinearLayout.LayoutParams params1 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+		params1.setMargins(Util.scaleWidthPx(20, outMetrics), 0, Util.scaleWidthPx(17, outMetrics), 0);
+
 		final EditText inputFirstName = new EditText(this);
+		inputFirstName.getBackground().clearColorFilter();
 		layout.addView(inputFirstName, params);
+
+		final RelativeLayout error_layout_firtName = new RelativeLayout(ManagerActivityLollipop.this);
+		layout.addView(error_layout_firtName, params1);
+
+		final ImageView error_icon_firtName = new ImageView(ManagerActivityLollipop.this);
+		error_icon_firtName.setImageDrawable(ManagerActivityLollipop.this.getDrawable(R.drawable.ic_input_warning));
+		error_layout_firtName.addView(error_icon_firtName);
+		RelativeLayout.LayoutParams params_icon_firtName = (RelativeLayout.LayoutParams) error_icon_firtName.getLayoutParams();
+
+		params_icon_firtName.width = 80;
+		params_icon_firtName.height = 80;
+		params_icon_firtName.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+		error_icon_firtName.setLayoutParams(params_icon_firtName);
+
+		error_icon_firtName.setColorFilter(ContextCompat.getColor(ManagerActivityLollipop.this, R.color.login_warning));
+
+		final TextView textError_firtName = new TextView(ManagerActivityLollipop.this);
+		error_layout_firtName.addView(textError_firtName);
+		RelativeLayout.LayoutParams params_text_error_firtName = (RelativeLayout.LayoutParams) textError_firtName.getLayoutParams();
+		params_text_error_firtName.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+		params_text_error_firtName.width = ViewGroup.LayoutParams.WRAP_CONTENT;
+		params_text_error_firtName.addRule(RelativeLayout.ALIGN_PARENT_TOP);
+		params_text_error_firtName.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+		params_text_error_firtName.setMargins(Util.scaleWidthPx(5, outMetrics), 0,0,0);
+		textError_firtName.setLayoutParams(params_text_error_firtName);
+
+		textError_firtName.setTextColor(ContextCompat.getColor(ManagerActivityLollipop.this, R.color.login_warning));
+
+		error_layout_firtName.setVisibility(View.GONE);
+
 		final EditText inputLastName = new EditText(this);
+		inputLastName.getBackground().clearColorFilter();
 		layout.addView(inputLastName, params);
+
+		final RelativeLayout error_layout_lastName = new RelativeLayout(ManagerActivityLollipop.this);
+		layout.addView(error_layout_lastName, params1);
+
+		final ImageView error_icon_lastName = new ImageView(ManagerActivityLollipop.this);
+		error_icon_lastName.setImageDrawable(ManagerActivityLollipop.this.getDrawable(R.drawable.ic_input_warning));
+		error_layout_lastName.addView(error_icon_lastName);
+		RelativeLayout.LayoutParams params_icon_lastName = (RelativeLayout.LayoutParams) error_icon_lastName.getLayoutParams();
+
+		params_icon_lastName.width = 80;
+		params_icon_lastName.height = 80;
+		params_icon_lastName.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+		error_icon_lastName.setLayoutParams(params_icon_lastName);
+
+		error_icon_lastName.setColorFilter(ContextCompat.getColor(ManagerActivityLollipop.this, R.color.login_warning));
+
+		final TextView textError_lastName = new TextView(ManagerActivityLollipop.this);
+		error_layout_lastName.addView(textError_lastName);
+		RelativeLayout.LayoutParams params_text_error_lastName = (RelativeLayout.LayoutParams) textError_lastName.getLayoutParams();
+		params_text_error_lastName.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+		params_text_error_lastName.width = ViewGroup.LayoutParams.WRAP_CONTENT;
+		params_text_error_lastName.addRule(RelativeLayout.ALIGN_PARENT_TOP);
+		params_text_error_lastName.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+		params_text_error_lastName.setMargins(Util.scaleWidthPx(5, outMetrics), 0,0,0);
+		textError_lastName.setLayoutParams(params_text_error_lastName);
+
+		textError_lastName.setTextColor(ContextCompat.getColor(ManagerActivityLollipop.this, R.color.login_warning));
+
+		error_layout_lastName.setVisibility(View.GONE);
+
 		final EditText inputMail = new EditText(this);
+		inputMail.getBackground().clearColorFilter();
 		layout.addView(inputMail, params);
 
+		final RelativeLayout error_layout_email = new RelativeLayout(ManagerActivityLollipop.this);
+		layout.addView(error_layout_email, params1);
+
+		final ImageView error_icon_email = new ImageView(ManagerActivityLollipop.this);
+		error_icon_email.setImageDrawable(ManagerActivityLollipop.this.getDrawable(R.drawable.ic_input_warning));
+		error_layout_email.addView(error_icon_email);
+		RelativeLayout.LayoutParams params_icon_email = (RelativeLayout.LayoutParams) error_icon_email.getLayoutParams();
+
+		params_icon_email.width = 80;
+		params_icon_email.height = 80;
+		params_icon_email.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+		error_icon_email.setLayoutParams(params_icon_email);
+
+		error_icon_email.setColorFilter(ContextCompat.getColor(ManagerActivityLollipop.this, R.color.login_warning));
+
+		final TextView textError_email = new TextView(ManagerActivityLollipop.this);
+		error_layout_email.addView(textError_email);
+		RelativeLayout.LayoutParams params_text_error_email = (RelativeLayout.LayoutParams) textError_email.getLayoutParams();
+		params_text_error_email.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+		params_text_error_email.width = ViewGroup.LayoutParams.WRAP_CONTENT;
+		params_text_error_email.addRule(RelativeLayout.ALIGN_PARENT_TOP);
+		params_text_error_email.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+		params_text_error_email.setMargins(Util.scaleWidthPx(5, outMetrics), 0,0,0);
+		textError_email.setLayoutParams(params_text_error_email);
+
+		textError_email.setTextColor(ContextCompat.getColor(ManagerActivityLollipop.this, R.color.login_warning));
+
+		error_layout_email.setVisibility(View.GONE);
+
+
+		inputFirstName.addTextChangedListener(new TextWatcher() {
+			@Override
+			public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+			}
+
+			@Override
+			public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+			}
+
+			@Override
+			public void afterTextChanged(Editable editable) {
+				if(error_layout_firtName.getVisibility() == View.VISIBLE){
+					error_layout_firtName.setVisibility(View.GONE);
+					inputFirstName.getBackground().clearColorFilter();
+				}
+			}
+		});
 		inputFirstName.setSingleLine();
 		inputFirstName.setText(myAccountInfo.getFirstNameText());
 		inputFirstName.setTextColor(getResources().getColor(R.color.text_secondary));
@@ -2666,17 +2785,26 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					String value = inputMail.getText().toString().trim();
 					String emailError = Util.getEmailError(value, managerActivity);
 					if (emailError != null) {
-						inputMail.setError(emailError);
+//						inputMail.setError(emailError);
+						inputMail.getBackground().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_IN);
+						textError_email.setText(emailError);
+						error_layout_email.setVisibility(View.VISIBLE);
 						inputMail.requestFocus();
 					}
 					else if(valueFirstName.equals("")||valueFirstName.isEmpty()){
 						log("input is empty");
-						inputFirstName.setError(getString(R.string.invalid_string));
+//						inputFirstName.setError(getString(R.string.invalid_string));
+						inputFirstName.getBackground().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_IN);
+						textError_firtName.setText(getString(R.string.invalid_string));
+						error_layout_firtName.setVisibility(View.VISIBLE);
 						inputFirstName.requestFocus();
 					}
 					else if(valueLastName.equals("")||valueLastName.isEmpty()){
 						log("input is empty");
-						inputLastName.setError(getString(R.string.invalid_string));
+//						inputLastName.setError(getString(R.string.invalid_string));
+						inputLastName.getBackground().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_IN);
+						textError_lastName.setText(getString(R.string.invalid_string));
+						error_layout_lastName.setVisibility(View.VISIBLE);
 						inputLastName.requestFocus();
 					}
 					else {
@@ -2695,6 +2823,25 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 		inputFirstName.setImeActionLabel(getString(R.string.title_edit_profile_info),EditorInfo.IME_ACTION_DONE);
 
+		inputLastName.addTextChangedListener(new TextWatcher() {
+			@Override
+			public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+			}
+
+			@Override
+			public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+			}
+
+			@Override
+			public void afterTextChanged(Editable editable) {
+				if(error_layout_lastName.getVisibility() == View.VISIBLE){
+					error_layout_lastName.setVisibility(View.GONE);
+					inputLastName.getBackground().clearColorFilter();
+				}
+			}
+		});
 		inputLastName.setSingleLine();
 		inputLastName.setText(myAccountInfo.getLastNameText());
 		inputLastName.setTextColor(getResources().getColor(R.color.text_secondary));
@@ -2710,17 +2857,26 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					String value = inputMail.getText().toString().trim();
 					String emailError = Util.getEmailError(value, managerActivity);
 					if (emailError != null) {
-						inputMail.setError(emailError);
+//						inputMail.setError(emailError);
+						inputMail.getBackground().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_IN);
+						textError_email.setText(emailError);
+						error_layout_email.setVisibility(View.VISIBLE);
 						inputMail.requestFocus();
 					}
 					else if(valueFirstName.equals("")||valueFirstName.isEmpty()){
 						log("input is empty");
-						inputFirstName.setError(getString(R.string.invalid_string));
+//						inputFirstName.setError(getString(R.string.invalid_string));
+						inputFirstName.getBackground().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_IN);
+						textError_firtName.setText(getString(R.string.invalid_string));
+						error_layout_firtName.setVisibility(View.VISIBLE);
 						inputFirstName.requestFocus();
 					}
 					else if(valueLastName.equals("")||valueLastName.isEmpty()){
 						log("input is empty");
-						inputLastName.setError(getString(R.string.invalid_string));
+//						inputLastName.setError(getString(R.string.invalid_string));
+						inputLastName.getBackground().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_IN);
+						textError_lastName.setText(getString(R.string.invalid_string));
+						error_layout_lastName.setVisibility(View.VISIBLE);
 						inputLastName.requestFocus();
 					}
 					else {
@@ -2738,7 +2894,26 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 		inputLastName.setImeActionLabel(getString(R.string.title_edit_profile_info),EditorInfo.IME_ACTION_DONE);
 
+		inputMail.getBackground().clearColorFilter();
+		inputMail.addTextChangedListener(new TextWatcher() {
+			@Override
+			public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
+			}
+
+			@Override
+			public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+			}
+
+			@Override
+			public void afterTextChanged(Editable editable) {
+				if(error_layout_email.getVisibility() == View.VISIBLE){
+					error_layout_email.setVisibility(View.GONE);
+					inputMail.getBackground().clearColorFilter();
+				}
+			}
+		});
 		inputMail.setSingleLine();
 		inputMail.setText(myAccountInfo.getMyUser().getEmail());
 		inputMail.setTextColor(getResources().getColor(R.color.text_secondary));
@@ -2754,17 +2929,26 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					String value = inputMail.getText().toString().trim();
 					String emailError = Util.getEmailError(value, managerActivity);
 					if (emailError != null) {
-						inputMail.setError(emailError);
+//						inputMail.setError(emailError);
+						inputMail.getBackground().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_IN);
+						textError_email.setText(emailError);
+						error_layout_email.setVisibility(View.VISIBLE);
 						inputMail.requestFocus();
 					}
 					else if(valueFirstName.equals("")||valueFirstName.isEmpty()){
 						log("input is empty");
-						inputFirstName.setError(getString(R.string.invalid_string));
+//						inputFirstName.setError(getString(R.string.invalid_string));
+						inputFirstName.getBackground().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_IN);
+						textError_firtName.setText(getString(R.string.invalid_string));
+						error_layout_firtName.setVisibility(View.VISIBLE);
 						inputFirstName.requestFocus();
 					}
 					else if(valueLastName.equals("")||valueLastName.isEmpty()){
 						log("input is empty");
-						inputLastName.setError(getString(R.string.invalid_string));
+//						inputLastName.setError(getString(R.string.invalid_string));
+						inputLastName.getBackground().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_IN);
+						textError_lastName.setText(getString(R.string.invalid_string));
+						error_layout_lastName.setVisibility(View.VISIBLE);
 						inputLastName.requestFocus();
 					}
 					else {
@@ -2789,7 +2973,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 					}
 				});
-		builder.setNegativeButton(getString(android.R.string.cancel), null);
+		builder.setNegativeButton(getString(android.R.string.cancel), new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialogInterface, int i) {
+				inputFirstName.getBackground().clearColorFilter();
+				inputLastName.getBackground().clearColorFilter();
+				inputMail.getBackground().clearColorFilter();
+			}
+		});
 		builder.setView(layout);
 
 		changeUserAttributeDialog = builder.create();
@@ -2803,17 +2994,26 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				String value = inputMail.getText().toString().trim();
 				String emailError = Util.getEmailError(value, managerActivity);
 				if (emailError != null) {
-					inputMail.setError(emailError);
+//					inputMail.setError(emailError);
+					inputMail.getBackground().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_IN);
+					textError_email.setText(emailError);
+					error_layout_email.setVisibility(View.VISIBLE);
 					inputMail.requestFocus();
 				}
 				else if(valueFirstName.equals("")||valueFirstName.isEmpty()){
 					log("input is empty");
-					inputFirstName.setError(getString(R.string.invalid_string));
+//					inputFirstName.setError(getString(R.string.invalid_string));
+					inputFirstName.getBackground().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_IN);
+					textError_firtName.setText(getString(R.string.invalid_string));
+					error_layout_firtName.setVisibility(View.VISIBLE);
 					inputFirstName.requestFocus();
 				}
 				else if(valueLastName.equals("")||valueLastName.isEmpty()){
 					log("input is empty");
-					inputLastName.setError(getString(R.string.invalid_string));
+//					inputLastName.setError(getString(R.string.invalid_string));
+					inputLastName.getBackground().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_IN);
+					textError_lastName.setText(getString(R.string.invalid_string));
+					error_layout_lastName.setVisibility(View.VISIBLE);
 					inputLastName.requestFocus();
 				}
 				else {
@@ -8295,42 +8495,119 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 		});
 
+	    layout.addView(input, params);
+
+		LinearLayout.LayoutParams params1 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+		params1.setMargins(Util.scaleWidthPx(20, outMetrics), 0, Util.scaleWidthPx(17, outMetrics), 0);
+
+		final RelativeLayout error_layout = new RelativeLayout(ManagerActivityLollipop.this);
+		layout.addView(error_layout, params1);
+
+		final ImageView error_icon = new ImageView(ManagerActivityLollipop.this);
+		error_icon.setImageDrawable(ManagerActivityLollipop.this.getDrawable(R.drawable.ic_input_warning));
+		error_layout.addView(error_icon);
+		RelativeLayout.LayoutParams params_icon = (RelativeLayout.LayoutParams) error_icon.getLayoutParams();
+
+//		params_icon.width = Util.scaleWidthPx(24, outMetrics);
+		params_icon.width = 80;
+//		params_icon.height = Util.scaleHeightPx(24, outMetrics);
+		params_icon.height = 80;
+		params_icon.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+		error_icon.setLayoutParams(params_icon);
+
+		error_icon.setColorFilter(ContextCompat.getColor(ManagerActivityLollipop.this, R.color.login_warning));
+
+		final TextView textError = new TextView(ManagerActivityLollipop.this);
+		error_layout.addView(textError);
+		RelativeLayout.LayoutParams params_text_error = (RelativeLayout.LayoutParams) textError.getLayoutParams();
+		params_text_error.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+		params_text_error.width = ViewGroup.LayoutParams.WRAP_CONTENT;
+		params_text_error.addRule(RelativeLayout.ALIGN_PARENT_TOP);
+		params_text_error.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+		params_text_error.setMargins(Util.scaleWidthPx(5, outMetrics), 0,0,0);
+		textError.setLayoutParams(params_text_error);
+
+		textError.setTextColor(ContextCompat.getColor(ManagerActivityLollipop.this, R.color.login_warning));
+
+		error_layout.setVisibility(View.GONE);
+
+		input.getBackground().clearColorFilter();
+		input.addTextChangedListener(new TextWatcher() {
+			@Override
+			public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+			}
+
+			@Override
+			public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+			}
+
+			@Override
+			public void afterTextChanged(Editable editable) {
+				if(error_layout.getVisibility() == View.VISIBLE){
+					error_layout.setVisibility(View.GONE);
+					input.getBackground().clearColorFilter();
+				}
+			}
+		});
+
 		input.setOnEditorActionListener(new OnEditorActionListener() {
 			@Override
 			public boolean onEditorAction(TextView v, int actionId,
-					KeyEvent event) {
+										  KeyEvent event) {
 				if (actionId == EditorInfo.IME_ACTION_DONE) {
-					renameDialog.dismiss();
 					String value = v.getText().toString().trim();
 					if (value.length() == 0) {
+						input.getBackground().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_IN);
+						textError.setText(getString(R.string.invalid_string));
+						error_layout.setVisibility(View.VISIBLE);
+						input.requestFocus();
 						return true;
 					}
 					nC.renameNode(document, value);
+					renameDialog.dismiss();
 					return true;
 				}
 				return false;
 			}
 		});
 
-	    layout.addView(input, params);
-
 		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
 		builder.setTitle(getString(R.string.context_rename) + " "	+ new String(document.getName()));
 		builder.setPositiveButton(getString(R.string.context_rename),
 				new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int whichButton) {
-						String value = input.getText().toString().trim();
-						if (value.length() == 0) {
-							return;
-						}
-						nC.renameNode(document, value);
+
 					}
 				});
-		builder.setNegativeButton(getString(android.R.string.cancel), null);
+		builder.setNegativeButton(getString(android.R.string.cancel), new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialogInterface, int i) {
+				input.getBackground().clearColorFilter();
+			}
+		});
 		builder.setView(layout);
 		renameDialog = builder.create();
 		renameDialog.show();
-
+		renameDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new   View.OnClickListener()
+		{
+			@Override
+			public void onClick(View v)
+			{
+				String value = input.getText().toString().trim();
+				if (value.length() == 0) {
+					input.getBackground().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_IN);
+					textError.setText(getString(R.string.invalid_string));
+					error_layout.setVisibility(View.VISIBLE);
+					input.requestFocus();
+				}
+				else{
+					nC.renameNode(document, value);
+					renameDialog.dismiss();
+				}
+			}
+		});
 	}
 
 	public void showGetLinkActivity(long handle){
@@ -8890,6 +9167,61 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	    final EditText input = new EditText(this);
 	    layout.addView(input, params);
 
+		LinearLayout.LayoutParams params1 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+		params1.setMargins(Util.scaleWidthPx(20, outMetrics), 0, Util.scaleWidthPx(17, outMetrics), 0);
+
+		final RelativeLayout error_layout = new RelativeLayout(ManagerActivityLollipop.this);
+		layout.addView(error_layout, params1);
+
+		final ImageView error_icon = new ImageView(ManagerActivityLollipop.this);
+		error_icon.setImageDrawable(ManagerActivityLollipop.this.getDrawable(R.drawable.ic_input_warning));
+		error_layout.addView(error_icon);
+		RelativeLayout.LayoutParams params_icon = (RelativeLayout.LayoutParams) error_icon.getLayoutParams();
+
+//		params_icon.width = Util.scaleWidthPx(24, outMetrics);
+		params_icon.width = 80;
+//		params_icon.height = Util.scaleHeightPx(24, outMetrics);
+		params_icon.height = 80;
+		params_icon.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+		error_icon.setLayoutParams(params_icon);
+
+		error_icon.setColorFilter(ContextCompat.getColor(ManagerActivityLollipop.this, R.color.login_warning));
+
+		final TextView textError = new TextView(ManagerActivityLollipop.this);
+		error_layout.addView(textError);
+		RelativeLayout.LayoutParams params_text_error = (RelativeLayout.LayoutParams) textError.getLayoutParams();
+		params_text_error.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+		params_text_error.width = ViewGroup.LayoutParams.WRAP_CONTENT;
+		params_text_error.addRule(RelativeLayout.ALIGN_PARENT_TOP);
+		params_text_error.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+		params_text_error.setMargins(Util.scaleWidthPx(5, outMetrics), 0,0,0);
+		textError.setLayoutParams(params_text_error);
+
+		textError.setTextColor(ContextCompat.getColor(ManagerActivityLollipop.this, R.color.login_warning));
+
+		error_layout.setVisibility(View.GONE);
+
+		input.getBackground().clearColorFilter();
+		input.addTextChangedListener(new TextWatcher() {
+			@Override
+			public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+			}
+
+			@Override
+			public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+			}
+
+			@Override
+			public void afterTextChanged(Editable editable) {
+				if(error_layout.getVisibility() == View.VISIBLE){
+					error_layout.setVisibility(View.GONE);
+					input.getBackground().clearColorFilter();
+				}
+			}
+		});
+
 //		input.setId(EDIT_TEXT_ID);
 		input.setSingleLine();
 		input.setTextColor(getResources().getColor(R.color.text_secondary));
@@ -8902,6 +9234,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				if (actionId == EditorInfo.IME_ACTION_DONE) {
 					String value = v.getText().toString().trim();
 					if (value.length() == 0) {
+						input.getBackground().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_IN);
+						textError.setText(getString(R.string.invalid_string));
+						error_layout.setVisibility(View.VISIBLE);
+						input.requestFocus();
 						return true;
 					}
 					createFolder(value);
@@ -8933,10 +9269,33 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						createFolder(value);
 					}
 				});
-		builder.setNegativeButton(getString(android.R.string.cancel), null);
+		builder.setNegativeButton(getString(android.R.string.cancel), new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialogInterface, int i) {
+				input.getBackground().clearColorFilter();
+			}
+		});
 		builder.setView(layout);
 		newFolderDialog = builder.create();
 		newFolderDialog.show();
+		newFolderDialog.getButton(android.support.v7.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener(new   View.OnClickListener()
+		{
+			@Override
+			public void onClick(View v)
+			{
+				String value = input.getText().toString().trim();
+				if (value.length() == 0) {
+					input.getBackground().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_IN);
+					textError.setText(getString(R.string.invalid_string));
+					error_layout.setVisibility(View.VISIBLE);
+					input.requestFocus();
+				}
+				else{
+					createFolder(value);
+					renameDialog.dismiss();
+				}
+			}
+		});
 	}
 
 	public void showAutoAwayValueDialog(){
@@ -9363,9 +9722,63 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	    params.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleHeightPx(20, outMetrics), Util.scaleWidthPx(17, outMetrics), 0);
 
 		final EditText input = new EditText(this);
-	    layout.addView(input, params);
+		layout.addView(input, params);
+
+		LinearLayout.LayoutParams params1 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+		params1.setMargins(Util.scaleWidthPx(20, outMetrics), 0, Util.scaleWidthPx(17, outMetrics), 0);
+
+		final RelativeLayout error_layout_email = new RelativeLayout(ManagerActivityLollipop.this);
+		layout.addView(error_layout_email, params1);
+
+		final ImageView error_icon_email = new ImageView(ManagerActivityLollipop.this);
+		error_icon_email.setImageDrawable(ManagerActivityLollipop.this.getDrawable(R.drawable.ic_input_warning));
+		error_layout_email.addView(error_icon_email);
+		RelativeLayout.LayoutParams params_icon = (RelativeLayout.LayoutParams) error_icon_email.getLayoutParams();
+
+//		params_icon.width = Util.scaleWidthPx(24, outMetrics);
+		params_icon.width = 80;
+//		params_icon.height = Util.scaleHeightPx(24, outMetrics);
+		params_icon.height = 80;
+		params_icon.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+		error_icon_email.setLayoutParams(params_icon);
+
+		error_icon_email.setColorFilter(ContextCompat.getColor(ManagerActivityLollipop.this, R.color.login_warning));
+
+		final TextView textError_email = new TextView(ManagerActivityLollipop.this);
+		error_layout_email.addView(textError_email);
+		RelativeLayout.LayoutParams params_text_error = (RelativeLayout.LayoutParams) textError_email.getLayoutParams();
+		params_text_error.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+		params_text_error.width = ViewGroup.LayoutParams.WRAP_CONTENT;
+		params_text_error.addRule(RelativeLayout.ALIGN_PARENT_TOP);
+		params_text_error.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+		params_text_error.setMargins(Util.scaleWidthPx(5, outMetrics), 0,0,0);
+		textError_email.setLayoutParams(params_text_error);
+
+		textError_email.setTextColor(ContextCompat.getColor(ManagerActivityLollipop.this, R.color.login_warning));
+
+		error_layout_email.setVisibility(View.GONE);
 
 //		input.setId(EDIT_TEXT_ID);
+		input.getBackground().clearColorFilter();
+		input.addTextChangedListener(new TextWatcher() {
+			@Override
+			public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+			}
+
+			@Override
+			public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+			}
+
+			@Override
+			public void afterTextChanged(Editable editable) {
+				if(error_layout_email.getVisibility() == View.VISIBLE){
+					error_layout_email.setVisibility(View.GONE);
+					input.getBackground().clearColorFilter();
+				}
+			}
+		});
 		input.setSingleLine();
 		input.setHint(getString(R.string.context_new_contact_name));
 		input.setTextColor(getResources().getColor(R.color.text_secondary));
@@ -9379,8 +9792,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					String value = input.getText().toString().trim();
 					String emailError = Util.getEmailError(value, managerActivity);
 					if (emailError != null) {
-						input.setError(emailError);
-						input.requestFocus();
+//                        input.setError(emailError);
+						input.getBackground().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_IN);
+						textError_email.setText(emailError);
+						error_layout_email.setVisibility(View.VISIBLE);
 					} else {
 						cC.inviteContact(value);
 						addContactDialog.dismiss();
@@ -9410,7 +9825,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 					}
 				});
-		builder.setNegativeButton(getString(android.R.string.cancel), null);
+		builder.setNegativeButton(getString(android.R.string.cancel), new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialogInterface, int i) {
+				input.getBackground().clearColorFilter();
+			}
+		});
 		builder.setView(layout);
 		addContactDialog = builder.create();
 		addContactDialog.show();
@@ -9420,7 +9840,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				String value = input.getText().toString().trim();
 				String emailError = Util.getEmailError(value, managerActivity);
 				if (emailError != null) {
-					input.setError(emailError);
+//					input.setError(emailError);
+					input.getBackground().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_IN);
+					textError_email.setText(emailError);
+					error_layout_email.setVisibility(View.VISIBLE);
 				} else {
 					cC.inviteContact(value);
 					addContactDialog.dismiss();
