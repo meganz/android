@@ -87,7 +87,7 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaShare;
 
-public class ChatFullScreenImageViewer extends PinActivityLollipop implements OnPageChangeListener, OnClickListener, MegaRequestListenerInterface, OnItemClickListener, MegaChatRequestListenerInterface {
+public class ChatFullScreenImageViewer extends PinActivityLollipop implements OnPageChangeListener, OnClickListener, MegaRequestListenerInterface, OnItemClickListener {
 
 	private DisplayMetrics outMetrics;
 
@@ -128,7 +128,7 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 
 	public static int REQUEST_CODE_SELECT_LOCAL_FOLDER = 1004;
 
-	ArrayList<MegaNode> nodes;
+	ArrayList<MegaChatMessage> messages;
 
 	DatabaseHandler dbH = null;
 	MegaPreferences prefs = null;
@@ -207,7 +207,7 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 		messageIds = intent.getLongArrayExtra("messageIds");
 		chatId = intent.getLongExtra("chatId", -1);
 
-		nodes = new ArrayList<MegaNode>();
+		messages = new ArrayList<MegaChatMessage>();
 
 		imageHandles = new ArrayList<Long>();
 		paths = new ArrayList<String>();
@@ -223,16 +223,11 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 				if(list.size()==1){
 					MegaNode node = list.get(0);
 					if(MimeTypeList.typeForName(node.getName()).isImage()){
-						nodes.add(node);
+						messages.add(message);
 					}
 				}
 				else{
-					for(int i=0; i<list.size(); i++){
-						MegaNode node = list.get(i);
-						if(MimeTypeList.typeForName(node.getName()).isImage()){
-							nodes.add(node);
-						}
-					}
+					log("Messages with more than one attachment - do not supported");
 				}
 			}
 			else{
@@ -240,9 +235,15 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 			}
 		}
 
+		if(messages.size() == 0)
+		{
+			finish();
+			return;
+		}
+
 		int imageNumber = 0;
-		for (int i=0;i<nodes.size();i++){
-			MegaNode n = nodes.get(i);
+		for (int i=0;i<messages.size();i++){
+			MegaNode n = messages.get(i).getMegaNodeList().get(0);
 			if (MimeTypeList.typeForName(n.getName()).isImage()){
 				imageHandles.add(n.getHandle());
 				if (i == positionG){
@@ -253,18 +254,13 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 		}
 //			Toast.makeText(this, ""+parentNode.getName() + "_" + imageHandles.size(), Toast.LENGTH_LONG).show();
 
-		if(nodes.size() == 0)
-		{
-			finish();
-			return;
-		}
 
 		if(positionG >= imageHandles.size())
 		{
 			positionG = 0;
 		}
 
-		adapterMega = new MegaChatFullScreenImageAdapter(fullScreenImageViewer,nodes, megaApi);
+		adapterMega = new MegaChatFullScreenImageAdapter(fullScreenImageViewer,messages, megaApi);
 
 		viewPager.setAdapter(adapterMega);
 
@@ -301,7 +297,7 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 		topLayout = (RelativeLayout) findViewById(R.id.chat_image_viewer_layout_top);
 
 		fileNameTextView = (TextView) findViewById(R.id.chat_full_image_viewer_file_name);
-		fileNameTextView.setText(nodes.get(positionG).getName());
+		fileNameTextView.setText(messages.get(positionG).getMegaNodeList().get(0).getName());
 
 		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 
@@ -331,7 +327,7 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 					if (tIV != null){
 						tIV.setZoom(1);
 					}
-					fileNameTextView.setText(nodes.get(positionG).getName());
+					fileNameTextView.setText(messages.get(positionG).getMegaNodeList().get(0).getName());
 				}
 				catch(Exception e){}
 //				title.setText(names.get(positionG));
@@ -343,7 +339,7 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 	public void onClick(View v) {
 		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 
-		MegaNode node = nodes.get(positionG);
+		MegaNode node = messages.get(positionG).getMegaNodeList().get(0);
 
 		if((megaApi.getNodeByHandle(node.getHandle()))==null){
 			log("The node is not mine");
@@ -581,14 +577,14 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 				break;
 			}
 			case 1:{
-				MegaNode node = nodes.get(positionG);
-				showConfirmationDeleteNode(chatId, node.getHandle());
+				MegaChatMessage msg = messages.get(positionG);
+				showConfirmationDeleteNode(chatId, msg);
 				break;
 			}
 		}
 	}
 
-	public void showConfirmationDeleteNode(final long chatId, final long nodeHandle){
+	public void showConfirmationDeleteNode(final long chatId, final MegaChatMessage message){
 		log("showConfirmationDeleteNode");
 
 		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
@@ -597,7 +593,8 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 				switch (which){
 					case DialogInterface.BUTTON_POSITIVE:
 						ChatController cC = new ChatController(fullScreenImageViewer);
-						cC.deleteNodeAttachment(chatId, nodeHandle);
+						cC.deleteMessage(message, chatId);
+						finish();
 						break;
 
 					case DialogInterface.BUTTON_NEGATIVE:
@@ -831,35 +828,5 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 			}
 		}
 		super.onBackPressed();
-	}
-
-	@Override
-	public void onRequestStart(MegaChatApiJava api, MegaChatRequest request) {
-
-	}
-
-	@Override
-	public void onRequestUpdate(MegaChatApiJava api, MegaChatRequest request) {
-
-	}
-
-	@Override
-	public void onRequestFinish(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
-		log("onRequestFinish: "+request.getRequestString());
-		if(request.getType() == MegaChatRequest.TYPE_REVOKE_NODE_MESSAGE){
-			if(e.getErrorCode()==MegaChatError.ERROR_OK){
-				log("Node revoked correctly, msg id: "+request.getMegaChatMessage().getMsgId());
-				finish();
-			}
-			else{
-				log("NOT revoked correctly");
-				showSnackbar(getString(R.string.error_revoking_node));
-			}
-		}
-	}
-
-	@Override
-	public void onRequestTemporaryError(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
-
 	}
 }

@@ -36,6 +36,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaContactAdapter;
 import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.components.CustomizedGridRecyclerView;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
@@ -259,10 +260,15 @@ public class ContactsFragmentLollipop extends Fragment{
 	/*
 	 * Clear all selected items
 	 */
-	private void clearSelections() {
+	public void clearSelections() {
 		if(adapter.isMultipleSelect()){
 			adapter.clearSelections();
 		}
+	}
+
+	public void clearSelectionsNoAnimations() {
+		adapter.clearSelectionsNoAnimations();
+
 	}
 	
 	private void updateActionModeTitle() {
@@ -426,6 +432,7 @@ public class ContactsFragmentLollipop extends Fragment{
 			recyclerView.setPadding(0, 0, 0, Util.scaleHeightPx(80, outMetrics));
 			recyclerView.setClipToPadding(false);
 			recyclerView.setHasFixedSize(true);
+			((CustomizedGridRecyclerView) recyclerView).setWrapContent();
 			final GridLayoutManager gridLayoutManager = (GridLayoutManager) recyclerView.getLayoutManager();
 			gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
 				@Override
