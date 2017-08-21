@@ -33,8 +33,9 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:scaleType="centerCrop"
-            android:background="@color/blue"
-            android:adjustViewBounds="true"/>
+            android:background="@color/white"
+            android:adjustViewBounds="true"
+            />
 
         <RelativeLayout
             android:layout_width="match_parent"

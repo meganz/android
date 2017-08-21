@@ -1003,14 +1003,15 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 				monthPics.clear();
 			}
 
-			List<Integer> spanSizePosition = null;
+
+			List<MegaPhotoSyncGridTitleAdapterLollipop.ItemInformation> itemInformationList = new ArrayList<>();
 			int countTitles = 0;
 			if (megaApi.getNodeByHandle(photosyncHandle) != null){
 				
 				nodes = megaApi.getChildren(megaApi.getNodeByHandle(photosyncHandle), MegaApiJava.ORDER_MODIFICATION_DESC);
 //				MegaChildren children = megaApi.getFileFolderChildren(megaApi.getNodeByHandle(photosyncHandle), MegaApiJava.ORDER_MODIFICATION_DESC);
 //				nodes = children.getFileList();
-				spanSizePosition =  new ArrayList<>(this.nodes.size());
+				itemInformationList = new ArrayList<>(this.nodes.size());
 				int month = 0;
 				int year = 0;
 				MegaMonthPicLollipop monthPic = new MegaMonthPicLollipop();
@@ -1025,15 +1026,21 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 					}
 					
 					Date d = new Date(nodes.get(i).getModificationTime()*1000);
+					MegaNode n = nodes.get(i);
 					if ((month == 0) && (year == 0)){
 						month = d.getMonth();
 						year = d.getYear();
 						monthPic.monthYearString = getImageDateString(month, year);
-						spanSizePosition.add(MegaPhotoSyncGridTitleAdapterLollipop.TYPE_ITEM_TITLE);
+						itemInformationList.add(new MegaPhotoSyncGridTitleAdapterLollipop.ItemInformation(MegaPhotoSyncGridTitleAdapterLollipop.TYPE_ITEM_TITLE, monthPic.monthYearString, monthPic));
 						countTitles++;
-						monthPic.nodeHandles.add(nodes.get(i).getHandle());
-						monthPic.setPosition(nodes.get(i), i);
-						spanSizePosition.add(MegaPhotoSyncGridTitleAdapterLollipop.TYPE_ITEM_IMAGE);
+						monthPic.nodeHandles.add(n.getHandle());
+						monthPic.setPosition(n, i);
+						if(!Util.isVideoFile(n.getName())){
+							itemInformationList.add(new MegaPhotoSyncGridTitleAdapterLollipop.ItemInformation(MegaPhotoSyncGridTitleAdapterLollipop.TYPE_ITEM_IMAGE, n, monthPic));
+						}
+						else{
+							itemInformationList.add(new MegaPhotoSyncGridTitleAdapterLollipop.ItemInformation(MegaPhotoSyncGridTitleAdapterLollipop.TYPE_ITEM_VIDEO, n, monthPic));
+						}
 //						monthPics.add(monthPic);
 //						monthPic = new MegaMonthPicLollipop();
 //						i--;
@@ -1046,9 +1053,14 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 //							monthPic.nodeHandles.add(nodes.get(i).getHandle());
 //						}
 //						else{
-							monthPic.nodeHandles.add(nodes.get(i).getHandle());
-							monthPic.setPosition(nodes.get(i), i);
-						spanSizePosition.add(MegaPhotoSyncGridTitleAdapterLollipop.TYPE_ITEM_IMAGE);
+							monthPic.nodeHandles.add(n.getHandle());
+							monthPic.setPosition(n, i);
+						if(!Util.isVideoFile(n.getName())){
+							itemInformationList.add(new MegaPhotoSyncGridTitleAdapterLollipop.ItemInformation(MegaPhotoSyncGridTitleAdapterLollipop.TYPE_ITEM_IMAGE, n, monthPic));
+						}
+						else{
+							itemInformationList.add(new MegaPhotoSyncGridTitleAdapterLollipop.ItemInformation(MegaPhotoSyncGridTitleAdapterLollipop.TYPE_ITEM_VIDEO, n, monthPic));
+						}
 //						}
 					}
 					else{
@@ -1057,11 +1069,16 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 						monthPics.add(monthPic);
 						monthPic = new MegaMonthPicLollipop();
 						monthPic.monthYearString = getImageDateString(month, year);
-						spanSizePosition.add(MegaPhotoSyncGridTitleAdapterLollipop.TYPE_ITEM_TITLE);
+						itemInformationList.add(new MegaPhotoSyncGridTitleAdapterLollipop.ItemInformation(MegaPhotoSyncGridTitleAdapterLollipop.TYPE_ITEM_TITLE, monthPic.monthYearString, monthPic));
 						countTitles++;
-						monthPic.nodeHandles.add(nodes.get(i).getHandle());
-						monthPic.setPosition(nodes.get(i), i);
-						spanSizePosition.add(MegaPhotoSyncGridTitleAdapterLollipop.TYPE_ITEM_IMAGE);
+						monthPic.nodeHandles.add(n.getHandle());
+						monthPic.setPosition(n, i);
+						if(!Util.isVideoFile(n.getName())){
+							itemInformationList.add(new MegaPhotoSyncGridTitleAdapterLollipop.ItemInformation(MegaPhotoSyncGridTitleAdapterLollipop.TYPE_ITEM_IMAGE, n, monthPic));
+						}
+						else{
+							itemInformationList.add(new MegaPhotoSyncGridTitleAdapterLollipop.ItemInformation(MegaPhotoSyncGridTitleAdapterLollipop.TYPE_ITEM_VIDEO, n, monthPic));
+						}
 //						monthPics.add(monthPic);
 //						monthPic = new MegaMonthPicLollipop();
 //						i--;
@@ -1086,24 +1103,20 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 				listView.setVisibility(View.GONE);
 			}
 
-			if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT && numberOfCells == GRID_SMALL){
-				log("the device is portrait and the grid is small");
-				listView.setItemViewCacheSize(numberOfCells * 20);
-			}
+//			if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT && numberOfCells == GRID_SMALL){
+//				log("the device is portrait and the grid is small");
+//				listView.setItemViewCacheSize(numberOfCells * 20);
+//			}
 
 			if (adapterGrid == null){
 				log("ADAPTERGRID.MONTHPICS(NEW) = " + monthPics.size());
-				Integer[] array = new Integer[spanSizePosition.size()];
-				spanSizePosition.toArray(array);
-				adapterGrid = new MegaPhotoSyncGridTitleAdapterLollipop(context, monthPics, photosyncHandle, listView, emptyImageView, emptyTextView, aB, nodes, numberOfCells, gridWidth, this, Constants.CAMERA_UPLOAD_ADAPTER, spanSizePosition.size(), array, countTitles);
+				adapterGrid = new MegaPhotoSyncGridTitleAdapterLollipop(context, monthPics, photosyncHandle, listView, emptyImageView, emptyTextView, aB, nodes, numberOfCells, gridWidth, this, Constants.CAMERA_UPLOAD_ADAPTER, itemInformationList.size(), countTitles, itemInformationList);
 				adapterGrid.setHasStableIds(true);
 			}
 			else{
 				log("ADAPTERGRID.MONTHPICS = " + monthPics.size());
 				adapterGrid.setNumberOfCells(numberOfCells, gridWidth);
-				Integer[] array = new Integer[spanSizePosition.size()];
-				spanSizePosition.toArray(array);
-				adapterGrid.setNodes(monthPics, nodes, spanSizePosition.size(), array, countTitles);
+				adapterGrid.setNodes(monthPics, nodes, itemInformationList.size(), countTitles, itemInformationList);
 			}
 
 //			mLayoutManager = new StaggeredGridLayoutManager(numberOfCells, StaggeredGridLayoutManager.HORIZONTAL | StaggeredGridLayoutManager.VERTICAL);
@@ -1930,27 +1943,33 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 //					i--;
 //				}
 //			}
-			List<Integer> spanSizePosition = new ArrayList<>(nodes.size());
+			List<MegaPhotoSyncGridTitleAdapterLollipop.ItemInformation> itemInformationList = new ArrayList<>(nodes.size());
 			int countTitles = 0;
 			for (int i=0;i<nodes.size();i++){
 				if (nodes.get(i).isFolder()){
 					continue;
 				}
 
-
 				if (!MimeTypeList.typeForName(nodes.get(i).getName()).isImage() && (!MimeTypeList.typeForName(nodes.get(i).getName()).isVideo())){
 					continue;
 				}
 
 				Date d = new Date(nodes.get(i).getModificationTime()*1000);
+				MegaNode n = nodes.get(i);
 				if ((month == 0) && (year == 0)){
 					month = d.getMonth();
 					year = d.getYear();
 					monthPic.monthYearString = getImageDateString(month, year);
-					spanSizePosition.add(MegaPhotoSyncGridTitleAdapterLollipop.TYPE_ITEM_TITLE);
-					monthPic.nodeHandles.add(nodes.get(i).getHandle());
-					monthPic.setPosition(nodes.get(i), i);
-					spanSizePosition.add(MegaPhotoSyncGridTitleAdapterLollipop.TYPE_ITEM_IMAGE);
+					itemInformationList.add(new MegaPhotoSyncGridTitleAdapterLollipop.ItemInformation(MegaPhotoSyncGridTitleAdapterLollipop.TYPE_ITEM_TITLE, monthPic.monthYearString, monthPic));
+					countTitles++;
+					monthPic.nodeHandles.add(n.getHandle());
+					monthPic.setPosition(n, i);
+					if(!Util.isVideoFile(n.getName())){
+						itemInformationList.add(new MegaPhotoSyncGridTitleAdapterLollipop.ItemInformation(MegaPhotoSyncGridTitleAdapterLollipop.TYPE_ITEM_IMAGE, n, monthPic));
+					}
+					else{
+						itemInformationList.add(new MegaPhotoSyncGridTitleAdapterLollipop.ItemInformation(MegaPhotoSyncGridTitleAdapterLollipop.TYPE_ITEM_VIDEO, n, monthPic));
+					}
 //						monthPics.add(monthPic);
 //						monthPic = new MegaMonthPicLollipop();
 //						i--;
@@ -1963,9 +1982,14 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 //							monthPic.nodeHandles.add(nodes.get(i).getHandle());
 //						}
 //						else{
-					monthPic.nodeHandles.add(nodes.get(i).getHandle());
-					monthPic.setPosition(nodes.get(i), i);
-					spanSizePosition.add(MegaPhotoSyncGridTitleAdapterLollipop.TYPE_ITEM_IMAGE);
+					monthPic.nodeHandles.add(n.getHandle());
+					monthPic.setPosition(n, i);
+					if(!Util.isVideoFile(n.getName())){
+						itemInformationList.add(new MegaPhotoSyncGridTitleAdapterLollipop.ItemInformation(MegaPhotoSyncGridTitleAdapterLollipop.TYPE_ITEM_IMAGE, n, monthPic));
+					}
+					else{
+						itemInformationList.add(new MegaPhotoSyncGridTitleAdapterLollipop.ItemInformation(MegaPhotoSyncGridTitleAdapterLollipop.TYPE_ITEM_VIDEO, n, monthPic));
+					}
 //						}
 				}
 				else{
@@ -1974,11 +1998,16 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 					monthPics.add(monthPic);
 					monthPic = new MegaMonthPicLollipop();
 					monthPic.monthYearString = getImageDateString(month, year);
-					spanSizePosition.add(MegaPhotoSyncGridTitleAdapterLollipop.TYPE_ITEM_TITLE);
+					itemInformationList.add(new MegaPhotoSyncGridTitleAdapterLollipop.ItemInformation(MegaPhotoSyncGridTitleAdapterLollipop.TYPE_ITEM_TITLE, monthPic.monthYearString, monthPic));
 					countTitles++;
-					monthPic.nodeHandles.add(nodes.get(i).getHandle());
-					monthPic.setPosition(nodes.get(i), i);
-					spanSizePosition.add(MegaPhotoSyncGridTitleAdapterLollipop.TYPE_ITEM_IMAGE);
+					monthPic.nodeHandles.add(n.getHandle());
+					monthPic.setPosition(n, i);
+					if(!Util.isVideoFile(n.getName())){
+						itemInformationList.add(new MegaPhotoSyncGridTitleAdapterLollipop.ItemInformation(MegaPhotoSyncGridTitleAdapterLollipop.TYPE_ITEM_IMAGE, n, monthPic));
+					}
+					else{
+						itemInformationList.add(new MegaPhotoSyncGridTitleAdapterLollipop.ItemInformation(MegaPhotoSyncGridTitleAdapterLollipop.TYPE_ITEM_VIDEO, n, monthPic));
+					}
 //						monthPics.add(monthPic);
 //						monthPic = new MegaMonthPicLollipop();
 //						i--;
@@ -2001,9 +2030,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			if (adapterGrid != null){
 				log("ADAPTERGRID.MONTHPICS = " + monthPics.size());
 				adapterGrid.setNumberOfCells(numberOfCells, gridWidth);
-				Integer[] array = new Integer[spanSizePosition.size()];
-				spanSizePosition.toArray(array);
-				adapterGrid.setNodes(monthPics, nodes, spanSizePosition.size(), array, countTitles);
+				adapterGrid.setNodes(monthPics, nodes, itemInformationList.size(), countTitles, itemInformationList);
 			}
 		}
 	}

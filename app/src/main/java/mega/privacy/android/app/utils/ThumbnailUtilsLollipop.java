@@ -1431,6 +1431,8 @@ public class ThumbnailUtilsLollipop {
 		ImageView getImageView();
 		int getPositionOnAdapter();
 		void postSetImageView();
+		void preSetImageView();
+		void setBitmap(Bitmap bitmap);
 	}
 
 	static class ThumbnailDownloadListenerThumbnailInterface implements MegaRequestListenerInterface{
@@ -1473,7 +1475,9 @@ public class ThumbnailUtilsLollipop {
 								thumbnailCache.put(handle, bitmap);
 
 								if ((holder.getDocument() == handle)){
-									holder.getImageView().setImageBitmap(bitmap);
+									holder.postSetImageView();
+//									holder.getImageView().setImageBitmap(bitmap);
+									holder.setBitmap(bitmap);
 									Animation fadeInAnimation = AnimationUtils.loadAnimation(context, R.anim.fade_in);
 									holder.getImageView().startAnimation(fadeInAnimation);
 									holder.postSetImageView();
