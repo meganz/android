@@ -573,12 +573,12 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
 
             document = n.getHandle();
 
+//            LoadImage task = new LoadImage(n, type, 0);
+//            task.execute(holder);
+
             Bitmap thumb = null;
             photo.setImageResource(MimeTypeThumbnail.typeForName(n.getName()).getIconResourceId());
             postSetImageView();
-
-//            LoadImage task = new LoadImage(n, type, 0);
-//            task.execute(holder);
 
             if (n.hasThumbnail()){
                 thumb = ThumbnailUtilsLollipop.getThumbnailFromCache(n);
@@ -612,8 +612,6 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
             else{
                 log(n.getName()+" NO ThUMB!!");
             }
-
-
 
         }
 
@@ -804,7 +802,8 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
                 content_layout.setLayoutParams(marginParams);
             }
         }
-        //        private class LoadImage extends AsyncTask<ViewHolderPhotoTitleSyncGridTitle, Void, Bitmap> {
+
+//        private class LoadImage extends AsyncTask<ViewHolderPhotoTitleSyncGridTitle, Void, Bitmap> {
 //
 //            private MegaNode n;
 //            private int type;
@@ -891,49 +890,7 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
 //                    photo.setImageBitmap(result);
 //                    postSetImageView();
 //                }
-////                else{
-////                    if(type == TYPE_ITEM_IMAGE){
-////                        photo.setImageResource(MimeTypeThumbnail.typeForName(n.getName()).getIconResourceId());
-////                    }
-////                    else if(type == TYPE_ITEM_VIDEO){
-////                        photo.setImageResource(MimeTypeThumbnail.typeForName(n.getName()).getIconResourceId());
-////                        if(numberOfColumns == CameraUploadFragmentLollipop.GRID_LARGE){
-////                            videoIcon.setImageResource(R.drawable.ic_play_arrow_white_24dp);
-////                            log(n.getName()+" DURATION: "+n.getDuration());
-////                            int duration = n.getDuration();
-////                            if(duration>0){
-////                                int hours = duration / 3600;
-////                                int minutes = (duration % 3600) / 60;
-////                                int seconds = duration % 60;
-////
-////                                String timeString;
-////                                if(hours>0){
-////                                    timeString = String.format("%d:%d:%02d", hours, minutes, seconds);
-////                                }
-////                                else{
-////                                    timeString = String.format("%d:%02d", minutes, seconds);
-////                                }
-////
-////                                log("The duration is: "+hours+" "+minutes+" "+seconds);
-////
-////                                videoDuration.setText(timeString);
-////                            }
-////                            else{
-////                                videoDuration.setVisibility(View.GONE);
-////                            }
-////                        }
-////                        else{
-////                            videoIcon.setImageResource(R.drawable.ic_play_arrow_white_18dp);
-////                            videoDuration.setVisibility(View.GONE);
-////                        }
-////                    }
-////                }
 //            }
-//
-////            @Override
-////            protected void onCancelled (){
-////                photo.setImageResource(MimeTypeThumbnail.typeForName(n.getName()).getIconResourceId());
-////            }
 //        };
 
     }
