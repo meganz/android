@@ -402,45 +402,22 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
         log("PositionAdapter -> "+position+" Gridwidth -> "+gridWidth+" onBind");
         switch (itemInformation.type){
             case TYPE_ITEM_TITLE:{
-//                String title = (String) getItemOfPosition(position);
                 holder.setDataTitle(itemInformation.name);
-//                StaggeredGridLayoutManager.LayoutParams layoutParams = (StaggeredGridLayoutManager.LayoutParams) holder.itemView.getLayoutParams();
-//                layoutParams.setFullSpan(true);
                 break;
             }
             case TYPE_ITEM_IMAGE:{
-//                MegaNode n = (MegaNode) getItemOfPosition(position);
-//                int positionInNodes = 0;
-//                for (int i=0;i<nodes.size();i++){
-//                    if(nodes.get(i).getHandle() == n.getHandle()){
-//                        positionInNodes = i;
-//                        break;
-//                    }
-//                }
                 holder.setMegaMonthPicLollipop(itemInformation.megaMonthPic);
                 int positionNodes = (int) itemInformation.megaMonthPic.getPosition(itemInformation.n);
                 holder.setDataImage(itemInformation.n, isChecked(positionNodes), multipleSelect, position, positionNodes);
                 holder.setGridWidth(gridWidth, numberOfCells);
-//                StaggeredGridLayoutManager.LayoutParams layoutParams = (StaggeredGridLayoutManager.LayoutParams) holder.itemView.getLayoutParams();
-//                layoutParams.setFullSpan(false);
 
                 break;
             }
             case TYPE_ITEM_VIDEO:{
-//                MegaNode n = (MegaNode) getItemOfPosition(position);
-//                int positionInNodes = 0;
-//                for (int i=0;i<nodes.size();i++){
-//                    if(nodes.get(i).getHandle() == n.getHandle()){
-//                        positionInNodes = i;
-//                        break;
-//                    }
-//                }
                 holder.setMegaMonthPicLollipop(itemInformation.megaMonthPic);
                 int positionNodes = (int) itemInformation.megaMonthPic.getPosition(itemInformation.n);
                 holder.setDataVideo(itemInformation.n, isChecked(positionNodes), multipleSelect, numberOfCells, position, positionNodes);
                 holder.setGridWidth(gridWidth, numberOfCells);
-//                StaggeredGridLayoutManager.LayoutParams layoutParams = (StaggeredGridLayoutManager.LayoutParams) holder.itemView.getLayoutParams();
-//                layoutParams.setFullSpan(false);
                 break;
             }
             case TYPE_NO_TYPE:
@@ -453,12 +430,6 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
 
     @Override
     public int getItemCount() {
-//        int sum = 0;
-//        for(MegaMonthPicLollipop temp : monthPics){
-//            if(temp.nodeHandles.size() > 0)
-//                sum += temp.nodeHandles.size() + 1;
-//        }
-//        return sum;
         return count;
     }
 
@@ -511,11 +482,6 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
             params.height = gridWidth;
             params.width = gridWidth;
             content_layout.setLayoutParams(params);
-
-//            ViewGroup.LayoutParams params1 = (ViewGroup.LayoutParams) photo.getLayoutParams();
-//            params1.height = gridWidth;
-//            params1.width = gridWidth;
-//            photo.setLayoutParams(params1);
 
             click_icon.setMaxHeight(gridWidth);
             click_icon.setMaxWidth(gridWidth);
@@ -769,13 +735,6 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
 
         @Override
         public void postSetImageView() {
-
-//            ViewGroup.MarginLayoutParams marginParams = (ViewGroup.MarginLayoutParams) content_layout.getLayoutParams();
-//            marginParams.setMargins(margins, margins, margins, margins);
-//            content_layout.setLayoutParams(marginParams);
-//
-
-//            photo.setScaleType(ImageView.ScaleType.FIT_XY);
         }
 
         @Override
@@ -1322,39 +1281,6 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
     }
 
     private ItemInformation getInformationOfPosition(int position){
-//        for(MegaMonthPicLollipop temp : monthPics){
-//            log("size of temp: "+temp.nodeHandles);
-//            if(position == 0){
-//                ItemInformation itemInformation = new ItemInformation();
-//                itemInformation.type = TYPE_ITEM_TITLE;
-//                itemInformation.name = temp.monthYearString;
-//                itemInformation.megaMonthPic = temp;
-//                return itemInformation;
-//            }
-//            if(position > 0 && position-1 < temp.nodeHandles.size()){
-//                MegaNode n = megaApi.getNodeByHandle(temp.nodeHandles.get(position - 1));
-//                if(!Util.isVideoFile(n.getName())){
-//                    ItemInformation itemInformation = new ItemInformation();
-//                    itemInformation.type = TYPE_ITEM_IMAGE;
-//                    itemInformation.n = n;
-//                    itemInformation.megaMonthPic = temp;
-//                    itemInformation.isChecked = isChecked((int) temp.getPosition(n));
-//                    return itemInformation;
-//                }
-//                else{
-//                    ItemInformation itemInformation = new ItemInformation();
-//                    itemInformation.type = TYPE_ITEM_VIDEO;
-//                    itemInformation.n = n;
-//                    itemInformation.megaMonthPic = temp;
-//                    itemInformation.isChecked = isChecked((int) temp.getPosition(n));
-//                    return itemInformation;
-//                }
-//            }
-//            position -= (temp.nodeHandles.size() + 1);
-//        }
-//        ItemInformation itemInformation = new ItemInformation();
-//        itemInformation.type = TYPE_NO_TYPE;
-//        return itemInformation;
         return itemInformationList.get(position);
     }
 
