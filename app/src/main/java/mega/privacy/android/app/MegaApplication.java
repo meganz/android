@@ -28,6 +28,7 @@ import android.graphics.drawable.Drawable;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
+import android.os.Build;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
 import android.text.Html;
@@ -79,7 +80,7 @@ import nz.mega.sdk.MegaUser;
 
 public class MegaApplication extends Application implements MegaListenerInterface, MegaChatListenerInterface{
 	final String TAG = "MegaApplication";
-	static final String USER_AGENT = "MEGAAndroid/3.2.2_145";
+	static final String USER_AGENT = "MEGAAndroid/3.2.2_148";
 
 	DatabaseHandler dbH;
 	MegaApiAndroid megaApi;
@@ -577,8 +578,15 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 								.setColor(ContextCompat.getColor(this,R.color.mega))
 								.setContentIntent(pendingIntent);
 
-						Drawable d = getDrawable(R.drawable.ic_folder_incoming);
-							notificationBuilder.setLargeIcon(((BitmapDrawable)d).getBitmap());
+						Drawable d;
+
+						if(android.os.Build.VERSION.SDK_INT >=  Build.VERSION_CODES.LOLLIPOP){
+							d = getResources().getDrawable(R.drawable.ic_folder_incoming, getTheme());
+						} else {
+							d = getResources().getDrawable(R.drawable.ic_folder_incoming);
+						}
+
+						notificationBuilder.setLargeIcon(((BitmapDrawable)d).getBitmap());
 
 						NotificationManager notificationManager =
 								(NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
@@ -780,7 +788,7 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 
 		log("Unread count is: "+item.getUnreadCount());
 
-		if (item.hasChanged(MegaChatListItem.CHANGE_TYPE_LAST_TS) && (item.getUnreadCount() != 0)){
+		if (item.hasChanged(MegaChatListItem.CHANGE_TYPE_LAST_MSG) && (item.getUnreadCount() != 0)){
 
 			try {
 				if(isFireBaseConnection){
@@ -801,13 +809,17 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 									showNotification(item);
 								}
 								else{
-									if(firstTs>item.getLastTimestamp()){
-										log("DO NOT SHOW NOTIF - FirstTS when logging "+firstTs+ " > item timestamp: "+item.getLastTimestamp());
-									}
-									else{
-										log("FirstTS when logging "+firstTs+ " < item timestamp: "+item.getLastTimestamp());
-										showNotification(item);
-										firstTs=-1;
+
+									MegaChatMessage lastMessage = megaChatApi.getMessage(item.getChatId(), item.getLastMessageId());
+									if(lastMessage!=null){
+										if(firstTs>lastMessage.getTimestamp()){
+											log("DO NOT SHOW NOTIF - FirstTS when logging "+firstTs+ " > last message timestamp: "+lastMessage.getTimestamp());
+										}
+										else{
+											log("FirstTS when logging "+firstTs+ " < last message timestamp: "+lastMessage.getTimestamp());
+											showNotification(item);
+											firstTs=-1;
+										}
 									}
 								}
 							}

@@ -71,27 +71,27 @@ public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaP
 	private MegaApplication app;
 	private MegaApiAndroid megaApi;
 
-	private ArrayList<MegaMonthPicLollipop> monthPics;
-	private ArrayList<MegaNode> nodes;
+	ArrayList<MegaMonthPicLollipop> monthPics;
+	ArrayList<MegaNode> nodes;
 
-	private long photosyncHandle = -1;
+	long photosyncHandle = -1;
 
-	private RecyclerView listFragment;
-	private ImageView emptyImageViewFragment;
-	private TextView emptyTextViewFragment;
-	private ActionBar aB;
+	RecyclerView listFragment;
+	ImageView emptyImageViewFragment;
+	TextView emptyTextViewFragment;
+	ActionBar aB;
 
-	private int numberOfCells;
-	private int gridWidth;
+	int numberOfCells;
+	int gridWidth;
 
-	private boolean multipleSelect;
+	boolean multipleSelect;
 
-	private SparseBooleanArray checkedItems = new SparseBooleanArray();
+	SparseBooleanArray checkedItems = new SparseBooleanArray();
 
-	private int orderGetChildren = MegaApiJava.ORDER_MODIFICATION_DESC;
+	int orderGetChildren = MegaApiJava.ORDER_MODIFICATION_DESC;
 
-	private Object fragment;
-	private int type = Constants.CAMERA_UPLOAD_ADAPTER;
+	Object fragment;
+	int type = Constants.CAMERA_UPLOAD_ADAPTER;
 	
 	private ActionMode actionMode;
 	

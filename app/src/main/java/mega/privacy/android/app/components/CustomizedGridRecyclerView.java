@@ -14,13 +14,20 @@ package mega.privacy.android.app.components;
 
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.graphics.Rect;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
+import android.view.View;
+import android.view.ViewGroup;
+
+import mega.privacy.android.app.utils.Util;
 
 public class CustomizedGridRecyclerView extends RecyclerView {
 
 	private CustomizedGridLayoutManager manager;
 	private int columnWidth = -1;
+	private boolean isWrapContent = false;
+	private int widthTotal = 0;
 
 	public CustomizedGridRecyclerView(Context context) {
 		super(context);
@@ -54,10 +61,30 @@ public class CustomizedGridRecyclerView extends RecyclerView {
 	@Override
 	protected void onMeasure(int widthSpec, int heightSpec) {
 		super.onMeasure(widthSpec, heightSpec);
-		if (columnWidth > 0) {
-			int spanCount = Math.max(1, getMeasuredWidth() / columnWidth);
-			manager.setSpanCount(spanCount);
+		if(!isWrapContent){
+			if (columnWidth > 0) {
+				int spanCount = Math.max(1, getMeasuredWidth() / columnWidth);
+				manager.setSpanCount(spanCount);
+			}
 		}
+		else{
+			ViewGroup.LayoutParams params = getLayoutParams();
+			if (columnWidth > 0) {
+				int spanCount = Math.max(1, getMeasuredWidth() / columnWidth);
+				manager.setSpanCount(spanCount);
+				params.width = ViewGroup.LayoutParams.WRAP_CONTENT;
+				setLayoutParams(params);
+			}
+		}
+	}
+
+	public void setWrapContent(){
+		isWrapContent = true;
+//		widthTotal = getMeasuredWidth();
+//		ViewGroup.LayoutParams params = getLayoutParams();
+//		params.width = ViewGroup.LayoutParams.WRAP_CONTENT;
+//		setLayoutParams(params);
+		this.invalidate();
 	}
 
 	public int findFirstCompletelyVisibleItemPosition() {
@@ -71,5 +98,9 @@ public class CustomizedGridRecyclerView extends RecyclerView {
 	@Override
 	public CustomizedGridLayoutManager getLayoutManager() {
 		return manager;
+	}
+
+	private static void log(String txt){
+		Util.log("CustomizedGridRecyclerView", txt);
 	}
 }
