@@ -70,7 +70,7 @@ public class TourFragmentLollipop extends Fragment implements View.OnClickListen
         bar4 = (LinearLayout) v.findViewById(R.id.bar_tour_layout_4);
         tourLoginCreate = (LinearLayout) v.findViewById(R.id.tour_login_create);
 
-        mainLinearLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.white));
+       // mainLinearLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.white));
         tourText1 = (TextView) v.findViewById(R.id.tour_text_1);
         tourText1.setGravity(Gravity.CENTER_VERTICAL);
 
