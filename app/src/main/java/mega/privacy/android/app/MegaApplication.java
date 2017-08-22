@@ -28,6 +28,7 @@ import android.graphics.drawable.Drawable;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
+import android.os.Build;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
 import android.text.Html;
@@ -79,7 +80,7 @@ import nz.mega.sdk.MegaUser;
 
 public class MegaApplication extends Application implements MegaListenerInterface, MegaChatListenerInterface{
 	final String TAG = "MegaApplication";
-	static final String USER_AGENT = "MEGAAndroid/3.2.2_145";
+	static final String USER_AGENT = "MEGAAndroid/3.2.2_148";
 
 	DatabaseHandler dbH;
 	MegaApiAndroid megaApi;
@@ -317,6 +318,15 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 	public void disableMegaChatApi(){
 		megaChatApi = null;
 	}
+
+	public void enableChat(){
+		log("enableChat");
+		if(Util.isChatEnabled()){
+			megaChatApi = new MegaChatApiAndroid(megaApi);
+			log("enableChat: addChatListener");
+			megaChatApi.addChatListener(this);
+		}
+	}
 	
 	public MegaApiAndroid getMegaApi()
 	{
@@ -359,6 +369,7 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 
 			if(Util.isChatEnabled()){
 				megaChatApi = new MegaChatApiAndroid(megaApi);
+				log("addChatListener");
 				megaChatApi.addChatListener(this);
 			}
 
@@ -577,8 +588,15 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 								.setColor(ContextCompat.getColor(this,R.color.mega))
 								.setContentIntent(pendingIntent);
 
-						Drawable d = getDrawable(R.drawable.ic_folder_incoming);
-							notificationBuilder.setLargeIcon(((BitmapDrawable)d).getBitmap());
+						Drawable d;
+
+						if(android.os.Build.VERSION.SDK_INT >=  Build.VERSION_CODES.LOLLIPOP){
+							d = getResources().getDrawable(R.drawable.ic_folder_incoming, getTheme());
+						} else {
+							d = getResources().getDrawable(R.drawable.ic_folder_incoming);
+						}
+
+						notificationBuilder.setLargeIcon(((BitmapDrawable)d).getBitmap());
 
 						NotificationManager notificationManager =
 								(NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);

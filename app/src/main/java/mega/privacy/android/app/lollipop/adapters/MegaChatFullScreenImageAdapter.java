@@ -33,6 +33,7 @@ import mega.privacy.android.app.utils.ThumbnailUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
@@ -46,7 +47,7 @@ public class MegaChatFullScreenImageAdapter extends PagerAdapter implements OnCl
 
 	private Activity activity;
 	private MegaChatFullScreenImageAdapter megaFullScreenImageAdapter;
-	private ArrayList<MegaNode> nodes;
+	private ArrayList<MegaChatMessage> messages;
 	private SparseArray<ViewHolderFullImage> visibleImgs = new SparseArray<ViewHolderFullImage>();
 	private boolean aBshown = true;
 	private boolean menuVisible = false;
@@ -210,16 +211,16 @@ public class MegaChatFullScreenImageAdapter extends PagerAdapter implements OnCl
 	}
 
 	// constructor
-	public MegaChatFullScreenImageAdapter(Activity activity, ArrayList<MegaNode> nodes, MegaApiAndroid megaApi) {
+	public MegaChatFullScreenImageAdapter(Activity activity, ArrayList<MegaChatMessage> messages, MegaApiAndroid megaApi) {
 		this.activity = activity;
 		this.megaApi = megaApi;
-		this.nodes = nodes;
+		this.messages = messages;
 		this.megaFullScreenImageAdapter = this;
 	}
 
 	@Override
 	public int getCount() {
-		return nodes.size();
+		return messages.size();
 	}
 
 	@Override
@@ -231,7 +232,7 @@ public class MegaChatFullScreenImageAdapter extends PagerAdapter implements OnCl
     public Object instantiateItem(ViewGroup container, int position) {
         log ("INSTANTIATE POSITION " + position);
 
-		MegaNode node = nodes.get(position);
+		MegaNode node = messages.get(position).getMegaNodeList().get(0);
 		
 		ViewHolderFullImage holder = new ViewHolderFullImage();
 		LayoutInflater inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -254,7 +255,7 @@ public class MegaChatFullScreenImageAdapter extends PagerAdapter implements OnCl
 		holder.progressBar.setVisibility(View.GONE);
 		holder.downloadProgressBar = (ProgressBar) viewLayout.findViewById(R.id.full_screen_image_viewer_download_progress_bar);
 		holder.downloadProgressBar.setVisibility(View.GONE);
-		holder.document = nodes.get(position).getHandle();
+		holder.document = messages.get(position).getMegaNodeList().get(0).getHandle();
 		
 		visibleImgs.put(position, holder);
         

@@ -18,6 +18,8 @@ import android.graphics.BitmapShader;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Point;
+import android.graphics.Rect;
 import android.graphics.Shader.TileMode;
 import android.net.Uri;
 import android.os.Build;
@@ -25,6 +27,8 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.provider.MediaStore;
+import android.support.design.widget.BottomSheetDialog;
+import android.support.design.widget.BottomSheetDialogFragment;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -197,7 +201,8 @@ import nz.mega.sdk.MegaTransferListenerInterface;
 import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUtilsAndroid;
 
-public class ManagerActivityLollipop extends PinActivityLollipop implements NetworkStateReceiver.NetworkStateReceiverListener, MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatRequestListenerInterface, OnNavigationItemSelectedListener, MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener  {
+public class ManagerActivityLollipop extends PinActivityLollipop implements NetworkStateReceiver.NetworkStateReceiverListener, MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatRequestListenerInterface, OnNavigationItemSelectedListener, MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener,
+			NodeOptionsBottomSheetDialogFragment.CustomHeight, ContactsBottomSheetDialogFragment.CustomHeight{
 
 	public int accountFragment;
 
@@ -243,7 +248,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	MegaOffline selectedOfflineNode;
 	MegaContactAdapter selectedUser;
 	MegaContactRequest selectedRequest;
-	MegaChatListItem selectedChatItem;
+
+	public long selectedChatItemId;
 //	String fullNameChat;
 
 	//COLLECTION FAB BUTTONS
@@ -1116,6 +1122,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			selectedPaymentMethod = savedInstanceState.getInt("selectedPaymentMethod", -1);
 			searchQuery = savedInstanceState.getString("searchQuery");
 			chatConnection = savedInstanceState.getBoolean("chatConnection");
+
 		}
 		else{
 			log("Bundle is NULL");
@@ -2018,6 +2025,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				selectDrawerItemLollipop(drawerItem);
 			}
 		}
+
 		log("END onCreate");
 //		showTransferOverquotaDialog();
 	}
@@ -2952,6 +2960,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					if (parentNode != null){
 						if (parentNode.getHandle() == megaApi.getRootNode().getHandle()){
 							aB.setTitle(getString(R.string.section_cloud_drive));
+							//aB.setTitle(getString());
+
 							aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 							firstNavigationLevel = true;
 						}
@@ -3128,7 +3138,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					sttFLol.setOnlineOptions(true);
 				}
 			}
-			invalidateOptionsMenu();
+			supportInvalidateOptionsMenu();
 		}
 		else{
 			log("showOnlineMode - Root is NULL");
@@ -3264,7 +3274,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 		}
 
-		invalidateOptionsMenu();
+		supportInvalidateOptionsMenu();
 
 	}
 
@@ -3647,11 +3657,30 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 			@Override
 			public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-
+				log("onPageScrolled");
 			}
 
 			@Override
 			public void onPageSelected(int position) {
+				log("onPageSelected");
+				String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);
+				cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
+				if(cFLol!=null){
+					cFLol.hideMultipleSelect();
+					cFLol.clearSelectionsNoAnimations();
+				}
+				cFTag = getFragmentTag(R.id.contact_tabs_pager, 1);
+				sRFLol = (SentRequestsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
+				if(sRFLol!=null){
+					sRFLol.clearSelections();
+					sRFLol.hideMultipleSelect();
+				}
+				cFTag = getFragmentTag(R.id.contact_tabs_pager, 2);
+				rRFLol = (ReceivedRequestsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
+				if(rRFLol!=null){
+					rRFLol.clearSelections();
+					rRFLol.hideMultipleSelect();
+				}
 				supportInvalidateOptionsMenu();
 				showFabButton();
 			}
@@ -4593,7 +4622,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		}
 		fragmentContainer.setVisibility(View.VISIBLE);
 
-		invalidateOptionsMenu();
+		supportInvalidateOptionsMenu();
 		showFabButton();
 	}
 
@@ -4780,6 +4809,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					if (fbFLol!=null){
 						log("in CloudDrive");
 						//Cloud Drive
+
+						aB.setTitle(getString(R.string.section_cloud_drive));
+
 						//Show
 						addMenuItem.setEnabled(true);
 						addMenuItem.setVisible(true);
@@ -9881,6 +9913,24 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
 	}
 
+	public int getHeightToPanel(BottomSheetDialogFragment dialog){
+		if(dialog instanceof NodeOptionsBottomSheetDialogFragment){
+			if(fragmentContainer != null && aB != null && tabLayoutCloud != null){
+				final Rect r = new Rect();
+				fragmentContainer.getWindowVisibleDisplayFrame(r);
+				return (r.height() - aB.getHeight() - tabLayoutCloud.getHeight());
+			}
+		}
+		else if(dialog instanceof ContactsBottomSheetDialogFragment){
+			if(fragmentContainer != null && aB != null && tabLayoutContacts != null){
+				final Rect r = new Rect();
+				fragmentContainer.getWindowVisibleDisplayFrame(r);
+				return (r.height() - aB.getHeight() - tabLayoutContacts.getHeight());
+			}
+		}
+		return -1;
+	}
+
 	private void showOverquotaAlert(){
 		log("showOverquotaAlert");
 		dbH.setCamSyncEnabled(false);
@@ -13068,7 +13118,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 								completedTFLol.updateCompletedTransfers();
 							}
 						}
-						invalidateOptionsMenu();
+						supportInvalidateOptionsMenu();
 						break;
 					}
 					case DialogInterface.BUTTON_NEGATIVE: {
@@ -13513,7 +13563,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		log("showChatPanel");
 
 		if(chat!=null){
-			this.selectedChatItem = chat;
+			this.selectedChatItemId = chat.getChatId();
 			ChatBottomSheetDialogFragment bottomSheetDialogFragment = new ChatBottomSheetDialogFragment();
 			bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
 		}
@@ -13880,15 +13930,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		this.displayedAccountType = displayedAccountType;
 	}
 
-	public MegaChatListItem getSelectedChat() {
-		return selectedChatItem;
-	}
-
-	public void setSelectedChat(MegaChatListItem selectedChatItem) {
-		this.selectedChatItem = selectedChatItem;
-	}
-
 	public void enableChat(){
+
+		((MegaApplication) getApplication()).enableChat();
+
 		Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
 		intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
 		intent.setAction(Constants.ACTION_ENABLE_CHAT);
