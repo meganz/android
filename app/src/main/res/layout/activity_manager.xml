@@ -220,14 +220,19 @@
         app:itemTextColor="@color/drawer_item_text"
         app:menu="@menu/navigation_drawer_items" >
 
+        <ScrollView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:scrollbars="none"
+            android:layout_gravity="bottom"
+            android:layout_marginBottom="-70dp">
+
         <RelativeLayout
             android:id="@+id/nv_used_space_layout"
             android:layout_width="match_parent"
             android:clickable="true"
             android:layout_height="80dp"
-            android:layout_gravity="bottom"
-            android:layout_marginBottom="-70dp"
-            android:background="#ffffff" >
+            android:background="#ffffff">
 
             <TextView
                 android:id="@+id/navigation_drawer_used_space_text"
@@ -277,6 +282,7 @@
                 android:textSize="12sp"
                 tools:fontFamily="roboto" />
         </RelativeLayout>
+        </ScrollView>
     </android.support.design.widget.NavigationView>
 
 </android.support.v4.widget.DrawerLayout>

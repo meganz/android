@@ -1,5 +1,7 @@
 package mega.privacy.android.app.lollipop.adapters;
 
+import android.animation.Animator;
+import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -401,6 +403,7 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 					}
 				}
 				else{
+					log("Do not ask for user avatar - its in cache: "+avatar.getAbsolutePath());
 					holder.contactInitialLetter.setVisibility(View.GONE);
 					holder.imageView.setImageBitmap(bitmap);
 				}
@@ -583,6 +586,7 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 						}
 					}
 					else{
+						log("Do not ask for user avatar - its in cache: "+avatar.getAbsolutePath());
 						holder.contactInitialLetter.setVisibility(View.GONE);
 						holder.imageView.setImageBitmap(bitmap);
 					}
@@ -829,59 +833,75 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 		}
 	}
 
-	public void toggleAllSelection(int pos) {
-		log("toggleSelection: "+pos);
-		final int positionToflip = pos;
-
-		if (selectedItems.get(pos, false)) {
-			log("delete pos: "+pos);
-			selectedItems.delete(pos);
-		}
-		else {
-			log("PUT pos: "+pos);
-			selectedItems.put(pos, true);
-		}
-
-		if (adapterType == MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST){
-			log("adapter type is LIST");
-			MegaContactsLollipopAdapter.ViewHolderContactsList view = (MegaContactsLollipopAdapter.ViewHolderContactsList) listFragment.findViewHolderForLayoutPosition(pos);
-			if(view!=null){
-				log("Start animation: "+pos);
-				Animation flipAnimation = AnimationUtils.loadAnimation(context, R.anim.multiselect_flip);
-				flipAnimation.setAnimationListener(new Animation.AnimationListener() {
-					@Override
-					public void onAnimationStart(Animation animation) {
-
-					}
-
-					@Override
-					public void onAnimationEnd(Animation animation) {
-						if (selectedItems.size() <= 0){
-							((ContactsFragmentLollipop) fragment).hideMultipleSelect();
-						}
-						notifyItemChanged(positionToflip);
-					}
-
-					@Override
-					public void onAnimationRepeat(Animation animation) {
-
-					}
-				});
-				view.imageView.startAnimation(flipAnimation);
-			}
-			else{
-				log("NULL view pos: "+positionToflip);
-				notifyItemChanged(pos);
-			}
-		}
-		else {
-			log("adapter type is GRID");
-			if (selectedItems.size() <= 0){
-				((ContactsFragmentLollipop) fragment).hideMultipleSelect();
-			}
-			notifyItemChanged(positionToflip);
-		}
-	}
+//	public void toggleAllSelection(int pos) {
+//		log("toggleAllSelection: "+pos);
+//		final int positionToflip = pos;
+//
+//		if (selectedItems.get(pos, false)) {
+//			log("delete pos: "+pos);
+//			selectedItems.delete(pos);
+//		}
+//		else {
+//			log("PUT pos: "+pos);
+//			selectedItems.put(pos, true);
+//		}
+//		notifyItemChanged(positionToflip);
+//
+//		if (adapterType == MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST){
+//			log("adapter type is LIST");
+//			MegaContactsLollipopAdapter.ViewHolderContactsList view = (MegaContactsLollipopAdapter.ViewHolderContactsList) listFragment.findViewHolderForLayoutPosition(pos);
+//			if(view!=null){
+//				log("Start animation: "+pos);
+////				Animation flipAnimation = AnimationUtils.loadAnimation(context, R.anim.multiselect_flip);
+//
+////				view.imageView.startAnimation(flipAnimation);
+//				ObjectAnimator imageViewObjectAnimator = ObjectAnimator.ofFloat(view.imageView ,
+//						"rotationY", 360f, 0f);
+//				imageViewObjectAnimator.setDuration(500);
+//
+//				imageViewObjectAnimator.addListener(new Animator.AnimatorListener() {
+//					@Override
+//					public void onAnimationStart(Animator animation) {
+//						log("START animation--");
+//					}
+//
+//					@Override
+//					public void onAnimationEnd(Animator animation) {
+//						if (selectedItems.size() <= 0){
+//							log("Force hideMultiselect");
+//							((ContactsFragmentLollipop) fragment).hideMultipleSelect();
+//						}
+//						log("END animation--");
+//
+//					}
+//
+//					@Override
+//					public void onAnimationCancel(Animator animation) {
+//
+//					}
+//
+//					@Override
+//					public void onAnimationRepeat(Animator animation) {
+//
+//					}
+//				});
+//
+//				imageViewObjectAnimator.start();
+//			}
+//			else{
+//				log("NULL view pos: "+positionToflip);
+//                log("multiselect: "+isMultipleSelect());
+//				notifyItemChanged(pos);
+//			}
+//		}
+//		else {
+//			log("adapter type is GRID");
+//			if (selectedItems.size() <= 0){
+//				((ContactsFragmentLollipop) fragment).hideMultipleSelect();
+//			}
+//			notifyItemChanged(positionToflip);
+//		}
+//	}
 	
 	public void toggleSelection(int pos) {
 		log("toggleSelection");
@@ -943,13 +963,26 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 		log("clearSelections");
 		for (int i= 0; i<this.getItemCount();i++){
 			if(isItemChecked(i)){
-				toggleAllSelection(i);
+				toggleSelection(i);
 			}
 		}
 	}
-	
+
+	public void clearSelectionsNoAnimations() {
+		log("clearSelections");
+		for (int i= 0; i<this.getItemCount();i++){
+			if(isItemChecked(i)){
+				selectedItems.delete(i);
+				notifyItemChanged(i);
+			}
+		}
+	}
+
 	private boolean isItemChecked(int position) {
-        return selectedItems.get(position);
+		if(selectedItems!=null){
+			return selectedItems.get(position);
+		}
+		return false;
     }
 
 	public int getSelectedItemCount() {
