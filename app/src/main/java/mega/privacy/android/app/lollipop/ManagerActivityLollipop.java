@@ -13906,6 +13906,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	}
 
 	public void enableChat(){
+
+		((MegaApplication) getApplication()).enableChat();
+
 		Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
 		intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
 		intent.setAction(Constants.ACTION_ENABLE_CHAT);
