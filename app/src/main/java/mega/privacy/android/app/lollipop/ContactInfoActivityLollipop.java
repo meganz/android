@@ -233,8 +233,6 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 				window.setStatusBarColor(ContextCompat.getColor(this, R.color.transparent_black));
 			}
 
-
-
 			collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.collapse_toolbar);
 			contactStateIcon = (ImageView) findViewById(R.id.contact_drawable_state);
 
@@ -270,8 +268,6 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 				emailLength.setPadding(0,0,0,11);
 			}
 
-
-
 			imageGradient = (View) findViewById(R.id.gradient_view);
 
 			setTitle(null);
@@ -282,7 +278,6 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			contactPropertiesImage = (ImageView) findViewById(R.id.chat_contact_properties_toolbar_image);
 
 			dbH = DatabaseHandler.getDbHandler(getApplicationContext());
-
 
 			appBarLayout.post(new Runnable() {
 				@Override
@@ -312,8 +307,6 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 				nameLength.setText(chat.getTitle());
 				String fullname = (String)nameContact.getText();
 				setDefaultAvatar(fullname);
-
-
 			}
 			else{
 				log("From contacts!!");
@@ -350,8 +343,6 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 
 						nameContact.setText(fullName);
 						nameLength.setText(fullName);
-
-
 					}
 					else{
 						log("The contactDB is null: ");
@@ -375,9 +366,6 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 
 			//OPTIONS LAYOUT
 			optionsLayout = (LinearLayout) findViewById(R.id.chat_contact_properties_options);
-
-
-
 
 			//Notifications Layout
 
@@ -464,8 +452,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			 } else{
 			 	contactStateIcon.setVisibility(View.GONE);
 			 }
-
-
+			
 			if(Util.isOnline(this)){
 				log("online -- network connection");
 				setAvatar();
