@@ -2806,7 +2806,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                 holder.previewFrameLand.setVisibility(View.VISIBLE);
                                 holder.contentOwnMessageThumbLand.setVisibility(View.VISIBLE);
                                 holder.contentOwnMessageFileLayout.setVisibility(View.GONE);
-                               holder.previewFramePort.setVisibility(View.GONE);
+                                holder.previewFramePort.setVisibility(View.GONE);
                                 holder.contentOwnMessageThumbPort.setVisibility(View.GONE);
                             }
                         }
@@ -2822,7 +2822,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                 holder.contentContactMessageThumbLand.setVisibility(View.GONE);
                                 holder.contentContactMessageThumbLandFramework.setVisibility(View.GONE);
 
-
                                 holder.contentContactMessageFileThumb.setVisibility(View.GONE);
                                 holder.contentContactMessageFileName.setVisibility(View.GONE);
                                 holder.contentContactMessageFileSize.setVisibility(View.GONE);
@@ -2834,8 +2833,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                     holder.contentContactMessageThumbPortFramework.setLayoutParams(contactThumbParams);
                                     holder.contentContactMessageThumbPortFramework.setBackgroundResource(R.drawable.shape_images_chat_3);
 
-
-
                                     log("Max width to MAX_WIDTH_NAME_SENDER_GROUP_THUMB");
                                     float width = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MAX_WIDTH_NAME_SENDER_GROUP_THUMB_PORTRAIT_PICTURE, context.getResources().getDisplayMetrics());
                                     holder.contentContactMessageFileSender.setMaxWidth((int) width);
@@ -2846,8 +2843,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                     holder.contentContactMessageThumbPort.setLayoutParams(contactThumbParams);
                                     holder.contentContactMessageThumbPortFramework.setLayoutParams(contactThumbParams);
                                     holder.contentContactMessageThumbPortFramework.setBackgroundResource(R.drawable.shape_images_chat);
-
-
                                 }
                             } else {
                                 log("Landcape");
@@ -2870,8 +2865,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                     holder.contentContactMessageThumbLandFramework.setLayoutParams(contactThumbParams);
                                     holder.contentContactMessageThumbLandFramework.setBackgroundResource(R.drawable.shape_images_chat_3);
 
-
-
                                     log("Max width to 220");
                                     float width = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MAX_WIDTH_NAME_SENDER_GROUP_THUMB_LAND_PICTURE, context.getResources().getDisplayMetrics());
                                     holder.contentContactMessageFileSender.setMaxWidth((int) width);
@@ -2882,7 +2875,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                     holder.contentContactMessageThumbLand.setLayoutParams(contactThumbParams);
                                     holder.contentContactMessageThumbLandFramework.setLayoutParams(contactThumbParams);
                                     holder.contentContactMessageThumbLandFramework.setBackgroundResource(R.drawable.shape_images_chat);
-
 
                                 }
                             }
