@@ -403,6 +403,7 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 					}
 				}
 				else{
+					log("Do not ask for user avatar - its in cache: "+avatar.getAbsolutePath());
 					holder.contactInitialLetter.setVisibility(View.GONE);
 					holder.imageView.setImageBitmap(bitmap);
 				}
@@ -585,6 +586,7 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 						}
 					}
 					else{
+						log("Do not ask for user avatar - its in cache: "+avatar.getAbsolutePath());
 						holder.contactInitialLetter.setVisibility(View.GONE);
 						holder.imageView.setImageBitmap(bitmap);
 					}
