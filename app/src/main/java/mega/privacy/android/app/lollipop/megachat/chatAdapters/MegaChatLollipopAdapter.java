@@ -1848,6 +1848,13 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                         if(((ChatActivityLollipop) context).isGroup()){
                             String textToShow = String.format(context.getString(R.string.text_deleted_message_by), ((ViewHolderMessageChat)holder).fullNameTitle);
+                            try{
+                                textToShow = textToShow.replace("[A]", "<font color=\'#00BFA5\'>");
+                                textToShow = textToShow.replace("[/A]", "</font>");
+                                textToShow = textToShow.replace("[B]", "<font color=\'#060000\'>");
+                                textToShow = textToShow.replace("[/B]", "</font>");
+                            }
+                            catch (Exception e){}
                             Spanned result = null;
                             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
                                 result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
