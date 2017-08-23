@@ -1852,6 +1852,15 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					}
 					else{
 						String textToShow = String.format(getString(R.string.section_chat_with_notification), numberUnread);
+						try {
+							textToShow = textToShow.replace("[A]", "<font color=\'#ff333a\'>");
+							textToShow = textToShow.replace("[/A]", "</font>");
+						}
+						catch(Exception e){
+							log("Formatted string: " + textToShow);
+						}
+
+						log("TEXTTOSHOW: " + textToShow);
 						Spanned result = null;
 						if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
 							result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
@@ -14001,7 +14010,16 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						chat.setTitle(getString(R.string.section_chat));
 					}
 					else{
-						String textToShow = String.format(getString(R.string.section_chat_with_notification), numberUnread);
+                        String textToShow = String.format(getString(R.string.section_chat_with_notification), numberUnread);
+                        try {
+                            textToShow = textToShow.replace("[A]", "<font color=\'#ff333a\'>");
+                            textToShow = textToShow.replace("[/A]", "</font>");
+                        }
+                        catch(Exception e){
+                            log("Formatted string: " + textToShow);
+                        }
+
+						log("TEXTTOSHOW: " + textToShow);
 						Spanned result = null;
 						if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
 							result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
