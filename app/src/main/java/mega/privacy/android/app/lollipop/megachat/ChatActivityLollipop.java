@@ -285,7 +285,12 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
                     actionMode = startSupportActionMode(new ActionBarCallBack());
 
-                    itemClick(position);
+                    if(position<0){
+                        log("Position not valid");
+                    }
+                    else{
+                        itemClick(position);
+                    }
                 }
             }
 
@@ -302,7 +307,12 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
             View view = listView.findChildViewUnder(e.getX(), e.getY());
             int position = listView.getChildLayoutPosition(view);
-            itemClick(position);
+            if(position<0){
+                log("Position not valid");
+            }
+            else{
+                itemClick(position);
+            }
             return true;
         }
     }
@@ -2059,82 +2069,87 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         if(megaChatApi.isSignalActivityRequired()){
             megaChatApi.signalPresenceActivity();
         }
-        AndroidMegaChatMessage m = messages.get(position);
 
-        if (adapter.isMultipleSelect()){
+        if(position<messages.size()){
+            AndroidMegaChatMessage m = messages.get(position);
 
-            if(!m.isUploading()){
-                adapter.toggleSelection(position);
+            if (adapter.isMultipleSelect()){
 
-                List<AndroidMegaChatMessage> messages = adapter.getSelectedMessages();
-                if (messages.size() > 0){
-                    updateActionModeTitle();
+                if(!m.isUploading()){
+                    adapter.toggleSelection(position);
+
+                    List<AndroidMegaChatMessage> messages = adapter.getSelectedMessages();
+                    if (messages.size() > 0){
+                        updateActionModeTitle();
 //                adapter.notifyDataSetChanged();
-                }
-                else{
-                    hideMultipleSelect();
+                    }
+                    else{
+                        hideMultipleSelect();
+                    }
                 }
             }
-        }
-        else{
+            else{
 
-            if(m!=null){
-                if(m.isUploading()){
-                    if(m.getPendingMessage().getState()==PendingMessage.STATE_ERROR){
-                        showUploadingAttachmentBottomSheet(m, position);
-                    }
-                }
-                else{
-                    if(m.getMessage().getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT){
-
-                        MegaNodeList nodeList = m.getMessage().getMegaNodeList();
-                        if(nodeList.size()==1){
-                            MegaNode node = nodeList.get(0);
-                            if(node.hasPreview()){
-                                log("Show full screen viewer");
-                                showFullScreenViewer(m.getMessage().getMsgId());
-                            }
-                            else{
-                                log("show node attachment panel for one node");
-                                showNodeAttachmentBottomSheet(m, position);
-                            }
-                        }
-                        else{
-                            log("show node attachment panel");
-                            showNodeAttachmentBottomSheet(m, position);
+                if(m!=null){
+                    if(m.isUploading()){
+                        if(m.getPendingMessage().getState()==PendingMessage.STATE_ERROR){
+                            showUploadingAttachmentBottomSheet(m, position);
                         }
                     }
-                    if(m.getMessage().getType()==MegaChatMessage.TYPE_CONTACT_ATTACHMENT){
-                        log("show contact attachment panel");
-                        if (m != null) {
-                            if (m.getMessage().getUsersCount() == 1) {
-                                long userHandle = m.getMessage().getUserHandle(0);
-                                if(userHandle != megaApi.getMyUser().getHandle()){
-                                    showContactAttachmentBottomSheet(m, position);
+                    else{
+                        if(m.getMessage().getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT){
+
+                            MegaNodeList nodeList = m.getMessage().getMegaNodeList();
+                            if(nodeList.size()==1){
+                                MegaNode node = nodeList.get(0);
+                                if(node.hasPreview()){
+                                    log("Show full screen viewer");
+                                    showFullScreenViewer(m.getMessage().getMsgId());
+                                }
+                                else{
+                                    log("show node attachment panel for one node");
+                                    showNodeAttachmentBottomSheet(m, position);
                                 }
                             }
                             else{
-                                showContactAttachmentBottomSheet(m, position);
+                                log("show node attachment panel");
+                                showNodeAttachmentBottomSheet(m, position);
                             }
                         }
-                    }
-                    else if(m.getMessage().getUserHandle()==megaChatApi.getMyUserHandle()) {
-                        if(!(m.getMessage().isManagementMessage())){
-                            log("selected message: "+m.getMessage().getContent());
-                            log("selected message handle: "+m.getMessage().getTempId());
-                            log("selected message rowId: "+m.getMessage().getRowId());
-                            if((m.getMessage().getStatus()==MegaChatMessage.STATUS_SERVER_REJECTED)||(m.getMessage().getStatus()==MegaChatMessage.STATUS_SENDING_MANUAL)){
-                                log("show not sent message panel");
-                                showMsgNotSentPanel(m, position);
+                        if(m.getMessage().getType()==MegaChatMessage.TYPE_CONTACT_ATTACHMENT){
+                            log("show contact attachment panel");
+                            if (m != null) {
+                                if (m.getMessage().getUsersCount() == 1) {
+                                    long userHandle = m.getMessage().getUserHandle(0);
+                                    if(userHandle != megaApi.getMyUser().getHandle()){
+                                        showContactAttachmentBottomSheet(m, position);
+                                    }
+                                }
+                                else{
+                                    showContactAttachmentBottomSheet(m, position);
+                                }
+                            }
+                        }
+                        else if(m.getMessage().getUserHandle()==megaChatApi.getMyUserHandle()) {
+                            if(!(m.getMessage().isManagementMessage())){
+                                log("selected message: "+m.getMessage().getContent());
+                                log("selected message handle: "+m.getMessage().getTempId());
+                                log("selected message rowId: "+m.getMessage().getRowId());
+                                if((m.getMessage().getStatus()==MegaChatMessage.STATUS_SERVER_REJECTED)||(m.getMessage().getStatus()==MegaChatMessage.STATUS_SENDING_MANUAL)){
+                                    log("show not sent message panel");
+                                    showMsgNotSentPanel(m, position);
+                                }
                             }
                         }
                     }
                 }
-            }
 
+            }
+        }
+        else{
+            log("DO NOTHING: Position ("+position+") is more than size in messages (size: "+messages.size()+")");
         }
     }
-
 
     public void showFullScreenViewer(long msgId){
         log("showFullScreenViewer");
