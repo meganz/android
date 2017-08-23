@@ -236,7 +236,9 @@ public class CallsChat extends PinActivityLollipop implements MegaRequestListene
 
             myImage = (RoundedImageView) findViewById(R.id.call_chat_my_image);
             myImageBorder = (RelativeLayout) findViewById(R.id.call_chat_my_image_rl);
+            myImageBorder.setVisibility(View.GONE);
             callChatMyVideo = (RelativeLayout) findViewById(R.id.call_chat_my_video);
+            callChatMyVideo.setVisibility(View.VISIBLE);
             myInitialLetter = (TextView) findViewById(R.id.call_chat_my_image_initial_letter);
 
             imageLayout = (RelativeLayout) findViewById(R.id.call_chat_contact_image_layout);
@@ -254,13 +256,14 @@ public class CallsChat extends PinActivityLollipop implements MegaRequestListene
                     if(callChatMyVideo.isShown()){
                         callChatMyVideo.setVisibility(View.GONE);
                         myImageBorder.setVisibility(View.VISIBLE);
-                        firstFAB.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.accentColor)));
+                        firstFAB.setBackgroundTintList(ColorStateList.valueOf(Color.BLACK));
 
 
                     }else{
                         callChatMyVideo.setVisibility(View.VISIBLE);
                         myImageBorder.setVisibility(View.GONE);
-                        firstFAB.setBackgroundTintList(ColorStateList.valueOf(Color.BLACK));
+                        firstFAB.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.accentColor)));
+
 
 
                     }
@@ -328,7 +331,9 @@ public class CallsChat extends PinActivityLollipop implements MegaRequestListene
             log("From contacts!!");
             fromContacts = true;
             userEmailExtra = extras.getString("name");
+            String myLetter = extras.getString("initialLetter");
             user = megaApi.getContact(userEmailExtra);
+            myInitialLetter.setText(myLetter);
 
             String fullName = "";
             if (user != null) {
@@ -583,8 +588,6 @@ public class CallsChat extends PinActivityLollipop implements MegaRequestListene
 
         c.drawCircle(defaultAvatar.getWidth()/2, defaultAvatar.getHeight()/2, radius, p);
         myImage.setImageBitmap(defaultAvatar);
-        myInitialLetter.setText(firstLetter);
-
 
         myInitialLetter.setTextSize(40);
         myInitialLetter.setTextColor(Color.WHITE);
