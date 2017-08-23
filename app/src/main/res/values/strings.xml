@@ -1010,7 +1010,7 @@
     <string name="limited_bandwith" context="Word to indicate the limited bandwidth of the free accounts">Limited</string>
 
     <string name="section_chat" context="Item of the navigation title for the chat section">Chat BETA</string>
-    <string name="section_chat_with_notification" context="Item of the navigation title for the chat section when there is any unread message"><![CDATA[Chat BETA <font color=\'#ff333a\'>(%1$d)</font>]]></string>
+    <string name="section_chat_with_notification" context="Item of the navigation title for the chat section when there is any unread message">Chat BETA [A](%1$d)[/A]</string>
 
     <string name="tab_archive_chat" context="Title of the archived chats tab. Capital letters">Archive</string>
     <!--
