@@ -896,6 +896,19 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 if(message.getUserHandle()==myUserHandle){
                     log("I changed my Own permission");
                     textToShow = String.format(context.getString(R.string.message_permissions_changed), megaChatApi.getMyFullname(), privilegeString, megaChatApi.getMyFullname());
+                    try{
+                        textToShow = textToShow.replace("[A]", "<font color=\'#060000\'>");
+                        textToShow = textToShow.replace("[/A]", "</font>");
+                        textToShow = textToShow.replace("[B]", "<font color=\'#868686\'>");
+                        textToShow = textToShow.replace("[/B]", "</font>");
+                        textToShow = textToShow.replace("[C]", "<font color=\'#060000\'>");
+                        textToShow = textToShow.replace("[/C]", "</font>");
+                        textToShow = textToShow.replace("[D]", "<font color=\'#868686\'>");
+                        textToShow = textToShow.replace("[/D]", "</font>");
+                        textToShow = textToShow.replace("[E]", "<font color=\'#060000\'>");
+                        textToShow = textToShow.replace("[/E]", "</font>");
+                    }
+                    catch (Exception e){}
                 }
                 else{
                     log("I was change by someone");
@@ -921,6 +934,19 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                         }
                     }
                     textToShow = String.format(context.getString(R.string.message_permissions_changed), megaChatApi.getMyFullname(), privilegeString, fullNameAction);
+                    try{
+                        textToShow = textToShow.replace("[A]", "<font color=\'#060000\'>");
+                        textToShow = textToShow.replace("[/A]", "</font>");
+                        textToShow = textToShow.replace("[B]", "<font color=\'#868686\'>");
+                        textToShow = textToShow.replace("[/B]", "</font>");
+                        textToShow = textToShow.replace("[C]", "<font color=\'#060000\'>");
+                        textToShow = textToShow.replace("[/C]", "</font>");
+                        textToShow = textToShow.replace("[D]", "<font color=\'#868686\'>");
+                        textToShow = textToShow.replace("[/D]", "</font>");
+                        textToShow = textToShow.replace("[E]", "<font color=\'#060000\'>");
+                        textToShow = textToShow.replace("[/E]", "</font>");
+                    }
+                    catch (Exception e){}
                 }
 
                 Spanned result = null;
@@ -1069,6 +1095,19 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 if(message.getUserHandle()==myUserHandle){
                     log("The privilege was change by me");
                     textToShow = String.format(context.getString(R.string.message_permissions_changed), ((ViewHolderMessageChat)holder).fullNameTitle, privilegeString, megaChatApi.getMyFullname());
+                    try{
+                        textToShow = textToShow.replace("[A]", "<font color=\'#060000\'>");
+                        textToShow = textToShow.replace("[/A]", "</font>");
+                        textToShow = textToShow.replace("[B]", "<font color=\'#868686\'>");
+                        textToShow = textToShow.replace("[/B]", "</font>");
+                        textToShow = textToShow.replace("[C]", "<font color=\'#060000\'>");
+                        textToShow = textToShow.replace("[/C]", "</font>");
+                        textToShow = textToShow.replace("[D]", "<font color=\'#868686\'>");
+                        textToShow = textToShow.replace("[/D]", "</font>");
+                        textToShow = textToShow.replace("[E]", "<font color=\'#060000\'>");
+                        textToShow = textToShow.replace("[/E]", "</font>");
+                    }
+                    catch (Exception e){}
 
                 }
                 else{
@@ -1096,6 +1135,19 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     }
 
                     textToShow = String.format(context.getString(R.string.message_permissions_changed), ((ViewHolderMessageChat)holder).fullNameTitle, privilegeString, fullNameAction);
+                    try{
+                        textToShow = textToShow.replace("[A]", "<font color=\'#060000\'>");
+                        textToShow = textToShow.replace("[/A]", "</font>");
+                        textToShow = textToShow.replace("[B]", "<font color=\'#868686\'>");
+                        textToShow = textToShow.replace("[/B]", "</font>");
+                        textToShow = textToShow.replace("[C]", "<font color=\'#060000\'>");
+                        textToShow = textToShow.replace("[/C]", "</font>");
+                        textToShow = textToShow.replace("[D]", "<font color=\'#868686\'>");
+                        textToShow = textToShow.replace("[/D]", "</font>");
+                        textToShow = textToShow.replace("[E]", "<font color=\'#060000\'>");
+                        textToShow = textToShow.replace("[/E]", "</font>");
+                    }
+                    catch (Exception e){}
                 }
                 Spanned result = null;
                 if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
