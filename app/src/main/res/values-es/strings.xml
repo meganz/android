@@ -972,7 +972,7 @@
 
     <string name="change_title_messages" context="Message shown when a participant change the title of a group chat.">[A]%1$s[/A][B] cambió el nombre del grupo a [/B][C]\"%2$s\"[/C]</string>
 
-    <string name="message_participant_left_group_chat" context="chat message when a participant left a group chat"><![CDATA[<font color=\'#060000\'>%1$s</font><font color=\'#868686\'> dejó el chat</font>]]></string>
+    <string name="message_participant_left_group_chat" context="chat message when a participant left a group chat">[A]%1$s[/A][B] dejó el chat[/B]</string>
 
     <string name="manual_retry_alert" context="chat message alert when the message have to been manually">Mensaje no enviado. Tocar para opciones</string>
 

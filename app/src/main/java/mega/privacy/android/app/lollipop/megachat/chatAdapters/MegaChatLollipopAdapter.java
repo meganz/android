@@ -625,7 +625,13 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     if(message.getUserHandle()==message.getHandleOfAction()){
                         log("I left the chat");
                         textToShow = String.format(context.getString(R.string.message_participant_left_group_chat), megaChatApi.getMyFullname());
-
+                        try{
+                            textToShow = textToShow.replace("[A]", "<font color=\'#060000\'>");
+                            textToShow = textToShow.replace("[/A]", "</font>");
+                            textToShow = textToShow.replace("[B]", "<font color=\'#868686\'>");
+                            textToShow = textToShow.replace("[/B]", "</font>");
+                        }
+                        catch (Exception e){}
                     }
                     else{
                         textToShow = String.format(context.getString(R.string.message_remove_participant), megaChatApi.getMyFullname(), fullNameAction);
@@ -843,6 +849,13 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                             log("The participant left the chat");
 
                             textToShow = String.format(context.getString(R.string.message_participant_left_group_chat), ((ViewHolderMessageChat)holder).fullNameTitle);
+                            try{
+                                textToShow = textToShow.replace("[A]", "<font color=\'#060000\'>");
+                                textToShow = textToShow.replace("[/A]", "</font>");
+                                textToShow = textToShow.replace("[B]", "<font color=\'#868686\'>");
+                                textToShow = textToShow.replace("[/B]", "</font>");
+                            }
+                            catch (Exception e){}
 
                         }
                         else{
