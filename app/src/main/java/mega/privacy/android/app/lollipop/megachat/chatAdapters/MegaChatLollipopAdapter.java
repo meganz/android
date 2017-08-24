@@ -6,9 +6,15 @@ import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.BitmapShader;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
+import android.graphics.RectF;
+import android.graphics.Shader;
 import android.graphics.Typeface;
 import android.media.ExifInterface;
 import android.os.AsyncTask;
@@ -27,6 +33,7 @@ import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
@@ -203,6 +210,13 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
         RelativeLayout itemLayout;
 
+
+        RelativeLayout previewFramePort;
+        RelativeLayout previewFrameLand;
+
+        RelativeLayout previewFrameContactPort;
+
+
         RelativeLayout dateLayout;
         TextView dateText;
         RelativeLayout ownMessageLayout;
@@ -240,7 +254,10 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         TextView contentContactMessageText;
 
         ImageView contentContactMessageThumbLand;
+        ImageView contentContactMessageThumbLandFramework;
         ImageView contentContactMessageThumbPort;
+        ImageView contentContactMessageThumbPortFramework;
+
         RelativeLayout contentContactMessageFileLayout;
         ImageView contentContactMessageFileThumb;
         TextView contentContactMessageFileName;
@@ -313,6 +330,12 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         holder.titleOwnMessage = (RelativeLayout) v.findViewById(R.id.title_own_message_layout);
 //        holder.meText = (TextView) v.findViewById(R.id.message_chat_me_text);
 
+
+        holder.previewFramePort = (RelativeLayout) v.findViewById(R.id.preview_frame_portrait);
+        holder.previewFrameLand = (RelativeLayout) v.findViewById(R.id.preview_frame_landscape);
+
+       // holder.previewFrameContactPort = (RelativeLayout) v.findViewById(R.id.preview_frame_contact_portrait);
+
         holder.timeOwnText = (TextView) v.findViewById(R.id.message_chat_time_text);
 
         holder.contentOwnMessageLayout = (RelativeLayout) v.findViewById(R.id.content_own_message_layout);
@@ -365,7 +388,11 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         holder.contentContactMessageText = (WrapTextView) v.findViewById(R.id.content_contact_message_text);
 
         holder.contentContactMessageThumbLand = (ImageView)  v.findViewById(R.id.content_contact_message_thumb_landscape);
+        holder.contentContactMessageThumbLandFramework = (ImageView)  v.findViewById(R.id.content_contact_message_thumb_landscape_framework);
+
         holder.contentContactMessageThumbPort = (ImageView)  v.findViewById(R.id.content_contact_message_thumb_portrait);
+        holder.contentContactMessageThumbPortFramework = (ImageView)  v.findViewById(R.id.content_contact_message_thumb_portrait_framework);
+
 
         holder.contentContactMessageFileLayout = (RelativeLayout)  v.findViewById(R.id.content_contact_message_file_layout);
         holder.contentContactMessageFileSender = (TextView)  v.findViewById(R.id.content_contact_message_file_sender);
@@ -448,8 +475,12 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         ((ViewHolderMessageChat)holder).contactMessageLayout.setVisibility(View.GONE);
 
         ((ViewHolderMessageChat)holder).contentOwnMessageText.setVisibility(View.GONE);
+        ((ViewHolderMessageChat)holder).previewFrameLand.setVisibility(View.GONE);
         ((ViewHolderMessageChat)holder).contentOwnMessageThumbLand.setVisibility(View.GONE);
+        ((ViewHolderMessageChat)holder).previewFramePort.setVisibility(View.GONE);
         ((ViewHolderMessageChat)holder).contentOwnMessageThumbPort.setVisibility(View.GONE);
+
+
 
         ((ViewHolderMessageChat)holder).contentOwnMessageFileLayout.setVisibility(View.VISIBLE);
 
@@ -1275,8 +1306,11 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                         log("MY Message is edited");
 
                         ((ViewHolderMessageChat) holder).contentOwnMessageText.setVisibility(View.VISIBLE);
+                        ((ViewHolderMessageChat)holder).previewFrameLand.setVisibility(View.GONE);
                         ((ViewHolderMessageChat) holder).contentOwnMessageThumbLand.setVisibility(View.GONE);
+                        ((ViewHolderMessageChat)holder).previewFramePort.setVisibility(View.GONE);
                         ((ViewHolderMessageChat) holder).contentOwnMessageThumbPort.setVisibility(View.GONE);
+
                         ((ViewHolderMessageChat) holder).contentOwnMessageFileLayout.setVisibility(View.GONE);
                         ((ViewHolderMessageChat) holder).contentOwnMessageContactLayout.setVisibility(View.GONE);
 
@@ -1345,8 +1379,11 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                         ((ViewHolderMessageChat)holder).ownManagementMessageText.setText(context.getString(R.string.text_deleted_message));
                         ((ViewHolderMessageChat)holder).ownManagementMessageLayout.setVisibility(View.VISIBLE);
 
+                        ((ViewHolderMessageChat)holder).previewFrameLand.setVisibility(View.GONE);
                         ((ViewHolderMessageChat) holder).contentOwnMessageThumbLand.setVisibility(View.GONE);
+                        ((ViewHolderMessageChat)holder).previewFramePort.setVisibility(View.GONE);
                         ((ViewHolderMessageChat) holder).contentOwnMessageThumbPort.setVisibility(View.GONE);
+
                         ((ViewHolderMessageChat) holder).contentOwnMessageFileLayout.setVisibility(View.GONE);
                         ((ViewHolderMessageChat) holder).contentOwnMessageContactLayout.setVisibility(View.GONE);
 
@@ -1380,8 +1417,11 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                         if(message.getType()==MegaChatMessage.TYPE_NORMAL){
 
                             ((ViewHolderMessageChat)holder).contentOwnMessageText.setVisibility(View.VISIBLE);
+                            ((ViewHolderMessageChat)holder).previewFrameLand.setVisibility(View.GONE);
                             ((ViewHolderMessageChat)holder).contentOwnMessageThumbLand.setVisibility(View.GONE);
+                            ((ViewHolderMessageChat)holder).previewFramePort.setVisibility(View.GONE);
                             ((ViewHolderMessageChat)holder).contentOwnMessageThumbPort.setVisibility(View.GONE);
+
                             ((ViewHolderMessageChat)holder).contentOwnMessageFileLayout.setVisibility(View.GONE);
 
                             ((ViewHolderMessageChat)holder).contentOwnMessageContactLayout.setVisibility(View.GONE);
@@ -1414,8 +1454,11 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                         else if(message.getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT){
 
                             ((ViewHolderMessageChat)holder).contentOwnMessageText.setVisibility(View.GONE);
+                            ((ViewHolderMessageChat)holder).previewFrameLand.setVisibility(View.GONE);
                             ((ViewHolderMessageChat)holder).contentOwnMessageThumbLand.setVisibility(View.GONE);
+                            ((ViewHolderMessageChat)holder).previewFramePort.setVisibility(View.GONE);
                             ((ViewHolderMessageChat)holder).contentOwnMessageThumbPort.setVisibility(View.GONE);
+
 
                             ((ViewHolderMessageChat)holder).contentOwnMessageFileLayout.setVisibility(View.VISIBLE);
 
@@ -1459,38 +1502,53 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                         Bitmap preview = null;
                                         preview = PreviewUtils.getPreviewFromCache(node);
                                         if (preview != null) {
-                                             PreviewUtils.previewCache.put(node.getHandle(), preview);
+
+                                            PreviewUtils.previewCache.put(node.getHandle(), preview);
                                             if (preview.getWidth() < preview.getHeight()) {
                                                 log("Portrait");
+
                                                 ((ViewHolderMessageChat) holder).contentOwnMessageThumbPort.setImageBitmap(preview);
+                                                ((ViewHolderMessageChat) holder).previewFramePort.setVisibility(View.VISIBLE);
                                                 ((ViewHolderMessageChat) holder).contentOwnMessageThumbPort.setVisibility(View.VISIBLE);
                                                 ((ViewHolderMessageChat) holder).contentOwnMessageFileLayout.setVisibility(View.GONE);
+                                                ((ViewHolderMessageChat)holder).previewFrameLand.setVisibility(View.GONE);
                                                 ((ViewHolderMessageChat) holder).contentOwnMessageThumbLand.setVisibility(View.GONE);
 
                                             } else {
                                                 log("Landcape");
+
                                                 ((ViewHolderMessageChat) holder).contentOwnMessageThumbLand.setImageBitmap(preview);
+                                                ((ViewHolderMessageChat)holder).previewFrameLand.setVisibility(View.VISIBLE);
                                                 ((ViewHolderMessageChat) holder).contentOwnMessageThumbLand.setVisibility(View.VISIBLE);
                                                 ((ViewHolderMessageChat) holder).contentOwnMessageFileLayout.setVisibility(View.GONE);
+                                                ((ViewHolderMessageChat) holder).previewFramePort.setVisibility(View.GONE);
                                                 ((ViewHolderMessageChat) holder).contentOwnMessageThumbPort.setVisibility(View.GONE);
                                             }
 
                                         } else {
+
                                             preview = PreviewUtils.getPreviewFromFolder(node, context);
                                             if (preview != null) {
                                                 PreviewUtils.previewCache.put(node.getHandle(), preview);
                                                 if (preview.getWidth() < preview.getHeight()) {
                                                     log("Portrait");
+
+
                                                     ((ViewHolderMessageChat) holder).contentOwnMessageThumbPort.setImageBitmap(preview);
+                                                    ((ViewHolderMessageChat) holder).previewFramePort.setVisibility(View.VISIBLE);
                                                     ((ViewHolderMessageChat) holder).contentOwnMessageThumbPort.setVisibility(View.VISIBLE);
                                                     ((ViewHolderMessageChat) holder).contentOwnMessageFileLayout.setVisibility(View.GONE);
+                                                    ((ViewHolderMessageChat)holder).previewFrameLand.setVisibility(View.GONE);
                                                     ((ViewHolderMessageChat) holder).contentOwnMessageThumbLand.setVisibility(View.GONE);
 
                                                 } else {
                                                     log("Landcape");
+
                                                     ((ViewHolderMessageChat) holder).contentOwnMessageThumbLand.setImageBitmap(preview);
+                                                    ((ViewHolderMessageChat)holder).previewFrameLand.setVisibility(View.VISIBLE);
                                                     ((ViewHolderMessageChat) holder).contentOwnMessageThumbLand.setVisibility(View.VISIBLE);
                                                     ((ViewHolderMessageChat) holder).contentOwnMessageFileLayout.setVisibility(View.GONE);
+                                                    ((ViewHolderMessageChat) holder).previewFramePort.setVisibility(View.GONE);
                                                     ((ViewHolderMessageChat) holder).contentOwnMessageThumbPort.setVisibility(View.GONE);
                                                 }
 
@@ -1498,7 +1556,9 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                                                 if (pendingPreviews.contains(node.getHandle())) {
                                                     log("the preview is already downloaded or added to the list");
+
                                                 } else {
+
                                                     File previewFile = new File(PreviewUtils.getPreviewFolder(context), node.getBase64Handle() + ".jpg");
 
                                                     PreviewDownloadListener listener = new PreviewDownloadListener(context, (ViewHolderMessageChat) holder, this);
@@ -1512,6 +1572,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                             }
                                         }
                                     }
+                                    ((ViewHolderMessageChat)holder).contentContactMessageFileLayout.setElevation(0);
+
                                 }
                                 else{
                                     long totalSize = 0;
@@ -1538,8 +1600,11 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                         }
                         else if(message.getType()==MegaChatMessage.TYPE_REVOKE_NODE_ATTACHMENT){
                             ((ViewHolderMessageChat)holder).contentOwnMessageText.setVisibility(View.VISIBLE);
+                            ((ViewHolderMessageChat)holder).previewFrameLand.setVisibility(View.GONE);
                             ((ViewHolderMessageChat)holder).contentOwnMessageThumbLand.setVisibility(View.GONE);
+                            ((ViewHolderMessageChat)holder).previewFramePort.setVisibility(View.GONE);
                             ((ViewHolderMessageChat)holder).contentOwnMessageThumbPort.setVisibility(View.GONE);
+
 
                             ((ViewHolderMessageChat)holder).contentOwnMessageFileLayout.setVisibility(View.GONE);
 
@@ -1559,8 +1624,11 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                         else if(message.getType()==MegaChatMessage.TYPE_CONTACT_ATTACHMENT){
 
                             ((ViewHolderMessageChat)holder).contentOwnMessageText.setVisibility(View.GONE);
+                            ((ViewHolderMessageChat)holder).previewFrameLand.setVisibility(View.GONE);
                             ((ViewHolderMessageChat)holder).contentOwnMessageThumbLand.setVisibility(View.GONE);
+                            ((ViewHolderMessageChat)holder).previewFramePort.setVisibility(View.GONE);
                             ((ViewHolderMessageChat)holder).contentOwnMessageThumbPort.setVisibility(View.GONE);
+
 
                             ((ViewHolderMessageChat)holder).contentOwnMessageFileLayout.setVisibility(View.GONE);
 
@@ -1857,6 +1925,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                 }
                                 ((ViewHolderMessageChat)holder).contentContactMessageText.setText(name);
                                 ((ViewHolderMessageChat)holder).contentContactMessageFileSender.setVisibility(View.GONE);
+
                             }
 
 
@@ -1900,9 +1969,12 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                         }
 
                         ((ViewHolderMessageChat) holder).contentContactMessageText.setVisibility(View.VISIBLE);
-                        ((ViewHolderMessageChat) holder).contentContactMessageThumbLand.setVisibility(View.GONE);
-                        ((ViewHolderMessageChat) holder).contentContactMessageThumbPort.setVisibility(View.GONE);
                         ((ViewHolderMessageChat) holder).contentContactMessageFileLayout.setVisibility(View.GONE);
+                        ((ViewHolderMessageChat) holder).contentContactMessageThumbLand.setVisibility(View.GONE);
+                        ((ViewHolderMessageChat) holder).contentContactMessageThumbLandFramework.setVisibility(View.GONE);
+                        ((ViewHolderMessageChat) holder).previewFrameContactPort.setVisibility(View.GONE);
+                        ((ViewHolderMessageChat) holder).contentContactMessageThumbPort.setVisibility(View.GONE);
+                        ((ViewHolderMessageChat) holder).contentContactMessageThumbPortFramework.setVisibility(View.GONE);
                         ((ViewHolderMessageChat) holder).contentContactMessageContactLayout.setVisibility(View.GONE);
 
                         Spannable content = new SpannableString(messageContent);
@@ -1949,7 +2021,11 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                         ((ViewHolderMessageChat)holder).contactManagementMessageLayout.setVisibility(View.VISIBLE);
 
                         ((ViewHolderMessageChat) holder).contentContactMessageThumbLand.setVisibility(View.GONE);
+                        ((ViewHolderMessageChat) holder).contentContactMessageThumbLandFramework.setVisibility(View.GONE);
+                        ((ViewHolderMessageChat) holder).previewFrameContactPort.setVisibility(View.GONE);
                         ((ViewHolderMessageChat) holder).contentContactMessageThumbPort.setVisibility(View.GONE);
+                        ((ViewHolderMessageChat) holder).contentContactMessageThumbPortFramework.setVisibility(View.GONE);
+
                         ((ViewHolderMessageChat) holder).contentContactMessageFileLayout.setVisibility(View.GONE);
                         ((ViewHolderMessageChat) holder).contentContactMessageContactLayout.setVisibility(View.GONE);
 
@@ -2012,7 +2088,10 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                             ((ViewHolderMessageChat)holder).contentContactMessageText.setVisibility(View.VISIBLE);
                             ((ViewHolderMessageChat)holder).contentContactMessageThumbLand.setVisibility(View.GONE);
+                            ((ViewHolderMessageChat) holder).contentContactMessageThumbLandFramework.setVisibility(View.GONE);
                             ((ViewHolderMessageChat)holder).contentContactMessageThumbPort.setVisibility(View.GONE);
+                            ((ViewHolderMessageChat) holder).contentContactMessageThumbPortFramework.setVisibility(View.GONE);
+
                             ((ViewHolderMessageChat)holder).contentContactMessageFileLayout.setVisibility(View.GONE);
 
                             ((ViewHolderMessageChat)holder).contentContactMessageContactLayout.setVisibility(View.GONE);
@@ -2032,9 +2111,13 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                             ((ViewHolderMessageChat)holder).contentContactMessageText.setVisibility(View.GONE);
                             ((ViewHolderMessageChat)holder).contentContactMessageThumbLand.setVisibility(View.GONE);
+                            ((ViewHolderMessageChat) holder).contentContactMessageThumbLandFramework.setVisibility(View.GONE);
                             ((ViewHolderMessageChat)holder).contentContactMessageThumbPort.setVisibility(View.GONE);
+                            ((ViewHolderMessageChat) holder).contentContactMessageThumbPortFramework.setVisibility(View.GONE);
+
 
                             ((ViewHolderMessageChat)holder).contentContactMessageFileLayout.setVisibility(View.VISIBLE);
+                            ((ViewHolderMessageChat)holder).contentContactMessageFileLayout.setElevation(0);
 
                             ((ViewHolderMessageChat)holder).contentContactMessageFileThumb.setVisibility(View.VISIBLE);
                             ((ViewHolderMessageChat)holder).contentContactMessageFileName.setVisibility(View.VISIBLE);
@@ -2075,13 +2158,20 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                     Bitmap preview = null;
                                     preview = PreviewUtils.getPreviewFromCache(node);
                                     if (preview != null){
+                                        ((ViewHolderMessageChat)holder).contentContactMessageFileLayout.setElevation(2);
+
                                         log("Success -> getPreviewFromCache");
                                         PreviewUtils.previewCache.put(node.getHandle(), preview);
                                         if (preview.getWidth() < preview.getHeight()) {
                                             log("Portrait");
+
                                             ((ViewHolderMessageChat) holder).contentContactMessageThumbPort.setImageBitmap(preview);
+
                                             ((ViewHolderMessageChat) holder).contentContactMessageThumbPort.setVisibility(View.VISIBLE);
+                                            ((ViewHolderMessageChat) holder).contentContactMessageThumbPortFramework.setVisibility(View.VISIBLE);
+
                                             ((ViewHolderMessageChat) holder).contentContactMessageThumbLand.setVisibility(View.GONE);
+                                            ((ViewHolderMessageChat) holder).contentContactMessageThumbLandFramework.setVisibility(View.GONE);
 
                                             ((ViewHolderMessageChat)holder).contentContactMessageFileThumb.setVisibility(View.GONE);
                                             ((ViewHolderMessageChat)holder).contentContactMessageFileName.setVisibility(View.GONE);
@@ -2091,6 +2181,10 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                                 RelativeLayout.LayoutParams contactThumbParams = (RelativeLayout.LayoutParams)((ViewHolderMessageChat)holder).contentContactMessageThumbPort.getLayoutParams();
                                                 contactThumbParams.setMargins(0, Util.scaleHeightPx(10, outMetrics) ,0, 0);
                                                 ((ViewHolderMessageChat)holder).contentContactMessageThumbPort.setLayoutParams(contactThumbParams);
+                                                ((ViewHolderMessageChat)holder).contentContactMessageThumbPortFramework.setLayoutParams(contactThumbParams);
+                                                ((ViewHolderMessageChat)holder).contentContactMessageThumbPortFramework.setBackgroundResource(R.drawable.shape_images_chat_3);
+
+
 
                                                 log("Max width to MAX_WIDTH_NAME_SENDER_GROUP_THUMB");
                                                 float width = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MAX_WIDTH_NAME_SENDER_GROUP_THUMB_PORTRAIT_PICTURE, context.getResources().getDisplayMetrics());
@@ -2100,6 +2194,10 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                                 RelativeLayout.LayoutParams contactThumbParams = (RelativeLayout.LayoutParams)((ViewHolderMessageChat)holder).contentContactMessageThumbPort.getLayoutParams();
                                                 contactThumbParams.setMargins(0, 0 ,0, 0);
                                                 ((ViewHolderMessageChat)holder).contentContactMessageThumbPort.setLayoutParams(contactThumbParams);
+                                                ((ViewHolderMessageChat)holder).contentContactMessageThumbPortFramework.setLayoutParams(contactThumbParams);
+                                                ((ViewHolderMessageChat)holder).contentContactMessageThumbPortFramework.setBackgroundResource(R.drawable.shape_images_chat);
+
+
                                             }
 
                                         } else {
@@ -2107,7 +2205,11 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                                             ((ViewHolderMessageChat) holder).contentContactMessageThumbLand.setImageBitmap(preview);
                                             ((ViewHolderMessageChat) holder).contentContactMessageThumbLand.setVisibility(View.VISIBLE);
+                                            ((ViewHolderMessageChat) holder).contentContactMessageThumbLandFramework.setVisibility(View.VISIBLE);
+
                                             ((ViewHolderMessageChat) holder).contentContactMessageThumbPort.setVisibility(View.GONE);
+                                            ((ViewHolderMessageChat) holder).contentContactMessageThumbPortFramework.setVisibility(View.GONE);
+
 
                                             ((ViewHolderMessageChat)holder).contentContactMessageFileThumb.setVisibility(View.GONE);
                                             ((ViewHolderMessageChat)holder).contentContactMessageFileName.setVisibility(View.GONE);
@@ -2117,6 +2219,10 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                                 RelativeLayout.LayoutParams contactThumbParams = (RelativeLayout.LayoutParams)((ViewHolderMessageChat)holder).contentContactMessageThumbLand.getLayoutParams();
                                                 contactThumbParams.setMargins(0, Util.scaleHeightPx(10, outMetrics) ,0, 0);
                                                 ((ViewHolderMessageChat)holder).contentContactMessageThumbLand.setLayoutParams(contactThumbParams);
+                                                ((ViewHolderMessageChat)holder).contentContactMessageThumbLandFramework.setLayoutParams(contactThumbParams);
+                                                ((ViewHolderMessageChat)holder).contentContactMessageThumbLandFramework.setBackgroundResource(R.drawable.shape_images_chat_3);
+
+
 
                                                 log("Max width to 220");
                                                 float width = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MAX_WIDTH_NAME_SENDER_GROUP_THUMB_LAND_PICTURE, context.getResources().getDisplayMetrics())- 8;
@@ -2126,20 +2232,34 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                                 RelativeLayout.LayoutParams contactThumbParams = (RelativeLayout.LayoutParams)((ViewHolderMessageChat)holder).contentContactMessageThumbLand.getLayoutParams();
                                                 contactThumbParams.setMargins(0, 0 ,0, 0);
                                                 ((ViewHolderMessageChat)holder).contentContactMessageThumbLand.setLayoutParams(contactThumbParams);
+                                                ((ViewHolderMessageChat)holder).contentContactMessageThumbLandFramework.setLayoutParams(contactThumbParams);
+                                                ((ViewHolderMessageChat)holder).contentContactMessageThumbLandFramework.setBackgroundResource(R.drawable.shape_images_chat);
+
+
                                             }
                                         }
                                     }
                                     else {
+
+
                                         log("Fail -> getPreviewFromCache");
                                         preview = PreviewUtils.getPreviewFromFolder(node, context);
                                         if (preview != null) {
+
                                             log("SUCCESS -> getPreviewFromFolder");
                                             PreviewUtils.previewCache.put(node.getHandle(), preview);
+                                            ((ViewHolderMessageChat)holder).contentContactMessageFileLayout.setElevation(2);
+
                                             if (preview.getWidth() < preview.getHeight()) {
                                                 log("Portrait");
                                                 ((ViewHolderMessageChat) holder).contentContactMessageThumbPort.setImageBitmap(preview);
+
                                                 ((ViewHolderMessageChat) holder).contentContactMessageThumbPort.setVisibility(View.VISIBLE);
+                                                ((ViewHolderMessageChat) holder).contentContactMessageThumbPortFramework.setVisibility(View.VISIBLE);
+
                                                 ((ViewHolderMessageChat) holder).contentContactMessageThumbLand.setVisibility(View.GONE);
+                                                ((ViewHolderMessageChat) holder).contentContactMessageThumbLandFramework.setVisibility(View.GONE);
+
 
                                                 ((ViewHolderMessageChat)holder).contentContactMessageFileThumb.setVisibility(View.GONE);
                                                 ((ViewHolderMessageChat)holder).contentContactMessageFileName.setVisibility(View.GONE);
@@ -2149,6 +2269,10 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                                     RelativeLayout.LayoutParams contactThumbParams = (RelativeLayout.LayoutParams)((ViewHolderMessageChat)holder).contentContactMessageThumbPort.getLayoutParams();
                                                     contactThumbParams.setMargins(0, Util.scaleHeightPx(10, outMetrics) ,0, 0);
                                                     ((ViewHolderMessageChat)holder).contentContactMessageThumbPort.setLayoutParams(contactThumbParams);
+                                                    ((ViewHolderMessageChat)holder).contentContactMessageThumbPortFramework.setLayoutParams(contactThumbParams);
+                                                    ((ViewHolderMessageChat)holder).contentContactMessageThumbPortFramework.setBackgroundResource(R.drawable.shape_images_chat_3);
+
+
 
                                                     log("Max width to MAX_WIDTH_NAME_SENDER_GROUP_THUMB");
                                                     float width = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MAX_WIDTH_NAME_SENDER_GROUP_THUMB_PORTRAIT_PICTURE, context.getResources().getDisplayMetrics());
@@ -2158,6 +2282,10 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                                     RelativeLayout.LayoutParams contactThumbParams = (RelativeLayout.LayoutParams)((ViewHolderMessageChat)holder).contentContactMessageThumbPort.getLayoutParams();
                                                     contactThumbParams.setMargins(0, 0 ,0, 0);
                                                     ((ViewHolderMessageChat)holder).contentContactMessageThumbPort.setLayoutParams(contactThumbParams);
+                                                    ((ViewHolderMessageChat)holder).contentContactMessageThumbPortFramework.setLayoutParams(contactThumbParams);
+                                                    ((ViewHolderMessageChat)holder).contentContactMessageThumbPortFramework.setBackgroundResource(R.drawable.shape_images_chat);
+
+
                                                 }
 
                                             } else {
@@ -2165,8 +2293,10 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                                                 ((ViewHolderMessageChat) holder).contentContactMessageThumbLand.setImageBitmap(preview);
                                                 ((ViewHolderMessageChat) holder).contentContactMessageThumbLand.setVisibility(View.VISIBLE);
-                                                ((ViewHolderMessageChat) holder).contentContactMessageThumbPort.setVisibility(View.GONE);
+                                                ((ViewHolderMessageChat) holder).contentContactMessageThumbLandFramework.setVisibility(View.VISIBLE);
 
+                                                ((ViewHolderMessageChat) holder).contentContactMessageThumbPort.setVisibility(View.GONE);
+                                                ((ViewHolderMessageChat) holder).contentContactMessageThumbPortFramework.setVisibility(View.GONE);
                                                 ((ViewHolderMessageChat)holder).contentContactMessageFileThumb.setVisibility(View.GONE);
                                                 ((ViewHolderMessageChat)holder).contentContactMessageFileName.setVisibility(View.GONE);
                                                 ((ViewHolderMessageChat)holder).contentContactMessageFileSize.setVisibility(View.GONE);
@@ -2175,6 +2305,10 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                                     RelativeLayout.LayoutParams contactThumbParams = (RelativeLayout.LayoutParams)((ViewHolderMessageChat)holder).contentContactMessageThumbLand.getLayoutParams();
                                                     contactThumbParams.setMargins(0, Util.scaleHeightPx(10, outMetrics),0, 0);
                                                     ((ViewHolderMessageChat)holder).contentContactMessageThumbLand.setLayoutParams(contactThumbParams);
+                                                    ((ViewHolderMessageChat)holder).contentContactMessageThumbLandFramework.setLayoutParams(contactThumbParams);
+                                                    ((ViewHolderMessageChat)holder).contentContactMessageThumbLandFramework.setBackgroundResource(R.drawable.shape_images_chat_3);
+
+
 
                                                     log("Max width to 220");
                                                     float width = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MAX_WIDTH_NAME_SENDER_GROUP_THUMB_LAND_PICTURE, context.getResources().getDisplayMetrics())- 8;
@@ -2184,13 +2318,19 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                                     RelativeLayout.LayoutParams contactThumbParams = (RelativeLayout.LayoutParams)((ViewHolderMessageChat)holder).contentContactMessageThumbLand.getLayoutParams();
                                                     contactThumbParams.setMargins(0, 0 ,0, 0);
                                                     ((ViewHolderMessageChat)holder).contentContactMessageThumbLand.setLayoutParams(contactThumbParams);
+                                                    ((ViewHolderMessageChat)holder).contentContactMessageThumbLandFramework.setLayoutParams(contactThumbParams);
+                                                    ((ViewHolderMessageChat)holder).contentContactMessageThumbLandFramework.setBackgroundResource(R.drawable.shape_images_chat);
+
+
                                                 }
                                             }
 
                                         } else {
+
                                             log("Fail -> getPreviewFromFolder");
                                             if (node.hasPreview()){
                                                 log("Node has preview");
+
                                                 if (pendingPreviews.contains(node.getHandle())){
                                                     log("the preview is already downloaded or added to the list");
                                                 }
@@ -2207,6 +2347,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                             }
                                             else{
                                                 log("Node has NO preview!!!");
+                                                ((ViewHolderMessageChat)holder).contentContactMessageFileLayout.setElevation(0);
+
                                             }
                                         }
                                     }
@@ -2238,7 +2380,11 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                             ((ViewHolderMessageChat)holder).contentContactMessageText.setVisibility(View.VISIBLE);
                             ((ViewHolderMessageChat)holder).contentContactMessageThumbLand.setVisibility(View.GONE);
+                            ((ViewHolderMessageChat)holder).contentContactMessageThumbLandFramework.setVisibility(View.GONE);
+
+
                             ((ViewHolderMessageChat)holder).contentContactMessageThumbPort.setVisibility(View.GONE);
+                            ((ViewHolderMessageChat)holder).contentContactMessageThumbPortFramework.setVisibility(View.GONE);
 
                             ((ViewHolderMessageChat)holder).contentContactMessageFileLayout.setVisibility(View.GONE);
                             ((ViewHolderMessageChat)holder).contentContactMessageFileThumb.setVisibility(View.GONE);
@@ -2258,7 +2404,11 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                             ((ViewHolderMessageChat)holder).contentContactMessageText.setVisibility(View.GONE);
                             ((ViewHolderMessageChat)holder).contentContactMessageThumbLand.setVisibility(View.GONE);
+                            ((ViewHolderMessageChat)holder).contentContactMessageThumbLandFramework.setVisibility(View.GONE);
+
+
                             ((ViewHolderMessageChat)holder).contentContactMessageThumbPort.setVisibility(View.GONE);
+                            ((ViewHolderMessageChat)holder).contentContactMessageThumbPortFramework.setVisibility(View.GONE);
 
                             ((ViewHolderMessageChat)holder).contentContactMessageFileLayout.setVisibility(View.GONE);
                             ((ViewHolderMessageChat)holder).contentContactMessageFileThumb.setVisibility(View.GONE);
@@ -2801,39 +2951,64 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
     private void setPreview(long handle, MegaChatLollipopAdapter.ViewHolderMessageChat holder){
         log("setPreview: "+handle);
+        ((ViewHolderMessageChat)holder).contentContactMessageFileLayout.setElevation(2);
+
         if(holder!=null){
+
             File previewDir = PreviewUtils.getPreviewFolder(context);
             String base64 = MegaApiJava.handleToBase64(handle);
             File preview = new File(previewDir, base64+".jpg");
             if (preview.exists()) {
+
                 if (preview.length() > 0) {
                     Bitmap bitmap = PreviewUtils.getBitmapForCache(preview, context);
+
                     if(bitmap!=null){
+
                         PreviewUtils.previewCache.put(handle, bitmap);
+
                         if(holder.userHandle == megaChatApi.getMyUserHandle()){
+
                             log("Update my preview");
                             if (bitmap.getWidth() < bitmap.getHeight()) {
                                 log("Portrait");
+
                                 holder.contentOwnMessageThumbPort.setImageBitmap(bitmap);
+
+                                holder.previewFramePort.setVisibility(View.VISIBLE);
                                 holder.contentOwnMessageThumbPort.setVisibility(View.VISIBLE);
                                 holder.contentOwnMessageFileLayout.setVisibility(View.GONE);
+                                holder.previewFrameLand.setVisibility(View.GONE);
                                 holder.contentOwnMessageThumbLand.setVisibility(View.GONE);
                             }
                             else {
+
                                 log("Landcape");
+
                                 holder.contentOwnMessageThumbLand.setImageBitmap(bitmap);
+
+                                holder.previewFrameLand.setVisibility(View.VISIBLE);
                                 holder.contentOwnMessageThumbLand.setVisibility(View.VISIBLE);
                                 holder.contentOwnMessageFileLayout.setVisibility(View.GONE);
+                                holder.previewFramePort.setVisibility(View.GONE);
                                 holder.contentOwnMessageThumbPort.setVisibility(View.GONE);
                             }
                         }
                         else{
+
                             log("Update my contacts preview");
+
                             if (bitmap.getWidth() < bitmap.getHeight()) {
+
                                 log("Portrait");
+
                                 holder.contentContactMessageThumbPort.setImageBitmap(bitmap);
+
                                 holder.contentContactMessageThumbPort.setVisibility(View.VISIBLE);
+                                holder.contentContactMessageThumbPortFramework.setVisibility(View.VISIBLE);
+
                                 holder.contentContactMessageThumbLand.setVisibility(View.GONE);
+                                holder.contentContactMessageThumbLandFramework.setVisibility(View.GONE);
 
                                 holder.contentContactMessageFileThumb.setVisibility(View.GONE);
                                 holder.contentContactMessageFileName.setVisibility(View.GONE);
@@ -2843,6 +3018,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                     RelativeLayout.LayoutParams contactThumbParams = (RelativeLayout.LayoutParams)holder.contentContactMessageThumbPort.getLayoutParams();
                                     contactThumbParams.setMargins(0, Util.scaleHeightPx(10, outMetrics) ,0, 0);
                                     holder.contentContactMessageThumbPort.setLayoutParams(contactThumbParams);
+                                    holder.contentContactMessageThumbPortFramework.setLayoutParams(contactThumbParams);
+                                    holder.contentContactMessageThumbPortFramework.setBackgroundResource(R.drawable.shape_images_chat_3);
 
                                     log("Max width to MAX_WIDTH_NAME_SENDER_GROUP_THUMB");
                                     float width = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MAX_WIDTH_NAME_SENDER_GROUP_THUMB_PORTRAIT_PICTURE, context.getResources().getDisplayMetrics());
@@ -2852,13 +3029,21 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                     RelativeLayout.LayoutParams contactThumbParams = (RelativeLayout.LayoutParams)holder.contentContactMessageThumbPort.getLayoutParams();
                                     contactThumbParams.setMargins(0, 0 ,0, 0);
                                     holder.contentContactMessageThumbPort.setLayoutParams(contactThumbParams);
+                                    holder.contentContactMessageThumbPortFramework.setLayoutParams(contactThumbParams);
+                                    holder.contentContactMessageThumbPortFramework.setBackgroundResource(R.drawable.shape_images_chat);
                                 }
+
                             } else {
+
                                 log("Landcape");
 
                                 holder.contentContactMessageThumbLand.setImageBitmap(bitmap);
+
                                 holder.contentContactMessageThumbLand.setVisibility(View.VISIBLE);
+                                holder.contentContactMessageThumbLandFramework.setVisibility(View.VISIBLE);
+
                                 holder.contentContactMessageThumbPort.setVisibility(View.GONE);
+                                holder.contentContactMessageThumbPortFramework.setVisibility(View.GONE);
 
                                 holder.contentContactMessageFileThumb.setVisibility(View.GONE);
                                 holder.contentContactMessageFileName.setVisibility(View.GONE);
@@ -2868,6 +3053,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                     RelativeLayout.LayoutParams contactThumbParams = (RelativeLayout.LayoutParams)holder.contentContactMessageThumbLand.getLayoutParams();
                                     contactThumbParams.setMargins(0, Util.scaleHeightPx(10, outMetrics),0, 0);
                                     holder.contentContactMessageThumbLand.setLayoutParams(contactThumbParams);
+                                    holder.contentContactMessageThumbLandFramework.setLayoutParams(contactThumbParams);
+                                    holder.contentContactMessageThumbLandFramework.setBackgroundResource(R.drawable.shape_images_chat_3);
 
                                     log("Max width to 220");
                                     float width = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MAX_WIDTH_NAME_SENDER_GROUP_THUMB_LAND_PICTURE, context.getResources().getDisplayMetrics());
@@ -2877,14 +3064,23 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                     RelativeLayout.LayoutParams contactThumbParams = (RelativeLayout.LayoutParams)holder.contentContactMessageThumbLand.getLayoutParams();
                                     contactThumbParams.setMargins(0, 0 ,0, 0);
                                     holder.contentContactMessageThumbLand.setLayoutParams(contactThumbParams);
+                                    holder.contentContactMessageThumbLandFramework.setLayoutParams(contactThumbParams);
+                                    holder.contentContactMessageThumbLandFramework.setBackgroundResource(R.drawable.shape_images_chat);
+
                                 }
+
                             }
                         }
                     }
+
                 }
+
+
             }
             else{
                 log("Preview not exists");
+                ((ViewHolderMessageChat)holder).contentContactMessageFileLayout.setElevation(0);
+
             }
         }
     }
@@ -2897,14 +3093,13 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                 int currentPosition = holder.getAdapterPosition();
                 AndroidMegaChatMessage message = messages.get(currentPosition);
+                if(message.getPendingMessage()!=null) {
+                    log("State of the message: " + message.getPendingMessage().getState());
 
-                if(message.getPendingMessage()!=null){
-                    log("State of the message: "+message.getPendingMessage().getState());
-                    if(message.getPendingMessage().getState()== PendingMessage.STATE_ERROR){
+                    if (message.getPendingMessage().getState() == PendingMessage.STATE_ERROR) {
                         holder.uploadingProgressBar.setVisibility(View.GONE);
                         holder.errorUploadingLayout.setVisibility(View.VISIBLE);
-                    }
-                    else{
+                    } else {
                         holder.uploadingProgressBar.setVisibility(View.VISIBLE);
                         holder.errorUploadingLayout.setVisibility(View.GONE);
                     }
@@ -2912,36 +3107,38 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     if (bitmap.getWidth() < bitmap.getHeight()) {
                         log("Portrait");
                         holder.contentOwnMessageThumbPort.setImageBitmap(bitmap);
+                        holder.previewFramePort.setVisibility(View.VISIBLE);
                         holder.contentOwnMessageThumbPort.setVisibility(View.VISIBLE);
                         holder.contentOwnMessageFileLayout.setVisibility(View.GONE);
+                        holder.previewFrameLand.setVisibility(View.GONE);
                         holder.contentOwnMessageThumbLand.setVisibility(View.GONE);
 
-                        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams)holder.errorUploadingLayout.getLayoutParams();
-                        float width = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 160, context.getResources().getDisplayMetrics());
+                        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) holder.errorUploadingLayout.getLayoutParams();
+                        float width = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 152, context.getResources().getDisplayMetrics());
 
-                        params.width = (int)width;
-                        log("Preview ImageView width: "+width);
+                        params.width = (int) width;
+                        log("Preview ImageView width: " + width);
                         holder.errorUploadingLayout.setLayoutParams(params);
-                    }
-                    else {
-                        log("Landcape");
+                    } else {
+                        log("Landscape");
                         holder.contentOwnMessageThumbLand.setImageBitmap(bitmap);
+                        holder.previewFrameLand.setVisibility(View.VISIBLE);
                         holder.contentOwnMessageThumbLand.setVisibility(View.VISIBLE);
                         holder.contentOwnMessageFileLayout.setVisibility(View.GONE);
+                        holder.previewFramePort.setVisibility(View.GONE);
                         holder.contentOwnMessageThumbPort.setVisibility(View.GONE);
 
-                        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams)holder.errorUploadingLayout.getLayoutParams();
-                        float width = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 220, context.getResources().getDisplayMetrics());
+                        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) holder.errorUploadingLayout.getLayoutParams();
+                        float width = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 212, context.getResources().getDisplayMetrics());
 
-                        params.width = (int)width;
-                        log("Preview ImageView width: "+width);
+                        params.width = (int) width;
+                        log("Preview ImageView width: " + width);
                         holder.errorUploadingLayout.setLayoutParams(params);
                     }
                 }
                 else{
                     log("The pending message is NULL-- cannot set preview");
                 }
-
             }
             else{
                 log("Bitmap is NULL");
@@ -2980,8 +3177,10 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
             if (request.getType() == MegaRequest.TYPE_GET_ATTR_FILE){
                 if (e.getErrorCode() == MegaError.API_OK){
+
                     long handle = request.getNodeHandle();
                     pendingPreviews.remove(handle);
+
                     setPreview(handle, holder);
                 }
                 else {
@@ -2999,5 +3198,9 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         public void onRequestUpdate (MegaApiJava api, MegaRequest request){
 
         }
+
+
+
     }
+
 }
