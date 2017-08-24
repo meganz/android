@@ -965,7 +965,7 @@
     <string name="number_correctly_add_participant" context="success message when inviting multiple contacts to a group chat">%d participantes correctamente invitados</string>
     <string name="number_no_add_participant_request" context="error message when inviting multiple contacts to a group chat">%1$d participantes correctamente invitados pero %2$d no han sido invitados.</string>
 
-    <string name="message_permissions_changed" context="chat message when the permissions for a user has been changed"><![CDATA[<font color=\'#060000\'>%3$s</font><font color=\'#868686\'> ha cambiado los permisos de </font><font color=\'#060000\'>%1$s</font><font color=\'#868686\'> a </font><font color=\'#060000\'>%2$s</font>]]></string>
+    <string name="message_permissions_changed" context="chat message when the permissions for a user has been changed">[A]%3$s[/A][B] ha cambiado los permisos de [/B][C]%1$s[/C][D] a [/D][E]%2$s[/E]</string>
 
     <string name="message_add_participant" formatted="false" context="chat message when a participant was added to a group chat"><![CDATA[<font color=\'#060000\'>%1$s</font><font color=\'#868686\'> ha sido añadido al chat grupal por </font><font color=\'#060000\'>%2$s</font>]]></string>
     <string name="message_remove_participant" context="chat message when a participant was removed from a group chat"><![CDATA[<font color=\'#060000\'>%1$s</font><font color=\'#868686\'> ha sido eliminado del chat grupal por </font><font color=\'#060000\'>%2$s</font>]]></string>
