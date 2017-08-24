@@ -3733,7 +3733,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 sendMessageToUI(request.getMegaChatMessage());
             }
             else{
-                log("File NOT sent: "+e.getErrorCode());
+                log("File NOT sent: "+e.getErrorCode()+"___"+e.getErrorString());
                 showSnackbar(getString(R.string.error_attaching_node_from_cloud));
             }
         }
