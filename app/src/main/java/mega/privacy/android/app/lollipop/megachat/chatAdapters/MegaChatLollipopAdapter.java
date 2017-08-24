@@ -2952,6 +2952,20 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         }
     }
 
+    public void updateSelectionOnScroll(){
+        log("updateSelectionOnScroll");
+
+        List<Integer> selected = getSelectedItems();
+        selectedItems.clear();
+
+        for(int i=0;i<selected.size();i++){
+            int pos = selected.get(i);
+            selectedItems.put(pos+1, true);
+            notifyItemChanged(pos);
+            notifyItemChanged(pos+1);
+        }
+    }
+
     public void clearSelections() {
         log("clearSelection");
         if(selectedItems!=null){
