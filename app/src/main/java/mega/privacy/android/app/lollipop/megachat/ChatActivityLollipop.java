@@ -3067,6 +3067,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         if(messages.size()>1) {
             adjustInfoToShow(1);
         }
+
+        if(adapter.isMultipleSelect()){
+            adapter.updateSelectionOnScroll();
+        }
     }
 
     public void appendMessageAnotherMS(AndroidMegaChatMessage msg){
