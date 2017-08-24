@@ -1695,6 +1695,15 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     String messageContent = message.getContent();
 
                     String textToShow = String.format(context.getString(R.string.change_title_messages), megaChatApi.getMyFullname(), messageContent);
+                    try{
+                        textToShow = textToShow.replace("[A]", "<font color=\'#060000\'>");
+                        textToShow = textToShow.replace("[/A]", "</font>");
+                        textToShow = textToShow.replace("[B]", "<font color=\'#868686\'>");
+                        textToShow = textToShow.replace("[/B]", "</font>");
+                        textToShow = textToShow.replace("[C]", "<font color=\'#060000\'>");
+                        textToShow = textToShow.replace("[/C]", "</font>");
+                    }
+                    catch (Exception e){}
 
                     Spanned result = null;
                     if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
@@ -2414,6 +2423,15 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     String messageContent = message.getContent();
 
                     String textToShow = String.format(context.getString(R.string.change_title_messages), ((ViewHolderMessageChat)holder).fullNameTitle, messageContent);
+                    try{
+                        textToShow = textToShow.replace("[A]", "<font color=\'#060000\'>");
+                        textToShow = textToShow.replace("[/A]", "</font>");
+                        textToShow = textToShow.replace("[B]", "<font color=\'#868686\'>");
+                        textToShow = textToShow.replace("[/B]", "</font>");
+                        textToShow = textToShow.replace("[C]", "<font color=\'#060000\'>");
+                        textToShow = textToShow.replace("[/C]", "</font>");
+                    }
+                    catch (Exception e){}
 
                     Spanned result = null;
                     if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
