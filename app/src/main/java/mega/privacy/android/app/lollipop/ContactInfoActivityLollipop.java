@@ -234,8 +234,6 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 				window.setStatusBarColor(ContextCompat.getColor(this, R.color.transparent_black));
 			}
 
-
-
 			collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.collapse_toolbar);
 			contactStateIcon = (ImageView) findViewById(R.id.contact_drawable_state);
 
@@ -271,8 +269,6 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 				emailLength.setPadding(0,0,0,11);
 			}
 
-
-
 			imageGradient = (View) findViewById(R.id.gradient_view);
 
 			setTitle(null);
@@ -284,7 +280,6 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 
 			dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 
-
 			appBarLayout.post(new Runnable() {
 				@Override
 				public void run() {
@@ -294,6 +289,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 
 			chatHandle = extras.getLong("handle",-1);
 			if (chatHandle != -1) {
+
 				log("From chat!!");
 				fromContacts = false;
 				chat = megaChatApi.getChatRoom(chatHandle);
@@ -310,10 +306,12 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 
 				nameContact.setText(chat.getTitle());
 				nameLength.setText(chat.getTitle());
-
+				String fullname = (String)nameContact.getText();
+				setDefaultAvatar(fullname);
 			}
 			else{
 				log("From contacts!!");
+
 				fromContacts = true;
 				userEmailExtra = extras.getString("name");
 				user = megaApi.getContact(userEmailExtra);
@@ -346,8 +344,6 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 
 						nameContact.setText(fullName);
 						nameLength.setText(fullName);
-
-
 					}
 					else{
 						log("The contactDB is null: ");
@@ -366,15 +362,11 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 					}
 
 				}
-
 				setDefaultAvatar(fullName);
 			}
 
 			//OPTIONS LAYOUT
 			optionsLayout = (LinearLayout) findViewById(R.id.chat_contact_properties_options);
-
-
-
 
 			//Notifications Layout
 
@@ -917,6 +909,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 
 	public void setDefaultAvatar(String title) {
 		log("setDefaultAvatar");
+
 
 		Bitmap defaultAvatar = Bitmap.createBitmap(outMetrics.widthPixels, outMetrics.widthPixels, Bitmap.Config.ARGB_8888);
 		Canvas c = new Canvas(defaultAvatar);

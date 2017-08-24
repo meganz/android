@@ -58,7 +58,7 @@ SODIUM=sodium
 SODIUM_VERSION=1.0.10
 SODIUM_SOURCE_FILE=libsodium-${SODIUM_VERSION}.tar.gz
 SODIUM_SOURCE_FOLDER=libsodium-${SODIUM_VERSION}
-SODIUM_DOWNLOAD_URL=https://download.libsodium.org/libsodium/releases/${SODIUM_SOURCE_FILE}
+SODIUM_DOWNLOAD_URL=https://download.libsodium.org/libsodium/releases/old/${SODIUM_SOURCE_FILE}
 SODIUM_SHA1="f34f78330cf1a4f69acce5f3fc2ada2d4098c7f4"
 
 LIBUV=libuv
@@ -158,9 +158,6 @@ if [ "$1" == "clean_mega" ]; then
     make -C mega -f MakefileBindings clean JAVA_BASE_OUTPUT_PATH=${JAVA_OUTPUT_PATH} &> ${LOG_FILE}
     rm -rf megachat/megachat.cpp megachat/megachat.h
     
-    echo "* Deleting source folders"
-    rm -rf megachat/sdk
-
     echo "* Deleting tarballs"
 	rm -rf ../obj/local/armeabi/
 	rm -rf ../obj/local/x86
@@ -189,7 +186,6 @@ if [ "$1" == "clean" ]; then
     rm -rf ${LIBUV}/${LIBUV}
     rm -rf ${LIBEXPAT}/${LIBEXPAT}
     rm -rf ${LIBEXPAT}/${LIBEXPAT_SOURCE_FOLDER}
-    rm -rf megachat/sdk
 
     echo "* Deleting tarballs"
     rm -rf ${CRYPTOPP}/${CRYPTOPP_SOURCE_FILE}
