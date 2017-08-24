@@ -80,7 +80,7 @@ import nz.mega.sdk.MegaUser;
 
 public class MegaApplication extends Application implements MegaListenerInterface, MegaChatListenerInterface{
 	final String TAG = "MegaApplication";
-	static final String USER_AGENT = "MEGAAndroid/3.2.2_145";
+	static final String USER_AGENT = "MEGAAndroid/3.2.2_148";
 
 	DatabaseHandler dbH;
 	MegaApiAndroid megaApi;
@@ -318,6 +318,15 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 	public void disableMegaChatApi(){
 		megaChatApi = null;
 	}
+
+	public void enableChat(){
+		log("enableChat");
+		if(Util.isChatEnabled()){
+			megaChatApi = new MegaChatApiAndroid(megaApi);
+			log("enableChat: addChatListener");
+			megaChatApi.addChatListener(this);
+		}
+	}
 	
 	public MegaApiAndroid getMegaApi()
 	{
@@ -360,6 +369,7 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 
 			if(Util.isChatEnabled()){
 				megaChatApi = new MegaChatApiAndroid(megaApi);
+				log("addChatListener");
 				megaChatApi.addChatListener(this);
 			}
 
