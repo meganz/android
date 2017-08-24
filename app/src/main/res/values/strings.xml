@@ -740,7 +740,7 @@
     <string name="settings_about_terms_of_service" context="App means &quot;Application&quot;">Terms of Service</string>
     <string name="settings_about_app_version" context="App means &quot;Application&quot;">App version</string>
     <string name="settings_about_sdk_version" context="Title of the label where the SDK version is shown">MEGA SDK version</string>
-    <string name="settings_about_karere_version" context="Title of the label where the karere version is shown">MEGAchat SDK version</string>
+    <string name="settings_about_karere_version" context="Title of the label where the MEGAchat SDK version is shown">MEGAchat SDK version</string>
     <string name="settings_about_code_link_title" context="Link to the public code of the app">View source code</string>
 
     <string name="january">January</string>
@@ -1264,7 +1264,7 @@
         <item context="Plural" quantity="other">are typing...</item>
     </plurals>
 
-    <string name="more_users_typing" context="Title of the general tab in My Account Section">more are typing...</string>
+    <string name="more_users_typing" context="text that appear when there are more than 2 people writing at that time in a chat. For example User1, user2 and more are typing...">more are typing...</string>
 
     <string name="tab_my_account_general" context="Title of the general tab in My Account Section">General</string>
     <string name="tab_my_account_storage" context="Title of the storage tab in My Account Section">Storage</string>
