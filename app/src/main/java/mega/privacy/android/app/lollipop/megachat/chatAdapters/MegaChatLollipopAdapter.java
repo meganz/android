@@ -35,6 +35,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -86,6 +87,9 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
     public static int MAX_WIDTH_FILENAME_LAND=491;
     public static int MAX_WIDTH_FILENAME_PORT=220;
+
+    private static final int TYPE_HEADER = 0;
+    private static final int TYPE_ITEM = 1;
 
     Context context;
     int positionClicked;
@@ -297,141 +301,255 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             contentContactMessageContactInitialLetter.setVisibility(View.GONE);
         }
     }
+
+    public static class ViewHolderHeaderChat extends RecyclerView.ViewHolder {
+        public ViewHolderHeaderChat(View view) {
+            super(view);
+        }
+
+//        int currentPosition;
+//        long userHandle;
+//        String fullNameTitle;
+//        //        boolean nameRequested = false;
+//        boolean nameRequestedAction = false;
+//
+//        RelativeLayout itemLayout;
+//
+//
+//        RelativeLayout previewFramePort;
+//        RelativeLayout previewFrameLand;
+//
+//        RelativeLayout previewFrameContactPort;
+//
+//
+//        RelativeLayout dateLayout;
+//        TextView dateText;
+//        RelativeLayout ownMessageLayout;
+//        RelativeLayout titleOwnMessage;
+//        //        TextView meText;
+//        TextView timeOwnText;
+//        RelativeLayout contentOwnMessageLayout;
+//        TextView contentOwnMessageText;
+//
+//        ImageView contentOwnMessageThumbLand;
+//        ImageView contentOwnMessageThumbPort;
+//        RelativeLayout contentOwnMessageFileLayout;
+//        ImageView contentOwnMessageFileThumb;
+//        TextView contentOwnMessageFileName;
+//        TextView contentOwnMessageFileSize;
+//
+//        RelativeLayout contentOwnMessageContactLayout;
+//        RelativeLayout contentOwnMessageContactLayoutAvatar;
+//        RoundedImageView contentOwnMessageContactThumb;
+//        TextView contentOwnMessageContactName;
+//        public TextView contentOwnMessageContactEmail;
+//        TextView contentOwnMessageContactInitialLetter;
+//
+//        ProgressBar uploadingProgressBar;
+//        RelativeLayout errorUploadingLayout;
+//
+//        TextView retryAlert;
+//        ImageView triangleIcon;
+//
+//        RelativeLayout contactMessageLayout;
+//        RelativeLayout titleContactMessage;
+//        //        TextView contactText;
+//        TextView timeContactText;
+//        RelativeLayout contentContactMessageLayout;
+//        TextView contentContactMessageText;
+//
+//        ImageView contentContactMessageThumbLand;
+//        ImageView contentContactMessageThumbLandFramework;
+//        ImageView contentContactMessageThumbPort;
+//        ImageView contentContactMessageThumbPortFramework;
+//
+//        RelativeLayout contentContactMessageFileLayout;
+//        ImageView contentContactMessageFileThumb;
+//        TextView contentContactMessageFileName;
+//        TextView contentContactMessageFileSize;
+//        TextView contentContactMessageFileSender;
+//
+//        RelativeLayout contentContactMessageContactLayout;
+//        RelativeLayout contentContactMessageContactLayoutAvatar;
+//        RoundedImageView contentContactMessageContactThumb;
+//        TextView contentContactMessageContactName;
+//        public TextView contentContactMessageContactEmail;
+//        TextView contentContactMessageContactInitialLetter;
+//        TextView contentContactMessageContactSender;
+//
+//        RelativeLayout ownManagementMessageLayout;
+//        TextView ownManagementMessageText;
+//
+//        TextView contactManagementMessageText;
+//        RelativeLayout contactManagementMessageLayout;
+//
+//        public String filePathUploading;
+//
+//        public long getUserHandle (){
+//            return userHandle;
+//        }
+//
+//        public int getCurrentPosition (){
+//            return currentPosition;
+//        }
+//
+//        public void setMyImageView(Bitmap bitmap){
+//            contentOwnMessageContactThumb.setImageBitmap(bitmap);
+//            contentOwnMessageContactInitialLetter.setVisibility(View.GONE);
+//        }
+//        public void setContactImageView(Bitmap bitmap){
+//            contentContactMessageContactThumb.setImageBitmap(bitmap);
+//            contentContactMessageContactInitialLetter.setVisibility(View.GONE);
+//        }
+    }
+
     ViewHolderMessageChat holder;
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         log("onCreateViewHolder");
 
-        Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
-        outMetrics = new DisplayMetrics ();
-        display.getMetrics(outMetrics);
-        float density  = context.getResources().getDisplayMetrics().density;
+        if(viewType == TYPE_HEADER)
+        {
+            log("Create header");
+            View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.header_item_chat, parent, false);
+            return  new ViewHolderHeaderChat(v);
+        }
+        else
+        {
+            log("Create item message");
+            Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
+            outMetrics = new DisplayMetrics ();
+            display.getMetrics(outMetrics);
+            float density  = context.getResources().getDisplayMetrics().density;
 
-        dbH = DatabaseHandler.getDbHandler(context);
+            dbH = DatabaseHandler.getDbHandler(context);
 
-        cC = new ChatController(context);
+            cC = new ChatController(context);
 
-        View v = null;
+            View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_message_chat, parent, false);
+            holder = new ViewHolderMessageChat(v);
+            holder.itemLayout = (RelativeLayout) v.findViewById(R.id.message_chat_item_layout);
+            holder.dateLayout = (RelativeLayout) v.findViewById(R.id.message_chat_date_layout);
+            //Margins
+            RelativeLayout.LayoutParams dateLayoutParams = (RelativeLayout.LayoutParams)holder.dateLayout.getLayoutParams();
+            dateLayoutParams.setMargins(0, Util.scaleHeightPx(8, outMetrics), 0, Util.scaleHeightPx(8, outMetrics));
+            holder.dateLayout.setLayoutParams(dateLayoutParams);
 
-        v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_message_chat, parent, false);
-        holder = new ViewHolderMessageChat(v);
-        holder.itemLayout = (RelativeLayout) v.findViewById(R.id.message_chat_item_layout);
-        holder.dateLayout = (RelativeLayout) v.findViewById(R.id.message_chat_date_layout);
-        //Margins
-        RelativeLayout.LayoutParams dateLayoutParams = (RelativeLayout.LayoutParams)holder.dateLayout.getLayoutParams();
-        dateLayoutParams.setMargins(0, Util.scaleHeightPx(8, outMetrics), 0, Util.scaleHeightPx(8, outMetrics));
-        holder.dateLayout.setLayoutParams(dateLayoutParams);
+            holder.dateText = (TextView) v.findViewById(R.id.message_chat_date_text);
 
-        holder.dateText = (TextView) v.findViewById(R.id.message_chat_date_text);
-
-        //Own messages
-        holder.ownMessageLayout = (RelativeLayout) v.findViewById(R.id.message_chat_own_message_layout);
-        holder.titleOwnMessage = (RelativeLayout) v.findViewById(R.id.title_own_message_layout);
+            //Own messages
+            holder.ownMessageLayout = (RelativeLayout) v.findViewById(R.id.message_chat_own_message_layout);
+            holder.titleOwnMessage = (RelativeLayout) v.findViewById(R.id.title_own_message_layout);
 //        holder.meText = (TextView) v.findViewById(R.id.message_chat_me_text);
 
+            holder.previewFramePort = (RelativeLayout) v.findViewById(R.id.preview_frame_portrait);
+            holder.previewFrameLand = (RelativeLayout) v.findViewById(R.id.preview_frame_landscape);
 
-        holder.previewFramePort = (RelativeLayout) v.findViewById(R.id.preview_frame_portrait);
-        holder.previewFrameLand = (RelativeLayout) v.findViewById(R.id.preview_frame_landscape);
+            // holder.previewFrameContactPort = (RelativeLayout) v.findViewById(R.id.preview_frame_contact_portrait);
 
-       // holder.previewFrameContactPort = (RelativeLayout) v.findViewById(R.id.preview_frame_contact_portrait);
+            holder.timeOwnText = (TextView) v.findViewById(R.id.message_chat_time_text);
 
-        holder.timeOwnText = (TextView) v.findViewById(R.id.message_chat_time_text);
+            holder.contentOwnMessageLayout = (RelativeLayout) v.findViewById(R.id.content_own_message_layout);
 
-        holder.contentOwnMessageLayout = (RelativeLayout) v.findViewById(R.id.content_own_message_layout);
+            holder.contentOwnMessageText = (WrapTextView) v.findViewById(R.id.content_own_message_text);
 
-        holder.contentOwnMessageText = (WrapTextView) v.findViewById(R.id.content_own_message_text);
+            holder.contentOwnMessageThumbLand = (ImageView)  v.findViewById(R.id.content_own_message_thumb_landscape);
+            holder.contentOwnMessageThumbPort = (ImageView)  v.findViewById(R.id.content_own_message_thumb_portrait);
 
-        holder.contentOwnMessageThumbLand = (ImageView)  v.findViewById(R.id.content_own_message_thumb_landscape);
-        holder.contentOwnMessageThumbPort = (ImageView)  v.findViewById(R.id.content_own_message_thumb_portrait);
+            holder.contentOwnMessageFileLayout = (RelativeLayout)  v.findViewById(R.id.content_own_message_file_layout);
+            holder.contentOwnMessageFileThumb = (ImageView)  v.findViewById(R.id.content_own_message_file_thumb);
+            holder.contentOwnMessageFileName = (TextView)  v.findViewById(R.id.content_own_message_file_name);
+            holder.contentOwnMessageFileSize = (TextView)  v.findViewById(R.id.content_own_message_file_size);
 
-        holder.contentOwnMessageFileLayout = (RelativeLayout)  v.findViewById(R.id.content_own_message_file_layout);
-        holder.contentOwnMessageFileThumb = (ImageView)  v.findViewById(R.id.content_own_message_file_thumb);
-        holder.contentOwnMessageFileName = (TextView)  v.findViewById(R.id.content_own_message_file_name);
-        holder.contentOwnMessageFileSize = (TextView)  v.findViewById(R.id.content_own_message_file_size);
+            holder.contentOwnMessageContactLayout = (RelativeLayout) v.findViewById(R.id.content_own_message_contact_layout);
+            holder.contentOwnMessageContactLayoutAvatar = (RelativeLayout) v.findViewById(R.id.content_own_message_contact_layout_avatar);
+            holder.contentOwnMessageContactThumb = (RoundedImageView) v.findViewById(R.id.content_own_message_contact_thumb);
+            holder.contentOwnMessageContactName = (TextView)  v.findViewById(R.id.content_own_message_contact_name);
+            holder.contentOwnMessageContactEmail = (TextView)  v.findViewById(R.id.content_own_message_contact_email);
+            holder.contentOwnMessageContactInitialLetter = (TextView)  v.findViewById(R.id.content_own_message_contact_initial_letter);
 
-        holder.contentOwnMessageContactLayout = (RelativeLayout) v.findViewById(R.id.content_own_message_contact_layout);
-        holder.contentOwnMessageContactLayoutAvatar = (RelativeLayout) v.findViewById(R.id.content_own_message_contact_layout_avatar);
-        holder.contentOwnMessageContactThumb = (RoundedImageView) v.findViewById(R.id.content_own_message_contact_thumb);
-        holder.contentOwnMessageContactName = (TextView)  v.findViewById(R.id.content_own_message_contact_name);
-        holder.contentOwnMessageContactEmail = (TextView)  v.findViewById(R.id.content_own_message_contact_email);
-        holder.contentOwnMessageContactInitialLetter = (TextView)  v.findViewById(R.id.content_own_message_contact_initial_letter);
+            holder.retryAlert = (TextView) v.findViewById(R.id.not_sent_own_message_text);
 
-        holder.retryAlert = (TextView) v.findViewById(R.id.not_sent_own_message_text);
+            holder.triangleIcon = (ImageView)  v.findViewById(R.id.own_triangle_icon);
 
-        holder.triangleIcon = (ImageView)  v.findViewById(R.id.own_triangle_icon);
+            holder.uploadingProgressBar = (ProgressBar) v.findViewById(R.id.uploadingProgressBar);
+            holder.uploadingProgressBar.setVisibility(View.GONE);
 
-        holder.uploadingProgressBar = (ProgressBar) v.findViewById(R.id.uploadingProgressBar);
-        holder.uploadingProgressBar.setVisibility(View.GONE);
+            holder.errorUploadingLayout = (RelativeLayout) v.findViewById(R.id.error_uploading_relative_layout);
+            holder.errorUploadingLayout.setVisibility(View.GONE);
 
-        holder.errorUploadingLayout = (RelativeLayout) v.findViewById(R.id.error_uploading_relative_layout);
-        holder.errorUploadingLayout.setVisibility(View.GONE);
+            holder.ownManagementMessageLayout = (RelativeLayout) v.findViewById(R.id.own_management_message_layout);
+            //Margins
+            RelativeLayout.LayoutParams ownManagementParams = (RelativeLayout.LayoutParams)holder.ownManagementMessageLayout.getLayoutParams();
+            ownManagementParams.addRule(RelativeLayout.ALIGN_RIGHT);
+            ownManagementParams.setMargins(0, 0, 0, Util.scaleHeightPx(4, outMetrics));
+            holder.ownManagementMessageLayout.setLayoutParams(ownManagementParams);
 
-        holder.ownManagementMessageLayout = (RelativeLayout) v.findViewById(R.id.own_management_message_layout);
-        //Margins
-        RelativeLayout.LayoutParams ownManagementParams = (RelativeLayout.LayoutParams)holder.ownManagementMessageLayout.getLayoutParams();
-        ownManagementParams.addRule(RelativeLayout.ALIGN_RIGHT);
-        ownManagementParams.setMargins(0, 0, 0, Util.scaleHeightPx(4, outMetrics));
-        holder.ownManagementMessageLayout.setLayoutParams(ownManagementParams);
+            holder.ownManagementMessageText = (TextView) v.findViewById(R.id.own_management_message_text);
 
-        holder.ownManagementMessageText = (TextView) v.findViewById(R.id.own_management_message_text);
-
-        //Contact messages////////////////////////////////////////
-        holder.contactMessageLayout = (RelativeLayout) v.findViewById(R.id.message_chat_contact_message_layout);
-        holder.titleContactMessage = (RelativeLayout) v.findViewById(R.id.title_contact_message_layout);
+            //Contact messages////////////////////////////////////////
+            holder.contactMessageLayout = (RelativeLayout) v.findViewById(R.id.message_chat_contact_message_layout);
+            holder.titleContactMessage = (RelativeLayout) v.findViewById(R.id.title_contact_message_layout);
 //        holder.contactText = (TextView) v.findViewById(R.id.message_chat_contact_text);
 
-        holder.timeContactText = (TextView) v.findViewById(R.id.contact_message_chat_time_text);
+            holder.timeContactText = (TextView) v.findViewById(R.id.contact_message_chat_time_text);
 
-        holder.contentContactMessageLayout = (RelativeLayout) v.findViewById(R.id.content_contact_message_layout);
+            holder.contentContactMessageLayout = (RelativeLayout) v.findViewById(R.id.content_contact_message_layout);
 
-        holder.contentContactMessageText = (WrapTextView) v.findViewById(R.id.content_contact_message_text);
+            holder.contentContactMessageText = (WrapTextView) v.findViewById(R.id.content_contact_message_text);
 
-        holder.contentContactMessageThumbLand = (ImageView)  v.findViewById(R.id.content_contact_message_thumb_landscape);
-        holder.contentContactMessageThumbLandFramework = (ImageView)  v.findViewById(R.id.content_contact_message_thumb_landscape_framework);
+            holder.contentContactMessageThumbLand = (ImageView)  v.findViewById(R.id.content_contact_message_thumb_landscape);
+            holder.contentContactMessageThumbLandFramework = (ImageView)  v.findViewById(R.id.content_contact_message_thumb_landscape_framework);
 
-        holder.contentContactMessageThumbPort = (ImageView)  v.findViewById(R.id.content_contact_message_thumb_portrait);
-        holder.contentContactMessageThumbPortFramework = (ImageView)  v.findViewById(R.id.content_contact_message_thumb_portrait_framework);
+            holder.contentContactMessageThumbPort = (ImageView)  v.findViewById(R.id.content_contact_message_thumb_portrait);
+            holder.contentContactMessageThumbPortFramework = (ImageView)  v.findViewById(R.id.content_contact_message_thumb_portrait_framework);
 
 
-        holder.contentContactMessageFileLayout = (RelativeLayout)  v.findViewById(R.id.content_contact_message_file_layout);
-        holder.contentContactMessageFileSender = (TextView)  v.findViewById(R.id.content_contact_message_file_sender);
-        holder.contentContactMessageFileThumb = (ImageView)  v.findViewById(R.id.content_contact_message_file_thumb);
-        holder.contentContactMessageFileName = (TextView)  v.findViewById(R.id.content_contact_message_file_name);
-        holder.contentContactMessageFileSize = (TextView)  v.findViewById(R.id.content_contact_message_file_size);
+            holder.contentContactMessageFileLayout = (RelativeLayout)  v.findViewById(R.id.content_contact_message_file_layout);
+            holder.contentContactMessageFileSender = (TextView)  v.findViewById(R.id.content_contact_message_file_sender);
+            holder.contentContactMessageFileThumb = (ImageView)  v.findViewById(R.id.content_contact_message_file_thumb);
+            holder.contentContactMessageFileName = (TextView)  v.findViewById(R.id.content_contact_message_file_name);
+            holder.contentContactMessageFileSize = (TextView)  v.findViewById(R.id.content_contact_message_file_size);
 
-        holder.contentContactMessageContactLayout = (RelativeLayout) v.findViewById(R.id.content_contact_message_contact_layout);
-        holder.contentContactMessageContactLayoutAvatar = (RelativeLayout) v.findViewById(R.id.content_contact_message_contact_layout_avatar);
-        holder.contentContactMessageContactThumb = (RoundedImageView) v.findViewById(R.id.content_contact_message_contact_thumb);
-        holder.contentContactMessageContactName = (TextView)  v.findViewById(R.id.content_contact_message_contact_name);
-        holder.contentContactMessageContactEmail = (TextView)  v.findViewById(R.id.content_contact_message_contact_email);
-        holder.contentContactMessageContactInitialLetter = (TextView)  v.findViewById(R.id.content_contact_message_contact_initial_letter);
-        holder.contentContactMessageContactSender = (TextView)  v.findViewById(R.id.content_contact_message_contact_sender);
+            holder.contentContactMessageContactLayout = (RelativeLayout) v.findViewById(R.id.content_contact_message_contact_layout);
+            holder.contentContactMessageContactLayoutAvatar = (RelativeLayout) v.findViewById(R.id.content_contact_message_contact_layout_avatar);
+            holder.contentContactMessageContactThumb = (RoundedImageView) v.findViewById(R.id.content_contact_message_contact_thumb);
+            holder.contentContactMessageContactName = (TextView)  v.findViewById(R.id.content_contact_message_contact_name);
+            holder.contentContactMessageContactEmail = (TextView)  v.findViewById(R.id.content_contact_message_contact_email);
+            holder.contentContactMessageContactInitialLetter = (TextView)  v.findViewById(R.id.content_contact_message_contact_initial_letter);
+            holder.contentContactMessageContactSender = (TextView)  v.findViewById(R.id.content_contact_message_contact_sender);
 
-        holder.contactManagementMessageLayout = (RelativeLayout) v.findViewById(R.id.contact_management_message_layout);
-        //Margins
-        RelativeLayout.LayoutParams contactManagementParams = (RelativeLayout.LayoutParams)holder.contactManagementMessageLayout.getLayoutParams();
-        contactManagementParams.addRule(RelativeLayout.ALIGN_LEFT);
-        holder.contactManagementMessageLayout.setLayoutParams(contactManagementParams);
+            holder.contactManagementMessageLayout = (RelativeLayout) v.findViewById(R.id.contact_management_message_layout);
+            //Margins
+            RelativeLayout.LayoutParams contactManagementParams = (RelativeLayout.LayoutParams)holder.contactManagementMessageLayout.getLayoutParams();
+            contactManagementParams.addRule(RelativeLayout.ALIGN_LEFT);
+            holder.contactManagementMessageLayout.setLayoutParams(contactManagementParams);
 
-        holder.contactManagementMessageText = (TextView) v.findViewById(R.id.contact_management_message_text);
+            holder.contactManagementMessageText = (TextView) v.findViewById(R.id.contact_management_message_text);
 
-        v.setTag(holder);
+            v.setTag(holder);
 
-        return holder;
+            return holder;
+        }
     }
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-        log("onBindViewHolder: " + position);
 
-        AndroidMegaChatMessage androidMessage = messages.get(position);
-
-        if(androidMessage.isUploading()){
-            onBindViewHolderUploading(holder, position);
+        if(holder instanceof ViewHolderHeaderChat){
+            log("onBindViewHolder ViewHolderHeaderChat: " + position);
         }
         else{
-            onBindViewHolderMessage(holder, position);
+            log("onBindViewHolder ViewHolderMessageChat: " + position);
+            AndroidMegaChatMessage androidMessage = messages.get(position-1);
+
+            if(androidMessage.isUploading()){
+                onBindViewHolderUploading(holder, position);
+            }
+            else{
+                onBindViewHolderMessage(holder, position);
+            }
         }
     }
 
@@ -443,10 +561,10 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         ((ViewHolderMessageChat) holder).triangleIcon.setVisibility(View.GONE);
         ((ViewHolderMessageChat) holder).retryAlert.setVisibility(View.GONE);
 
-        AndroidMegaChatMessage message = messages.get(position);
+        AndroidMegaChatMessage message = messages.get(position-1);
 
-        if(messages.get(position).getInfoToShow()!=-1){
-            switch (messages.get(position).getInfoToShow()){
+        if(messages.get(position-1).getInfoToShow()!=-1){
+            switch (messages.get(position-1).getInfoToShow()){
                 case Constants.CHAT_ADAPTER_SHOW_ALL:{
                     ((ViewHolderMessageChat)holder).dateLayout.setVisibility(View.VISIBLE);
                     ((ViewHolderMessageChat)holder).dateText.setText(TimeChatUtils.formatDate(message.getPendingMessage().getUploadTimestamp(), TimeChatUtils.DATE_SHORT_FORMAT));
@@ -575,7 +693,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
         ((ViewHolderMessageChat) holder).uploadingProgressBar.setVisibility(View.GONE);
 
-        MegaChatMessage message = messages.get(position).getMessage();
+        MegaChatMessage message = messages.get(position-1).getMessage();
         ((ViewHolderMessageChat)holder).userHandle = message.getUserHandle();
 
         if(message.getType()==MegaChatMessage.TYPE_ALTER_PARTICIPANTS){
@@ -584,8 +702,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             if(message.getHandleOfAction()==myUserHandle){
                 log("me alter participant");
 
-                if(messages.get(position).getInfoToShow()!=-1){
-                    switch (messages.get(position).getInfoToShow()){
+                if(messages.get(position-1).getInfoToShow()!=-1){
+                    switch (messages.get(position-1).getInfoToShow()){
                         case Constants.CHAT_ADAPTER_SHOW_ALL:{
                             ((ViewHolderMessageChat)holder).dateLayout.setVisibility(View.VISIBLE);
                             ((ViewHolderMessageChat)holder).dateText.setText(TimeChatUtils.formatDate(message.getTimestamp(), TimeChatUtils.DATE_SHORT_FORMAT));
@@ -723,8 +841,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 int privilege = message.getPrivilege();
                 log("Privilege of the user: "+privilege);
 
-                if(messages.get(position).getInfoToShow()!=-1){
-                    switch (messages.get(position).getInfoToShow()){
+                if(messages.get(position-1).getInfoToShow()!=-1){
+                    switch (messages.get(position-1).getInfoToShow()){
                         case Constants.CHAT_ADAPTER_SHOW_ALL:{
                             ((ViewHolderMessageChat)holder).dateLayout.setVisibility(View.VISIBLE);
                             ((ViewHolderMessageChat)holder).dateText.setText(TimeChatUtils.formatDate(message.getTimestamp(), TimeChatUtils.DATE_SHORT_FORMAT));
@@ -945,8 +1063,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 int privilege = message.getPrivilege();
                 log("Privilege of the user: "+privilege);
 
-                if(messages.get(position).getInfoToShow()!=-1){
-                    switch (messages.get(position).getInfoToShow()){
+                if(messages.get(position-1).getInfoToShow()!=-1){
+                    switch (messages.get(position-1).getInfoToShow()){
                         case Constants.CHAT_ADAPTER_SHOW_ALL:{
                             ((ViewHolderMessageChat)holder).dateLayout.setVisibility(View.VISIBLE);
                             ((ViewHolderMessageChat)holder).dateText.setText(TimeChatUtils.formatDate(message.getTimestamp(), TimeChatUtils.DATE_SHORT_FORMAT));
@@ -1090,8 +1208,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 log("Participant privilege change!");
                 log("Message type PRIVILEGE CHANGE: "+message.getContent());
 
-                if(messages.get(position).getInfoToShow()!=-1){
-                    switch (messages.get(position).getInfoToShow()){
+                if(messages.get(position-1).getInfoToShow()!=-1){
+                    switch (messages.get(position-1).getInfoToShow()){
                         case Constants.CHAT_ADAPTER_SHOW_ALL:{
                             ((ViewHolderMessageChat)holder).dateLayout.setVisibility(View.VISIBLE);
                             ((ViewHolderMessageChat)holder).dateText.setText(TimeChatUtils.formatDate(message.getTimestamp(), TimeChatUtils.DATE_SHORT_FORMAT));
@@ -1263,8 +1381,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 log("MY message!!");
                 log("MY message handle!!: "+message.getMsgId());
 
-                if(messages.get(position).getInfoToShow()!=-1){
-                    switch (messages.get(position).getInfoToShow()){
+                if(messages.get(position-1).getInfoToShow()!=-1){
+                    switch (messages.get(position-1).getInfoToShow()){
                         case Constants.CHAT_ADAPTER_SHOW_ALL:{
                             ((ViewHolderMessageChat)holder).dateLayout.setVisibility(View.VISIBLE);
                             ((ViewHolderMessageChat)holder).dateText.setText(TimeChatUtils.formatDate(message.getTimestamp(), TimeChatUtils.DATE_SHORT_FORMAT));
@@ -1871,8 +1989,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     ((ViewHolderMessageChat)holder).fullNameTitle = chatRoom.getTitle();
                 }
 
-                if(messages.get(position).getInfoToShow()!=-1){
-                    switch (messages.get(position).getInfoToShow()){
+                if(messages.get(position-1).getInfoToShow()!=-1){
+                    switch (messages.get(position-1).getInfoToShow()){
                         case Constants.CHAT_ADAPTER_SHOW_ALL:{
                             ((ViewHolderMessageChat)holder).dateLayout.setVisibility(View.VISIBLE);
                             ((ViewHolderMessageChat)holder).dateText.setText(TimeChatUtils.formatDate(message.getTimestamp(), TimeChatUtils.DATE_SHORT_FORMAT));
@@ -1911,7 +2029,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                         if(message.getType()==MegaChatMessage.TYPE_NORMAL){
 
-                            if(messages.get(position).getInfoToShow()==Constants.CHAT_ADAPTER_SHOW_NOTHING_NO_NAME){
+                            if(messages.get(position-1).getInfoToShow()==Constants.CHAT_ADAPTER_SHOW_NOTHING_NO_NAME){
                                 ((ViewHolderMessageChat)holder).contentContactMessageText.setText("");
                             }else{
                                 Spannable name = new SpannableString(((ViewHolderMessageChat)holder).fullNameTitle+"\n");
@@ -2785,9 +2903,15 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
     @Override
     public int getItemCount() {
-        return messages.size();
+        return messages.size()+1;
     }
 
+    @Override
+    public int getItemViewType(int position) {
+        if(position==0)
+            return TYPE_HEADER;
+        return TYPE_ITEM;
+    }
 
     public boolean isMultipleSelect() {
         log("isMultipleSelect");
@@ -2858,7 +2982,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
     public AndroidMegaChatMessage getMessageAt(int position) {
         try {
             if (messages != null) {
-                return messages.get(position);
+                return messages.get(position-1);
             }
         } catch (IndexOutOfBoundsException e) {
         }
@@ -2884,7 +3008,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
     }
 
     public Object getItem(int position) {
-        return messages.get(position);
+        return messages.get(position-1);
     }
 
     @Override

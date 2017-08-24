@@ -168,7 +168,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     EmojiconEditText textChat;
     ImageButton sendIcon;
     RelativeLayout messagesContainerLayout;
-    ScrollView emptyScrollView;
 
     FloatingActionButton fab;
     FrameLayout emojiKeyboardLayout;
@@ -185,16 +184,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     MenuItem clearHistoryMenuItem;
     MenuItem contactInfoMenuItem;
     MenuItem leaveMenuItem;
-
-    LinearLayout megaInfoEmptyLayout;
-    LinearLayout confidentialityEmptyLayout;
-    LinearLayout authenticityEmptyLayout;
-    TextView megaInfoTextView;
-    TextView confidentialityTextView;
-    TextView authenticityTextView;
-    TextView megaInfoTitle;
-    TextView authenticityTitle;
-    TextView confidentialityTitle;
 
     boolean focusChanged=false;
 
@@ -280,12 +269,12 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
             if (!adapter.isMultipleSelect()){
 
-                if(!messages.get(position).isUploading()){
+                if(!messages.get(position-1).isUploading()){
                     adapter.setMultipleSelect(true);
 
                     actionMode = startSupportActionMode(new ActionBarCallBack());
 
-                    if(position<0){
+                    if(position<1){
                         log("Position not valid");
                     }
                     else{
@@ -307,7 +296,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
             View view = listView.findChildViewUnder(e.getX(), e.getY());
             int position = listView.getChildLayoutPosition(view);
-            if(position<0){
+            if(position<1){
                 log("Position not valid");
             }
             else{
@@ -399,55 +388,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
         writingLayout = (RelativeLayout) findViewById(R.id.writing_linear_layout_chat);
         disabledWritingLayout = (RelativeLayout) findViewById(R.id.writing_disabled_linear_layout_chat);
-
-        ///Empty screen
-        emptyScrollView = (ScrollView) findViewById(R.id.layout_empty_scroll_view);
-//        emptyScrollView.setVisibility(View.VISIBLE);
-
-        megaInfoEmptyLayout = (LinearLayout) findViewById(R.id.mega_info_layout);
-        RelativeLayout.LayoutParams megaInfoParams = (RelativeLayout.LayoutParams)megaInfoEmptyLayout.getLayoutParams();
-        megaInfoParams.setMargins(Util.scaleWidthPx(36, outMetrics), Util.scaleHeightPx(40, outMetrics), Util.scaleWidthPx(36, outMetrics), Util.scaleHeightPx(24, outMetrics));
-        megaInfoEmptyLayout.setLayoutParams(megaInfoParams);
-
-        confidentialityEmptyLayout = (LinearLayout) findViewById(R.id.confidentiality_info);
-        RelativeLayout.LayoutParams megaConfidentialityParams = (RelativeLayout.LayoutParams)confidentialityEmptyLayout.getLayoutParams();
-        megaConfidentialityParams.setMargins(Util.scaleWidthPx(36, outMetrics), 0, Util.scaleWidthPx(36, outMetrics), Util.scaleHeightPx(24, outMetrics));
-        confidentialityEmptyLayout.setLayoutParams(megaConfidentialityParams);
-
-        authenticityEmptyLayout = (LinearLayout) findViewById(R.id.authenticity_info);
-        RelativeLayout.LayoutParams megaAuthenticityParams = (RelativeLayout.LayoutParams)authenticityEmptyLayout.getLayoutParams();
-        megaAuthenticityParams.setMargins(Util.scaleWidthPx(36, outMetrics), 0, Util.scaleWidthPx(36, outMetrics), Util.scaleHeightPx(24, outMetrics));
-        authenticityEmptyLayout.setLayoutParams(megaAuthenticityParams);
-
-        megaInfoTitle = (TextView) findViewById(R.id.mega_title);
-        RelativeLayout.LayoutParams megaTitleParams = (RelativeLayout.LayoutParams)megaInfoTitle.getLayoutParams();
-        megaTitleParams.setMargins(Util.scaleWidthPx(24, outMetrics), 0, 0, 0);
-        megaInfoTitle.setLayoutParams(megaTitleParams);
-
-        confidentialityTitle = (TextView) findViewById(R.id.confidentiality_title);
-        RelativeLayout.LayoutParams confidentialityTitleParams = (RelativeLayout.LayoutParams)confidentialityTitle.getLayoutParams();
-        confidentialityTitleParams.setMargins(Util.scaleWidthPx(24, outMetrics), 0, 0, 0);
-        confidentialityTitle.setLayoutParams(confidentialityTitleParams);
-
-        authenticityTitle = (TextView) findViewById(R.id.authenticity_title);
-        RelativeLayout.LayoutParams authenticityTitleParams = (RelativeLayout.LayoutParams)authenticityTitle.getLayoutParams();
-        authenticityTitleParams.setMargins(Util.scaleWidthPx(24, outMetrics), 0, 0, 0);
-        authenticityTitle.setLayoutParams(authenticityTitleParams);
-
-        megaInfoTextView = (TextView) findViewById(R.id.mega_info);
-        RelativeLayout.LayoutParams megaTextParams = (RelativeLayout.LayoutParams)megaInfoTextView.getLayoutParams();
-        megaTextParams.setMargins(Util.scaleWidthPx(24, outMetrics), 0, 0, 0);
-        megaInfoTextView.setLayoutParams(megaTextParams);
-
-        confidentialityTextView = (TextView) findViewById(R.id.confidentiality_text);
-        RelativeLayout.LayoutParams confidentialityTextParams = (RelativeLayout.LayoutParams)confidentialityTextView.getLayoutParams();
-        confidentialityTextParams.setMargins(Util.scaleWidthPx(24, outMetrics), 0, 0, 0);
-        confidentialityTextView.setLayoutParams(confidentialityTextParams);
-
-        authenticityTextView = (TextView) findViewById(R.id.authenticity_text);
-        RelativeLayout.LayoutParams authenticityTextParams = (RelativeLayout.LayoutParams)authenticityTextView.getLayoutParams();
-        authenticityTextParams.setMargins(Util.scaleWidthPx(24, outMetrics), 0, 0, 0);
-        authenticityTextView.setLayoutParams(authenticityTextParams);
 
         keyboardButton = (ImageButton) findViewById(R.id.keyboard_icon_chat);
         textChat = (EmojiconEditText) findViewById(R.id.edit_text_chat);
@@ -587,8 +527,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 }
             }
         });
-        listView.setAdapter(null);
-        adapter = null;
+
+//        listView.setAdapter(null);
+//        adapter = null;
 
         messagesContainerLayout = (RelativeLayout) findViewById(R.id.message_container_chat_layout);
 
@@ -665,10 +606,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 myMail = megaApi.getMyEmail();
                 myUserHandle = megaChatApi.getMyUserHandle();
 
-                log("Show empty screen");
-                chatRelativeLayout.setVisibility(View.GONE);
-                emptyScrollView.setVisibility(View.VISIBLE);
-
                 if(savedInstanceState!=null) {
                     log("Bundle is NOT NULL");
                     selectedMessageId = savedInstanceState.getLong("selectedMessageId", -1);
@@ -718,6 +655,12 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         bufferManualSending = new ArrayList<AndroidMegaChatMessage>();
                         bufferSending = new ArrayList<AndroidMegaChatMessage>();
 
+                        if (adapter == null) {
+                            adapter = new MegaChatLollipopAdapter(this, chatRoom, messages, listView);
+                            adapter.setHasStableIds(true);
+                            listView.setAdapter(adapter);
+                        }
+
                         log("Result of open chat: " + result);
 
                         aB.setTitle(chatRoom.getTitle());
@@ -725,11 +668,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
                         if (intentAction.equals(Constants.ACTION_CHAT_NEW)) {
                             log("ACTION_CHAT_NEW");
-
-                            listView.setVisibility(View.GONE);
-                            chatRelativeLayout.setVisibility(View.GONE);
-                            emptyScrollView.setVisibility(View.VISIBLE);
-                            //                    inviteText.setVisibility(View.VISIBLE);
                             textChat.setOnFocusChangeListener(focus);
                         } else if (intentAction.equals(Constants.ACTION_CHAT_SHOW_MESSAGES)) {
                             log("ACTION_CHAT_SHOW_MESSAGES");
@@ -763,7 +701,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                                     log("D->Load history of " + chatRoom.getUnreadCount());
                                     stateHistory = megaChatApi.loadMessages(idChat, NUMBER_MESSAGES_TO_LOAD);
                                 }
-                                listView.setVisibility(View.VISIBLE);
                             }
                             log("On create: stateHistory: "+stateHistory);
                         }
@@ -1557,16 +1494,11 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 listView.setLayoutManager(mLayoutManager);
                 listView.setAdapter(adapter);
                 adapter.setMessages(messages);
-                if(adapter.getItemCount()>0){
-                    listView.setVisibility(View.VISIBLE);
-                    chatRelativeLayout.setVisibility(View.VISIBLE);
-                    emptyScrollView.setVisibility(View.GONE);
-                }
             }
             else{
                 log("adapter is NOT null");
-                adapter.addMessage(messages, index);
-                final int indexToScroll = index;
+                adapter.addMessage(messages, index+1);
+                final int indexToScroll = index+1;
 
                 mLayoutManager.scrollToPositionWithOffset(indexToScroll,20);
 //                Handler handler = new Handler();
@@ -1631,25 +1563,14 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 listView.setLayoutManager(mLayoutManager);
                 listView.setAdapter(adapter);
                 adapter.setMessages(messages);
-                if(adapter.getItemCount()>0){
-                    listView.setVisibility(View.VISIBLE);
-                    chatRelativeLayout.setVisibility(View.VISIBLE);
-                    emptyScrollView.setVisibility(View.GONE);
-                }
             }
             else{
                 log("adapter is NOT null");
                 final int indexToScroll = index;
 
-                if(adapter.getItemCount()>0){
-                    listView.setVisibility(View.VISIBLE);
-                    chatRelativeLayout.setVisibility(View.VISIBLE);
-                    emptyScrollView.setVisibility(View.GONE);
-                }
+                mLayoutManager.scrollToPositionWithOffset(indexToScroll,20);
 
-                mLayoutManager.scrollToPositionWithOffset(indexToScroll-1,20);
-
-                adapter.addMessage(messages, index);
+                adapter.addMessage(messages, index+1);
             }
         }
         else{
@@ -2064,7 +1985,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
     }
 
-    public void itemClick(int position) {
+    public void itemClick(int positionInAdapter) {
+        int position = positionInAdapter-1;
         log("itemClick: "+position);
         if(megaChatApi.isSignalActivityRequired()){
             megaChatApi.signalPresenceActivity();
@@ -2076,7 +1998,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             if (adapter.isMultipleSelect()){
 
                 if(!m.isUploading()){
-                    adapter.toggleSelection(position);
+                    adapter.toggleSelection(positionInAdapter);
 
                     List<AndroidMegaChatMessage> messages = adapter.getSelectedMessages();
                     if (messages.size() > 0){
@@ -2623,8 +2545,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 log("onMessageLoaded: Size of messages: "+messages.size());
                 if(bufferMessages.size()>=NUMBER_MESSAGES_TO_UPDATE_UI){
                     log("onMessageLoaded: Show messages screen");
-                    chatRelativeLayout.setVisibility(View.VISIBLE);
-                    emptyScrollView.setVisibility(View.GONE);
                     loadMessages();
                 }
                 else{
@@ -2646,9 +2566,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }
 
             if(bufferMessages.size()!=0){
-                chatRelativeLayout.setVisibility(View.VISIBLE);
-                emptyScrollView.setVisibility(View.GONE);
-
                 loadMessages();
 
                 if(lastSeenReceived==false){
@@ -2665,8 +2582,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         if(positionToScroll<messages.size()){
                             log("onMessageLoaded: message position to scroll: "+positionToScroll+" content: "+messages.get(positionToScroll).getMessage().getContent());
                             messages.get(positionToScroll).setInfoToShow(Constants.CHAT_ADAPTER_SHOW_ALL);
-                            adapter.notifyItemChanged(positionToScroll);
-                            mLayoutManager.scrollToPositionWithOffset(positionToScroll,20);
+                            adapter.notifyItemChanged(positionToScroll+1);
+                            mLayoutManager.scrollToPositionWithOffset(positionToScroll+1,20);
                         }
                         else{
                             log("Error, the position to scroll is more than size of messages");
@@ -2905,15 +2822,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             log("Removed index: " + indexToChange);
             log("deleteMessage: messages size: " + messages.size());
 //                adapter.notifyDataSetChanged();
-            adapter.removeMessage(indexToChange, messages);
+            adapter.removeMessage(indexToChange+1, messages);
 
-            if(messages.isEmpty()){
-                log("No more messages in list");
-                listView.setVisibility(View.GONE);
-                chatRelativeLayout.setVisibility(View.GONE);
-                emptyScrollView.setVisibility(View.VISIBLE);
-            }
-            else{
+            if(!messages.isEmpty()){
                 //Update infoToShow of the next message also
                 if (indexToChange == 0) {
                     messages.get(indexToChange).setInfoToShow(Constants.CHAT_ADAPTER_SHOW_ALL);
@@ -2929,7 +2840,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
                     adjustInfoToShow(indexToUpdate);
 
-                    adapter.modifyMessage(messages, indexToChange);
+                    adapter.modifyMessage(messages, indexToChange+1);
                 }
             }
         }
@@ -2966,7 +2877,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             messages.remove(indexToChange);
             log("Removed index: "+indexToChange);
             log("modifyAttachmentReceived: messages size: "+messages.size());
-            adapter.removeMessage(indexToChange, messages);
+            adapter.removeMessage(indexToChange+1, messages);
             int scrollToP = appendMessagePosition(msg);
             if(scrollToP!=-1){
                 if(msg.getMessage().getStatus()==MegaChatMessage.STATUS_SERVER_RECEIVED){
@@ -3072,7 +2983,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         adapter.setHasStableIds(true);
                         listView.setAdapter(adapter);
                     } else {
-                        adapter.modifyMessage(messages, indexToChange);
+                        adapter.modifyMessage(messages, indexToChange+1);
                     }
                 }
 
@@ -3082,7 +2993,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 messages.remove(indexToChange);
                 log("Removed index: "+indexToChange);
                 log("modifyMessageReceived: messages size: "+messages.size());
-                adapter.removeMessage(indexToChange, messages);
+                adapter.removeMessage(indexToChange+1, messages);
                 int scrollToP = appendMessagePosition(msg);
                 if(scrollToP!=-1){
                     if(msg.getMessage().getStatus()==MegaChatMessage.STATUS_SERVER_RECEIVED){
@@ -3178,21 +3089,15 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             listView.setLayoutManager(mLayoutManager);
             listView.setAdapter(adapter);
             adapter.setMessages(messages);
-            listView.setVisibility(View.VISIBLE);
-            chatRelativeLayout.setVisibility(View.VISIBLE);
-            emptyScrollView.setVisibility(View.GONE);
         }
         else{
             log("Update adapter with last index: "+lastIndex);
             if(lastIndex==0){
                 log("Arrives the first message of the chat");
                 adapter.setMessages(messages);
-                listView.setVisibility(View.VISIBLE);
-                chatRelativeLayout.setVisibility(View.VISIBLE);
-                emptyScrollView.setVisibility(View.GONE);
             }
             else{
-                adapter.addMessage(messages, lastIndex);
+                adapter.addMessage(messages, lastIndex+1);
             }
         }
     }
@@ -3238,21 +3143,15 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             listView.setLayoutManager(mLayoutManager);
             listView.setAdapter(adapter);
             adapter.setMessages(messages);
-            listView.setVisibility(View.VISIBLE);
-            chatRelativeLayout.setVisibility(View.VISIBLE);
-            emptyScrollView.setVisibility(View.GONE);
         }
         else{
             log("Update adapter with last index: "+lastIndex);
             if(lastIndex<0){
                 log("Arrives the first message of the chat");
                 adapter.setMessages(messages);
-                listView.setVisibility(View.VISIBLE);
-                chatRelativeLayout.setVisibility(View.VISIBLE);
-                emptyScrollView.setVisibility(View.GONE);
             }
             else{
-                adapter.addMessage(messages, lastIndex);
+                adapter.addMessage(messages, lastIndex+1);
             }
         }
         return lastIndex;
@@ -3306,21 +3205,15 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             listView.setLayoutManager(mLayoutManager);
             listView.setAdapter(adapter);
             adapter.setMessages(messages);
-            listView.setVisibility(View.VISIBLE);
-            chatRelativeLayout.setVisibility(View.VISIBLE);
-            emptyScrollView.setVisibility(View.GONE);
         }
         else{
             log("Update adapter with last index: "+lastIndex);
             if(lastIndex<0){
                 log("Arrives the first message of the chat");
                 adapter.setMessages(messages);
-                listView.setVisibility(View.VISIBLE);
-                chatRelativeLayout.setVisibility(View.VISIBLE);
-                emptyScrollView.setVisibility(View.GONE);
             }
             else{
-                adapter.addMessage(messages, lastIndex);
+                adapter.addMessage(messages, lastIndex+1);
             }
         }
         return lastIndex;
@@ -3817,7 +3710,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         if(indexToChange!=-1){
                             log("Index modified: "+indexToChange);
                             messages.get(indexToChange).getPendingMessage().setState(PendingMessage.STATE_ERROR);
-                            adapter.modifyMessage(messages, indexToChange);
+                            adapter.modifyMessage(messages, indexToChange+1);
                         }
                         else{
                             log("Error, id pending message message not found!!");
