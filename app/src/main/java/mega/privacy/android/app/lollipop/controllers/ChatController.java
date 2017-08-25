@@ -148,16 +148,6 @@ public class ChatController {
         }
     }
 
-    public void deleteNodeAttachment(long chatId, long nodeHandle) {
-        log("deleteNodeAttachment");
-        if(context instanceof ChatFullScreenImageViewer){
-            megaChatApi.revokeAttachment(chatId, nodeHandle, (ChatFullScreenImageViewer) context);
-        }
-        else if(context instanceof NodeAttachmentActivityLollipop){
-            megaChatApi.revokeAttachment(chatId, nodeHandle, (NodeAttachmentActivityLollipop) context);
-        }
-    }
-
     public void deleteMessage(MegaChatMessage message, long chatId){
         log("deleteMessage");
         MegaChatMessage messageToDelete;
@@ -165,14 +155,7 @@ public class ChatController {
 
             if(message.getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT){
                 log("Delete node attachment message");
-                MegaNodeList nodeList = message.getMegaNodeList();
-
-                for(int j=0; j<nodeList.size(); j++){
-                    MegaNode node = nodeList.get(j);
-                    if(context instanceof ChatActivityLollipop){
-                        megaChatApi.revokeAttachment(chatId, node.getHandle(), (ChatActivityLollipop) context);
-                    }
-                }
+                megaChatApi.revokeAttachmentMessage(chatId, message.getMsgId());
             }
             else{
                 log("Delete normal message");
@@ -583,6 +566,13 @@ public class ChatController {
                     log("Message type TRUNCATE");
 
                     String textToShow = String.format(context.getString(R.string.history_cleared_by), megaChatApi.getMyFullname());
+                    try{
+                        textToShow = textToShow.replace("[A]", "<font color=\'#060000\'>");
+                        textToShow = textToShow.replace("[/A]", "</font>");
+                        textToShow = textToShow.replace("[B]", "<font color=\'#00BFA5\'>");
+                        textToShow = textToShow.replace("[/B]", "</font>");
+                    }
+                    catch (Exception e){}
                     Spanned result = null;
                     if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
                         result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);

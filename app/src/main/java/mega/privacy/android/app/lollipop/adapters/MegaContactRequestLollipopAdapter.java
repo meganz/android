@@ -433,7 +433,10 @@ public class MegaContactRequestLollipopAdapter extends RecyclerView.Adapter<Mega
 	}
 	
 	private boolean isItemChecked(int position) {
-        return selectedItems.get(position);
+		if(selectedItems!=null){
+			return selectedItems.get(position);
+		}
+		return false;
     }
 
 	public int getSelectedItemCount() {

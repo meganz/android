@@ -1055,7 +1055,7 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 	public void onRequestStart(MegaApiJava api, MegaRequest request) {
 		log("onRequestStart");
 	}
-	
+
 	String gSession = null;
 	UserCredentials credentials = null;
 
@@ -1081,7 +1081,7 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 		if (request.getType() == MegaRequest.TYPE_LOGIN){
 			log("REQUEST LOGIN");
 
-			try { 
+			try {
 				statusDialog.dismiss();	
 			} 
 			catch (Exception ex) {}
