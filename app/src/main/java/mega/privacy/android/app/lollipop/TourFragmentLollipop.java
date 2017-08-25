@@ -197,14 +197,4 @@ public class TourFragmentLollipop extends Fragment implements View.OnClickListen
         Util.log("TourFragmentLollipop", message);
     }
 
-    public void orientation(int mode){
-        if(mode ==0 ){
-            //Portrait
-            shapeGrey.setBackgroundResource(R.drawable.shape_grey);
-        }else{
-            //Landscape
-            shapeGrey.setBackgroundResource(R.drawable.shape_white);
-
-        }
-    }
 }

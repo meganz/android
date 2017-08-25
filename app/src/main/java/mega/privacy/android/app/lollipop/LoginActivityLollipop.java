@@ -91,7 +91,6 @@ public class LoginActivityLollipop extends AppCompatActivity implements MegaGlob
     String sessionTemp = null;
     String firstNameTemp = null;
     String lastNameTemp = null;
-    int mode =0;
 
 
     @Override
@@ -107,14 +106,6 @@ public class LoginActivityLollipop extends AppCompatActivity implements MegaGlob
         log("onCreate");
         super.onCreate(savedInstanceState);
 
-        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-            log("?????horizontal");
-        }
-        else
-        {
-            log("?????vertical");
-
-        }
         loginActivity = this;
 
         display = getWindowManager().getDefaultDisplay();
@@ -264,20 +255,9 @@ public class LoginActivityLollipop extends AppCompatActivity implements MegaGlob
             case Constants.TOUR_FRAGMENT: {
                 log("Show TOUR_FRAGMENT");
 
-                log("?????? 1");
-
                 if (tourFragment == null) {
                     tourFragment = new TourFragmentLollipop();
-                    log("?????? 2");
-
-
-                }else{
-                    log("?????? 3");
-
-                    tourFragment.orientation(mode);
                 }
-
-
 
                 FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
                 ft.replace(R.id.fragment_container_login, tourFragment);
