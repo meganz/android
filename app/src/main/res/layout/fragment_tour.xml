@@ -97,6 +97,7 @@
                     android:layout_marginTop="24dp"
                     android:layout_marginLeft="24dp"
                     android:layout_marginRight="24dp"
+                    android:layout_marginBottom="12dp"
                     android:text="@string/tour_space_text"
                     android:textColor="@color/black"
                     android:textSize="14sp" />
