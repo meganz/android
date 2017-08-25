@@ -97,4 +97,6 @@
     <color name="status_invisible_layout">#bfbfbf</color>
 
     <color name="sliding_panel_separator">#dcdcdcdc</color>
+    <color name="status_bar_login">#33000000</color>
+
 </resources>

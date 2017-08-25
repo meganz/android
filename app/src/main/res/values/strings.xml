@@ -195,10 +195,7 @@
     <string name="session_problem" context="if a link to a folder cannot be fetched">Problem of retrieving files from the folder</string>
     -->
 
-    <string name="tour_space_title">MEGA SPACE</string>
-    <string name="tour_speed_title">MEGA SPEED</string>
-    <string name="tour_privacy_title">MEGA PRIVACY</string>
-    <string name="tour_access_title">MEGA ACCESS</string>
+
     <string name="tour_space_text">Register now and get 50 GB of free space</string>
     <string name="tour_speed_text">Uploads are fast. Quickly share files with everyone</string>
     <string name="tour_privacy_text">Keep all your files safe with MEGA\'s end-to-end encryption</string>
@@ -1499,4 +1496,9 @@
     <string name="title_contact_request_notification" context="title of contact request notification">New contact request</string>
 
     <string name="history_cleared_by" context="Text shown when the chat history was cleared by someone"><![CDATA[<font color=\'#060000\'>%1$s</font><font color=\'#00BFA5\'> cleared the chat history</font>]]></string>
+
+    <string name="tour_space_title">Mega Space</string>
+    <string name="tour_speed_title">Mega Speed</string>
+    <string name="tour_privacy_title">Mega Privacy</string>
+    <string name="tour_access_title">Mega Access</string>
 </resources>
