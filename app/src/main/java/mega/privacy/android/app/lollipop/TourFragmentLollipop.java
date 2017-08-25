@@ -91,8 +91,6 @@ public class TourFragmentLollipop extends Fragment implements View.OnClickListen
         bLogin.setOnClickListener(this);
         bRegister.setOnClickListener(this);
 
-
-
         adapter = new TourImageAdapter((LoginActivityLollipop)context);
         viewPager.setAdapter(adapter);
         viewPager.setCurrentItem(0);
@@ -102,12 +100,7 @@ public class TourFragmentLollipop extends Fragment implements View.OnClickListen
         bar3.setBackgroundColor(getResources().getColor(R.color.tour_bar_grey));
         bar4.setBackgroundColor(getResources().getColor(R.color.tour_bar_grey));
 
-       // viewPager.getLayoutParams().height = metrics.widthPixels;
-       // viewPager.getLayoutParams().width = metrics.widthPixels;
-        viewPager.getLayoutParams().height = metrics.widthPixels -65;
-
-
-
+        viewPager.getLayoutParams().height = metrics.widthPixels-70;
         viewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener(){
 
             @Override
@@ -213,6 +206,5 @@ public class TourFragmentLollipop extends Fragment implements View.OnClickListen
             shapeGrey.setBackgroundResource(R.drawable.shape_white);
 
         }
-
     }
 }
