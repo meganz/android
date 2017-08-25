@@ -132,11 +132,17 @@ public class LoginActivityLollipop extends AppCompatActivity implements MegaGlob
         relativeContainer = (RelativeLayout) findViewById(R.id.relative_container_login);
 
         intentReceived = getIntent();
-        if (intentReceived != null) {
-            visibleFragment = intentReceived.getIntExtra("visibleFragment", Constants.LOGIN_FRAGMENT);
-            log("There is an intent! VisibleFragment: " + visibleFragment);
-        } else {
-            visibleFragment = Constants.LOGIN_FRAGMENT;
+        if(savedInstanceState!=null) {
+            log("Bundle is NOT NULL");
+            visibleFragment = savedInstanceState.getInt("visibleFragment", Constants.LOGIN_FRAGMENT);
+        }
+        else{
+            if (intentReceived != null) {
+                visibleFragment = intentReceived.getIntExtra("visibleFragment", Constants.LOGIN_FRAGMENT);
+                log("There is an intent! VisibleFragment: " + visibleFragment);
+            } else {
+                visibleFragment = Constants.LOGIN_FRAGMENT;
+            }
         }
 
         if (dbH.getEphemeral() != null) {
@@ -775,6 +781,22 @@ public class LoginActivityLollipop extends AppCompatActivity implements MegaGlob
     @Override
     public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) {
         log("onRequestTemporaryError - " + request.getRequestString());
+    }
+
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        log("onSaveInstanceState");
+
+        super.onSaveInstanceState(outState);
+
+        outState.putInt("visibleFragment", visibleFragment);
+    }
+
+    @Override
+    protected void onPause() {
+        log("onPause");
+        super.onPause();
     }
 
     @Override

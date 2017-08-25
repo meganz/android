@@ -3210,10 +3210,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                             }
                         }
                     }
-
                 }
-
-
             }
             else{
                 log("Preview not exists");
