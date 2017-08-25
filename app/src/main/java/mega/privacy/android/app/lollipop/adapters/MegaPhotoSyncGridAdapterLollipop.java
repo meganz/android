@@ -70,23 +70,23 @@ public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaP
 
 	ArrayList<MegaMonthPicLollipop> monthPics;
 	ArrayList<MegaNode> nodes;
-	
+
 	long photosyncHandle = -1;
-	
+
 	RecyclerView listFragment;
 	ImageView emptyImageViewFragment;
 	TextView emptyTextViewFragment;
 	ActionBar aB;
-	
+
 	int numberOfCells;
 	int gridWidth;
-	
+
 	boolean multipleSelect;
-	
+
 	SparseBooleanArray checkedItems = new SparseBooleanArray();
-	
+
 	int orderGetChildren = MegaApiJava.ORDER_MODIFICATION_DESC;
-	
+
 	Object fragment;
 	int type = Constants.CAMERA_UPLOAD_ADAPTER;
 	
@@ -403,9 +403,8 @@ public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaP
 				checkedItems.append(i, true);
 			}
 		}
-		if (actionMode == null){
-			actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
-		}
+
+		actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
 
 		updateActionModeTitle();
 		notifyDataSetChanged();
@@ -572,17 +571,17 @@ public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaP
 		}
 		Resources res = context.getResources();
 		String title;
-		int sum=files+folders;
-
-		if (files == 0 && folders == 0) {
-			title = Integer.toString(sum);
-		} else if (files == 0) {
-			title = Integer.toString(folders);
-		} else if (folders == 0) {
-			title = Integer.toString(files);
-		} else {
-			title = Integer.toString(sum);
-		}
+		int sum=files;
+		title = Integer.toString(sum);
+//		if (files == 0 && folders == 0) {
+//			title = Integer.toString(sum);
+//		} else if (files == 0) {
+//			title = Integer.toString(folders);
+//		} else if (folders == 0) {
+//			title = Integer.toString(files);
+//		} else {
+//			title = Integer.toString(sum);
+//		}
 		actionMode.setTitle(title);
 		try {
 			actionMode.invalidate();

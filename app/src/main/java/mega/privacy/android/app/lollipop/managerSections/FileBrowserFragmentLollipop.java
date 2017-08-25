@@ -522,7 +522,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			log("After consulting... the parent keeps -1 or ROOTNODE: "+parentHandle);
 
 			if(aB!=null){
-				aB.setTitle(getString(R.string.section_cloud_drive));
+				//aB.setTitle(getString(R.string.section_cloud_drive));
 				log("indicator_menu_white_435");
 				aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 				((ManagerActivityLollipop)context).setFirstNavigationLevel(true);

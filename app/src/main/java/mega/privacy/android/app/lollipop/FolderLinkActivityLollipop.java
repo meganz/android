@@ -818,7 +818,9 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 				if (numberOfNodesPending > 0){
 					msg = msg + getString(R.string.pending_multiple, numberOfNodesPending);
 				}
+
 				showSnackbar(msg);
+
 			}
 		}
 	}
@@ -1028,6 +1030,9 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 			}else{
 				log("OK");
 				Snackbar.make(fragmentContainer, getString(R.string.context_correctly_copied), Snackbar.LENGTH_LONG).show();
+				clearSelections();
+				hideMultipleSelect();
+
 //				Intent intent = new Intent(this, ManagerActivityLollipop.class);
 //		        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
 //		        	intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -1234,7 +1239,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 			}
 		}
 		Resources res = getResources();
-		String format = "%d %s";
+		/*String format = "%d %s";
 		String filesStr = String.format(format, files,
 				res.getQuantityString(R.plurals.general_num_files, files));
 		String foldersStr = String.format(format, folders,
@@ -1249,6 +1254,20 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 		} else {
 			title = foldersStr + ", " + filesStr;
 		}
+		actionMode.setTitle(title);*/
+
+		String title;
+		int sum=files+folders;
+
+		if (files == 0 && folders == 0) {
+			title = Integer.toString(sum);
+		} else if (files == 0) {
+			title = Integer.toString(folders);
+		} else if (folders == 0) {
+			title = Integer.toString(files);
+		} else {
+			title = Integer.toString(sum);
+		}
 		actionMode.setTitle(title);
 		try {
 			actionMode.invalidate();
@@ -1256,7 +1275,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 			e.printStackTrace();
 			log("oninvalidate error");
 		}
-		// actionMode.
+
 	}
 	
 	ArrayList<Long> handleListM = new ArrayList<Long>();

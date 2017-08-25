@@ -252,6 +252,11 @@ public class MyStorageFragmentLollipop extends Fragment implements MegaRequestLi
 		}
 		else{
 			String usedSpaceString = String.format(context.getString(R.string.my_account_of_string), myAccountInfo.getUsedFormatted(), myAccountInfo.getTotalFormatted());
+			try{
+				usedSpaceString = usedSpaceString.replace("[A]", "<font color=\'#777777\'>");
+				usedSpaceString = usedSpaceString.replace("[/A]", "</font>");
+			}
+			catch (Exception e){}
 			Spanned result = null;
 			if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
 				result = Html.fromHtml(usedSpaceString,Html.FROM_HTML_MODE_LEGACY);
@@ -287,6 +292,11 @@ public class MyStorageFragmentLollipop extends Fragment implements MegaRequestLi
 				long transferQuotaMax = myAccountInfo.getAccountInfo().getTransferMax();
 
 				String textToShow = String.format(context.getString(R.string.my_account_of_string), Util.getSizeString(transferQuotaUsed), Util.getSizeString(transferQuotaMax));
+				try{
+					textToShow = textToShow.replace("[A]", "<font color=\'#777777\'>");
+					textToShow = textToShow.replace("[/A]", "</font>");
+				}
+				catch (Exception e){}
 				Spanned result = null;
 				if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
 					result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);

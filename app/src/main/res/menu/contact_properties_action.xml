@@ -3,20 +3,19 @@
     
     <item
         android:id="@+id/cab_menu_share_folder"
-        android:orderInCategory="100"
+        android:orderInCategory="110"
         android:title="@string/context_share_folder"
-        MEGA:showAsAction="never" />
+        android:icon="@drawable/ic_share_white"
+        MEGA:showAsAction="always"
+        android:visible="true"/>
 
-    <item
-        android:id="@+id/cab_menu_view_shares"
-        android:orderInCategory="105"
-        android:title="@string/context_view_shared_folders"
-        MEGA:showAsAction="never" />
 
     <item
         android:id="@+id/cab_menu_start_conversation"
-        android:orderInCategory="110"
+        android:orderInCategory="100"
         android:title="@string/group_chat_start_conversation_label"
-        MEGA:showAsAction="never" />
+        android:icon="@drawable/ic_chat_w"
+        MEGA:showAsAction="always"
+        android:visible="false"/>
 
 </menu>

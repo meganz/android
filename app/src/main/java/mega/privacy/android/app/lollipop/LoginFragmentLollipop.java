@@ -778,6 +778,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     megaChatApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaChatApi();
                 }
                 log("INIT STATE: "+megaChatApi.getInitState());
+                log("addChatListener");
                 megaChatApi.addChatListener(this);
                 int ret = megaChatApi.init(gSession);
                 log("enableChat: result of init ---> "+ret);
