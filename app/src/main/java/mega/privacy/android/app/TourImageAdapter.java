@@ -60,38 +60,35 @@ public class TourImageAdapter extends PagerAdapter {
  
         imgDisplay = (ImageView) viewLayout.findViewById(R.id.imageTour);
 
-
         imgDisplay.setImageResource(mImages[position]);
 
 		/*Rounded corners of image*/
 
 		Bitmap bitmap = ((BitmapDrawable)imgDisplay.getDrawable()).getBitmap();
-			int w = bitmap.getWidth();
-			int h = bitmap.getHeight();
-			int radius =20;
-			Bitmap output = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
-			Canvas canvas = new Canvas(output);
+		int w = bitmap.getWidth();
+		int h = bitmap.getHeight();
+		int radius =20;
+		Bitmap output = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
+		Canvas canvas = new Canvas(output);
 
-			final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
-			final RectF rectF = new RectF(0, 0, w, h);
+		final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+		final RectF rectF = new RectF(0, 0, w, h);
 
-			canvas.drawRoundRect(rectF, radius, radius, paint);
+		canvas.drawRoundRect(rectF, radius, radius, paint);
 
-			paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
-			canvas.drawBitmap(bitmap, null, rectF, paint);
+		paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
+		canvas.drawBitmap(bitmap, null, rectF, paint);
 
-			/*left top and right top corners*/
+		/*left top and right top corners*/
 
-			final Rect clipRect = new Rect(0, radius, w, h);
-			paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC));
-			canvas.drawRect(clipRect, paint);
+		final Rect clipRect = new Rect(0, radius, w, h);
+		paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC));
+		canvas.drawRect(clipRect, paint);
 
-			paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
-			canvas.drawBitmap(bitmap, null, rectF, paint);
+		paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
+		canvas.drawBitmap(bitmap, null, rectF, paint);
 
-			imgDisplay.setImageBitmap(output);
-
-
+		imgDisplay.setImageBitmap(output);
 
         ((ViewPager) container).addView(viewLayout);
  
