@@ -244,7 +244,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         public TextView contentOwnMessageContactEmail;
         TextView contentOwnMessageContactInitialLetter;
 
-        ProgressBar uploadingProgressBar;
+        RelativeLayout transparentCoatingLandscape;
+        RelativeLayout transparentCoatingPortrait;
         RelativeLayout errorUploadingLayout;
 
         TextView retryAlert;
@@ -473,8 +474,11 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
             holder.triangleIcon = (ImageView)  v.findViewById(R.id.own_triangle_icon);
 
-            holder.uploadingProgressBar = (ProgressBar) v.findViewById(R.id.uploadingProgressBar);
-            holder.uploadingProgressBar.setVisibility(View.GONE);
+            holder.transparentCoatingPortrait = (RelativeLayout) v.findViewById(R.id.transparent_coating_portrait);
+            holder.transparentCoatingPortrait.setVisibility(View.GONE);
+
+            holder.transparentCoatingLandscape = (RelativeLayout) v.findViewById(R.id.transparent_coating_landscape);
+            holder.transparentCoatingLandscape.setVisibility(View.GONE);
 
             holder.errorUploadingLayout = (RelativeLayout) v.findViewById(R.id.error_uploading_relative_layout);
             holder.errorUploadingLayout.setVisibility(View.GONE);
@@ -691,7 +695,9 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         ((ViewHolderMessageChat) holder).triangleIcon.setVisibility(View.GONE);
         ((ViewHolderMessageChat) holder).retryAlert.setVisibility(View.GONE);
 
-        ((ViewHolderMessageChat) holder).uploadingProgressBar.setVisibility(View.GONE);
+        ((ViewHolderMessageChat) holder).transparentCoatingLandscape.setVisibility(View.GONE);
+        ((ViewHolderMessageChat) holder).transparentCoatingPortrait.setVisibility(View.GONE);
+
 
         MegaChatMessage message = messages.get(position-1).getMessage();
         ((ViewHolderMessageChat)holder).userHandle = message.getUserHandle();
@@ -3232,10 +3238,14 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     log("State of the message: " + message.getPendingMessage().getState());
 
                     if (message.getPendingMessage().getState() == PendingMessage.STATE_ERROR) {
-                        holder.uploadingProgressBar.setVisibility(View.GONE);
+                        holder.transparentCoatingPortrait.setVisibility(View.GONE);
+                        holder.transparentCoatingLandscape.setVisibility(View.GONE);
+
                         holder.errorUploadingLayout.setVisibility(View.VISIBLE);
                     } else {
-                        holder.uploadingProgressBar.setVisibility(View.VISIBLE);
+                        holder.transparentCoatingLandscape.setVisibility(View.VISIBLE);
+                        holder.transparentCoatingPortrait.setVisibility(View.VISIBLE);
+
                         holder.errorUploadingLayout.setVisibility(View.GONE);
                     }
 
