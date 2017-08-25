@@ -100,6 +100,8 @@
 
 
     <color name="transparent_transparent_black">#35000000</color>
+    <color name="less_transparent_white">#80FFFFFF</color>
+
 
 
 </resources>
