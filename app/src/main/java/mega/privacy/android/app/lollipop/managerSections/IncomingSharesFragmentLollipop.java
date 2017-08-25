@@ -395,7 +395,7 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 			if (adapter.getItemCount() == 0){
 				recyclerView.setVisibility(View.GONE);
 				emptyImageView.setVisibility(View.VISIBLE);
-				emptyTextView.setVisibility(View.VISIBLE);	
+				emptyTextView.setVisibility(View.VISIBLE);
 			}
 			else{
 				recyclerView.setVisibility(View.VISIBLE);
