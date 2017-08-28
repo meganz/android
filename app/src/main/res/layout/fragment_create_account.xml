@@ -10,6 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="left"
+        android:background="@color/white"
         android:orientation="vertical" >
 
         <LinearLayout
@@ -25,22 +26,22 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="left"
                 android:fontFamily="sans-serif-medium"
-                android:layout_marginLeft="34dp"
-                android:layout_marginRight="32dp"
-                android:layout_marginTop="32dp"
-                android:layout_marginBottom="22dp"
+                android:layout_marginTop="40dp"
+                android:layout_marginBottom="24dp"
+                android:layout_marginLeft="72dp"
+                android:layout_marginRight="72dp"
                 android:text="@string/create_account_text"
                 android:textColor="@color/lollipop_primary_color"
-                android:textSize="22sp" />
+                android:textSize="20sp" />
 
             <EditText
                 android:id="@+id/create_account_name_text"
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
                 android:layout_gravity="left"
-                android:layout_marginLeft="32dp"
-                android:layout_marginRight="32dp"
                 android:layout_marginBottom="10dp"
+                android:layout_marginLeft="70dp"
+                android:layout_marginRight="72dp"
                 android:hint="@string/name_text"
                 android:textSize="16sp"
                 android:imeOptions="actionNext"
@@ -51,9 +52,9 @@
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
                 android:layout_gravity="left"
-                 android:layout_marginLeft="32dp"
-                 android:layout_marginRight="32dp"
                  android:layout_marginBottom="10dp"
+                 android:layout_marginLeft="70dp"
+                 android:layout_marginRight="72dp"
                 android:hint="@string/lastname_text"
                  android:textSize="16sp"
                 android:imeOptions="actionNext"
@@ -64,9 +65,9 @@
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
                 android:layout_gravity="left"
-                android:layout_marginLeft="32dp"
-                android:layout_marginRight="32dp"
                 android:layout_marginBottom="10dp"
+                android:layout_marginLeft="70dp"
+                android:layout_marginRight="72dp"
                 android:hint="@string/email_text"
                 android:textSize="16sp"
                 android:imeOptions="actionNext"
@@ -77,9 +78,9 @@
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
                 android:layout_gravity="left"
-                android:layout_marginLeft="32dp"
-                android:layout_marginRight="32dp"
                 android:layout_marginBottom="10dp"
+                android:layout_marginLeft="70dp"
+                android:layout_marginRight="72dp"
                 android:hint="@string/password_text"
                 android:imeOptions="actionNext"
                 android:textSize="16sp"
@@ -91,9 +92,9 @@
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
                 android:layout_gravity="left"
-                android:layout_marginLeft="32dp"
-                android:layout_marginRight="32dp"
                 android:layout_marginBottom="10dp"
+                android:layout_marginLeft="70dp"
+                android:layout_marginRight="72dp"
                 android:hint="@string/confirm_password_text"
                 android:imeOptions="actionDone"
                 android:textSize="16sp"
@@ -104,9 +105,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="left"
-                android:layout_marginLeft="32dp"
-                android:layout_marginRight="32dp"
                 android:layout_marginBottom="20dp"
+                android:layout_marginLeft="66dp"
+                android:layout_marginRight="40dp"
                 android:layout_marginTop="35dp"
                 android:orientation="horizontal" >
 
@@ -121,11 +122,10 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
-                    android:linksClickable="true"
+                    android:textColor="@color/text_login"
                     android:layout_marginRight="16dp"
                     android:singleLine="false"
-                    android:text="@string/tos"
-                    android:textSize="10sp" />
+                    android:textSize="12sp" />
 
             </LinearLayout>
 
@@ -135,9 +135,9 @@
                 android:layout_height="wrap_content"
                 android:textColor="@color/accentColor"
                 android:background="@android:color/transparent"
-                android:layout_marginLeft="40dp"
-                android:layout_marginRight="32dp"
                 android:layout_marginBottom="30dp"
+                android:layout_marginLeft="72dp"
+                android:layout_marginRight="72dp"
                 android:layout_gravity="left"
                 android:minHeight="0dp"
                 android:minWidth="0dp"
@@ -161,10 +161,11 @@
                 android:layout_height="wrap_content"
                 android:text="@string/already_account"
                 android:textColor="@color/text_login"
-                android:layout_marginLeft="40dp"
-                android:layout_marginTop="20dp"
+                android:layout_marginTop="24dp"
                 android:layout_marginBottom="30dp"
-                android:textSize="22sp" />
+                android:layout_marginLeft="72dp"
+                android:layout_marginRight="40dp"
+                android:textSize="20sp" />
 
             <Button
                 android:id="@+id/button_login_create"
@@ -173,10 +174,11 @@
                 android:textColor="@color/accentColor"
                 android:background="@android:color/transparent"
                 android:layout_gravity="left"
-                android:layout_marginLeft="40dp"
                 android:minHeight="0dp"
                 android:minWidth="0dp"
                 android:layout_marginBottom="30dp"
+                android:layout_marginLeft="72dp"
+                android:layout_marginRight="72dp"
                 android:stateListAnimator="@null" />
         </LinearLayout>
 

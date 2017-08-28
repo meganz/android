@@ -8,6 +8,8 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.text.Html;
+import android.text.Spanned;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.LayoutInflater;
@@ -118,11 +120,26 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
         userPasswordConfirm = (EditText) v.findViewById(R.id.create_account_password_text_confirm);
 
         TextView tos = (TextView)v.findViewById(R.id.tos);
-        tos.setTextColor(getResources().getColor(R.color.mega));
+
+        String textToShow = context.getString(R.string.tos);
+        try{
+            textToShow = textToShow.replace("[A]", "<u>");
+            textToShow = textToShow.replace("[/A]", "</u>");
+        }
+        catch (Exception e){}
+
+        Spanned result = null;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+            result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
+        } else {
+            result = Html.fromHtml(textToShow);
+        }
+
+        tos.setText(result);
+
         tos.setOnClickListener(this);
 
         chkTOS = (CheckBox) v.findViewById(R.id.create_account_chkTOS);
-        tos = (TextView) v.findViewById(R.id.tos);
 
         bRegister = (Button) v.findViewById(R.id.button_create_account_create);
         bRegister.setText(getString(R.string.create_account));
@@ -150,6 +167,7 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
 
     @Override
     public void onClick(View v) {
+        log("onClick");
 
         switch (v.getId()) {
             case R.id.button_create_account_create:
@@ -161,6 +179,7 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
                 break;
 
             case R.id.tos:
+                log("Show tos");
 //				Intent browserIntent = new Intent(Intent.ACTION_VIEW);
 //				browserIntent.setComponent(new ComponentName("com.android.browser", "com.android.browser.BrowserActivity"));
 //				browserIntent.setDataAndType(Uri.parse("http://www.google.es"), "text/html");
