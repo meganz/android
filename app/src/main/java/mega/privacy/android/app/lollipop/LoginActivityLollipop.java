@@ -7,6 +7,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -21,6 +22,8 @@ import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -88,6 +91,7 @@ public class LoginActivityLollipop extends AppCompatActivity implements MegaGlob
     String sessionTemp = null;
     String firstNameTemp = null;
     String lastNameTemp = null;
+
 
     @Override
     protected void onDestroy() {
@@ -161,6 +165,8 @@ public class LoginActivityLollipop extends AppCompatActivity implements MegaGlob
 //		visibleFragment = Constants.CHOOSE_ACCOUNT_FRAGMENT;
 //		visibleFragment = Constants.CONFIRM_EMAIL_FRAGMENT;
         showFragment(visibleFragment);
+
+
     }
 
     public void showSnackbar(String message) {
@@ -199,7 +205,12 @@ public class LoginActivityLollipop extends AppCompatActivity implements MegaGlob
                 ft.replace(R.id.fragment_container_login, loginFragment);
                 ft.commitNowAllowingStateLoss();
 
-//
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    Window window = this.getWindow();
+                    window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+                    window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+                    window.setStatusBarColor(ContextCompat.getColor(this, R.color.status_bar_login));
+                }
 //				getFragmentManager()
 //						.beginTransaction()
 //						.attach(loginFragment)
@@ -216,6 +227,12 @@ public class LoginActivityLollipop extends AppCompatActivity implements MegaGlob
                 FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
                 ft.replace(R.id.fragment_container_login, chooseAccountFragment);
                 ft.commitNowAllowingStateLoss();
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    Window window = this.getWindow();
+                    window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+                    window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+                    window.setStatusBarColor(ContextCompat.getColor(this, R.color.status_bar_login));
+                }
                 break;
             }
             case Constants.CREATE_ACCOUNT_FRAGMENT: {
@@ -227,6 +244,12 @@ public class LoginActivityLollipop extends AppCompatActivity implements MegaGlob
                 FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
                 ft.replace(R.id.fragment_container_login, createAccountFragment);
                 ft.commitNowAllowingStateLoss();
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    Window window = this.getWindow();
+                    window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+                    window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+                    window.setStatusBarColor(ContextCompat.getColor(this, R.color.status_bar_login));
+                }
                 break;
             }
             case Constants.TOUR_FRAGMENT: {
@@ -239,6 +262,13 @@ public class LoginActivityLollipop extends AppCompatActivity implements MegaGlob
                 FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
                 ft.replace(R.id.fragment_container_login, tourFragment);
                 ft.commitNowAllowingStateLoss();
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    Window window = this.getWindow();
+                    window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+                    window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+                    window.setStatusBarColor(ContextCompat.getColor(this, R.color.lollipop_dark_primary_color));
+                }
                 break;
             }
             case Constants.CONFIRM_EMAIL_FRAGMENT: {
@@ -269,6 +299,12 @@ public class LoginActivityLollipop extends AppCompatActivity implements MegaGlob
                 ft.commitNowAllowingStateLoss();
                 FragmentManager fragmentManager = getSupportFragmentManager();
                 fragmentManager.executePendingTransactions();
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    Window window = this.getWindow();
+                    window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+                    window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+                    window.setStatusBarColor(ContextCompat.getColor(this, R.color.status_bar_login));
+                }
                 break;
             }
         }
@@ -728,7 +764,6 @@ public class LoginActivityLollipop extends AppCompatActivity implements MegaGlob
 
     @Override
     public void onReloadNeeded(MegaApiJava api) {
-
     }
 
     @Override
@@ -744,7 +779,6 @@ public class LoginActivityLollipop extends AppCompatActivity implements MegaGlob
 
     @Override
     public void onContactRequestsUpdate(MegaApiJava api, ArrayList<MegaContactRequest> requests) {
-
     }
 
     @Override
@@ -803,6 +837,5 @@ public class LoginActivityLollipop extends AppCompatActivity implements MegaGlob
     protected void onPostResume() {
         log("onPostResume");
         super.onPostResume();
-
     }
 }
