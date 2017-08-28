@@ -410,7 +410,7 @@
 	<string name="upload_to_audio" context="upload to. Then choose an Audio file">Audio </string>
 	<string name="upload_to_video" context="upload to. Then choose a Video file">Vídeo</string>
 	<!-- <string name="upload_to_other" context="upload to. Then choose a file which is not an Image, an Audio or a Video">Otro fichero</string> -->
-	<string name="upload_to_filesystem" context="upload to. Then choose to browse the file system to choose a file">Elegir del Sistema de Ficheros</string>
+	<string name="upload_to_filesystem" context="upload to. Then choose to browse the file system to choose a file">Desde Sistema de Ficheros</string>
 	<!-- <string name="upload_select_file_type" context="title of the dialog for choosing if a user wants to upload an image, an audio, a video or a file from the system">Selecciona el tipo de archivo</string> -->
 	<!-- <string name="upload_uploading" context="status text">Subiendo</string> -->
 	<!-- <string name="upload_touch_to_cancel" context="hint to how to cancel the upload (by touching the notification)">Toca para cancelar la subida</string> -->
