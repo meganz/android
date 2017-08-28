@@ -246,6 +246,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
         RelativeLayout transparentCoatingLandscape;
         RelativeLayout transparentCoatingPortrait;
+        ProgressBar uploadingProgressBar;
+
         RelativeLayout errorUploadingLayout;
 
         TextView retryAlert;
@@ -480,6 +482,9 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.transparentCoatingLandscape = (RelativeLayout) v.findViewById(R.id.transparent_coating_landscape);
             holder.transparentCoatingLandscape.setVisibility(View.GONE);
 
+            holder.uploadingProgressBar = (ProgressBar) v.findViewById(R.id.uploadingProgressBar);
+            holder.uploadingProgressBar.setVisibility(View.GONE);
+
             holder.errorUploadingLayout = (RelativeLayout) v.findViewById(R.id.error_uploading_relative_layout);
             holder.errorUploadingLayout.setVisibility(View.GONE);
 
@@ -697,6 +702,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
         ((ViewHolderMessageChat) holder).transparentCoatingLandscape.setVisibility(View.GONE);
         ((ViewHolderMessageChat) holder).transparentCoatingPortrait.setVisibility(View.GONE);
+        ((ViewHolderMessageChat) holder).uploadingProgressBar.setVisibility(View.GONE);
 
 
         MegaChatMessage message = messages.get(position-1).getMessage();
@@ -3240,12 +3246,12 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     if (message.getPendingMessage().getState() == PendingMessage.STATE_ERROR) {
                         holder.transparentCoatingPortrait.setVisibility(View.GONE);
                         holder.transparentCoatingLandscape.setVisibility(View.GONE);
-
+                        holder.uploadingProgressBar.setVisibility(View.GONE);
                         holder.errorUploadingLayout.setVisibility(View.VISIBLE);
                     } else {
                         holder.transparentCoatingLandscape.setVisibility(View.VISIBLE);
                         holder.transparentCoatingPortrait.setVisibility(View.VISIBLE);
-
+                        holder.uploadingProgressBar.setVisibility(View.VISIBLE);
                         holder.errorUploadingLayout.setVisibility(View.GONE);
                     }
 
