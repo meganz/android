@@ -332,7 +332,8 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 			}
 			else
 			{
-					collapsingToolbar.setExpandedTitleMarginBottom(Util.scaleHeightPx(35, outMetrics));
+
+				collapsingToolbar.setExpandedTitleMarginBottom(Util.scaleHeightPx(35, outMetrics));
 			}
 			collapsingToolbar.setExpandedTitleMarginStart((int) getResources().getDimension(R.dimen.recycler_view_separator));
 			getSupportActionBar().setDisplayShowTitleEnabled(false);
