@@ -214,6 +214,16 @@
                         </RelativeLayout>
                 </RelativeLayout>
 
+                <ProgressBar
+                    android:id="@+id/uploadingProgressBar"
+                    android:indeterminate="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignParentBottom="true"
+                    android:paddingRight="25dp"
+                    android:paddingBottom="12dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
 
                 <RelativeLayout
                     android:id="@+id/error_uploading_relative_layout"
