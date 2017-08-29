@@ -708,7 +708,7 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 			case R.id.change_password_oldPassword:{
 				oldPasswordErrorView.setVisibility(View.VISIBLE);
 				oldPasswordErrorText.setText(error);
-				oldPasswordView.getBackground().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_IN);
+				oldPasswordView.getBackground().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
 				LinearLayout.LayoutParams textParamsEditText = (LinearLayout.LayoutParams)oldPasswordView.getLayoutParams();
 				textParamsEditText.setMargins(Util.scaleWidthPx(60, outMetrics), 0, 0, 0);
 				oldPasswordView.setLayoutParams(textParamsEditText);
@@ -717,7 +717,7 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 			case R.id.change_password_newPassword1:{
 				newPassword1ErrorView.setVisibility(View.VISIBLE);
 				newPassword1ErrorText.setText(error);
-				newPassword1View.getBackground().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_IN);
+				newPassword1View.getBackground().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
 				LinearLayout.LayoutParams textParamsEditText = (LinearLayout.LayoutParams) newPassword1View.getLayoutParams();
 				textParamsEditText.setMargins(Util.scaleWidthPx(60, outMetrics), 0, 0, 0);
 				newPassword1View.setLayoutParams(textParamsEditText);
@@ -726,7 +726,7 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 			case R.id.change_password_newPassword2:{
 				newPassword2ErrorView.setVisibility(View.VISIBLE);
 				newPassword2ErrorText.setText(error);
-				newPassword2View.getBackground().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_IN);
+				newPassword2View.getBackground().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
 				LinearLayout.LayoutParams textParamsEditText = (LinearLayout.LayoutParams) newPassword2View.getLayoutParams();
 				textParamsEditText.setMargins(Util.scaleWidthPx(60, outMetrics), 0, 0, 0);
 				newPassword2View.setLayoutParams(textParamsEditText);

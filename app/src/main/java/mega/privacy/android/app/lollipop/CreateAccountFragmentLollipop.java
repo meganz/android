@@ -510,7 +510,7 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
             case R.id.create_account_email_text:{
                 email_error_layout.setVisibility(View.VISIBLE);
                 email_error_text.setText(error);
-                userEmail.getBackground().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_IN);
+                userEmail.getBackground().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
                 LinearLayout.LayoutParams textParamsEditText = (LinearLayout.LayoutParams) userEmail.getLayoutParams();
                 textParamsEditText.setMargins(Util.scaleWidthPx(32, outMetrics), 0, Util.scaleWidthPx(32, outMetrics), Util.scaleWidthPx(3, outMetrics));
                 userEmail.setLayoutParams(textParamsEditText);
@@ -519,7 +519,7 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
             case R.id.create_account_password_text_confirm:{
                 password_confirm_error_layout.setVisibility(View.VISIBLE);
                 password_confirm_error_text.setText(error);
-                userPasswordConfirm.getBackground().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_IN);
+                userPasswordConfirm.getBackground().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
                 LinearLayout.LayoutParams textParamsEditText = (LinearLayout.LayoutParams) userPasswordConfirm.getLayoutParams();
                 textParamsEditText.setMargins(Util.scaleWidthPx(32, outMetrics), 0, Util.scaleWidthPx(32, outMetrics), Util.scaleWidthPx(3, outMetrics));
                 userPasswordConfirm.setLayoutParams(textParamsEditText);
@@ -528,7 +528,7 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
             case R.id.create_account_name_text:{
                 name_error_layout.setVisibility(View.VISIBLE);
                 name_error_text.setText(error);
-                userName.getBackground().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_IN);
+                userName.getBackground().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
                 LinearLayout.LayoutParams textParamsEditText = (LinearLayout.LayoutParams) userName.getLayoutParams();
                 textParamsEditText.setMargins(Util.scaleWidthPx(32, outMetrics), 0, Util.scaleWidthPx(32, outMetrics), Util.scaleWidthPx(3, outMetrics));
                 userName.setLayoutParams(textParamsEditText);
@@ -537,7 +537,7 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
             case R.id.create_account_password_text:{
                 password_error_layout.setVisibility(View.VISIBLE);
                 password_error_text.setText(error);
-                userPassword.getBackground().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_IN);
+                userPassword.getBackground().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
                 LinearLayout.LayoutParams textParamsEditText = (LinearLayout.LayoutParams) userPassword.getLayoutParams();
                 textParamsEditText.setMargins(Util.scaleWidthPx(32, outMetrics), 0, Util.scaleWidthPx(32, outMetrics), Util.scaleWidthPx(3, outMetrics));
                 userPassword.setLayoutParams(textParamsEditText);

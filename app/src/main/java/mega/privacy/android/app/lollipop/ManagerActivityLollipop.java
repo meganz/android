@@ -2676,7 +2676,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		RelativeLayout.LayoutParams params_text_error_firtName = (RelativeLayout.LayoutParams) textError_firtName.getLayoutParams();
 		params_text_error_firtName.height = ViewGroup.LayoutParams.WRAP_CONTENT;
 		params_text_error_firtName.width = ViewGroup.LayoutParams.WRAP_CONTENT;
-		params_text_error_firtName.addRule(RelativeLayout.ALIGN_PARENT_TOP);
+        params_text_error_firtName.addRule(RelativeLayout.CENTER_VERTICAL);
 		params_text_error_firtName.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
 		params_text_error_firtName.setMargins(Util.scaleWidthPx(3, outMetrics), 0,0,0);
 		textError_firtName.setLayoutParams(params_text_error_firtName);
@@ -2709,7 +2709,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		RelativeLayout.LayoutParams params_text_error_lastName = (RelativeLayout.LayoutParams) textError_lastName.getLayoutParams();
 		params_text_error_lastName.height = ViewGroup.LayoutParams.WRAP_CONTENT;
 		params_text_error_lastName.width = ViewGroup.LayoutParams.WRAP_CONTENT;
-		params_text_error_lastName.addRule(RelativeLayout.ALIGN_PARENT_TOP);
+        params_text_error_lastName.addRule(RelativeLayout.CENTER_VERTICAL);
 		params_text_error_lastName.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
 		params_text_error_lastName.setMargins(Util.scaleWidthPx(3, outMetrics), 0,0,0);
 		textError_lastName.setLayoutParams(params_text_error_lastName);
@@ -2742,7 +2742,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		RelativeLayout.LayoutParams params_text_error_email = (RelativeLayout.LayoutParams) textError_email.getLayoutParams();
 		params_text_error_email.height = ViewGroup.LayoutParams.WRAP_CONTENT;
 		params_text_error_email.width = ViewGroup.LayoutParams.WRAP_CONTENT;
-		params_text_error_email.addRule(RelativeLayout.ALIGN_PARENT_TOP);
+        params_text_error_email.addRule(RelativeLayout.CENTER_VERTICAL);
 		params_text_error_email.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
 		params_text_error_email.setMargins(Util.scaleWidthPx(3, outMetrics), 0,0,0);
 		textError_email.setLayoutParams(params_text_error_email);
@@ -2787,7 +2787,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					String emailError = Util.getEmailError(value, managerActivity);
 					if (emailError != null) {
 //						inputMail.setError(emailError);
-						inputMail.getBackground().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_IN);
+						inputMail.getBackground().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
 						textError_email.setText(emailError);
 						error_layout_email.setVisibility(View.VISIBLE);
 						inputMail.requestFocus();
@@ -2795,7 +2795,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					else if(valueFirstName.equals("")||valueFirstName.isEmpty()){
 						log("input is empty");
 //						inputFirstName.setError(getString(R.string.invalid_string));
-						inputFirstName.getBackground().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_IN);
+						inputFirstName.getBackground().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
 						textError_firtName.setText(getString(R.string.invalid_string));
 						error_layout_firtName.setVisibility(View.VISIBLE);
 						inputFirstName.requestFocus();
@@ -2803,7 +2803,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					else if(valueLastName.equals("")||valueLastName.isEmpty()){
 						log("input is empty");
 //						inputLastName.setError(getString(R.string.invalid_string));
-						inputLastName.getBackground().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_IN);
+						inputLastName.getBackground().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
 						textError_lastName.setText(getString(R.string.invalid_string));
 						error_layout_lastName.setVisibility(View.VISIBLE);
 						inputLastName.requestFocus();
@@ -2859,7 +2859,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					String emailError = Util.getEmailError(value, managerActivity);
 					if (emailError != null) {
 //						inputMail.setError(emailError);
-						inputMail.getBackground().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_IN);
+						inputMail.getBackground().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
 						textError_email.setText(emailError);
 						error_layout_email.setVisibility(View.VISIBLE);
 						inputMail.requestFocus();
@@ -2867,7 +2867,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					else if(valueFirstName.equals("")||valueFirstName.isEmpty()){
 						log("input is empty");
 //						inputFirstName.setError(getString(R.string.invalid_string));
-						inputFirstName.getBackground().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_IN);
+						inputFirstName.getBackground().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
 						textError_firtName.setText(getString(R.string.invalid_string));
 						error_layout_firtName.setVisibility(View.VISIBLE);
 						inputFirstName.requestFocus();
@@ -2875,7 +2875,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					else if(valueLastName.equals("")||valueLastName.isEmpty()){
 						log("input is empty");
 //						inputLastName.setError(getString(R.string.invalid_string));
-						inputLastName.getBackground().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_IN);
+						inputLastName.getBackground().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
 						textError_lastName.setText(getString(R.string.invalid_string));
 						error_layout_lastName.setVisibility(View.VISIBLE);
 						inputLastName.requestFocus();
@@ -2931,7 +2931,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					String emailError = Util.getEmailError(value, managerActivity);
 					if (emailError != null) {
 //						inputMail.setError(emailError);
-						inputMail.getBackground().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_IN);
+						inputMail.getBackground().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
 						textError_email.setText(emailError);
 						error_layout_email.setVisibility(View.VISIBLE);
 						inputMail.requestFocus();
@@ -2939,7 +2939,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					else if(valueFirstName.equals("")||valueFirstName.isEmpty()){
 						log("input is empty");
 //						inputFirstName.setError(getString(R.string.invalid_string));
-						inputFirstName.getBackground().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_IN);
+						inputFirstName.getBackground().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
 						textError_firtName.setText(getString(R.string.invalid_string));
 						error_layout_firtName.setVisibility(View.VISIBLE);
 						inputFirstName.requestFocus();
@@ -2947,7 +2947,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					else if(valueLastName.equals("")||valueLastName.isEmpty()){
 						log("input is empty");
 //						inputLastName.setError(getString(R.string.invalid_string));
-						inputLastName.getBackground().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_IN);
+						inputLastName.getBackground().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
 						textError_lastName.setText(getString(R.string.invalid_string));
 						error_layout_lastName.setVisibility(View.VISIBLE);
 						inputLastName.requestFocus();
@@ -2996,7 +2996,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				String emailError = Util.getEmailError(value, managerActivity);
 				if (emailError != null) {
 //					inputMail.setError(emailError);
-					inputMail.getBackground().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_IN);
+					inputMail.getBackground().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
 					textError_email.setText(emailError);
 					error_layout_email.setVisibility(View.VISIBLE);
 					inputMail.requestFocus();
@@ -3004,7 +3004,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				else if(valueFirstName.equals("")||valueFirstName.isEmpty()){
 					log("input is empty");
 //					inputFirstName.setError(getString(R.string.invalid_string));
-					inputFirstName.getBackground().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_IN);
+					inputFirstName.getBackground().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
 					textError_firtName.setText(getString(R.string.invalid_string));
 					error_layout_firtName.setVisibility(View.VISIBLE);
 					inputFirstName.requestFocus();
@@ -3012,7 +3012,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				else if(valueLastName.equals("")||valueLastName.isEmpty()){
 					log("input is empty");
 //					inputLastName.setError(getString(R.string.invalid_string));
-					inputLastName.getBackground().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_IN);
+					inputLastName.getBackground().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
 					textError_lastName.setText(getString(R.string.invalid_string));
 					error_layout_lastName.setVisibility(View.VISIBLE);
 					inputLastName.requestFocus();
@@ -8480,7 +8480,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		RelativeLayout.LayoutParams params_text_error = (RelativeLayout.LayoutParams) textError.getLayoutParams();
 		params_text_error.height = ViewGroup.LayoutParams.WRAP_CONTENT;
 		params_text_error.width = ViewGroup.LayoutParams.WRAP_CONTENT;
-		params_text_error.addRule(RelativeLayout.ALIGN_PARENT_TOP);
+        params_text_error.addRule(RelativeLayout.CENTER_VERTICAL);
 		params_text_error.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
 		params_text_error.setMargins(Util.scaleWidthPx(3, outMetrics), 0,0,0);
 		textError.setLayoutParams(params_text_error);
@@ -8517,7 +8517,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				if (actionId == EditorInfo.IME_ACTION_DONE) {
 					String value = v.getText().toString().trim();
 					if (value.length() == 0) {
-						input.getBackground().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_IN);
+						input.getBackground().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
 						textError.setText(getString(R.string.invalid_string));
 						error_layout.setVisibility(View.VISIBLE);
 						input.requestFocus();
@@ -8555,7 +8555,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			{
 				String value = input.getText().toString().trim();
 				if (value.length() == 0) {
-					input.getBackground().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_IN);
+					input.getBackground().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
 					textError.setText(getString(R.string.invalid_string));
 					error_layout.setVisibility(View.VISIBLE);
 					input.requestFocus();
@@ -8854,6 +8854,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 		input.setTextColor(getResources().getColor(R.color.text_secondary));
 		input.setImeOptions(EditorInfo.IME_ACTION_DONE);
+		input.getBackground().clearColorFilter();
 	    layout.addView(input, params);
 		input.setImeActionLabel(getString(R.string.context_open_link_title),EditorInfo.IME_ACTION_DONE);
 
@@ -9150,7 +9151,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		RelativeLayout.LayoutParams params_text_error = (RelativeLayout.LayoutParams) textError.getLayoutParams();
 		params_text_error.height = ViewGroup.LayoutParams.WRAP_CONTENT;
 		params_text_error.width = ViewGroup.LayoutParams.WRAP_CONTENT;
-		params_text_error.addRule(RelativeLayout.ALIGN_PARENT_TOP);
+        params_text_error.addRule(RelativeLayout.CENTER_VERTICAL);
 		params_text_error.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
 		params_text_error.setMargins(Util.scaleWidthPx(3, outMetrics), 0,0,0);
 		textError.setLayoutParams(params_text_error);
@@ -9192,7 +9193,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				if (actionId == EditorInfo.IME_ACTION_DONE) {
 					String value = v.getText().toString().trim();
 					if (value.length() == 0) {
-						input.getBackground().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_IN);
+						input.getBackground().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
 						textError.setText(getString(R.string.invalid_string));
 						error_layout.setVisibility(View.VISIBLE);
 						input.requestFocus();
@@ -9243,7 +9244,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			{
 				String value = input.getText().toString().trim();
 				if (value.length() == 0) {
-					input.getBackground().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_IN);
+					input.getBackground().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
 					textError.setText(getString(R.string.invalid_string));
 					error_layout.setVisibility(View.VISIBLE);
 					input.requestFocus();
@@ -9707,7 +9708,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		RelativeLayout.LayoutParams params_text_error = (RelativeLayout.LayoutParams) textError_email.getLayoutParams();
 		params_text_error.height = ViewGroup.LayoutParams.WRAP_CONTENT;
 		params_text_error.width = ViewGroup.LayoutParams.WRAP_CONTENT;
-		params_text_error.addRule(RelativeLayout.ALIGN_PARENT_TOP);
+        params_text_error.addRule(RelativeLayout.CENTER_VERTICAL);
 		params_text_error.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
 		params_text_error.setMargins(Util.scaleWidthPx(3, outMetrics), 0,0,0);
 		textError_email.setLayoutParams(params_text_error);
@@ -9751,7 +9752,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					String emailError = Util.getEmailError(value, managerActivity);
 					if (emailError != null) {
 //                        input.setError(emailError);
-						input.getBackground().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_IN);
+						input.getBackground().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
 						textError_email.setText(emailError);
 						error_layout_email.setVisibility(View.VISIBLE);
 					} else {
@@ -9799,7 +9800,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				String emailError = Util.getEmailError(value, managerActivity);
 				if (emailError != null) {
 //					input.setError(emailError);
-					input.getBackground().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_IN);
+					input.getBackground().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
 					textError_email.setText(emailError);
 					error_layout_email.setVisibility(View.VISIBLE);
 				} else {
