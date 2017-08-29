@@ -16,6 +16,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.StatFs;
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -24,11 +25,16 @@ import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.SwitchCompat;
+import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Display;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -91,7 +97,7 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaShare;
 
-public class FullScreenImageViewerLollipop extends PinActivityLollipop implements OnPageChangeListener, OnClickListener, MegaRequestListenerInterface, OnItemClickListener{
+public class FullScreenImageViewerLollipop extends PinActivityLollipop implements OnPageChangeListener, MegaRequestListenerInterface, OnItemClickListener{
 	
 	private DisplayMetrics outMetrics;
 
@@ -99,12 +105,17 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	
 	ProgressDialog statusDialog;
 
+	AppBarLayout appBarLayout;
+	Toolbar tB;
+	ActionBar aB;
+
 	int accountType;
-
 	private boolean isGetLink = false;
-
 	float scaleText;
-	
+
+	Context context;
+
+
 	private MegaFullScreenImageAdapterLollipop adapterMega;
 	private MegaOfflineFullScreenImageAdapterLollipop adapterOffline;
 	private int positionG;
@@ -112,17 +123,17 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	private boolean fromShared = false;
 	private RelativeLayout fragmentContainer;
 	private TextView fileNameTextView;
-	private ImageView actionBarIcon;
-	private ImageView overflowIcon;
-	private ImageView shareIcon;
-	private ImageView downloadIcon;
-	private ImageView propertiesIcon;
-	private ImageView linkIcon;
-	private ListView overflowMenuList;
-	private boolean overflowVisible = false; 
+	//private ImageView actionBarIcon;
+	//private ImageView overflowIcon;
+	//private ImageView shareIcon;
+	//private ImageView downloadIcon;
+	//private ImageView propertiesIcon;
+	//private ImageView linkIcon;
+	//private ListView overflowMenuList;
+	//private boolean overflowVisible = false;
 	
 	private RelativeLayout bottomLayout;
-    private RelativeLayout topLayout;
+   // private RelativeLayout topLayout;
 	private ExtendedViewPager viewPager;	
 	
 	static FullScreenImageViewerLollipop fullScreenImageViewer;
@@ -157,7 +168,10 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	
 	ArrayList<MegaOffline> mOffList;
 	ArrayList<MegaOffline> mOffListImages;
-	
+
+
+
+
 	@Override
 	public void onDestroy(){
 		if(megaApi != null)
@@ -176,12 +190,70 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	    }
 	    return super.onKeyDown(keyCode, event);
 	}
-	
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		log("onCreateOptionsMenu");
+
+		MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.menu.activity_full_screen_image_viewer, menu);
+
+		return super.onCreateOptionsMenu(menu);
+	}
+
+	@Override
+	public boolean onPrepareOptionsMenu(Menu menu) {
+		log("onPrepareOptionsMenu");
+		return super.onPrepareOptionsMenu(menu);
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		log("onOptionsItemSelected");
+		((MegaApplication) getApplication()).sendSignalPresenceActivity();
+
+		int id = item.getItemId();
+		switch (id) {
+			case android.R.id.home: {
+				onBackPressed();
+				break;
+			}
+			case R.id.full_image_viewer_get_link: {
+				break;
+			}
+			case R.id.full_image_viewer_share: {
+				break;
+			}
+			case R.id.full_image_viewer_properties: {
+				break;
+			}
+			case R.id.full_image_viewer_download: {
+				break;
+			}
+			case R.id.full_image_viewer_rename: {
+				break;
+			}
+			case R.id.full_image_viewer_move: {
+				break;
+			}
+			case R.id.full_image_viewer_copy: {
+				break;
+			}
+			case R.id.full_image_viewer_move_to_trash: {
+				break;
+			}
+		}
+		return super.onOptionsItemSelected(item);
+	}
+
+
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		log("onCreate");
 		super.onCreate(savedInstanceState);
-		
+		setContentView(R.layout.activity_full_screen_image_viewer);
+
 		handler = new Handler();
 		fullScreenImageViewer = this;
 
@@ -189,6 +261,8 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		outMetrics = new DisplayMetrics ();
 		display.getMetrics(outMetrics);
 		float density  = getResources().getDisplayMetrics().density;
+
+		appBarLayout = (AppBarLayout) findViewById(R.id.app_bar);
 
 		float scaleW = Util.getScaleW(outMetrics, density);
 		float scaleH = Util.getScaleH(outMetrics, density);
@@ -199,34 +273,34 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			scaleText = scaleW;
 		}
 		
-		dbH = DatabaseHandler.getDbHandler(this);
+
+		//if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.GINGERBREAD){
+		  //  requestWindowFeature(Window.FEATURE_NO_TITLE);
+		   // this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+		//}
 		
-		if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.GINGERBREAD){
-		    requestWindowFeature(Window.FEATURE_NO_TITLE); 
-		    this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-		}
-		
-		setContentView(R.layout.activity_full_screen_image_viewer);
-		
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH){
+
+		/*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH){
 		    ActionBar actionBar = getSupportActionBar();
 		    if (actionBar != null){
 		    	actionBar.hide();
 		    }
-		}
+		}*/
 		
-		if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.GINGERBREAD){
-	        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-	    }
+		//if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.GINGERBREAD){
+	      //  getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+	   // }
+
+
+		//display = getWindowManager().getDefaultDisplay();
+		//outMetrics = new DisplayMetrics ();
+	   // display.getMetrics(outMetrics);
+	    //density  = getResources().getDisplayMetrics().density;
 		
-		display = getWindowManager().getDefaultDisplay();
-		outMetrics = new DisplayMetrics ();
-	    display.getMetrics(outMetrics);
-	    density  = getResources().getDisplayMetrics().density;
-		
-	    scaleW = Util.getScaleW(outMetrics, density);
-	    scaleH = Util.getScaleH(outMetrics, density);
-		
+	   // scaleW = Util.getScaleW(outMetrics, density);
+	    //scaleH = Util.getScaleH(outMetrics, density);
+
+
 		viewPager = (ExtendedViewPager) findViewById(R.id.image_viewer_pager);
 		viewPager.setPageMargin(40);
 		
@@ -246,13 +320,40 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		else{
 			megaApi = app.getMegaApi();
 		}
-		
+		dbH = DatabaseHandler.getDbHandler(this);
+		handler = new Handler();
+
+		tB = (Toolbar) findViewById(R.id.call_toolbar);
+		if (tB == null) {
+			log("Tb is Null");
+			return;
+		}
+
+		tB.setVisibility(View.VISIBLE);
+		setSupportActionBar(tB);
+		aB = getSupportActionBar();
+		log("aB.setHomeAsUpIndicator_1");
+		aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+		aB.setHomeButtonEnabled(true);
+		aB.setDisplayHomeAsUpEnabled(true);
+		aB.setTitle(" ");
+
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+			Window window = this.getWindow();
+			window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+			window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+			window.setStatusBarColor(ContextCompat.getColor(this, R.color.black));
+		}
+
 		imageHandles = new ArrayList<Long>();
 		paths = new ArrayList<String>();
 		long parentNodeHandle = intent.getLongExtra("parentNodeHandle", -1);
 		fromShared = intent.getBooleanExtra("fromShared", false);
-		MegaNode parentNode;		
-		
+		MegaNode parentNode;
+
+		bottomLayout = (RelativeLayout) findViewById(R.id.image_viewer_layout_bottom);
+
+
 		adapterType = intent.getIntExtra("adapterType", 0);
 		if (adapterType == Constants.OFFLINE_ADAPTER){
 			mOffList = new ArrayList<MegaOffline>();
@@ -359,26 +460,26 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		
 				viewPager.setOnPageChangeListener(this);
 				
-				actionBarIcon = (ImageView) findViewById(R.id.full_image_viewer_icon);
-				actionBarIcon.setOnClickListener(this);
+			//	actionBarIcon = (ImageView) findViewById(R.id.full_image_viewer_icon);
+			//	actionBarIcon.setOnClickListener(this);
 				
-				overflowIcon = (ImageView) findViewById(R.id.full_image_viewer_overflow);
-				overflowIcon.setVisibility(View.INVISIBLE);
+			//	overflowIcon = (ImageView) findViewById(R.id.full_image_viewer_overflow);
+			//	overflowIcon.setVisibility(View.INVISIBLE);
 				
-				downloadIcon = (ImageView) findViewById(R.id.full_image_viewer_download);
-				downloadIcon.setVisibility(View.GONE);
+			//	downloadIcon = (ImageView) findViewById(R.id.full_image_viewer_download);
+			//	downloadIcon.setVisibility(View.GONE);
 				
-				propertiesIcon = (ImageView) findViewById(R.id.full_image_viewer_properties);
-				propertiesIcon.setVisibility(View.GONE);
+				//propertiesIcon = (ImageView) findViewById(R.id.full_image_viewer_properties);
+				//propertiesIcon.setVisibility(View.GONE);
 				
-				linkIcon = (ImageView) findViewById(R.id.full_image_viewer_get_link);
-				linkIcon.setVisibility(View.GONE);
+				//linkIcon = (ImageView) findViewById(R.id.full_image_viewer_get_link);
+				//linkIcon.setVisibility(View.GONE);
 				
-				shareIcon = (ImageView) findViewById(R.id.full_image_viewer_share);
-				shareIcon.setVisibility(View.GONE);
+				//shareIcon = (ImageView) findViewById(R.id.full_image_viewer_share);
+				//shareIcon.setVisibility(View.GONE);
 				
-				bottomLayout = (RelativeLayout) findViewById(R.id.image_viewer_layout_bottom);
-			    topLayout = (RelativeLayout) findViewById(R.id.image_viewer_layout_top);
+				//bottomLayout = (RelativeLayout) findViewById(R.id.image_viewer_layout_bottom);
+			   // topLayout = (RelativeLayout) findViewById(R.id.image_viewer_layout_top);
 			}			
 		}				
 		else if (adapterType == Constants.ZIP_ADAPTER){
@@ -441,26 +542,26 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	
 			viewPager.setOnPageChangeListener(this);
 			
-			actionBarIcon = (ImageView) findViewById(R.id.full_image_viewer_icon);
-			actionBarIcon.setOnClickListener(this);
+			//actionBarIcon = (ImageView) findViewById(R.id.full_image_viewer_icon);
+			//actionBarIcon.setOnClickListener(this);
 			
-			overflowIcon = (ImageView) findViewById(R.id.full_image_viewer_overflow);
-			overflowIcon.setVisibility(View.INVISIBLE);
+			//overflowIcon = (ImageView) findViewById(R.id.full_image_viewer_overflow);
+			//overflowIcon.setVisibility(View.INVISIBLE);
 			
-			downloadIcon = (ImageView) findViewById(R.id.full_image_viewer_download);
-			downloadIcon.setVisibility(View.GONE);
+			//downloadIcon = (ImageView) findViewById(R.id.full_image_viewer_download);
+			//downloadIcon.setVisibility(View.GONE);
 			
-			propertiesIcon = (ImageView) findViewById(R.id.full_image_viewer_properties);
-			propertiesIcon.setVisibility(View.GONE);
+			//propertiesIcon = (ImageView) findViewById(R.id.full_image_viewer_properties);
+			//propertiesIcon.setVisibility(View.GONE);
 			
-			linkIcon = (ImageView) findViewById(R.id.full_image_viewer_get_link);
-			linkIcon.setVisibility(View.GONE);
+			//linkIcon = (ImageView) findViewById(R.id.full_image_viewer_get_link);
+			//linkIcon.setVisibility(View.GONE);
 			
-			shareIcon = (ImageView) findViewById(R.id.full_image_viewer_share);
-			shareIcon.setVisibility(View.GONE);
+			//shareIcon = (ImageView) findViewById(R.id.full_image_viewer_share);
+			//shareIcon.setVisibility(View.GONE);
 			
-			bottomLayout = (RelativeLayout) findViewById(R.id.image_viewer_layout_bottom);
-		    topLayout = (RelativeLayout) findViewById(R.id.image_viewer_layout_top);
+		//	bottomLayout = (RelativeLayout) findViewById(R.id.image_viewer_layout_bottom);
+		    //topLayout = (RelativeLayout) findViewById(R.id.image_viewer_layout_top);
 		}
 		else if(adapterType == Constants.SEARCH_ADAPTER){
 			ArrayList<MegaNode> nodes = null;
@@ -496,7 +597,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				positionG = 0;
 			}
 			
-			adapterMega = new MegaFullScreenImageAdapterLollipop(fullScreenImageViewer,imageHandles, megaApi);
+			adapterMega = new MegaFullScreenImageAdapterLollipop(this, fullScreenImageViewer,imageHandles, megaApi);
 			
 			viewPager.setAdapter(adapterMega);
 			
@@ -504,42 +605,41 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	
 			viewPager.setOnPageChangeListener(this);
 			
-			actionBarIcon = (ImageView) findViewById(R.id.full_image_viewer_icon);
-			actionBarIcon.setOnClickListener(this);
+			//actionBarIcon = (ImageView) findViewById(R.id.full_image_viewer_icon);
+			//actionBarIcon.setOnClickListener(this);
 			
-			overflowIcon = (ImageView) findViewById(R.id.full_image_viewer_overflow);
-			if (!isFolderLink){
+		//	overflowIcon = (ImageView) findViewById(R.id.full_image_viewer_overflow);
+			/*if (!isFolderLink){
 				overflowIcon.setVisibility(View.VISIBLE);
 				overflowIcon.setOnClickListener(this);
 			}
 			else{
 				overflowIcon.setVisibility(View.INVISIBLE);
-			}
+			}*/
 			
-			shareIcon = (ImageView) findViewById(R.id.full_image_viewer_share);
-			shareIcon.setVisibility(View.VISIBLE);
-			shareIcon.setOnClickListener(this);
+			//shareIcon = (ImageView) findViewById(R.id.full_image_viewer_share);
+			//shareIcon.setVisibility(View.VISIBLE);
+			//shareIcon.setOnClickListener(this);
 			
-			downloadIcon = (ImageView) findViewById(R.id.full_image_viewer_download);
-			downloadIcon.setVisibility(View.VISIBLE);
-			downloadIcon.setOnClickListener(this);
+		//	downloadIcon = (ImageView) findViewById(R.id.full_image_viewer_download);
+		//	downloadIcon.setVisibility(View.VISIBLE);
+		//	downloadIcon.setOnClickListener(this);
 			
-			propertiesIcon = (ImageView) findViewById(R.id.full_image_viewer_properties);
-			propertiesIcon.setVisibility(View.VISIBLE);
-			propertiesIcon.setOnClickListener(this);
+			//propertiesIcon = (ImageView) findViewById(R.id.full_image_viewer_properties);
+			//propertiesIcon.setVisibility(View.VISIBLE);
+			//propertiesIcon.setOnClickListener(this);
 			
-			linkIcon = (ImageView) findViewById(R.id.full_image_viewer_get_link);
-			linkIcon.setVisibility(View.VISIBLE);
-			linkIcon.setOnClickListener(this);
+		//	linkIcon = (ImageView) findViewById(R.id.full_image_viewer_get_link);
+		//	linkIcon.setVisibility(View.VISIBLE);
+		//	linkIcon.setOnClickListener(this);
 			
-			String menuOptions[] = new String[4];
-//			menuOptions[0] = getString(R.string.context_get_link_menu);
+		/*	String menuOptions[] = new String[4];
 			menuOptions[0] = getString(R.string.context_rename);
 			menuOptions[1] = getString(R.string.context_move);
 			menuOptions[2] = getString(R.string.context_copy);
-			menuOptions[3] = getString(R.string.context_remove);
+			menuOptions[3] = getString(R.string.context_remove);*/
 			
-			overflowMenuList = (ListView) findViewById(R.id.image_viewer_overflow_menu_list);
+			/*overflowMenuList = (ListView) findViewById(R.id.image_viewer_overflow_menu_list);
 			ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, menuOptions);
 			overflowMenuList.setAdapter(arrayAdapter);
 			overflowMenuList.setOnItemClickListener(this);
@@ -548,10 +648,10 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			}
 			else{
 				overflowMenuList.setVisibility(View.GONE);
-			}
+			}*/
 			
-			bottomLayout = (RelativeLayout) findViewById(R.id.image_viewer_layout_bottom);
-		    topLayout = (RelativeLayout) findViewById(R.id.image_viewer_layout_top);
+			//bottomLayout = (RelativeLayout) findViewById(R.id.image_viewer_layout_bottom);
+		   // topLayout = (RelativeLayout) findViewById(R.id.image_viewer_layout_top);
 		    
 		    fileNameTextView = (TextView) findViewById(R.id.full_image_viewer_file_name);
 		    fileNameTextView.setText(megaApi.getNodeByHandle(imageHandles.get(positionG)).getName());
@@ -621,7 +721,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				positionG = 0;
 			}
 			
-			adapterMega = new MegaFullScreenImageAdapterLollipop(fullScreenImageViewer,imageHandles, megaApi);
+			adapterMega = new MegaFullScreenImageAdapterLollipop(this, fullScreenImageViewer,imageHandles, megaApi);
 			
 			viewPager.setAdapter(adapterMega);
 			
@@ -629,19 +729,19 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	
 			viewPager.setOnPageChangeListener(this);
 			
-			actionBarIcon = (ImageView) findViewById(R.id.full_image_viewer_icon);
-			actionBarIcon.setOnClickListener(this);
+			//actionBarIcon = (ImageView) findViewById(R.id.full_image_viewer_icon);
+			//actionBarIcon.setOnClickListener(this);
 			
-			overflowIcon = (ImageView) findViewById(R.id.full_image_viewer_overflow);
-			if (!isFolderLink){
+			//overflowIcon = (ImageView) findViewById(R.id.full_image_viewer_overflow);
+			/*if (!isFolderLink){
 				overflowIcon.setVisibility(View.VISIBLE);
 				overflowIcon.setOnClickListener(this);
 			}
 			else{
 				overflowIcon.setVisibility(View.INVISIBLE);
-			}
+			}*/
 			
-			shareIcon = (ImageView) findViewById(R.id.full_image_viewer_share);
+			/*shareIcon = (ImageView) findViewById(R.id.full_image_viewer_share);
 
 			if(adapterType==Constants.CONTACT_FILE_ADAPTER){
 				shareIcon.setVisibility(View.GONE);
@@ -659,23 +759,23 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 						shareIcon.setVisibility(View.GONE);
 					}
 				}
-			}
+			}*/
 			
-			downloadIcon = (ImageView) findViewById(R.id.full_image_viewer_download);
-			downloadIcon.setVisibility(View.VISIBLE);
-			downloadIcon.setOnClickListener(this);
+		//	downloadIcon = (ImageView) findViewById(R.id.full_image_viewer_download);
+		//	downloadIcon.setVisibility(View.VISIBLE);
+		//	downloadIcon.setOnClickListener(this);
 			
-			propertiesIcon = (ImageView) findViewById(R.id.full_image_viewer_properties);
+		/*	propertiesIcon = (ImageView) findViewById(R.id.full_image_viewer_properties);
 			if (!isFolderLink){
 				propertiesIcon.setVisibility(View.VISIBLE);
 			}
 			else{
 				propertiesIcon.setVisibility(View.GONE);
 			}
-			propertiesIcon.setOnClickListener(this);
+			propertiesIcon.setOnClickListener(this);*/
 			
-			linkIcon = (ImageView) findViewById(R.id.full_image_viewer_get_link);
-			if (!isFolderLink){
+		//	linkIcon = (ImageView) findViewById(R.id.full_image_viewer_get_link);
+			/*if (!isFolderLink){
 				linkIcon.setVisibility(View.VISIBLE);
 				linkIcon.setOnClickListener(this);
 				if(adapterType==Constants.CONTACT_FILE_ADAPTER){
@@ -693,7 +793,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			}
 			else{
 				linkIcon.setVisibility(View.GONE);
-			}
+			}*/
 
 			ArrayAdapter<String> arrayAdapter;
 
@@ -702,7 +802,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 
 				int accessLevel = megaApi.getAccess(node);
 
-				if(accessLevel== MegaShare.ACCESS_FULL){
+				/*if(accessLevel== MegaShare.ACCESS_FULL){
 					String menuOptions[] = new String[4];
 					menuOptions[0] = getString(R.string.context_rename);
 					menuOptions[1] = getString(R.string.context_move);
@@ -718,29 +818,29 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 					overflowMenuList = (ListView) findViewById(R.id.image_viewer_overflow_menu_list);
 					arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, menuOptions);
 					overflowMenuList.setAdapter(arrayAdapter);
-				}
+				}*/
 			}
 			else{
-				String menuOptions[] = new String[4];
+				/*String menuOptions[] = new String[4];
 				menuOptions[0] = getString(R.string.context_rename);
 				menuOptions[1] = getString(R.string.context_move);
 				menuOptions[2] = getString(R.string.context_copy);
 				menuOptions[3] = getString(R.string.context_move_to_trash);
 				overflowMenuList = (ListView) findViewById(R.id.image_viewer_overflow_menu_list);
 				arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, menuOptions);
-				overflowMenuList.setAdapter(arrayAdapter);
+				overflowMenuList.setAdapter(arrayAdapter);*/
 			}
 
-			overflowMenuList.setOnItemClickListener(this);
+			/*overflowMenuList.setOnItemClickListener(this);
 			if (overflowVisible){
 				overflowMenuList.setVisibility(View.VISIBLE);	
 			}
 			else{
 				overflowMenuList.setVisibility(View.GONE);
-			}
+			}*/
 			
-			bottomLayout = (RelativeLayout) findViewById(R.id.image_viewer_layout_bottom);
-		    topLayout = (RelativeLayout) findViewById(R.id.image_viewer_layout_top);
+		//	bottomLayout = (RelativeLayout) findViewById(R.id.image_viewer_layout_bottom);
+		  //  topLayout = (RelativeLayout) findViewById(R.id.image_viewer_layout_top);
 		    
 		    fileNameTextView = (TextView) findViewById(R.id.full_image_viewer_file_name);
 		    fileNameTextView.setText(megaApi.getNodeByHandle(imageHandles.get(positionG)).getName());
@@ -975,17 +1075,17 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		}
 	}
 
-	@Override
-	public void onClick(View v) {
-		((MegaApplication) getApplication()).sendSignalPresenceActivity();
+	//@Override
+	//public void onClick(View v) {
+		//((MegaApplication) getApplication()).sendSignalPresenceActivity();
 
-		if (adapterType == Constants.OFFLINE_ADAPTER){
-			switch (v.getId()){
-				case R.id.full_image_viewer_icon:{
-					finish();
-					break;
-				}
-				case R.id.full_image_viewer_share:{
+		//if (adapterType == Constants.OFFLINE_ADAPTER){
+			//switch (v.getId()){
+				//case R.id.full_image_viewer_icon:{
+				//	finish();
+				//	break;
+				//}
+			/*	case R.id.full_image_viewer_share:{
 					String offlineDirectory;
 					if (Environment.getExternalStorageDirectory() != null){
 						offlineDirectory = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR;
@@ -1008,17 +1108,17 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 					}
 					
 					break;
-				}
-			}
-		}
-		else if (adapterType == Constants.ZIP_ADAPTER){
+				}*/
+		//	}
+		//}
+		//else if (adapterType == Constants.ZIP_ADAPTER){
 
-			switch (v.getId()){
-				case R.id.full_image_viewer_icon:{
-					finish();
-					break;
-				}
-				case R.id.full_image_viewer_share:{
+			//switch (v.getId()){
+				//case R.id.full_image_viewer_icon:{
+				//	finish();
+				//	break;
+				//}
+				/*case R.id.full_image_viewer_share:{
 					
 					String fileName = paths.get(positionG);
 					File previewFile = new File(fileName);
@@ -1034,30 +1134,30 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 					}
 					
 					break;
-				}
-			}
-		}
-		else{
-			node = megaApi.getNodeByHandle(imageHandles.get(positionG));
-			switch (v.getId()){
-				case R.id.full_image_viewer_icon:{
-					finish();
-					break;
-				}
-				case R.id.full_image_viewer_get_link:{
+				}*/
+			//}
+		//}
+		//else{
+		//	node = megaApi.getNodeByHandle(imageHandles.get(positionG));
+		//	switch (v.getId()){
+				//case R.id.full_image_viewer_icon:{
+				//	finish();
+				//	break;
+				//}
+				/*case R.id.full_image_viewer_get_link:{
 					shareIt = false;
 			    	showGetLinkActivity(node.getHandle());
 					break;
-				}
-				case R.id.full_image_viewer_properties:{
+				}*/
+			/*	case R.id.full_image_viewer_properties:{
 					Intent i = new Intent(this, FileInfoActivityLollipop.class);
 					i.putExtra("handle", node.getHandle());
 					i.putExtra("imageId", MimeTypeMime.typeForName(node.getName()).getIconResourceId());
 					i.putExtra("name", node.getName());
 					startActivity(i);
 					break;
-				}
-				case R.id.full_image_viewer_overflow:{
+				}*/
+				/*case R.id.full_image_viewer_overflow:{
 					if (adapterMega.isaBshown()){
 						overflowVisible = adapterMega.isMenuVisible();
 						if (overflowVisible){
@@ -1071,8 +1171,8 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 						adapterMega.setMenuVisible(overflowVisible);
 					}
 					break;
-				}
-				case R.id.full_image_viewer_share:{
+				}*/
+				/*case R.id.full_image_viewer_share:{
 					
 					overflowMenuList.setVisibility(View.GONE);
 					overflowVisible = false;
@@ -1090,10 +1190,10 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 					else{
 						Snackbar.make(fragmentContainer, getString(R.string.full_image_viewer_not_preview), Snackbar.LENGTH_LONG).show();
 					}
-					
+
 					break;
-				}
-				case R.id.full_image_viewer_download:{
+				}*/
+			/*	case R.id.full_image_viewer_download:{
 					
 					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 						boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
@@ -1116,10 +1216,10 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 					handleList.add(node.getHandle());
 					downloadNode(handleList);
 					break;
-				}
-			}
-		}
-	}
+				}*/
+			//}
+		//}
+	//}
 	
 	@Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
@@ -1278,23 +1378,23 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		else{
 			aBshown = savedInstanceState.getBoolean("aBshown");
 			adapterMega.setaBshown(aBshown);
-			overflowVisible = savedInstanceState.getBoolean("overflowVisible");
-			adapterMega.setMenuVisible(overflowVisible);
+			//overflowVisible = savedInstanceState.getBoolean("overflowVisible");
+			//adapterMega.setMenuVisible(overflowVisible);
 		}
 		
 		if (!aBshown){
-			TranslateAnimation animBottom = new TranslateAnimation(0, 0, 0, Util.px2dp(48, outMetrics));
-			animBottom.setDuration(0);
-			animBottom.setFillAfter( true );
-			bottomLayout.setAnimation(animBottom);
+			//TranslateAnimation animBottom = new TranslateAnimation(0, 0, 0, Util.px2dp(48, outMetrics));
+			//animBottom.setDuration(0);
+			//animBottom.setFillAfter( true );
+			//bottomLayout.setAnimation(animBottom);
 			
-			TranslateAnimation animTop = new TranslateAnimation(0, 0, 0, Util.px2dp(-48, outMetrics));
-			animTop.setDuration(0);
-			animTop.setFillAfter( true );
-			topLayout.setAnimation(animTop);
+			//TranslateAnimation animTop = new TranslateAnimation(0, 0, 0, Util.px2dp(-48, outMetrics));
+			//animTop.setDuration(0);
+			//animTop.setFillAfter( true );
+			//topLayout.setAnimation(animTop);
 		}
 		
-		if(overflowMenuList != null)
+		/*if(overflowMenuList != null)
 		{
 			if (overflowVisible){
 				overflowMenuList.setVisibility(View.VISIBLE);
@@ -1302,7 +1402,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			else{
 				overflowMenuList.setVisibility(View.GONE);
 			}
-		}
+		}*/
 	}
 
 	public void showRenameDialog(){
@@ -1654,8 +1754,8 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 
-		overflowMenuList.setVisibility(View.GONE);
-		overflowVisible = false;
+		//overflowMenuList.setVisibility(View.GONE);
+		/*overflowVisible = false;
 		adapterMega.setMenuVisible(overflowVisible);
 		
 		switch(position){
@@ -1675,7 +1775,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				moveToTrash();
 				break;
 			}
-		}
+		}*/
 	}
 	
 	@Override
@@ -1928,17 +2028,58 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		snackbarTextView.setMaxLines(5);
 		snackbar.show();
 	}
-	
+
+
+	public void touchImage() {
+		log("touchImage");
+		if(aB.isShowing()){
+				hideActionBar();
+			}else{
+				showActionBar();
+			}
+	}
+
+
+	protected void hideActionBar(){
+		if (aB != null && aB.isShowing()) {
+			if(tB != null) {
+				tB.animate().translationY(-220).setDuration(800L)
+						.withEndAction(new Runnable() {
+							@Override
+							public void run() {
+								aB.hide();
+							}
+						}).start();
+				bottomLayout.animate().translationY(220).setDuration(800L).start();
+
+
+			} else {
+				aB.hide();
+			}
+		}
+	}
+
+	protected void showActionBar(){
+		if (aB != null && !aB.isShowing()) {
+			aB.show();
+			if(tB != null) {
+				tB.animate().translationY(0).setDuration(800L).start();
+				bottomLayout.animate().translationY(0).setDuration(800L).start();
+
+			}
+		}
+	}
+
 	@Override
 	public void onBackPressed() {
 		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 
-		if (overflowMenuList != null){
+		/*if (overflowMenuList != null){
 			if (overflowMenuList.getVisibility() == View.VISIBLE){
 				overflowMenuList.setVisibility(View.GONE);
 				return;
 			}
-		}
+		}*/
 		super.onBackPressed();
 	}
 }
