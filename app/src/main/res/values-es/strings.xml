@@ -802,7 +802,7 @@
     </plurals>
 
     <string name="error_incorrect_email_or_password" context="Error message when the credentials to login are incorrect.">El correo electrónico o la contraseña introducidas no son correctas. Por favor, pruebe otra vez.</string>
-    <string name="error_account_suspended" context="Error message when trying to login and the account is suspended.">La cuenta ha sido suspendida por la violación de los Términos de Servicio. Por favor, contacte con support@mega.co.nz</string>
+    <string name="error_account_suspended" context="Error message when trying to login and the account is suspended.">La cuenta ha sido suspendida por la violación de los Términos de Servicio. Por favor, contacte con support@mega.nz</string>
     <string name="too_many_attempts_login" context="Error message when to many attempts to login.">Demasiados intentos incorrectos para iniciar sesión, por favor, espere una hora.</string>
     <string name="account_not_validated_login" context="Error message when trying to login to an account not validated.">La cuenta no ha sido validada todavía. Por favor, compruebe su correo electrónico.</string>
 
@@ -840,7 +840,7 @@
 
     <string name="recent_chat_empty_invite" context="Message shown when the user has no recent chats">Invita a tus amigos a unirse al Chat y disfruta de nuestra plataforma encriptada con privacidad y seguridad.</string>
 
-    <string name="recent_chat_empty_enable_chat" context="Message shown when the user has no recent chats">Habilita el chat\ny disfruta de nuestra plataforma encriptada con privacidad y seguridad.</string>
+    <string name="recent_chat_empty_enable_chat" context="Message shown when the user has no recent chats">Habilita el chat[A]y disfruta de nuestra plataforma encriptada con privacidad y seguridad.</string>
 
     <!-- <string name="videocall_title" context="Title shown in the list of main chat screen for a videocall">Videollamada</string> -->
 
