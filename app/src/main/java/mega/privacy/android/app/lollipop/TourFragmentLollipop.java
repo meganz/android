@@ -2,6 +2,8 @@ package mega.privacy.android.app.lollipop;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.res.Configuration;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
@@ -12,6 +14,8 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
@@ -37,6 +41,7 @@ public class TourFragmentLollipop extends Fragment implements View.OnClickListen
     private Button bLogin;
     TextView tourText1;
     TextView tourText2;
+    LinearLayout shapeGrey;
     private LinearLayout tourLoginCreate;
     private LinearLayout optionsLayout;
     ScrollView scrollView;
@@ -70,13 +75,14 @@ public class TourFragmentLollipop extends Fragment implements View.OnClickListen
         bar4 = (LinearLayout) v.findViewById(R.id.bar_tour_layout_4);
         tourLoginCreate = (LinearLayout) v.findViewById(R.id.tour_login_create);
 
-        mainLinearLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.white));
+       // mainLinearLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.white));
         tourText1 = (TextView) v.findViewById(R.id.tour_text_1);
         tourText1.setGravity(Gravity.CENTER_VERTICAL);
 
         tourText2 = (TextView) v.findViewById(R.id.tour_text_2);
         tourText2.setGravity(Gravity.CENTER_VERTICAL);
 
+        shapeGrey = (LinearLayout) v.findViewById(R.id.shape_grey);
         optionsLayout = (LinearLayout) v.findViewById(R.id.options_layout);
 
         bLogin = (Button) v.findViewById(R.id.button_login_tour);
@@ -94,8 +100,7 @@ public class TourFragmentLollipop extends Fragment implements View.OnClickListen
         bar3.setBackgroundColor(getResources().getColor(R.color.tour_bar_grey));
         bar4.setBackgroundColor(getResources().getColor(R.color.tour_bar_grey));
 
-        viewPager.getLayoutParams().height = metrics.widthPixels;
-
+        viewPager.getLayoutParams().height = metrics.widthPixels-70;
         viewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener(){
 
             @Override
@@ -191,4 +196,5 @@ public class TourFragmentLollipop extends Fragment implements View.OnClickListen
     public static void log(String message) {
         Util.log("TourFragmentLollipop", message);
     }
+
 }

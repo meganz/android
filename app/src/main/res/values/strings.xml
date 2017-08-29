@@ -195,10 +195,6 @@
     <string name="session_problem" context="if a link to a folder cannot be fetched">Problem of retrieving files from the folder</string>
     -->
 
-    <string name="tour_space_title">MEGA SPACE</string>
-    <string name="tour_speed_title">MEGA SPEED</string>
-    <string name="tour_privacy_title">MEGA PRIVACY</string>
-    <string name="tour_access_title">MEGA ACCESS</string>
     <string name="tour_space_text">Register now and get 50 GB of free space</string>
     <string name="tour_speed_text">Uploads are fast. Quickly share files with everyone</string>
     <string name="tour_privacy_text">Keep all your files safe with MEGA\'s end-to-end encryption</string>
@@ -207,7 +203,7 @@
     <string name="create_account_text" context="button that allows the user to create an account">Create account</string>
     <string name="name_text" context="Name of the user">Name</string>
     <string name="lastname_text" context="Last name of the user">Last Name</string>
-    <string name="tos" context="text placed on the checkbox of acceptation of the Terms of Service">I agree with MEGA\'s Terms of Service</string>
+    <string name="tos" context="text placed on the checkbox of acceptation of the Terms of Service">I agree with MEGA\'s [A]Terms of Service[/A]</string>
     <string name="already_account" context="Does the user already have a MEGA account">Already have an account?</string>
 
     <string name="create_account_no_terms" context="warning dialog">You have to accept our Terms of Service</string>
@@ -520,7 +516,7 @@
     <!--
     <string name="upload_to_other" context="upload to. Then choose a file which is not an Image, an Audio or a Video">Other File</string>
     -->
-    <string name="upload_to_filesystem" context="upload to. Then choose to browse the file system to choose a file">Pick from File System</string>
+    <string name="upload_to_filesystem" context="upload to. Then choose to browse the file system to choose a file">From File System</string>
     <!--
     <string name="upload_select_file_type" context="title of the dialog for choosing if a user wants to upload an image, an audio, a video or a file from the system">Select file type</string>
     -->
@@ -740,7 +736,7 @@
     <string name="settings_about_terms_of_service" context="App means &quot;Application&quot;">Terms of Service</string>
     <string name="settings_about_app_version" context="App means &quot;Application&quot;">App version</string>
     <string name="settings_about_sdk_version" context="Title of the label where the SDK version is shown">MEGA SDK version</string>
-    <string name="settings_about_karere_version" context="Title of the label where the karere version is shown">MEGAchat SDK version</string>
+    <string name="settings_about_karere_version" context="Title of the label where the MEGAchat SDK version is shown">MEGAchat SDK version</string>
     <string name="settings_about_code_link_title" context="Link to the public code of the app">View source code</string>
 
     <string name="january">January</string>
@@ -984,7 +980,7 @@
     </plurals>
 
     <string name="error_incorrect_email_or_password" context="Error message when the credentials to login are incorrect.">Invalid e-mail and/or password. Please try again.</string>
-    <string name="error_account_suspended" context="Error message when trying to login and the account is suspended.">Your account have been suspended due to Terms of Service violations. Please contact to support@mega.co.nz</string>
+    <string name="error_account_suspended" context="Error message when trying to login and the account is suspended.">Your account have been suspended due to Terms of Service violations. Please contact support@mega.nz</string>
     <string name="too_many_attempts_login" context="Error message when to many attempts to login.">Too many attempts to login, please wait for an hour.</string>
     <string name="account_not_validated_login" context="Error message when trying to login to an account not validated.">This account has not been validated yet. Please, check your e-mail.</string>
 
@@ -1010,7 +1006,7 @@
     <string name="limited_bandwith" context="Word to indicate the limited bandwidth of the free accounts">Limited</string>
 
     <string name="section_chat" context="Item of the navigation title for the chat section">Chat BETA</string>
-    <string name="section_chat_with_notification" context="Item of the navigation title for the chat section when there is any unread message"><![CDATA[Chat BETA <font color=\'#ff333a\'>(%1$d)</font>]]></string>
+    <string name="section_chat_with_notification" context="Item of the navigation title for the chat section when there is any unread message">Chat BETA [A](%1$d)[/A]</string>
 
     <string name="tab_archive_chat" context="Title of the archived chats tab. Capital letters">Archive</string>
     <!--
@@ -1030,7 +1026,7 @@
     -->
 
     <string name="recent_chat_empty_invite" context="Message shown when the user has no recent chats">Invite your friends to join you on Chat and enjoy our encrypted platform with privacy and security.</string>
-    <string name="recent_chat_empty_enable_chat" context="Message shown when the user has no recent chats">Enable Chat\nand enjoy our encrypted platform with privacy and security.</string>
+    <string name="recent_chat_empty_enable_chat" context="Message shown when the user has no recent chats">Enable Chat[A]and enjoy our encrypted platform with privacy and security.</string>
 
     <!--
     <string name="videocall_title" context="Title shown in the list of main chat screen for a videocall">Video call</string>
@@ -1125,7 +1121,7 @@
 
     <string name="text_deleted_message" context="Text shown when a message has been deleted in the chat">This message has been deleted</string>
     <string name="history_cleared_message" context="Text shown when the chat history was cleared by me">Chat history was cleared</string>
-    <string name="text_deleted_message_by" context="Text shown when a message has been deleted in the chat"><![CDATA[<font color=\'#00BFA5\'>This message has been deleted by </font><font color=\'#060000\'>%1$s</font>]]></string>
+    <string name="text_deleted_message_by" context="Text shown when a message has been deleted in the chat">[A]This message has been deleted by [/A][B]%1$s[/B]</string>
 
     <string name="confirmation_delete_several_messages" context="Confirmation before deleting messages">Remove messages?</string>
     <string name="confirmation_delete_one_message" context="Confirmation before deleting one message">Remove message?</string>
@@ -1165,13 +1161,13 @@
     <string name="number_correctly_add_participant" context="success message when inviting multiple contacts to a group chat">%d participants were correctly invited</string>
     <string name="number_no_add_participant_request" context="error message when inviting multiple contacts to a group chat">%1$d participants were successfully invited but %2$d participants were not invited.</string>
 
-    <string name="message_permissions_changed" context="chat message when the permissions for a user has been changed"><![CDATA[<font color=\'#060000\'>%1$s</font><font color=\'#868686\'> was changed to </font><font color=\'#060000\'>%2$s</font><font color=\'#868686\'> by </font><font color=\'#060000\'>%3$s</font>]]></string>
-    <string name="message_add_participant" formatted="false" context="chat message when a participant was added to a group chat"><![CDATA[<font color=\'#060000\'>%1$s</font><font color=\'#868686\'> joined the group chat by invitation from </font><font color=\'#060000\'>%2$s</font>]]></string>
-    <string name="message_remove_participant" context="chat message when a participant was removed from a group chat"><![CDATA[<font color=\'#060000\'>%1$s</font><font color=\'#868686\'> was removed from group chat by </font><font color=\'#060000\'>%2$s</font>]]></string>
+    <string name="message_permissions_changed" context="chat message when the permissions for a user has been changed">[A]%1$s[/A][B] was changed to [/B][C]%2$s[/C][D] by [/D][E]%3$s[/E]</string>
+    <string name="message_add_participant" formatted="false" context="chat message when a participant was added to a group chat">[A]%1$s[/A][B] joined the group chat by invitation from [/B][C]%2$s[/C]</string>
+    <string name="message_remove_participant" context="chat message when a participant was removed from a group chat">[A]%1$s[/A][B] was removed from group chat by [/B][C]%2$s[/C]</string>
 
-    <string name="change_title_messages" context="Message shown when a participant change the title of a group chat."><![CDATA[<font color=\'#060000\'>%1$s</font><font color=\'#868686\'> changed the group chat name to </font><font color=\'#060000\'>\"%2$s\"</font>]]></string>
+    <string name="change_title_messages" context="Message shown when a participant change the title of a group chat.">[A]%1$s[/A][B] changed the group chat name to [/B][C]\"%2$s\"[/C]</string>
 
-    <string name="message_participant_left_group_chat" context="chat message when a participant left a group chat"><![CDATA[<font color=\'#060000\'>%1$s</font><font color=\'#868686\'> left the group chat</font>]]></string>
+    <string name="message_participant_left_group_chat" context="chat message when a participant left a group chat">[A]%1$s[/A][B] left the group chat[/B]</string>
 
     <string name="manual_retry_alert" context="chat message alert when the message have to been manually">Message not sent. Tap for options</string>
 
@@ -1264,7 +1260,7 @@
         <item context="Plural" quantity="other">are typing...</item>
     </plurals>
 
-    <string name="more_users_typing" context="Title of the general tab in My Account Section">more are typing...</string>
+    <string name="more_users_typing" context="text that appear when there are more than 2 people writing at that time in a chat. For example User1, user2 and more are typing...">more are typing...</string>
 
     <string name="tab_my_account_general" context="Title of the general tab in My Account Section">General</string>
     <string name="tab_my_account_storage" context="Title of the storage tab in My Account Section">Storage</string>
@@ -1278,7 +1274,7 @@
 
     <string name="no_bylling_cycle" context="Label in section the storage tab when the account is Free">No billing cycle</string>
 
-    <string name="my_account_of_string" context="String to show the transfer quota and the used space in My Account section"><![CDATA[%1$s <font color=\'#777777\'>of %2$s</font>]]></string>
+    <string name="my_account_of_string" context="String to show the transfer quota and the used space in My Account section">%1$s [A]of %2$s[/A]</string>
 
     <string name="confirmation_delete_from_save_for_offline" context="confirmation message before removing a something for the Save for offline section">Remove from Save for offline?</string>
 
@@ -1497,11 +1493,16 @@
     <string name="title_incoming_folder_notification" context="title of incoming shared folder notification">New shared folder</string>
     <string name="title_contact_request_notification" context="title of contact request notification">New contact request</string>
 
+    <string name="tour_space_title">Mega Space</string>
+    <string name="tour_speed_title">Mega Speed</string>
+    <string name="tour_privacy_title">Mega Privacy</string>
+    <string name="tour_access_title">Mega Access</string>
+
     <string name="title_properties_chat_clear" context="Title of the section to clear the chat content in the Contact Properties screen">Clear chat history</string>
     <string name="title_properties_remove_contact" context="Title of the section to remove contact in the Contact Properties screen">Remove contact</string>
 
     <string name="title_properties_chat_notifications_contact" context="Title of the section to enable notifications in the Contact Properties screen">Chat notifications</string>
-    <string name="history_cleared_by" context="Text shown when the chat history was cleared by someone"><![CDATA[<font color=\'#060000\'>%1$s</font><font color=\'#00BFA5\'> cleared the chat history</font>]]></string>
+    <string name="history_cleared_by" context="Text shown when the chat history was cleared by someone">[A]%1$s[/A][B] cleared the chat history[/B]</string>
 
     <string name="number_messages_chat_notification" formatted="false" context="messages string in chat notification">%1$d unread chats</string>
 

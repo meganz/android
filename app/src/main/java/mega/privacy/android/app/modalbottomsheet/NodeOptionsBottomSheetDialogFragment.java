@@ -6,7 +6,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
+import android.graphics.Point;
+import android.graphics.Rect;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.BottomSheetDialogFragment;
 import android.support.design.widget.CoordinatorLayout;
@@ -15,6 +18,7 @@ import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Display;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -79,6 +83,9 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
     LinearLayout optionRemove;
     LinearLayout optionOpenFolder;
 
+    private LinearLayout items_layout;
+    private RelativeLayout node_head;
+
     DisplayMetrics outMetrics;
 
     static ManagerActivityLollipop.DrawerItem drawerItem = null;
@@ -86,6 +93,12 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
 
     MegaApiAndroid megaApi;
     DatabaseHandler dbH;
+
+    private int height = -1;
+    private boolean heightseted = false;
+
+    private View contentView;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -99,6 +112,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
         if(savedInstanceState!=null) {
             log("Bundle is NOT NULL");
             long handle = savedInstanceState.getLong("handle", -1);
+            height = savedInstanceState.getInt("height", -1);
             log("Handle of the node: "+handle);
             node = megaApi.getNodeByHandle(handle);
             if(context instanceof ManagerActivityLollipop){
@@ -127,9 +141,12 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
         outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
 
-        View contentView = View.inflate(getContext(), R.layout.bottom_sheet_node_item, null);
+        contentView = View.inflate(getContext(), R.layout.bottom_sheet_node_item, null);
 
         mainLinearLayout = (LinearLayout) contentView.findViewById(R.id.node_bottom_sheet);
+
+        items_layout = (LinearLayout) contentView.findViewById(R.id.items_layout_bottom_sheet_node);
+        node_head = (RelativeLayout) contentView.findViewById(R.id.node_title_layout);
 
         nodeThumb = (ImageView) contentView.findViewById(R.id.node_thumbnail);
         nodeName = (TextView) contentView.findViewById(R.id.node_name_text);
@@ -590,6 +607,49 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
 
             mBehavior = BottomSheetBehavior.from((View) contentView.getParent());
             mBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+
+
+            final NodeOptionsBottomSheetDialogFragment thisclass = this;
+
+            mBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
+                @Override
+                public void onStateChanged(@NonNull View bottomSheet, int newState) {
+                    if(newState == BottomSheetBehavior.STATE_HIDDEN){
+                        dismiss();
+                    }
+                }
+
+                @Override
+                public void onSlide(@NonNull View bottomSheet, float slideOffset) {
+                    if(slideOffset> 0 && !heightseted){
+                        heightseted = true;
+                        if(context instanceof CustomHeight){
+                            height = ((CustomHeight) context).getHeightToPanel(thisclass);
+                        }
+                        if(height != -1){
+                            int numSons = 0;
+                            int num = items_layout.getChildCount();
+                            for(int i=0; i<num; i++){
+                                View v = items_layout.getChildAt(i);
+                                if(v.getVisibility() == View.VISIBLE){
+                                    numSons++;
+                                }
+                            }
+                            if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE && numSons > 3){
+
+                                ViewGroup.LayoutParams params = bottomSheet.getLayoutParams();
+                                params.height = height;
+                                bottomSheet.setLayoutParams(params);
+                            }
+                            else if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT && numSons > 9){
+                                ViewGroup.LayoutParams params = bottomSheet.getLayoutParams();
+                                params.height = height;
+                                bottomSheet.setLayoutParams(params);
+                            }
+                        }
+                    }
+                }
+            });
         }
         else{
             log("Node NULL");
@@ -840,5 +900,9 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
 
     private static void log(String log) {
         Util.log("NodeOptionsBottomSheetDialogFragment", log);
+    }
+
+    public interface CustomHeight{
+        int getHeightToPanel(BottomSheetDialogFragment dialog);
     }
 }

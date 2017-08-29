@@ -334,7 +334,8 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 			}
 			else
 			{
-					collapsingToolbar.setExpandedTitleMarginBottom(Util.scaleHeightPx(35, outMetrics));
+
+				collapsingToolbar.setExpandedTitleMarginBottom(Util.scaleHeightPx(35, outMetrics));
 			}
 			collapsingToolbar.setExpandedTitleMarginStart((int) getResources().getDimension(R.dimen.recycler_view_separator));
 			getSupportActionBar().setDisplayShowTitleEnabled(false);
@@ -2540,7 +2541,6 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 			iconToolbarView.setImageResource(imageId);
 			sl = megaApi.getOutShares(node);
 			if (sl != null){
-
 				if (sl.size() == 0){
 					log("sl.size==0");
 					sharedLayout.setVisibility(View.GONE);
@@ -2585,16 +2585,12 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 							}
 						}
 					}
-
 				}
 				else{
-
 					sharedLayout.setVisibility(View.VISIBLE);
 					dividerSharedLayout.setVisibility(View.VISIBLE);
-					usersSharedWithTextButton.setText((sl.size()-1)+" "+getResources().getQuantityString(R.plurals.general_num_users,(sl.size()-1)));
-
+					usersSharedWithTextButton.setText((sl.size())+" "+getResources().getQuantityString(R.plurals.general_num_users,(sl.size()-1)));
 				}
-
 
 				if (node.getCreationTime() != 0){
 					try {addedTextView.setText(DateUtils.getRelativeTimeSpanString(node.getCreationTime() * 1000));}catch(Exception ex)	{addedTextView.setText("");}
@@ -2611,8 +2607,6 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 					modifiedTextView.setText("");
 				}
 			}
-
-//			iconView.setImageResource(imageId);
 		}
 	}
 

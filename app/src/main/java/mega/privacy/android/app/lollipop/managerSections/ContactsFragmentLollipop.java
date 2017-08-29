@@ -522,6 +522,9 @@ public class ContactsFragmentLollipop extends Fragment{
 				visibleContacts.add(megaContactAdapter);
 			}
 		}
+
+		orderContacts = ((ManagerActivityLollipop)context).getOrderContacts();
+		sortBy(orderContacts);
 		
 		adapter.setContacts(visibleContacts);
 

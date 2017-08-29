@@ -174,7 +174,7 @@
                     android:fontFamily="sans-serif-medium"
                     android:text="@string/new_to_mega"
                     android:textColor="@color/text_login"
-                    android:textSize="14sp" />
+                    android:textSize="20sp" />
 
                 <TextView
                     android:id="@+id/button_create_account_login"

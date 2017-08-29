@@ -168,6 +168,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             megaChatApi = app.getMegaChatApi();
         }
 
+        log("addChatListener");
         megaChatApi.addChatListener(this);
 
         display = getWindowManager().getDefaultDisplay();
