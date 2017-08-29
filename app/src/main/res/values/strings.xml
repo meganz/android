@@ -980,7 +980,7 @@
     </plurals>
 
     <string name="error_incorrect_email_or_password" context="Error message when the credentials to login are incorrect.">Invalid e-mail and/or password. Please try again.</string>
-    <string name="error_account_suspended" context="Error message when trying to login and the account is suspended.">Your account have been suspended due to Terms of Service violations. Please contact to support@mega.co.nz</string>
+    <string name="error_account_suspended" context="Error message when trying to login and the account is suspended.">Your account have been suspended due to Terms of Service violations. Please contact support@mega.nz</string>
     <string name="too_many_attempts_login" context="Error message when to many attempts to login.">Too many attempts to login, please wait for an hour.</string>
     <string name="account_not_validated_login" context="Error message when trying to login to an account not validated.">This account has not been validated yet. Please, check your e-mail.</string>
 
@@ -1026,7 +1026,7 @@
     -->
 
     <string name="recent_chat_empty_invite" context="Message shown when the user has no recent chats">Invite your friends to join you on Chat and enjoy our encrypted platform with privacy and security.</string>
-    <string name="recent_chat_empty_enable_chat" context="Message shown when the user has no recent chats">Enable Chat\nand enjoy our encrypted platform with privacy and security.</string>
+    <string name="recent_chat_empty_enable_chat" context="Message shown when the user has no recent chats">Enable Chat[A]and enjoy our encrypted platform with privacy and security.</string>
 
     <!--
     <string name="videocall_title" context="Title shown in the list of main chat screen for a videocall">Video call</string>
