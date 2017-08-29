@@ -399,7 +399,6 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
 //        float scaleH = Util.getScaleH(outMetrics, density);
 
         ItemInformation itemInformation = getInformationOfPosition(position);
-        log("PositionAdapter -> "+position+" Gridwidth -> "+gridWidth+" onBind");
         switch (itemInformation.type){
             case TYPE_ITEM_TITLE:{
                 holder.setDataTitle(itemInformation.name);
@@ -547,7 +546,6 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
             this.positionAdapter = positionAdapter;
             this.positionNodes = positionNodes;
 
-            log("PositionAdapter -> "+positionAdapter+" Gridwidth -> "+gridWidth);
 
             type = MegaPhotoSyncGridTitleAdapterLollipop.TYPE_ITEM_IMAGE;
 
@@ -1271,7 +1269,6 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
         } catch (Exception e){
             e.printStackTrace();
         }
-        log("type is "+type+" position: "+position);
         switch (type){
             case TYPE_ITEM_TITLE:{
                 return numberOfCells;

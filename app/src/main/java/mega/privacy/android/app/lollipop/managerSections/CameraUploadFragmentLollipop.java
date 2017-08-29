@@ -1017,16 +1017,16 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 				MegaMonthPicLollipop monthPic = new MegaMonthPicLollipop();
 				boolean thereAreImages = false;
 				for (int i=0;i<nodes.size();i++){
-					if (nodes.get(i).isFolder()){
-						continue;
-					}
-					
-					if (!MimeTypeList.typeForName(nodes.get(i).getName()).isImage() && (!MimeTypeList.typeForName(nodes.get(i).getName()).isVideo())){
-						continue;
-					}
-					
-					Date d = new Date(nodes.get(i).getModificationTime()*1000);
 					MegaNode n = nodes.get(i);
+					if (n.isFolder()){
+						continue;
+					}
+					
+					if (!MimeTypeList.typeForName(n.getName()).isImage() && (!MimeTypeList.typeForName(n.getName()).isVideo())){
+						continue;
+					}
+					
+					Date d = new Date(n.getModificationTime()*1000);
 					if ((month == 0) && (year == 0)){
 						month = d.getMonth();
 						year = d.getYear();
@@ -1946,16 +1946,16 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			List<MegaPhotoSyncGridTitleAdapterLollipop.ItemInformation> itemInformationList = new ArrayList<>(nodes.size());
 			int countTitles = 0;
 			for (int i=0;i<nodes.size();i++){
-				if (nodes.get(i).isFolder()){
-					continue;
-				}
-
-				if (!MimeTypeList.typeForName(nodes.get(i).getName()).isImage() && (!MimeTypeList.typeForName(nodes.get(i).getName()).isVideo())){
-					continue;
-				}
-
-				Date d = new Date(nodes.get(i).getModificationTime()*1000);
 				MegaNode n = nodes.get(i);
+				if (n.isFolder()){
+					continue;
+				}
+
+				if (!MimeTypeList.typeForName(n.getName()).isImage() && (!MimeTypeList.typeForName(n.getName()).isVideo())){
+					continue;
+				}
+
+				Date d = new Date(n.getModificationTime()*1000);
 				if ((month == 0) && (year == 0)){
 					month = d.getMonth();
 					year = d.getYear();
