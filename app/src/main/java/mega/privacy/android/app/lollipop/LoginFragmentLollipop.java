@@ -305,9 +305,8 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         paramsb1.width = Util.scaleWidthPx(280, outMetrics);
         login_email_error_layout.setLayoutParams(paramsb1);
         textParamsEditText = (LinearLayout.LayoutParams)login_email_error_layout.getLayoutParams();
-        textParamsEditText.setMargins(Util.scaleWidthPx(60, outMetrics), 0, 0, 0);
+        textParamsEditText.setMargins(Util.scaleWidthPx(63, outMetrics), Util.scaleWidthPx(2, outMetrics), 0, Util.scaleWidthPx(10, outMetrics));
         login_email_error_layout.setLayoutParams(textParamsEditText);
-        login_email_error_layout.setPadding(Util.scaleWidthPx(3, outMetrics), Util.scaleWidthPx(2, outMetrics), 0 , Util.scaleWidthPx(10, outMetrics));
         login_email_error_layout.setVisibility(View.GONE);
 
         login_email_error_text = (TextView) v.findViewById(R.id.login_email_text_error_text);
@@ -352,12 +351,11 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
         login_password_error_layout = (RelativeLayout) v.findViewById(R.id.login_password_text_error);
         login_password_error_layout.setVisibility(View.GONE);
-        login_password_error_layout.setPadding(Util.scaleWidthPx(3, outMetrics), Util.scaleWidthPx(2, outMetrics), 0 , Util.scaleWidthPx(10, outMetrics));
         paramsb1 = login_password_error_layout.getLayoutParams();
         paramsb1.width = Util.scaleWidthPx(280, outMetrics);
         login_password_error_layout.setLayoutParams(paramsb1);
         textParamsEditText = (LinearLayout.LayoutParams)login_password_error_layout.getLayoutParams();
-        textParamsEditText.setMargins(Util.scaleWidthPx(60, outMetrics), 0, 0, 0);
+        textParamsEditText.setMargins(Util.scaleWidthPx(63, outMetrics), Util.scaleWidthPx(2, outMetrics), 0, Util.scaleWidthPx(10, outMetrics));
         login_password_error_layout.setLayoutParams(textParamsEditText);
         login_password_error_text = (TextView) v.findViewById(R.id.login_password_text_error_text);
 
@@ -1985,7 +1983,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         RelativeLayout.LayoutParams params_text_error = (RelativeLayout.LayoutParams) textError.getLayoutParams();
         params_text_error.height = ViewGroup.LayoutParams.WRAP_CONTENT;
         params_text_error.width = ViewGroup.LayoutParams.WRAP_CONTENT;
-        params_text_error.addRule(RelativeLayout.ALIGN_PARENT_TOP);
+        params_text_error.addRule(RelativeLayout.CENTER_VERTICAL);
         params_text_error.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
         params_text_error.setMargins(Util.scaleWidthPx(3, outMetrics), 0,0,0);
         textError.setLayoutParams(params_text_error);
@@ -2032,7 +2030,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     if (emailError != null) {
                         log("mail incorrect");
 //                        input.setError(emailError);
-                        input.getBackground().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_IN);
+                        input.getBackground().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
                         textError.setText(emailError);
                         error_layout.setVisibility(View.VISIBLE);
                         input.requestFocus();
@@ -2116,7 +2114,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 if (emailError != null) {
                     log("mail incorrect");
 //                    input.setError(emailError);
-                    input.getBackground().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_IN);
+                    input.getBackground().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
                     textError.setText(emailError);
                     error_layout.setVisibility(View.VISIBLE);
                     input.requestFocus();
@@ -2396,7 +2394,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             case R.id.login_email_text:{
                 login_email_error_layout.setVisibility(View.VISIBLE);
                 login_email_error_text.setText(error);
-                et_user.getBackground().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_IN);
+                et_user.getBackground().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
                 LinearLayout.LayoutParams textParamsEditText = (LinearLayout.LayoutParams)et_user.getLayoutParams();
                 textParamsEditText.setMargins(Util.scaleWidthPx(60, outMetrics), 0, 0, 0);
                 et_user.setLayoutParams(textParamsEditText);
@@ -2405,7 +2403,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             case R.id.login_password_text:{
                 login_password_error_layout.setVisibility(View.VISIBLE);
                 login_password_error_text.setText(error);
-                et_password.getBackground().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_IN);
+                et_password.getBackground().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
                 LinearLayout.LayoutParams textParamsEditText = (LinearLayout.LayoutParams) et_password.getLayoutParams();
                 textParamsEditText.setMargins(Util.scaleWidthPx(60, outMetrics), 0, 0, 0);
                 et_password.setLayoutParams(textParamsEditText);

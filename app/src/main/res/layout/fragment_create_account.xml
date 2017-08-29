@@ -70,7 +70,7 @@
                     android:textColor="@color/login_warning"
                     android:layout_toLeftOf="@id/create_account_name_error_icon"
                     android:layout_alignParentLeft="true"
-                    android:layout_alignParentTop="true"
+                    android:layout_centerVertical="true"
                     android:paddingLeft="3dp"
                     />
 
@@ -126,7 +126,7 @@
                     android:textColor="@color/login_warning"
                     android:layout_toLeftOf="@id/create_account_email_error_icon"
                     android:layout_alignParentLeft="true"
-                    android:layout_alignParentTop="true"
+                    android:layout_centerVertical="true"
                     android:paddingLeft="3dp"
                     />
 
@@ -170,7 +170,7 @@
                     android:textColor="@color/login_warning"
                     android:layout_toLeftOf="@id/create_account_password_error_icon"
                     android:layout_alignParentLeft="true"
-                    android:layout_alignParentTop="true"
+                    android:layout_centerVertical="true"
                     android:paddingLeft="3dp"
                     />
 
@@ -214,7 +214,7 @@
                     android:textColor="@color/login_warning"
                     android:layout_toLeftOf="@id/create_account_password_confirm_error_icon"
                     android:layout_alignParentLeft="true"
-                    android:layout_alignParentTop="true"
+                    android:layout_centerVertical="true"
                     android:paddingLeft="3dp"
                     />
 
