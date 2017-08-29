@@ -13011,6 +13011,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					if (nps != null){
 						log("nps != null");
 						ArrayList<MegaNode> nodes = megaApi.getChildren(nps, MegaApiJava.ORDER_MODIFICATION_DESC);
+//						cuFL.setNodes(megaApi.getFileFolderChildren(nps, MegaApiJava.ORDER_MODIFICATION_DESC));
 						cuFL.setNodes(nodes);
 					}
 				}
@@ -13025,6 +13026,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					if (nps != null){
 						log("nps != null");
 						ArrayList<MegaNode> nodes = megaApi.getChildren(nps, MegaApiJava.ORDER_MODIFICATION_DESC);
+//						muFLol.setNodes(megaApi.getFileFolderChildren(nps, MegaApiJava.ORDER_MODIFICATION_DESC));
 						muFLol.setNodes(nodes);
 					}
 				}
