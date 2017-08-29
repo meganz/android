@@ -19,6 +19,8 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
+import android.graphics.Point;
+import android.graphics.Rect;
 import android.graphics.Shader.TileMode;
 import android.net.Uri;
 import android.os.Build;
@@ -26,6 +28,8 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.provider.MediaStore;
+import android.support.design.widget.BottomSheetDialog;
+import android.support.design.widget.BottomSheetDialogFragment;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -200,7 +204,8 @@ import nz.mega.sdk.MegaTransferListenerInterface;
 import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUtilsAndroid;
 
-public class ManagerActivityLollipop extends PinActivityLollipop implements NetworkStateReceiver.NetworkStateReceiverListener, MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatRequestListenerInterface, OnNavigationItemSelectedListener, MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener  {
+public class ManagerActivityLollipop extends PinActivityLollipop implements NetworkStateReceiver.NetworkStateReceiverListener, MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatRequestListenerInterface, OnNavigationItemSelectedListener, MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener,
+			NodeOptionsBottomSheetDialogFragment.CustomHeight, ContactsBottomSheetDialogFragment.CustomHeight{
 
 	public int accountFragment;
 
@@ -1120,6 +1125,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			selectedPaymentMethod = savedInstanceState.getInt("selectedPaymentMethod", -1);
 			searchQuery = savedInstanceState.getString("searchQuery");
 			chatConnection = savedInstanceState.getBoolean("chatConnection");
+
 		}
 		else{
 			log("Bundle is NULL");
@@ -1849,6 +1855,15 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					}
 					else{
 						String textToShow = String.format(getString(R.string.section_chat_with_notification), numberUnread);
+						try {
+							textToShow = textToShow.replace("[A]", "<font color=\'#ff333a\'>");
+							textToShow = textToShow.replace("[/A]", "</font>");
+						}
+						catch(Exception e){
+							log("Formatted string: " + textToShow);
+						}
+
+						log("TEXTTOSHOW: " + textToShow);
 						Spanned result = null;
 						if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
 							result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
@@ -2022,6 +2037,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				selectDrawerItemLollipop(drawerItem);
 			}
 		}
+
 		log("END onCreate");
 //		showTransferOverquotaDialog();
 	}
@@ -10330,6 +10346,24 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
 	}
 
+	public int getHeightToPanel(BottomSheetDialogFragment dialog){
+		if(dialog instanceof NodeOptionsBottomSheetDialogFragment){
+			if(fragmentContainer != null && aB != null && tabLayoutCloud != null){
+				final Rect r = new Rect();
+				fragmentContainer.getWindowVisibleDisplayFrame(r);
+				return (r.height() - aB.getHeight() - tabLayoutCloud.getHeight());
+			}
+		}
+		else if(dialog instanceof ContactsBottomSheetDialogFragment){
+			if(fragmentContainer != null && aB != null && tabLayoutContacts != null){
+				final Rect r = new Rect();
+				fragmentContainer.getWindowVisibleDisplayFrame(r);
+				return (r.height() - aB.getHeight() - tabLayoutContacts.getHeight());
+			}
+		}
+		return -1;
+	}
+
 	private void showOverquotaAlert(){
 		log("showOverquotaAlert");
 		dbH.setCamSyncEnabled(false);
@@ -13401,6 +13435,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					if (nps != null){
 						log("nps != null");
 						ArrayList<MegaNode> nodes = megaApi.getChildren(nps, MegaApiJava.ORDER_MODIFICATION_DESC);
+//						cuFL.setNodes(megaApi.getFileFolderChildren(nps, MegaApiJava.ORDER_MODIFICATION_DESC));
 						cuFL.setNodes(nodes);
 					}
 				}
@@ -13415,6 +13450,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					if (nps != null){
 						log("nps != null");
 						ArrayList<MegaNode> nodes = megaApi.getChildren(nps, MegaApiJava.ORDER_MODIFICATION_DESC);
+//						muFLol.setNodes(megaApi.getFileFolderChildren(nps, MegaApiJava.ORDER_MODIFICATION_DESC));
 						muFLol.setNodes(nodes);
 					}
 				}
@@ -14330,6 +14366,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	}
 
 	public void enableChat(){
+
+		((MegaApplication) getApplication()).enableChat();
+
 		Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
 		intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
 		intent.setAction(Constants.ACTION_ENABLE_CHAT);
@@ -14397,7 +14436,16 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						chat.setTitle(getString(R.string.section_chat));
 					}
 					else{
-						String textToShow = String.format(getString(R.string.section_chat_with_notification), numberUnread);
+                        String textToShow = String.format(getString(R.string.section_chat_with_notification), numberUnread);
+                        try {
+                            textToShow = textToShow.replace("[A]", "<font color=\'#ff333a\'>");
+                            textToShow = textToShow.replace("[/A]", "</font>");
+                        }
+                        catch(Exception e){
+                            log("Formatted string: " + textToShow);
+                        }
+
+						log("TEXTTOSHOW: " + textToShow);
 						Spanned result = null;
 						if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
 							result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);

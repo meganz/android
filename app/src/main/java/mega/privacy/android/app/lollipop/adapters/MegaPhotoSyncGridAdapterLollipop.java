@@ -61,12 +61,15 @@ public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaP
 		public String filePath;
 		public long timestamp;
 	}
-	
-	ViewHolderPhotoSyncGrid holder = null;
 
-	Context context;
-	MegaApplication app;
-	MegaApiAndroid megaApi;
+	public static int PADDING_GRID_LARGE = 6;
+	public static int PADDING_GRID_SMALL = 3;
+	
+	private ViewHolderPhotoSyncGrid holder = null;
+
+	private Context context;
+	private MegaApplication app;
+	private MegaApiAndroid megaApi;
 
 	ArrayList<MegaMonthPicLollipop> monthPics;
 	ArrayList<MegaNode> nodes;
@@ -403,9 +406,8 @@ public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaP
 				checkedItems.append(i, true);
 			}
 		}
-		if (actionMode == null){
-			actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
-		}
+
+		actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
 
 		updateActionModeTitle();
 		notifyDataSetChanged();
@@ -572,17 +574,17 @@ public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaP
 		}
 		Resources res = context.getResources();
 		String title;
-		int sum=files+folders;
-
-		if (files == 0 && folders == 0) {
-			title = Integer.toString(sum);
-		} else if (files == 0) {
-			title = Integer.toString(folders);
-		} else if (folders == 0) {
-			title = Integer.toString(files);
-		} else {
-			title = Integer.toString(sum);
-		}
+		int sum=files;
+		title = Integer.toString(sum);
+//		if (files == 0 && folders == 0) {
+//			title = Integer.toString(sum);
+//		} else if (files == 0) {
+//			title = Integer.toString(folders);
+//		} else if (folders == 0) {
+//			title = Integer.toString(files);
+//		} else {
+//			title = Integer.toString(sum);
+//		}
 		actionMode.setTitle(title);
 		try {
 			actionMode.invalidate();
@@ -1006,7 +1008,31 @@ public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaP
 			
 			ImageView iV = (ImageView) rLView.findViewById(R.id.cell_photosync_grid_thumbnail);
 			iV.setLayoutParams(new RelativeLayout.LayoutParams(gridWidth, gridWidth));
-			iV.setPadding(2, 2, 2, 2);
+			if(numberOfCells == CameraUploadFragmentLollipop.GRID_LARGE){
+				log("numOfCells is GRID_LARGE");
+
+				int padding = PADDING_GRID_LARGE;
+				ViewGroup.MarginLayoutParams layoutParams = (ViewGroup.MarginLayoutParams)  iV.getLayoutParams();
+				layoutParams.setMargins(padding, padding, padding, padding);
+				iV.requestLayout();
+//				iV.setPadding(padding, padding, padding, padding);
+			}
+			else if (numberOfCells == CameraUploadFragmentLollipop.GRID_SMALL){
+				log("numOfCells is GRID_SMALL");
+				int padding = PADDING_GRID_SMALL;
+				ViewGroup.MarginLayoutParams layoutParams = (ViewGroup.MarginLayoutParams)  iV.getLayoutParams();
+				layoutParams.setMargins(padding, padding, padding, padding);
+				iV.requestLayout();
+//				iV.setPadding(padding, padding, padding, padding);
+			}
+			else{
+				log("numOfCells is "+numberOfCells);
+				int padding = 2;
+				ViewGroup.MarginLayoutParams layoutParams = (ViewGroup.MarginLayoutParams)  iV.getLayoutParams();
+				layoutParams.setMargins(padding, padding, padding, padding);
+				iV.requestLayout();
+//				iV.setPadding(padding, padding, padding, padding);
+			}
 			holder.imageViews.add(iV);
 			
 			LinearLayout lcLS = (LinearLayout) rLView.findViewById(R.id.cell_photosync_menu_long_click_selected);

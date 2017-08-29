@@ -105,6 +105,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	int accountType;
 
 	private boolean isGetLink = false;
+	int positionToRemove = -1;
 
 	float scaleText;
 	
@@ -1679,8 +1680,24 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			
 			if (moveToRubbish){
 				if (e.getErrorCode() == MegaError.API_OK){
-					Snackbar.make(fragmentContainer, getString(R.string.context_correctly_moved), Snackbar.LENGTH_LONG).show();
-					finish();
+					if(positionToRemove!=-1){
+						log("Position to remove: "+positionToRemove);
+						log("Position in: "+positionG);
+						imageHandles.remove(positionToRemove);
+						if(imageHandles.size()==0){
+							finish();
+						}
+						else{
+							adapterMega.refreshImageHandles(imageHandles);
+							viewPager.setAdapter(adapterMega);
+							if(positionG>imageHandles.size()-1){
+								log("Last item deleted, go to new last position");
+								positionG=imageHandles.size()-1;
+							}
+							viewPager.setCurrentItem(positionG);
+							positionToRemove=-1;
+						}
+					}
 				}
 				else{
 					Snackbar.make(fragmentContainer, getString(R.string.context_no_moved), Snackbar.LENGTH_LONG).show();
@@ -1765,6 +1782,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				break;
 			}
 			case 3:{
+				positionToRemove = positionG;
 				moveToTrash();
 				break;
 			}

@@ -30,9 +30,7 @@ public class UploadBottomSheetDialogFragment extends BottomSheetDialogFragment i
 
     public LinearLayout mainLinearLayout;
     public TextView title;
-    public LinearLayout optionImage;
-    public LinearLayout optionAudio;
-    public LinearLayout optionVideo;
+    public LinearLayout optionFromDevice;
     public LinearLayout optionFromSystem;
 
     DisplayMetrics outMetrics;
@@ -59,16 +57,12 @@ public class UploadBottomSheetDialogFragment extends BottomSheetDialogFragment i
 
         mainLinearLayout = (LinearLayout) contentView.findViewById(R.id.upload_bottom_sheet);
 
-        optionImage = (LinearLayout) contentView.findViewById(R.id.upload_image_layout);
-        optionAudio = (LinearLayout) contentView.findViewById(R.id.upload_audio_layout);
-        optionVideo = (LinearLayout) contentView.findViewById(R.id.upload_video_layout);
+        optionFromDevice = (LinearLayout) contentView.findViewById(R.id.upload_from_device_layout);
         optionFromSystem = (LinearLayout) contentView.findViewById(R.id.upload_from_system_layout);
 
         title = (TextView) contentView.findViewById(R.id.contact_list_contact_name_text);
 
-        optionImage.setOnClickListener(this);
-        optionAudio.setOnClickListener(this);
-        optionVideo.setOnClickListener(this);
+        optionFromDevice.setOnClickListener(this);
         optionFromSystem.setOnClickListener(this);
 
         dialog.setContentView(contentView);
@@ -81,8 +75,8 @@ public class UploadBottomSheetDialogFragment extends BottomSheetDialogFragment i
 
         switch(v.getId()){
 
-            case R.id.upload_image_layout:{
-                log("click upload image");
+            case R.id.upload_from_device_layout:{
+                log("click upload from device");
 
                 Intent intent = new Intent();
                 intent.setAction(Intent.ACTION_OPEN_DOCUMENT);
@@ -97,41 +91,6 @@ public class UploadBottomSheetDialogFragment extends BottomSheetDialogFragment i
                     ((ContactFileListActivityLollipop)context).startActivityForResult(Intent.createChooser(intent, null), Constants.REQUEST_CODE_GET);
                 }
 
-                dismissAllowingStateLoss();
-                break;
-            }
-            case R.id.upload_audio_layout:{
-                log("click upload audio");
-                Intent intent = new Intent();
-                intent.setAction(Intent.ACTION_OPEN_DOCUMENT);
-                intent.setAction(Intent.ACTION_GET_CONTENT);
-                intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-                intent.setType("*/*");
-
-                if(context instanceof ManagerActivityLollipop){
-                    ((ManagerActivityLollipop)context).startActivityForResult(Intent.createChooser(intent, null), Constants.REQUEST_CODE_GET);
-                }
-                else if(context instanceof ContactFileListActivityLollipop){
-                    ((ContactFileListActivityLollipop)context).startActivityForResult(Intent.createChooser(intent, null), Constants.REQUEST_CODE_GET);
-                }
-                dismissAllowingStateLoss();
-                break;
-            }
-            case R.id.upload_video_layout:{
-                log("click upload video");
-
-                Intent intent = new Intent();
-                intent.setAction(Intent.ACTION_OPEN_DOCUMENT);
-                intent.setAction(Intent.ACTION_GET_CONTENT);
-                intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-                intent.setType("*/*");
-
-                if(context instanceof ManagerActivityLollipop){
-                    ((ManagerActivityLollipop)context).startActivityForResult(Intent.createChooser(intent, null), Constants.REQUEST_CODE_GET);
-                }
-                else if(context instanceof ContactFileListActivityLollipop){
-                    ((ContactFileListActivityLollipop)context).startActivityForResult(Intent.createChooser(intent, null), Constants.REQUEST_CODE_GET);
-                }
                 dismissAllowingStateLoss();
                 break;
             }

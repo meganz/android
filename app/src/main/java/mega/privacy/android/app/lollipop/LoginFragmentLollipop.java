@@ -249,13 +249,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
         scaleW = Util.getScaleW(outMetrics, density);
         scaleH = Util.getScaleH(outMetrics, density);
-        float scaleText;
-        if (scaleH < scaleW){
-            scaleText = scaleH;
-        }
-        else{
-            scaleText = scaleW;
-        }
 
         View v = inflater.inflate(R.layout.fragment_login, container, false);
 
@@ -268,7 +261,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         loginTitle.setLayoutParams(textParams);
 
         loginTitle.setText(R.string.login_text);
-        loginTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, (20*scaleText));
         loginTitle.setOnClickListener(this);
 
         et_user = (EditText) v.findViewById(R.id.login_email_text);
@@ -420,7 +412,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         LinearLayout.LayoutParams textnewToMega = (LinearLayout.LayoutParams)newToMega.getLayoutParams();
         textnewToMega.setMargins(Util.scaleWidthPx(65, outMetrics), Util.scaleHeightPx(20, outMetrics), 0, Util.scaleHeightPx(30, outMetrics));
         newToMega.setLayoutParams(textnewToMega);
-        newToMega.setTextSize(TypedValue.COMPLEX_UNIT_SP, (20*scaleText));
         newToMega.setOnClickListener(this);
 
         bRegister = (TextView) v.findViewById(R.id.button_create_account_login);
@@ -846,6 +837,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     megaChatApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaChatApi();
                 }
                 log("INIT STATE: "+megaChatApi.getInitState());
+                log("addChatListener");
                 megaChatApi.addChatListener(this);
                 int ret = megaChatApi.init(gSession);
                 log("enableChat: result of init ---> "+ret);

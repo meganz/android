@@ -8,7 +8,7 @@
     <color name="background_create_account">#eeebeb</color>
     <color name="mega">#d90007</color>
     <color name="mega_transparency">#CCdb0605</color>
-    <color name="text_login">#333333</color>
+    <color name="text_login">#FF000000</color>
     <color name="transparency_white">#80FFFFFF</color>
     <color name="used_space_warning">#ffb800</color>
     <color name="used_space_exceed">#d52400</color>
@@ -100,5 +100,7 @@
     <color name="login_warning">#FFFF333A</color>
 
     <color name="transparent_transparent_black">#35000000</color>
+    <color name="status_bar_login">#33000000</color>
+    <color name="less_transparent_white">#80FFFFFF</color>
 
 </resources>
