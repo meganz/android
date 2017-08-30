@@ -774,6 +774,7 @@
     <string name="title_edit_profile_info" context="Title of the Dialog to edit the profile attributes of the user's account">Editar</string>
 
     <string name="title_set_expiry_date" context="Alert Dialog to get link">Fecha de caducidad</string>
+    <string name="title_set_password_protection" context="Alert Dialog to get link">Protección con contraseña</string>
     <string name="subtitle_set_expiry_date" context="Alert Dialog to get link">(SOLO PRO)</string>
 
     <string name="edit_link_option" context="Option of the sliding panel to edit the link of a node">Editar link</string>

@@ -88,6 +88,7 @@
             android:layout_height="1dp"
             android:background="@color/separator_grey"/>
 
+
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="72dp"
@@ -121,7 +122,7 @@
                     android:textSize="14dp"/>
 
                 <Button
-                    android:id="@+id/expiry_date"
+                    android:id="@+id/expiry_date_button"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor="@color/accentColor"
@@ -153,7 +154,84 @@
             </RelativeLayout>
 
             <RelativeLayout
-                android:id="@+id/transparent_key_layout"
+                android:id="@+id/transparent_key_layout_expiry_date"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/transparent_white"/>
+
+        </RelativeLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/separator_grey"/>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="72dp"
+            android:gravity="center_vertical"
+            android:id="@+id/password_protection_layout">
+
+            <RelativeLayout
+                android:id="@+id/password_protection_relative_layout"
+                android:layout_alignParentLeft="true"
+                android:gravity="center_vertical"
+                android:layout_centerVertical="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+                <TextView
+                    android:id="@+id/title_set_password_protection"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="16dp"
+                    android:text="@string/title_set_password_protection"
+                    android:textColor="@color/name_my_account"
+                    android:textSize="16dp"/>
+
+                <TextView
+                    android:id="@+id/subtitle_set_password_protection"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="16dp"
+                    android:layout_below="@+id/title_set_password_protection"
+                    android:text="@string/subtitle_set_expiry_date"
+                    android:textColor="@color/mail_my_account"
+                    android:textSize="14dp"/>
+
+                <Button
+                    android:id="@+id/password_protection_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/accentColor"
+                    android:layout_below="@+id/title_set_password_protection"
+                    android:stateListAnimator="@null"
+                    android:layout_marginLeft="16dp"
+                    android:minHeight="0dp"
+                    android:minWidth="0dp"
+                    android:elevation="0dp"
+                    android:background="@color/white"
+                    android:visibility="invisible"/>
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@+id/password_protection_relative_layout"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true">
+
+                <android.support.v7.widget.SwitchCompat
+                    android:id="@+id/switch_set_password_protection"
+                    android:layout_alignParentRight="true"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="16dp"/>
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/transparent_key_layout_password_protection"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="@color/transparent_white"/>

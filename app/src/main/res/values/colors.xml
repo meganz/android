@@ -98,6 +98,9 @@
 
     <color name="sliding_panel_separator">#dcdcdcdc</color>
 
+    <color name="copyright_title">#FFF0373A</color>
+    <color name="copyright_text">#FF333333</color>
+
     <color name="status_bar_login">#33000000</color>
     <color name="transparent_transparent_black">#35000000</color>
     <color name="less_transparent_white">#80FFFFFF</color>
