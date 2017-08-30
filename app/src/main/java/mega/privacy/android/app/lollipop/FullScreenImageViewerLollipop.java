@@ -383,7 +383,10 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				
 				bottomLayout = (RelativeLayout) findViewById(R.id.image_viewer_layout_bottom);
 			    topLayout = (RelativeLayout) findViewById(R.id.image_viewer_layout_top);
-			}			
+			}
+
+			fileNameTextView = (TextView) findViewById(R.id.full_image_viewer_file_name);
+			fileNameTextView.setText(mOffListImages.get(positionG).getName());
 		}				
 		else if (adapterType == Constants.ZIP_ADAPTER){
 			String offlinePathDirectory = intent.getStringExtra("offlinePathDirectory");
@@ -962,8 +965,11 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				positionG = newPosition;
 				
 				try{
-					if ((adapterType == Constants.OFFLINE_ADAPTER) || (adapterType == Constants.ZIP_ADAPTER)){
-						
+					if ((adapterType == Constants.OFFLINE_ADAPTER)){
+						fileNameTextView.setText(mOffListImages.get(positionG).getName());
+					}
+					else if(adapterType == Constants.ZIP_ADAPTER){
+
 					}
 					else{
 						TouchImageView tIV = adapterMega.getVisibleImage(oldPosition);

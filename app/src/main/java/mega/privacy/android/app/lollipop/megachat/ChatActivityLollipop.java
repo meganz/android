@@ -19,6 +19,8 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SimpleItemAnimator;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
+import android.text.Html;
+import android.text.Spanned;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.view.Display;
@@ -160,7 +162,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     RelativeLayout chatRelativeLayout;
     RelativeLayout userTypingLayout;
     TextView userTypingText;
-    TextView userTypingName;
     boolean sendIsTyping=true;
     long userTypingTimeStamp = -1;
 //    TextView inviteText;
@@ -536,9 +537,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         userTypingLayout = (RelativeLayout) findViewById(R.id.user_typing_layout);
         userTypingLayout.setVisibility(View.GONE);
         userTypingText = (TextView) findViewById(R.id.user_typing_text);
-        userTypingName = (TextView) findViewById(R.id.user_typing_name);
-
-        userTypingName.setMaxWidth(Util.scaleWidthPx(165, outMetrics));
 
         fab = (FloatingActionButton) findViewById(R.id.fab_chat);
         fab.setOnClickListener(this);
@@ -2219,20 +2217,16 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     String nameTyping = chatC.getFirstName(userHandleTyping, chatRoom);
 
                     log("userHandleTyping: "+userHandleTyping);
-                    String userTyping = getResources().getQuantityString(R.plurals.user_typing, 1);
-                    userTypingText.setText(" "+userTyping);
+
 
                     if(nameTyping==null){
                         log("NULL name");
-                        userTypingName.setText(getString(R.string.transfer_unknown));
+                        nameTyping = getString(R.string.transfer_unknown);
                     }
                     else{
                         if(nameTyping.trim().isEmpty()){
                             log("EMPTY name");
-                            userTypingName.setText(getString(R.string.transfer_unknown));
-                        }
-                        else{
-                            userTypingName.setText(nameTyping);
+                            nameTyping = getString(R.string.transfer_unknown);
                         }
                     }
                     participantTyping.setFirstName(nameTyping);
@@ -2241,8 +2235,22 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     currentUserTyping.setTimeStampTyping(userTypingTimeStamp);
 
                     usersTypingSync.add(currentUserTyping);
-                    userTypingLayout.setVisibility(View.VISIBLE);
 
+                    String userTyping =  getResources().getQuantityString(R.plurals.user_typing, 1, usersTypingSync.get(0).getParticipantTyping().getFirstName());
+
+                    userTyping = userTyping.replace("[A]", "<small><font color=\'#8d8d94\'>");
+                    userTyping = userTyping.replace("[/A]", "</font></small>");
+
+                    Spanned result = null;
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                        result = Html.fromHtml(userTyping,Html.FROM_HTML_MODE_LEGACY);
+                    } else {
+                        result = Html.fromHtml(userTyping);
+                    }
+
+                    userTypingText.setText(result);
+
+                    userTypingLayout.setVisibility(View.VISIBLE);
                 }
                 else{
                     log("More users writing or the same in different timestamp");
@@ -2267,15 +2275,12 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         String nameTyping = chatC.getFirstName(userHandleTyping, chatRoom);
                         if(nameTyping==null){
                             log("NULL name");
-                            userTypingName.setText(getString(R.string.transfer_unknown));
+                            nameTyping = getString(R.string.transfer_unknown);
                         }
                         else{
                             if(nameTyping.trim().isEmpty()){
                                 log("EMPTY name");
-                                userTypingName.setText(getString(R.string.transfer_unknown));
-                            }
-                            else{
-                                userTypingName.setText(nameTyping);
+                                nameTyping = getString(R.string.transfer_unknown);
                             }
                         }
                         participantTyping.setFirstName(nameTyping);
@@ -2289,23 +2294,52 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         int size = usersTypingSync.size();
                         switch (size){
                             case 1:{
-                                String userTyping = getResources().getQuantityString(R.plurals.user_typing, 1);
-                                userTypingText.setText(" "+userTyping);
-                                userTypingName.setText(usersTypingSync.get(0).getParticipantTyping().getFirstName()+" ");
+                                String userTyping = getResources().getQuantityString(R.plurals.user_typing, 1, usersTypingSync.get(0).getParticipantTyping().getFirstName());
+
+                                userTyping = userTyping.replace("[A]", "<small><font color=\'#8d8d94\'>");
+                                userTyping = userTyping.replace("[/A]", "</font></small>");
+
+                                Spanned result = null;
+                                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                                    result = Html.fromHtml(userTyping,Html.FROM_HTML_MODE_LEGACY);
+                                } else {
+                                    result = Html.fromHtml(userTyping);
+                                }
+
+                                userTypingText.setText(result);
                                 break;
                             }
                             case 2:{
-                                String userTyping = getResources().getQuantityString(R.plurals.user_typing, 2);
-                                userTypingText.setText(" "+userTyping);
-                                String userNames = usersTypingSync.get(0).getParticipantTyping().getFirstName()+", "+usersTypingSync.get(1).getParticipantTyping().getFirstName()+" ";
-                                userTypingName.setText(userNames);
+                                String userTyping = getResources().getQuantityString(R.plurals.user_typing, 2, usersTypingSync.get(0).getParticipantTyping().getFirstName()+", "+usersTypingSync.get(1).getParticipantTyping().getFirstName());
+
+                                userTyping = userTyping.replace("[A]", "<small><font color=\'#8d8d94\'>");
+                                userTyping = userTyping.replace("[/A]", "</font></small>");
+
+                                Spanned result = null;
+                                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                                    result = Html.fromHtml(userTyping,Html.FROM_HTML_MODE_LEGACY);
+                                } else {
+                                    result = Html.fromHtml(userTyping);
+                                }
+
+                                userTypingText.setText(result);
                                 break;
                             }
                             default:{
-                                String userTyping = getString(R.string.more_users_typing);
-                                userTypingText.setText(" "+userTyping);
-                                String userNames = usersTypingSync.get(0).getParticipantTyping().getFirstName()+", "+usersTypingSync.get(1).getParticipantTyping().getFirstName()+" ";
-                                userTypingName.setText(userNames);
+                                String names = usersTypingSync.get(0).getParticipantTyping().getFirstName()+", "+usersTypingSync.get(1).getParticipantTyping().getFirstName();
+                                String userTyping = String.format(getString(R.string.more_users_typing), names);
+
+                                userTyping = userTyping.replace("[A]", "<small><font color=\'#8d8d94\'>");
+                                userTyping = userTyping.replace("[/A]", "</font></small>");
+
+                                Spanned result = null;
+                                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                                    result = Html.fromHtml(userTyping,Html.FROM_HTML_MODE_LEGACY);
+                                } else {
+                                    result = Html.fromHtml(userTyping);
+                                }
+
+                                userTypingText.setText(result);
                                 break;
                             }
                         }
@@ -2359,23 +2393,50 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         break;
                     }
                     case 1:{
-                        String userTyping = getResources().getQuantityString(R.plurals.user_typing, 1);
-                        userTypingText.setText(userTyping);
-                        userTypingName.setText(usersTypingSync.get(0).getParticipantTyping().getFirstName()+" ");
+                        String userTyping = getResources().getQuantityString(R.plurals.user_typing, 1, usersTypingSync.get(0).getParticipantTyping().getFirstName());
+                        userTyping = userTyping.replace("[A]", "<small><font color=\'#8d8d94\'>");
+                        userTyping = userTyping.replace("[/A]", "</font></small>");
+
+                        Spanned result = null;
+                        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                            result = Html.fromHtml(userTyping,Html.FROM_HTML_MODE_LEGACY);
+                        } else {
+                            result = Html.fromHtml(userTyping);
+                        }
+
+                        userTypingText.setText(result);
                         break;
                     }
                     case 2:{
-                        String userTyping = getResources().getQuantityString(R.plurals.user_typing, 2);
-                        userTypingText.setText(" "+userTyping);
-                        String userNames = usersTypingSync.get(0).getParticipantTyping().getFirstName()+", "+usersTypingSync.get(1).getParticipantTyping().getFirstName()+" ";
-                        userTypingName.setText(userNames);
+                        String userTyping = getResources().getQuantityString(R.plurals.user_typing, 2, usersTypingSync.get(0).getParticipantTyping().getFirstName()+", "+usersTypingSync.get(1).getParticipantTyping().getFirstName());
+                        userTyping = userTyping.replace("[A]", "<small><font color=\'#8d8d94\'>");
+                        userTyping = userTyping.replace("[/A]", "</font></small>");
+
+                        Spanned result = null;
+                        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                            result = Html.fromHtml(userTyping,Html.FROM_HTML_MODE_LEGACY);
+                        } else {
+                            result = Html.fromHtml(userTyping);
+                        }
+
+                        userTypingText.setText(result);
                         break;
                     }
                     default:{
-                        String userTyping = getString(R.string.more_users_typing);
-                        userTypingText.setText(" "+userTyping);
-                        String userNames = usersTypingSync.get(0).getParticipantTyping().getFirstName()+", "+usersTypingSync.get(1).getParticipantTyping().getFirstName()+" ";
-                        userTypingName.setText(userNames);
+                        String names = usersTypingSync.get(0).getParticipantTyping().getFirstName()+", "+usersTypingSync.get(1).getParticipantTyping().getFirstName();
+                        String userTyping = String.format(getString(R.string.more_users_typing), names);
+
+                        userTyping = userTyping.replace("[A]", "<small><font color=\'#8d8d94\'>");
+                        userTyping = userTyping.replace("[/A]", "</font></small>");
+
+                        Spanned result = null;
+                        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                            result = Html.fromHtml(userTyping,Html.FROM_HTML_MODE_LEGACY);
+                        } else {
+                            result = Html.fromHtml(userTyping);
+                        }
+
+                        userTypingText.setText(result);
                         break;
                     }
                 }

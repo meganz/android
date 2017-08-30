@@ -739,8 +739,8 @@
 
     <string name="my_account_upgrade_pro" context="Button to upgrade the account to PRO account">Hazte PRO</string>
     <string name="my_account_upgrade_pro_panel" context="Button to upgrade the account to PRO account in the panel that appears randomly">¡Hazte PRO!</string>
-    <string name="get_pro_account" context="Message to promote PRO accounts">Aumenta la capacidad de tu almacenamiento en la nube!\n Más espacio &amp; ancho de banda con una cuenta PRO!</string>
-    <string name="toast_master_key" context="success message when the MasterKey file has been downloaded">Tu Clave de recuperación ha sido exportada en: %1s.\nMientras el fichero esté en esta ruta, lo encontrarás también la sección Sin conexión.\nNota: El fichero se eliminará si cierras la sesión, por favor, guárdalo en un lugar seguro.</string>
+    <string name="get_pro_account" context="Message to promote PRO accounts">Aumenta la capacidad de tu almacenamiento en la nube![A] Más espacio &amp; ancho de banda con una cuenta PRO!</string>
+    <string name="toast_master_key" context="success message when the MasterKey file has been downloaded">Tu Clave de recuperación ha sido exportada en: %1s.[A]Mientras el fichero esté en esta ruta, lo encontrarás también la sección Sin conexión.[A]Nota: El fichero se eliminará si cierras la sesión, por favor, guárdalo en un lugar seguro.</string>
 
     <!-- <string name="next_ime_action" context="Action to pass focus to the next field in a form">Siguiente</string> -->
 
@@ -1038,11 +1038,11 @@
     <string name="no_conversation_history" context="message shown when a chat has no messages">No hay historial</string>
 
     <plurals name="user_typing" context="title of confirmation alert before removing a contact">
-        <item context="Singular" quantity="one">está escribiendo...</item>
-        <item context="Plural" quantity="other">están escribiendo...</item>
+        <item context="Singular" quantity="one">%1$s [A]está escribiendo...[/A]</item>
+        <item context="Plural" quantity="other">%1$s [A]están escribiendo...[/A]</item>
     </plurals>
 
-    <string name="more_users_typing" context="text that appear when there are more than 2 people writing at that time in a chat. For example User1, user2 and more are typing...">más están escribiendo...</string>
+    <string name="more_users_typing" context="text that appear when there are more than 2 people writing at that time in a chat. For example User1, user2 and more are typing...">%1$s [A]and more are typing...[/A]</string>
 
     <string name="tab_my_account_general" context="Title of the general tab in My Account Section">General</string>
     <string name="tab_my_account_storage" context="Title of the storage tab in My Account Section">Almacenamiento</string>
