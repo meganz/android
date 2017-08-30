@@ -61,8 +61,7 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 	private ArrayList<Long> pendingFullImages = new ArrayList<Long>();
 	
 	MegaApiAndroid megaApi;
-
-Context context;
+	Context context;
 	
 	/*view holder class*/
     public class ViewHolderFullImage {
