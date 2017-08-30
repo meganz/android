@@ -56,8 +56,8 @@
                 android:layout_marginBottom="10dp">
 
                 <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:id="@+id/create_account_name_error_icon"
                     android:layout_alignParentRight="true"
                     android:src="@drawable/ic_input_warning"
@@ -112,8 +112,8 @@
                 android:layout_marginBottom="10dp">
 
                 <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:id="@+id/create_account_email_error_icon"
                     android:layout_alignParentRight="true"
                     android:src="@drawable/ic_input_warning"
@@ -156,8 +156,8 @@
                 android:layout_marginBottom="10dp">
 
                 <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:id="@+id/create_account_password_error_icon"
                     android:layout_alignParentRight="true"
                     android:src="@drawable/ic_input_warning"
@@ -200,8 +200,8 @@
                 android:layout_marginBottom="10dp">
 
                 <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:id="@+id/create_account_password_confirm_error_icon"
                     android:layout_alignParentRight="true"
                     android:src="@drawable/ic_input_warning"

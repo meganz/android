@@ -1972,8 +1972,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         error_layout.addView(error_icon);
         RelativeLayout.LayoutParams params_icon = (RelativeLayout.LayoutParams) error_icon.getLayoutParams();
 
-        params_icon.width = 80;
-        params_icon.height = 80;
+
         params_icon.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
         error_icon.setLayoutParams(params_icon);
 
@@ -1995,6 +1994,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
 //		input.setId(EDIT_TEXT_ID);
         input.getBackground().mutate().clearColorFilter();
+        input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
         input.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -2011,6 +2011,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 if(error_layout.getVisibility() == View.VISIBLE){
                     error_layout.setVisibility(View.GONE);
                     input.getBackground().mutate().clearColorFilter();
+                    input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
                 }
             }
         });
