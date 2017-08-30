@@ -2669,7 +2669,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		params1.setMargins(Util.scaleWidthPx(20, outMetrics), 0, Util.scaleWidthPx(17, outMetrics), 0);
 
 		final EditText inputFirstName = new EditText(this);
-		inputFirstName.getBackground().clearColorFilter();
+		inputFirstName.getBackground().mutate().clearColorFilter();
+		inputFirstName.getBackground().mutate().setColorFilter(getResources().getColor(R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
 		layout.addView(inputFirstName, params);
 
 		final RelativeLayout error_layout_firtName = new RelativeLayout(ManagerActivityLollipop.this);
@@ -2680,8 +2681,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		error_layout_firtName.addView(error_icon_firtName);
 		RelativeLayout.LayoutParams params_icon_firtName = (RelativeLayout.LayoutParams) error_icon_firtName.getLayoutParams();
 
-		params_icon_firtName.width = 80;
-		params_icon_firtName.height = 80;
 		params_icon_firtName.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
 		error_icon_firtName.setLayoutParams(params_icon_firtName);
 
@@ -2702,7 +2701,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		error_layout_firtName.setVisibility(View.GONE);
 
 		final EditText inputLastName = new EditText(this);
-		inputLastName.getBackground().clearColorFilter();
+		inputLastName.getBackground().mutate().clearColorFilter();
+		inputLastName.getBackground().mutate().setColorFilter(getResources().getColor(R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
 		layout.addView(inputLastName, params);
 
 		final RelativeLayout error_layout_lastName = new RelativeLayout(ManagerActivityLollipop.this);
@@ -2713,8 +2713,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		error_layout_lastName.addView(error_icon_lastName);
 		RelativeLayout.LayoutParams params_icon_lastName = (RelativeLayout.LayoutParams) error_icon_lastName.getLayoutParams();
 
-		params_icon_lastName.width = 80;
-		params_icon_lastName.height = 80;
+
 		params_icon_lastName.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
 		error_icon_lastName.setLayoutParams(params_icon_lastName);
 
@@ -2735,7 +2734,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		error_layout_lastName.setVisibility(View.GONE);
 
 		final EditText inputMail = new EditText(this);
-		inputMail.getBackground().clearColorFilter();
+		inputMail.getBackground().mutate().clearColorFilter();
+		inputMail.getBackground().mutate().setColorFilter(getResources().getColor(R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
 		layout.addView(inputMail, params);
 
 		final RelativeLayout error_layout_email = new RelativeLayout(ManagerActivityLollipop.this);
@@ -2746,8 +2746,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		error_layout_email.addView(error_icon_email);
 		RelativeLayout.LayoutParams params_icon_email = (RelativeLayout.LayoutParams) error_icon_email.getLayoutParams();
 
-		params_icon_email.width = 80;
-		params_icon_email.height = 80;
+
 		params_icon_email.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
 		error_icon_email.setLayoutParams(params_icon_email);
 
@@ -2783,7 +2782,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			public void afterTextChanged(Editable editable) {
 				if(error_layout_firtName.getVisibility() == View.VISIBLE){
 					error_layout_firtName.setVisibility(View.GONE);
-					inputFirstName.getBackground().clearColorFilter();
+					inputFirstName.getBackground().mutate().clearColorFilter();
+					inputFirstName.getBackground().mutate().setColorFilter(getResources().getColor(R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
 				}
 			}
 		});
@@ -2855,7 +2855,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			public void afterTextChanged(Editable editable) {
 				if(error_layout_lastName.getVisibility() == View.VISIBLE){
 					error_layout_lastName.setVisibility(View.GONE);
-					inputLastName.getBackground().clearColorFilter();
+					inputLastName.getBackground().mutate().clearColorFilter();
+					inputLastName.getBackground().mutate().setColorFilter(getResources().getColor(R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
 				}
 			}
 		});
@@ -2911,7 +2912,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 		inputLastName.setImeActionLabel(getString(R.string.title_edit_profile_info),EditorInfo.IME_ACTION_DONE);
 
-		inputMail.getBackground().clearColorFilter();
+		inputMail.getBackground().mutate().clearColorFilter();
 		inputMail.addTextChangedListener(new TextWatcher() {
 			@Override
 			public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -2927,7 +2928,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			public void afterTextChanged(Editable editable) {
 				if(error_layout_email.getVisibility() == View.VISIBLE){
 					error_layout_email.setVisibility(View.GONE);
-					inputMail.getBackground().clearColorFilter();
+					inputMail.getBackground().mutate().clearColorFilter();
+					inputMail.getBackground().mutate().setColorFilter(getResources().getColor(R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
+
 				}
 			}
 		});
@@ -8482,10 +8485,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		error_layout.addView(error_icon);
 		RelativeLayout.LayoutParams params_icon = (RelativeLayout.LayoutParams) error_icon.getLayoutParams();
 
-//		params_icon.width = Util.scaleWidthPx(24, outMetrics);
-		params_icon.width = 80;
-//		params_icon.height = Util.scaleHeightPx(24, outMetrics);
-		params_icon.height = 80;
+
 		params_icon.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
 		error_icon.setLayoutParams(params_icon);
 
@@ -8505,7 +8505,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 		error_layout.setVisibility(View.GONE);
 
-		input.getBackground().clearColorFilter();
+		input.getBackground().mutate().clearColorFilter();
+		input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
 		input.addTextChangedListener(new TextWatcher() {
 			@Override
 			public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -8521,7 +8522,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			public void afterTextChanged(Editable editable) {
 				if(error_layout.getVisibility() == View.VISIBLE){
 					error_layout.setVisibility(View.GONE);
-					input.getBackground().clearColorFilter();
+					input.getBackground().mutate().clearColorFilter();
+					input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
 				}
 			}
 		});
@@ -8533,7 +8535,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				if (actionId == EditorInfo.IME_ACTION_DONE) {
 					String value = v.getText().toString().trim();
 					if (value.length() == 0) {
-						input.getBackground().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+						input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
 						textError.setText(getString(R.string.invalid_string));
 						error_layout.setVisibility(View.VISIBLE);
 						input.requestFocus();
@@ -8571,7 +8573,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			{
 				String value = input.getText().toString().trim();
 				if (value.length() == 0) {
-					input.getBackground().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+					input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
 					textError.setText(getString(R.string.invalid_string));
 					error_layout.setVisibility(View.VISIBLE);
 					input.requestFocus();
@@ -8870,9 +8872,65 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 		input.setTextColor(getResources().getColor(R.color.text_secondary));
 		input.setImeOptions(EditorInfo.IME_ACTION_DONE);
-		input.getBackground().clearColorFilter();
-	    layout.addView(input, params);
+		input.getBackground().mutate().clearColorFilter();
+		input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
+		layout.addView(input, params);
 		input.setImeActionLabel(getString(R.string.context_open_link_title),EditorInfo.IME_ACTION_DONE);
+
+		LinearLayout.LayoutParams params1 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+		params1.setMargins(Util.scaleWidthPx(20, outMetrics), 0, Util.scaleWidthPx(17, outMetrics), 0);
+
+		final RelativeLayout error_layout = new RelativeLayout(ManagerActivityLollipop.this);
+		layout.addView(error_layout, params1);
+
+		final ImageView error_icon = new ImageView(ManagerActivityLollipop.this);
+		error_icon.setImageDrawable(ManagerActivityLollipop.this.getDrawable(R.drawable.ic_input_warning));
+		error_layout.addView(error_icon);
+		RelativeLayout.LayoutParams params_icon = (RelativeLayout.LayoutParams) error_icon.getLayoutParams();
+
+//		params_icon.width = Util.scaleWidthPx(24, outMetrics);
+//		params_icon.width = 80;
+//		params_icon.height = Util.scaleHeightPx(24, outMetrics);
+//		params_icon.height = 80;
+		params_icon.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+		error_icon.setLayoutParams(params_icon);
+
+		error_icon.setColorFilter(ContextCompat.getColor(ManagerActivityLollipop.this, R.color.login_warning));
+
+		final TextView textError = new TextView(ManagerActivityLollipop.this);
+		error_layout.addView(textError);
+		RelativeLayout.LayoutParams params_text_error = (RelativeLayout.LayoutParams) textError.getLayoutParams();
+		params_text_error.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+		params_text_error.width = ViewGroup.LayoutParams.WRAP_CONTENT;
+		params_text_error.addRule(RelativeLayout.CENTER_VERTICAL);
+		params_text_error.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+		params_text_error.setMargins(Util.scaleWidthPx(3, outMetrics), 0,0,0);
+		textError.setLayoutParams(params_text_error);
+
+		textError.setTextColor(ContextCompat.getColor(ManagerActivityLollipop.this, R.color.login_warning));
+
+		error_layout.setVisibility(View.GONE);
+
+		input.addTextChangedListener(new TextWatcher() {
+			@Override
+			public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+			}
+
+			@Override
+			public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+			}
+
+			@Override
+			public void afterTextChanged(Editable editable) {
+				if(error_layout.getVisibility() == View.VISIBLE){
+					error_layout.setVisibility(View.GONE);
+					input.getBackground().mutate().clearColorFilter();
+					input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
+				}
+			}
+		});
 
 		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
 		builder.setTitle(getString(R.string.context_open_link_title));
@@ -8901,19 +8959,49 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			public boolean onEditorAction(TextView v, int actionId,
 					KeyEvent event) {
 				if (actionId == EditorInfo.IME_ACTION_DONE) {
+
+					String value = v.getText().toString().trim();
+					if (value.length() == 0) {
+						input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+						textError.setText(getString(R.string.invalid_string));
+						error_layout.setVisibility(View.VISIBLE);
+						input.requestFocus();
+						return true;
+					}
+					nC.importLink(value);
 					try{
 						openLinkDialog.dismiss();
 					}
 					catch(Exception e){}
-
-					String value = v.getText().toString().trim();
-					if (value.length() == 0) {
-						return true;
-					}
-					nC.importLink(value);
 					return true;
 				}
+				try{
+					openLinkDialog.dismiss();
+				}
+				catch(Exception e){}
 				return false;
+			}
+		});
+
+		openLinkDialog.getButton(android.support.v7.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener(new   View.OnClickListener()
+		{
+			@Override
+			public void onClick(View v)
+			{
+				String value = input.getText().toString().trim();
+				if (value.length() == 0) {
+					input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+					textError.setText(getString(R.string.invalid_string));
+					error_layout.setVisibility(View.VISIBLE);
+					input.requestFocus();
+					return;
+				}
+
+				try{
+					openLinkDialog.dismiss();
+				}
+				catch(Exception e){}
+				nC.importLink(value);
 			}
 		});
 	}
@@ -9153,10 +9241,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		error_layout.addView(error_icon);
 		RelativeLayout.LayoutParams params_icon = (RelativeLayout.LayoutParams) error_icon.getLayoutParams();
 
-//		params_icon.width = Util.scaleWidthPx(24, outMetrics);
-		params_icon.width = 80;
-//		params_icon.height = Util.scaleHeightPx(24, outMetrics);
-		params_icon.height = 80;
+
 		params_icon.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
 		error_icon.setLayoutParams(params_icon);
 
@@ -9176,7 +9261,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 		error_layout.setVisibility(View.GONE);
 
-		input.getBackground().clearColorFilter();
+		input.getBackground().mutate().clearColorFilter();
+		input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
 		input.addTextChangedListener(new TextWatcher() {
 			@Override
 			public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -9192,7 +9278,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			public void afterTextChanged(Editable editable) {
 				if(error_layout.getVisibility() == View.VISIBLE){
 					error_layout.setVisibility(View.GONE);
-					input.getBackground().clearColorFilter();
+					input.getBackground().mutate().clearColorFilter();
+					input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
 				}
 			}
 		});
@@ -9710,10 +9797,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		error_layout_email.addView(error_icon_email);
 		RelativeLayout.LayoutParams params_icon = (RelativeLayout.LayoutParams) error_icon_email.getLayoutParams();
 
-//		params_icon.width = Util.scaleWidthPx(24, outMetrics);
-		params_icon.width = 80;
-//		params_icon.height = Util.scaleHeightPx(24, outMetrics);
-		params_icon.height = 80;
+
 		params_icon.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
 		error_icon_email.setLayoutParams(params_icon);
 
@@ -9734,7 +9818,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		error_layout_email.setVisibility(View.GONE);
 
 //		input.setId(EDIT_TEXT_ID);
-		input.getBackground().clearColorFilter();
+		input.getBackground().mutate().clearColorFilter();
+		input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
 		input.addTextChangedListener(new TextWatcher() {
 			@Override
 			public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -9750,7 +9835,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			public void afterTextChanged(Editable editable) {
 				if(error_layout_email.getVisibility() == View.VISIBLE){
 					error_layout_email.setVisibility(View.GONE);
-					input.getBackground().clearColorFilter();
+					input.getBackground().mutate().clearColorFilter();
+					input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
 				}
 			}
 		});
@@ -9768,7 +9854,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					String emailError = Util.getEmailError(value, managerActivity);
 					if (emailError != null) {
 //                        input.setError(emailError);
-						input.getBackground().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+						input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
 						textError_email.setText(emailError);
 						error_layout_email.setVisibility(View.VISIBLE);
 					} else {
@@ -9816,7 +9902,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				String emailError = Util.getEmailError(value, managerActivity);
 				if (emailError != null) {
 //					input.setError(emailError);
-					input.getBackground().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+					input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
 					textError_email.setText(emailError);
 					error_layout_email.setVisibility(View.VISIBLE);
 				} else {
