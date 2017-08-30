@@ -6,7 +6,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
+import android.graphics.PorterDuffColorFilter;
 import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBar;
@@ -74,6 +76,10 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 
 	private ActionBar aB;
 	Toolbar tB;
+
+	private Drawable oldPassword_background;
+	private Drawable newPassword_background;
+	private Drawable newPassword2_background;
 	
 	@SuppressLint("NewApi")
 	@Override
@@ -118,6 +124,7 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 		android.view.ViewGroup.LayoutParams paramsb1 = oldPasswordView.getLayoutParams();		
 		paramsb1.width = Util.scaleWidthPx(280, outMetrics);		
 		oldPasswordView.setLayoutParams(paramsb1);
+
 		//Left margin
 		LinearLayout.LayoutParams textParams = (LinearLayout.LayoutParams)oldPasswordView.getLayoutParams();
 		textParams.setMargins(Util.scaleWidthPx(60, outMetrics), 0, 0, Util.scaleHeightPx(10, outMetrics));
@@ -136,6 +143,8 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 		oldPasswordErrorView.setPadding(Util.scaleWidthPx(3, outMetrics), 0, 0, 0);
 
 		oldPasswordErrorText = (TextView) findViewById(R.id.login_oldPassword_text_error_text);
+
+		oldPassword_background = oldPasswordView.getBackground().mutate().getConstantState().newDrawable();
 
 		oldPasswordView.addTextChangedListener(new TextWatcher() {
 			@Override
@@ -163,6 +172,8 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 		newPassword1View.setLayoutParams(textParams);
 
 		newPassword1View.getBackground().clearColorFilter();
+
+		newPassword_background = newPassword1View.getBackground().mutate().getConstantState().newDrawable();
 
 		newPassword1ErrorView = (RelativeLayout) findViewById(R.id.login_newPassword1_text_error);
 		paramsb1 = newPassword1ErrorView.getLayoutParams();
@@ -214,6 +225,8 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 		newPassword2ErrorView.setPadding(Util.scaleWidthPx(3, outMetrics), 0, 0, 0);
 
 		newPassword2ErrorText = (TextView) findViewById(R.id.login_newPassword2_text_error_text);
+
+		newPassword2_background = newPassword2View.getBackground().mutate().getConstantState().newDrawable();
 
 		newPassword2View.addTextChangedListener(new TextWatcher() {
 			@Override
@@ -708,7 +721,11 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 			case R.id.change_password_oldPassword:{
 				oldPasswordErrorView.setVisibility(View.VISIBLE);
 				oldPasswordErrorText.setText(error);
-				oldPasswordView.getBackground().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+				PorterDuffColorFilter porterDuffColorFilter = new PorterDuffColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+//                et_user.getBackground().mutate().setColorFilter(porterDuffColorFilter);
+				Drawable background = oldPassword_background.mutate().getConstantState().newDrawable();
+				background.setColorFilter(porterDuffColorFilter);
+				oldPasswordView.setBackground(background);
 				LinearLayout.LayoutParams textParamsEditText = (LinearLayout.LayoutParams)oldPasswordView.getLayoutParams();
 				textParamsEditText.setMargins(Util.scaleWidthPx(60, outMetrics), 0, 0, 0);
 				oldPasswordView.setLayoutParams(textParamsEditText);
@@ -717,7 +734,11 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 			case R.id.change_password_newPassword1:{
 				newPassword1ErrorView.setVisibility(View.VISIBLE);
 				newPassword1ErrorText.setText(error);
-				newPassword1View.getBackground().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+				PorterDuffColorFilter porterDuffColorFilter = new PorterDuffColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+//                et_user.getBackground().mutate().setColorFilter(porterDuffColorFilter);
+				Drawable background = newPassword_background.mutate().getConstantState().newDrawable();
+				background.setColorFilter(porterDuffColorFilter);
+				newPassword1View.setBackground(background);
 				LinearLayout.LayoutParams textParamsEditText = (LinearLayout.LayoutParams) newPassword1View.getLayoutParams();
 				textParamsEditText.setMargins(Util.scaleWidthPx(60, outMetrics), 0, 0, 0);
 				newPassword1View.setLayoutParams(textParamsEditText);
@@ -726,7 +747,11 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 			case R.id.change_password_newPassword2:{
 				newPassword2ErrorView.setVisibility(View.VISIBLE);
 				newPassword2ErrorText.setText(error);
-				newPassword2View.getBackground().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+				PorterDuffColorFilter porterDuffColorFilter = new PorterDuffColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+//                et_user.getBackground().mutate().setColorFilter(porterDuffColorFilter);
+				Drawable background = newPassword2_background.mutate().getConstantState().newDrawable();
+				background.setColorFilter(porterDuffColorFilter);
+				newPassword2View.setBackground(background);
 				LinearLayout.LayoutParams textParamsEditText = (LinearLayout.LayoutParams) newPassword2View.getLayoutParams();
 				textParamsEditText.setMargins(Util.scaleWidthPx(60, outMetrics), 0, 0, 0);
 				newPassword2View.setLayoutParams(textParamsEditText);
@@ -740,7 +765,7 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 			case R.id.change_password_oldPassword:{
 				if(oldPasswordErrorView.getVisibility() != View.GONE){
 					oldPasswordErrorView.setVisibility(View.GONE);
-					oldPasswordView.getBackground().clearColorFilter();
+					oldPasswordView.setBackground(oldPassword_background);
 					LinearLayout.LayoutParams textParamsEditText = (LinearLayout.LayoutParams)oldPasswordView.getLayoutParams();
 					textParamsEditText.setMargins(Util.scaleWidthPx(60, outMetrics), 0, 0, Util.scaleWidthPx(10, outMetrics));
 					oldPasswordView.setLayoutParams(textParamsEditText);
@@ -750,7 +775,7 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 			case R.id.change_password_newPassword1:{
 				if(newPassword1ErrorView.getVisibility() != View.GONE){
 					newPassword1ErrorView.setVisibility(View.GONE);
-					newPassword1View.getBackground().clearColorFilter();
+					newPassword1View.setBackground(newPassword_background);
 					LinearLayout.LayoutParams textParamsEditText = (LinearLayout.LayoutParams) newPassword1View.getLayoutParams();
 					textParamsEditText.setMargins(Util.scaleWidthPx(60, outMetrics), 0, 0, Util.scaleWidthPx(10, outMetrics));
 					newPassword1View.setLayoutParams(textParamsEditText);
@@ -760,7 +785,7 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 			case R.id.change_password_newPassword2:{
 				if(newPassword2ErrorView.getVisibility() != View.GONE){
 					newPassword2ErrorView.setVisibility(View.GONE);
-					newPassword2View.getBackground().clearColorFilter();
+					newPassword2View.setBackground(newPassword2_background);
 					LinearLayout.LayoutParams textParamsEditText = (LinearLayout.LayoutParams) newPassword2View.getLayoutParams();
 					textParamsEditText.setMargins(Util.scaleWidthPx(60, outMetrics), 0, 0, Util.scaleWidthPx(10, outMetrics));
 					newPassword2View.setLayoutParams(textParamsEditText);

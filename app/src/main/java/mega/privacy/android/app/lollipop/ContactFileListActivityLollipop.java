@@ -224,7 +224,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 
 		error_layout.setVisibility(View.GONE);
 
-		input.getBackground().clearColorFilter();
+		input.getBackground().mutate().clearColorFilter();
 		input.addTextChangedListener(new TextWatcher() {
 			@Override
 			public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -240,7 +240,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 			public void afterTextChanged(Editable editable) {
 				if(error_layout.getVisibility() == View.VISIBLE){
 					error_layout.setVisibility(View.GONE);
-					input.getBackground().clearColorFilter();
+					input.getBackground().mutate().clearColorFilter();
 				}
 			}
 		});
@@ -257,7 +257,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 				if (actionId == EditorInfo.IME_ACTION_DONE) {
 					String value = v.getText().toString().trim();
 					if (value.length() == 0) {
-						input.getBackground().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+						input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
 						textError.setText(getString(R.string.invalid_string));
 						error_layout.setVisibility(View.VISIBLE);
 						input.requestFocus();
@@ -308,7 +308,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 			{
 				String value = input.getText().toString().trim();
 				if (value.length() == 0) {
-					input.getBackground().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+					input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
 					textError.setText(getString(R.string.invalid_string));
 					error_layout.setVisibility(View.VISIBLE);
 					input.requestFocus();
@@ -1173,7 +1173,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 
 		error_layout.setVisibility(View.GONE);
 
-		input.getBackground().clearColorFilter();
+		input.getBackground().mutate().clearColorFilter();
 		input.addTextChangedListener(new TextWatcher() {
 			@Override
 			public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -1189,7 +1189,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 			public void afterTextChanged(Editable editable) {
 				if(error_layout.getVisibility() == View.VISIBLE){
 					error_layout.setVisibility(View.GONE);
-					input.getBackground().clearColorFilter();
+					input.getBackground().mutate().clearColorFilter();
 				}
 			}
 		});
@@ -1203,7 +1203,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 					log("actionId is IME_ACTION_DONE");
 					String value = v.getText().toString().trim();
 					if (value.length() == 0) {
-						input.getBackground().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+						input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
 						textError.setText(getString(R.string.invalid_string));
 						error_layout.setVisibility(View.VISIBLE);
 						input.requestFocus();
@@ -1246,7 +1246,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 			{
 				String value = input.getText().toString().trim();
 				if (value.length() == 0) {
-					input.getBackground().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+					input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
 					textError.setText(getString(R.string.invalid_string));
 					error_layout.setVisibility(View.VISIBLE);
 					input.requestFocus();
