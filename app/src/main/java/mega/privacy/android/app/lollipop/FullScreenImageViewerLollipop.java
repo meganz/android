@@ -110,7 +110,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	private DisplayMetrics outMetrics;
 
 	private boolean aBshown = true;
-	
+
 	ProgressDialog statusDialog;
 
 	AppBarLayout appBarLayout;
@@ -226,7 +226,6 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		adapterType = intent.getIntExtra("adapterType", 0);
 
 		if (adapterType == Constants.OFFLINE_ADAPTER){
-			log("***** OFFLINE_ADAPTER");
 
 			getlinkIcon.setVisible(false);
 			menu.findItem(R.id.full_image_viewer_get_link).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
@@ -250,8 +249,6 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			removeIcon.setVisible(false);
 
 		}else if (adapterType == Constants.ZIP_ADAPTER){
-			log("***** ZIP_ADAPTER");
-
 
 			getlinkIcon.setVisible(false);
 			menu.findItem(R.id.full_image_viewer_get_link).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
@@ -270,7 +267,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 
 
 		}else if(adapterType == Constants.SEARCH_ADAPTER){
-			log("***** SEARCH_ADAPTER");
+
 			node = megaApi.getNodeByHandle(imageHandles.get(positionG));
 
 			if(node.isExported()){
@@ -318,7 +315,6 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			}
 
 		}else {
-			log("***** default");
 
 			node = megaApi.getNodeByHandle(imageHandles.get(positionG));
 
@@ -927,11 +923,9 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			fileNameTextView = (TextView) findViewById(R.id.full_image_viewer_file_name);
 
 			if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-				log("***landscape");
 				fileNameTextView.setMaxWidth(Util.scaleWidthPx(300, outMetrics));
 			}
 			else{
-				log("***portrait");
 				fileNameTextView.setMaxWidth(Util.scaleWidthPx(300, outMetrics));
 			}
 
@@ -985,11 +979,9 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			fileNameTextView = (TextView) findViewById(R.id.full_image_viewer_file_name);
 
 			if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-				log("***landscape");
 				fileNameTextView.setMaxWidth(Util.scaleWidthPx(300, outMetrics));
 			}
 			else{
-				log("***portrait");
 				fileNameTextView.setMaxWidth(Util.scaleWidthPx(300, outMetrics));
 			}
 
@@ -1063,11 +1055,9 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			fileNameTextView = (TextView) findViewById(R.id.full_image_viewer_file_name);
 
 			if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-				log("***landscape");
 				fileNameTextView.setMaxWidth(Util.scaleWidthPx(300, outMetrics));
 			}
 			else{
-				log("***portrait");
 				fileNameTextView.setMaxWidth(Util.scaleWidthPx(300, outMetrics));
 			}
 
@@ -1294,7 +1284,6 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	
 	@Override
 	public void onPageScrollStateChanged(int state) {
-
 		if (state == ViewPager.SCROLL_STATE_IDLE){
 			if (viewPager.getCurrentItem() != positionG){
 				int oldPosition = positionG;
@@ -1308,6 +1297,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 					else{
 						TouchImageView tIV = adapterMega.getVisibleImage(oldPosition);
 						if (tIV != null){
+							log("**zoomm");
 							tIV.setZoom(1);
 						}
 						fileNameTextView.setText(megaApi.getNodeByHandle(imageHandles.get(positionG)).getName());
@@ -2087,14 +2077,29 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		snackbar.show();
 	}
 
+	public void zoomImage(boolean zoom) {
+		log("zoomImage");
+		if(zoom){
+			hideStatusBar();
+		}else{
+			showStatusBar();
+		}
+	}
 
 	public void touchImage() {
 		log("touchImage");
 		if(aB.isShowing()){
-				hideActionBar();
-			}else{
-				showActionBar();
-			}
+			hideActionBar();
+		}else{
+			showActionBar();
+		}
+	}
+
+	public void hideStatusBar() {
+		getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+	}
+	public void showStatusBar(){
+		getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 	}
 
 	protected void hideActionBar(){
@@ -2113,7 +2118,6 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			}
 		}
 	}
-
 	protected void showActionBar(){
 		if (aB != null && !aB.isShowing()) {
 			aB.show();
@@ -2167,16 +2171,14 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			node = megaApi.getNodeByHandle(imageHandles.get(positionG));
 		}
 
-		fileNameTextView.setText(megaApi.getNodeByHandle(imageHandles.get(positionG)).getName());
 
-
-		supportInvalidateOptionsMenu();
 
 		if (node == null){
 			return;
 		}
 
-
+		fileNameTextView.setText(megaApi.getNodeByHandle(imageHandles.get(positionG)).getName());
+		supportInvalidateOptionsMenu();
 
 	}
 
