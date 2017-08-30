@@ -123,7 +123,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	private boolean fromShared = false;
 	private RelativeLayout fragmentContainer;
 	private TextView fileNameTextView;
-	private MenuItem linkIcon;
+	private MenuItem getlinkIcon;
 	private MenuItem shareIcon;
 	private MenuItem downloadIcon;
 	private MenuItem propertiesIcon;
@@ -132,6 +132,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	private MenuItem copyIcon;
 	private MenuItem moveToTrashIcon;
 	private MenuItem removeIcon;
+	private MenuItem removelinkIcon;
 
 
 	private RelativeLayout bottomLayout;
@@ -197,7 +198,8 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.activity_full_screen_image_viewer, menu);
 
-		linkIcon = menu.findItem(R.id.full_image_viewer_get_link);
+		getlinkIcon = menu.findItem(R.id.full_image_viewer_get_link);
+		removelinkIcon = menu.findItem(R.id.full_image_viewer_remove_link);
 		shareIcon = menu.findItem(R.id.full_image_viewer_share);
 		propertiesIcon = menu.findItem(R.id.full_image_viewer_properties);
 		downloadIcon = menu.findItem(R.id.full_image_viewer_download);
@@ -215,8 +217,11 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		if (adapterType == Constants.OFFLINE_ADAPTER){
 			log("***** OFFLINE_ADAPTER");
 
-			linkIcon.setVisible(false);
+			getlinkIcon.setVisible(false);
 			menu.findItem(R.id.full_image_viewer_get_link).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+
+			removelinkIcon.setVisible(false);
+			menu.findItem(R.id.full_image_viewer_remove_link).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
 
 			shareIcon.setVisible(false);
 			menu.findItem(R.id.full_image_viewer_share).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
@@ -237,8 +242,11 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			log("***** ZIP_ADAPTER");
 
 
-			linkIcon.setVisible(false);
+			getlinkIcon.setVisible(false);
 			menu.findItem(R.id.full_image_viewer_get_link).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+
+			removelinkIcon.setVisible(false);
+			menu.findItem(R.id.full_image_viewer_remove_link).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
 
 			shareIcon.setVisible(false);
 			menu.findItem(R.id.full_image_viewer_share).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
@@ -253,8 +261,19 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		}else if(adapterType == Constants.SEARCH_ADAPTER){
 			log("***** SEARCH_ADAPTER");
 
-			linkIcon.setVisible(true);
-			menu.findItem(R.id.full_image_viewer_get_link).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+			if (isFolderLink){
+				removelinkIcon.setVisible(true);
+				menu.findItem(R.id.full_image_viewer_remove_link).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+
+				getlinkIcon.setVisible(false);
+				menu.findItem(R.id.full_image_viewer_get_link).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+			}else{
+				removelinkIcon.setVisible(false);
+				menu.findItem(R.id.full_image_viewer_remove_link).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+
+				getlinkIcon.setVisible(true);
+				menu.findItem(R.id.full_image_viewer_get_link).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+			}
 
 			shareIcon.setVisible(true);
 			menu.findItem(R.id.full_image_viewer_share).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
@@ -322,26 +341,42 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			}
 
 			if (!isFolderLink){
-				linkIcon.setVisible(true);
+				getlinkIcon.setVisible(true);
 				menu.findItem(R.id.full_image_viewer_get_link).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+
+				removelinkIcon.setVisible(false);
+				menu.findItem(R.id.full_image_viewer_remove_link).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+
 				if(adapterType==Constants.CONTACT_FILE_ADAPTER){
-					linkIcon.setVisible(false);
+					getlinkIcon.setVisible(false);
 					menu.findItem(R.id.full_image_viewer_get_link).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+
+					removelinkIcon.setVisible(true);
+					menu.findItem(R.id.full_image_viewer_remove_link).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 				}
 				else{
 					if(fromShared){
-						linkIcon.setVisible(false);
+						getlinkIcon.setVisible(false);
 						menu.findItem(R.id.full_image_viewer_get_link).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+
+						removelinkIcon.setVisible(true);
+						menu.findItem(R.id.full_image_viewer_remove_link).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 					}
 					else{
-						linkIcon.setVisible(true);
+						getlinkIcon.setVisible(true);
 						menu.findItem(R.id.full_image_viewer_get_link).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+
+						removelinkIcon.setVisible(false);
+						menu.findItem(R.id.full_image_viewer_remove_link).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
 					}
 				}
 			}
 			else{
-				linkIcon.setVisible(false);
+				getlinkIcon.setVisible(false);
 				menu.findItem(R.id.full_image_viewer_get_link).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+
+				removelinkIcon.setVisible(true);
+				menu.findItem(R.id.full_image_viewer_remove_link).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 			}
 
 			if(fromShared){
@@ -412,7 +447,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				break;
 			}
 			case R.id.full_image_viewer_get_link: {
-				if (adapterType == Constants.OFFLINE_ADAPTER){
+				/*if (adapterType == Constants.OFFLINE_ADAPTER){
 					break;
 
 				}else if (adapterType == Constants.ZIP_ADAPTER){
@@ -423,8 +458,16 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 					shareIt = false;
 			    	showGetLinkActivity(node.getHandle());
 					break;
-				}
+				}*/
 
+				log("***get link");
+				break;
+
+			}
+
+			case R.id.full_image_viewer_remove_link: {
+				log("***remove link");
+				break;
 			}
 			case R.id.full_image_viewer_share: {
 
