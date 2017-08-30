@@ -1043,9 +1043,6 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
                 else{
                     boolean enabled = notificationsSwitch.isChecked();
 
-
-//                    notificationsSwitch.setChecked(isChecked);
-
                     if(!enabled){
                         ringtoneLayout.setVisibility(View.GONE);
                         dividerRingtoneLayout.setVisibility(View.GONE);
@@ -1118,32 +1115,32 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             log("Selected notification sound OK");
 
             Uri uri = intent.getParcelableExtra(RingtoneManager.EXTRA_RINGTONE_PICKED_URI);
-            String chosenSound = "-1";
-            if(uri!=null){
+                String chosenSound = "-1";
+                if(uri!=null){
 
-                Ringtone ringtone = RingtoneManager.getRingtone(this, uri);
-                String title = ringtone.getTitle(this);
+                    Ringtone ringtone = RingtoneManager.getRingtone(this, uri);
+                    String title = ringtone.getTitle(this);
 
-                if(title!=null){
-                    log("Title ringtone: "+title);
-                    messageSoundText.setText(title);
+                    if(title!=null){
+                        log("Title ringtone: "+title);
+                        messageSoundText.setText(title);
+                    }
+
+                    chosenSound = uri.toString();
+                }
+                else{
+                    messageSoundText.setText(getString(R.string.settings_chat_silent_sound_not));
                 }
 
-                chosenSound = uri.toString();
-            }
-            else{
-                messageSoundText.setText(getString(R.string.settings_chat_silent_sound_not));
-            }
+                if(chatPrefs==null){
 
-            if(chatPrefs==null){
-
-                chatPrefs = new ChatItemPreferences(Long.toString(chatHandle), Boolean.toString(true), "", chosenSound);
-                dbH.setChatItemPreferences(chatPrefs);
-            }
-            else{
-                chatPrefs.setNotificationsSound(chosenSound);
-                dbH.setNotificationSoundChatItem(chosenSound, Long.toString(chatHandle));
-            }
+                    chatPrefs = new ChatItemPreferences(Long.toString(chatHandle), Boolean.toString(true), "", chosenSound);
+                    dbH.setChatItemPreferences(chatPrefs);
+                }
+                else{
+                    chatPrefs.setNotificationsSound(chosenSound);
+                    dbH.setNotificationSoundChatItem(chosenSound, Long.toString(chatHandle));
+                }
         }
         else if (requestCode == Constants.REQUEST_ADD_PARTICIPANTS && resultCode == RESULT_OK) {
             log("onActivityResult REQUEST_ADD_PARTICIPANTS OK");
