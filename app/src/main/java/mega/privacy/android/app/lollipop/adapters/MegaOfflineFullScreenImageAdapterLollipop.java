@@ -250,35 +250,6 @@ public class MegaOfflineFullScreenImageAdapterLollipop extends PagerAdapter impl
 				
 			    float scaleW = Util.getScaleW(outMetrics, density);
 			    float scaleH = Util.getScaleH(outMetrics, density);
-			    
-			    RelativeLayout bottomLayout = (RelativeLayout) activity.findViewById(R.id.image_viewer_layout_bottom);
-			   // RelativeLayout topLayout = (RelativeLayout) activity.findViewById(R.id.image_viewer_layout_top);
-				if (aBshown){
-					TranslateAnimation animBottom = new TranslateAnimation(0, 0, 0, Util.px2dp(48, outMetrics));
-					animBottom.setDuration(1000);
-					animBottom.setFillAfter( true );
-					bottomLayout.setAnimation(animBottom);
-					
-					//TranslateAnimation animTop = new TranslateAnimation(0, 0, 0, Util.px2dp(-48, outMetrics));
-					//animTop.setDuration(1000);
-					//animTop.setFillAfter( true );
-					//topLayout.setAnimation(animTop);
-					
-					aBshown = false;
-				}
-				else{					
-					TranslateAnimation animBottom = new TranslateAnimation(0, 0, Util.px2dp(48, outMetrics), 0);
-					animBottom.setDuration(1000);
-					animBottom.setFillAfter( true );
-					bottomLayout.setAnimation(animBottom);
-					
-					//TranslateAnimation animTop = new TranslateAnimation(0, 0, Util.px2dp(-48, outMetrics), 0);
-					//animTop.setDuration(1000);
-					//animTop.setFillAfter( true );
-					//topLayout.setAnimation(animTop);
-					
-					aBshown = true;
-				}
 				
 				RelativeLayout activityLayout = (RelativeLayout) activity.findViewById(R.id.full_image_viewer_parent_layout);
 				activityLayout.invalidate();
