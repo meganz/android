@@ -149,7 +149,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	public static int REQUEST_CODE_SELECT_LOCAL_FOLDER = 1004;
 	
 	MegaNode node;
-	
+
 	boolean shareIt = true;
 	boolean moveToRubbish = false;
 	
@@ -268,8 +268,22 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			renameIcon.setVisible(true);
 			moveIcon.setVisible(true);
 			copyIcon .setVisible(true);
-			moveToTrashIcon.setVisible(false);
-			removeIcon.setVisible(true);
+
+			node = megaApi.getNodeByHandle(imageHandles.get(positionG));
+			final long handle = node.getHandle();
+			MegaNode parent = megaApi.getNodeByHandle(handle);
+			while (megaApi.getParentNode(parent) != null){
+				parent = megaApi.getParentNode(parent);
+			}
+
+			if (parent.getHandle() != megaApi.getRubbishNode().getHandle()){
+				moveToTrashIcon.setVisible(true);
+				removeIcon.setVisible(false);
+			}
+			else{
+				moveToTrashIcon.setVisible(false);
+				removeIcon.setVisible(true);
+			}
 
 		}else {
 			log("***** default");
@@ -360,7 +374,21 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				removeIcon.setVisible(false);
 			}
 
+			node = megaApi.getNodeByHandle(imageHandles.get(positionG));
+			final long handle = node.getHandle();
+			MegaNode parent = megaApi.getNodeByHandle(handle);
+			while (megaApi.getParentNode(parent) != null){
+				parent = megaApi.getParentNode(parent);
+			}
 
+			if (parent.getHandle() != megaApi.getRubbishNode().getHandle()){
+				moveToTrashIcon.setVisible(true);
+				removeIcon.setVisible(false);
+			}
+			else{
+				moveToTrashIcon.setVisible(false);
+				removeIcon.setVisible(true);
+			}
 		}
 
 			return super.onCreateOptionsMenu(menu);
@@ -505,15 +533,23 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				}
 			}
 			case R.id.full_image_viewer_rename: {
+				showRenameDialog();
 				break;
 			}
 			case R.id.full_image_viewer_move: {
+				showMove();
 				break;
 			}
 			case R.id.full_image_viewer_copy: {
+				showCopy();
 				break;
 			}
 			case R.id.full_image_viewer_move_to_trash: {
+				moveToTrash();
+				break;
+			}
+			case R.id.full_image_viewer_remove: {
+				moveToTrash();
 				break;
 			}
 		}
@@ -1285,9 +1321,11 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	}
 
 	public void showRenameDialog(){
-		
+		log("showRenameDialog");
+
+		node = megaApi.getNodeByHandle(imageHandles.get(positionG));
+
 		final EditTextCursorWatcher input = new EditTextCursorWatcher(this, node.isFolder());
-//		input.setId(EDIT_TEXT_ID);
 		input.setSingleLine();
 		input.setText(node.getName());
 
@@ -1358,19 +1396,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			}
 		});
 	}
-	
 
-	 //Display keyboard
-	private void showKeyboardDelayed(final View view) {
-		handler.postDelayed(new Runnable() {
-			@Override
-			public void run() {
-				InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-				imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT);
-			}
-		}, 50);
-	}
-	
 	private void rename(String newName){
 		if (newName.equals(node.getName())) {
 			return;
@@ -1402,7 +1428,10 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	}
 	
 	public void showMove(){
-		
+		log("showMove");
+
+		node = megaApi.getNodeByHandle(imageHandles.get(positionG));
+
 		ArrayList<Long> handleList = new ArrayList<Long>();
 		handleList.add(node.getHandle());
 		
@@ -1417,7 +1446,10 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	}
 	
 	public void showCopy(){
-		
+		log("showCopy");
+
+		node = megaApi.getNodeByHandle(imageHandles.get(positionG));
+
 		ArrayList<Long> handleList = new ArrayList<Long>();
 		handleList.add(node.getHandle());
 		
@@ -1433,7 +1465,9 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	
 	public void moveToTrash(){
 		log("moveToTrash");
-		
+
+		node = megaApi.getNodeByHandle(imageHandles.get(positionG));
+
 		final long handle = node.getHandle();
 		moveToRubbish = false;
 		if (!Util.isOnline(this)){
@@ -1527,6 +1561,18 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 
 	public void setIsGetLink(boolean value){
 		this.isGetLink = value;
+	}
+
+
+	//Display keyboard
+	private void showKeyboardDelayed(final View view) {
+		handler.postDelayed(new Runnable() {
+			@Override
+			public void run() {
+				InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+				imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT);
+			}
+		}, 50);
 	}
 
 	@Override
