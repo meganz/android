@@ -913,8 +913,8 @@
 
     <string name="my_account_upgrade_pro" context="Button to upgrade the account to PRO account in My Account Section">Upgrade</string>
     <string name="my_account_upgrade_pro_panel" context="Button to upgrade the account to PRO account in the panel that appears randomly">Upgrade now</string>
-    <string name="get_pro_account" context="Message to promote PRO accounts">Improve your cloud capacity!\nGet more space &amp; transfer quota with a PRO account!</string>
-    <string name="toast_master_key" context="success message when the MasterKey file has been downloaded">The recovery key has been backup into: %1s.\nWhile the file remains in this path, you will find it at the Saved for Offline Section.\nNote: It will be deleted if you log out, please store it in a safe place.</string>
+    <string name="get_pro_account" context="Message to promote PRO accounts">Improve your cloud capacity![A]Get more space &amp; transfer quota with a PRO account!</string>
+    <string name="toast_master_key" context="success message when the MasterKey file has been downloaded">The recovery key has been backup into: %1s.[A]While the file remains in this path, you will find it at the Saved for Offline Section.[A]Note: It will be deleted if you log out, please store it in a safe place.</string>
 
     <!--
     <string name="next_ime_action" context="Action to pass focus to the next field in a form">Next</string>
@@ -1256,11 +1256,11 @@
     <string name="no_conversation_history" context="message shown when a chat has no messages">No conversation history</string>
 
     <plurals name="user_typing" context="title of confirmation alert before removing a contact">
-        <item context="Singular" quantity="one">is typing...</item>
-        <item context="Plural" quantity="other">are typing...</item>
+        <item context="Singular" quantity="one">%1$s [A]is typing...[/A]</item>
+        <item context="Plural" quantity="other">%1$s [A]are typing...[/A]</item>
     </plurals>
 
-    <string name="more_users_typing" context="text that appear when there are more than 2 people writing at that time in a chat. For example User1, user2 and more are typing...">more are typing...</string>
+    <string name="more_users_typing" context="text that appear when there are more than 2 people writing at that time in a chat. For example User1, user2 and more are typing...">%1$s [A]and more are typing...[/A]</string>
 
     <string name="tab_my_account_general" context="Title of the general tab in My Account Section">General</string>
     <string name="tab_my_account_storage" context="Title of the storage tab in My Account Section">Storage</string>
