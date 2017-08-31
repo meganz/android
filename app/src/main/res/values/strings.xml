@@ -952,8 +952,12 @@
     <string name="title_edit_profile_info" context="Title of the Dialog to edit the profile attributes of the user's account">Edit</string>
 
     <string name="title_set_expiry_date" context="Alert Dialog to get link">Set expiry date</string>
-    <string name="title_set_password_protection" context="Alert Dialog to get link">Set password protection</string>
-    <string name="subtitle_set_expiry_date" context="Alert Dialog to get link">(PRO ONLY)</string>
+    <string name="title_set_password_protection" context="Title of the dialog to get link with password">Set password protection</string>
+    <string name="subtitle_set_expiry_date" context="Subtitle of the dialog to get link">(PRO ONLY)</string>
+    <string name="set_password_protection_dialog" context="Alert Dialog to get link with password">Set password</string>
+    <string name="hint_set_password_protection_dialog" context="Hint of the dialog to get link with password">Enter password</string>
+    <string name="hint_confirm_password_protection_dialog" context="Hint of the confirmation dialog to get link with password">Confirm password</string>
+    <string name="link_request_status" context="Status text at the beginning of getting a link">Processing...</string>
 
     <string name="edit_link_option" context="Option of the sliding panel to edit the link of a node">Edit link</string>
 
