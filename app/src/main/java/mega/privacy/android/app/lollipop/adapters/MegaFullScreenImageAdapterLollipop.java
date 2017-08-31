@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.PointF;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.support.design.widget.AppBarLayout;
@@ -14,7 +15,10 @@ import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.util.SparseArray;
 import android.view.Display;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
+import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -30,8 +34,6 @@ import java.util.ArrayList;
 import mega.privacy.android.app.MimeTypeMime;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.TouchImageView;
-import mega.privacy.android.app.lollipop.FolderLinkActivityLollipop;
-import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.PreviewUtils;
@@ -47,8 +49,7 @@ import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaTransferListenerInterface;
 import nz.mega.sdk.MegaUtilsAndroid;
 
-
-public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements OnClickListener, MegaRequestListenerInterface, MegaTransferListenerInterface  {
+public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements OnClickListener, MegaRequestListenerInterface, MegaTransferListenerInterface {
 	
 	private Activity activity;
 	private MegaFullScreenImageAdapterLollipop megaFullScreenImageAdapter;
@@ -62,7 +63,7 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 	
 	MegaApiAndroid megaApi;
 	Context context;
-	
+
 	/*view holder class*/
     public class ViewHolderFullImage {
     	public TouchImageView imgDisplay;
@@ -282,6 +283,7 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 		this.megaApi = megaApi;
 		this.megaFullScreenImageAdapter = this;
 		this.context = context;
+
 	}
 
 	@Override
@@ -317,11 +319,12 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 		holder.imgDisplay = (TouchImageView) viewLayout.findViewById(R.id.full_screen_image_viewer_image);
 		holder.imgDisplay.setImageResource(MimeTypeMime.typeForName(node.getName()).getIconResourceId());
 		holder.imgDisplay.setOnClickListener(this);
+
 		holder.progressBar = (ProgressBar) viewLayout.findViewById(R.id.full_screen_image_viewer_progress_bar);
 		holder.downloadProgressBar = (ProgressBar) viewLayout.findViewById(R.id.full_screen_image_viewer_download_progress_bar);
 		holder.downloadProgressBar.setVisibility(View.GONE);
 		holder.document = imageHandles.get(position);
-		
+
 		visibleImgs.put(position, holder);
         
 		Bitmap preview = null;
@@ -388,15 +391,11 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
     }
 	
 	public TouchImageView getVisibleImage(int position){
-		log("****touchImageVIew");
-
 		return visibleImgs.get(position).imgDisplay;
 	}
 
 	@Override
 	public void onClick(View v) {
-		log("****onClick");
-
 		switch(v.getId()){
 			case R.id.full_screen_image_viewer_image:{
 

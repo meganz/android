@@ -700,7 +700,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		viewPager.setPageMargin(40);
 		
 		fragmentContainer = (RelativeLayout) findViewById(R.id.full_image_viewer_parent_layout);
-		
+
 		Intent intent = getIntent();
 		positionG = intent.getIntExtra("position", 0);
 		orderGetChildren = intent.getIntExtra("orderGetChildren", MegaApiJava.ORDER_DEFAULT_ASC);
@@ -2077,15 +2077,6 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		snackbar.show();
 	}
 
-	public void zoomImage(boolean zoom) {
-		log("zoomImage");
-		if(zoom){
-			hideStatusBar();
-		}else{
-			showStatusBar();
-		}
-	}
-
 	public void touchImage() {
 		log("touchImage");
 		if(aB.isShowing()){
@@ -2095,16 +2086,10 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		}
 	}
 
-	public void hideStatusBar() {
-		getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
-	}
-	public void showStatusBar(){
-		getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
-	}
-
 	protected void hideActionBar(){
 		if (aB != null && aB.isShowing()) {
 			if(tB != null) {
+				getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 				tB.animate().translationY(-220).setDuration(800L)
 						.withEndAction(new Runnable() {
 							@Override
@@ -2114,21 +2099,23 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 						}).start();
 				bottomLayout.animate().translationY(220).setDuration(800L).start();
 			} else {
+				getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 				aB.hide();
 			}
 		}
 	}
 	protected void showActionBar(){
 		if (aB != null && !aB.isShowing()) {
+			getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+			getWindow().setBackgroundDrawableResource(android.R.color.black);
 			aB.show();
 			if(tB != null) {
 				tB.animate().translationY(0).setDuration(800L).start();
 				bottomLayout.animate().translationY(0).setDuration(800L).start();
 			}
+
 		}
 	}
-
-
 
 	@Override
 	public void onBackPressed() {
@@ -2171,8 +2158,6 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			node = megaApi.getNodeByHandle(imageHandles.get(positionG));
 		}
 
-
-
 		if (node == null){
 			return;
 		}
@@ -2183,17 +2168,12 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	}
 
 	@Override
-	public void onReloadNeeded(MegaApiJava api) {
-
-	}
+	public void onReloadNeeded(MegaApiJava api) {}
 
 	@Override
-	public void onAccountUpdate(MegaApiJava api) {
-
-	}
+	public void onAccountUpdate(MegaApiJava api) {}
 
 	@Override
-	public void onContactRequestsUpdate(MegaApiJava api, ArrayList<MegaContactRequest> requests) {
+	public void onContactRequestsUpdate(MegaApiJava api, ArrayList<MegaContactRequest> requests) {}
 
-	}
 }

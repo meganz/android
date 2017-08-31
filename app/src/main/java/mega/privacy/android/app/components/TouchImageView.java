@@ -849,7 +849,7 @@ public class TouchImageView extends ImageView {
 
         @Override
         public boolean onScale(ScaleGestureDetector detector) {
-        	scaleImage(detector.getScaleFactor(), detector.getFocusX(), detector.getFocusY(), true);
+            scaleImage(detector.getScaleFactor(), detector.getFocusX(), detector.getFocusY(), true);
             return true;
         }
         
@@ -860,13 +860,13 @@ public class TouchImageView extends ImageView {
         	boolean animateToZoomBoundary = false;
         	float targetZoom = normalizedScale;
         	if (normalizedScale > maxScale) {
-        		targetZoom = maxScale;
+                targetZoom = maxScale;
         		animateToZoomBoundary = true;
         		
         	} else if (normalizedScale < minScale) {
         		targetZoom = minScale;
         		animateToZoomBoundary = true;
-        	}
+            }
         	
         	if (animateToZoomBoundary) {
 	        	DoubleTapZoom doubleTap = new DoubleTapZoom(targetZoom, viewWidth / 2, viewHeight / 2, true);
@@ -874,10 +874,10 @@ public class TouchImageView extends ImageView {
         	}
         }
     }
-    
+
     private void scaleImage(float deltaScale, float focusX, float focusY, boolean stretchImageToSuper) {
-    	
-    	float lowerScale, upperScale;
+
+        float lowerScale, upperScale;
     	if (stretchImageToSuper) {
     		lowerScale = superMinScale;
     		upperScale = superMaxScale;
