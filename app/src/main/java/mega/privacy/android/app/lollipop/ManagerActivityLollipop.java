@@ -8376,6 +8376,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					p = megaApi.getParentNode(p);
 				}
 				if (p.getHandle() != megaApi.getRubbishNode().getHandle()){
+
 					setMoveToRubbish(true);
 					AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
 //				builder.setTitle(getResources().getString(R.string.section_rubbish_bin));
@@ -8386,13 +8387,15 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					builder.show();
 				}
 				else{
+
 					setMoveToRubbish(false);
 					AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
 //				builder.setTitle(getResources().getString(R.string.title_delete_from_mega));
 
 					builder.setMessage(getResources().getString(R.string.confirmation_delete_from_mega));
 
-					builder.setPositiveButton(R.string.context_delete, dialogClickListener);
+					//builder.setPositiveButton(R.string.context_delete, dialogClickListener);
+					builder.setPositiveButton(R.string.context_remove, dialogClickListener);
 					builder.setNegativeButton(R.string.general_cancel, dialogClickListener);
 					builder.show();
 				}
@@ -9091,7 +9094,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
 //		builder.setTitle(getString(R.string.context_clear_rubbish));
 		builder.setMessage(getString(R.string.clear_rubbish_confirmation));
-		builder.setPositiveButton(getString(R.string.context_delete),
+		/*builder.setPositiveButton(getString(R.string.context_delete),new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int whichButton) {
+						nC.cleanRubbishBin();
+					}
+				});*/
+		builder.setPositiveButton(getString(R.string.context_remove),
 				new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int whichButton) {
 						nC.cleanRubbishBin();
