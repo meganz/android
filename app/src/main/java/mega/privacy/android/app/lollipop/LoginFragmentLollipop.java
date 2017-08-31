@@ -93,7 +93,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
     private LinearLayout loginLogin;
     private LinearLayout loginLoggingIn;
     private LinearLayout loginCreateAccount;
-    private View loginDelimiter;
     private ProgressBar loginProgressBar;
     private ProgressBar loginFetchNodesProgressBar;
     private TextView generatingKeysText;
@@ -260,22 +259,11 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         scrollView = (ScrollView) v.findViewById(R.id.scroll_view_login);
 
         loginTitle = (TextView) v.findViewById(R.id.login_text_view);
-        //Left margin
-        LinearLayout.LayoutParams textParams = (LinearLayout.LayoutParams)loginTitle.getLayoutParams();
-        textParams.setMargins(Util.scaleWidthPx(60, outMetrics), Util.scaleHeightPx(40, outMetrics), 0, Util.scaleHeightPx(20, outMetrics));
-        loginTitle.setLayoutParams(textParams);
 
         loginTitle.setText(R.string.login_text);
         loginTitle.setOnClickListener(this);
 
         et_user = (EditText) v.findViewById(R.id.login_email_text);
-        android.view.ViewGroup.LayoutParams paramsb1 = et_user.getLayoutParams();
-        paramsb1.width = Util.scaleWidthPx(280, outMetrics);
-        et_user.setLayoutParams(paramsb1);
-        //Left margin
-        LinearLayout.LayoutParams textParamsEditText = (LinearLayout.LayoutParams)et_user.getLayoutParams();
-        textParamsEditText.setMargins(Util.scaleWidthPx(60, outMetrics), 0, 0, Util.scaleWidthPx(10, outMetrics));
-        et_user.setLayoutParams(textParamsEditText);
 
         et_user.setCursorVisible(true);
         et_user.getBackground().clearColorFilter();
@@ -300,23 +288,11 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         login_background = et_user.getBackground().mutate().getConstantState().newDrawable();
 
         login_email_error_layout = (RelativeLayout) v.findViewById(R.id.login_email_text_error);
-        paramsb1 = login_email_error_layout.getLayoutParams();
-        paramsb1.width = Util.scaleWidthPx(280, outMetrics);
-        login_email_error_layout.setLayoutParams(paramsb1);
-        textParamsEditText = (LinearLayout.LayoutParams)login_email_error_layout.getLayoutParams();
-        textParamsEditText.setMargins(Util.scaleWidthPx(63, outMetrics), Util.scaleWidthPx(2, outMetrics), 0, Util.scaleWidthPx(10, outMetrics));
-        login_email_error_layout.setLayoutParams(textParamsEditText);
         login_email_error_layout.setVisibility(View.GONE);
 
         login_email_error_text = (TextView) v.findViewById(R.id.login_email_text_error_text);
 
         et_password = (EditText) v.findViewById(R.id.login_password_text);
-        paramsb1 = et_password.getLayoutParams();
-        paramsb1.width = Util.scaleWidthPx(280, outMetrics);
-        et_password.setLayoutParams(paramsb1);
-        textParamsEditText = (LinearLayout.LayoutParams) et_password.getLayoutParams();
-        textParamsEditText.setMargins(Util.scaleWidthPx(60, outMetrics), 0, 0, Util.scaleWidthPx(10, outMetrics));
-        et_password.setLayoutParams(textParamsEditText);
 
         et_password.setCursorVisible(true);
         et_password.getBackground().clearColorFilter();
@@ -352,12 +328,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
         login_password_error_layout = (RelativeLayout) v.findViewById(R.id.login_password_text_error);
         login_password_error_layout.setVisibility(View.GONE);
-        paramsb1 = login_password_error_layout.getLayoutParams();
-        paramsb1.width = Util.scaleWidthPx(280, outMetrics);
-        login_password_error_layout.setLayoutParams(paramsb1);
-        textParamsEditText = (LinearLayout.LayoutParams)login_password_error_layout.getLayoutParams();
-        textParamsEditText.setMargins(Util.scaleWidthPx(63, outMetrics), Util.scaleWidthPx(2, outMetrics), 0, Util.scaleWidthPx(10, outMetrics));
-        login_password_error_layout.setLayoutParams(textParamsEditText);
+
         login_password_error_text = (TextView) v.findViewById(R.id.login_password_text_error_text);
 
         loginThreeDots = (ImageView) v.findViewById(R.id.login_three_dots);
@@ -389,51 +360,20 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
         bLogin = (TextView) v.findViewById(R.id.button_login_login);
         bLogin.setText(getString(R.string.login_text).toUpperCase(Locale.getDefault()));
-        android.view.ViewGroup.LayoutParams paramsbLogin = bLogin.getLayoutParams();
-        paramsbLogin.height = Util.scaleHeightPx(48, outMetrics);
-		/*paramsbLogin.width = Util.scaleWidthPx(63, outMetrics);*/
-        bLogin.setLayoutParams(paramsbLogin);
-        //Margin
-        LinearLayout.LayoutParams textParamsLogin = (LinearLayout.LayoutParams)bLogin.getLayoutParams();
-        textParamsLogin.setMargins(Util.scaleWidthPx(65, outMetrics), Util.scaleHeightPx(40, outMetrics), 0, Util.scaleHeightPx(10, outMetrics));
-        bLogin.setLayoutParams(textParamsLogin);
-
         bLogin.setOnClickListener(this);
 
         bForgotPass = (TextView) v.findViewById(R.id.button_forgot_pass);
         bForgotPass.setText(getString(R.string.forgot_pass).toUpperCase(Locale.getDefault()));
-        android.view.ViewGroup.LayoutParams paramsbForgotPass = bForgotPass.getLayoutParams();
-        paramsbForgotPass.height = Util.scaleHeightPx(48, outMetrics);
-		/*paramsbLogin.width = Util.scaleWidthPx(63, outMetrics);*/
-        bForgotPass.setLayoutParams(paramsbForgotPass);
-        //Margin
-        LinearLayout.LayoutParams textParamsForgotPass = (LinearLayout.LayoutParams)bForgotPass.getLayoutParams();
-        textParamsForgotPass.setMargins(Util.scaleWidthPx(65, outMetrics), 0, 0, Util.scaleHeightPx(20, outMetrics));
-        bForgotPass.setLayoutParams(textParamsForgotPass);
-
         bForgotPass.setOnClickListener(this);
 
-        loginDelimiter = (View) v.findViewById(R.id.login_delimiter);
         loginCreateAccount = (LinearLayout) v.findViewById(R.id.login_create_account_layout);
 
         newToMega = (TextView) v.findViewById(R.id.text_newToMega);
-        //Margins (left, top, right, bottom)
-        LinearLayout.LayoutParams textnewToMega = (LinearLayout.LayoutParams)newToMega.getLayoutParams();
-        textnewToMega.setMargins(Util.scaleWidthPx(65, outMetrics), Util.scaleHeightPx(20, outMetrics), 0, Util.scaleHeightPx(30, outMetrics));
-        newToMega.setLayoutParams(textnewToMega);
         newToMega.setOnClickListener(this);
 
         bRegister = (TextView) v.findViewById(R.id.button_create_account_login);
 
         bRegister.setText(getString(R.string.create_account).toUpperCase(Locale.getDefault()));
-        android.view.ViewGroup.LayoutParams paramsb2 = bRegister.getLayoutParams();
-        paramsb2.height = Util.scaleHeightPx(48, outMetrics);
-        bRegister.setLayoutParams(paramsb2);
-        //Margin
-        LinearLayout.LayoutParams textParamsRegister = (LinearLayout.LayoutParams)bRegister.getLayoutParams();
-        textParamsRegister.setMargins(Util.scaleWidthPx(65, outMetrics), 0, 0, 0);
-        bRegister.setLayoutParams(textParamsRegister);
-
         bRegister.setOnClickListener(this);
 
         loginLogin = (LinearLayout) v.findViewById(R.id.login_login_layout);
@@ -450,7 +390,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
         loginLogin.setVisibility(View.VISIBLE);
         loginCreateAccount.setVisibility(View.VISIBLE);
-        loginDelimiter.setVisibility(View.VISIBLE);
         loginLoggingIn.setVisibility(View.GONE);
         generatingKeysText.setVisibility(View.GONE);
         loggingInText.setVisibility(View.GONE);
@@ -794,7 +733,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 		gSession = credentials.getSession();
 
         loginLogin.setVisibility(View.GONE);
-        loginDelimiter.setVisibility(View.GONE);
         loginCreateAccount.setVisibility(View.GONE);
         queryingSignupLinkText.setVisibility(View.GONE);
         confirmingAccountText.setVisibility(View.GONE);
@@ -824,7 +762,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             MegaApplication.setLoggingIn(true);
 
             loginLogin.setVisibility(View.GONE);
-            loginDelimiter.setVisibility(View.GONE);
             loginCreateAccount.setVisibility(View.GONE);
             queryingSignupLinkText.setVisibility(View.GONE);
             confirmingAccountText.setVisibility(View.GONE);
@@ -901,7 +838,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
     public void oldCredentialsLogin(){
         log("oldCredentialsLogin");
         loginLogin.setVisibility(View.GONE);
-        loginDelimiter.setVisibility(View.GONE);
         loginCreateAccount.setVisibility(View.GONE);
         queryingSignupLinkText.setVisibility(View.GONE);
         confirmingAccountText.setVisibility(View.GONE);
@@ -930,7 +866,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
         loginLogin.setVisibility(View.GONE);
         scrollView.setBackgroundColor(getResources().getColor(R.color.white));
-        loginDelimiter.setVisibility(View.GONE);
         loginCreateAccount.setVisibility(View.GONE);
         queryingSignupLinkText.setVisibility(View.GONE);
         confirmingAccountText.setVisibility(View.GONE);
@@ -1010,7 +945,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             loginLoggingIn.setVisibility(View.GONE);
             loginLogin.setVisibility(View.VISIBLE);
             scrollView.setBackgroundColor(getResources().getColor(R.color.background_create_account));
-            loginDelimiter.setVisibility(View.VISIBLE);
             loginCreateAccount.setVisibility(View.VISIBLE);
             queryingSignupLinkText.setVisibility(View.GONE);
             confirmingAccountText.setVisibility(View.GONE);
@@ -1026,7 +960,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
         loginLogin.setVisibility(View.GONE);
         scrollView.setBackgroundColor(getResources().getColor(R.color.white));
-        loginDelimiter.setVisibility(View.GONE);
         loginCreateAccount.setVisibility(View.GONE);
         loginLoggingIn.setVisibility(View.VISIBLE);
         scrollView.setBackgroundColor(getResources().getColor(R.color.white));
@@ -1054,7 +987,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             loginLoggingIn.setVisibility(View.GONE);
             loginLogin.setVisibility(View.VISIBLE);
             scrollView.setBackgroundColor(getResources().getColor(R.color.background_create_account));
-            loginDelimiter.setVisibility(View.VISIBLE);
             loginCreateAccount.setVisibility(View.VISIBLE);
             queryingSignupLinkText.setVisibility(View.GONE);
             confirmingAccountText.setVisibility(View.GONE);
@@ -1070,7 +1002,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
         loginLogin.setVisibility(View.GONE);
         scrollView.setBackgroundColor(getResources().getColor(R.color.white));
-        loginDelimiter.setVisibility(View.GONE);
         loginCreateAccount.setVisibility(View.GONE);
         loginLoggingIn.setVisibility(View.VISIBLE);
         scrollView.setBackgroundColor(getResources().getColor(R.color.white));
@@ -1105,7 +1036,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
             loginLogin.setVisibility(View.GONE);
             scrollView.setBackgroundColor(getResources().getColor(R.color.white));
-            loginDelimiter.setVisibility(View.GONE);
             loginCreateAccount.setVisibility(View.GONE);
             loginLoggingIn.setVisibility(View.VISIBLE);
             scrollView.setBackgroundColor(getResources().getColor(R.color.white));
@@ -1129,7 +1059,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             loginLoggingIn.setVisibility(View.GONE);
             loginLogin.setVisibility(View.VISIBLE);
             scrollView.setBackgroundColor(getResources().getColor(R.color.background_create_account));
-            loginDelimiter.setVisibility(View.VISIBLE);
             loginCreateAccount.setVisibility(View.VISIBLE);
             queryingSignupLinkText.setVisibility(View.GONE);
             confirmingAccountText.setVisibility(View.GONE);
@@ -1386,7 +1315,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
         loginLogin.setVisibility(View.GONE);
         scrollView.setBackgroundColor(getResources().getColor(R.color.white));
-        loginDelimiter.setVisibility(View.GONE);
         loginCreateAccount.setVisibility(View.GONE);
         loginLoggingIn.setVisibility(View.VISIBLE);
         scrollView.setBackgroundColor(getResources().getColor(R.color.white));
@@ -1697,7 +1625,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 loginLoggingIn.setVisibility(View.GONE);
                 loginLogin.setVisibility(View.VISIBLE);
                 scrollView.setBackgroundColor(getResources().getColor(R.color.background_create_account));
-                loginDelimiter.setVisibility(View.VISIBLE);
                 loginCreateAccount.setVisibility(View.VISIBLE);
                 queryingSignupLinkText.setVisibility(View.GONE);
                 confirmingAccountText.setVisibility(View.GONE);
@@ -1812,7 +1739,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 loginLoggingIn.setVisibility(View.GONE);
                 loginLogin.setVisibility(View.VISIBLE);
                 scrollView.setBackgroundColor(getResources().getColor(R.color.background_create_account));
-                loginDelimiter.setVisibility(View.VISIBLE);
                 loginCreateAccount.setVisibility(View.VISIBLE);
                 generatingKeysText.setVisibility(View.GONE);
                 loggingInText.setVisibility(View.GONE);
@@ -1832,7 +1758,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             loginLogin.setVisibility(View.VISIBLE);
             scrollView.setBackgroundColor(getResources().getColor(R.color.background_create_account));
             bForgotPass.setVisibility(View.INVISIBLE);
-            loginDelimiter.setVisibility(View.VISIBLE);
             loginCreateAccount.setVisibility(View.VISIBLE);
             loginLoggingIn.setVisibility(View.GONE);
             generatingKeysText.setVisibility(View.GONE);
@@ -1860,7 +1785,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             else{
                 loginLogin.setVisibility(View.VISIBLE);
                 scrollView.setBackgroundColor(getResources().getColor(R.color.background_create_account));
-                loginDelimiter.setVisibility(View.VISIBLE);
                 loginCreateAccount.setVisibility(View.VISIBLE);
                 loginLoggingIn.setVisibility(View.GONE);
                 generatingKeysText.setVisibility(View.GONE);
@@ -2401,11 +2325,8 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 Drawable background = login_background.mutate().getConstantState().newDrawable();
                 background.setColorFilter(porterDuffColorFilter);
                 et_user.setBackground(background);
-                LinearLayout.LayoutParams textParamsEditText = (LinearLayout.LayoutParams)et_user.getLayoutParams();
-                textParamsEditText.setMargins(Util.scaleWidthPx(60, outMetrics), 0, 0, 0);
-                et_user.setLayoutParams(textParamsEditText);
-                }
                 break;
+            }
             case R.id.login_password_text:{
                 login_password_error_layout.setVisibility(View.VISIBLE);
                 login_password_error_text.setText(error);
@@ -2414,11 +2335,8 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 Drawable background = password_background.mutate().getConstantState().newDrawable();
                 background.setColorFilter(porterDuffColorFilter);
                 et_password.setBackground(background);
-                LinearLayout.LayoutParams textParamsEditText = (LinearLayout.LayoutParams) et_password.getLayoutParams();
-                textParamsEditText.setMargins(Util.scaleWidthPx(60, outMetrics), 0, 0, 0);
-                et_password.setLayoutParams(textParamsEditText);
-                }
                 break;
+            }
         }
     }
 
@@ -2428,9 +2346,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 if(login_email_error_layout.getVisibility() != View.GONE){
                     login_email_error_layout.setVisibility(View.GONE);
                     et_user.setBackground(login_background);
-                    LinearLayout.LayoutParams textParamsEditText = (LinearLayout.LayoutParams)et_user.getLayoutParams();
-                    textParamsEditText.setMargins(Util.scaleWidthPx(60, outMetrics), 0, 0, Util.scaleWidthPx(10, outMetrics));
-                    et_user.setLayoutParams(textParamsEditText);
                 }
             }
             break;
@@ -2438,9 +2353,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 if(login_password_error_layout.getVisibility() != View.GONE){
                     login_password_error_layout.setVisibility(View.GONE);
                     et_password.setBackground(password_background);
-                    LinearLayout.LayoutParams textParamsEditText = (LinearLayout.LayoutParams) et_password.getLayoutParams();
-                    textParamsEditText.setMargins(Util.scaleWidthPx(60, outMetrics), 0, 0, Util.scaleWidthPx(10, outMetrics));
-                    et_password.setLayoutParams(textParamsEditText);
                 }
             }
             break;
