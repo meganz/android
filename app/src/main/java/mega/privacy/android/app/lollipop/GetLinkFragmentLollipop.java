@@ -5,25 +5,36 @@ import android.app.DatePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.PorterDuff;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.SwitchCompat;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.view.Display;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.CheckedTextView;
 import android.widget.CompoundButton;
 import android.widget.DatePicker;
+import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
+
+import org.w3c.dom.Text;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -33,6 +44,7 @@ import java.util.TimeZone;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.components.EditTextCursorWatcher;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaAccountDetails;
@@ -78,7 +90,7 @@ public class GetLinkFragmentLollipop extends Fragment implements View.OnClickLis
 
     TextView subtitleProOnlyProtection;
     SwitchCompat switchButtonProtection;
-    Button passwordProtectionButton;
+    TextView passwordProtectionEditText;
 
     RelativeLayout transparentKeyLayoutExpiry;
     RelativeLayout transparentKeyLayoutProtection;
@@ -133,7 +145,8 @@ public class GetLinkFragmentLollipop extends Fragment implements View.OnClickLis
 
         subtitleProOnlyProtection = (TextView)v.findViewById(R.id.subtitle_set_password_protection);
         switchButtonProtection = (SwitchCompat) v.findViewById(R.id.switch_set_password_protection);
-        passwordProtectionButton = (Button) v.findViewById(R.id.password_protection_button);
+        passwordProtectionEditText = (TextView) v.findViewById(R.id.password_protection_edit);
+        passwordProtectionEditText.setOnClickListener(this);
 
         transparentKeyLayoutProtection = (RelativeLayout) v.findViewById(R.id.transparent_key_layout_password_protection);
 
@@ -149,7 +162,7 @@ public class GetLinkFragmentLollipop extends Fragment implements View.OnClickLis
         }
         else{
             nC.exportLink(((GetLinkActivityLollipop)context).selectedNode);
-            linkText.setText("Processing...");
+            linkText.setText(getString(R.string.link_request_status));
         }
 
 		if(((GetLinkActivityLollipop)context).accountType > MegaAccountDetails.ACCOUNT_TYPE_FREE){
@@ -180,10 +193,10 @@ public class GetLinkFragmentLollipop extends Fragment implements View.OnClickLis
             expiryDateButton.setOnClickListener(this);
 
             //Check if the link has password
-            transparentKeyLayoutProtection.setVisibility(View.VISIBLE);
+            transparentKeyLayoutProtection.setVisibility(View.GONE);
 
             switchButtonProtection.setChecked(false);
-            passwordProtectionButton.setVisibility(View.GONE);
+            passwordProtectionEditText.setVisibility(View.GONE);
             subtitleProOnlyProtection.setVisibility(View.VISIBLE);
 
             switchButtonProtection.setEnabled(true);
@@ -201,7 +214,7 @@ public class GetLinkFragmentLollipop extends Fragment implements View.OnClickLis
             transparentKeyLayoutProtection.setVisibility(View.VISIBLE);
 
             switchButtonProtection.setEnabled(false);
-            passwordProtectionButton.setVisibility(View.GONE);
+            passwordProtectionEditText.setVisibility(View.GONE);
             subtitleProOnlyProtection.setVisibility(View.VISIBLE);
 		}
 
@@ -292,6 +305,9 @@ public class GetLinkFragmentLollipop extends Fragment implements View.OnClickLis
                 ((GetLinkActivityLollipop)context).sendLink(linkText.getText().toString());
                 break;
             }
+            case R.id.password_protection_edit:{
+                ((GetLinkActivityLollipop)context).showSetPasswordDialog(null, link);
+            }
         }
     }
 
@@ -335,62 +351,79 @@ public class GetLinkFragmentLollipop extends Fragment implements View.OnClickLis
         log("the TIMESTAMP is: "+timestamp);
         isExpiredDateLink=true;
         nC.exportLinkTimestamp(((GetLinkActivityLollipop)context).selectedNode, timestamp);
+    }
 
+    public void enablePassProtection(boolean enable){
+        switchButtonProtection.setChecked(enable);
+    }
+
+    public void processingPass(){
+        linkText.setText(getString(R.string.link_request_status));
     }
 
     public void requestFinish(MegaRequest request, MegaError e){
         log("requestFinish");
 
-        MegaNode node = ((GetLinkActivityLollipop)context).selectedNode;
-        log("EXPIRATION DATE: " + node.getExpirationTime());
-        if (isExpiredDateLink) {
-            log("change the expiration date");
-            if (node.getExpirationTime() <= 0) {
-                switchButtonExpiry.setChecked(false);
-                expiryDateButton.setVisibility(View.GONE);
-                subtitleProOnlyExpiry.setVisibility(View.VISIBLE);
+        if (request.getType() == MegaRequest.TYPE_EXPORT) {
+            log("export request finished");
+            MegaNode node = ((GetLinkActivityLollipop)context).selectedNode;
+            log("EXPIRATION DATE: " + node.getExpirationTime());
+            if (isExpiredDateLink) {
+                log("change the expiration date");
+                if (node.getExpirationTime() <= 0) {
+                    switchButtonExpiry.setChecked(false);
+                    expiryDateButton.setVisibility(View.GONE);
+                    subtitleProOnlyExpiry.setVisibility(View.VISIBLE);
+                } else {
+                    switchButtonExpiry.setChecked(true);
+                    java.text.DateFormat df = SimpleDateFormat.getDateInstance(SimpleDateFormat.MEDIUM, Locale.getDefault());
+                    Calendar cal = Util.calculateDateFromTimestamp(node.getExpirationTime());
+                    TimeZone tz = cal.getTimeZone();
+                    df.setTimeZone(tz);
+                    Date date = cal.getTime();
+                    String formattedDate = df.format(date);
+                    expiryDateButton.setText(formattedDate);
+                    expiryDateButton.setVisibility(View.VISIBLE);
+                    subtitleProOnlyExpiry.setVisibility(View.GONE);
+                }
             } else {
-                switchButtonExpiry.setChecked(true);
-                java.text.DateFormat df = SimpleDateFormat.getDateInstance(SimpleDateFormat.MEDIUM, Locale.getDefault());
-                Calendar cal = Util.calculateDateFromTimestamp(node.getExpirationTime());
-                TimeZone tz = cal.getTimeZone();
-                df.setTimeZone(tz);
-                Date date = cal.getTime();
-                String formattedDate = df.format(date);
-                expiryDateButton.setText(formattedDate);
-                expiryDateButton.setVisibility(View.VISIBLE);
-                subtitleProOnlyExpiry.setVisibility(View.GONE);
-            }
-        } else {
-            link = request.getLink();
+                link = request.getLink();
 
-            if(linkWithoutKeyCheck.isChecked()){
-                if(link!=null){
-                    String urlString="";
-                    String [] s = link.split("!");
-                    if (s.length == 3){
-                        urlString = s[0] + "!" + s[1];
+                if(linkWithoutKeyCheck.isChecked()){
+                    if(link!=null){
+                        String urlString="";
+                        String [] s = link.split("!");
+                        if (s.length == 3){
+                            urlString = s[0] + "!" + s[1];
+                        }
+                        linkText.setText(urlString);
                     }
-                    linkText.setText(urlString);
+                }
+                else if(linkDecryptionKeyCheck.isChecked()){
+                    if(link!=null){
+                        String keyString="!";
+                        String [] s = link.split("!");
+                        if (s.length == 3){
+                            keyString = keyString+s[2];
+                        }
+                        linkText.setText(keyString);
+                    }
+                }
+                else{
+                    linkText.setText(link);
                 }
             }
-            else if(linkDecryptionKeyCheck.isChecked()){
-                if(link!=null){
-                    String keyString="!";
-                    String [] s = link.split("!");
-                    if (s.length == 3){
-                        keyString = keyString+s[2];
-                    }
-                    linkText.setText(keyString);
-                }
-            }
-            else{
-                linkText.setText(link);
-            }
+            log("link: " + request.getLink());
+
+            isExpiredDateLink = false;
         }
-        log("link: " + request.getLink());
-
-        isExpiredDateLink = false;
+        else if(request.getType() == MegaRequest.TYPE_PASSWORD_LINK){
+            log("password link request finished");
+            linkText.setText(request.getText());
+            passwordProtectionEditText.setText(request.getPassword());
+            passwordProtectionEditText.setVisibility(View.VISIBLE);
+            subtitleProOnlyProtection.setVisibility(View.GONE);
+        }
     }
 
     @Override
@@ -412,6 +445,16 @@ public class GetLinkFragmentLollipop extends Fragment implements View.OnClickLis
             case R.id.switch_set_password_protection:{
 //                showDatePicker(((GetLinkActivityLollipop)context).selectedNode.getExpirationTime());
                 log("Set password protection");
+                if(switchButtonProtection.isChecked()){
+                    ((GetLinkActivityLollipop)context).showSetPasswordDialog(null, link);
+                }
+                else{
+                    log("Remove pass protection");
+                    linkText.setText(link);
+                    passwordProtectionEditText.setVisibility(View.GONE);
+                    subtitleProOnlyProtection.setVisibility(View.VISIBLE);
+                }
+
                 break;
             }
         }
