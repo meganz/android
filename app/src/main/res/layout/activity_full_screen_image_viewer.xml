@@ -3,33 +3,17 @@
 	android:layout_width="match_parent"
 	android:layout_height="match_parent"
 	xmlns:app="http://schemas.android.com/apk/res-auto"
-	xmlns:tools="http://schemas.android.com/tools"
 	android:orientation="vertical"
 	android:fitsSystemWindows="true"
-	android:background="@color/blue"
+	android:background="@color/black"
 	android:id="@+id/full_image_viewer_parent_layout">
-<!--
-<android.support.design.widget.CoordinatorLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:fitsSystemWindows="true">
-
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/full_image_viewer_parent_layout"
-        android:orientation="vertical"
-        android:fitsSystemWindows="true" >-->
-
 
 	<android.support.design.widget.AppBarLayout
 		android:id="@+id/app_bar"
 		android:layout_width="match_parent"
 		android:layout_height="match_parent"
-		android:fitsSystemWindows="true">
+		android:fitsSystemWindows="true"
+		android:background="@color/black">
 
 
 		<RelativeLayout
@@ -86,8 +70,4 @@
 		</RelativeLayout>
 
 	</android.support.design.widget.AppBarLayout>
-    <!--</RelativeLayout>
-</android.support.design.widget.CoordinatorLayout>-->
-
-
-</RelativeLayout>
+ </RelativeLayout>
