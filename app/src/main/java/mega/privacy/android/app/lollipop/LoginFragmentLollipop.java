@@ -4,6 +4,9 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffColorFilter;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -14,7 +17,9 @@ import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.SwitchCompat;
+import android.text.Editable;
 import android.text.InputType;
+import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Display;
@@ -68,63 +73,63 @@ import nz.mega.sdk.MegaUser;
 
 public class LoginFragmentLollipop extends Fragment implements View.OnClickListener, MegaRequestListenerInterface, MegaChatRequestListenerInterface, MegaChatListenerInterface {
 
-    Context context;
+    private Context context;
     private AlertDialog insertMailDialog;
     private AlertDialog insertMKDialog;
 
-    LoginFragmentLollipop loginFragment = this;
+    private LoginFragmentLollipop loginFragment = this;
 
-    TextView loginTitle;
-    TextView newToMega;
-    EditText et_user;
-    EditText et_password;
-    TextView bRegister;
-    TextView registerText;
-    TextView bLogin;
-    TextView bForgotPass;
-    ImageView loginThreeDots;
-    SwitchCompat loginSwitch;
-    TextView loginABC;
-    LinearLayout loginLogin;
-    LinearLayout loginLoggingIn;
-    LinearLayout loginCreateAccount;
-    View loginDelimiter;
-    ProgressBar loginProgressBar;
-    ProgressBar loginFetchNodesProgressBar;
-    TextView generatingKeysText;
-    TextView queryingSignupLinkText;
-    TextView confirmingAccountText;
-    TextView loggingInText;
-    TextView fetchingNodesText;
-    TextView prepareNodesText;
-    TextView serversBusyText;
-    ScrollView scrollView;
+    private TextView loginTitle;
+    private TextView newToMega;
+    private EditText et_user;
+    private EditText et_password;
+    private TextView bRegister;
+    private TextView registerText;
+    private TextView bLogin;
+    private TextView bForgotPass;
+    private ImageView loginThreeDots;
+    private SwitchCompat loginSwitch;
+    private TextView loginABC;
+    private LinearLayout loginLogin;
+    private LinearLayout loginLoggingIn;
+    private LinearLayout loginCreateAccount;
+    private View loginDelimiter;
+    private ProgressBar loginProgressBar;
+    private ProgressBar loginFetchNodesProgressBar;
+    private TextView generatingKeysText;
+    private TextView queryingSignupLinkText;
+    private TextView confirmingAccountText;
+    private TextView loggingInText;
+    private TextView fetchingNodesText;
+    private TextView prepareNodesText;
+    private TextView serversBusyText;
+    private ScrollView scrollView;
 
-    RelativeLayout forgotPassLayout;
-    TextView forgotPassTitle;
-    TextView forgotPassFirstP;
-    TextView forgotPassSecondP;
-    TextView forgotPassAction;
-    Button yesMK;
-    Button noMK;
+    private RelativeLayout forgotPassLayout;
+    private TextView forgotPassTitle;
+    private TextView forgotPassFirstP;
+    private TextView forgotPassSecondP;
+    private TextView forgotPassAction;
+    private Button yesMK;
+    private Button noMK;
 
-    RelativeLayout parkAccountLayout;
-    TextView parkAccountTitle;
-    TextView parkAccountFirstP;
-    TextView parkAccountSecondP;
-    Button parkAccountButton;
+    private RelativeLayout parkAccountLayout;
+    private TextView parkAccountTitle;
+    private TextView parkAccountFirstP;
+    private TextView parkAccountSecondP;
+    private Button parkAccountButton;
 
-    CountDownTimer timer;
-    boolean firstRequestUpdate = true;
+    private CountDownTimer timer;
+    private boolean firstRequestUpdate = true;
 
-    float scaleH, scaleW;
-    float density;
-    DisplayMetrics outMetrics;
-    Display display;
+    private float scaleH, scaleW;
+    private float density;
+    private DisplayMetrics outMetrics;
+    private Display display;
 
-    DatabaseHandler dbH;
-    Handler handler = new Handler();
-    ChatSettings chatSettings;
+    private DatabaseHandler dbH;
+    private Handler handler = new Handler();
+    private ChatSettings chatSettings;
 
     private String lastEmail;
     private String lastPassword;
@@ -140,20 +145,28 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
     int numberOfClicksKarere = 0;
     int numberOfClicksSDK = 0;
 
-    boolean firstTime = true;
+    private boolean firstTime = true;
 
     private boolean backWhileLogin;
     private boolean loginClicked = false;
 
-    Intent intentReceived = null;
-    Bundle extras = null;
-    Uri uriData = null;
-    String action = null;
-    String url = null;
+    private Intent intentReceived = null;
+    private Bundle extras = null;
+    private Uri uriData = null;
+    private String action = null;
+    private String url = null;
     private long parentHandle = -1;
 
-    String emailTemp = null;
-    String passwdTemp = null;
+    private String emailTemp = null;
+    private String passwdTemp = null;
+
+    private RelativeLayout login_email_error_layout;
+    private RelativeLayout login_password_error_layout;
+    private TextView login_email_error_text;
+    private TextView login_password_error_text;
+
+    private Drawable login_background;
+    private Drawable password_background;
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
@@ -260,17 +273,53 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         paramsb1.width = Util.scaleWidthPx(280, outMetrics);
         et_user.setLayoutParams(paramsb1);
         //Left margin
-        textParams = (LinearLayout.LayoutParams)et_user.getLayoutParams();
-        textParams.setMargins(Util.scaleWidthPx(60, outMetrics), 0, 0, Util.scaleHeightPx(10, outMetrics));
-        et_user.setLayoutParams(textParams);
+        LinearLayout.LayoutParams textParamsEditText = (LinearLayout.LayoutParams)et_user.getLayoutParams();
+        textParamsEditText.setMargins(Util.scaleWidthPx(60, outMetrics), 0, 0, Util.scaleWidthPx(10, outMetrics));
+        et_user.setLayoutParams(textParamsEditText);
 
         et_user.setCursorVisible(true);
+        et_user.getBackground().clearColorFilter();
+
+        et_user.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                quitError(et_user);
+            }
+        });
+
+        login_background = et_user.getBackground().mutate().getConstantState().newDrawable();
+
+        login_email_error_layout = (RelativeLayout) v.findViewById(R.id.login_email_text_error);
+        paramsb1 = login_email_error_layout.getLayoutParams();
+        paramsb1.width = Util.scaleWidthPx(280, outMetrics);
+        login_email_error_layout.setLayoutParams(paramsb1);
+        textParamsEditText = (LinearLayout.LayoutParams)login_email_error_layout.getLayoutParams();
+        textParamsEditText.setMargins(Util.scaleWidthPx(63, outMetrics), Util.scaleWidthPx(2, outMetrics), 0, Util.scaleWidthPx(10, outMetrics));
+        login_email_error_layout.setLayoutParams(textParamsEditText);
+        login_email_error_layout.setVisibility(View.GONE);
+
+        login_email_error_text = (TextView) v.findViewById(R.id.login_email_text_error_text);
 
         et_password = (EditText) v.findViewById(R.id.login_password_text);
+        paramsb1 = et_password.getLayoutParams();
+        paramsb1.width = Util.scaleWidthPx(280, outMetrics);
         et_password.setLayoutParams(paramsb1);
-        et_password.setLayoutParams(textParams);
+        textParamsEditText = (LinearLayout.LayoutParams) et_password.getLayoutParams();
+        textParamsEditText.setMargins(Util.scaleWidthPx(60, outMetrics), 0, 0, Util.scaleWidthPx(10, outMetrics));
+        et_password.setLayoutParams(textParamsEditText);
 
         et_password.setCursorVisible(true);
+        et_password.getBackground().clearColorFilter();
 
         et_password.setOnEditorActionListener(new TextView.OnEditorActionListener() {
 
@@ -283,6 +332,34 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 return false;
             }
         });
+
+        et_password.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                quitError(et_password);
+            }
+        });
+
+        password_background = et_password.getBackground().mutate().getConstantState().newDrawable();
+
+        login_password_error_layout = (RelativeLayout) v.findViewById(R.id.login_password_text_error);
+        login_password_error_layout.setVisibility(View.GONE);
+        paramsb1 = login_password_error_layout.getLayoutParams();
+        paramsb1.width = Util.scaleWidthPx(280, outMetrics);
+        login_password_error_layout.setLayoutParams(paramsb1);
+        textParamsEditText = (LinearLayout.LayoutParams)login_password_error_layout.getLayoutParams();
+        textParamsEditText.setMargins(Util.scaleWidthPx(63, outMetrics), Util.scaleWidthPx(2, outMetrics), 0, Util.scaleWidthPx(10, outMetrics));
+        login_password_error_layout.setLayoutParams(textParamsEditText);
+        login_password_error_text = (TextView) v.findViewById(R.id.login_password_text_error_text);
+
         loginThreeDots = (ImageView) v.findViewById(R.id.login_three_dots);
         LinearLayout.LayoutParams textThreeDots = (LinearLayout.LayoutParams)loginThreeDots.getLayoutParams();
         textThreeDots.setMargins(Util.scaleWidthPx(0, outMetrics), 0, Util.scaleWidthPx(10, outMetrics), 0);
@@ -1109,8 +1186,8 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         String emailError = getEmailError();
         String passwordError = getPasswordError();
 
-        et_user.setError(emailError);
-        et_password.setError(passwordError);
+        setError(et_user, emailError);
+        setError(et_password, passwordError);
 
         if (emailError != null) {
             et_user.requestFocus();
@@ -1881,10 +1958,63 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         params.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleHeightPx(20, outMetrics), Util.scaleWidthPx(17, outMetrics), 0);
 
+        LinearLayout.LayoutParams params1 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        params1.setMargins(Util.scaleWidthPx(20, outMetrics), 0, Util.scaleWidthPx(17, outMetrics), 0);
+
         final EditText input = new EditText(context);
         layout.addView(input, params);
 
+        final RelativeLayout error_layout = new RelativeLayout(context);
+        layout.addView(error_layout, params1);
+
+        final ImageView error_icon = new ImageView(context);
+        error_icon.setImageDrawable(context.getDrawable(R.drawable.ic_input_warning));
+        error_layout.addView(error_icon);
+        RelativeLayout.LayoutParams params_icon = (RelativeLayout.LayoutParams) error_icon.getLayoutParams();
+
+
+        params_icon.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+        error_icon.setLayoutParams(params_icon);
+
+        error_icon.setColorFilter(ContextCompat.getColor(context, R.color.login_warning));
+
+        final TextView textError = new TextView(context);
+        error_layout.addView(textError);
+        RelativeLayout.LayoutParams params_text_error = (RelativeLayout.LayoutParams) textError.getLayoutParams();
+        params_text_error.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+        params_text_error.width = ViewGroup.LayoutParams.WRAP_CONTENT;
+        params_text_error.addRule(RelativeLayout.CENTER_VERTICAL);
+        params_text_error.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+        params_text_error.setMargins(Util.scaleWidthPx(3, outMetrics), 0,0,0);
+        textError.setLayoutParams(params_text_error);
+
+        textError.setTextColor(ContextCompat.getColor(context, R.color.login_warning));
+
+        error_layout.setVisibility(View.GONE);
+
 //		input.setId(EDIT_TEXT_ID);
+        input.getBackground().mutate().clearColorFilter();
+        input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
+        input.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                if(error_layout.getVisibility() == View.VISIBLE){
+                    error_layout.setVisibility(View.GONE);
+                    input.getBackground().mutate().clearColorFilter();
+                    input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
+                }
+            }
+        });
         input.setSingleLine();
         input.setHint(getString(R.string.edit_text_insert_mail));
         input.setTextColor(getResources().getColor(R.color.text_secondary));
@@ -1901,7 +2031,10 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     String emailError = Util.getEmailError(value, context);
                     if (emailError != null) {
                         log("mail incorrect");
-                        input.setError(emailError);
+//                        input.setError(emailError);
+                        input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+                        textError.setText(emailError);
+                        error_layout.setVisibility(View.VISIBLE);
                         input.requestFocus();
                     } else {
                         if(reset){
@@ -1965,7 +2098,12 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 }
             }
         });
-        builder.setNegativeButton(getString(android.R.string.cancel), null);
+        builder.setNegativeButton(getString(android.R.string.cancel), new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                input.getBackground().mutate().clearColorFilter();
+            }
+        });
         builder.setView(layout);
         insertMailDialog = builder.create();
         insertMailDialog.show();
@@ -1977,7 +2115,11 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 String emailError = Util.getEmailError(value, context);
                 if (emailError != null) {
                     log("mail incorrect");
-                    input.setError(emailError);
+//                    input.setError(emailError);
+                    input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+                    textError.setText(emailError);
+                    error_layout.setVisibility(View.VISIBLE);
+                    input.requestFocus();
                 } else {
                     if(reset){
                         log("ask for link to reset pass");
@@ -2244,6 +2386,65 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
     @Override
     public void onChatPresenceConfigUpdate(MegaChatApiJava api, MegaChatPresenceConfig config) {
 
+    }
+
+    private void setError(final EditText editText, String error){
+        if(error == null || error.equals("")){
+            return;
+        }
+        switch (editText.getId()){
+            case R.id.login_email_text:{
+                login_email_error_layout.setVisibility(View.VISIBLE);
+                login_email_error_text.setText(error);
+                PorterDuffColorFilter porterDuffColorFilter = new PorterDuffColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+//                et_user.getBackground().mutate().setColorFilter(porterDuffColorFilter);
+                Drawable background = login_background.mutate().getConstantState().newDrawable();
+                background.setColorFilter(porterDuffColorFilter);
+                et_user.setBackground(background);
+                LinearLayout.LayoutParams textParamsEditText = (LinearLayout.LayoutParams)et_user.getLayoutParams();
+                textParamsEditText.setMargins(Util.scaleWidthPx(60, outMetrics), 0, 0, 0);
+                et_user.setLayoutParams(textParamsEditText);
+                }
+                break;
+            case R.id.login_password_text:{
+                login_password_error_layout.setVisibility(View.VISIBLE);
+                login_password_error_text.setText(error);
+                PorterDuffColorFilter porterDuffColorFilter = new PorterDuffColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+//                et_password.getBackground().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+                Drawable background = password_background.mutate().getConstantState().newDrawable();
+                background.setColorFilter(porterDuffColorFilter);
+                et_password.setBackground(background);
+                LinearLayout.LayoutParams textParamsEditText = (LinearLayout.LayoutParams) et_password.getLayoutParams();
+                textParamsEditText.setMargins(Util.scaleWidthPx(60, outMetrics), 0, 0, 0);
+                et_password.setLayoutParams(textParamsEditText);
+                }
+                break;
+        }
+    }
+
+    private void quitError(EditText editText){
+        switch (editText.getId()){
+            case R.id.login_email_text:{
+                if(login_email_error_layout.getVisibility() != View.GONE){
+                    login_email_error_layout.setVisibility(View.GONE);
+                    et_user.setBackground(login_background);
+                    LinearLayout.LayoutParams textParamsEditText = (LinearLayout.LayoutParams)et_user.getLayoutParams();
+                    textParamsEditText.setMargins(Util.scaleWidthPx(60, outMetrics), 0, 0, Util.scaleWidthPx(10, outMetrics));
+                    et_user.setLayoutParams(textParamsEditText);
+                }
+            }
+            break;
+            case R.id.login_password_text:{
+                if(login_password_error_layout.getVisibility() != View.GONE){
+                    login_password_error_layout.setVisibility(View.GONE);
+                    et_password.setBackground(password_background);
+                    LinearLayout.LayoutParams textParamsEditText = (LinearLayout.LayoutParams) et_password.getLayoutParams();
+                    textParamsEditText.setMargins(Util.scaleWidthPx(60, outMetrics), 0, 0, Util.scaleWidthPx(10, outMetrics));
+                    et_password.setLayoutParams(textParamsEditText);
+                }
+            }
+            break;
+        }
     }
 
     private static void log(String log) {
