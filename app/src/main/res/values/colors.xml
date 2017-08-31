@@ -5,7 +5,7 @@
     <color name="text_secondary">#7a7a7a</color>
     <color name="separator_grey">#10000000</color>
     <color name="background_secondary">#eeeeee</color>
-    <color name="background_create_account">#eeebeb</color>
+    <color name="background_create_account">#f4f4f4</color>
     <color name="mega">#d90007</color>
     <color name="mega_transparency">#CCdb0605</color>
     <color name="text_login">#FF000000</color>
@@ -98,6 +98,7 @@
 
     <color name="sliding_panel_separator">#dcdcdcdc</color>
     <color name="login_warning">#FFFF333A</color>
+    <color name="login_title">#FFD90007</color>
 
     <color name="copyright_title">#FFF0373A</color>
     <color name="copyright_text">#FF333333</color>

@@ -18,6 +18,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/white"
+            android:layout_marginLeft="45dp"
+            android:layout_marginRight="45dp"
             android:orientation="vertical">
 
             <TextView
@@ -25,13 +27,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="left"
-                android:fontFamily="sans-serif-medium"
                 android:layout_marginTop="40dp"
                 android:layout_marginBottom="24dp"
-                android:layout_marginLeft="72dp"
-                android:layout_marginRight="72dp"
                 android:text="@string/create_account_text"
-                android:textColor="@color/lollipop_primary_color"
+                android:layout_marginLeft="3dp"
+                android:textColor="@color/login_title"
                 android:textSize="20sp" />
 
             <EditText
@@ -40,8 +40,6 @@
                 android:layout_height="fill_parent"
                 android:layout_gravity="left"
                 android:layout_marginBottom="10dp"
-                android:layout_marginLeft="70dp"
-                android:layout_marginRight="72dp"
                 android:hint="@string/name_text"
                 android:textSize="16sp"
                 android:imeOptions="actionNext"
@@ -51,8 +49,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/create_account_name_error"
-                android:layout_marginLeft="70dp"
-                android:layout_marginRight="72dp"
                 android:layout_marginBottom="10dp">
 
                 <ImageView
@@ -83,8 +79,6 @@
                 android:layout_height="fill_parent"
                 android:layout_gravity="left"
                  android:layout_marginBottom="10dp"
-                 android:layout_marginLeft="70dp"
-                 android:layout_marginRight="72dp"
                 android:hint="@string/lastname_text"
                  android:textSize="16sp"
                 android:imeOptions="actionNext"
@@ -96,8 +90,6 @@
                 android:layout_height="fill_parent"
                 android:layout_gravity="left"
                 android:layout_marginBottom="10dp"
-                android:layout_marginLeft="70dp"
-                android:layout_marginRight="72dp"
                 android:hint="@string/email_text"
                 android:textSize="16sp"
                 android:imeOptions="actionNext"
@@ -107,8 +99,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/create_account_email_error"
-                android:layout_marginLeft="70dp"
-                android:layout_marginRight="72dp"
                 android:layout_marginBottom="10dp">
 
                 <ImageView
@@ -139,8 +129,6 @@
                 android:layout_height="fill_parent"
                 android:layout_gravity="left"
                 android:layout_marginBottom="10dp"
-                android:layout_marginLeft="70dp"
-                android:layout_marginRight="72dp"
                 android:hint="@string/password_text"
                 android:imeOptions="actionNext"
                 android:textSize="16sp"
@@ -151,8 +139,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/create_account_password_error"
-                android:layout_marginLeft="70dp"
-                android:layout_marginRight="72dp"
                 android:layout_marginBottom="10dp">
 
                 <ImageView
@@ -183,8 +169,6 @@
                 android:layout_height="fill_parent"
                 android:layout_gravity="left"
                 android:layout_marginBottom="10dp"
-                android:layout_marginLeft="70dp"
-                android:layout_marginRight="72dp"
                 android:hint="@string/confirm_password_text"
                 android:imeOptions="actionDone"
                 android:textSize="16sp"
@@ -195,8 +179,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/create_account_password_confirm_error"
-                android:layout_marginLeft="70dp"
-                android:layout_marginRight="72dp"
                 android:layout_marginBottom="10dp">
 
                 <ImageView
@@ -226,9 +208,8 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="left"
                 android:layout_marginBottom="20dp"
-                android:layout_marginLeft="66dp"
-                android:layout_marginRight="40dp"
-                android:layout_marginTop="35dp"
+                android:layout_marginTop="30dp"
+                android:layout_marginLeft="-2dp"
                 android:orientation="horizontal" >
 
                 <CheckBox
@@ -256,22 +237,19 @@
                 android:textColor="@color/accentColor"
                 android:background="@android:color/transparent"
                 android:layout_marginBottom="30dp"
-                android:layout_marginLeft="72dp"
-                android:layout_marginRight="72dp"
                 android:layout_gravity="left"
                 android:minHeight="0dp"
                 android:minWidth="0dp"
+                android:layout_marginLeft="4dp"
                 android:stateListAnimator="@null"/>
 
         </LinearLayout>
-
-        <include layout="@layout/delimiter" />
 
         <LinearLayout
             android:id="@+id/create_account_login_layout"
             android:layout_width="match_parent"
             android:layout_height="fill_parent"
-            android:background="@color/background_secondary"
+            android:background="@color/background_create_account"
             android:gravity="left"
             android:orientation="vertical" >
 
@@ -283,8 +261,8 @@
                 android:textColor="@color/text_login"
                 android:layout_marginTop="24dp"
                 android:layout_marginBottom="30dp"
-                android:layout_marginLeft="72dp"
-                android:layout_marginRight="40dp"
+                android:layout_marginLeft="47dp"
+                android:layout_marginRight="47dp"
                 android:textSize="20sp" />
 
             <Button
@@ -296,9 +274,9 @@
                 android:layout_gravity="left"
                 android:minHeight="0dp"
                 android:minWidth="0dp"
+                android:layout_marginLeft="47dp"
+                android:layout_marginRight="47dp"
                 android:layout_marginBottom="30dp"
-                android:layout_marginLeft="72dp"
-                android:layout_marginRight="72dp"
                 android:stateListAnimator="@null" />
         </LinearLayout>
 
