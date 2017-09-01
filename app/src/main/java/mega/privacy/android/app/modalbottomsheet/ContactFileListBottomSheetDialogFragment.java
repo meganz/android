@@ -4,16 +4,20 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.BottomSheetDialogFragment;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Display;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -37,34 +41,39 @@ import nz.mega.sdk.MegaShare;
 
 public class ContactFileListBottomSheetDialogFragment extends BottomSheetDialogFragment implements View.OnClickListener {
 
-    Context context;
-    MegaNode node = null;
-    NodeController nC;
+    private Context context;
+    private MegaNode node = null;
+    private NodeController nC;
 
     private BottomSheetBehavior mBehavior;
 
-    LinearLayout mainLinearLayout;
-    ImageView nodeThumb;
-    TextView nodeName;
-    TextView nodeInfo;
-    RelativeLayout nodeIconLayout;
-    ImageView nodeIcon;
-    LinearLayout optionDownload;
-    LinearLayout optionInfo;
-    TextView optionInfoText;
-    ImageView optionInfoImage;
-    LinearLayout optionLeave;
-    LinearLayout optionCopy;
-    LinearLayout optionMove;
-    LinearLayout optionRename;
-    LinearLayout optionRubbish;
+    private LinearLayout mainLinearLayout;
+    private ImageView nodeThumb;
+    private TextView nodeName;
+    private TextView nodeInfo;
+    private RelativeLayout nodeIconLayout;
+    private ImageView nodeIcon;
+    private LinearLayout optionDownload;
+    private LinearLayout optionInfo;
+    private TextView optionInfoText;
+    private ImageView optionInfoImage;
+    private LinearLayout optionLeave;
+    private LinearLayout optionCopy;
+    private LinearLayout optionMove;
+    private LinearLayout optionRename;
+    private LinearLayout optionRubbish;
 
-    DisplayMetrics outMetrics;
+    private LinearLayout items_layout;
 
-    Bitmap thumb = null;
+    private DisplayMetrics outMetrics;
 
-    MegaApiAndroid megaApi;
-    DatabaseHandler dbH;
+    private Bitmap thumb = null;
+
+    private int height = -1;
+    private boolean heightseted = false;
+
+    private MegaApiAndroid megaApi;
+    private DatabaseHandler dbH;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -120,6 +129,8 @@ public class ContactFileListBottomSheetDialogFragment extends BottomSheetDialogF
         optionMove = (LinearLayout) contentView.findViewById(R.id.option_move_layout);
         optionRename = (LinearLayout) contentView.findViewById(R.id.option_rename_layout);
         optionRubbish = (LinearLayout) contentView.findViewById(R.id.option_rubbish_bin_layout);
+
+        items_layout = (LinearLayout) contentView.findViewById(R.id.item_list_bottom_sheet_contact_file);
 
         optionDownload.setOnClickListener(this);
         optionInfo.setOnClickListener(this);
@@ -241,6 +252,48 @@ public class ContactFileListBottomSheetDialogFragment extends BottomSheetDialogF
             dialog.setContentView(contentView);
             mBehavior = BottomSheetBehavior.from((View) mainLinearLayout.getParent());
             mBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+
+            final ContactFileListBottomSheetDialogFragment thisclass = this;
+
+            mBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
+                @Override
+                public void onStateChanged(@NonNull View bottomSheet, int newState) {
+                    if(newState == BottomSheetBehavior.STATE_HIDDEN){
+                        dismiss();
+                    }
+                }
+
+                @Override
+                public void onSlide(@NonNull View bottomSheet, float slideOffset) {
+                    if(slideOffset> 0 && !heightseted){
+                        heightseted = true;
+                        if(context instanceof ContactFileListBottomSheetDialogFragment.CustomHeight){
+                            height = ((ContactFileListBottomSheetDialogFragment.CustomHeight) context).getHeightToPanel(thisclass);
+                        }
+                        if(height != -1){
+                            int numSons = 0;
+                            int num = items_layout.getChildCount();
+                            for(int i=0; i<num; i++){
+                                View v = items_layout.getChildAt(i);
+                                if(v.getVisibility() == View.VISIBLE){
+                                    numSons++;
+                                }
+                            }
+                            if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE && numSons > 3){
+
+                                ViewGroup.LayoutParams params = bottomSheet.getLayoutParams();
+                                params.height = height;
+                                bottomSheet.setLayoutParams(params);
+                            }
+                            else if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT && numSons > 9){
+                                ViewGroup.LayoutParams params = bottomSheet.getLayoutParams();
+                                params.height = height;
+                                bottomSheet.setLayoutParams(params);
+                            }
+                        }
+                    }
+                }
+            });
         }
         else{
             log("Node NULL");
@@ -378,6 +431,10 @@ public class ContactFileListBottomSheetDialogFragment extends BottomSheetDialogF
         long handle = node.getHandle();
         log("Handle of the node: "+handle);
         outState.putLong("handle", handle);
+    }
+
+    public interface CustomHeight{
+        int getHeightToPanel(BottomSheetDialogFragment dialog);
     }
 
     private static void log(String log) {
