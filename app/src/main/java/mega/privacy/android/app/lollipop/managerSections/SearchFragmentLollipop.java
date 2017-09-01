@@ -203,23 +203,7 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 			boolean showMove = false;
 			boolean showLink = false;
 			boolean showTrash = false;
-
-			if(selected.size() == 1){
-
-				final long handle = selected.get(0).getHandle();
-				MegaNode parent = megaApi.getNodeByHandle(handle);
-				while (megaApi.getParentNode(parent) != null){
-					parent = megaApi.getParentNode(parent);
-				}
-
-				if (parent.getHandle() != megaApi.getRubbishNode().getHandle()){
-                    trashIcon.setTitle(getString(R.string.context_move_to_trash));
-
-                }else{
-                    trashIcon.setTitle(getString(R.string.context_remove));
-
-                }
-			}
+			int itemsSelected = 0;
 
 			// Rename
 			if((selected.size() == 1) && (megaApi.checkAccess(selected.get(0), MegaShare.ACCESS_FULL).getErrorCode() == MegaError.API_OK)) {
@@ -252,18 +236,49 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 					unselect.setVisible(true);
 				}
 				else if(selected.size()==1){
-					menu.findItem(R.id.cab_menu_select_all).setVisible(true);
+
+                    menu.findItem(R.id.cab_menu_select_all).setVisible(true);
 					unselect.setTitle(getString(R.string.action_unselect_all));
 					unselect.setVisible(true);
 
 					if (megaApi.checkAccess(selected.get(0), MegaShare.ACCESS_OWNER).getErrorCode() == MegaError.API_OK) {
 						showLink = true;
 					}
+
+					final long handle = selected.get(0).getHandle();
+					MegaNode parent = megaApi.getNodeByHandle(handle);
+					while (megaApi.getParentNode(parent) != null){
+						parent = megaApi.getParentNode(parent);
+					}
+
+					if (parent.getHandle() != megaApi.getRubbishNode().getHandle()){
+						trashIcon.setTitle(getString(R.string.context_move_to_trash));
+					}else{
+						trashIcon.setTitle(getString(R.string.context_remove));
+					}
 				}
 				else{
 					menu.findItem(R.id.cab_menu_select_all).setVisible(true);
 					unselect.setTitle(getString(R.string.action_unselect_all));
 					unselect.setVisible(true);
+
+					for(MegaNode i:selected){
+
+						final long handle = i.getHandle();
+						MegaNode parent = megaApi.getNodeByHandle(handle);
+						while (megaApi.getParentNode(parent) != null){
+							parent = megaApi.getParentNode(parent);
+						}
+						if (parent.getHandle() != megaApi.getRubbishNode().getHandle()){
+							itemsSelected=1;
+						}
+					}
+
+					if(itemsSelected == 0){
+						trashIcon.setTitle(getString(R.string.context_remove));
+					}else{
+						trashIcon.setTitle(getString(R.string.context_move_to_trash));
+					}
 				}
 			}
 			else{
