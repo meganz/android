@@ -11,11 +11,13 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.PorterDuff;
+import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.StatFs;
+import android.support.design.widget.BottomSheetDialogFragment;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
@@ -84,7 +86,7 @@ import nz.mega.sdk.MegaTransferListenerInterface;
 import nz.mega.sdk.MegaUser;
 
 
-public class ContactFileListActivityLollipop extends PinActivityLollipop implements MegaGlobalListenerInterface, MegaRequestListenerInterface {
+public class ContactFileListActivityLollipop extends PinActivityLollipop implements MegaGlobalListenerInterface, MegaRequestListenerInterface, ContactFileListBottomSheetDialogFragment.CustomHeight {
 
 	FrameLayout fragmentContainer;
     
@@ -2159,5 +2161,17 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 			cflF.clearSelections();
 			cflF.hideMultipleSelect();
 		}
+	}
+
+	@Override
+	public int getHeightToPanel(BottomSheetDialogFragment dialog) {
+			if(dialog instanceof ContactFileListBottomSheetDialogFragment){
+				if(fragmentContainer != null && aB != null){
+					final Rect r = new Rect();
+					fragmentContainer.getWindowVisibleDisplayFrame(r);
+					return (r.height() - aB.getHeight());
+				}
+			}
+		return -1;
 	}
 }
