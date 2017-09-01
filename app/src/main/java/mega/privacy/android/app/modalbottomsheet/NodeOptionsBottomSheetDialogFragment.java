@@ -584,13 +584,25 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                         optionRemoveLink.setVisibility(View.GONE);
                     }
 
+                    //Parent
+                    final long handle = node.getHandle();
+                    MegaNode parent = megaApi.getNodeByHandle(handle);
+                    while (megaApi.getParentNode(parent) != null){
+                        parent = megaApi.getParentNode(parent);
+                    }
+
+                    if (parent.getHandle() != megaApi.getRubbishNode().getHandle()){
+                        optionRubbishBin.setVisibility(View.VISIBLE);
+                        optionRemove.setVisibility(View.GONE);
+                    }else{
+                        optionRubbishBin.setVisibility(View.GONE);
+                        optionRemove.setVisibility(View.VISIBLE);
+                    }
+
                     optionSendInbox.setVisibility(View.VISIBLE);
                     optionDownload.setVisibility(View.VISIBLE);
                     optionInfo.setVisibility(View.VISIBLE);
-                    optionRubbishBin.setVisibility(View.VISIBLE);
                     optionLink.setVisibility(View.VISIBLE);
-
-                    optionRubbishBin.setVisibility(View.VISIBLE);
                     optionRename.setVisibility(View.VISIBLE);
                     optionOpenFolder.setVisibility(View.VISIBLE);
 
@@ -598,7 +610,6 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                     optionMove.setVisibility(View.GONE);
                     optionCopy.setVisibility(View.GONE);
                     optionClearShares.setVisibility(View.GONE);
-                    optionRemove.setVisibility(View.GONE);
                     optionLeaveShares.setVisibility(View.GONE);
                     break;
                 }
@@ -845,9 +856,19 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                 dismissAllowingStateLoss();
                 break;
             }
-            case R.id.option_rubbish_bin_layout:
+            case R.id.option_rubbish_bin_layout:{
+                log("Move to rubbish option");
+                if(node==null){
+                    log("The selected node is NULL");
+                    return;
+                }
+                ArrayList<Long> handleList = new ArrayList<Long>();
+                handleList.add(node.getHandle());
+                ((ManagerActivityLollipop) context).askConfirmationMoveToRubbish(handleList);
+                break;
+            }
             case R.id.option_remove_layout:{
-                log("Delete/Move to rubbish option");
+                log("Remove option");
                 if(node==null){
                     log("The selected node is NULL");
                     return;
