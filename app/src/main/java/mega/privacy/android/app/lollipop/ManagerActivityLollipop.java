@@ -9190,7 +9190,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 		CharSequence[] items;
 
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && megaFingerprintManager.hasFingerprintHardware(this)) {
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && megaFingerprintManager != null && megaFingerprintManager.hasFingerprintHardware(this)) {
 			items = new CharSequence[]{getString(R.string.four_pin_lock), getString(R.string.six_pin_lock), getString(R.string.AN_pin_lock),getString(R.string.fingerprint_or_AN_pin_lock)};
 		} else {
 			items = new CharSequence[]{getString(R.string.four_pin_lock), getString(R.string.six_pin_lock), getString(R.string.AN_pin_lock)};
@@ -9273,7 +9273,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		setPinDialog.setOnShowListener(new DialogInterface.OnShowListener() {
 			@Override
 			public void onShow(DialogInterface dialog) {
-				if(!megaFingerprintManager.hasConfiguredFingerPrint(ManagerActivityLollipop.this)){
+				if(megaFingerprintManager != null && !megaFingerprintManager.hasConfiguredFingerPrint(ManagerActivityLollipop.this)){
 
 					ListView list = setPinDialog.getListView();
 					final ListAdapter adaptor = setPinDialog.getListView().getAdapter();
