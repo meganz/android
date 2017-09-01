@@ -9273,7 +9273,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		setPinDialog.setOnShowListener(new DialogInterface.OnShowListener() {
 			@Override
 			public void onShow(DialogInterface dialog) {
-				if(megaFingerprintManager != null && !megaFingerprintManager.hasConfiguredFingerPrint(ManagerActivityLollipop.this)){
+				if(megaFingerprintManager != null && megaFingerprintManager.hasFingerprintHardware(ManagerActivityLollipop.this)
+				   && !megaFingerprintManager.hasConfiguredFingerPrint(ManagerActivityLollipop.this)){
 
 					ListView list = setPinDialog.getListView();
 					final ListAdapter adaptor = setPinDialog.getListView().getAdapter();
