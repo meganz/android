@@ -362,13 +362,16 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 		if (isList){
 			
 			View v = inflater.inflate(R.layout.fragment_filebrowserlist, container, false);
-			
+
 			recyclerView = (RecyclerView) v.findViewById(R.id.file_list_view_browser);
+			recyclerView.setPadding(0, 0, 0, Util.scaleHeightPx(85, outMetrics));
+			recyclerView.setClipToPadding(false);
 			recyclerView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
 			mLayoutManager = new LinearLayoutManager(context);
 			recyclerView.setLayoutManager(mLayoutManager);
-			recyclerView.setItemAnimator(new DefaultItemAnimator()); 
-			
+			recyclerView.setHasFixedSize(true);
+			recyclerView.setItemAnimator(new DefaultItemAnimator());
+
 			progressBar = (ProgressBar) v.findViewById(R.id.transfers_overview_progress_bar);
 			progressBar.setVisibility(View.GONE);
 
@@ -393,6 +396,10 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 			adapter.setMultipleSelect(false);
 	
 			recyclerView.setAdapter(adapter);
+
+			RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) recyclerView.getLayoutParams();
+			params.addRule(RelativeLayout.BELOW, contentTextLayout.getId());
+			recyclerView.setLayoutParams(params);
 			
 			setNodes(nodes);
 			
@@ -420,11 +427,7 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 			contentTextLayout = (RelativeLayout) v.findViewById(R.id.content_grid_text_layout);
 
 			contentText = (TextView) v.findViewById(R.id.content_grid_text);			
-			//Margins
-			RelativeLayout.LayoutParams contentTextParams = (RelativeLayout.LayoutParams)contentText.getLayoutParams();
-			contentTextParams.setMargins(Util.scaleWidthPx(78, outMetrics), Util.scaleHeightPx(5, outMetrics), 0, Util.scaleHeightPx(5, outMetrics)); 
-			contentText.setLayoutParams(contentTextParams);
-			
+
 			if (adapter == null){
 				adapter = new MegaBrowserLollipopAdapter(context, this, nodes, parentHandle, recyclerView, aB, Constants.SEARCH_ADAPTER, MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_GRID);
 			}
@@ -885,7 +888,7 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 			if (adapter.getItemCount() == 0){
 				log("no results");
 				recyclerView.setVisibility(View.GONE);
-				contentText.setVisibility(View.GONE);
+				contentTextLayout.setVisibility(View.GONE);
 				emptyImageView.setVisibility(View.VISIBLE);
 				emptyTextView.setVisibility(View.VISIBLE);
 				if(parentHandle==-1){
@@ -902,6 +905,7 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 				}
 			}
 			else{
+				contentTextLayout.setVisibility(View.VISIBLE);
 				recyclerView.setVisibility(View.VISIBLE);
 				emptyImageView.setVisibility(View.GONE);
 				emptyTextView.setVisibility(View.GONE);
