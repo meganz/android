@@ -11,4 +11,5 @@ include $(TOP_PATH)/libexpat/Android.mk
 include $(TOP_PATH)/megachat/Android.mk
 include $(TOP_PATH)/mega/Android.mk
 include $(TOP_PATH)/bindings/Android.mk
+LOCAL_CFLAGS += -DHAVE_PTHREAD_COND_TIMEDWAIT_MONOTONIC
 

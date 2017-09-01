@@ -3,6 +3,8 @@ package mega.privacy.android.app.lollipop;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
+import android.hardware.fingerprint.FingerprintManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
@@ -30,8 +32,11 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.Locale;
+
+import javax.crypto.Cipher;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
@@ -41,6 +46,8 @@ import mega.privacy.android.app.PinUtil;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.EditTextPIN;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
+import mega.privacy.android.app.lollipop.fingerprint.FingerprintAuthenticationDialogFragmentLollipop;
+import mega.privacy.android.app.lollipop.fingerprint.MegaFingerprintManager;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -48,10 +55,12 @@ import nz.mega.sdk.MegaChatApiAndroid;
 
 
 @SuppressLint("NewApi")
-public class PinLockActivityLollipop extends AppCompatActivity implements OnClickListener{
+public class PinLockActivityLollipop extends AppCompatActivity implements OnClickListener, FingerprintAuthenticationDialogFragmentLollipop.FingerprintAuthenticationListener{
 
 	public static String ACTION_SET_PIN_LOCK = "ACTION_SET";
 	public static String ACTION_RESET_PIN_LOCK = "ACTION_RESET";
+
+	private static final String FINGERPRINT_DIALOG_FRAGMENT_TAG = "fingerPrintDialogFragment";
 
 	final public static int MAX_ATTEMPS = 10;
 	final public static int SET = 0;
@@ -69,6 +78,7 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 
 	String choosenTypePin;
 
+	MegaFingerprintManager megaFingerprintManager;
 	CoordinatorLayout coordinatorLayout;
 	MegaApiAndroid megaApi;
 	MegaChatApiAndroid megaChatApi;
@@ -114,6 +124,10 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 		if ((intent != null) && (intent.getAction() != null)){
 			if (intent.getAction().equals(ACTION_SET_PIN_LOCK)){
 				mode=SET;
+				if (intent.hasExtra(Constants.FINGERPRINT_OR_ALPHANUMERIC)) {
+					Bundle b = intent.getExtras();
+					choosenTypePin = b.getString(Constants.FINGERPRINT_OR_ALPHANUMERIC);
+				}
 			}
 			else if(intent.getAction().equals(ACTION_RESET_PIN_LOCK)){
 				mode=RESET_UNLOCK;
@@ -151,6 +165,9 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 		att = dbH.getAttributes();
 		attemps = att.getAttemps();
 		log("onCreate Attemps number: "+attemps);
+
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+			megaFingerprintManager = new MegaFingerprintManager(this);
 
 		fragmentContainer = (RelativeLayout) findViewById(R.id.fragment_container_pin_lock);
 		coordinatorLayout = (CoordinatorLayout) findViewById(R.id.myCoordinatorLayout);
@@ -260,6 +277,17 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 				}
 				else if(prefs.getPinLockType().equals(Constants.PIN_6)){
 					add6DigitsPin();
+				} else if (prefs.getPinLockType().equals(Constants.FINGERPRINT_OR_ALPHANUMERIC)) {
+					addAlphanumericPin();
+
+					if (mode == UNLOCK) {
+						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && megaFingerprintManager.hasFingerprintHardware(this)) {
+							megaFingerprintManager = new MegaFingerprintManager(this);
+							if (megaFingerprintManager.hasConfiguredFingerPrint(this) && megaFingerprintManager.hasFingerprintHardware(this)) {
+								showFingerprintDialog();
+							}
+						}
+					}
 				}
 				else{
 					addAlphanumericPin();
@@ -301,6 +329,28 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 			}
 		}
 		((MegaApplication) getApplication()).sendSignalPresenceActivity();
+	}
+
+	private void showFingerprintDialog() {
+
+		try {
+
+			FingerprintAuthenticationDialogFragmentLollipop fragment = (FingerprintAuthenticationDialogFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FINGERPRINT_DIALOG_FRAGMENT_TAG);
+			if (fragment == null) {
+				megaFingerprintManager.generateKey();
+				Cipher cipher = megaFingerprintManager.getCipher();
+				if (cipher != null) {
+					fragment = FingerprintAuthenticationDialogFragmentLollipop.newInstance(new FingerprintManager.CryptoObject(cipher));
+					fragment.show(getSupportFragmentManager(), FINGERPRINT_DIALOG_FRAGMENT_TAG);
+				} else {
+					//TODO Cipher don't created
+				}
+			}
+
+		} catch (MegaFingerprintManager.FingerprintException e) {
+			e.printStackTrace();
+		}
+
 	}
 
 	private void addAlphanumericPin(){
@@ -1118,7 +1168,8 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 	 */
 	private void submitFormAlphanumeric(String code) {
 //		String code = sbSecond
-		choosenTypePin = Constants.PIN_ALPHANUMERIC;
+		if(choosenTypePin != null && !choosenTypePin.equals(Constants.FINGERPRINT_OR_ALPHANUMERIC))
+			choosenTypePin = Constants.PIN_ALPHANUMERIC;
 		switch(mode){
 			case UNLOCK:{
 				String codePref = prefs.getPinLockCode();
@@ -1381,6 +1432,38 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 			}
 		});
 
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && megaFingerprintManager.hasFingerprintHardware(this)) {
+
+			final CheckedTextView fingerprintPinANCheck = (CheckedTextView) dialoglayout.findViewById(R.id.choose_pin_alphaN_fingerprint_check);
+			fingerprintPinANCheck.setText(getString(R.string.fingerprint_or_AN_pin_lock));
+			fingerprintPinANCheck.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16 * scaleText));
+			fingerprintPinANCheck.setCompoundDrawablePadding(Util.scaleWidthPx(10, outMetrics));
+			ViewGroup.MarginLayoutParams pinFingerprintANLP = (ViewGroup.MarginLayoutParams) fingerprintPinANCheck.getLayoutParams();
+			pinFingerprintANLP.setMargins(Util.scaleWidthPx(15, outMetrics), Util.scaleHeightPx(10, outMetrics), 0, Util.scaleHeightPx(10, outMetrics));
+			fingerprintPinANCheck.setVisibility(View.VISIBLE);
+
+			fingerprintPinANCheck.setOnClickListener(new OnClickListener() {
+
+				@Override
+				public void onClick(View v) {
+					fingerprintPinANCheck.setChecked(true);
+					pin4Check.setChecked(false);
+					dbH.setPinLockType(Constants.FINGERPRINT_OR_ALPHANUMERIC);
+					if (dialog != null) {
+						dialog.dismiss();
+					}
+					modeSetResetOn(Constants.FINGERPRINT_OR_ALPHANUMERIC);
+				}
+			});
+
+			if (!megaFingerprintManager.hasConfiguredFingerPrint(this)) {
+				fingerprintPinANCheck.setEnabled(false);
+				Toast.makeText(this, R.string.fingerprint_not_configuration_available, Toast.LENGTH_LONG).show();
+			}
+
+
+		}
+
 	}
 
 	public void modeSetResetOn(String type)	{
@@ -1423,8 +1506,16 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 
 	        passFirstLetter.requestFocus();
 	        passFirstLetter.setCursorVisible(true);
-		}
-		else{
+		} else if (type.equals(Constants.FINGERPRINT_OR_ALPHANUMERIC)) {
+			log("FINGERPRINT");
+			addAlphanumericPin();
+
+			if (passwordText != null) {
+				passwordText.setText("");
+			}
+			choosenTypePin = type;
+
+		} else{
 			log("AN PIN");
 			addAlphanumericPin();
 
@@ -1589,5 +1680,14 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 		if(view!=null){
 			imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
 		}
+	}
+
+	@Override
+	public void onSuccessFingerprintAuthentication() {
+		PinUtil.update();
+		attemps = 0;
+		att.setAttemps(attemps);
+		dbH.setAttrAttemps(attemps);
+		finish();
 	}
 }

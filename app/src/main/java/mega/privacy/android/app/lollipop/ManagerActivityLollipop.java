@@ -75,6 +75,8 @@ import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListAdapter;
+import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -123,6 +125,7 @@ import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
+import mega.privacy.android.app.lollipop.fingerprint.MegaFingerprintManager;
 import mega.privacy.android.app.lollipop.listeners.ContactNameListener;
 import mega.privacy.android.app.lollipop.listeners.FabButtonListener;
 import mega.privacy.android.app.lollipop.managerSections.CameraUploadFragmentLollipop;
@@ -255,6 +258,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	private Animation openFabAnim,closeFabAnim,rotateLeftAnim,rotateRightAnim, collectionFABLayoutOut;
 	boolean isFabOpen=false;
 	//
+
+	MegaFingerprintManager megaFingerprintManager = null;
 
 	DatabaseHandler dbH = null;
 	MegaPreferences prefs = null;
@@ -1135,6 +1140,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		cC = new ContactController(this);
 		aC = new AccountController(this);
 		myAccountInfo = new MyAccountInfo(this);
+
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+			megaFingerprintManager = new MegaFingerprintManager(this);
 
 		File thumbDir;
 		if (getExternalCacheDir() != null){
@@ -9179,7 +9187,15 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		log("showPanelSetPinLock");
 
 		AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-		final CharSequence[] items = {getString(R.string.four_pin_lock), getString(R.string.six_pin_lock), getString(R.string.AN_pin_lock)};
+
+		CharSequence[] items;
+
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && megaFingerprintManager.hasFingerprintHardware(this)) {
+			items = new CharSequence[]{getString(R.string.four_pin_lock), getString(R.string.six_pin_lock), getString(R.string.AN_pin_lock),getString(R.string.fingerprint_or_AN_pin_lock)};
+		} else {
+			items = new CharSequence[]{getString(R.string.four_pin_lock), getString(R.string.six_pin_lock), getString(R.string.AN_pin_lock)};
+		}
+
 
 		dialogBuilder.setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int item) {
@@ -9189,21 +9205,28 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					case 0:{
 						dbH.setPinLockType(Constants.PIN_4);
 						if(sttFLol!=null){
-							sttFLol.intentToPinLock();
+							sttFLol.intentToPinLock(false);
 						}
 						break;
 					}
 					case 1:{
 						dbH.setPinLockType(Constants.PIN_6);
 						if(sttFLol!=null){
-							sttFLol.intentToPinLock();
+							sttFLol.intentToPinLock(false);
 						}
 						break;
 					}
 					case 2:{
 						dbH.setPinLockType(Constants.PIN_ALPHANUMERIC);
 						if(sttFLol!=null){
-							sttFLol.intentToPinLock();
+							sttFLol.intentToPinLock(false);
+						}
+						break;
+					}
+					case 3:{
+						dbH.setPinLockType(Constants.FINGERPRINT_OR_ALPHANUMERIC);
+						if(sttFLol!=null){
+							sttFLol.intentToPinLock(true);
 						}
 						break;
 					}
@@ -9247,7 +9270,21 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 		setPinDialog = dialogBuilder.create();
 		setPinDialog.setCanceledOnTouchOutside(true);
+		setPinDialog.setOnShowListener(new DialogInterface.OnShowListener() {
+			@Override
+			public void onShow(DialogInterface dialog) {
+				if(!megaFingerprintManager.hasConfiguredFingerPrint(ManagerActivityLollipop.this)){
+
+					ListView list = setPinDialog.getListView();
+					final ListAdapter adaptor = setPinDialog.getListView().getAdapter();
+					// Disable choice in dialog
+					adaptor.getView(3, null, list).setEnabled(false);
+					Toast.makeText(ManagerActivityLollipop.this, getString(R.string.fingerprint_not_configuration_available), Toast.LENGTH_LONG).show();
+				}
+			}
+		});
 		setPinDialog.show();
+
 	}
 
 	public void chooseAddContactDialog(boolean isMegaContact){

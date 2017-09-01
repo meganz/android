@@ -1,6 +1,7 @@
 package mega.privacy.android.app;
 
 import mega.privacy.android.app.lollipop.PinLockActivityLollipop;
+import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import android.content.Context;
 import android.content.Intent;
@@ -24,7 +25,12 @@ public class PinUtil {
 		if (shouldLock(context)){
 			lastLocked = context;
 			log("lastLocked " + context);
-			showLock(context);
+			if(prefs.getPinLockType().equals(Constants.FINGERPRINT_OR_ALPHANUMERIC)){
+				showLock(context,true);
+			}else{
+				showLock(context,false);
+			}
+
 		}
 		else{
 			log("lastLocked null");
@@ -54,9 +60,11 @@ public class PinUtil {
 	}
 	
 	// Display lock screen
-	public static void showLock(Context context) {
+	public static void showLock(Context context,boolean fingerprint) {
 		log("showLock");
 		Intent intent = new Intent(context, PinLockActivityLollipop.class);
+		if(fingerprint)
+			intent.putExtra(Constants.FINGERPRINT_OR_ALPHANUMERIC,Constants.FINGERPRINT_OR_ALPHANUMERIC);
 		context.startActivity(intent);
 	}
 	
