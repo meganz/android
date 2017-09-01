@@ -1,7 +1,9 @@
 package mega.privacy.android.app.lollipop.managerSections;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.net.Uri;
@@ -73,8 +75,11 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 	RelativeLayout transfersOverViewLayout;
 
 	Stack<Integer> lastPositionStack;
-		
-	long parentHandle = -1;
+
+    private MenuItem trashIcon;
+
+
+    long parentHandle = -1;
 	boolean isList = true;
 	int levels = -1;
 	int orderGetChildren;
@@ -175,6 +180,8 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 		public boolean onCreateActionMode(ActionMode mode, Menu menu) {
 			MenuInflater inflater = mode.getMenuInflater();
 			inflater.inflate(R.menu.file_browser_action, menu);
+            trashIcon = menu.findItem(R.id.cab_menu_trash);
+
 			return true;
 		}
 
@@ -196,7 +203,8 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 			boolean showMove = false;
 			boolean showLink = false;
 			boolean showTrash = false;
-			
+			boolean itemsSelected = false;
+
 			// Rename
 			if((selected.size() == 1) && (megaApi.checkAccess(selected.get(0), MegaShare.ACCESS_FULL).getErrorCode() == MegaError.API_OK)) {
 				showRename = true;
@@ -228,18 +236,49 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 					unselect.setVisible(true);
 				}
 				else if(selected.size()==1){
-					menu.findItem(R.id.cab_menu_select_all).setVisible(true);
+
+                    menu.findItem(R.id.cab_menu_select_all).setVisible(true);
 					unselect.setTitle(getString(R.string.action_unselect_all));
 					unselect.setVisible(true);
 
 					if (megaApi.checkAccess(selected.get(0), MegaShare.ACCESS_OWNER).getErrorCode() == MegaError.API_OK) {
 						showLink = true;
 					}
+
+					final long handle = selected.get(0).getHandle();
+					MegaNode parent = megaApi.getNodeByHandle(handle);
+					while (megaApi.getParentNode(parent) != null){
+						parent = megaApi.getParentNode(parent);
+					}
+
+					if (parent.getHandle() != megaApi.getRubbishNode().getHandle()){
+						trashIcon.setTitle(getString(R.string.context_move_to_trash));
+					}else{
+						trashIcon.setTitle(getString(R.string.context_remove));
+					}
 				}
 				else{
 					menu.findItem(R.id.cab_menu_select_all).setVisible(true);
 					unselect.setTitle(getString(R.string.action_unselect_all));
 					unselect.setVisible(true);
+
+					for(MegaNode i:selected){
+
+						final long handle = i.getHandle();
+						MegaNode parent = megaApi.getNodeByHandle(handle);
+						while (megaApi.getParentNode(parent) != null){
+							parent = megaApi.getParentNode(parent);
+						}
+						if (parent.getHandle() != megaApi.getRubbishNode().getHandle()){
+							itemsSelected=true;
+						}
+					}
+
+					if(!itemsSelected){
+						trashIcon.setTitle(getString(R.string.context_remove));
+					}else{
+						trashIcon.setTitle(getString(R.string.context_move_to_trash));
+					}
 				}
 			}
 			else{
@@ -253,6 +292,7 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 			menu.findItem(R.id.cab_menu_move).setVisible(showMove);
 			menu.findItem(R.id.cab_menu_share_link).setVisible(showLink);
 			menu.findItem(R.id.cab_menu_trash).setVisible(showTrash);
+
 			menu.findItem(R.id.cab_menu_leave_multiple_share).setVisible(false);
 			
 			return false;
@@ -305,7 +345,7 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 		}
 		else{
 			MegaNode n = megaApi.getNodeByHandle(parentHandle);
-					
+
 			aB.setTitle(n.getName());	
 			log("aB.setHomeAsUpIndicator_50");
 			aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
@@ -313,6 +353,8 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 			
 			((ManagerActivityLollipop)context).setParentHandleSearch(parentHandle);
 			nodes = megaApi.getChildren(n, orderGetChildren);
+
+
 		}
 
 		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
@@ -880,4 +922,5 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 	private static void log(String log) {
 		Util.log("SearchFragmentLollipop", log);
 	}
+
 }
