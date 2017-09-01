@@ -291,6 +291,75 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 				}
 			});
 
+			//OPTIONS LAYOUT
+			optionsLayout = (LinearLayout) findViewById(R.id.chat_contact_properties_options);
+
+			//Notifications Layout
+
+			notificationsLayout = (LinearLayout) findViewById(R.id.chat_contact_properties_notifications_layout);
+			notificationsLayout.setVisibility(View.VISIBLE);
+
+			notificationsTitle = (TextView) findViewById(R.id.chat_contact_properties_notifications_text);
+
+			notificationsSwitch = (SwitchCompat) findViewById(R.id.chat_contact_properties_switch);
+			notificationsSwitch.setOnClickListener(this);
+
+			dividerNotificationsLayout = (View) findViewById(R.id.divider_notifications_layout);
+
+			//Chat message sound Layout
+
+			messageSoundLayout = (RelativeLayout) findViewById(R.id.chat_contact_properties_messages_sound_layout);
+			messageSoundLayout.setOnClickListener(this);
+
+			messageSoundText = (TextView) findViewById(R.id.chat_contact_properties_messages_sound);
+
+			dividerMessageSoundLayout = (View) findViewById(R.id.divider_message_sound_layout);
+
+			//Call ringtone Layout
+
+			ringtoneLayout = (RelativeLayout) findViewById(R.id.chat_contact_properties_ringtone_layout);
+			ringtoneLayout.setOnClickListener(this);
+
+			ringtoneText = (TextView) findViewById(R.id.chat_contact_properties_ringtone);
+
+			dividerRingtoneLayout = (View) findViewById(R.id.divider_ringtone_layout);
+
+			//Shared folders layout
+			sharedFoldersLayout = (RelativeLayout) findViewById(R.id.chat_contact_properties_shared_folders_layout);
+			sharedFoldersLayout.setOnClickListener(this);
+
+			sharedFoldersIcon = (ImageView) findViewById(R.id.chat_contact_properties_shared_folder_icon);
+
+			sharedFoldersText = (TextView) findViewById(R.id.chat_contact_properties_shared_folders_label);
+
+			sharedFoldersButton = (Button) findViewById(R.id.chat_contact_properties_shared_folders_button);
+			sharedFoldersButton.setOnClickListener(this);
+
+			dividerSharedFoldersLayout = (View) findViewById(R.id.divider_shared_folder_layout);
+
+			//Share Contact Layout
+
+			//shareContactLayout = (RelativeLayout) findViewById(R.id.chat_contact_properties_share_contact_layout);
+			//shareContactLayout.setOnClickListener(this);
+
+			//shareContactIcon = (ImageView) findViewById(R.id.chat_contact_properties_email_icon);
+
+			//shareContactContentLayout = (RelativeLayout) findViewById(R.id.chat_contact_properties_share_contact_content);
+
+			//shareContactText = (TextView) findViewById(R.id.chat_contact_properties_share_contact);
+
+			//	dividerShareContactLayout = (View) findViewById(R.id.divider_share_contact_layout);
+
+			//Clear chat Layout
+			clearChatLayout = (RelativeLayout) findViewById(R.id.chat_contact_properties_clear_layout);
+			clearChatLayout.setOnClickListener(this);
+
+			dividerClearChatLayout = (View) findViewById(R.id.divider_clear_chat_layout);
+
+			//Remove contact Layout
+			removeContactChatLayout = (RelativeLayout) findViewById(R.id.chat_contact_properties_remove_contact_layout);
+			removeContactChatLayout.setOnClickListener(this);
+
 			chatHandle = extras.getLong("handle",-1);
 			if (chatHandle != -1) {
 
@@ -357,8 +426,28 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 				//Find chat with this contact
 				if(Util.isChatEnabled()){
 					chat = megaChatApi.getChatRoomByUser(user.getHandle());
+
 					if(chat!=null){
-						chatPrefs = dbH.findChatPreferencesByHandle(String.valueOf(chat.getChatId()));
+						chatHandle = chat.getChatId();
+						if(chatHandle==-1){
+							notificationsLayout.setVisibility(View.GONE);
+							dividerNotificationsLayout.setVisibility(View.GONE);
+							ringtoneLayout.setVisibility(View.GONE);
+							dividerRingtoneLayout.setVisibility(View.GONE);
+							messageSoundLayout.setVisibility(View.GONE);
+							dividerMessageSoundLayout.setVisibility(View.GONE);
+						}
+						else{
+							chatPrefs = dbH.findChatPreferencesByHandle(String.valueOf(chatHandle));
+						}
+					}
+					else{
+						notificationsLayout.setVisibility(View.GONE);
+						dividerNotificationsLayout.setVisibility(View.GONE);
+						ringtoneLayout.setVisibility(View.GONE);
+						dividerRingtoneLayout.setVisibility(View.GONE);
+						messageSoundLayout.setVisibility(View.GONE);
+						dividerMessageSoundLayout.setVisibility(View.GONE);
 					}
 
 					if (megaChatApi == null){
@@ -368,75 +457,6 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 				}
 				setDefaultAvatar(fullName);
 			}
-
-			//OPTIONS LAYOUT
-			optionsLayout = (LinearLayout) findViewById(R.id.chat_contact_properties_options);
-
-			//Notifications Layout
-
-			notificationsLayout = (LinearLayout) findViewById(R.id.chat_contact_properties_notifications_layout);
-			notificationsLayout.setVisibility(View.VISIBLE);
-
-			notificationsTitle = (TextView) findViewById(R.id.chat_contact_properties_notifications_text);
-
-			notificationsSwitch = (SwitchCompat) findViewById(R.id.chat_contact_properties_switch);
-			notificationsSwitch.setOnClickListener(this);
-
-			dividerNotificationsLayout = (View) findViewById(R.id.divider_notifications_layout);
-
-			//Chat message sound Layout
-
-			messageSoundLayout = (RelativeLayout) findViewById(R.id.chat_contact_properties_messages_sound_layout);
-			messageSoundLayout.setOnClickListener(this);
-
-			messageSoundText = (TextView) findViewById(R.id.chat_contact_properties_messages_sound);
-
-			dividerMessageSoundLayout = (View) findViewById(R.id.divider_message_sound_layout);
-
-			//Call ringtone Layout
-
-			ringtoneLayout = (RelativeLayout) findViewById(R.id.chat_contact_properties_ringtone_layout);
-			ringtoneLayout.setOnClickListener(this);
-
-			ringtoneText = (TextView) findViewById(R.id.chat_contact_properties_ringtone);
-
-			dividerRingtoneLayout = (View) findViewById(R.id.divider_ringtone_layout);
-
-			//Shared folders layout
-			sharedFoldersLayout = (RelativeLayout) findViewById(R.id.chat_contact_properties_shared_folders_layout);
-			sharedFoldersLayout.setOnClickListener(this);
-
-			sharedFoldersIcon = (ImageView) findViewById(R.id.chat_contact_properties_shared_folder_icon);
-
-			sharedFoldersText = (TextView) findViewById(R.id.chat_contact_properties_shared_folders_label);
-
-			sharedFoldersButton = (Button) findViewById(R.id.chat_contact_properties_shared_folders_button);
-			sharedFoldersButton.setOnClickListener(this);
-
-			dividerSharedFoldersLayout = (View) findViewById(R.id.divider_shared_folder_layout);
-
-			//Share Contact Layout
-
-			//shareContactLayout = (RelativeLayout) findViewById(R.id.chat_contact_properties_share_contact_layout);
-			//shareContactLayout.setOnClickListener(this);
-
-			//shareContactIcon = (ImageView) findViewById(R.id.chat_contact_properties_email_icon);
-
-			//shareContactContentLayout = (RelativeLayout) findViewById(R.id.chat_contact_properties_share_contact_content);
-
-			//shareContactText = (TextView) findViewById(R.id.chat_contact_properties_share_contact);
-
-		//	dividerShareContactLayout = (View) findViewById(R.id.divider_share_contact_layout);
-
-			//Clear chat Layout
-			clearChatLayout = (RelativeLayout) findViewById(R.id.chat_contact_properties_clear_layout);
-			clearChatLayout.setOnClickListener(this);
-
-			dividerClearChatLayout = (View) findViewById(R.id.divider_clear_chat_layout);
-
-			//Remove contact Layout
-			removeContactChatLayout = (RelativeLayout) findViewById(R.id.chat_contact_properties_remove_contact_layout);
-			removeContactChatLayout.setOnClickListener(this);
 
 			 if(Util.isChatEnabled()){
 				 contactStateIcon.setVisibility(View.VISIBLE);
@@ -1214,6 +1234,15 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 					}
 					else{
 						chatC.muteChat(chatHandle);
+					}
+
+					if(chatPrefs!=null){
+						chatPrefs.setNotificationsEnabled(Boolean.toString(enabled));
+					}
+					else{
+						if(chat!=null){
+							chatPrefs = dbH.findChatPreferencesByHandle(String.valueOf(chat.getChatId()));
+						}
 					}
 
 					if(!enabled){
