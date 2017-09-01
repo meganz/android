@@ -203,7 +203,7 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 			boolean showMove = false;
 			boolean showLink = false;
 			boolean showTrash = false;
-			int itemsSelected = 0;
+			boolean itemsSelected = false;
 
 			// Rename
 			if((selected.size() == 1) && (megaApi.checkAccess(selected.get(0), MegaShare.ACCESS_FULL).getErrorCode() == MegaError.API_OK)) {
@@ -270,11 +270,11 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 							parent = megaApi.getParentNode(parent);
 						}
 						if (parent.getHandle() != megaApi.getRubbishNode().getHandle()){
-							itemsSelected=1;
+							itemsSelected=true;
 						}
 					}
 
-					if(itemsSelected == 0){
+					if(!itemsSelected){
 						trashIcon.setTitle(getString(R.string.context_remove));
 					}else{
 						trashIcon.setTitle(getString(R.string.context_move_to_trash));
