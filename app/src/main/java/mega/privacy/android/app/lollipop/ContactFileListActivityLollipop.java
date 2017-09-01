@@ -197,7 +197,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 		layout.addView(error_layout, params1);
 
 		final ImageView error_icon = new ImageView(ContactFileListActivityLollipop.this);
-		error_icon.setImageDrawable(ContactFileListActivityLollipop.this.getDrawable(R.drawable.ic_input_warning));
+		error_icon.setImageDrawable(ContactFileListActivityLollipop.this.getResources().getDrawable(R.drawable.ic_input_warning));
 		error_layout.addView(error_icon);
 		RelativeLayout.LayoutParams params_icon = (RelativeLayout.LayoutParams) error_icon.getLayoutParams();
 
@@ -1145,7 +1145,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 		layout.addView(error_layout, params1);
 
 		final ImageView error_icon = new ImageView(ContactFileListActivityLollipop.this);
-		error_icon.setImageDrawable(ContactFileListActivityLollipop.this.getDrawable(R.drawable.ic_input_warning));
+		error_icon.setImageDrawable(ContactFileListActivityLollipop.this.getResources().getDrawable(R.drawable.ic_input_warning));
 		error_layout.addView(error_icon);
 		RelativeLayout.LayoutParams params_icon = (RelativeLayout.LayoutParams) error_icon.getLayoutParams();
 
