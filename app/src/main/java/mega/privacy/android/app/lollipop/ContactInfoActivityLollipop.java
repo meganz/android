@@ -1208,8 +1208,6 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 				else{
 					boolean enabled = notificationsSwitch.isChecked();
 
-					chatPrefs.setNotificationsEnabled(Boolean.toString(enabled));
-
 					ChatController chatC = new ChatController(this);
 					if(enabled){
 						chatC.unmuteChat(chatHandle);
