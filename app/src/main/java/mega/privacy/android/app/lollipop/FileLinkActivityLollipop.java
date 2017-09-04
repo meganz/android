@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
@@ -58,6 +59,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop.Mode;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
+import mega.privacy.android.app.utils.PreviewUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -233,11 +235,9 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 //		
 //		((LayoutParams) sizeTextView.getLayoutParams()).setMargins(Util.px2dp((75*scaleW), outMetrics), 0, 0, 0);
 		
-		dbH = DatabaseHandler.getDbHandler(getApplicationContext()); 
-    	if(dbH.getCredentials() == null){	
-    		importButton.setVisibility(View.INVISIBLE);
-    	}
-		
+		dbH = DatabaseHandler.getDbHandler(getApplicationContext());
+		importButton.setVisibility(View.INVISIBLE);
+
 		Intent intent = getIntent();
 		if (intent != null){
 			url = intent.getDataString();
@@ -271,7 +271,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 
 		input.setSingleLine();
 		input.setTextColor(getResources().getColor(R.color.text_secondary));
-		input.setHint(getString(R.string.alert_decryption_key));
+		input.setHint(getString(R.string.password_text));
 //		input.setSelectAllOnFocus(true);
 		input.setImeOptions(EditorInfo.IME_ACTION_DONE);
 		input.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -399,7 +399,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 	}
 
 	public static void log(String message) {
-		Util.log("FileLinkActivityLollipop", message);
+		Util.log("OpenPasswordLinkActivity", message);
 	}
 
 	@Override
@@ -439,7 +439,40 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 				iconView.setImageResource(MimeTypeList.typeForName(document.getName()).getIconResourceId());
 
 				downloadButton.setVisibility(View.VISIBLE);
-				importButton.setVisibility(View.VISIBLE);
+
+				if(dbH.getCredentials() == null){
+					importButton.setVisibility(View.INVISIBLE);
+				}
+				else{
+					if (megaApi.getRootNode() == null){
+						importButton.setVisibility(View.INVISIBLE);
+					}
+					else{
+						importButton.setVisibility(View.VISIBLE);
+					}
+				}
+
+				Bitmap preview = null;
+				preview = PreviewUtils.getPreviewFromCache(document);
+				if (preview != null){
+					PreviewUtils.previewCache.put(document.getHandle(), preview);
+					iconView.setImageBitmap(preview);
+					iconView.setOnClickListener(this);
+				}
+				else{
+					preview = PreviewUtils.getPreviewFromFolder(document, this);
+					if (preview != null){
+						PreviewUtils.previewCache.put(document.getHandle(), preview);
+						iconView.setImageBitmap(preview);
+						iconView.setOnClickListener(this);
+					}
+					else{
+						if (document.hasPreview()) {
+							File previewFile = new File(PreviewUtils.getPreviewFolder(this), document.getBase64Handle() + ".jpg");
+							megaApi.getPreview(document, previewFile.getAbsolutePath(), this);
+						}
+					}
+				}
 
 				if (importClicked){
 					if ((document != null) && (target != null)){
@@ -507,6 +540,24 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 				return;
 			}
 		}
+		else if (request.getType() == MegaRequest.TYPE_GET_ATTR_FILE){
+			if (e.getErrorCode() == MegaError.API_OK){
+				File previewDir = PreviewUtils.getPreviewFolder(this);
+				if (document != null){
+					File preview = new File(previewDir, document.getBase64Handle()+".jpg");
+					if (preview.exists()) {
+						if (preview.length() > 0) {
+							Bitmap bitmap = PreviewUtils.getBitmapForCache(preview, this);
+							PreviewUtils.previewCache.put(document.getHandle(), bitmap);
+							if (iconView != null) {
+								iconView.setImageBitmap(bitmap);
+								iconView.setOnClickListener(this);
+							}
+						}
+					}
+				}
+			}
+		}
 		else if (request.getType() == MegaRequest.TYPE_COPY){
 			
 			try{
@@ -562,6 +613,10 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 			}
 			case R.id.file_link_button_import:{
 				importNode();
+				break;
+			}
+			case R.id.file_link_icon:{
+
 				break;
 			}
 		}
