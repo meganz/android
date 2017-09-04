@@ -71,7 +71,7 @@ public class ContactFileListBottomSheetDialogFragment extends BottomSheetDialogF
     private int height = -1;
     private boolean heightseted = false;
     private int heightReal = -1;
-    
+
     private MegaApiAndroid megaApi;
     private DatabaseHandler dbH;
 
