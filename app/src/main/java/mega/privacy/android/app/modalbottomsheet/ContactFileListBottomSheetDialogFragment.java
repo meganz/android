@@ -71,6 +71,7 @@ public class ContactFileListBottomSheetDialogFragment extends BottomSheetDialogF
 
     private int height = -1;
     private boolean heightseted = false;
+    private int heightReal = -1;
 
     private MegaApiAndroid megaApi;
     private DatabaseHandler dbH;
@@ -114,6 +115,13 @@ public class ContactFileListBottomSheetDialogFragment extends BottomSheetDialogF
         View contentView = View.inflate(getContext(), R.layout.bottom_sheet_contact_file_list, null);
 
         mainLinearLayout = (LinearLayout) contentView.findViewById(R.id.contact_file_list_bottom_sheet);
+
+        mainLinearLayout.post(new Runnable() {
+            @Override
+            public void run() {
+                heightReal = mainLinearLayout.getHeight();
+            }
+        });
 
         nodeThumb = (ImageView) contentView.findViewById(R.id.contact_file_list_thumbnail);
         nodeName = (TextView) contentView.findViewById(R.id.contact_file_list_name_text);
@@ -266,11 +274,11 @@ public class ContactFileListBottomSheetDialogFragment extends BottomSheetDialogF
                 @Override
                 public void onSlide(@NonNull View bottomSheet, float slideOffset) {
                     if(slideOffset> 0 && !heightseted){
-                        heightseted = true;
                         if(context instanceof ContactFileListBottomSheetDialogFragment.CustomHeight){
                             height = ((ContactFileListBottomSheetDialogFragment.CustomHeight) context).getHeightToPanel(thisclass);
                         }
-                        if(height != -1){
+                        if(height != -1 && heightReal != -1){
+                            heightseted = true;
                             int numSons = 0;
                             int num = items_layout.getChildCount();
                             for(int i=0; i<num; i++){
@@ -279,13 +287,18 @@ public class ContactFileListBottomSheetDialogFragment extends BottomSheetDialogF
                                     numSons++;
                                 }
                             }
-                            if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE && numSons > 3){
-
-                                ViewGroup.LayoutParams params = bottomSheet.getLayoutParams();
-                                params.height = height;
-                                bottomSheet.setLayoutParams(params);
-                            }
-                            else if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT && numSons > 9){
+//                            if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE && numSons > 3){
+//
+//                                ViewGroup.LayoutParams params = bottomSheet.getLayoutParams();
+//                                params.height = height;
+//                                bottomSheet.setLayoutParams(params);
+//                            }
+//                            else if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT && numSons > 9){
+//                                ViewGroup.LayoutParams params = bottomSheet.getLayoutParams();
+//                                params.height = height;
+//                                bottomSheet.setLayoutParams(params);
+//                            }
+                            if(heightReal > height){
                                 ViewGroup.LayoutParams params = bottomSheet.getLayoutParams();
                                 params.height = height;
                                 bottomSheet.setLayoutParams(params);
