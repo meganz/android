@@ -5410,13 +5410,27 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				setStatusMenuItem.setVisible(false);
 				if (index == 0){
 					log("createOptions TAB CONTACTS");
+					String contactsTag = getFragmentTag(R.id.contact_tabs_pager, 0);
+					cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(contactsTag);
+
 					//Show
 					addContactMenuItem.setVisible(true);
-					selectMenuItem.setVisible(true);
 					sortByMenuItem.setVisible(true);
 					thumbViewMenuItem.setVisible(true);
 					upgradeAccountMenuItem.setVisible(true);
 					searchMenuItem.setVisible(true);
+
+					if (cFLol != null) {
+						if(cFLol.getItemCount()>0){
+							selectMenuItem.setVisible(true);
+						}
+						else{
+							selectMenuItem.setVisible(false);
+						}
+					}
+					else{
+						log("The CONTACTS tab is null");
+					}
 
 					//Hide
 					pauseTransfersMenuIcon.setVisible(false);
@@ -5449,10 +5463,22 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				}
 				else if (index == 1){
 					log("createOptions TAB SENT requests");
+
+					String contactsTag = getFragmentTag(R.id.contact_tabs_pager, 1);
+					sRFLol = (SentRequestsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(contactsTag);
+
 					//Show
-					selectMenuItem.setVisible(true);
 					addContactMenuItem.setVisible(true);
 					upgradeAccountMenuItem.setVisible(true);
+
+					if (sRFLol != null) {
+						if(sRFLol.getItemCount()>0){
+							selectMenuItem.setVisible(true);
+						}
+						else{
+							selectMenuItem.setVisible(false);
+						}
+					}
 
 					//Hide
 					sortByMenuItem.setVisible(false);
@@ -5481,9 +5507,21 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				}
 				else{
 					log("createOptions TAB RECEIVED requests");
+
+					String contactsTag = getFragmentTag(R.id.contact_tabs_pager, 2);
+					rRFLol = (ReceivedRequestsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(contactsTag);
+
 					//Show
-					selectMenuItem.setVisible(true);
 					upgradeAccountMenuItem.setVisible(true);
+
+					if (rRFLol != null) {
+						if(rRFLol.getItemCount()>0){
+							selectMenuItem.setVisible(true);
+						}
+						else{
+							selectMenuItem.setVisible(false);
+						}
+					}
 
 					//Hide
 					searchMenuItem.setVisible(false);
