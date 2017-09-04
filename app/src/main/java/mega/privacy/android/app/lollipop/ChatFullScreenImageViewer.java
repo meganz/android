@@ -467,13 +467,20 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 	public void onSaveInstanceState (Bundle savedInstanceState){
 		super.onSaveInstanceState(savedInstanceState);
 		savedInstanceState.putBoolean("aBshown", adapterMega.isaBshown());
+		savedInstanceState.putBoolean("overflowVisible", adapterMega.isMenuVisible());
+
 	}
 	
 	@Override
 	public void onRestoreInstanceState (Bundle savedInstanceState){
 		super.onRestoreInstanceState(savedInstanceState);
+
+
 		aBshown = savedInstanceState.getBoolean("aBshown");
 		adapterMega.setaBshown(aBshown);
+
+
+
 	}
 
 	
@@ -759,25 +766,26 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 	protected void hideActionBar(){
 		if (aB != null && aB.isShowing()) {
 			if(tB != null) {
-				getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+				//getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 				tB.animate().translationY(-220).setDuration(800L)
 						.withEndAction(new Runnable() {
 							@Override
 							public void run() {
 								aB.hide();
+								//getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 							}
 						}).start();
 				bottomLayout.animate().translationY(220).setDuration(800L).start();
 			} else {
-				getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+				//getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 				aB.hide();
 			}
 		}
 	}
 	protected void showActionBar(){
 		if (aB != null && !aB.isShowing()) {
-			getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
-			getWindow().setBackgroundDrawableResource(android.R.color.black);
+			//getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+			//getWindow().setBackgroundDrawableResource(android.R.color.black);
 			aB.show();
 			if(tB != null) {
 				tB.animate().translationY(0).setDuration(800L).start();
