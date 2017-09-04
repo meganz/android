@@ -62,7 +62,6 @@ public class ContactFileListBottomSheetDialogFragment extends BottomSheetDialogF
     private LinearLayout optionMove;
     private LinearLayout optionRename;
     private LinearLayout optionRubbish;
-
     private LinearLayout items_layout;
 
     private DisplayMetrics outMetrics;
@@ -72,7 +71,7 @@ public class ContactFileListBottomSheetDialogFragment extends BottomSheetDialogF
     private int height = -1;
     private boolean heightseted = false;
     private int heightReal = -1;
-
+    
     private MegaApiAndroid megaApi;
     private DatabaseHandler dbH;
 
