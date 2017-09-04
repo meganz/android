@@ -441,6 +441,13 @@ public class ReceivedRequestsFragmentLollipop extends Fragment {
 		}
 	}
 
+	public int getItemCount(){
+		if(adapterList!=null){
+			return adapterList.getItemCount();
+		}
+		return 0;
+	}
+
 	@Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
