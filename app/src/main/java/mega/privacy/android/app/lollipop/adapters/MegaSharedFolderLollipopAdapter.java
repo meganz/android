@@ -332,7 +332,7 @@ public class MegaSharedFolderLollipopAdapter extends RecyclerView.Adapter<MegaSh
 			} else {
 
 				if(this.isItemChecked(position)){
-					holder.imageView.setImageResource(R.drawable.ic_multiselect);
+					holder.imageView.setImageResource(R.drawable.ic_select_avatar);
 					holder.initialLetter.setVisibility(View.GONE);
 					holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.new_multiselect_color));
 				}
