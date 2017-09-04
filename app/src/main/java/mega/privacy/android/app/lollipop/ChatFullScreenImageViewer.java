@@ -95,7 +95,7 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 
-public class ChatFullScreenImageViewer extends PinActivityLollipop implements OnPageChangeListener, MegaRequestListenerInterface, OnItemClickListener, MegaGlobalListenerInterface {
+public class ChatFullScreenImageViewer extends PinActivityLollipop implements OnPageChangeListener, MegaRequestListenerInterface, MegaGlobalListenerInterface {
 
 
 	private DisplayMetrics outMetrics;
@@ -152,9 +152,6 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 		super.onDestroy();
 	}
 
-
-
-
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		log("onCreateOptionsMenu");
@@ -198,7 +195,6 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 				break;
 			}
 			case R.id.chat_full_image_viewer_download: {
-
 				log("download option");
 				MegaNode node = messages.get(positionG).getMegaNodeList().get(0);
 				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -224,11 +220,14 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 				break;
 			}
 			case R.id.full_image_viewer_save_for_offline: {
-				log("**full_image_viewer_save_for_offline");
+				log("save for offline option");
+				showSnackbar("Coming soon...");
 				break;
 			}
 			case R.id.full_image_viewer_remove: {
-				log("**full_image_viewer_remove");
+				log("remove option");
+				MegaChatMessage msg = messages.get(positionG);
+				showConfirmationDeleteNode(chatId, msg);
 				break;
 			}
 
@@ -519,23 +518,6 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 	
 	public static void log(String message) {
 		Util.log("ChatFullScreenImageViewer", message);
-	}
-
-	@Override
-	public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-		((MegaApplication) getApplication()).sendSignalPresenceActivity();
-
-		switch(position){
-			case 0:{
-				showSnackbar("Coming soon...");
-				break;
-			}
-			case 1:{
-				MegaChatMessage msg = messages.get(positionG);
-				showConfirmationDeleteNode(chatId, msg);
-				break;
-			}
-		}
 	}
 
 	public void showConfirmationDeleteNode(final long chatId, final MegaChatMessage message){
