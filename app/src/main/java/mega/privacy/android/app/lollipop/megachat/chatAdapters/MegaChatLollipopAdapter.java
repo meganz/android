@@ -2823,7 +2823,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             }
             holder.contentContactMessageContactInitialLetter.setTextSize(24);
         }
-
     }
 
     @Override
