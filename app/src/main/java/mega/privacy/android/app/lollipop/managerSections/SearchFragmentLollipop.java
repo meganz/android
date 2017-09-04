@@ -627,22 +627,21 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 			}
 		}
 		Resources res = getActivity().getResources();
-		String format = "%d %s";
-		String filesStr = String.format(format, files,
-				res.getQuantityString(R.plurals.general_num_files, files));
-		String foldersStr = String.format(format, folders,
-				res.getQuantityString(R.plurals.general_num_folders, folders));
+
 		String title;
+		int sum=files+folders;
+
 		if (files == 0 && folders == 0) {
-			title = foldersStr + ", " + filesStr;
+			title = Integer.toString(sum);
 		} else if (files == 0) {
-			title = foldersStr;
+			title = Integer.toString(folders);
 		} else if (folders == 0) {
-			title = filesStr;
+			title = Integer.toString(files);
 		} else {
-			title = foldersStr + ", " + filesStr;
+			title = Integer.toString(sum);
 		}
 		actionMode.setTitle(title);
+
 		try {
 			actionMode.invalidate();
 		} catch (NullPointerException e) {
