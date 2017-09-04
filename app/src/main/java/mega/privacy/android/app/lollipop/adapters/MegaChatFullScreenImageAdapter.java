@@ -42,6 +42,9 @@ import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaTransferListenerInterface;
 import nz.mega.sdk.MegaUtilsAndroid;
 
+import mega.privacy.android.app.lollipop.ChatFullScreenImageViewer;
+
+
 
 public class MegaChatFullScreenImageAdapter extends PagerAdapter implements OnClickListener, MegaRequestListenerInterface  {
 
@@ -56,6 +59,7 @@ public class MegaChatFullScreenImageAdapter extends PagerAdapter implements OnCl
 	private ArrayList<Long> pendingFullImages = new ArrayList<Long>();
 
 	MegaApiAndroid megaApi;
+	Context context;
 
 	/*view holder class*/
     public class ViewHolderFullImage {
@@ -211,11 +215,12 @@ public class MegaChatFullScreenImageAdapter extends PagerAdapter implements OnCl
 	}
 
 	// constructor
-	public MegaChatFullScreenImageAdapter(Activity activity, ArrayList<MegaChatMessage> messages, MegaApiAndroid megaApi) {
+	public MegaChatFullScreenImageAdapter(Context context, Activity activity, ArrayList<MegaChatMessage> messages, MegaApiAndroid megaApi) {
 		this.activity = activity;
 		this.megaApi = megaApi;
 		this.messages = messages;
 		this.megaFullScreenImageAdapter = this;
+		this.context = context;
 	}
 
 	@Override
@@ -336,48 +341,9 @@ public class MegaChatFullScreenImageAdapter extends PagerAdapter implements OnCl
 				
 			    float scaleW = Util.getScaleW(outMetrics, density);
 			    float scaleH = Util.getScaleH(outMetrics, density);
-			    
-			    RelativeLayout bottomLayout = (RelativeLayout) activity.findViewById(R.id.chat_image_viewer_layout_bottom);
-			    RelativeLayout topLayout = (RelativeLayout) activity.findViewById(R.id.chat_image_viewer_layout_top);
-			    ListView overflowMenuList = (ListView) activity.findViewById(R.id.chat_image_viewer_overflow_menu_list);
-			    
-			    if (menuVisible){
-//			    	AlphaAnimation a = new AlphaAnimation(0.2f, 1.0f);
-//			    	a.setDuration(1000);
-//			    	overflowMenuList.startAnimation(a);
-			    	overflowMenuList.setVisibility(View.GONE);
-			    	
-			    	menuVisible = false;
-			    }
-			    else{
-					if (aBshown){
-						TranslateAnimation animBottom = new TranslateAnimation(0, 0, 0, Util.px2dp(48, outMetrics));
-						animBottom.setDuration(1000);
-						animBottom.setFillAfter( true );
-						bottomLayout.setAnimation(animBottom);
-						
-						TranslateAnimation animTop = new TranslateAnimation(0, 0, 0, Util.px2dp(-48, outMetrics));
-						animTop.setDuration(1000);
-						animTop.setFillAfter( true );
-						topLayout.setAnimation(animTop);
-						
-						aBshown = false;
-					}
-					else{					
-						TranslateAnimation animBottom = new TranslateAnimation(0, 0, Util.px2dp(48, outMetrics), 0);
-						animBottom.setDuration(1000);
-						animBottom.setFillAfter( true );
-						bottomLayout.setAnimation(animBottom);
-						
-						TranslateAnimation animTop = new TranslateAnimation(0, 0, Util.px2dp(-48, outMetrics), 0);
-						animTop.setDuration(1000);
-						animTop.setFillAfter( true );
-						topLayout.setAnimation(animTop);
-						
-						aBshown = true;
-					}
-			    }
-				
+
+				((ChatFullScreenImageViewer) context).touchImage();
+
 				RelativeLayout activityLayout = (RelativeLayout) activity.findViewById(R.id.chat_full_image_viewer_parent_layout);
 				activityLayout.invalidate();
 				
