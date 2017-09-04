@@ -4543,9 +4543,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
     			tB.setVisibility(View.VISIBLE);
 
-    			if (sFLol == null){
-    				sFLol = new SearchFragmentLollipop();
-        		}
 
 				if (nV != null){
 					Menu nVMenu = nV.getMenu();
@@ -4578,11 +4575,15 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				}
     			drawerItem = DrawerItem.SEARCH;
 
-    			sFLol.setSearchNodes(searchNodes);
-    			sFLol.setNodes(searchNodes);
-    			sFLol.setSearchQuery(searchQuery);
-    			sFLol.setParentHandle(parentHandleSearch);
-    			sFLol.setLevels(levelsSearch);
+				if (sFLol == null){
+					sFLol = new SearchFragmentLollipop();
+				}
+
+				sFLol.setNodes(searchNodes);
+				sFLol.setSearchQuery(searchQuery);
+				sFLol.setParentHandle(parentHandleSearch);
+				sFLol.setLevels(levelsSearch);
+				aB.setTitle(getString(R.string.action_search)+": "+searchQuery);
 
     			tabLayoutCloud.setVisibility(View.GONE);
     			viewPagerCDrive.setVisibility(View.GONE);

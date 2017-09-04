@@ -85,7 +85,7 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 	int orderGetChildren;
 	
 	ArrayList<MegaNode> nodes;
-	ArrayList<MegaNode> searchNodes;
+//	ArrayList<MegaNode> searchNodes;
 	String searchQuery = null;
 		
 	private ActionMode actionMode;
@@ -335,8 +335,7 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 		
 		if (parentHandle == -1){
 			nodes = megaApi.search(searchQuery);
-			searchNodes = megaApi.search(searchQuery);
-			
+
 			aB.setTitle(getString(R.string.action_search)+": "+searchQuery);
 			log("aB.setHomeAsUpIndicator_49");
 			aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
@@ -353,7 +352,6 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 			
 			((ManagerActivityLollipop)context).setParentHandleSearch(parentHandle);
 			nodes = megaApi.getChildren(n, orderGetChildren);
-
 
 		}
 
@@ -402,8 +400,6 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 			recyclerView.setLayoutParams(params);
 			
 			setNodes(nodes);
-			
-			contentText.setText(MegaApiUtils.getInfoNode(nodes, (ManagerActivityLollipop)context));
 
 			return v;
 		}
@@ -870,10 +866,6 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 	public void setSearchQuery(String searchQuery){
 		this.searchQuery = searchQuery;
 	}
-	
-	public void setSearchNodes (ArrayList<MegaNode> searchNodes){
-		this.searchNodes = searchNodes;
-	}
 
 	public ArrayList<MegaNode> getNodes(){
 		return nodes;
@@ -905,6 +897,7 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 			}
 			else{
 				contentTextLayout.setVisibility(View.VISIBLE);
+				contentText.setText(MegaApiUtils.getInfoNode(nodes, context));
 				recyclerView.setVisibility(View.VISIBLE);
 				emptyImageView.setVisibility(View.GONE);
 				emptyTextView.setVisibility(View.GONE);
