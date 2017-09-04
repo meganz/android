@@ -130,7 +130,7 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 		textParams.setMargins(Util.scaleWidthPx(60, outMetrics), 0, 0, Util.scaleHeightPx(10, outMetrics));
 		oldPasswordView.setLayoutParams(textParams);
 
-		oldPasswordView.getBackground().clearColorFilter();
+		oldPasswordView.getBackground().mutate().clearColorFilter();
 
 		oldPasswordErrorView = (RelativeLayout) findViewById(R.id.login_oldPassword_text_error);
 		paramsb1 = oldPasswordErrorView.getLayoutParams();

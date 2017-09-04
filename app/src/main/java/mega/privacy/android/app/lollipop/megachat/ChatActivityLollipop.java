@@ -1755,14 +1755,21 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         menu.findItem(R.id.chat_cab_menu_edit).setVisible(false);
                     }
                     else if(selected.get(0).getMessage().getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT){
+                        log("TYPE_NODE_ATTACHMENT selected");
                         menu.findItem(R.id.chat_cab_menu_copy).setVisible(false);
                         menu.findItem(R.id.chat_cab_menu_edit).setVisible(false);
-                        if(selected.get(0).getMessage().isDeletable()){
-                            log("one message Message DELETABLE");
-                            menu.findItem(R.id.chat_cab_menu_delete).setVisible(true);
+
+                        if(selected.get(0).getMessage().getUserHandle()==myUserHandle){
+                            if(selected.get(0).getMessage().isDeletable()){
+                                log("one message Message DELETABLE");
+                                menu.findItem(R.id.chat_cab_menu_delete).setVisible(true);
+                            }
+                            else{
+                                log("one message Message NOT DELETABLE");
+                                menu.findItem(R.id.chat_cab_menu_delete).setVisible(false);
+                            }
                         }
                         else{
-                            log("one message Message NOT DELETABLE");
                             menu.findItem(R.id.chat_cab_menu_delete).setVisible(false);
                         }
                     }

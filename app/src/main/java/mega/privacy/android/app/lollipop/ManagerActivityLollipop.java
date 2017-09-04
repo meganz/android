@@ -84,6 +84,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
@@ -2659,9 +2660,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	public void showDialogChangeUserAttribute(){
 		log("showDialogChangeUserAttribute");
 
+		ScrollView scrollView = new ScrollView(this);
+
 		LinearLayout layout = new LinearLayout(this);
+
+		scrollView.addView(layout);
+
 		layout.setOrientation(LinearLayout.VERTICAL);
-        layout.setNestedScrollingEnabled(true);
+//        layout.setNestedScrollingEnabled(true);
 		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
 		params.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleHeightPx(20, outMetrics), Util.scaleWidthPx(17, outMetrics), 0);
 
@@ -2677,7 +2683,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		layout.addView(error_layout_firtName, params1);
 
 		final ImageView error_icon_firtName = new ImageView(ManagerActivityLollipop.this);
-		error_icon_firtName.setImageDrawable(ManagerActivityLollipop.this.getDrawable(R.drawable.ic_input_warning));
+		error_icon_firtName.setImageDrawable(ManagerActivityLollipop.this.getResources().getDrawable(R.drawable.ic_input_warning));
 		error_layout_firtName.addView(error_icon_firtName);
 		RelativeLayout.LayoutParams params_icon_firtName = (RelativeLayout.LayoutParams) error_icon_firtName.getLayoutParams();
 
@@ -2709,7 +2715,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		layout.addView(error_layout_lastName, params1);
 
 		final ImageView error_icon_lastName = new ImageView(ManagerActivityLollipop.this);
-		error_icon_lastName.setImageDrawable(ManagerActivityLollipop.this.getDrawable(R.drawable.ic_input_warning));
+		error_icon_lastName.setImageDrawable(ManagerActivityLollipop.this.getResources().getDrawable(R.drawable.ic_input_warning));
 		error_layout_lastName.addView(error_icon_lastName);
 		RelativeLayout.LayoutParams params_icon_lastName = (RelativeLayout.LayoutParams) error_icon_lastName.getLayoutParams();
 
@@ -2742,7 +2748,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		layout.addView(error_layout_email, params1);
 
 		final ImageView error_icon_email = new ImageView(ManagerActivityLollipop.this);
-		error_icon_email.setImageDrawable(ManagerActivityLollipop.this.getDrawable(R.drawable.ic_input_warning));
+		error_icon_email.setImageDrawable(ManagerActivityLollipop.this.getResources().getDrawable(R.drawable.ic_input_warning));
 		error_layout_email.addView(error_icon_email);
 		RelativeLayout.LayoutParams params_icon_email = (RelativeLayout.LayoutParams) error_icon_email.getLayoutParams();
 
@@ -3001,7 +3007,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				inputMail.getBackground().clearColorFilter();
 			}
 		});
-		builder.setView(layout);
+		builder.setView(scrollView);
 
 		changeUserAttributeDialog = builder.create();
 		changeUserAttributeDialog.show();
@@ -8481,7 +8487,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		layout.addView(error_layout, params1);
 
 		final ImageView error_icon = new ImageView(ManagerActivityLollipop.this);
-		error_icon.setImageDrawable(ManagerActivityLollipop.this.getDrawable(R.drawable.ic_input_warning));
+		error_icon.setImageDrawable(ManagerActivityLollipop.this.getResources().getDrawable(R.drawable.ic_input_warning));
 		error_layout.addView(error_icon);
 		RelativeLayout.LayoutParams params_icon = (RelativeLayout.LayoutParams) error_icon.getLayoutParams();
 
@@ -8886,7 +8892,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		layout.addView(error_layout, params1);
 
 		final ImageView error_icon = new ImageView(ManagerActivityLollipop.this);
-		error_icon.setImageDrawable(ManagerActivityLollipop.this.getDrawable(R.drawable.ic_input_warning));
+		error_icon.setImageDrawable(ManagerActivityLollipop.this.getResources().getDrawable(R.drawable.ic_input_warning));
 		error_layout.addView(error_icon);
 		RelativeLayout.LayoutParams params_icon = (RelativeLayout.LayoutParams) error_icon.getLayoutParams();
 
@@ -9239,7 +9245,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		layout.addView(error_layout, params1);
 
 		final ImageView error_icon = new ImageView(ManagerActivityLollipop.this);
-		error_icon.setImageDrawable(ManagerActivityLollipop.this.getDrawable(R.drawable.ic_input_warning));
+		error_icon.setImageDrawable(ManagerActivityLollipop.this.getResources().getDrawable(R.drawable.ic_input_warning));
 		error_layout.addView(error_icon);
 		RelativeLayout.LayoutParams params_icon = (RelativeLayout.LayoutParams) error_icon.getLayoutParams();
 
@@ -9800,7 +9806,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		layout.addView(error_layout_email, params1);
 
 		final ImageView error_icon_email = new ImageView(ManagerActivityLollipop.this);
-		error_icon_email.setImageDrawable(ManagerActivityLollipop.this.getDrawable(R.drawable.ic_input_warning));
+		error_icon_email.setImageDrawable(ManagerActivityLollipop.this.getResources().getDrawable(R.drawable.ic_input_warning));
 		error_layout_email.addView(error_icon_email);
 		RelativeLayout.LayoutParams params_icon = (RelativeLayout.LayoutParams) error_icon_email.getLayoutParams();
 
@@ -9817,6 +9823,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		params_text_error.width = ViewGroup.LayoutParams.WRAP_CONTENT;
         params_text_error.addRule(RelativeLayout.CENTER_VERTICAL);
 		params_text_error.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+		params_text_error.addRule(RelativeLayout.LEFT_OF, error_icon_email.getId());
 		params_text_error.setMargins(Util.scaleWidthPx(3, outMetrics), 0,0,0);
 		textError_email.setLayoutParams(params_text_error);
 
