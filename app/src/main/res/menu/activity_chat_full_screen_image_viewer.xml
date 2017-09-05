@@ -2,7 +2,6 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:MEGA="http://schemas.android.com/apk/res-auto" >
 
-
     <item
         android:id="@+id/chat_full_image_viewer_download"
         android:orderInCategory="100"
@@ -15,6 +14,7 @@
         android:id="@+id/chat_full_image_viewer_import"
         android:orderInCategory="100"
         android:icon="@drawable/ic_cloud_drive"
+        android:background="#ffffffff"
         android:title="@string/add_to_cloud"
         MEGA:showAsAction="always"
         android:visible="true"/>

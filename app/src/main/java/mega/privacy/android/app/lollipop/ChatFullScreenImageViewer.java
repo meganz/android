@@ -241,7 +241,6 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 	protected void onCreate(Bundle savedInstanceState) {
 		log("onCreate");
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_chat_full_screen_image_viewer);
 
 		fullScreenImageViewer = this;
 
@@ -250,7 +249,6 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 		display.getMetrics(outMetrics);
 		float density  = getResources().getDisplayMetrics().density;
 
-		appBarLayout = (AppBarLayout) findViewById(R.id.app_bar);
 
 		float scaleW = Util.getScaleW(outMetrics, density);
 		float scaleH = Util.getScaleH(outMetrics, density);
@@ -263,9 +261,9 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 
 		dbH = DatabaseHandler.getDbHandler(this);
 
-		if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.GINGERBREAD){
+		/*if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.GINGERBREAD){
 	        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-	    }
+	    }*/
 
 
 		MegaApplication app = (MegaApplication)getApplication();
@@ -273,14 +271,26 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 		megaApi = app.getMegaApi();
 		megaChatApi = app.getMegaChatApi();
 
-		display = getWindowManager().getDefaultDisplay();
-		outMetrics = new DisplayMetrics ();
-	    display.getMetrics(outMetrics);
+		megaApi.addGlobalListener(this);
 
+
+		/*display = getWindowManager().getDefaultDisplay();
+		outMetrics = new DisplayMetrics ();
+	    display.getMetrics(outMetrics);*/
+
+		setContentView(R.layout.activity_chat_full_screen_image_viewer);
+
+		fragmentContainer = (RelativeLayout) findViewById(R.id.chat_full_image_viewer_parent_layout);
+		appBarLayout = (AppBarLayout) findViewById(R.id.app_bar);
 		viewPager = (ExtendedViewPager) findViewById(R.id.image_viewer_pager);
 		viewPager.setPageMargin(40);
 
-		fragmentContainer = (RelativeLayout) findViewById(R.id.chat_full_image_viewer_parent_layout);
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+			Window window = this.getWindow();
+			window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+			window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+			window.setStatusBarColor(ContextCompat.getColor(this, R.color.black));
+		}
 
 		tB = (Toolbar) findViewById(R.id.call_toolbar);
 		if (tB == null) {
@@ -296,13 +306,6 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 		aB.setHomeButtonEnabled(true);
 		aB.setDisplayHomeAsUpEnabled(true);
 		aB.setTitle(" ");
-
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-			Window window = this.getWindow();
-			window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-			window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-			window.setStatusBarColor(ContextCompat.getColor(this, R.color.black));
-		}
 
 		Intent intent = getIntent();
 		positionG = intent.getIntExtra("position", 0);
@@ -403,7 +406,7 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 					}
 					fileNameTextView.setText(messages.get(positionG).getMegaNodeList().get(0).getName());
 				}
-				catch(Exception e){}
+			catch(Exception e){}
 			}
 		}
 	}
