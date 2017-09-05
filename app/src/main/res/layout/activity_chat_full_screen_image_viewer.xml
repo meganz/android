@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:id="@+id/chat_full_image_viewer_parent_layout"
 	xmlns:app="http://schemas.android.com/apk/res-auto"
-	android:fitsSystemWindows="true"
-	android:background="@color/black">
+	android:fitsSystemWindows="true">
 
 	<android.support.design.widget.AppBarLayout
 		android:id="@+id/app_bar"
 		android:layout_width="match_parent"
 		android:layout_height="match_parent"
-		android:fitsSystemWindows="true"
-		android:background="@color/black">
+		android:fitsSystemWindows="true">
 
 		<RelativeLayout
 			android:layout_width="match_parent"
-			android:layout_height="match_parent">
+			android:layout_height="match_parent"
+			android:background="@color/black">
 
 			<!--Background -->
 
