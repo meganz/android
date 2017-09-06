@@ -734,10 +734,8 @@ public class ContactsFragmentLollipop extends Fragment{
 
 	public int getItemCount(){
 		if(adapter!=null){
-			log("item count contacts: "+adapter.getItemCount());
 			return adapter.getItemCount();
 		}
-		log("item count is 0 contacts");
 		return 0;
 	}
 	
