@@ -69,6 +69,8 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 	TextView lastSession;
 	TextView connections;
 
+	ImageView editImageView;
+
 	Button upgradeButton;
 	Button logoutButton;
 	Button mkButton;
@@ -142,6 +144,9 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		nameView = (TextView) v.findViewById(R.id.my_account_name);
 		nameView.setOnClickListener(this);
 
+		editImageView = (ImageView) v.findViewById(R.id.my_account_edit_icon);
+		editImageView.setOnClickListener(this);
+
 		infoEmail = (TextView) v.findViewById(R.id.my_account_email);
 		myEmail = megaApi.getMyUser().getEmail();
 		infoEmail.setText(myEmail);
@@ -153,7 +158,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 			infoEmail.setMaxWidth(Util.scaleWidthPx(250, outMetrics));
 		}
 		else{
-			nameView.setMaxWidth(Util.scaleWidthPx(210, outMetrics));
+			nameView.setMaxWidth(Util.scaleWidthPx(180, outMetrics));
 			infoEmail.setMaxWidth(Util.scaleWidthPx(210, outMetrics));
 		}
 		
@@ -167,6 +172,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		}
 		else{
 			mkButton.setBackgroundResource(R.drawable.black_button_border);
+//			mkButton.setBackgroundColor(ContextCompat.getColor(context, R.color.white));
 		}
 		mkButton.setOnClickListener(this);
 		mkButton.setVisibility(View.VISIBLE);
@@ -211,6 +217,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		}
 		else{
 			logoutButton.setBackgroundResource(R.drawable.black_button_border);
+//			logoutButton.setBackgroundColor(ContextCompat.getColor(context, R.color.white));
 		}
 		logoutButton.setOnClickListener(this);
 		logoutButton.setVisibility(View.VISIBLE);
@@ -505,7 +512,8 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 				break;
 			}
 			case R.id.my_account_name:
-			case R.id.my_account_email:{
+			case R.id.my_account_email:
+			case R.id.my_account_edit_icon:{
 				log("Click user attributes text");
 				((ManagerActivityLollipop)context).showDialogChangeUserAttribute();
 				break;
