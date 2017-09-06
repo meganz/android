@@ -36,15 +36,28 @@
 					android:layout_marginLeft="72dp"
 					android:orientation="vertical" >
 
-					<TextView
-						android:id="@+id/my_account_name"
+					<RelativeLayout
 						android:layout_width="wrap_content"
-						android:layout_height="wrap_content"
-						android:textColor="@color/name_my_account"
-						android:singleLine="true"
-						android:maxLines="1"
-						android:ellipsize="end"
-						android:textSize="16sp" />
+						android:layout_height="wrap_content">
+						<TextView
+							android:id="@+id/my_account_name"
+							android:layout_width="wrap_content"
+							android:layout_height="wrap_content"
+							android:textColor="@color/name_my_account"
+							android:singleLine="true"
+							android:maxLines="1"
+							android:ellipsize="end"
+							android:textSize="16sp" />
+
+						<ImageView
+							android:id="@+id/my_account_edit_icon"
+							android:layout_width="wrap_content"
+							android:layout_height="wrap_content"
+							android:layout_toRightOf="@+id/my_account_name"
+							android:layout_marginLeft="2dp"
+							android:src="@drawable/ic_rename_title" />
+
+					</RelativeLayout>
 
 					<TextView
 						android:id="@+id/my_account_email"
