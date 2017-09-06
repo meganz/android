@@ -7749,6 +7749,20 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	public void updateAliveFragments(){
 		log("updateAliveFragments");
 		//Needed to update view when changing list<->grid from other section
+
+		updateCloudSection();
+
+		updateRubbishSection();
+
+		updateIncomingSection();
+
+		updateOutgoingSection();
+
+		updateContactsSection();
+	}
+
+	public void updateCloudSection(){
+		log("updateCloudSection");
 		String cloudTag = getFragmentTag(R.id.cloud_drive_tabs_pager, 0);
 		fbFLol = (FileBrowserFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cloudTag);
 		if (fbFLol != null){
@@ -7764,9 +7778,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			fragTransaction.attach(fbFLol);
 			fragTransaction.commitNowAllowingStateLoss();
 		}
+	}
 
-		cloudTag = getFragmentTag(R.id.cloud_drive_tabs_pager, 1);
-		rubbishBinFLol = (RubbishBinFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cloudTag);
+	public void updateRubbishSection(){
+		log("updateRubbishSection");
+		String rubbishTag = getFragmentTag(R.id.cloud_drive_tabs_pager, 1);
+		rubbishBinFLol = (RubbishBinFragmentLollipop) getSupportFragmentManager().findFragmentByTag(rubbishTag);
 		if (rubbishBinFLol != null){
 			log("RubbishBinFragment is not NULL -> UPDATE");
 			rubbishBinFLol.hideMultipleSelect();
@@ -7780,7 +7797,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			fragTransaction.attach(rubbishBinFLol);
 			fragTransaction.commitNowAllowingStateLoss();
 		}
+	}
 
+	public void updateIncomingSection(){
+		log("updateIncomingSection");
 		String sharesTag = getFragmentTag(R.id.shares_tabs_pager, 0);
 		inSFLol = (IncomingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(sharesTag);
 		if (inSFLol != null){
@@ -7796,8 +7816,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			fragTransaction.attach(inSFLol);
 			fragTransaction.commitNowAllowingStateLoss();
 		}
+	}
 
-		sharesTag = getFragmentTag(R.id.shares_tabs_pager, 1);
+	public void updateOutgoingSection(){
+		log("updateOutgoingSection");
+		String sharesTag = getFragmentTag(R.id.shares_tabs_pager, 1);
 		outSFLol = (OutgoingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(sharesTag);
 		if (outSFLol != null){
 			log("OutgoingFragment is not NULL -> UPDATE");
@@ -7812,7 +7835,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			fragTransaction.attach(outSFLol);
 			fragTransaction.commitNowAllowingStateLoss();
 		}
+	}
 
+	public void updateContactsSection(){
+		log("updateContactsSection");
 		String contactsTag = getFragmentTag(R.id.contact_tabs_pager, 0);
 		cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(contactsTag);
 		if (cFLol != null){
@@ -13372,237 +13398,159 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		}
 		catch (Exception ex) {}
 
+		boolean updateContacts = false;
+
 		if(updatedNodes!=null){
 			//Verify is it is a new item to the inbox
 			for(int i=0;i<updatedNodes.size(); i++){
-				MegaNode updateNode = updatedNodes.get(i);
-				if(updateNode.getParentHandle()==inboxNode.getHandle()){
+				MegaNode updatedNode = updatedNodes.get(i);
+
+				if(!updateContacts){
+					if(updatedNode.isInShare()){
+						updateContacts = true;
+					}
+				}
+
+				if(updatedNode.getParentHandle()==inboxNode.getHandle()){
 					log("New element to Inbox!!");
 					setInboxNavigationDrawer();
 				}
 			}
 		}
 
-		if (drawerItem == DrawerItem.CLOUD_DRIVE){
-			log("DrawerItem.CLOUD_DRIVE");
-
-			if(viewPagerCDrive!=null) {
-				int index = viewPagerCDrive.getCurrentItem();
-				log("Fragment Index: " + index);
-				if (index == 1) {
-					log("Rubbish bin shown");
-					String cloudTag = getFragmentTag(R.id.cloud_drive_tabs_pager, 0);
-					fbFLol = (FileBrowserFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cloudTag);
-					if (fbFLol != null){
-						log("FileBrowser is not NULL");
-						ArrayList<MegaNode> nodes;
-						if(parentHandleBrowser==-1||parentHandleBrowser==megaApi.getRootNode().getHandle()){
-							nodes = megaApi.getChildren(megaApi.getRootNode(), orderCloud);
-						}
-						else{
-							nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbFLol.getParentHandle()), orderCloud);
-						}
-						fbFLol.setNodes(nodes);
-						fbFLol.setContentText();
-						fbFLol.getRecyclerView().invalidate();
-					}
-
-					String rubbishTag = getFragmentTag(R.id.cloud_drive_tabs_pager, 1);
-					rubbishBinFLol = (RubbishBinFragmentLollipop) getSupportFragmentManager().findFragmentByTag(rubbishTag);
-					if (rubbishBinFLol != null){
-						if (isClearRubbishBin){
-							isClearRubbishBin = false;
-							parentHandleRubbish = megaApi.getRubbishNode().getHandle();
-							aB.setTitle(getString(R.string.section_rubbish_bin));
-							log("aB.setHomeAsUpIndicator_24");
-							aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
-							this.firstNavigationLevel = true;
-
-							ArrayList<MegaNode> nodes;
-							if(rubbishBinFLol.getParentHandle()==-1){
-								nodes = megaApi.getChildren(megaApi.getNodeByHandle(megaApi.getRubbishNode().getHandle()), orderCloud);
-							}
-							else{
-								nodes = megaApi.getChildren(megaApi.getNodeByHandle(rubbishBinFLol.getParentHandle()), orderCloud);
-							}
-							rubbishBinFLol.setParentHandle(megaApi.getRubbishNode().getHandle());
-							rubbishBinFLol.setNodes(nodes);
-							rubbishBinFLol.getRecyclerView().invalidate();
-
-						}
-						else{
-
-							ArrayList<MegaNode> nodes;
-							if(rubbishBinFLol.getParentHandle()==-1){
-								nodes = megaApi.getChildren(megaApi.getNodeByHandle(megaApi.getRubbishNode().getHandle()), orderCloud);
-							}
-							else{
-								nodes = megaApi.getChildren(megaApi.getNodeByHandle(rubbishBinFLol.getParentHandle()), orderCloud);
-							}
-							rubbishBinFLol.setNodes(nodes);
-							rubbishBinFLol.getRecyclerView().invalidate();
-
-						}
-					}
-				}
-				else {
-					//Cloud Drive TAB
-					log("Cloud drive shown");
-
-					String rubbishTag = getFragmentTag(R.id.cloud_drive_tabs_pager, 1);
-					rubbishBinFLol = (RubbishBinFragmentLollipop) getSupportFragmentManager().findFragmentByTag(rubbishTag);
-					if (rubbishBinFLol != null){
-						if (isClearRubbishBin){
-							isClearRubbishBin = false;
-							parentHandleRubbish = megaApi.getRubbishNode().getHandle();
-							aB.setTitle(getString(R.string.section_rubbish_bin));
-							log("aB.setHomeAsUpIndicator_24");
-							aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
-							this.firstNavigationLevel = true;
-
-							ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getRubbishNode(), orderCloud);
-							rubbishBinFLol.setParentHandle(megaApi.getRubbishNode().getHandle());
-							rubbishBinFLol.setNodes(nodes);
-							rubbishBinFLol.getRecyclerView().invalidate();
-
-						}
-						else{
-							log("NOT clearRubbish");
-							ArrayList<MegaNode> nodes;
-							if(parentHandleRubbish==-1||parentHandleRubbish==megaApi.getRubbishNode().getHandle()){
-								nodes = megaApi.getChildren(megaApi.getRubbishNode(), orderCloud);
-							}
-							else{
-								nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleRubbish), orderCloud);
-							}
-							if(nodes!=null){
-								rubbishBinFLol.setNodes(nodes);
-								rubbishBinFLol.getRecyclerView().invalidate();
-							}
-						}
-					}
-
-					String cloudTag = getFragmentTag(R.id.cloud_drive_tabs_pager, 0);
-					fbFLol = (FileBrowserFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cloudTag);
-					if (fbFLol != null){
-						log("FileBrowser is not NULL");
-						ArrayList<MegaNode> nodes;
-						if(parentHandleBrowser==-1||parentHandleBrowser==megaApi.getRootNode().getHandle()){
-							nodes = megaApi.getChildren(megaApi.getRootNode(), orderCloud);
-						}
-						else{
-							nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbFLol.getParentHandle()), orderCloud);
-						}
-						if(nodes!=null){
-							fbFLol.setNodes(nodes);
-							fbFLol.setContentText();
-							fbFLol.getRecyclerView().invalidate();
-						}
-					}
-				}
-			}
-		}
-		else if (drawerItem == DrawerItem.SEARCH){
-			log("SEARCH shown");
-			if (sFLol != null){
-				sFLol.refresh();
-			}
-		}
-		else if (drawerItem == DrawerItem.INBOX){
-			log("INBOX shown");
-			if (iFLol != null){
-				iFLol.refresh();
-//				iFLol.getListView().invalidateViews();
+		if(updateContacts){
+			String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);
+			cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
+			if (cFLol != null){
+				log("Incoming update - update contacts section");
+				cFLol.updateShares();
 			}
 		}
 
-		else if (drawerItem == DrawerItem.SHARED_ITEMS){
-			int index = viewPagerShares.getCurrentItem();
-			if(index==1){
-				//OUTGOING
-				String cFTag2 = getFragmentTag(R.id.shares_tabs_pager, 1);
-				log("DrawerItem.SHARED_ITEMS Tag: "+ cFTag2);
-				outSFLol = (OutgoingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag2);
-				if (outSFLol != null){
-					MegaNode node = megaApi.getNodeByHandle(parentHandleOutgoing);
-					if (node != null){
-						outSFLol.setNodes(megaApi.getChildren(node, orderOthers));
-						aB.setTitle(node.getName());
-						log("indicator_arrow_back_888");
-    					aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
-    					firstNavigationLevel = false;
-					}
-					else{
-						outSFLol.refresh();
-						aB.setTitle(getResources().getString(R.string.section_shared_items));
-						log("aB.setHomeAsUpIndicator_26");
-    					aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
-    					firstNavigationLevel = true;
-					}
-				}
+		String cloudTag = getFragmentTag(R.id.cloud_drive_tabs_pager, 0);
+		fbFLol = (FileBrowserFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cloudTag);
+		if (fbFLol != null){
+			log("FileBrowser is not NULL");
+			ArrayList<MegaNode> nodes;
+			if(parentHandleBrowser==-1||parentHandleBrowser==megaApi.getRootNode().getHandle()){
+				nodes = megaApi.getChildren(megaApi.getRootNode(), orderCloud);
 			}
 			else{
-				//InCOMING
-				String cFTag1 = getFragmentTag(R.id.shares_tabs_pager, 0);
-				log("DrawerItem.SHARED_ITEMS Tag Incoming: "+ cFTag1);
-				inSFLol = (IncomingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag1);
-				if (inSFLol != null){
-					MegaNode node = megaApi.getNodeByHandle(parentHandleIncoming);
-					if (node != null){
-						inSFLol.setNodes(megaApi.getChildren(node, orderOthers));
-						aB.setTitle(node.getName());
-						log("indicator_arrow_back_889");
-    					aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
-    					firstNavigationLevel = false;
-					}
-					else{
-						inSFLol.findNodes();
-						aB.setTitle(getResources().getString(R.string.section_shared_items));
-						log("aB.setHomeAsUpIndicator_28");
-    					aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
-    					firstNavigationLevel = true;
-					}
+				nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbFLol.getParentHandle()), orderCloud);
+			}
+			fbFLol.setNodes(nodes);
+			fbFLol.setContentText();
+			fbFLol.getRecyclerView().invalidate();
+		}
+
+		String rubbishTag = getFragmentTag(R.id.cloud_drive_tabs_pager, 1);
+		rubbishBinFLol = (RubbishBinFragmentLollipop) getSupportFragmentManager().findFragmentByTag(rubbishTag);
+		if (rubbishBinFLol != null){
+			if (isClearRubbishBin){
+				isClearRubbishBin = false;
+				parentHandleRubbish = megaApi.getRubbishNode().getHandle();
+				aB.setTitle(getString(R.string.section_rubbish_bin));
+				log("aB.setHomeAsUpIndicator_24");
+				aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+				this.firstNavigationLevel = true;
+
+				ArrayList<MegaNode> nodes;
+				if(rubbishBinFLol.getParentHandle()==-1){
+					nodes = megaApi.getChildren(megaApi.getNodeByHandle(megaApi.getRubbishNode().getHandle()), orderCloud);
 				}
+				else{
+					nodes = megaApi.getChildren(megaApi.getNodeByHandle(rubbishBinFLol.getParentHandle()), orderCloud);
+				}
+				rubbishBinFLol.setParentHandle(megaApi.getRubbishNode().getHandle());
+				rubbishBinFLol.setNodes(nodes);
+				rubbishBinFLol.getRecyclerView().invalidate();
+
+			}
+			else{
+
+				ArrayList<MegaNode> nodes;
+				if(rubbishBinFLol.getParentHandle()==-1){
+					nodes = megaApi.getChildren(megaApi.getNodeByHandle(megaApi.getRubbishNode().getHandle()), orderCloud);
+				}
+				else{
+					nodes = megaApi.getChildren(megaApi.getNodeByHandle(rubbishBinFLol.getParentHandle()), orderCloud);
+				}
+				rubbishBinFLol.setNodes(nodes);
+				rubbishBinFLol.getRecyclerView().invalidate();
+
 			}
 		}
-		else if (drawerItem == DrawerItem.CAMERA_UPLOADS){
-			if (cuFL != null){
-				if(cuFL.isAdded()){
-					long cameraUploadHandle = cuFL.getPhotoSyncHandle();
-					MegaNode nps = megaApi.getNodeByHandle(cameraUploadHandle);
-					log("cameraUploadHandle: " + cameraUploadHandle);
-					if (nps != null){
-						log("nps != null");
-						ArrayList<MegaNode> nodes = megaApi.getChildren(nps, MegaApiJava.ORDER_MODIFICATION_DESC);
+
+		if (sFLol != null){
+			sFLol.refresh();
+		}
+
+		String cFTag2 = getFragmentTag(R.id.shares_tabs_pager, 1);
+		log("DrawerItem.SHARED_ITEMS Tag: "+ cFTag2);
+		outSFLol = (OutgoingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag2);
+		if (outSFLol != null){
+			MegaNode node = megaApi.getNodeByHandle(parentHandleOutgoing);
+			if (node != null){
+				outSFLol.setNodes(megaApi.getChildren(node, orderOthers));
+				aB.setTitle(node.getName());
+				log("indicator_arrow_back_888");
+				aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+				firstNavigationLevel = false;
+			}
+			else{
+				outSFLol.refresh();
+				aB.setTitle(getResources().getString(R.string.section_shared_items));
+				log("aB.setHomeAsUpIndicator_26");
+				aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+				firstNavigationLevel = true;
+			}
+		}
+
+		String cFTag1 = getFragmentTag(R.id.shares_tabs_pager, 0);
+		log("DrawerItem.SHARED_ITEMS Tag Incoming: "+ cFTag1);
+		inSFLol = (IncomingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag1);
+		if (inSFLol != null){
+			MegaNode node = megaApi.getNodeByHandle(parentHandleIncoming);
+			if (node != null){
+				inSFLol.setNodes(megaApi.getChildren(node, orderOthers));
+				aB.setTitle(node.getName());
+				log("indicator_arrow_back_889");
+				aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+				firstNavigationLevel = false;
+			}
+			else{
+				inSFLol.findNodes();
+				aB.setTitle(getResources().getString(R.string.section_shared_items));
+				log("aB.setHomeAsUpIndicator_28");
+				aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+				firstNavigationLevel = true;
+			}
+		}
+
+		if (cuFL != null){
+			if(cuFL.isAdded()){
+				long cameraUploadHandle = cuFL.getPhotoSyncHandle();
+				MegaNode nps = megaApi.getNodeByHandle(cameraUploadHandle);
+				log("cameraUploadHandle: " + cameraUploadHandle);
+				if (nps != null){
+					log("nps != null");
+					ArrayList<MegaNode> nodes = megaApi.getChildren(nps, MegaApiJava.ORDER_MODIFICATION_DESC);
 //						cuFL.setNodes(megaApi.getFileFolderChildren(nps, MegaApiJava.ORDER_MODIFICATION_DESC));
-						cuFL.setNodes(nodes);
-					}
+					cuFL.setNodes(nodes);
 				}
 			}
 		}
-		else if (drawerItem == DrawerItem.MEDIA_UPLOADS){
-			if (muFLol != null){
-				if(muFLol.isAdded()){
-					long cameraUploadHandle = muFLol.getPhotoSyncHandle();
-					MegaNode nps = megaApi.getNodeByHandle(cameraUploadHandle);
-					log("mediaUploadsHandle: " + cameraUploadHandle);
-					if (nps != null){
-						log("nps != null");
-						ArrayList<MegaNode> nodes = megaApi.getChildren(nps, MegaApiJava.ORDER_MODIFICATION_DESC);
+
+		if (muFLol != null){
+			if(muFLol.isAdded()){
+				long cameraUploadHandle = muFLol.getPhotoSyncHandle();
+				MegaNode nps = megaApi.getNodeByHandle(cameraUploadHandle);
+				log("mediaUploadsHandle: " + cameraUploadHandle);
+				if (nps != null){
+					log("nps != null");
+					ArrayList<MegaNode> nodes = megaApi.getChildren(nps, MegaApiJava.ORDER_MODIFICATION_DESC);
 //						muFLol.setNodes(megaApi.getFileFolderChildren(nps, MegaApiJava.ORDER_MODIFICATION_DESC));
-						muFLol.setNodes(nodes);
-					}
-				}
-			}
-		}
-		else if (drawerItem == DrawerItem.CONTACTS){
-			int index = viewPagerContacts.getCurrentItem();
-			if (index == 0){
-				String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);
-				cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
-				if (cFLol != null){
-					log("Share finish");
-					cFLol.updateShares();
+					muFLol.setNodes(nodes);
 				}
 			}
 		}
