@@ -600,6 +600,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			if (adapter.getItemCount() == 0){				
 				log("itemCount is 0");
 				recyclerView.setVisibility(View.GONE);
+				contentTextLayout.setVisibility(View.GONE);
 				emptyImageView.setVisibility(View.VISIBLE);
 				emptyTextView.setVisibility(View.VISIBLE);
 			}
@@ -666,11 +667,13 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			if (adapter.getItemCount() == 0){				
 				
 				recyclerView.setVisibility(View.GONE);
+				contentTextLayout.setVisibility(View.GONE);
 				emptyImageView.setVisibility(View.VISIBLE);
 				emptyTextView.setVisibility(View.VISIBLE);
 			}
 			else{
 				recyclerView.setVisibility(View.VISIBLE);
+				contentTextLayout.setVisibility(View.VISIBLE);
 				emptyImageView.setVisibility(View.GONE);
 				emptyTextView.setVisibility(View.GONE);
 			}
@@ -1021,6 +1024,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 		//If folder has no files
 		if (adapter.getItemCount() == 0){
 			recyclerView.setVisibility(View.GONE);
+			contentTextLayout.setVisibility(View.GONE);
 			emptyImageView.setVisibility(View.VISIBLE);
 			emptyTextView.setVisibility(View.VISIBLE);
 
@@ -1034,6 +1038,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 		}
 		else{
 			recyclerView.setVisibility(View.VISIBLE);
+			contentTextLayout.setVisibility(View.VISIBLE);
 			emptyImageView.setVisibility(View.GONE);
 			emptyTextView.setVisibility(View.GONE);
 		}
@@ -1139,6 +1144,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(parentHandle));
 			if (parentNode != null){
 				recyclerView.setVisibility(View.VISIBLE);
+				contentTextLayout.setVisibility(View.VISIBLE);
 				emptyImageView.setVisibility(View.GONE);
 				emptyTextView.setVisibility(View.GONE);
 
@@ -1236,6 +1242,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 				adapter.setNodes(nodes);
 				if (adapter.getItemCount() == 0){
 					recyclerView.setVisibility(View.GONE);
+					contentTextLayout.setVisibility(View.GONE);
 					emptyImageView.setVisibility(View.VISIBLE);
 					emptyTextView.setVisibility(View.VISIBLE);
 
@@ -1249,6 +1256,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 				}
 				else{
 					recyclerView.setVisibility(View.VISIBLE);
+					contentTextLayout.setVisibility(View.VISIBLE);
 					emptyImageView.setVisibility(View.GONE);
 					emptyTextView.setVisibility(View.GONE);
 				}
@@ -1263,6 +1271,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 				adapter.setNodes(nodes);
 				if (adapter.getItemCount() == 0){
 					recyclerView.setVisibility(View.GONE);
+					contentTextLayout.setVisibility(View.GONE);
 					emptyImageView.setVisibility(View.VISIBLE);
 					emptyTextView.setVisibility(View.VISIBLE);
 
@@ -1276,6 +1285,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 				}
 				else{
 					recyclerView.setVisibility(View.VISIBLE);
+					contentTextLayout.setVisibility(View.VISIBLE);
 					emptyImageView.setVisibility(View.GONE);
 					emptyTextView.setVisibility(View.GONE);
 				}			
