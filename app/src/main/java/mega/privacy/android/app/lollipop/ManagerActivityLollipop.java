@@ -12629,6 +12629,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					aC.setCount(0);
 				}
 			}
+			else if(request.getParamType() == MegaApiJava.USER_ATTR_PWD_REMINDER){
+				log("MK exported - USER_ATTR_PWD_REMINDER finished");
+			}
 			if (request.getParamType() == MegaApiJava.USER_ATTR_AVATAR) {
 
 				if (e.getErrorCode() == MegaError.API_OK){
