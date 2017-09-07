@@ -48,7 +48,7 @@
     <string name="general_importing" context="state while importing the file">Importing</string>
     <string name="general_import" context="Import button. When the user clicks this button the file will be imported to his account.">Import</string>
     <string name="general_storage" context="Text listed before the amount of storage a user gets with a certain package. For example: &quot;1TB Storage&quot;.">Storage</string>
-    <string name="general_bandwidth" context="Text listed before the amount of bandwidth a user gets with a certain package. For example: &quot;8TB Bandwidth&quot;. Can also be translated as data transfer.">Transfer quota</string>
+    <string name="general_bandwidth" context="Text listed before the amount of bandwidth a user gets with a certain package. For example: &quot;8TB Bandwidth&quot;. Can also be translated as data transfer.">Transfer Quota</string>
     <string name="general_subscribe" context="Text placed inside the button the user clicks when upgrading to PRO. Meaning: subscribe to this plan">Subscribe</string>
     <!--
     <string name="general_continue" context="Text placed inside the button the user clicks when clicking into the FREE account. Meaning: Continue to the main screen">Continue</string>
@@ -1533,6 +1533,9 @@
 
     <string name="unlocked_storage_title" context="title of the section for unlocked storage quota">Storage Quota</string>
 
-    <string name="title_referral_bonuses" context="title of the section for referral bonuses">Referral Bonuses</string>
+    <string name="title_referral_bonuses" context="title of the section for referral bonuses in achivements section">Referral Bonuses</string>
+    <string name="title_install_app" context="title of the section for install a mobile app bonuses in achivements section">Install a mobile app</string>
+    <string name="title_regitration" context="title of the section for install a mobile app bonuses in achivements section">Registration bonus</string>
+    <string name="title_install_desktop" context="title of the section for install a mobile app bonuses in achivements section">Install MEGA desktop app</string>
 
 </resources>
