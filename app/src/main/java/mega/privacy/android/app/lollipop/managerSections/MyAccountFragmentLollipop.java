@@ -2,6 +2,7 @@ package mega.privacy.android.app.lollipop.managerSections;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -34,9 +35,12 @@ import java.util.Locale;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
+import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.MyAccountInfo;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
+import mega.privacy.android.app.lollipop.megaachievements.AchievementsActivity;
+import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.DBUtil;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -561,6 +565,9 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 			case R.id.my_account_achievements_layout:{
 				log("Show achievements");
 
+				Intent intent = new Intent(context, AchievementsActivity.class);
+//				intent.putExtra("orderGetChildren", orderGetChildren);
+				startActivity(intent);
 				break;
 			}
 		}
