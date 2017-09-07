@@ -88,6 +88,8 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 	int deepBrowserTree = 0;
 	boolean isList = true;
 	int orderGetChildren;
+
+	MenuItem rubbish_bin;
 	
 	ArrayList<MegaNode> nodes;
 	MegaNode selectedNode;
@@ -125,6 +127,17 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 
 					NodeController nC = new NodeController(context);
 					nC.prepareForDownload(handleList);
+					break;
+				}
+				case R.id.cab_menu_trash:{
+
+					ArrayList<Long> handleList = new ArrayList<Long>();
+					for (int i=0;i<documents.size();i++){
+						handleList.add(documents.get(i).getHandle());
+					}
+
+					((ManagerActivityLollipop) context).askConfirmationMoveToRubbish(handleList);
+					hideMultipleSelect();
 					break;
 				}
 				case R.id.cab_menu_rename:{
@@ -257,8 +270,7 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 			menu.findItem(R.id.cab_menu_download).setVisible(true);
 			menu.findItem(R.id.cab_menu_download).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
-			menu.findItem(R.id.cab_menu_leave_multiple_share).setVisible(true);
-			menu.findItem(R.id.cab_menu_leave_multiple_share).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+
 
 			menu.findItem(R.id.cab_menu_rename).setVisible(showRename);
 			menu.findItem(R.id.cab_menu_copy).setVisible(true);
@@ -266,8 +278,20 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 
 			menu.findItem(R.id.cab_menu_move).setVisible(showMove);
 			menu.findItem(R.id.cab_menu_share_link).setVisible(false);
-			menu.findItem(R.id.cab_menu_trash).setVisible(false);
-			
+			rubbish_bin = menu.findItem(R.id.cab_menu_trash);
+
+			if (deepBrowserTree == 0){
+				rubbish_bin.setVisible(false);
+				menu.findItem(R.id.cab_menu_leave_multiple_share).setVisible(true);
+				menu.findItem(R.id.cab_menu_leave_multiple_share).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+			}
+			else{
+				rubbish_bin.setVisible(true);
+				menu.findItem(R.id.cab_menu_leave_multiple_share).setVisible(false);
+				menu.findItem(R.id.cab_menu_leave_multiple_share).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+			}
+
+
 			return false;
 		}
 		
@@ -459,9 +483,11 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 				contentText.setText(MegaApiUtils.getInfoNodeOnlyFolders(nodes, context));
 			}
 			else{
+
 				MegaNode infoNode = megaApi.getNodeByHandle(parentHandle);
 				contentText.setText(MegaApiUtils.getInfoFolder(infoNode, context));
 				aB.setTitle(infoNode.getName());
+
 			}						
 			
 			adapter.setMultipleSelect(false);
