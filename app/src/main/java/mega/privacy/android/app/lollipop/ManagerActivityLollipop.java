@@ -1419,7 +1419,16 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 		//PRO PANEL
 		getProLayout=(LinearLayout) findViewById(R.id.get_pro_account);
+		String getProTextString = getString(R.string.get_pro_account);
+		try {
+			getProTextString = getProTextString.replace("[A]", "\n");
+		}
+		catch(Exception e){
+			log("Formatted string: " + getProTextString);
+		}
+
 		getProText= (TextView) findViewById(R.id.get_pro_account_text);
+		getProText.setText(getProTextString);
 		rightUpgradeButton = (TextView) findViewById(R.id.btnRight_upgrade);
 		leftCancelButton = (TextView) findViewById(R.id.btnLeft_cancel);
 
