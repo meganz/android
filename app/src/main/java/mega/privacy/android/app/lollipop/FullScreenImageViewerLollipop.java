@@ -735,6 +735,10 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
 			window.setStatusBarColor(ContextCompat.getColor(this, R.color.black));
 		}
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.GINGERBREAD){
+            requestWindowFeature(Window.FEATURE_NO_TITLE);
+            this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        }
 
 		imageHandles = new ArrayList<Long>();
 		paths = new ArrayList<String>();
