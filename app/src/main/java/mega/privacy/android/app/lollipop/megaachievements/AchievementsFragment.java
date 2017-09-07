@@ -29,6 +29,7 @@ import android.widget.TextView;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Locale;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
@@ -68,6 +69,24 @@ public class AchievementsFragment extends Fragment implements OnClickListener{
 	TextView textReferralBonusesStorage;
 	TextView textReferralBonusesTransfer;
 
+	TextView figureInstallAppStorage;
+	TextView figureInstallAppTransfer;
+	TextView textInstallAppStorage;
+	TextView textInstallAppTransfer;
+	TextView daysLeftInstallAppTransfer;
+
+	TextView figureRegistrationStorage;
+	TextView figureRegistrationTransfer;
+	TextView textRegistrationStorage;
+	TextView textRegistrationTransfer;
+	TextView daysLeftRegistrationTransfer;
+
+	TextView figureInstallDesktopStorage;
+	TextView figureInstallDesktopTransfer;
+	TextView textInstallDesktopStorage;
+	TextView textInstallDesktopTransfer;
+	TextView daysLeftInstallDesktopTransfer;
+
 	@Override
 	public void onCreate (Bundle savedInstanceState){
 		log("onCreate");
@@ -98,6 +117,50 @@ public class AchievementsFragment extends Fragment implements OnClickListener{
 		View v = inflater.inflate(R.layout.fragment_achievements, container, false);
 
 		parentLinearLayout = (LinearLayout) v.findViewById(R.id.main_linear_layout_achievements);
+
+		String transferQuotaString = getString(R.string.transfer_quota);
+		transferQuotaString = transferQuotaString.toLowerCase(Locale.getDefault());
+
+		String storageQuotaString = getString(R.string.unlocked_storage_title);
+		storageQuotaString = storageQuotaString.toLowerCase(Locale.getDefault());
+
+		figureUnlockedRewardStorage = (TextView) v.findViewById(R.id.unlocked_storage_text);
+		TextView figureUnlockedRewardTransfer = (TextView) v.findViewById(R.id.unlocked_transfer_text);
+		TextView textUnlockedRewardTransfer = (TextView) v.findViewById(R.id.unlocked_transfer_title);
+
+		TextView figureReferralBonusesStorage = (TextView) v.findViewById(R.id.figure_unlocked_storage_text_referral);
+		TextView figureReferralBonusesTransfer = (TextView) v.findViewById(R.id.figure_unlocked_transfer_text_referral);
+		TextView textReferralBonusesStorage = (TextView) v.findViewById(R.id.unlocked_storage_title_referral);
+		textReferralBonusesStorage.setText(storageQuotaString);
+		TextView textReferralBonusesTransfer = (TextView) v.findViewById(R.id.unlocked_transfer_title_referral);
+		textReferralBonusesTransfer.setText(transferQuotaString);
+
+		TextView figureInstallAppStorage = (TextView) v.findViewById(R.id.figure_unlocked_storage_text_install_app);
+		TextView figureInstallAppTransfer = (TextView) v.findViewById(R.id.figure_unlocked_transfer_text_install_app);
+		TextView textInstallAppStorage = (TextView) v.findViewById(R.id.unlocked_storage_title_install_app);
+		textInstallAppStorage.setText(storageQuotaString);
+		TextView textInstallAppTransfer = (TextView) v.findViewById(R.id.unlocked_transfer_title_install_app);
+		textInstallAppTransfer.setText(transferQuotaString);
+		TextView daysLeftInstallAppTransfer = (TextView) v.findViewById(R.id.days_left_text_install_app);
+		daysLeftInstallAppTransfer.setText(("6 days left"));
+
+		TextView figureRegistrationStorage = (TextView) v.findViewById(R.id.figure_unlocked_storage_text_registration);
+		TextView figureRegistrationTransfer = (TextView) v.findViewById(R.id.figure_unlocked_transfer_text_registration);
+		TextView textRegistrationStorage = (TextView) v.findViewById(R.id.unlocked_storage_title_registration);
+		textRegistrationStorage.setText(storageQuotaString);
+		TextView textRegistrationTransfer = (TextView) v.findViewById(R.id.unlocked_transfer_title_registration);
+		textRegistrationTransfer.setText(transferQuotaString);
+		TextView daysLeftRegistrationTransfer = (TextView) v.findViewById(R.id.days_left_text_registration);
+		daysLeftRegistrationTransfer.setText(("40 days left"));
+
+		TextView figureInstallDesktopStorage = (TextView) v.findViewById(R.id.figure_unlocked_storage_text_install_desktop);
+		TextView figureInstallDesktopTransfer = (TextView) v.findViewById(R.id.figure_unlocked_transfer_text_install_desktop);
+		TextView textInstallDesktopStorage = (TextView) v.findViewById(R.id.unlocked_storage_title_install_desktop);
+		textInstallDesktopStorage.setText(storageQuotaString);
+		TextView textInstallDesktopTransfer= (TextView) v.findViewById(R.id.unlocked_transfer_title_install_desktop);
+		textInstallDesktopTransfer.setText(transferQuotaString);
+		TextView daysLeftInstallDesktopTransfer = (TextView) v.findViewById(R.id.days_left_text_install_desktop);
+		daysLeftInstallDesktopTransfer.setText(("15 days left"));
 
 		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
