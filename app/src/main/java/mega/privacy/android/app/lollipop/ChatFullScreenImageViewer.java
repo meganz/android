@@ -261,9 +261,9 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 
 		dbH = DatabaseHandler.getDbHandler(this);
 
-		/*if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.GINGERBREAD){
+		if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.GINGERBREAD){
 	        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-	    }*/
+	    }
 
 
 		MegaApplication app = (MegaApplication)getApplication();
@@ -274,9 +274,9 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 		megaApi.addGlobalListener(this);
 
 
-		/*display = getWindowManager().getDefaultDisplay();
+		display = getWindowManager().getDefaultDisplay();
 		outMetrics = new DisplayMetrics ();
-	    display.getMetrics(outMetrics);*/
+	    display.getMetrics(outMetrics);
 
 		setContentView(R.layout.activity_chat_full_screen_image_viewer);
 
@@ -769,26 +769,21 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 	protected void hideActionBar(){
 		if (aB != null && aB.isShowing()) {
 			if(tB != null) {
-				//getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 				tB.animate().translationY(-220).setDuration(800L)
 						.withEndAction(new Runnable() {
 							@Override
 							public void run() {
 								aB.hide();
-								//getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 							}
 						}).start();
 				bottomLayout.animate().translationY(220).setDuration(800L).start();
 			} else {
-				//getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 				aB.hide();
 			}
 		}
 	}
 	protected void showActionBar(){
 		if (aB != null && !aB.isShowing()) {
-			//getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
-			//getWindow().setBackgroundDrawableResource(android.R.color.black);
 			aB.show();
 			if(tB != null) {
 				tB.animate().translationY(0).setDuration(800L).start();
