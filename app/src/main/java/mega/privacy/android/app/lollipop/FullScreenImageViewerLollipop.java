@@ -1297,7 +1297,6 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 					else{
 						TouchImageView tIV = adapterMega.getVisibleImage(oldPosition);
 						if (tIV != null){
-							log("**zoomm");
 							tIV.setZoom(1);
 						}
 						fileNameTextView.setText(megaApi.getNodeByHandle(imageHandles.get(positionG)).getName());
@@ -2089,7 +2088,6 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	protected void hideActionBar(){
 		if (aB != null && aB.isShowing()) {
 			if(tB != null) {
-				getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 				tB.animate().translationY(-220).setDuration(800L)
 						.withEndAction(new Runnable() {
 							@Override
@@ -2099,15 +2097,12 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 						}).start();
 				bottomLayout.animate().translationY(220).setDuration(800L).start();
 			} else {
-				getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 				aB.hide();
 			}
 		}
 	}
 	protected void showActionBar(){
 		if (aB != null && !aB.isShowing()) {
-			getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
-			getWindow().setBackgroundDrawableResource(android.R.color.black);
 			aB.show();
 			if(tB != null) {
 				tB.animate().translationY(0).setDuration(800L).start();
