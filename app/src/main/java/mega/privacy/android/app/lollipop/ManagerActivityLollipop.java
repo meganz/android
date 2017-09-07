@@ -5982,7 +5982,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	@Override
     public boolean onOptionsItemSelected(MenuItem item) {
 		fromTakePicture = -1;
-		log("onOptionsItemSelectedLollipop");
+		log("onOptionsItemSelected");
 		if (megaApi == null){
 			megaApi = ((MegaApplication)getApplication()).getMegaApi();
 		}

@@ -79,6 +79,9 @@ public class Constants {
 	final public static int GET_LINK_FRAGMENT = 7000;
 	final public static int COPYRIGHT_FRAGMENT = 7001;
 
+	final public static int ACHIEVEMENTS_FRAGMENT = 8000;
+	final public static int BONUSES_FRAGMENT = 8001;
+
 	public static final int REQUEST_WRITE_STORAGE = 1;
 	public static final int REQUEST_CAMERA = 2;
 	public static final int REQUEST_READ_CONTACTS = 3;

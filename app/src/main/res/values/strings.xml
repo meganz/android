@@ -1525,4 +1525,14 @@
     <string name="achievements_title" context="title of the section for achievements">Achievements</string>
     <string name="achievements_subtitle" context="subtitle of the section for achievements">Invite friends and get rewards</string>
 
+    <string name="button_invite_friends" context="button to invite friends for getting achievements">Invite friends</string>
+
+    <string name="title_main_card_achievements" context="title of the introduction for the achievements screen">Get 10GB of storage and 20GB of transfers for each referral</string>
+
+    <string name="unlocked_rewards_title" context="title of the section for unlocked rewards">Unlocked rewards</string>
+
+    <string name="unlocked_storage_title" context="title of the section for unlocked storage quota">Storage Quota</string>
+
+    <string name="title_referral_bonuses" context="title of the section for referral bonuses">Referral Bonuses</string>
+
 </resources>
