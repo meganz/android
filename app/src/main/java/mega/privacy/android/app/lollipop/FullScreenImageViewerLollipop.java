@@ -503,12 +503,8 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 
 				float scaleW = Util.getScaleW(outMetrics, density);
 				float scaleH = Util.getScaleH(outMetrics, density);
-
-
 				if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-
 					removeText.setTextSize(TypedValue.COMPLEX_UNIT_SP, (10*scaleW));
-
 				}else{
 					removeText.setTextSize(TypedValue.COMPLEX_UNIT_SP, (15*scaleW));
 
