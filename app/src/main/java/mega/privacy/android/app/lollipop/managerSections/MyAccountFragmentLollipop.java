@@ -85,6 +85,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 	LinearLayout connectionsLayout;
 
 	LinearLayout achievementsLayout;
+	LinearLayout achievementsSeparator;
 
 	RelativeLayout exportMKLayout;
 	LinearLayout exportMKButtonsLayout;
@@ -192,7 +193,19 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		}
 
 		achievementsLayout = (LinearLayout) v.findViewById(R.id.my_account_achievements_layout);
-		achievementsLayout.setOnClickListener(this);
+		achievementsSeparator = (LinearLayout)v.findViewById(R.id.my_account_achievements_separator);
+
+		if(megaApi.isAchievementsEnabled()){
+			log("Achievements enabled!!");
+			achievementsLayout.setVisibility(View.VISIBLE);
+			achievementsSeparator.setVisibility(View.VISIBLE);
+			achievementsLayout.setOnClickListener(this);
+		}
+		else{
+			log("NO Achievements enabled!!");
+			achievementsLayout.setVisibility(View.GONE);
+			achievementsSeparator.setVisibility(View.GONE);
+		}
 
 		typeLayout = (RelativeLayout) v.findViewById(R.id.my_account_account_type_layout);
 
