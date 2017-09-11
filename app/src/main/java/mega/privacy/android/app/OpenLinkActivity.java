@@ -376,7 +376,18 @@ public class OpenLinkActivity extends PinActivity implements MegaRequestListener
 			finish();
 			return;
 		}
-		
+
+		if (url != null && (url.matches("^https://mega.co.nz/#.+$") || url.matches("^https://mega.nz/#.+$"))) {
+			log("handle link url");
+
+			Intent handleIntent = new Intent(this, ManagerActivityLollipop.class);
+			handleIntent.setAction(Constants.ACTION_OPEN_HANDLE_NODE);
+			handleIntent.setData(Uri.parse(url));
+			startActivity(handleIntent);
+			finish();
+			return;
+		}
+
 		log("wrong url: " + url);
 
 		Intent errorIntent = new Intent(this, ManagerActivityLollipop.class);
