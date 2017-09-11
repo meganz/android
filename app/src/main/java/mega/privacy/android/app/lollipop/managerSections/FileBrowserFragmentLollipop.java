@@ -326,7 +326,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 				showTrash = true;
 				showMove = true;
 				showCopy = true;
-				//**
 				showShare = true;
 
 				for(int i=0; i<selected.size();i++)	{
@@ -362,7 +361,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			else{
 				menu.findItem(R.id.cab_menu_select_all).setVisible(true);
 				menu.findItem(R.id.cab_menu_unselect_all).setVisible(false);
-				//**showShare = false;
 			}
 
 
@@ -420,10 +418,14 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 
 			menu.findItem(R.id.cab_menu_share).setVisible(showShare);
 			if(showShare){
-				menu.findItem(R.id.cab_menu_share).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+				if(selected.size()==1){
+					menu.findItem(R.id.cab_menu_share).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+
+				}else{
+					menu.findItem(R.id.cab_menu_share).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+				}
 			}else{
 				menu.findItem(R.id.cab_menu_share).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
-
 			}
 
 			menu.findItem(R.id.cab_menu_send_file).setVisible(true);
