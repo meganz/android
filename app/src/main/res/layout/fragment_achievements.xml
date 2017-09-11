@@ -16,7 +16,7 @@
     android:background="@color/grey_my_account_background">
 
         <android.support.v7.widget.CardView
-            android:id="@+id/card_view"
+            android:id="@+id/card_view_invite_friends"
             android:layout_width="match_parent"
             android:layout_height="120dp"
             android:layout_gravity="center"
@@ -30,7 +30,8 @@
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/google_wallet_ic"
+                    android:layout_marginLeft="24dp"
+                    android:src="@drawable/ic_invite_friends"
                     android:layout_centerVertical="true"/>
 
                 <LinearLayout
@@ -39,7 +40,7 @@
                     android:layout_height="wrap_content"
                     android:gravity="left|center_vertical"
                     android:layout_centerVertical="true"
-                    android:layout_marginLeft="72dp"
+                    android:layout_marginLeft="113dp"
                     android:orientation="vertical">
 
                     <TextView
@@ -202,8 +203,8 @@
                         <ImageView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:src="@drawable/google_wallet_ic"/>
-
+                            android:layout_marginLeft="20dp"
+                            android:src="@drawable/ic_referral_bonuses"/>
 
                         <RelativeLayout
                             android:layout_width="wrap_content"
@@ -253,7 +254,7 @@
                                         android:layout_below="@id/figure_unlocked_storage_text_referral"
                                         android:layout_column="0"/>
 
-                                 </RelativeLayout>
+                                </RelativeLayout>
 
                                 <RelativeLayout
                                     android:layout_width="wrap_content"
@@ -311,9 +312,134 @@
                     android:background="@color/separator_grey"/>
 
                 <RelativeLayout
-                    android:id="@+id/install_app_layout"
+                    android:id="@+id/base_quota_layout"
                     android:layout_width="match_parent"
                     android:layout_below="@+id/separator_referral_bonuses"
+                    android:layout_height="96dp">
+
+                    <LinearLayout
+                        android:id="@+id/base_quota_linear_layout"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <ImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:src="@drawable/google_wallet_ic"/>
+
+
+                        <RelativeLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="20dp">
+
+                            <TextView
+                                android:id="@+id/title_base_quota"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_alignParentTop="true"
+                                android:text="@string/title_base_quota"
+                                android:layout_marginRight="21dp"
+                                android:layout_marginBottom="14dp"
+                                android:textSize="16dp"
+                                android:textColor="@color/name_my_account"/>
+
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_below="@+id/title_base_quota"
+                                android:orientation="horizontal">
+
+                                <RelativeLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginRight="24dp">
+
+                                    <TextView
+                                        android:id="@+id/figure_unlocked_storage_text_base_quota"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="1 GB"
+                                        android:textSize="14dp"
+                                        android:textColor="@color/blue_unlocked_rewards"
+                                        android:layout_gravity="left"
+                                        android:layout_column="0"/>
+
+                                    <TextView
+                                        android:id="@+id/unlocked_storage_title_base_quota"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textSize="11dp"
+                                        android:text="@string/unlocked_storage_title"
+                                        android:textAllCaps="false"
+                                        android:textColor="@color/grey_achievements_title"
+                                        android:layout_below="@id/figure_unlocked_storage_text_base_quota"
+                                        android:layout_column="0"/>
+
+                                 </RelativeLayout>
+
+                                <RelativeLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content">
+
+                                    <TextView
+                                        android:id="@+id/figure_unlocked_transfer_text_base_quota"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="0 GB"
+                                        android:textSize="14dp"
+                                        android:layout_gravity="left"
+                                        android:textColor="@color/green_unlocked_rewards"
+                                        android:layout_column="0"/>
+
+                                    <TextView
+                                        android:id="@+id/unlocked_transfer_title_base_quota"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textSize="11dp"
+                                        android:text="@string/transfer_quota"
+                                        android:textColor="@color/grey_achievements_title"
+                                        android:layout_below="@id/figure_unlocked_transfer_text_base_quota"
+                                        android:layout_column="0"/>
+
+                                </RelativeLayout>
+
+
+                            </LinearLayout>
+
+                        </RelativeLayout>
+
+                        <RelativeLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:visibility="invisible">
+                            <ImageView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_alignParentRight="true"
+                                android:src="@drawable/ic_chevron_right_grey"
+                                android:layout_marginRight="13dp"/>
+                        </RelativeLayout>
+
+                    </LinearLayout>
+
+
+                </RelativeLayout>
+
+                <LinearLayout
+                    android:id="@+id/separator_base_quota"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_below="@+id/base_quota_layout"
+                    android:orientation="horizontal"
+                    android:background="@color/separator_grey"/>
+
+                <RelativeLayout
+                    android:id="@+id/install_app_layout"
+                    android:layout_width="match_parent"
+                    android:layout_below="@+id/separator_base_quota"
                     android:layout_height="96dp">
 
                     <LinearLayout

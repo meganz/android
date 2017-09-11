@@ -1537,5 +1537,8 @@
     <string name="title_install_app" context="title of the section for install a mobile app bonuses in achivements section">Install a mobile app</string>
     <string name="title_regitration" context="title of the section for install a mobile app bonuses in achivements section">Registration bonus</string>
     <string name="title_install_desktop" context="title of the section for install a mobile app bonuses in achivements section">Install MEGA desktop app</string>
+    <string name="title_base_quota" context="title of the section for base quota in achivements section">Account Base Quota</string>
 
+    <string name="general_num_days_left" context="indicates the number of days left related to a achievement">%1$d d left</string>
+    <string name="expired_achievement" context="state to indicate the achievement has expired">Expired</string>
 </resources>
