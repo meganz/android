@@ -130,6 +130,8 @@ public class RubbishBinFragmentLollipop extends Fragment {
 
 					NodeController nC = new NodeController(context);
 					nC.chooseLocationToCopyNodes(handleList);
+					clearSelections();
+					hideMultipleSelect();
 					break;
 				}
 				case R.id.cab_menu_trash:{

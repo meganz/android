@@ -112,7 +112,10 @@ public class ContactsFragmentLollipop extends Fragment{
 					if (users.size()>0){
 						ContactController cC = new ContactController(context);
 						cC.pickFolderToShare(users);
-					}										
+						clearSelections();
+						hideMultipleSelect();
+					}
+
 					break;
 				}
 				case R.id.cab_menu_send_file:{
@@ -224,7 +227,7 @@ public class ContactsFragmentLollipop extends Fragment{
 			
 			menu.findItem(R.id.cab_menu_help).setVisible(false);
 			menu.findItem(R.id.cab_menu_upgrade_account).setVisible(false);
-			menu.findItem(R.id.cab_menu_settings).setVisible(false);
+			//menu.findItem(R.id.cab_menu_settings).setVisible(false);
 //			menu.findItem(R.id.cab_menu_leave_multiple_share).setVisible(false);
 			return false;
 		}		
