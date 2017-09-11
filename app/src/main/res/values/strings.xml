@@ -940,8 +940,6 @@
     <string name="incorrect_MK" context="Alert when the user introduces his MK to reset pass incorrectly">The key you supplied does not match this account. Please make sure you use the correct recovery key and try again.</string>
     <string name="incorrect_MK_title" context="Title of the alert when the user introduces his MK to reset pass incorrectly">Invalid recovery key</string>
 
-    <string name="camera_uploads_empty" context="Text that indicates that no pictures have been uploaded to the Camera Uploads section">No pictures uploaded</string>
-
     <string name="option_full_link" context="Alert Dialog to get link">Link with key</string>
 
     <string name="recovering_info" context="Message shown meanwhile the app is waiting for a request">Getting info&#8230;</string>
@@ -1537,5 +1535,8 @@
     <string name="title_install_app" context="title of the section for install a mobile app bonuses in achivements section">Install a mobile app</string>
     <string name="title_regitration" context="title of the section for install a mobile app bonuses in achivements section">Registration bonus</string>
     <string name="title_install_desktop" context="title of the section for install a mobile app bonuses in achivements section">Install MEGA desktop app</string>
+
+    <string name="camera_uploads_empty" context="Text that indicates that no pictures have been uploaded to the Camera Uploads section">No media on Camera Uploads</string>
+
 
 </resources>
