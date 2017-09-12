@@ -411,6 +411,8 @@ public class ContactsFragmentLollipop extends Fragment{
 				emptyTextView.setVisibility(View.GONE);
 			}
 
+			((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
+
 			if (aB != null){
 				aB.setTitle(getString(R.string.section_contacts));
 			}
@@ -481,6 +483,8 @@ public class ContactsFragmentLollipop extends Fragment{
 				emptyImageView.setVisibility(View.GONE);
 				emptyTextView.setVisibility(View.GONE);
 			}
+
+			((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 
 			if (aB != null){
 				aB.setTitle(getString(R.string.section_contacts));
@@ -726,6 +730,13 @@ public class ContactsFragmentLollipop extends Fragment{
 		}
 		
 		return false;
+	}
+
+	public int getItemCount(){
+		if(adapter!=null){
+			return adapter.getItemCount();
+		}
+		return 0;
 	}
 	
 	public void setOrder(int orderContacts){

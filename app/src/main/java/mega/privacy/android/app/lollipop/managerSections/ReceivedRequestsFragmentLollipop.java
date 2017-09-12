@@ -200,7 +200,10 @@ public class ReceivedRequestsFragmentLollipop extends Fragment {
 	 */
 	public void hideMultipleSelect() {
 		log("hideMultipleSelect");
-		adapterList.setMultipleSelect(false);
+		if(adapterList!=null){
+			adapterList.setMultipleSelect(false);
+		}
+
 		if (actionMode != null) {
 			actionMode.finish();
 		}
@@ -439,6 +442,13 @@ public class ReceivedRequestsFragmentLollipop extends Fragment {
 				emptyTextView.setVisibility(View.GONE);
 			}
 		}
+	}
+
+	public int getItemCount(){
+		if(adapterList!=null){
+			return adapterList.getItemCount();
+		}
+		return 0;
 	}
 
 	@Override

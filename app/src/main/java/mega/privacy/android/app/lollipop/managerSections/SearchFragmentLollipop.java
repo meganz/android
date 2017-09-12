@@ -1,7 +1,9 @@
 package mega.privacy.android.app.lollipop.managerSections;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.net.Uri;
@@ -73,14 +75,17 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 	RelativeLayout transfersOverViewLayout;
 
 	Stack<Integer> lastPositionStack;
-		
-	long parentHandle = -1;
+
+    private MenuItem trashIcon;
+
+
+    long parentHandle = -1;
 	boolean isList = true;
 	int levels = -1;
 	int orderGetChildren;
 	
 	ArrayList<MegaNode> nodes;
-	ArrayList<MegaNode> searchNodes;
+//	ArrayList<MegaNode> searchNodes;
 	String searchQuery = null;
 		
 	private ActionMode actionMode;
@@ -175,6 +180,8 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 		public boolean onCreateActionMode(ActionMode mode, Menu menu) {
 			MenuInflater inflater = mode.getMenuInflater();
 			inflater.inflate(R.menu.file_browser_action, menu);
+            trashIcon = menu.findItem(R.id.cab_menu_trash);
+
 			return true;
 		}
 
@@ -196,7 +203,8 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 			boolean showMove = false;
 			boolean showLink = false;
 			boolean showTrash = false;
-			
+			boolean itemsSelected = false;
+
 			// Rename
 			if((selected.size() == 1) && (megaApi.checkAccess(selected.get(0), MegaShare.ACCESS_FULL).getErrorCode() == MegaError.API_OK)) {
 				showRename = true;
@@ -228,18 +236,49 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 					unselect.setVisible(true);
 				}
 				else if(selected.size()==1){
-					menu.findItem(R.id.cab_menu_select_all).setVisible(true);
+
+                    menu.findItem(R.id.cab_menu_select_all).setVisible(true);
 					unselect.setTitle(getString(R.string.action_unselect_all));
 					unselect.setVisible(true);
 
 					if (megaApi.checkAccess(selected.get(0), MegaShare.ACCESS_OWNER).getErrorCode() == MegaError.API_OK) {
 						showLink = true;
 					}
+
+					final long handle = selected.get(0).getHandle();
+					MegaNode parent = megaApi.getNodeByHandle(handle);
+					while (megaApi.getParentNode(parent) != null){
+						parent = megaApi.getParentNode(parent);
+					}
+
+					if (parent.getHandle() != megaApi.getRubbishNode().getHandle()){
+						trashIcon.setTitle(getString(R.string.context_move_to_trash));
+					}else{
+						trashIcon.setTitle(getString(R.string.context_remove));
+					}
 				}
 				else{
 					menu.findItem(R.id.cab_menu_select_all).setVisible(true);
 					unselect.setTitle(getString(R.string.action_unselect_all));
 					unselect.setVisible(true);
+
+					for(MegaNode i:selected){
+
+						final long handle = i.getHandle();
+						MegaNode parent = megaApi.getNodeByHandle(handle);
+						while (megaApi.getParentNode(parent) != null){
+							parent = megaApi.getParentNode(parent);
+						}
+						if (parent.getHandle() != megaApi.getRubbishNode().getHandle()){
+							itemsSelected=true;
+						}
+					}
+
+					if(!itemsSelected){
+						trashIcon.setTitle(getString(R.string.context_remove));
+					}else{
+						trashIcon.setTitle(getString(R.string.context_move_to_trash));
+					}
 				}
 			}
 			else{
@@ -253,6 +292,7 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 			menu.findItem(R.id.cab_menu_move).setVisible(showMove);
 			menu.findItem(R.id.cab_menu_share_link).setVisible(showLink);
 			menu.findItem(R.id.cab_menu_trash).setVisible(showTrash);
+
 			menu.findItem(R.id.cab_menu_leave_multiple_share).setVisible(false);
 			
 			return false;
@@ -295,8 +335,7 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 		
 		if (parentHandle == -1){
 			nodes = megaApi.search(searchQuery);
-			searchNodes = megaApi.search(searchQuery);
-			
+
 			aB.setTitle(getString(R.string.action_search)+": "+searchQuery);
 			log("aB.setHomeAsUpIndicator_49");
 			aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
@@ -305,7 +344,7 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 		}
 		else{
 			MegaNode n = megaApi.getNodeByHandle(parentHandle);
-					
+
 			aB.setTitle(n.getName());	
 			log("aB.setHomeAsUpIndicator_50");
 			aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
@@ -313,6 +352,7 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 			
 			((ManagerActivityLollipop)context).setParentHandleSearch(parentHandle);
 			nodes = megaApi.getChildren(n, orderGetChildren);
+
 		}
 
 		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
@@ -320,13 +360,16 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 		if (isList){
 			
 			View v = inflater.inflate(R.layout.fragment_filebrowserlist, container, false);
-			
+
 			recyclerView = (RecyclerView) v.findViewById(R.id.file_list_view_browser);
+			recyclerView.setPadding(0, 0, 0, Util.scaleHeightPx(85, outMetrics));
+			recyclerView.setClipToPadding(false);
 			recyclerView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
 			mLayoutManager = new LinearLayoutManager(context);
 			recyclerView.setLayoutManager(mLayoutManager);
-			recyclerView.setItemAnimator(new DefaultItemAnimator()); 
-			
+			recyclerView.setHasFixedSize(true);
+			recyclerView.setItemAnimator(new DefaultItemAnimator());
+
 			progressBar = (ProgressBar) v.findViewById(R.id.transfers_overview_progress_bar);
 			progressBar.setVisibility(View.GONE);
 
@@ -351,10 +394,12 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 			adapter.setMultipleSelect(false);
 	
 			recyclerView.setAdapter(adapter);
+
+			RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) recyclerView.getLayoutParams();
+			params.addRule(RelativeLayout.BELOW, contentTextLayout.getId());
+			recyclerView.setLayoutParams(params);
 			
 			setNodes(nodes);
-			
-			contentText.setText(MegaApiUtils.getInfoNode(nodes, (ManagerActivityLollipop)context));
 
 			return v;
 		}
@@ -378,11 +423,7 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 			contentTextLayout = (RelativeLayout) v.findViewById(R.id.content_grid_text_layout);
 
 			contentText = (TextView) v.findViewById(R.id.content_grid_text);			
-			//Margins
-			RelativeLayout.LayoutParams contentTextParams = (RelativeLayout.LayoutParams)contentText.getLayoutParams();
-			contentTextParams.setMargins(Util.scaleWidthPx(78, outMetrics), Util.scaleHeightPx(5, outMetrics), 0, Util.scaleHeightPx(5, outMetrics)); 
-			contentText.setLayoutParams(contentTextParams);
-			
+
 			if (adapter == null){
 				adapter = new MegaBrowserLollipopAdapter(context, this, nodes, parentHandle, recyclerView, aB, Constants.SEARCH_ADAPTER, MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_GRID);
 			}
@@ -582,22 +623,21 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 			}
 		}
 		Resources res = getActivity().getResources();
-		String format = "%d %s";
-		String filesStr = String.format(format, files,
-				res.getQuantityString(R.plurals.general_num_files, files));
-		String foldersStr = String.format(format, folders,
-				res.getQuantityString(R.plurals.general_num_folders, folders));
+
 		String title;
+		int sum=files+folders;
+
 		if (files == 0 && folders == 0) {
-			title = foldersStr + ", " + filesStr;
+			title = Integer.toString(sum);
 		} else if (files == 0) {
-			title = foldersStr;
+			title = Integer.toString(folders);
 		} else if (folders == 0) {
-			title = filesStr;
+			title = Integer.toString(files);
 		} else {
-			title = foldersStr + ", " + filesStr;
+			title = Integer.toString(sum);
 		}
 		actionMode.setTitle(title);
+
 		try {
 			actionMode.invalidate();
 		} catch (NullPointerException e) {
@@ -826,10 +866,6 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 	public void setSearchQuery(String searchQuery){
 		this.searchQuery = searchQuery;
 	}
-	
-	public void setSearchNodes (ArrayList<MegaNode> searchNodes){
-		this.searchNodes = searchNodes;
-	}
 
 	public ArrayList<MegaNode> getNodes(){
 		return nodes;
@@ -843,7 +879,7 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 			if (adapter.getItemCount() == 0){
 				log("no results");
 				recyclerView.setVisibility(View.GONE);
-				contentText.setVisibility(View.GONE);
+				contentTextLayout.setVisibility(View.GONE);
 				emptyImageView.setVisibility(View.VISIBLE);
 				emptyTextView.setVisibility(View.VISIBLE);
 				if(parentHandle==-1){
@@ -860,6 +896,8 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 				}
 			}
 			else{
+				contentTextLayout.setVisibility(View.VISIBLE);
+				contentText.setText(MegaApiUtils.getInfoNode(nodes, context));
 				recyclerView.setVisibility(View.VISIBLE);
 				emptyImageView.setVisibility(View.GONE);
 				emptyTextView.setVisibility(View.GONE);
@@ -880,4 +918,5 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 	private static void log(String log) {
 		Util.log("SearchFragmentLollipop", log);
 	}
+
 }

@@ -63,10 +63,13 @@ import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatApiJava;
+import nz.mega.sdk.MegaChatError;
 import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatListenerInterface;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatPresenceConfig;
+import nz.mega.sdk.MegaChatRequest;
+import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaListenerInterface;
@@ -78,9 +81,9 @@ import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaUser;
 
 
-public class MegaApplication extends Application implements MegaListenerInterface, MegaChatListenerInterface{
+public class MegaApplication extends Application implements MegaListenerInterface, MegaChatListenerInterface, MegaChatRequestListenerInterface {
 	final String TAG = "MegaApplication";
-	static final String USER_AGENT = "MEGAAndroid/3.2.2_148";
+	static final String USER_AGENT = "MEGAAndroid/3.2.3.1_152";
 
 	DatabaseHandler dbH;
 	MegaApiAndroid megaApi;
@@ -93,6 +96,7 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 
 	MegaChatApiAndroid megaChatApi = null;
 	private NotificationBuilder notificationBuilder;
+
 //	static final String GA_PROPERTY_ID = "UA-59254318-1";
 //	
 //	/**
@@ -198,6 +202,7 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 
 		megaApi = getMegaApi();
 		megaApiFolder = getMegaApiFolder();
+		megaChatApi = getMegaChatApi();
 
 		MegaChatApiAndroid.setLoggerObject(new AndroidChatLogger());
 		MegaChatApiAndroid.setLogLevel(MegaChatApiAndroid.LOG_LEVEL_MAX);
@@ -309,6 +314,8 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 			}
 			else{
 				megaChatApi = new MegaChatApiAndroid(megaApi);
+				megaChatApi.addChatListener(this);
+				megaChatApi.addChatRequestListener(this);
 			}
 		}
 
@@ -316,15 +323,21 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 	}
 
 	public void disableMegaChatApi(){
+		try {
+			if (megaChatApi != null) {
+				megaChatApi.removeChatListener(this);
+				megaChatApi.removeChatRequestListener(this);
+			}
+		}
+		catch (Exception e){}
+
 		megaChatApi = null;
 	}
 
 	public void enableChat(){
 		log("enableChat");
 		if(Util.isChatEnabled()){
-			megaChatApi = new MegaChatApiAndroid(megaApi);
-			log("enableChat: addChatListener");
-			megaChatApi.addChatListener(this);
+			megaChatApi = getMegaChatApi();
 		}
 	}
 	
@@ -368,9 +381,7 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 //			}
 
 			if(Util.isChatEnabled()){
-				megaChatApi = new MegaChatApiAndroid(megaApi);
-				log("addChatListener");
-				megaChatApi.addChatListener(this);
+				megaChatApi = getMegaChatApi();
 			}
 
 			String language = Locale.getDefault().toString();
@@ -847,6 +858,10 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 	public void showNotification(MegaChatListItem item){
 		log("showNotification: "+item.getTitle()+ " message: "+item.getLastMessage());
 
+		if (megaChatApi == null){
+			megaChatApi = getMegaChatApi();
+		}
+
 		ChatSettings chatSettings = dbH.getChatSettings();
 		String email = megaChatApi.getContactEmail(item.getPeerHandle());
 
@@ -952,5 +967,37 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 				}
 			}
 		}
+	}
+
+	@Override
+	public void onRequestStart(MegaChatApiJava api, MegaChatRequest request) {
+		log("onRequestStart: Chat");
+	}
+
+	@Override
+	public void onRequestUpdate(MegaChatApiJava api, MegaChatRequest request) {
+		log("onRequestUpdate: Chat");
+	}
+
+	@Override
+	public void onRequestFinish(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
+		log("onRequestFinish: Chat " + request.getRequestString());
+		if (request.getType() == MegaChatRequest.TYPE_LOGOUT) {
+			log("CHAT_TYPE_LOGOUT: " + e.getErrorCode() + "__" + e.getErrorString());
+			try{
+				if (megaChatApi != null){
+					megaChatApi.removeChatListener(this);
+					megaChatApi.removeChatRequestListener(this);
+				}
+			}
+			catch (Exception exc){}
+
+			megaChatApi = null;
+		}
+	}
+
+	@Override
+	public void onRequestTemporaryError(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
+		log("onRequestTemporaryError: Chat");
 	}
 }
