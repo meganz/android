@@ -164,22 +164,34 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 		saveForOfflineIcon = menu.findItem(R.id.full_image_viewer_save_for_offline);
 		removeIcon = menu.findItem(R.id.full_image_viewer_remove);
 
-		MegaNode node = messages.get(positionG).getMegaNodeList().get(0);
-
-		if((megaApi.getNodeByHandle(node.getHandle()))==null){
-			log("The node is not mine");
-			removeIcon.setVisible(false);
-		}
-		else{
-			removeIcon.setVisible(true);
-		}
-
 		return super.onCreateOptionsMenu(menu);
 	}
 
 	@Override
 	public boolean onPrepareOptionsMenu(Menu menu) {
 		log("onPrepareOptionsMenu");
+
+		MegaNode node = messages.get(positionG).getMegaNodeList().get(0);
+
+		if(megaApi.userHandleToBase64(messages.get(positionG).getUserHandle()).equals(megaApi.getMyUserHandle())){
+			if((megaApi.getNodeByHandle(node.getHandle()))==null){
+				log("The node is not mine");
+				removeIcon.setVisible(false);
+			}
+			else{
+				if(messages.get(positionG).isDeletable()){
+					removeIcon.setVisible(true);
+				}
+				else{
+					removeIcon.setVisible(false);
+				}
+			}
+		}
+		else{
+			log("The message is not mine");
+			removeIcon.setVisible(false);
+		}
+
 		return super.onPrepareOptionsMenu(menu);
 	}
 
@@ -283,6 +295,24 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 		fragmentContainer = (RelativeLayout) findViewById(R.id.chat_full_image_viewer_parent_layout);
 		appBarLayout = (AppBarLayout) findViewById(R.id.app_bar);
 		viewPager = (ExtendedViewPager) findViewById(R.id.image_viewer_pager);
+		viewPager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
+
+			// optional
+			@Override
+			public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) { }
+
+			// optional
+			@Override
+			public void onPageSelected(int position) {
+				log("onPageSelected");
+				supportInvalidateOptionsMenu();
+			}
+
+			// optional
+			@Override
+			public void onPageScrollStateChanged(int state) { }
+		});
+
 		viewPager.setPageMargin(40);
 
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
