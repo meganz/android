@@ -114,6 +114,7 @@ import mega.privacy.android.app.MegaContactAdapter;
 import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MegaPreferences;
+import mega.privacy.android.app.MimeTypeInfo;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.OldPreferences;
 import mega.privacy.android.app.R;
@@ -1335,6 +1336,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		setSupportActionBar(tB);
 		aB = getSupportActionBar();
 		log("aB.setHomeAsUpIndicator_1");
+		aB.setTitle(getString(R.string.section_cloud_drive));
         aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
         aB.setHomeButtonEnabled(true);
         aB.setDisplayHomeAsUpEnabled(true);
@@ -1351,7 +1353,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		View nVHeader = LayoutInflater.from(this).inflate(R.layout.nav_header, null);
 		nV.addHeaderView(nVHeader);
 
-		//FAB button
+		//FAB buttonaB.
 		fabButton = (FloatingActionButton) findViewById(R.id.floating_button);
 		fabButton.setOnClickListener(new FabButtonListener(this));
 
@@ -1584,6 +1586,16 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
 						intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 						intent.setAction(Constants.ACTION_INCOMING_SHARED_FOLDER_NOTIFICATION);
+						startActivity(intent);
+						finish();
+						return;
+					}
+					else if (getIntent().getAction().equals(Constants.ACTION_OPEN_HANDLE_NODE)){
+						Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
+						intent.putExtra("visibleFragment", Constants.LOGIN_FRAGMENT);
+						intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+						intent.setAction(Constants.ACTION_OPEN_HANDLE_NODE);
+						intent.setData(Uri.parse(getIntent().getDataString()));
 						startActivity(intent);
 						finish();
 						return;
@@ -1840,6 +1852,56 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 							if(!(alertDialogTransferOverquota.isShowing())){
 								showTransferOverquotaDialog();
 							}
+						}
+					}
+					else if (getIntent().getAction().equals(Constants.ACTION_OPEN_HANDLE_NODE)){
+						String link = getIntent().getDataString();
+						String [] s = link.split("#");
+						if (s.length > 1){
+							String nodeHandleLink = s[1];
+							String [] sSlash = s[1].split("/");
+							if (sSlash.length > 0){
+								nodeHandleLink = sSlash[0];
+							}
+							long nodeHandleLinkLong = MegaApiAndroid.base64ToHandle(nodeHandleLink);
+							MegaNode nodeLink = megaApi.getNodeByHandle(nodeHandleLinkLong);
+							if (nodeLink == null){
+								showSnackbar(getString(R.string.general_error_file_not_found));
+							}
+							else{
+								MegaNode pN = megaApi.getParentNode(nodeLink);
+								if (pN == null){
+									pN = megaApi.getRootNode();
+								}
+								parentHandleBrowser = pN.getHandle();
+
+								drawerItem = DrawerItem.CLOUD_DRIVE;
+								selectDrawerItemLollipop(drawerItem);
+								selectDrawerItemPending = false;
+
+								Intent i = new Intent(this, FileInfoActivityLollipop.class);
+								i.putExtra("handle", nodeLink.getHandle());
+								if (nodeLink.isFolder()) {
+									if (nodeLink.isInShare()){
+										i.putExtra("imageId", R.drawable.ic_folder_incoming);
+									}
+									else if (nodeLink.isOutShare()){
+										i.putExtra("imageId", R.drawable.ic_folder_outgoing);
+									}
+									else{
+										i.putExtra("imageId", R.drawable.ic_folder);
+									}
+								}
+								else {
+									i.putExtra("imageId", MimeTypeInfo.typeForName(nodeLink.getName()).getIconResourceId());
+								}
+								i.putExtra("name", nodeLink.getName());
+								startActivity(i);
+							}
+						}
+						else{
+							drawerItem = DrawerItem.CLOUD_DRIVE;
+							selectDrawerItemLollipop(drawerItem);
 						}
 					}
 				}
@@ -5037,8 +5099,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					if (fbFLol!=null){
 						log("in CloudDrive");
 						//Cloud Drive
-
-						aB.setTitle(getString(R.string.section_cloud_drive));
 
 						//Show
 						addMenuItem.setEnabled(true);
