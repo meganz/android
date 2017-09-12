@@ -160,6 +160,8 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 
 					NodeController nC = new NodeController(context);
 					nC.chooseLocationToCopyNodes(handleList);
+					clearSelections();
+					hideMultipleSelect();
 					break;
 				}
 				case R.id.cab_menu_move:{
@@ -170,6 +172,8 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 
 					NodeController nC = new NodeController(context);
 					nC.chooseLocationToMoveNodes(handleList);
+					clearSelections();
+					hideMultipleSelect();
 					break;
 				}
 				case R.id.cab_menu_share:{
@@ -183,6 +187,9 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 
 					NodeController nC = new NodeController(context);
 					nC.selectContactToShareFolders(handleList);
+
+					clearSelections();
+					hideMultipleSelect();
 					break;
 				}
 				case R.id.cab_menu_send_file:{
@@ -197,6 +204,9 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 					log("sendToInbox no of files: "+handleList.size());
 					NodeController nC = new NodeController(context);
 					nC.selectContactToSendNodes(handleList);
+
+					clearSelections();
+					hideMultipleSelect();
 					break;
 				}
 				case R.id.cab_menu_share_link:{
@@ -239,6 +249,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 					}
 
 					((ManagerActivityLollipop) context).askConfirmationMoveToRubbish(handleList);
+
 					break;
 				}
 				case R.id.cab_menu_select_all:{
@@ -310,11 +321,12 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			}
 
 
-				if (selected.size() != 0) {
+			if (selected.size() != 0) {
 				showDownload = true;
 				showTrash = true;
 				showMove = true;
 				showCopy = true;
+				showShare = true;
 
 				for(int i=0; i<selected.size();i++)	{
 					if(megaApi.checkMove(selected.get(i), megaApi.getRubbishNode()).getErrorCode() != MegaError.API_OK)	{
@@ -349,7 +361,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			else{
 				menu.findItem(R.id.cab_menu_select_all).setVisible(true);
 				menu.findItem(R.id.cab_menu_unselect_all).setVisible(false);
-				showShare = false;
 			}
 
 
@@ -407,10 +418,14 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 
 			menu.findItem(R.id.cab_menu_share).setVisible(showShare);
 			if(showShare){
-				menu.findItem(R.id.cab_menu_share).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+				if(selected.size()==1){
+					menu.findItem(R.id.cab_menu_share).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+
+				}else{
+					menu.findItem(R.id.cab_menu_share).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+				}
 			}else{
 				menu.findItem(R.id.cab_menu_share).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
-
 			}
 
 			menu.findItem(R.id.cab_menu_send_file).setVisible(true);
