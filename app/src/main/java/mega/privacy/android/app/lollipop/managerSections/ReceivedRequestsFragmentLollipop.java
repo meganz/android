@@ -200,7 +200,10 @@ public class ReceivedRequestsFragmentLollipop extends Fragment {
 	 */
 	public void hideMultipleSelect() {
 		log("hideMultipleSelect");
-		adapterList.setMultipleSelect(false);
+		if(adapterList!=null){
+			adapterList.setMultipleSelect(false);
+		}
+
 		if (actionMode != null) {
 			actionMode.finish();
 		}
