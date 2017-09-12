@@ -89,7 +89,7 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 	boolean isList = true;
 	int orderGetChildren;
 
-	MenuItem rubbish_bin;
+	MenuItem rubbishBinMenuItem;
 	
 	ArrayList<MegaNode> nodes;
 	MegaNode selectedNode;
@@ -270,31 +270,26 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 			menu.findItem(R.id.cab_menu_download).setVisible(true);
 			menu.findItem(R.id.cab_menu_download).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
-
-
 			menu.findItem(R.id.cab_menu_rename).setVisible(showRename);
 			menu.findItem(R.id.cab_menu_copy).setVisible(true);
 			menu.findItem(R.id.cab_menu_copy).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
 			menu.findItem(R.id.cab_menu_move).setVisible(showMove);
 			menu.findItem(R.id.cab_menu_share_link).setVisible(false);
-			rubbish_bin = menu.findItem(R.id.cab_menu_trash);
+			rubbishBinMenuItem = menu.findItem(R.id.cab_menu_trash);
 
 			if (deepBrowserTree == 0){
-				rubbish_bin.setVisible(false);
+				rubbishBinMenuItem.setVisible(false);
 				menu.findItem(R.id.cab_menu_leave_multiple_share).setVisible(true);
 				menu.findItem(R.id.cab_menu_leave_multiple_share).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 			}
 			else{
-				rubbish_bin.setVisible(true);
+				rubbishBinMenuItem.setVisible(true);
 				menu.findItem(R.id.cab_menu_leave_multiple_share).setVisible(false);
 				menu.findItem(R.id.cab_menu_leave_multiple_share).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
 			}
-
-
 			return false;
 		}
-		
 	}
 
 	public static IncomingSharesFragmentLollipop newInstance() {
