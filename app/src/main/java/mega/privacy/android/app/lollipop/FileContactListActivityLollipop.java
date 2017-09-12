@@ -76,7 +76,6 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 	CoordinatorLayout coordinatorLayout;
 	RelativeLayout container;
 	RelativeLayout contactLayout;
-	RelativeLayout fileContactLayout;
 	RecyclerView listView;
 	LinearLayoutManager mLayoutManager;
 	GestureDetectorCompat detector;
@@ -241,7 +240,8 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 								showConfirmationRemoveContactFromShare(u);
 							}
 						}
-					}				
+					}
+					clearSelections();
 					break;
 				}
 				case R.id.cab_menu_select_all:{
@@ -372,7 +372,6 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 			createdView = (TextView) findViewById(R.id.node_last_update);
 			contactLayout = (RelativeLayout) findViewById(R.id.file_contact_list_layout);
 			contactLayout.setOnClickListener(this);
-			fileContactLayout = (RelativeLayout) findViewById(R.id.file_contact_list_browser_layout);
 
 			fab = (FloatingActionButton) findViewById(R.id.floating_button_file_contact_list);
 			fab.setOnClickListener(this);
@@ -401,14 +400,15 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 			
 			emptyImage = (ImageView) findViewById(R.id.file_contact_list_empty_image);
 			emptyText = (TextView) findViewById(R.id.file_contact_list_empty_text);
+			emptyImage.setImageResource(R.drawable.ic_empty_contacts);
+			emptyText.setText(R.string.contacts_list_empty_text);
+
 			if (listContacts.size() != 0){
 				emptyImage.setVisibility(View.GONE);
 				emptyText.setVisibility(View.GONE);
-				fileContactLayout.setVisibility(View.VISIBLE);
 				listView.setVisibility(View.VISIBLE);
 			}			
 			else{
-				fileContactLayout.setVisibility(View.VISIBLE);
 				emptyImage.setVisibility(View.VISIBLE);
 				emptyText.setVisibility(View.VISIBLE);
 				
@@ -451,9 +451,6 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 	
 	public void showOptionsPanel(MegaShare sShare){
 		log("showNodeOptionsPanel");
-		
-//		fabButton.setVisibility(View.GONE);
-
 		if(node!=null){
 			this.selectedShare = sShare;
 			FileContactsListBottomSheetDialogFragment bottomSheetDialogFragment = new FileContactsListBottomSheetDialogFragment();
@@ -509,7 +506,6 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 		    }
 		    case R.id.action_folder_contacts_list_share_folder:{
 		    	//Option add new contact to share
-
 				removeShare = false;
 				changeShare = false;
 
@@ -532,9 +528,7 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 	    }
 	}
 
-	/*
-	 * Clear all selected items
-	 */
+	// Clear all selected items
 	private void clearSelections() {
 		if(adapter.isMultipleSelect()){
 			adapter.clearSelections();
@@ -945,7 +939,6 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 
 	@Override
 	public void onNodesUpdate(MegaApiJava api, ArrayList<MegaNode> nodes) {
-
 		log("onNodesUpdate");
 
 		try {
@@ -968,7 +961,9 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 //			listContacts = megaApi.getOutShares(node);
 			if (listContacts != null){
 				if (listContacts.size() > 0){
-					fileContactLayout.setVisibility(View.VISIBLE);
+					listView.setVisibility(View.VISIBLE);
+					emptyImage.setVisibility(View.GONE);
+					emptyText.setVisibility(View.GONE);
 
 					if (adapter != null){
 						adapter.setNode(node);
@@ -979,10 +974,11 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 					else{
 						adapter = new MegaSharedFolderLollipopAdapter(this, node, listContacts, listView);
 					}
-
 				}
 				else{
-					fileContactLayout.setVisibility(View.GONE);
+					listView.setVisibility(View.GONE);
+					emptyImage.setVisibility(View.VISIBLE);
+					emptyText.setVisibility(View.VISIBLE);
 					//((RelativeLayout.LayoutParams)infoTable.getLayoutParams()).addRule(RelativeLayout.BELOW, R.id.file_properties_image);
 				}
 			}			
