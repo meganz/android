@@ -36,6 +36,7 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.components.EmojiconTextView;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.listeners.ChatListNonContactNameListener;
@@ -114,7 +115,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
     	TextView contactInitialLetter;
 //        ImageView imageView;
         TextView textViewContactName;
-        TextView textViewContent;
+        EmojiconTextView textViewContent;
 		TextView textViewDate;
         ImageButton imageButtonThreeDots;
         RelativeLayout itemLayout;
@@ -477,7 +478,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		holder.textViewContactName = (TextView) v.findViewById(R.id.recent_chat_list_name);
 		holder.textViewContactName.setMaxWidth(Util.scaleWidthPx(194, outMetrics));
 
-		holder.textViewContent = (TextView) v.findViewById(R.id.recent_chat_list_content);
+		holder.textViewContent = (EmojiconTextView) v.findViewById(R.id.recent_chat_list_content);
 		holder.textViewContent.setMaxWidth(Util.scaleWidthPx(194, outMetrics));
 
 		holder.textViewDate = (TextView) v.findViewById(R.id.recent_chat_list_date);

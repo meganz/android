@@ -52,7 +52,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
-import mega.privacy.android.app.components.WrapTextView;
+import mega.privacy.android.app.components.WrapEmojiconTextView;
 import mega.privacy.android.app.lollipop.adapters.MegaBrowserLollipopAdapter;
 import mega.privacy.android.app.lollipop.adapters.MegaFullScreenImageAdapterLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaOfflineFullScreenImageAdapterLollipop;
@@ -229,7 +229,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 //        TextView meText;
         TextView timeOwnText;
         RelativeLayout contentOwnMessageLayout;
-        TextView contentOwnMessageText;
+        WrapEmojiconTextView contentOwnMessageText;
 
         ImageView contentOwnMessageThumbLand;
         ImageView contentOwnMessageThumbPort;
@@ -259,7 +259,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 //        TextView contactText;
         TextView timeContactText;
         RelativeLayout contentContactMessageLayout;
-        TextView contentContactMessageText;
+        WrapEmojiconTextView contentContactMessageText;
 
         ImageView contentContactMessageThumbLand;
         ImageView contentContactMessageThumbLandFramework;
@@ -361,7 +361,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
             holder.contentOwnMessageLayout = (RelativeLayout) v.findViewById(R.id.content_own_message_layout);
 
-            holder.contentOwnMessageText = (WrapTextView) v.findViewById(R.id.content_own_message_text);
+            holder.contentOwnMessageText = (WrapEmojiconTextView) v.findViewById(R.id.content_own_message_text);
 
             holder.contentOwnMessageThumbLand = (ImageView)  v.findViewById(R.id.content_own_message_thumb_landscape);
             holder.contentOwnMessageThumbPort = (ImageView)  v.findViewById(R.id.content_own_message_thumb_portrait);
@@ -412,7 +412,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
             holder.contentContactMessageLayout = (RelativeLayout) v.findViewById(R.id.content_contact_message_layout);
 
-            holder.contentContactMessageText = (WrapTextView) v.findViewById(R.id.content_contact_message_text);
+            holder.contentContactMessageText = (WrapEmojiconTextView) v.findViewById(R.id.content_contact_message_text);
 
             holder.contentContactMessageThumbLand = (ImageView)  v.findViewById(R.id.content_contact_message_thumb_landscape);
             holder.contentContactMessageThumbLandFramework = (ImageView)  v.findViewById(R.id.content_contact_message_thumb_landscape_framework);
@@ -1371,6 +1371,9 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                         ((ViewHolderMessageChat)holder).contentOwnMessageText.setText(content+" ");
 
+                        /*******/
+                        log("***OWN: 1: "+((ViewHolderMessageChat)holder).contentOwnMessageText.getText());
+
                         Spannable edited = new SpannableString(context.getString(R.string.edited_message_text));
                         edited.setSpan(new RelativeSizeSpan(0.85f), 0, edited.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                         edited.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.accentColor)), 0, edited.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
@@ -1485,6 +1488,10 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                             }
 
                             ((ViewHolderMessageChat)holder).contentOwnMessageText.setText(messageContent);
+
+                            /*******/
+                            log("***OWN: 2: "+messageContent);
+
                         }
                         else if(message.getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT){
 
@@ -1655,6 +1662,9 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                             ((ViewHolderMessageChat)holder).contentOwnMessageText.setTextColor(ContextCompat.getColor(context, R.color.accentColor));
                             messageContent = "Attachment revoked";
                             ((ViewHolderMessageChat)holder).contentOwnMessageText.setText(messageContent);
+                            /*******/
+                            log("***OWN: 3: "+((ViewHolderMessageChat)holder).contentOwnMessageText.getText());
+
 
                         }
                         else if(message.getType()==MegaChatMessage.TYPE_CONTACT_ATTACHMENT){
@@ -1865,6 +1875,9 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     ((ViewHolderMessageChat)holder).contentOwnMessageText.setTextColor(ContextCompat.getColor(context, R.color.tour_bar_red));
 
                     ((ViewHolderMessageChat)holder).contentOwnMessageText.setText(context.getString(R.string.error_message_unrecognizable));
+                    /*******/
+                    log("***OWN: 4: "+((ViewHolderMessageChat)holder).contentOwnMessageText.getText());
+
                     ((ViewHolderMessageChat)holder).contentOwnMessageLayout.setVisibility(View.VISIBLE);
                     ((ViewHolderMessageChat)holder).ownManagementMessageLayout.setVisibility(View.GONE);
 
@@ -1949,6 +1962,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                             if(messages.get(position-1).getInfoToShow()==Constants.CHAT_ADAPTER_SHOW_NOTHING_NO_NAME){
                                 ((ViewHolderMessageChat)holder).contentContactMessageText.setText("");
+
+
                             }else{
                                 Spannable name = new SpannableString(((ViewHolderMessageChat)holder).fullNameTitle+"\n");
                                 if(color!=null){
@@ -1960,6 +1975,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                     name.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.accentColor)), 0, name.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                                 }
                                 ((ViewHolderMessageChat)holder).contentContactMessageText.setText(name);
+                                /*******/
+                                log("***CONTACT: 2: "+name);
                                 ((ViewHolderMessageChat)holder).contentContactMessageFileSender.setVisibility(View.GONE);
 
                             }
@@ -1995,6 +2012,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                         ((ViewHolderMessageChat)holder).contentContactMessageFileSender.setVisibility(View.GONE);
                         ((ViewHolderMessageChat)holder).contentContactMessageContactSender.setVisibility(View.GONE);
                         ((ViewHolderMessageChat)holder).contentContactMessageText.setText("");
+
                     }
 
                     if(message.isEdited()){
@@ -2139,6 +2157,10 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                 messageContent = message.getContent();
                             }
                             ((ViewHolderMessageChat)holder).contentContactMessageText.append(messageContent);
+                            /*******/
+                            log("***CONTACT: 5: "+messageContent);
+
+
 
                             ((ViewHolderMessageChat)holder).contentContactMessageText.setTextColor(ContextCompat.getColor(context, R.color.name_my_account));
 
@@ -2443,6 +2465,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                             ((ViewHolderMessageChat)holder).contentContactMessageText.setTextColor(ContextCompat.getColor(context, R.color.accentColor));
                             messageContent = "Attachment revoked";
                             ((ViewHolderMessageChat)holder).contentContactMessageText.setText(messageContent);
+                            /*******/
+                            log("***CONTACT: 4: "+messageContent);
                         }
                         else if(message.getType()==MegaChatMessage.TYPE_CONTACT_ATTACHMENT){
 

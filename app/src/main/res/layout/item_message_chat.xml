@@ -109,7 +109,7 @@
                 android:layout_height="wrap_content"
                 android:background="@android:color/transparent">
 
-                <mega.privacy.android.app.components.WrapTextView
+                <mega.privacy.android.app.components.WrapEmojiconTextView
                     android:id="@+id/content_own_message_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -477,7 +477,7 @@
             android:background="@android:color/transparent"
             android:layout_below="@+id/title_contact_message_layout">
 
-            <mega.privacy.android.app.components.WrapTextView
+            <mega.privacy.android.app.components.WrapEmojiconTextView
                 android:id="@+id/content_contact_message_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
