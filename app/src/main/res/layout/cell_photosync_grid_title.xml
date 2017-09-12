@@ -2,14 +2,12 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:id="@+id/cell_photosync_grid"
-    >
+    android:id="@+id/cell_photosync_grid">
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="36dp"
-        android:id="@+id/cell_photosync_grid_title_layout"
-        >
+        android:id="@+id/cell_photosync_grid_title_layout">
         <TextView
             android:id="@+id/cell_photosync_grid_title_title"
             android:layout_width="match_parent"
@@ -34,8 +32,7 @@
             android:layout_height="match_parent"
             android:scaleType="centerCrop"
             android:background="@color/white"
-            android:adjustViewBounds="true"
-            />
+            android:adjustViewBounds="true" />
 
         <RelativeLayout
             android:layout_width="match_parent"
