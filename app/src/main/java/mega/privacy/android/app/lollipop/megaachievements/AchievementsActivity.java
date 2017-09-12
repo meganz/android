@@ -1,7 +1,9 @@
 package mega.privacy.android.app.lollipop.megaachievements;
 
+import android.app.Activity;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
@@ -12,23 +14,44 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
 
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+
+import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.PinActivityLollipop;
 import mega.privacy.android.app.lollipop.managerSections.OutgoingSharesFragmentLollipop;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
+import nz.mega.sdk.MegaAchievementsDetails;
+import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaError;
+import nz.mega.sdk.MegaRequest;
+import nz.mega.sdk.MegaRequestListenerInterface;
 
-public class AchievementsActivity extends PinActivityLollipop {
+public class AchievementsActivity extends PinActivityLollipop implements MegaRequestListenerInterface {
 
     FrameLayout fragmentContainer;
     Toolbar tB;
     ActionBar aB;
     int visibleFragment;
     private AchievementsFragment achievementsFragment;
+    private ReferralBonusesFragment referralBonusesFragment;
+
+    public MegaAchievementsDetails megaAchievements;
+    public ArrayList<ReferralBonus> referralBonuses;
+
+    MegaApiAndroid megaApi;
 
     protected void onCreate(Bundle savedInstanceState) {
         log("onCreate");
 		super.onCreate(savedInstanceState);
+
+        if (megaApi == null){
+            megaApi = ((MegaApplication) getApplication()).getMegaApi();
+        }
 
         setContentView(R.layout.activity_achievements);
 
@@ -55,6 +78,9 @@ public class AchievementsActivity extends PinActivityLollipop {
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         ft.replace(R.id.fragment_container_achievements, achievementsFragment, "achievementsFragment");
         ft.commitNow();
+
+        referralBonuses = new ArrayList<>();
+        megaApi.getAccountAchievements(this);
     }
 
     @Override
@@ -80,6 +106,32 @@ public class AchievementsActivity extends PinActivityLollipop {
     public void showFragment(int fragment){
         visibleFragment = fragment;
 
+        if(visibleFragment==Constants.ACHIEVEMENTS_FRAGMENT){
+
+            aB.setTitle(getString(R.string.achievements_title));
+            if(achievementsFragment==null){
+                achievementsFragment = new AchievementsFragment();
+            }
+
+
+            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            ft.replace(R.id.fragment_container_achievements, achievementsFragment, "achievementsFragment");
+            ft.commitNow();
+
+            achievementsFragment.updateValues();
+
+        }
+        else{
+
+            if(referralBonusesFragment==null) {
+                referralBonusesFragment = new ReferralBonusesFragment();
+            }
+
+            aB.setTitle(getString(R.string.title_referral_bonuses));
+            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            ft.replace(R.id.fragment_container_achievements, referralBonusesFragment, "referralBonusesFragment");
+            ft.commitNow();
+        }
     }
 
     @Override
@@ -94,4 +146,83 @@ public class AchievementsActivity extends PinActivityLollipop {
     }
 
 
+    @Override
+    public void onRequestStart(MegaApiJava api, MegaRequest request) {
+        log("onRequestStart: "+request.getRequestString());
+    }
+
+    @Override
+    public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
+
+    }
+
+    @Override
+    public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
+        log("onRequestFinish: "+request.getRequestString()+"__"+e.getErrorCode());
+
+        if(request.getType()==MegaRequest.TYPE_GET_ACHIEVEMENTS){
+            if (e.getErrorCode() == MegaError.API_OK){
+
+                megaAchievements=request.getMegaAchievementsDetails();
+                if(megaAchievements!=null){
+                    if(visibleFragment==Constants.ACHIEVEMENTS_FRAGMENT){
+                        achievementsFragment.updateValues();
+                    }
+
+                    calculateReferralBonuses();
+                }
+            }
+            else{
+                Snackbar.make(fragmentContainer, getString(R.string.cancel_subscription_error), Snackbar.LENGTH_LONG).show();
+            }
+        }
+    }
+
+    public void calculateReferralBonuses() {
+        log("calculateReferralBonuses");
+
+        long count = megaAchievements.getAwardsCount();
+
+        for (int i = 0; i < count; i++) {
+            int type = megaAchievements.getAwardClass(i);
+
+            int awardId = megaAchievements.getAwardId(i);
+
+            int rewardId = megaAchievements.getRewardAwardId(awardId);
+            log("AWARD ID: " + awardId + " REWARD id: " + rewardId);
+
+            if (type == MegaAchievementsDetails.MEGA_ACHIEVEMENT_INVITE) {
+
+                ReferralBonus rBonus = new ReferralBonus();
+
+                rBonus.setEmails(megaAchievements.getAwardEmails(i));
+
+                long daysLeft = megaAchievements.getAwardExpirationTs(i);
+                log("Registration AwardExpirationTs: " + daysLeft);
+
+                Calendar start = Util.calculateDateFromTimestamp(daysLeft);
+                Calendar end = Calendar.getInstance();
+                Date startDate = start.getTime();
+                Date endDate = end.getTime();
+                long startTime = startDate.getTime();
+                long endTime = endDate.getTime();
+                long diffTime = startTime - endTime;
+                long diffDays = diffTime / (1000 * 60 * 60 * 24);
+
+                rBonus.setDaysLeft(diffDays);
+
+                rBonus.setStorage(megaAchievements.getRewardStorageByAwardId(awardId));
+                rBonus.setTransfer(megaAchievements.getRewardTransferByAwardId(awardId));
+
+                referralBonuses.add(rBonus);
+            } else {
+                log("MEGA_ACHIEVEMENT: " + type);
+            }
+        }
+    }
+
+    @Override
+    public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) {
+
+    }
 }
