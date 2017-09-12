@@ -8796,8 +8796,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				if (p.getHandle() != megaApi.getRubbishNode().getHandle()){
 
 					setMoveToRubbish(true);
-					AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-//				builder.setTitle(getResources().getString(R.string.section_rubbish_bin));
+
+					AlertDialog.Builder builder = new AlertDialog.Builder(this);
 					builder.setMessage(getResources().getString(R.string.confirmation_move_to_rubbish));
 
 					builder.setPositiveButton(R.string.general_move, dialogClickListener);
@@ -8807,9 +8807,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				else{
 
 					setMoveToRubbish(false);
-					AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-//				builder.setTitle(getResources().getString(R.string.title_delete_from_mega));
 
+					AlertDialog.Builder builder = new AlertDialog.Builder(this);
 					builder.setMessage(getResources().getString(R.string.confirmation_delete_from_mega));
 
 					//builder.setPositiveButton(R.string.context_delete, dialogClickListener);
