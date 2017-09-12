@@ -1709,7 +1709,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			String[] sdCardOptions = getResources().getStringArray(R.array.settings_storage_download_location_array);
 	        AlertDialog.Builder b=new AlertDialog.Builder(context);
 
-			b.setTitle(getResources().getString(R.string.settings_storage_download_location));
+			b.setTitle(getResources().getString(R.string.settings_local_camera_upload_folder));
 			b.setItems(sdCardOptions, new OnClickListener() {
 				
 				@Override
