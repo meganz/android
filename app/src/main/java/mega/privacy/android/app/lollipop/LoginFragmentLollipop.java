@@ -590,6 +590,10 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     else if (intentReceived.getAction().equals(Constants.ACTION_SHOW_TRANSFERS)){
                         action = intentReceived.getAction();
                     }
+                    if(intentReceived.getAction().equals(Constants.ACTION_OPEN_HANDLE_NODE)){
+                        action = Constants.ACTION_OPEN_HANDLE_NODE;
+                        url = intentReceived.getDataString();
+                    }
 
                     MegaNode rootNode = megaApi.getRootNode();
                     if (rootNode != null){

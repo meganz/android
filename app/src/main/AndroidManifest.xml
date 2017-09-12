@@ -2,8 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="mega.privacy.android.app"
     android:installLocation="auto"
-    android:versionCode="149"
-    android:versionName="3.2.3 (149)" >
+    android:versionCode="152"
+    android:versionName="3.2.3.1 (152)" >
 
     <uses-sdk
         android:minSdkVersion="11"
@@ -130,7 +130,6 @@
             android:name="mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop"
             android:label="@string/full_screen_image_viewer_label"
             android:launchMode="singleTop"
-            android:theme="@style/Theme.Megaactionbar.FullScreen"
             android:uiOptions="splitActionBarWhenNarrow" >
         </activity>
 
@@ -138,7 +137,6 @@
             android:name="mega.privacy.android.app.lollipop.ChatFullScreenImageViewer"
             android:label="@string/full_screen_image_viewer_label"
             android:launchMode="singleTop"
-            android:theme="@style/Theme.Megaactionbar.FullScreen"
             android:uiOptions="splitActionBarWhenNarrow" >
         </activity>
 
