@@ -49,53 +49,54 @@ import nz.mega.sdk.MegaUser;
 
 public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragment implements View.OnClickListener {
 
-    Context context;
-    MegaNode node = null;
-    NodeController nC;
+    private Context context;
+    private MegaNode node = null;
+    private NodeController nC;
 
     private BottomSheetBehavior mBehavior;
 
-    LinearLayout mainLinearLayout;
-    CoordinatorLayout coordinatorLayout;
+    private LinearLayout mainLinearLayout;
+    private CoordinatorLayout coordinatorLayout;
 
-    ImageView nodeThumb;
-    TextView nodeName;
-    TextView nodeInfo;
-    RelativeLayout nodeIconLayout;
-    ImageView nodeIcon;
-    LinearLayout optionDownload;
-    LinearLayout optionInfo;
-    TextView optionInfoText;
-    ImageView optionInfoImage;
-    LinearLayout optionLink;
-    TextView optionLinkText;
-    ImageView optionLinkImage;
-    LinearLayout optionRemoveLink;
-    LinearLayout optionShare;
-    TextView optionShareText;
-    LinearLayout optionClearShares;
-    LinearLayout optionLeaveShares;
-    LinearLayout optionSendInbox;
-    LinearLayout optionRename;
-    LinearLayout optionMove;
-    LinearLayout optionCopy;
-    LinearLayout optionRubbishBin;
-    LinearLayout optionRemove;
-    LinearLayout optionOpenFolder;
+    private ImageView nodeThumb;
+    private TextView nodeName;
+    private TextView nodeInfo;
+    private RelativeLayout nodeIconLayout;
+    private ImageView nodeIcon;
+    private LinearLayout optionDownload;
+    private LinearLayout optionInfo;
+    private TextView optionInfoText;
+    private ImageView optionInfoImage;
+    private LinearLayout optionLink;
+    private TextView optionLinkText;
+    private ImageView optionLinkImage;
+    private LinearLayout optionRemoveLink;
+    private LinearLayout optionShare;
+    private TextView optionShareText;
+    private LinearLayout optionClearShares;
+    private LinearLayout optionLeaveShares;
+    private LinearLayout optionSendInbox;
+    private LinearLayout optionRename;
+    private LinearLayout optionMove;
+    private LinearLayout optionCopy;
+    private LinearLayout optionRubbishBin;
+    private LinearLayout optionRemove;
+    private LinearLayout optionOpenFolder;
 
     private LinearLayout items_layout;
     private RelativeLayout node_head;
 
-    DisplayMetrics outMetrics;
+    private DisplayMetrics outMetrics;
 
     static ManagerActivityLollipop.DrawerItem drawerItem = null;
-    Bitmap thumb = null;
+    private Bitmap thumb = null;
 
-    MegaApiAndroid megaApi;
-    DatabaseHandler dbH;
+    private MegaApiAndroid megaApi;
+    private DatabaseHandler dbH;
 
     private int height = -1;
     private boolean heightseted = false;
+    private int heightReal = -1;
 
     private View contentView;
 
@@ -142,6 +143,13 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
         display.getMetrics(outMetrics);
 
         contentView = View.inflate(getContext(), R.layout.bottom_sheet_node_item, null);
+
+        contentView.post(new Runnable() {
+            @Override
+            public void run() {
+                heightReal = contentView.getHeight();
+            }
+        });
 
         mainLinearLayout = (LinearLayout) contentView.findViewById(R.id.node_bottom_sheet);
 
@@ -584,13 +592,25 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                         optionRemoveLink.setVisibility(View.GONE);
                     }
 
+                    //Parent
+                    final long handle = node.getHandle();
+                    MegaNode parent = megaApi.getNodeByHandle(handle);
+                    while (megaApi.getParentNode(parent) != null){
+                        parent = megaApi.getParentNode(parent);
+                    }
+
+                    if (parent.getHandle() != megaApi.getRubbishNode().getHandle()){
+                        optionRubbishBin.setVisibility(View.VISIBLE);
+                        optionRemove.setVisibility(View.GONE);
+                    }else{
+                        optionRubbishBin.setVisibility(View.GONE);
+                        optionRemove.setVisibility(View.VISIBLE);
+                    }
+
                     optionSendInbox.setVisibility(View.VISIBLE);
                     optionDownload.setVisibility(View.VISIBLE);
                     optionInfo.setVisibility(View.VISIBLE);
-                    optionRubbishBin.setVisibility(View.VISIBLE);
                     optionLink.setVisibility(View.VISIBLE);
-
-                    optionRubbishBin.setVisibility(View.VISIBLE);
                     optionRename.setVisibility(View.VISIBLE);
                     optionOpenFolder.setVisibility(View.VISIBLE);
 
@@ -598,7 +618,6 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                     optionMove.setVisibility(View.GONE);
                     optionCopy.setVisibility(View.GONE);
                     optionClearShares.setVisibility(View.GONE);
-                    optionRemove.setVisibility(View.GONE);
                     optionLeaveShares.setVisibility(View.GONE);
                     break;
                 }
@@ -615,18 +634,20 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                 @Override
                 public void onStateChanged(@NonNull View bottomSheet, int newState) {
                     if(newState == BottomSheetBehavior.STATE_HIDDEN){
-                        dismiss();
+                        dismissAllowingStateLoss();
                     }
                 }
 
                 @Override
                 public void onSlide(@NonNull View bottomSheet, float slideOffset) {
                     if(slideOffset> 0 && !heightseted){
-                        heightseted = true;
+                        log("HeightReal is "+ heightReal);
                         if(context instanceof CustomHeight){
                             height = ((CustomHeight) context).getHeightToPanel(thisclass);
                         }
-                        if(height != -1){
+                        log("Height is "+height);
+                        if(height != -1 && heightReal != -1){
+                            heightseted = true;
                             int numSons = 0;
                             int num = items_layout.getChildCount();
                             for(int i=0; i<num; i++){
@@ -635,13 +656,18 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                                     numSons++;
                                 }
                             }
-                            if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE && numSons > 3){
-
-                                ViewGroup.LayoutParams params = bottomSheet.getLayoutParams();
-                                params.height = height;
-                                bottomSheet.setLayoutParams(params);
-                            }
-                            else if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT && numSons > 9){
+//                            if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE && numSons > 3){
+//
+//                                ViewGroup.LayoutParams params = bottomSheet.getLayoutParams();
+//                                params.height = height;
+//                                bottomSheet.setLayoutParams(params);
+//                            }
+//                            else if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT && numSons > 9){
+//                                ViewGroup.LayoutParams params = bottomSheet.getLayoutParams();
+//                                params.height = height;
+//                                bottomSheet.setLayoutParams(params);
+//                            }
+                            if(heightReal > height){
                                 ViewGroup.LayoutParams params = bottomSheet.getLayoutParams();
                                 params.height = height;
                                 bottomSheet.setLayoutParams(params);
@@ -845,9 +871,19 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                 dismissAllowingStateLoss();
                 break;
             }
-            case R.id.option_rubbish_bin_layout:
+            case R.id.option_rubbish_bin_layout:{
+                log("Move to rubbish option");
+                if(node==null){
+                    log("The selected node is NULL");
+                    return;
+                }
+                ArrayList<Long> handleList = new ArrayList<Long>();
+                handleList.add(node.getHandle());
+                ((ManagerActivityLollipop) context).askConfirmationMoveToRubbish(handleList);
+                break;
+            }
             case R.id.option_remove_layout:{
-                log("Delete/Move to rubbish option");
+                log("Remove option");
                 if(node==null){
                     log("The selected node is NULL");
                     return;

@@ -2,6 +2,7 @@ package mega.privacy.android.app.lollipop.managerSections;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -34,9 +35,12 @@ import java.util.Locale;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
+import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.MyAccountInfo;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
+import mega.privacy.android.app.lollipop.megaachievements.AchievementsActivity;
+import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.DBUtil;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -56,8 +60,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 	RelativeLayout avatarLayout;
 	TextView initialLetter;
 	RoundedImageView myAccountImage;
-	ImageView mailIcon;
-	
+
 	TextView nameView;
 	boolean mKLayoutVisible;
 
@@ -69,7 +72,8 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 	TextView usedSpace;
 	TextView lastSession;
 	TextView connections;
-	TextView fingerprint;
+
+	ImageView editImageView;
 
 	Button upgradeButton;
 	Button logoutButton;
@@ -79,7 +83,9 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 	RelativeLayout typeLayout;
 	LinearLayout lastSessionLayout;
 	LinearLayout connectionsLayout;
-	LinearLayout fingerprintLayout;
+
+	LinearLayout achievementsLayout;
+	LinearLayout achievementsSeparator;
 
 	RelativeLayout exportMKLayout;
 	LinearLayout exportMKButtonsLayout;
@@ -139,23 +145,16 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 
 		avatarLayout = (RelativeLayout) v.findViewById(R.id.my_account_relative_layout_avatar);
 		avatarLayout.setOnClickListener(this);
-		mailIcon = (ImageView)  v.findViewById(R.id.my_account_email_icon);
-		LinearLayout.LayoutParams mailIconParams = (LinearLayout.LayoutParams)mailIcon.getLayoutParams();
-		mailIconParams.setMargins(Util.scaleWidthPx(16, outMetrics), Util.scaleHeightPx(28, outMetrics), 0, 0);
-		mailIcon.setLayoutParams(mailIconParams);
 
 		nameView = (TextView) v.findViewById(R.id.my_account_name);
-		LinearLayout.LayoutParams nameViewParams = (LinearLayout.LayoutParams)nameView.getLayoutParams();
-		nameViewParams.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleHeightPx(26, outMetrics), 0, 0);
-		nameView.setLayoutParams(nameViewParams);
 		nameView.setOnClickListener(this);
+
+		editImageView = (ImageView) v.findViewById(R.id.my_account_edit_icon);
+		editImageView.setOnClickListener(this);
 
 		infoEmail = (TextView) v.findViewById(R.id.my_account_email);
 		myEmail = megaApi.getMyUser().getEmail();
 		infoEmail.setText(myEmail);
-		LinearLayout.LayoutParams infoEmailParams = (LinearLayout.LayoutParams)infoEmail.getLayoutParams();
-		infoEmailParams.setMargins(Util.scaleWidthPx(20, outMetrics), 0, 0, Util.scaleHeightPx(26, outMetrics));
-		infoEmail.setLayoutParams(infoEmailParams);
 		infoEmail.setOnClickListener(this);
 
 		if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
@@ -164,15 +163,11 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 			infoEmail.setMaxWidth(Util.scaleWidthPx(250, outMetrics));
 		}
 		else{
-			nameView.setMaxWidth(Util.scaleWidthPx(210, outMetrics));
+			nameView.setMaxWidth(Util.scaleWidthPx(180, outMetrics));
 			infoEmail.setMaxWidth(Util.scaleWidthPx(210, outMetrics));
 		}
 		
 		myAccountImage = (RoundedImageView) v.findViewById(R.id.my_account_thumbnail);
-
-		RelativeLayout.LayoutParams avatarLayoutParams = (RelativeLayout.LayoutParams)avatarLayout.getLayoutParams();
-		avatarLayoutParams.setMargins(0, Util.scaleHeightPx(16, outMetrics), Util.scaleWidthPx(16, outMetrics), Util.scaleHeightPx(16, outMetrics));
-		avatarLayout.setLayoutParams(avatarLayoutParams);
 
 		initialLetter = (TextView) v.findViewById(R.id.my_account_initial_letter);
 
@@ -182,13 +177,10 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		}
 		else{
 			mkButton.setBackgroundResource(R.drawable.black_button_border);
+//			mkButton.setBackgroundColor(ContextCompat.getColor(context, R.color.white));
 		}
 		mkButton.setOnClickListener(this);
 		mkButton.setVisibility(View.VISIBLE);
-
-		LinearLayout.LayoutParams mkButtonParams = (LinearLayout.LayoutParams)mkButton.getLayoutParams();
-		mkButtonParams.setMargins(Util.scaleWidthPx(57, outMetrics), Util.scaleHeightPx(8, outMetrics), 0, Util.scaleHeightPx(8, outMetrics));
-		mkButton.setLayoutParams(mkButtonParams);
 
 		String path = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
 		log("Exists MK in: "+path);
@@ -200,15 +192,24 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 			mkButton.setText(getString(R.string.action_export_master_key));
 		}
 
+		achievementsLayout = (LinearLayout) v.findViewById(R.id.my_account_achievements_layout);
+		achievementsSeparator = (LinearLayout)v.findViewById(R.id.my_account_achievements_separator);
+
+		if(megaApi.isAchievementsEnabled()){
+			log("Achievements enabled!!");
+			achievementsLayout.setVisibility(View.VISIBLE);
+			achievementsSeparator.setVisibility(View.VISIBLE);
+			achievementsLayout.setOnClickListener(this);
+		}
+		else{
+			log("NO Achievements enabled!!");
+			achievementsLayout.setVisibility(View.GONE);
+			achievementsSeparator.setVisibility(View.GONE);
+		}
+
 		typeLayout = (RelativeLayout) v.findViewById(R.id.my_account_account_type_layout);
-		LinearLayout.LayoutParams typeLayoutParams = (LinearLayout.LayoutParams)typeLayout.getLayoutParams();
-		typeLayoutParams.setMargins(Util.scaleWidthPx(60, outMetrics), Util.scaleHeightPx(27, outMetrics), 0, 0);
-		typeLayout.setLayoutParams(typeLayoutParams);
 
 		typeAccount = (TextView) v.findViewById(R.id.my_account_account_type_text);
-		LinearLayout.LayoutParams typeAccountParams = (LinearLayout.LayoutParams)typeAccount.getLayoutParams();
-		typeAccountParams.setMargins(0, Util.scaleHeightPx(5, outMetrics), 0, 0);
-		typeAccount.setLayoutParams(typeAccountParams);
 
 		usedSpace = (TextView) v.findViewById(R.id.my_account_used_space);
 
@@ -220,28 +221,10 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		upgradeButton.setOnClickListener(this);
 		upgradeButton.setVisibility(View.VISIBLE);
 
-		RelativeLayout.LayoutParams upgradeButtonParams = (RelativeLayout.LayoutParams)upgradeButton.getLayoutParams();
-		upgradeButtonParams.setMargins(0, 0, Util.scaleWidthPx(16, outMetrics), 0);
-		upgradeButton.setLayoutParams(upgradeButtonParams);
-
 		lastSessionLayout = (LinearLayout) v.findViewById(R.id.my_account_last_session_layout);
-		LinearLayout.LayoutParams lastSessionParams = (LinearLayout.LayoutParams)lastSessionLayout.getLayoutParams();
-		lastSessionParams.setMargins(Util.scaleWidthPx(60, outMetrics), Util.scaleHeightPx(30, outMetrics), 0, 0);
-		lastSessionLayout.setLayoutParams(lastSessionParams);
-
 		lastSession = (TextView) v.findViewById(R.id.my_account_last_session);
 
-		fingerprintLayout = (LinearLayout) v.findViewById(R.id.my_account_fingerprint_layout);
-		LinearLayout.LayoutParams fingerprintParams = (LinearLayout.LayoutParams)fingerprintLayout.getLayoutParams();
-		fingerprintParams.setMargins(Util.scaleWidthPx(60, outMetrics), Util.scaleHeightPx(30, outMetrics), 0, 0);
-		fingerprintLayout.setLayoutParams(fingerprintParams);
-
-		fingerprint = (TextView) v.findViewById(R.id.my_account_fingerprint);
-
 		connectionsLayout = (LinearLayout) v.findViewById(R.id.my_account_connections_layout);
-		LinearLayout.LayoutParams connectionsParams = (LinearLayout.LayoutParams)connectionsLayout.getLayoutParams();
-		connectionsParams.setMargins(Util.scaleWidthPx(60, outMetrics), Util.scaleHeightPx(30, outMetrics), 0, 0);
-		connectionsLayout.setLayoutParams(connectionsParams);
 
 		connections = (TextView) v.findViewById(R.id.my_account_connections);
 
@@ -251,23 +234,16 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		}
 		else{
 			logoutButton.setBackgroundResource(R.drawable.black_button_border);
+//			logoutButton.setBackgroundColor(ContextCompat.getColor(context, R.color.white));
 		}
 		logoutButton.setOnClickListener(this);
 		logoutButton.setVisibility(View.VISIBLE);
-
-		LinearLayout.LayoutParams logoutButtonParams = (LinearLayout.LayoutParams)logoutButton.getLayoutParams();
-		logoutButtonParams.setMargins(Util.scaleWidthPx(57, outMetrics), Util.scaleHeightPx(24, outMetrics), 0, Util.scaleHeightPx(0, outMetrics));
-		logoutButton.setLayoutParams(logoutButtonParams);
 
 		deleteAccountButton = (Button) v.findViewById(R.id.delete_account_button);
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 			deleteAccountButton.setBackground(ContextCompat.getDrawable(context, R.drawable.red_rounded_corners_button));
 		}
 		deleteAccountButton.setOnClickListener(this);
-
-		LinearLayout.LayoutParams deleteAccountParams = (LinearLayout.LayoutParams)deleteAccountButton.getLayoutParams();
-		deleteAccountParams.setMargins(Util.scaleWidthPx(57, outMetrics), Util.scaleHeightPx(24, outMetrics), 0, Util.scaleHeightPx(32, outMetrics));
-		deleteAccountButton.setLayoutParams(deleteAccountParams);
 
 		parentLinearLayout = (LinearLayout) v.findViewById(R.id.parent_linear_layout);
 		exportMKLayout = (RelativeLayout) v.findViewById(R.id.export_mk_full_layout);
@@ -363,33 +339,6 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 			showMKLayout();
 		}
 
-		fingerprintLayout.setVisibility(View.GONE);
-		if (megaApi.getMyFingerprint() != null){
-			if (megaApi.getMyFingerprint().compareTo("") != 0){
-				fingerprintLayout.setVisibility(View.VISIBLE);
-				String fingerprintString = megaApi.getMyFingerprint();
-				String fingerprintUIString = "";
-				for (int i=0;i<fingerprintString.length();i++){
-					if (i != 0){
-						if ((i % 20) == 0){
-							fingerprintUIString = fingerprintUIString + "\n" + fingerprintString.charAt(i);
-						}
-						else if ((i % 4) == 0){
-							fingerprintUIString = fingerprintUIString + " " + fingerprintString.charAt(i);
-						}
-						else{
-							fingerprintUIString = fingerprintUIString + fingerprintString.charAt(i);
-						}
-					}
-					else{
-						fingerprintUIString = fingerprintUIString + fingerprintString.charAt(i);
-					}
-				}
-
-				fingerprint.setText(fingerprintUIString);
-			}
-		}
-		
 		ArrayList<MegaUser> contacts = megaApi.getContacts();
 		ArrayList<MegaUser> visibleContacts=new ArrayList<MegaUser>();
 
@@ -580,7 +529,8 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 				break;
 			}
 			case R.id.my_account_name:
-			case R.id.my_account_email:{
+			case R.id.my_account_email:
+			case R.id.my_account_edit_icon:{
 				log("Click user attributes text");
 				((ManagerActivityLollipop)context).showDialogChangeUserAttribute();
 				break;
@@ -623,6 +573,14 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 				log("Upgrade Account button");
 				((ManagerActivityLollipop)context).showUpAF();
 
+				break;
+			}
+			case R.id.my_account_achievements_layout:{
+				log("Show achievements");
+
+				Intent intent = new Intent(context, AchievementsActivity.class);
+//				intent.putExtra("orderGetChildren", orderGetChildren);
+				startActivity(intent);
 				break;
 			}
 		}

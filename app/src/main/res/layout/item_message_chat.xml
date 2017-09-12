@@ -158,6 +158,11 @@
                             android:layout_gravity="center_horizontal|center_vertical"
                             android:cropToPadding="true"
                             android:background="@drawable/shape_images_chat"/>
+                        <RelativeLayout
+                            android:id="@+id/transparent_coating_portrait"
+                            android:layout_width="160dp"
+                            android:layout_height="220dp"
+                            android:background="@drawable/shape_images_chat_transparent"/>
                     </RelativeLayout>
                 </RelativeLayout>
 
@@ -168,36 +173,45 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:background="@android:color/transparent">
-                    <RelativeLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentRight="true"
-                        android:layout_marginEnd="16dp"
-                        android:layout_marginRight="16dp"
-                        android:layout_marginTop="2dp"
-                        android:layout_marginBottom="7dp"
-                        android:background="@drawable/shape_images_chat_2"
-                        android:elevation="2dp">
 
-                        <ImageView
-                            android:id="@+id/content_own_message_thumb_landscape"
-                            android:layout_width="220dp"
-                            android:layout_height="160dp"
-                            android:layout_gravity="center_horizontal|center_vertical"
-                            android:padding="3dp"
-                            android:scaleType="centerCrop"
-                            android:cropToPadding="true"
-                            android:background="@drawable/shape_images_chat"/>
+                        <RelativeLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentRight="true"
+                            android:layout_marginEnd="16dp"
+                            android:layout_marginRight="16dp"
+                            android:layout_marginTop="2dp"
+                            android:layout_marginBottom="7dp"
+                            android:background="@drawable/shape_images_chat_2"
+                            android:elevation="2dp">
 
-                        <ImageView
-                            android:layout_width="220dp"
-                            android:layout_height="160dp"
-                            android:padding="3dp"
-                            android:scaleType="centerCrop"
-                            android:layout_gravity="center_horizontal|center_vertical"
-                            android:cropToPadding="true"
-                            android:background="@drawable/shape_images_chat"/>
-                    </RelativeLayout>
+                            <ImageView
+                                android:id="@+id/content_own_message_thumb_landscape"
+                                android:layout_width="220dp"
+                                android:layout_height="160dp"
+                                android:layout_gravity="center_horizontal|center_vertical"
+                                android:padding="3dp"
+                                android:scaleType="centerCrop"
+                                android:cropToPadding="true"
+                                android:background="@drawable/shape_images_chat"/>
+
+                            <ImageView
+                                android:layout_width="220dp"
+                                android:layout_height="160dp"
+                                android:padding="3dp"
+                                android:scaleType="centerCrop"
+                                android:layout_gravity="center_horizontal|center_vertical"
+                                android:cropToPadding="true"
+                                android:background="@drawable/shape_images_chat"/>
+
+                            <RelativeLayout
+                                android:id="@+id/transparent_coating_landscape"
+                                android:layout_width="220dp"
+                                android:layout_height="160dp"
+                                android:background="@drawable/shape_images_chat_transparent"/>
+
+
+                        </RelativeLayout>
                 </RelativeLayout>
 
                 <ProgressBar
@@ -208,10 +222,9 @@
                     android:paddingRight="25dp"
                     android:paddingBottom="12dp"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"/>
 
 
-                </ProgressBar>
                 <RelativeLayout
                     android:id="@+id/error_uploading_relative_layout"
                     android:layout_width="wrap_content"
@@ -492,8 +505,6 @@
                     android:layout_alignParentLeft="true"
                     android:layout_marginStart="16dp"
                     android:layout_marginLeft="16dp"
-                    android:layout_marginEnd="108dp"
-                    android:layout_marginRight="108dp"
                     android:layout_marginBottom="7dp"
                     android:layout_marginTop="2dp"
                     android:gravity="left"

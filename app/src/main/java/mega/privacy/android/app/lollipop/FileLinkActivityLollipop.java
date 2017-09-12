@@ -235,11 +235,9 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 //		
 //		((LayoutParams) sizeTextView.getLayoutParams()).setMargins(Util.px2dp((75*scaleW), outMetrics), 0, 0, 0);
 		
-		dbH = DatabaseHandler.getDbHandler(getApplicationContext()); 
-    	if(dbH.getCredentials() == null){	
-    		importButton.setVisibility(View.INVISIBLE);
-    	}
-		
+		dbH = DatabaseHandler.getDbHandler(getApplicationContext());
+		importButton.setVisibility(View.INVISIBLE);
+
 		Intent intent = getIntent();
 		if (intent != null){
 			url = intent.getDataString();
@@ -273,7 +271,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 
 		input.setSingleLine();
 		input.setTextColor(getResources().getColor(R.color.text_secondary));
-		input.setHint(getString(R.string.alert_decryption_key));
+		input.setHint(getString(R.string.password_text));
 //		input.setSelectAllOnFocus(true);
 		input.setImeOptions(EditorInfo.IME_ACTION_DONE);
 		input.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -401,7 +399,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 	}
 
 	public static void log(String message) {
-		Util.log("FileLinkActivityLollipop", message);
+		Util.log("OpenPasswordLinkActivity", message);
 	}
 
 	@Override
@@ -441,7 +439,18 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 				iconView.setImageResource(MimeTypeList.typeForName(document.getName()).getIconResourceId());
 
 				downloadButton.setVisibility(View.VISIBLE);
-				importButton.setVisibility(View.VISIBLE);
+
+				if(dbH.getCredentials() == null){
+					importButton.setVisibility(View.INVISIBLE);
+				}
+				else{
+					if (megaApi.getRootNode() == null){
+						importButton.setVisibility(View.INVISIBLE);
+					}
+					else{
+						importButton.setVisibility(View.VISIBLE);
+					}
+				}
 
 				Bitmap preview = null;
 				preview = PreviewUtils.getPreviewFromCache(document);

@@ -410,7 +410,7 @@
 	<string name="upload_to_audio" context="upload to. Then choose an Audio file">Audio </string>
 	<string name="upload_to_video" context="upload to. Then choose a Video file">Vídeo</string>
 	<!-- <string name="upload_to_other" context="upload to. Then choose a file which is not an Image, an Audio or a Video">Otro fichero</string> -->
-	<string name="upload_to_filesystem" context="upload to. Then choose to browse the file system to choose a file">Elegir del Sistema de Ficheros</string>
+	<string name="upload_to_filesystem" context="upload to. Then choose to browse the file system to choose a file">Desde Sistema de Ficheros</string>
 	<!-- <string name="upload_select_file_type" context="title of the dialog for choosing if a user wants to upload an image, an audio, a video or a file from the system">Selecciona el tipo de archivo</string> -->
 	<!-- <string name="upload_uploading" context="status text">Subiendo</string> -->
 	<!-- <string name="upload_touch_to_cancel" context="hint to how to cancel the upload (by touching the notification)">Toca para cancelar la subida</string> -->
@@ -739,8 +739,8 @@
 
     <string name="my_account_upgrade_pro" context="Button to upgrade the account to PRO account">Hazte PRO</string>
     <string name="my_account_upgrade_pro_panel" context="Button to upgrade the account to PRO account in the panel that appears randomly">¡Hazte PRO!</string>
-    <string name="get_pro_account" context="Message to promote PRO accounts">Aumenta la capacidad de tu almacenamiento en la nube!\n Más espacio &amp; ancho de banda con una cuenta PRO!</string>
-    <string name="toast_master_key" context="success message when the MasterKey file has been downloaded">Tu Clave de recuperación ha sido exportada en: %1s.\nMientras el fichero esté en esta ruta, lo encontrarás también la sección Sin conexión.\nNota: El fichero se eliminará si cierras la sesión, por favor, guárdalo en un lugar seguro.</string>
+    <string name="get_pro_account" context="Message to promote PRO accounts">Aumenta la capacidad de tu almacenamiento en la nube![A] Más espacio &amp; ancho de banda con una cuenta PRO!</string>
+    <string name="toast_master_key" context="success message when the MasterKey file has been downloaded">Tu Clave de recuperación ha sido exportada en: %1s.[A]Mientras el fichero esté en esta ruta, lo encontrarás también la sección Sin conexión.[A]Nota: El fichero se eliminará si cierras la sesión, por favor, guárdalo en un lugar seguro.</string>
 
     <!-- <string name="next_ime_action" context="Action to pass focus to the next field in a form">Siguiente</string> -->
 
@@ -774,6 +774,7 @@
     <string name="title_edit_profile_info" context="Title of the Dialog to edit the profile attributes of the user's account">Editar</string>
 
     <string name="title_set_expiry_date" context="Alert Dialog to get link">Fecha de caducidad</string>
+    <string name="title_set_password_protection" context="Alert Dialog to get link">Protección con contraseña</string>
     <string name="subtitle_set_expiry_date" context="Alert Dialog to get link">(SOLO PRO)</string>
 
     <string name="edit_link_option" context="Option of the sliding panel to edit the link of a node">Editar link</string>
@@ -802,7 +803,7 @@
     </plurals>
 
     <string name="error_incorrect_email_or_password" context="Error message when the credentials to login are incorrect.">El correo electrónico o la contraseña introducidas no son correctas. Por favor, pruebe otra vez.</string>
-    <string name="error_account_suspended" context="Error message when trying to login and the account is suspended.">La cuenta ha sido suspendida por la violación de los Términos de Servicio. Por favor, contacte con support@mega.co.nz</string>
+    <string name="error_account_suspended" context="Error message when trying to login and the account is suspended.">La cuenta ha sido suspendida por la violación de los Términos de Servicio. Por favor, contacte con support@mega.nz</string>
     <string name="too_many_attempts_login" context="Error message when to many attempts to login.">Demasiados intentos incorrectos para iniciar sesión, por favor, espere una hora.</string>
     <string name="account_not_validated_login" context="Error message when trying to login to an account not validated.">La cuenta no ha sido validada todavía. Por favor, compruebe su correo electrónico.</string>
 
@@ -840,7 +841,7 @@
 
     <string name="recent_chat_empty_invite" context="Message shown when the user has no recent chats">Invita a tus amigos a unirse al Chat y disfruta de nuestra plataforma encriptada con privacidad y seguridad.</string>
 
-    <string name="recent_chat_empty_enable_chat" context="Message shown when the user has no recent chats">Habilita el chat\ny disfruta de nuestra plataforma encriptada con privacidad y seguridad.</string>
+    <string name="recent_chat_empty_enable_chat" context="Message shown when the user has no recent chats">Habilita el chat[A]y disfruta de nuestra plataforma encriptada con privacidad y seguridad.</string>
 
     <!-- <string name="videocall_title" context="Title shown in the list of main chat screen for a videocall">Videollamada</string> -->
 
@@ -1038,11 +1039,11 @@
     <string name="no_conversation_history" context="message shown when a chat has no messages">No hay historial</string>
 
     <plurals name="user_typing" context="title of confirmation alert before removing a contact">
-        <item context="Singular" quantity="one">está escribiendo...</item>
-        <item context="Plural" quantity="other">están escribiendo...</item>
+        <item context="Singular" quantity="one">%1$s [A]está escribiendo...[/A]</item>
+        <item context="Plural" quantity="other">%1$s [A]están escribiendo...[/A]</item>
     </plurals>
 
-    <string name="more_users_typing" context="text that appear when there are more than 2 people writing at that time in a chat. For example User1, user2 and more are typing...">más están escribiendo...</string>
+    <string name="more_users_typing" context="text that appear when there are more than 2 people writing at that time in a chat. For example User1, user2 and more are typing...">%1$s [A]and more are typing...[/A]</string>
 
     <string name="tab_my_account_general" context="Title of the general tab in My Account Section">General</string>
     <string name="tab_my_account_storage" context="Title of the storage tab in My Account Section">Almacenamiento</string>

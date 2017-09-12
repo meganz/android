@@ -68,8 +68,10 @@
                         android:background="@null"
                         android:tint="@color/transparency_white"
                         android:src="@drawable/ic_insert_emoticon"
-                        android:layout_centerVertical="true"
-                        android:layout_marginLeft="10dp"/>
+                        android:layout_alignBottom="@+id/edit_text_chat"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginBottom="2dp"
+                        />
 
                     <ImageButton
                         android:id="@+id/send_message_icon_chat"
@@ -78,18 +80,19 @@
                         android:layout_alignParentRight="true"
                         android:layout_marginRight="10dp"
                         android:background="@null"
-                        android:layout_centerVertical="true"
+                        android:layout_alignBottom="@id/edit_text_chat"
                         android:tint="@color/accentColor"
-                        android:src="@drawable/ic_send_black" />
+                        android:src="@drawable/ic_send_black"
+                        android:layout_marginBottom="3dp"/>
 
                     <io.github.rockerhieu.emojicon.EmojiconEditText
-                        android:id="@+id/edit_text_chat"
+                        android:id="@id/edit_text_chat"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:background="@android:color/transparent"
                         android:layout_toRightOf="@+id/keyboard_icon_chat"
                         android:layout_marginTop="6dp"
-                        android:layout_marginBottom="6dp"
+                        android:layout_marginBottom="12dp"
                         android:layout_marginLeft="10dp"
                         android:layout_marginRight="10dp"
                         android:layout_centerVertical="true"
@@ -146,48 +149,45 @@
                     android:layout_height="22dp"
                     android:layout_alignParentBottom="true"
                     android:background="@color/participants_layout">
-
-                    <TextView
-                        android:id="@+id/user_typing_name"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="16dp"
-                        android:textColor="@color/name_my_account"
-                        android:layout_marginTop="4dp"
-                        android:ellipsize="end"
-                        android:singleLine="true"
-                        android:lines="1"
-                        android:textSize="14sp"/>
-
                     <TextView
                         android:id="@+id/user_typing_text"
+                        android:layout_marginLeft="16dp"
+                        android:layout_marginRight="16dp"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="6dp"
-                        android:ellipsize="end"
-                        android:layout_toRightOf="@+id/user_typing_name"
-                        android:textSize="12sp"/>
+                        android:layout_height="18dp"
+                        android:layout_marginTop="4dp"
+                        android:ellipsize="middle"
+                        android:maxLines="1"
+                        android:singleLine="true"
+                        android:textColor="@color/name_my_account"
+                        android:textSize="14sp"/>
                 </RelativeLayout>
 
             </RelativeLayout>
 
-            <android.support.design.widget.FloatingActionButton
-                android:id="@+id/fab_chat"
+            <android.support.design.widget.CoordinatorLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:fabSize="mini"
-                android:layout_gravity="bottom|end"
-                app:elevation="6dp"
-                app:borderWidth="0dp"
-                android:scaleType="center"
-                app:backgroundTint="@color/accentColor"
-                app:pressedTranslationZ="12dp"
-                android:layout_marginLeft="16dp"
-                android:layout_marginRight="16dp"
-                android:layout_marginBottom="12dp"
-                android:src="@drawable/ic_add_white"
-                android:layout_alignParentRight="true"
-                android:layout_alignParentBottom="true"/>
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentRight="true">
+                <android.support.design.widget.FloatingActionButton
+                    android:id="@+id/fab_chat"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:fabSize="mini"
+                    android:layout_gravity="bottom|end"
+                    app:elevation="6dp"
+                    app:borderWidth="0dp"
+                    android:scaleType="center"
+                    app:backgroundTint="@color/accentColor"
+                    app:pressedTranslationZ="12dp"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginRight="16dp"
+                    android:layout_marginBottom="12dp"
+                    android:src="@drawable/ic_add_white"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignParentBottom="true"/>
+            </android.support.design.widget.CoordinatorLayout>
 
         </RelativeLayout>
 

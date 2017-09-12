@@ -9,6 +9,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -23,7 +25,10 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
+import android.text.format.Formatter;
 import android.util.DisplayMetrics;
+import android.util.TypedValue;
 import android.view.Display;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -37,9 +42,11 @@ import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
@@ -50,6 +57,7 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Stack;
 
@@ -66,6 +74,7 @@ import mega.privacy.android.app.lollipop.adapters.MegaBrowserLollipopAdapter;
 import mega.privacy.android.app.modalbottomsheet.FolderLinkBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
+import mega.privacy.android.app.utils.PreviewUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -84,6 +93,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 	
 	ActionBar aB;
 	Toolbar tB;
+	Toolbar fileLinktB;
 	Handler handler;
 	String url;
 	String folderHandle;
@@ -96,6 +106,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 	TextView emptyTextView;
 	TextView contentText;
     RelativeLayout fragmentContainer;
+	RelativeLayout fileLinkFragmentContainer;
 	Button downloadButton;
 	View separator;
 	Button importButton;
@@ -104,6 +115,16 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 	long parentHandle = -1;
 	ArrayList<MegaNode> nodes;
 	MegaBrowserLollipopAdapter adapterList;
+
+	ImageView fileLinkIconView;
+	TextView fileLinkNameView;
+	ScrollView fileLinkScrollView;
+	TextView fileLinkSizeTextView;
+	TextView fileLinkSizeTitleView;
+	TextView fileLinkImportButton;
+	TextView fileLinkDownloadButton;
+	LinearLayout fileLinkOptionsBar;
+	RelativeLayout fileLinkInfoLayout;
 
 	Stack<Integer> lastPositionStack;
 	
@@ -120,6 +141,10 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 	
 	boolean downloadCompleteFolder = false;
 	FolderLinkActivityLollipop folderLinkActivityLollipop = this;
+
+	MegaNode pN = null;
+
+	boolean fileLinkFolderLink = false;
 
 	public void activateActionMode(){
 		log("activateActionMode");
@@ -248,6 +273,17 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 	    display.getMetrics(outMetrics);
 	    float density  = getResources().getDisplayMetrics().density;
 
+		float scaleW = Util.getScaleW(outMetrics, density);
+		float scaleH = Util.getScaleH(outMetrics, density);
+
+		float scaleText;
+		if (scaleH < scaleW){
+			scaleText = scaleH;
+		}
+		else{
+			scaleText = scaleW;
+		}
+
 		MegaApplication app = (MegaApplication)getApplication();
 		megaApiFolder = app.getMegaApiFolder();
 		megaApi = app.getMegaApi();
@@ -272,8 +308,12 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 //		aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 		aB.setDisplayHomeAsUpEnabled(true);
 		aB.setDisplayShowHomeEnabled(true);
-		
+
+		fileLinktB = (Toolbar) findViewById(R.id.toolbar_folder_link_file_link);
+
         fragmentContainer = (RelativeLayout) findViewById(R.id.folder_link_fragment_container);
+		fileLinkFragmentContainer = (RelativeLayout) findViewById(R.id.folder_link_file_link_fragment_container);
+		fileLinkFragmentContainer.setVisibility(View.GONE);
 
 		emptyImageView = (ImageView) findViewById(R.id.folder_link_list_empty_image);
 		emptyTextView = (TextView) findViewById(R.id.folder_link_list_empty_text);
@@ -307,7 +347,62 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 
 		contentText = (TextView) findViewById(R.id.content_text);
 		contentText.setVisibility(View.GONE);
-		
+
+		fileLinkIconView = (ImageView) findViewById(R.id.folder_link_file_link_icon);
+		fileLinkIconView.getLayoutParams().width = Util.scaleWidthPx(200, outMetrics);
+		fileLinkIconView.getLayoutParams().height = Util.scaleHeightPx(200, outMetrics);
+		RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) fileLinkIconView.getLayoutParams();
+		params.addRule(RelativeLayout.CENTER_HORIZONTAL);
+		fileLinkIconView.setLayoutParams(params);
+
+		fileLinkNameView = (TextView) findViewById(R.id.folder_link_file_link_name);
+		fileLinkNameView.setTextSize(TypedValue.COMPLEX_UNIT_SP, (18*scaleText));
+		fileLinkNameView.setEllipsize(TextUtils.TruncateAt.MIDDLE);
+		fileLinkNameView.setSingleLine();
+		fileLinkNameView.setTypeface(null, Typeface.BOLD);
+		//Left margin
+		RelativeLayout.LayoutParams nameViewParams = (RelativeLayout.LayoutParams)fileLinkNameView.getLayoutParams();
+		nameViewParams.setMargins(Util.scaleWidthPx(60, outMetrics), 0, 0, Util.scaleHeightPx(20, outMetrics));
+		fileLinkNameView.setLayoutParams(nameViewParams);
+
+		fileLinkScrollView = (ScrollView) findViewById(R.id.folder_link_file_link_scroll_layout);
+
+		fileLinkSizeTitleView = (TextView) findViewById(R.id.folder_link_file_link_info_menu_size);
+		//Left margin, Top margin
+		RelativeLayout.LayoutParams sizeTitleParams = (RelativeLayout.LayoutParams)fileLinkSizeTitleView.getLayoutParams();
+		sizeTitleParams.setMargins(Util.scaleWidthPx(10, outMetrics), Util.scaleHeightPx(15, outMetrics), 0, 0);
+		fileLinkSizeTitleView.setLayoutParams(sizeTitleParams);
+
+		fileLinkSizeTextView = (TextView) findViewById(R.id.folder_link_file_link_size);
+		//Bottom margin
+		RelativeLayout.LayoutParams sizeTextParams = (RelativeLayout.LayoutParams)fileLinkSizeTextView.getLayoutParams();
+		sizeTextParams.setMargins(Util.scaleWidthPx(10, outMetrics), 0, 0, Util.scaleHeightPx(15, outMetrics));
+		fileLinkSizeTextView.setLayoutParams(sizeTextParams);
+
+		fileLinkOptionsBar = (LinearLayout) findViewById(R.id.options_folder_link_file_link_layout);
+
+		fileLinkDownloadButton = (TextView) findViewById(R.id.folder_link_file_link_button_download);
+		fileLinkDownloadButton.setOnClickListener(this);
+		fileLinkDownloadButton.setText(getString(R.string.general_download).toUpperCase(Locale.getDefault()));
+		//Left and Right margin
+		LinearLayout.LayoutParams downloadTextParams = (LinearLayout.LayoutParams)fileLinkDownloadButton.getLayoutParams();
+		downloadTextParams.setMargins(Util.scaleWidthPx(6, outMetrics), 0, Util.scaleWidthPx(8, outMetrics), 0);
+		fileLinkDownloadButton.setLayoutParams(downloadTextParams);
+
+		fileLinkImportButton = (TextView) findViewById(R.id.folder_link_file_link_button_import);
+		fileLinkImportButton.setText(getString(R.string.general_import).toUpperCase(Locale.getDefault()));
+		fileLinkImportButton.setOnClickListener(this);
+		//Left and Right margin
+		LinearLayout.LayoutParams importTextParams = (LinearLayout.LayoutParams)fileLinkImportButton.getLayoutParams();
+		importTextParams.setMargins(Util.scaleWidthPx(6, outMetrics), 0, Util.scaleWidthPx(8, outMetrics), 0);
+		fileLinkImportButton.setLayoutParams(importTextParams);
+		fileLinkImportButton.setVisibility(View.INVISIBLE);
+
+		fileLinkInfoLayout = (RelativeLayout) findViewById(R.id.folder_link_file_link_layout);
+		FrameLayout.LayoutParams infoLayoutParams = (FrameLayout.LayoutParams)fileLinkInfoLayout.getLayoutParams();
+		infoLayoutParams.setMargins(0, 0, 0, Util.scaleHeightPx(80, outMetrics));
+		fileLinkInfoLayout.setLayoutParams(infoLayoutParams);
+
 		Intent intent = getIntent();
     	
     	if (intent != null) {
@@ -1075,12 +1170,73 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 					}
 					else{
 						if (folderSubHandle != null){
-							MegaNode pN = megaApiFolder.getNodeByHandle(MegaApiAndroid.base64ToHandle(folderSubHandle));
+							pN = megaApiFolder.getNodeByHandle(MegaApiAndroid.base64ToHandle(folderSubHandle));
 							if (pN != null){
-								parentHandle = MegaApiAndroid.base64ToHandle(folderSubHandle);
-								nodes = megaApiFolder.getChildren(pN);
-								aB.setTitle(pN.getName());
-								supportInvalidateOptionsMenu();
+								if (pN.isFolder()) {
+									parentHandle = MegaApiAndroid.base64ToHandle(folderSubHandle);
+									nodes = megaApiFolder.getChildren(pN);
+									aB.setTitle(pN.getName());
+									supportInvalidateOptionsMenu();
+								}
+								else if (pN.isFile()){
+									fileLinkFolderLink = true;
+									parentHandle = MegaApiAndroid.base64ToHandle(folderSubHandle);
+									setSupportActionBar(fileLinktB);
+									aB = getSupportActionBar();
+									aB.setDisplayHomeAsUpEnabled(true);
+									aB.setDisplayShowHomeEnabled(true);
+									aB.setTitle("");
+
+									fragmentContainer.setVisibility(View.GONE);
+									fileLinkFragmentContainer.setVisibility(View.VISIBLE);
+
+									fileLinkNameView.setText(pN.getName());
+									fileLinkSizeTextView.setText(Formatter.formatFileSize(this, pN.getSize()));
+
+									fileLinkIconView.setImageResource(MimeTypeList.typeForName(pN.getName()).getIconResourceId());
+
+									fileLinkDownloadButton.setVisibility(View.VISIBLE);
+									if (dbH == null){
+										dbH = DatabaseHandler.getDbHandler(getApplicationContext());
+									}
+									if (dbH != null){
+										if (dbH.getCredentials() != null){
+											fileLinkImportButton.setVisibility(View.VISIBLE);
+										}
+										else{
+											fileLinkImportButton.setVisibility(View.INVISIBLE);
+										}
+									}
+
+									Bitmap preview = null;
+									preview = PreviewUtils.getPreviewFromCache(pN);
+									if (preview != null){
+										PreviewUtils.previewCache.put(pN.getHandle(), preview);
+										fileLinkIconView.setImageBitmap(preview);
+										fileLinkIconView.setOnClickListener(this);
+									}
+									else{
+										preview = PreviewUtils.getPreviewFromFolder(pN, this);
+										if (preview != null){
+											PreviewUtils.previewCache.put(pN.getHandle(), preview);
+											fileLinkIconView.setImageBitmap(preview);
+											fileLinkIconView.setOnClickListener(this);
+										}
+										else{
+											if (pN.hasPreview()) {
+												File previewFile = new File(PreviewUtils.getPreviewFolder(this), pN.getBase64Handle() + ".jpg");
+												megaApiFolder.getPreview(pN, previewFile.getAbsolutePath(), this);
+											}
+										}
+									}
+
+								}
+								else{
+									parentHandle = rootNode.getHandle();
+									nodes = megaApiFolder.getChildren(rootNode);
+									aB.setTitle(megaApiFolder.getRootNode().getName());
+									supportInvalidateOptionsMenu();
+								}
 							}
 							else{
 								parentHandle = rootNode.getHandle();
@@ -1172,6 +1328,24 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 				catch(Exception ex){
 					Snackbar.make(fragmentContainer, getResources().getString(R.string.general_error_folder_not_found), Snackbar.LENGTH_LONG).show();
 					finish();
+				}
+			}
+		}
+		else if (request.getType() == MegaRequest.TYPE_GET_ATTR_FILE) {
+			if (e.getErrorCode() == MegaError.API_OK) {
+				File previewDir = PreviewUtils.getPreviewFolder(this);
+				if (pN != null) {
+					File preview = new File(previewDir, pN.getBase64Handle() + ".jpg");
+					if (preview.exists()) {
+						if (preview.length() > 0) {
+							Bitmap bitmap = PreviewUtils.getBitmapForCache(preview, this);
+							PreviewUtils.previewCache.put(pN.getHandle(), bitmap);
+							if (fileLinkIconView != null) {
+								fileLinkIconView.setImageBitmap(bitmap);
+								fileLinkIconView.setOnClickListener(this);
+							}
+						}
+					}
 				}
 			}
 		}
@@ -1434,6 +1608,49 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 	public void onBackPressed() {
 		log("onBackPressed");
 
+		if (fileLinkFolderLink){
+			fileLinkFragmentContainer.setVisibility(View.GONE);
+			fragmentContainer.setVisibility(View.VISIBLE);
+			setSupportActionBar(tB);
+			aB = getSupportActionBar();
+			aB.setDisplayHomeAsUpEnabled(true);
+			aB.setDisplayShowHomeEnabled(true);
+			fileLinkFolderLink = false;
+			pN = null;
+			MegaNode parentNode = megaApiFolder.getParentNode(megaApiFolder.getNodeByHandle(parentHandle));
+			if (parentNode != null){
+				log("onBackPressed: parentNode != NULL");
+				listView.setVisibility(View.VISIBLE);
+				emptyImageView.setVisibility(View.GONE);
+				emptyTextView.setVisibility(View.GONE);
+				aB.setTitle(parentNode.getName());
+
+				supportInvalidateOptionsMenu();
+
+				parentHandle = parentNode.getHandle();
+				nodes = megaApiFolder.getChildren(parentNode, orderGetChildren);
+				adapterList.setNodes(nodes);
+				int lastVisiblePosition = 0;
+				if(!lastPositionStack.empty()){
+					lastVisiblePosition = lastPositionStack.pop();
+					log("Pop of the stack "+lastVisiblePosition+" position");
+				}
+				log("Scroll to "+lastVisiblePosition+" position");
+
+				if(lastVisiblePosition>=0){
+
+					mLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
+
+				}
+				adapterList.setParentHandle(parentHandle);
+				return;
+			}
+			else{
+				log("onBackPressed: parentNode == NULL");
+				finish();
+			}
+		}
+
 		if (adapterList != null){
 			log("onBackPressed: adapter !=null");
 			parentHandle = adapterList.getParentHandle();
@@ -1515,6 +1732,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 
 		switch(v.getId()){
+			case R.id.folder_link_file_link_button_download:
 			case R.id.folder_link_button_download:{
 				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 					boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
@@ -1547,9 +1765,17 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 	        	}
 				break;
 			}
+			case R.id.folder_link_file_link_button_import:
 			case R.id.folder_link_import_button:{
 				if (megaApiFolder.getRootNode() != null){
-					this.selectedNode = megaApiFolder.getRootNode();
+					if (fileLinkFolderLink){
+						if (pN != null){
+							this.selectedNode = pN;
+						}
+					}
+					else {
+						this.selectedNode = megaApiFolder.getRootNode();
+					}
 					importNode();
 				}
 				break;
