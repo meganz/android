@@ -112,7 +112,10 @@ public class ContactsFragmentLollipop extends Fragment{
 					if (users.size()>0){
 						ContactController cC = new ContactController(context);
 						cC.pickFolderToShare(users);
-					}										
+						clearSelections();
+						hideMultipleSelect();
+					}
+
 					break;
 				}
 				case R.id.cab_menu_send_file:{
@@ -224,7 +227,7 @@ public class ContactsFragmentLollipop extends Fragment{
 			
 			menu.findItem(R.id.cab_menu_help).setVisible(false);
 			menu.findItem(R.id.cab_menu_upgrade_account).setVisible(false);
-			menu.findItem(R.id.cab_menu_settings).setVisible(false);
+			//menu.findItem(R.id.cab_menu_settings).setVisible(false);
 //			menu.findItem(R.id.cab_menu_leave_multiple_share).setVisible(false);
 			return false;
 		}		
@@ -411,6 +414,8 @@ public class ContactsFragmentLollipop extends Fragment{
 				emptyTextView.setVisibility(View.GONE);
 			}
 
+			((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
+
 			if (aB != null){
 				aB.setTitle(getString(R.string.section_contacts));
 			}
@@ -481,6 +486,8 @@ public class ContactsFragmentLollipop extends Fragment{
 				emptyImageView.setVisibility(View.GONE);
 				emptyTextView.setVisibility(View.GONE);
 			}
+
+			((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 
 			if (aB != null){
 				aB.setTitle(getString(R.string.section_contacts));
@@ -726,6 +733,13 @@ public class ContactsFragmentLollipop extends Fragment{
 		}
 		
 		return false;
+	}
+
+	public int getItemCount(){
+		if(adapter!=null){
+			return adapter.getItemCount();
+		}
+		return 0;
 	}
 	
 	public void setOrder(int orderContacts){
