@@ -107,22 +107,29 @@ public class AchievementsActivity extends PinActivityLollipop implements MegaReq
         visibleFragment = fragment;
 
         if(visibleFragment==Constants.ACHIEVEMENTS_FRAGMENT){
-            achievementsFragment = new AchievementsFragment();
+
+            aB.setTitle(getString(R.string.achievements_title));
+            if(achievementsFragment==null){
+                achievementsFragment = new AchievementsFragment();
+            }
+
+
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             ft.replace(R.id.fragment_container_achievements, achievementsFragment, "achievementsFragment");
             ft.commitNow();
+
+            achievementsFragment.updateValues();
+
         }
         else{
 
-            if(referralBonusesFragment!=null){
-                referralBonusesFragment.updateValues(referralBonuses);
-            }
-            else{
+            if(referralBonusesFragment==null) {
                 referralBonusesFragment = new ReferralBonusesFragment();
             }
 
+            aB.setTitle(getString(R.string.title_referral_bonuses));
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            ft.replace(R.id.fragment_container_achievements, achievementsFragment, "achievementsFragment");
+            ft.replace(R.id.fragment_container_achievements, referralBonusesFragment, "referralBonusesFragment");
             ft.commitNow();
         }
     }

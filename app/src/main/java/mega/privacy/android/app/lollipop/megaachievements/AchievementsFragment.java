@@ -41,6 +41,7 @@ import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.MyAccountInfo;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
+import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.DBUtil;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaAchievementsDetails;
@@ -157,7 +158,7 @@ public class AchievementsFragment extends Fragment implements OnClickListener{
 		inviteFriendsCard = (CardView) v.findViewById(R.id.card_view_invite_friends);
 
 		referralBonusesLayout = (RelativeLayout) v.findViewById(R.id.referral_bonuses_layout);
-
+		referralBonusesLayout.setOnClickListener(this);
 		String transferQuotaString = getString(R.string.transfer_quota);
 		transferQuotaString = transferQuotaString.toLowerCase(Locale.getDefault());
 
@@ -186,7 +187,7 @@ public class AchievementsFragment extends Fragment implements OnClickListener{
 		figureBaseQuotaStorage = (TextView) v.findViewById(R.id.figure_unlocked_storage_text_base_quota);
 		figureBaseQuotaTransfer = (TextView) v.findViewById(R.id.figure_unlocked_transfer_text_base_quota);
 
-		figureBaseQuotaStorage.setText("15 GB");
+		figureBaseQuotaStorage.setText(Util.getSizeString(0));
 		figureBaseQuotaTransfer.setText(Util.getSizeString(0));
 		figureBaseQuotaTransfer.setVisibility(View.INVISIBLE);
 
@@ -207,7 +208,7 @@ public class AchievementsFragment extends Fragment implements OnClickListener{
 		textInstallAppTransfer = (TextView) v.findViewById(R.id.unlocked_transfer_title_install_app);
 		textInstallAppTransfer.setText(transferQuotaString);
 		daysLeftInstallAppText = (TextView) v.findViewById(R.id.days_left_text_install_app);
-		daysLeftInstallAppText.setText(("6 days left"));
+		daysLeftInstallAppText.setText(("..."));
 
 		figureRegistrationStorage = (TextView) v.findViewById(R.id.figure_unlocked_storage_text_registration);
 		figureRegistrationTransfer = (TextView) v.findViewById(R.id.figure_unlocked_transfer_text_registration);
@@ -220,7 +221,7 @@ public class AchievementsFragment extends Fragment implements OnClickListener{
 		textRegistrationTransfer = (TextView) v.findViewById(R.id.unlocked_transfer_title_registration);
 		textRegistrationTransfer.setText(transferQuotaString);
 		daysLeftRegistrationText = (TextView) v.findViewById(R.id.days_left_text_registration);
-		daysLeftRegistrationText.setText(("40 days left"));
+		daysLeftRegistrationText.setText(("..."));
 
 		figureInstallDesktopStorage = (TextView) v.findViewById(R.id.figure_unlocked_storage_text_install_desktop);
 		figureInstallDesktopTransfer = (TextView) v.findViewById(R.id.figure_unlocked_transfer_text_install_desktop);
@@ -233,7 +234,7 @@ public class AchievementsFragment extends Fragment implements OnClickListener{
 		textInstallDesktopTransfer= (TextView) v.findViewById(R.id.unlocked_transfer_title_install_desktop);
 		textInstallDesktopTransfer.setText(transferQuotaString);
 		daysLeftInstallDesktopText = (TextView) v.findViewById(R.id.days_left_text_install_desktop);
-		daysLeftInstallDesktopText.setText(("15 days left"));
+		daysLeftInstallDesktopText.setText(("..."));
 
 		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
@@ -275,7 +276,7 @@ public class AchievementsFragment extends Fragment implements OnClickListener{
 			case R.id.referral_bonuses_layout:{
 				log("Go to section Referral bonuses");
 
-
+				((AchievementsActivity)context).showFragment(Constants.BONUSES_FRAGMENT);
 
 				break;
 			}
@@ -360,10 +361,8 @@ public class AchievementsFragment extends Fragment implements OnClickListener{
 				}
 				else{
 					daysLeftInstallAppText.setText(context.getResources().getString(R.string.expired_achievement));
-
 				}
 
-				daysLeftInstallAppText.setText(context.getResources().getString(R.string.general_num_days_left, (int)diffDays));
 			}
 			else if(type == MegaAchievementsDetails.MEGA_ACHIEVEMENT_DESKTOP_INSTALL){
 				log("MEGA_ACHIEVEMENT_DESKTOP_INSTALL");
@@ -414,8 +413,6 @@ public class AchievementsFragment extends Fragment implements OnClickListener{
 
 				}
 
-				daysLeftInstallDesktopText.setText(context.getResources().getString(R.string.general_num_days_left, (int)diffDays));
-
 			}
 			else if(type == MegaAchievementsDetails.MEGA_ACHIEVEMENT_WELCOME){
 				log("MEGA_ACHIEVEMENT_WELCOME");
@@ -464,7 +461,6 @@ public class AchievementsFragment extends Fragment implements OnClickListener{
 				}
 				else{
 					daysLeftRegistrationText.setText(context.getResources().getString(R.string.expired_achievement));
-
 				}
 			}
 			else{
