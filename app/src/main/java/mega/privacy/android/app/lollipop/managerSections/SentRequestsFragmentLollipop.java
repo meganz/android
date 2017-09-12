@@ -373,6 +373,13 @@ public class SentRequestsFragmentLollipop extends Fragment {
 			adapterList.setPositionClicked(positionClicked);
 		}
 	}
+
+	public int getItemCount(){
+		if(adapterList!=null){
+			return adapterList.getItemCount();
+		}
+		return 0;
+	}
 	
 	public void notifyDataSetChanged(){
 

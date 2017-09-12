@@ -106,4 +106,14 @@
     <color name="transparent_transparent_black">#35000000</color>
     <color name="status_bar_login">#33000000</color>
     <color name="less_transparent_white">#80FFFFFF</color>
+
+    <color name="grey_my_account_background">#FFF9F9F9</color>
+    <color name="grey_my_account_separator">#80FFFFFF</color>
+
+    <color name="grey_achievements_background">#E6FFFFFF</color>
+    <color name="grey_achievements_title">#FF777777</color>
+
+    <color name="blue_unlocked_rewards">#FF2BA6DE</color>
+    <color name="green_unlocked_rewards">#FF31B500</color>
+
 </resources>

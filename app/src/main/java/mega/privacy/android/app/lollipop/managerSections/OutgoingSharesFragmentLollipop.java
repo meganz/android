@@ -474,11 +474,13 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 				adapter.setNodes(nodes);
 				if (adapter.getItemCount() == 0){
 					recyclerView.setVisibility(View.GONE);
+					contentTextLayout.setVisibility(View.GONE);
 					emptyImageView.setVisibility(View.VISIBLE);
 					emptyTextView.setVisibility(View.VISIBLE);	
 				}
 				else{
 					recyclerView.setVisibility(View.VISIBLE);
+					contentTextLayout.setVisibility(View.VISIBLE);
 					emptyImageView.setVisibility(View.GONE);
 					emptyTextView.setVisibility(View.GONE);
 				}			
@@ -545,11 +547,13 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 
 			if (adapter.getItemCount() == 0){
 				recyclerView.setVisibility(View.GONE);
+				contentTextLayout.setVisibility(View.GONE);
 				emptyImageView.setVisibility(View.VISIBLE);
 				emptyTextView.setVisibility(View.VISIBLE);	
 			}
 			else{
 				recyclerView.setVisibility(View.VISIBLE);
+				contentTextLayout.setVisibility(View.VISIBLE);
 				emptyImageView.setVisibility(View.GONE);
 				emptyTextView.setVisibility(View.GONE);
 			}	
@@ -586,6 +590,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 		//If folder has no files
 		if (adapter.getItemCount() == 0){
 			recyclerView.setVisibility(View.GONE);
+			contentTextLayout.setVisibility(View.GONE);
 			emptyImageView.setVisibility(View.VISIBLE);
 			emptyTextView.setVisibility(View.VISIBLE);
 
@@ -599,6 +604,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 		}
 		else{
 			recyclerView.setVisibility(View.VISIBLE);
+			contentTextLayout.setVisibility(View.VISIBLE);
 			emptyImageView.setVisibility(View.GONE);
 			emptyTextView.setVisibility(View.GONE);
 		}	
@@ -619,12 +625,14 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 			if (adapter.getItemCount() == 0){
 				log("adapter.getItemCount() = 0");
 				recyclerView.setVisibility(View.GONE);
+				contentTextLayout.setVisibility(View.GONE);
 				emptyImageView.setVisibility(View.VISIBLE);
 				emptyTextView.setVisibility(View.VISIBLE);
 			}
 			else{
 				log("adapter.getItemCount() != 0");
 				recyclerView.setVisibility(View.VISIBLE);
+				contentTextLayout.setVisibility(View.VISIBLE);
 				emptyImageView.setVisibility(View.GONE);
 				emptyTextView.setVisibility(View.GONE);
 			}
@@ -722,6 +730,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 				//If folder has no files
 				if (adapter.getItemCount() == 0){
 					recyclerView.setVisibility(View.GONE);
+					contentTextLayout.setVisibility(View.GONE);
 					emptyImageView.setVisibility(View.VISIBLE);
 					emptyTextView.setVisibility(View.VISIBLE);
 
@@ -735,6 +744,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 				}
 				else{
 					recyclerView.setVisibility(View.VISIBLE);
+					contentTextLayout.setVisibility(View.VISIBLE);
 					emptyImageView.setVisibility(View.GONE);
 					emptyTextView.setVisibility(View.GONE);
 				}
@@ -1037,6 +1047,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 
 			contentText.setText(MegaApiUtils.getInfoNodeOnlyFolders(nodes, context));
 			recyclerView.setVisibility(View.VISIBLE);
+			contentTextLayout.setVisibility(View.VISIBLE);
 			emptyImageView.setVisibility(View.GONE);
 			emptyTextView.setVisibility(View.GONE);
 			((ManagerActivityLollipop) context).showFabButton();
@@ -1051,6 +1062,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 			contentText.setText(MegaApiUtils.getInfoFolder(parentNode, context));
 			if (parentNode != null){
 				recyclerView.setVisibility(View.VISIBLE);
+				contentTextLayout.setVisibility(View.VISIBLE);
 				emptyImageView.setVisibility(View.GONE);
 				emptyTextView.setVisibility(View.GONE);
 				
@@ -1090,6 +1102,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 		else{
 			log("Back to Cloud");
 			recyclerView.setVisibility(View.VISIBLE);
+			contentTextLayout.setVisibility(View.VISIBLE);
 			emptyImageView.setVisibility(View.GONE);
 			emptyTextView.setVisibility(View.GONE);
 //			((ManagerActivityLollipop)context).setParentHandleBrowser(megaApi.getRootNode().getHandle());

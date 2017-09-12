@@ -818,15 +818,18 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 				
 				if (nodesArray.size() == 0){
 					emptyImageView.setVisibility(View.VISIBLE);
+					emptyTextView.setVisibility(View.VISIBLE);
 					listView.setVisibility(View.GONE);	
 				}
 				else{
 					emptyImageView.setVisibility(View.GONE);
+					emptyTextView.setVisibility(View.GONE);
 					listView.setVisibility(View.VISIBLE);
 				}
 			}
 			else{
 				emptyImageView.setVisibility(View.VISIBLE);
+				emptyTextView.setVisibility(View.VISIBLE);
 				listView.setVisibility(View.GONE);
 			}
 			
@@ -892,7 +895,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			RelativeLayout.LayoutParams p = (RelativeLayout.LayoutParams) listView.getLayoutParams();
 			p.addRule(RelativeLayout.ABOVE, R.id.file_grid_browser_camera_upload_on_off);
 			listView.setLayoutParams(p);
-			
+
 			emptyImageView = (ImageView) v.findViewById(R.id.file_grid_empty_image);
 			emptyTextView = (TextView) v.findViewById(R.id.file_grid_empty_text);
 			
@@ -947,7 +950,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			
 			listView.setVisibility(View.VISIBLE);
 			emptyImageView.setVisibility(View.GONE);
-			emptyTextView.setVisibility(View.GONE);			
+			emptyTextView.setVisibility(View.GONE);
  
 		    int totalWidth = outMetrics.widthPixels;
 		    		    
@@ -1073,15 +1076,19 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 				if (!thereAreImages){
 					monthPics.clear();
 					emptyImageView.setVisibility(View.VISIBLE);
+					emptyTextView.setVisibility(View.VISIBLE);
 					listView.setVisibility(View.GONE);
 				}
 				else{
+
 					emptyImageView.setVisibility(View.GONE);
+					emptyTextView.setVisibility(View.GONE);
 					listView.setVisibility(View.VISIBLE);
 				}
 			}
 			else {
 				emptyImageView.setVisibility(View.VISIBLE);
+				emptyTextView.setVisibility(View.VISIBLE);
 				listView.setVisibility(View.GONE);
 			}
 
@@ -1836,16 +1843,17 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 				if (adapterList.getItemCount() == 0){
 					if (listView != null){
 						listView.setVisibility(View.GONE);
-					}					
-					emptyImageView.setVisibility(View.VISIBLE);
-					emptyTextView.setVisibility(View.VISIBLE);
+						emptyImageView.setVisibility(View.VISIBLE);
+						emptyTextView.setVisibility(View.VISIBLE);
+					}
 				}
 				else{
 					if (listView != null){
 						listView.setVisibility(View.VISIBLE);
+						emptyImageView.setVisibility(View.GONE);
+						emptyTextView.setVisibility(View.GONE);
 					}					
-					emptyImageView.setVisibility(View.GONE);
-					emptyTextView.setVisibility(View.GONE);
+
 				}			
 			}	
 		}
@@ -1861,7 +1869,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 
 			listView.setVisibility(View.VISIBLE);
 			emptyImageView.setVisibility(View.GONE);
-			emptyTextView.setVisibility(View.GONE);			
+			emptyTextView.setVisibility(View.GONE);
  
 		    int totalWidth = outMetrics.widthPixels;
 		    		    
@@ -2002,10 +2010,12 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			if (!thereAreImages){
 				monthPics.clear();
 				emptyImageView.setVisibility(View.VISIBLE);
+				emptyTextView.setVisibility(View.VISIBLE);
 				listView.setVisibility(View.GONE);
 			}
 			else{
 				emptyImageView.setVisibility(View.GONE);
+				emptyTextView.setVisibility(View.GONE);
 				listView.setVisibility(View.VISIBLE);
 			}
 			
