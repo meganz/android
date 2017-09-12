@@ -8,6 +8,9 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.LayoutInflater;
@@ -25,6 +28,9 @@ import java.util.Locale;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.components.SimpleDividerItemDecoration;
+import mega.privacy.android.app.lollipop.adapters.MegaBrowserLollipopAdapter;
+import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaAchievementsDetails;
 import nz.mega.sdk.MegaApiAndroid;
@@ -37,15 +43,16 @@ public class ReferralBonusesFragment extends Fragment implements OnClickListener
 	Context context;
 	ActionBar aB;
 
-	LinearLayout parentLinearLayout;
+	RelativeLayout parentRelativeLayout;
+	RecyclerView recyclerView;
+	LinearLayoutManager mLayoutManager;
+	MegaReferralBonusesAdapter adapter;
 	
 	DisplayMetrics outMetrics;
 	float density;
 
 	MegaApiAndroid megaApi;
 	MegaChatApiAndroid megaChatApi;
-
-	ArrayList<ReferralBonus> referralBonuses;
 
 	@Override
 	public void onCreate (Bundle savedInstanceState){
@@ -77,11 +84,25 @@ public class ReferralBonusesFragment extends Fragment implements OnClickListener
 		boolean enabledAchievements = megaApi.isAchievementsEnabled();
 		log("The achievements are: "+enabledAchievements);
 
-		View v = inflater.inflate(R.layout.fragment_achievements, container, false);
+		View v = inflater.inflate(R.layout.fragment_referral_bonuses, container, false);
 
-		parentLinearLayout = (LinearLayout) v.findViewById(R.id.main_linear_layout_achievements);
+		parentRelativeLayout = (RelativeLayout) v.findViewById(R.id.referral_bonuses_relative_layout);
 
-		this.referralBonuses = ((AchievementsActivity)context).referralBonuses;
+		recyclerView = (RecyclerView) v.findViewById(R.id.referral_bonuses_recycler_view);
+		recyclerView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
+		mLayoutManager = new LinearLayoutManager(context);
+		recyclerView.setLayoutManager(mLayoutManager);
+		recyclerView.setItemAnimator(new DefaultItemAnimator());
+
+		if (adapter == null){
+			adapter = new MegaReferralBonusesAdapter(context, this, ((AchievementsActivity)context).referralBonuses, recyclerView);
+		}
+		else{
+			adapter.setReferralBonuses(((AchievementsActivity)context).referralBonuses);
+		}
+
+
+		recyclerView.setAdapter(adapter);
 
 		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
@@ -130,12 +151,6 @@ public class ReferralBonusesFragment extends Fragment implements OnClickListener
 		}
 	}
 
-	public void updateValues(ArrayList<ReferralBonus> referralBonuses){
-		log("updateValues");
-
-		this.referralBonuses=referralBonuses;
-	}
-	
 	public int onBackPressed(){
 		log("onBackPressed");
 		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
