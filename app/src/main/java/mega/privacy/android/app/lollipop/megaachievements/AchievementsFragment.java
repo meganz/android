@@ -70,6 +70,7 @@ public class AchievementsFragment extends Fragment implements OnClickListener{
 	CardView inviteFriendsCard;
 
 	RelativeLayout referralBonusesLayout;
+	LinearLayout referralBonusesSeparator;
 
 	TextView figureUnlockedRewardStorage;
 	long storageQuota = 0;
@@ -130,7 +131,6 @@ public class AchievementsFragment extends Fragment implements OnClickListener{
 
 		super.onCreate(savedInstanceState);
 	}
-	
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -159,6 +159,9 @@ public class AchievementsFragment extends Fragment implements OnClickListener{
 
 		referralBonusesLayout = (RelativeLayout) v.findViewById(R.id.referral_bonuses_layout);
 		referralBonusesLayout.setOnClickListener(this);
+
+		referralBonusesSeparator = (LinearLayout) v.findViewById(R.id.separator_referral_bonuses);
+
 		String transferQuotaString = getString(R.string.transfer_quota);
 		transferQuotaString = transferQuotaString.toLowerCase(Locale.getDefault());
 
@@ -238,6 +241,9 @@ public class AchievementsFragment extends Fragment implements OnClickListener{
 
 		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
+		daysLeftInstallDesktopText.setVisibility(View.INVISIBLE);
+		daysLeftInstallAppText.setVisibility(View.INVISIBLE);
+
 		figureUnlockedRewardStorage.setText("...");
 
 		figureUnlockedRewardTransfer.setText("...");
@@ -301,11 +307,19 @@ public class AchievementsFragment extends Fragment implements OnClickListener{
 
 		storageReferrals = ((AchievementsActivity)context).megaAchievements.currentStorageReferrals();
 
-		figureReferralBonusesStorage.setText(Util.getSizeString(storageReferrals));
-
 		transferReferrals = ((AchievementsActivity)context).megaAchievements.currentTransferReferrals();
 
-		figureReferralBonusesTransfer.setText(Util.getSizeString(transferReferrals));
+		if(transferReferrals>0||storageReferrals>0){
+
+			figureReferralBonusesTransfer.setText(Util.getSizeString(transferReferrals));
+			figureReferralBonusesStorage.setText(Util.getSizeString(storageReferrals));
+			referralBonusesSeparator.setVisibility(View.VISIBLE);
+			referralBonusesLayout.setVisibility(View.VISIBLE);
+		}
+		else{
+			referralBonusesSeparator.setVisibility(View.GONE);
+			referralBonusesLayout.setVisibility(View.GONE);
+		}
 
 		long count = ((AchievementsActivity)context).megaAchievements.getAwardsCount();
 
@@ -339,6 +353,7 @@ public class AchievementsFragment extends Fragment implements OnClickListener{
 					textInstallAppTransfer.setVisibility(View.INVISIBLE);
 				}
 
+				daysLeftInstallAppText.setVisibility(View.VISIBLE);
 				daysLeftInstallApp = ((AchievementsActivity)context).megaAchievements.getAwardExpirationTs(i);
 				log("Install App AwardExpirationTs: "+daysLeftInstallApp);
 
@@ -388,6 +403,7 @@ public class AchievementsFragment extends Fragment implements OnClickListener{
 					textInstallDesktopTransfer.setVisibility(View.INVISIBLE);
 				}
 
+				daysLeftInstallDesktopText.setVisibility(View.VISIBLE);
 				daysLeftInstallDesktop = ((AchievementsActivity)context).megaAchievements.getAwardExpirationTs(i);
 				log("Install Desktop AwardExpirationTs: "+daysLeftInstallDesktop);
 

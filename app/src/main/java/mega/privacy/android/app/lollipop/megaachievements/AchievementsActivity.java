@@ -119,7 +119,6 @@ public class AchievementsActivity extends PinActivityLollipop implements MegaReq
             ft.commitNow();
 
             achievementsFragment.updateValues();
-
         }
         else{
 
