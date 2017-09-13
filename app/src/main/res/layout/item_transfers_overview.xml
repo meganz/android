@@ -44,7 +44,6 @@
 		android:id="@+id/transfers_overview_number"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
-
 		android:layout_below="@+id/transfers_overview_title"
 		android:textColor="@color/file_list_second_row"
 		android:layout_marginLeft="72dp"

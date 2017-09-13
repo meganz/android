@@ -168,9 +168,11 @@ public class ReceivedRequestsFragmentLollipop extends Fragment {
 	/*
 	 * Clear all selected items
 	 */
-	private void clearSelections() {
-		if(adapterList.isMultipleSelect()){
-			adapterList.clearSelections();
+	public void clearSelections() {
+		if(adapterList!=null){
+			if(adapterList.isMultipleSelect()){
+				adapterList.clearSelections();
+			}
 		}
 	}
 
@@ -198,7 +200,10 @@ public class ReceivedRequestsFragmentLollipop extends Fragment {
 	 */
 	public void hideMultipleSelect() {
 		log("hideMultipleSelect");
-		adapterList.setMultipleSelect(false);
+		if(adapterList!=null){
+			adapterList.setMultipleSelect(false);
+		}
+
 		if (actionMode != null) {
 			actionMode.finish();
 		}
@@ -437,6 +442,13 @@ public class ReceivedRequestsFragmentLollipop extends Fragment {
 				emptyTextView.setVisibility(View.GONE);
 			}
 		}
+	}
+
+	public int getItemCount(){
+		if(adapterList!=null){
+			return adapterList.getItemCount();
+		}
+		return 0;
 	}
 
 	@Override

@@ -28,6 +28,7 @@ import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MimeTypeMime;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.TouchImageView;
+import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.utils.PreviewUtils;
 import mega.privacy.android.app.utils.ThumbnailUtils;
 import mega.privacy.android.app.utils.Util;
@@ -43,8 +44,9 @@ public class MegaOfflineFullScreenImageAdapterLollipop extends PagerAdapter impl
 	private boolean aBshown = true;
 	DatabaseHandler dbH = null;
 	private boolean zipImage = false;
-	
-	private class OfflinePreviewAsyncTask extends AsyncTask<String, Void, Bitmap>{
+    Context context;
+
+    private class OfflinePreviewAsyncTask extends AsyncTask<String, Void, Bitmap>{
 		
 		ViewHolderOfflineFullImage holder;
 		String currentPath;
@@ -109,24 +111,27 @@ public class MegaOfflineFullScreenImageAdapterLollipop extends PagerAdapter impl
     }
 	
 	// constructor
-	public MegaOfflineFullScreenImageAdapterLollipop(Activity activity, ArrayList<MegaOffline> mOffList) {
+	public MegaOfflineFullScreenImageAdapterLollipop(Context context, Activity activity, ArrayList<MegaOffline> mOffList) {
 		this.activity = activity;
 		this.mOffList = mOffList;
 		this.megaFullScreenImageAdapter = this;
 //		dbH = new DatabaseHandler(activity);
 		dbH = DatabaseHandler.getDbHandler(activity);
 		this.zipImage = false;
-	}
+        this.context = context;
+    }
 	
 	// constructor
-	public MegaOfflineFullScreenImageAdapterLollipop(Activity activity, ArrayList<String> paths, boolean zipImage) {
+	public MegaOfflineFullScreenImageAdapterLollipop(Context context, Activity activity, ArrayList<String> paths, boolean zipImage) {
 		this.activity = activity;
 		this.paths = paths;
 		this.megaFullScreenImageAdapter = this;
 //			dbH = new DatabaseHandler(activity);
 		dbH = DatabaseHandler.getDbHandler(activity);
 		this.zipImage = zipImage;
-	}
+        this.context = context;
+
+    }
 
 	@Override
 	public int getCount() {
@@ -250,37 +255,11 @@ public class MegaOfflineFullScreenImageAdapterLollipop extends PagerAdapter impl
 				
 			    float scaleW = Util.getScaleW(outMetrics, density);
 			    float scaleH = Util.getScaleH(outMetrics, density);
-			    
-			    RelativeLayout bottomLayout = (RelativeLayout) activity.findViewById(R.id.image_viewer_layout_bottom);
-			    RelativeLayout topLayout = (RelativeLayout) activity.findViewById(R.id.image_viewer_layout_top);
-				if (aBshown){
-					TranslateAnimation animBottom = new TranslateAnimation(0, 0, 0, Util.px2dp(48, outMetrics));
-					animBottom.setDuration(1000);
-					animBottom.setFillAfter( true );
-					bottomLayout.setAnimation(animBottom);
-					
-					TranslateAnimation animTop = new TranslateAnimation(0, 0, 0, Util.px2dp(-48, outMetrics));
-					animTop.setDuration(1000);
-					animTop.setFillAfter( true );
-					topLayout.setAnimation(animTop);
-					
-					aBshown = false;
-				}
-				else{					
-					TranslateAnimation animBottom = new TranslateAnimation(0, 0, Util.px2dp(48, outMetrics), 0);
-					animBottom.setDuration(1000);
-					animBottom.setFillAfter( true );
-					bottomLayout.setAnimation(animBottom);
-					
-					TranslateAnimation animTop = new TranslateAnimation(0, 0, Util.px2dp(-48, outMetrics), 0);
-					animTop.setDuration(1000);
-					animTop.setFillAfter( true );
-					topLayout.setAnimation(animTop);
-					
-					aBshown = true;
-				}
-				
-				RelativeLayout activityLayout = (RelativeLayout) activity.findViewById(R.id.full_image_viewer_parent_layout);
+
+                ((FullScreenImageViewerLollipop) context).touchImage();
+
+
+                RelativeLayout activityLayout = (RelativeLayout) activity.findViewById(R.id.full_image_viewer_parent_layout);
 				activityLayout.invalidate();
 				
 				break;

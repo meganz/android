@@ -480,11 +480,6 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 	public ViewHolderBrowser onCreateViewHolder(ViewGroup parent, int viewType) {
 		log("onCreateViewHolder");
 
-		Display display = ((Activity) context).getWindowManager().getDefaultDisplay();
-		DisplayMetrics outMetrics = new DisplayMetrics();
-		display.getMetrics(outMetrics);
-
-
 		if (viewType == MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST){
 			log("onCreateViewHolder -> type: ITEM_VIEW_TYPE_LIST");
 		
@@ -582,12 +577,6 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 		log("onBindViewHolderGrid");
 		
 		Display display = ((Activity) context).getWindowManager().getDefaultDisplay();
-		DisplayMetrics outMetrics = new DisplayMetrics();
-		display.getMetrics(outMetrics);
-		float density = ((Activity) context).getResources().getDisplayMetrics().density;
-
-		float scaleW = Util.getScaleW(outMetrics, density);
-		float scaleH = Util.getScaleH(outMetrics, density);
 
 		MegaNode node = (MegaNode) getItem(position);
 		if (node == null){
@@ -855,10 +844,6 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 
 	public void onBindViewHolderList(ViewHolderBrowserList holder, int position){
 		log("onBindViewHolderList");
-
-		Display display = ((Activity) context).getWindowManager().getDefaultDisplay();
-		DisplayMetrics outMetrics = new DisplayMetrics();
-		display.getMetrics(outMetrics);
 
 		MegaNode node = (MegaNode) getItem(position);
 		holder.document = node.getHandle();
@@ -1475,7 +1460,6 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 				}
 				else if(type==Constants.NODE_ATTACHMENT_ADAPTER){
 					log("Node attachment adapter");
-					((NodeAttachmentActivityLollipop) context).itemClick(currentPosition);
 				}
 				else{
 					log("click layout FileBrowserFragmentLollipop!");
@@ -1524,8 +1508,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 			((SearchFragmentLollipop) fragment).itemClick(currentPosition);
 		}
 		else if(type==Constants.NODE_ATTACHMENT_ADAPTER){
-			((NodeAttachmentActivityLollipop) context).activateActionMode();
-			((NodeAttachmentActivityLollipop) context).itemClick(currentPosition);
+			log("NODE_ATTACHMENT_ADAPTER - no multiselect");
 		}
 		else{
 			log("click layout FileBrowserFragmentLollipop!");
