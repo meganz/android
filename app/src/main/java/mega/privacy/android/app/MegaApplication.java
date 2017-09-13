@@ -268,6 +268,13 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 			}
 		}
 
+		boolean useHttpsOnly = false;
+		if (dbH != null) {
+			useHttpsOnly = Boolean.parseBoolean(dbH.getUseHttpsOnly());
+			log("Value of useHttpsOnly: "+useHttpsOnly);
+			megaApi.useHttpsOnly(useHttpsOnly);
+		}
+
 		notificationBuilder =  NotificationBuilder.newInstance(this, megaApi, megaChatApi);
 		
 //		initializeGA();

@@ -1540,4 +1540,6 @@
     <string name="general_num_days_left" context="indicates the number of days left related to a achievement">%1$d d left</string>
     <string name="expired_achievement" context="state to indicate the achievement has expired">Expired</string>
 
+    <string name="setting_title_use_https_only" context="title of the advanced setting to choose the use of https">Don\'t use HTTP</string>
+    <string name="setting_subtitle_use_https_only" context="subtitle of the advanced setting to choose the use of https">Enable this option only if your transfers don\'t start. In normal circumstances HTTP is satisfactory as all transfers are already encrypted.</string>
 </resources>
