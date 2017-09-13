@@ -272,6 +272,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 	    float density  = getResources().getDisplayMetrics().density;
 		
 		if (credentials == null){
+
 			log("User credentials NULL");
 //			megaApi.localLogout();
 //			AccountController aC = new AccountController(this);
@@ -304,6 +305,8 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		}
 		else{
 			log("User has credentials");
+
+
 		}
 		
 		if (savedInstanceState != null){
@@ -314,12 +317,6 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		
 		megaApi.addGlobalListener(this);
 
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-			Window window = this.getWindow();
-			window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-			window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-			window.setStatusBarColor(ContextCompat.getColor(this, R.color.lollipop_dark_primary_color));
-		}
 		
 		setContentView(R.layout.activity_file_explorer);
 		
@@ -354,8 +351,16 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 
 		intent = getIntent();
 		if (megaApi.getRootNode() == null){
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+				Window window = this.getWindow();
+				window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+				window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+				window.setStatusBarColor(ContextCompat.getColor(this, R.color.transparent_black));
+			}
+
 			log("hide action bar");
 			if (!MegaApplication.isLoggingIn()) {
+
 				MegaApplication.setLoggingIn(true);
 
 				getSupportActionBar().hide();
@@ -372,6 +377,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 				gSession = credentials.getSession();
 
 				if(Util.isChatEnabled()){
+
 					log("onCreate: Chat is ENABLED");
 					if (megaChatApi == null){
 						megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
@@ -387,19 +393,23 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 					}
 					else if (ret == MegaChatApi.INIT_ERROR)
 					{
+
 						log("onCreate: condition ret == MegaChatApi.INIT_ERROR");
 						if(chatSettings==null) {
+
 							log("1 - onCreate: ERROR----> Switch OFF chat");
 							chatSettings = new ChatSettings(false+"", true + "", "",true + "");
 							dbH.setChatSettings(chatSettings);
 						}
 						else{
+
 							log("2 - onCreate: ERROR----> Switch OFF chat");
 							dbH.setEnabledChat(false + "");
 						}
 						megaChatApi.logout(this);
 					}
 					else{
+
 						log("onCreate: Chat correctly initialized");
 					}
 				}
@@ -409,12 +419,22 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			}
 		}
 		else{
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+				Window window = this.getWindow();
+				window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+				window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+				window.setStatusBarColor(ContextCompat.getColor(this, R.color.lollipop_dark_primary_color));
+
+			}
+
 			afterLoginAndFetch();
 			((MegaApplication) getApplication()).sendSignalPresenceActivity();
 		}
 
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH, WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH);
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL, WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL);
+
+
 	}
 	
 	private void afterLoginAndFetch(){
@@ -1333,13 +1353,16 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 	public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError error) {
 		log("onRequestFinish");
 		if (request.getType() == MegaRequest.TYPE_CREATE_FOLDER){
+
 			try { 
 				statusDialog.dismiss();	
 			} 
 			catch (Exception ex) {}
 			
 			if (error.getErrorCode() == MegaError.API_OK){
+
 				if(tabShown==CLOUD_TAB){
+
 					String gcFTag = getFragmentTag(R.id.explorer_tabs_pager, 0);
 					cDriveExplorer = (CloudDriveExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag(gcFTag);
 					if (cDriveExplorer != null){
@@ -1350,6 +1373,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 					}						
 				}
 				else{
+
 					String gcFTag = getFragmentTag(R.id.explorer_tabs_pager, 1);
 					iSharesExplorer = (IncomingSharesExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag(gcFTag);
 					if (iSharesExplorer != null){
@@ -1360,7 +1384,9 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			}
 		}
 		if (request.getType() == MegaRequest.TYPE_LOGIN){
+
 			if (error.getErrorCode() != MegaError.API_OK) {
+
 				MegaApplication.setLoggingIn(false);
 
 				//ERROR LOGIN
@@ -1402,7 +1428,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			}
 			else{
 				//LOGIN OK
-				
+
 				loginProgressBar.setVisibility(View.VISIBLE);
 				loginFetchNodesProgressBar.setVisibility(View.GONE);
 				loggingInText.setVisibility(View.VISIBLE);
@@ -1423,6 +1449,14 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		else if (request.getType() == MegaRequest.TYPE_FETCH_NODES){
 
 			if (error.getErrorCode() == MegaError.API_OK){
+
+				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+					Window window = this.getWindow();
+					window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+					window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+					window.setStatusBarColor(ContextCompat.getColor(this, R.color.lollipop_dark_primary_color));
+
+				}
 				DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 				
 				gSession = megaApi.dumpSession();
@@ -1441,20 +1475,24 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 
 				chatSettings = dbH.getChatSettings();
 				if(chatSettings!=null) {
+
 					boolean chatEnabled = Boolean.parseBoolean(chatSettings.getEnabled());
 					if(chatEnabled){
+
 						log("Chat enabled-->connect");
 						megaChatApi.connect(this);
 						MegaApplication.setLoggingIn(false);
 						afterLoginAndFetch();
 					}
 					else{
+
 						log("Chat NOT enabled - readyToManager");
 						MegaApplication.setLoggingIn(false);
 						afterLoginAndFetch();
 					}
 				}
 				else{
+
 					log("chatSettings NULL - readyToManager");
 					MegaApplication.setLoggingIn(false);
 					afterLoginAndFetch();

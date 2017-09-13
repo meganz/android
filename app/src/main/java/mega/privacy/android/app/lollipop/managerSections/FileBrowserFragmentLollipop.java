@@ -89,8 +89,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 
 	MegaApiAndroid megaApi;
 
-    View separator;
-
 	RelativeLayout transfersOverViewLayout;
 	TextView transfersTitleText;
 	TextView transfersNumberText;
@@ -152,6 +150,8 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 					if (documents.size()==1){
 						((ManagerActivityLollipop) context).showRenameDialog(documents.get(0), documents.get(0).getName());
 					}
+					hideMultipleSelect();
+
 					break;
 				}
 				case R.id.cab_menu_copy:{
@@ -162,6 +162,8 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 
 					NodeController nC = new NodeController(context);
 					nC.chooseLocationToCopyNodes(handleList);
+					clearSelections();
+					hideMultipleSelect();
 					break;
 				}
 				case R.id.cab_menu_move:{
@@ -172,6 +174,8 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 
 					NodeController nC = new NodeController(context);
 					nC.chooseLocationToMoveNodes(handleList);
+					clearSelections();
+					hideMultipleSelect();
 					break;
 				}
 				case R.id.cab_menu_share:{
@@ -185,6 +189,9 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 
 					NodeController nC = new NodeController(context);
 					nC.selectContactToShareFolders(handleList);
+
+					clearSelections();
+					hideMultipleSelect();
 					break;
 				}
 				case R.id.cab_menu_send_file:{
@@ -199,6 +206,9 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 					log("sendToInbox no of files: "+handleList.size());
 					NodeController nC = new NodeController(context);
 					nC.selectContactToSendNodes(handleList);
+
+					clearSelections();
+					hideMultipleSelect();
 					break;
 				}
 				case R.id.cab_menu_share_link:{
@@ -241,6 +251,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 					}
 
 					((ManagerActivityLollipop) context).askConfirmationMoveToRubbish(handleList);
+
 					break;
 				}
 				case R.id.cab_menu_select_all:{
@@ -312,11 +323,12 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			}
 
 
-				if (selected.size() != 0) {
+			if (selected.size() != 0) {
 				showDownload = true;
 				showTrash = true;
 				showMove = true;
 				showCopy = true;
+				showShare = true;
 
 				for(int i=0; i<selected.size();i++)	{
 					if(megaApi.checkMove(selected.get(i), megaApi.getRubbishNode()).getErrorCode() != MegaError.API_OK)	{
@@ -351,7 +363,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			else{
 				menu.findItem(R.id.cab_menu_select_all).setVisible(true);
 				menu.findItem(R.id.cab_menu_unselect_all).setVisible(false);
-				showShare = false;
 			}
 
 
@@ -409,10 +420,14 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 
 			menu.findItem(R.id.cab_menu_share).setVisible(showShare);
 			if(showShare){
-				menu.findItem(R.id.cab_menu_share).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+				if(selected.size()==1){
+					menu.findItem(R.id.cab_menu_share).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+
+				}else{
+					menu.findItem(R.id.cab_menu_share).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+				}
 			}else{
 				menu.findItem(R.id.cab_menu_share).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
-
 			}
 
 			menu.findItem(R.id.cab_menu_send_file).setVisible(true);
@@ -522,7 +537,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			log("After consulting... the parent keeps -1 or ROOTNODE: "+parentHandle);
 
 			if(aB!=null){
-				aB.setTitle(getString(R.string.section_cloud_drive));
+				//aB.setTitle(getString(R.string.section_cloud_drive));
 				log("indicator_menu_white_435");
 				aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 				((ManagerActivityLollipop)context).setFirstNavigationLevel(true);
@@ -572,7 +587,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			emptyTextView = (TextView) v.findViewById(R.id.file_list_empty_text);
 			contentTextLayout = (RelativeLayout) v.findViewById(R.id.content_text_layout);
 			contentText = (TextView) v.findViewById(R.id.content_text);
-            separator = v.findViewById(R.id.separator_file_browser);
 
 			transfersOverViewLayout = (RelativeLayout) v.findViewById(R.id.transfers_overview_item_layout);
 			transfersTitleText = (TextView) v.findViewById(R.id.transfers_overview_title);
@@ -603,6 +617,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			if (adapter.getItemCount() == 0){				
 				log("itemCount is 0");
 				recyclerView.setVisibility(View.GONE);
+				contentTextLayout.setVisibility(View.GONE);
 				emptyImageView.setVisibility(View.VISIBLE);
 				emptyTextView.setVisibility(View.VISIBLE);
 			}
@@ -669,11 +684,13 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			if (adapter.getItemCount() == 0){				
 				
 				recyclerView.setVisibility(View.GONE);
+				contentTextLayout.setVisibility(View.GONE);
 				emptyImageView.setVisibility(View.VISIBLE);
 				emptyTextView.setVisibility(View.VISIBLE);
 			}
 			else{
 				recyclerView.setVisibility(View.VISIBLE);
+				contentTextLayout.setVisibility(View.VISIBLE);
 				emptyImageView.setVisibility(View.GONE);
 				emptyTextView.setVisibility(View.GONE);
 			}
@@ -696,7 +713,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			if(pendingTransfers>0){
 				log("Transfers in progress");
 				contentTextLayout.setVisibility(View.GONE);
-				separator.setVisibility(View.GONE);
 				transfersOverViewLayout.setVisibility(View.VISIBLE);
 				dotsOptionsTransfers.setOnClickListener(this);
 				playButton.setOnClickListener(this);
@@ -727,7 +743,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			else{
 				log("NO TRANSFERS in progress");
 				contentTextLayout.setVisibility(View.VISIBLE);
-				separator.setVisibility(View.VISIBLE);
 				transfersOverViewLayout.setVisibility(View.GONE);
 				dotsOptionsTransfers.setOnClickListener(null);
 				playButton.setOnClickListener(null);
@@ -1026,6 +1041,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 		//If folder has no files
 		if (adapter.getItemCount() == 0){
 			recyclerView.setVisibility(View.GONE);
+			contentTextLayout.setVisibility(View.GONE);
 			emptyImageView.setVisibility(View.VISIBLE);
 			emptyTextView.setVisibility(View.VISIBLE);
 
@@ -1039,6 +1055,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 		}
 		else{
 			recyclerView.setVisibility(View.VISIBLE);
+			contentTextLayout.setVisibility(View.VISIBLE);
 			emptyImageView.setVisibility(View.GONE);
 			emptyTextView.setVisibility(View.GONE);
 		}
@@ -1144,6 +1161,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(parentHandle));
 			if (parentNode != null){
 				recyclerView.setVisibility(View.VISIBLE);
+				contentTextLayout.setVisibility(View.VISIBLE);
 				emptyImageView.setVisibility(View.GONE);
 				emptyTextView.setVisibility(View.GONE);
 
@@ -1241,6 +1259,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 				adapter.setNodes(nodes);
 				if (adapter.getItemCount() == 0){
 					recyclerView.setVisibility(View.GONE);
+					contentTextLayout.setVisibility(View.GONE);
 					emptyImageView.setVisibility(View.VISIBLE);
 					emptyTextView.setVisibility(View.VISIBLE);
 
@@ -1254,6 +1273,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 				}
 				else{
 					recyclerView.setVisibility(View.VISIBLE);
+					contentTextLayout.setVisibility(View.VISIBLE);
 					emptyImageView.setVisibility(View.GONE);
 					emptyTextView.setVisibility(View.GONE);
 				}
@@ -1268,6 +1288,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 				adapter.setNodes(nodes);
 				if (adapter.getItemCount() == 0){
 					recyclerView.setVisibility(View.GONE);
+					contentTextLayout.setVisibility(View.GONE);
 					emptyImageView.setVisibility(View.VISIBLE);
 					emptyTextView.setVisibility(View.VISIBLE);
 
@@ -1281,6 +1302,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 				}
 				else{
 					recyclerView.setVisibility(View.VISIBLE);
+					contentTextLayout.setVisibility(View.VISIBLE);
 					emptyImageView.setVisibility(View.GONE);
 					emptyTextView.setVisibility(View.GONE);
 				}			

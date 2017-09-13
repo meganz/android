@@ -12,29 +12,33 @@
         <android.support.design.widget.AppBarLayout
         android:id="@+id/app_bar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="350dp"
         android:fitsSystemWindows="true">
 
             <android.support.design.widget.CollapsingToolbarLayout
-                android:id="@+id/collapse_toolbar"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:fitsSystemWindows="true"
-                app:collapsedTitleTextAppearance="@style/ToolbarTitle"
-                app:contentScrim="?attr/colorPrimary"
-                app:theme="@style/CollapsingToolbarContactInfo"
-                app:layout_scrollFlags="scroll|exitUntilCollapsed">
+             android:id="@+id/collapse_toolbar"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent"
+             android:fitsSystemWindows="true"
+             android:background="@color/content_text_background"
+             app:collapsedTitleTextAppearance="@style/ToolbarTitle"
+             app:contentScrim="?attr/colorPrimary"
+             app:theme="@style/CollapsingToolbarContactInfo"
+             app:layout_scrollFlags="scroll|exitUntilCollapsed"
+             app:expandedTitleTextAppearance="@style/CollapsingToolbarContactInfo.TitleText"
+                app:titleEnabled="false">
+
 
                 <FrameLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     app:layout_collapseMode="parallax"
-                    android:fitsSystemWindows="true" >
+                    android:fitsSystemWindows="true">
 
                     <RelativeLayout
                         android:id="@+id/chat_contact_properties_image_layout"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
+                        android:layout_height="match_parent">
 
                         <ImageView
                             android:id="@+id/chat_contact_properties_toolbar_image"
@@ -53,15 +57,100 @@
 
                 </FrameLayout>
 
+              <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom">
+
+
+                  <TextView
+                      android:id="@+id/name_length"
+                      android:visibility="invisible"
+                      android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:layout_marginLeft="72dp"
+                      android:textSize="20sp"
+                      android:paddingTop="6dp"
+                      android:ellipsize="end"
+                      android:maxLines="1"
+                      android:singleLine="true"
+                      android:textAppearance="@style/ToolbarTitle"/>
+
+                  <TextView
+                      android:id="@+id/email_length"
+                      android:visibility="invisible"
+                      android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:textSize="14sp"
+                      android:layout_below="@+id/name_length"
+                      android:layout_marginLeft="72dp"
+                      android:ellipsize="end"
+                      android:maxLines="1"
+                      android:singleLine="true"
+                      android:textAppearance="@style/ToolbarTitle"
+                      android:paddingBottom="9dp"/>
+
+
+                  <ImageView
+                      android:id="@+id/contact_drawable_state"
+                      android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:layout_marginLeft="7dp"
+                      android:layout_toEndOf="@+id/name_length"
+                      android:layout_toRightOf="@+id/name_length"
+                      android:background="@null"
+                      android:src="@drawable/ic_offline"
+                      app:layout_collapseMode="pin"
+                      android:layout_marginTop="8dp"/>
+
+                </RelativeLayout>
+
+
                 <android.support.v7.widget.Toolbar
                     android:id="@+id/toolbar"
                     android:layout_width="match_parent"
                     android:layout_height="?attr/actionBarSize"
-                    app:layout_collapseMode="pin" />
-                <!--android:background="@drawable/gradient_shape"-->
+                    app:layout_collapseMode="pin"/>
+
+                <RelativeLayout
+                    android:id="@+id/layout_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom"
+                    android:orientation="vertical"
+                    app:layout_collapseMode="pin">
+
+                    <TextView
+                        android:id="@+id/name_contact"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="72dp"
+                        android:textSize="20sp"
+                        android:paddingTop="6dp"
+                        android:textColor="@color/white"
+                        android:ellipsize="end"
+                        android:maxLines="1"
+                        android:singleLine="true"
+                        android:textAppearance="@style/ToolbarTitle" />
+
+                    <TextView
+                        android:id="@+id/email_contact"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="14sp"
+                        android:layout_below="@+id/name_contact"
+                        android:layout_marginLeft="72dp"
+                        android:textColor="@color/white"
+                        android:maxLines="1"
+                        android:ellipsize="end"
+                        android:singleLine="true"
+                        android:textAppearance="@style/ToolbarTitle"
+                        android:paddingBottom="9dp"/>
+                </RelativeLayout>
 
             </android.support.design.widget.CollapsingToolbarLayout>
         </android.support.design.widget.AppBarLayout>
+
 
         <include layout="@layout/content_chat_contact_properties_activity" />
 

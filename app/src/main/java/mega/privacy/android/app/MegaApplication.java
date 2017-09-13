@@ -28,6 +28,7 @@ import android.graphics.drawable.Drawable;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
+import android.os.Build;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
 import android.text.Html;
@@ -62,10 +63,13 @@ import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatApiJava;
+import nz.mega.sdk.MegaChatError;
 import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatListenerInterface;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatPresenceConfig;
+import nz.mega.sdk.MegaChatRequest;
+import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaListenerInterface;
@@ -77,9 +81,9 @@ import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaUser;
 
 
-public class MegaApplication extends Application implements MegaListenerInterface, MegaChatListenerInterface{
+public class MegaApplication extends Application implements MegaListenerInterface, MegaChatListenerInterface, MegaChatRequestListenerInterface {
 	final String TAG = "MegaApplication";
-	static final String USER_AGENT = "MEGAAndroid/3.2.2_145";
+	static final String USER_AGENT = "MEGAAndroid/3.2.3.1_152";
 
 	DatabaseHandler dbH;
 	MegaApiAndroid megaApi;
@@ -92,6 +96,7 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 
 	MegaChatApiAndroid megaChatApi = null;
 	private NotificationBuilder notificationBuilder;
+
 //	static final String GA_PROPERTY_ID = "UA-59254318-1";
 //	
 //	/**
@@ -197,6 +202,7 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 
 		megaApi = getMegaApi();
 		megaApiFolder = getMegaApiFolder();
+		megaChatApi = getMegaChatApi();
 
 		MegaChatApiAndroid.setLoggerObject(new AndroidChatLogger());
 		MegaChatApiAndroid.setLogLevel(MegaChatApiAndroid.LOG_LEVEL_MAX);
@@ -262,6 +268,13 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 			}
 		}
 
+		boolean useHttpsOnly = false;
+		if (dbH != null) {
+			useHttpsOnly = Boolean.parseBoolean(dbH.getUseHttpsOnly());
+			log("Value of useHttpsOnly: "+useHttpsOnly);
+			megaApi.useHttpsOnly(useHttpsOnly);
+		}
+
 		notificationBuilder =  NotificationBuilder.newInstance(this, megaApi, megaChatApi);
 		
 //		initializeGA();
@@ -308,6 +321,8 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 			}
 			else{
 				megaChatApi = new MegaChatApiAndroid(megaApi);
+				megaChatApi.addChatListener(this);
+				megaChatApi.addChatRequestListener(this);
 			}
 		}
 
@@ -315,7 +330,22 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 	}
 
 	public void disableMegaChatApi(){
+		try {
+			if (megaChatApi != null) {
+				megaChatApi.removeChatListener(this);
+				megaChatApi.removeChatRequestListener(this);
+			}
+		}
+		catch (Exception e){}
+
 		megaChatApi = null;
+	}
+
+	public void enableChat(){
+		log("enableChat");
+		if(Util.isChatEnabled()){
+			megaChatApi = getMegaChatApi();
+		}
 	}
 	
 	public MegaApiAndroid getMegaApi()
@@ -358,8 +388,7 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 //			}
 
 			if(Util.isChatEnabled()){
-				megaChatApi = new MegaChatApiAndroid(megaApi);
-				megaChatApi.addChatListener(this);
+				megaChatApi = getMegaChatApi();
 			}
 
 			String language = Locale.getDefault().toString();
@@ -577,8 +606,15 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 								.setColor(ContextCompat.getColor(this,R.color.mega))
 								.setContentIntent(pendingIntent);
 
-						Drawable d = getDrawable(R.drawable.ic_folder_incoming);
-							notificationBuilder.setLargeIcon(((BitmapDrawable)d).getBitmap());
+						Drawable d;
+
+						if(android.os.Build.VERSION.SDK_INT >=  Build.VERSION_CODES.LOLLIPOP){
+							d = getResources().getDrawable(R.drawable.ic_folder_incoming, getTheme());
+						} else {
+							d = getResources().getDrawable(R.drawable.ic_folder_incoming);
+						}
+
+						notificationBuilder.setLargeIcon(((BitmapDrawable)d).getBitmap());
 
 						NotificationManager notificationManager =
 								(NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
@@ -780,7 +816,7 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 
 		log("Unread count is: "+item.getUnreadCount());
 
-		if (item.hasChanged(MegaChatListItem.CHANGE_TYPE_LAST_TS) && (item.getUnreadCount() != 0)){
+		if (item.hasChanged(MegaChatListItem.CHANGE_TYPE_LAST_MSG) && (item.getUnreadCount() != 0)){
 
 			try {
 				if(isFireBaseConnection){
@@ -801,13 +837,17 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 									showNotification(item);
 								}
 								else{
-									if(firstTs>item.getLastTimestamp()){
-										log("DO NOT SHOW NOTIF - FirstTS when logging "+firstTs+ " > item timestamp: "+item.getLastTimestamp());
-									}
-									else{
-										log("FirstTS when logging "+firstTs+ " < item timestamp: "+item.getLastTimestamp());
-										showNotification(item);
-										firstTs=-1;
+
+									MegaChatMessage lastMessage = megaChatApi.getMessage(item.getChatId(), item.getLastMessageId());
+									if(lastMessage!=null){
+										if(firstTs>lastMessage.getTimestamp()){
+											log("DO NOT SHOW NOTIF - FirstTS when logging "+firstTs+ " > last message timestamp: "+lastMessage.getTimestamp());
+										}
+										else{
+											log("FirstTS when logging "+firstTs+ " < last message timestamp: "+lastMessage.getTimestamp());
+											showNotification(item);
+											firstTs=-1;
+										}
 									}
 								}
 							}
@@ -824,6 +864,10 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 
 	public void showNotification(MegaChatListItem item){
 		log("showNotification: "+item.getTitle()+ " message: "+item.getLastMessage());
+
+		if (megaChatApi == null){
+			megaChatApi = getMegaChatApi();
+		}
 
 		ChatSettings chatSettings = dbH.getChatSettings();
 		String email = megaChatApi.getContactEmail(item.getPeerHandle());
@@ -930,5 +974,37 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 				}
 			}
 		}
+	}
+
+	@Override
+	public void onRequestStart(MegaChatApiJava api, MegaChatRequest request) {
+		log("onRequestStart: Chat");
+	}
+
+	@Override
+	public void onRequestUpdate(MegaChatApiJava api, MegaChatRequest request) {
+		log("onRequestUpdate: Chat");
+	}
+
+	@Override
+	public void onRequestFinish(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
+		log("onRequestFinish: Chat " + request.getRequestString());
+		if (request.getType() == MegaChatRequest.TYPE_LOGOUT) {
+			log("CHAT_TYPE_LOGOUT: " + e.getErrorCode() + "__" + e.getErrorString());
+			try{
+				if (megaChatApi != null){
+					megaChatApi.removeChatListener(this);
+					megaChatApi.removeChatRequestListener(this);
+				}
+			}
+			catch (Exception exc){}
+
+			megaChatApi = null;
+		}
+	}
+
+	@Override
+	public void onRequestTemporaryError(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
+		log("onRequestTemporaryError: Chat");
 	}
 }

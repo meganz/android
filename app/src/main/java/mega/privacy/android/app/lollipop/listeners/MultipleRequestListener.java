@@ -3,6 +3,7 @@ package mega.privacy.android.app.lollipop.listeners;
 import android.content.Context;
 
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.lollipop.ContactFileListActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ContactAttachmentActivityLollipop;
@@ -84,7 +85,10 @@ public class MultipleRequestListener implements MegaRequestListenerInterface {
                         else{
                             message = context.getString(R.string.number_correctly_moved_to_rubbish, max_items);
                         }
-                        ((ManagerActivityLollipop) context).refreshAfterMovingToRubbish();
+                        if(context instanceof ManagerActivityLollipop)
+                            ((ManagerActivityLollipop) context).refreshAfterMovingToRubbish();
+                        else
+                            ((ContactFileListActivityLollipop) context).refreshAfterMovingToRubbish();
                     }
                     else{
                         log("move nodes request finished");

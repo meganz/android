@@ -220,43 +220,51 @@
         app:itemTextColor="@color/drawer_item_text"
         app:menu="@menu/navigation_drawer_items" >
 
+        <ScrollView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:scrollbars="none"
+            android:layout_gravity="bottom"
+            android:layout_marginBottom="-70dp">
+
         <RelativeLayout
             android:id="@+id/nv_used_space_layout"
             android:layout_width="match_parent"
+            android:clickable="true"
             android:layout_height="80dp"
-            android:layout_gravity="bottom"
-            android:layout_marginBottom="-80dp"
-            android:background="#ffffff" >
+            android:background="#ffffff">
 
             <TextView
                 android:id="@+id/navigation_drawer_used_space_text"
                 style="@style/NavDrawerAccountUsedSpaceText"
                 android:text="@string/my_account_used_space"
-                android:textStyle="bold"
-                tools:fontFamily="sans-serif-medium" />
+                android:layout_marginLeft="6dp"
+                tools:fontFamily="roboto"
+                android:lineSpacingMultiplier="1.71" />
+
 
             <ProgressBar
                 android:id="@+id/manager_used_space_bar"
                 style="@style/UsedSpaceProgressBar"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="5dp"
                 android:layout_below="@id/navigation_drawer_used_space_text"
-                android:layout_marginBottom="2dp"
-                android:layout_marginLeft="10dp"
-                android:layout_marginRight="10dp"
-                android:layout_marginTop="2dp"/>
+                android:layout_marginBottom="8dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:layout_marginTop="4dp"/>
 
             <TextView
                 android:id="@+id/navigation_drawer_used_space"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/manager_used_space_bar"
-                android:paddingLeft="10dp"
+                android:paddingLeft="16dp"
                 android:text="0"
-                android:textColor="#9b9b9b"
-                android:textSize="14sp"
-                android:textStyle="bold"
-                tools:fontFamily="sans-serif-medium" />
+                android:lineSpacingMultiplier="1.17"
+                android:textColor="#ff9e9e9e"
+                android:textSize="12sp"
+                tools:fontFamily="roboto"/>
 
             <TextView
                 android:id="@+id/navigation_drawer_total_space"
@@ -264,13 +272,14 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
                 android:layout_below="@id/manager_used_space_bar"
-                android:paddingRight="10dp"
+                android:paddingRight="16dp"
                 android:text="50GB"
-                android:textColor="#9b9b9b"
-                android:textSize="14sp"
-                android:textStyle="bold"
-                tools:fontFamily="sans-serif-medium" />
+                android:lineSpacingMultiplier="1.17"
+                android:textColor="#ff9e9e9e"
+                android:textSize="12sp"
+                tools:fontFamily="roboto" />
         </RelativeLayout>
+        </ScrollView>
     </android.support.design.widget.NavigationView>
 
 </android.support.v4.widget.DrawerLayout>

@@ -410,7 +410,7 @@
 	<string name="upload_to_audio" context="upload to. Then choose an Audio file">Audio </string>
 	<string name="upload_to_video" context="upload to. Then choose a Video file">Vídeo</string>
 	<!-- <string name="upload_to_other" context="upload to. Then choose a file which is not an Image, an Audio or a Video">Otro fichero</string> -->
-	<string name="upload_to_filesystem" context="upload to. Then choose to browse the file system to choose a file">Elegir del Sistema de Ficheros</string>
+	<string name="upload_to_filesystem" context="upload to. Then choose to browse the file system to choose a file">Desde Sistema de Ficheros</string>
 	<!-- <string name="upload_select_file_type" context="title of the dialog for choosing if a user wants to upload an image, an audio, a video or a file from the system">Selecciona el tipo de archivo</string> -->
 	<!-- <string name="upload_uploading" context="status text">Subiendo</string> -->
 	<!-- <string name="upload_touch_to_cancel" context="hint to how to cancel the upload (by touching the notification)">Toca para cancelar la subida</string> -->
@@ -579,7 +579,7 @@
     <string name="settings_about_terms_of_service" context="App means &quot;Application&quot;">Términos de uso</string>
     <string name="settings_about_app_version" context="App means &quot;Application&quot;">Versión de app</string>
     <string name="settings_about_sdk_version" context="App means &quot;Application&quot;">Versión del SDK de MEGA</string>
-    <string name="settings_about_karere_version" context="Title of the label where the karere version is shown">Versión de Karere de MEGA</string>
+    <string name="settings_about_karere_version" context="Title of the label where the MEGAchat SDK version is shown">Versión de MEGAchat SDK</string>
     <string name="settings_about_code_link_title" context="Link to the public code of the app">Ver código fuente</string>
 
     <string name="january">Enero</string>
@@ -739,8 +739,8 @@
 
     <string name="my_account_upgrade_pro" context="Button to upgrade the account to PRO account">Hazte PRO</string>
     <string name="my_account_upgrade_pro_panel" context="Button to upgrade the account to PRO account in the panel that appears randomly">¡Hazte PRO!</string>
-    <string name="get_pro_account" context="Message to promote PRO accounts">Aumenta la capacidad de tu almacenamiento en la nube!\n Más espacio &amp; ancho de banda con una cuenta PRO!</string>
-    <string name="toast_master_key" context="success message when the MasterKey file has been downloaded">Tu Clave de recuperación ha sido exportada en: %1s.\nMientras el fichero esté en esta ruta, lo encontrarás también la sección Sin conexión.\nNota: El fichero se eliminará si cierras la sesión, por favor, guárdalo en un lugar seguro.</string>
+    <string name="get_pro_account" context="Message to promote PRO accounts">Aumenta la capacidad de tu almacenamiento en la nube![A] Más espacio &amp; ancho de banda con una cuenta PRO!</string>
+    <string name="toast_master_key" context="success message when the MasterKey file has been downloaded">Tu Clave de recuperación ha sido exportada en: %1s.[A]Mientras el fichero esté en esta ruta, lo encontrarás también la sección Sin conexión.[A]Nota: El fichero se eliminará si cierras la sesión, por favor, guárdalo en un lugar seguro.</string>
 
     <!-- <string name="next_ime_action" context="Action to pass focus to the next field in a form">Siguiente</string> -->
 
@@ -774,6 +774,7 @@
     <string name="title_edit_profile_info" context="Title of the Dialog to edit the profile attributes of the user's account">Editar</string>
 
     <string name="title_set_expiry_date" context="Alert Dialog to get link">Fecha de caducidad</string>
+    <string name="title_set_password_protection" context="Alert Dialog to get link">Protección con contraseña</string>
     <string name="subtitle_set_expiry_date" context="Alert Dialog to get link">(SOLO PRO)</string>
 
     <string name="edit_link_option" context="Option of the sliding panel to edit the link of a node">Editar link</string>
@@ -802,7 +803,7 @@
     </plurals>
 
     <string name="error_incorrect_email_or_password" context="Error message when the credentials to login are incorrect.">El correo electrónico o la contraseña introducidas no son correctas. Por favor, pruebe otra vez.</string>
-    <string name="error_account_suspended" context="Error message when trying to login and the account is suspended.">La cuenta ha sido suspendida por la violación de los Términos de Servicio. Por favor, contacte con support@mega.co.nz</string>
+    <string name="error_account_suspended" context="Error message when trying to login and the account is suspended.">La cuenta ha sido suspendida por la violación de los Términos de Servicio. Por favor, contacte con support@mega.nz</string>
     <string name="too_many_attempts_login" context="Error message when to many attempts to login.">Demasiados intentos incorrectos para iniciar sesión, por favor, espere una hora.</string>
     <string name="account_not_validated_login" context="Error message when trying to login to an account not validated.">La cuenta no ha sido validada todavía. Por favor, compruebe su correo electrónico.</string>
 
@@ -840,7 +841,7 @@
 
     <string name="recent_chat_empty_invite" context="Message shown when the user has no recent chats">Invita a tus amigos a unirse al Chat y disfruta de nuestra plataforma encriptada con privacidad y seguridad.</string>
 
-    <string name="recent_chat_empty_enable_chat" context="Message shown when the user has no recent chats">Habilita el chat\ny disfruta de nuestra plataforma encriptada con privacidad y seguridad.</string>
+    <string name="recent_chat_empty_enable_chat" context="Message shown when the user has no recent chats">Habilita el chat[A]y disfruta de nuestra plataforma encriptada con privacidad y seguridad.</string>
 
     <!-- <string name="videocall_title" context="Title shown in the list of main chat screen for a videocall">Videollamada</string> -->
 
@@ -929,8 +930,7 @@
 
     <string name="text_deleted_message" context="Text shown when a message has been deleted in the chat">Mensaje eliminado</string>
     <string name="history_cleared_message" context="Text shown when the chat history was cleared by me">La historia del chat ha sido eliminada</string>
-    <string name="text_deleted_message_by" context="Text shown when a message has been deleted in the chat"><![CDATA[<font color=\'#00BFA5\'>This message has been deleted by </font><font color=\'#060000\'>%1$s</font>]]></string>
-    <string name="history_cleared_by" context="Text shown when the chat history was cleared by someone"><![CDATA[<font color=\'#060000\'>%1$s</font><font color=\'#00BFA5\'> limpió el historial del chat</font>]]></string>
+    <string name="history_cleared_by" context="Text shown when the chat history was cleared by someone">[A]%1$s[/A][B] limpió el historial del chat[/B]</string>
 
     <string name="confirmation_delete_several_messages" context="Confirmation before deleting messages">¿Eliminar mensajes?</string>
     <string name="confirmation_delete_one_message" context="Confirmation before deleting one message">¿Eliminar mensaje?</string>
@@ -966,14 +966,14 @@
     <string name="number_correctly_add_participant" context="success message when inviting multiple contacts to a group chat">%d participantes correctamente invitados</string>
     <string name="number_no_add_participant_request" context="error message when inviting multiple contacts to a group chat">%1$d participantes correctamente invitados pero %2$d no han sido invitados.</string>
 
-    <string name="message_permissions_changed" context="chat message when the permissions for a user has been changed"><![CDATA[<font color=\'#060000\'>%3$s</font><font color=\'#868686\'> ha cambiado los permisos de </font><font color=\'#060000\'>%1$s</font><font color=\'#868686\'> a </font><font color=\'#060000\'>%2$s</font>]]></string>
+    <string name="message_permissions_changed" context="chat message when the permissions for a user has been changed">[A]%3$s[/A][B] ha cambiado los permisos de [/B][C]%1$s[/C][D] a [/D][E]%2$s[/E]</string>
 
-    <string name="message_add_participant" formatted="false" context="chat message when a participant was added to a group chat"><![CDATA[<font color=\'#060000\'>%1$s</font><font color=\'#868686\'> ha sido añadido al chat grupal por </font><font color=\'#060000\'>%2$s</font>]]></string>
-    <string name="message_remove_participant" context="chat message when a participant was removed from a group chat"><![CDATA[<font color=\'#060000\'>%1$s</font><font color=\'#868686\'> ha sido eliminado del chat grupal por </font><font color=\'#060000\'>%2$s</font>]]></string>
+    <string name="message_add_participant" formatted="false" context="chat message when a participant was added to a group chat">[A]%1$s[/A][B] ha sido añadido al chat grupal por [/B][C]%2$s[/C]</string>
+    <string name="message_remove_participant" context="chat message when a participant was removed from a group chat">[A]%1$s[/A][B] ha sido eliminado del chat grupal por [/B][C]%2$s[/C]</string>
 
-    <string name="change_title_messages" context="Message shown when a participant change the title of a group chat."><![CDATA[<font color=\'#060000\'>%1$s</font><font color=\'#868686\'> cambió el nombre del grupo a </font><font color=\'#060000\'>\"%2$s\"</font>]]></string>
+    <string name="change_title_messages" context="Message shown when a participant change the title of a group chat.">[A]%1$s[/A][B] cambió el nombre del grupo a [/B][C]\"%2$s\"[/C]</string>
 
-    <string name="message_participant_left_group_chat" context="chat message when a participant left a group chat"><![CDATA[<font color=\'#060000\'>%1$s</font><font color=\'#868686\'> dejó el chat</font>]]></string>
+    <string name="message_participant_left_group_chat" context="chat message when a participant left a group chat">[A]%1$s[/A][B] dejó el chat[/B]</string>
 
     <string name="manual_retry_alert" context="chat message alert when the message have to been manually">Mensaje no enviado. Tocar para opciones</string>
 
@@ -1039,11 +1039,11 @@
     <string name="no_conversation_history" context="message shown when a chat has no messages">No hay historial</string>
 
     <plurals name="user_typing" context="title of confirmation alert before removing a contact">
-        <item context="Singular" quantity="one">está escribiendo...</item>
-        <item context="Plural" quantity="other">están escribiendo...</item>
+        <item context="Singular" quantity="one">%1$s [A]está escribiendo...[/A]</item>
+        <item context="Plural" quantity="other">%1$s [A]están escribiendo...[/A]</item>
     </plurals>
 
-    <string name="more_users_typing" context="Title of the general tab in My Account Section">más están escribiendo...</string>
+    <string name="more_users_typing" context="text that appear when there are more than 2 people writing at that time in a chat. For example User1, user2 and more are typing...">%1$s [A]and more are typing...[/A]</string>
 
     <string name="tab_my_account_general" context="Title of the general tab in My Account Section">General</string>
     <string name="tab_my_account_storage" context="Title of the storage tab in My Account Section">Almacenamiento</string>
@@ -1057,7 +1057,7 @@
 
     <string name="no_bylling_cycle" context="Label in section the storage tab when the account is Free">Sin pagos programados</string>
 
-    <string name="my_account_of_string" context="String to show the transfer quota and the used space in My Account section"><![CDATA[%1$s <font color=\'#777777\'>de %2$s</font>]]></string>
+    <string name="my_account_of_string" context="String to show the transfer quota and the used space in My Account section">%1$s [A]de %2$s[/A]</string>
 
     <string name="confirmation_delete_from_save_for_offline" context="confirmation message before removing a something for the Save for Offline section">¿Eliminar de Sin conexión?</string>
 
@@ -1264,4 +1264,8 @@
     <string name="title_contact_request_notification" context="title of contact request notification">Nueva solicitud de contacto</string>
 
     <string name="number_messages_chat_notification" formatted="false" context="messages string in chat notification">%1$d chats sin leer</string>
+
+    <string name="context_permissions_changing_folder" context="Item menu option upon clicking on one or multiple files.">Cambiando permisos</string>
+    <string name="context_removing_contact_folder" context="Item menu option upon clicking on one or multiple files.">Eliminando contacto de la carpeta compartida</string>
+
 </resources>

@@ -17,7 +17,8 @@
 			android:layout_gravity="center_horizontal"
 			android:layout_marginTop="46dp"
 			android:layout_marginBottom="32dp"
-			android:src="@drawable/ic_copyright"/>
+			android:src="@drawable/ic_copyright"
+			android:tint="@color/copyright_title"/>
 
 		<TextView
 			android:id="@+id/copyright_title"
@@ -28,7 +29,7 @@
 			android:text="@string/copyright_alert_title"
 			android:gravity="left"
 			android:textSize="20dp"
-			android:textColor="@color/name_my_account"
+			android:textColor="@color/copyright_title"
 			android:layout_gravity="left"/>
 
 		<TextView
@@ -37,10 +38,11 @@
 			android:layout_height="wrap_content"
 			android:layout_marginLeft="25dp"
 			android:layout_marginRight="25dp"
-			android:layout_marginBottom="10dp"
+			android:layout_marginBottom="24dp"
+			android:lineSpacingMultiplier="1.4"
 			android:text="@string/copyright_alert_first_paragraph"
-			android:textSize="16dp"
-			android:textColor="@color/mail_my_account"
+			android:textSize="14dp"
+			android:textColor="@color/copyright_text"
 			android:gravity="left"
 			android:layout_gravity="left"/>
 
@@ -51,9 +53,10 @@
 			android:layout_marginLeft="25dp"
 			android:layout_marginRight="25dp"
 			android:layout_marginBottom="32dp"
+			android:lineSpacingMultiplier="1.4"
 			android:text="@string/copyright_alert_second_paragraph"
-			android:textSize="16dp"
-			android:textColor="@color/mail_my_account"
+			android:textSize="14dp"
+			android:textColor="@color/copyright_text"
 			android:gravity="left"
 			android:layout_gravity="left"/>
 
@@ -61,8 +64,8 @@
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:layout_gravity="right"
-			android:layout_marginRight="16dp"
-			android:layout_marginBottom="8dp"
+			android:layout_marginRight="20dp"
+			android:layout_marginBottom="4dp"
 			android:orientation="horizontal">
 
 			<Button
@@ -70,11 +73,12 @@
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
 				android:layout_alignParentRight="true"
-				android:paddingLeft="8dp"
-				android:paddingRight="8dp"
-				android:paddingTop="10dp"
-				android:paddingBottom="10dp"
+				android:paddingLeft="16dp"
+				android:paddingRight="16dp"
+				android:paddingTop="4dp"
+				android:paddingBottom="4dp"
 				android:layout_marginRight="10dp"
+				android:layout_marginBottom="4dp"
 				android:textColor="@color/white"
 				android:text="@string/copyright_alert_disagree_button"
 				android:background="@color/accentColor"
@@ -86,10 +90,12 @@
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
 				android:layout_alignParentRight="true"
-				android:paddingLeft="8dp"
-				android:paddingRight="8dp"
-				android:paddingTop="10dp"
-				android:paddingBottom="10dp"
+				android:paddingLeft="16dp"
+				android:paddingRight="16dp"
+				android:paddingTop="8dp"
+				android:paddingBottom="8dp"
+				android:layout_marginBottom="4dp"
+				android:layout_marginRight="4dp"
 				android:minWidth="0dp"
 				android:textColor="@color/white"
 				android:text="@string/copyright_alert_agree_button"

@@ -36,6 +36,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaContactAdapter;
 import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.components.CustomizedGridRecyclerView;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
@@ -111,7 +112,10 @@ public class ContactsFragmentLollipop extends Fragment{
 					if (users.size()>0){
 						ContactController cC = new ContactController(context);
 						cC.pickFolderToShare(users);
-					}										
+						clearSelections();
+						hideMultipleSelect();
+					}
+
 					break;
 				}
 				case R.id.cab_menu_send_file:{
@@ -223,7 +227,7 @@ public class ContactsFragmentLollipop extends Fragment{
 			
 			menu.findItem(R.id.cab_menu_help).setVisible(false);
 			menu.findItem(R.id.cab_menu_upgrade_account).setVisible(false);
-			menu.findItem(R.id.cab_menu_settings).setVisible(false);
+			//menu.findItem(R.id.cab_menu_settings).setVisible(false);
 //			menu.findItem(R.id.cab_menu_leave_multiple_share).setVisible(false);
 			return false;
 		}		
@@ -259,10 +263,15 @@ public class ContactsFragmentLollipop extends Fragment{
 	/*
 	 * Clear all selected items
 	 */
-	private void clearSelections() {
+	public void clearSelections() {
 		if(adapter.isMultipleSelect()){
 			adapter.clearSelections();
 		}
+	}
+
+	public void clearSelectionsNoAnimations() {
+		adapter.clearSelectionsNoAnimations();
+
 	}
 	
 	private void updateActionModeTitle() {
@@ -405,6 +414,8 @@ public class ContactsFragmentLollipop extends Fragment{
 				emptyTextView.setVisibility(View.GONE);
 			}
 
+			((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
+
 			if (aB != null){
 				aB.setTitle(getString(R.string.section_contacts));
 			}
@@ -426,6 +437,7 @@ public class ContactsFragmentLollipop extends Fragment{
 			recyclerView.setPadding(0, 0, 0, Util.scaleHeightPx(80, outMetrics));
 			recyclerView.setClipToPadding(false);
 			recyclerView.setHasFixedSize(true);
+			((CustomizedGridRecyclerView) recyclerView).setWrapContent();
 			final GridLayoutManager gridLayoutManager = (GridLayoutManager) recyclerView.getLayoutManager();
 			gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
 				@Override
@@ -475,6 +487,8 @@ public class ContactsFragmentLollipop extends Fragment{
 				emptyTextView.setVisibility(View.GONE);
 			}
 
+			((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
+
 			if (aB != null){
 				aB.setTitle(getString(R.string.section_contacts));
 			}
@@ -515,6 +529,9 @@ public class ContactsFragmentLollipop extends Fragment{
 				visibleContacts.add(megaContactAdapter);
 			}
 		}
+
+		orderContacts = ((ManagerActivityLollipop)context).getOrderContacts();
+		sortBy(orderContacts);
 		
 		adapter.setContacts(visibleContacts);
 
@@ -716,6 +733,13 @@ public class ContactsFragmentLollipop extends Fragment{
 		}
 		
 		return false;
+	}
+
+	public int getItemCount(){
+		if(adapter!=null){
+			return adapter.getItemCount();
+		}
+		return 0;
 	}
 	
 	public void setOrder(int orderContacts){
