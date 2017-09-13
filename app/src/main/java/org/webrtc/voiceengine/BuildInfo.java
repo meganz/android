@@ -11,7 +11,6 @@
 package org.webrtc.voiceengine;
 
 import android.os.Build;
-import android.util.Log;
 
 public final class BuildInfo {
   public static String getDevice() {
@@ -46,7 +45,7 @@ public final class BuildInfo {
     return Build.VERSION.RELEASE;
   }
 
-  public static String getSdkVersion() {
-    return Integer.toString(Build.VERSION.SDK_INT);
+  public static int getSdkVersion() {
+    return Build.VERSION.SDK_INT;
   }
 }
