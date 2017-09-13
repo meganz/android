@@ -1005,7 +1005,7 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 			}
 		};
 
-		android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this);
 //		builder.setTitle(getResources().getString(R.string.alert_leave_share));
 		String message= getResources().getString(R.string.remove_contact_shared_folder,u.getEmail());
 		builder.setMessage(message).setPositiveButton(R.string.general_remove, dialogClickListener)
@@ -1030,7 +1030,7 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 			}
 		};
 
-		android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this);
 //		builder.setTitle(getResources().getString(R.string.alert_leave_share));
 		String message= getResources().getString(R.string.remove_multiple_contacts_shared_folder,contacts.size());
 		builder.setMessage(message).setPositiveButton(R.string.general_remove, dialogClickListener)

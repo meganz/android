@@ -157,8 +157,13 @@
 	    android:key="advanced_features"
 	    android:textColor="@color/pressed_mega"
 	    android:title="@string/settings_advanced_features" >
-		
-	    <Preference
+
+		<mega.privacy.android.app.components.TwoLineCheckPreference
+			android:key="settings_use_https_only"
+			android:title="@string/setting_title_use_https_only"
+			android:summary="@string/setting_subtitle_use_https_only"/>
+
+		<Preference
 	        android:key="settings_advanced_features_cache"
 	        android:title="@string/settings_advanced_features_cache" />
 	    
