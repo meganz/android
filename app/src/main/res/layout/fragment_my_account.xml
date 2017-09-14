@@ -127,8 +127,7 @@
 			<RelativeLayout
 				android:id="@+id/my_account_MK_layout"
 				android:layout_width="match_parent"
-				android:layout_height="64dp"
-				android:background="@color/grey_my_account_background">
+				android:layout_height="64dp">
 
 				<Button
 					android:id="@+id/MK_button"
@@ -199,13 +198,14 @@
 				android:id="@+id/my_account_achievements_separator"
 				android:layout_width="match_parent"
 				android:layout_height="1dp"
-				android:background="@color/grey_my_account_background"
+				android:layout_marginLeft="71dp"
+				android:background="@color/divider_upgrade_account"
 				android:orientation="horizontal" />
 
 			<RelativeLayout
 				android:id="@+id/my_account_account_type_layout"
 				android:layout_width="match_parent"
-				android:layout_height="72dp"
+				android:layout_height="wrap_content"
 				android:background="@color/white">
 
 				<LinearLayout
@@ -213,6 +213,7 @@
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
 					android:gravity="left|center_vertical"
+					android:layout_marginTop="20dp"
 					android:layout_centerVertical="true"
 					android:layout_marginLeft="72dp"
 					android:orientation="vertical">
@@ -231,33 +232,30 @@
 						android:textSize="14sp"
 						android:textColor="@color/mail_my_account"/>
 
+					<Button
+						android:id="@+id/my_account_account_type_button"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:paddingLeft="20dp"
+						android:paddingRight="20dp"
+						android:layout_marginBottom="10dp"
+						android:layout_marginRight="8dp"
+						android:layout_marginTop="16dp"
+						android:textColor="@color/white"
+						android:text="@string/my_account_upgrade_pro"
+						android:background="@color/accentColor"
+						android:elevation="@dimen/elevation_upgrade_low"
+						android:stateListAnimator="@anim/button_upgrade_elevation"
+						android:tint="@android:color/white" />
 				</LinearLayout>
-
-				<Button
-					android:id="@+id/my_account_account_type_button"
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
-					android:layout_alignParentRight="true"
-					android:layout_centerVertical="true"
-					android:paddingLeft="20dp"
-					android:paddingRight="20dp"
-					android:paddingTop="-3dp"
-					android:paddingBottom="-3dp"
-					android:textColor="@color/white"
-					android:text="@string/my_account_upgrade_pro"
-					android:background="@color/accentColor"
-					android:layout_marginRight="16dp"
-					android:elevation="@dimen/elevation_upgrade_low"
-					android:stateListAnimator="@anim/button_upgrade_elevation"
-					android:tint="@android:color/white" />
-
 			</RelativeLayout>
 
 			<LinearLayout
 				android:id="@+id/my_account_type_separator"
 				android:layout_width="match_parent"
 				android:layout_height="1dp"
-				android:background="@color/grey_my_account_background"
+				android:layout_marginLeft="71dp"
+				android:background="@color/divider_upgrade_account"
 				android:orientation="horizontal" />
 
 			<LinearLayout
@@ -299,7 +297,8 @@
 				android:id="@+id/my_account_last_session_separator"
 				android:layout_width="match_parent"
 				android:layout_height="1dp"
-				android:background="@color/grey_my_account_background"
+				android:layout_marginLeft="71dp"
+				android:background="@color/divider_upgrade_account"
 				android:orientation="horizontal" />
 
 			<LinearLayout
@@ -338,10 +337,17 @@
 			</LinearLayout>
 
 			<LinearLayout
+				android:id="@+id/my_account_connections_separator"
+				android:layout_width="match_parent"
+				android:layout_height="1dp"
+				android:layout_marginLeft="71dp"
+				android:background="@color/divider_upgrade_account"
+				android:orientation="horizontal" />
+
+			<LinearLayout
 				android:id="@+id/my_account_buttons_layout"
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
-				android:background="@color/grey_my_account_background"
 				android:gravity="left"
 				android:orientation="vertical" >
 
