@@ -39,6 +39,7 @@ public class AchievementsActivity extends PinActivityLollipop implements MegaReq
     int visibleFragment;
     private AchievementsFragment achievementsFragment;
     private ReferralBonusesFragment referralBonusesFragment;
+    private InviteFriendsFragment inviteFriendsFragment;
 
     public MegaAchievementsDetails megaAchievements;
     public ArrayList<ReferralBonus> referralBonuses;
@@ -120,7 +121,18 @@ public class AchievementsActivity extends PinActivityLollipop implements MegaReq
 
             achievementsFragment.updateValues();
         }
-        else{
+        else if(visibleFragment==Constants.INVITE_FRIENDS_FRAGMENT){
+
+            aB.setTitle(getString(R.string.button_invite_friends));
+            if(inviteFriendsFragment==null){
+                inviteFriendsFragment = new InviteFriendsFragment();
+            }
+
+            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            ft.replace(R.id.fragment_container_achievements, inviteFriendsFragment, "inviteFriendsFragment");
+            ft.commitNow();
+        }
+        else if(visibleFragment==Constants.BONUSES_FRAGMENT){
 
             if(referralBonusesFragment==null) {
                 referralBonusesFragment = new ReferralBonusesFragment();

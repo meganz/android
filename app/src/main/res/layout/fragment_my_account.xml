@@ -26,6 +26,15 @@
 				android:gravity="left"
 				android:orientation="horizontal" >
 
+				<ImageView
+					android:id="@+id/my_account_email_icon"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_marginLeft="18dp"
+					android:layout_marginRight="34dp"
+					android:layout_gravity="center_vertical"
+					android:src="@drawable/ic_email_grey" />
+
 				<LinearLayout
 					android:id="@+id/my_account_email_text_layout"
 					android:layout_width="wrap_content"
@@ -33,7 +42,6 @@
 					android:background="@color/white"
 					android:gravity="left"
 					android:layout_gravity="center_vertical"
-					android:layout_marginLeft="72dp"
 					android:orientation="vertical" >
 
 					<RelativeLayout
@@ -150,9 +158,9 @@
 					android:id="@+id/my_account_achievements_icon"
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
-					android:layout_marginLeft="20dp"
-					android:layout_marginRight="28dp"
-					android:src="@drawable/ic_email_grey" />
+					android:layout_marginLeft="18dp"
+					android:layout_marginRight="34dp"
+					android:src="@drawable/ic_achievements" />
 
 				<LinearLayout
 					android:id="@+id/my_account_achievements_text_layout"
