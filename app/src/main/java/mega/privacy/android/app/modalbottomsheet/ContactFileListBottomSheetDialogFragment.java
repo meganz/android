@@ -286,17 +286,7 @@ public class ContactFileListBottomSheetDialogFragment extends BottomSheetDialogF
                                     numSons++;
                                 }
                             }
-//                            if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE && numSons > 3){
-//
-//                                ViewGroup.LayoutParams params = bottomSheet.getLayoutParams();
-//                                params.height = height;
-//                                bottomSheet.setLayoutParams(params);
-//                            }
-//                            else if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT && numSons > 9){
-//                                ViewGroup.LayoutParams params = bottomSheet.getLayoutParams();
-//                                params.height = height;
-//                                bottomSheet.setLayoutParams(params);
-//                            }
+
                             if(heightReal > height){
                                 ViewGroup.LayoutParams params = bottomSheet.getLayoutParams();
                                 params.height = height;
