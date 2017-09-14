@@ -10574,14 +10574,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	}
 
 	public int getHeightToPanel(BottomSheetDialogFragment dialog){
-		log("getHeightToPanel dialog -> "+ dialog);
-		log("getHeightToPanel fragmentContainer  is null -> "+ (fragmentContainer == null));
-		log("getHeightToPanel aB  is null -> "+ (aB == null));
-		log("getHeightToPanel tabLayoutCloud  is null -> "+ (tabLayoutCloud == null));
-		if(tabLayoutCloud != null){
-			log("getHeightToPanel tabLayoutCloud height is -> "+ tabLayoutCloud.getHeight());
-		}
-		log("getHeightToPanel tabLayoutShares  is null -> "+ (tabLayoutShares == null));
+		
 		if(dialog instanceof NodeOptionsBottomSheetDialogFragment){
 			if(fragmentContainer != null && aB != null && tabLayoutCloud != null && tabLayoutCloud.getHeight() != 0){
 				final Rect r = new Rect();
