@@ -133,8 +133,6 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		display.getMetrics(outMetrics);
 		density = ((Activity) context).getResources().getDisplayMetrics().density;
 
-		float scaleW = Util.getScaleW(outMetrics, density);
-		float scaleH = Util.getScaleH(outMetrics, density);
 		View v = null;
 		v = inflater.inflate(R.layout.fragment_my_account, container, false);
 		
