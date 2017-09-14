@@ -121,5 +121,6 @@
 
     <color name="grey_text_chip">#FF535353</color>
     <color name="grey_background_chip">#FFE0E0E0</color>
+    <color name="invite_button_deactivated">#424F4F4F</color>
 
 </resources>

@@ -5,6 +5,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -20,6 +21,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -29,6 +31,7 @@ import java.util.ArrayList;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
+import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
@@ -48,6 +51,7 @@ public class InviteFriendsFragment extends Fragment implements OnClickListener{
 	MegaInviteFriendsAdapter adapter;
 	EditText editTextMail;
 	LinearLayout linearLayoutCard;
+	Button inviteButton;
 
 	ArrayList<String> mails;
 	
@@ -66,7 +70,6 @@ public class InviteFriendsFragment extends Fragment implements OnClickListener{
 
 		super.onCreate(savedInstanceState);
 	}
-	
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -97,6 +100,9 @@ public class InviteFriendsFragment extends Fragment implements OnClickListener{
 		mLayoutManager = new LinearLayoutManager(context);
 		recyclerView.setLayoutManager(mLayoutManager);
 		recyclerView.setItemAnimator(new DefaultItemAnimator());
+
+		inviteButton = (Button)v.findViewById(R.id.invite_button);
+		inviteButton.setBackgroundColor(ContextCompat.getColor(context, R.color.invite_button_deactivated));
 
 		editTextMail = (EditText) v.findViewById(R.id.edit_text_invite_mail);
 
@@ -186,10 +192,43 @@ public class InviteFriendsFragment extends Fragment implements OnClickListener{
 		}
 	}
 
+	public void deleteMail(String mailToDelete){
+		int positionToRemove=-1;
+		for(int i=0;i<mails.size();i++){
+			if(mailToDelete.equals(mails.get(i))){
+				positionToRemove = i;
+				break;
+			}
+		}
+		if(positionToRemove!=-1){
+			mails.remove(positionToRemove);
+			adapter.setNames(mails);
+			adapter.notifyDataSetChanged();
+		}
+
+		if(mails.isEmpty()){
+			inviteButton.setBackgroundColor(ContextCompat.getColor(context, R.color.invite_button_deactivated));
+			inviteButton.setOnClickListener(null);
+		}
+		else{
+			inviteButton.setBackgroundColor(ContextCompat.getColor(context, R.color.accentColor));
+			inviteButton.setOnClickListener(this);
+		}
+	}
+
 	public void addMail(String mail){
 		log("addMail: "+mail);
 		mails.add(mail);
 		adapter.setNames(mails);
+
+		if(mails.isEmpty()){
+			inviteButton.setBackgroundColor(ContextCompat.getColor(context, R.color.invite_button_deactivated));
+			inviteButton.setOnClickListener(null);
+		}
+		else{
+			inviteButton.setBackgroundColor(ContextCompat.getColor(context, R.color.accentColor));
+			inviteButton.setOnClickListener(this);
+		}
 //		if(adapter.getItemCount() > 5){
 //			View item = adapter.getView(0, null, recyclerView);
 //			adapter.getItemViewType()
@@ -249,14 +288,13 @@ public class InviteFriendsFragment extends Fragment implements OnClickListener{
 		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 		switch (v.getId()) {
 
-			case R.id.referral_bonuses_layout:{
-				log("Go to section Referral bonuses");
-
-				break;
-			}
-			case R.id.card_view_invite_friends:{
+			case R.id.invite_button:{
 				log("Invite friends");
-
+				((AchievementsActivity)context).inviteFriends(mails);
+				editTextMail.getText().clear();
+				mails.clear();
+				adapter.setNames(mails);
+				adapter.notifyDataSetChanged();
 				break;
 			}
 		}

@@ -137,7 +137,7 @@
                     android:id="@+id/edit_text_invite_mail"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="15dp"
+                    android:layout_marginTop="12dp"
                     android:drawableRight="@drawable/ic_phone_contact_list"/>
 
                 <Button
@@ -153,7 +153,7 @@
                     android:text="@string/contact_invite"
                     android:background="@color/accentColor"
                     android:layout_marginRight="6dp"
-                    android:layout_marginTop="21dp"
+                    android:layout_marginTop="16dp"
                     android:padding="12dp"
                     android:elevation="@dimen/elevation_upgrade_low"
                     android:stateListAnimator="@anim/button_upgrade_elevation"

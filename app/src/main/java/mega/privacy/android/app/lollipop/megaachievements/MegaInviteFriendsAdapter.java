@@ -39,7 +39,7 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUser;
 
 
-public class MegaInviteFriendsAdapter extends RecyclerView.Adapter<MegaInviteFriendsAdapter.ViewHolderChips>{
+public class MegaInviteFriendsAdapter extends RecyclerView.Adapter<MegaInviteFriendsAdapter.ViewHolderChips> implements View.OnClickListener {
 
 	private Context context;
 	private int positionClicked;
@@ -110,24 +110,19 @@ public class MegaInviteFriendsAdapter extends RecyclerView.Adapter<MegaInviteFri
 
 		String name = (String) getItem(position);
 		holder.textViewName.setText(name);
-		holderList.deleteIcon.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View view) {
-				int positionToRemove=-1;
-				for(int i=0;i<names.size();i++){
-					if(holderList.textViewName.getText().equals(names.get(i))){
-						positionToRemove = i;
-						break;
-					}
-				}
-				if(positionToRemove!=-1){
-					names.remove(positionToRemove);
-					notifyDataSetChanged();
-				}
-			}
-		});
+		holderList.deleteIcon.setOnClickListener(this);
 	}
 
+	@Override
+	public void onClick(View v) {
+
+		switch (v.getId()) {
+			case R.id.delete_icon_chip: {
+				((InviteFriendsFragment)fragment).deleteMail(holderList.textViewName.getText().toString());
+				break;
+			}
+		}
+	}
 
 	private int getAvatarTextSize (float density){
 		float textSize = 0.0f;
