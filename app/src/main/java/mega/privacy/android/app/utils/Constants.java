@@ -81,6 +81,7 @@ public class Constants {
 
 	final public static int ACHIEVEMENTS_FRAGMENT = 8000;
 	final public static int BONUSES_FRAGMENT = 8001;
+	final public static int INVITE_FRIENDS_FRAGMENT = 8002;
 
 	public static final int REQUEST_WRITE_STORAGE = 1;
 	public static final int REQUEST_CAMERA = 2;

@@ -122,6 +122,8 @@ public class AchievementsFragment extends Fragment implements OnClickListener{
 	TextView textInstallDesktopTransfer;
 	TextView daysLeftInstallDesktopText;
 
+	Button inviteFriendsButton;
+
 	@Override
 	public void onCreate (Bundle savedInstanceState){
 		log("onCreate");
@@ -156,6 +158,9 @@ public class AchievementsFragment extends Fragment implements OnClickListener{
 		parentLinearLayout = (LinearLayout) v.findViewById(R.id.main_linear_layout_achievements);
 
 		inviteFriendsCard = (CardView) v.findViewById(R.id.card_view_invite_friends);
+		inviteFriendsButton = (Button) v.findViewById(R.id.invite_button);
+		inviteFriendsCard.setOnClickListener(this);
+		inviteFriendsButton.setOnClickListener(this);
 
 		referralBonusesLayout = (RelativeLayout) v.findViewById(R.id.referral_bonuses_layout);
 		referralBonusesLayout.setOnClickListener(this);
@@ -286,9 +291,10 @@ public class AchievementsFragment extends Fragment implements OnClickListener{
 
 				break;
 			}
-			case R.id.card_view_invite_friends:{
+			case R.id.card_view_invite_friends:
+			case R.id.invite_button:{
 				log("Invite friends");
-
+				((AchievementsActivity)context).showFragment(Constants.INVITE_FRIENDS_FRAGMENT);
 				break;
 			}
 

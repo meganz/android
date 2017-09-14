@@ -1542,4 +1542,11 @@
 
     <string name="setting_title_use_https_only" context="title of the advanced setting to choose the use of https">Don\'t use HTTP</string>
     <string name="setting_subtitle_use_https_only" context="subtitle of the advanced setting to choose the use of https">Enable this option only if your transfers don\'t start. In normal circumstances HTTP is satisfactory as all transfers are already encrypted.</string>
+
+    <string name="title_achievement_invite_friends" context="title of screen to invite friends and get an achievement">How it works</string>
+    <string name="first_paragraph_achievement_invite_friends" context="first paragraph of screen to invite friends and get an achievement">Invite your friends to create a free MEGA account and install our mobile app. For every successful signup and app install you receive bonus storage and transfer quota.</string>
+    <string name="second_paragraph_achievement_invite_friends" context="second paragraph of screen to invite friends and get an achievement">You will not receive credit for inviting someone who has used MEGA previously and you will not be notified about such a rejection. Invited contacts must install MEGA mobile app or MEGA app on their devices.</string>
+
+    <string name="card_title_invite_friends" context="explanation of screen to invite friends and get an achievement"> Select contacts from your phone contact list or enter multiple email addresses.</string>
+
 </resources>
