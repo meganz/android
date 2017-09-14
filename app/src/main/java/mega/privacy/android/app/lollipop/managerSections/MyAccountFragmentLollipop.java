@@ -164,7 +164,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		}
 		else{
 			nameView.setMaxWidth(Util.scaleWidthPx(180, outMetrics));
-			infoEmail.setMaxWidth(Util.scaleWidthPx(210, outMetrics));
+			infoEmail.setMaxWidth(Util.scaleWidthPx(200, outMetrics));
 		}
 		
 		myAccountImage = (RoundedImageView) v.findViewById(R.id.my_account_thumbnail);

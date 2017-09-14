@@ -223,6 +223,9 @@ public class AchievementsActivity extends PinActivityLollipop implements MegaReq
             InputMethodManager inputManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
             inputManager.hideSoftInputFromWindow(view.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
         }
+
+        showFragment(Constants.ACHIEVEMENTS_FRAGMENT);
+
         ContactController cC = new ContactController(this);
         cC.inviteMultipleContacts(mails);
     }
