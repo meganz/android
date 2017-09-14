@@ -16,6 +16,11 @@
         android:background="@drawable/shape_chip_drawable"
         android:paddingBottom="4dp"
         android:paddingTop="4dp">
+        
+        <!--<mega.privacy.android.app.components.RoundedImageView
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:src="@drawable/ic_phone_contact_list"/>-->
 
         <TextView
             android:id="@+id/name_chip"
