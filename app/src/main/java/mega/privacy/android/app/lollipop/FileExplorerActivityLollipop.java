@@ -647,6 +647,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 					mode = UPLOAD_SELFIE;
 					imagePath=intent.getStringExtra("IMAGE_PATH");
 
+
 					if (mTabsAdapterExplorer == null){
 						fileExplorerSectionLayout.setVisibility(View.VISIBLE);
 						viewPagerExplorer.setVisibility(View.VISIBLE);
