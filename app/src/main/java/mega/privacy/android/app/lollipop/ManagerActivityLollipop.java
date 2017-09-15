@@ -22,6 +22,7 @@ import android.graphics.PorterDuff;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.graphics.Shader.TileMode;
+import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -68,6 +69,8 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.animation.TranslateAnimation;
@@ -11616,12 +11619,67 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		else if (requestCode == Constants.TAKE_PICTURE_PROFILE_CODE){
 			log("TAKE_PICTURE_PROFILE_CODE");
 			if(resultCode == Activity.RESULT_OK){
-				Intent intentPicture = new Intent(this, SecureSelfiePreviewActivityLollipop.class);
-				intentPicture.putExtra("PICTURE_PROFILE", 1);
-				intentPicture.putExtra("MY_MAIL", myAccountInfo.getMyUser().getEmail());
-				startActivity(intentPicture);
-			}
-			else{
+
+				String myEmail =  myAccountInfo.getMyUser().getEmail();
+				String filePath = Environment.getExternalStorageDirectory().getAbsolutePath() +"/"+ Util.profilePicDIR + "/picture.jpg";;
+				File imgFile = new File(filePath);
+
+				if(imgFile.exists()){
+
+					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+						Window window = this.getWindow();
+						window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+						window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+						window.setStatusBarColor(ContextCompat.getColor(this, R.color.black));
+					}
+
+					BitmapFactory.Options options = new BitmapFactory.Options();
+					options.inJustDecodeBounds = true;
+					Bitmap preview = BitmapFactory.decodeFile(imgFile.getAbsolutePath(), options);
+
+					ExifInterface exif;
+					int orientation = ExifInterface.ORIENTATION_NORMAL;
+					try {
+						exif = new ExifInterface(imgFile.getAbsolutePath());
+						orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_UNDEFINED);
+					} catch (IOException e) {}
+
+					// Calculate inSampleSize
+					options.inSampleSize = Util.calculateInSampleSize(options, 1000, 1000);
+
+					// Decode bitmap with inSampleSize set
+					options.inJustDecodeBounds = false;
+
+					preview = BitmapFactory.decodeFile(imgFile.getAbsolutePath(), options);
+
+					if (preview != null){
+						preview = Util.rotateBitmap(preview, orientation);
+					}
+				}
+
+				String newPath = null;
+				if (getExternalCacheDir() != null){
+					newPath = getExternalCacheDir().getAbsolutePath() + "/" + myEmail + "Temp.jpg";
+				}else{
+					log("getExternalCacheDir() is NULL");
+					newPath = getCacheDir().getAbsolutePath() + "/" + myEmail + "Temp.jpg";
+				}
+
+				if(newPath!=null) {
+					File newFile = new File(newPath);
+					log("NEW - the destination of the avatar is: " + newPath);
+					if (newFile != null) {
+						MegaUtilsAndroid.createAvatar(imgFile, newFile);
+						megaApi.setAvatar(newFile.getAbsolutePath(), this);
+
+					} else {
+						log("Error new path avatar!!");
+					}
+
+				}else{
+					log("ERROR! Destination PATH is NULL");
+				}
+			}else{
 				log("TAKE_PICTURE_PROFILE_CODE--->ERROR!");
 			}
 
