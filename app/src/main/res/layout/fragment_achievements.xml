@@ -8,7 +8,6 @@
     android:background="@color/white"
     android:layout_height="match_parent" >
 
-
     <LinearLayout
     android:orientation="vertical" android:layout_width="match_parent"
     android:id="@+id/main_linear_layout_achievements"
@@ -176,12 +175,14 @@
 
         <android.support.v7.widget.CardView
             android:id="@+id/card_view_2"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            card_view:cardCornerRadius="1dp"
-            android:elevation="6dp"
-            android:layout_marginTop="12dp">
+            card_view:cardCornerRadius="0dp"
+            android:layout_marginTop="12dp"
+            android:layout_marginRight="0dp"
+            android:layout_marginLeft="0dp"
+            android:layout_marginBottom="0dp">
 
             <RelativeLayout
                 android:id="@+id/card_view_relative_layout"
@@ -315,7 +316,8 @@
                     android:id="@+id/base_quota_layout"
                     android:layout_width="match_parent"
                     android:layout_below="@+id/separator_referral_bonuses"
-                    android:layout_height="96dp">
+                    android:layout_height="96dp"
+                    android:visibility="gone">
 
                     <LinearLayout
                         android:id="@+id/base_quota_linear_layout"
@@ -434,7 +436,8 @@
                     android:layout_height="1dp"
                     android:layout_below="@+id/base_quota_layout"
                     android:orientation="horizontal"
-                    android:background="@color/separator_grey"/>
+                    android:background="@color/separator_grey"
+                    android:visibility="gone"/>
 
                 <RelativeLayout
                     android:id="@+id/install_app_layout"
@@ -452,8 +455,8 @@
                         <ImageView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:src="@drawable/google_wallet_ic"/>
-
+                            android:layout_marginLeft="20dp"
+                            android:src="@drawable/ic_install_mobile"/>
 
                         <RelativeLayout
                             android:layout_width="wrap_content"
@@ -580,8 +583,8 @@
                         <ImageView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:src="@drawable/google_wallet_ic"/>
-
+                            android:layout_marginLeft="20dp"
+                            android:src="@drawable/ic_registration"/>
 
                         <RelativeLayout
                             android:layout_width="wrap_content"
@@ -708,8 +711,8 @@
                         <ImageView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:src="@drawable/google_wallet_ic"/>
-
+                            android:layout_marginLeft="20dp"
+                            android:src="@drawable/ic_install_mega"/>
 
                         <RelativeLayout
                             android:layout_width="wrap_content"

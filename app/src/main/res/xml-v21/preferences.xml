@@ -163,6 +163,11 @@
 	    android:key="advanced_features"
 		android:layout="@layout/my_category_preference"
 	    android:title="@string/settings_advanced_features" >
+
+		<mega.privacy.android.app.components.TwoLineCheckPreference
+			android:key="settings_use_https_only"
+			android:title="@string/setting_title_use_https_only"
+			android:summary="@string/setting_subtitle_use_https_only"/>
 		
 	    <Preference
 	        android:key="settings_advanced_features_cache"

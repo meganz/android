@@ -133,8 +133,6 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		display.getMetrics(outMetrics);
 		density = ((Activity) context).getResources().getDisplayMetrics().density;
 
-		float scaleW = Util.getScaleW(outMetrics, density);
-		float scaleH = Util.getScaleH(outMetrics, density);
 		View v = null;
 		v = inflater.inflate(R.layout.fragment_my_account, container, false);
 		
@@ -164,7 +162,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		}
 		else{
 			nameView.setMaxWidth(Util.scaleWidthPx(180, outMetrics));
-			infoEmail.setMaxWidth(Util.scaleWidthPx(210, outMetrics));
+			infoEmail.setMaxWidth(Util.scaleWidthPx(200, outMetrics));
 		}
 		
 		myAccountImage = (RoundedImageView) v.findViewById(R.id.my_account_thumbnail);

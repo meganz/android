@@ -81,6 +81,7 @@ public class Constants {
 
 	final public static int ACHIEVEMENTS_FRAGMENT = 8000;
 	final public static int BONUSES_FRAGMENT = 8001;
+	final public static int INVITE_FRIENDS_FRAGMENT = 8002;
 
 	public static final int REQUEST_WRITE_STORAGE = 1;
 	public static final int REQUEST_CAMERA = 2;
@@ -122,6 +123,7 @@ public class Constants {
 	public static String ACTION_CHAT_NOTIFICATION_MESSAGE = "ACTION_CHAT_MESSAGE";
 	public static String ACTION_CHAT_SUMMARY = "ACTION_CHAT_SUMMARY";
 	public static String ACTION_INCOMING_SHARED_FOLDER_NOTIFICATION = "ACTION_INCOMING_SHARED_FOLDER_NOTIFICATION";
+	public static String ACTION_OPEN_HANDLE_NODE = "ACTION_OPEN_HANDLE_NODE";
 
 	public static String ACTION_CHAT_NEW = "CHAT_NEW";
 	public static String ACTION_CHAT_SHOW_MESSAGES = "CHAT_SHOW_MESSAGES";
