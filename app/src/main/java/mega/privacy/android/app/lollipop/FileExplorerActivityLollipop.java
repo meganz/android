@@ -1039,7 +1039,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			finish();
 		}
 		else if(mode == UPLOAD_SELFIE){
-		
+
 			long parentHandle = handle;
 			MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
 			if(parentNode == null){
@@ -1060,6 +1060,8 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			
 		}
 		else if (mode == UPLOAD){
+
+
 			log("mode UPLOAD");
 			
 			if (filePreparedInfos == null){
