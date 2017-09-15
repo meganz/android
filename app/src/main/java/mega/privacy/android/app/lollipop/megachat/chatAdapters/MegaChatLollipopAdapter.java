@@ -25,6 +25,7 @@ import android.text.Html;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.Spanned;
+import android.text.TextUtils;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.RelativeSizeSpan;
 import android.util.DisplayMetrics;
@@ -1941,11 +1942,13 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                 if(message.getType()==MegaChatMessage.TYPE_NORMAL||message.getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT||message.getType()==MegaChatMessage.TYPE_REVOKE_NODE_ATTACHMENT||message.getType()==MegaChatMessage.TYPE_CONTACT_ATTACHMENT){
 
+                    String color = null;
+
                     if(((ChatActivityLollipop) context).isGroup()){
 
 //                    name.setSpan(new RelativeSizeSpan(0.85f), 0, name.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                         String handleString = megaApi.userHandleToBase64(((ViewHolderMessageChat)holder).userHandle);
-                        String color = megaApi.getUserAvatarColor(handleString);
+                        color = megaApi.getUserAvatarColor(handleString);
 
                         if(message.getType()==MegaChatMessage.TYPE_NORMAL){
 
@@ -1965,7 +1968,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                 }
                                 ((ViewHolderMessageChat)holder).contentContactMessageText.setText(name);
                                 ((ViewHolderMessageChat)holder).contentContactMessageFileSender.setVisibility(View.GONE);
-
                             }
 
 
@@ -2013,21 +2015,33 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                         ((ViewHolderMessageChat) holder).contentContactMessageFileLayout.setVisibility(View.GONE);
                         ((ViewHolderMessageChat) holder).contentContactMessageThumbLand.setVisibility(View.GONE);
                         ((ViewHolderMessageChat) holder).contentContactMessageThumbLandFramework.setVisibility(View.GONE);
-                        ((ViewHolderMessageChat) holder).previewFrameContactPort.setVisibility(View.GONE);
+//                        ((ViewHolderMessageChat) holder).previewFrameContactPort.setVisibility(View.GONE);
                         ((ViewHolderMessageChat) holder).contentContactMessageThumbPort.setVisibility(View.GONE);
                         ((ViewHolderMessageChat) holder).contentContactMessageThumbPortFramework.setVisibility(View.GONE);
                         ((ViewHolderMessageChat) holder).contentContactMessageContactLayout.setVisibility(View.GONE);
 
+                        messageContent = messageContent+" ";
                         Spannable content = new SpannableString(messageContent);
                         content.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.name_my_account)), 0, content.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                        ((ViewHolderMessageChat)holder).contentContactMessageText.append(content+" ");
-//                    ((ViewHolderMessageChat)holder).contentContactMessageText.setText(content);
 
                         Spannable edited = new SpannableString(context.getString(R.string.edited_message_text));
                         edited.setSpan(new RelativeSizeSpan(0.85f), 0, edited.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                         edited.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.accentColor)), 0, edited.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                         edited.setSpan(new android.text.style.StyleSpan(Typeface.ITALIC), 0, edited.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                        ((ViewHolderMessageChat)holder).contentContactMessageText.append(edited);
+
+                        Spannable name = new SpannableString(((ViewHolderMessageChat)holder).fullNameTitle+"\n");
+                        if(color!=null){
+                            log("The color to set the avatar is "+color);
+                            name.setSpan(new ForegroundColorSpan(Color.parseColor(color)), 0, name.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                        }
+                        else{
+                            log("Default color to the avatar");
+                            name.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.accentColor)), 0, name.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                        }
+                        CharSequence indexedText = TextUtils.concat(name, messageContent);
+                        indexedText = TextUtils.concat(indexedText, edited);
+                        ((ViewHolderMessageChat)holder).contentContactMessageText.setText(indexedText);
+
                         ((ViewHolderMessageChat)holder).contentContactMessageLayout.setVisibility(View.VISIBLE);
                         ((ViewHolderMessageChat)holder).contactManagementMessageLayout.setVisibility(View.GONE);
 
@@ -2144,9 +2158,18 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                 messageContent = message.getContent();
                             }
 
-
                             if(chatRoom.isGroup()){
-                                ((ViewHolderMessageChat)holder).contentContactMessageText.append(messageContent);
+                                Spannable name = new SpannableString(((ViewHolderMessageChat)holder).fullNameTitle+"\n");
+                                if(color!=null){
+                                    log("The color to set the avatar is "+color);
+                                    name.setSpan(new ForegroundColorSpan(Color.parseColor(color)), 0, name.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                                }
+                                else{
+                                    log("Default color to the avatar");
+                                    name.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.accentColor)), 0, name.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                                }
+                                CharSequence indexedText = TextUtils.concat(name, messageContent);
+                                ((ViewHolderMessageChat)holder).contentContactMessageText.setText(indexedText);
                             }
                             else{
                                 ((ViewHolderMessageChat)holder).contentContactMessageText.setText(messageContent);
