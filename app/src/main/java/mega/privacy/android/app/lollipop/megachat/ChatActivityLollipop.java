@@ -4,6 +4,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -51,10 +52,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.ListIterator;
 
-import io.github.rockerhieu.emojicon.EmojiconEditText;
-import io.github.rockerhieu.emojicon.EmojiconGridFragment;
-import io.github.rockerhieu.emojicon.EmojiconsFragment;
-import io.github.rockerhieu.emojicon.emoji.Emojicon;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
@@ -100,7 +97,13 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUser;
 
-public class ChatActivityLollipop extends PinActivityLollipop implements MegaChatRequestListenerInterface, MegaRequestListenerInterface, MegaChatRoomListenerInterface, RecyclerView.OnItemTouchListener, GestureDetector.OnGestureListener, View.OnClickListener, EmojiconGridFragment.OnEmojiconClickedListener, EmojiconsFragment.OnEmojiconBackspaceClickedListener {
+import mega.privacy.android.app.components.emojicon.EmojiconsFragment;
+import mega.privacy.android.app.components.emojicon.EmojiconEditText;
+import mega.privacy.android.app.components.emojicon.EmojiconGridFragment;
+import mega.privacy.android.app.components.emojicon.emoji.Emojicon;
+
+
+public class ChatActivityLollipop extends PinActivityLollipop implements MegaChatRequestListenerInterface, MegaRequestListenerInterface, MegaChatRoomListenerInterface, RecyclerView.OnItemTouchListener, GestureDetector.OnGestureListener, View.OnClickListener, EmojiconGridFragment.OnEmojiconClickedListener,EmojiconsFragment.OnEmojiconBackspaceClickedListener {
 
     public static int NUMBER_MESSAGES_TO_LOAD = 20;
     public static int NUMBER_MESSAGES_TO_UPDATE_UI = 7;
@@ -218,7 +221,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     private ActionMode actionMode;
 
-    @Override
+
     public void onEmojiconClicked(Emojicon emojicon) {
         EmojiconsFragment.input(textChat, emojicon);
     }
@@ -903,6 +906,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         log("setEmojiconFragment(" + useSystemDefault + ")");
         if (firstTimeEmoji) {
             emojiconsFragment = EmojiconsFragment.newInstance(useSystemDefault);
+
+
             getSupportFragmentManager()
                     .beginTransaction()
                     .replace(R.id.chat_emoji_keyboard, emojiconsFragment)
