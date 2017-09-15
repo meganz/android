@@ -12,6 +12,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.BitmapShader;
@@ -114,6 +115,7 @@ import mega.privacy.android.app.MegaContactAdapter;
 import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MegaPreferences;
+import mega.privacy.android.app.MimeTypeInfo;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.OldPreferences;
 import mega.privacy.android.app.R;
@@ -1335,6 +1337,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		setSupportActionBar(tB);
 		aB = getSupportActionBar();
 		log("aB.setHomeAsUpIndicator_1");
+		aB.setTitle(getString(R.string.section_cloud_drive));
         aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
         aB.setHomeButtonEnabled(true);
         aB.setDisplayHomeAsUpEnabled(true);
@@ -1351,7 +1354,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		View nVHeader = LayoutInflater.from(this).inflate(R.layout.nav_header, null);
 		nV.addHeaderView(nVHeader);
 
-		//FAB button
+		//FAB buttonaB.
 		fabButton = (FloatingActionButton) findViewById(R.id.floating_button);
 		fabButton.setOnClickListener(new FabButtonListener(this));
 
@@ -1452,6 +1455,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		//TABS section Contacts
 		tabLayoutContacts =  (TabLayout) findViewById(R.id.sliding_tabs_contacts);
 		viewPagerContacts = (ViewPager) findViewById(R.id.contact_tabs_pager);
+
+		if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+			tabLayoutContacts.setTabMode(TabLayout.MODE_FIXED);
+		}else{
+			tabLayoutContacts.setTabMode(TabLayout.MODE_SCROLLABLE);
+		}
 
 		//TABS section Shared Items
 		tabLayoutShares =  (TabLayout) findViewById(R.id.sliding_tabs_shares);
@@ -1584,6 +1593,16 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
 						intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 						intent.setAction(Constants.ACTION_INCOMING_SHARED_FOLDER_NOTIFICATION);
+						startActivity(intent);
+						finish();
+						return;
+					}
+					else if (getIntent().getAction().equals(Constants.ACTION_OPEN_HANDLE_NODE)){
+						Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
+						intent.putExtra("visibleFragment", Constants.LOGIN_FRAGMENT);
+						intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+						intent.setAction(Constants.ACTION_OPEN_HANDLE_NODE);
+						intent.setData(Uri.parse(getIntent().getDataString()));
 						startActivity(intent);
 						finish();
 						return;
@@ -1840,6 +1859,56 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 							if(!(alertDialogTransferOverquota.isShowing())){
 								showTransferOverquotaDialog();
 							}
+						}
+					}
+					else if (getIntent().getAction().equals(Constants.ACTION_OPEN_HANDLE_NODE)){
+						String link = getIntent().getDataString();
+						String [] s = link.split("#");
+						if (s.length > 1){
+							String nodeHandleLink = s[1];
+							String [] sSlash = s[1].split("/");
+							if (sSlash.length > 0){
+								nodeHandleLink = sSlash[0];
+							}
+							long nodeHandleLinkLong = MegaApiAndroid.base64ToHandle(nodeHandleLink);
+							MegaNode nodeLink = megaApi.getNodeByHandle(nodeHandleLinkLong);
+							if (nodeLink == null){
+								showSnackbar(getString(R.string.general_error_file_not_found));
+							}
+							else{
+								MegaNode pN = megaApi.getParentNode(nodeLink);
+								if (pN == null){
+									pN = megaApi.getRootNode();
+								}
+								parentHandleBrowser = pN.getHandle();
+
+								drawerItem = DrawerItem.CLOUD_DRIVE;
+								selectDrawerItemLollipop(drawerItem);
+								selectDrawerItemPending = false;
+
+								Intent i = new Intent(this, FileInfoActivityLollipop.class);
+								i.putExtra("handle", nodeLink.getHandle());
+								if (nodeLink.isFolder()) {
+									if (nodeLink.isInShare()){
+										i.putExtra("imageId", R.drawable.ic_folder_incoming);
+									}
+									else if (nodeLink.isOutShare()){
+										i.putExtra("imageId", R.drawable.ic_folder_outgoing);
+									}
+									else{
+										i.putExtra("imageId", R.drawable.ic_folder);
+									}
+								}
+								else {
+									i.putExtra("imageId", MimeTypeInfo.typeForName(nodeLink.getName()).getIconResourceId());
+								}
+								i.putExtra("name", nodeLink.getName());
+								startActivity(i);
+							}
+						}
+						else{
+							drawerItem = DrawerItem.CLOUD_DRIVE;
+							selectDrawerItemLollipop(drawerItem);
 						}
 					}
 				}
@@ -2246,7 +2315,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					}
 
 					final Intent cancelIntent = tempIntent;
-					AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+					AlertDialog.Builder builder = new AlertDialog.Builder(this);
 //					builder.setTitle(title);
 		            builder.setMessage(text);
 
@@ -3000,7 +3069,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		});
 		inputMail.setImeActionLabel(getString(R.string.title_edit_profile_info),EditorInfo.IME_ACTION_DONE);
 
-		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setTitle(getString(R.string.title_edit_profile_info));
 
 		builder.setPositiveButton(getString(R.string.title_edit_profile_info), new DialogInterface.OnClickListener() {
@@ -3397,13 +3466,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 		};
 
-		AlertDialog.Builder builder;
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-			builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-		}
-		else{
-			builder = new AlertDialog.Builder(this);
-		}
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		try {
 			builder.setMessage(R.string.confirmation_to_reconnect).setPositiveButton(R.string.cam_sync_ok, dialogClickListener)
 					.setNegativeButton(R.string.general_cancel, dialogClickListener).show().setCanceledOnTouchOutside(false);
@@ -5038,8 +5101,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						log("in CloudDrive");
 						//Cloud Drive
 
-						aB.setTitle(getString(R.string.section_cloud_drive));
-
 						//Show
 						addMenuItem.setEnabled(true);
 						addMenuItem.setVisible(true);
@@ -6280,7 +6341,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 							}
 							else if(megaApi.checkAccess(checkNode, MegaShare.ACCESS_READ).getErrorCode() == MegaError.API_OK){
 								log("Not permissions to upload");
-								AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+								AlertDialog.Builder builder = new AlertDialog.Builder(this);
 					            builder.setMessage(getString(R.string.no_permissions_upload));
 //								builder.setTitle(R.string.op_not_allowed);
 								builder.setCancelable(false).setPositiveButton(R.string.cam_sync_ok, new DialogInterface.OnClickListener() {
@@ -6970,7 +7031,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
         		ViewGroup.MarginLayoutParams smallestMLP = (ViewGroup.MarginLayoutParams) smallestCheck.getLayoutParams();
         		smallestMLP.setMargins(Util.scaleWidthPx(15, outMetrics), Util.scaleHeightPx(10, outMetrics), 0, Util.scaleHeightPx(10, outMetrics));
 
-        		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+        		AlertDialog.Builder builder = new AlertDialog.Builder(this);
         		builder.setView(dialoglayout);
 				TextView textViewTitle = new TextView(ManagerActivityLollipop.this);
 				textViewTitle.setText(getString(R.string.action_sort_by));
@@ -8375,7 +8436,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		final long [] hashesC = hashes;
 		final long sizeC=size;
 
-		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		LinearLayout confirmationLayout = new LinearLayout(this);
 		confirmationLayout.setOrientation(LinearLayout.VERTICAL);
 		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -8420,7 +8481,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		final long [] hashesC = hashes;
 		final long sizeC=size;
 
-		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		LinearLayout confirmationLayout = new LinearLayout(this);
 		confirmationLayout.setOrientation(LinearLayout.VERTICAL);
 		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -8466,7 +8527,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		final long sizeC = size;
 		final ChatController chatC = new ChatController(this);
 
-		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		LinearLayout confirmationLayout = new LinearLayout(this);
 		confirmationLayout.setOrientation(LinearLayout.VERTICAL);
 		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -8628,7 +8689,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 		});
 
-		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setTitle(getString(R.string.context_rename) + " "	+ new String(document.getName()));
 		builder.setPositiveButton(getString(R.string.context_rename),
 				new DialogInterface.OnClickListener() {
@@ -8736,8 +8797,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				if (p.getHandle() != megaApi.getRubbishNode().getHandle()){
 
 					setMoveToRubbish(true);
-					AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-//				builder.setTitle(getResources().getString(R.string.section_rubbish_bin));
+
+					AlertDialog.Builder builder = new AlertDialog.Builder(this);
 					builder.setMessage(getResources().getString(R.string.confirmation_move_to_rubbish));
 
 					builder.setPositiveButton(R.string.general_move, dialogClickListener);
@@ -8747,9 +8808,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				else{
 
 					setMoveToRubbish(false);
-					AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-//				builder.setTitle(getResources().getString(R.string.title_delete_from_mega));
 
+					AlertDialog.Builder builder = new AlertDialog.Builder(this);
 					builder.setMessage(getResources().getString(R.string.confirmation_delete_from_mega));
 
 					//builder.setPositiveButton(R.string.context_delete, dialogClickListener);
@@ -8787,7 +8847,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		input.setImeOptions(EditorInfo.IME_ACTION_DONE);
 		input.setInputType(InputType.TYPE_CLASS_TEXT|InputType.TYPE_TEXT_VARIATION_PASSWORD);
 
-		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		if(cancelAccount){
 			log("cancelAccount action");
 			input.setOnEditorActionListener(new OnEditorActionListener() {
@@ -8930,7 +8990,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 		};
 
-		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setTitle(getString(R.string.delete_account));
 
 		builder.setMessage(getResources().getString(R.string.delete_account_text));
@@ -9014,7 +9074,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 		});
 
-		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setTitle(getString(R.string.context_open_link_title));
 		builder.setPositiveButton(getString(R.string.context_open_link),
 				new DialogInterface.OnClickListener() {
@@ -9172,7 +9232,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 	public void showCancelMessage(){
 		AlertDialog cancelDialog;
-		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 //		builder.setTitle(getString(R.string.title_cancel_subscriptions));
 
 		LayoutInflater inflater = getLayoutInflater();
@@ -9223,7 +9283,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	public void showPresenceStatusDialog(){
 		log("showPresenceStatusDialog");
 
-		AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
 		final CharSequence[] items = {getString(R.string.online_status), getString(R.string.away_status), getString(R.string.busy_status), getString(R.string.offline_status)};
 		int statusToShow = megaChatApi.getOnlineStatus();
 		switch(statusToShow){
@@ -9295,7 +9355,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		    }
 		};
 
-		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setMessage(R.string.confirmation_cancel_subscriptions).setPositiveButton(R.string.general_yes, dialogClickListener)
 		    .setNegativeButton(R.string.general_no, dialogClickListener).show();
 
@@ -9401,7 +9461,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 		});
 
-		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setTitle(getString(R.string.menu_new_folder));
 		builder.setPositiveButton(getString(R.string.general_create),
 				new DialogInterface.OnClickListener() {
@@ -9485,7 +9545,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 		});
 
-		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setTitle(getString(R.string.title_dialog_set_autoaway_value));
 		builder.setPositiveButton(getString(R.string.button_set),
 				new DialogInterface.OnClickListener() {
@@ -9617,7 +9677,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			text = editText;
 		}
 
-		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 //		builder.setTitle(getString(R.string.context_clear_rubbish));
 		builder.setMessage(getString(R.string.clear_rubbish_confirmation));
 		/*builder.setPositiveButton(getString(R.string.context_delete),new DialogInterface.OnClickListener() {
@@ -9686,7 +9746,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	public void showPanelSetPinLock(){
 		log("showPanelSetPinLock");
 
-		AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
 		final CharSequence[] items = {getString(R.string.four_pin_lock), getString(R.string.six_pin_lock), getString(R.string.AN_pin_lock)};
 
 		dialogBuilder.setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
@@ -9966,7 +10026,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 		});
 
-		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setTitle(getString(R.string.menu_add_contact));
 		builder.setPositiveButton(getString(R.string.general_add),
 				new DialogInterface.OnClickListener() {
@@ -10125,7 +10185,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		    }
 		};
 
-		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 //		builder.setTitle(getResources().getString(R.string.alert_leave_share));
 		String message= getResources().getString(R.string.confirmation_leave_share_folder);
 		builder.setMessage(message).setPositiveButton(R.string.general_leave, dialogClickListener)
@@ -10150,7 +10210,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 		};
 
-		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 //		builder.setTitle(getResources().getString(R.string.alert_leave_share));
 		int size = shareList.size();
 		String message = getResources().getQuantityString(R.plurals.confirmation_remove_outgoing_shares, size, size);
@@ -10176,7 +10236,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 		};
 
-		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 //		builder.setTitle(getResources().getString(R.string.alert_leave_share));
 		String message= getResources().getString(R.string.context_remove_link_warning_text);
 		builder.setMessage(message).setPositiveButton(R.string.general_remove, dialogClickListener)
@@ -10205,7 +10265,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		    }
 		};
 
-		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 //		builder.setTitle(getResources().getString(R.string.alert_leave_share));
 		String message= getResources().getString(R.string.confirmation_leave_share_folder);
 		builder.setMessage(message).setPositiveButton(R.string.general_leave, dialogClickListener)
@@ -10232,7 +10292,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 		};
 
-		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setTitle(getResources().getString(R.string.title_confirmation_leave_group_chat));
 		String message= getResources().getString(R.string.confirmation_leave_group_chat);
 		builder.setMessage(message).setPositiveButton(R.string.general_leave, dialogClickListener)
@@ -10258,7 +10318,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 		};
 
-		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setTitle(getResources().getString(R.string.title_confirmation_leave_group_chat));
 		String message= getResources().getString(R.string.confirmation_leave_group_chat);
 		builder.setMessage(message).setPositiveButton(R.string.general_leave, dialogClickListener)
@@ -10296,7 +10356,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 		};
 
-		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setTitle(getResources().getString(R.string.title_confirmation_leave_group_chat));
 		String message= getResources().getString(R.string.confirmation_leave_group_chat);
 		builder.setMessage(message).setPositiveButton(R.string.general_leave, dialogClickListener)
@@ -10325,7 +10385,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 		};
 
-		android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this);
 		String message= getResources().getString(R.string.confirmation_clear_group_chat);
 		builder.setTitle(R.string.title_confirmation_clear_group_chat);
 		builder.setMessage(message).setPositiveButton(R.string.general_clear, dialogClickListener)
@@ -10354,7 +10414,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 		};
 
-		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		String message= getResources().getString(R.string.email_verification_text_change_pass);
 		builder.setMessage(message).setPositiveButton(R.string.cam_sync_ok, dialogClickListener)
 				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
@@ -10383,7 +10443,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 		};
 
-		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setTitle(getResources().getString(R.string.title_dialog_insert_MK));
 		String message= getResources().getString(R.string.text_reset_pass_logged_in);
 		builder.setMessage(message).setPositiveButton(R.string.pin_lock_enter, dialogClickListener)
@@ -10521,15 +10581,26 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	}
 
 	public int getHeightToPanel(BottomSheetDialogFragment dialog){
+		
 		if(dialog instanceof NodeOptionsBottomSheetDialogFragment){
-			if(fragmentContainer != null && aB != null && tabLayoutCloud != null){
+			if(fragmentContainer != null && aB != null && tabLayoutCloud != null && tabLayoutCloud.getHeight() != 0){
 				final Rect r = new Rect();
 				fragmentContainer.getWindowVisibleDisplayFrame(r);
 				return (r.height() - aB.getHeight() - tabLayoutCloud.getHeight());
 			}
+			else if(fragmentContainer != null && aB != null && tabLayoutShares != null && tabLayoutShares.getHeight() != 0){
+				final Rect r = new Rect();
+				fragmentContainer.getWindowVisibleDisplayFrame(r);
+				return (r.height() - aB.getHeight() - tabLayoutShares.getHeight());
+			}
+			else if(fragmentContainer != null && aB != null && tabLayoutTransfers != null && tabLayoutTransfers.getHeight() != 0){
+				final Rect r = new Rect();
+				fragmentContainer.getWindowVisibleDisplayFrame(r);
+				return (r.height() - aB.getHeight() - tabLayoutTransfers.getHeight());
+			}
 		}
 		else if(dialog instanceof ContactsBottomSheetDialogFragment){
-			if(fragmentContainer != null && aB != null && tabLayoutContacts != null){
+			if(fragmentContainer != null && aB != null && tabLayoutContacts != null && tabLayoutContacts.getHeight() != 0){
 				final Rect r = new Rect();
 				fragmentContainer.getWindowVisibleDisplayFrame(r);
 				return (r.height() - aB.getHeight() - tabLayoutContacts.getHeight());
@@ -10543,7 +10614,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		dbH.setCamSyncEnabled(false);
 
 		if(overquotaDialog==null){
-			AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+			AlertDialog.Builder builder = new AlertDialog.Builder(this);
 			builder.setTitle(getString(R.string.overquota_alert_title));
 			LayoutInflater inflater = getLayoutInflater();
 			View dialoglayout = inflater.inflate(R.layout.dialog_overquota_error, null);
@@ -10992,13 +11063,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 		};
 
-		AlertDialog.Builder builder;
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-			builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-		}
-		else{
-			builder = new AlertDialog.Builder(this);
-		}
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
 		builder.setMessage(R.string.remove_key_confirmation).setPositiveButton(R.string.general_remove, dialogClickListener)
 				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
 	}
@@ -11033,13 +11099,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 		};
 
-		AlertDialog.Builder builder;
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-			builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-		}
-		else{
-			builder = new AlertDialog.Builder(this);
-		}
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
 		builder.setMessage(R.string.confirmation_delete_from_save_for_offline).setPositiveButton(R.string.general_remove, dialogClickListener)
 				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
 	}
@@ -11065,13 +11126,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 		};
 
-		AlertDialog.Builder builder;
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-			builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-		}
-		else{
-			builder = new AlertDialog.Builder(this);
-		}
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
 		builder.setMessage(R.string.enable_log_text_dialog).setPositiveButton(R.string.general_enable, dialogClickListener)
 				.setNegativeButton(R.string.general_cancel, dialogClickListener).show().setCanceledOnTouchOutside(false);
@@ -11098,13 +11153,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 		};
 
-		AlertDialog.Builder builder;
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-			builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-		}
-		else{
-			builder = new AlertDialog.Builder(this);
-		}
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
 		builder.setMessage(R.string.enable_log_text_dialog).setPositiveButton(R.string.general_enable, dialogClickListener)
 				.setNegativeButton(R.string.general_cancel, dialogClickListener).show().setCanceledOnTouchOutside(false);
@@ -11149,13 +11198,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 		};
 
-		AlertDialog.Builder builder;
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-			builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-		}
-		else{
-			builder = new AlertDialog.Builder(this);
-		}
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
 		builder.setMessage(R.string.confirmation_delete_avatar).setPositiveButton(R.string.context_delete, dialogClickListener)
 				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
 	}
@@ -11278,7 +11322,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			final ArrayList<String> selectedContacts = intent.getStringArrayListExtra("SELECTED_CONTACTS");
 			final long folderHandle = intent.getLongExtra("SELECT", 0);
 
-			AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+			AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
 			dialogBuilder.setTitle(getString(R.string.file_properties_shared_folder_permissions));
 			final CharSequence[] items = {getString(R.string.file_properties_shared_folder_read_only), getString(R.string.file_properties_shared_folder_read_write), getString(R.string.file_properties_shared_folder_full_access)};
 			dialogBuilder.setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
@@ -11328,7 +11372,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						//One file to share
 						final long nodeHandle = intent.getLongExtra(ContactsExplorerActivityLollipop.EXTRA_NODE_HANDLE, -1);
 
-						AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+						AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
 						dialogBuilder.setTitle(getString(R.string.file_properties_shared_folder_permissions));
 						final CharSequence[] items = {getString(R.string.file_properties_shared_folder_read_only), getString(R.string.file_properties_shared_folder_read_write), getString(R.string.file_properties_shared_folder_full_access)};
 						dialogBuilder.setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
@@ -13662,7 +13706,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 		};
 
-		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 //		builder.setTitle(getResources().getString(R.string.cancel_transfer_title));
 
 		builder.setMessage(getResources().getString(R.string.confirmation_to_clear_completed_transfers));
@@ -13699,7 +13743,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 		};
 
-		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 //		builder.setTitle(getResources().getString(R.string.cancel_transfer_title));
 		if(cancel){
 
@@ -13745,7 +13789,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 		};
 
-		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 //		builder.setTitle(getResources().getString(R.string.cancel_transfer_title));
 
 		builder.setMessage(getResources().getString(R.string.cancel_all_transfer_confirmation));

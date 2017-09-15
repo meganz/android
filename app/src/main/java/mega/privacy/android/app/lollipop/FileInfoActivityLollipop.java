@@ -547,7 +547,6 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 			if(from==FROM_INCOMING_SHARES){
 
 				downloadMenuItem.setVisible(true);
-				menu.findItem(R.id.cab_menu_file_info_download).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
 				shareMenuItem.setVisible(false);
 				menu.findItem(R.id.cab_menu_file_info_share_folder).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
@@ -632,7 +631,6 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 		    }
 			else{
 				downloadMenuItem.setVisible(true);
-				menu.findItem(R.id.cab_menu_file_info_download).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
 				if (node.isFolder()){
 					shareMenuItem.setVisible(true);

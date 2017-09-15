@@ -193,4 +193,14 @@
         <item name="android:windowMinWidthMinor">90%</item>
     </style>
 
+    <style name="MyCustomTabLayoutKeyboard" parent="Widget.Design.TabLayout">
+        <item name="tabIndicatorColor">@color/accentColor</item>
+        <item name="tabIndicatorHeight">2dp</item>
+        <item name="tabBackground">@color/white</item>
+        <item name="tabSelectedTextColor">@color/black</item>
+        <item name="tabPaddingStart">12dp</item>
+        <item name="tabPaddingEnd">12dp</item>
+    </style>
+
+
 </resources>

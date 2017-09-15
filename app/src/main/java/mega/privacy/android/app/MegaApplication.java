@@ -83,7 +83,7 @@ import nz.mega.sdk.MegaUser;
 
 public class MegaApplication extends Application implements MegaListenerInterface, MegaChatListenerInterface, MegaChatRequestListenerInterface {
 	final String TAG = "MegaApplication";
-	static final String USER_AGENT = "MEGAAndroid/3.2.3_149";
+	static final String USER_AGENT = "MEGAAndroid/3.2.3.1_152";
 
 	DatabaseHandler dbH;
 	MegaApiAndroid megaApi;
@@ -266,6 +266,13 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 			} else {
 				MegaChatApiAndroid.setLogLevel(MegaChatApiAndroid.LOG_LEVEL_ERROR);
 			}
+		}
+
+		boolean useHttpsOnly = false;
+		if (dbH != null) {
+			useHttpsOnly = Boolean.parseBoolean(dbH.getUseHttpsOnly());
+			log("Value of useHttpsOnly: "+useHttpsOnly);
+			megaApi.useHttpsOnly(useHttpsOnly);
 		}
 
 		notificationBuilder =  NotificationBuilder.newInstance(this, megaApi, megaChatApi);

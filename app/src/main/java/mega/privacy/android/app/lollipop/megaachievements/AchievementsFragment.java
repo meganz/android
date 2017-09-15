@@ -41,6 +41,7 @@ import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.MyAccountInfo;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
+import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.DBUtil;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaAchievementsDetails;
@@ -69,6 +70,7 @@ public class AchievementsFragment extends Fragment implements OnClickListener{
 	CardView inviteFriendsCard;
 
 	RelativeLayout referralBonusesLayout;
+	LinearLayout referralBonusesSeparator;
 
 	TextView figureUnlockedRewardStorage;
 	long storageQuota = 0;
@@ -120,6 +122,8 @@ public class AchievementsFragment extends Fragment implements OnClickListener{
 	TextView textInstallDesktopTransfer;
 	TextView daysLeftInstallDesktopText;
 
+	Button inviteFriendsButton;
+
 	@Override
 	public void onCreate (Bundle savedInstanceState){
 		log("onCreate");
@@ -129,7 +133,6 @@ public class AchievementsFragment extends Fragment implements OnClickListener{
 
 		super.onCreate(savedInstanceState);
 	}
-	
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -155,8 +158,14 @@ public class AchievementsFragment extends Fragment implements OnClickListener{
 		parentLinearLayout = (LinearLayout) v.findViewById(R.id.main_linear_layout_achievements);
 
 		inviteFriendsCard = (CardView) v.findViewById(R.id.card_view_invite_friends);
+		inviteFriendsButton = (Button) v.findViewById(R.id.invite_button);
+		inviteFriendsCard.setOnClickListener(this);
+		inviteFriendsButton.setOnClickListener(this);
 
 		referralBonusesLayout = (RelativeLayout) v.findViewById(R.id.referral_bonuses_layout);
+		referralBonusesLayout.setOnClickListener(this);
+
+		referralBonusesSeparator = (LinearLayout) v.findViewById(R.id.separator_referral_bonuses);
 
 		String transferQuotaString = getString(R.string.transfer_quota);
 		transferQuotaString = transferQuotaString.toLowerCase(Locale.getDefault());
@@ -186,7 +195,7 @@ public class AchievementsFragment extends Fragment implements OnClickListener{
 		figureBaseQuotaStorage = (TextView) v.findViewById(R.id.figure_unlocked_storage_text_base_quota);
 		figureBaseQuotaTransfer = (TextView) v.findViewById(R.id.figure_unlocked_transfer_text_base_quota);
 
-		figureBaseQuotaStorage.setText("15 GB");
+		figureBaseQuotaStorage.setText(Util.getSizeString(0));
 		figureBaseQuotaTransfer.setText(Util.getSizeString(0));
 		figureBaseQuotaTransfer.setVisibility(View.INVISIBLE);
 
@@ -207,7 +216,7 @@ public class AchievementsFragment extends Fragment implements OnClickListener{
 		textInstallAppTransfer = (TextView) v.findViewById(R.id.unlocked_transfer_title_install_app);
 		textInstallAppTransfer.setText(transferQuotaString);
 		daysLeftInstallAppText = (TextView) v.findViewById(R.id.days_left_text_install_app);
-		daysLeftInstallAppText.setText(("6 days left"));
+		daysLeftInstallAppText.setText(("..."));
 
 		figureRegistrationStorage = (TextView) v.findViewById(R.id.figure_unlocked_storage_text_registration);
 		figureRegistrationTransfer = (TextView) v.findViewById(R.id.figure_unlocked_transfer_text_registration);
@@ -220,7 +229,7 @@ public class AchievementsFragment extends Fragment implements OnClickListener{
 		textRegistrationTransfer = (TextView) v.findViewById(R.id.unlocked_transfer_title_registration);
 		textRegistrationTransfer.setText(transferQuotaString);
 		daysLeftRegistrationText = (TextView) v.findViewById(R.id.days_left_text_registration);
-		daysLeftRegistrationText.setText(("40 days left"));
+		daysLeftRegistrationText.setText(("..."));
 
 		figureInstallDesktopStorage = (TextView) v.findViewById(R.id.figure_unlocked_storage_text_install_desktop);
 		figureInstallDesktopTransfer = (TextView) v.findViewById(R.id.figure_unlocked_transfer_text_install_desktop);
@@ -233,9 +242,12 @@ public class AchievementsFragment extends Fragment implements OnClickListener{
 		textInstallDesktopTransfer= (TextView) v.findViewById(R.id.unlocked_transfer_title_install_desktop);
 		textInstallDesktopTransfer.setText(transferQuotaString);
 		daysLeftInstallDesktopText = (TextView) v.findViewById(R.id.days_left_text_install_desktop);
-		daysLeftInstallDesktopText.setText(("15 days left"));
+		daysLeftInstallDesktopText.setText(("..."));
 
 		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
+
+		daysLeftInstallDesktopText.setVisibility(View.INVISIBLE);
+		daysLeftInstallAppText.setVisibility(View.INVISIBLE);
 
 		figureUnlockedRewardStorage.setText("...");
 
@@ -275,13 +287,14 @@ public class AchievementsFragment extends Fragment implements OnClickListener{
 			case R.id.referral_bonuses_layout:{
 				log("Go to section Referral bonuses");
 
-
+				((AchievementsActivity)context).showFragment(Constants.BONUSES_FRAGMENT);
 
 				break;
 			}
-			case R.id.card_view_invite_friends:{
+			case R.id.card_view_invite_friends:
+			case R.id.invite_button:{
 				log("Invite friends");
-
+				((AchievementsActivity)context).showFragment(Constants.INVITE_FRIENDS_FRAGMENT);
 				break;
 			}
 
@@ -300,11 +313,19 @@ public class AchievementsFragment extends Fragment implements OnClickListener{
 
 		storageReferrals = ((AchievementsActivity)context).megaAchievements.currentStorageReferrals();
 
-		figureReferralBonusesStorage.setText(Util.getSizeString(storageReferrals));
-
 		transferReferrals = ((AchievementsActivity)context).megaAchievements.currentTransferReferrals();
 
-		figureReferralBonusesTransfer.setText(Util.getSizeString(transferReferrals));
+		if(transferReferrals>0||storageReferrals>0){
+
+			figureReferralBonusesTransfer.setText(Util.getSizeString(transferReferrals));
+			figureReferralBonusesStorage.setText(Util.getSizeString(storageReferrals));
+			referralBonusesSeparator.setVisibility(View.VISIBLE);
+			referralBonusesLayout.setVisibility(View.VISIBLE);
+		}
+		else{
+			referralBonusesSeparator.setVisibility(View.GONE);
+			referralBonusesLayout.setVisibility(View.GONE);
+		}
 
 		long count = ((AchievementsActivity)context).megaAchievements.getAwardsCount();
 
@@ -338,6 +359,7 @@ public class AchievementsFragment extends Fragment implements OnClickListener{
 					textInstallAppTransfer.setVisibility(View.INVISIBLE);
 				}
 
+				daysLeftInstallAppText.setVisibility(View.VISIBLE);
 				daysLeftInstallApp = ((AchievementsActivity)context).megaAchievements.getAwardExpirationTs(i);
 				log("Install App AwardExpirationTs: "+daysLeftInstallApp);
 
@@ -360,10 +382,8 @@ public class AchievementsFragment extends Fragment implements OnClickListener{
 				}
 				else{
 					daysLeftInstallAppText.setText(context.getResources().getString(R.string.expired_achievement));
-
 				}
 
-				daysLeftInstallAppText.setText(context.getResources().getString(R.string.general_num_days_left, (int)diffDays));
 			}
 			else if(type == MegaAchievementsDetails.MEGA_ACHIEVEMENT_DESKTOP_INSTALL){
 				log("MEGA_ACHIEVEMENT_DESKTOP_INSTALL");
@@ -389,6 +409,7 @@ public class AchievementsFragment extends Fragment implements OnClickListener{
 					textInstallDesktopTransfer.setVisibility(View.INVISIBLE);
 				}
 
+				daysLeftInstallDesktopText.setVisibility(View.VISIBLE);
 				daysLeftInstallDesktop = ((AchievementsActivity)context).megaAchievements.getAwardExpirationTs(i);
 				log("Install Desktop AwardExpirationTs: "+daysLeftInstallDesktop);
 
@@ -413,8 +434,6 @@ public class AchievementsFragment extends Fragment implements OnClickListener{
 					daysLeftInstallDesktopText.setText(context.getResources().getString(R.string.expired_achievement));
 
 				}
-
-				daysLeftInstallDesktopText.setText(context.getResources().getString(R.string.general_num_days_left, (int)diffDays));
 
 			}
 			else if(type == MegaAchievementsDetails.MEGA_ACHIEVEMENT_WELCOME){
@@ -464,7 +483,6 @@ public class AchievementsFragment extends Fragment implements OnClickListener{
 				}
 				else{
 					daysLeftRegistrationText.setText(context.getResources().getString(R.string.expired_achievement));
-
 				}
 			}
 			else{
