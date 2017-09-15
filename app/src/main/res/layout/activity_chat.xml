@@ -21,14 +21,12 @@
             android:id="@+id/chat_emoji_keyboard"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_alignParentBottom="true"
-            />
+            android:layout_alignParentBottom="true" />
 
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_above="@id/chat_emoji_keyboard"
-            >
+            android:layout_above="@id/chat_emoji_keyboard">
 
             <android.support.v7.widget.Toolbar
                 android:id="@+id/toolbar_chat"
@@ -85,7 +83,7 @@
                         android:src="@drawable/ic_send_black"
                         android:layout_marginBottom="3dp"/>
 
-                    <io.github.rockerhieu.emojicon.EmojiconEditText
+                    <mega.privacy.android.app.components.emojicon.EmojiconEditText
                         android:id="@id/edit_text_chat"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
