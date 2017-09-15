@@ -12,6 +12,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.ViewHolder;
 import android.text.Spannable;
 import android.text.SpannableString;
+import android.text.TextUtils;
 import android.text.style.ForegroundColorSpan;
 import android.util.DisplayMetrics;
 import android.util.SparseBooleanArray;
@@ -1136,12 +1137,12 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 					log("getLastMessageSender: the last message is mine: "+lastMsgSender);
 					Spannable me = new SpannableString("Me: ");
 					me.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.file_list_first_row)), 0, me.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-					holder.textViewContent.setText(me);
 
 					if(lastMessageString!=null) {
 						Spannable myMessage = new SpannableString(lastMessageString);
 						myMessage.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.file_list_second_row)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-						holder.textViewContent.append(myMessage);
+						CharSequence indexedText = TextUtils.concat(me, myMessage);
+						holder.textViewContent.setText(indexedText);
 					}
 				}
 				else{
@@ -1167,20 +1168,21 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 					if(chat.isGroup()){
 						Spannable name = new SpannableString(fullNameAction+": ");
 						name.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.black)), 0, name.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-						holder.textViewContent.setText(name);
 
 						if(chat.getUnreadCount()==0){
 							log("Message READ");
 
 							Spannable myMessage = new SpannableString(lastMessageString);
 							myMessage.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.file_list_second_row)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-							holder.textViewContent.append(myMessage);
+							CharSequence indexedText = TextUtils.concat(name, myMessage);
+							holder.textViewContent.setText(indexedText);
 						}
 						else{
 							log("Message NOt read");
 							Spannable myMessage = new SpannableString(lastMessageString);
 							myMessage.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.accentColor)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-							holder.textViewContent.append(myMessage);
+							CharSequence indexedText = TextUtils.concat(name, myMessage);
+							holder.textViewContent.setText(indexedText);
 						}
 					}
 					else{
