@@ -647,7 +647,6 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 					mode = UPLOAD_SELFIE;
 					imagePath=intent.getStringExtra("IMAGE_PATH");
 
-
 					if (mTabsAdapterExplorer == null){
 						fileExplorerSectionLayout.setVisibility(View.VISIBLE);
 						viewPagerExplorer.setVisibility(View.VISIBLE);
@@ -1040,7 +1039,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			finish();
 		}
 		else if(mode == UPLOAD_SELFIE){
-
+			log("Start to upload selfie");
 			long parentHandle = handle;
 			MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
 			if(parentNode == null){

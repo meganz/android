@@ -11608,45 +11608,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		else if (requestCode == Constants.TAKE_PHOTO_CODE){
 			log("TAKE_PHOTO_CODE");
 			if(resultCode == Activity.RESULT_OK){
-//				Intent intentPicture = new Intent(this, SecureSelfiePreviewActivityLollipop.class);
+				Intent intentPicture = new Intent(this, SecureSelfiePreviewActivityLollipop.class);
 //				startActivity(intentPicture);
 
-				String myEmail =  myAccountInfo.getMyUser().getEmail();
-				String filePath = Environment.getExternalStorageDirectory().getAbsolutePath() +"/"+ Util.profilePicDIR + "/picture.jpg";;
+				String filePath = Environment.getExternalStorageDirectory().getAbsolutePath() +"/"+ Util.temporalPicDIR + "/picture.jpg";
 				File imgFile = new File(filePath);
-
-				if(imgFile.exists()){
-
-					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-						Window window = this.getWindow();
-						window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-						window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-						window.setStatusBarColor(ContextCompat.getColor(this, R.color.black));
-					}
-
-					BitmapFactory.Options options = new BitmapFactory.Options();
-					options.inJustDecodeBounds = true;
-					Bitmap preview = BitmapFactory.decodeFile(imgFile.getAbsolutePath(), options);
-
-					ExifInterface exif;
-					int orientation = ExifInterface.ORIENTATION_NORMAL;
-					try {
-						exif = new ExifInterface(imgFile.getAbsolutePath());
-						orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_UNDEFINED);
-					} catch (IOException e) {}
-
-					// Calculate inSampleSize
-					options.inSampleSize = Util.calculateInSampleSize(options, 1000, 1000);
-
-					// Decode bitmap with inSampleSize set
-					options.inJustDecodeBounds = false;
-
-					preview = BitmapFactory.decodeFile(imgFile.getAbsolutePath(), options);
-
-					if (preview != null){
-						preview = Util.rotateBitmap(preview, orientation);
-					}
-				}
 
 				String name = Util.getPhotoSyncName(imgFile.lastModified(), imgFile.getAbsolutePath());
 				log("Taken picture Name: "+name);
@@ -11654,7 +11620,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				log("----NEW Name: "+newPath);
 				File newFile = new File(newPath);
 				imgFile.renameTo(newFile);
-				log("Take picture");
 				showFileChooser(newPath);
 			}
 			else{
@@ -11669,39 +11634,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				String myEmail =  myAccountInfo.getMyUser().getEmail();
 				String filePath = Environment.getExternalStorageDirectory().getAbsolutePath() +"/"+ Util.profilePicDIR + "/picture.jpg";;
 				File imgFile = new File(filePath);
-
-				if(imgFile.exists()){
-
-					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-						Window window = this.getWindow();
-						window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-						window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-						window.setStatusBarColor(ContextCompat.getColor(this, R.color.black));
-					}
-
-					BitmapFactory.Options options = new BitmapFactory.Options();
-					options.inJustDecodeBounds = true;
-					Bitmap preview = BitmapFactory.decodeFile(imgFile.getAbsolutePath(), options);
-
-					ExifInterface exif;
-					int orientation = ExifInterface.ORIENTATION_NORMAL;
-					try {
-						exif = new ExifInterface(imgFile.getAbsolutePath());
-						orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_UNDEFINED);
-					} catch (IOException e) {}
-
-					// Calculate inSampleSize
-					options.inSampleSize = Util.calculateInSampleSize(options, 1000, 1000);
-
-					// Decode bitmap with inSampleSize set
-					options.inJustDecodeBounds = false;
-
-					preview = BitmapFactory.decodeFile(imgFile.getAbsolutePath(), options);
-
-					if (preview != null){
-						preview = Util.rotateBitmap(preview, orientation);
-					}
-				}
 
 				String newPath = null;
 				if (getExternalCacheDir() != null){
@@ -14772,7 +14704,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 	public void showFileChooser(String imagePath){
 
-		log("showFileChooser");
+		log("showFileChooser: "+imagePath);
 		Intent intent = new Intent(this, FileExplorerActivityLollipop.class);
 		intent.setAction(FileExplorerActivityLollipop.ACTION_UPLOAD_SELFIE);
 		intent.putExtra("IMAGE_PATH", imagePath);

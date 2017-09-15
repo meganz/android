@@ -577,9 +577,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
             else{
                 log("transfer.getPath() is NULL");
             }
-
         }
-
 	}
 
 	@Override
