@@ -42,6 +42,8 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.vdurmont.emoji.EmojiManager;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -1485,6 +1487,15 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                 ((ViewHolderMessageChat)holder).contentOwnMessageText.setTextColor(ContextCompat.getColor(context, R.color.name_my_account));
                             }
 
+                            if(EmojiManager.isEmoji(messageContent)){
+                                log("IS emoji!!!");
+                                ((ViewHolderMessageChat)holder).contentOwnMessageText.setEmojiconSizeSp(32);
+                            }
+                            else{
+                                log("NOT IS emoji!!!");
+                                ((ViewHolderMessageChat)holder).contentOwnMessageText.setEmojiconSizeSp(20);
+                            }
+
                             ((ViewHolderMessageChat)holder).contentOwnMessageText.setText(messageContent);
 
                         }
@@ -2155,6 +2166,17 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                             if(message.getContent()!=null){
                                 messageContent = message.getContent();
+                            }
+
+                            if(EmojiManager.isEmoji(messageContent)){
+                                log("IS emoji!!!");
+                                ((ViewHolderMessageChat)holder).contentContactMessageText.setEmojiconSizeSp(32);
+                                ((ViewHolderMessageChat)holder).contentContactMessageText.setLineSpacing(1,1.2f);
+                            }
+                            else{
+                                log("NOT IS emoji!!!");
+                                ((ViewHolderMessageChat)holder).contentContactMessageText.setEmojiconSizeSp(20);
+                                ((ViewHolderMessageChat)holder).contentContactMessageText.setLineSpacing(1,1.0f);
                             }
 
                             if(chatRoom.isGroup()){

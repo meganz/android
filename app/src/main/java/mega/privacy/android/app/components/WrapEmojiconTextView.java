@@ -8,6 +8,7 @@ import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
 import android.text.style.DynamicDrawableSpan;
 import android.util.AttributeSet;
+import android.util.TypedValue;
 
 import io.github.rockerhieu.emojicon.EmojiconHandler;
 import mega.privacy.android.app.R;
@@ -69,11 +70,18 @@ public class WrapEmojiconTextView extends AppCompatTextView {
 
     //Set the size of emojicon in pixels.
 
-    public void setEmojiconSize(int pixels) {
+    public void setEmojiconSizePx(int pixels) {
         mEmojiconSize = pixels;
         super.setText(getText());
     }
 
+    //Set the size of emojicon in sp.
+
+    public void setEmojiconSizeSp(int sp) {
+        int px = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, sp, getResources().getDisplayMetrics());
+        mEmojiconSize = px;
+        super.setText(getText());
+    }
     //Set whether to use system default emojicon
 
     public void setUseSystemDefault(boolean useSystemDefault) {
