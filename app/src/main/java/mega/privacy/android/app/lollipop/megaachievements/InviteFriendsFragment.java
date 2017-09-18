@@ -2,6 +2,9 @@ package mega.privacy.android.app.lollipop.megaachievements;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffColorFilter;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
@@ -52,6 +55,8 @@ public class InviteFriendsFragment extends Fragment implements OnClickListener{
 	EditText editTextMail;
 	LinearLayout linearLayoutCard;
 	Button inviteButton;
+	private RelativeLayout emailErrorLayout;
+	private Drawable editTextBackground;
 
 	ArrayList<String> mails;
 	
@@ -105,24 +110,24 @@ public class InviteFriendsFragment extends Fragment implements OnClickListener{
 		inviteButton.setBackgroundColor(ContextCompat.getColor(context, R.color.invite_button_deactivated));
 
 		editTextMail = (EditText) v.findViewById(R.id.edit_text_invite_mail);
+		editTextBackground = editTextMail.getBackground().mutate().getConstantState().newDrawable();
 
 		editTextMail.addTextChangedListener(new TextWatcher() {
 
-			public void afterTextChanged(Editable s) {}
+			public void afterTextChanged(Editable s) {
+
+			}
 
 			public void beforeTextChanged(CharSequence s, int start,
 										  int count, int after) {
+				quitError();
 			}
 
 			public void onTextChanged(CharSequence s, int start,
 									  int before, int count) {
-				log("onTextChanged: " + s + ", " + start + ", " + before + ", " + count);
-
 				if (s != null) {
 					if (s.length() > 0) {
 						String temp = s.toString();
-
-//						CharSequence last = s.subSequence(s.length()-1, s.length());
 						char last = s.charAt(s.length()-1);
 						if(last == ' '){
 							temp = temp.trim();
@@ -132,49 +137,25 @@ public class InviteFriendsFragment extends Fragment implements OnClickListener{
 								editTextMail.getText().clear();
 							}
 							else{
-
+								setError();
 							}
-
 						}
 						else{
 							log("Last character is: "+last);
 						}
-//						String lastCharacter = last.toString();
-//						if(last.equals(" ")){
-//
-//						}
-//						else{
-//							log("Last character is: "+last);
-//						}
-//						if(temp.trim().length()>0){
-//							sendIcon.setVisibility(View.VISIBLE);
-//						}
-//						else{
-//							sendIcon.setVisibility(View.GONE);
-//						}
-					}
-					else {
-//						sendIcon.setVisibility(View.GONE);
 					}
 				}
-				else{
-//					sendIcon.setVisibility(View.GONE);
-				}
-
-//				if(megaChatApi.isSignalActivityRequired()){
-//					megaChatApi.signalPresenceActivity();
-//				}
-
 			}
 		});
+
+
+		emailErrorLayout = (RelativeLayout) v.findViewById(R.id.invite_friends_email_error);
+		emailErrorLayout.setVisibility(View.GONE);
 
 		mails = new ArrayList<>();
 
 		if (adapter == null){
 			adapter = new MegaInviteFriendsAdapter(context, this, mails, recyclerView);
-		}
-		else{
-//			adapter.setReferralBonuses(((AchievementsActivity)context).referralBonuses);
 		}
 
 		recyclerView.setAdapter(adapter);
@@ -182,6 +163,23 @@ public class InviteFriendsFragment extends Fragment implements OnClickListener{
 		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
 		return v;
+	}
+
+	private void setError(){
+		log("setError");
+		emailErrorLayout.setVisibility(View.VISIBLE);
+		PorterDuffColorFilter porterDuffColorFilter = new PorterDuffColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+		Drawable background = editTextBackground.mutate().getConstantState().newDrawable();
+		background.setColorFilter(porterDuffColorFilter);
+		editTextMail.setBackground(background);
+	}
+
+	private void quitError(){
+		if(emailErrorLayout.getVisibility() != View.GONE){
+			log("quitError");
+			emailErrorLayout.setVisibility(View.GONE);
+			editTextMail.setBackground(editTextBackground);
+		}
 	}
 
 	public final static boolean isValidEmail(CharSequence target) {
