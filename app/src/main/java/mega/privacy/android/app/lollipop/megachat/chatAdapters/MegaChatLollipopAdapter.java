@@ -3030,14 +3030,14 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         log("addMessage: "+position);
         this.messages = messages;
         notifyItemInserted(position);
-        if(position==messages.size()-1){
+        if(position==messages.size()){
             log("No need to update more");
         }
         else{
             log("Update until end");
             int itemCount = messages.size()-position;
             log("itemCount: "+itemCount);
-            notifyItemRangeChanged(position, itemCount);
+            notifyItemRangeChanged(position, itemCount+1);
         }
     }
 

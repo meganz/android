@@ -1524,7 +1524,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     }
 
     public void sendMessageToUI(MegaChatMessage msgSent){
-        log("sendMessage: msgSent");
+        log("sendMessageToUI");
+        int infoToShow = -1;
         AndroidMegaChatMessage androidMsgSent = new AndroidMegaChatMessage(msgSent);
         int index = messages.size()-1;
         if(msgSent!=null){
@@ -1557,7 +1558,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
                 messages.add(index, androidMsgSent);
 
-                adjustInfoToShow(index);
+                infoToShow = adjustInfoToShow(index);
             }
             if (adapter == null){
                 log("adapter NULL");
@@ -1570,9 +1571,15 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             else{
                 log("adapter is NOT null");
                 final int indexToScroll = index;
-                adapter.addMessage(messages, index+1);
-//                mLayoutManager.scrollToPositionWithOffset(indexToScroll, Util.scaleHeightPx(20, outMetrics));
-                mLayoutManager.scrollToPosition(messages.size());
+//                adapter.notifyDataSetChanged();
+                adapter.addMessage(messages, index);
+
+                if(infoToShow==Constants.CHAT_ADAPTER_SHOW_ALL){
+                    mLayoutManager.scrollToPositionWithOffset(indexToScroll, Util.scaleHeightPx(50, outMetrics));
+                }
+                else{
+                    mLayoutManager.scrollToPositionWithOffset(indexToScroll, Util.scaleHeightPx(20, outMetrics));
+                }
             }
         }
         else{
@@ -3304,7 +3311,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         return lastIndex;
     }
 
-    public void adjustInfoToShow(int index) {
+    public int adjustInfoToShow(int index) {
         log("adjustInfoToShow");
 
         AndroidMegaChatMessage msg = messages.get(index);
@@ -3525,6 +3532,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
             }
         }
+        return msg.getInfoToShow();
     }
 
     public boolean isGroup(){
