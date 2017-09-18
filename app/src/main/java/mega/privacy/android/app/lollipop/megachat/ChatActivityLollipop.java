@@ -1503,7 +1503,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 adapter.addMessage(messages, index+1);
                 final int indexToScroll = index+1;
 
-                mLayoutManager.scrollToPositionWithOffset(indexToScroll,20);
+                mLayoutManager.scrollToPositionWithOffset(indexToScroll,Util.scaleHeightPx(20, outMetrics));
 //                Handler handler = new Handler();
 //                handler.postDelayed(new Runnable() {
 //
@@ -1570,10 +1570,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             else{
                 log("adapter is NOT null");
                 final int indexToScroll = index;
-
-                mLayoutManager.scrollToPositionWithOffset(indexToScroll,20);
-
                 adapter.addMessage(messages, index+1);
+//                mLayoutManager.scrollToPositionWithOffset(indexToScroll, Util.scaleHeightPx(20, outMetrics));
+                mLayoutManager.scrollToPosition(messages.size());
             }
         }
         else{
@@ -2656,7 +2655,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                             log("onMessageLoaded: message position to scroll: "+positionToScroll+" content: "+messages.get(positionToScroll).getMessage().getContent());
                             messages.get(positionToScroll).setInfoToShow(Constants.CHAT_ADAPTER_SHOW_ALL);
                             adapter.notifyItemChanged(positionToScroll+1);
-                            mLayoutManager.scrollToPositionWithOffset(positionToScroll+1,20);
+                            mLayoutManager.scrollToPositionWithOffset(positionToScroll+1,Util.scaleHeightPx(20, outMetrics));
                         }
                         else{
                             log("Error, the position to scroll is more than size of messages");
@@ -2668,6 +2667,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             if(!pendingMessagesLoaded){
                 pendingMessagesLoaded = true;
                 loadPendingMessages();
+                if(positionToScroll<=0){
+                    log("positionToScroll is 0 - no unread messages");
+                    mLayoutManager.scrollToPosition(messages.size());
+                }
             }
 
             if(messages.size()<NUMBER_MESSAGES_BEFORE_LOAD){
@@ -2722,9 +2725,14 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         AndroidMegaChatMessage androidMsg = new AndroidMegaChatMessage(msg);
         appendMessagePosition(androidMsg);
 
-        int firstVisiblePosition = mLayoutManager.findLastVisibleItemPosition();
-        log("The last item visible: "+firstVisiblePosition+" the last message: "+messages.size());
-        mLayoutManager.scrollToPosition(messages.size()-1);
+        if(mLayoutManager.findLastCompletelyVisibleItemPosition()==messages.size()-1){
+            log("Do scroll to end");
+            mLayoutManager.scrollToPosition(messages.size());
+        }
+        else{
+            log("DONT scroll to end");
+        }
+
 //        mLayoutManager.setStackFromEnd(true);
 //        mLayoutManager.scrollToPosition(0);
         log("------------------------------------------");
@@ -2955,7 +2963,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             if(scrollToP!=-1){
                 if(msg.getMessage().getStatus()==MegaChatMessage.STATUS_SERVER_RECEIVED){
                     log("modifyAttachmentReceived: need to scroll to position: "+indexToChange);
-                    mLayoutManager.scrollToPositionWithOffset(scrollToP, 20);
+                    mLayoutManager.scrollToPositionWithOffset(scrollToP, Util.scaleHeightPx(20, outMetrics));
                 }
             }
         }
@@ -3071,7 +3079,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 if(scrollToP!=-1){
                     if(msg.getMessage().getStatus()==MegaChatMessage.STATUS_SERVER_RECEIVED){
                         log("modifyMessageReceived: need to scroll to position: "+indexToChange);
-                        mLayoutManager.scrollToPositionWithOffset(scrollToP, 20);
+                        mLayoutManager.scrollToPositionWithOffset(scrollToP, Util.scaleHeightPx(20, outMetrics));
                     }
                 }
                 log("modifyMessageReceived: messages size 2: "+messages.size());

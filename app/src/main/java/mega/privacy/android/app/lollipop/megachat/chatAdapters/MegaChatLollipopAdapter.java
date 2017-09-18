@@ -3210,7 +3210,14 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             if(bitmap!=null){
                 log("Update uploading my preview");
 
-                int currentPosition = holder.getAdapterPosition()-1;
+                int currentPosition = holder.getLayoutPosition()-1;
+                log("currentPosition: "+currentPosition);
+                log("Messages size: "+messages.size());
+                if(messages.size()<=currentPosition){
+                    log("Do nothing, the message list is not fully loaded");
+                    return;
+                }
+
                 AndroidMegaChatMessage message = messages.get(currentPosition);
                 if(message.getPendingMessage()!=null) {
                     log("State of the message: " + message.getPendingMessage().getState());
