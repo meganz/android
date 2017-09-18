@@ -11608,9 +11608,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		else if (requestCode == Constants.TAKE_PHOTO_CODE){
 			log("TAKE_PHOTO_CODE");
 			if(resultCode == Activity.RESULT_OK){
-				Intent intentPicture = new Intent(this, SecureSelfiePreviewActivityLollipop.class);
-//				startActivity(intentPicture);
-
 				String filePath = Environment.getExternalStorageDirectory().getAbsolutePath() +"/"+ Util.temporalPicDIR + "/picture.jpg";
 				File imgFile = new File(filePath);
 
