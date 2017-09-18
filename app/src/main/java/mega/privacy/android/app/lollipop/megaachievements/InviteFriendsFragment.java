@@ -95,10 +95,6 @@ public class InviteFriendsFragment extends Fragment implements OnClickListener{
 		log("The achievements are: "+enabledAchievements);
 
 		View v = inflater.inflate(R.layout.fragment_invite_friends, container, false);
-
-//		parentRelativeLayout = (RelativeLayout) v.findViewById(R.id.referral_bonuses_relative_layout);
-//		linearLayoutCard = (LinearLayout) v.findViewById(R.id.card_linear_layout);
-
 		recyclerView = (RecyclerView) v.findViewById(R.id.invite_friends_recycler_view);
 //		mLayoutManager = new StaggeredGridLayoutManager(3,StaggeredGridLayoutManager.VERTICAL);
 //		mLayoutManager.setGapStrategy(StaggeredGridLayoutManager.GAP_HANDLING_MOVE_ITEMS_BETWEEN_SPANS);
@@ -147,7 +143,6 @@ public class InviteFriendsFragment extends Fragment implements OnClickListener{
 				}
 			}
 		});
-
 
 		emailErrorLayout = (RelativeLayout) v.findViewById(R.id.invite_friends_email_error);
 		emailErrorLayout.setVisibility(View.GONE);
@@ -227,42 +222,9 @@ public class InviteFriendsFragment extends Fragment implements OnClickListener{
 			inviteButton.setBackgroundColor(ContextCompat.getColor(context, R.color.accentColor));
 			inviteButton.setOnClickListener(this);
 		}
-//		if(adapter.getItemCount() > 5){
-//			View item = adapter.getView(0, null, recyclerView);
-//			adapter.getItemViewType()
-//			item.measure(0, 0);
-//			ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(RecyclerView.LayoutParams.MATCH_PARENT, (int) (5.5 * item.getMeasuredHeight()));
-//			recyclerView.setLayoutParams(params);
-//		}
-
-//		int totalHeight = 0;
-//
-//		for (int i = 0; i < adapter.getItemCount(); i++) {
-//			View mView = recyclerView.findViewHolderForAdapterPosition(i).itemView;
-//
-//			mView.measure(View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED),
-//					View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
-//
-//			totalHeight += mView.getMeasuredHeight();
-//			log(totalHeight);
-//		}
-
-//
-//		if (recyclerView.getLayoutParams().height > height) {
-//			ViewGroup.LayoutParams params = recyclerView.getLayoutParams();
-//			params.height = 500;
-//			recyclerView.setLayoutParams(params);
-//		}
 
 		recyclerView.setVisibility(View.VISIBLE);
-//		log("recyclerView: "+recyclerView.getLayoutParams().height+" height "+height);
 	}
-
-//	public static AchievementsFragment newInstance() {
-//		log("newInstance");
-//		AchievementsFragment fragment = new AchievementsFragment();
-//		return fragment;
-//	}
 
 	@Override
 	public void onAttach(Activity activity) {
@@ -302,11 +264,6 @@ public class InviteFriendsFragment extends Fragment implements OnClickListener{
 		log("onBackPressed");
 		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
-//		if(exportMKLayout.getVisibility()==View.VISIBLE){
-//			log("Master Key layout is VISIBLE");
-//			hideMKLayout();
-//			return 1;
-//		}
 
 		return 0;
 	}

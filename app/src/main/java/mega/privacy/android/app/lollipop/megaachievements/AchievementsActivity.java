@@ -117,11 +117,16 @@ public class AchievementsActivity extends PinActivityLollipop implements MegaReq
 
         if(visibleFragment==Constants.ACHIEVEMENTS_FRAGMENT){
 
+            View view = getCurrentFocus();
+            if (view != null) {
+                InputMethodManager inputManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                inputManager.hideSoftInputFromWindow(view.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+            }
+
             aB.setTitle(getString(R.string.achievements_title));
             if(achievementsFragment==null){
                 achievementsFragment = new AchievementsFragment();
             }
-
 
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             ft.replace(R.id.fragment_container_achievements, achievementsFragment, "achievementsFragment");
