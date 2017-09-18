@@ -12,6 +12,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.ViewHolder;
 import android.text.Spannable;
 import android.text.SpannableString;
+import android.text.TextUtils;
 import android.text.style.ForegroundColorSpan;
 import android.util.DisplayMetrics;
 import android.util.SparseBooleanArray;
@@ -36,6 +37,7 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.components.EmojiconTextView;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.listeners.ChatListNonContactNameListener;
@@ -114,7 +116,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
     	TextView contactInitialLetter;
 //        ImageView imageView;
         TextView textViewContactName;
-        TextView textViewContent;
+        EmojiconTextView textViewContent;
 		TextView textViewDate;
         ImageButton imageButtonThreeDots;
         RelativeLayout itemLayout;
@@ -477,7 +479,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		holder.textViewContactName = (TextView) v.findViewById(R.id.recent_chat_list_name);
 		holder.textViewContactName.setMaxWidth(Util.scaleWidthPx(194, outMetrics));
 
-		holder.textViewContent = (TextView) v.findViewById(R.id.recent_chat_list_content);
+		holder.textViewContent = (EmojiconTextView) v.findViewById(R.id.recent_chat_list_content);
 		holder.textViewContent.setMaxWidth(Util.scaleWidthPx(194, outMetrics));
 
 		holder.textViewDate = (TextView) v.findViewById(R.id.recent_chat_list_date);
@@ -1135,12 +1137,12 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 					log("getLastMessageSender: the last message is mine: "+lastMsgSender);
 					Spannable me = new SpannableString("Me: ");
 					me.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.file_list_first_row)), 0, me.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-					holder.textViewContent.setText(me);
 
 					if(lastMessageString!=null) {
 						Spannable myMessage = new SpannableString(lastMessageString);
 						myMessage.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.file_list_second_row)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-						holder.textViewContent.append(myMessage);
+						CharSequence indexedText = TextUtils.concat(me, myMessage);
+						holder.textViewContent.setText(indexedText);
 					}
 				}
 				else{
@@ -1166,20 +1168,21 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 					if(chat.isGroup()){
 						Spannable name = new SpannableString(fullNameAction+": ");
 						name.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.black)), 0, name.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-						holder.textViewContent.setText(name);
 
 						if(chat.getUnreadCount()==0){
 							log("Message READ");
 
 							Spannable myMessage = new SpannableString(lastMessageString);
 							myMessage.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.file_list_second_row)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-							holder.textViewContent.append(myMessage);
+							CharSequence indexedText = TextUtils.concat(name, myMessage);
+							holder.textViewContent.setText(indexedText);
 						}
 						else{
 							log("Message NOt read");
 							Spannable myMessage = new SpannableString(lastMessageString);
 							myMessage.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.accentColor)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-							holder.textViewContent.append(myMessage);
+							CharSequence indexedText = TextUtils.concat(name, myMessage);
+							holder.textViewContent.setText(indexedText);
 						}
 					}
 					else{
