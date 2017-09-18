@@ -159,10 +159,10 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
     private String emailTemp = null;
     private String passwdTemp = null;
 
-    private RelativeLayout login_email_error_layout;
-    private RelativeLayout login_password_error_layout;
-    private TextView login_email_error_text;
-    private TextView login_password_error_text;
+    private RelativeLayout loginEmailErrorLayout;
+    private RelativeLayout loginPasswordErrorLayout;
+    private TextView loginEmailErrorText;
+    private TextView loginPasswordErrorText;
 
     private Drawable login_background;
     private Drawable password_background;
@@ -287,10 +287,10 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
         login_background = et_user.getBackground().mutate().getConstantState().newDrawable();
 
-        login_email_error_layout = (RelativeLayout) v.findViewById(R.id.login_email_text_error);
-        login_email_error_layout.setVisibility(View.GONE);
+        loginEmailErrorLayout = (RelativeLayout) v.findViewById(R.id.login_email_text_error);
+        loginEmailErrorLayout.setVisibility(View.GONE);
 
-        login_email_error_text = (TextView) v.findViewById(R.id.login_email_text_error_text);
+        loginEmailErrorText = (TextView) v.findViewById(R.id.login_email_text_error_text);
 
         et_password = (EditText) v.findViewById(R.id.login_password_text);
 
@@ -326,10 +326,10 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
         password_background = et_password.getBackground().mutate().getConstantState().newDrawable();
 
-        login_password_error_layout = (RelativeLayout) v.findViewById(R.id.login_password_text_error);
-        login_password_error_layout.setVisibility(View.GONE);
+        loginPasswordErrorLayout = (RelativeLayout) v.findViewById(R.id.login_password_text_error);
+        loginPasswordErrorLayout.setVisibility(View.GONE);
 
-        login_password_error_text = (TextView) v.findViewById(R.id.login_password_text_error_text);
+        loginPasswordErrorText = (TextView) v.findViewById(R.id.login_password_text_error_text);
 
         loginThreeDots = (ImageView) v.findViewById(R.id.login_three_dots);
         LinearLayout.LayoutParams textThreeDots = (LinearLayout.LayoutParams)loginThreeDots.getLayoutParams();
@@ -2322,8 +2322,8 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         }
         switch (editText.getId()){
             case R.id.login_email_text:{
-                login_email_error_layout.setVisibility(View.VISIBLE);
-                login_email_error_text.setText(error);
+                loginEmailErrorLayout.setVisibility(View.VISIBLE);
+                loginEmailErrorText.setText(error);
                 PorterDuffColorFilter porterDuffColorFilter = new PorterDuffColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
 //                et_user.getBackground().mutate().setColorFilter(porterDuffColorFilter);
                 Drawable background = login_background.mutate().getConstantState().newDrawable();
@@ -2332,8 +2332,8 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 break;
             }
             case R.id.login_password_text:{
-                login_password_error_layout.setVisibility(View.VISIBLE);
-                login_password_error_text.setText(error);
+                loginPasswordErrorLayout.setVisibility(View.VISIBLE);
+                loginPasswordErrorText.setText(error);
                 PorterDuffColorFilter porterDuffColorFilter = new PorterDuffColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
 //                et_password.getBackground().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
                 Drawable background = password_background.mutate().getConstantState().newDrawable();
@@ -2347,19 +2347,19 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
     private void quitError(EditText editText){
         switch (editText.getId()){
             case R.id.login_email_text:{
-                if(login_email_error_layout.getVisibility() != View.GONE){
-                    login_email_error_layout.setVisibility(View.GONE);
+                if(loginEmailErrorLayout.getVisibility() != View.GONE){
+                    loginEmailErrorLayout.setVisibility(View.GONE);
                     et_user.setBackground(login_background);
                 }
+                break;
             }
-            break;
             case R.id.login_password_text:{
-                if(login_password_error_layout.getVisibility() != View.GONE){
-                    login_password_error_layout.setVisibility(View.GONE);
+                if(loginPasswordErrorLayout.getVisibility() != View.GONE){
+                    loginPasswordErrorLayout.setVisibility(View.GONE);
                     et_password.setBackground(password_background);
                 }
+                break;
             }
-            break;
         }
     }
 

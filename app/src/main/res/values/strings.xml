@@ -1553,4 +1553,5 @@
     <string name="subtitle_confirmation_invite_friends" context="subtitle of the dialog to confirm the contact request">Thanks! Invitation was sent by email</string>
     <string name="paragraph_confirmation_invite_friends" context="paragraph of the dialog to confirm the contact request">Encourage your friends to register and install a MEGA app. As long as your friend uses the same email address as you\'ve entered, you will receive your free GB of transfer quota.</string>
 
+    <string name="invalid_email_to_invite" context="Error shown when the user writes a email with an incorrect format">Email is malformed</string>
 </resources>
