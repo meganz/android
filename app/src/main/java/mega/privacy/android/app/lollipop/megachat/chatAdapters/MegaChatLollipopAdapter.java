@@ -3263,8 +3263,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                         holder.contentOwnMessageThumbLand.setVisibility(View.GONE);
                         holder.errorUploadingLandscape.setVisibility(View.GONE);
                         holder.notSentTextLandscape.setVisibility(View.GONE);
-                        holder.errorUploadingPortrait.setVisibility(View.VISIBLE);
-                        holder.notSentTextPortrait.setVisibility(View.VISIBLE);
 
 
                         RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) holder.errorUploadingPortrait.getLayoutParams();
@@ -3284,8 +3282,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                         holder.contentOwnMessageThumbPort.setVisibility(View.GONE);
                         holder.errorUploadingPortrait.setVisibility(View.GONE);
                         holder.notSentTextPortrait.setVisibility(View.GONE);
-                        holder.errorUploadingLandscape.setVisibility(View.VISIBLE);
-                        holder.notSentTextLandscape.setVisibility(View.VISIBLE);
 
 
                         RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) holder.errorUploadingLandscape.getLayoutParams();
