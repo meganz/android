@@ -3258,16 +3258,34 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                         holder.transparentCoatingPortrait.setVisibility(View.VISIBLE);
                         holder.transparentCoatingLandscape.setVisibility(View.VISIBLE);
                         holder.uploadingProgressBar.setVisibility(View.GONE);
-                        holder.errorUploadingPortrait.setVisibility(View.VISIBLE);
-                        holder.notSentTextPortrait.setVisibility(View.VISIBLE);
-                        holder.errorUploadingLandscape.setVisibility(View.VISIBLE);
-                        holder.notSentTextLandscape.setVisibility(View.VISIBLE);
+
+                        if (bitmap.getWidth() < bitmap.getHeight()) {
+                            log("Portrait");
+                            holder.errorUploadingPortrait.setVisibility(View.VISIBLE);
+                            holder.notSentTextPortrait.setVisibility(View.VISIBLE);
+                            holder.errorUploadingLandscape.setVisibility(View.GONE);
+                            holder.notSentTextLandscape.setVisibility(View.GONE);
+                        }else{
+                            log("Landscape");
+                            holder.errorUploadingPortrait.setVisibility(View.GONE);
+                            holder.notSentTextPortrait.setVisibility(View.GONE);
+                            holder.errorUploadingLandscape.setVisibility(View.VISIBLE);
+                            holder.notSentTextLandscape.setVisibility(View.VISIBLE);
+                        }
+
 
 
                     } else {
                         holder.transparentCoatingLandscape.setVisibility(View.VISIBLE);
                         holder.transparentCoatingPortrait.setVisibility(View.VISIBLE);
-                        holder.uploadingProgressBar.setVisibility(View.VISIBLE);
+
+                        if(holder.contentOwnMessageFileLayout.isShown()){
+                            holder.uploadingProgressBar.setVisibility(View.GONE);
+
+                        }else{
+                            holder.uploadingProgressBar.setVisibility(View.VISIBLE);
+
+                        }
                         holder.errorUploadingPortrait.setVisibility(View.GONE);
                         holder.notSentTextPortrait.setVisibility(View.GONE);
                         holder.errorUploadingLandscape.setVisibility(View.GONE);
@@ -3295,7 +3313,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                         holder.errorUploadingPortrait.setLayoutParams(params);
 
                     } else {
-                        log("Landscape");
                         holder.contentOwnMessageThumbLand.setImageBitmap(bitmap);
                         holder.previewFrameLand.setVisibility(View.VISIBLE);
                         holder.contentOwnMessageThumbLand.setVisibility(View.VISIBLE);
