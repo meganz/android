@@ -2093,19 +2093,23 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         boolean positionFound = false;
         List<Long> ids = new ArrayList<>();
         for(int i=0; i<messages.size();i++){
-            MegaChatMessage msg = messages.get(i).getMessage();
-            if(msg.getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT){
-                ids.add(msg.getMsgId());
+            AndroidMegaChatMessage androidMessage = messages.get(i);
+            if(!androidMessage.isUploading()){
+                MegaChatMessage msg = androidMessage.getMessage();
 
-                if(msg.getMsgId()==msgId){
-                    positionFound=true;
-                }
-                if(!positionFound){
-                    MegaNodeList nodeList = msg.getMegaNodeList();
-                    if(nodeList.size()==1){
-                        MegaNode node = nodeList.get(0);
-                        if(MimeTypeList.typeForName(node.getName()).isImage()){
-                            position++;
+                if(msg.getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT){
+                    ids.add(msg.getMsgId());
+
+                    if(msg.getMsgId()==msgId){
+                        positionFound=true;
+                    }
+                    if(!positionFound){
+                        MegaNodeList nodeList = msg.getMegaNodeList();
+                        if(nodeList.size()==1){
+                            MegaNode node = nodeList.get(0);
+                            if(MimeTypeList.typeForName(node.getName()).isImage()){
+                                position++;
+                            }
                         }
                     }
                 }
