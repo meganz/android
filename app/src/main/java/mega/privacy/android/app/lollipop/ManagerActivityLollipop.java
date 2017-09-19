@@ -6389,7 +6389,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
             				if (rubbishBinFLol.showSelectMenuItem()){
             					selectMenuItem.setVisible(true);
             					unSelectMenuItem.setVisible(false);
-            				}
+								changeStatusBarColor(1);
+							}
             				else{
             					selectMenuItem.setVisible(false);
             					unSelectMenuItem.setVisible(true);

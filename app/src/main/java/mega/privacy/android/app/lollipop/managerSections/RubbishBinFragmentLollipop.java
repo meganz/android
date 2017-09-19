@@ -146,6 +146,7 @@ public class RubbishBinFragmentLollipop extends Fragment {
 					break;
 				}
 				case R.id.cab_menu_select_all:{
+					((ManagerActivityLollipop)context).changeStatusBarColor(1);
 					selectAll();
 					break;
 				}
@@ -517,6 +518,8 @@ public class RubbishBinFragmentLollipop extends Fragment {
 			List<MegaNode> selectedNodes = adapter.getSelectedNodes();
 			if (selectedNodes.size() > 0){
 				updateActionModeTitle();
+				((ManagerActivityLollipop)context).changeStatusBarColor(1);
+
 			}
 		}
 		else{
@@ -672,6 +675,8 @@ public class RubbishBinFragmentLollipop extends Fragment {
 	 */
 	public void hideMultipleSelect() {
 		adapter.setMultipleSelect(false);
+		((ManagerActivityLollipop)context).changeStatusBarColor(2);
+
 		if (actionMode != null) {
 			actionMode.finish();
 		}
