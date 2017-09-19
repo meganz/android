@@ -101,16 +101,13 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 
 		ImageView permissionsIcon;
 		int currentPosition;
-		String contactMail;
-		String userHandle;
+		public String contactMail;
+		public String userHandle;
 		String fullName="";
 
 		public void setImageView(Bitmap bitmap){
 			imageView.setImageBitmap(bitmap);
 			contactInitialLetter.setVisibility(View.GONE);
-		}
-		public String getContactMail (){
-			return contactMail;
 		}
     }
 
@@ -271,46 +268,35 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 			}
 			else{
 				log("NOOOT me!!!");
-
+				ChatParticipantAvatarListener listener = new ChatParticipantAvatarListener(context, ((ViewHolderParticipantsList)holder), this);
 				if (((ViewHolderParticipantsList)holder).contactMail != null) {
 					log("The participant is contact!!");
 
 					MegaUser contact = megaApi.getContact(((ViewHolderParticipantsList)holder).contactMail);
-
 					if(contact!=null){
-						if (contact.getVisibility() == MegaUser.VISIBILITY_VISIBLE){
-							ChatParticipantAvatarListener listener = new ChatParticipantAvatarListener(context, ((ViewHolderParticipantsList)holder), this);
-
-							File avatar = null;
-							if (context.getExternalCacheDir() != null) {
-								avatar = new File(context.getExternalCacheDir().getAbsolutePath(), ((ViewHolderParticipantsList)holder).contactMail + ".jpg");
-							} else {
-								avatar = new File(context.getCacheDir().getAbsolutePath(), ((ViewHolderParticipantsList)holder).contactMail + ".jpg");
-							}
-							Bitmap bitmap = null;
-							if (avatar.exists()) {
-								if (avatar.length() > 0) {
-									BitmapFactory.Options bOpts = new BitmapFactory.Options();
-									bOpts.inPurgeable = true;
-									bOpts.inInputShareable = true;
-									bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
-									if (bitmap == null) {
-										avatar.delete();
-										if (context.getExternalCacheDir() != null) {
-											megaApi.getUserAvatar(contact, context.getExternalCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);
-										} else {
-											megaApi.getUserAvatar(contact, context.getCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);
-										}
-									} else {
-										((ViewHolderParticipantsList)holder).contactInitialLetter.setVisibility(View.GONE);
-										((ViewHolderParticipantsList)holder).imageView.setImageBitmap(bitmap);
-									}
-								} else {
+						File avatar = null;
+						if (context.getExternalCacheDir() != null) {
+							avatar = new File(context.getExternalCacheDir().getAbsolutePath(), ((ViewHolderParticipantsList)holder).contactMail + ".jpg");
+						} else {
+							avatar = new File(context.getCacheDir().getAbsolutePath(), ((ViewHolderParticipantsList)holder).contactMail + ".jpg");
+						}
+						Bitmap bitmap = null;
+						if (avatar.exists()) {
+							if (avatar.length() > 0) {
+								BitmapFactory.Options bOpts = new BitmapFactory.Options();
+								bOpts.inPurgeable = true;
+								bOpts.inInputShareable = true;
+								bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
+								if (bitmap == null) {
+									avatar.delete();
 									if (context.getExternalCacheDir() != null) {
 										megaApi.getUserAvatar(contact, context.getExternalCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);
 									} else {
 										megaApi.getUserAvatar(contact, context.getCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);
 									}
+								} else {
+									((ViewHolderParticipantsList)holder).contactInitialLetter.setVisibility(View.GONE);
+									((ViewHolderParticipantsList)holder).imageView.setImageBitmap(bitmap);
 								}
 							} else {
 								if (context.getExternalCacheDir() != null) {
@@ -319,15 +305,22 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 									megaApi.getUserAvatar(contact, context.getCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);
 								}
 							}
-							((ViewHolderParticipantsList) holder).imageButtonThreeDots.setColorFilter(null);
-
+						} else {
+							if (context.getExternalCacheDir() != null) {
+								megaApi.getUserAvatar(contact, context.getExternalCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);
+							} else {
+								megaApi.getUserAvatar(contact, context.getCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);
+							}
 						}
-						else{
-							log("Participant is NOT contact");
-						}
+						((ViewHolderParticipantsList) holder).imageButtonThreeDots.setColorFilter(null);
 					}
 					else{
 						log("Participant is NOT contact");
+						if (context.getExternalCacheDir() != null) {
+							megaApi.getUserAvatar(((ViewHolderParticipantsList)holder).contactMail, context.getExternalCacheDir().getAbsolutePath() + "/" + ((ViewHolderParticipantsList)holder).contactMail + ".jpg", listener);
+						} else {
+							megaApi.getUserAvatar(((ViewHolderParticipantsList)holder).contactMail, context.getCacheDir().getAbsolutePath() + "/" + ((ViewHolderParticipantsList)holder).contactMail + ".jpg", listener);
+						}
 					}
 
 				} else {
@@ -335,6 +328,12 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 					if(position!=0){
 						((ViewHolderParticipantsList) holder).imageButtonThreeDots.setColorFilter(ContextCompat.getColor(context, R.color.chat_sliding_panel_separator));
 						((ViewHolderParticipantsList)holder).imageButtonThreeDots.setOnClickListener(null);
+					}
+
+					if (context.getExternalCacheDir() != null) {
+						megaApi.getUserAvatar(((ViewHolderParticipantsList)holder).userHandle, context.getExternalCacheDir().getAbsolutePath() + "/" + ((ViewHolderParticipantsList)holder).userHandle + ".jpg", listener);
+					} else {
+						megaApi.getUserAvatar(((ViewHolderParticipantsList)holder).userHandle, context.getCacheDir().getAbsolutePath() + "/" + ((ViewHolderParticipantsList)holder).userHandle + ".jpg", listener);
 					}
 				}
 			}

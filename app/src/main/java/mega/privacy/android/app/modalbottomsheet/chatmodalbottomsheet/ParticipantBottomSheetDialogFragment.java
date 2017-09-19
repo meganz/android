@@ -279,14 +279,49 @@ public class ParticipantBottomSheetDialogFragment extends BottomSheetDialogFragm
     public void addAvatarParticipantPanel(long handle, String email, String myName){
 
         File avatar = null;
+        String userHandleEncoded = MegaApiAndroid.userHandleToBase64(handle);
 
-        //Ask for avatar
-        if (getActivity().getExternalCacheDir() != null){
-            avatar = new File(getActivity().getExternalCacheDir().getAbsolutePath(), email + ".jpg");
+        if(handle == megaChatApi.getMyUserHandle()){
+            //Ask for my avatar
+            if (getActivity().getExternalCacheDir() != null){
+                avatar = new File(getActivity().getExternalCacheDir().getAbsolutePath(), email + ".jpg");
+            }
+            else{
+                avatar = new File(getActivity().getCacheDir().getAbsolutePath(), email + ".jpg");
+            }
         }
         else{
-            avatar = new File(getActivity().getCacheDir().getAbsolutePath(), email + ".jpg");
+
+            if(email!=null){
+                //Ask for avatar
+                if (getActivity().getExternalCacheDir() != null){
+                    avatar = new File(getActivity().getExternalCacheDir().getAbsolutePath(), email + ".jpg");
+                }
+                else{
+                    avatar = new File(getActivity().getCacheDir().getAbsolutePath(), email + ".jpg");
+                }
+            }
+
+            if(avatar!=null){
+                if (!avatar.exists()){
+                    if (getActivity().getExternalCacheDir() != null){
+                        avatar = new File(getActivity().getExternalCacheDir().getAbsolutePath(), userHandleEncoded + ".jpg");
+                    }
+                    else{
+                        avatar = new File(getActivity().getCacheDir().getAbsolutePath(), userHandleEncoded + ".jpg");
+                    }
+                }
+            }
+            else{
+                if (getActivity().getExternalCacheDir() != null){
+                    avatar = new File(getActivity().getExternalCacheDir().getAbsolutePath(), userHandleEncoded + ".jpg");
+                }
+                else{
+                    avatar = new File(getActivity().getCacheDir().getAbsolutePath(), userHandleEncoded + ".jpg");
+                }
+            }
         }
+
         Bitmap bitmap = null;
         if (avatar.exists()){
             if (avatar.length() > 0){
@@ -311,7 +346,6 @@ public class ParticipantBottomSheetDialogFragment extends BottomSheetDialogFragm
         Canvas c = new Canvas(defaultAvatar);
         Paint p = new Paint();
         p.setAntiAlias(true);
-        String userHandleEncoded = MegaApiAndroid.userHandleToBase64(handle);
         String color = megaApi.getUserAvatarColor(userHandleEncoded);
         if(color!=null){
             log("The color to set the avatar is "+color);
