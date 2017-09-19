@@ -536,6 +536,8 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 					emptyImageView.setVisibility(View.GONE);
 					emptyTextView.setVisibility(View.GONE);
 				}
+
+				((ManagerActivityLollipop) context).showFabButton();
 			}
 			else{
 				if (MimeTypeList.typeForName(nodes.get(position).getName()).isImage()){
@@ -754,14 +756,17 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 
 				adapter.setParentHandle(parentHandle);
 				levels--;
+				((ManagerActivityLollipop) context).showFabButton();
 				return 2;
 			}
 			else{
+				((ManagerActivityLollipop) context).showFabButton();
 				return 0;
 			}
 		}
 		else if (levels == -1){
 			log("levels == -1");
+			((ManagerActivityLollipop) context).showFabButton();
 			return 0;
 		}
 		else{
@@ -810,6 +815,7 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 			aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 			((ManagerActivityLollipop)context).setFirstNavigationLevel(true);
 			((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
+			((ManagerActivityLollipop) context).showFabButton();
 			return 3;
 		}
 	}

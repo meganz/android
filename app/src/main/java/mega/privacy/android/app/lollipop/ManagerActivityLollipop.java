@@ -4618,7 +4618,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
     			tB.setVisibility(View.VISIBLE);
 
-
 				if (nV != null){
 					Menu nVMenu = nV.getMenu();
 					MenuItem hidden = nVMenu.findItem(R.id.navigation_item_hidden);
@@ -11524,7 +11523,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					}
 				}
 			}
+			if (drawerItem == DrawerItem.SEARCH){
+				if(sFLol!=null)
+				{
+					parentHandleUpload = sFLol.getParentHandle();
+				}
+			}
 			else{
+				log("Return - nothing to be done");
 				return;
 			}
 
@@ -14359,6 +14365,43 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					fabButton.setVisibility(View.GONE);
 				}
 
+				break;
+			}
+			case SEARCH:{
+				if(sFLol!=null){
+					log("parentHandleSearch: "+parentHandleSearch);
+
+					if(sFLol.getLevels()<0){
+						fabButton.setVisibility(View.GONE);
+					}
+					else{
+						long parentHandleSearch = sFLol.getParentHandle();
+						if(parentHandleSearch!=-1){
+							MegaNode node = megaApi.getNodeByHandle(parentHandleSearch);
+							if(node.isInShare()){
+								log("Node is incoming folder");
+								int accessLevel = megaApi.getAccess(node);
+
+								if(accessLevel== MegaShare.ACCESS_FULL||accessLevel== MegaShare.ACCESS_OWNER){
+									fabButton.setVisibility(View.VISIBLE);
+								}
+								else if(accessLevel== MegaShare.ACCESS_READWRITE){
+									fabButton.setVisibility(View.VISIBLE);
+								}
+								else{
+									fabButton.setVisibility(View.GONE);
+								}
+							}
+							else{
+								fabButton.setVisibility(View.VISIBLE);
+							}
+						}
+						else{
+							fabButton.setVisibility(View.GONE);
+						}
+
+					}
+				}
 				break;
 			}
 			default:{
