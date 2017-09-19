@@ -1570,15 +1570,13 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }
             else{
                 log("adapter is NOT null");
-                final int indexToScroll = index;
-//                adapter.notifyDataSetChanged();
                 adapter.addMessage(messages, index);
 
                 if(infoToShow==Constants.CHAT_ADAPTER_SHOW_ALL){
-                    mLayoutManager.scrollToPositionWithOffset(indexToScroll, Util.scaleHeightPx(50, outMetrics));
+                    mLayoutManager.scrollToPositionWithOffset(index, Util.scaleHeightPx(50, outMetrics));
                 }
                 else{
-                    mLayoutManager.scrollToPositionWithOffset(indexToScroll, Util.scaleHeightPx(20, outMetrics));
+                    mLayoutManager.scrollToPositionWithOffset(index, Util.scaleHeightPx(20, outMetrics));
                 }
             }
         }
