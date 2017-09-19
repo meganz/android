@@ -42,6 +42,7 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.vdurmont.emoji.Emoji;
 import com.vdurmont.emoji.EmojiManager;
 
 import java.io.File;
@@ -1492,8 +1493,15 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                 ((ViewHolderMessageChat)holder).contentOwnMessageText.setEmojiconSizeSp(32);
                             }
                             else{
-                                log("NOT IS emoji!!!");
                                 ((ViewHolderMessageChat)holder).contentOwnMessageText.setEmojiconSizeSp(20);
+                            }
+
+                            if(EmojiManager.isOnlyEmojis(messageContent)){
+                                log("IS ONLY emoji!!!");
+                                ((ViewHolderMessageChat)holder).contentOwnMessageText.setLineSpacing(1,1.2f);
+                            }
+                            else{
+                                ((ViewHolderMessageChat)holder).contentOwnMessageText.setLineSpacing(1,1.0f);
                             }
 
                             ((ViewHolderMessageChat)holder).contentOwnMessageText.setText(messageContent);
@@ -2176,6 +2184,14 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                             else{
                                 log("NOT IS emoji!!!");
                                 ((ViewHolderMessageChat)holder).contentContactMessageText.setEmojiconSizeSp(20);
+                                ((ViewHolderMessageChat)holder).contentContactMessageText.setLineSpacing(1,1.0f);
+                            }
+
+                            if(EmojiManager.isOnlyEmojis(messageContent)){
+                                log("IS ONLY emoji!!!");
+                                ((ViewHolderMessageChat)holder).contentContactMessageText.setLineSpacing(1,1.2f);
+                            }
+                            else{
                                 ((ViewHolderMessageChat)holder).contentContactMessageText.setLineSpacing(1,1.0f);
                             }
 
