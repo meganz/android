@@ -2436,8 +2436,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                                     ((ViewHolderMessageChat)holder).contentContactMessageThumbLand.setLayoutParams(contactThumbParams);
                                                     ((ViewHolderMessageChat)holder).contentContactMessageThumbLandFramework.setLayoutParams(contactThumbParams);
                                                     ((ViewHolderMessageChat)holder).contentContactMessageThumbLandFramework.setBackgroundResource(R.drawable.shape_images_chat);
-
-
                                                 }
                                             }
 
@@ -3047,14 +3045,14 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         log("addMessage: "+position);
         this.messages = messages;
         notifyItemInserted(position);
-        if(position==messages.size()-1){
+        if(position==messages.size()){
             log("No need to update more");
         }
         else{
             log("Update until end");
             int itemCount = messages.size()-position;
             log("itemCount: "+itemCount);
-            notifyItemRangeChanged(position, itemCount);
+            notifyItemRangeChanged(position, itemCount+1);
         }
     }
 
@@ -3227,8 +3225,32 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             if(bitmap!=null){
                 log("Update uploading my preview");
 
-                int currentPosition = holder.getAdapterPosition()-1;
-                AndroidMegaChatMessage message = messages.get(currentPosition);
+                int currentPosition = holder.getLayoutPosition();
+                log("currentPosition: "+currentPosition);
+
+                if(currentPosition==-1){
+                    log("The position cannot be recovered - had changed");
+                    for(int i=messages.size()-1;i>=0;i--){
+                        AndroidMegaChatMessage message = messages.get(i);
+                        if(message.isUploading()){
+                            String path = message.getPendingMessage().getFilePaths().get(0);
+                            if(path.equals(holder.filePathUploading)){
+                                currentPosition = i+1;
+                                log("Found current position: "+currentPosition);
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                log("Messages size: "+messages.size());
+
+                if(currentPosition>messages.size()){
+                    log("Position not valid");
+                    return;
+                }
+
+                AndroidMegaChatMessage message = messages.get(currentPosition-1);
                 if(message.getPendingMessage()!=null) {
                     log("State of the message: " + message.getPendingMessage().getState());
 

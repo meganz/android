@@ -23,6 +23,7 @@ import android.graphics.PorterDuff;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.graphics.Shader.TileMode;
+import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -69,6 +70,8 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.animation.TranslateAnimation;
@@ -11649,8 +11652,16 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		else if (requestCode == Constants.TAKE_PHOTO_CODE){
 			log("TAKE_PHOTO_CODE");
 			if(resultCode == Activity.RESULT_OK){
-				Intent intentPicture = new Intent(this, SecureSelfiePreviewActivityLollipop.class);
-				startActivity(intentPicture);
+				String filePath = Environment.getExternalStorageDirectory().getAbsolutePath() +"/"+ Util.temporalPicDIR + "/picture.jpg";
+				File imgFile = new File(filePath);
+
+				String name = Util.getPhotoSyncName(imgFile.lastModified(), imgFile.getAbsolutePath());
+				log("Taken picture Name: "+name);
+				String newPath = Environment.getExternalStorageDirectory().getAbsolutePath() +"/"+ Util.temporalPicDIR + "/"+name;
+				log("----NEW Name: "+newPath);
+				File newFile = new File(newPath);
+				imgFile.renameTo(newFile);
+				showFileChooser(newPath);
 			}
 			else{
 				log("TAKE_PHOTO_CODE--->ERROR!");
@@ -11660,12 +11671,34 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		else if (requestCode == Constants.TAKE_PICTURE_PROFILE_CODE){
 			log("TAKE_PICTURE_PROFILE_CODE");
 			if(resultCode == Activity.RESULT_OK){
-				Intent intentPicture = new Intent(this, SecureSelfiePreviewActivityLollipop.class);
-				intentPicture.putExtra("PICTURE_PROFILE", 1);
-				intentPicture.putExtra("MY_MAIL", myAccountInfo.getMyUser().getEmail());
-				startActivity(intentPicture);
-			}
-			else{
+
+				String myEmail =  myAccountInfo.getMyUser().getEmail();
+				String filePath = Environment.getExternalStorageDirectory().getAbsolutePath() +"/"+ Util.profilePicDIR + "/picture.jpg";;
+				File imgFile = new File(filePath);
+
+				String newPath = null;
+				if (getExternalCacheDir() != null){
+					newPath = getExternalCacheDir().getAbsolutePath() + "/" + myEmail + "Temp.jpg";
+				}else{
+					log("getExternalCacheDir() is NULL");
+					newPath = getCacheDir().getAbsolutePath() + "/" + myEmail + "Temp.jpg";
+				}
+
+				if(newPath!=null) {
+					File newFile = new File(newPath);
+					log("NEW - the destination of the avatar is: " + newPath);
+					if (newFile != null) {
+						MegaUtilsAndroid.createAvatar(imgFile, newFile);
+						megaApi.setAvatar(newFile.getAbsolutePath(), this);
+
+					} else {
+						log("Error new path avatar!!");
+					}
+
+				}else{
+					log("ERROR! Destination PATH is NULL");
+				}
+			}else{
 				log("TAKE_PICTURE_PROFILE_CODE--->ERROR!");
 			}
 
@@ -14708,5 +14741,15 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	public void networkUnavailable() {
 		log("networkUnavailable: network NOT available");
 		showOfflineMode();
+	}
+
+	public void showFileChooser(String imagePath){
+
+		log("showFileChooser: "+imagePath);
+		Intent intent = new Intent(this, FileExplorerActivityLollipop.class);
+		intent.setAction(FileExplorerActivityLollipop.ACTION_UPLOAD_SELFIE);
+		intent.putExtra("IMAGE_PATH", imagePath);
+		startActivity(intent);
+		//finish();
 	}
 }

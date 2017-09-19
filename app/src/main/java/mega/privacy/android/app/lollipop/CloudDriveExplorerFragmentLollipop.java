@@ -440,7 +440,7 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 	public void onClick(View v) {
 		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 		switch(v.getId()){
-			case R.id.action_text:{				
+			case R.id.action_text:{
 				dbH.setLastCloudFolder(Long.toString(parentHandle));
 				if(((FileExplorerActivityLollipop)context).multiselect){
 					log("Send several files to chat");
