@@ -825,7 +825,9 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 					firstTs=-1;
 				}
 				else{
+
 					if (!recentChatsFragmentVisible) {
+						log("NOt recentFragment visible");
 //						if (openChatId != item.getChatId()) {
 //							if (isFirstConnect()) {
 //								log("onChatListItemUpdateMegaApplication. FIRSTCONNECT " + item.getTitle() + "Unread count: " + item.getUnreadCount() + " hasChanged(CHANGE_TYPE_UNREAD_COUNT): " + item.hasChanged(MegaChatListItem.CHANGE_TYPE_UNREAD_COUNT) + " hasChanged(CHANGE_TYPE_LAST_TS):" + item.hasChanged(MegaChatListItem.CHANGE_TYPE_LAST_TS));
