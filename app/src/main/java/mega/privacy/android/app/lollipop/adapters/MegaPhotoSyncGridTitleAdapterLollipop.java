@@ -504,7 +504,6 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
 
                     MegaNode n = megaApi.getNodeByHandle(handle);
                     if (n != null){
-
                         onNodeClick(thisClass, thisClass.getPositionNodes());
                     }
                 }
@@ -1033,6 +1032,7 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
     }
 
     public void onNodeClick(MegaPhotoSyncGridTitleAdapterLollipop.ViewHolderPhotoTitleSyncGridTitle holder, int positionInNodes){
+        log("onNodeClick");
 
         if (!multipleSelect){
             MegaNode n = megaApi.getNodeByHandle(holder.getDocument());
@@ -1126,6 +1126,8 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
             actionMode = ((AppCompatActivity)context).startSupportActionMode(new MegaPhotoSyncGridTitleAdapterLollipop.ActionBarCallBack());
 
             updateActionModeTitle();
+            ((ManagerActivityLollipop)context).changeStatusBarColor(1);
+
             notifyItemChanged(holder.getPositionOnAdapter());
         }
         else{
