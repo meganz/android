@@ -256,7 +256,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 				}
 				case R.id.cab_menu_select_all:{
 					((ManagerActivityLollipop)context).changeStatusBarColor(1);
-
 					selectAll();
 					break;
 				}

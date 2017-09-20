@@ -202,6 +202,7 @@ public class ReceivedRequestsFragmentLollipop extends Fragment {
 		log("hideMultipleSelect");
 		if(adapterList!=null){
 			adapterList.setMultipleSelect(false);
+
 		}
 
 		if (actionMode != null) {
@@ -238,6 +239,7 @@ public class ReceivedRequestsFragmentLollipop extends Fragment {
 			log("nothing, not multiple select");
 		}
 	}
+
 	/////END Multiselect/////
 
 	public static ReceivedRequestsFragmentLollipop newInstance() {
