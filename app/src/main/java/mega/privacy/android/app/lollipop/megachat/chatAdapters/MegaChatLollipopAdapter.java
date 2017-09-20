@@ -28,6 +28,7 @@ import android.text.Spanned;
 import android.text.TextUtils;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.RelativeSizeSpan;
+import android.text.util.Linkify;
 import android.util.DisplayMetrics;
 import android.util.SparseBooleanArray;
 import android.util.TypedValue;
@@ -1525,6 +1526,9 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                             }
 
                             ((ViewHolderMessageChat)holder).contentOwnMessageText.setText(messageContent);
+
+                            ((ViewHolderMessageChat)holder).contentOwnMessageText.setLinksClickable(true);
+                            Linkify.addLinks(((ViewHolderMessageChat)holder).contentOwnMessageText, Linkify.WEB_URLS);
                         }
                         else if(message.getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT){
 
@@ -2246,6 +2250,9 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                             else{
                                 ((ViewHolderMessageChat)holder).contentContactMessageText.setText(messageContent);
                             }
+
+                            ((ViewHolderMessageChat)holder).contentContactMessageText.setLinksClickable(true);
+                            Linkify.addLinks(((ViewHolderMessageChat)holder).contentContactMessageText, Linkify.WEB_URLS);
 
                             ((ViewHolderMessageChat)holder).contentContactMessageText.setTextColor(ContextCompat.getColor(context, R.color.name_my_account));
 
