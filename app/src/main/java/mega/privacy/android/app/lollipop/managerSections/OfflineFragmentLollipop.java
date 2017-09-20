@@ -208,6 +208,8 @@ public class OfflineFragmentLollipop extends Fragment{
 					break;
 				}
 				case R.id.cab_menu_select_all:{
+					((ManagerActivityLollipop)context).changeStatusBarColor(1);
+
 					selectAll();
 					break;
 				}
@@ -850,6 +852,8 @@ public class OfflineFragmentLollipop extends Fragment{
 				List<MegaOffline> selectedNodes = adapter.getSelectedOfflineNodes();
 				if (selectedNodes.size() > 0){
 					updateActionModeTitle();
+					((ManagerActivityLollipop)context).changeStatusBarColor(1);
+
 				}
 			}
 		}
@@ -1119,6 +1123,8 @@ public class OfflineFragmentLollipop extends Fragment{
 	public void hideMultipleSelect() {
 		log("hideMultipleSelect");
 		adapter.setMultipleSelect(false);
+		((ManagerActivityLollipop)context).changeStatusBarColor(2);
+
 		if (actionMode != null) {
 			actionMode.finish();
 		}

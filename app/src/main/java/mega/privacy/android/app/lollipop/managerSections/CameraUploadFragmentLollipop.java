@@ -355,6 +355,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 					break;
 				}
 				case R.id.cab_menu_select_all:{
+					((ManagerActivityLollipop)context).changeStatusBarColor(1);
 					selectAll();
 					break;
 				}
@@ -459,6 +460,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 						}
 					}
 
+
 					if(selected.size() == nodes.size()){
 						menu.findItem(R.id.cab_menu_select_all).setVisible(false);
 						menu.findItem(R.id.cab_menu_unselect_all).setVisible(true);
@@ -472,6 +474,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 					menu.findItem(R.id.cab_menu_select_all).setVisible(true);
 					menu.findItem(R.id.cab_menu_unselect_all).setVisible(false);
 				}
+
 			}
 			else if(adapterGrid!=null){
 				log("GRID onPrepareActionMode");
@@ -1506,7 +1509,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 		
 		PhotoSyncHolder psHPosition = nodesArray.get(position);
-		
+
 		if (isList){
 			log("isList");
 			if (adapterList.isMultipleSelect()){
@@ -1514,7 +1517,8 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 				List<PhotoSyncHolder> documents = adapterList.getSelectedDocuments();
 				if (documents.size() > 0){
 					updateActionModeTitle();
-					adapterList.notifyDataSetChanged();
+                    ((ManagerActivityLollipop)context).changeStatusBarColor(1);
+                    adapterList.notifyDataSetChanged();
 				}
 				else{
 					hideMultipleSelect();
@@ -1693,6 +1697,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 				adapterGrid.setMultipleSelect(false);
 			}
 		}
+		((ManagerActivityLollipop)context).changeStatusBarColor(2);
 
 		if (actionMode != null) {
 			actionMode.finish();
