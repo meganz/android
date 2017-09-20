@@ -1121,6 +1121,7 @@
     <string name="online_status" context="Info label about the status of the user">Online</string>
     <string name="away_status" context="Info label about the status of the user">Away</string>
     <string name="busy_status" context="Info label about the status of the user">Busy</string>
+    <string name="invalid_status" context="Info label about the status of the user">No connection</string>
 
     <string name="text_deleted_message" context="Text shown when a message has been deleted in the chat">This message has been deleted</string>
     <string name="history_cleared_message" context="Text shown when the chat history was cleared by me">Chat history was cleared</string>
