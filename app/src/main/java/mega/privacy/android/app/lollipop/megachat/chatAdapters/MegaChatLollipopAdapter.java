@@ -44,10 +44,12 @@ import android.widget.TextView;
 
 import com.vdurmont.emoji.Emoji;
 import com.vdurmont.emoji.EmojiManager;
+import com.vdurmont.emoji.EmojiParser;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 
@@ -1488,24 +1490,41 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                 ((ViewHolderMessageChat)holder).contentOwnMessageText.setTextColor(ContextCompat.getColor(context, R.color.name_my_account));
                             }
 
-                            if(EmojiManager.isEmoji(messageContent)){
-                                log("IS emoji!!!");
-                                ((ViewHolderMessageChat)holder).contentOwnMessageText.setEmojiconSizeSp(32);
+                            if(EmojiManager.isOnlyEmojis(messageContent)){
+                                log("IS ONLY emoji!!!");
+                                List<String> emojis = EmojiParser.extractEmojis(messageContent);
+                                int size = emojis.size();
+                                log("size of emojis: "+size);
+                                switch (size){
+                                    case 1:{
+                                        ((ViewHolderMessageChat)holder).contentOwnMessageText.setEmojiconSizeSp(35);
+                                        ((ViewHolderMessageChat)holder).contentOwnMessageText.setLineSpacing(1,1.2f);
+                                        break;
+                                    }
+                                    case 2:{
+                                        ((ViewHolderMessageChat)holder).contentOwnMessageText.setEmojiconSizeSp(30);
+                                        ((ViewHolderMessageChat)holder).contentOwnMessageText.setLineSpacing(1,1.2f);
+                                        break;
+                                    }
+                                    case 3:{
+                                        ((ViewHolderMessageChat)holder).contentOwnMessageText.setEmojiconSizeSp(25);
+                                        ((ViewHolderMessageChat)holder).contentOwnMessageText.setLineSpacing(1,1.2f);
+                                        break;
+                                    }
+                                    default:{
+                                        ((ViewHolderMessageChat)holder).contentOwnMessageText.setEmojiconSizeSp(20);
+                                        ((ViewHolderMessageChat)holder).contentOwnMessageText.setLineSpacing(1,1.2f);
+                                        break;
+                                    }
+                                }
                             }
                             else{
+                                log("IS NOT only emoji!!!");
+                                ((ViewHolderMessageChat)holder).contentOwnMessageText.setLineSpacing(1,1.0f);
                                 ((ViewHolderMessageChat)holder).contentOwnMessageText.setEmojiconSizeSp(20);
                             }
 
-                            if(EmojiManager.isOnlyEmojis(messageContent)){
-                                log("IS ONLY emoji!!!");
-                                ((ViewHolderMessageChat)holder).contentOwnMessageText.setLineSpacing(1,1.2f);
-                            }
-                            else{
-                                ((ViewHolderMessageChat)holder).contentOwnMessageText.setLineSpacing(1,1.0f);
-                            }
-
                             ((ViewHolderMessageChat)holder).contentOwnMessageText.setText(messageContent);
-
                         }
                         else if(message.getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT){
 
@@ -2176,23 +2195,39 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                 messageContent = message.getContent();
                             }
 
-                            if(EmojiManager.isEmoji(messageContent)){
-                                log("IS emoji!!!");
-                                ((ViewHolderMessageChat)holder).contentContactMessageText.setEmojiconSizeSp(32);
-                                ((ViewHolderMessageChat)holder).contentContactMessageText.setLineSpacing(1,1.2f);
-                            }
-                            else{
-                                log("NOT IS emoji!!!");
-                                ((ViewHolderMessageChat)holder).contentContactMessageText.setEmojiconSizeSp(20);
-                                ((ViewHolderMessageChat)holder).contentContactMessageText.setLineSpacing(1,1.0f);
-                            }
-
                             if(EmojiManager.isOnlyEmojis(messageContent)){
                                 log("IS ONLY emoji!!!");
-                                ((ViewHolderMessageChat)holder).contentContactMessageText.setLineSpacing(1,1.2f);
+                                List<String> emojis = EmojiParser.extractEmojis(messageContent);
+                                int size = emojis.size();
+                                log("size of emojis: "+size);
+                                switch (size){
+                                    case 1:{
+                                        ((ViewHolderMessageChat)holder).contentContactMessageText.setEmojiconSizeSp(35);
+                                        ((ViewHolderMessageChat)holder).contentContactMessageText.setLineSpacing(1,1.2f);
+                                        break;
+                                    }
+                                    case 2:{
+                                        ((ViewHolderMessageChat)holder).contentContactMessageText.setEmojiconSizeSp(30);
+                                        ((ViewHolderMessageChat)holder).contentContactMessageText.setLineSpacing(1,1.2f);
+                                        break;
+                                    }
+                                    case 3:{
+                                        ((ViewHolderMessageChat)holder).contentContactMessageText.setEmojiconSizeSp(25);
+                                        ((ViewHolderMessageChat)holder).contentContactMessageText.setLineSpacing(1,1.2f);
+                                        break;
+                                    }
+                                    default:{
+                                        ((ViewHolderMessageChat)holder).contentContactMessageText.setEmojiconSizeSp(20);
+                                        ((ViewHolderMessageChat)holder).contentContactMessageText.setLineSpacing(1,1.2f);
+                                        break;
+                                    }
+                                }
+
                             }
                             else{
+                                log("IS NOT only emoji!!!");
                                 ((ViewHolderMessageChat)holder).contentContactMessageText.setLineSpacing(1,1.0f);
+                                ((ViewHolderMessageChat)holder).contentContactMessageText.setEmojiconSizeSp(20);
                             }
 
                             if(chatRoom.isGroup()){
