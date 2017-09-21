@@ -169,6 +169,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     long userTypingTimeStamp = -1;
 //    TextView inviteText;
     ImageButton keyboardButton;
+
     EmojiconEditText textChat;
     ImageButton sendIcon;
     RelativeLayout messagesContainerLayout;
@@ -458,6 +459,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             public boolean onTouch(View v, MotionEvent event) {
 
                 if (emojiKeyboardShown){
+                    keyboardButton.setImageResource(R.drawable.ic_emoticon_white);
 //                    int inputType = textChat.getInputType();
 //                    textChat.setInputType(InputType.TYPE_NULL);
 //                    textChat.onTouchEvent(event);
@@ -1367,6 +1369,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
 
         if (emojiKeyboardShown) {
+            keyboardButton.setImageResource(R.drawable.ic_emoticon_white);
             removeEmojiconFragment();
         }
         else{
@@ -1426,8 +1429,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     textChat.requestFocus();
                     InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                     imm.showSoftInput(textChat, InputMethodManager.SHOW_IMPLICIT);
-                }
-                else{
+                    keyboardButton.setImageResource(R.drawable.ic_emoticon_white);
+
+                } else{
                     InputMethodManager imm = (InputMethodManager) getSystemService(this.INPUT_METHOD_SERVICE);
 
                     if (softKeyboardShown){
@@ -1438,6 +1442,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     else{
                         setEmojiconFragment(false);
                     }
+                    keyboardButton.setImageResource(R.drawable.ic_keyboard_white);
+
                 }
                 break;
             }
@@ -4059,4 +4065,16 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }
         }
     }
+
+   @Override
+    protected void onResume(){
+        log("onResume");
+        super.onResume();
+
+        if (emojiKeyboardShown){
+            keyboardButton.setImageResource(R.drawable.ic_emoticon_white);
+            removeEmojiconFragment();
+        }
+    }
+
 }
