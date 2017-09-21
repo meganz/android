@@ -13,6 +13,10 @@
         android:layout_width="wrap_content"
         android:layout_height="32dp"
         android:layout_centerInParent="true"
+        android:layout_marginLeft="3dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="3dp"
+        android:layout_marginBottom="16dp"
         android:background="@drawable/shape_chip_drawable">
         
         <!--<mega.privacy.android.app.components.RoundedImageView
