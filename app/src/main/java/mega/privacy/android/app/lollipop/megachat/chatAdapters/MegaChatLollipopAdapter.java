@@ -256,7 +256,10 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         RelativeLayout transparentCoatingPortrait;
         ProgressBar uploadingProgressBar;
 
-        RelativeLayout errorUploadingLayout;
+        RelativeLayout errorUploadingPortrait;
+        RelativeLayout errorUploadingLandscape;
+        TextView notSentTextLandscape;
+        TextView notSentTextPortrait;
 
         TextView retryAlert;
         ImageView triangleIcon;
@@ -398,8 +401,17 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.uploadingProgressBar = (ProgressBar) v.findViewById(R.id.uploadingProgressBar);
             holder.uploadingProgressBar.setVisibility(View.GONE);
 
-            holder.errorUploadingLayout = (RelativeLayout) v.findViewById(R.id.error_uploading_relative_layout);
-            holder.errorUploadingLayout.setVisibility(View.GONE);
+            holder.errorUploadingPortrait = (RelativeLayout) v.findViewById(R.id.error_uploading_portrait);
+            holder.errorUploadingPortrait.setVisibility(View.GONE);
+
+            holder.notSentTextPortrait = (TextView) v.findViewById(R.id.not_sent_text_portrait);
+            holder.notSentTextPortrait.setVisibility(View.GONE);
+
+            holder.errorUploadingLandscape = (RelativeLayout) v.findViewById(R.id.error_uploading_landscape);
+            holder.errorUploadingLandscape.setVisibility(View.GONE);
+
+            holder.notSentTextLandscape = (TextView) v.findViewById(R.id.not_sent_text_landscape);
+            holder.notSentTextLandscape.setVisibility(View.GONE);
 
             holder.ownManagementMessageLayout = (RelativeLayout) v.findViewById(R.id.own_management_message_layout);
             //Margins
@@ -615,7 +627,12 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         ((ViewHolderMessageChat) holder).transparentCoatingLandscape.setVisibility(View.GONE);
         ((ViewHolderMessageChat) holder).transparentCoatingPortrait.setVisibility(View.GONE);
         ((ViewHolderMessageChat) holder).uploadingProgressBar.setVisibility(View.GONE);
-        ((ViewHolderMessageChat) holder).errorUploadingLayout.setVisibility(View.GONE);
+        ((ViewHolderMessageChat) holder).errorUploadingPortrait.setVisibility(View.GONE);
+        ((ViewHolderMessageChat) holder).errorUploadingLandscape.setVisibility(View.GONE);
+        ((ViewHolderMessageChat) holder).notSentTextLandscape.setVisibility(View.GONE);
+        ((ViewHolderMessageChat) holder).notSentTextPortrait.setVisibility(View.GONE);
+
+
 
         MegaChatMessage message = messages.get(position-1).getMessage();
         ((ViewHolderMessageChat)holder).userHandle = message.getUserHandle();
@@ -3296,15 +3313,42 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     log("State of the message: " + message.getPendingMessage().getState());
 
                     if (message.getPendingMessage().getState() == PendingMessage.STATE_ERROR) {
-                        holder.transparentCoatingPortrait.setVisibility(View.GONE);
-                        holder.transparentCoatingLandscape.setVisibility(View.GONE);
+                        holder.transparentCoatingPortrait.setVisibility(View.VISIBLE);
+                        holder.transparentCoatingLandscape.setVisibility(View.VISIBLE);
                         holder.uploadingProgressBar.setVisibility(View.GONE);
-                        holder.errorUploadingLayout.setVisibility(View.VISIBLE);
+
+                        if (bitmap.getWidth() < bitmap.getHeight()) {
+                            log("Portrait");
+                            holder.errorUploadingPortrait.setVisibility(View.VISIBLE);
+                            holder.notSentTextPortrait.setVisibility(View.VISIBLE);
+                            holder.errorUploadingLandscape.setVisibility(View.GONE);
+                            holder.notSentTextLandscape.setVisibility(View.GONE);
+                        }else{
+                            log("Landscape");
+                            holder.errorUploadingPortrait.setVisibility(View.GONE);
+                            holder.notSentTextPortrait.setVisibility(View.GONE);
+                            holder.errorUploadingLandscape.setVisibility(View.VISIBLE);
+                            holder.notSentTextLandscape.setVisibility(View.VISIBLE);
+                        }
+
+
+
                     } else {
                         holder.transparentCoatingLandscape.setVisibility(View.VISIBLE);
                         holder.transparentCoatingPortrait.setVisibility(View.VISIBLE);
-                        holder.uploadingProgressBar.setVisibility(View.VISIBLE);
-                        holder.errorUploadingLayout.setVisibility(View.GONE);
+
+                        if(holder.contentOwnMessageFileLayout.isShown()){
+                            holder.uploadingProgressBar.setVisibility(View.GONE);
+
+                        }else{
+                            holder.uploadingProgressBar.setVisibility(View.VISIBLE);
+
+                        }
+                        holder.errorUploadingPortrait.setVisibility(View.GONE);
+                        holder.notSentTextPortrait.setVisibility(View.GONE);
+                        holder.errorUploadingLandscape.setVisibility(View.GONE);
+                        holder.notSentTextLandscape.setVisibility(View.GONE);
+
                     }
 
                     if (bitmap.getWidth() < bitmap.getHeight()) {
@@ -3315,28 +3359,34 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                         holder.contentOwnMessageFileLayout.setVisibility(View.GONE);
                         holder.previewFrameLand.setVisibility(View.GONE);
                         holder.contentOwnMessageThumbLand.setVisibility(View.GONE);
+                        holder.errorUploadingLandscape.setVisibility(View.GONE);
+                        holder.notSentTextLandscape.setVisibility(View.GONE);
 
-                        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) holder.errorUploadingLayout.getLayoutParams();
+
+                        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) holder.errorUploadingPortrait.getLayoutParams();
                         float width = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 152, context.getResources().getDisplayMetrics());
 
                         params.width = (int) width;
-                        log("Preview ImageView width: " + width);
-                        holder.errorUploadingLayout.setLayoutParams(params);
+                        log("Preview (Portrait) ImageView width: " + width);
+                        holder.errorUploadingPortrait.setLayoutParams(params);
+
                     } else {
-                        log("Landscape");
                         holder.contentOwnMessageThumbLand.setImageBitmap(bitmap);
                         holder.previewFrameLand.setVisibility(View.VISIBLE);
                         holder.contentOwnMessageThumbLand.setVisibility(View.VISIBLE);
                         holder.contentOwnMessageFileLayout.setVisibility(View.GONE);
                         holder.previewFramePort.setVisibility(View.GONE);
                         holder.contentOwnMessageThumbPort.setVisibility(View.GONE);
+                        holder.errorUploadingPortrait.setVisibility(View.GONE);
+                        holder.notSentTextPortrait.setVisibility(View.GONE);
 
-                        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) holder.errorUploadingLayout.getLayoutParams();
+
+                        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) holder.errorUploadingLandscape.getLayoutParams();
                         float width = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 212, context.getResources().getDisplayMetrics());
 
                         params.width = (int) width;
-                        log("Preview ImageView width: " + width);
-                        holder.errorUploadingLayout.setLayoutParams(params);
+                        log("Preview (Landscape) ImageView width: " + width);
+                        holder.errorUploadingLandscape.setLayoutParams(params);
                     }
                 }
                 else{
