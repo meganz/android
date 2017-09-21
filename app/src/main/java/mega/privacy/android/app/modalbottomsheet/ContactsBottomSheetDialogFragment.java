@@ -11,12 +11,14 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.BottomSheetDialogFragment;
 import android.support.v4.content.ContextCompat;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -63,9 +65,15 @@ public class ContactsBottomSheetDialogFragment extends BottomSheetDialogFragment
     public LinearLayout optionRemove;
     ImageView contactStateIcon;
 
+    private LinearLayout items_layout;
+
     String fullName="";
 
     DisplayMetrics outMetrics;
+
+    private int height = -1;
+    private boolean heightseted = false;
+    private int heightReal = -1;
 
     MegaApiAndroid megaApi;
     MegaChatApiAndroid megaChatApi;
@@ -119,6 +127,15 @@ public class ContactsBottomSheetDialogFragment extends BottomSheetDialogFragment
         View contentView = View.inflate(getContext(), R.layout.bottom_sheet_contact_item, null);
 
         mainLinearLayout = (LinearLayout) contentView.findViewById(R.id.contact_item_bottom_sheet);
+
+        mainLinearLayout.post(new Runnable() {
+            @Override
+            public void run() {
+                heightReal = mainLinearLayout.getHeight();
+            }
+        });
+
+        items_layout = (LinearLayout) contentView.findViewById(R.id.items_layout_bottom_sheet_contact);
 
         titleNameContactPanel = (TextView) contentView.findViewById(R.id.contact_list_contact_name_text);
         titleMailContactPanel = (TextView) contentView.findViewById(R.id.contact_list_contact_mail_text);
@@ -192,6 +209,53 @@ public class ContactsBottomSheetDialogFragment extends BottomSheetDialogFragment
             dialog.setContentView(contentView);
             mBehavior = BottomSheetBehavior.from((View) mainLinearLayout.getParent());
             mBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+
+            final ContactsBottomSheetDialogFragment thisclass = this;
+
+            mBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
+                @Override
+                public void onStateChanged(@NonNull View bottomSheet, int newState) {
+                    if(newState == BottomSheetBehavior.STATE_HIDDEN){
+                        dismiss();
+                    }
+                }
+
+                @Override
+                public void onSlide(@NonNull View bottomSheet, float slideOffset) {
+                    if(slideOffset> 0 && !heightseted){
+                        if(context instanceof CustomHeight){
+                            height = ((CustomHeight) context).getHeightToPanel(thisclass);
+                        }
+                        if(height != -1 && heightReal != -1){
+                            heightseted = true;
+                            int numSons = 0;
+                            int num = items_layout.getChildCount();
+                            for(int i=0; i<num; i++){
+                                View v = items_layout.getChildAt(i);
+                                if(v.getVisibility() == View.VISIBLE){
+                                    numSons++;
+                                }
+                            }
+//                            if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE && numSons > 3){
+//
+//                                ViewGroup.LayoutParams params = bottomSheet.getLayoutParams();
+//                                params.height = height;
+//                                bottomSheet.setLayoutParams(params);
+//                            }
+//                            else if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT && numSons > 9){
+//                                ViewGroup.LayoutParams params = bottomSheet.getLayoutParams();
+//                                params.height = height;
+//                                bottomSheet.setLayoutParams(params);
+//                            }
+                            if(heightReal > height){
+                                ViewGroup.LayoutParams params = bottomSheet.getLayoutParams();
+                                params.height = height;
+                                bottomSheet.setLayoutParams(params);
+                            }
+                        }
+                    }
+                }
+            });
         }
         else{
             log("Contact NULL");
@@ -398,5 +462,9 @@ public class ContactsBottomSheetDialogFragment extends BottomSheetDialogFragment
 
     private static void log(String log) {
         Util.log("ContactsBottomSheetDialogFragment", log);
+    }
+
+    public interface CustomHeight{
+        int getHeightToPanel(BottomSheetDialogFragment dialog);
     }
 }

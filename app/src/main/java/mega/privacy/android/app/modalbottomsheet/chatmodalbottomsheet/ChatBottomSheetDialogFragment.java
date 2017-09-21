@@ -47,6 +47,7 @@ public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment imp
 
     Context context;
     MegaChatListItem chat = null;
+    long chatId;
 
     private BottomSheetBehavior mBehavior;
 
@@ -63,6 +64,7 @@ public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment imp
     public LinearLayout optionMuteChat;
     public ImageView optionMuteChatIcon;
     public TextView optionMuteChatText;
+
 
     boolean notificationsEnabled;
     ChatItemPreferences chatPrefs;
@@ -85,8 +87,21 @@ public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment imp
             megaChatApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaChatApi();
         }
 
-        if(context instanceof ManagerActivityLollipop){
-            chat = ((ManagerActivityLollipop) context).getSelectedChat();
+        if(savedInstanceState!=null) {
+            log("Bundle is NOT NULL");
+            chatId = savedInstanceState.getLong("chatId", -1);
+            log("Handle of the chat: "+chatId);
+        }
+        else{
+            log("Bundle NULL");
+            if(context instanceof ManagerActivityLollipop){
+                chatId = ((ManagerActivityLollipop) context).selectedChatItemId;
+
+            }
+        }
+
+        if(chatId!=-1){
+            chat = megaChatApi.getChatListItem(chatId);
         }
 
         dbH = DatabaseHandler.getDbHandler(getActivity());
@@ -418,6 +433,14 @@ public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment imp
     public void onAttach(Context context) {
         super.onAttach(context);
         this.context = context;
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState){
+        log("onSaveInstanceState");
+        super.onSaveInstanceState(outState);
+
+        outState.putLong("chatId", chatId);
     }
 
     private static void log(String log) {

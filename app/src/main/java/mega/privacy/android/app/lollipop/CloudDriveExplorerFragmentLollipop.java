@@ -219,22 +219,25 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 		}
 		else{
 			if (parentHandle == -1)
-			{			
+			{
+				//QA Report #6608 - do not remember last folder
 				//Find in the database the last parentHandle
-				if (dbH == null){
-					dbH = DatabaseHandler.getDbHandler(context);
-				}
-				if (dbH != null){
-					prefs = dbH.getPreferences();
-					if (prefs != null) {
-						String lastFolder = prefs.getLastFolderCloud();
-						if(lastFolder != null) {
-							if (lastFolder.compareTo("") != 0){
-								parentHandle = Long.parseLong(lastFolder);
-							}
-						}
-					}
-				}
+//				if (dbH == null){
+//					dbH = DatabaseHandler.getDbHandler(context);
+//				}
+//				if (dbH != null){
+//					prefs = dbH.getPreferences();
+//					if (prefs != null) {
+//
+//						String lastFolder = prefs.getLastFolderCloud();
+//						if(lastFolder != null) {
+//							if (lastFolder.compareTo("") != 0){
+//								parentHandle = Long.parseLong(lastFolder);
+//							}
+//						}
+//					}
+//				}
+				parentHandle = megaApi.getRootNode().getHandle();
 			}
 		}		
 		

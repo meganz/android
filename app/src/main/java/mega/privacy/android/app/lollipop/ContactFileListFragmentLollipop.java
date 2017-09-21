@@ -147,6 +147,20 @@ public class ContactFileListFragmentLollipop extends Fragment{
 					}
 
 					((ContactFileListActivityLollipop) context).showConfirmationLeaveIncomingShare(handleList);
+                    break;
+				}
+                case R.id.cab_menu_trash: {
+                    ArrayList<Long> handleList = new ArrayList<Long>();
+                    for (int i=0;i<documents.size();i++){
+                        handleList.add(documents.get(i).getHandle());
+                    }
+                    ((ContactFileListActivityLollipop)(context)).askConfirmationMoveToRubbish(handleList);
+                    break;
+                }
+				case R.id.cab_menu_rename: {
+					MegaNode aux = documents.get(0);
+					((ContactFileListActivityLollipop) context).showRenameDialog(aux, aux.getName());
+					break;
 				}
 			}
 			return false;
@@ -173,6 +187,7 @@ public class ContactFileListFragmentLollipop extends Fragment{
 			List<MegaNode> selected = adapter.getSelectedNodes();
 			boolean showRename = false;
 			boolean showMove = false;
+			boolean showTrash = false;
 			
 			// Rename
 			if(selected.size() == 1){
@@ -184,7 +199,7 @@ public class ContactFileListFragmentLollipop extends Fragment{
 			if (selected.size() > 0) {
 				if ((megaApi.checkAccess(selected.get(0), MegaShare.ACCESS_FULL).getErrorCode() == MegaError.API_OK) || (megaApi.checkAccess(selected.get(0), MegaShare.ACCESS_READWRITE).getErrorCode() == MegaError.API_OK)) {
 					showMove = true;	
-				}				
+				}
 			}
 			
 			if (selected.size() != 0) {
@@ -209,6 +224,16 @@ public class ContactFileListFragmentLollipop extends Fragment{
 				for(int i=0; i<selected.size();i++)	{
 					if(megaApi.checkMove(selected.get(i), megaApi.getRubbishNode()).getErrorCode() != MegaError.API_OK)	{
 						showMove = false;
+						break;
+					}
+				}
+
+				if(!((ContactFileListActivityLollipop)context).isEmptyParentHandleStack()){
+					showTrash = true;
+				}
+				for(int i=0; i<selected.size(); i++){
+					if((megaApi.checkAccess(selected.get(i), MegaShare.ACCESS_FULL).getErrorCode() != MegaError.API_OK)){
+						showTrash = false;
 						break;
 					}
 				}
@@ -238,7 +263,7 @@ public class ContactFileListFragmentLollipop extends Fragment{
 
 			menu.findItem(R.id.cab_menu_move).setVisible(showMove);
 			menu.findItem(R.id.cab_menu_share_link).setVisible(false);
-			menu.findItem(R.id.cab_menu_trash).setVisible(false);
+			menu.findItem(R.id.cab_menu_trash).setVisible(showTrash);
 
 			return false;
 		}
@@ -664,7 +689,7 @@ public class ContactFileListFragmentLollipop extends Fragment{
 	/*
 	 * Clear all selected items
 	 */
-	private void clearSelections() {
+	public void clearSelections() {
 		if(adapter.isMultipleSelect()){
 			adapter.clearSelections();
 		}

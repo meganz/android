@@ -2,9 +2,9 @@
 <resources>
 
     <string name="app_name" context="Not translate">MEGA</string>
-    <string name="app_version" context="Not translate">3.2.2 (148)</string>
-    <string name="sdk_version" context="Not translate">57a6ee2</string>
-    <string name="karere_version" context="Not translate">3eaeba7</string>
+    <string name="app_version" context="Not translate">3.2.3.1 (153)</string>
+    <string name="sdk_version" context="Not translate">aca5c25</string>
+    <string name="karere_version" context="Not translate">1d28a69</string>
     <!--
     <string name="full_description_text" context="Full description text of the app in the Google Play page of the app">MEGA is a secure cloud storage service that gives you 50 GB free storage space. Unlike other cloud storage providers, your data is encrypted and decrypted by your client devices only and never by us.\nUpload your files from your smartphone or tablet then search, store, download, stream, view, share, rename or delete your files any time, from any device, anywhere. Share folders with your contacts and see their updates in real time.\nThe encryption process means we cannot access or reset your password so you MUST remember it (unless you have your Master Key backed up) or you will lose access to your stored files.\nInside the app you can upgrade your storage space and transfer quota quota with a monthly or yearly subscription.\nPRO LITE subscription: 4.99 € per month or 49.99 € per year gives you 200 GB of storage space and 1 TB of transfer quota per month.\nPRO I subscription: 9.99 € per month or 99.99 € per year gives you 500 GB of storage space and 2 TB of transfer quota per month.\nPRO II subscription: 19.99 € per month or 199.99 € per year gives you 2 TB of storage space and 4 TB of transfer quota per month.\nPRO III subscription: 29.99 € per month or 299.99 € per year gives you 4 TB of storage space and 8 TB of transfer quota per month.\nSubscriptions are renewed automatically for successive subscription periods of the same duration and at the same price as the initial period chosen. To manage your subscriptions, simply click on the Play Store icon on your handset, sign in with your Google ID (if you haven\'t already done so) and then click on the MEGA app. You\'ll be able to manage your subscription there.\nFor more info, please check our website: \n https://mega.nz/mobile_terms.html \n https://mega.nz/mobile_privacy.html \nNew Terms of Service apply effective from 20 February 2016. See https://mega.nz/TermsOfService2016.pdf \n Note: For desktop access to your files Mega needs to use HTML5 compatible browsers to handle our advanced features. We recommend Mozilla Firefox and Google Chrome. However the mobile versions of browsers cannot access the Mega cloud storage system.</string>
     -->
@@ -81,13 +81,13 @@
     <string name="confirmation_add_contact" context="confirmation message before sending an invitation to a contact">Do you want to send an invitation to %s?</string>
     <!--
     <string name="confirmation_remove_multiple_contacts" context="confirmation message before removing mutiple contacts">Remove these %d contacts?</string>
-    -->
+
     <string name="confirmation_move_to_rubbish" context="confirmation message before removing a file">Move to rubbish bin?</string>
     <string name="confirmation_move_to_rubbish_plural" context="confirmation message before removing a file">Move to rubbish bin?</string>
+
     <string name="confirmation_delete_from_mega" context="confirmation message before removing a file">Delete from MEGA?</string>
     <string name="confirmation_leave_share_folder" context="confirmation message before leaving an incoming shared folder">If you leave the folder, you will not be able to see it again</string>
 
-    <!--
     <string name="confirmation_alert" context="confirmation message before removing a file">Please confirm</string>
     -->
 
@@ -195,10 +195,6 @@
     <string name="session_problem" context="if a link to a folder cannot be fetched">Problem of retrieving files from the folder</string>
     -->
 
-    <string name="tour_space_title">MEGA SPACE</string>
-    <string name="tour_speed_title">MEGA SPEED</string>
-    <string name="tour_privacy_title">MEGA PRIVACY</string>
-    <string name="tour_access_title">MEGA ACCESS</string>
     <string name="tour_space_text">Register now and get 50 GB of free space</string>
     <string name="tour_speed_text">Uploads are fast. Quickly share files with everyone</string>
     <string name="tour_privacy_text">Keep all your files safe with MEGA\'s end-to-end encryption</string>
@@ -207,7 +203,7 @@
     <string name="create_account_text" context="button that allows the user to create an account">Create account</string>
     <string name="name_text" context="Name of the user">Name</string>
     <string name="lastname_text" context="Last name of the user">Last Name</string>
-    <string name="tos" context="text placed on the checkbox of acceptation of the Terms of Service">I agree with MEGA\'s Terms of Service</string>
+    <string name="tos" context="text placed on the checkbox of acceptation of the Terms of Service">I agree with MEGA\'s [A]Terms of Service[/A]</string>
     <string name="already_account" context="Does the user already have a MEGA account">Already have an account?</string>
 
     <string name="create_account_no_terms" context="warning dialog">You have to accept our Terms of Service</string>
@@ -520,7 +516,7 @@
     <!--
     <string name="upload_to_other" context="upload to. Then choose a file which is not an Image, an Audio or a Video">Other File</string>
     -->
-    <string name="upload_to_filesystem" context="upload to. Then choose to browse the file system to choose a file">Pick from File System</string>
+    <string name="upload_to_filesystem" context="upload to. Then choose to browse the file system to choose a file">From File System</string>
     <!--
     <string name="upload_select_file_type" context="title of the dialog for choosing if a user wants to upload an image, an audio, a video or a file from the system">Select file type</string>
     -->
@@ -740,7 +736,7 @@
     <string name="settings_about_terms_of_service" context="App means &quot;Application&quot;">Terms of Service</string>
     <string name="settings_about_app_version" context="App means &quot;Application&quot;">App version</string>
     <string name="settings_about_sdk_version" context="Title of the label where the SDK version is shown">MEGA SDK version</string>
-    <string name="settings_about_karere_version" context="Title of the label where the karere version is shown">MEGAchat SDK version</string>
+    <string name="settings_about_karere_version" context="Title of the label where the MEGAchat SDK version is shown">MEGAchat SDK version</string>
     <string name="settings_about_code_link_title" context="Link to the public code of the app">View source code</string>
 
     <string name="january">January</string>
@@ -788,18 +784,18 @@
 
     <string name="sortby_owner_mail" context="category in sort by action">Owner\'s E-mail</string>
     <string name="sortby_name" context="category in sort by action">Name</string>
-    <string name="sortby_name_ascending" context="sort files alphabetically ascending">ascending</string>
-    <string name="sortby_name_descending" context="sort files alphabetically descending">descending</string>
+    <string name="sortby_name_ascending" context="sort files alphabetically ascending">Ascending</string>
+    <string name="sortby_name_descending" context="sort files alphabetically descending">Descending</string>
 
     <string name="sortby_date" context="category in sort by action">Date</string>
     <string name="sortby_creation_date" context="category in sort by action">Creation Date</string>
     <string name="sortby_modification_date" context="category in sort by action">Modification Date</string>
-    <string name="sortby_date_newest" context="sort files by date newest first">newest</string>
-    <string name="sortby_date_oldest" context="sort files by date oldest first">oldest</string>
+    <string name="sortby_date_newest" context="sort files by date newest first">Newest</string>
+    <string name="sortby_date_oldest" context="sort files by date oldest first">Oldest</string>
 
     <string name="sortby_size" context="category in sort by action">Size</string>
-    <string name="sortby_size_largest_first" context="sort files by size largest first">largest</string>
-    <string name="sortby_size_smallest_first" context="sort files by size smallest first">smallest</string>
+    <string name="sortby_size_largest_first" context="sort files by size largest first">Largest</string>
+    <string name="sortby_size_smallest_first" context="sort files by size smallest first">Smallest</string>
 
     <string name="per_month" context="in payments, for example: 4.99€ per month">per month</string>
     <string name="per_year" context="in payments, for example: 49.99€ per year">per year</string>
@@ -917,8 +913,8 @@
 
     <string name="my_account_upgrade_pro" context="Button to upgrade the account to PRO account in My Account Section">Upgrade</string>
     <string name="my_account_upgrade_pro_panel" context="Button to upgrade the account to PRO account in the panel that appears randomly">Upgrade now</string>
-    <string name="get_pro_account" context="Message to promote PRO accounts">Improve your cloud capacity!\nGet more space &amp; transfer quota with a PRO account!</string>
-    <string name="toast_master_key" context="success message when the MasterKey file has been downloaded">The recovery key has been backup into: %1s.\nWhile the file remains in this path, you will find it at the Saved for Offline Section.\nNote: It will be deleted if you log out, please store it in a safe place.</string>
+    <string name="get_pro_account" context="Message to promote PRO accounts">Improve your cloud capacity![A]Get more space &amp; transfer quota with a PRO account!</string>
+    <string name="toast_master_key" context="success message when the MasterKey file has been downloaded">The recovery key has been backup into: %1s.[A]While the file remains in this path, you will find it at the Saved for Offline Section.[A]Note: It will be deleted if you log out, please store it in a safe place.</string>
 
     <!--
     <string name="next_ime_action" context="Action to pass focus to the next field in a form">Next</string>
@@ -956,7 +952,12 @@
     <string name="title_edit_profile_info" context="Title of the Dialog to edit the profile attributes of the user's account">Edit</string>
 
     <string name="title_set_expiry_date" context="Alert Dialog to get link">Set expiry date</string>
-    <string name="subtitle_set_expiry_date" context="Alert Dialog to get link">(PRO ONLY)</string>
+    <string name="title_set_password_protection" context="Title of the dialog to get link with password">Set password protection</string>
+    <string name="subtitle_set_expiry_date" context="Subtitle of the dialog to get link">(PRO ONLY)</string>
+    <string name="set_password_protection_dialog" context="Alert Dialog to get link with password">Set password</string>
+    <string name="hint_set_password_protection_dialog" context="Hint of the dialog to get link with password">Enter password</string>
+    <string name="hint_confirm_password_protection_dialog" context="Hint of the confirmation dialog to get link with password">Confirm password</string>
+    <string name="link_request_status" context="Status text at the beginning of getting a link">Processing...</string>
 
     <string name="edit_link_option" context="Option of the sliding panel to edit the link of a node">Edit link</string>
 
@@ -984,7 +985,7 @@
     </plurals>
 
     <string name="error_incorrect_email_or_password" context="Error message when the credentials to login are incorrect.">Invalid e-mail and/or password. Please try again.</string>
-    <string name="error_account_suspended" context="Error message when trying to login and the account is suspended.">Your account have been suspended due to Terms of Service violations. Please contact to support@mega.co.nz</string>
+    <string name="error_account_suspended" context="Error message when trying to login and the account is suspended.">Your account have been suspended due to Terms of Service violations. Please contact support@mega.nz</string>
     <string name="too_many_attempts_login" context="Error message when to many attempts to login.">Too many attempts to login, please wait for an hour.</string>
     <string name="account_not_validated_login" context="Error message when trying to login to an account not validated.">This account has not been validated yet. Please, check your e-mail.</string>
 
@@ -1010,7 +1011,7 @@
     <string name="limited_bandwith" context="Word to indicate the limited bandwidth of the free accounts">Limited</string>
 
     <string name="section_chat" context="Item of the navigation title for the chat section">Chat BETA</string>
-    <string name="section_chat_with_notification" context="Item of the navigation title for the chat section when there is any unread message"><![CDATA[Chat BETA <font color=\'#ff333a\'>(%1$d)</font>]]></string>
+    <string name="section_chat_with_notification" context="Item of the navigation title for the chat section when there is any unread message">Chat BETA [A](%1$d)[/A]</string>
 
     <string name="tab_archive_chat" context="Title of the archived chats tab. Capital letters">Archive</string>
     <!--
@@ -1030,7 +1031,7 @@
     -->
 
     <string name="recent_chat_empty_invite" context="Message shown when the user has no recent chats">Invite your friends to join you on Chat and enjoy our encrypted platform with privacy and security.</string>
-    <string name="recent_chat_empty_enable_chat" context="Message shown when the user has no recent chats">Enable Chat\nand enjoy our encrypted platform with privacy and security.</string>
+    <string name="recent_chat_empty_enable_chat" context="Message shown when the user has no recent chats">Enable Chat[A]and enjoy our encrypted platform with privacy and security.</string>
 
     <!--
     <string name="videocall_title" context="Title shown in the list of main chat screen for a videocall">Video call</string>
@@ -1078,15 +1079,12 @@
     <string name="number_correctly_invite_contact_request" context="success message when reinviting multiple contacts">%d invite requests sent successfully. </string>
     <string name="number_no_invite_contact_request" context="error message when reinviting multiple contacts">%1$d invite requests successfully sent but %2$d requests were not sent.</string>
 
-    <string name="chat_me_text" context="Word next to own user's message in chat screen">Me</string>
     <string name="chat_me_text_bracket" context="Word next to own user's message in chat screen">%1s (Me)</string>
-    <string name="chat_I_text" context="Word next to own user's message in chat message">I</string>
     <string name="type_message_hint" context="Hint shown in the field to write a message in the chat screen">Type a message</string>
 
     <string name="general_mute" context="button">Mute</string>
     <string name="general_unmute" context="button">Unmute</string>
 
-    <string name="title_properties_contact_notifications_for_chat" context="Title of the section to enable notifications in the Contact Properties screen">Chat notifications</string>
     <string name="title_properties_chat_contact_notifications" context="Title of the section to enable notifications in the Contact Properties screen">Notifications</string>
     <string name="title_properties_chat_contact_message_sound" context="Title of the section to choose the sound of incoming messages in the Contact Properties screen">Message sound</string>
     <string name="title_properties_chat_clear_chat" context="Title of the section to clear the chat content in the Contact Properties screen">Clear chat</string>
@@ -1128,8 +1126,7 @@
 
     <string name="text_deleted_message" context="Text shown when a message has been deleted in the chat">This message has been deleted</string>
     <string name="history_cleared_message" context="Text shown when the chat history was cleared by me">Chat history was cleared</string>
-    <string name="text_deleted_message_by" context="Text shown when a message has been deleted in the chat"><![CDATA[<font color=\'#00BFA5\'>This message has been deleted by </font><font color=\'#060000\'>%1$s</font>]]></string>
-    <string name="history_cleared_by" context="Text shown when the chat history was cleared by someone"><![CDATA[<font color=\'#00BFA5\'>Chat history cleared by </font><font color=\'#060000\'>%1$s</font>]]></string>
+    <string name="text_deleted_message_by" context="Text shown when a message has been deleted in the chat">[A]This message has been deleted by [/A][B]%1$s[/B]</string>
 
     <string name="confirmation_delete_several_messages" context="Confirmation before deleting messages">Remove messages?</string>
     <string name="confirmation_delete_one_message" context="Confirmation before deleting one message">Remove message?</string>
@@ -1169,13 +1166,13 @@
     <string name="number_correctly_add_participant" context="success message when inviting multiple contacts to a group chat">%d participants were correctly invited</string>
     <string name="number_no_add_participant_request" context="error message when inviting multiple contacts to a group chat">%1$d participants were successfully invited but %2$d participants were not invited.</string>
 
-    <string name="message_permissions_changed" context="chat message when the permissions for a user has been changed"><![CDATA[<font color=\'#060000\'>%1$s</font><font color=\'#868686\'> was changed to </font><font color=\'#060000\'>%2$s</font><font color=\'#868686\'> by </font><font color=\'#060000\'>%3$s</font>]]></string>
-    <string name="message_add_participant" formatted="false" context="chat message when a participant was added to a group chat"><![CDATA[<font color=\'#060000\'>%1$s</font><font color=\'#868686\'> was added to this group chat by invitation from </font><font color=\'#060000\'>%2$s</font>]]></string>
-    <string name="message_remove_participant" context="chat message when a participant was removed from a group chat"><![CDATA[<font color=\'#060000\'>%1$s</font><font color=\'#868686\'> was removed from group chat by </font><font color=\'#060000\'>%2$s</font>]]></string>
+    <string name="message_permissions_changed" context="chat message when the permissions for a user has been changed">[A]%1$s[/A][B] was changed to [/B][C]%2$s[/C][D] by [/D][E]%3$s[/E]</string>
+    <string name="message_add_participant" formatted="false" context="chat message when a participant was added to a group chat">[A]%1$s[/A][B] joined the group chat by invitation from [/B][C]%2$s[/C]</string>
+    <string name="message_remove_participant" context="chat message when a participant was removed from a group chat">[A]%1$s[/A][B] was removed from group chat by [/B][C]%2$s[/C]</string>
 
-    <string name="change_title_messages" context="Message shown when a participant change the title of a group chat."><![CDATA[<font color=\'#060000\'>%1$s</font><font color=\'#868686\'> changed the group chat name to </font><font color=\'#060000\'>\"%2$s\"</font>]]></string>
+    <string name="change_title_messages" context="Message shown when a participant change the title of a group chat.">[A]%1$s[/A][B] changed the group chat name to [/B][C]\"%2$s\"[/C]</string>
 
-    <string name="message_participant_left_group_chat" context="chat message when a participant left a group chat"><![CDATA[<font color=\'#060000\'>%1$s</font><font color=\'#868686\'> left the group chat</font>]]></string>
+    <string name="message_participant_left_group_chat" context="chat message when a participant left a group chat">[A]%1$s[/A][B] left the group chat[/B]</string>
 
     <string name="manual_retry_alert" context="chat message alert when the message have to been manually">Message not sent. Tap for options</string>
 
@@ -1264,11 +1261,11 @@
     <string name="no_conversation_history" context="message shown when a chat has no messages">No conversation history</string>
 
     <plurals name="user_typing" context="title of confirmation alert before removing a contact">
-        <item context="Singular" quantity="one">is typing...</item>
-        <item context="Plural" quantity="other">are typing...</item>
+        <item context="Singular" quantity="one">%1$s [A]is typing...[/A]</item>
+        <item context="Plural" quantity="other">%1$s [A]are typing...[/A]</item>
     </plurals>
 
-    <string name="more_users_typing" context="Title of the general tab in My Account Section">more are typing...</string>
+    <string name="more_users_typing" context="text that appear when there are more than 2 people writing at that time in a chat. For example User1, user2 and more are typing...">%1$s [A]and more are typing...[/A]</string>
 
     <string name="tab_my_account_general" context="Title of the general tab in My Account Section">General</string>
     <string name="tab_my_account_storage" context="Title of the storage tab in My Account Section">Storage</string>
@@ -1282,7 +1279,7 @@
 
     <string name="no_bylling_cycle" context="Label in section the storage tab when the account is Free">No billing cycle</string>
 
-    <string name="my_account_of_string" context="String to show the transfer quota and the used space in My Account section"><![CDATA[%1$s <font color=\'#777777\'>of %2$s</font>]]></string>
+    <string name="my_account_of_string" context="String to show the transfer quota and the used space in My Account section">%1$s [A]of %2$s[/A]</string>
 
     <string name="confirmation_delete_from_save_for_offline" context="confirmation message before removing a something for the Save for offline section">Remove from Save for offline?</string>
 
@@ -1487,7 +1484,7 @@
 
     <string name="confirmation_delete_one_attachment" context="Confirmation before deleting one attachment">Remove attachment?</string>
 
-    <string name="general_view_with_revoke" formatted="false" context="Menu option">View files (%1d deleted)</string>
+    <string name="general_view_with_revoke" formatted="false" context="Menu option">View files (%1$d deleted)</string>
 
     <string name="error_attaching_node_from_cloud" context="Error message when the attachment cannot be sent">Error. The file has not been sent</string>
     <string name="error_revoking_node" context="Error message when the attachment cannot be revoked">Error. The attachment has not been removed</string>
@@ -1500,5 +1497,30 @@
     <string name="incoming_folder_notification" context="part of the string in incoming shared folder notification">from</string>
     <string name="title_incoming_folder_notification" context="title of incoming shared folder notification">New shared folder</string>
     <string name="title_contact_request_notification" context="title of contact request notification">New contact request</string>
+
+    <string name="tour_space_title">Mega Space</string>
+    <string name="tour_speed_title">Mega Speed</string>
+    <string name="tour_privacy_title">Mega Privacy</string>
+    <string name="tour_access_title">Mega Access</string>
+
+    <string name="title_properties_chat_clear" context="Title of the section to clear the chat content in the Contact Properties screen">Clear chat history</string>
+    <string name="title_properties_remove_contact" context="Title of the section to remove contact in the Contact Properties screen">Remove contact</string>
+
+    <string name="title_properties_chat_notifications_contact" context="Title of the section to enable notifications in the Contact Properties screen">Chat notifications</string>
+    <string name="history_cleared_by" context="Text shown when the chat history was cleared by someone">[A]%1$s[/A][B] cleared the chat history[/B]</string>
+
+    <string name="number_messages_chat_notification" formatted="false" context="messages string in chat notification">%1$d unread chats</string>
+
+    <string name="context_permissions_changing_folder" context="Item menu option upon clicking on one or multiple files.">Changing permissions</string>
+    <string name="context_removing_contact_folder" context="Item menu option upon clicking on one or multiple files.">Removing contact from shared folder</string>
+
+    <string name="confirmation_move_to_rubbish" context="confirmation message before removing a file">Move to rubbish bin?</string>
+    <string name="confirmation_move_to_rubbish_plural" context="confirmation message before removing a file">Move to rubbish bin?</string>
+    <string name="confirmation_leave_share_folder" context="confirmation message before leaving an incoming shared folder">If you leave the folder, you will not be able to see it again</string>
+    <string name="attachment_uploading_state">Uploading...</string>
+
+    <string name="title_properties_contact_notifications_for_chat" context="Title of the section to enable notifications in the Contact Properties screen">Chat notifications</string>
+    <string name="confirmation_delete_from_mega" context="confirmation message before removing a file">Remove from MEGA?</string>
+
 
 </resources>
