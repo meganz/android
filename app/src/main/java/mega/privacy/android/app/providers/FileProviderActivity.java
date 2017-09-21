@@ -132,7 +132,6 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 	ScrollView scrollView;
 	TextView newToMega;
 	LinearLayout loginLogin;
-	View loginDelimiter;
 	LinearLayout loginCreateAccount;
 	LinearLayout loginLoggingIn;
 	TextView queryingSignupLinkText;
@@ -259,7 +258,6 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 				scrollView.setBackgroundColor(getResources().getColor(R.color.background_create_account));
 			}
 			loginCreateAccount.setVisibility(View.INVISIBLE);
-			loginDelimiter.setVisibility(View.VISIBLE);
 			loginLoggingIn.setVisibility(View.GONE);
 			generatingKeysText.setVisibility(View.GONE);
 			loggingInText.setVisibility(View.GONE);
@@ -293,7 +291,6 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 				if (!MegaApplication.isLoggingIn()){
 					MegaApplication.setLoggingIn(true);
 					loginLogin.setVisibility(View.GONE);
-					loginDelimiter.setVisibility(View.GONE);
 					loginCreateAccount.setVisibility(View.GONE);
 					queryingSignupLinkText.setVisibility(View.GONE);
 					confirmingAccountText.setVisibility(View.GONE);
@@ -560,7 +557,6 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 		
 		bLoginLol.setOnClickListener(this);
 		
-		loginDelimiter = (View) findViewById(R.id.login_delimiter);
 		loginCreateAccount = (LinearLayout) findViewById(R.id.login_create_account_layout);
 		loginCreateAccount.setVisibility(View.INVISIBLE);
 		
@@ -867,7 +863,6 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 			if(scrollView!=null){
 				scrollView.setBackgroundColor(getResources().getColor(R.color.background_create_account));
 			}
-			loginDelimiter.setVisibility(View.VISIBLE);
 			loginCreateAccount.setVisibility(View.INVISIBLE);
 			queryingSignupLinkText.setVisibility(View.GONE);
 			confirmingAccountText.setVisibility(View.GONE);
@@ -884,7 +879,6 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 		}
 		
 		loginLogin.setVisibility(View.GONE);
-		loginDelimiter.setVisibility(View.GONE);
 		loginCreateAccount.setVisibility(View.GONE);
 		loginLoggingIn.setVisibility(View.VISIBLE);
 		if(scrollView!=null){
@@ -971,7 +965,6 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 			if(scrollView!=null){
 				scrollView.setBackgroundColor(getResources().getColor(R.color.background_create_account));
 			}
-			loginDelimiter.setVisibility(View.VISIBLE);
 			loginCreateAccount.setVisibility(View.INVISIBLE);
 			queryingSignupLinkText.setVisibility(View.GONE);
 			confirmingAccountText.setVisibility(View.GONE);
@@ -1055,7 +1048,7 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 	public void onRequestStart(MegaApiJava api, MegaRequest request) {
 		log("onRequestStart");
 	}
-	
+
 	String gSession = null;
 	UserCredentials credentials = null;
 
@@ -1081,7 +1074,7 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 		if (request.getType() == MegaRequest.TYPE_LOGIN){
 			log("REQUEST LOGIN");
 
-			try { 
+			try {
 				statusDialog.dismiss();	
 			} 
 			catch (Exception ex) {}
@@ -1112,7 +1105,6 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 				if(scrollView!=null){
 					scrollView.setBackgroundColor(getResources().getColor(R.color.background_create_account));
 				}
-				loginDelimiter.setVisibility(View.VISIBLE);
 				loginCreateAccount.setVisibility(View.INVISIBLE);
 				queryingSignupLinkText.setVisibility(View.GONE);
 				confirmingAccountText.setVisibility(View.GONE);
@@ -1170,7 +1162,6 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 				if(scrollView!=null){
 					scrollView.setBackgroundColor(getResources().getColor(R.color.background_create_account));
 				}
-				loginDelimiter.setVisibility(View.VISIBLE);
 				loginCreateAccount.setVisibility(View.INVISIBLE);
 				generatingKeysText.setVisibility(View.GONE);
 				loggingInText.setVisibility(View.GONE);

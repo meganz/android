@@ -89,8 +89,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 
 	MegaApiAndroid megaApi;
 
-    View separator;
-
 	RelativeLayout transfersOverViewLayout;
 	TextView transfersTitleText;
 	TextView transfersNumberText;
@@ -522,7 +520,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			log("After consulting... the parent keeps -1 or ROOTNODE: "+parentHandle);
 
 			if(aB!=null){
-				aB.setTitle(getString(R.string.section_cloud_drive));
+				//aB.setTitle(getString(R.string.section_cloud_drive));
 				log("indicator_menu_white_435");
 				aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 				((ManagerActivityLollipop)context).setFirstNavigationLevel(true);
@@ -572,7 +570,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			emptyTextView = (TextView) v.findViewById(R.id.file_list_empty_text);
 			contentTextLayout = (RelativeLayout) v.findViewById(R.id.content_text_layout);
 			contentText = (TextView) v.findViewById(R.id.content_text);
-            separator = v.findViewById(R.id.separator_file_browser);
 
 			transfersOverViewLayout = (RelativeLayout) v.findViewById(R.id.transfers_overview_item_layout);
 			transfersTitleText = (TextView) v.findViewById(R.id.transfers_overview_title);
@@ -696,7 +693,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			if(pendingTransfers>0){
 				log("Transfers in progress");
 				contentTextLayout.setVisibility(View.GONE);
-				separator.setVisibility(View.GONE);
 				transfersOverViewLayout.setVisibility(View.VISIBLE);
 				dotsOptionsTransfers.setOnClickListener(this);
 				playButton.setOnClickListener(this);
@@ -727,7 +723,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			else{
 				log("NO TRANSFERS in progress");
 				contentTextLayout.setVisibility(View.VISIBLE);
-				separator.setVisibility(View.VISIBLE);
 				transfersOverViewLayout.setVisibility(View.GONE);
 				dotsOptionsTransfers.setOnClickListener(null);
 				playButton.setOnClickListener(null);

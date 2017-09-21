@@ -37,34 +37,34 @@ import nz.mega.sdk.MegaShare;
 
 public class ContactFileListBottomSheetDialogFragment extends BottomSheetDialogFragment implements View.OnClickListener {
 
-    Context context;
-    MegaNode node = null;
-    NodeController nC;
+    private Context context;
+    private MegaNode node = null;
+    private NodeController nC;
 
     private BottomSheetBehavior mBehavior;
 
-    LinearLayout mainLinearLayout;
-    ImageView nodeThumb;
-    TextView nodeName;
-    TextView nodeInfo;
-    RelativeLayout nodeIconLayout;
-    ImageView nodeIcon;
-    LinearLayout optionDownload;
-    LinearLayout optionInfo;
-    TextView optionInfoText;
-    ImageView optionInfoImage;
-    LinearLayout optionLeave;
-    LinearLayout optionCopy;
-    LinearLayout optionMove;
-    LinearLayout optionRename;
-    LinearLayout optionRubbish;
+    private LinearLayout mainLinearLayout;
+    private ImageView nodeThumb;
+    private TextView nodeName;
+    private TextView nodeInfo;
+    private RelativeLayout nodeIconLayout;
+    private ImageView nodeIcon;
+    private LinearLayout optionDownload;
+    private LinearLayout optionInfo;
+    private TextView optionInfoText;
+    private ImageView optionInfoImage;
+    private LinearLayout optionLeave;
+    private LinearLayout optionCopy;
+    private LinearLayout optionMove;
+    private LinearLayout optionRename;
+    private LinearLayout optionRubbish;
 
-    DisplayMetrics outMetrics;
+    private DisplayMetrics outMetrics;
 
-    Bitmap thumb = null;
+    private Bitmap thumb = null;
 
-    MegaApiAndroid megaApi;
-    DatabaseHandler dbH;
+    private MegaApiAndroid megaApi;
+    private DatabaseHandler dbH;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
