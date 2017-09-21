@@ -28,6 +28,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
+
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 
@@ -35,7 +38,9 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
+import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
+import nz.mega.sdk.MegaAchievementsDetails;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
 
@@ -57,6 +62,8 @@ public class InviteFriendsFragment extends Fragment implements OnClickListener{
 	Button inviteButton;
 	private RelativeLayout emailErrorLayout;
 	private Drawable editTextBackground;
+
+	TextView titleCard;
 
 	ArrayList<String> mails;
 	
@@ -104,6 +111,13 @@ public class InviteFriendsFragment extends Fragment implements OnClickListener{
 
 		inviteButton = (Button)v.findViewById(R.id.invite_button);
 		inviteButton.setBackgroundColor(ContextCompat.getColor(context, R.color.invite_button_deactivated));
+
+		titleCard = (TextView) v.findViewById(R.id.title_card_invite_fragment);
+
+		long referralsStorageValue = ((AchievementsActivity)context).megaAchievements.getClassStorage(MegaAchievementsDetails.MEGA_ACHIEVEMENT_INVITE);
+		long referralsTransferValue = ((AchievementsActivity)context).megaAchievements.getClassTransfer(MegaAchievementsDetails.MEGA_ACHIEVEMENT_INVITE);
+
+		titleCard.setText(getString(R.string.figures_achievements_text_referrals, Util.getSizeString(referralsStorageValue), Util.getSizeString(referralsTransferValue)));
 
 		editTextMail = (EditText) v.findViewById(R.id.edit_text_invite_mail);
 		editTextBackground = editTextMail.getBackground().mutate().getConstantState().newDrawable();
@@ -264,7 +278,7 @@ public class InviteFriendsFragment extends Fragment implements OnClickListener{
 		log("onBackPressed");
 		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
-
+		((AchievementsActivity) context).showFragment(Constants.ACHIEVEMENTS_FRAGMENT, -1);
 		return 0;
 	}
 

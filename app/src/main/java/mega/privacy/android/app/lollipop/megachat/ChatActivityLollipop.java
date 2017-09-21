@@ -783,9 +783,17 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             log("This user is busy");
             aB.setSubtitle(getString(R.string.busy_status));
         }
+        else if(state == MegaChatApi.STATUS_OFFLINE){
+            log("This user is offline");
+            aB.setSubtitle(getString(R.string.offline_status));
+        }
+        else if(state == MegaChatApi.STATUS_INVALID){
+            log("INVALID status: "+state);
+            aB.setSubtitle(getString(R.string.invalid_status));
+        }
         else{
             log("This user status is: "+state);
-            aB.setSubtitle(getString(R.string.offline_status));
+            aB.setSubtitle(getString(R.string.invalid_status));
         }
     }
 

@@ -26,11 +26,10 @@
             android:src="@drawable/ic_invite_friends_big"/>
 
         <TextView
-            android:id="@+id/title_card"
+            android:id="@+id/title_card_invite_fragment"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
-            android:text="@string/title_main_card_achievements"
             android:layout_marginTop="24dp"
             android:layout_marginRight="24dp"
             android:layout_marginLeft="24dp"

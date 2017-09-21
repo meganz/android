@@ -576,9 +576,14 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 			case R.id.my_account_achievements_layout:{
 				log("Show achievements");
 
-				Intent intent = new Intent(context, AchievementsActivity.class);
+				if(!Util.isOnline(context)){
+					((ManagerActivityLollipop)context).showSnackbar(getString(R.string.error_server_connection_problem));
+				}
+				else{
+					Intent intent = new Intent(context, AchievementsActivity.class);
 //				intent.putExtra("orderGetChildren", orderGetChildren);
-				startActivity(intent);
+					startActivity(intent);
+				}
 				break;
 			}
 		}

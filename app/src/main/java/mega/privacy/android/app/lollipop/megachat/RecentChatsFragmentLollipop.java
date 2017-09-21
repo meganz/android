@@ -832,6 +832,10 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
                         aB.setSubtitle(getString(R.string.offline_status));
                         break;
                     }
+                    case MegaChatApi.STATUS_INVALID:{
+                        aB.setSubtitle(getString(R.string.invalid_status));
+                        break;
+                    }
                     default:{
 
                         if(!Util.isOnline(context)){
