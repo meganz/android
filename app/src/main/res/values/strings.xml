@@ -1526,7 +1526,9 @@
 
     <string name="button_invite_friends" context="button to invite friends for getting achievements">Invite friends</string>
 
-    <string name="title_main_card_achievements" context="title of the introduction for the achievements screen">Get 10GB of storage and 20GB of transfers for each referral</string>
+    <string name="figures_achievements_text_referrals" context="title of the introduction for the achievements screen">Get %1$s of storage and %2$s of transfers for each referral</string>
+
+    <string name="figures_achievements_text" context="sentence to detail the figures of storage and transfer quota related to each achievement">Get %1$s of storage and %2$s of transfers</string>
 
     <string name="unlocked_rewards_title" context="title of the section for unlocked rewards">Unlocked rewards</string>
 
@@ -1555,4 +1557,7 @@
     <string name="paragraph_confirmation_invite_friends" context="paragraph of the dialog to confirm the contact request">Encourage your friends to register and install a MEGA app. As long as your friend uses the same email address as you\'ve entered, you will receive your free GB of transfer quota.</string>
 
     <string name="invalid_email_to_invite" context="Error shown when the user writes a email with an incorrect format">Email is malformed</string>
-</resources>
+
+    <string name="string_test" context="Error shown when the user writes a email with an incorrect format">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</string>
+
+    </resources>
