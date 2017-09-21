@@ -9,9 +9,11 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
@@ -23,6 +25,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
@@ -34,6 +37,8 @@ import java.util.ArrayList;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
+import mega.privacy.android.app.components.flowlayoutmanager.Alignment;
+import mega.privacy.android.app.components.flowlayoutmanager.FlowLayoutManager;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -50,7 +55,10 @@ public class InviteFriendsFragment extends Fragment implements OnClickListener{
 	RelativeLayout parentRelativeLayout;
 	RecyclerView recyclerView;
 //	StaggeredGridLayoutManager mLayoutManager;
-	LinearLayoutManager mLayoutManager;
+//	private StaggeredGridLayoutManager gaggeredGridLayoutManager;
+
+//	LinearLayoutManager mLayoutManager;
+	FlowLayoutManager mLayoutManager;
 	MegaInviteFriendsAdapter adapter;
 	EditText editTextMail;
 	LinearLayout linearLayoutCard;
@@ -96,12 +104,29 @@ public class InviteFriendsFragment extends Fragment implements OnClickListener{
 
 		View v = inflater.inflate(R.layout.fragment_invite_friends, container, false);
 		recyclerView = (RecyclerView) v.findViewById(R.id.invite_friends_recycler_view);
+
+		//recyclerView.setHasFixedSize(true);
+		//mLayoutManager = new LinearLayoutManager(context);
+
 //		mLayoutManager = new StaggeredGridLayoutManager(3,StaggeredGridLayoutManager.VERTICAL);
 //		mLayoutManager.setGapStrategy(StaggeredGridLayoutManager.GAP_HANDLING_MOVE_ITEMS_BETWEEN_SPANS);
-		mLayoutManager = new LinearLayoutManager(context);
+//		mLayoutManager = new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL,false);
+		//gaggeredGridLayoutManager = new StaggeredGridLayoutManager(3, 1);
+	//	StaggeredGridLayoutManager lmStaggeredVertical = new StaggeredGridLayoutManager(5, StaggeredGridLayoutManager.HORIZONTAL);
+	//	recyclerView.setLayoutManager(lmStaggeredVertical);
+		//recyclerView.setLayoutManager(new FlowLayoutManager().setAlignment(Alignment.LEFT));
+
+		mLayoutManager = new FlowLayoutManager().setAlignment(Alignment.LEFT);
+
 		recyclerView.setLayoutManager(mLayoutManager);
 		recyclerView.setItemAnimator(new DefaultItemAnimator());
 
+//		recyclerView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+//			@Override
+//			public void onGlobalLayout() {
+//				calculateSwipeRefreshFullHeight();
+//			}
+//		});
 		inviteButton = (Button)v.findViewById(R.id.invite_button);
 		inviteButton.setBackgroundColor(ContextCompat.getColor(context, R.color.invite_button_deactivated));
 
@@ -154,7 +179,6 @@ public class InviteFriendsFragment extends Fragment implements OnClickListener{
 		}
 
 		recyclerView.setAdapter(adapter);
-
 		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
 		return v;
@@ -271,4 +295,17 @@ public class InviteFriendsFragment extends Fragment implements OnClickListener{
 	public static void log(String log) {
 		Util.log("InviteFriendsFragment", log);
 	}
+
+
+
+//	protected void calculateSwipeRefreshFullHeight() {
+//		int height = 0;
+//		for (int idx = 0; idx < recyclerView.getChildCount(); idx++ ) {
+//			View v = recyclerView.getChildAt(idx);
+//			height += v.getHeight();
+//		}
+//		SwipeRefreshLayout.LayoutParams params = recyclerView.getLayoutParams();
+//		params.height = height;
+//		recyclerView.setLayoutParams(params);
+//	}
 }

@@ -121,16 +121,20 @@
 
                 <RelativeLayout
                     android:id="@+id/recycler_layout_invite_friends"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="-6dp"
-                    android:layout_marginRight="-6dp">
+                    android:layout_marginLeft="6dp"
+                    android:layout_marginRight="6dp">
 
-                    <android.support.v7.widget.RecyclerView
-                        android:id="@+id/invite_friends_recycler_view"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:choiceMode="multipleChoice"/>
+                        <android.support.v7.widget.RecyclerView
+                            android:id="@+id/invite_friends_recycler_view"
+                            android:layout_width="match_parent"
+                            android:layout_height="200dp"
+                            android:choiceMode="multipleChoice"
+                            android:background="@color/green_free_account"/>
+
+
+
                 </RelativeLayout>
 
                 <EditText
