@@ -175,7 +175,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 //					holder.imageButtonThreeDots.setVisibility(View.GONE);
 					holder.imageButtonThreeDots.setVisibility(View.VISIBLE);
 					holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.new_multiselect_color));
-					holder.imageView.setImageResource(R.drawable.ic_multiselect);
+					holder.imageView.setImageResource(R.drawable.ic_select_avatar);
 					holder.contactInitialLetter.setVisibility(View.GONE);
 				}
 				else{
@@ -215,7 +215,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 				if(this.isItemChecked(position)){
 //					holder.imageButtonThreeDots.setVisibility(View.GONE);
 					holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.new_multiselect_color));
-					holder.imageView.setImageResource(R.drawable.ic_multiselect);
+					holder.imageView.setImageResource(R.drawable.ic_select_avatar);
 
 					holder.contactInitialLetter.setVisibility(View.GONE);
 				}

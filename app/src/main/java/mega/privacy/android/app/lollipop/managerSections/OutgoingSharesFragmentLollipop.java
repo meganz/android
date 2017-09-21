@@ -582,7 +582,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 		adapter.setParentHandle(parentHandle);
 		nodes = megaApi.getChildren(n, orderGetChildren);
 		adapter.setNodes(nodes);
-		
+
 		//If folder has no files
 		if (adapter.getItemCount() == 0){
 			recyclerView.setVisibility(View.GONE);
@@ -615,7 +615,22 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 			log("adapter != null");
 			adapter.setParentHandle(-1);
 			adapter.setNodes(nodes);
+
+			if (adapter.getItemCount() == 0){
+				log("adapter.getItemCount() = 0");
+				recyclerView.setVisibility(View.GONE);
+				emptyImageView.setVisibility(View.VISIBLE);
+				emptyTextView.setVisibility(View.VISIBLE);
+			}
+			else{
+				log("adapter.getItemCount() != 0");
+				recyclerView.setVisibility(View.VISIBLE);
+				emptyImageView.setVisibility(View.GONE);
+				emptyTextView.setVisibility(View.GONE);
+			}
+			contentText.setText(MegaApiUtils.getInfoNodeOnlyFolders(nodes, context));
 		}
+
 		((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 	}
 		

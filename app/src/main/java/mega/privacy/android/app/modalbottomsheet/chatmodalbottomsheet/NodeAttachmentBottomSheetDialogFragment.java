@@ -76,7 +76,6 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
     LinearLayout optionDownload;
     LinearLayout optionImport;
     LinearLayout optionSaveOffline;
-    LinearLayout optionRevoke;
 
     DisplayMetrics outMetrics;
 
@@ -158,13 +157,11 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
         optionDownload = (LinearLayout) contentView.findViewById(R.id.option_download_layout);
         optionView = (LinearLayout) contentView.findViewById(R.id.option_view_layout);
         optionViewText = (TextView) contentView.findViewById(R.id.option_view_text);
-        optionRevoke = (LinearLayout) contentView.findViewById(R.id.option_revoke_layout);
         optionSaveOffline = (LinearLayout) contentView.findViewById(R.id.option_save_offline_layout);
         optionImport = (LinearLayout) contentView.findViewById(R.id.option_import_layout);
 
         optionDownload.setOnClickListener(this);
         optionView.setOnClickListener(this);
-        optionRevoke.setOnClickListener(this);
         optionSaveOffline.setOnClickListener(this);
         optionImport.setOnClickListener(this);
 
@@ -305,13 +302,6 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
                     optionView.setVisibility(View.GONE);
                 }
 
-                if(message.getMessage().getUserHandle()==megaChatApi.getMyUserHandle()){
-                    optionRevoke.setVisibility(View.VISIBLE);
-                }
-                else{
-                    optionRevoke.setVisibility(View.GONE);
-                }
-
                 dialog.setContentView(contentView);
 
                 mBehavior = BottomSheetBehavior.from((View) contentView.getParent());
@@ -396,22 +386,6 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
                 }
                 else if(context instanceof NodeAttachmentActivityLollipop){
                     chatC.saveForOffline(((NodeAttachmentActivityLollipop) context).selectedNode);
-                }
-
-                break;
-            }
-            case R.id.option_revoke_layout:{
-                log("Revoke option");
-                if(node==null){
-                    log("The selected node is NULL");
-                    return;
-                }
-
-                if(context instanceof ChatActivityLollipop){
-                    ((ChatActivityLollipop)context).showConfirmationDeleteMessage(messageId, chatId);
-                }
-                else if(context instanceof NodeAttachmentActivityLollipop){
-                    ((NodeAttachmentActivityLollipop)context).showConfirmationDeleteNode(chatId, ((NodeAttachmentActivityLollipop) context).selectedNode.getHandle());
                 }
 
                 break;
