@@ -75,7 +75,13 @@ public class CopyrightFragmentLollipop extends Fragment implements View.OnClickL
         View v = inflater.inflate(R.layout.fragment_copyright, container, false);
 
         agreeButton = (Button) v.findViewById(R.id.agree_button);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            agreeButton.setBackground(ContextCompat.getDrawable(context, R.drawable.ripple_upgrade));
+        }
         disagreeButton = (Button) v.findViewById(R.id.disagree_button);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            disagreeButton.setBackground(ContextCompat.getDrawable(context, R.drawable.ripple_upgrade));
+        }
 
         agreeButton.setOnClickListener(this);
         disagreeButton.setOnClickListener(this);
