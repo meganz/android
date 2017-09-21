@@ -472,6 +472,7 @@ public class AchievementsFragment extends Fragment implements OnClickListener{
 
 				}
 				else{
+					daysLeftInstallAppText.setBackground(ContextCompat.getDrawable(context, R.drawable.expired_border));
 					figuresInstallAppLayout.setAlpha(0.5f);
 					installAppIcon.setAlpha(0.5f);
 					daysLeftInstallAppText.setText(context.getResources().getString(R.string.expired_achievement));
@@ -530,6 +531,7 @@ public class AchievementsFragment extends Fragment implements OnClickListener{
 					log("After desktop install: storage: "+Util.getSizeString(totalStorage)+" transfer "+Util.getSizeString(totalTransfer));
 				}
 				else{
+                    daysLeftInstallDesktopText.setBackground(ContextCompat.getDrawable(context, R.drawable.expired_border));
 					figuresInstallDesktopLayout.setAlpha(0.5f);
 					installDesktopIcon.setAlpha(0.5f);
 					daysLeftInstallDesktopText.setText(context.getResources().getString(R.string.expired_achievement));
@@ -583,6 +585,7 @@ public class AchievementsFragment extends Fragment implements OnClickListener{
 					log("After desktop install: storage: "+totalStorage+" transfer "+totalTransfer);
 				}
 				else{
+                    daysLeftRegistrationText.setBackground(ContextCompat.getDrawable(context, R.drawable.expired_border));
 					figuresRegistrationLayout.setAlpha(0.5f);
 					registrationIcon.setAlpha(0.5f);
 					daysLeftRegistrationText.setText(context.getResources().getString(R.string.expired_achievement));
