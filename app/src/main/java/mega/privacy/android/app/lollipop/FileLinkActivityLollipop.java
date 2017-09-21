@@ -399,7 +399,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 	}
 
 	public static void log(String message) {
-		Util.log("OpenPasswordLinkActivity", message);
+		Util.log("FileLinkActivityLollipop", message);
 	}
 
 	@Override
