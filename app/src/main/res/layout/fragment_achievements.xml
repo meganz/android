@@ -47,7 +47,6 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentTop="true"
-                        android:text="@string/title_main_card_achievements"
                         android:layout_marginRight="21dp"
                         android:layout_marginBottom="16dp"
                         android:textSize="14dp"
@@ -202,6 +201,7 @@
                         android:orientation="horizontal">
 
                         <ImageView
+                            android:id="@+id/referral_bonuses_icon"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="20dp"
@@ -223,7 +223,16 @@
                                 android:textSize="16dp"
                                 android:textColor="@color/name_my_account"/>
 
+                            <TextView
+                                android:id="@+id/zero_figures_referral_bonuses_text"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_below="@+id/title_referral_bonuses"
+                                android:layout_marginRight="24dp"
+                                android:textSize="12sp"/>
+
                             <LinearLayout
+                                android:id="@+id/figures_referral_bonuses_layout"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_below="@+id/title_referral_bonuses"
@@ -282,8 +291,6 @@
                                         android:layout_column="0"/>
 
                                 </RelativeLayout>
-
-
                             </LinearLayout>
 
                         </RelativeLayout>
@@ -453,6 +460,7 @@
                         android:orientation="horizontal">
 
                         <ImageView
+                            android:id="@+id/install_app_icon"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="20dp"
@@ -474,7 +482,16 @@
                                 android:textSize="16dp"
                                 android:textColor="@color/name_my_account"/>
 
+                            <TextView
+                                android:id="@+id/zero_figures_install_app_text"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_below="@+id/title_install_app"
+                                android:layout_marginRight="24dp"
+                                android:textSize="12sp"/>
+
                             <LinearLayout
+                                android:id="@+id/figures_install_app_layout"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_below="@+id/title_install_app"
@@ -581,6 +598,7 @@
                         android:orientation="horizontal">
 
                         <ImageView
+                            android:id="@+id/registration_icon"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="20dp"
@@ -603,6 +621,7 @@
                                 android:textColor="@color/name_my_account"/>
 
                             <LinearLayout
+                                android:id="@+id/figures_registration_layout"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_below="@+id/title_registration"
@@ -709,6 +728,7 @@
                         android:orientation="horizontal">
 
                         <ImageView
+                            android:id="@+id/install_desktop_icon"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="20dp"
@@ -730,7 +750,16 @@
                                 android:textSize="16dp"
                                 android:textColor="@color/name_my_account"/>
 
+                            <TextView
+                                android:id="@+id/zero_figures_install_desktop_text"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_below="@+id/title_install_desktop"
+                                android:layout_marginRight="24dp"
+                                android:textSize="12sp"/>
+
                             <LinearLayout
+                                android:id="@+id/figures_install_desktop_layout"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_below="@+id/title_install_desktop"

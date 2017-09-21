@@ -51,7 +51,6 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-
                 <RelativeLayout
                     android:id="@+id/writing_linear_layout_chat"
                     android:layout_width="match_parent"

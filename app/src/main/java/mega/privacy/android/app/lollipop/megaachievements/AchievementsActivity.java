@@ -46,6 +46,7 @@ public class AchievementsActivity extends PinActivityLollipop implements MegaReq
     private AchievementsFragment achievementsFragment;
     private ReferralBonusesFragment referralBonusesFragment;
     private InviteFriendsFragment inviteFriendsFragment;
+    private InfoAchievementsFragment infoAchievementsFragment;
 
     public MegaAchievementsDetails megaAchievements;
     public ArrayList<ReferralBonus> referralBonuses;
@@ -103,7 +104,7 @@ public class AchievementsActivity extends PinActivityLollipop implements MegaReq
                     finish();
                 }
                 else{
-                    showFragment(Constants.ACHIEVEMENTS_FRAGMENT);
+                    showFragment(Constants.ACHIEVEMENTS_FRAGMENT, -1);
                 }
 
                 break;
@@ -112,7 +113,8 @@ public class AchievementsActivity extends PinActivityLollipop implements MegaReq
         return super.onOptionsItemSelected(item);
     }
 
-    public void showFragment(int fragment){
+    public void showFragment(int fragment, int achievementType){
+        log("showFragment: "+fragment+" type: "+achievementType);
         visibleFragment = fragment;
 
         if(visibleFragment==Constants.ACHIEVEMENTS_FRAGMENT){
@@ -156,12 +158,29 @@ public class AchievementsActivity extends PinActivityLollipop implements MegaReq
             ft.replace(R.id.fragment_container_achievements, referralBonusesFragment, "referralBonusesFragment");
             ft.commitNow();
         }
+        else if(visibleFragment==Constants.INFO_ACHIEVEMENTS_FRAGMENT){
+            Bundle bundle = new Bundle();
+            bundle.putInt("achievementType", achievementType);
+
+            infoAchievementsFragment = new InfoAchievementsFragment();
+            infoAchievementsFragment.setArguments(bundle);
+
+            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            ft.replace(R.id.fragment_container_achievements, infoAchievementsFragment, "infoAchievementsFragment");
+            ft.commitNow();
+        }
     }
 
     @Override
     public void onBackPressed() {
         log("onBackPressedLollipop");
-        super.onBackPressed();
+        ((MegaApplication) getApplication()).sendSignalPresenceActivity();
+        if(visibleFragment==Constants.ACHIEVEMENTS_FRAGMENT){
+            super.onBackPressed();
+        }
+        else{
+            showFragment(Constants.ACHIEVEMENTS_FRAGMENT, -1);
+        }
     }
 
 
@@ -190,7 +209,9 @@ public class AchievementsActivity extends PinActivityLollipop implements MegaReq
                 megaAchievements=request.getMegaAchievementsDetails();
                 if(megaAchievements!=null){
                     if(visibleFragment==Constants.ACHIEVEMENTS_FRAGMENT){
-                        achievementsFragment.updateValues();
+                        if(achievementsFragment.isAdded()){
+                            achievementsFragment.updateValues();
+                        }
                     }
 
                     calculateReferralBonuses();
@@ -229,7 +250,7 @@ public class AchievementsActivity extends PinActivityLollipop implements MegaReq
             inputManager.hideSoftInputFromWindow(view.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
         }
 
-        showFragment(Constants.ACHIEVEMENTS_FRAGMENT);
+        showFragment(Constants.ACHIEVEMENTS_FRAGMENT, -1);
 
         ContactController cC = new ContactController(this);
         cC.inviteMultipleContacts(mails);

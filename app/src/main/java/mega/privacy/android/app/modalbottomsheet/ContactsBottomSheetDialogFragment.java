@@ -185,19 +185,31 @@ public class ContactsBottomSheetDialogFragment extends BottomSheetDialogFragment
                     int userStatus = megaChatApi.getUserOnlineStatus(contact.getMegaUser().getHandle());
                     if(userStatus == MegaChatApi.STATUS_ONLINE){
                         log("This user is connected");
+                        contactStateIcon.setVisibility(View.VISIBLE);
                         contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_online));
                     }
                     else if(userStatus == MegaChatApi.STATUS_AWAY){
                         log("This user is away");
+                        contactStateIcon.setVisibility(View.VISIBLE);
                         contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_away));
                     }
                     else if(userStatus == MegaChatApi.STATUS_BUSY){
                         log("This user is busy");
+                        contactStateIcon.setVisibility(View.VISIBLE);
                         contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_busy));
+                    }
+                    else if(userStatus == MegaChatApi.STATUS_OFFLINE){
+                        log("This user is offline");
+                        contactStateIcon.setVisibility(View.VISIBLE);
+                        contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_offline));
+                    }
+                    else if(userStatus == MegaChatApi.STATUS_INVALID){
+                        log("INVALID status: "+userStatus);
+                        contactStateIcon.setVisibility(View.GONE);
                     }
                     else{
                         log("This user status is: "+userStatus);
-                        contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_offline));
+                        contactStateIcon.setVisibility(View.GONE);
                     }
                 }
             }
