@@ -117,8 +117,7 @@ public class InviteFriendsFragment extends Fragment implements OnClickListener{
 		//recyclerView.setLayoutManager(new FlowLayoutManager().setAlignment(Alignment.LEFT));
 
 		mLayoutManager = new FlowLayoutManager().setAlignment(Alignment.LEFT);
-
-		recyclerView.setLayoutManager(mLayoutManager);
+recyclerView.setLayoutManager(mLayoutManager);
 		recyclerView.setItemAnimator(new DefaultItemAnimator());
 
 //		recyclerView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
@@ -177,8 +176,8 @@ public class InviteFriendsFragment extends Fragment implements OnClickListener{
 		if (adapter == null){
 			adapter = new MegaInviteFriendsAdapter(context, this, mails, recyclerView);
 		}
-
 		recyclerView.setAdapter(adapter);
+
 		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
 		return v;
@@ -248,6 +247,14 @@ public class InviteFriendsFragment extends Fragment implements OnClickListener{
 		}
 
 		recyclerView.setVisibility(View.VISIBLE);
+//		recyclerView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+//			@Override
+//			public void onGlobalLayout() {
+//				calculateSwipeRefreshFullHeight();
+//			}
+//		});
+
+
 	}
 
 	@Override
