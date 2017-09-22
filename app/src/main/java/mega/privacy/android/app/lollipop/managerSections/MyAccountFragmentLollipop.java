@@ -154,16 +154,6 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		myEmail = megaApi.getMyUser().getEmail();
 		infoEmail.setText(myEmail);
 		infoEmail.setOnClickListener(this);
-
-		if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-			log("onCreate: Landscape configuration");
-			nameView.setMaxWidth(Util.scaleWidthPx(250, outMetrics));
-			infoEmail.setMaxWidth(Util.scaleWidthPx(250, outMetrics));
-		}
-		else{
-			nameView.setMaxWidth(Util.scaleWidthPx(180, outMetrics));
-			infoEmail.setMaxWidth(Util.scaleWidthPx(200, outMetrics));
-		}
 		
 		myAccountImage = (RoundedImageView) v.findViewById(R.id.my_account_thumbnail);
 
@@ -180,14 +170,16 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		mkButton.setOnClickListener(this);
 		mkButton.setVisibility(View.VISIBLE);
 
-		String path = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
-		log("Exists MK in: "+path);
-		File file= new File(path);
-		if(file.exists()){
-			mkButton.setText(getString(R.string.action_remove_master_key));
+		setMkButtonText();
+
+		if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+			log("onCreate: Landscape configuration");
+			nameView.setMaxWidth(Util.scaleWidthPx(250, outMetrics));
+			infoEmail.setMaxWidth(Util.scaleWidthPx(250, outMetrics));
 		}
 		else{
-			mkButton.setText(getString(R.string.action_export_master_key));
+			nameView.setMaxWidth(Util.scaleWidthPx(180, outMetrics));
+			infoEmail.setMaxWidth(Util.scaleWidthPx(200, outMetrics));
 		}
 
 		achievementsLayout = (LinearLayout) v.findViewById(R.id.my_account_achievements_layout);
@@ -355,6 +347,49 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
 		return v;
+	}
+
+	public void setMkButtonText(){
+		String path = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
+		log("Exists MK in: "+path);
+		File file= new File(path);
+		String mkButtonText;
+		if(file.exists()){
+			mkButtonText = getString(R.string.action_remove_master_key);
+		}
+		else{
+			mkButtonText= getString(R.string.action_export_master_key);
+		}
+
+		if(mkButtonText.length()>27){
+			boolean found = false;
+			int mid = mkButtonText.length()/2;
+
+			for(int i=mid;i<mkButtonText.length()-1;i++){
+				char letter = mkButtonText.charAt(i);
+				if(letter == ' '){
+					StringBuilder sb = new StringBuilder(mkButtonText);
+					sb.setCharAt(i, '\n');
+					mkButtonText = sb.toString();
+					found = true;
+					break;
+				}
+			}
+
+			if(!found){
+				for(int i=0;i<mid;i++){
+					char letter = mkButtonText.charAt(i);
+					if(letter == ' '){
+						StringBuilder sb = new StringBuilder(mkButtonText);
+						sb.setCharAt(i, '\n');
+						mkButtonText = sb.toString();
+						break;
+					}
+				}
+			}
+		}
+
+		mkButton.setText(mkButtonText);
 	}
 
 	public static MyAccountFragmentLollipop newInstance() {
@@ -589,19 +624,6 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		}
 	}
 
-	public void updateMKButton(){
-		log("updateMKButton");
-		String path = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
-		log("update MK Button - Exists MK in: "+path);
-		File file= new File(path);
-		if(file.exists()){
-			mkButton.setText(getString(R.string.action_remove_master_key));
-		}
-		else{
-			mkButton.setText(getString(R.string.action_export_master_key));
-		}
-	}
-	
 	public int onBackPressed(){
 		log("onBackPressed");
 		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();

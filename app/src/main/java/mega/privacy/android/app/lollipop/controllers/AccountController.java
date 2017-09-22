@@ -163,7 +163,7 @@ public class AccountController {
             ((ManagerActivityLollipop) context).invalidateOptionsMenu();
             MyAccountFragmentLollipop mAF = ((ManagerActivityLollipop) context).getMyAccountFragment();
             if(mAF!=null){
-                mAF.updateMKButton();
+                mAF.setMkButtonText();
             }
             Util.showAlert(((ManagerActivityLollipop) context), message, null);
 
@@ -239,7 +239,7 @@ public class AccountController {
         ((ManagerActivityLollipop) context).invalidateOptionsMenu();
         MyAccountFragmentLollipop mAF = ((ManagerActivityLollipop) context).getMyAccountFragment();
         if(mAF!=null){
-            mAF.updateMKButton();
+            mAF.setMkButtonText();;
         }
         Util.showAlert(((ManagerActivityLollipop) context), message, null);
     }
