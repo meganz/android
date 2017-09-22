@@ -129,7 +129,7 @@
                         <android.support.v7.widget.RecyclerView
                             android:id="@+id/invite_friends_recycler_view"
                             android:layout_width="match_parent"
-                            android:layout_height="200dp"
+                            android:layout_height="100dp"
                             android:choiceMode="multipleChoice"
                             android:background="@color/green_free_account"/>
 

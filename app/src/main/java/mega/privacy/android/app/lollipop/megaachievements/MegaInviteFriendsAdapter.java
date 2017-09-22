@@ -100,6 +100,7 @@ public class MegaInviteFriendsAdapter extends RecyclerView.Adapter<MegaInviteFri
 
 		v.setTag(holderList);
 
+
 		return holderList;
 
 	}
