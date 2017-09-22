@@ -3313,80 +3313,88 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     log("State of the message: " + message.getPendingMessage().getState());
 
                     if (message.getPendingMessage().getState() == PendingMessage.STATE_ERROR) {
-                        holder.transparentCoatingPortrait.setVisibility(View.VISIBLE);
-                        holder.transparentCoatingLandscape.setVisibility(View.VISIBLE);
+
+                        //Error
                         holder.uploadingProgressBar.setVisibility(View.GONE);
 
                         if (bitmap.getWidth() < bitmap.getHeight()) {
                             log("Portrait");
-                            holder.errorUploadingPortrait.setVisibility(View.VISIBLE);
-                            holder.notSentTextPortrait.setVisibility(View.VISIBLE);
+
                             holder.errorUploadingLandscape.setVisibility(View.GONE);
                             holder.notSentTextLandscape.setVisibility(View.GONE);
+                            holder.transparentCoatingLandscape.setVisibility(View.GONE);
+
+                            RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) holder.errorUploadingPortrait.getLayoutParams();
+                            float width = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 152, context.getResources().getDisplayMetrics());
+                            params.width = (int) width;
+                            log("Preview (Portrait) ImageView width: " + width);
+                            holder.errorUploadingPortrait.setLayoutParams(params);
+
+                            holder.errorUploadingPortrait.setVisibility(View.VISIBLE);
+                            holder.notSentTextPortrait.setVisibility(View.VISIBLE);
+                            holder.transparentCoatingPortrait.setVisibility(View.VISIBLE);
+
                         }else{
                             log("Landscape");
+
                             holder.errorUploadingPortrait.setVisibility(View.GONE);
                             holder.notSentTextPortrait.setVisibility(View.GONE);
+                            holder.transparentCoatingPortrait.setVisibility(View.GONE);
+
+                            RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) holder.errorUploadingLandscape.getLayoutParams();
+                            float width = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 212, context.getResources().getDisplayMetrics());
+                            params.width = (int) width;
+                            log("Preview (Landscape) ImageView width: " + width);
+                            holder.errorUploadingLandscape.setLayoutParams(params);
+
                             holder.errorUploadingLandscape.setVisibility(View.VISIBLE);
                             holder.notSentTextLandscape.setVisibility(View.VISIBLE);
+                            holder.transparentCoatingLandscape.setVisibility(View.VISIBLE);
+
                         }
-
-
 
                     } else {
-                        holder.transparentCoatingLandscape.setVisibility(View.VISIBLE);
-                        holder.transparentCoatingPortrait.setVisibility(View.VISIBLE);
 
-                        if(holder.contentOwnMessageFileLayout.isShown()){
-                            holder.uploadingProgressBar.setVisibility(View.GONE);
-
-                        }else{
-                            holder.uploadingProgressBar.setVisibility(View.VISIBLE);
-
-                        }
+                        //In progress
+                        holder.uploadingProgressBar.setVisibility(View.VISIBLE);
                         holder.errorUploadingPortrait.setVisibility(View.GONE);
                         holder.notSentTextPortrait.setVisibility(View.GONE);
                         holder.errorUploadingLandscape.setVisibility(View.GONE);
                         holder.notSentTextLandscape.setVisibility(View.GONE);
 
+                        if (bitmap.getWidth() < bitmap.getHeight()) {
+                            log("Portrait");
+
+                            holder.transparentCoatingPortrait.setVisibility(View.VISIBLE);
+                            holder.transparentCoatingLandscape.setVisibility(View.GONE);
+
+                        }else{
+                            log("Landscape");
+
+                            holder.transparentCoatingPortrait.setVisibility(View.GONE);
+                            holder.transparentCoatingLandscape.setVisibility(View.VISIBLE);
+                        }
                     }
 
                     if (bitmap.getWidth() < bitmap.getHeight()) {
                         log("Portrait");
+
                         holder.contentOwnMessageThumbPort.setImageBitmap(bitmap);
                         holder.previewFramePort.setVisibility(View.VISIBLE);
                         holder.contentOwnMessageThumbPort.setVisibility(View.VISIBLE);
                         holder.contentOwnMessageFileLayout.setVisibility(View.GONE);
                         holder.previewFrameLand.setVisibility(View.GONE);
                         holder.contentOwnMessageThumbLand.setVisibility(View.GONE);
-                        holder.errorUploadingLandscape.setVisibility(View.GONE);
-                        holder.notSentTextLandscape.setVisibility(View.GONE);
-
-
-                        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) holder.errorUploadingPortrait.getLayoutParams();
-                        float width = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 152, context.getResources().getDisplayMetrics());
-
-                        params.width = (int) width;
-                        log("Preview (Portrait) ImageView width: " + width);
-                        holder.errorUploadingPortrait.setLayoutParams(params);
 
                     } else {
+                        log("Landscape");
+
                         holder.contentOwnMessageThumbLand.setImageBitmap(bitmap);
                         holder.previewFrameLand.setVisibility(View.VISIBLE);
                         holder.contentOwnMessageThumbLand.setVisibility(View.VISIBLE);
                         holder.contentOwnMessageFileLayout.setVisibility(View.GONE);
                         holder.previewFramePort.setVisibility(View.GONE);
                         holder.contentOwnMessageThumbPort.setVisibility(View.GONE);
-                        holder.errorUploadingPortrait.setVisibility(View.GONE);
-                        holder.notSentTextPortrait.setVisibility(View.GONE);
-
-
-                        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) holder.errorUploadingLandscape.getLayoutParams();
-                        float width = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 212, context.getResources().getDisplayMetrics());
-
-                        params.width = (int) width;
-                        log("Preview (Landscape) ImageView width: " + width);
-                        holder.errorUploadingLandscape.setLayoutParams(params);
                     }
                 }
                 else{
