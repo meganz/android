@@ -83,7 +83,7 @@ import nz.mega.sdk.MegaUser;
 
 public class MegaApplication extends Application implements MegaListenerInterface, MegaChatListenerInterface, MegaChatRequestListenerInterface {
 	final String TAG = "MegaApplication";
-	static final String USER_AGENT = "MEGAAndroid/3.2.3.1_152";
+	static final String USER_AGENT = "MEGAAndroid/3.2.3.1_153";
 
 	DatabaseHandler dbH;
 	MegaApiAndroid megaApi;
@@ -825,7 +825,9 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 					firstTs=-1;
 				}
 				else{
+
 					if (!recentChatsFragmentVisible) {
+						log("NOt recentFragment visible");
 //						if (openChatId != item.getChatId()) {
 //							if (isFirstConnect()) {
 //								log("onChatListItemUpdateMegaApplication. FIRSTCONNECT " + item.getTitle() + "Unread count: " + item.getUnreadCount() + " hasChanged(CHANGE_TYPE_UNREAD_COUNT): " + item.hasChanged(MegaChatListItem.CHANGE_TYPE_UNREAD_COUNT) + " hasChanged(CHANGE_TYPE_LAST_TS):" + item.hasChanged(MegaChatListItem.CHANGE_TYPE_LAST_TS));

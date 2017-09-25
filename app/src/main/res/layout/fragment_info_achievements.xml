@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/chat_background">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_centerHorizontal="true"
+        android:gravity="center_horizontal"
+        android:orientation="vertical">
+
+        <ImageView
+            android:id="@+id/icon_info_achievements"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="48dp"
+            android:layout_gravity="center_horizontal"
+            android:src="@drawable/ic_invite_friends_big"/>
+
+        <TextView
+            android:id="@+id/title_info_achievements"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_marginTop="24dp"
+            android:layout_marginRight="24dp"
+            android:layout_marginLeft="24dp"
+            android:layout_gravity="center_horizontal"
+            android:gravity="center_horizontal"
+            android:textSize="14dp"
+            android:lineSpacingMultiplier="1.2"
+            android:textColor="@color/mail_my_account"/>
+
+        <LinearLayout
+            android:id="@+id/separator_info_achievements"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="43dp"
+            android:orientation="horizontal"
+            android:background="@color/separator_grey"/>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@color/white">
+
+            <TextView
+                android:id="@+id/how_works_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/title_achievement_invite_friends"
+                android:layout_marginBottom="16dp"
+                android:layout_marginTop="24dp"
+                android:textSize="16dp"
+                android:lineSpacingMultiplier="1.2"
+                android:layout_gravity="center_horizontal"
+                android:textColor="@color/blue_unlocked_rewards"/>
+
+            <TextView
+                android:id="@+id/info_achievements_how_works_first_p"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/first_paragraph_achievement_invite_friends"
+                android:layout_marginLeft="24dp"
+                android:layout_marginBottom="16dp"
+                android:layout_marginRight="24dp"
+                android:textSize="14dp"
+                android:lineSpacingMultiplier="1.5"
+                android:textColor="@color/grey_achievements_invite_friends"/>
+
+            <TextView
+                android:id="@+id/info_achievements_how_works_second_p"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/second_paragraph_achievement_invite_friends"
+                android:layout_marginRight="24dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginLeft="24dp"
+                android:layout_marginBottom="24dp"
+                android:textStyle="italic"
+                android:textSize="14dp"
+                android:lineSpacingMultiplier="1.5"
+                android:textColor="@color/grey_achievements_invite_friends_sub"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</RelativeLayout>
+
+
+</ScrollView>
