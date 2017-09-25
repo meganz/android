@@ -9,9 +9,11 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
@@ -23,6 +25,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
@@ -37,6 +40,8 @@ import java.util.ArrayList;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
+import mega.privacy.android.app.components.flowlayoutmanager.Alignment;
+import mega.privacy.android.app.components.flowlayoutmanager.FlowLayoutManager;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
@@ -55,7 +60,10 @@ public class InviteFriendsFragment extends Fragment implements OnClickListener{
 	RelativeLayout parentRelativeLayout;
 	RecyclerView recyclerView;
 //	StaggeredGridLayoutManager mLayoutManager;
-	LinearLayoutManager mLayoutManager;
+//	private StaggeredGridLayoutManager gaggeredGridLayoutManager;
+
+//	LinearLayoutManager mLayoutManager;
+	FlowLayoutManager mLayoutManager;
 	MegaInviteFriendsAdapter adapter;
 	EditText editTextMail;
 	LinearLayout linearLayoutCard;
@@ -103,9 +111,9 @@ public class InviteFriendsFragment extends Fragment implements OnClickListener{
 
 		View v = inflater.inflate(R.layout.fragment_invite_friends, container, false);
 		recyclerView = (RecyclerView) v.findViewById(R.id.invite_friends_recycler_view);
-//		mLayoutManager = new StaggeredGridLayoutManager(3,StaggeredGridLayoutManager.VERTICAL);
-//		mLayoutManager.setGapStrategy(StaggeredGridLayoutManager.GAP_HANDLING_MOVE_ITEMS_BETWEEN_SPANS);
-		mLayoutManager = new LinearLayoutManager(context);
+
+		mLayoutManager = new FlowLayoutManager().setAlignment(Alignment.LEFT);
+		mLayoutManager.setAutoMeasureEnabled(true);
 		recyclerView.setLayoutManager(mLayoutManager);
 		recyclerView.setItemAnimator(new DefaultItemAnimator());
 
@@ -163,10 +171,11 @@ public class InviteFriendsFragment extends Fragment implements OnClickListener{
 
 		mails = new ArrayList<>();
 
+
 		if (adapter == null){
 			adapter = new MegaInviteFriendsAdapter(context, this, mails, recyclerView);
-		}
 
+		}
 		recyclerView.setAdapter(adapter);
 
 		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
@@ -238,6 +247,9 @@ public class InviteFriendsFragment extends Fragment implements OnClickListener{
 		}
 
 		recyclerView.setVisibility(View.VISIBLE);
+
+
+
 	}
 
 	@Override
@@ -285,4 +297,5 @@ public class InviteFriendsFragment extends Fragment implements OnClickListener{
 	public static void log(String log) {
 		Util.log("InviteFriendsFragment", log);
 	}
+
 }
