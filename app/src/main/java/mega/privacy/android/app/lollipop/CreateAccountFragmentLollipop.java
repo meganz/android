@@ -647,7 +647,6 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
             case R.id.create_account_name_text:{
                 if(name_error_layout.getVisibility() != View.GONE){
                     name_error_layout.setVisibility(View.GONE);
-                    userName.setBackground(name_background);
                     if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.JELLY_BEAN) {
                         userName.setBackgroundDrawable(name_background);
                     } else{
@@ -662,7 +661,11 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
             case R.id.create_account_password_text:{
                 if(password_error_layout.getVisibility() != View.GONE){
                     password_error_layout.setVisibility(View.GONE);
-                    userPassword.setBackground(password_background);
+                    if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.JELLY_BEAN) {
+                        userPassword.setBackgroundDrawable(password_background);
+                    } else{
+                        userPassword.setBackground(password_background);
+                    }
                     LinearLayout.LayoutParams textParamsEditText = (LinearLayout.LayoutParams) userPassword.getLayoutParams();
                     textParamsEditText.bottomMargin = Util.scaleWidthPx(10, outMetrics);
                     userPassword.setLayoutParams(textParamsEditText);
