@@ -177,65 +177,71 @@ public class FlowLayoutManager extends RecyclerView.LayoutManager {
 
     @Override
     public boolean canScrollVertically() {
-        if (getChildCount() == 0) {
-            return false;
-        }
-
-        View firstChild = getChildAt(0);
-        View lastChild = getChildAt(getChildCount() - 1);
-        View topChild = getChildAt(getMaxHeightLayoutPositionInLine(0));
-        View bottomChild = getChildAt(getMaxHeightLayoutPositionInLine(getChildCount() - 1));
-        boolean topReached = false, bottomReached = false;
-        if (getChildAdapterPosition(firstChild) == 0) {
-            if (getDecoratedTop(topChild) >= topVisibleEdge()) {
-                topReached = true;
-            }
-        }
-
-        if (getChildAdapterPosition(lastChild) == recyclerView.getAdapter().getItemCount() - 1) {
-            if (getDecoratedBottom(bottomChild) <= bottomVisibleEdge()) {
-                bottomReached = true;
-            }
-        }
-        return !(topReached && bottomReached);
+        return false;
     }
 
-    @Override
-    public int scrollVerticallyBy(int dy, RecyclerView.Recycler recycler, RecyclerView.State state) {
-        if (dy == 0) {
-            return 0;
-        }
-        if (getItemCount() == 0) {
-            return 0;
-        }
 
-        View firstChild = getChildAt(0);
-        View lastChild = getChildAt(getChildCount() - 1);
-        View topChild = getChildAt(getMaxHeightLayoutPositionInLine(0));
-        View bottomChild = getChildAt(getMaxHeightLayoutPositionInLine(getChildCount() - 1));
-        boolean topReached = false, bottomReached = false;
-        if (getChildAdapterPosition(firstChild) == 0) {
-            if (getDecoratedTop(topChild) >= topVisibleEdge()) {
-                topReached = true;
-            }
-        }
+//    @Override
+//    public boolean canScrollVertically() {
+//        if (getChildCount() == 0) {
+//            return false;
+//        }
+//
+//        View firstChild = getChildAt(0);
+//        View lastChild = getChildAt(getChildCount() - 1);
+//        View topChild = getChildAt(getMaxHeightLayoutPositionInLine(0));
+//        View bottomChild = getChildAt(getMaxHeightLayoutPositionInLine(getChildCount() - 1));
+//        boolean topReached = false, bottomReached = false;
+//        if (getChildAdapterPosition(firstChild) == 0) {
+//            if (getDecoratedTop(topChild) >= topVisibleEdge()) {
+//                topReached = true;
+//            }
+//        }
+//
+//        if (getChildAdapterPosition(lastChild) == recyclerView.getAdapter().getItemCount() - 1) {
+//            if (getDecoratedBottom(bottomChild) <= bottomVisibleEdge()) {
+//                bottomReached = true;
+//            }
+//        }
+//        return !(topReached && bottomReached);
+//    }
 
-        if (getChildAdapterPosition(lastChild) == recyclerView.getAdapter().getItemCount() - 1) {
-            if (getDecoratedBottom(bottomChild) <= bottomVisibleEdge()) {
-                bottomReached = true;
-            }
-        }
-
-        if (dy > 0 && bottomReached) {
-            return 0;
-        }
-
-        if (dy < 0 && topReached) {
-            return 0;
-        }
-
-        return dy > 0? contentMoveUp(dy, recycler) : contentMoveDown(dy, recycler);
-    }
+//    @Override
+//    public int scrollVerticallyBy(int dy, RecyclerView.Recycler recycler, RecyclerView.State state) {
+//        if (dy == 0) {
+//            return 0;
+//        }
+//        if (getItemCount() == 0) {
+//            return 0;
+//        }
+//
+//        View firstChild = getChildAt(0);
+//        View lastChild = getChildAt(getChildCount() - 1);
+//        View topChild = getChildAt(getMaxHeightLayoutPositionInLine(0));
+//        View bottomChild = getChildAt(getMaxHeightLayoutPositionInLine(getChildCount() - 1));
+//        boolean topReached = false, bottomReached = false;
+//        if (getChildAdapterPosition(firstChild) == 0) {
+//            if (getDecoratedTop(topChild) >= topVisibleEdge()) {
+//                topReached = true;
+//            }
+//        }
+//
+//        if (getChildAdapterPosition(lastChild) == recyclerView.getAdapter().getItemCount() - 1) {
+//            if (getDecoratedBottom(bottomChild) <= bottomVisibleEdge()) {
+//                bottomReached = true;
+//            }
+//        }
+//
+//        if (dy > 0 && bottomReached) {
+//            return 0;
+//        }
+//
+//        if (dy < 0 && topReached) {
+//            return 0;
+//        }
+//
+//        return dy > 0? contentMoveUp(dy, recycler) : contentMoveDown(dy, recycler);
+//    }
 
     @Override
     public void onItemsChanged(RecyclerView recyclerView) {
