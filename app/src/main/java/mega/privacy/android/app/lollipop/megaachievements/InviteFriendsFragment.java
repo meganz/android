@@ -209,6 +209,7 @@ public class InviteFriendsFragment extends Fragment implements OnClickListener{
 	}
 
 	public void deleteMail(String mailToDelete){
+		log("deleteMail: "+mailToDelete);
 		int positionToRemove=-1;
 		for(int i=0;i<mails.size();i++){
 			if(mailToDelete.equals(mails.get(i))){
@@ -218,6 +219,25 @@ public class InviteFriendsFragment extends Fragment implements OnClickListener{
 		}
 		if(positionToRemove!=-1){
 			mails.remove(positionToRemove);
+			adapter.setNames(mails);
+			adapter.notifyDataSetChanged();
+		}
+		log("deleteMail: positionToRemove: "+positionToRemove);
+		if(mails.isEmpty()){
+			inviteButton.setBackgroundColor(ContextCompat.getColor(context, R.color.invite_button_deactivated));
+			inviteButton.setOnClickListener(null);
+		}
+		else{
+			inviteButton.setBackgroundColor(ContextCompat.getColor(context, R.color.accentColor));
+			inviteButton.setOnClickListener(this);
+		}
+	}
+
+	public void deleteMail(int positionToDelete){
+		log("deleteMail: "+positionToDelete);
+
+		if(positionToDelete!=-1){
+			mails.remove(positionToDelete);
 			adapter.setNames(mails);
 			adapter.notifyDataSetChanged();
 		}
