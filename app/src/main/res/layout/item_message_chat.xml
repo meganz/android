@@ -163,8 +163,39 @@
                             android:layout_width="160dp"
                             android:layout_height="220dp"
                             android:background="@drawable/shape_images_chat_transparent"/>
+
                     </RelativeLayout>
                 </RelativeLayout>
+
+                <RelativeLayout
+                    android:id="@+id/error_uploading_portrait"
+                    android:layout_width="wrap_content"
+                    android:layout_height="220dp"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginRight="50dp"
+                    android:background="@android:color/transparent">
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_alignParentLeft="true"
+                        android:layout_gravity="center"
+                        android:background="@drawable/ic_input_warning"/>
+                </RelativeLayout>
+
+                <TextView
+                    android:id="@+id/not_sent_text_portrait"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/preview_frame_portrait"
+                    android:textColor="@color/name_my_account"
+                    android:layout_alignParentRight="true"
+                    android:text="@string/manual_retry_alert"
+                    android:textSize="11sp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginRight="16dp"
+                    android:inputType="textMultiLine|textNoSuggestions"
+                    android:gravity="right"/>
 
 
                 <!-- own landscape -->
@@ -214,6 +245,37 @@
                         </RelativeLayout>
                 </RelativeLayout>
 
+                <RelativeLayout
+                    android:id="@+id/error_uploading_landscape"
+                    android:layout_width="wrap_content"
+                    android:layout_height="160dp"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginRight="50dp"
+                    android:background="@android:color/transparent">
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_alignParentLeft="true"
+                        android:layout_gravity="center"
+                        android:background="@drawable/ic_input_warning"/>
+                </RelativeLayout>
+
+                <TextView
+                    android:id="@+id/not_sent_text_landscape"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/preview_frame_landscape"
+                    android:textColor="@color/name_my_account"
+                    android:layout_alignParentRight="true"
+                    android:text="@string/manual_retry_alert"
+                    android:textSize="11sp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginRight="16dp"
+                    android:inputType="textMultiLine|textNoSuggestions"
+                    android:gravity="right"/>
+
+
                 <ProgressBar
                     android:id="@+id/uploadingProgressBar"
                     android:indeterminate="true"
@@ -224,34 +286,6 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"/>
 
-
-                <RelativeLayout
-                    android:id="@+id/error_uploading_relative_layout"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@android:color/transparent"
-                    android:layout_alignParentRight="true"
-                    android:layout_alignParentBottom="true"
-                    android:layout_marginEnd="20dp"
-                    android:layout_marginRight="20dp">
-                    <RelativeLayout
-                        android:layout_marginBottom="11dp"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:background="@drawable/actionbar_gradient_dark_round_corners">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_alignParentRight="true"
-                            android:paddingRight="5dp"
-                            android:textColor="@color/white"
-                            android:text="@string/attachment_uploading_state_error"
-                            android:textSize="14dp"/>
-
-                    </RelativeLayout>
-
-                </RelativeLayout>
 
                 <RelativeLayout
                     android:id="@+id/content_own_message_file_layout"
