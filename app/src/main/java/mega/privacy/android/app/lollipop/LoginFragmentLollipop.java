@@ -2330,7 +2330,11 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 //                et_user.getBackground().mutate().setColorFilter(porterDuffColorFilter);
                 Drawable background = login_background.mutate().getConstantState().newDrawable();
                 background.setColorFilter(porterDuffColorFilter);
-                et_user.setBackground(background);
+                if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.JELLY_BEAN) {
+                    et_user.setBackgroundDrawable(background);
+                } else{
+                    et_user.setBackground(background);
+                }
                 break;
             }
             case R.id.login_password_text:{
@@ -2340,7 +2344,11 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 //                et_password.getBackground().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
                 Drawable background = password_background.mutate().getConstantState().newDrawable();
                 background.setColorFilter(porterDuffColorFilter);
-                et_password.setBackground(background);
+                if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.JELLY_BEAN) {
+                    et_password.setBackgroundDrawable(background);
+                } else{
+                    et_password.setBackground(background);
+                }
                 break;
             }
         }
@@ -2351,14 +2359,22 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             case R.id.login_email_text:{
                 if(loginEmailErrorLayout.getVisibility() != View.GONE){
                     loginEmailErrorLayout.setVisibility(View.GONE);
-                    et_user.setBackground(login_background);
+                    if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.JELLY_BEAN) {
+                        et_user.setBackgroundDrawable(login_background);
+                    } else{
+                        et_user.setBackground(login_background);
+                    }
                 }
                 break;
             }
             case R.id.login_password_text:{
                 if(loginPasswordErrorLayout.getVisibility() != View.GONE){
                     loginPasswordErrorLayout.setVisibility(View.GONE);
-                    et_password.setBackground(password_background);
+                    if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.JELLY_BEAN) {
+                        et_password.setBackgroundDrawable(password_background);
+                    } else{
+                        et_password.setBackground(password_background);
+                    }
                 }
                 break;
             }
