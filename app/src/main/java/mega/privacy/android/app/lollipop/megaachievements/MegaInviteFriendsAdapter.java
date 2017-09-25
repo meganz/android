@@ -93,6 +93,13 @@ public class MegaInviteFriendsAdapter extends RecyclerView.Adapter<MegaInviteFri
 		holderList.itemLayout = (RelativeLayout) v.findViewById(R.id.item_layout_chip);
 
 		holderList.textViewName = (TextView) v.findViewById(R.id.name_chip);
+		if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+			log("Landscape");
+			holderList.textViewName.setMaxWidth(Util.scaleWidthPx(260, outMetrics));
+		}else{
+			log("Portrait");
+			holderList.textViewName.setMaxWidth(Util.scaleWidthPx(230, outMetrics));
+		}
 
 		holderList.deleteIcon = (ImageView) v.findViewById(R.id.delete_icon_chip);
 

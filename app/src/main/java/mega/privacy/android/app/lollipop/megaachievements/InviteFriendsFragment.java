@@ -105,27 +105,11 @@ public class InviteFriendsFragment extends Fragment implements OnClickListener{
 		View v = inflater.inflate(R.layout.fragment_invite_friends, container, false);
 		recyclerView = (RecyclerView) v.findViewById(R.id.invite_friends_recycler_view);
 
-		//recyclerView.setHasFixedSize(true);
-		//mLayoutManager = new LinearLayoutManager(context);
-
-//		mLayoutManager = new StaggeredGridLayoutManager(3,StaggeredGridLayoutManager.VERTICAL);
-//		mLayoutManager.setGapStrategy(StaggeredGridLayoutManager.GAP_HANDLING_MOVE_ITEMS_BETWEEN_SPANS);
-//		mLayoutManager = new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL,false);
-		//gaggeredGridLayoutManager = new StaggeredGridLayoutManager(3, 1);
-	//	StaggeredGridLayoutManager lmStaggeredVertical = new StaggeredGridLayoutManager(5, StaggeredGridLayoutManager.HORIZONTAL);
-	//	recyclerView.setLayoutManager(lmStaggeredVertical);
-		//recyclerView.setLayoutManager(new FlowLayoutManager().setAlignment(Alignment.LEFT));
-
 		mLayoutManager = new FlowLayoutManager().setAlignment(Alignment.LEFT);
-recyclerView.setLayoutManager(mLayoutManager);
+		mLayoutManager.setAutoMeasureEnabled(true);
+		recyclerView.setLayoutManager(mLayoutManager);
 		recyclerView.setItemAnimator(new DefaultItemAnimator());
 
-//		recyclerView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-//			@Override
-//			public void onGlobalLayout() {
-//				calculateSwipeRefreshFullHeight();
-//			}
-//		});
 		inviteButton = (Button)v.findViewById(R.id.invite_button);
 		inviteButton.setBackgroundColor(ContextCompat.getColor(context, R.color.invite_button_deactivated));
 
@@ -173,8 +157,10 @@ recyclerView.setLayoutManager(mLayoutManager);
 
 		mails = new ArrayList<>();
 
+
 		if (adapter == null){
 			adapter = new MegaInviteFriendsAdapter(context, this, mails, recyclerView);
+
 		}
 		recyclerView.setAdapter(adapter);
 
@@ -247,12 +233,7 @@ recyclerView.setLayoutManager(mLayoutManager);
 		}
 
 		recyclerView.setVisibility(View.VISIBLE);
-//		recyclerView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-//			@Override
-//			public void onGlobalLayout() {
-//				calculateSwipeRefreshFullHeight();
-//			}
-//		});
+
 
 
 	}
@@ -303,16 +284,4 @@ recyclerView.setLayoutManager(mLayoutManager);
 		Util.log("InviteFriendsFragment", log);
 	}
 
-
-
-//	protected void calculateSwipeRefreshFullHeight() {
-//		int height = 0;
-//		for (int idx = 0; idx < recyclerView.getChildCount(); idx++ ) {
-//			View v = recyclerView.getChildAt(idx);
-//			height += v.getHeight();
-//		}
-//		SwipeRefreshLayout.LayoutParams params = recyclerView.getLayoutParams();
-//		params.height = height;
-//		recyclerView.setLayoutParams(params);
-//	}
 }
