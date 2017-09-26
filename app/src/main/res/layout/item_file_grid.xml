@@ -57,6 +57,35 @@
             android:layout_alignParentRight="true"
             android:layout_marginRight="22dp"
             android:layout_marginTop="10dp"/>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:id="@+id/item_file_videoinfo_layout">
+
+            <TextView
+                android:id="@+id/file_grid_title_video_duration"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="9dp"
+                android:layout_centerVertical="true"
+                android:layout_alignParentRight="true"
+                android:textColor="@color/white"
+                android:textSize="14sp"
+                android:text="00:00"/>
+
+            <ImageView
+                android:id="@+id/file_grid_video_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_play_arrow_white_24dp"
+                android:background="@null"
+                android:layout_alignParentLeft="true"
+                />
+
+        </RelativeLayout>
+
     </RelativeLayout>
 
     <View

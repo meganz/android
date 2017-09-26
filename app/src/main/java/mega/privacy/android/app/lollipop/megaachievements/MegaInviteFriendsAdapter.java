@@ -93,10 +93,18 @@ public class MegaInviteFriendsAdapter extends RecyclerView.Adapter<MegaInviteFri
 		holderList.itemLayout = (RelativeLayout) v.findViewById(R.id.item_layout_chip);
 
 		holderList.textViewName = (TextView) v.findViewById(R.id.name_chip);
+		if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+			log("Landscape");
+			holderList.textViewName.setMaxWidth(Util.scaleWidthPx(260, outMetrics));
+		}else{
+			log("Portrait");
+			holderList.textViewName.setMaxWidth(Util.scaleWidthPx(230, outMetrics));
+		}
 
 		holderList.deleteIcon = (ImageView) v.findViewById(R.id.delete_icon_chip);
+		holderList.deleteIcon.setOnClickListener(this);
 
-		holderList.itemLayout.setTag(holderList);
+		holderList.deleteIcon.setTag(holderList);
 
 		v.setTag(holderList);
 
@@ -110,18 +118,32 @@ public class MegaInviteFriendsAdapter extends RecyclerView.Adapter<MegaInviteFri
 
 		String name = (String) getItem(position);
 		holder.textViewName.setText(name);
-		holderList.deleteIcon.setOnClickListener(this);
 	}
 
 	@Override
 	public void onClick(View v) {
+		log("onClick");
 
-		switch (v.getId()) {
-			case R.id.delete_icon_chip: {
-				((InviteFriendsFragment)fragment).deleteMail(holderList.textViewName.getText().toString());
-				break;
+		MegaInviteFriendsAdapter.ViewHolderChips holder = (MegaInviteFriendsAdapter.ViewHolderChips) v.getTag();
+		if(holder!=null){
+			int currentPosition = holder.getLayoutPosition();
+			log("onClick -> Current position: "+currentPosition);
+
+			if(currentPosition<0){
+				log("Current position error - not valid value");
+				return;
+			}
+			switch (v.getId()) {
+				case R.id.delete_icon_chip: {
+					fragment.deleteMail(currentPosition);
+					break;
+				}
 			}
 		}
+		else{
+			log("Error. Holder is Null");
+		}
+
 	}
 
 	private int getAvatarTextSize (float density){

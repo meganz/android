@@ -428,24 +428,30 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				removeIcon.setVisible(false);
 			}
 
-			node = megaApi.getNodeByHandle(imageHandles.get(positionG));
-			final long handle = node.getHandle();
-			MegaNode parent = megaApi.getNodeByHandle(handle);
-			while (megaApi.getParentNode(parent) != null){
-				parent = megaApi.getParentNode(parent);
-			}
-
-			if (parent.getHandle() != megaApi.getRubbishNode().getHandle()){
-				moveToTrashIcon.setVisible(true);
+			if(isFolderLink){
+				moveToTrashIcon.setVisible(false);
 				removeIcon.setVisible(false);
 			}
 			else{
-				moveToTrashIcon.setVisible(false);
-				removeIcon.setVisible(true);
+				node = megaApi.getNodeByHandle(imageHandles.get(positionG));
+				final long handle = node.getHandle();
+				MegaNode parent = megaApi.getNodeByHandle(handle);
+				while (megaApi.getParentNode(parent) != null){
+					parent = megaApi.getParentNode(parent);
+				}
+
+				if (parent.getHandle() != megaApi.getRubbishNode().getHandle()){
+					moveToTrashIcon.setVisible(true);
+					removeIcon.setVisible(false);
+				}
+				else{
+					moveToTrashIcon.setVisible(false);
+					removeIcon.setVisible(true);
+				}
 			}
 		}
 
-			return super.onCreateOptionsMenu(menu);
+		return super.onCreateOptionsMenu(menu);
 	}
 
 	@Override
