@@ -208,13 +208,14 @@ public class AchievementsActivity extends PinActivityLollipop implements MegaReq
 
                 megaAchievements=request.getMegaAchievementsDetails();
                 if(megaAchievements!=null){
+                    calculateReferralBonuses();
                     if(visibleFragment==Constants.ACHIEVEMENTS_FRAGMENT){
                         if(achievementsFragment.isAdded()){
                             achievementsFragment.updateValues();
                         }
                     }
 
-                    calculateReferralBonuses();
+
                 }
             }
             else{

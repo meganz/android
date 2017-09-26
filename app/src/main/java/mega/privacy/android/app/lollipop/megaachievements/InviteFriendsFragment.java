@@ -2,16 +2,20 @@ package mega.privacy.android.app.lollipop.megaachievements;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
@@ -23,6 +27,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
@@ -37,6 +42,8 @@ import java.util.ArrayList;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
+import mega.privacy.android.app.components.flowlayoutmanager.Alignment;
+import mega.privacy.android.app.components.flowlayoutmanager.FlowLayoutManager;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
@@ -54,8 +61,9 @@ public class InviteFriendsFragment extends Fragment implements OnClickListener{
 
 	RelativeLayout parentRelativeLayout;
 	RecyclerView recyclerView;
-//	StaggeredGridLayoutManager mLayoutManager;
-	LinearLayoutManager mLayoutManager;
+
+	LinearLayoutManager mLayoutManager_2;
+	FlowLayoutManager mLayoutManager;
 	MegaInviteFriendsAdapter adapter;
 	EditText editTextMail;
 	LinearLayout linearLayoutCard;
@@ -103,10 +111,19 @@ public class InviteFriendsFragment extends Fragment implements OnClickListener{
 
 		View v = inflater.inflate(R.layout.fragment_invite_friends, container, false);
 		recyclerView = (RecyclerView) v.findViewById(R.id.invite_friends_recycler_view);
-//		mLayoutManager = new StaggeredGridLayoutManager(3,StaggeredGridLayoutManager.VERTICAL);
-//		mLayoutManager.setGapStrategy(StaggeredGridLayoutManager.GAP_HANDLING_MOVE_ITEMS_BETWEEN_SPANS);
-		mLayoutManager = new LinearLayoutManager(context);
-		recyclerView.setLayoutManager(mLayoutManager);
+
+		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN){
+
+			mLayoutManager_2 = new LinearLayoutManager(context);
+			recyclerView.setLayoutManager(mLayoutManager_2);
+
+		}else{
+
+			mLayoutManager = new FlowLayoutManager().setAlignment(Alignment.LEFT);
+			mLayoutManager.setAutoMeasureEnabled(true);
+			recyclerView.setLayoutManager(mLayoutManager);
+		}
+
 		recyclerView.setItemAnimator(new DefaultItemAnimator());
 
 		inviteButton = (Button)v.findViewById(R.id.invite_button);
@@ -163,10 +180,11 @@ public class InviteFriendsFragment extends Fragment implements OnClickListener{
 
 		mails = new ArrayList<>();
 
+
 		if (adapter == null){
 			adapter = new MegaInviteFriendsAdapter(context, this, mails, recyclerView);
-		}
 
+		}
 		recyclerView.setAdapter(adapter);
 
 		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
@@ -200,6 +218,7 @@ public class InviteFriendsFragment extends Fragment implements OnClickListener{
 	}
 
 	public void deleteMail(String mailToDelete){
+		log("deleteMail: "+mailToDelete);
 		int positionToRemove=-1;
 		for(int i=0;i<mails.size();i++){
 			if(mailToDelete.equals(mails.get(i))){
@@ -209,6 +228,25 @@ public class InviteFriendsFragment extends Fragment implements OnClickListener{
 		}
 		if(positionToRemove!=-1){
 			mails.remove(positionToRemove);
+			adapter.setNames(mails);
+			adapter.notifyDataSetChanged();
+		}
+		log("deleteMail: positionToRemove: "+positionToRemove);
+		if(mails.isEmpty()){
+			inviteButton.setBackgroundColor(ContextCompat.getColor(context, R.color.invite_button_deactivated));
+			inviteButton.setOnClickListener(null);
+		}
+		else{
+			inviteButton.setBackgroundColor(ContextCompat.getColor(context, R.color.accentColor));
+			inviteButton.setOnClickListener(this);
+		}
+	}
+
+	public void deleteMail(int positionToDelete){
+		log("deleteMail: "+positionToDelete);
+
+		if(positionToDelete!=-1){
+			mails.remove(positionToDelete);
 			adapter.setNames(mails);
 			adapter.notifyDataSetChanged();
 		}
@@ -238,6 +276,9 @@ public class InviteFriendsFragment extends Fragment implements OnClickListener{
 		}
 
 		recyclerView.setVisibility(View.VISIBLE);
+
+
+
 	}
 
 	@Override
@@ -285,4 +326,5 @@ public class InviteFriendsFragment extends Fragment implements OnClickListener{
 	public static void log(String log) {
 		Util.log("InviteFriendsFragment", log);
 	}
+
 }
