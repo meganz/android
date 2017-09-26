@@ -106,9 +106,12 @@ public class InviteFriendsFragment extends Fragment implements OnClickListener{
 		recyclerView = (RecyclerView) v.findViewById(R.id.invite_friends_recycler_view);
 
 		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN){
+
 			mLayoutManager_2 = new LinearLayoutManager(context);
 			recyclerView.setLayoutManager(mLayoutManager_2);
+
 		}else{
+
 			mLayoutManager = new FlowLayoutManager().setAlignment(Alignment.LEFT);
 			mLayoutManager.setAutoMeasureEnabled(true);
 			recyclerView.setLayoutManager(mLayoutManager);
