@@ -399,6 +399,24 @@ public class AchievementsFragment extends Fragment implements OnClickListener{
 
 			figuresReferralBonusesLayout.setVisibility(View.VISIBLE);
 			zeroFiguresReferralBonusesText.setVisibility(View.GONE);
+
+			log("Check if referrals are expired");
+			int expiredNumber = 0;
+			if(((AchievementsActivity)context).referralBonuses!=null){
+				for(int i=0;i<((AchievementsActivity)context).referralBonuses.size();i++){
+					ReferralBonus referralBonus = ((AchievementsActivity)context).referralBonuses.get(i);
+					if(referralBonus.getDaysLeft()<0){
+						expiredNumber++;
+					}
+				}
+			}
+
+			if(expiredNumber>=((AchievementsActivity)context).referralBonuses.size()-1){
+				log("All the referrals are expired");
+				figuresReferralBonusesLayout.setAlpha(0.5f);
+				referralBonusIcon.setAlpha(0.5f);
+			}
+
 		}
 		else{
 			figuresReferralBonusesLayout.setVisibility(View.GONE);
@@ -475,6 +493,9 @@ public class AchievementsFragment extends Fragment implements OnClickListener{
 					daysLeftInstallAppText.setBackground(ContextCompat.getDrawable(context, R.drawable.expired_border));
 					figuresInstallAppLayout.setAlpha(0.5f);
 					installAppIcon.setAlpha(0.5f);
+					RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) daysLeftRegistrationText.getLayoutParams();
+					params.setMargins(0,0,Util.scaleWidthPx(12,outMetrics),0);
+					daysLeftInstallAppText.setLayoutParams(params);
 					daysLeftInstallAppText.setText(context.getResources().getString(R.string.expired_achievement));
 				}
 
@@ -534,6 +555,9 @@ public class AchievementsFragment extends Fragment implements OnClickListener{
                     daysLeftInstallDesktopText.setBackground(ContextCompat.getDrawable(context, R.drawable.expired_border));
 					figuresInstallDesktopLayout.setAlpha(0.5f);
 					installDesktopIcon.setAlpha(0.5f);
+					RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) daysLeftRegistrationText.getLayoutParams();
+					params.setMargins(0,0,Util.scaleWidthPx(12,outMetrics),0);
+					daysLeftInstallDesktopText.setLayoutParams(params);
 					daysLeftInstallDesktopText.setText(context.getResources().getString(R.string.expired_achievement));
 				}
 
@@ -588,6 +612,9 @@ public class AchievementsFragment extends Fragment implements OnClickListener{
                     daysLeftRegistrationText.setBackground(ContextCompat.getDrawable(context, R.drawable.expired_border));
 					figuresRegistrationLayout.setAlpha(0.5f);
 					registrationIcon.setAlpha(0.5f);
+					RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) daysLeftRegistrationText.getLayoutParams();
+					params.setMargins(0,0,Util.scaleWidthPx(12,outMetrics),0);
+					daysLeftRegistrationText.setLayoutParams(params);
 					daysLeftRegistrationText.setText(context.getResources().getString(R.string.expired_achievement));
 				}
 			}
