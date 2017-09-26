@@ -431,6 +431,13 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			if(isFolderLink){
 				moveToTrashIcon.setVisible(false);
 				removeIcon.setVisible(false);
+				getlinkIcon.setVisible(false);
+				renameIcon.setVisible(false);
+				shareIcon.setVisible(false);
+				propertiesIcon.setVisible(false);
+				moveIcon.setVisible(false);
+				copyIcon.setVisible(false);
+				removelinkIcon.setVisible(false);
 			}
 			else{
 				node = megaApi.getNodeByHandle(imageHandles.get(positionG));
