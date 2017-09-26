@@ -415,8 +415,6 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 				ownerLabel.setMaxWidth((int) width1);
 				ownerInfo.setMaxWidth((int) width2);
 
-
-
 			}
 			else{
 				log("Portrait configuration");
@@ -530,10 +528,6 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 				editLinkMenuItem.setVisible(true);
 				removeLinkMenuItem.setVisible(true);
 				menu.findItem(R.id.cab_menu_file_info_remove_link).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-
-
-
-
 			}
 			else{
 				getLinkMenuItem.setVisible(true);
@@ -541,7 +535,6 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 				editLinkMenuItem.setVisible(false);
 				removeLinkMenuItem.setVisible(false);
 				menu.findItem(R.id.cab_menu_file_info_remove_link).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
-
 			}
 
 			if(from==FROM_INCOMING_SHARES){
@@ -649,7 +642,6 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 				deleteMenuItem.setVisible(false);
 				leaveMenuItem.setVisible(false);
 				menu.findItem(R.id.cab_menu_file_info_leave).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
-
 
 				renameMenuItem.setVisible(true);
 				moveMenuItem.setVisible(true);
@@ -1163,22 +1155,27 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 					log("FROM_INCOMING_SHARES");
 					//Find in the filesystem
 					if (Environment.getExternalStorageDirectory() != null) {
-						offlineFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" + offlineNode.getHandleIncoming() + offlineNode.getPath());
+						offlineFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" + offlineNode.getHandleIncoming() + offlineNode.getPath()+ "/" + node.getName());
 						log("offline File INCOMING: " + offlineFile.getAbsolutePath());
 					} else {
 						offlineFile = this.getFilesDir();
 					}
 
-				} else {
-					log("NOT INCOMING");
-					//Find in the filesystem
-					//Path MEGA
-					String pathMega = megaApi.getNodePath(node);
-					if(from==FROM_INBOX){
-						pathMega = pathMega.replace("/in", "");
-					}
+				}
+				else if(from==FROM_INBOX){
+
 					if (Environment.getExternalStorageDirectory() != null) {
-						offlineFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" + pathMega);
+						offlineFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/in/" + offlineNode.getPath()+ "/" + node.getName());
+						log("offline File INCOMING: " + offlineFile.getAbsolutePath());
+					} else {
+						offlineFile = this.getFilesDir();
+					}
+				}
+				else {
+					log("NOT INCOMING NEITHER INBOX");
+					//Find in the filesystem
+					if (Environment.getExternalStorageDirectory() != null) {
+						offlineFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" + megaApi.getNodePath(node));
 						log("offline File: " + offlineFile.getAbsolutePath());
 					} else {
 						offlineFile = this.getFilesDir();
@@ -1209,7 +1206,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
 		}
 		else{
-			log("NOT Exists OFFLINE: setChecket FALSE");
+			log("NOT Exists in DB OFFLINE: setChecket FALSE: "+node.getHandle());
 			availableOfflineBoolean = false;
 			offlineSwitch.setChecked(false);
 		}
@@ -1365,15 +1362,41 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 						availableOfflineBoolean = true;
 						offlineSwitch.setChecked(true);
 
-						log("Path destination: "+Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/"+MegaApiUtils.createStringTree(node, this));
-
 						File destination = null;
-						if (Environment.getExternalStorageDirectory() != null){
-							destination = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/"+MegaApiUtils.createStringTree(node, this));
+						if (from == FROM_INCOMING_SHARES) {
+							log("FROM_INCOMING_SHARES");
+							//Find in the filesystem
+							if (Environment.getExternalStorageDirectory() != null) {
+								long handleIncoming = findIncomingParentHandle(node);
+								destination = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" + Long.toString(handleIncoming) + "/" + MegaApiUtils.createStringTree(node, this));
+								log("offline File INCOMING: " + destination.getAbsolutePath());
+							} else {
+								destination = this.getFilesDir();
+							}
+
 						}
-						else{
-							destination = getFilesDir();
+						else if(from==FROM_INBOX){
+							log("FROM_INBOX");
+							if (Environment.getExternalStorageDirectory() != null) {
+								destination = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/in/" + MegaApiUtils.createStringTree(node, this));
+								log("offline File INBOX: " + destination.getAbsolutePath());
+							} else {
+								destination = this.getFilesDir();
+							}
 						}
+						else {
+							log("NOT INCOMING NOT INBOX");
+							//Find in the filesystem
+
+							if (Environment.getExternalStorageDirectory() != null){
+								destination = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/"+MegaApiUtils.createStringTree(node, this));
+							}
+							else{
+								destination = getFilesDir();
+							}
+						}
+
+						log("Path destination: "+destination);
 
 						if (destination.exists() && destination.isDirectory()){
 							File offlineFile = new File(destination, node.getName());
@@ -1382,6 +1405,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 							}
 						}
 
+						log("Handle to save for offline : "+node.getHandle());
 						saveOffline(destination);
 
 						supportInvalidateOptionsMenu();
@@ -1559,9 +1583,10 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
 		//Remove the node physically
 		File destination = null;
+		log("Path: "+mOffDelete.getPath());
 		if(mOffDelete.isIncoming()){
 			if (Environment.getExternalStorageDirectory() != null){
-				destination = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR);
+				destination = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" + mOffDelete.getHandleIncoming() +"/" + mOffDelete.getPath());
 			}
 			else{
 				destination = new File(getFilesDir(), mOffDelete.getHandle()+"");
@@ -1570,22 +1595,33 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 			log("Remove incoming: "+destination.getAbsolutePath());
 
 			try{
-				File offlineFile = new File(destination,  mOffDelete.getHandleIncoming());
+				File offlineFile = new File(destination,  mOffDelete.getName());
 				Util.deleteFolderAndSubfolders(this, offlineFile);
 			}
 			catch(Exception e){
 				log("EXCEPTION: removeOffline - file");
+				log("EXCEPTION: "+e.toString());
 			};
 
 			dbH.removeById(mOffDelete.getId());
 		}
 		else
 		{
-			if (Environment.getExternalStorageDirectory() != null){
-				destination = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + mOffDelete.getPath());
+			if(from==FROM_INBOX){
+				if (Environment.getExternalStorageDirectory() != null) {
+					destination = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/in/" + mOffDelete.getPath());
+					log("offline File INCOMING: " + destination.getAbsolutePath());
+				} else {
+					destination = this.getFilesDir();
+				}
 			}
 			else{
-				destination = new File(getFilesDir(), mOffDelete.getHandle()+"");
+				if (Environment.getExternalStorageDirectory() != null){
+					destination = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + mOffDelete.getPath());
+				}
+				else{
+					destination = new File(getFilesDir(), mOffDelete.getHandle()+"");
+				}
 			}
 
 			log("Remove node: "+destination.getAbsolutePath());

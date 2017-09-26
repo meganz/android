@@ -134,7 +134,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 		public View separator;
 		public ImageView imageViewVideoIcon;
 		public TextView videoDuration;
-		public RelativeLayout videoInfo_layout;
+		public RelativeLayout videoInfoLayout;
 	}
 
 	public void toggleAllSelection(int pos) {
@@ -536,7 +536,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 			holderGrid.publicLinkImage = (ImageView) v.findViewById(R.id.file_grid_public_link);
 			holderGrid.imageViewVideoIcon = (ImageView) v.findViewById(R.id.file_grid_video_icon);
 			holderGrid.videoDuration = (TextView) v.findViewById(R.id.file_grid_title_video_duration);
-			holderGrid.videoInfo_layout = (RelativeLayout) v.findViewById(R.id.item_file_videoinfo_layout);
+			holderGrid.videoInfoLayout = (RelativeLayout) v.findViewById(R.id.item_file_videoinfo_layout);
 
 			if(holderGrid.textViewFileSize!=null){
 				holderGrid.textViewFileSize.setVisibility(View.VISIBLE);
@@ -595,7 +595,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 		
 		holder.textViewFileName.setText(node.getName());
 		holder.textViewFileSize.setText("");
-		holder.videoInfo_layout.setVisibility(View.GONE);
+		holder.videoInfoLayout.setVisibility(View.GONE);
 
 		if (!multipleSelect) {
 			holder.itemLayout.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.background_item_grid));
@@ -712,7 +712,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 			holder.thumbLayout.setBackgroundColor(Color.TRANSPARENT);
 
 			if(Util.isVideoFile(node.getName())){
-				holder.videoInfo_layout.setVisibility(View.VISIBLE);
+				holder.videoInfoLayout.setVisibility(View.VISIBLE);
 				holder.videoDuration.setVisibility(View.GONE);
 				log(node.getName()+" DURATION: "+node.getDuration());
 				int duration = node.getDuration();
