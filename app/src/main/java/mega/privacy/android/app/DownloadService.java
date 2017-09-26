@@ -1074,6 +1074,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		destination.mkdirs();
 
 		log("saveOffline: "+ destination.getAbsolutePath());
+		log("Handle to save for offline : "+node.getHandle());
 
 		Map<MegaNode, String> dlFiles = new HashMap<MegaNode, String>();
 		if (node.getType() == MegaNode.TYPE_FOLDER) {
@@ -1131,8 +1132,6 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		MegaOffline mOffParent=null;
 		MegaOffline mOffNode = null;
 
-		parentNode = megaApi.getParentNode(nodeToInsert);
-
 		for(int i=nodesToDB.size()-1; i>=0; i--){
 
 			nodeToInsert = nodesToDB.get(i);
@@ -1170,6 +1169,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 					if(mOffNode == null){
 
 						if(mOffParent!=null){
+							log("Parent of the node is NOT null");
 							if(nodeToInsert.isFile()){
 								MegaOffline mOffInsert = new MegaOffline(Long.toString(nodeToInsert.getHandle()), path, nodeToInsert.getName(), mOffParent.getId(), DB_FILE,false, "-1");
 								long checkInsert=dbH.setOfflineFile(mOffInsert);
@@ -1179,6 +1179,21 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 								MegaOffline mOffInsert = new MegaOffline(Long.toString(nodeToInsert.getHandle()), path, nodeToInsert.getName(), mOffParent.getId(), DB_FOLDER, false, "-1");
 								long checkInsert=dbH.setOfflineFile(mOffInsert);
 								log("Test insert B: "+checkInsert);
+							}
+						}
+						else{
+							log("Parent of the node is NULL");
+							path="/";
+
+							if(nodeToInsert.isFile()){
+								MegaOffline mOffInsert = new MegaOffline(Long.toString(nodeToInsert.getHandle()), path, nodeToInsert.getName(),-1, DB_FILE, false, "-1");
+								long checkInsert=dbH.setOfflineFile(mOffInsert);
+								log("Test insert E: "+checkInsert);
+							}
+							else{
+								MegaOffline mOffInsert = new MegaOffline(Long.toString(nodeToInsert.getHandle()), path, nodeToInsert.getName(), -1, DB_FOLDER, false, "-1");
+								long checkInsert=dbH.setOfflineFile(mOffInsert);
+								log("Test insert F: "+checkInsert);
 							}
 						}
 					}

@@ -1632,7 +1632,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	}
 	
 	public long setOfflineFile (MegaOffline offline){
-		log("setOfflineFile");
+		log("setOfflineFile: "+offline.getHandle());
         ContentValues values = new ContentValues();
         
         MegaOffline checkInsert = null;
