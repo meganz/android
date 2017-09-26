@@ -383,7 +383,7 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 			else{
 				adapter.setParentHandle(parentHandle);
 				adapter.setAdapterType(MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST);
-//				adapterList.setNodes(nodes);
+//				adapter.setNodes(nodes);
 			}
 
 			if (parentHandle == -1){
@@ -399,9 +399,6 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 				MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
 				log("ParentHandle to find children: "+parentHandle);
 				nodes = megaApi.getChildren(parentNode, orderGetChildren);
-                if(orderGetChildren == MegaApiJava.ORDER_DEFAULT_DESC){
-                    sortByMailDescending();
-                }
 				adapter.setNodes(nodes);
 				aB.setTitle(parentNode.getName());
 				log("ic_arrow_back_white_68");
@@ -550,9 +547,6 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 				log("ParentHandle: " + _parentHandle);
 
 				nodes = megaApi.getChildren(parentNode, orderGetChildren);
-                if(orderGetChildren == MegaApiJava.ORDER_DEFAULT_DESC){
-                    sortByMailDescending();
-                }
 				adapter.setNodes(nodes);
 
 				aB.setTitle(parentNode.getName());
@@ -647,9 +641,6 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 				((ManagerActivityLollipop)context).setParentHandleIncoming(parentHandle);
 				adapter.setParentHandle(parentHandle);
 				nodes = megaApi.getChildren(nodes.get(position), orderGetChildren);
-                if(orderGetChildren == MegaApiJava.ORDER_DEFAULT_DESC){
-                    sortByMailDescending();
-                }
 				adapter.setNodes(nodes);
 				recyclerView.scrollToPosition(0);
 				
@@ -935,9 +926,6 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 				((ManagerActivityLollipop)context).setParentHandleIncoming(parentHandle);
 				nodes = megaApi.getChildren(parentNode, orderGetChildren);
 				//TODO
-                if(orderGetChildren == MegaApiJava.ORDER_DEFAULT_DESC){
-                    sortByMailDescending();
-                }
 				adapter.setNodes(nodes);
 				int lastVisiblePosition = 0;
 				if(!lastPositionStack.empty()){
@@ -1047,18 +1035,11 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 	
 	public void setOrder(int orderGetChildren){
 		this.orderGetChildren = orderGetChildren;
-
-        if(orderGetChildren == MegaApiJava.ORDER_DEFAULT_DESC){
-            sortByMailDescending();
-        }
 	}
 	
 	public void setNodes(ArrayList<MegaNode> nodes){
 		log("setNodes");
 		this.nodes = nodes;
-        if(orderGetChildren == MegaApiJava.ORDER_DEFAULT_DESC){
-            sortByMailDescending();
-        }
 		adapter.setNodes(nodes);
 	}
 	
@@ -1076,8 +1057,8 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 			}
 		}
 
-//		Collections.reverse(folderNodes);
-//		Collections.reverse(fileNodes);
+		Collections.reverse(folderNodes);
+		Collections.reverse(fileNodes);
 
 		nodes.clear();
 		nodes.addAll(folderNodes);

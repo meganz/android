@@ -1023,14 +1023,14 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			}
 			
 			ArrayList<MegaNode> nodes = megaApi.getChildren(parentNode, orderGetChildren);
-			if (fromShared){
-				if(orderGetChildren == MegaApiJava.ORDER_DEFAULT_DESC){
-					nodes = sortByMailDescending(nodes);
-				}
+//			if (fromShared){
+//				if(orderGetChildren == MegaApiJava.ORDER_DEFAULT_DESC){
+//					nodes = sortByMailDescending(nodes);
+//				}
 //				else{
 //					nodes = sortByNameAscending(nodes);
 //				}
-			}
+//			}
 			int imageNumber = 0;
 			for (int i=0;i<nodes.size();i++){
 				MegaNode n = nodes.get(i);
