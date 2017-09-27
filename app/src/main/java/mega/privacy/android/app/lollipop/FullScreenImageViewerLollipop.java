@@ -774,41 +774,44 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			
 			for(int i=0; i<mOffList.size();i++){
 				MegaOffline checkOffline = mOffList.get(i);
-				
-				if(!checkOffline.isIncoming()){				
-					log("NOT isIncomingOffline");
-					File offlineDirectory = null;
-					if (Environment.getExternalStorageDirectory() != null){
-						offlineDirectory = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + checkOffline.getPath()+checkOffline.getName());
-					}
-					else{
-						offlineDirectory = getFilesDir();
-					}	
-					
-					if (!offlineDirectory.exists()){
-						log("Path to remove A: "+(mOffList.get(i).getPath()+mOffList.get(i).getName()));
-						//dbH.removeById(mOffList.get(i).getId());
-						mOffList.remove(i);		
-						i--;
-					}	
-				}
-				else{
+				File offlineDirectory = null;
+				if(checkOffline.getOrigin()==MegaOffline.INCOMING){
 					log("isIncomingOffline");
-					File offlineDirectory = null;
+
 					if (Environment.getExternalStorageDirectory() != null){
 						offlineDirectory = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" +checkOffline.getHandleIncoming() + "/" + checkOffline.getPath()+checkOffline.getName());
 						log("offlineDirectory: "+offlineDirectory);
 					}
 					else{
 						offlineDirectory = getFilesDir();
-					}	
-					
+					}
+				}
+				else if(checkOffline.getOrigin()==MegaOffline.INBOX){
+					if (Environment.getExternalStorageDirectory() != null){
+						offlineDirectory = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/in/" + checkOffline.getPath()+checkOffline.getName());
+						log("offlineDirectory: "+offlineDirectory);
+					}
+					else{
+						offlineDirectory = getFilesDir();
+					}
+				}
+				else{
+					log("NOT isIncomingOffline");
+					if (Environment.getExternalStorageDirectory() != null){
+						offlineDirectory = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + checkOffline.getPath()+checkOffline.getName());
+					}
+					else{
+						offlineDirectory = getFilesDir();
+					}
+				}
+
+				if(offlineDirectory!=null){
 					if (!offlineDirectory.exists()){
 						log("Path to remove B: "+(mOffList.get(i).getPath()+mOffList.get(i).getName()));
 						//dbH.removeById(mOffList.get(i).getId());
 						mOffList.remove(i);
 						i--;
-					}						
+					}
 				}
 			}
 			
@@ -820,7 +823,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 						log("Export in: "+path);
 						File file= new File(path);
 						if(file.exists()){
-							MegaOffline masterKeyFile = new MegaOffline("0", path, "MEGARecoveryKey.txt", 0, "0", false, "0");
+							MegaOffline masterKeyFile = new MegaOffline("0", path, "MEGARecoveryKey.txt", 0, "0", 0, "0");
 							mOffList.add(masterKeyFile);
 						}
 					}	
@@ -830,7 +833,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 					log("Export in: "+path);
 					File file= new File(path);
 					if(file.exists()){
-						MegaOffline masterKeyFile = new MegaOffline("0", path, "MEGARecoveryKey.txt", 0, "0", false, "0");
+						MegaOffline masterKeyFile = new MegaOffline("0", path, "MEGARecoveryKey.txt", 0, "0", 0, "0");
 						mOffList.add(masterKeyFile);
 					}
 				}

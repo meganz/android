@@ -123,8 +123,11 @@ public class OfflineOptionsBottomSheetDialogFragment extends BottomSheetDialogFr
                 log("Set node info");
                 String path=null;
 
-                if(nodeOffline.isIncoming()){
+                if(nodeOffline.getOrigin()==MegaOffline.INCOMING){
                     path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" + nodeOffline.getHandleIncoming() + "/";
+                }
+                else if(nodeOffline.getOrigin()==MegaOffline.INBOX){
+                    path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/in";
                 }
                 else{
                     path= Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR;
@@ -132,7 +135,9 @@ public class OfflineOptionsBottomSheetDialogFragment extends BottomSheetDialogFr
 
                 File currentFile = null;
                 if (Environment.getExternalStorageDirectory() != null){
-                    currentFile = new File(path + nodeOffline.getPath()+nodeOffline.getName());
+                    String finalPath = path + nodeOffline.getPath()+nodeOffline.getName();
+                    currentFile = new File(finalPath);
+                    log("Path to find file: "+finalPath);
                 }
                 else{
                     currentFile = context.getFilesDir();

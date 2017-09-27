@@ -365,7 +365,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 							log("Export in: "+path);
 							File file= new File(path);
 							if(file.exists()){
-								MegaOffline masterKeyFile = new MegaOffline("0", path, "MEGARecoveryKey.txt", 0, "0", false, "0");
+								MegaOffline masterKeyFile = new MegaOffline("0", path, "MEGARecoveryKey.txt", 0, "0", 0, "0");
 								mOffList.add(masterKeyFile);
 							}
 						}	
@@ -375,7 +375,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 						log("Export in: "+path);
 						File file= new File(path);
 						if(file.exists()){
-							MegaOffline masterKeyFile = new MegaOffline("0", path, "MEGARecoveryKey.txt", 0, "0", false, "0");
+							MegaOffline masterKeyFile = new MegaOffline("0", path, "MEGARecoveryKey.txt", 0, "0", 0, "0");
 							mOffList.add(masterKeyFile);
 						}
 					}
@@ -538,8 +538,11 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 		
 		String path=null;
 		
-		if(currentNode.isIncoming()){
+		if(currentNode.getOrigin()==MegaOffline.INCOMING){
 			path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" + currentNode.getHandleIncoming() + "/";
+		}
+		else if(currentNode.getOrigin()==MegaOffline.INBOX){
+			path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/in/";
 		}
 		else{
 			path= Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR;
@@ -659,8 +662,11 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 		
 		String path=null;
 		
-		if(currentNode.isIncoming()){
+		if(currentNode.getOrigin()==MegaOffline.INCOMING){
 			path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" + currentNode.getHandleIncoming() + "/";
+		}
+		else if(currentNode.getOrigin()==MegaOffline.INBOX){
+			path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/in/";
 		}
 		else{
 			path= Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR;
