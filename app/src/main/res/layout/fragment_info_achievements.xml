@@ -17,13 +17,25 @@
         android:gravity="center_horizontal"
         android:orientation="vertical">
 
-        <ImageView
-            android:id="@+id/icon_info_achievements"
+        <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="48dp"
-            android:layout_gravity="center_horizontal"
-            android:src="@drawable/ic_invite_friends_big"/>
+            android:layout_gravity="center_horizontal">
+            <ImageView
+                android:id="@+id/icon_info_achievements"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@color/orange"
+                android:src="@drawable/ic_invite_friends_big"/>
+
+            <ImageView
+                android:id="@+id/icon_achievement_completed"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@color/blue"
+                android:src="@drawable/get_link_circle_white_ic"/>
+        </RelativeLayout>
 
         <TextView
             android:id="@+id/title_info_achievements"
@@ -36,6 +48,11 @@
             android:layout_gravity="center_horizontal"
             android:gravity="center_horizontal"
             android:textSize="14dp"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
+            android:paddingLeft="12dp"
+            android:paddingRight="12dp"
+            android:background="@color/white"
             android:lineSpacingMultiplier="1.2"
             android:textColor="@color/mail_my_account"/>
 
