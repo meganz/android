@@ -67,6 +67,7 @@ public class MyAccountInfo implements MegaRequestListenerInterface {
     String fullName = "";
 
     String lastSessionFormattedDate;
+    long createSessionTimeStamp = -1;
 
     DatabaseHandler dbH;
     Context context;
@@ -531,6 +532,15 @@ public class MyAccountInfo implements MegaRequestListenerInterface {
                         df.setTimeZone(tz);
                         lastSessionFormattedDate = df.format(date);
                         log("Formatted date: "+lastSessionFormattedDate);
+
+                        createSessionTimeStamp = megaAccountSession.getCreationTimestamp();
+                        log("createSessionTimeStamp: " + createSessionTimeStamp);
+                        date = new Date(createSessionTimeStamp * 1000);
+                        cal = Calendar.getInstance();
+                        tz = cal.getTimeZone();
+                        df.setTimeZone(tz);
+                        log("createSessionTimeStamp: " + df.format(date));
+
                     }
                 }
 
