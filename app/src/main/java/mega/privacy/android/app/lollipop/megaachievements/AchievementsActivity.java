@@ -214,8 +214,6 @@ public class AchievementsActivity extends PinActivityLollipop implements MegaReq
                             achievementsFragment.updateValues();
                         }
                     }
-
-
                 }
             }
             else{

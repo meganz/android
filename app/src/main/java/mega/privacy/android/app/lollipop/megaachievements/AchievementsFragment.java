@@ -342,7 +342,7 @@ public class AchievementsFragment extends Fragment implements OnClickListener{
 					((AchievementsActivity)context).showFragment(Constants.BONUSES_FRAGMENT, -1);
 				}
 				else{
-					((AchievementsActivity)context).showFragment(Constants.INFO_ACHIEVEMENTS_FRAGMENT, MegaAchievementsDetails.MEGA_ACHIEVEMENT_INVITE);
+					((AchievementsActivity)context).showFragment(Constants.INVITE_FRIENDS_FRAGMENT, -1);
 				}
 				break;
 			}
@@ -487,7 +487,6 @@ public class AchievementsFragment extends Fragment implements OnClickListener{
 					totalStorage = totalStorage + storageInstallApp;
 					totalTransfer = totalTransfer + transferInstallApp;
 					log("After mobile install: storage: "+Util.getSizeString(totalStorage)+" transfer "+Util.getSizeString(totalTransfer));
-
 				}
 				else{
 					daysLeftInstallAppText.setBackground(ContextCompat.getDrawable(context, R.drawable.expired_border));
@@ -625,11 +624,13 @@ public class AchievementsFragment extends Fragment implements OnClickListener{
 
 		storageQuota = ((AchievementsActivity)context).megaAchievements.currentStorage();
 
-		figureUnlockedRewardStorage.setText(Util.getSizeString(totalStorage));
+		log("My calculated totalTransfer: "+totalStorage);
+		figureUnlockedRewardStorage.setText(Util.getSizeString(storageQuota));
 
 		transferQuota = ((AchievementsActivity)context).megaAchievements.currentTransfer();
 
-		figureUnlockedRewardTransfer.setText(Util.getSizeString(totalTransfer));
+		log("My calculated totalTransfer: "+totalTransfer);
+		figureUnlockedRewardTransfer.setText(Util.getSizeString(transferQuota));
 	}
 
 	public static void log(String log) {
