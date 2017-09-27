@@ -257,7 +257,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
         RelativeLayout transparentCoatingLandscape;
         RelativeLayout transparentCoatingPortrait;
-        ProgressBar uploadingProgressBar;
+        RelativeLayout uploadingProgressBarPort;
+        RelativeLayout uploadingProgressBarLand;
 
         RelativeLayout errorUploadingPortrait;
         RelativeLayout errorUploadingLandscape;
@@ -402,8 +403,10 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.transparentCoatingLandscape = (RelativeLayout) v.findViewById(R.id.transparent_coating_landscape);
             holder.transparentCoatingLandscape.setVisibility(View.GONE);
 
-            holder.uploadingProgressBar = (ProgressBar) v.findViewById(R.id.uploadingProgressBar);
-            holder.uploadingProgressBar.setVisibility(View.GONE);
+            holder.uploadingProgressBarPort = (RelativeLayout) v.findViewById(R.id.uploadingProgressBarPort);
+            holder.uploadingProgressBarPort.setVisibility(View.GONE);
+            holder.uploadingProgressBarLand = (RelativeLayout) v.findViewById(R.id.uploadingProgressBarLand);
+            holder.uploadingProgressBarLand.setVisibility(View.GONE);
 
             holder.errorUploadingPortrait = (RelativeLayout) v.findViewById(R.id.error_uploading_portrait);
             holder.errorUploadingPortrait.setVisibility(View.GONE);
@@ -504,37 +507,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         AndroidMegaChatMessage message = messages.get(position-1);
 
         if(message.isUploading()){
-            if(message.getPendingMessage().getState()==PendingMessage.STATE_ERROR){
-
-                if(((ViewHolderMessageChat)holder).contentOwnMessageText.getVisibility()==View.GONE){
-
-                    ((ViewHolderMessageChat) holder).errorUploadingPortrait.setVisibility(View.GONE);
-                    ((ViewHolderMessageChat) holder).notSentTextPortrait.setVisibility(View.GONE);
-
-                    ((ViewHolderMessageChat) holder).errorUploadingLandscape.setVisibility(View.GONE);
-                    ((ViewHolderMessageChat) holder).notSentTextLandscape.setVisibility(View.GONE);
-
-                }else if(((ViewHolderMessageChat)holder).previewFrameLand.getVisibility()==View.GONE){
-                    ((ViewHolderMessageChat) holder).errorUploadingPortrait.setVisibility(View.GONE);
-                    ((ViewHolderMessageChat) holder).notSentTextPortrait.setVisibility(View.GONE);
-
-                    ((ViewHolderMessageChat) holder).errorUploadingLandscape.setVisibility(View.VISIBLE);
-                    ((ViewHolderMessageChat) holder).notSentTextLandscape.setVisibility(View.VISIBLE);
-
-                }else if(((ViewHolderMessageChat)holder).previewFramePort.getVisibility()==View.GONE){
-
-                    ((ViewHolderMessageChat) holder).errorUploadingPortrait.setVisibility(View.VISIBLE);
-                    ((ViewHolderMessageChat) holder).notSentTextPortrait.setVisibility(View.VISIBLE);
-
-                    ((ViewHolderMessageChat) holder).errorUploadingLandscape.setVisibility(View.GONE);
-                    ((ViewHolderMessageChat) holder).notSentTextLandscape.setVisibility(View.GONE);
-
-                }
-            }
-
-            ((ViewHolderMessageChat)holder).previewFramePort.setVisibility(View.VISIBLE);
-
-            if(message.getInfoToShow()!=-1){
+                if(message.getInfoToShow()!=-1){
                 switch (message.getInfoToShow()){
 
                     case Constants.CHAT_ADAPTER_SHOW_ALL:{
@@ -668,7 +641,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
         ((ViewHolderMessageChat) holder).transparentCoatingLandscape.setVisibility(View.GONE);
         ((ViewHolderMessageChat) holder).transparentCoatingPortrait.setVisibility(View.GONE);
-        ((ViewHolderMessageChat) holder).uploadingProgressBar.setVisibility(View.GONE);
+        ((ViewHolderMessageChat) holder).uploadingProgressBarPort.setVisibility(View.GONE);
+        ((ViewHolderMessageChat) holder).uploadingProgressBarLand.setVisibility(View.GONE);
         ((ViewHolderMessageChat) holder).errorUploadingPortrait.setVisibility(View.GONE);
         ((ViewHolderMessageChat) holder).errorUploadingLandscape.setVisibility(View.GONE);
         ((ViewHolderMessageChat) holder).notSentTextLandscape.setVisibility(View.GONE);
@@ -3377,7 +3351,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     if (message.getPendingMessage().getState() == PendingMessage.STATE_ERROR) {
                         log("Message is on ERROR state");
                         //Error
-                        holder.uploadingProgressBar.setVisibility(View.GONE);
+                        holder.uploadingProgressBarPort.setVisibility(View.GONE);
+                        holder.uploadingProgressBarLand.setVisibility(View.GONE);
 
                         if (bitmap.getWidth() < bitmap.getHeight()) {
                             log("Portrait");
@@ -3416,7 +3391,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     } else {
                         log("Message is in progress state");
                         //In progress
-                        holder.uploadingProgressBar.setVisibility(View.VISIBLE);
                         holder.errorUploadingPortrait.setVisibility(View.GONE);
                         holder.notSentTextPortrait.setVisibility(View.GONE);
                         holder.errorUploadingLandscape.setVisibility(View.GONE);
@@ -3424,16 +3398,23 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                         if (bitmap.getWidth() < bitmap.getHeight()) {
                             log("Portrait");
-
-                            holder.transparentCoatingPortrait.setVisibility(View.VISIBLE);
                             holder.transparentCoatingLandscape.setVisibility(View.GONE);
+                            holder.transparentCoatingPortrait.setVisibility(View.VISIBLE);
+                            holder.uploadingProgressBarPort.setVisibility(View.VISIBLE);
+                            holder.uploadingProgressBarLand.setVisibility(View.GONE);
+
+
 
                         }else{
                             log("Landscape");
-
                             holder.transparentCoatingPortrait.setVisibility(View.GONE);
                             holder.transparentCoatingLandscape.setVisibility(View.VISIBLE);
+                            holder.uploadingProgressBarLand.setVisibility(View.VISIBLE);
+                            holder.uploadingProgressBarPort.setVisibility(View.GONE);
+
+
                         }
+
                     }
                 }
                 else{

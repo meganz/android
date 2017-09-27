@@ -2,9 +2,11 @@ package mega.privacy.android.app.lollipop.megaachievements;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
@@ -59,10 +61,8 @@ public class InviteFriendsFragment extends Fragment implements OnClickListener{
 
 	RelativeLayout parentRelativeLayout;
 	RecyclerView recyclerView;
-//	StaggeredGridLayoutManager mLayoutManager;
-//	private StaggeredGridLayoutManager gaggeredGridLayoutManager;
 
-//	LinearLayoutManager mLayoutManager;
+	LinearLayoutManager mLayoutManager_2;
 	FlowLayoutManager mLayoutManager;
 	MegaInviteFriendsAdapter adapter;
 	EditText editTextMail;
@@ -112,9 +112,18 @@ public class InviteFriendsFragment extends Fragment implements OnClickListener{
 		View v = inflater.inflate(R.layout.fragment_invite_friends, container, false);
 		recyclerView = (RecyclerView) v.findViewById(R.id.invite_friends_recycler_view);
 
-		mLayoutManager = new FlowLayoutManager().setAlignment(Alignment.LEFT);
-		mLayoutManager.setAutoMeasureEnabled(true);
-		recyclerView.setLayoutManager(mLayoutManager);
+		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN){
+
+			mLayoutManager_2 = new LinearLayoutManager(context);
+			recyclerView.setLayoutManager(mLayoutManager_2);
+
+		}else{
+
+			mLayoutManager = new FlowLayoutManager().setAlignment(Alignment.LEFT);
+			mLayoutManager.setAutoMeasureEnabled(true);
+			recyclerView.setLayoutManager(mLayoutManager);
+		}
+
 		recyclerView.setItemAnimator(new DefaultItemAnimator());
 
 		inviteButton = (Button)v.findViewById(R.id.invite_button);
