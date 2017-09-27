@@ -1584,7 +1584,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 		//Remove the node physically
 		File destination = null;
 		log("Path: "+mOffDelete.getPath());
-		if(mOffDelete.isIncoming()){
+		if(mOffDelete.getOrigin()==MegaOffline.INCOMING){
 			if (Environment.getExternalStorageDirectory() != null){
 				destination = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" + mOffDelete.getHandleIncoming() +"/" + mOffDelete.getPath());
 			}
