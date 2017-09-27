@@ -26,15 +26,13 @@
                 android:id="@+id/icon_info_achievements"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@color/orange"
                 android:src="@drawable/ic_invite_friends_big"/>
 
             <ImageView
                 android:id="@+id/icon_achievement_completed"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@color/blue"
-                android:src="@drawable/get_link_circle_white_ic"/>
+                android:src="@drawable/ic_check_achievements"/>
         </RelativeLayout>
 
         <TextView
