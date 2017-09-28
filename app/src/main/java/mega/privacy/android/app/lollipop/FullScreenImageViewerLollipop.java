@@ -271,6 +271,12 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			downloadIcon.setVisible(false);
 			menu.findItem(R.id.full_image_viewer_download).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
 
+			renameIcon.setVisible(false);
+			moveIcon.setVisible(false);
+			copyIcon .setVisible(false);
+			moveToTrashIcon.setVisible(false);
+			removeIcon.setVisible(false);
+
 
 		}else if(adapterType == Constants.SEARCH_ADAPTER){
 
@@ -874,7 +880,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		}				
 		else if (adapterType == Constants.ZIP_ADAPTER){
 			String offlinePathDirectory = intent.getStringExtra("offlinePathDirectory");
-		
+
 			File offlineDirectory = new File(offlinePathDirectory);
 //			if (Environment.getExternalStorageDirectory() != null){
 //				offlineDirectory = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR);
@@ -882,8 +888,8 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 //			else{
 //				offlineDirectory = getFilesDir();
 //			}
-			
-			paths.clear();			
+
+			paths.clear();
 			int imageNumber = 0;
 			int index = 0;
 			File[] fList = offlineDirectory.listFiles();
@@ -894,20 +900,20 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				finish();
 				return;
 			}
-			
+
 			log("SIZE: " + fList.length);
 			for (File f : fList){
 				log("F: " + f.getAbsolutePath());
 				if (MimeTypeList.typeForName(f.getName()).isImage()){
 					paths.add(f.getAbsolutePath());
 					if (index == positionG){
-						positionG = imageNumber; 
+						positionG = imageNumber;
 					}
 					imageNumber++;
 				}
-				index++;				
+				index++;
 			}
-			
+
 			if(paths.size() == 0)
 			{
 				//No images to show (images deleted?)
@@ -915,21 +921,21 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				finish();
 				return;
 			}
-			
+
 			if(positionG >= paths.size())
 			{
 				//Invalid index. Show the first image
 				positionG = 0;
 			}
-			
+
 			if(adapterType == Constants.ZIP_ADAPTER){
 				adapterOffline = new MegaOfflineFullScreenImageAdapterLollipop(this, fullScreenImageViewer, paths, true);
 			}
-			
+
 			viewPager.setAdapter(adapterOffline);
-			
+
 			viewPager.setCurrentItem(positionG);
-	
+
 			viewPager.setOnPageChangeListener(this);
 
 			fileNameTextView = (TextView) findViewById(R.id.full_image_viewer_file_name);
@@ -943,7 +949,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 
 
 
-			fileNameTextView.setText(megaApi.getNodeByHandle(imageHandles.get(positionG)).getName());
+//			fileNameTextView.setText(megaApi.getNodeByHandle(imageHandles.get(positionG)).getName());
 		}
 		else if(adapterType == Constants.SEARCH_ADAPTER){
 

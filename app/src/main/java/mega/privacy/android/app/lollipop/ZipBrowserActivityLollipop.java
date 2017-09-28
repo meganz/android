@@ -11,6 +11,9 @@ import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.ActionBar;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.view.Display;
@@ -22,6 +25,7 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import java.io.BufferedInputStream;
@@ -41,11 +45,14 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.adapters.ZipListAdapterLollipop;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiJava;
+
+import static mega.privacy.android.app.utils.Util.context;
 
 
 public class ZipBrowserActivityLollipop extends PinActivityLollipop implements OnItemClickListener, OnItemLongClickListener{
@@ -64,7 +71,9 @@ public class ZipBrowserActivityLollipop extends PinActivityLollipop implements O
 	public static int REQUEST_CODE_SELECT_LOCAL_FOLDER = 1004;
 	boolean folderzipped = false;
     
-	ListView listView;
+	//ListView listView;
+	RecyclerView recyclerView;
+	LinearLayoutManager mLayoutManager;
 
 	ZipListAdapterLollipop adapterList;
 	Toolbar tB;
@@ -211,12 +220,21 @@ public class ZipBrowserActivityLollipop extends PinActivityLollipop implements O
 			window.setStatusBarColor(ContextCompat.getColor(this, R.color.lollipop_dark_primary_color));
 		}
 
-		
-		listView = (ListView) findViewById(R.id.zip_list_view_browser);
-		listView.setOnItemClickListener(this);
-		listView.setOnItemLongClickListener(this);
-		listView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
-		listView.setItemsCanFocus(false);
+		recyclerView = (RecyclerView) findViewById(R.id.zip_list_view_browser);
+		recyclerView.setPadding(0, 0, 0, Util.scaleHeightPx(85, outMetrics));
+		recyclerView.setClipToPadding(false);
+		recyclerView.addItemDecoration(new SimpleDividerItemDecoration(this, outMetrics));
+		mLayoutManager = new LinearLayoutManager(this);
+		recyclerView.setLayoutManager(mLayoutManager);
+		recyclerView.setHasFixedSize(true);
+		recyclerView.setItemAnimator(new DefaultItemAnimator());
+
+
+//		listView = (ListView) findViewById(R.id.zip_list_view_browser);
+//		listView.setOnItemClickListener(this);
+//		listView.setOnItemLongClickListener(this);
+//		listView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+//		listView.setItemsCanFocus(false);
 
 		try {
 			myZipFile = new ZipFile(pathZip);			
@@ -342,15 +360,15 @@ public class ZipBrowserActivityLollipop extends PinActivityLollipop implements O
 		
 
 		if (adapterList == null){
-			adapterList = new ZipListAdapterLollipop(this, listView, aB, zipNodes, currentFolder);
-			
+			adapterList = new ZipListAdapterLollipop(this, recyclerView, aB, zipNodes, currentFolder);
 		}
 		else{
 //			adapterList.setParentHandle(parentHandle);
 //			adapterList.setNodes(nodes);
 		}		
 
-		listView.setAdapter(adapterList);
+		recyclerView.setAdapter(adapterList);
+
 
 		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 	}
