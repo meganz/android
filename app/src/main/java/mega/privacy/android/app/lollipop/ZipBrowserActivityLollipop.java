@@ -8,6 +8,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
@@ -15,6 +16,8 @@ import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
@@ -200,11 +203,14 @@ public class ZipBrowserActivityLollipop extends PinActivityLollipop implements O
 		aB.setDisplayHomeAsUpEnabled(true);
 		aB.setTitle(getString(R.string.zip_browser_activity));
 		aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
-		
-//		Window window = this.getWindow();
-//		window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-//		window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-//		window.setStatusBarColor(this.getResources().getColor(R.color.lollipop_dark_primary_color));
+
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+			Window window = this.getWindow();
+			window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+			window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+			window.setStatusBarColor(ContextCompat.getColor(this, R.color.lollipop_dark_primary_color));
+		}
+
 		
 		listView = (ListView) findViewById(R.id.zip_list_view_browser);
 		listView.setOnItemClickListener(this);
