@@ -66,7 +66,6 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
 
     private LinearLayout createAccountLayout;
     private LinearLayout creatingAccountLayout;
-    private LinearLayout createAccountLoginLayout;
 
     private TextView creatingAccountTextView;
     private ProgressBar createAccountProgressBar;
@@ -79,7 +78,6 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
     private TextView password_confirm_error_text;
     private TextView name_error_text;
     private TextView password_error_text;
-
 
     private Drawable email_background;
     private Drawable password_confirm_background;
@@ -130,7 +128,6 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
 
         scrollView = (ScrollView) v.findViewById(R.id.scroll_view_account);
         createAccountLayout = (LinearLayout) v.findViewById(R.id.create_account_create_layout);
-        createAccountLoginLayout = (LinearLayout) v.findViewById(R.id.create_account_login_layout);
         createAccountTitle = (TextView) v.findViewById(R.id.create_account_text_view);
 
         userName = (EditText) v.findViewById(R.id.create_account_name_text);
@@ -272,7 +269,6 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
         createAccountProgressBar = (ProgressBar) v.findViewById(R.id.create_account_progress_bar);
 
         createAccountLayout.setVisibility(View.VISIBLE);
-        createAccountLoginLayout.setVisibility(View.VISIBLE);
         creatingAccountLayout.setVisibility(View.GONE);
         creatingAccountTextView.setVisibility(View.GONE);
         createAccountProgressBar.setVisibility(View.GONE);
@@ -336,7 +332,6 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
         }
 
         createAccountLayout.setVisibility(View.GONE);
-        createAccountLoginLayout.setVisibility(View.GONE);
         creatingAccountLayout.setVisibility(View.VISIBLE);
         creatingAccountTextView.setVisibility(View.GONE);
         createAccountProgressBar.setVisibility(View.VISIBLE);
@@ -347,7 +342,6 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
         }
 
         createAccountLayout.setVisibility(View.GONE);
-        createAccountLoginLayout.setVisibility(View.GONE);
         creatingAccountLayout.setVisibility(View.VISIBLE);
         creatingAccountTextView.setVisibility(View.VISIBLE);
         createAccountProgressBar.setVisibility(View.VISIBLE);
@@ -435,7 +429,6 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
         }
 
         createAccountLayout.setVisibility(View.GONE);
-        createAccountLoginLayout.setVisibility(View.GONE);
         creatingAccountLayout.setVisibility(View.VISIBLE);
         creatingAccountTextView.setVisibility(View.VISIBLE);
         createAccountProgressBar.setVisibility(View.VISIBLE);
@@ -460,7 +453,6 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
             if (e.getErrorCode() == MegaError.API_EEXIST) {
                 ((LoginActivityLollipop)context).showSnackbar(getString(R.string.error_email_registered));
                 createAccountLayout.setVisibility(View.VISIBLE);
-                createAccountLoginLayout.setVisibility(View.VISIBLE);
                 creatingAccountLayout.setVisibility(View.GONE);
                 creatingAccountTextView.setVisibility(View.GONE);
                 createAccountProgressBar.setVisibility(View.GONE);
@@ -471,7 +463,6 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
                 ((LoginActivityLollipop)context).showSnackbar(message);
                 ((LoginActivityLollipop)context).showFragment(Constants.LOGIN_FRAGMENT);
                 createAccountLayout.setVisibility(View.VISIBLE);
-                createAccountLoginLayout.setVisibility(View.VISIBLE);
                 creatingAccountLayout.setVisibility(View.GONE);
                 creatingAccountTextView.setVisibility(View.GONE);
                 createAccountProgressBar.setVisibility(View.GONE);
