@@ -604,7 +604,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 				adapter.setParentHandle(parentHandle);
 				adapter.setAdapterType(MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST);
 //				adapter.setNodes(nodes);
-			}
+		}
 
 			setOverviewLayout();
 			
