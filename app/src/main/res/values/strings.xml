@@ -957,7 +957,7 @@
     <string name="hint_confirm_password_protection_dialog" context="Hint of the confirmation dialog to get link with password">Confirm password</string>
     <string name="link_request_status" context="Status text at the beginning of getting a link">Processing...</string>
 
-    <string name="edit_link_option" context="Option of the sliding panel to edit the link of a node">Edit link</string>
+    <string name="edit_link_option" context="Option of the sliding panel to edit the link of a node">Manage link</string>
 
     <string name="old_password_provided_incorrect" context="Error alert dialog shown when changing the password the user provides an incorrect password ">The current password you have provided is incorrect.</string>
 
