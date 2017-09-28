@@ -383,7 +383,7 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 			else{
 				adapter.setParentHandle(parentHandle);
 				adapter.setAdapterType(MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST);
-//				adapterList.setNodes(nodes);
+//				adapter.setNodes(nodes);
 			}
 
 			if (parentHandle == -1){
