@@ -1039,14 +1039,14 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			}
 			
 			ArrayList<MegaNode> nodes = megaApi.getChildren(parentNode, orderGetChildren);
-			if (fromShared){
-				if(orderGetChildren == MegaApiJava.ORDER_DEFAULT_DESC){
-					nodes = sortByNameDescending(nodes);
-				}
-				else{
-					nodes = sortByNameAscending(nodes);
-				}
-			}
+//			if (fromShared){
+//				if(orderGetChildren == MegaApiJava.ORDER_DEFAULT_DESC){
+//					nodes = sortByMailDescending(nodes);
+//				}
+//				else{
+//					nodes = sortByNameAscending(nodes);
+//				}
+//			}
 			int imageNumber = 0;
 			for (int i=0;i<nodes.size();i++){
 				MegaNode n = nodes.get(i);
@@ -1286,6 +1286,29 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		nodes.addAll(folderNodes);
 		nodes.addAll(fileNodes);
 		
+		return nodes;
+	}
+
+	public ArrayList<MegaNode> sortByMailDescending(ArrayList<MegaNode> nodes){
+		log("sortByNameDescending");
+		ArrayList<MegaNode> folderNodes = new ArrayList<MegaNode>();
+		ArrayList<MegaNode> fileNodes = new ArrayList<MegaNode>();
+
+		for (int i=0;i<nodes.size();i++){
+			if (nodes.get(i).isFolder()){
+				folderNodes.add(nodes.get(i));
+			}
+			else{
+				fileNodes.add(nodes.get(i));
+			}
+		}
+
+//		Collections.reverse(folderNodes);
+//		Collections.reverse(fileNodes);
+
+		nodes.clear();
+		nodes.addAll(folderNodes);
+		nodes.addAll(fileNodes);
 		return nodes;
 	}
 
