@@ -229,13 +229,6 @@ public class ZipBrowserActivityLollipop extends PinActivityLollipop implements O
 		recyclerView.setHasFixedSize(true);
 		recyclerView.setItemAnimator(new DefaultItemAnimator());
 
-
-//		listView = (ListView) findViewById(R.id.zip_list_view_browser);
-//		listView.setOnItemClickListener(this);
-//		listView.setOnItemLongClickListener(this);
-//		listView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
-//		listView.setItemsCanFocus(false);
-
 		try {
 			myZipFile = new ZipFile(pathZip);			
 	
@@ -540,7 +533,55 @@ public class ZipBrowserActivityLollipop extends PinActivityLollipop implements O
 			}									
 		}			
 	}
-	
+
+	public void itemClick(int position) {
+		log("itemClick: position: "+position);
+		((MegaApplication) getApplication()).sendSignalPresenceActivity();
+
+		ZipEntry currentNode = zipNodes.get(position);
+
+		currentPath=currentNode.getName();
+
+		log("onItemClick, currentPath: "+currentPath);
+
+		if(currentNode.isDirectory()){
+			depth=depth+1;
+			listDirectory(currentPath);
+			this.setFolder(currentPath);
+			adapterList.setNodes(zipNodes);
+		}
+		else{
+
+			String checkFolder = null;
+			int index = pathZip.lastIndexOf(".");
+			checkFolder = pathZip.substring(0, index);
+
+			if(checkFolder!=null){
+				File check = new File(checkFolder);
+
+				if(check.exists()){
+					log("Already unzipped");
+					openFile(position);
+
+				}
+				else{
+					UnZipTask unZipTask = new UnZipTask(this, pathZip, position);
+					unZipTask.execute();
+					try{
+						temp = new ProgressDialog(this);
+						temp.setMessage(getString(R.string.unzipping_process));
+						temp.show();
+					}
+					catch(Exception e){
+						return;
+					}
+				}
+
+			}
+		}
+	}
+
+
 	private void listDirectory (String directory){
 		log("listDirectory: "+directory);
 		
