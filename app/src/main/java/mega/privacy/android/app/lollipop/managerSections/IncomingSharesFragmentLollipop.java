@@ -772,6 +772,25 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 		contentText.setText(MegaApiUtils.getInfoNodeOnlyFolders(nodes, context));
 	}
 
+	public void setOrderNodes(){
+		log("setOrderNodes: "+parentHandle);
+
+		if(parentHandle==-1){
+			if(orderGetChildren == MegaApiJava.ORDER_DEFAULT_DESC){
+				sortByMailDescending();
+			}
+			else{
+				nodes=megaApi.getInShares();
+			}
+		}
+		else{
+			MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
+			nodes = megaApi.getChildren(parentNode, orderGetChildren);
+		}
+
+		adapter.setNodes(nodes);
+	}
+
 	public void selectAll(){
 		if (adapter != null){
 			if(adapter.isMultipleSelect()){
@@ -981,43 +1000,6 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 		return recyclerView;
 	}
 	
-//	public void setNodes(ArrayList<MegaNode> nodes){
-//		this.nodes = nodes;
-//		if (isList){
-//			if (adapterList != null){
-//				adapterList.setNodes(nodes);
-//				if (adapterList.getCount() == 0){
-//					listView.setVisibility(View.GONE);
-//					emptyImageView.setVisibility(View.VISIBLE);
-//					emptyTextView.setVisibility(View.VISIBLE);	
-//					contentText.setVisibility(View.GONE);
-//				}
-//				else{
-//					listView.setVisibility(View.VISIBLE);
-//					emptyImageView.setVisibility(View.GONE);
-//					emptyTextView.setVisibility(View.GONE);
-//					aB.setTitle(getInfoNode());
-//					contentText.setVisibility(View.VISIBLE);
-//				}			
-//			}	
-//		}
-//		else{
-//			if (adapterGrid != null){
-//				adapterGrid.setNodes(nodes);
-//				if (adapterGrid.getCount() == 0){
-//					listView.setVisibility(View.GONE);
-//					emptyImageView.setVisibility(View.VISIBLE);
-//					emptyTextView.setVisibility(View.VISIBLE);					
-//				}
-//				else{
-//					listView.setVisibility(View.VISIBLE);
-//					emptyImageView.setVisibility(View.GONE);
-//					emptyTextView.setVisibility(View.GONE);
-//
-//				}			
-//			}
-//		}
-//	}
 
 	public void notifyDataSetChanged(){
 		if (adapter != null){
@@ -1065,32 +1047,6 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 		nodes.addAll(fileNodes);
 	}
 
-	
-//	public void sortByMailAscending(){
-//		log("sortByNameAscending");
-//
-//		ArrayList<MegaNode> folderNodes = new ArrayList<MegaNode>();
-//		ArrayList<MegaNode> fileNodes = new ArrayList<MegaNode>();
-//
-//		for (int i=0;i<nodes.size();i++){
-//			if (nodes.get(i).isFolder()){
-//				folderNodes.add(nodes.get(i));
-//			}
-//			else{
-//				fileNodes.add(nodes.get(i));
-//			}
-//		}
-//
-//		Collections.reverse(folderNodes);
-//		Collections.reverse(fileNodes);
-//
-//		nodes.clear();
-//		nodes.addAll(folderNodes);
-//		nodes.addAll(fileNodes);
-//
-//		adapter.setNodes(nodes);
-//	}
-//
 	public int getItemCount(){
 		if(adapter != null){
 			return adapter.getItemCount();
