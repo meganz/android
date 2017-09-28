@@ -538,7 +538,11 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
 //                et_user.getBackground().mutate().setColorFilter(porterDuffColorFilter);
                 Drawable background = email_background.mutate().getConstantState().newDrawable();
                 background.setColorFilter(porterDuffColorFilter);
-                userEmail.setBackground(background);
+                if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.JELLY_BEAN) {
+                    userEmail.setBackgroundDrawable(background);
+                } else{
+                    userEmail.setBackground(background);
+                }
                 LinearLayout.LayoutParams textParamsEditText = (LinearLayout.LayoutParams) userEmail.getLayoutParams();
                 textParamsEditText.bottomMargin = Util.scaleWidthPx(3, outMetrics);
                 userEmail.setLayoutParams(textParamsEditText);
@@ -551,7 +555,11 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
 //                et_user.getBackground().mutate().setColorFilter(porterDuffColorFilter);
                 Drawable background = password_confirm_background.mutate().getConstantState().newDrawable();
                 background.setColorFilter(porterDuffColorFilter);
-                userPasswordConfirm.setBackground(background);
+                if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.JELLY_BEAN) {
+                    userPasswordConfirm.setBackgroundDrawable(background);
+                } else{
+                    userPasswordConfirm.setBackground(background);
+                }
                 LinearLayout.LayoutParams textParamsEditText = (LinearLayout.LayoutParams) userPasswordConfirm.getLayoutParams();
                 textParamsEditText.bottomMargin = Util.scaleWidthPx(3, outMetrics);
                 userPasswordConfirm.setLayoutParams(textParamsEditText);
@@ -564,7 +572,11 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
 //                et_user.getBackground().mutate().setColorFilter(porterDuffColorFilter);
                 Drawable background = name_background.mutate().getConstantState().newDrawable();
                 background.setColorFilter(porterDuffColorFilter);
-                userName.setBackground(background);
+                if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.JELLY_BEAN) {
+                    userName.setBackgroundDrawable(background);
+                } else{
+                    userName.setBackground(background);
+                }
                 LinearLayout.LayoutParams textParamsEditText = (LinearLayout.LayoutParams) userName.getLayoutParams();
                 textParamsEditText.bottomMargin = Util.scaleWidthPx(3, outMetrics);
                 userName.setLayoutParams(textParamsEditText);
@@ -577,7 +589,11 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
 //                et_user.getBackground().mutate().setColorFilter(porterDuffColorFilter);
                 Drawable background = password_background.mutate().getConstantState().newDrawable();
                 background.setColorFilter(porterDuffColorFilter);
-                userPassword.setBackground(background);
+                if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.JELLY_BEAN) {
+                    userPassword.setBackgroundDrawable(background);
+                } else{
+                    userPassword.setBackground(background);
+                }
                 LinearLayout.LayoutParams textParamsEditText = (LinearLayout.LayoutParams) userPassword.getLayoutParams();
                 textParamsEditText.bottomMargin = Util.scaleWidthPx(3, outMetrics);
                 userPassword.setLayoutParams(textParamsEditText);
@@ -594,7 +610,11 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
             case R.id.create_account_email_text:{
                 if(email_error_layout.getVisibility() != View.GONE){
                     email_error_layout.setVisibility(View.GONE);
-                    userEmail.setBackground(email_background);
+                    if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.JELLY_BEAN) {
+                        userEmail.setBackgroundDrawable(email_background);
+                    } else{
+                        userEmail.setBackground(email_background);
+                    }
                     LinearLayout.LayoutParams textParamsEditText = (LinearLayout.LayoutParams)userEmail.getLayoutParams();
                     textParamsEditText.bottomMargin = Util.scaleWidthPx(10, outMetrics);
                     userEmail.setLayoutParams(textParamsEditText);
@@ -604,7 +624,11 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
             case R.id.create_account_password_text_confirm:{
                 if(password_confirm_error_layout.getVisibility() != View.GONE){
                     password_confirm_error_layout.setVisibility(View.GONE);
-                    userPasswordConfirm.setBackground(password_confirm_background);
+                    if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.JELLY_BEAN) {
+                        userPasswordConfirm.setBackgroundDrawable(password_confirm_background);
+                    } else{
+                        userPasswordConfirm.setBackground(password_confirm_background);
+                    }
                     LinearLayout.LayoutParams textParamsEditText = (LinearLayout.LayoutParams) userPasswordConfirm.getLayoutParams();
                     textParamsEditText.bottomMargin = Util.scaleWidthPx(10, outMetrics);
                     userPasswordConfirm.setLayoutParams(textParamsEditText);
@@ -614,7 +638,11 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
             case R.id.create_account_name_text:{
                 if(name_error_layout.getVisibility() != View.GONE){
                     name_error_layout.setVisibility(View.GONE);
-                    userName.setBackground(name_background);
+                    if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.JELLY_BEAN) {
+                        userName.setBackgroundDrawable(name_background);
+                    } else{
+                        userName.setBackground(name_background);
+                    }
                     LinearLayout.LayoutParams textParamsEditText = (LinearLayout.LayoutParams)userName.getLayoutParams();
                     textParamsEditText.bottomMargin = Util.scaleWidthPx(10, outMetrics);
                     userName.setLayoutParams(textParamsEditText);
@@ -624,7 +652,11 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
             case R.id.create_account_password_text:{
                 if(password_error_layout.getVisibility() != View.GONE){
                     password_error_layout.setVisibility(View.GONE);
-                    userPassword.setBackground(password_background);
+                    if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.JELLY_BEAN) {
+                        userPassword.setBackgroundDrawable(password_background);
+                    } else{
+                        userPassword.setBackground(password_background);
+                    }
                     LinearLayout.LayoutParams textParamsEditText = (LinearLayout.LayoutParams) userPassword.getLayoutParams();
                     textParamsEditText.bottomMargin = Util.scaleWidthPx(10, outMetrics);
                     userPassword.setLayoutParams(textParamsEditText);
