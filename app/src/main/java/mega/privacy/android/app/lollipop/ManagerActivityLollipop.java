@@ -7311,13 +7311,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		        		largestCheck.setVisibility(View.GONE);
 		        		smallestCheck.setVisibility(View.GONE);
 
-
 		        		if (viewPagerShares.getCurrentItem()==0){
-
-							sortByNameTV.setText(getString(R.string.sortby_owner_mail));
-		        		}
-		        		else{
-
+							if(firstNavigationLevel){
+								sortByNameTV.setText(getString(R.string.sortby_owner_mail));
+							}
+							else{
+								log("No first level navigation on Incoming Shares");
+							}
 		        		}
 
 		        		ascendingCheck.setOnClickListener(new OnClickListener() {
@@ -7329,7 +7329,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 								if(orderOthers!=MegaApiJava.ORDER_DEFAULT_ASC){
 									selectSortByIncoming(MegaApiJava.ORDER_DEFAULT_ASC);
 									selectSortByOutgoing(MegaApiJava.ORDER_DEFAULT_ASC);
-
 								}
 
 			        			if (dialog != null){
@@ -10768,7 +10767,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		this.setOrderOthers(orderOthers);
 		if (inSFLol != null){
 			inSFLol.setOrder(orderOthers);
-			inSFLol.findNodes();
+			inSFLol.setOrderNodes();
 		}
 	}
 
