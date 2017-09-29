@@ -974,6 +974,10 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
             log("Interaction - change lastFirstVisiblePosition");
             lastFirstVisiblePosition=0;
         }
+
+        if(adapterList.isMultipleSelect()){
+            adapterList.updateMultiselectionPosition(position);
+        }
     }
 
     public String getParticipantFullName(MegaChatRoom chat, long i){
