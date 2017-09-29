@@ -1265,6 +1265,38 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		return info;
 	}
 
+	public void updateMultiselectionPosition(int oldPosition){
+		log("updateMultiselectionPosition");
+
+		List<Integer> selected = getSelectedItems();
+		boolean movedSelected = false;
+
+		if(isItemChecked(oldPosition)){
+			movedSelected=true;
+		}
+
+		selectedItems.clear();
+
+		if(movedSelected){
+			selectedItems.put(0, true);
+		}
+
+		for(int i=0;i<selected.size();i++){
+			int pos = selected.get(i);
+			if(pos!=oldPosition){
+				if(pos<oldPosition){
+					selectedItems.put(pos+1, true);
+				}
+				else{
+					selectedItems.put(pos, true);
+				}
+			}
+
+//			notifyItemChanged(pos);
+//			notifyItemChanged(pos+1);
+		}
+	}
+
 	public void modifyChat(ArrayList<MegaChatListItem> chats, int position){
 		this.chats = chats;
 		notifyItemChanged(position);
