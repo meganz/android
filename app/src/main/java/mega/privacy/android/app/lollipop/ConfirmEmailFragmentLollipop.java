@@ -92,6 +92,7 @@ public class ConfirmEmailFragmentLollipop extends Fragment implements MegaReques
 
 		et_newEmail.setCursorVisible(true);
 		et_newEmail.setText(emailTemp);
+		et_newEmail.requestFocus();
 
 		resendButton.setOnClickListener(this);
 

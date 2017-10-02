@@ -150,6 +150,8 @@ public class LoginActivityLollipop extends AppCompatActivity implements MegaGlob
         }
 
         if (dbH.getEphemeral() != null) {
+            visibleFragment = Constants.CONFIRM_EMAIL_FRAGMENT;
+
             EphemeralCredentials ephemeralCredentials = dbH.getEphemeral();
 
             emailTemp = ephemeralCredentials.getEmail();
@@ -159,12 +161,13 @@ public class LoginActivityLollipop extends AppCompatActivity implements MegaGlob
             lastNameTemp = ephemeralCredentials.getLastName();
 
             megaApi.resumeCreateAccount(sessionTemp, this);
-            return;
         }
+
 
 //		visibleFragment = Constants.CHOOSE_ACCOUNT_FRAGMENT;
 //		visibleFragment = Constants.CONFIRM_EMAIL_FRAGMENT;
         showFragment(visibleFragment);
+
 
 
     }
@@ -305,6 +308,7 @@ public class LoginActivityLollipop extends AppCompatActivity implements MegaGlob
                     window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
                     window.setStatusBarColor(ContextCompat.getColor(this, R.color.status_bar_login));
                 }
+
                 break;
             }
         }
@@ -801,6 +805,7 @@ public class LoginActivityLollipop extends AppCompatActivity implements MegaGlob
                     waitingForConfirmAccount = true;
                     visibleFragment = Constants.CONFIRM_EMAIL_FRAGMENT;
                     showFragment(visibleFragment);
+
                 }
                 else{
                     dbH.clearEphemeral();
