@@ -6388,7 +6388,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
             				if (rubbishBinFLol.showSelectMenuItem()){
             					selectMenuItem.setVisible(true);
             					unSelectMenuItem.setVisible(false);
-            				}
+								changeStatusBarColor(Constants.COLOR_STATUS_BAR_RED);
+							}
             				else{
             					selectMenuItem.setVisible(false);
             					unSelectMenuItem.setVisible(true);
@@ -6404,6 +6405,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
                 			if (fbFLol.showSelectMenuItem()){
                 				selectMenuItem.setVisible(true);
                 				unSelectMenuItem.setVisible(false);
+								changeStatusBarColor(Constants.COLOR_STATUS_BAR_RED);
                 			}
                 			else{
                 				selectMenuItem.setVisible(false);
@@ -6426,6 +6428,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 								if (cFLol.showSelectMenuItem()){
 									selectMenuItem.setVisible(true);
 									unSelectMenuItem.setVisible(false);
+									changeStatusBarColor(Constants.COLOR_STATUS_BAR_RED);
 								}
 								else{
 									selectMenuItem.setVisible(false);
@@ -6442,6 +6445,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 								if (sRFLol.showSelectMenuItem()){
 									selectMenuItem.setVisible(true);
 									unSelectMenuItem.setVisible(false);
+									changeStatusBarColor(Constants.COLOR_STATUS_BAR_RED);
 								}
 								else{
 									selectMenuItem.setVisible(false);
@@ -6458,6 +6462,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 								if (rRFLol.showSelectMenuItem()){
 									selectMenuItem.setVisible(true);
 									unSelectMenuItem.setVisible(false);
+									changeStatusBarColor(Constants.COLOR_STATUS_BAR_RED);
 								}
 								else{
 									selectMenuItem.setVisible(false);
@@ -6478,7 +6483,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		        			if (inSFLol.showSelectMenuItem()){
 		        				selectMenuItem.setVisible(true);
 		        				unSelectMenuItem.setVisible(false);
-		        			}
+								changeStatusBarColor(Constants.COLOR_STATUS_BAR_RED);
+							}
 		        			else{
 		        				selectMenuItem.setVisible(false);
 		        				unSelectMenuItem.setVisible(true);
@@ -6493,7 +6499,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		        			if (outSFLol.showSelectMenuItem()){
 		        				selectMenuItem.setVisible(true);
 		        				unSelectMenuItem.setVisible(false);
-		        			}
+								changeStatusBarColor(Constants.COLOR_STATUS_BAR_RED);
+							}
 		        			else{
 		        				selectMenuItem.setVisible(false);
 		        				unSelectMenuItem.setVisible(true);
@@ -6508,7 +6515,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	    				if (oFLol.showSelectMenuItem()){
 	        				selectMenuItem.setVisible(true);
 	        				unSelectMenuItem.setVisible(false);
-	        			}
+							changeStatusBarColor(Constants.COLOR_STATUS_BAR_RED);
+						}
 	        			else{
 	        				selectMenuItem.setVisible(false);
 	        				unSelectMenuItem.setVisible(true);
@@ -6521,6 +6529,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						if (rChatFL.showSelectMenuItem()){
 							selectMenuItem.setVisible(true);
 							unSelectMenuItem.setVisible(false);
+							changeStatusBarColor(Constants.COLOR_STATUS_BAR_RED);
 						}
 						else{
 							selectMenuItem.setVisible(false);
@@ -6534,7 +6543,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	    				if (iFLol.showSelectMenuItem()){
 	        				selectMenuItem.setVisible(true);
 	        				unSelectMenuItem.setVisible(false);
-	        			}
+							changeStatusBarColor(Constants.COLOR_STATUS_BAR_RED);
+						}
 	        			else{
 	        				selectMenuItem.setVisible(false);
 	        				unSelectMenuItem.setVisible(true);
@@ -6547,7 +6557,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	    				if (sFLol.showSelectMenuItem()){
 	        				selectMenuItem.setVisible(true);
 	        				unSelectMenuItem.setVisible(false);
-	        			}
+							changeStatusBarColor(Constants.COLOR_STATUS_BAR_RED);
+						}
 	        			else{
 	        				selectMenuItem.setVisible(false);
 	        				unSelectMenuItem.setVisible(true);
@@ -6560,7 +6571,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	        			if (muFLol.showSelectMenuItem()){
 	        				selectMenuItem.setVisible(true);
 	        				unSelectMenuItem.setVisible(false);
-	        			}
+							changeStatusBarColor(Constants.COLOR_STATUS_BAR_RED);
+						}
 	        			else{
 	        				selectMenuItem.setVisible(false);
 	        				unSelectMenuItem.setVisible(true);
@@ -6573,6 +6585,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	        			if (cuFL.showSelectMenuItem()){
 	        				selectMenuItem.setVisible(true);
 	        				unSelectMenuItem.setVisible(false);
+							changeStatusBarColor(Constants.COLOR_STATUS_BAR_RED);
 	        			}
 	        			else{
 	        				selectMenuItem.setVisible(false);
@@ -14798,4 +14811,29 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		startActivity(intent);
 		//finish();
 	}
+
+	public void changeStatusBarColor(int option) {
+
+		if (option == 1) {
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+				Window window = this.getWindow();
+				window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+				window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+				window.setStatusBarColor(ContextCompat.getColor(this, R.color.lollipop_dark_primary_color));
+			}
+			drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+
+
+		} else if (option == 2) {
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+				Window window = this.getWindow();
+				window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+				window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+				window.setStatusBarColor(ContextCompat.getColor(this, R.color.transparent_transparent_black));
+			}
+			drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
+		}
+
+	}
+
 }

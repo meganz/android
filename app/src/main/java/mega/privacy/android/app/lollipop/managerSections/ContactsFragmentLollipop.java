@@ -153,6 +153,7 @@ public class ContactsFragmentLollipop extends Fragment{
 					break;
 				}
 				case R.id.cab_menu_select_all:{
+					((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_RED);
 					selectAll();
 					actionMode.invalidate();
 					break;
@@ -239,6 +240,7 @@ public class ContactsFragmentLollipop extends Fragment{
 	public void hideMultipleSelect() {
 		log("hideMultipleSelect");
 		adapter.setMultipleSelect(false);
+		((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_TRANSPARENT_BLACK);
 		if (actionMode != null) {
 			actionMode.finish();
 		}
@@ -564,6 +566,7 @@ public class ContactsFragmentLollipop extends Fragment{
 			List<MegaUser> users = adapter.getSelectedUsers();
 			if (users.size() > 0){
 				updateActionModeTitle();
+				((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_RED);
 			}
 		}
 		else{
