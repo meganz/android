@@ -196,7 +196,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
     @Override
     public void onCreate (Bundle savedInstanceState){
-        log("onCreate");
+        log("*****onCreate");
         super.onCreate(savedInstanceState);
 
         if(context==null){
@@ -207,7 +207,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        log("onCreateView");
+        log("*****onCreateView");
 
         loginClicked = false;
         backWhileLogin = false;
@@ -268,6 +268,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
         et_user.setCursorVisible(true);
         et_user.getBackground().clearColorFilter();
+        et_user.requestFocus();
 
         et_user.addTextChangedListener(new TextWatcher() {
             @Override
@@ -1924,7 +1925,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
 //		input.setId(EDIT_TEXT_ID);
         input.getBackground().mutate().clearColorFilter();
-        input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
+        input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.green_free_account), PorterDuff.Mode.SRC_ATOP);
         input.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -1941,7 +1942,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 if(error_layout.getVisibility() == View.VISIBLE){
                     error_layout.setVisibility(View.GONE);
                     input.getBackground().mutate().clearColorFilter();
-                    input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
+                    input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.blue), PorterDuff.Mode.SRC_ATOP);
                 }
             }
         });

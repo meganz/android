@@ -137,6 +137,7 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
         userPasswordConfirm = (EditText) v.findViewById(R.id.create_account_password_text_confirm);
 
         userName.getBackground().clearColorFilter();
+        userName.requestFocus();
         userName.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
