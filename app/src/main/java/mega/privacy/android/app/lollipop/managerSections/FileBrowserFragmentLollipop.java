@@ -255,7 +255,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 					break;
 				}
 				case R.id.cab_menu_select_all:{
-					((ManagerActivityLollipop)context).changeStatusBarColor(1);
+					((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_RED);
 					selectAll();
 					break;
 				}
@@ -821,7 +821,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			List<MegaNode> selectedNodes = adapter.getSelectedNodes();
 			if (selectedNodes.size() > 0){
 				updateActionModeTitle();
-				((ManagerActivityLollipop)context).changeStatusBarColor(1);
+				((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_RED);
 			}
 //			else{
 //				hideMultipleSelect();
@@ -1146,7 +1146,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 	public void hideMultipleSelect() {
 		log("hideMultipleSelect");
 		adapter.setMultipleSelect(false);
-		((ManagerActivityLollipop)context).changeStatusBarColor(2);
+		((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_TRANSPARENT_BLACK);
 
 		if (actionMode != null) {
 			actionMode.finish();
