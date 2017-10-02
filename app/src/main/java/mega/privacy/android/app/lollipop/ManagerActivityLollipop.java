@@ -1142,7 +1142,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			parentHandleSearch = -1;
 			parentHandleInbox = -1;
 
-			chatConnection = false;
+			chatConnection = MegaApplication.isChatConnection();
 
 			this.setPathNavigationOffline("/");
 		}
@@ -1927,6 +1927,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					log("timestamp: "+System.currentTimeMillis()/1000);
                     MegaApplication.setFirstTs(System.currentTimeMillis()/1000);
 				}
+				else{
+					log("Already connected");
+				}
 
 				if (nV != null){
 					Menu nVMenu = nV.getMenu();
@@ -2128,8 +2131,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	protected void onResume(){
 		log("onResume");
 		super.onResume();
-
-		MegaApplication.activityResumed();
 	}
 
 	@Override
@@ -3144,8 +3145,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
     	log("onPause");
     	managerActivity = null;
     	super.onPause();
-
-		MegaApplication.activityPaused();
     }
 
 	@Override
@@ -12527,7 +12526,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		}
 		else if (request.getType() == MegaChatRequest.TYPE_CONNECT){
 			log("Connecting chat finished");
-			chatConnection = true;
 
 			if (MegaApplication.isFirstConnect()){
 				log("Set first connect to false");
@@ -12537,6 +12535,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 			if(e.getErrorCode()==MegaChatError.ERROR_OK){
 				log("CONNECT CHAT finished ");
+
+				chatConnection = true;
+				MegaApplication.setChatConnection(chatConnection);
+
 				if(rChatFL!=null){
 					if(rChatFL.isAdded()){
 						rChatFL.onlineStatusUpdate(megaChatApi.getOnlineStatus());
@@ -12544,7 +12546,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				}
 			}
 			else{
-				log("EEEERRRRROR WHEN CONNECTING " + e.getErrorString());
+				log("ERROR WHEN CONNECTING " + e.getErrorString());
 //				showSnackbar(getString(R.string.chat_connection_error));
 			}
 		}

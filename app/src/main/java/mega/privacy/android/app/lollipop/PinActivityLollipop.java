@@ -29,6 +29,9 @@ public class PinActivityLollipop extends AppCompatActivity{
 			megaApi = ((MegaApplication)getApplication()).getMegaApi();
 		}
 		PinUtil.pause(this);
+
+		MegaApplication.activityPaused();
+
 		super.onPause();
 	}
 	
@@ -37,6 +40,9 @@ public class PinActivityLollipop extends AppCompatActivity{
 		log("onResume");
 
 		super.onResume();
+
+		MegaApplication.activityResumed();
+
 		if (megaApi == null){
 			megaApi = ((MegaApplication)getApplication()).getMegaApi();
 		}
