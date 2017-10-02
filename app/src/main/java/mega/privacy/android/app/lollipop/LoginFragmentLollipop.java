@@ -268,6 +268,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
         et_user.setCursorVisible(true);
         et_user.getBackground().clearColorFilter();
+        et_user.requestFocus();
 
         et_user.addTextChangedListener(new TextWatcher() {
             @Override
