@@ -325,6 +325,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
 
             switch(item.getItemId()){
                 case R.id.cab_menu_select_all:{
+                    ((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_RED);
                     selectAll();
                     actionMode.invalidate();
                     break;
@@ -516,6 +517,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
     public void hideMultipleSelect() {
         log("hideMultipleSelect");
         adapterList.setMultipleSelect(false);
+        ((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_TRANSPARENT_BLACK);
         if (actionMode != null) {
             actionMode.finish();
         }
@@ -546,6 +548,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
             List<MegaChatListItem> chats = adapterList.getSelectedChats();
             if (chats.size() > 0){
                 updateActionModeTitle();
+                ((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_RED);
             }
         }
         else{

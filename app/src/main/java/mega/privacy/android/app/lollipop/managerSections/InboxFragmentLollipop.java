@@ -158,6 +158,7 @@ public class InboxFragmentLollipop extends Fragment{
 					break;
 				}
 				case R.id.cab_menu_select_all:{
+					((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_RED);
 					selectAll();
 					break;
 				}
@@ -493,6 +494,7 @@ public class InboxFragmentLollipop extends Fragment{
 			List<MegaNode> selectedNodes = adapter.getSelectedNodes();
 			if (selectedNodes.size() > 0){
 				updateActionModeTitle();
+				((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_RED);
 			}
 		}
 		else{
@@ -683,6 +685,7 @@ public class InboxFragmentLollipop extends Fragment{
 	public void hideMultipleSelect() {
 		log("hideMultipleSelect");
 		adapter.setMultipleSelect(false);
+		((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_TRANSPARENT_BLACK);
 		if (actionMode != null) {
 			actionMode.finish();
 		}
