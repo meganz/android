@@ -125,7 +125,7 @@ public class MegaContactRequestLollipopAdapter extends RecyclerView.Adapter<Mega
 			log("Multiselect ON");
 
 			if(this.isItemChecked(position)){
-				holder.imageView.setImageResource(R.drawable.ic_multiselect);
+				holder.imageView.setImageResource(R.drawable.ic_select_avatar);
 				holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.new_multiselect_color));
 			}
 			else{
@@ -433,7 +433,10 @@ public class MegaContactRequestLollipopAdapter extends RecyclerView.Adapter<Mega
 	}
 	
 	private boolean isItemChecked(int position) {
-        return selectedItems.get(position);
+		if(selectedItems!=null){
+			return selectedItems.get(position);
+		}
+		return false;
     }
 
 	public int getSelectedItemCount() {

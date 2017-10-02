@@ -65,7 +65,7 @@ public class OpenLinkActivity extends PinActivity implements MegaRequestListener
 		
 		log("url " + url);
 		
-		// Download link
+		// Download file link
 		if (url != null && (url.matches("^https://mega.co.nz/#!.+$") || url.matches("^https://mega.nz/#!.+$"))) {
 			log("open link url");
 
@@ -113,6 +113,19 @@ public class OpenLinkActivity extends PinActivity implements MegaRequestListener
 			openFolderIntent.setAction(Constants.ACTION_OPEN_MEGA_FOLDER_LINK);
 			openFolderIntent.setData(Uri.parse(url));
 			startActivity(openFolderIntent);
+			finish();
+
+			return;
+		}
+
+		// Password link
+		if (url != null && (url.matches("^https://mega.co.nz/#P!.+$") || url.matches("^https://mega.nz/#P!.+$"))) {
+			log("link with password url");
+
+			Intent openLinkIntent = new Intent(this, OpenPasswordLinkActivity.class);
+			openLinkIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			openLinkIntent.setData(Uri.parse(url));
+			startActivity(openLinkIntent);
 			finish();
 
 			return;
@@ -363,7 +376,18 @@ public class OpenLinkActivity extends PinActivity implements MegaRequestListener
 			finish();
 			return;
 		}
-		
+
+		if (url != null && (url.matches("^https://mega.co.nz/#.+$") || url.matches("^https://mega.nz/#.+$"))) {
+			log("handle link url");
+
+			Intent handleIntent = new Intent(this, ManagerActivityLollipop.class);
+			handleIntent.setAction(Constants.ACTION_OPEN_HANDLE_NODE);
+			handleIntent.setData(Uri.parse(url));
+			startActivity(handleIntent);
+			finish();
+			return;
+		}
+
 		log("wrong url: " + url);
 
 		Intent errorIntent = new Intent(this, ManagerActivityLollipop.class);

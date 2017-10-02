@@ -280,6 +280,13 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 		return imageHandles.size();
 	}
 
+	public void refreshImageHandles(ArrayList<Long> imageHandles){
+		log("refreshImageHandles");
+		this.imageHandles = imageHandles;
+		visibleImgs.clear();
+		notifyDataSetChanged();
+	}
+
 	@Override
 	public boolean isViewFromObject(View view, Object object) {
         return view == ((RelativeLayout) object);
@@ -287,7 +294,7 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 	
 	@Override
     public Object instantiateItem(ViewGroup container, int position) {
-        log ("INSTANTIATE POSITION " + position);
+        log ("instantiateItem POSITION " + position);
 
 		MegaNode node = megaApi.getNodeByHandle(imageHandles.get(position));
 		
@@ -371,11 +378,10 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 	
 	@Override
     public void destroyItem(ViewGroup container, int position, Object object) {
+		log ("destroyItem: position " + position + " visibleImgs.size(): " + visibleImgs.size());
 		visibleImgs.remove(position);
         ((ViewPager) container).removeView((RelativeLayout) object);
         System.gc();
-        log ("DESTROY POSITION " + position + " visibleImgs.size(): " + visibleImgs.size());
- 
     }
 	
 	public TouchImageView getVisibleImage(int position){

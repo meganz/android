@@ -18,6 +18,9 @@ import android.graphics.BitmapShader;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.Point;
+import android.graphics.Rect;
 import android.graphics.Shader.TileMode;
 import android.net.Uri;
 import android.os.Build;
@@ -25,6 +28,8 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.provider.MediaStore;
+import android.support.design.widget.BottomSheetDialog;
+import android.support.design.widget.BottomSheetDialogFragment;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -45,9 +50,11 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
 import android.text.Html;
 import android.text.InputType;
 import android.text.Spanned;
+import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Display;
@@ -79,6 +86,7 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
@@ -108,6 +116,7 @@ import mega.privacy.android.app.MegaContactAdapter;
 import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MegaPreferences;
+import mega.privacy.android.app.MimeTypeInfo;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.OldPreferences;
 import mega.privacy.android.app.R;
@@ -200,7 +209,8 @@ import nz.mega.sdk.MegaTransferListenerInterface;
 import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUtilsAndroid;
 
-public class ManagerActivityLollipop extends PinActivityLollipop implements NetworkStateReceiver.NetworkStateReceiverListener, MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatRequestListenerInterface, OnNavigationItemSelectedListener, MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener  {
+public class ManagerActivityLollipop extends PinActivityLollipop implements NetworkStateReceiver.NetworkStateReceiverListener, MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatRequestListenerInterface, OnNavigationItemSelectedListener, MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener,
+			NodeOptionsBottomSheetDialogFragment.CustomHeight, ContactsBottomSheetDialogFragment.CustomHeight{
 
 	public int accountFragment;
 
@@ -246,7 +256,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	MegaOffline selectedOfflineNode;
 	MegaContactAdapter selectedUser;
 	MegaContactRequest selectedRequest;
-	MegaChatListItem selectedChatItem;
+
+	public long selectedChatItemId;
 //	String fullNameChat;
 
 	//COLLECTION FAB BUTTONS
@@ -1121,6 +1132,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			selectedPaymentMethod = savedInstanceState.getInt("selectedPaymentMethod", -1);
 			searchQuery = savedInstanceState.getString("searchQuery");
 			chatConnection = savedInstanceState.getBoolean("chatConnection");
+
 		}
 		else{
 			log("Bundle is NULL");
@@ -1332,6 +1344,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		setSupportActionBar(tB);
 		aB = getSupportActionBar();
 		log("aB.setHomeAsUpIndicator_1");
+		aB.setTitle(getString(R.string.section_cloud_drive));
         aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
         aB.setHomeButtonEnabled(true);
         aB.setDisplayHomeAsUpEnabled(true);
@@ -1348,7 +1361,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		View nVHeader = LayoutInflater.from(this).inflate(R.layout.nav_header, null);
 		nV.addHeaderView(nVHeader);
 
-		//FAB button
+		//FAB buttonaB.
 		fabButton = (FloatingActionButton) findViewById(R.id.floating_button);
 		fabButton.setOnClickListener(new FabButtonListener(this));
 
@@ -1572,6 +1585,16 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
 						intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 						intent.setAction(Constants.ACTION_INCOMING_SHARED_FOLDER_NOTIFICATION);
+						startActivity(intent);
+						finish();
+						return;
+					}
+					else if (getIntent().getAction().equals(Constants.ACTION_OPEN_HANDLE_NODE)){
+						Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
+						intent.putExtra("visibleFragment", Constants.LOGIN_FRAGMENT);
+						intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+						intent.setAction(Constants.ACTION_OPEN_HANDLE_NODE);
+						intent.setData(Uri.parse(getIntent().getDataString()));
 						startActivity(intent);
 						finish();
 						return;
@@ -1830,6 +1853,56 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 							}
 						}
 					}
+					else if (getIntent().getAction().equals(Constants.ACTION_OPEN_HANDLE_NODE)){
+						String link = getIntent().getDataString();
+						String [] s = link.split("#");
+						if (s.length > 1){
+							String nodeHandleLink = s[1];
+							String [] sSlash = s[1].split("/");
+							if (sSlash.length > 0){
+								nodeHandleLink = sSlash[0];
+							}
+							long nodeHandleLinkLong = MegaApiAndroid.base64ToHandle(nodeHandleLink);
+							MegaNode nodeLink = megaApi.getNodeByHandle(nodeHandleLinkLong);
+							if (nodeLink == null){
+								showSnackbar(getString(R.string.general_error_file_not_found));
+							}
+							else{
+								MegaNode pN = megaApi.getParentNode(nodeLink);
+								if (pN == null){
+									pN = megaApi.getRootNode();
+								}
+								parentHandleBrowser = pN.getHandle();
+
+								drawerItem = DrawerItem.CLOUD_DRIVE;
+								selectDrawerItemLollipop(drawerItem);
+								selectDrawerItemPending = false;
+
+								Intent i = new Intent(this, FileInfoActivityLollipop.class);
+								i.putExtra("handle", nodeLink.getHandle());
+								if (nodeLink.isFolder()) {
+									if (nodeLink.isInShare()){
+										i.putExtra("imageId", R.drawable.ic_folder_incoming);
+									}
+									else if (nodeLink.isOutShare()){
+										i.putExtra("imageId", R.drawable.ic_folder_outgoing);
+									}
+									else{
+										i.putExtra("imageId", R.drawable.ic_folder);
+									}
+								}
+								else {
+									i.putExtra("imageId", MimeTypeInfo.typeForName(nodeLink.getName()).getIconResourceId());
+								}
+								i.putExtra("name", nodeLink.getName());
+								startActivity(i);
+							}
+						}
+						else{
+							drawerItem = DrawerItem.CLOUD_DRIVE;
+							selectDrawerItemLollipop(drawerItem);
+						}
+					}
 				}
 	        }
 
@@ -1853,6 +1926,15 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					}
 					else{
 						String textToShow = String.format(getString(R.string.section_chat_with_notification), numberUnread);
+						try {
+							textToShow = textToShow.replace("[A]", "<font color=\'#ff333a\'>");
+							textToShow = textToShow.replace("[/A]", "</font>");
+						}
+						catch(Exception e){
+							log("Formatted string: " + textToShow);
+						}
+
+						log("TEXTTOSHOW: " + textToShow);
 						Spanned result = null;
 						if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
 							result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
@@ -2026,6 +2108,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				selectDrawerItemLollipop(drawerItem);
 			}
 		}
+
 		log("END onCreate");
 //		showTransferOverquotaDialog();
 	}
@@ -2647,18 +2730,139 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	public void showDialogChangeUserAttribute(){
 		log("showDialogChangeUserAttribute");
 
+		ScrollView scrollView = new ScrollView(this);
+
 		LinearLayout layout = new LinearLayout(this);
+
+		scrollView.addView(layout);
+
 		layout.setOrientation(LinearLayout.VERTICAL);
+//        layout.setNestedScrollingEnabled(true);
 		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
 		params.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleHeightPx(20, outMetrics), Util.scaleWidthPx(17, outMetrics), 0);
 
+		LinearLayout.LayoutParams params1 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+		params1.setMargins(Util.scaleWidthPx(20, outMetrics), 0, Util.scaleWidthPx(17, outMetrics), 0);
+
 		final EditText inputFirstName = new EditText(this);
+		inputFirstName.getBackground().mutate().clearColorFilter();
+		inputFirstName.getBackground().mutate().setColorFilter(getResources().getColor(R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
 		layout.addView(inputFirstName, params);
+
+		final RelativeLayout error_layout_firtName = new RelativeLayout(ManagerActivityLollipop.this);
+		layout.addView(error_layout_firtName, params1);
+
+		final ImageView error_icon_firtName = new ImageView(ManagerActivityLollipop.this);
+		error_icon_firtName.setImageDrawable(ManagerActivityLollipop.this.getResources().getDrawable(R.drawable.ic_input_warning));
+		error_layout_firtName.addView(error_icon_firtName);
+		RelativeLayout.LayoutParams params_icon_firtName = (RelativeLayout.LayoutParams) error_icon_firtName.getLayoutParams();
+
+		params_icon_firtName.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+		error_icon_firtName.setLayoutParams(params_icon_firtName);
+
+		error_icon_firtName.setColorFilter(ContextCompat.getColor(ManagerActivityLollipop.this, R.color.login_warning));
+
+		final TextView textError_firtName = new TextView(ManagerActivityLollipop.this);
+		error_layout_firtName.addView(textError_firtName);
+		RelativeLayout.LayoutParams params_text_error_firtName = (RelativeLayout.LayoutParams) textError_firtName.getLayoutParams();
+		params_text_error_firtName.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+		params_text_error_firtName.width = ViewGroup.LayoutParams.WRAP_CONTENT;
+        params_text_error_firtName.addRule(RelativeLayout.CENTER_VERTICAL);
+		params_text_error_firtName.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+		params_text_error_firtName.setMargins(Util.scaleWidthPx(3, outMetrics), 0,0,0);
+		textError_firtName.setLayoutParams(params_text_error_firtName);
+
+		textError_firtName.setTextColor(ContextCompat.getColor(ManagerActivityLollipop.this, R.color.login_warning));
+
+		error_layout_firtName.setVisibility(View.GONE);
+
 		final EditText inputLastName = new EditText(this);
+		inputLastName.getBackground().mutate().clearColorFilter();
+		inputLastName.getBackground().mutate().setColorFilter(getResources().getColor(R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
 		layout.addView(inputLastName, params);
+
+		final RelativeLayout error_layout_lastName = new RelativeLayout(ManagerActivityLollipop.this);
+		layout.addView(error_layout_lastName, params1);
+
+		final ImageView error_icon_lastName = new ImageView(ManagerActivityLollipop.this);
+		error_icon_lastName.setImageDrawable(ManagerActivityLollipop.this.getResources().getDrawable(R.drawable.ic_input_warning));
+		error_layout_lastName.addView(error_icon_lastName);
+		RelativeLayout.LayoutParams params_icon_lastName = (RelativeLayout.LayoutParams) error_icon_lastName.getLayoutParams();
+
+
+		params_icon_lastName.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+		error_icon_lastName.setLayoutParams(params_icon_lastName);
+
+		error_icon_lastName.setColorFilter(ContextCompat.getColor(ManagerActivityLollipop.this, R.color.login_warning));
+
+		final TextView textError_lastName = new TextView(ManagerActivityLollipop.this);
+		error_layout_lastName.addView(textError_lastName);
+		RelativeLayout.LayoutParams params_text_error_lastName = (RelativeLayout.LayoutParams) textError_lastName.getLayoutParams();
+		params_text_error_lastName.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+		params_text_error_lastName.width = ViewGroup.LayoutParams.WRAP_CONTENT;
+        params_text_error_lastName.addRule(RelativeLayout.CENTER_VERTICAL);
+		params_text_error_lastName.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+		params_text_error_lastName.setMargins(Util.scaleWidthPx(3, outMetrics), 0,0,0);
+		textError_lastName.setLayoutParams(params_text_error_lastName);
+
+		textError_lastName.setTextColor(ContextCompat.getColor(ManagerActivityLollipop.this, R.color.login_warning));
+
+		error_layout_lastName.setVisibility(View.GONE);
+
 		final EditText inputMail = new EditText(this);
+		inputMail.getBackground().mutate().clearColorFilter();
+		inputMail.getBackground().mutate().setColorFilter(getResources().getColor(R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
 		layout.addView(inputMail, params);
 
+		final RelativeLayout error_layout_email = new RelativeLayout(ManagerActivityLollipop.this);
+		layout.addView(error_layout_email, params1);
+
+		final ImageView error_icon_email = new ImageView(ManagerActivityLollipop.this);
+		error_icon_email.setImageDrawable(ManagerActivityLollipop.this.getResources().getDrawable(R.drawable.ic_input_warning));
+		error_layout_email.addView(error_icon_email);
+		RelativeLayout.LayoutParams params_icon_email = (RelativeLayout.LayoutParams) error_icon_email.getLayoutParams();
+
+
+		params_icon_email.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+		error_icon_email.setLayoutParams(params_icon_email);
+
+		error_icon_email.setColorFilter(ContextCompat.getColor(ManagerActivityLollipop.this, R.color.login_warning));
+
+		final TextView textError_email = new TextView(ManagerActivityLollipop.this);
+		error_layout_email.addView(textError_email);
+		RelativeLayout.LayoutParams params_text_error_email = (RelativeLayout.LayoutParams) textError_email.getLayoutParams();
+		params_text_error_email.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+		params_text_error_email.width = ViewGroup.LayoutParams.WRAP_CONTENT;
+        params_text_error_email.addRule(RelativeLayout.CENTER_VERTICAL);
+		params_text_error_email.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+		params_text_error_email.setMargins(Util.scaleWidthPx(3, outMetrics), 0,0,0);
+		textError_email.setLayoutParams(params_text_error_email);
+
+		textError_email.setTextColor(ContextCompat.getColor(ManagerActivityLollipop.this, R.color.login_warning));
+
+		error_layout_email.setVisibility(View.GONE);
+
+
+		inputFirstName.addTextChangedListener(new TextWatcher() {
+			@Override
+			public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+			}
+
+			@Override
+			public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+			}
+
+			@Override
+			public void afterTextChanged(Editable editable) {
+				if(error_layout_firtName.getVisibility() == View.VISIBLE){
+					error_layout_firtName.setVisibility(View.GONE);
+					inputFirstName.getBackground().mutate().clearColorFilter();
+					inputFirstName.getBackground().mutate().setColorFilter(getResources().getColor(R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
+				}
+			}
+		});
 		inputFirstName.setSingleLine();
 		inputFirstName.setText(myAccountInfo.getFirstNameText());
 		inputFirstName.setTextColor(getResources().getColor(R.color.text_secondary));
@@ -2674,17 +2878,26 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					String value = inputMail.getText().toString().trim();
 					String emailError = Util.getEmailError(value, managerActivity);
 					if (emailError != null) {
-						inputMail.setError(emailError);
+//						inputMail.setError(emailError);
+						inputMail.getBackground().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+						textError_email.setText(emailError);
+						error_layout_email.setVisibility(View.VISIBLE);
 						inputMail.requestFocus();
 					}
 					else if(valueFirstName.equals("")||valueFirstName.isEmpty()){
 						log("input is empty");
-						inputFirstName.setError(getString(R.string.invalid_string));
+//						inputFirstName.setError(getString(R.string.invalid_string));
+						inputFirstName.getBackground().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+						textError_firtName.setText(getString(R.string.invalid_string));
+						error_layout_firtName.setVisibility(View.VISIBLE);
 						inputFirstName.requestFocus();
 					}
 					else if(valueLastName.equals("")||valueLastName.isEmpty()){
 						log("input is empty");
-						inputLastName.setError(getString(R.string.invalid_string));
+//						inputLastName.setError(getString(R.string.invalid_string));
+						inputLastName.getBackground().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+						textError_lastName.setText(getString(R.string.invalid_string));
+						error_layout_lastName.setVisibility(View.VISIBLE);
 						inputLastName.requestFocus();
 					}
 					else {
@@ -2703,6 +2916,26 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 		inputFirstName.setImeActionLabel(getString(R.string.title_edit_profile_info),EditorInfo.IME_ACTION_DONE);
 
+		inputLastName.addTextChangedListener(new TextWatcher() {
+			@Override
+			public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+			}
+
+			@Override
+			public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+			}
+
+			@Override
+			public void afterTextChanged(Editable editable) {
+				if(error_layout_lastName.getVisibility() == View.VISIBLE){
+					error_layout_lastName.setVisibility(View.GONE);
+					inputLastName.getBackground().mutate().clearColorFilter();
+					inputLastName.getBackground().mutate().setColorFilter(getResources().getColor(R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
+				}
+			}
+		});
 		inputLastName.setSingleLine();
 		inputLastName.setText(myAccountInfo.getLastNameText());
 		inputLastName.setTextColor(getResources().getColor(R.color.text_secondary));
@@ -2718,17 +2951,26 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					String value = inputMail.getText().toString().trim();
 					String emailError = Util.getEmailError(value, managerActivity);
 					if (emailError != null) {
-						inputMail.setError(emailError);
+//						inputMail.setError(emailError);
+						inputMail.getBackground().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+						textError_email.setText(emailError);
+						error_layout_email.setVisibility(View.VISIBLE);
 						inputMail.requestFocus();
 					}
 					else if(valueFirstName.equals("")||valueFirstName.isEmpty()){
 						log("input is empty");
-						inputFirstName.setError(getString(R.string.invalid_string));
+//						inputFirstName.setError(getString(R.string.invalid_string));
+						inputFirstName.getBackground().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+						textError_firtName.setText(getString(R.string.invalid_string));
+						error_layout_firtName.setVisibility(View.VISIBLE);
 						inputFirstName.requestFocus();
 					}
 					else if(valueLastName.equals("")||valueLastName.isEmpty()){
 						log("input is empty");
-						inputLastName.setError(getString(R.string.invalid_string));
+//						inputLastName.setError(getString(R.string.invalid_string));
+						inputLastName.getBackground().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+						textError_lastName.setText(getString(R.string.invalid_string));
+						error_layout_lastName.setVisibility(View.VISIBLE);
 						inputLastName.requestFocus();
 					}
 					else {
@@ -2746,7 +2988,28 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 		inputLastName.setImeActionLabel(getString(R.string.title_edit_profile_info),EditorInfo.IME_ACTION_DONE);
 
+		inputMail.getBackground().mutate().clearColorFilter();
+		inputMail.addTextChangedListener(new TextWatcher() {
+			@Override
+			public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
+			}
+
+			@Override
+			public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+			}
+
+			@Override
+			public void afterTextChanged(Editable editable) {
+				if(error_layout_email.getVisibility() == View.VISIBLE){
+					error_layout_email.setVisibility(View.GONE);
+					inputMail.getBackground().mutate().clearColorFilter();
+					inputMail.getBackground().mutate().setColorFilter(getResources().getColor(R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
+
+				}
+			}
+		});
 		inputMail.setSingleLine();
 		inputMail.setText(myAccountInfo.getMyUser().getEmail());
 		inputMail.setTextColor(getResources().getColor(R.color.text_secondary));
@@ -2762,17 +3025,26 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					String value = inputMail.getText().toString().trim();
 					String emailError = Util.getEmailError(value, managerActivity);
 					if (emailError != null) {
-						inputMail.setError(emailError);
+//						inputMail.setError(emailError);
+						inputMail.getBackground().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+						textError_email.setText(emailError);
+						error_layout_email.setVisibility(View.VISIBLE);
 						inputMail.requestFocus();
 					}
 					else if(valueFirstName.equals("")||valueFirstName.isEmpty()){
 						log("input is empty");
-						inputFirstName.setError(getString(R.string.invalid_string));
+//						inputFirstName.setError(getString(R.string.invalid_string));
+						inputFirstName.getBackground().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+						textError_firtName.setText(getString(R.string.invalid_string));
+						error_layout_firtName.setVisibility(View.VISIBLE);
 						inputFirstName.requestFocus();
 					}
 					else if(valueLastName.equals("")||valueLastName.isEmpty()){
 						log("input is empty");
-						inputLastName.setError(getString(R.string.invalid_string));
+//						inputLastName.setError(getString(R.string.invalid_string));
+						inputLastName.getBackground().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+						textError_lastName.setText(getString(R.string.invalid_string));
+						error_layout_lastName.setVisibility(View.VISIBLE);
 						inputLastName.requestFocus();
 					}
 					else {
@@ -2797,8 +3069,15 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 					}
 				});
-		builder.setNegativeButton(getString(android.R.string.cancel), null);
-		builder.setView(layout);
+		builder.setNegativeButton(getString(android.R.string.cancel), new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialogInterface, int i) {
+				inputFirstName.getBackground().clearColorFilter();
+				inputLastName.getBackground().clearColorFilter();
+				inputMail.getBackground().clearColorFilter();
+			}
+		});
+		builder.setView(scrollView);
 
 		changeUserAttributeDialog = builder.create();
 		changeUserAttributeDialog.show();
@@ -2811,17 +3090,26 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				String value = inputMail.getText().toString().trim();
 				String emailError = Util.getEmailError(value, managerActivity);
 				if (emailError != null) {
-					inputMail.setError(emailError);
+//					inputMail.setError(emailError);
+					inputMail.getBackground().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+					textError_email.setText(emailError);
+					error_layout_email.setVisibility(View.VISIBLE);
 					inputMail.requestFocus();
 				}
 				else if(valueFirstName.equals("")||valueFirstName.isEmpty()){
 					log("input is empty");
-					inputFirstName.setError(getString(R.string.invalid_string));
+//					inputFirstName.setError(getString(R.string.invalid_string));
+					inputFirstName.getBackground().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+					textError_firtName.setText(getString(R.string.invalid_string));
+					error_layout_firtName.setVisibility(View.VISIBLE);
 					inputFirstName.requestFocus();
 				}
 				else if(valueLastName.equals("")||valueLastName.isEmpty()){
 					log("input is empty");
-					inputLastName.setError(getString(R.string.invalid_string));
+//					inputLastName.setError(getString(R.string.invalid_string));
+					inputLastName.getBackground().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+					textError_lastName.setText(getString(R.string.invalid_string));
+					error_layout_lastName.setVisibility(View.VISIBLE);
 					inputLastName.requestFocus();
 				}
 				else {
@@ -2960,6 +3248,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					if (parentNode != null){
 						if (parentNode.getHandle() == megaApi.getRootNode().getHandle()){
 							aB.setTitle(getString(R.string.section_cloud_drive));
+							//aB.setTitle(getString());
+
 							aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 							firstNavigationLevel = true;
 						}
@@ -3136,7 +3426,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					sttFLol.setOnlineOptions(true);
 				}
 			}
-			invalidateOptionsMenu();
+			supportInvalidateOptionsMenu();
 		}
 		else{
 			log("showOnlineMode - Root is NULL");
@@ -3272,7 +3562,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 		}
 
-		invalidateOptionsMenu();
+		supportInvalidateOptionsMenu();
 
 	}
 
@@ -3655,11 +3945,30 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 			@Override
 			public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-
+				log("onPageScrolled");
 			}
 
 			@Override
 			public void onPageSelected(int position) {
+				log("onPageSelected");
+				String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);
+				cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
+				if(cFLol!=null){
+					cFLol.hideMultipleSelect();
+					cFLol.clearSelectionsNoAnimations();
+				}
+				cFTag = getFragmentTag(R.id.contact_tabs_pager, 1);
+				sRFLol = (SentRequestsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
+				if(sRFLol!=null){
+					sRFLol.clearSelections();
+					sRFLol.hideMultipleSelect();
+				}
+				cFTag = getFragmentTag(R.id.contact_tabs_pager, 2);
+				rRFLol = (ReceivedRequestsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
+				if(rRFLol!=null){
+					rRFLol.clearSelections();
+					rRFLol.hideMultipleSelect();
+				}
 				supportInvalidateOptionsMenu();
 				showFabButton();
 			}
@@ -4030,16 +4339,27 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 				log("FirstTimeCam: " + firstTimeCam);
     			if (cuFL == null){
-    				cuFL = new CameraUploadFragmentLollipop();
-    				cuFL.setIsList(isListCameraUploads);
-    				cuFL.setIsLargeGrid(isLargeGridCameraUploads);
-    				cuFL.setFirstTimeCam(firstTimeCam);
+                    Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("cuFLol");
+                    if(currentFragment != null && currentFragment instanceof CameraUploadFragmentLollipop){
+                        cuFL = ((CameraUploadFragmentLollipop) currentFragment);
+                        isListCameraUploads = cuFL.getIsList();
+                        isLargeGridCameraUploads = cuFL.getIsLargeGrid();
+                        firstTimeCam = cuFL.getFirstTimeCam();
+                    }
+                    else{
+                        cuFL = new CameraUploadFragmentLollipop();
+                        cuFL.setIsList(isListCameraUploads);
+                        cuFL.setIsLargeGrid(isLargeGridCameraUploads);
+                        cuFL.setFirstTimeCam(firstTimeCam);
+                    }
 				}
 				else{
 					cuFL.setIsList(isListCameraUploads);
 					cuFL.setIsLargeGrid(isLargeGridCameraUploads);
 					cuFL.setFirstTimeCam(firstTimeCam);
 				}
+
+				invalidateOptionsMenu();
 
     			tabLayoutCloud.setVisibility(View.GONE);
     			viewPagerCDrive.setVisibility(View.GONE);
@@ -4111,15 +4431,25 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				}
 
     			if (muFLol == null){
-//    				cuF = new CameraUploadFragmentLollipop(CameraUploadFragmentLollipop.TYPE_MEDIA);
-    				muFLol = CameraUploadFragmentLollipop.newInstance(CameraUploadFragmentLollipop.TYPE_MEDIA);
-    				muFLol.setIsList(isListCameraUploads);
-    				muFLol.setIsLargeGrid(isLargeGridCameraUploads);
+                    Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("muFLol");
+                    if(currentFragment != null && currentFragment instanceof CameraUploadFragmentLollipop){
+                        muFLol = (CameraUploadFragmentLollipop) currentFragment;
+                        isListCameraUploads = muFLol.getIsList();
+                        isLargeGridCameraUploads = muFLol.getIsLargeGrid();
+                    }
+                    else {
+//    					cuF = new CameraUploadFragmentLollipop(CameraUploadFragmentLollipop.TYPE_MEDIA);
+                        muFLol = CameraUploadFragmentLollipop.newInstance(CameraUploadFragmentLollipop.TYPE_MEDIA);
+                        muFLol.setIsList(isListCameraUploads);
+                        muFLol.setIsLargeGrid(isLargeGridCameraUploads);
+                    }
 				}
 				else{
 					muFLol.setIsList(isListCameraUploads);
 					muFLol.setIsLargeGrid(isLargeGridCameraUploads);
 				}
+
+				invalidateOptionsMenu();
 
     			tabLayoutCloud.setVisibility(View.GONE);
     			viewPagerCDrive.setVisibility(View.GONE);
@@ -4580,7 +4910,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		}
 		fragmentContainer.setVisibility(View.VISIBLE);
 
-		invalidateOptionsMenu();
+		supportInvalidateOptionsMenu();
 		showFabButton();
 	}
 
@@ -4767,6 +5097,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					if (fbFLol!=null){
 						log("in CloudDrive");
 						//Cloud Drive
+
 						//Show
 						addMenuItem.setEnabled(true);
 						addMenuItem.setVisible(true);
@@ -6606,16 +6937,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
         		nameMLP.setMargins(Util.scaleWidthPx(25, outMetrics), Util.scaleHeightPx(15, outMetrics), 0, Util.scaleHeightPx(10, outMetrics));
 
         		TextView sortByDateTV = (TextView) dialoglayout.findViewById(R.id.sortby_dialog_date_text);
-        		sortByDateTV.setText(getString(R.string.sortby_creation_date));
+        		sortByDateTV.setText(getString(R.string.sortby_modification_date));
         		ViewGroup.MarginLayoutParams dateMLP = (ViewGroup.MarginLayoutParams) sortByDateTV.getLayoutParams();
         		sortByDateTV.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16*scaleText));
         		dateMLP.setMargins(Util.scaleWidthPx(25, outMetrics), Util.scaleHeightPx(15, outMetrics), 0, Util.scaleHeightPx(10, outMetrics));
-
-				TextView sortByModificationDateTV = (TextView) dialoglayout.findViewById(R.id.sortby_dialog_date_modification_text);
-				sortByModificationDateTV.setText(getString(R.string.sortby_modification_date));
-				ViewGroup.MarginLayoutParams dateModMLP = (ViewGroup.MarginLayoutParams) sortByModificationDateTV.getLayoutParams();
-				sortByModificationDateTV.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16*scaleText));
-				dateModMLP.setMargins(Util.scaleWidthPx(25, outMetrics), Util.scaleHeightPx(15, outMetrics), 0, Util.scaleHeightPx(10, outMetrics));
 
         		TextView sortBySizeTV = (TextView) dialoglayout.findViewById(R.id.sortby_dialog_size_text);
         		sortBySizeTV.setText(getString(R.string.sortby_size));
@@ -6626,62 +6951,53 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
         		final CheckedTextView ascendingCheck = (CheckedTextView) dialoglayout.findViewById(R.id.sortby_dialog_ascending_check);
         		ascendingCheck.setText(getString(R.string.sortby_name_ascending));
         		ascendingCheck.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16*scaleText));
-        		ascendingCheck.setCompoundDrawablePadding(Util.scaleWidthPx(10, outMetrics));
+        		ascendingCheck.setCompoundDrawablePadding(Util.scaleWidthPx(34, outMetrics));
         		ViewGroup.MarginLayoutParams ascendingMLP = (ViewGroup.MarginLayoutParams) ascendingCheck.getLayoutParams();
         		ascendingMLP.setMargins(Util.scaleWidthPx(15, outMetrics), Util.scaleHeightPx(10, outMetrics), 0, Util.scaleHeightPx(10, outMetrics));
 
         		final CheckedTextView descendingCheck = (CheckedTextView) dialoglayout.findViewById(R.id.sortby_dialog_descending_check);
         		descendingCheck.setText(getString(R.string.sortby_name_descending));
         		descendingCheck.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16*scaleText));
-        		descendingCheck.setCompoundDrawablePadding(Util.scaleWidthPx(10, outMetrics));
+        		descendingCheck.setCompoundDrawablePadding(Util.scaleWidthPx(34, outMetrics));
         		ViewGroup.MarginLayoutParams descendingMLP = (ViewGroup.MarginLayoutParams) descendingCheck.getLayoutParams();
         		descendingMLP.setMargins(Util.scaleWidthPx(15, outMetrics), Util.scaleHeightPx(10, outMetrics), 0, Util.scaleHeightPx(10, outMetrics));
 
         		final CheckedTextView newestCheck = (CheckedTextView) dialoglayout.findViewById(R.id.sortby_dialog_newest_check);
         		newestCheck.setText(getString(R.string.sortby_date_newest));
         		newestCheck.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16*scaleText));
-        		newestCheck.setCompoundDrawablePadding(Util.scaleWidthPx(10, outMetrics));
+        		newestCheck.setCompoundDrawablePadding(Util.scaleWidthPx(34, outMetrics));
         		ViewGroup.MarginLayoutParams newestMLP = (ViewGroup.MarginLayoutParams) newestCheck.getLayoutParams();
         		newestMLP.setMargins(Util.scaleWidthPx(15, outMetrics), Util.scaleHeightPx(10, outMetrics), 0, Util.scaleHeightPx(10, outMetrics));
 
         		final CheckedTextView oldestCheck = (CheckedTextView) dialoglayout.findViewById(R.id.sortby_dialog_oldest_check);
         		oldestCheck.setText(getString(R.string.sortby_date_oldest));
         		oldestCheck.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16*scaleText));
-        		oldestCheck.setCompoundDrawablePadding(Util.scaleWidthPx(10, outMetrics));
+        		oldestCheck.setCompoundDrawablePadding(Util.scaleWidthPx(34, outMetrics));
         		ViewGroup.MarginLayoutParams oldestMLP = (ViewGroup.MarginLayoutParams) oldestCheck.getLayoutParams();
         		oldestMLP.setMargins(Util.scaleWidthPx(15, outMetrics), Util.scaleHeightPx(10, outMetrics), 0, Util.scaleHeightPx(10, outMetrics));
-
-				final CheckedTextView newestModificationCheck = (CheckedTextView) dialoglayout.findViewById(R.id.sortby_dialog_newest_modification_check);
-				newestModificationCheck.setText(getString(R.string.sortby_date_newest));
-				newestModificationCheck.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16*scaleText));
-				newestModificationCheck.setCompoundDrawablePadding(Util.scaleWidthPx(10, outMetrics));
-				ViewGroup.MarginLayoutParams newestModMLP = (ViewGroup.MarginLayoutParams) newestModificationCheck.getLayoutParams();
-				newestModMLP.setMargins(Util.scaleWidthPx(15, outMetrics), Util.scaleHeightPx(10, outMetrics), 0, Util.scaleHeightPx(10, outMetrics));
-
-				final CheckedTextView oldestModificationCheck = (CheckedTextView) dialoglayout.findViewById(R.id.sortby_dialog_oldest_modification_check);
-				oldestModificationCheck.setText(getString(R.string.sortby_date_oldest));
-				oldestModificationCheck.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16*scaleText));
-				oldestModificationCheck.setCompoundDrawablePadding(Util.scaleWidthPx(10, outMetrics));
-				ViewGroup.MarginLayoutParams oldestModMLP = (ViewGroup.MarginLayoutParams) oldestModificationCheck.getLayoutParams();
-				oldestModMLP.setMargins(Util.scaleWidthPx(15, outMetrics), Util.scaleHeightPx(10, outMetrics), 0, Util.scaleHeightPx(10, outMetrics));
 
         		final CheckedTextView largestCheck = (CheckedTextView) dialoglayout.findViewById(R.id.sortby_dialog_largest_first_check);
         		largestCheck.setText(getString(R.string.sortby_size_largest_first));
         		largestCheck.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16*scaleText));
-        		largestCheck.setCompoundDrawablePadding(Util.scaleWidthPx(10, outMetrics));
+        		largestCheck.setCompoundDrawablePadding(Util.scaleWidthPx(34, outMetrics));
         		ViewGroup.MarginLayoutParams largestMLP = (ViewGroup.MarginLayoutParams) largestCheck.getLayoutParams();
         		largestMLP.setMargins(Util.scaleWidthPx(15, outMetrics), Util.scaleHeightPx(10, outMetrics), 0, Util.scaleHeightPx(10, outMetrics));
 
         		final CheckedTextView smallestCheck = (CheckedTextView) dialoglayout.findViewById(R.id.sortby_dialog_smallest_first_check);
         		smallestCheck.setText(getString(R.string.sortby_size_smallest_first));
         		smallestCheck.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16*scaleText));
-        		smallestCheck.setCompoundDrawablePadding(Util.scaleWidthPx(10, outMetrics));
+        		smallestCheck.setCompoundDrawablePadding(Util.scaleWidthPx(34, outMetrics));
         		ViewGroup.MarginLayoutParams smallestMLP = (ViewGroup.MarginLayoutParams) smallestCheck.getLayoutParams();
         		smallestMLP.setMargins(Util.scaleWidthPx(15, outMetrics), Util.scaleHeightPx(10, outMetrics), 0, Util.scaleHeightPx(10, outMetrics));
 
         		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
         		builder.setView(dialoglayout);
-        		builder.setTitle(getString(R.string.action_sort_by));
+				TextView textViewTitle = new TextView(ManagerActivityLollipop.this);
+				textViewTitle.setText(getString(R.string.action_sort_by));
+				textViewTitle.setTextSize(20);
+				textViewTitle.setTextColor(0xde000000);
+				textViewTitle.setPadding(Util.scaleWidthPx(23, outMetrics), Util.scaleHeightPx(20, outMetrics), 0, 0);
+        		builder.setCustomTitle(textViewTitle);
 
         		sortByDialog = builder.create();
         		sortByDialog.show();
@@ -6742,8 +7058,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		        			descendingCheck.setChecked(false);
 		        			newestCheck.setChecked(false);
 		        			oldestCheck.setChecked(false);
-							newestModificationCheck.setChecked(false);
-							oldestModificationCheck.setChecked(false);
 		        			largestCheck.setChecked(false);
 		        			smallestCheck.setChecked(false);
 		        			break;
@@ -6753,8 +7067,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		        			descendingCheck.setChecked(true);
 		        			newestCheck.setChecked(false);
 		        			oldestCheck.setChecked(false);
-							newestModificationCheck.setChecked(false);
-							oldestModificationCheck.setChecked(false);
 		        			largestCheck.setChecked(false);
 		        			smallestCheck.setChecked(false);
 		        			break;
@@ -6764,8 +7076,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		        			descendingCheck.setChecked(false);
 		        			newestCheck.setChecked(true);
 		        			oldestCheck.setChecked(false);
-							newestModificationCheck.setChecked(false);
-							oldestModificationCheck.setChecked(false);
 		        			largestCheck.setChecked(false);
 		        			smallestCheck.setChecked(false);
 		        			break;
@@ -6775,8 +7085,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		        			descendingCheck.setChecked(false);
 		        			newestCheck.setChecked(false);
 		        			oldestCheck.setChecked(true);
-							newestModificationCheck.setChecked(false);
-							oldestModificationCheck.setChecked(false);
 		        			largestCheck.setChecked(false);
 		        			smallestCheck.setChecked(false);
 		        			break;
@@ -6786,8 +7094,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 							descendingCheck.setChecked(false);
 							newestCheck.setChecked(false);
 							oldestCheck.setChecked(false);
-							newestModificationCheck.setChecked(false);
-							oldestModificationCheck.setChecked(true);
 							largestCheck.setChecked(false);
 							smallestCheck.setChecked(false);
 							break;
@@ -6797,8 +7103,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 							descendingCheck.setChecked(false);
 							newestCheck.setChecked(false);
 							oldestCheck.setChecked(false);
-							newestModificationCheck.setChecked(true);
-							oldestModificationCheck.setChecked(false);
 							largestCheck.setChecked(false);
 							smallestCheck.setChecked(false);
 							break;
@@ -6808,8 +7112,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		        			descendingCheck.setChecked(false);
 		        			newestCheck.setChecked(false);
 		        			oldestCheck.setChecked(false);
-							newestModificationCheck.setChecked(false);
-							oldestModificationCheck.setChecked(false);
 		        			largestCheck.setChecked(false);
 		        			smallestCheck.setChecked(true);
 		        			break;
@@ -6819,8 +7121,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		        			descendingCheck.setChecked(false);
 		        			newestCheck.setChecked(false);
 		        			oldestCheck.setChecked(false);
-							newestModificationCheck.setChecked(false);
-							oldestModificationCheck.setChecked(false);
 		        			largestCheck.setChecked(true);
 		        			smallestCheck.setChecked(false);
 		        			break;
@@ -6835,9 +7135,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						sortByDateTV.setVisibility(View.VISIBLE);
 		        		newestCheck.setVisibility(View.VISIBLE);
 		        		oldestCheck.setVisibility(View.VISIBLE);
-						sortByModificationDateTV.setVisibility(View.GONE);
-						newestModificationCheck.setVisibility(View.GONE);
-						oldestModificationCheck.setVisibility(View.GONE);
 		        		sortBySizeTV.setVisibility(View.GONE);
 		        		largestCheck.setVisibility(View.GONE);
 		        		smallestCheck.setVisibility(View.GONE);
@@ -6925,9 +7222,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		        		sortByDateTV.setVisibility(View.GONE);
 		        		newestCheck.setVisibility(View.GONE);
 		        		oldestCheck.setVisibility(View.GONE);
-						sortByModificationDateTV.setVisibility(View.GONE);
-						newestModificationCheck.setVisibility(View.GONE);
-						oldestModificationCheck.setVisibility(View.GONE);
 		        		sortBySizeTV.setVisibility(View.GONE);
 		        		largestCheck.setVisibility(View.GONE);
 		        		smallestCheck.setVisibility(View.GONE);
@@ -6970,9 +7264,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		        		sortByDateTV.setVisibility(View.GONE);
 		        		newestCheck.setVisibility(View.GONE);
 		        		oldestCheck.setVisibility(View.GONE);
-						sortByModificationDateTV.setVisibility(View.GONE);
-						newestModificationCheck.setVisibility(View.GONE);
-						oldestModificationCheck.setVisibility(View.GONE);
 		        		sortBySizeTV.setVisibility(View.GONE);
 		        		largestCheck.setVisibility(View.GONE);
 		        		smallestCheck.setVisibility(View.GONE);
@@ -7073,62 +7364,15 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 							}
 						});
 
-		        		newestCheck.setOnClickListener(new OnClickListener() {
 
-							@Override
-							public void onClick(View v) {
-								ascendingCheck.setChecked(false);
-			        			descendingCheck.setChecked(false);
-			        			newestCheck.setChecked(true);
-			        			oldestCheck.setChecked(false);
-			        			largestCheck.setChecked(false);
-			        			smallestCheck.setChecked(false);
-			        			if(drawerItem==DrawerItem.CLOUD_DRIVE){
-			        				selectSortByCloudDrive(MegaApiJava.ORDER_CREATION_DESC);
-			        			}
-			        			else{
-			        				selectSortByInbox(MegaApiJava.ORDER_CREATION_DESC);
-			        			}
-
-			        			if (dialog != null){
-			        				dialog.dismiss();
-			        			}
-							}
-						});
-
-		        		oldestCheck.setOnClickListener(new OnClickListener() {
-
-							@Override
-							public void onClick(View v) {
-								ascendingCheck.setChecked(false);
-			        			descendingCheck.setChecked(false);
-			        			newestCheck.setChecked(false);
-			        			oldestCheck.setChecked(true);
-			        			largestCheck.setChecked(false);
-			        			smallestCheck.setChecked(false);
-			        			if(drawerItem==DrawerItem.CLOUD_DRIVE){
-			        				selectSortByCloudDrive(MegaApiJava.ORDER_CREATION_ASC);
-			        			}
-			        			else{
-			        				selectSortByInbox(MegaApiJava.ORDER_CREATION_ASC);
-			        			}
-
-			        			if (dialog != null){
-			        				dialog.dismiss();
-			        			}
-							}
-						});
-
-						newestModificationCheck.setOnClickListener(new OnClickListener() {
+						newestCheck.setOnClickListener(new OnClickListener() {
 
 							@Override
 							public void onClick(View v) {
 								ascendingCheck.setChecked(false);
 								descendingCheck.setChecked(false);
-								newestCheck.setChecked(false);
+								newestCheck.setChecked(true);
 								oldestCheck.setChecked(false);
-								newestModificationCheck.setChecked(true);
-								oldestModificationCheck.setChecked(false);
 								largestCheck.setChecked(false);
 								smallestCheck.setChecked(false);
 								if(drawerItem==DrawerItem.CLOUD_DRIVE){
@@ -7144,16 +7388,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 							}
 						});
 
-						oldestModificationCheck.setOnClickListener(new OnClickListener() {
+						oldestCheck.setOnClickListener(new OnClickListener() {
 
 							@Override
 							public void onClick(View v) {
 								ascendingCheck.setChecked(false);
-								descendingCheck.setChecked(false);
+								descendingCheck.setChecked(false);;
 								newestCheck.setChecked(false);
-								oldestCheck.setChecked(false);
-								newestModificationCheck.setChecked(false);
-								oldestModificationCheck.setChecked(true);
+								oldestCheck.setChecked(true);
 								largestCheck.setChecked(false);
 								smallestCheck.setChecked(false);
 								if(drawerItem==DrawerItem.CLOUD_DRIVE){
@@ -7168,6 +7410,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 								}
 							}
 						});
+
 
 		        		largestCheck.setOnClickListener(new OnClickListener() {
 
@@ -8303,42 +8546,117 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 		});
 
+	    layout.addView(input, params);
+
+		LinearLayout.LayoutParams params1 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+		params1.setMargins(Util.scaleWidthPx(20, outMetrics), 0, Util.scaleWidthPx(17, outMetrics), 0);
+
+		final RelativeLayout error_layout = new RelativeLayout(ManagerActivityLollipop.this);
+		layout.addView(error_layout, params1);
+
+		final ImageView error_icon = new ImageView(ManagerActivityLollipop.this);
+		error_icon.setImageDrawable(ManagerActivityLollipop.this.getResources().getDrawable(R.drawable.ic_input_warning));
+		error_layout.addView(error_icon);
+		RelativeLayout.LayoutParams params_icon = (RelativeLayout.LayoutParams) error_icon.getLayoutParams();
+
+		params_icon.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+		error_icon.setLayoutParams(params_icon);
+
+		error_icon.setColorFilter(ContextCompat.getColor(ManagerActivityLollipop.this, R.color.login_warning));
+
+		final TextView textError = new TextView(ManagerActivityLollipop.this);
+		error_layout.addView(textError);
+		RelativeLayout.LayoutParams params_text_error = (RelativeLayout.LayoutParams) textError.getLayoutParams();
+		params_text_error.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+		params_text_error.width = ViewGroup.LayoutParams.WRAP_CONTENT;
+        params_text_error.addRule(RelativeLayout.CENTER_VERTICAL);
+		params_text_error.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+		params_text_error.setMargins(Util.scaleWidthPx(3, outMetrics), 0,0,0);
+		textError.setLayoutParams(params_text_error);
+
+		textError.setTextColor(ContextCompat.getColor(ManagerActivityLollipop.this, R.color.login_warning));
+
+		error_layout.setVisibility(View.GONE);
+
+		input.getBackground().mutate().clearColorFilter();
+		input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
+		input.addTextChangedListener(new TextWatcher() {
+			@Override
+			public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+			}
+
+			@Override
+			public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+			}
+
+			@Override
+			public void afterTextChanged(Editable editable) {
+				if(error_layout.getVisibility() == View.VISIBLE){
+					error_layout.setVisibility(View.GONE);
+					input.getBackground().mutate().clearColorFilter();
+					input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
+				}
+			}
+		});
+
 		input.setOnEditorActionListener(new OnEditorActionListener() {
 			@Override
 			public boolean onEditorAction(TextView v, int actionId,
-					KeyEvent event) {
+										  KeyEvent event) {
 				if (actionId == EditorInfo.IME_ACTION_DONE) {
-					renameDialog.dismiss();
 					String value = v.getText().toString().trim();
 					if (value.length() == 0) {
+						input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+						textError.setText(getString(R.string.invalid_string));
+						error_layout.setVisibility(View.VISIBLE);
+						input.requestFocus();
 						return true;
 					}
 					nC.renameNode(document, value);
+					renameDialog.dismiss();
 					return true;
 				}
 				return false;
 			}
 		});
 
-	    layout.addView(input, params);
-
 		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
 		builder.setTitle(getString(R.string.context_rename) + " "	+ new String(document.getName()));
 		builder.setPositiveButton(getString(R.string.context_rename),
 				new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int whichButton) {
-						String value = input.getText().toString().trim();
-						if (value.length() == 0) {
-							return;
-						}
-						nC.renameNode(document, value);
+
 					}
 				});
-		builder.setNegativeButton(getString(android.R.string.cancel), null);
+		builder.setNegativeButton(getString(android.R.string.cancel), new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialogInterface, int i) {
+				input.getBackground().clearColorFilter();
+			}
+		});
 		builder.setView(layout);
 		renameDialog = builder.create();
 		renameDialog.show();
-
+		renameDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new   View.OnClickListener()
+		{
+			@Override
+			public void onClick(View v)
+			{
+				String value = input.getText().toString().trim();
+				if (value.length() == 0) {
+					input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+					textError.setText(getString(R.string.invalid_string));
+					error_layout.setVisibility(View.VISIBLE);
+					input.requestFocus();
+				}
+				else{
+					nC.renameNode(document, value);
+					renameDialog.dismiss();
+				}
+			}
+		});
 	}
 
 	public void showGetLinkActivity(long handle){
@@ -8410,6 +8728,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					p = megaApi.getParentNode(p);
 				}
 				if (p.getHandle() != megaApi.getRubbishNode().getHandle()){
+
 					setMoveToRubbish(true);
 					AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
 //				builder.setTitle(getResources().getString(R.string.section_rubbish_bin));
@@ -8420,13 +8739,15 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					builder.show();
 				}
 				else{
+
 					setMoveToRubbish(false);
 					AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
 //				builder.setTitle(getResources().getString(R.string.title_delete_from_mega));
 
 					builder.setMessage(getResources().getString(R.string.confirmation_delete_from_mega));
 
-					builder.setPositiveButton(R.string.context_delete, dialogClickListener);
+					//builder.setPositiveButton(R.string.context_delete, dialogClickListener);
+					builder.setPositiveButton(R.string.context_remove, dialogClickListener);
 					builder.setNegativeButton(R.string.general_cancel, dialogClickListener);
 					builder.show();
 				}
@@ -8627,8 +8948,65 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 		input.setTextColor(getResources().getColor(R.color.text_secondary));
 		input.setImeOptions(EditorInfo.IME_ACTION_DONE);
-	    layout.addView(input, params);
+		input.getBackground().mutate().clearColorFilter();
+		input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
+		layout.addView(input, params);
 		input.setImeActionLabel(getString(R.string.context_open_link_title),EditorInfo.IME_ACTION_DONE);
+
+		LinearLayout.LayoutParams params1 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+		params1.setMargins(Util.scaleWidthPx(20, outMetrics), 0, Util.scaleWidthPx(17, outMetrics), 0);
+
+		final RelativeLayout error_layout = new RelativeLayout(ManagerActivityLollipop.this);
+		layout.addView(error_layout, params1);
+
+		final ImageView error_icon = new ImageView(ManagerActivityLollipop.this);
+		error_icon.setImageDrawable(ManagerActivityLollipop.this.getResources().getDrawable(R.drawable.ic_input_warning));
+		error_layout.addView(error_icon);
+		RelativeLayout.LayoutParams params_icon = (RelativeLayout.LayoutParams) error_icon.getLayoutParams();
+
+//		params_icon.width = Util.scaleWidthPx(24, outMetrics);
+//		params_icon.width = 80;
+//		params_icon.height = Util.scaleHeightPx(24, outMetrics);
+//		params_icon.height = 80;
+		params_icon.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+		error_icon.setLayoutParams(params_icon);
+
+		error_icon.setColorFilter(ContextCompat.getColor(ManagerActivityLollipop.this, R.color.login_warning));
+
+		final TextView textError = new TextView(ManagerActivityLollipop.this);
+		error_layout.addView(textError);
+		RelativeLayout.LayoutParams params_text_error = (RelativeLayout.LayoutParams) textError.getLayoutParams();
+		params_text_error.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+		params_text_error.width = ViewGroup.LayoutParams.WRAP_CONTENT;
+		params_text_error.addRule(RelativeLayout.CENTER_VERTICAL);
+		params_text_error.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+		params_text_error.setMargins(Util.scaleWidthPx(3, outMetrics), 0,0,0);
+		textError.setLayoutParams(params_text_error);
+
+		textError.setTextColor(ContextCompat.getColor(ManagerActivityLollipop.this, R.color.login_warning));
+
+		error_layout.setVisibility(View.GONE);
+
+		input.addTextChangedListener(new TextWatcher() {
+			@Override
+			public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+			}
+
+			@Override
+			public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+			}
+
+			@Override
+			public void afterTextChanged(Editable editable) {
+				if(error_layout.getVisibility() == View.VISIBLE){
+					error_layout.setVisibility(View.GONE);
+					input.getBackground().mutate().clearColorFilter();
+					input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
+				}
+			}
+		});
 
 		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
 		builder.setTitle(getString(R.string.context_open_link_title));
@@ -8657,19 +9035,49 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			public boolean onEditorAction(TextView v, int actionId,
 					KeyEvent event) {
 				if (actionId == EditorInfo.IME_ACTION_DONE) {
+
+					String value = v.getText().toString().trim();
+					if (value.length() == 0) {
+						input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+						textError.setText(getString(R.string.invalid_string));
+						error_layout.setVisibility(View.VISIBLE);
+						input.requestFocus();
+						return true;
+					}
+					nC.importLink(value);
 					try{
 						openLinkDialog.dismiss();
 					}
 					catch(Exception e){}
-
-					String value = v.getText().toString().trim();
-					if (value.length() == 0) {
-						return true;
-					}
-					nC.importLink(value);
 					return true;
 				}
+				try{
+					openLinkDialog.dismiss();
+				}
+				catch(Exception e){}
 				return false;
+			}
+		});
+
+		openLinkDialog.getButton(android.support.v7.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener(new   View.OnClickListener()
+		{
+			@Override
+			public void onClick(View v)
+			{
+				String value = input.getText().toString().trim();
+				if (value.length() == 0) {
+					input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+					textError.setText(getString(R.string.invalid_string));
+					error_layout.setVisibility(View.VISIBLE);
+					input.requestFocus();
+					return;
+				}
+
+				try{
+					openLinkDialog.dismiss();
+				}
+				catch(Exception e){}
+				nC.importLink(value);
 			}
 		});
 	}
@@ -8898,6 +9306,60 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	    final EditText input = new EditText(this);
 	    layout.addView(input, params);
 
+		LinearLayout.LayoutParams params1 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+		params1.setMargins(Util.scaleWidthPx(20, outMetrics), 0, Util.scaleWidthPx(17, outMetrics), 0);
+
+		final RelativeLayout error_layout = new RelativeLayout(ManagerActivityLollipop.this);
+		layout.addView(error_layout, params1);
+
+		final ImageView error_icon = new ImageView(ManagerActivityLollipop.this);
+		error_icon.setImageDrawable(ManagerActivityLollipop.this.getResources().getDrawable(R.drawable.ic_input_warning));
+		error_layout.addView(error_icon);
+		RelativeLayout.LayoutParams params_icon = (RelativeLayout.LayoutParams) error_icon.getLayoutParams();
+
+
+		params_icon.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+		error_icon.setLayoutParams(params_icon);
+
+		error_icon.setColorFilter(ContextCompat.getColor(ManagerActivityLollipop.this, R.color.login_warning));
+
+		final TextView textError = new TextView(ManagerActivityLollipop.this);
+		error_layout.addView(textError);
+		RelativeLayout.LayoutParams params_text_error = (RelativeLayout.LayoutParams) textError.getLayoutParams();
+		params_text_error.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+		params_text_error.width = ViewGroup.LayoutParams.WRAP_CONTENT;
+        params_text_error.addRule(RelativeLayout.CENTER_VERTICAL);
+		params_text_error.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+		params_text_error.setMargins(Util.scaleWidthPx(3, outMetrics), 0,0,0);
+		textError.setLayoutParams(params_text_error);
+
+		textError.setTextColor(ContextCompat.getColor(ManagerActivityLollipop.this, R.color.login_warning));
+
+		error_layout.setVisibility(View.GONE);
+
+		input.getBackground().mutate().clearColorFilter();
+		input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
+		input.addTextChangedListener(new TextWatcher() {
+			@Override
+			public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+			}
+
+			@Override
+			public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+			}
+
+			@Override
+			public void afterTextChanged(Editable editable) {
+				if(error_layout.getVisibility() == View.VISIBLE){
+					error_layout.setVisibility(View.GONE);
+					input.getBackground().mutate().clearColorFilter();
+					input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
+				}
+			}
+		});
+
 //		input.setId(EDIT_TEXT_ID);
 		input.setSingleLine();
 		input.setTextColor(getResources().getColor(R.color.text_secondary));
@@ -8910,6 +9372,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				if (actionId == EditorInfo.IME_ACTION_DONE) {
 					String value = v.getText().toString().trim();
 					if (value.length() == 0) {
+						input.getBackground().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+						textError.setText(getString(R.string.invalid_string));
+						error_layout.setVisibility(View.VISIBLE);
+						input.requestFocus();
 						return true;
 					}
 					createFolder(value);
@@ -8941,10 +9407,33 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						createFolder(value);
 					}
 				});
-		builder.setNegativeButton(getString(android.R.string.cancel), null);
+		builder.setNegativeButton(getString(android.R.string.cancel), new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialogInterface, int i) {
+				input.getBackground().clearColorFilter();
+			}
+		});
 		builder.setView(layout);
 		newFolderDialog = builder.create();
 		newFolderDialog.show();
+		newFolderDialog.getButton(android.support.v7.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener(new   View.OnClickListener()
+		{
+			@Override
+			public void onClick(View v)
+			{
+				String value = input.getText().toString().trim();
+				if (value.length() == 0) {
+					input.getBackground().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+					textError.setText(getString(R.string.invalid_string));
+					error_layout.setVisibility(View.VISIBLE);
+					input.requestFocus();
+				}
+				else{
+					createFolder(value);
+					newFolderDialog.dismiss();
+				}
+			}
+		});
 	}
 
 	public void showAutoAwayValueDialog(){
@@ -9125,7 +9614,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
 //		builder.setTitle(getString(R.string.context_clear_rubbish));
 		builder.setMessage(getString(R.string.clear_rubbish_confirmation));
-		builder.setPositiveButton(getString(R.string.context_delete),
+		/*builder.setPositiveButton(getString(R.string.context_delete),new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int whichButton) {
+						nC.cleanRubbishBin();
+					}
+				});*/
+		builder.setPositiveButton(getString(R.string.context_remove),
 				new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int whichButton) {
 						nC.cleanRubbishBin();
@@ -9401,9 +9895,63 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	    params.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleHeightPx(20, outMetrics), Util.scaleWidthPx(17, outMetrics), 0);
 
 		final EditText input = new EditText(this);
-	    layout.addView(input, params);
+		layout.addView(input, params);
+
+		LinearLayout.LayoutParams params1 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+		params1.setMargins(Util.scaleWidthPx(20, outMetrics), 0, Util.scaleWidthPx(17, outMetrics), 0);
+
+		final RelativeLayout error_layout_email = new RelativeLayout(ManagerActivityLollipop.this);
+		layout.addView(error_layout_email, params1);
+
+		final ImageView error_icon_email = new ImageView(ManagerActivityLollipop.this);
+		error_icon_email.setImageDrawable(ManagerActivityLollipop.this.getResources().getDrawable(R.drawable.ic_input_warning));
+		error_layout_email.addView(error_icon_email);
+		RelativeLayout.LayoutParams params_icon = (RelativeLayout.LayoutParams) error_icon_email.getLayoutParams();
+
+
+		params_icon.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+		error_icon_email.setLayoutParams(params_icon);
+
+		error_icon_email.setColorFilter(ContextCompat.getColor(ManagerActivityLollipop.this, R.color.login_warning));
+
+		final TextView textError_email = new TextView(ManagerActivityLollipop.this);
+		error_layout_email.addView(textError_email);
+		RelativeLayout.LayoutParams params_text_error = (RelativeLayout.LayoutParams) textError_email.getLayoutParams();
+		params_text_error.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+		params_text_error.width = ViewGroup.LayoutParams.WRAP_CONTENT;
+        params_text_error.addRule(RelativeLayout.CENTER_VERTICAL);
+		params_text_error.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+		params_text_error.addRule(RelativeLayout.LEFT_OF, error_icon_email.getId());
+		params_text_error.setMargins(Util.scaleWidthPx(3, outMetrics), 0,0,0);
+		textError_email.setLayoutParams(params_text_error);
+
+		textError_email.setTextColor(ContextCompat.getColor(ManagerActivityLollipop.this, R.color.login_warning));
+
+		error_layout_email.setVisibility(View.GONE);
 
 //		input.setId(EDIT_TEXT_ID);
+		input.getBackground().mutate().clearColorFilter();
+		input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
+		input.addTextChangedListener(new TextWatcher() {
+			@Override
+			public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+			}
+
+			@Override
+			public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+			}
+
+			@Override
+			public void afterTextChanged(Editable editable) {
+				if(error_layout_email.getVisibility() == View.VISIBLE){
+					error_layout_email.setVisibility(View.GONE);
+					input.getBackground().mutate().clearColorFilter();
+					input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
+				}
+			}
+		});
 		input.setSingleLine();
 		input.setHint(getString(R.string.context_new_contact_name));
 		input.setTextColor(getResources().getColor(R.color.text_secondary));
@@ -9417,8 +9965,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					String value = input.getText().toString().trim();
 					String emailError = Util.getEmailError(value, managerActivity);
 					if (emailError != null) {
-						input.setError(emailError);
-						input.requestFocus();
+//                        input.setError(emailError);
+						input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+						textError_email.setText(emailError);
+						error_layout_email.setVisibility(View.VISIBLE);
 					} else {
 						cC.inviteContact(value);
 						addContactDialog.dismiss();
@@ -9448,7 +9998,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 					}
 				});
-		builder.setNegativeButton(getString(android.R.string.cancel), null);
+		builder.setNegativeButton(getString(android.R.string.cancel), new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialogInterface, int i) {
+				input.getBackground().clearColorFilter();
+			}
+		});
 		builder.setView(layout);
 		addContactDialog = builder.create();
 		addContactDialog.show();
@@ -9458,7 +10013,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				String value = input.getText().toString().trim();
 				String emailError = Util.getEmailError(value, managerActivity);
 				if (emailError != null) {
-					input.setError(emailError);
+//					input.setError(emailError);
+					input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+					textError_email.setText(emailError);
+					error_layout_email.setVisibility(View.VISIBLE);
 				} else {
 					cC.inviteContact(value);
 					addContactDialog.dismiss();
@@ -9984,6 +10542,24 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 		UploadBottomSheetDialogFragment bottomSheetDialogFragment = new UploadBottomSheetDialogFragment();
 		bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
+	}
+
+	public int getHeightToPanel(BottomSheetDialogFragment dialog){
+		if(dialog instanceof NodeOptionsBottomSheetDialogFragment){
+			if(fragmentContainer != null && aB != null && tabLayoutCloud != null){
+				final Rect r = new Rect();
+				fragmentContainer.getWindowVisibleDisplayFrame(r);
+				return (r.height() - aB.getHeight() - tabLayoutCloud.getHeight());
+			}
+		}
+		else if(dialog instanceof ContactsBottomSheetDialogFragment){
+			if(fragmentContainer != null && aB != null && tabLayoutContacts != null){
+				final Rect r = new Rect();
+				fragmentContainer.getWindowVisibleDisplayFrame(r);
+				return (r.height() - aB.getHeight() - tabLayoutContacts.getHeight());
+			}
+		}
+		return -1;
 	}
 
 	private void showOverquotaAlert(){
@@ -12816,12 +13392,20 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 							}
 						}
 					}
+
+					if(cFLol!=null){
+						if(cFLol.isAdded()){
+							updateContactsView(true, false, false);
+						}
+					}
 				}
 				else{
 					log("Continue...");
 					continue;
 				}
 			}
+
+
 		}
 	}
 
@@ -13049,6 +13633,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					if (nps != null){
 						log("nps != null");
 						ArrayList<MegaNode> nodes = megaApi.getChildren(nps, MegaApiJava.ORDER_MODIFICATION_DESC);
+//						cuFL.setNodes(megaApi.getFileFolderChildren(nps, MegaApiJava.ORDER_MODIFICATION_DESC));
 						cuFL.setNodes(nodes);
 					}
 				}
@@ -13063,6 +13648,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					if (nps != null){
 						log("nps != null");
 						ArrayList<MegaNode> nodes = megaApi.getChildren(nps, MegaApiJava.ORDER_MODIFICATION_DESC);
+//						muFLol.setNodes(megaApi.getFileFolderChildren(nps, MegaApiJava.ORDER_MODIFICATION_DESC));
 						muFLol.setNodes(nodes);
 					}
 				}
@@ -13165,7 +13751,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 								completedTFLol.updateCompletedTransfers();
 							}
 						}
-						invalidateOptionsMenu();
+						supportInvalidateOptionsMenu();
 						break;
 					}
 					case DialogInterface.BUTTON_NEGATIVE: {
@@ -13610,7 +14196,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		log("showChatPanel");
 
 		if(chat!=null){
-			this.selectedChatItem = chat;
+			this.selectedChatItemId = chat.getChatId();
 			ChatBottomSheetDialogFragment bottomSheetDialogFragment = new ChatBottomSheetDialogFragment();
 			bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
 		}
@@ -13977,15 +14563,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		this.displayedAccountType = displayedAccountType;
 	}
 
-	public MegaChatListItem getSelectedChat() {
-		return selectedChatItem;
-	}
-
-	public void setSelectedChat(MegaChatListItem selectedChatItem) {
-		this.selectedChatItem = selectedChatItem;
-	}
-
 	public void enableChat(){
+
+		((MegaApplication) getApplication()).enableChat();
+
 		Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
 		intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
 		intent.setAction(Constants.ACTION_ENABLE_CHAT);
@@ -14053,7 +14634,16 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						chat.setTitle(getString(R.string.section_chat));
 					}
 					else{
-						String textToShow = String.format(getString(R.string.section_chat_with_notification), numberUnread);
+                        String textToShow = String.format(getString(R.string.section_chat_with_notification), numberUnread);
+                        try {
+                            textToShow = textToShow.replace("[A]", "<font color=\'#ff333a\'>");
+                            textToShow = textToShow.replace("[/A]", "</font>");
+                        }
+                        catch(Exception e){
+                            log("Formatted string: " + textToShow);
+                        }
+
+						log("TEXTTOSHOW: " + textToShow);
 						Spanned result = null;
 						if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
 							result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);

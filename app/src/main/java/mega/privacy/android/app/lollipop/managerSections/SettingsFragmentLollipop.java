@@ -420,7 +420,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			}
 			else{
 				cameraUpload = Boolean.parseBoolean(prefs.getCamSyncEnabled());
-				camSyncLocalPath = prefs.getCamSyncLocalPath();
+
 				if (prefs.getCameraFolderExternalSDCard() != null){
 					isExternalSDCard = Boolean.parseBoolean(prefs.getCameraFolderExternalSDCard());
 				}
@@ -508,7 +508,8 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 				else{
 					fileNames = Boolean.parseBoolean(prefs.getKeepFileNames());
 				}
-				
+
+				camSyncLocalPath = prefs.getCamSyncLocalPath();
 				if (camSyncLocalPath == null){
 					File cameraDownloadLocation = null;
 					if (Environment.getExternalStorageDirectory() != null){
@@ -519,7 +520,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 					
 					dbH.setCamSyncLocalPath(cameraDownloadLocation.getAbsolutePath());
 					dbH.setCameraFolderExternalSDCard(false);
-					
+					isExternalSDCard = false;
 					camSyncLocalPath = cameraDownloadLocation.getAbsolutePath();
 				}
 				else{
@@ -533,7 +534,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 						
 						dbH.setCamSyncLocalPath(cameraDownloadLocation.getAbsolutePath());
 						dbH.setCameraFolderExternalSDCard(false);
-						
+						isExternalSDCard = false;
 						camSyncLocalPath = cameraDownloadLocation.getAbsolutePath();
 					}
 					else{
@@ -548,9 +549,21 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 								cameraDownloadLocation.mkdirs();
 								
 								dbH.setCamSyncLocalPath(cameraDownloadLocation.getAbsolutePath());
-								dbH.setCameraFolderExternalSDCard(false);
-								
 								camSyncLocalPath = cameraDownloadLocation.getAbsolutePath();
+							}
+						}
+						else{
+							Uri uri = Uri.parse(prefs.getUriExternalSDCard());
+
+							DocumentFile pickedDir = DocumentFile.fromTreeUri(context, uri);
+							String pickedDirName = pickedDir.getName();
+							if(pickedDirName!=null){
+								camSyncLocalPath = pickedDir.getName();
+								localCameraUploadFolder.setSummary(pickedDir.getName());
+								localCameraUploadFolderSDCard.setSummary(pickedDir.getName());
+							}
+							else{
+								log("pickedDirNAme NULL");
 							}
 						}
 					}
@@ -1378,23 +1391,40 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 				}
 				
 				if (camSyncLocalPath!=null){
-					File checkFile = new File(camSyncLocalPath);
-					if(!checkFile.exists()){
-						//Local path does not exist, then Camera folder by default
-						log("local path not exist, default camera folder");
-						File cameraDownloadLocation = null;
-						if (Environment.getExternalStorageDirectory() != null){
-							cameraDownloadLocation = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
+
+					if (!isExternalSDCard){
+						File checkFile = new File(camSyncLocalPath);
+						if(!checkFile.exists()){
+							//Local path does not exist, then Camera folder by default
+							log("local path not exist, default camera folder");
+							File cameraDownloadLocation = null;
+							if (Environment.getExternalStorageDirectory() != null){
+								cameraDownloadLocation = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
+							}
+
+							cameraDownloadLocation.mkdirs();
+
+							dbH.setCamSyncLocalPath(cameraDownloadLocation.getAbsolutePath());
+
+							camSyncLocalPath = cameraDownloadLocation.getAbsolutePath();
+							localCameraUploadFolder.setSummary(camSyncLocalPath);
+							localCameraUploadFolderSDCard.setSummary(camSyncLocalPath);
 						}
-						
-						cameraDownloadLocation.mkdirs();
-						
-						dbH.setCamSyncLocalPath(cameraDownloadLocation.getAbsolutePath());
-						dbH.setCameraFolderExternalSDCard(false);
-						
-						camSyncLocalPath = cameraDownloadLocation.getAbsolutePath();
-						
-					} 	
+					}
+					else{
+						Uri uri = Uri.parse(prefs.getUriExternalSDCard());
+
+						DocumentFile pickedDir = DocumentFile.fromTreeUri(context, uri);
+						String pickedDirName = pickedDir.getName();
+						if(pickedDirName!=null){
+							camSyncLocalPath = pickedDir.getName();
+							localCameraUploadFolder.setSummary(pickedDir.getName());
+							localCameraUploadFolderSDCard.setSummary(pickedDir.getName());
+						}
+						else{
+							log("pickedDirNAme NULL");
+						}
+					}
 				}
 				else{
 					log("local parh is NULL");
@@ -1408,6 +1438,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 					
 					dbH.setCamSyncLocalPath(cameraDownloadLocation.getAbsolutePath());
 					dbH.setCameraFolderExternalSDCard(false);
+					isExternalSDCard = false;
 					
 					camSyncLocalPath = cameraDownloadLocation.getAbsolutePath();
 				}
@@ -1771,14 +1802,14 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			
 			dbH.setUriExternalSDCard(treeUri.toString());
 			dbH.setCameraFolderExternalSDCard(true);
+			isExternalSDCard = true;
 			
 			DocumentFile pickedDir = DocumentFile.fromTreeUri(context, treeUri);
+
 			String pickedDirName = pickedDir.getName();
 			if(pickedDirName!=null){
-				dbH.setCamSyncLocalPath(pickedDir.getName());
-				localCameraUploadFolder.setSummary(pickedDir.getName());
-				localCameraUploadFolderSDCard.setSummary(pickedDir.getName());
-
+				prefs.setCamSyncLocalPath(pickedDir.getName());
+				camSyncLocalPath = pickedDir.getName();
 				dbH.setCamSyncLocalPath(pickedDir.getName());
 				localCameraUploadFolder.setSummary(pickedDir.getName());
 				localCameraUploadFolderSDCard.setSummary(pickedDir.getName());
@@ -1829,8 +1860,11 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 		else if (requestCode == REQUEST_CAMERA_FOLDER && resultCode == Activity.RESULT_OK && intent != null){
 			//Local folder to sync
 			String cameraPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
+			prefs.setCamSyncLocalPath(cameraPath);
+			camSyncLocalPath = cameraPath;
 			dbH.setCamSyncLocalPath(cameraPath);
 			dbH.setCameraFolderExternalSDCard(false);
+			isExternalSDCard = false;
 			localCameraUploadFolder.setSummary(cameraPath);
 			localCameraUploadFolderSDCard.setSummary(cameraPath);
 			dbH.setCamSyncTimeStamp(0);
