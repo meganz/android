@@ -6389,7 +6389,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
             				if (rubbishBinFLol.showSelectMenuItem()){
             					selectMenuItem.setVisible(true);
             					unSelectMenuItem.setVisible(false);
-								changeStatusBarColor(1);
+								changeStatusBarColor(Constants.COLOR_STATUS_BAR_RED);
 							}
             				else{
             					selectMenuItem.setVisible(false);
@@ -6406,7 +6406,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
                 			if (fbFLol.showSelectMenuItem()){
                 				selectMenuItem.setVisible(true);
                 				unSelectMenuItem.setVisible(false);
-								changeStatusBarColor(1);
+								changeStatusBarColor(Constants.COLOR_STATUS_BAR_RED);
                 			}
                 			else{
                 				selectMenuItem.setVisible(false);
@@ -6429,7 +6429,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 								if (cFLol.showSelectMenuItem()){
 									selectMenuItem.setVisible(true);
 									unSelectMenuItem.setVisible(false);
-									changeStatusBarColor(1);
+									changeStatusBarColor(Constants.COLOR_STATUS_BAR_RED);
 								}
 								else{
 									selectMenuItem.setVisible(false);
@@ -6446,7 +6446,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 								if (sRFLol.showSelectMenuItem()){
 									selectMenuItem.setVisible(true);
 									unSelectMenuItem.setVisible(false);
-									changeStatusBarColor(1);
+									changeStatusBarColor(Constants.COLOR_STATUS_BAR_RED);
 								}
 								else{
 									selectMenuItem.setVisible(false);
@@ -6463,7 +6463,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 								if (rRFLol.showSelectMenuItem()){
 									selectMenuItem.setVisible(true);
 									unSelectMenuItem.setVisible(false);
-									changeStatusBarColor(1);
+									changeStatusBarColor(Constants.COLOR_STATUS_BAR_RED);
 								}
 								else{
 									selectMenuItem.setVisible(false);
@@ -6484,7 +6484,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		        			if (inSFLol.showSelectMenuItem()){
 		        				selectMenuItem.setVisible(true);
 		        				unSelectMenuItem.setVisible(false);
-								changeStatusBarColor(1);
+								changeStatusBarColor(Constants.COLOR_STATUS_BAR_RED);
 							}
 		        			else{
 		        				selectMenuItem.setVisible(false);
@@ -6500,7 +6500,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		        			if (outSFLol.showSelectMenuItem()){
 		        				selectMenuItem.setVisible(true);
 		        				unSelectMenuItem.setVisible(false);
-								changeStatusBarColor(1);
+								changeStatusBarColor(Constants.COLOR_STATUS_BAR_RED);
 							}
 		        			else{
 		        				selectMenuItem.setVisible(false);
@@ -6516,7 +6516,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	    				if (oFLol.showSelectMenuItem()){
 	        				selectMenuItem.setVisible(true);
 	        				unSelectMenuItem.setVisible(false);
-							changeStatusBarColor(1);
+							changeStatusBarColor(Constants.COLOR_STATUS_BAR_RED);
 						}
 	        			else{
 	        				selectMenuItem.setVisible(false);
@@ -6530,7 +6530,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						if (rChatFL.showSelectMenuItem()){
 							selectMenuItem.setVisible(true);
 							unSelectMenuItem.setVisible(false);
-							changeStatusBarColor(1);
+							changeStatusBarColor(Constants.COLOR_STATUS_BAR_RED);
 						}
 						else{
 							selectMenuItem.setVisible(false);
@@ -6544,7 +6544,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	    				if (iFLol.showSelectMenuItem()){
 	        				selectMenuItem.setVisible(true);
 	        				unSelectMenuItem.setVisible(false);
-							changeStatusBarColor(1);
+							changeStatusBarColor(Constants.COLOR_STATUS_BAR_RED);
 						}
 	        			else{
 	        				selectMenuItem.setVisible(false);
@@ -6558,7 +6558,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	    				if (sFLol.showSelectMenuItem()){
 	        				selectMenuItem.setVisible(true);
 	        				unSelectMenuItem.setVisible(false);
-							changeStatusBarColor(1);
+							changeStatusBarColor(Constants.COLOR_STATUS_BAR_RED);
 						}
 	        			else{
 	        				selectMenuItem.setVisible(false);
@@ -6572,7 +6572,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	        			if (muFLol.showSelectMenuItem()){
 	        				selectMenuItem.setVisible(true);
 	        				unSelectMenuItem.setVisible(false);
-							changeStatusBarColor(1);
+							changeStatusBarColor(Constants.COLOR_STATUS_BAR_RED);
 						}
 	        			else{
 	        				selectMenuItem.setVisible(false);
@@ -6586,7 +6586,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	        			if (cuFL.showSelectMenuItem()){
 	        				selectMenuItem.setVisible(true);
 	        				unSelectMenuItem.setVisible(false);
-							changeStatusBarColor(1);
+							changeStatusBarColor(Constants.COLOR_STATUS_BAR_RED);
 	        			}
 	        			else{
 	        				selectMenuItem.setVisible(false);

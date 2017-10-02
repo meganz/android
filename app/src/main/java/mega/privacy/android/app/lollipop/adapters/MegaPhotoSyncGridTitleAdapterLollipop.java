@@ -214,7 +214,7 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
                     break;
                 }
                 case R.id.cab_menu_select_all:{
-                    ((ManagerActivityLollipop)context).changeStatusBarColor(1);
+                    ((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_RED);
                     selectAll();
                     break;
                 }
@@ -969,7 +969,7 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
      */
     public void hideMultipleSelect() {
         this.multipleSelect = false;
-        ((ManagerActivityLollipop)context).changeStatusBarColor(2);
+        ((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_TRANSPARENT_BLACK);
         clearSelections();
 
         if (actionMode != null) {
@@ -1126,7 +1126,7 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
             actionMode = ((AppCompatActivity)context).startSupportActionMode(new MegaPhotoSyncGridTitleAdapterLollipop.ActionBarCallBack());
 
             updateActionModeTitle();
-            ((ManagerActivityLollipop)context).changeStatusBarColor(1);
+            ((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_RED);
 
             notifyItemChanged(holder.getPositionOnAdapter());
         }
