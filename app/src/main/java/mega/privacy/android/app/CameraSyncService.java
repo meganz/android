@@ -149,6 +149,7 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 
 			if(e.getErrorCode()==MegaChatError.ERROR_OK){
 				log("Connected to chat!");
+				MegaApplication.setChatConnection(true);
 			}
 			else{
 				log("EEEERRRRROR WHEN CONNECTING " + e.getErrorString());
@@ -2065,7 +2066,7 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 					boolean chatEnabled = Boolean.parseBoolean(chatSettings.getEnabled());
 					if(chatEnabled){
 						log("Chat enabled-->connect");
-						megaChatApi.connect(this);
+						megaChatApi.connectInBackground(this);
 						isLoggingIn = false;
 						MegaApplication.setLoggingIn(isLoggingIn);
 						retryLaterShortTime();
