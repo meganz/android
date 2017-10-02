@@ -105,7 +105,7 @@ public class LoginActivityLollipop extends AppCompatActivity implements MegaGlob
     protected void onCreate(Bundle savedInstanceState) {
         log("onCreate");
         super.onCreate(savedInstanceState);
-
+        
         loginActivity = this;
 
         display = getWindowManager().getDefaultDisplay();
