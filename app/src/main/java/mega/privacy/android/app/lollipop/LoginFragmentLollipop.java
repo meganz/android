@@ -196,7 +196,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
     @Override
     public void onCreate (Bundle savedInstanceState){
-        log("*****onCreate");
+        log("onCreate");
         super.onCreate(savedInstanceState);
 
         if(context==null){
@@ -207,7 +207,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        log("*****onCreateView");
+        log("onCreateView");
 
         loginClicked = false;
         backWhileLogin = false;
