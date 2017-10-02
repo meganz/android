@@ -13678,6 +13678,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				MegaContactRequest req = requests.get(i);
 				if(req.isOutgoing()){
 					log("SENT REQUEST");
+					log("STATUS: "+req.getStatus()+" targetEmail: "+req.getTargetEmail()+" contactHandle: "+req.getHandle());
+					if(req.getStatus()==MegaContactRequest.STATUS_ACCEPTED){
+						cC.addContactDB(req.getTargetEmail());
+					}
 					updateContactsView(true, true, false);
 				}
 				else{
