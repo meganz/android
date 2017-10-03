@@ -416,6 +416,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 					copyIcon .setVisible(true);
 					moveToTrashIcon.setVisible(false);
 					removeIcon.setVisible(true);
+					removelinkIcon.setVisible(false);
 				}
 				else{
 					renameIcon.setVisible(false);
@@ -423,6 +424,8 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 					copyIcon .setVisible(true);
 					moveToTrashIcon.setVisible(false);
 					removeIcon.setVisible(false);
+					removelinkIcon.setVisible(false);
+
 				}
 			}
 			else{
