@@ -340,29 +340,10 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 					shareIcon.setVisible(false);
 					menu.findItem(R.id.full_image_viewer_share).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
 				}
-				else{
-					if (!isFolderLink){
-						shareIcon.setVisible(true);
-						menu.findItem(R.id.full_image_viewer_share).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-					}
-					else{
-						shareIcon.setVisible(false);
-						menu.findItem(R.id.full_image_viewer_share).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
-					}
-				}
 			}
 
 			downloadIcon.setVisible(true);
 			menu.findItem(R.id.full_image_viewer_download).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-
-			if (!isFolderLink){
-				propertiesIcon.setVisible(true);
-				menu.findItem(R.id.full_image_viewer_properties).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-			}
-			else{
-				propertiesIcon.setVisible(false);
-				menu.findItem(R.id.full_image_viewer_properties).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
-			}
 
 			if(node.isExported()){
 				getlinkIcon.setVisible(false);
@@ -403,29 +384,33 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				}
 			}
 
-
 			if(fromShared){
 				node = megaApi.getNodeByHandle(imageHandles.get(positionG));
 
 				int accessLevel = megaApi.getAccess(node);
 
-				if(accessLevel== MegaShare.ACCESS_FULL){
+				switch(accessLevel){
 
-					renameIcon.setVisible(true);
-					moveIcon.setVisible(true);
-					copyIcon .setVisible(true);
-					moveToTrashIcon.setVisible(false);
-					removeIcon.setVisible(true);
-					removelinkIcon.setVisible(false);
-				}
-				else{
-					renameIcon.setVisible(false);
-					moveIcon.setVisible(false);
-					copyIcon .setVisible(true);
-					moveToTrashIcon.setVisible(false);
-					removeIcon.setVisible(false);
-					removelinkIcon.setVisible(false);
-
+					case MegaShare.ACCESS_OWNER:
+					case MegaShare.ACCESS_FULL:{
+						renameIcon.setVisible(true);
+						moveIcon.setVisible(true);
+						copyIcon.setVisible(true);
+						moveToTrashIcon.setVisible(true);
+						removeIcon.setVisible(false);
+						removelinkIcon.setVisible(false);
+						break;
+					}
+					case MegaShare.ACCESS_READWRITE:
+					case MegaShare.ACCESS_READ:{
+						renameIcon.setVisible(false);
+						moveIcon.setVisible(false);
+						copyIcon.setVisible(true);
+						moveToTrashIcon.setVisible(false);
+						removeIcon.setVisible(false);
+						removelinkIcon.setVisible(false);
+						break;
+					}
 				}
 			}
 			else{
@@ -435,36 +420,44 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				copyIcon .setVisible(true);
 				moveToTrashIcon.setVisible(true);
 				removeIcon.setVisible(false);
-			}
 
-			if(isFolderLink){
-				moveToTrashIcon.setVisible(false);
-				removeIcon.setVisible(false);
-				getlinkIcon.setVisible(false);
-				renameIcon.setVisible(false);
-				shareIcon.setVisible(false);
-				propertiesIcon.setVisible(false);
-				moveIcon.setVisible(false);
-				copyIcon.setVisible(false);
-				removelinkIcon.setVisible(false);
-			}
-			else{
-				node = megaApi.getNodeByHandle(imageHandles.get(positionG));
-				final long handle = node.getHandle();
-				MegaNode parent = megaApi.getNodeByHandle(handle);
-				while (megaApi.getParentNode(parent) != null){
-					parent = megaApi.getParentNode(parent);
-				}
+				if(isFolderLink){
+					propertiesIcon.setVisible(false);
+					menu.findItem(R.id.full_image_viewer_properties).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
 
-				if (parent.getHandle() != megaApi.getRubbishNode().getHandle()){
-					moveToTrashIcon.setVisible(true);
+					moveToTrashIcon.setVisible(false);
 					removeIcon.setVisible(false);
+					getlinkIcon.setVisible(false);
+					renameIcon.setVisible(false);
+					shareIcon.setVisible(false);
+					propertiesIcon.setVisible(false);
+					moveIcon.setVisible(false);
+					copyIcon.setVisible(false);
+					removelinkIcon.setVisible(false);
 				}
 				else{
-					moveToTrashIcon.setVisible(false);
-					removeIcon.setVisible(true);
+					propertiesIcon.setVisible(true);
+					menu.findItem(R.id.full_image_viewer_properties).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+
+					node = megaApi.getNodeByHandle(imageHandles.get(positionG));
+					final long handle = node.getHandle();
+					MegaNode parent = megaApi.getNodeByHandle(handle);
+					while (megaApi.getParentNode(parent) != null){
+						parent = megaApi.getParentNode(parent);
+					}
+
+					if (parent.getHandle() != megaApi.getRubbishNode().getHandle()){
+						moveToTrashIcon.setVisible(true);
+						removeIcon.setVisible(false);
+					}
+					else{
+						moveToTrashIcon.setVisible(false);
+						removeIcon.setVisible(true);
+					}
 				}
+
 			}
+
 		}
 
 		return super.onCreateOptionsMenu(menu);
