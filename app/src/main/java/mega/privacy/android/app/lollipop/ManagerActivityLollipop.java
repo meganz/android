@@ -11508,7 +11508,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 			int i = 0;
 			long parentHandleUpload=-1;
+			log("On section: "+drawerItem);
 			if (drawerItem == DrawerItem.CLOUD_DRIVE){
+				String cloudTag = getFragmentTag(R.id.cloud_drive_tabs_pager, 0);
+				fbFLol = (FileBrowserFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cloudTag);
 				if(fbFLol!=null)
 				{
 					parentHandleUpload = fbFLol.getParentHandle();
@@ -11535,7 +11538,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					}
 				}
 			}
-			if (drawerItem == DrawerItem.SEARCH){
+			else if (drawerItem == DrawerItem.SEARCH){
 				if(sFLol!=null)
 				{
 					parentHandleUpload = sFLol.getParentHandle();
@@ -11905,6 +11908,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 		@Override
 		public void run(){
+
+			log("Run Upload Service Task");
 
 			MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
 			if (parentNode == null){
