@@ -690,6 +690,12 @@ public class InboxFragmentLollipop extends Fragment{
 			actionMode.finish();
 		}
 	}
+
+	public static InboxFragmentLollipop newInstance() {
+		log("newInstance");
+		InboxFragmentLollipop fragment = new InboxFragmentLollipop();
+		return fragment;
+	}
 	
 	public int onBackPressed(){
 		log("onBackPressed");

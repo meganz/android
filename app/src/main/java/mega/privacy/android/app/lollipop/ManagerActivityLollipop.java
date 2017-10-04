@@ -4497,45 +4497,42 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
     		case INBOX:{
 
     			tB.setVisibility(View.VISIBLE);
+				iFLol = new InboxFragmentLollipop().newInstance();
 
-    			if (iFLol == null){
-    				iFLol = new InboxFragmentLollipop();
-    			}
-    			else{
-					log("Inbox Fragment is not NULL");
+				log("Inbox Fragment is not NULL");
+//					iFLol = (InboxFragmentLollipop) getSupportFragmentManager().findFragmentByTag("iFLol");
 //    				iFLol.setParentHandle(parentHandleInbox);
-					MegaNode node = megaApi.getNodeByHandle(parentHandleInbox);
-					log("Selected Inbox with parent: "+parentHandleInbox);
+				MegaNode node = megaApi.getNodeByHandle(parentHandleInbox);
+				log("Selected Inbox with parent: "+parentHandleInbox);
 //					log("inSFLol deepBrowserTreeIncoming: "+deepBrowserTreeInbox);
-					if (node != null){
-						log("Go to inbox node: "+node.getName());
-						iFLol.setParentHandle(parentHandleInbox);
+				if (node != null){
+					log("Go to inbox node: "+node.getName());
+					iFLol.setParentHandle(parentHandleInbox);
 
-						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleInbox), orderCloud);
-						iFLol.setNodes(nodes);
+					ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleInbox), orderCloud);
+					iFLol.setNodes(nodes);
 
-						if(parentHandleInbox==megaApi.getInboxNode().getHandle()){
-							aB.setTitle(getResources().getString(R.string.section_inbox));
-							log("aB.setHomeAsUpIndicator_886");
-							aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
-							firstNavigationLevel = true;
-						}
-						else{
-							aB.setTitle(node.getName());
-							log("indicator_arrow_back_893");
-							aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
-							firstNavigationLevel = false;
-						}
-					}
-					else{
-						log("The Node is NULL");
-						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getInboxNode(), orderCloud);
-						iFLol.setNodes(nodes);
+					if(parentHandleInbox==megaApi.getInboxNode().getHandle()){
 						aB.setTitle(getResources().getString(R.string.section_inbox));
-						log("aB.setHomeAsUpIndicator_16");
+						log("aB.setHomeAsUpIndicator_886");
 						aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 						firstNavigationLevel = true;
 					}
+					else{
+						aB.setTitle(node.getName());
+						log("indicator_arrow_back_893");
+						aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+						firstNavigationLevel = false;
+					}
+				}
+				else{
+					log("The Node is NULL");
+					ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getInboxNode(), orderCloud);
+					iFLol.setNodes(nodes);
+					aB.setTitle(getResources().getString(R.string.section_inbox));
+					log("aB.setHomeAsUpIndicator_16");
+					aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+					firstNavigationLevel = true;
 				}
 
     			tabLayoutCloud.setVisibility(View.GONE);
