@@ -154,7 +154,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 			log("adapter type is LIST");
 			MegaBrowserLollipopAdapter.ViewHolderBrowserList view = (MegaBrowserLollipopAdapter.ViewHolderBrowserList) listFragment.findViewHolderForLayoutPosition(pos);
 			if(view!=null){
-				log("Start animation: "+pos);
+				log("Start animation: "+pos+" multiselection state: "+isMultipleSelect());
 				Animation flipAnimation = AnimationUtils.loadAnimation(context, R.anim.multiselect_flip);
 				flipAnimation.setAnimationListener(new Animation.AnimationListener() {
 					@Override
@@ -1616,7 +1616,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 	}
 
 	public void setMultipleSelect(boolean multipleSelect) {
-		log("setMultipleSelect");
+		log("setMultipleSelect: "+multipleSelect);
 		if (this.multipleSelect != multipleSelect) {
 			this.multipleSelect = multipleSelect;
 		}
