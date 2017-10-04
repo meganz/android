@@ -12547,6 +12547,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						rChatFL.onlineStatusUpdate(megaChatApi.getOnlineStatus());
 					}
 				}
+
+				megaChatApi.setBackgroundStatus(true);
+				megaChatApi.setBackgroundStatus(false);
 			}
 			else{
 				log("EEEERRRRROR WHEN CONNECTING " + e.getErrorString());
