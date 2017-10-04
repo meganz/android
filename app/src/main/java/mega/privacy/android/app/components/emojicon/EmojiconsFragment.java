@@ -1,7 +1,7 @@
 package mega.privacy.android.app.components.emojicon;
 
 import android.content.Context;
-import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.SystemClock;
@@ -18,6 +18,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
@@ -58,7 +59,6 @@ public class EmojiconsFragment extends Fragment implements ViewPager.OnPageChang
 
         mViewPager = (ViewPager) view.findViewById(R.id.emojis_pager);
         mTabs =  (TabLayout) view.findViewById(R.id.sliding_tabs);
-
         mViewPager.setOnPageChangeListener(this);
 
         EmojiconRecents recents = this;
@@ -73,12 +73,26 @@ public class EmojiconsFragment extends Fragment implements ViewPager.OnPageChang
         mViewPager.setAdapter(mEmojisAdapter);
 
         mTabs.setupWithViewPager(mViewPager);
-        mTabs.getTabAt(0).setIcon(R.drawable.ic_emoji_recent_light);
-        mTabs.getTabAt(1).setIcon(R.drawable.ic_emoji_people_light);
-        mTabs.getTabAt(2).setIcon(R.drawable.ic_emoji_nature_light);
-        mTabs.getTabAt(3).setIcon(R.drawable.ic_emoji_objects_light);
-        mTabs.getTabAt(4).setIcon(R.drawable.ic_emoji_places_light);
-        mTabs.getTabAt(5).setIcon(R.drawable.ic_emoji_symbols_light);
+
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+           mTabs.getTabAt(0).setCustomView(R.layout.ic_emoji_recent);
+            mTabs.getTabAt(1).setCustomView(R.layout.ic_emoji_people);
+            mTabs.getTabAt(2).setCustomView(R.layout.ic_emoji_nature);
+            mTabs.getTabAt(3).setCustomView(R.layout.ic_emoji_objects);
+            mTabs.getTabAt(4).setCustomView(R.layout.ic_emoji_places);
+            mTabs.getTabAt(5).setCustomView(R.layout.ic_emoji_symbols);
+        }else{
+            mTabs.getTabAt(0).setIcon(R.drawable.ic_emoji_recent_light);
+            mTabs.getTabAt(1).setIcon(R.drawable.ic_emoji_people_light);
+            mTabs.getTabAt(2).setIcon(R.drawable.ic_emoji_nature_light);
+            mTabs.getTabAt(3).setIcon(R.drawable.ic_emoji_objects_light);
+            mTabs.getTabAt(4).setIcon(R.drawable.ic_emoji_places_light);
+            mTabs.getTabAt(5).setIcon(R.drawable.ic_emoji_symbols_light);
+
+
+        }
+
+
 
         view.findViewById(R.id.emojis_backspace).setOnTouchListener(new RepeatListener(1000, 50, new View.OnClickListener() {
             @Override

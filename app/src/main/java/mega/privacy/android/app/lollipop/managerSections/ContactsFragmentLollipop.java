@@ -208,8 +208,6 @@ public class ContactsFragmentLollipop extends Fragment{
 					menu.findItem(R.id.cab_menu_start_conversation_more).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 				}
 
-
-
 				if(selected.size()==adapter.getItemCount()){
 					menu.findItem(R.id.cab_menu_select_all).setVisible(false);
 					unselect.setTitle(getString(R.string.action_unselect_all));
@@ -239,7 +237,10 @@ public class ContactsFragmentLollipop extends Fragment{
 	 */
 	public void hideMultipleSelect() {
 		log("hideMultipleSelect");
-		adapter.setMultipleSelect(false);
+		if(adapter!=null){
+			adapter.setMultipleSelect(false);
+		}
+
 		((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_TRANSPARENT_BLACK);
 		if (actionMode != null) {
 			actionMode.finish();
