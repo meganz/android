@@ -49,6 +49,7 @@ import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
+import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaHandleList;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaNode;
@@ -243,7 +244,23 @@ public class ContactAttachmentBottomSheetDialogFragment extends BottomSheetDialo
                     if(contact!=null) {
                         if (contact.getVisibility() == MegaUser.VISIBILITY_VISIBLE) {
                             optionInfo.setVisibility(View.VISIBLE);
-                            optionStartConversation.setVisibility(View.VISIBLE);
+
+                            //Check if the contact is the same that the one is chatting
+                            MegaChatRoom chatRoom = megaChatApi.getChatRoom(chatId);
+                            if(!chatRoom.isGroup()){
+                                long contactHandle = message.getMessage().getUserHandle(0);
+                                long messageContactHandle = chatRoom.getPeerHandle(0);
+                                if(contactHandle==messageContactHandle){
+                                    optionStartConversation.setVisibility(View.GONE);
+                                }
+                                else{
+                                    optionStartConversation.setVisibility(View.VISIBLE);
+                                }
+                            }
+                            else{
+                                optionStartConversation.setVisibility(View.VISIBLE);
+                            }
+
                             optionInvite.setVisibility(View.GONE);
                         }
                         else{
@@ -279,7 +296,6 @@ public class ContactAttachmentBottomSheetDialogFragment extends BottomSheetDialo
                         name.append(", "+message.getMessage().getUserName(i));
                     }
 
-                    optionStartConversation.setVisibility(View.VISIBLE);
                     optionInvite.setVisibility(View.GONE);
 
                     for(int i=1; i<userCount;i++){
@@ -362,7 +378,21 @@ public class ContactAttachmentBottomSheetDialogFragment extends BottomSheetDialo
                     if(contact!=null) {
                         if (contact.getVisibility() == MegaUser.VISIBILITY_VISIBLE) {
                             optionInfo.setVisibility(View.VISIBLE);
-                            optionStartConversation.setVisibility(View.VISIBLE);
+                            //Check if the contact is the same that the one is chatting
+                            MegaChatRoom chatRoom = megaChatApi.getChatRoom(chatId);
+                            if(!chatRoom.isGroup()){
+                                long messageContactHandle = chatRoom.getPeerHandle(0);
+                                if(contact.getHandle()==messageContactHandle){
+                                    optionStartConversation.setVisibility(View.GONE);
+                                }
+                                else{
+                                    optionStartConversation.setVisibility(View.VISIBLE);
+                                }
+                            }
+                            else{
+                                optionStartConversation.setVisibility(View.VISIBLE);
+                            }
+
                             optionInvite.setVisibility(View.GONE);
                         }
                         else{
