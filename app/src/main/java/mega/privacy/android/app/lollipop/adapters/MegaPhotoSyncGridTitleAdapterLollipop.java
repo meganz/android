@@ -145,7 +145,6 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
                         handleList.add(documents.get(i).getHandle());
                     }
                     clearSelections();
-                    hideMultipleSelect();
                     NodeController nC = new NodeController(context);
                     nC.prepareForDownload(handleList);
                     break;
@@ -156,7 +155,6 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
                         handleList.add(documents.get(i).getHandle());
                     }
                     clearSelections();
-                    hideMultipleSelect();
                     NodeController nC = new NodeController(context);
                     nC.chooseLocationToCopyNodes(handleList);
                     break;
@@ -167,14 +165,12 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
                         handleList.add(documents.get(i).getHandle());
                     }
                     clearSelections();
-                    hideMultipleSelect();
                     NodeController nC = new NodeController(context);
                     nC.chooseLocationToMoveNodes(handleList);
                     break;
                 }
                 case R.id.cab_menu_share_link:{
                     clearSelections();
-                    hideMultipleSelect();
                     if (documents.size()==1){
                         //NodeController nC = new NodeController(context);
                         //nC.exportLink(documents.get(0));
@@ -189,7 +185,6 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
                 case R.id.cab_menu_share_link_remove:{
 
                     clearSelections();
-                    hideMultipleSelect();
                     if (documents.size()==1){
                         //NodeController nC = new NodeController(context);
                         //nC.removeLink(documents.get(0));
@@ -209,7 +204,6 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
                         handleList.add(documents.get(i).getHandle());
                     }
                     clearSelections();
-                    hideMultipleSelect();
                     ((ManagerActivityLollipop) context).askConfirmationMoveToRubbish(handleList);
                     break;
                 }
@@ -220,7 +214,6 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
                 }
                 case R.id.cab_menu_unselect_all:{
                     clearSelections();
-                    hideMultipleSelect();
                     break;
                 }
             }
@@ -1113,7 +1106,8 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
                 notifyItemChanged(holder.getPositionOnAdapter());
             }
             else{
-                hideMultipleSelect();
+//                hideMultipleSelect();
+                clearSelections();
             }
         }
     }
