@@ -370,7 +370,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 
 		@Override
 		public void onDestroyActionMode(ActionMode mode) {
-			log("onDestroyActionMode LIST");
+			log("onDestroyActionMode");
 			clearSelections();
 
 			if(isList){
@@ -1595,7 +1595,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	}
 
 	private void clearSelections() {
-		log("clearSelections LIST");
+		log("clearSelections");
 		if (isList){
 			if (adapterList != null){
 				if(adapterList.isMultipleSelect()){
@@ -1618,7 +1618,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	
 	private void updateActionModeTitle() {
 
-		log("updateActionModeTitle LIST");
+		log("updateActionModeTitle");
 		if (actionMode == null || getActivity() == null) {
 			return;
 		}
@@ -1683,7 +1683,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	 * Disable selection
 	 */
 	void hideMultipleSelect() {
-		log("hideMultipleSelect LIST");
+		log("hideMultipleSelect");
 		if (isList){
 			if (adapterList != null){
 				adapterList.setMultipleSelect(false);
