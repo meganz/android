@@ -1565,4 +1565,9 @@
     <string name="result_paragraph_info_achievement_registration" context="info paragraph about the completed achievement registration">You have received %1$s storage space as you free registration bonus.</string>
 
     <string name="expiration_date_for_achievements" context="info paragraph about the completed achievement registration">Bonus expires in %1$d days</string>
+
+    <plurals name="context_share_folders">
+        <item context="menu item" quantity="one">Share folder</item>
+        <item context="menu items" quantity="other">Share folders</item>
+    </plurals>
 </resources>

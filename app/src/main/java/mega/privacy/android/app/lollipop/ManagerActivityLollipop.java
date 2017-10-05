@@ -6069,6 +6069,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				if (firstNavigationLevel){
 					log("firstNavigationLevel is TRUE");
 					drawerLayout.openDrawer(nV);
+
 				}
 				else{
 					log("NOT firstNavigationLevel");
@@ -6086,7 +6087,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		    			}
 		    			else{
 		    				//Cloud Drive
-		    				String cFTag1 = getFragmentTag(R.id.cloud_drive_tabs_pager, 0);
+							String cFTag1 = getFragmentTag(R.id.cloud_drive_tabs_pager, 0);
 		    				log("Tag: "+ cFTag1);
 		    				fbFLol = (FileBrowserFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag1);
 		    				if (fbFLol != null){

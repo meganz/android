@@ -222,7 +222,6 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 					}
 
 					clearSelections();
-					hideMultipleSelect();
 					NodeController nC = new NodeController(context);
 					nC.prepareForDownload(handleList);
 					break;
@@ -241,7 +240,6 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 						}
 					}
 					clearSelections();
-					hideMultipleSelect();
 					NodeController nC = new NodeController(context);
 					nC.chooseLocationToCopyNodes(handleList);
 					break;
@@ -261,7 +259,6 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 					}
 
 					clearSelections();
-					hideMultipleSelect();
 					NodeController nC = new NodeController(context);
 					nC.chooseLocationToMoveNodes(handleList);
 					break;
@@ -269,7 +266,6 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 				case R.id.cab_menu_share_link:{
 					log("Public link option");
 					clearSelections();
-					hideMultipleSelect();
 					if(adapterList!=null){
 						if (documentsList.size()==1){
 							//MegaNode n = megaApi.getNodeByHandle(documentsList.get(0).handle);
@@ -305,7 +301,6 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 					log("Remove public link option");
 
 					clearSelections();
-					hideMultipleSelect();
 					if(adapterList!=null){
 						if (documentsList.size()==1){
 							MegaNode n = megaApi.getNodeByHandle(documentsList.get(0).handle);
@@ -350,7 +345,6 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 						}
 					}
 					clearSelections();
-					hideMultipleSelect();
 					((ManagerActivityLollipop) context).askConfirmationMoveToRubbish(handleList);
 					break;
 				}
@@ -361,7 +355,6 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 				}
 				case R.id.cab_menu_unselect_all:{
 					clearSelections();
-					hideMultipleSelect();
 					break;
 				}
 			}
@@ -377,6 +370,9 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 
 		@Override
 		public void onDestroyActionMode(ActionMode mode) {
+			log("onDestroyActionMode LIST");
+			clearSelections();
+
 			if(isList){
 				if(adapterList!=null){
 					adapterList.setMultipleSelect(false);
@@ -387,7 +383,6 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 					adapterGrid.setMultipleSelect(false);
 				}
 			}
-			clearSelections();
 		}
 
 		@Override
@@ -1522,7 +1517,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
                     adapterList.notifyDataSetChanged();
 				}
 				else{
-					hideMultipleSelect();
+					clearSelections();
 				}					
 			}
 			else{
@@ -1598,16 +1593,14 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			log("isGrid");
 		}
 	}
-	
-	/*
-	 * Clear all selected items
-	 */
+
 	private void clearSelections() {
-		log("clearSelections");
+		log("clearSelections LIST");
 		if (isList){
 			if (adapterList != null){
 				if(adapterList.isMultipleSelect()){
 					adapterList.clearSelections();
+					hideMultipleSelect();
 				}
 				updateActionModeTitle();
 			}
@@ -1616,6 +1609,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			if (adapterGrid != null){
 				if(adapterGrid.isMultipleSelect()){
 					adapterGrid.clearSelections();
+					hideMultipleSelect();
 				}
 				updateActionModeTitle();
 			}
@@ -1623,6 +1617,8 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	}
 	
 	private void updateActionModeTitle() {
+
+		log("updateActionModeTitle LIST");
 		if (actionMode == null || getActivity() == null) {
 			return;
 		}
@@ -1687,18 +1683,21 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	 * Disable selection
 	 */
 	void hideMultipleSelect() {
-		log("hideMultipleSelect");
+		log("hideMultipleSelect LIST");
 		if (isList){
 			if (adapterList != null){
 				adapterList.setMultipleSelect(false);
+				((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_TRANSPARENT_BLACK);
+
 			}
 		}
 		else{
 			if (adapterGrid != null){
 				adapterGrid.setMultipleSelect(false);
+				((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_TRANSPARENT_BLACK);
+
 			}
 		}
-		((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_TRANSPARENT_BLACK);
 
 		if (actionMode != null) {
 			actionMode.finish();

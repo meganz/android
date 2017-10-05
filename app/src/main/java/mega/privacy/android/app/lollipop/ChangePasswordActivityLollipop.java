@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
+import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -257,6 +258,7 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 		switchParams.setMargins(0, 0, Util.scaleWidthPx(10, outMetrics), 0); 
 		loginSwitch.setLayoutParams(switchParams);
 		loginSwitch.setChecked(false);
+
 		
 		loginSwitch.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 			
@@ -264,12 +266,15 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 				if(!isChecked){
 					oldPasswordView.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+					oldPasswordView.setTypeface(Typeface.SANS_SERIF,Typeface.NORMAL);
 					oldPasswordView.setSelection(oldPasswordView.getText().length());
 					
 					newPassword1View.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+					newPassword1View.setTypeface(Typeface.SANS_SERIF,Typeface.NORMAL);
 					newPassword1View.setSelection(newPassword1View.getText().length());
 					
 					newPassword2View.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+					newPassword2View.setTypeface(Typeface.SANS_SERIF,Typeface.NORMAL);
 					newPassword2View.setSelection(newPassword2View.getText().length());
 				}else{
 					oldPasswordView.setInputType(InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
