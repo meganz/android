@@ -238,8 +238,8 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
         @Override
         public void onDestroyActionMode(ActionMode mode) {
             log("onDestroyActionMode");
-            multipleSelect = false;
             clearSelections();
+            multipleSelect = false;
             actionMode = null;
         }
 
@@ -968,9 +968,11 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
      * Disable selection
      */
     public void hideMultipleSelect() {
+        log("hideMultipleSelect");
+
         this.multipleSelect = false;
         ((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_TRANSPARENT_BLACK);
-        clearSelections();
+//        clearSelections();
 
         if (actionMode != null) {
             actionMode.finish();
@@ -1003,6 +1005,8 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
 
     public void clearSelections() {
         log("clearSelections");
+
+        hideMultipleSelect();
         for (int i = 0; i < checkedItems.size(); i++) {
             if (checkedItems.valueAt(i) == true) {
                 int checkedPosition = checkedItems.keyAt(i);
@@ -1011,7 +1015,6 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
         }
         this.multipleSelect = false;
         updateActionModeTitle();
-
         notifyDataSetChanged();
     }
 
