@@ -1609,7 +1609,6 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			if (adapterGrid != null){
 				if(adapterGrid.isMultipleSelect()){
 					adapterGrid.clearSelections();
-					hideMultipleSelect();
 				}
 				updateActionModeTitle();
 			}
