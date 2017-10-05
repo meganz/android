@@ -1380,9 +1380,24 @@
         <item context="Plural" quantity="other">%1$d files not uploaded</item>
     </plurals>
 
+    <plurals name="copied_service_upload" context="Text of the notification shown when the upload service has finished with any copied file instead uploaded">
+        <item context="Singular" quantity="one">%1$d file copied</item>
+        <item context="Plural" quantity="other">%1$d files copied</item>
+    </plurals>
+
+    <plurals name="already_downloaded_service" context="Text of the notification shown when the download service do not download because the file is already on the device">
+        <item context="Singular" quantity="one">%1$d file previously downloaded</item>
+        <item context="Plural" quantity="other">%1$d files previously downloaded</item>
+    </plurals>
+
     <plurals name="download_service_final_notification" context="Text of the notification shown when the download service has finished">
         <item context="Singular" quantity="one">Downloaded %1$d file</item>
         <item context="Plural" quantity="other">Downloaded %1$d files</item>
+    </plurals>
+
+    <plurals name="download_service_final_notification_with_details" context="Text of the notification shown when the download service has finished with any error">
+        <item context="Singular" quantity="one">Downloaded %1$d of %2$d file</item>
+        <item context="Plural" quantity="other">Downloaded %1$d of %2$d files</item>
     </plurals>
 
     <plurals name="download_service_failed" context="Text of the notification shown when the download service has finished with any transfer error">
