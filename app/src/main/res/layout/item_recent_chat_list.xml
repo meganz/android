@@ -70,7 +70,7 @@
         android:layout_toRightOf="@id/recent_chat_list_contact_state"
         android:layout_marginLeft="4dp"/>
 
-    <TextView
+    <mega.privacy.android.app.components.EmojiconTextView
         android:id="@+id/recent_chat_list_content"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

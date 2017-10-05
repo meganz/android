@@ -186,6 +186,8 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 	TwoLineCheckPreference storageAskMeAlways;
 	TwoLineCheckPreference storageAdvancedDevices;
 
+	TwoLineCheckPreference useHttpsOnly;
+
 	MegaChatPresenceConfig statusConfig;
 	
 	boolean cameraUpload = false;
@@ -212,6 +214,8 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 	String ast = "";
 	String pinLockCodeTxt = "";
 	int chatStatus = -1;
+
+	boolean useHttpsOnlyValue = false;
 	
 	//Secondary Folder
 	String localSecondaryFolderPath = "";
@@ -298,6 +302,9 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 		
 		storageAskMeAlways = (TwoLineCheckPreference) findPreference(KEY_STORAGE_ASK_ME_ALWAYS);
 		storageAskMeAlways.setOnPreferenceClickListener(this);
+
+		useHttpsOnly = (TwoLineCheckPreference) findPreference("settings_use_https_only");
+		useHttpsOnly.setOnPreferenceClickListener(this);
 		
 		storageAdvancedDevices = (TwoLineCheckPreference) findPreference(KEY_STORAGE_ADVANCED_DEVICES); 
 		storageAdvancedDevices.setOnPreferenceClickListener(this);
@@ -954,6 +961,11 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			storageAdvancedDevices.setEnabled(false);
 			storageAdvancedDevices.setChecked(false);
 		}
+
+		useHttpsOnlyValue = Boolean.parseBoolean(dbH.getUseHttpsOnly());
+		log("Value of useHttpsOnly: "+useHttpsOnlyValue);
+
+		useHttpsOnly.setChecked(useHttpsOnlyValue);
 	}
 
 	@Override
@@ -1685,6 +1697,12 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 				storageAdvancedDevices.setEnabled(false);
 			}
 		}
+		else if (preference.getKey().compareTo("settings_use_https_only") == 0){
+			log("settings_use_https_only");
+			useHttpsOnlyValue = useHttpsOnly.isChecked();
+			dbH.setUseHttpsOnly(useHttpsOnlyValue);
+			megaApi.useHttpsOnly(useHttpsOnlyValue);
+		}
 		else if (preference.getKey().compareTo(KEY_CAMERA_UPLOAD_CHARGING) == 0){
 			log("KEY_CAMERA_UPLOAD_CHARGING");
 			charging = cameraUploadCharging.isChecked();
@@ -1709,7 +1727,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			String[] sdCardOptions = getResources().getStringArray(R.array.settings_storage_download_location_array);
 	        AlertDialog.Builder b=new AlertDialog.Builder(context);
 
-			b.setTitle(getResources().getString(R.string.settings_storage_download_location));
+			b.setTitle(getResources().getString(R.string.settings_local_camera_upload_folder));
 			b.setItems(sdCardOptions, new OnClickListener() {
 				
 				@Override

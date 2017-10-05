@@ -49,6 +49,7 @@ import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
+import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaHandleList;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaNode;
@@ -203,19 +204,31 @@ public class ContactAttachmentBottomSheetDialogFragment extends BottomSheetDialo
                 int state = megaChatApi.getUserOnlineStatus(userHandle);
                 if(state == MegaChatApi.STATUS_ONLINE){
                     log("This user is connected");
+                    stateIcon.setVisibility(View.VISIBLE);
                     stateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_online));
                 }
                 else if(state == MegaChatApi.STATUS_AWAY){
                     log("This user is away");
+                    stateIcon.setVisibility(View.VISIBLE);
                     stateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_away));
                 }
                 else if(state == MegaChatApi.STATUS_BUSY){
                     log("This user is busy");
+                    stateIcon.setVisibility(View.VISIBLE);
                     stateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_busy));
+                }
+                else if(state == MegaChatApi.STATUS_OFFLINE){
+                    log("This user is offline");
+                    stateIcon.setVisibility(View.VISIBLE);
+                    stateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_offline));
+                }
+                else if(state == MegaChatApi.STATUS_INVALID){
+                    log("INVALID status: "+state);
+                    stateIcon.setVisibility(View.GONE);
                 }
                 else{
                     log("This user status is: "+state);
-                    stateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_offline));
+                    stateIcon.setVisibility(View.GONE);
                 }
 
                 if(userHandle != megaApi.getMyUser().getHandle()){
@@ -231,7 +244,23 @@ public class ContactAttachmentBottomSheetDialogFragment extends BottomSheetDialo
                     if(contact!=null) {
                         if (contact.getVisibility() == MegaUser.VISIBILITY_VISIBLE) {
                             optionInfo.setVisibility(View.VISIBLE);
-                            optionStartConversation.setVisibility(View.VISIBLE);
+
+                            //Check if the contact is the same that the one is chatting
+                            MegaChatRoom chatRoom = megaChatApi.getChatRoom(chatId);
+                            if(!chatRoom.isGroup()){
+                                long contactHandle = message.getMessage().getUserHandle(0);
+                                long messageContactHandle = chatRoom.getPeerHandle(0);
+                                if(contactHandle==messageContactHandle){
+                                    optionStartConversation.setVisibility(View.GONE);
+                                }
+                                else{
+                                    optionStartConversation.setVisibility(View.VISIBLE);
+                                }
+                            }
+                            else{
+                                optionStartConversation.setVisibility(View.VISIBLE);
+                            }
+
                             optionInvite.setVisibility(View.GONE);
                         }
                         else{
@@ -267,7 +296,6 @@ public class ContactAttachmentBottomSheetDialogFragment extends BottomSheetDialo
                         name.append(", "+message.getMessage().getUserName(i));
                     }
 
-                    optionStartConversation.setVisibility(View.VISIBLE);
                     optionInvite.setVisibility(View.GONE);
 
                     for(int i=1; i<userCount;i++){
@@ -350,7 +378,21 @@ public class ContactAttachmentBottomSheetDialogFragment extends BottomSheetDialo
                     if(contact!=null) {
                         if (contact.getVisibility() == MegaUser.VISIBILITY_VISIBLE) {
                             optionInfo.setVisibility(View.VISIBLE);
-                            optionStartConversation.setVisibility(View.VISIBLE);
+                            //Check if the contact is the same that the one is chatting
+                            MegaChatRoom chatRoom = megaChatApi.getChatRoom(chatId);
+                            if(!chatRoom.isGroup()){
+                                long messageContactHandle = chatRoom.getPeerHandle(0);
+                                if(contact.getHandle()==messageContactHandle){
+                                    optionStartConversation.setVisibility(View.GONE);
+                                }
+                                else{
+                                    optionStartConversation.setVisibility(View.VISIBLE);
+                                }
+                            }
+                            else{
+                                optionStartConversation.setVisibility(View.VISIBLE);
+                            }
+
                             optionInvite.setVisibility(View.GONE);
                         }
                         else{

@@ -165,7 +165,10 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 		log("onHandleIntent");
 
 		final File file = new File(intent.getStringExtra(EXTRA_FILEPATH));
-		
+		if(file!=null){
+			log("File to manage: "+file.getAbsolutePath());
+		}
+
 		long parentHandle = intent.getLongExtra(EXTRA_PARENT_HASH, 0);
 		
 		if (file.isDirectory()) {
@@ -233,7 +236,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 					i.setAction(Constants.SHOW_REPEATED_UPLOAD);
 					i.putExtra("MESSAGE", sShow);
 					startActivity(i);
-
+					log("Return - file already uploaded");
 					return;					
 				}
 			}
@@ -577,9 +580,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
             else{
                 log("transfer.getPath() is NULL");
             }
-
         }
-
 	}
 
 	@Override

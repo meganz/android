@@ -266,9 +266,6 @@
                 android:textSize="12sp"
                 tools:fontFamily="roboto"/>
 
-
-
-
             <TextView
                 android:id="@+id/navigation_drawer_total_space"
                 android:layout_width="wrap_content"

@@ -2,6 +2,7 @@ package mega.privacy.android.app.lollipop.adapters;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -200,6 +201,13 @@ public class MegaContactRequestLollipopAdapter extends RecyclerView.Adapter<Mega
 			holder.imageView = (RoundedImageView) v.findViewById(R.id.contact_request_list_thumbnail);	
 			holder.contactInitialLetter = (TextView) v.findViewById(R.id.contact_request_list_initial_letter);
 			holder.textViewContactName = (TextView) v.findViewById(R.id.contact_request_list_name);
+			if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+				log("Landscape");
+				holder.textViewContactName.setMaxWidth(Util.scaleWidthPx(280, outMetrics));
+			}else{
+				log("Portrait");
+				holder.textViewContactName.setMaxWidth(Util.scaleWidthPx(250, outMetrics));
+			}
 			holder.textViewContent = (TextView) v.findViewById(R.id.contact_request_list_content);
 			holder.imageButtonThreeDots = (ImageButton) v.findViewById(R.id.contact_request_list_three_dots);
 			//Right margin
@@ -221,6 +229,13 @@ public class MegaContactRequestLollipopAdapter extends RecyclerView.Adapter<Mega
 			holder.imageView = (RoundedImageView) v.findViewById(R.id.contact_request_list_thumbnail);	
 			holder.contactInitialLetter = (TextView) v.findViewById(R.id.contact_request_list_initial_letter);
 			holder.textViewContactName = (TextView) v.findViewById(R.id.contact_request_list_name);
+			if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+				log("Landscape");
+				holder.textViewContactName.setMaxWidth(Util.scaleWidthPx(280, outMetrics));
+			}else{
+				log("Portrait");
+				holder.textViewContactName.setMaxWidth(Util.scaleWidthPx(250, outMetrics));
+			}
 			holder.textViewContent = (TextView) v.findViewById(R.id.contact_request_list_content);
 			holder.imageButtonThreeDots = (ImageButton) v.findViewById(R.id.contact_request_list_three_dots);
 			//Right margin
