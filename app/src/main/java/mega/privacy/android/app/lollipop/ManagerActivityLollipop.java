@@ -4499,9 +4499,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
     			tB.setVisibility(View.VISIBLE);
 				iFLol = new InboxFragmentLollipop().newInstance();
 
-				log("Inbox Fragment is not NULL");
-//					iFLol = (InboxFragmentLollipop) getSupportFragmentManager().findFragmentByTag("iFLol");
-//    				iFLol.setParentHandle(parentHandleInbox);
 				MegaNode node = megaApi.getNodeByHandle(parentHandleInbox);
 				log("Selected Inbox with parent: "+parentHandleInbox);
 //					log("inSFLol deepBrowserTreeIncoming: "+deepBrowserTreeInbox);
@@ -6068,6 +6065,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			case android.R.id.home:{
 				if (firstNavigationLevel){
 					log("firstNavigationLevel is TRUE");
+
 					drawerLayout.openDrawer(nV);
 				}
 				else{
@@ -13164,18 +13162,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				else if (drawerItem == DrawerItem.INBOX){
 
 					if (iFLol != null){
-//						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(inSFLol.getParentHandle()), orderGetChildren);
-						//TODO: ojo con los hijos
-//						inSFLol.setNodes(nodes);
 						iFLol.getRecyclerView().invalidate();
 					}
 				}
 				else if (drawerItem == DrawerItem.SAVED_FOR_OFFLINE){
 
 					if (oFLol != null){
-//						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(inSFLol.getParentHandle()), orderGetChildren);
-						//TODO: ojo con los hijos
-//						inSFLol.setNodes(nodes);
 						oFLol.getRecyclerView().invalidate();
 					}
 				}
@@ -13636,6 +13628,19 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				log("aB.setHomeAsUpIndicator_28");
 				aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 				firstNavigationLevel = true;
+			}
+		}
+
+		if (iFLol != null){
+			if(iFLol.isAdded()){
+				MegaNode node = megaApi.getNodeByHandle(parentHandleInbox);
+				if (node != null){
+					log("Go to inbox node: "+node.getName());
+					iFLol.setParentHandle(parentHandleInbox);
+
+					ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleInbox), orderCloud);
+					iFLol.setNodes(nodes);
+				}
 			}
 		}
 

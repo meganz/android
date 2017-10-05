@@ -243,6 +243,7 @@ public class MegaPhotoSyncListAdapterLollipop extends RecyclerView.Adapter<MegaP
 		if(selectedItems!=null){
 			selectedItems.clear();
 		}
+
 		notifyDataSetChanged();
 	}
 	

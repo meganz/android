@@ -1609,6 +1609,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 				if(adapterList.isMultipleSelect()){
 					adapterList.clearSelections();
 				}
+				hideMultipleSelect();
 				updateActionModeTitle();
 			}
 		}
@@ -1617,6 +1618,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 				if(adapterGrid.isMultipleSelect()){
 					adapterGrid.clearSelections();
 				}
+				hideMultipleSelect();
 				updateActionModeTitle();
 			}
 		}
