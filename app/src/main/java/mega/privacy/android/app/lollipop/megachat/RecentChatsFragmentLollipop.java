@@ -325,6 +325,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
 
             switch(item.getItemId()){
                 case R.id.cab_menu_select_all:{
+                    ((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_RED);
                     selectAll();
                     actionMode.invalidate();
                     break;
@@ -516,6 +517,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
     public void hideMultipleSelect() {
         log("hideMultipleSelect");
         adapterList.setMultipleSelect(false);
+        ((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_TRANSPARENT_BLACK);
         if (actionMode != null) {
             actionMode.finish();
         }
@@ -546,6 +548,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
             List<MegaChatListItem> chats = adapterList.getSelectedChats();
             if (chats.size() > 0){
                 updateActionModeTitle();
+                ((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_RED);
             }
         }
         else{
@@ -832,6 +835,10 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
                         aB.setSubtitle(getString(R.string.offline_status));
                         break;
                     }
+                    case MegaChatApi.STATUS_INVALID:{
+                        aB.setSubtitle(getString(R.string.invalid_status));
+                        break;
+                    }
                     default:{
 
                         if(!Util.isOnline(context)){
@@ -969,6 +976,10 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
         if(lastFirstVisiblePosition==position){
             log("Interaction - change lastFirstVisiblePosition");
             lastFirstVisiblePosition=0;
+        }
+
+        if(adapterList.isMultipleSelect()){
+            adapterList.updateMultiselectionPosition(position);
         }
     }
 

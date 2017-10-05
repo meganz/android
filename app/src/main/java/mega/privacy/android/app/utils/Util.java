@@ -953,7 +953,6 @@ public class Util {
 		}
 	}
 	
-	
 	public static String getSpeedString (long speed){
 		String speedString = "";
 		double speedDouble = 0;

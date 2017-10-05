@@ -85,7 +85,7 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 	int orderGetChildren;
 	
 	ArrayList<MegaNode> nodes;
-	ArrayList<MegaNode> searchNodes;
+//	ArrayList<MegaNode> searchNodes;
 	String searchQuery = null;
 		
 	private ActionMode actionMode;
@@ -165,6 +165,7 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 					break;
 				}
 				case R.id.cab_menu_select_all:{
+					((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_RED);
 					selectAll();
 					break;
 				}
@@ -335,8 +336,7 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 		
 		if (parentHandle == -1){
 			nodes = megaApi.search(searchQuery);
-			searchNodes = megaApi.search(searchQuery);
-			
+
 			aB.setTitle(getString(R.string.action_search)+": "+searchQuery);
 			log("aB.setHomeAsUpIndicator_49");
 			aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
@@ -353,7 +353,6 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 			
 			((ManagerActivityLollipop)context).setParentHandleSearch(parentHandle);
 			nodes = megaApi.getChildren(n, orderGetChildren);
-
 
 		}
 
@@ -402,8 +401,6 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 			recyclerView.setLayoutParams(params);
 			
 			setNodes(nodes);
-			
-			contentText.setText(MegaApiUtils.getInfoNode(nodes, (ManagerActivityLollipop)context));
 
 			return v;
 		}
@@ -482,6 +479,8 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 			List<MegaNode> selectedNodes = adapter.getSelectedNodes();
 			if (selectedNodes.size() > 0){
 				updateActionModeTitle();
+				((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_RED);
+
 			}
 		}
 		else{
@@ -540,6 +539,8 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 					emptyImageView.setVisibility(View.GONE);
 					emptyTextView.setVisibility(View.GONE);
 				}
+
+				((ManagerActivityLollipop) context).showFabButton();
 			}
 			else{
 				if (MimeTypeList.typeForName(nodes.get(position).getName()).isImage()){
@@ -656,6 +657,8 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 	 */
 	public void hideMultipleSelect() {
 		adapter.setMultipleSelect(false);
+		((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_TRANSPARENT_BLACK);
+
 		if (actionMode != null) {
 			actionMode.finish();
 		}
@@ -758,14 +761,17 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 
 				adapter.setParentHandle(parentHandle);
 				levels--;
+				((ManagerActivityLollipop) context).showFabButton();
 				return 2;
 			}
 			else{
+				((ManagerActivityLollipop) context).showFabButton();
 				return 0;
 			}
 		}
 		else if (levels == -1){
 			log("levels == -1");
+			((ManagerActivityLollipop) context).showFabButton();
 			return 0;
 		}
 		else{
@@ -814,6 +820,7 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 			aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 			((ManagerActivityLollipop)context).setFirstNavigationLevel(true);
 			((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
+			((ManagerActivityLollipop) context).showFabButton();
 			return 3;
 		}
 	}
@@ -870,10 +877,6 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 	public void setSearchQuery(String searchQuery){
 		this.searchQuery = searchQuery;
 	}
-	
-	public void setSearchNodes (ArrayList<MegaNode> searchNodes){
-		this.searchNodes = searchNodes;
-	}
 
 	public ArrayList<MegaNode> getNodes(){
 		return nodes;
@@ -905,6 +908,7 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 			}
 			else{
 				contentTextLayout.setVisibility(View.VISIBLE);
+				contentText.setText(MegaApiUtils.getInfoNode(nodes, context));
 				recyclerView.setVisibility(View.VISIBLE);
 				emptyImageView.setVisibility(View.GONE);
 				emptyTextView.setVisibility(View.GONE);
