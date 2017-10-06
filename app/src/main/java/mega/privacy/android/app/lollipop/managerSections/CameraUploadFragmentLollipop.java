@@ -125,8 +125,6 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	private MegaApiAndroid megaApi;
 		
 //	long parentHandle = -1;
-	private boolean isList = false;
-	private boolean isLargeGridCameraUploads;
 	private boolean firstTimeCam = false;
 	private int orderGetChildren = MegaApiJava.ORDER_MODIFICATION_DESC;
 
@@ -141,7 +139,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 
 	private ProgressDialog statusDialog;
 	private long photosyncHandle = -1;
-	
+
 	public class PhotoSyncHolder{
 		public boolean isNode;
 		public long handle;
@@ -169,7 +167,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	public class RecyclerViewOnGestureListener extends SimpleOnGestureListener{
 		public void onLongPress(MotionEvent e) {
 			log("onLongPress");
-			if (isList){
+			if (((ManagerActivityLollipop)context).isListCameraUploads()){
 				log("onLongPress:isList");
 		        View view = listView.findChildViewUnder(e.getX(), e.getY());
 		        int position = listView.getChildPosition(view);
@@ -377,7 +375,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 
 		@Override
 		public void onDestroyActionMode(ActionMode mode) {
-			if(isList){
+			if(((ManagerActivityLollipop)context).isListCameraUploads()){
 				if(adapterList!=null){
 					adapterList.setMultipleSelect(false);
 				}
@@ -619,8 +617,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 		}
 		
 		prefs = dbH.getPreferences();
-		isList = ((ManagerActivityLollipop)context).isListCameraUploads();
-		log("Value of isList: "+isList);
+		log("Value of isList: "+((ManagerActivityLollipop)context).isListCameraUploads());
 		display = ((Activity)context).getWindowManager().getDefaultDisplay();
 		outMetrics = new DisplayMetrics ();
 	    display.getMetrics(outMetrics);
@@ -673,7 +670,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			}
 		}
 				
-		if (isList){
+		if (((ManagerActivityLollipop)context).isListCameraUploads()){
 			View v = inflater.inflate(R.layout.fragment_filebrowserlist, container, false);
 			
 			detector = new GestureDetectorCompat(getActivity(), new RecyclerViewOnGestureListener());
@@ -962,7 +959,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			int realGridWidth = 0;
 		    int numberOfCells = 0;
 			int padding = 0;
-		    if (isLargeGridCameraUploads){
+		    if (((ManagerActivityLollipop)context).isLargeGridCameraUploads){
 				realGridWidth = totalWidth / GRID_LARGE;
 				padding = MegaPhotoSyncGridTitleAdapterLollipop.PADDING_GRID_LARGE;
 				gridWidth = realGridWidth - (padding * 2);
@@ -1132,7 +1129,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	}
 	
 	public void selectAll(){
-		if (isList){
+		if (((ManagerActivityLollipop)context).isListCameraUploads()){
 			if (adapterList != null){
 				if(adapterList.isMultipleSelect()){
 					adapterList.selectAll();
@@ -1511,7 +1508,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 		
 		PhotoSyncHolder psHPosition = nodesArray.get(position);
 
-		if (isList){
+		if (((ManagerActivityLollipop)context).isListCameraUploads()){
 			log("isList");
 			if (adapterList.isMultipleSelect()){
 				adapterList.toggleSelection(position);
@@ -1604,7 +1601,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	 */
 	private void clearSelections() {
 		log("clearSelections");
-		if (isList){
+		if (((ManagerActivityLollipop)context).isListCameraUploads()){
 			if (adapterList != null){
 				if(adapterList.isMultipleSelect()){
 					adapterList.clearSelections();
@@ -1690,7 +1687,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	 */
 	void hideMultipleSelect() {
 		log("hideMultipleSelect");
-		if (isList){
+		if (((ManagerActivityLollipop)context).isListCameraUploads()){
 			if (adapterList != null){
 				adapterList.setMultipleSelect(false);
 			}
@@ -1709,7 +1706,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 
 	public int onBackPressed(){
 //		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
-		if (isList){
+		if (((ManagerActivityLollipop)context).isListCameraUploads()){
 			if (adapterList != null){
 				if (adapterList.isMultipleSelect()){
 					hideMultipleSelect();
@@ -1766,7 +1763,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 				}
 			}
 			
-			if (isList){
+			if (((ManagerActivityLollipop)context).isListCameraUploads()){
 				if (adapterList != null){
 					adapterList.setPhotoSyncHandle(photosyncHandle);
 				}
@@ -1797,7 +1794,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 				}
 			}
 		
-			if (isList){
+			if (((ManagerActivityLollipop)context).isListCameraUploads()){
 				if (adapterList != null){
 					adapterList.setPhotoSyncHandle(photosyncHandle);
 				}
@@ -1820,7 +1817,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	public void setNodes(ArrayList<MegaNode> nodes){
 		this.nodes = nodes;
 		
-		if (isList){
+		if (((ManagerActivityLollipop)context).isListCameraUploads()){
 			this.nodesArray.clear();
 			
 			int month = 0;
@@ -1883,7 +1880,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 		    		    
 		    int gridWidth = 0;
 		    int numberOfCells = 0;
-		    if (isLargeGridCameraUploads){
+		    if (((ManagerActivityLollipop)context).isLargeGridCameraUploads){
 		    	gridWidth = totalWidth / GRID_LARGE;
 		    	numberOfCells = GRID_LARGE;
 		    }
@@ -1895,7 +1892,6 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			if (monthPics != null){
 				monthPics.clear();
 			}
-			
 			
 			int month = 0;
 			int year = 0;
@@ -2036,7 +2032,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	}
 	
 	public void notifyDataSetChanged(){
-		if (isList){
+		if (((ManagerActivityLollipop)context).isListCameraUploads()){
 			if (adapterList != null){
 				adapterList.notifyDataSetChanged();
 			}
@@ -2047,23 +2043,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			}
 		}
 	}
-	
-	public void setIsList(boolean isList){
-		this.isList = isList;
-	}
-	
-	public void setIsLargeGrid(boolean isLargeGridCameraUploads){
-		this.isLargeGridCameraUploads = isLargeGridCameraUploads;
-	}
-	
-	public boolean getIsLargeGrid(){
-		return this.isLargeGridCameraUploads;
-	}
-	
-	public boolean getIsList(){
-		return isList;
-	}
-	
+
 	public void setFirstTimeCam(boolean firstTimeCam){
 		this.firstTimeCam = firstTimeCam;
 	}
@@ -2074,7 +2054,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	
 	public void setOrder(int orderGetChildren){
 		this.orderGetChildren = orderGetChildren;
-		if (isList){
+		if (((ManagerActivityLollipop)context).isListCameraUploads()){
 			if (adapterList != null){
 				adapterList.setOrder(orderGetChildren);
 			}
@@ -2087,7 +2067,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	}
 	
 	public boolean showSelectMenuItem(){
-		if (isList){
+		if (((ManagerActivityLollipop)context).isListCameraUploads()){
 			if (adapterList != null){
 				return adapterList.isMultipleSelect();
 			}
@@ -2143,6 +2123,10 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			MegaError e) {
 		// TODO Auto-generated method stub
 		
+	}
+
+	public boolean getIsLargeGrid() {
+		return ((ManagerActivityLollipop)context).isLargeGridCameraUploads;
 	}
 	
 	@Override
