@@ -387,7 +387,7 @@ public class ContactsFragmentLollipop extends Fragment{
 			contentText = (TextView) v.findViewById(R.id.contact_list_content_text);
 
 			if (adapter == null){
-				adapter = new MegaContactsLollipopAdapter(context, this, visibleContacts, emptyImageView, emptyTextView, recyclerView, MegaContactsLollipopAdapter.ITEM_VIEW_TYPE_LIST);
+				adapter = new MegaContactsLollipopAdapter(context, this, visibleContacts, recyclerView, MegaContactsLollipopAdapter.ITEM_VIEW_TYPE_LIST);
 			}
 			else{
 				adapter.setContacts(visibleContacts);
@@ -459,7 +459,7 @@ public class ContactsFragmentLollipop extends Fragment{
 			contentText = (TextView) v.findViewById(R.id.contact_content_text_grid);
 
 			if (adapter == null){
-				adapter = new MegaContactsLollipopAdapter(context, this, visibleContacts, emptyImageView, emptyTextView, recyclerView, MegaContactsLollipopAdapter.ITEM_VIEW_TYPE_GRID);
+				adapter = new MegaContactsLollipopAdapter(context, this, visibleContacts, recyclerView, MegaContactsLollipopAdapter.ITEM_VIEW_TYPE_GRID);
 			}
 			else{
 				adapter.setContacts(visibleContacts);
