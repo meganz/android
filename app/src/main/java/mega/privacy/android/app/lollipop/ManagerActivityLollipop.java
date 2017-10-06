@@ -215,9 +215,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 	public int accountFragment;
 
-	Button expiryDateButton;
-	SwitchCompat switchGetLink;
-
 	public ArrayList<Integer> transfersInProgress;
 	public MegaTransferData transferData;
 

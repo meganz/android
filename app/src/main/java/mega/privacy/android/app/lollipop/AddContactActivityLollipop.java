@@ -761,7 +761,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements T
             });
 
             if (adapterMEGA == null) {
-                adapterMEGA = new MegaContactsLollipopAdapter(this, null, visibleContactsMEGA, emptyImageView, emptyTextView, recyclerView, MegaContactsLollipopAdapter.ITEM_VIEW_TYPE_LIST_ADD_CONTACT);
+                adapterMEGA = new MegaContactsLollipopAdapter(this, null, visibleContactsMEGA, recyclerView, MegaContactsLollipopAdapter.ITEM_VIEW_TYPE_LIST_ADD_CONTACT);
             } else {
                 adapterMEGA.setContacts(visibleContactsMEGA);
                 adapterMEGA.setAdapterType(MegaContactsLollipopAdapter.ITEM_VIEW_TYPE_LIST_ADD_CONTACT);
