@@ -391,8 +391,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 //	private boolean isListCloudDrive = true;
 //	private boolean isListOffline = true;
 //	private boolean isListRubbishBin = true;
-	private boolean isListCameraUploads = false;
-	private boolean isLargeGridCameraUploads = true;
+	public boolean isListCameraUploads = false;
+	public boolean isLargeGridCameraUploads = true;
 //	private boolean isListInbox = true;
 //	private boolean isListContacts = true;
 //	private boolean isListIncoming = true;
@@ -1288,6 +1288,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 		}
 		log("Preferred View List: "+isList);
+		log("Preferred View List for camera uploads: "+isListCameraUploads);
 
 		if(prefs!=null){
 			if(prefs.getPreferredSortCloud()!=null){
@@ -4347,20 +4348,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
                     Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("cuFLol");
                     if(currentFragment != null && currentFragment instanceof CameraUploadFragmentLollipop){
                         cuFL = ((CameraUploadFragmentLollipop) currentFragment);
-                        isListCameraUploads = cuFL.getIsList();
-                        isLargeGridCameraUploads = cuFL.getIsLargeGrid();
                         firstTimeCam = cuFL.getFirstTimeCam();
                     }
                     else{
                         cuFL = new CameraUploadFragmentLollipop();
-                        cuFL.setIsList(isListCameraUploads);
-                        cuFL.setIsLargeGrid(isLargeGridCameraUploads);
                         cuFL.setFirstTimeCam(firstTimeCam);
                     }
 				}
 				else{
-					cuFL.setIsList(isListCameraUploads);
-					cuFL.setIsLargeGrid(isLargeGridCameraUploads);
 					cuFL.setFirstTimeCam(firstTimeCam);
 				}
 
@@ -4439,19 +4434,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
                     Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("muFLol");
                     if(currentFragment != null && currentFragment instanceof CameraUploadFragmentLollipop){
                         muFLol = (CameraUploadFragmentLollipop) currentFragment;
-                        isListCameraUploads = muFLol.getIsList();
-                        isLargeGridCameraUploads = muFLol.getIsLargeGrid();
                     }
                     else {
 //    					cuF = new CameraUploadFragmentLollipop(CameraUploadFragmentLollipop.TYPE_MEDIA);
                         muFLol = CameraUploadFragmentLollipop.newInstance(CameraUploadFragmentLollipop.TYPE_MEDIA);
-                        muFLol.setIsList(isListCameraUploads);
-                        muFLol.setIsLargeGrid(isLargeGridCameraUploads);
                     }
-				}
-				else{
-					muFLol.setIsList(isListCameraUploads);
-					muFLol.setIsLargeGrid(isLargeGridCameraUploads);
 				}
 
 				invalidateOptionsMenu();
@@ -6605,7 +6592,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	        			else{
 	        				gridSmallLargeMenuItem.setIcon(getResources().getDrawable(R.drawable.ic_menu_gridview));
 	        			}
-	        			cuFL.setIsLargeGrid(isLargeGridCameraUploads);
 
 	        			fragTransaction = getSupportFragmentManager().beginTransaction();
 	        			fragTransaction.attach(currentFragment);
@@ -6626,7 +6612,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	        			else{
 	        				gridSmallLargeMenuItem.setIcon(getResources().getDrawable(R.drawable.ic_menu_gridview));
 	        			}
-	        			muFLol.setIsLargeGrid(isLargeGridCameraUploads);
 
 	        			fragTransaction = getSupportFragmentManager().beginTransaction();
 	        			fragTransaction.attach(currentFragment);
@@ -6666,7 +6651,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
     						searchMenuItem.setVisible(false);
 
     	    			}
-        				cuFL.setIsList(isListCameraUploads);
 
         				fragTransaction = getSupportFragmentManager().beginTransaction();
         				fragTransaction.attach(currentFragment);
@@ -6702,7 +6686,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
     						searchMenuItem.setVisible(false);
 
     	    			}
-        				muFLol.setIsList(isListCameraUploads);
 
         				fragTransaction = getSupportFragmentManager().beginTransaction();
         				fragTransaction.attach(currentFragment);
@@ -6777,19 +6760,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	    				}
 	    			}
 	    			else if(drawerItem == DrawerItem.INBOX){
-	    				if (iFLol != null){
-	        				Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("iFLol");
-	        				FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
-	        				fragTransaction.detach(currentFragment);
-	        				fragTransaction.commitNowAllowingStateLoss();
-
-	        				iFLol.setIsList(isList);
-
-	        				fragTransaction = getSupportFragmentManager().beginTransaction();
-	        				fragTransaction.attach(currentFragment);
-	        				fragTransaction.commitNowAllowingStateLoss();
-
-		        		}
+	    				selectDrawerItemLollipop(drawerItem);
 	    			}
 	    			else if (drawerItem == DrawerItem.CONTACTS){
 	    				String cFTagC = getFragmentTag(R.id.contact_tabs_pager, 0);
