@@ -4,13 +4,15 @@ import android.content.Context;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentStatePagerAdapter;
+import android.view.ViewGroup;
 
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.managerSections.FileBrowserFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.RubbishBinFragmentLollipop;
 import mega.privacy.android.app.utils.Util;
 
-public class CloudDrivePagerAdapter extends FragmentPagerAdapter {
+public class CloudDrivePagerAdapter extends FragmentStatePagerAdapter {
 
     final int PAGE_COUNT = 2;
     private Context context;
@@ -32,6 +34,11 @@ public class CloudDrivePagerAdapter extends FragmentPagerAdapter {
             }
         }
         return null;
+    }
+
+    @Override
+    public int getItemPosition(Object obj) {
+        return POSITION_NONE;
     }
 
     @Override
