@@ -65,8 +65,7 @@ public class RubbishBinFragmentLollipop extends Fragment {
 		
 	boolean isList = true;
 	long parentHandle = -1;
-	int orderGetChildren;
-	
+
 	ArrayList<MegaNode> nodes;
 	MegaNode selectedNode = null;
 	
@@ -314,7 +313,6 @@ public class RubbishBinFragmentLollipop extends Fragment {
 		display.getMetrics(outMetrics);
 		density  = getResources().getDisplayMetrics().density;
 
-		orderGetChildren = ((ManagerActivityLollipop)context).getOrderCloud();
 		isList = ((ManagerActivityLollipop)context).isList();
 
 		if (parentHandle == -1){
@@ -329,7 +327,7 @@ public class RubbishBinFragmentLollipop extends Fragment {
 		if (parentHandle == -1||parentHandle==megaApi.getRubbishNode().getHandle()){
 			log("Parent is the Rubbish: "+parentHandle);
 
-			nodes = megaApi.getChildren(megaApi.getRubbishNode(), orderGetChildren);
+			nodes = megaApi.getChildren(megaApi.getRubbishNode(), ((ManagerActivityLollipop)context).orderCloud);
 			((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 
 		}
@@ -338,7 +336,7 @@ public class RubbishBinFragmentLollipop extends Fragment {
 
 			if (parentNode != null){
 				log("The parent node is: "+parentNode.getName());
-				nodes = megaApi.getChildren(parentNode, orderGetChildren);
+				nodes = megaApi.getChildren(parentNode, ((ManagerActivityLollipop)context).orderCloud);
 			
 				((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 
@@ -353,7 +351,7 @@ public class RubbishBinFragmentLollipop extends Fragment {
 				}
 
 			}
-			nodes = megaApi.getChildren(parentNode, orderGetChildren);
+			nodes = megaApi.getChildren(parentNode, ((ManagerActivityLollipop)context).orderCloud);
 			((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 		}
 
@@ -551,7 +549,7 @@ public class RubbishBinFragmentLollipop extends Fragment {
 				contentText.setText(MegaApiUtils.getInfoFolder(infoNode, context));
 				((ManagerActivityLollipop)context).setParentHandleRubbish(parentHandle);
 				adapter.setParentHandle(parentHandle);
-				nodes = megaApi.getChildren(nodes.get(position), orderGetChildren);
+				nodes = megaApi.getChildren(nodes.get(position), ((ManagerActivityLollipop)context).orderCloud);
 				adapter.setNodes(nodes);
 				recyclerView.scrollToPosition(0);
 				
@@ -592,7 +590,7 @@ public class RubbishBinFragmentLollipop extends Fragment {
 						intent.putExtra("typeAccount", accountInfo.getAccountType());
 					}
 
-					intent.putExtra("orderGetChildren", orderGetChildren);
+					intent.putExtra("orderGetChildren", ((ManagerActivityLollipop)context).orderCloud);
 					startActivity(intent);
 				}
 				else{
@@ -716,7 +714,7 @@ public class RubbishBinFragmentLollipop extends Fragment {
 
 			parentHandle = parentNode.getHandle();
 			((ManagerActivityLollipop)context).setParentHandleRubbish(parentHandle);
-			nodes = megaApi.getChildren(parentNode, orderGetChildren);
+			nodes = megaApi.getChildren(parentNode, ((ManagerActivityLollipop)context).orderCloud);
 			adapter.setNodes(nodes);
 
 			int lastVisiblePosition = 0;
@@ -830,11 +828,6 @@ public class RubbishBinFragmentLollipop extends Fragment {
 		if (adapter != null){
 			adapter.notifyDataSetChanged();
 		}
-	}
-	
-	public void setOrder(int orderGetChildren){
-		log("setOrder:Rubbish");
-		this.orderGetChildren = orderGetChildren;
 	}
 
 	public boolean isMultipleselect(){

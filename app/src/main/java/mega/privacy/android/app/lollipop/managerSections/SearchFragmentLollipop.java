@@ -82,8 +82,7 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
     long parentHandle = -1;
 	boolean isList = true;
 	int levels = -1;
-	int orderGetChildren;
-	
+
 	ArrayList<MegaNode> nodes;
 //	ArrayList<MegaNode> searchNodes;
 	String searchQuery = null;
@@ -332,7 +331,6 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 	    density  = getResources().getDisplayMetrics().density;
 	    
 	    isList = ((ManagerActivityLollipop)context).isList();
-		orderGetChildren = ((ManagerActivityLollipop)context).getOrderCloud();
 		
 		if (parentHandle == -1){
 			nodes = megaApi.search(searchQuery);
@@ -352,7 +350,7 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 			((ManagerActivityLollipop)context).setFirstNavigationLevel(false);
 			
 			((ManagerActivityLollipop)context).setParentHandleSearch(parentHandle);
-			nodes = megaApi.getChildren(n, orderGetChildren);
+			nodes = megaApi.getChildren(n, ((ManagerActivityLollipop)context).orderCloud);
 
 		}
 
@@ -513,7 +511,7 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 				parentHandle = nodes.get(position).getHandle();
 				((ManagerActivityLollipop)context).setParentHandleSearch(parentHandle);
 				adapter.setParentHandle(parentHandle);
-				nodes = megaApi.getChildren(nodes.get(position), orderGetChildren);
+				nodes = megaApi.getChildren(nodes.get(position), ((ManagerActivityLollipop)context).orderCloud);
 				adapter.setNodes(nodes);
 				recyclerView.scrollToPosition(0);
 				
@@ -559,7 +557,7 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 						intent.putExtra("typeAccount", accountInfo.getAccountType());
 					}
 
-					intent.putExtra("orderGetChildren", orderGetChildren);
+					intent.putExtra("orderGetChildren", ((ManagerActivityLollipop)context).orderCloud);
 					startActivity(intent);
 				}
 				else if (MimeTypeList.typeForName(nodes.get(position).getName()).isVideo() || MimeTypeList.typeForName(nodes.get(position).getName()).isAudio() ){
@@ -724,7 +722,7 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 
 				parentHandle = parentNode.getHandle();
 				((ManagerActivityLollipop)context).setParentHandleSearch(parentHandle);
-				nodes = megaApi.getChildren(parentNode, orderGetChildren);
+				nodes = megaApi.getChildren(parentNode, ((ManagerActivityLollipop)context).orderCloud);
 				if(nodes!=null){
 					log("nodes.size: "+nodes.size());
 					if(nodes.size()>0){
@@ -851,7 +849,7 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 			MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
 			if(parentNode!=null){
 				log("parentNode: "+parentNode.getName());
-				nodes = megaApi.getChildren(parentNode, orderGetChildren);
+				nodes = megaApi.getChildren(parentNode, ((ManagerActivityLollipop)context).orderCloud);
 				contentText.setText(MegaApiUtils.getInfoFolder(parentNode, context));
 			}
 		}
@@ -921,11 +919,7 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 			adapter.notifyDataSetChanged();
 		}
 	}
-	
-	public void setOrder(int orderGetChildren){
-		this.orderGetChildren = orderGetChildren;
-	}
-	
+
 	private static void log(String log) {
 		Util.log("SearchFragmentLollipop", log);
 	}
