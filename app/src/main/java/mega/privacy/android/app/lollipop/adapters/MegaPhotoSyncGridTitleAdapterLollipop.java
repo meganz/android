@@ -270,7 +270,8 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
                 else{
                     showRemoveLink=false;
                     showLink=true;
-                }			}
+                }
+            }
 
             if (selected.size() != 0) {
                 showDownload = true;
@@ -1157,6 +1158,7 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
                 folders++;
             }
         }
+
         Resources res = context.getResources();
         String title;
         int sum=files+folders;
@@ -1177,6 +1179,8 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
             e.printStackTrace();
             log("oninvalidate error");
         }
+
+
         // actionMode.
     }
 
