@@ -415,7 +415,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 		
 		switch (type) {
 			case Constants.FILE_BROWSER_ADAPTER: {
-				((ManagerActivityLollipop) context).setParentHandleBrowser(parentHandle);
+//				((ManagerActivityLollipop) context).setParentHandleBrowser(parentHandle);
 				break;
 			}
 			case Constants.CONTACT_FILE_ADAPTER: {
@@ -423,7 +423,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 				break;
 			}
 			case Constants.RUBBISH_BIN_ADAPTER: {
-				((ManagerActivityLollipop) context).setParentHandleRubbish(parentHandle);
+//				((ManagerActivityLollipop) context).setParentHandleRubbish(parentHandle);
 				break;
 			}		
 			case Constants.FOLDER_LINK_ADAPTER: {
@@ -440,7 +440,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 			}
 			case Constants.INCOMING_SHARES_ADAPTER: {
 				incoming=true;
-				((ManagerActivityLollipop) context).setParentHandleIncoming(parentHandle);
+//				((ManagerActivityLollipop) context).setParentHandleIncoming(parentHandle);
 				break;
 			}
 			case Constants.INBOX_ADAPTER: {

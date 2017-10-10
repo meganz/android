@@ -589,7 +589,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 				adapter.setParentHandle(((ManagerActivityLollipop)context).parentHandleBrowser);
 				adapter.setAdapterType(MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST);
 //				adapter.setNodes(nodes);
-		}
+			}
 
 			setOverviewLayout();
 			
@@ -1233,7 +1233,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 					emptyImageView.setVisibility(View.GONE);
 					emptyTextView.setVisibility(View.GONE);
 				}
-				log("Now the parentHandle of the adapter is; "+adapter.getParentHandle());
 			}
 			else{
 				log("adapter is NULL----------------");
