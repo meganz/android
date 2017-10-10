@@ -86,8 +86,6 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 
 	int deepBrowserTree = 0;
 
-	MenuItem rubbishBinMenuItem;
-	
 	ArrayList<MegaNode> nodes;
 	MegaNode selectedNode;
 
@@ -107,6 +105,7 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 		boolean showMove = false;
 		boolean showLink = false;
 		boolean showCopy = false;
+		boolean showTrash =false;
 
 
 		@Override
@@ -132,7 +131,6 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 					for (int i=0;i<documents.size();i++){
 						handleList.add(documents.get(i).getHandle());
 					}
-
 					((ManagerActivityLollipop) context).askConfirmationMoveToRubbish(handleList);
 					hideMultipleSelect();
 					break;
@@ -216,52 +214,76 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 			MenuItem unselect = menu.findItem(R.id.cab_menu_unselect_all);
 
 			if (selected.size() != 0) {
+
 				showMove = false;
 				showCopy = true;
+				showTrash =false;
+				showRename=false;
 
 				if(selected.size()==adapter.getItemCount()){
-					menu.findItem(R.id.cab_menu_select_all).setVisible(false);
+
+                    menu.findItem(R.id.cab_menu_select_all).setVisible(false);
 					unselect.setTitle(getString(R.string.action_unselect_all));
 					unselect.setVisible(true);
 					showRename = false;
 					showMove = false;
-					showLink = false;
-				}
-				else if(selected.size()==1){
-					menu.findItem(R.id.cab_menu_select_all).setVisible(true);
+					showTrash=false;
+
+
+				}else if(selected.size()==1){
+
+                    menu.findItem(R.id.cab_menu_select_all).setVisible(true);
 					unselect.setTitle(getString(R.string.action_unselect_all));
 					unselect.setVisible(true);
+					showTrash = false;
 
 					if((megaApi.checkAccess(selected.get(0), MegaShare.ACCESS_FULL).getErrorCode() == MegaError.API_OK)){
-						showMove = true;
 						showRename = true;
-						showLink = true;
-					}
-					else if(megaApi.checkAccess(selected.get(0), MegaShare.ACCESS_READWRITE).getErrorCode() == MegaError.API_OK){
-						showMove = false;
+                        showMove = true;
+
+                    }else if(megaApi.checkAccess(selected.get(0), MegaShare.ACCESS_READWRITE).getErrorCode() == MegaError.API_OK){
 						showRename = false;
-						showLink = true;
+                        showMove = false;
+
+                    }else if(megaApi.checkAccess(selected.get(0), MegaShare.ACCESS_READ).getErrorCode() == MegaError.API_OK){
+						showRename = false;
+						showMove = false;
+
 					}
-				}
-				else{
-					menu.findItem(R.id.cab_menu_select_all).setVisible(true);
+				}else{
+
+                    menu.findItem(R.id.cab_menu_select_all).setVisible(true);
 					unselect.setTitle(getString(R.string.action_unselect_all));
 					unselect.setVisible(true);
 					showRename = false;
 					showMove = false;
-					showLink = false;
+					showTrash = false;
+				}
+
+				if (deepBrowserTree == 0){
+                    showTrash = false;
+					menu.findItem(R.id.cab_menu_leave_multiple_share).setVisible(true);
+					menu.findItem(R.id.cab_menu_leave_multiple_share).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+				}else{
+                    if((megaApi.checkAccess(selected.get(0), MegaShare.ACCESS_FULL).getErrorCode() == MegaError.API_OK)){
+                        showTrash = true;
+					}else{
+                        showTrash = false;
+					}
+
+					menu.findItem(R.id.cab_menu_leave_multiple_share).setVisible(false);
+					menu.findItem(R.id.cab_menu_leave_multiple_share).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
 				}
 
 				for(int i=0; i<selected.size();i++)	{
-					if(megaApi.checkMove(selected.get(i), megaApi.getRubbishNode()).getErrorCode() != MegaError.API_OK)	{
-						showMove = false;
+                    if(megaApi.checkMove(selected.get(i), megaApi.getRubbishNode()).getErrorCode() != MegaError.API_OK)	{
+                        showMove = false;
 						break;
 					}
 				}
-
 			}
 			else{
-				menu.findItem(R.id.cab_menu_select_all).setVisible(true);
+                menu.findItem(R.id.cab_menu_select_all).setVisible(true);
 				menu.findItem(R.id.cab_menu_unselect_all).setVisible(false);
 			}
 			
@@ -269,23 +291,15 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 			menu.findItem(R.id.cab_menu_download).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
 			menu.findItem(R.id.cab_menu_rename).setVisible(showRename);
+
 			menu.findItem(R.id.cab_menu_copy).setVisible(true);
 			menu.findItem(R.id.cab_menu_copy).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
 			menu.findItem(R.id.cab_menu_move).setVisible(showMove);
-			menu.findItem(R.id.cab_menu_share_link).setVisible(false);
-			rubbishBinMenuItem = menu.findItem(R.id.cab_menu_trash);
+			menu.findItem(R.id.cab_menu_share_link).setVisible(showLink);
 
-			if (deepBrowserTree == 0){
-				rubbishBinMenuItem.setVisible(false);
-				menu.findItem(R.id.cab_menu_leave_multiple_share).setVisible(true);
-				menu.findItem(R.id.cab_menu_leave_multiple_share).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-			}
-			else{
-				rubbishBinMenuItem.setVisible(true);
-				menu.findItem(R.id.cab_menu_leave_multiple_share).setVisible(false);
-				menu.findItem(R.id.cab_menu_leave_multiple_share).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
-			}
+			menu.findItem(R.id.cab_menu_trash).setVisible(showTrash);
+
 			return false;
 		}
 	}
