@@ -1014,6 +1014,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 		((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 
 		((ManagerActivityLollipop)context).setParentHandleBrowser(n.getHandle());
+
 		MegaNode infoNode = megaApi.getNodeByHandle(((ManagerActivityLollipop)context).parentHandleBrowser);
 
 		contentText.setText(MegaApiUtils.getInfoFolder(infoNode, context));
@@ -1201,40 +1202,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 		
 		return 0;
 	}
-	
-//	public long getParentHandle(){
-//		if (isList){
-//			if (adapter != null){
-//				return adapter.getParentHandle();
-//			}
-//			else{
-//				return -1;
-//			}
-//		}
-//		else{
-//			if (adapter != null){
-//				return adapter.getParentHandle();
-//			}
-//			else{
-//				return -1;
-//			}
-//		}
-//	}
-
-	public long getParentHandle(){
-		return ((ManagerActivityLollipop)context).parentHandleBrowser;
-	}
-	
-	public void setParentHandleA(long parentHandle){
-		log("setParentHandle: "+parentHandle);
-//		this.parentHandle = parentHandle;
-//
-//		if (adapter != null){
-//			adapter.setParentHandle(parentHandle);
-//		}
-
-	}
-
 
 	public RecyclerView getRecyclerView(){
 		return recyclerView;
@@ -1342,7 +1309,10 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 	}
 
 	public boolean isMultipleselect(){
-		return adapter.isMultipleSelect();
+		if(adapter!=null){
+			return adapter.isMultipleSelect();
+		}
+		return false;
 	}
 
 	public int getItemCount(){
