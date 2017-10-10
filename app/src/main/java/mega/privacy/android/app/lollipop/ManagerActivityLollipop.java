@@ -6786,29 +6786,29 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		        			smallestCheck.setChecked(false);
 		        			break;
 		        		}
-		        		case MegaApiJava.ORDER_CREATION_DESC:{
-		        			ascendingCheck.setChecked(false);
-		        			descendingCheck.setChecked(false);
-		        			newestCheck.setChecked(true);
-		        			oldestCheck.setChecked(false);
-		        			largestCheck.setChecked(false);
-		        			smallestCheck.setChecked(false);
-		        			break;
-		        		}
-		        		case MegaApiJava.ORDER_CREATION_ASC:{
-		        			ascendingCheck.setChecked(false);
-		        			descendingCheck.setChecked(false);
-		        			newestCheck.setChecked(false);
-		        			oldestCheck.setChecked(true);
-		        			largestCheck.setChecked(false);
-		        			smallestCheck.setChecked(false);
-		        			break;
-		        		}
+//		        		case MegaApiJava.ORDER_CREATION_DESC:{
+//		        			ascendingCheck.setChecked(false);
+//		        			descendingCheck.setChecked(false);
+//		        			newestCheck.setChecked(true);
+//		        			oldestCheck.setChecked(false);
+//		        			largestCheck.setChecked(false);
+//		        			smallestCheck.setChecked(false);
+//		        			break;
+//		        		}
+//		        		case MegaApiJava.ORDER_CREATION_ASC:{
+//		        			ascendingCheck.setChecked(false);
+//		        			descendingCheck.setChecked(false);
+//		        			newestCheck.setChecked(false);
+//		        			oldestCheck.setChecked(true);
+//		        			largestCheck.setChecked(false);
+//		        			smallestCheck.setChecked(false);
+//		        			break;
+//		        		}
 						case MegaApiJava.ORDER_MODIFICATION_ASC:{
 							ascendingCheck.setChecked(false);
 							descendingCheck.setChecked(false);
 							newestCheck.setChecked(false);
-							oldestCheck.setChecked(false);
+							oldestCheck.setChecked(true);
 							largestCheck.setChecked(false);
 							smallestCheck.setChecked(false);
 							break;
@@ -6816,7 +6816,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						case MegaApiJava.ORDER_MODIFICATION_DESC:{
 							ascendingCheck.setChecked(false);
 							descendingCheck.setChecked(false);
-							newestCheck.setChecked(false);
+							newestCheck.setChecked(true);
 							oldestCheck.setChecked(false);
 							largestCheck.setChecked(false);
 							smallestCheck.setChecked(false);
@@ -10259,25 +10259,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		}
 	}
 
-	public void selectSortByCloudDrive(int _orderCloud){
-		log("selectSortByCloudDrive");
-
-		this.orderCloud = _orderCloud;
-		this.setOrderCloud(orderCloud);
-		MegaNode parentNode = megaApi.getNodeByHandle(parentHandleBrowser);
-		if (parentNode != null){
-			if (fbFLol != null){
-				ArrayList<MegaNode> nodes = megaApi.getChildren(parentNode, orderCloud);
-				fbFLol.setNodes(nodes);
-				fbFLol.getRecyclerView().invalidate();
-			}
-		}
-		else{
-			if (fbFLol != null){
-				ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getRootNode(), orderCloud);
-				fbFLol.setNodes(nodes);
-				fbFLol.getRecyclerView().invalidate();
-			}
+	public void selectSortByCloudDrive(int newOrderCloud){
+		log("selectSortByCloudDrive: "+newOrderCloud);
+		this.setOrderCloud(newOrderCloud);
+		if(cloudPageAdapter!=null){
+			cloudPageAdapter.notifyDataSetChanged();
 		}
 	}
 
