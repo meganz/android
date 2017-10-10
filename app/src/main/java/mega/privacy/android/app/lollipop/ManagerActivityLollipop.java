@@ -335,7 +335,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
     //Tabs in Shares
 	TabLayout tabLayoutShares;
-	SharesPageAdapter mTabsAdapterShares;
+	SharesPageAdapter sharesPageAdapter;
     ViewPager viewPagerShares;
 
     //Tabs in Cloud
@@ -370,8 +370,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	long lastTimeOnTransferUpdate = Calendar.getInstance().getTimeInMillis();
 
 	public int orderCloud = MegaApiJava.ORDER_DEFAULT_ASC;
-	private int orderContacts = MegaApiJava.ORDER_DEFAULT_ASC;
-	private int orderOthers = MegaApiJava.ORDER_DEFAULT_ASC;
+	public int orderContacts = MegaApiJava.ORDER_DEFAULT_ASC;
+	public int orderOthers = MegaApiJava.ORDER_DEFAULT_ASC;
 //	private int orderOffline = MegaApiJava.ORDER_DEFAULT_ASC;
 //	private int orderOutgoing = MegaApiJava.ORDER_DEFAULT_ASC;
 //	private int orderIncoming = MegaApiJava.ORDER_DEFAULT_ASC;
@@ -1467,27 +1467,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 							rubbishBinFLol.actionMode.finish();
 						}
 					}
-
-					fbFLol = (FileBrowserFragmentLollipop) cloudPageAdapter.instantiateItem(viewPagerCDrive, 0);
-					if (fbFLol != null){
-						log("parentHandleCloud: "+ parentHandleBrowser);
-						if(parentHandleBrowser==megaApi.getRootNode().getHandle()||parentHandleBrowser==-1){
-							log("aB.setTitle2");
-							aB.setTitle(getResources().getString(R.string.section_cloud_drive));
-							log("aB.setHomeAsUpIndicator_11");
-							aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
-//							fbFLol.setNodes(megaApi.getChildren(megaApi.getRootNode(), orderCloud));
-							firstNavigationLevel = true;
-						}
-						else {
-							MegaNode node = megaApi.getNodeByHandle(parentHandleBrowser);
-							aB.setTitle(node.getName());
-							log("indicator_arrow_back_891");
-							aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
-//							fbFLol.setNodes(megaApi.getChildren(node, orderCloud));
-							firstNavigationLevel = false;
-						}
-					}
 				}
 				else if(position == 1){
 
@@ -1497,27 +1476,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 							fbFLol.actionMode.finish();
 						}
 					}
-
-					rubbishBinFLol = (RubbishBinFragmentLollipop) cloudPageAdapter.instantiateItem(viewPagerCDrive, 1);
-					if (rubbishBinFLol != null){
-						log("parentHandleRubbish: "+ parentHandleRubbish);
-						if(parentHandleRubbish == megaApi.getRubbishNode().getHandle() || parentHandleRubbish == -1){
-							aB.setTitle(getResources().getString(R.string.section_rubbish_bin));
-							log("aB.setHomeAsUpIndicator_13");
-							aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
-//							rubbishBinFLol.setNodes(megaApi.getChildren(megaApi.getRubbishNode(), orderCloud));
-							firstNavigationLevel = true;
-						}
-						else{
-							MegaNode node = megaApi.getNodeByHandle(parentHandleRubbish);
-							aB.setTitle(node.getName());
-							log("indicator_arrow_back_892");
-							aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
-//							rubbishBinFLol.setNodes(megaApi.getChildren(node, orderCloud));
-							firstNavigationLevel = false;
-						}
-					}
 				}
+                setToolbarTitle();
 				showFabButton();
 			}
 		});
@@ -1535,6 +1495,39 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		//TABS section Shared Items
 		tabLayoutShares =  (TabLayout) findViewById(R.id.sliding_tabs_shares);
 		viewPagerShares = (ViewPager) findViewById(R.id.shares_tabs_pager);
+
+		viewPagerShares.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+
+			@Override
+			public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+			}
+
+			@Override
+			public void onPageSelected(int position) {
+				log("selectDrawerItemSharedItems: TabId :"+ position);
+				supportInvalidateOptionsMenu();
+				if(position == 1){
+					if (inSFLol != null){
+						if(inSFLol.isMultipleselect()){
+							inSFLol.actionMode.finish();
+						}
+					}
+				}
+				else if(position == 0){
+					if (outSFLol != null){
+						if(outSFLol.isMultipleselect()){
+							outSFLol.actionMode.finish();
+						}
+					}
+				}
+				setToolbarTitle();
+				showFabButton();
+			}
+
+			@Override
+			public void onPageScrollStateChanged(int state) {
+			}
+		});
 
 		//Tab section MyAccount
 		tabLayoutMyAccount =  (TabLayout) findViewById(R.id.sliding_tabs_my_account);
@@ -2465,23 +2458,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				}
 	    		case SHARED_ITEMS:{
 	    			log("onPostResume: case SHARED ITEMS");
-	    			if (viewPagerShares != null){
-	    				int index = viewPagerShares.getCurrentItem();
-	        			if(index==0){
-	        				String sharesTag = getFragmentTag(R.id.shares_tabs_pager, 0);
-	        				inSFLol = (IncomingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(sharesTag);
-	        				if (inSFLol != null){
-		   						inSFLol.refresh(parentHandleIncoming);
-	        				}
-	        			}
-	        			else{
-	        				String sharesTag = getFragmentTag(R.id.shares_tabs_pager, 1);
-	        				outSFLol = (OutgoingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(sharesTag);
-	        				if (outSFLol != null){
-	        					outSFLol.refresh(parentHandleOutgoing);
-	        				}
-	        			}
-		    		}
+					setToolbarTitle();
 					log("onPostResume: shared tabs visible");
 					tabLayoutShares.setVisibility(View.VISIBLE);
 					tabLayoutShares.setVisibility(View.VISIBLE);
@@ -3309,16 +3286,53 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				switch(indexShares){
 					case 0:{
 						log("setToolbarTitle: INCOMING TAB");
+						inSFLol = (IncomingSharesFragmentLollipop) sharesPageAdapter.instantiateItem(viewPagerShares, 0);
+						if (inSFLol != null){
 
+							if(parentHandleIncoming!=-1){
+								MegaNode node = megaApi.getNodeByHandle(parentHandleIncoming);
+								aB.setTitle(node.getName());
+								log("indicator_arrow_back_896");
+								aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+								firstNavigationLevel = false;
+							}
+							else{
+								aB.setTitle(getResources().getString(R.string.section_shared_items));
+								log("aB.setHomeAsUpIndicator_22");
+								aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+								firstNavigationLevel = true;
+							}
+						}
+						else{
+							log("selectDrawerItemSharedItems: inSFLol == null");
+						}
 						break;
 					}
 					case 1:{
 						log("setToolbarTitle: OUTGOING TAB");
+						outSFLol = (OutgoingSharesFragmentLollipop) sharesPageAdapter.instantiateItem(viewPagerShares, 1);
+						if (outSFLol != null) {
 
+							if (parentHandleOutgoing != -1) {
+								MegaNode node = megaApi.getNodeByHandle(parentHandleOutgoing);
+								aB.setTitle(node.getName());
+								log("indicator_arrow_back_895");
+								aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+								firstNavigationLevel = false;
+							} else {
+								aB.setTitle(getResources().getString(R.string.section_shared_items));
+								log("aB.setHomeAsUpIndicator_20");
+								aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+								firstNavigationLevel = true;
+							}
+						}
 						break;
 					}
 					default: {
-
+						aB.setTitle(getResources().getString(R.string.section_shared_items));
+						log("aB.setHomeAsUpIndicator_28");
+						aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+						firstNavigationLevel = true;
 						break;
 					}
 				}
@@ -3594,11 +3608,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		log("selectDrawerItemSharedItems");
 		tB.setVisibility(View.VISIBLE);
 
-		if (aB == null){
-			aB = getSupportActionBar();
-		}
-
-		aB.setTitle(getString(R.string.section_shared_items));
 		tabLayoutContacts.setVisibility(View.GONE);
 		viewPagerContacts.setVisibility(View.GONE);
 		tabLayoutCloud.setVisibility(View.GONE);
@@ -3608,13 +3617,15 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		tabLayoutTransfers.setVisibility(View.GONE);
 		viewPagerTransfers.setVisibility(View.GONE);
 
-		fragmentContainer.setVisibility(View.GONE);
+		fragmentContainer.setVisibility(View.GONE);		
 
-		if (mTabsAdapterShares == null){
-			log("selectDrawerItemSharedItems: mTabsAdapterShares is NULL");
+		if (sharesPageAdapter == null){
+			log("selectDrawerItemSharedItems: sharesPageAdapter is NULL");
+			tabLayoutShares.setVisibility(View.VISIBLE);
+			viewPagerShares.setVisibility(View.VISIBLE);
 
-			mTabsAdapterShares = new SharesPageAdapter(getSupportFragmentManager(),this);
-			viewPagerShares.setAdapter(mTabsAdapterShares);
+			sharesPageAdapter = new SharesPageAdapter(getSupportFragmentManager(),this);
+			viewPagerShares.setAdapter(sharesPageAdapter);
 			tabLayoutShares.setupWithViewPager(viewPagerShares);
 
 			//Force on CreateView, addTab do not execute onCreateView
@@ -3637,146 +3648,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				//No bundle, no change of orientation
 				log("selectDrawerItemSharedItems: indexShares is NOT -1");
 			}
-			tabLayoutShares.setVisibility(View.VISIBLE);
-			viewPagerShares.setVisibility(View.VISIBLE);
+
 		}
 		else{
-			log("selectDrawerItemSharedItems: mTabsAdapterShares NOT null");
+			log("selectDrawerItemSharedItems: sharesPageAdapter NOT null");
 			tabLayoutShares.setVisibility(View.VISIBLE);
 			viewPagerShares.setVisibility(View.VISIBLE);
-
-			String sharesTag = getFragmentTag(R.id.shares_tabs_pager, 0);
-			inSFLol = (IncomingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(sharesTag);
-			sharesTag = getFragmentTag(R.id.shares_tabs_pager, 1);
-			outSFLol = (OutgoingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(sharesTag);
-
-			int index = viewPagerShares.getCurrentItem();
-			log("selectDrawerItemSharedItems: Fragment Index Shared Items: " + index);
-			if(index==0){
-				//INCOMING TAB
-//        				String sharesTag = getFragmentTag(R.id.shares_tabs_pager, 0);
-//        				inSFLol = (IncomingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(sharesTag);
-				if (inSFLol != null){
-					MegaNode node = megaApi.getNodeByHandle(parentHandleIncoming);
-					log("selectDrawerItemSharedItems: Selected Incoming with parent: "+parentHandleIncoming);
-					log("selectDrawerItemSharedItems: inSFLol deepBrowserTreeIncoming: "+deepBrowserTreeIncoming);
-					if (node != null){
-						inSFLol.setNodes(megaApi.getChildren(node, orderOthers));
-						inSFLol.setParentHandle(parentHandleIncoming);
-						inSFLol.setDeepBrowserTree(deepBrowserTreeIncoming);
-						aB.setTitle(node.getName());
-						aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
-						firstNavigationLevel = false;
-					}
-					else{
-						log("selectDrawerItemSharedItems: The Node is NULL");
-						inSFLol.findNodes();
-						aB.setTitle(getResources().getString(R.string.section_shared_items));
-						aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
-						firstNavigationLevel = true;
-					}
-				}
-			}
-			else{
-//        				String sharesTag = getFragmentTag(R.id.shares_tabs_pager, 1);
-//        				outSFLol = (OutgoingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(sharesTag);
-				if (outSFLol != null){
-//        					outSFLol.refresh(parentHandleIncoming);
-					MegaNode node = megaApi.getNodeByHandle(parentHandleOutgoing);
-					if (node != null){
-						outSFLol.setNodes(megaApi.getChildren(node, orderOthers));
-						aB.setTitle(node.getName());
-						aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
-						firstNavigationLevel = false;
-					}
-					else{
-						outSFLol.refresh();
-						aB.setTitle(getResources().getString(R.string.section_shared_items));
-						aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
-						firstNavigationLevel = true;
-					}
-				}
-			}
 		}
-
-		tabLayoutShares.setVisibility(View.VISIBLE);
-		viewPagerShares.setVisibility(View.VISIBLE);
-
-		viewPagerShares.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-
-			@Override
-			public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-			}
-
-			@Override
-			public void onPageSelected(int position) {
-				log("selectDrawerItemSharedItems: TabId :"+ position);
-				supportInvalidateOptionsMenu();
-				if(position == 1){
-					if (inSFLol != null){
-						if(inSFLol.isMultipleselect()){
-							inSFLol.actionMode.finish();
-						}
-					}
-					String sharesTag = getFragmentTag(R.id.shares_tabs_pager, 1);
-					outSFLol = (OutgoingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(sharesTag);
-					if (outSFLol != null){
-
-						if(parentHandleOutgoing!=-1){
-							MegaNode node = megaApi.getNodeByHandle(parentHandleOutgoing);
-							aB.setTitle(node.getName());
-							log("indicator_arrow_back_895");
-							aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
-							firstNavigationLevel = false;
-							outSFLol.setNodes(megaApi.getChildren(node, orderOthers));
-						}
-						else{
-							aB.setTitle(getResources().getString(R.string.section_shared_items));
-							log("aB.setHomeAsUpIndicator_20");
-							aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
-							firstNavigationLevel = true;
-						}
-					}
-					else{
-						log("selectDrawerItemSharedItems: outSFLol == null");
-					}
-				}
-				else if(position == 0){
-					if (outSFLol != null){
-						if(outSFLol.isMultipleselect()){
-							outSFLol.actionMode.finish();
-						}
-					}
-					String sharesTag = getFragmentTag(R.id.shares_tabs_pager, 0);
-					inSFLol = (IncomingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(sharesTag);
-					if (inSFLol != null){
-
-						if(parentHandleIncoming!=-1){
-							MegaNode node = megaApi.getNodeByHandle(parentHandleIncoming);
-							aB.setTitle(node.getName());
-							log("indicator_arrow_back_896");
-							aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
-							firstNavigationLevel = false;
-							inSFLol.setNodes(megaApi.getChildren(node, orderOthers));
-						}
-						else{
-							aB.setTitle(getResources().getString(R.string.section_shared_items));
-							log("aB.setHomeAsUpIndicator_22");
-							aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
-							firstNavigationLevel = true;
-						}
-					}
-					else{
-						log("selectDrawerItemSharedItems: inSFLol == null");
-					}
-				}
-				showFabButton();
-			}
-
-			@Override
-			public void onPageScrollStateChanged(int state) {
-			}
-		});
 
 		drawerLayout.closeDrawer(Gravity.LEFT);
 	}
@@ -4479,6 +4357,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 				selectDrawerItemSharedItems();
     			supportInvalidateOptionsMenu();
+				setToolbarTitle();
+				showFabButton();
     			break;
     		}
     		case CONTACTS:{
@@ -5256,8 +5136,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				//Lollipop
 				int index = viewPagerShares.getCurrentItem();
 				if(index==0){
-					String sharesTag = getFragmentTag(R.id.shares_tabs_pager, 0);
-					inSFLol = (IncomingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(sharesTag);
+					inSFLol = (IncomingSharesFragmentLollipop) sharesPageAdapter.instantiateItem(viewPagerShares, 0);
 					if (inSFLol != null){
 						sortByMenuItem.setVisible(true);
 						thumbViewMenuItem.setVisible(true);
@@ -5331,8 +5210,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					}
 				}
 				else if(index==1){
-					String sharesTag = getFragmentTag(R.id.shares_tabs_pager, 1);
-					outSFLol = (OutgoingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(sharesTag);
+					outSFLol = (OutgoingSharesFragmentLollipop) sharesPageAdapter.instantiateItem(viewPagerShares, 1);
 					if (outSFLol != null){
 
 						sortByMenuItem.setVisible(true);
@@ -6007,20 +5885,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		    			int index = viewPagerShares.getCurrentItem();
 		    			if(index==1){
 		    				//OUTGOING
-		    				String cFTag2 = getFragmentTag(R.id.shares_tabs_pager, 1);
-		    				log("Tag: "+ cFTag2);
-		    				outSFLol = (OutgoingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag2);
+		    				outSFLol = (OutgoingSharesFragmentLollipop) sharesPageAdapter.instantiateItem(viewPagerShares, 1);
 		    				if (outSFLol != null){
 		    					outSFLol.onBackPressed();
 		    				}
 		    			}
 		    			else{
 		    				//InCOMING
-		    				String cFTag1 = getFragmentTag(R.id.shares_tabs_pager, 0);
-		    				log("Tag: "+ cFTag1);
-		    				inSFLol = (IncomingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag1);
-		    				log("deepBrowserTreeIncoming: "+deepBrowserTreeIncoming);
-
+		    				inSFLol = (IncomingSharesFragmentLollipop) sharesPageAdapter.instantiateItem(viewPagerShares, 0);
 							if (inSFLol != null){
 								log("deepBrowserTree get from inSFlol: "+inSFLol.getDeepBrowserTree());
 		    					inSFLol.onBackPressed();
@@ -6234,44 +6106,37 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	    		}
 
 	        	if (drawerItem == DrawerItem.SHARED_ITEMS){
-	        		String swmTag = getFragmentTag(R.id.shares_tabs_pager, 0);
-	        		inSFLol = (IncomingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(swmTag);
 	        		if (viewPagerShares.getCurrentItem()==0){
-		        		if (inSFLol != null){
-		        			Long checkHandle = inSFLol.getParentHandle();
-		        			MegaNode checkNode = megaApi.getNodeByHandle(checkHandle);
 
-		        			if((megaApi.checkAccess(checkNode, MegaShare.ACCESS_FULL).getErrorCode() == MegaError.API_OK)){
-		        				this.showUploadPanel();
-							}
-							else if(megaApi.checkAccess(checkNode, MegaShare.ACCESS_READWRITE).getErrorCode() == MegaError.API_OK){
-								this.showUploadPanel();
-							}
-							else if(megaApi.checkAccess(checkNode, MegaShare.ACCESS_READ).getErrorCode() == MegaError.API_OK){
-								log("Not permissions to upload");
-								AlertDialog.Builder builder = new AlertDialog.Builder(this);
-					            builder.setMessage(getString(R.string.no_permissions_upload));
+						MegaNode checkNode = megaApi.getNodeByHandle(parentHandleIncoming);
+
+						if((megaApi.checkAccess(checkNode, MegaShare.ACCESS_FULL).getErrorCode() == MegaError.API_OK)){
+							this.showUploadPanel();
+						}
+						else if(megaApi.checkAccess(checkNode, MegaShare.ACCESS_READWRITE).getErrorCode() == MegaError.API_OK){
+							this.showUploadPanel();
+						}
+						else if(megaApi.checkAccess(checkNode, MegaShare.ACCESS_READ).getErrorCode() == MegaError.API_OK){
+							log("Not permissions to upload");
+							AlertDialog.Builder builder = new AlertDialog.Builder(this);
+							builder.setMessage(getString(R.string.no_permissions_upload));
 //								builder.setTitle(R.string.op_not_allowed);
-								builder.setCancelable(false).setPositiveButton(R.string.cam_sync_ok, new DialogInterface.OnClickListener() {
-							           public void onClick(DialogInterface dialog, int id) {
-							                //do things
-							        	   alertNotPermissionsUpload.dismiss();
-							           }
-							       });
+							builder.setCancelable(false).setPositiveButton(R.string.cam_sync_ok, new DialogInterface.OnClickListener() {
+								   public void onClick(DialogInterface dialog, int id) {
+										//do things
+									   alertNotPermissionsUpload.dismiss();
+								   }
+							   });
 
-								alertNotPermissionsUpload = builder.create();
-								alertNotPermissionsUpload.show();
+							alertNotPermissionsUpload = builder.create();
+							alertNotPermissionsUpload.show();
 //								Util.brandAlertDialog(alertNotPermissionsUpload);
-							}
-		        		}
+						}
+
 	        		}
-	        		swmTag = getFragmentTag(R.id.shares_tabs_pager, 1);
-	        		outSFLol = (OutgoingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(swmTag);
-	        		if (viewPagerShares.getCurrentItem()==1){
-		        		if (outSFLol != null){
-		        			this.showUploadPanel();
-		        		}
-	        		}
+	        		else if(viewPagerShares.getCurrentItem()==1){
+						this.showUploadPanel();
+					}
 	        	}
 	        	else {
         			this.showUploadPanel();
@@ -6379,9 +6244,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					}
 	        	}
 	        	if (drawerItem == DrawerItem.SHARED_ITEMS){
-	        		String swmTag = getFragmentTag(R.id.shares_tabs_pager, 0);
-	        		inSFLol = (IncomingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(swmTag);
 	        		if (viewPagerShares.getCurrentItem()==0){
+						inSFLol = (IncomingSharesFragmentLollipop) sharesPageAdapter.instantiateItem(viewPagerShares, 0);
 		        		if (inSFLol != null){
 		        			inSFLol.selectAll();
 		        			if (inSFLol.showSelectMenuItem()){
@@ -6395,9 +6259,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		        			}
 		        		}
 	        		}
-	        		swmTag = getFragmentTag(R.id.shares_tabs_pager, 1);
-	        		outSFLol = (OutgoingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(swmTag);
-	        		if (viewPagerShares.getCurrentItem()==1){
+	        		else if (viewPagerShares.getCurrentItem()==1){
+						outSFLol = (OutgoingSharesFragmentLollipop) sharesPageAdapter.instantiateItem(viewPagerShares, 1);
 		        		if (outSFLol != null){
 		        			outSFLol.selectAll();
 		        			if (outSFLol.showSelectMenuItem()){
@@ -6625,12 +6488,15 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						thumbViewMenuItem.setTitle(getString(R.string.action_list));
 	    			}
 
-	    			if (drawerItem == DrawerItem.CLOUD_DRIVE){
-	    				if(cloudPageAdapter!=null){
-							cloudPageAdapter.notifyDataSetChanged();
-						}
-	    			}
-	    			else if(drawerItem == DrawerItem.INBOX){
+					if(cloudPageAdapter!=null){
+						cloudPageAdapter.notifyDataSetChanged();
+					}
+
+					if(sharesPageAdapter!=null){
+						sharesPageAdapter.notifyDataSetChanged();
+					}
+
+	    			if(drawerItem == DrawerItem.INBOX){
 	    				selectDrawerItemLollipop(drawerItem);
 	    			}
 	    			else if (drawerItem == DrawerItem.CONTACTS){
@@ -6649,39 +6515,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		        			fragTransaction.commitNowAllowingStateLoss();
 
 		        		}
-	    			}
-	    			else if (drawerItem == DrawerItem.SHARED_ITEMS){
-			        	//Incoming
-	    				String cFTagIN = getFragmentTag(R.id.shares_tabs_pager, 0);
-	    				inSFLol = (IncomingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTagIN);
-	    				if (inSFLol != null){
-		        			FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
-		        			fragTransaction.detach(inSFLol);
-		        			fragTransaction.commitNowAllowingStateLoss();
-
-		        			inSFLol.setIsList(isList);
-		        			inSFLol.setParentHandle(parentHandleIncoming);
-
-		        			fragTransaction = getSupportFragmentManager().beginTransaction();
-		        			fragTransaction.attach(inSFLol);
-		        			fragTransaction.commitNowAllowingStateLoss();
-	    				}
-
-	    				//Outgoing
-	    				String cFTagOUT = getFragmentTag(R.id.shares_tabs_pager, 1);
-	    				outSFLol = (OutgoingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTagOUT);
-	    				if (outSFLol != null){
-		        			FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
-		        			fragTransaction.detach(outSFLol);
-		        			fragTransaction.commitNowAllowingStateLoss();
-
-		        			outSFLol.setIsList(isList);
-		        			outSFLol.setParentHandle(parentHandleOutgoing);
-
-		        			fragTransaction = getSupportFragmentManager().beginTransaction();
-		        			fragTransaction.attach(outSFLol);
-		        			fragTransaction.commitNowAllowingStateLoss();
-	    				}
 	    			}
 	    			else if (drawerItem == DrawerItem.SAVED_FOR_OFFLINE){
 	    				if (oFLol != null){
@@ -6778,31 +6611,20 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		        		int index = viewPagerShares.getCurrentItem();
 		    			if(index==1){
 		    				//OUTGOING
-		    				String cFTag2 = getFragmentTag(R.id.shares_tabs_pager, 1);
-		    				log("Tag: "+ cFTag2);
-		    				outSFLol = (OutgoingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag2);
-		    				if (outSFLol != null){
-		    					Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
-								intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
-					    		intent.setAction(Constants.ACTION_REFRESH);
-					    		intent.putExtra("PARENT_HANDLE", parentHandleOutgoing);
-					    		startActivityForResult(intent, Constants.REQUEST_CODE_REFRESH);
-					    		break;
-		    				}
+							Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
+							intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
+							intent.setAction(Constants.ACTION_REFRESH);
+							intent.putExtra("PARENT_HANDLE", parentHandleOutgoing);
+							startActivityForResult(intent, Constants.REQUEST_CODE_REFRESH);
 		    			}
 		    			else{
 		    				//InCOMING
-		    				String cFTag1 = getFragmentTag(R.id.shares_tabs_pager, 0);
-		    				log("Tag: "+ cFTag1);
-		    				inSFLol = (IncomingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag1);
-		    				if (inSFLol != null){
-		    					Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
-								intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
-					    		intent.setAction(Constants.ACTION_REFRESH);
-					    		intent.putExtra("PARENT_HANDLE", parentHandleIncoming);
-					    		startActivityForResult(intent, Constants.REQUEST_CODE_REFRESH);
-					    		break;
-		    				}
+
+							Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
+							intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
+							intent.setAction(Constants.ACTION_REFRESH);
+							intent.putExtra("PARENT_HANDLE", parentHandleIncoming);
+							startActivityForResult(intent, Constants.REQUEST_CODE_REFRESH);
 		    			}
 		        	}
 		        	case ACCOUNT:{
@@ -7471,8 +7293,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 		}
 		else if (drawerItem == DrawerItem.SHARED_ITEMS){
-			String sharesTag = getFragmentTag(R.id.shares_tabs_pager, 1);
-			outSFLol = (OutgoingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(sharesTag);
+			outSFLol = (OutgoingSharesFragmentLollipop) sharesPageAdapter.instantiateItem(viewPagerShares, 1);
 			outSFLol.hideMultipleSelect();
 			outSFLol.refresh(parentHandleOutgoing);
 
@@ -7517,16 +7338,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 		}
 		else if(drawerItem == DrawerItem.SHARED_ITEMS) {
-
-			String sharesTag = getFragmentTag(R.id.shares_tabs_pager, 0);
-			inSFLol = (IncomingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(sharesTag);
+			inSFLol = (IncomingSharesFragmentLollipop) sharesPageAdapter.instantiateItem(viewPagerShares, 0);
 			if (inSFLol != null){
 
 				inSFLol.hideMultipleSelect();
 				inSFLol.getRecyclerView().invalidate();
 			}
-			sharesTag = getFragmentTag(R.id.shares_tabs_pager, 1);
-			outSFLol = (OutgoingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(sharesTag);
+
+			outSFLol = (OutgoingSharesFragmentLollipop) sharesPageAdapter.instantiateItem(viewPagerShares, 1);
 			if (outSFLol != null){
 				outSFLol.hideMultipleSelect();
 				outSFLol.refresh(parentHandleOutgoing);
@@ -7557,10 +7376,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getRubbishNode(), orderCloud);
 						rubbishBinFLol.setNodes(nodes);
 						rubbishBinFLol.getRecyclerView().invalidate();
-						aB.setTitle(getString(R.string.section_rubbish_bin));
-						log("aB.setHomeAsUpIndicator_23");
-						aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
-						this.firstNavigationLevel = true;
 					}
 					else{
 						ArrayList<MegaNode> nodes;
@@ -7693,9 +7508,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			int index = viewPagerShares.getCurrentItem();
 			if(index==1){
 				//OUTGOING
-				String cFTag2 = getFragmentTag(R.id.shares_tabs_pager, 1);
-				log("Tag: "+ cFTag2);
-				outSFLol = (OutgoingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag2);
+				outSFLol = (OutgoingSharesFragmentLollipop) sharesPageAdapter.instantiateItem(viewPagerShares, 1);
 				if (outSFLol != null){
 					if (outSFLol.onBackPressed() == 0){
 						drawerItem = DrawerItem.CLOUD_DRIVE;
@@ -7713,9 +7526,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 			else{
 				//InCOMING
-				String cFTag1 = getFragmentTag(R.id.shares_tabs_pager, 0);
-				log("Tag: "+ cFTag1);
-				inSFLol = (IncomingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag1);
+				inSFLol = (IncomingSharesFragmentLollipop) sharesPageAdapter.instantiateItem(viewPagerShares, 0);
 				if (inSFLol != null){
 					if (inSFLol.onBackPressed() == 0){
 						drawerItem = DrawerItem.CLOUD_DRIVE;
@@ -9269,18 +9080,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		else if(drawerItem == DrawerItem.SHARED_ITEMS){
 			int index = viewPagerShares.getCurrentItem();
 			if (index == 0){
-				String cFTag = getFragmentTag(R.id.shares_tabs_pager, 0);
-				inSFLol = (IncomingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
-				if (inSFLol != null){
-					parentHandle = inSFLol.getParentHandle();
-				}
+				parentHandle = parentHandleIncoming;
 			}
 			else{
-				String cFTag = getFragmentTag(R.id.shares_tabs_pager, 1);
-				outSFLol = (OutgoingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
-				if (outSFLol != null){
-					parentHandle = outSFLol.getParentHandle();
-				}
+				parentHandle = parentHandleOutgoing;
+
 			}
 		}
 		else{
@@ -10427,7 +10231,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		this.orderOthers = _orderOthers;
 		this.setOrderOthers(orderOthers);
 		if (inSFLol != null){
-			inSFLol.setOrder(orderOthers);
 			inSFLol.setOrderNodes();
 		}
 	}
@@ -11136,22 +10939,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			else if(drawerItem == DrawerItem.SHARED_ITEMS){
 				int index = viewPagerShares.getCurrentItem();
 				if(index==0){
-					//INCOMING
-					String cFTag1 = getFragmentTag(R.id.shares_tabs_pager, 0);
-//					log("Tag: "+ cFTag1);
-					inSFLol = (IncomingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag1);
-					if (inSFLol != null){
-						parentHandleUpload=inSFLol.getParentHandle();
-					}
+						parentHandleUpload=parentHandleIncoming;
 				}
 				else if(index==1){
-					//OUTGOING
-					String cFTag1 = getFragmentTag(R.id.shares_tabs_pager, 1);
-//					log("Tag: "+ cFTag1);
-					outSFLol = (OutgoingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag1);
-					if (outSFLol != null){
-						parentHandleUpload=outSFLol.getParentHandle();
-					}
+					parentHandleUpload=parentHandleOutgoing;
 				}
 			}
 			else if (drawerItem == DrawerItem.SEARCH){
@@ -11389,7 +11180,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				if (parentNode != null){
 					if (inSFLol != null){
 						ArrayList<MegaNode> nodes = megaApi.getChildren(parentNode, orderGetChildren);
-						inSFLol.setOrder(orderGetChildren);
 						//TODO: ojo con los hijos
 //							inSFLol.setNodes(nodes);
 						inSFLol.getRecyclerView().invalidate();
@@ -11398,9 +11188,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				else{
 					if (inSFLol != null){
 //						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getInboxNode(), orderGetChildren);
-						inSFLol.setOrder(orderGetChildren);
-						//TODO: ojo con los hijos
-//							inSFLol.setNodes(nodes);
 						inSFLol.getRecyclerView().invalidate();
 					}
 				}
@@ -11964,24 +11751,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		else if (drawerItem == DrawerItem.SHARED_ITEMS){
 			int index = viewPagerShares.getCurrentItem();
 			if(index==1){
-				//OUTGOING
-				String cFTag2 = getFragmentTag(R.id.shares_tabs_pager, 1);
-				log("Tag: "+ cFTag2);
-				outSFLol = (OutgoingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag2);
-				if (outSFLol != null){
-					parentHandleOutgoing = outSFLol.getParentHandle();
-					parentNode = megaApi.getNodeByHandle(parentHandleOutgoing);
-				}
+				parentNode = megaApi.getNodeByHandle(parentHandleOutgoing);
 			}
 			else{
-				//InCOMING
-				String cFTag1 = getFragmentTag(R.id.shares_tabs_pager, 0);
-				log("Tag: "+ cFTag1);
-				inSFLol = (IncomingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag1);
-				if (inSFLol != null){
-					parentHandleIncoming = inSFLol.getParentHandle();
-					parentNode = megaApi.getNodeByHandle(parentHandleIncoming);
-				}
+				parentNode = megaApi.getNodeByHandle(parentHandleIncoming);
+			}
+			if(parentNode==null){
+				log("Incorrect folder to upload");
+				parentNode = megaApi.getRootNode();
 			}
 		}
 		else if(drawerItem == DrawerItem.ACCOUNT){
@@ -12802,20 +12579,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					}
 				}
 				else if (drawerItem == DrawerItem.SHARED_ITEMS){
-					String sharesTag = getFragmentTag(R.id.shares_tabs_pager, 0);
-    				inSFLol = (IncomingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(sharesTag);
+    				inSFLol = (IncomingSharesFragmentLollipop) sharesPageAdapter.instantiateItem(viewPagerShares, 0);
 					if (inSFLol != null){
-//						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(inSFLol.getParentHandle()), orderGetChildren);
-						//TODO: ojo con los hijos
-//						inSFLol.setNodes(nodes);
 						inSFLol.getRecyclerView().invalidate();
 					}
-	    			sharesTag = getFragmentTag(R.id.shares_tabs_pager, 1);
-	        		outSFLol = (OutgoingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(sharesTag);
+	        		outSFLol = (OutgoingSharesFragmentLollipop) sharesPageAdapter.instantiateItem(viewPagerShares, 1);
 					if (outSFLol != null){
-//						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(inSFLol.getParentHandle()), orderGetChildren);
-						//TODO: ojo con los hijos
-//						inSFLol.setNodes(nodes);
 						outSFLol.getRecyclerView().invalidate();
 					}
 				}
@@ -13171,10 +12940,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getRubbishNode(), orderCloud);
 					rubbishBinFLol.setNodes(nodes);
 					rubbishBinFLol.getRecyclerView().invalidate();
-					aB.setTitle(getString(R.string.section_rubbish_bin));
-					log("aB.setHomeAsUpIndicator_23");
-					aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
-					this.firstNavigationLevel = true;
 				}
 				else{
 					ArrayList<MegaNode> nodes;
@@ -13212,45 +12977,43 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			sFLol.refresh();
 		}
 
-		String cFTag2 = getFragmentTag(R.id.shares_tabs_pager, 1);
-		log("DrawerItem.SHARED_ITEMS Tag: "+ cFTag2);
-		outSFLol = (OutgoingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag2);
-		if (outSFLol != null){
-			MegaNode node = megaApi.getNodeByHandle(parentHandleOutgoing);
-			if (node != null){
-				outSFLol.setNodes(megaApi.getChildren(node, orderOthers));
-				aB.setTitle(node.getName());
-				log("indicator_arrow_back_888");
-				aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
-				firstNavigationLevel = false;
+		if(sharesPageAdapter!=null){
+			outSFLol = (OutgoingSharesFragmentLollipop) sharesPageAdapter.instantiateItem(viewPagerShares, 1);
+			if (outSFLol != null){
+				MegaNode node = megaApi.getNodeByHandle(parentHandleOutgoing);
+				if (node != null){
+					outSFLol.setNodes(megaApi.getChildren(node, orderOthers));
+					aB.setTitle(node.getName());
+					log("indicator_arrow_back_888");
+					aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+					firstNavigationLevel = false;
+				}
+				else{
+					outSFLol.refresh();
+					aB.setTitle(getResources().getString(R.string.section_shared_items));
+					log("aB.setHomeAsUpIndicator_26");
+					aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+					firstNavigationLevel = true;
+				}
 			}
-			else{
-				outSFLol.refresh();
-				aB.setTitle(getResources().getString(R.string.section_shared_items));
-				log("aB.setHomeAsUpIndicator_26");
-				aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
-				firstNavigationLevel = true;
-			}
-		}
 
-		String cFTag1 = getFragmentTag(R.id.shares_tabs_pager, 0);
-		log("DrawerItem.SHARED_ITEMS Tag Incoming: "+ cFTag1);
-		inSFLol = (IncomingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag1);
-		if (inSFLol != null){
-			MegaNode node = megaApi.getNodeByHandle(parentHandleIncoming);
-			if (node != null){
-				inSFLol.setNodes(megaApi.getChildren(node, orderOthers));
-				aB.setTitle(node.getName());
-				log("indicator_arrow_back_889");
-				aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
-				firstNavigationLevel = false;
-			}
-			else{
-				inSFLol.findNodes();
-				aB.setTitle(getResources().getString(R.string.section_shared_items));
-				log("aB.setHomeAsUpIndicator_28");
-				aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
-				firstNavigationLevel = true;
+			inSFLol = (IncomingSharesFragmentLollipop) sharesPageAdapter.instantiateItem(viewPagerShares, 0);
+			if (inSFLol != null){
+				MegaNode node = megaApi.getNodeByHandle(parentHandleIncoming);
+				if (node != null){
+					inSFLol.setNodes(megaApi.getChildren(node, orderOthers));
+					aB.setTitle(node.getName());
+					log("indicator_arrow_back_889");
+					aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+					firstNavigationLevel = false;
+				}
+				else{
+					inSFLol.findNodes();
+					aB.setTitle(getResources().getString(R.string.section_shared_items));
+					log("aB.setHomeAsUpIndicator_28");
+					aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+					firstNavigationLevel = true;
+				}
 			}
 		}
 
@@ -13746,14 +13509,16 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	}
 
 	public int getDeepBrowserTreeIncoming() {
-		String sharesTag = getFragmentTag(R.id.shares_tabs_pager, 0);
-		inSFLol = (IncomingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(sharesTag);
-		if(inSFLol!=null) {
-			return inSFLol.getDeepBrowserTree();
+		if(sharesPageAdapter!=null){
+			inSFLol = (IncomingSharesFragmentLollipop) sharesPageAdapter.instantiateItem(viewPagerShares, 0);
+			if(inSFLol!=null) {
+				return inSFLol.getDeepBrowserTree();
+			}
+			else{
+				return -1;
+			}
 		}
-		else{
-			return -1;
-		}
+		return -1;
 	}
 
 	public void setDeepBrowserTreeIncoming(int deepBrowserTreeIncoming) {
@@ -13762,14 +13527,16 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	}
 
 	public int getDeepBrowserTreeOutgoing() {
-		String sharesTag = getFragmentTag(R.id.shares_tabs_pager, 1);
-		outSFLol = (OutgoingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(sharesTag);
-		if(outSFLol!=null) {
-			return outSFLol.getDeepBrowserTree();
+		if(sharesPageAdapter!=null){
+			outSFLol = (OutgoingSharesFragmentLollipop) sharesPageAdapter.instantiateItem(viewPagerShares, 1);
+			if(outSFLol!=null) {
+				return outSFLol.getDeepBrowserTree();
+			}
+			else{
+				return -1;
+			}
 		}
-		else{
-			return -1;
-		}
+		return -1;
 	}
 
 	public void setDeepBrowserTreeOutgoing(int deepBrowserTreeOutgoing) {
@@ -13920,8 +13687,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				switch(indexShares){
 					case 0:{
 						log("showFabButton: INCOMING TAB");
-						String sharesTag = getFragmentTag(R.id.shares_tabs_pager, 0);
-						inSFLol = (IncomingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(sharesTag);
+						inSFLol = (IncomingSharesFragmentLollipop) sharesPageAdapter.instantiateItem(viewPagerShares, 0);
 						if(inSFLol!=null){
 							int deepBrowserTreeIn = inSFLol.getDeepBrowserTree();
 							if(deepBrowserTreeIn<=0){
@@ -13930,9 +13696,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 							}
 							else {
 								//Check the folder's permissions
-								long handle = inSFLol.getParentHandle();
-								log("showFabButton: handle from incoming: "+handle);
-								MegaNode parentNodeInSF = megaApi.getNodeByHandle(handle);
+								MegaNode parentNodeInSF = megaApi.getNodeByHandle(parentHandleIncoming);
 								if(parentNodeInSF!=null){
 									int accessLevel= megaApi.getAccess(parentNodeInSF);
 									log("showFabButton: Node: "+parentNodeInSF.getName());
@@ -13959,8 +13723,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					}
 					case 1:{
 						log("showFabButton: OUTGOING TAB");
-						String sharesTag = getFragmentTag(R.id.shares_tabs_pager, 1);
-						outSFLol = (OutgoingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(sharesTag);
+						outSFLol = (OutgoingSharesFragmentLollipop) sharesPageAdapter.instantiateItem(viewPagerShares, 1);
 						if(outSFLol!=null){
 							int deepBrowserTreeOut = outSFLol.getDeepBrowserTree();
 							if(deepBrowserTreeOut<=0){
