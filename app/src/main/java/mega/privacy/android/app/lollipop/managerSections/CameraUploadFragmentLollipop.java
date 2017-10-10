@@ -2096,6 +2096,20 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 		Util.log("CameraUploadFragmentLollipop", log);
 	}
 
+	public int getItemCountList(){
+		if(adapterList != null){
+			return adapterList.getItemCount();
+		}
+		return 0;
+	}
+
+	public int getItemCountGrid(){
+		if(adapterGrid != null){
+			return adapterGrid.getItemCount();
+		}
+		return 0;
+	}
+
 	@Override
 	public void onRequestStart(MegaApiJava api, MegaRequest request) {
 		if (request.getType() == MegaRequest.TYPE_CREATE_FOLDER){
