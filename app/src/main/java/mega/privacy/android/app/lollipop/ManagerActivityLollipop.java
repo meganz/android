@@ -7300,11 +7300,19 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			//Refresh Rubbish Fragment
 			rubbishBinFLol = (RubbishBinFragmentLollipop) cloudPageAdapter.instantiateItem(viewPagerCDrive, 1);
 			if (rubbishBinFLol != null){
-				ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleRubbish), orderCloud);
+				ArrayList<MegaNode> nodes;
+				if(parentHandleRubbish == -1){
+					nodes = megaApi.getChildren(megaApi.getRubbishNode(), orderCloud);
+				}
+				else{
+					nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleRubbish), orderCloud);
+				}
+
 				rubbishBinFLol.setNodes(nodes);
 				rubbishBinFLol.getRecyclerView().invalidate();
 			}
 		}
+		setToolbarTitle();
 	}
 
 	public void refreshAfterMoving() {
@@ -7356,6 +7364,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				cloudPageAdapter.notifyDataSetChanged();
 			}
 		}
+		setToolbarTitle();
 	}
 
 	public void refreshAfterRemoving(){
@@ -12943,7 +12952,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				else{
 					ArrayList<MegaNode> nodes;
 					if(parentHandleRubbish==-1){
-						nodes = megaApi.getChildren(megaApi.getNodeByHandle(megaApi.getRubbishNode().getHandle()), orderCloud);
+						nodes = megaApi.getChildren(megaApi.getRubbishNode(), orderCloud);
 					}
 					else{
 						nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleRubbish), orderCloud);
