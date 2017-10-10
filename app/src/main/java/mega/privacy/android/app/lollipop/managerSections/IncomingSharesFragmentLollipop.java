@@ -364,9 +364,7 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 				adapter = new MegaBrowserLollipopAdapter(context, this, nodes, ((ManagerActivityLollipop)context).parentHandleIncoming, recyclerView, aB, Constants.INCOMING_SHARES_ADAPTER, MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST);
 			}
 			else{
-				adapter.setParentHandle(((ManagerActivityLollipop)context).parentHandleIncoming);
 				adapter.setAdapterType(MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST);
-//				adapter.setNodes(nodes);
 			}
 
 			if (((ManagerActivityLollipop)context).parentHandleIncoming == -1){

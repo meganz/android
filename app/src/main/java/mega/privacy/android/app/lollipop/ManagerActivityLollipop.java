@@ -7295,7 +7295,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		else if (drawerItem == DrawerItem.SHARED_ITEMS){
 			outSFLol = (OutgoingSharesFragmentLollipop) sharesPageAdapter.instantiateItem(viewPagerShares, 1);
 			outSFLol.hideMultipleSelect();
-			outSFLol.refresh(parentHandleOutgoing);
+			outSFLol.refresh();
 
 			//Refresh Rubbish Fragment
 			rubbishBinFLol = (RubbishBinFragmentLollipop) cloudPageAdapter.instantiateItem(viewPagerCDrive, 1);
@@ -7348,7 +7348,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			outSFLol = (OutgoingSharesFragmentLollipop) sharesPageAdapter.instantiateItem(viewPagerShares, 1);
 			if (outSFLol != null){
 				outSFLol.hideMultipleSelect();
-				outSFLol.refresh(parentHandleOutgoing);
+				outSFLol.refresh();
 			}
 
 			//Refresh Cloud Drive
@@ -10241,7 +10241,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		this.orderOthers = _orderOthers;
 		this.setOrderOthers(orderOthers);
 		if (outSFLol != null){
-			outSFLol.setOrder(orderOthers);
 			if (orderOthers == MegaApiJava.ORDER_DEFAULT_ASC){
 				outSFLol.sortByNameAscending();
 			}
@@ -12980,21 +12979,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		if(sharesPageAdapter!=null){
 			outSFLol = (OutgoingSharesFragmentLollipop) sharesPageAdapter.instantiateItem(viewPagerShares, 1);
 			if (outSFLol != null){
-				MegaNode node = megaApi.getNodeByHandle(parentHandleOutgoing);
-				if (node != null){
-					outSFLol.setNodes(megaApi.getChildren(node, orderOthers));
-					aB.setTitle(node.getName());
-					log("indicator_arrow_back_888");
-					aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
-					firstNavigationLevel = false;
-				}
-				else{
-					outSFLol.refresh();
-					aB.setTitle(getResources().getString(R.string.section_shared_items));
-					log("aB.setHomeAsUpIndicator_26");
-					aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
-					firstNavigationLevel = true;
-				}
+				outSFLol.refresh();
 			}
 
 			inSFLol = (IncomingSharesFragmentLollipop) sharesPageAdapter.instantiateItem(viewPagerShares, 0);
@@ -13002,19 +12987,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				MegaNode node = megaApi.getNodeByHandle(parentHandleIncoming);
 				if (node != null){
 					inSFLol.setNodes(megaApi.getChildren(node, orderOthers));
-					aB.setTitle(node.getName());
-					log("indicator_arrow_back_889");
-					aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
-					firstNavigationLevel = false;
 				}
 				else{
 					inSFLol.findNodes();
-					aB.setTitle(getResources().getString(R.string.section_shared_items));
-					log("aB.setHomeAsUpIndicator_28");
-					aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
-					firstNavigationLevel = true;
 				}
 			}
+			setToolbarTitle();
 		}
 
 		if (iFLol != null){
