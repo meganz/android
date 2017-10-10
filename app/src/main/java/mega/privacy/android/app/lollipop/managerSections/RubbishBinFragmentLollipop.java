@@ -62,11 +62,7 @@ public class RubbishBinFragmentLollipop extends Fragment {
 	CustomizedGridLayoutManager gridLayoutManager;
 	MegaBrowserLollipopAdapter adapter;
 	public RubbishBinFragmentLollipop rubbishBinFragment = this;
-		
-	boolean isList = true;
-	long parentHandle = -1;
-	int orderGetChildren;
-	
+
 	ArrayList<MegaNode> nodes;
 	MegaNode selectedNode = null;
 	
@@ -314,31 +310,19 @@ public class RubbishBinFragmentLollipop extends Fragment {
 		display.getMetrics(outMetrics);
 		density  = getResources().getDisplayMetrics().density;
 
-		orderGetChildren = ((ManagerActivityLollipop)context).getOrderCloud();
-		isList = ((ManagerActivityLollipop)context).isList();
+		if (((ManagerActivityLollipop)context).parentHandleRubbish == -1||((ManagerActivityLollipop)context).parentHandleRubbish==megaApi.getRubbishNode().getHandle()){
+			log("Parent is the Rubbish: "+((ManagerActivityLollipop)context).parentHandleRubbish);
 
-		if (parentHandle == -1){
-
-			long parentHandleRubbish = ((ManagerActivityLollipop)context).getParentHandleRubbish();
-			if(parentHandleRubbish!=-1){
-				log("After consulting... the parentRubbish is: "+parentHandleRubbish);
-				parentHandle = parentHandleRubbish;
-			}
-		}
-
-		if (parentHandle == -1||parentHandle==megaApi.getRubbishNode().getHandle()){
-			log("Parent is the Rubbish: "+parentHandle);
-
-			nodes = megaApi.getChildren(megaApi.getRubbishNode(), orderGetChildren);
+			nodes = megaApi.getChildren(megaApi.getRubbishNode(), ((ManagerActivityLollipop)context).orderCloud);
 			((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 
 		}
 		else{
-			MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
+			MegaNode parentNode = megaApi.getNodeByHandle(((ManagerActivityLollipop)context).parentHandleRubbish);
 
 			if (parentNode != null){
 				log("The parent node is: "+parentNode.getName());
-				nodes = megaApi.getChildren(parentNode, orderGetChildren);
+				nodes = megaApi.getChildren(parentNode, ((ManagerActivityLollipop)context).orderCloud);
 			
 				((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 
@@ -353,13 +337,13 @@ public class RubbishBinFragmentLollipop extends Fragment {
 				}
 
 			}
-			nodes = megaApi.getChildren(parentNode, orderGetChildren);
+			nodes = megaApi.getChildren(parentNode, ((ManagerActivityLollipop)context).orderCloud);
 			((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 		}
 
 		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
-		if (isList){
+		if (((ManagerActivityLollipop)context).isList){
 			log("isList View");
 			View v = inflater.inflate(R.layout.fragment_rubbishbinlist, container, false);
 			
@@ -376,24 +360,22 @@ public class RubbishBinFragmentLollipop extends Fragment {
 			contentText = (TextView) v.findViewById(R.id.rubbishbin_list_content_text);			
 
 			if (adapter == null){
-				adapter = new MegaBrowserLollipopAdapter(context, this, nodes, parentHandle, recyclerView, aB, Constants.RUBBISH_BIN_ADAPTER, MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST);
+				adapter = new MegaBrowserLollipopAdapter(context, this, nodes, ((ManagerActivityLollipop)context).parentHandleRubbish, recyclerView, aB, Constants.RUBBISH_BIN_ADAPTER, MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST);
 			}
 			else{
-
-
-				adapter.setParentHandle(parentHandle);
+				adapter.setParentHandle(((ManagerActivityLollipop)context).parentHandleRubbish);
 				adapter.setNodes(nodes);
 				adapter.setAdapterType(MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST);
 			}
 
 			if(megaApi.getRubbishNode()!=null){
 				log("setContent of the Rubbish Bin");
-				if (parentHandle == megaApi.getRubbishNode().getHandle()||parentHandle==-1){
+				if (((ManagerActivityLollipop)context).parentHandleRubbish == megaApi.getRubbishNode().getHandle()||((ManagerActivityLollipop)context).parentHandleRubbish==-1){
 					contentText.setText(MegaApiUtils.getInfoFolder(megaApi.getRubbishNode(), context));
 
 				}
 				else{
-					MegaNode infoNode = megaApi.getNodeByHandle(parentHandle);
+					MegaNode infoNode = megaApi.getNodeByHandle(((ManagerActivityLollipop)context).parentHandleRubbish);
 					contentText.setText(MegaApiUtils.getInfoFolder(infoNode, context));
 				}
 			}
@@ -409,7 +391,7 @@ public class RubbishBinFragmentLollipop extends Fragment {
 				emptyImageView.setVisibility(View.VISIBLE);
 				emptyTextView.setVisibility(View.VISIBLE);
 
-				if (megaApi.getRubbishNode().getHandle()==parentHandle||parentHandle==-1) {
+				if (megaApi.getRubbishNode().getHandle()==((ManagerActivityLollipop)context).parentHandleRubbish||((ManagerActivityLollipop)context).parentHandleRubbish==-1) {
 					emptyImageView.setImageResource(R.drawable.rubbish_bin_empty);
 					emptyTextView.setText(R.string.empty_rubbish_bin);
 				} else {
@@ -451,20 +433,20 @@ public class RubbishBinFragmentLollipop extends Fragment {
 			contentText = (TextView) v.findViewById(R.id.rubbishbin_grid_content_text);			
 
 			if (adapter == null){
-				adapter = new MegaBrowserLollipopAdapter(context, this, nodes, parentHandle, recyclerView, aB, Constants.RUBBISH_BIN_ADAPTER, MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_GRID);
+				adapter = new MegaBrowserLollipopAdapter(context, this, nodes, ((ManagerActivityLollipop)context).parentHandleRubbish, recyclerView, aB, Constants.RUBBISH_BIN_ADAPTER, MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_GRID);
 			}
 			else{
-				adapter.setParentHandle(parentHandle);
+				adapter.setParentHandle(((ManagerActivityLollipop)context).parentHandleRubbish);
 				adapter.setNodes(nodes);
 				adapter.setAdapterType(MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_GRID);
 			}
 
 			if(megaApi.getRubbishNode()!=null){
-				if (parentHandle == megaApi.getRubbishNode().getHandle()||parentHandle==-1){
+				if (((ManagerActivityLollipop)context).parentHandleRubbish == megaApi.getRubbishNode().getHandle()||((ManagerActivityLollipop)context).parentHandleRubbish==-1){
 					contentText.setText(MegaApiUtils.getInfoFolder(megaApi.getRubbishNode(), context));
 				}
 				else{
-					MegaNode infoNode = megaApi.getNodeByHandle(parentHandle);
+					MegaNode infoNode = megaApi.getNodeByHandle(((ManagerActivityLollipop)context).parentHandleRubbish);
 					contentText.setText(MegaApiUtils.getInfoFolder(infoNode, context));
 				}
 			}
@@ -482,7 +464,7 @@ public class RubbishBinFragmentLollipop extends Fragment {
 				emptyImageView.setVisibility(View.VISIBLE);
 				emptyTextView.setVisibility(View.VISIBLE);
 
-				if (megaApi.getRubbishNode().getHandle()==parentHandle||parentHandle==-1) {
+				if (megaApi.getRubbishNode().getHandle()==((ManagerActivityLollipop)context).parentHandleRubbish||((ManagerActivityLollipop)context).parentHandleRubbish==-1) {
 					emptyImageView.setImageResource(R.drawable.rubbish_bin_empty);
 					emptyTextView.setText(R.string.empty_rubbish_bin);
 				} else {
@@ -527,7 +509,7 @@ public class RubbishBinFragmentLollipop extends Fragment {
 				MegaNode n = nodes.get(position);
 
 				int lastFirstVisiblePosition = 0;
-				if(isList){
+				if(((ManagerActivityLollipop)context).isList){
 					lastFirstVisiblePosition = mLayoutManager.findFirstCompletelyVisibleItemPosition();
 				}
 				else{
@@ -545,13 +527,14 @@ public class RubbishBinFragmentLollipop extends Fragment {
 				aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
 				((ManagerActivityLollipop)context).setFirstNavigationLevel(false);
 				((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
-				
-				parentHandle = nodes.get(position).getHandle();
-				MegaNode infoNode = megaApi.getNodeByHandle(parentHandle);
+
+				((ManagerActivityLollipop)context).setParentHandleRubbish(n.getHandle());
+
+				MegaNode infoNode = megaApi.getNodeByHandle(((ManagerActivityLollipop)context).parentHandleRubbish);
 				contentText.setText(MegaApiUtils.getInfoFolder(infoNode, context));
-				((ManagerActivityLollipop)context).setParentHandleRubbish(parentHandle);
-				adapter.setParentHandle(parentHandle);
-				nodes = megaApi.getChildren(nodes.get(position), orderGetChildren);
+
+				adapter.setParentHandle(((ManagerActivityLollipop)context).parentHandleRubbish);
+				nodes = megaApi.getChildren(nodes.get(position), ((ManagerActivityLollipop)context).orderCloud);
 				adapter.setNodes(nodes);
 				recyclerView.scrollToPosition(0);
 				
@@ -561,7 +544,7 @@ public class RubbishBinFragmentLollipop extends Fragment {
 					contentTextLayout.setVisibility(View.GONE);
 					emptyImageView.setVisibility(View.VISIBLE);
 					emptyTextView.setVisibility(View.VISIBLE);
-					if (megaApi.getRubbishNode().getHandle()==parentHandle||parentHandle==-1) {
+					if (megaApi.getRubbishNode().getHandle()==((ManagerActivityLollipop)context).parentHandleRubbish||((ManagerActivityLollipop)context).parentHandleRubbish==-1) {
 						emptyImageView.setImageResource(R.drawable.rubbish_bin_empty);
 						emptyTextView.setText(R.string.empty_rubbish_bin);
 					} else {
@@ -577,6 +560,7 @@ public class RubbishBinFragmentLollipop extends Fragment {
 				}
 			}
 			else{
+				//Is FILE
 				if (MimeTypeList.typeForName(nodes.get(position).getName()).isImage()){
 					Intent intent = new Intent(context, FullScreenImageViewerLollipop.class);
 					intent.putExtra("position", position);
@@ -592,7 +576,7 @@ public class RubbishBinFragmentLollipop extends Fragment {
 						intent.putExtra("typeAccount", accountInfo.getAccountType());
 					}
 
-					intent.putExtra("orderGetChildren", orderGetChildren);
+					intent.putExtra("orderGetChildren", ((ManagerActivityLollipop)context).orderCloud);
 					startActivity(intent);
 				}
 				else{
@@ -685,14 +669,12 @@ public class RubbishBinFragmentLollipop extends Fragment {
 	public int onBackPressed(){
 		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
-		parentHandle = adapter.getParentHandle();
-		((ManagerActivityLollipop)context).setParentHandleRubbish(parentHandle);
-		
+
 		if (adapter == null){
 			return 0;
 		}
 
-		MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(parentHandle));
+		MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(((ManagerActivityLollipop)context).parentHandleRubbish));
 		if (parentNode != null){
 			recyclerView.setVisibility(View.VISIBLE);
 			contentTextLayout.setVisibility(View.VISIBLE);
@@ -713,10 +695,8 @@ public class RubbishBinFragmentLollipop extends Fragment {
 			}
 
 			((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
-
-			parentHandle = parentNode.getHandle();
-			((ManagerActivityLollipop)context).setParentHandleRubbish(parentHandle);
-			nodes = megaApi.getChildren(parentNode, orderGetChildren);
+			((ManagerActivityLollipop)context).setParentHandleRubbish(parentNode.getHandle());
+			nodes = megaApi.getChildren(parentNode, ((ManagerActivityLollipop)context).orderCloud);
 			adapter.setNodes(nodes);
 
 			int lastVisiblePosition = 0;
@@ -727,7 +707,7 @@ public class RubbishBinFragmentLollipop extends Fragment {
 			log("Scroll to "+lastVisiblePosition+" position");
 
 			if(lastVisiblePosition>=0){
-				if(isList){
+				if(((ManagerActivityLollipop)context).isList){
 					mLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
 				}
 				else{
@@ -735,7 +715,7 @@ public class RubbishBinFragmentLollipop extends Fragment {
 				}
 			}
 
-			adapter.setParentHandle(parentHandle);
+//			adapter.setParentHandle(parentHandle);
 			contentText.setText(MegaApiUtils.getInfoFolder(parentNode, context));
 			return 2;
 		}
@@ -748,12 +728,12 @@ public class RubbishBinFragmentLollipop extends Fragment {
 		log("setContentText");
 		MegaNode rN = megaApi.getRubbishNode();
 		if(rN!=null){
-			if (parentHandle == rN.getHandle()||parentHandle==-1){
+			if (((ManagerActivityLollipop)context).parentHandleRubbish == rN.getHandle()||((ManagerActivityLollipop)context).parentHandleRubbish==-1){
 				contentText.setText(MegaApiUtils.getInfoFolder(rN, context));
 
 			}
 			else{
-				MegaNode infoNode = megaApi.getNodeByHandle(parentHandle);
+				MegaNode infoNode = megaApi.getNodeByHandle(((ManagerActivityLollipop)context).parentHandleRubbish);
 				if (infoNode !=  null){
 					contentText.setText(MegaApiUtils.getInfoFolder(infoNode, context));
 				}
@@ -766,25 +746,9 @@ public class RubbishBinFragmentLollipop extends Fragment {
 			log("INFO NODE null");
 		}
 	}
-	
-	public void setIsList(boolean isList){
-		log("setIsList");
-		this.isList = isList;
-	}
-	
-	public boolean getIsList(){
-		return isList;
-	}
-	
+
 	public long getParentHandle(){
-		return adapter.getParentHandle();
-	}
-	
-	public void setParentHandle(long parentHandle){
-		this.parentHandle = parentHandle;
-		if (adapter != null){
-			adapter.setParentHandle(parentHandle);
-		}
+		return ((ManagerActivityLollipop)context).parentHandleRubbish;
 	}
 	
 	public RecyclerView getRecyclerView(){
@@ -794,10 +758,12 @@ public class RubbishBinFragmentLollipop extends Fragment {
 	public void setNodes(ArrayList<MegaNode> nodes){
 		log("setNodes");
 		this.nodes = nodes;
-		
-		if(megaApi.getRubbishNode()==null){
-			log("megaApi.getRubbishNode() is NULL");
-			return;
+
+		if(megaApi!=null){
+			if(megaApi.getRubbishNode()==null){
+				log("megaApi.getRubbishNode() is NULL");
+				return;
+			}
 		}
 		
 		if (adapter != null){
@@ -807,7 +773,7 @@ public class RubbishBinFragmentLollipop extends Fragment {
 				contentTextLayout.setVisibility(View.GONE);
 				emptyImageView.setVisibility(View.VISIBLE);
 				emptyTextView.setVisibility(View.VISIBLE);
-				if (megaApi.getRubbishNode().getHandle()==parentHandle||parentHandle==-1) {
+				if (megaApi.getRubbishNode().getHandle()==((ManagerActivityLollipop)context).parentHandleRubbish||((ManagerActivityLollipop)context).parentHandleRubbish==-1) {
 					emptyImageView.setImageResource(R.drawable.rubbish_bin_empty);
 					emptyTextView.setText(R.string.empty_rubbish_bin);
 				} else {
@@ -830,11 +796,6 @@ public class RubbishBinFragmentLollipop extends Fragment {
 		if (adapter != null){
 			adapter.notifyDataSetChanged();
 		}
-	}
-	
-	public void setOrder(int orderGetChildren){
-		log("setOrder:Rubbish");
-		this.orderGetChildren = orderGetChildren;
 	}
 
 	public boolean isMultipleselect(){

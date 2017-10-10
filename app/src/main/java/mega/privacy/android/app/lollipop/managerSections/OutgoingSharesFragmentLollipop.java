@@ -1017,7 +1017,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 
 		deepBrowserTree = deepBrowserTree-1;
 		((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
-		if(deepBrowserTree==0){
+		if(deepBrowserTree<=0){
 			log("deepBrowserTree==0");
 			//In the beginning of the navigation
 			((ManagerActivityLollipop)context).setParentHandleOutgoing(-1);
