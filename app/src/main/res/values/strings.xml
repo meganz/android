@@ -1581,5 +1581,10 @@
 
     <string name="expiration_date_for_achievements" context="info paragraph about the completed achievement registration">Bonus expires in %1$d days</string>
 
+    <plurals name="context_share_folders">
+        <item context="menu item" quantity="one">Share folder</item>
+        <item context="menu items" quantity="other">Share folders</item>
+    </plurals>
+
     <string name="no_folders_shared" context="Info of a contact if there is no folders shared with him">No folders shared</string>
 </resources>

@@ -5860,6 +5860,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				if (firstNavigationLevel){
 					log("firstNavigationLevel is TRUE");
 					drawerLayout.openDrawer(nV);
+
 				}
 				else{
 					log("NOT firstNavigationLevel");
