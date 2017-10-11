@@ -4,13 +4,14 @@ import android.content.Context;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentStatePagerAdapter;
 
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.managerSections.IncomingSharesFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.OutgoingSharesFragmentLollipop;
 import mega.privacy.android.app.utils.Util;
 
-public class SharesPageAdapter extends FragmentPagerAdapter {
+public class SharesPageAdapter extends FragmentStatePagerAdapter {
 
     final int PAGE_COUNT = 2;
     private Context context;
@@ -32,6 +33,11 @@ public class SharesPageAdapter extends FragmentPagerAdapter {
             }
         }
         return null;
+    }
+
+    @Override
+    public int getItemPosition(Object obj) {
+        return POSITION_NONE;
     }
 
     @Override
