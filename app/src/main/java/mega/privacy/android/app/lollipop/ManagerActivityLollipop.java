@@ -4842,7 +4842,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						rubbishBinFLol = (RubbishBinFragmentLollipop) cloudPageAdapter.instantiateItem(viewPagerCDrive, 1);
 						if (rubbishBinFLol != null){
 							//Show
-							sortByMenuItem.setVisible(true);
 							selectMenuItem.setVisible(true);
 							thumbViewMenuItem.setVisible(true);
 							clearRubbishBinMenuitem.setVisible(true);
@@ -4875,10 +4874,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 							}
 
 							if(rubbishBinFLol.getItemCount()>0){
+								sortByMenuItem.setVisible(true);
 								selectMenuItem.setVisible(true);
 								clearRubbishBinMenuitem.setVisible(true);
 							}
 							else{
+								sortByMenuItem.setVisible(false);
 								selectMenuItem.setVisible(false);
 								clearRubbishBinMenuitem.setVisible(false);
 							}
@@ -4897,7 +4898,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 							addMenuItem.setVisible(true);
 							log("createFolderMenuItem.setVisible_14");
 							createFolderMenuItem.setVisible(true);
-							sortByMenuItem.setVisible(true);
 							thumbViewMenuItem.setVisible(true);
 							rubbishBinMenuItem.setVisible(false);
 							upgradeAccountMenuItem.setVisible(true);
@@ -4921,9 +4921,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 							if(fbFLol.getItemCount()>0){
 								selectMenuItem.setVisible(true);
+								sortByMenuItem.setVisible(true);
 							}
 							else{
 								selectMenuItem.setVisible(false);
+								sortByMenuItem.setVisible(false);
 							}
 
 							if (isList){
@@ -4945,13 +4947,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			else if (drawerItem == DrawerItem.SAVED_FOR_OFFLINE){
 				if (oFLol != null){
 					//Show
-					sortByMenuItem.setVisible(true);
 					thumbViewMenuItem.setVisible(true);
 
 					if(oFLol.getItemCount()>0){
+						sortByMenuItem.setVisible(true);
 						selectMenuItem.setVisible(true);
 					}
 					else{
+						sortByMenuItem.setVisible(false);
 						selectMenuItem.setVisible(false);
 					}
 					searchMenuItem.setVisible(true);
@@ -4992,7 +4995,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 					//Show
 					upgradeAccountMenuItem.setVisible(true);
-					selectMenuItem.setVisible(true);
 					takePicture.setVisible(true);
 
 					//Hide
@@ -5003,7 +5005,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					addContactMenuItem.setVisible(false);
 					addMenuItem.setVisible(false);
 					refreshMenuItem.setVisible(false);
-					sortByMenuItem.setVisible(false);
 					unSelectMenuItem.setVisible(false);
 					thumbViewMenuItem.setVisible(true);
 					changePass.setVisible(false);
@@ -5019,6 +5020,15 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						thumbViewMenuItem.setTitle(getString(R.string.action_grid));
 						gridSmallLargeMenuItem.setVisible(false);
 						searchMenuItem.setVisible(true);
+
+						if(cuFL.getItemCountList()>0){
+							sortByMenuItem.setVisible(true);
+							selectMenuItem.setVisible(true);
+						}
+						else{
+							sortByMenuItem.setVisible(false);
+							selectMenuItem.setVisible(false);
+						}
 					}
 					else{
 						thumbViewMenuItem.setTitle(getString(R.string.action_list));
@@ -5030,6 +5040,15 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						}
 						gridSmallLargeMenuItem.setVisible(true);
 						searchMenuItem.setVisible(false);
+
+						if(cuFL.getItemCountGrid()>0){
+							sortByMenuItem.setVisible(true);
+							selectMenuItem.setVisible(true);
+						}
+						else{
+							sortByMenuItem.setVisible(false);
+							selectMenuItem.setVisible(false);
+						}
 					}
 				}
 				newChatMenuItem.setVisible(false);
@@ -5040,7 +5059,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 					//Show
 					upgradeAccountMenuItem.setVisible(true);
-					selectMenuItem.setVisible(true);
 					takePicture.setVisible(true);
 
 					//Hide
@@ -5051,7 +5069,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					addContactMenuItem.setVisible(false);
 					addMenuItem.setVisible(false);
 					refreshMenuItem.setVisible(false);
-					sortByMenuItem.setVisible(false);
 					unSelectMenuItem.setVisible(false);
 					thumbViewMenuItem.setVisible(true);
 					changePass.setVisible(false);
@@ -5067,6 +5084,15 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						thumbViewMenuItem.setTitle(getString(R.string.action_grid));
 						gridSmallLargeMenuItem.setVisible(false);
 						searchMenuItem.setVisible(true);
+
+						if(muFLol.getItemCountList()>0){
+							sortByMenuItem.setVisible(true);
+							selectMenuItem.setVisible(true);
+						}
+						else{
+							sortByMenuItem.setVisible(false);
+							selectMenuItem.setVisible(false);
+						}
 					}
 					else{
 						thumbViewMenuItem.setTitle(getString(R.string.action_list));
@@ -5078,6 +5104,15 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						}
 						gridSmallLargeMenuItem.setVisible(true);
 						searchMenuItem.setVisible(false);
+
+						if(muFLol.getItemCountGrid()>0){
+							sortByMenuItem.setVisible(true);
+							selectMenuItem.setVisible(true);
+						}
+						else{
+							sortByMenuItem.setVisible(false);
+							selectMenuItem.setVisible(false);
+						}
 					}
 				}
 				newChatMenuItem.setVisible(false);
@@ -13031,6 +13066,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				}
 			}
 		}
+
+		supportInvalidateOptionsMenu();
 	}
 
 	@Override
