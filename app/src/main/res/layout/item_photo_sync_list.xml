@@ -179,8 +179,7 @@
 			 android:singleLine="false"
 			 android:textColor="@color/mail_my_account"
 			 android:textSize="14sp"
-			 android:layout_centerVertical="true"
-			 />
+			 android:layout_centerVertical="true"/>
 	 </RelativeLayout>
     
 </RelativeLayout>
