@@ -130,6 +130,9 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 					if (documents.size()==1){
 						((ManagerActivityLollipop) context).showRenameDialog(documents.get(0), documents.get(0).getName());
 					}
+					hideMultipleSelect();
+					clearSelections();
+
 					break;
 				}
 				case R.id.cab_menu_copy:{
@@ -140,6 +143,8 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 
 					NodeController nC = new NodeController(context);
 					nC.chooseLocationToCopyNodes(handleList);
+					clearSelections();
+					hideMultipleSelect();
 					break;
 				}	
 				case R.id.cab_menu_share:{
@@ -153,6 +158,8 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 
 					NodeController nC = new NodeController(context);
 					nC.selectContactToShareFolders(handleList);
+					clearSelections();
+					hideMultipleSelect();
 					break;
 				}
 				case R.id.cab_menu_move:{
@@ -163,6 +170,8 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 
 					NodeController nC = new NodeController(context);
 					nC.chooseLocationToMoveNodes(handleList);
+					clearSelections();
+					hideMultipleSelect();
 					break;
 				}
 				case R.id.cab_menu_share_link:{
@@ -262,8 +271,6 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 				showShare = true;
 				showCopy = true;
 
-
-
 				for(int i=0; i<selected.size();i++)	{
 					if(megaApi.checkMove(selected.get(i), megaApi.getRubbishNode()).getErrorCode() != MegaError.API_OK)	{
 						showTrash = false;
@@ -279,7 +286,11 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 					showLink=false;
 					showRemoveLink=false;
 					showEditLink=false;
-					showRename=false;
+					if(selected.size()==1){
+						showRename=true;
+					}else{
+						showRename=false;
+					}
 				}
 				else if(selected.size()==1){
 					//showLink=true;
@@ -974,6 +985,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 			actionMode.finish();
 		}
 	}
+
 	
 	public int onBackPressed(){
 
