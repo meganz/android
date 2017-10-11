@@ -139,8 +139,8 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 					if (documents.size()==1){
 						((ManagerActivityLollipop) context).showRenameDialog(documents.get(0), documents.get(0).getName());
 					}
-                    hideMultipleSelect();
-                    clearSelections();
+					clearSelections();
+					hideMultipleSelect();
 					break;
 				}
 				case R.id.cab_menu_copy:{
@@ -151,8 +151,8 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 
 					NodeController nC = new NodeController(context);
 					nC.chooseLocationToCopyNodes(handleList);
-                    clearSelections();
-                    hideMultipleSelect();
+					clearSelections();
+					hideMultipleSelect();
 					break;
 				}	
 				case R.id.cab_menu_move:{
@@ -163,8 +163,8 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 
 					NodeController nC = new NodeController(context);
 					nC.chooseLocationToMoveNodes(handleList);
-                    clearSelections();
-                    hideMultipleSelect();
+					clearSelections();
+					hideMultipleSelect();
 					break;
 				}
 				case R.id.cab_menu_share_link:{
