@@ -181,7 +181,6 @@ public class OfflineFragmentLollipop extends Fragment{
 						}
 						handleList.add(n.getHandle());
 					}
-
 					NodeController nC = new NodeController(context);
 					nC.chooseLocationToMoveNodes(handleList);
 					clearSelections();
