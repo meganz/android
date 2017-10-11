@@ -1016,10 +1016,10 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 					if (!MimeTypeList.typeForName(n.getName()).isImage() && (!MimeTypeList.typeForName(n.getName()).isVideo())){
 						continue;
 					}
-					
+					thereAreImages = true;
+
 					Date d = new Date(n.getModificationTime()*1000);
 					if ((month == 0) && (year == 0)){
-						thereAreImages = true;
 						month = d.getMonth();
 						year = d.getYear();
 						monthPic.monthYearString = getImageDateString(month, year);
@@ -1038,7 +1038,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 //						i--;
 					}
 					else if ((month == d.getMonth()) && (year == d.getYear())){
-						thereAreImages = true;
+
 //						if (monthPic.nodeHandles.size() == numberOfCells){
 //							monthPics.add(monthPic);
 //							monthPic = new MegaMonthPicLollipop();
@@ -1955,6 +1955,8 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 					continue;
 				}
 
+				thereAreImages = true;
+
 				Date d = new Date(n.getModificationTime()*1000);
 				if ((month == 0) && (year == 0)){
 					month = d.getMonth();
@@ -1975,7 +1977,6 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 //						i--;
 				}
 				else if ((month == d.getMonth()) && (year == d.getYear())){
-					thereAreImages = true;
 //						if (monthPic.nodeHandles.size() == numberOfCells){
 //							monthPics.add(monthPic);
 //							monthPic = new MegaMonthPicLollipop();
