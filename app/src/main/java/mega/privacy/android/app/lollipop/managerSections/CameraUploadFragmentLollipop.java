@@ -126,7 +126,6 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 		
 //	long parentHandle = -1;
 	private boolean firstTimeCam = false;
-	private int orderGetChildren = MegaApiJava.ORDER_MODIFICATION_DESC;
 
 	private int type = 0;
 
@@ -1020,6 +1019,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 					
 					Date d = new Date(n.getModificationTime()*1000);
 					if ((month == 0) && (year == 0)){
+						thereAreImages = true;
 						month = d.getMonth();
 						year = d.getYear();
 						monthPic.monthYearString = getImageDateString(month, year);
@@ -1554,7 +1554,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 							if(accountInfo!=null){
 								intent.putExtra("typeAccount", accountInfo.getAccountType());
 							}
-							intent.putExtra("orderGetChildren", orderGetChildren);
+							intent.putExtra("orderGetChildren", ((ManagerActivityLollipop)context).orderCamera);
 							startActivity(intent);
 									
 						}
@@ -1820,12 +1820,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 		
 		return photosyncHandle;
 	}
-	
-	
-	public RecyclerView getListView(){
-		return listView;
-	}
-	
+
 	public void setNodes(ArrayList<MegaNode> nodes){
 		this.nodes = nodes;
 		
@@ -2062,21 +2057,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	public boolean getFirstTimeCam(){
 		return firstTimeCam;
 	}
-	
-	public void setOrder(int orderGetChildren){
-		this.orderGetChildren = orderGetChildren;
-		if (((ManagerActivityLollipop)context).isListCameraUploads()){
-			if (adapterList != null){
-				adapterList.setOrder(orderGetChildren);
-			}
-		}
-		else{
-			if (adapterGrid != null){
-				adapterGrid.setOrder(orderGetChildren);
-			}
-		}
-	}
-	
+
 	public boolean showSelectMenuItem(){
 		if (((ManagerActivityLollipop)context).isListCameraUploads()){
 			if (adapterList != null){
@@ -2108,6 +2089,10 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			return adapterGrid.getItemCount();
 		}
 		return 0;
+	}
+
+	public RecyclerView getRecyclerView(){
+		return listView;
 	}
 
 	@Override

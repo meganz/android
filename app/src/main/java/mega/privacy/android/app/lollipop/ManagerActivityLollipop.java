@@ -372,6 +372,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	public int orderCloud = MegaApiJava.ORDER_DEFAULT_ASC;
 	public int orderContacts = MegaApiJava.ORDER_DEFAULT_ASC;
 	public int orderOthers = MegaApiJava.ORDER_DEFAULT_ASC;
+	public int orderCamera = MegaApiJava.ORDER_MODIFICATION_DESC;
 //	private int orderOffline = MegaApiJava.ORDER_DEFAULT_ASC;
 //	private int orderOutgoing = MegaApiJava.ORDER_DEFAULT_ASC;
 //	private int orderIncoming = MegaApiJava.ORDER_DEFAULT_ASC;
@@ -4998,6 +4999,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					takePicture.setVisible(true);
 
 					//Hide
+					sortByMenuItem.setVisible(false);
 					pauseTransfersMenuIcon.setVisible(false);
 					playTransfersMenuIcon.setVisible(false);
 					log("createFolderMenuItem.setVisible_16");
@@ -5022,11 +5024,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						searchMenuItem.setVisible(true);
 
 						if(cuFL.getItemCountList()>0){
-							sortByMenuItem.setVisible(true);
 							selectMenuItem.setVisible(true);
 						}
 						else{
-							sortByMenuItem.setVisible(false);
 							selectMenuItem.setVisible(false);
 						}
 					}
@@ -5042,11 +5042,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						searchMenuItem.setVisible(false);
 
 						if(cuFL.getItemCountGrid()>0){
-							sortByMenuItem.setVisible(true);
 							selectMenuItem.setVisible(true);
 						}
 						else{
-							sortByMenuItem.setVisible(false);
 							selectMenuItem.setVisible(false);
 						}
 					}
@@ -5062,6 +5060,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					takePicture.setVisible(true);
 
 					//Hide
+					sortByMenuItem.setVisible(false);
 					pauseTransfersMenuIcon.setVisible(false);
 					playTransfersMenuIcon.setVisible(false);
 					log("createFolderMenuItem.setVisible_17");
@@ -5086,11 +5085,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						searchMenuItem.setVisible(true);
 
 						if(muFLol.getItemCountList()>0){
-							sortByMenuItem.setVisible(true);
 							selectMenuItem.setVisible(true);
 						}
 						else{
-							sortByMenuItem.setVisible(false);
 							selectMenuItem.setVisible(false);
 						}
 					}
@@ -5106,11 +5103,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						searchMenuItem.setVisible(false);
 
 						if(muFLol.getItemCountGrid()>0){
-							sortByMenuItem.setVisible(true);
 							selectMenuItem.setVisible(true);
 						}
 						else{
-							sortByMenuItem.setVisible(false);
 							selectMenuItem.setVisible(false);
 						}
 					}
@@ -6455,29 +6450,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					else{
 						thumbViewMenuItem.setTitle(getString(R.string.action_list));
 	    			}
-	        		if (cuFL != null){
-        				Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("cuFLol");
-        				FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
-        				fragTransaction.detach(currentFragment);
-        				fragTransaction.commitNowAllowingStateLoss();
-
-        				if (isListCameraUploads){
-    	    				thumbViewMenuItem.setTitle(getString(R.string.action_grid));
-    	    				gridSmallLargeMenuItem.setVisible(false);
-    	    				searchMenuItem.setVisible(true);
-    					}
-    					else{
-    						thumbViewMenuItem.setTitle(getString(R.string.action_list));
-    						gridSmallLargeMenuItem.setVisible(true);
-    						searchMenuItem.setVisible(false);
-
-    	    			}
-
-        				fragTransaction = getSupportFragmentManager().beginTransaction();
-        				fragTransaction.attach(currentFragment);
-        				fragTransaction.commitNowAllowingStateLoss();
-
-        			}
+					selectDrawerItemLollipop(drawerItem);
 	        	}
 	        	else if (drawerItem == DrawerItem.MEDIA_UPLOADS){
 	        		log("action_grid_list in MediaUploads");
@@ -6801,6 +6774,22 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		        		}
         			}
         		}
+				else if(drawerItem==DrawerItem.CAMERA_UPLOADS||drawerItem==DrawerItem.MEDIA_UPLOADS){
+					switch(orderCamera){
+						case MegaApiJava.ORDER_MODIFICATION_ASC:{
+							log("ASCE");
+							newestCheck.setChecked(false);
+							oldestCheck.setChecked(true);
+							break;
+						}
+						case MegaApiJava.ORDER_MODIFICATION_DESC:{
+							log("DESC");
+							newestCheck.setChecked(true);
+							oldestCheck.setChecked(false);
+							break;
+						}
+					}
+				}
         		else{
 					log("orderCloud: "+orderCloud);
 	        		switch(orderCloud){
@@ -7065,6 +7054,49 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		        		break;
 
 		        	}
+					case MEDIA_UPLOADS:
+					case CAMERA_UPLOADS:{
+
+						sortByNameTV.setVisibility(View.GONE);
+						ascendingCheck.setVisibility(View.GONE);
+						descendingCheck.setVisibility(View.GONE);
+						sortBySizeTV.setVisibility(View.GONE);
+						largestCheck.setVisibility(View.GONE);
+						smallestCheck.setVisibility(View.GONE);
+
+						oldestCheck.setOnClickListener(new OnClickListener() {
+
+							@Override
+							public void onClick(View v) {
+								ascendingCheck.setChecked(true);
+								descendingCheck.setChecked(false);
+								if(orderCamera!=MegaApiJava.ORDER_MODIFICATION_ASC){
+									selectSortUploads(MegaApiJava.ORDER_MODIFICATION_ASC);
+								}
+
+								if (dialog != null){
+									dialog.dismiss();
+								}
+							}
+						});
+
+						newestCheck.setOnClickListener(new OnClickListener() {
+
+							@Override
+							public void onClick(View v) {
+								ascendingCheck.setChecked(false);
+								descendingCheck.setChecked(true);
+								if(orderCamera!=MegaApiJava.ORDER_MODIFICATION_DESC){
+									selectSortUploads(MegaApiJava.ORDER_MODIFICATION_DESC);
+								}
+
+								if (dialog != null){
+									dialog.dismiss();
+								}
+							}
+						});
+						break;
+					}
 		        	case CLOUD_DRIVE:
 		        	case INBOX:{
 
@@ -10316,6 +10348,26 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				iFLol.setNodes(nodes);
 				iFLol.getRecyclerView().invalidate();
 			}
+		}
+	}
+
+	public void selectSortUploads(int orderCamera){
+		log("selectSortUploads");
+
+		this.orderCamera = orderCamera;
+
+		cuFL = (CameraUploadFragmentLollipop) getSupportFragmentManager().findFragmentByTag("cuFLol");
+		if (cuFL != null){
+			ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(cuFL.getPhotoSyncHandle()), MegaApiJava.ORDER_MODIFICATION_DESC);
+			cuFL.setNodes(nodes);
+			cuFL.getRecyclerView().invalidate();
+		}
+
+		muFLol = (CameraUploadFragmentLollipop) getSupportFragmentManager().findFragmentByTag("muFLol");
+		if (muFLol != null){
+			ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(cuFL.getPhotoSyncHandle()), MegaApiJava.ORDER_MODIFICATION_DESC);
+			muFLol.setNodes(nodes);
+			muFLol.getRecyclerView().invalidate();
 		}
 	}
 
