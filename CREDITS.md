@@ -112,6 +112,46 @@ The MIT License (MIT)
 
 --------------------------------------------------------------------
 
+#### Emojicon
+https://github.com/rockerhieu/emojicon
+
+A library to show emoji in TextView, EditText for Android
+
+Copyright (c) 2014 Hieu Rocker
+
+###### License:
+Apache License, Version 2.0
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+--------------------------------------------------------------------
+
+#### FlowLayoutManager
+https://github.com/xiaofeng-han/AndroidLibs/tree/master/flowlayoutmanager
+
+LayoutManager that works with Android RecyclerView Widget, to layout views in flow style, with support of predictive animations, item per line limit, auto measurement & alignments (left or right)
+
+Copyright (c) 2016 Xiaofeng Han
+
+###### License:
+Apache License, Version 2.0
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+--------------------------------------------------------------------
+
+#### emoji-java
+https://github.com/vdurmont/emoji-java
+
+emoji-java is a lightweight java library that helps you use Emojis in your java applications.
+
+Copyright (c) 2014 Vincent DURMONT
+
+###### License:
+The MIT License (MIT)
+
+--------------------------------------------------------------------
+
 #### Android Support Library v7 appcompat
 
 This library adds support for the Action Bar user interface design pattern. This library includes support for material design user interface implementations.

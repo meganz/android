@@ -69,8 +69,6 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 	private Context context;
 	private int positionClicked;
 	private ArrayList<MegaContactAdapter> contacts;
-	private ImageView emptyImageViewFragment;
-	private TextView emptyTextViewFragment;
 	private RecyclerView listFragment;
 	private MegaApiAndroid megaApi;
 	private MegaChatApiAndroid megaChatApi;
@@ -153,7 +151,7 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 		
 	}
 
-	public MegaContactsLollipopAdapter(Context _context, ContactsFragmentLollipop _fragment, ArrayList<MegaContactAdapter> _contacts, ImageView _emptyImageView,TextView _emptyTextView, RecyclerView _listView, int adapterType) {
+	public MegaContactsLollipopAdapter(Context _context, ContactsFragmentLollipop _fragment, ArrayList<MegaContactAdapter> _contacts, RecyclerView _listView, int adapterType) {
 		this.context = _context;
 		this.contacts = _contacts;
 		this.fragment = _fragment;
@@ -170,8 +168,6 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 			}
 		}
 		
-		emptyImageViewFragment = _emptyImageView;
-		emptyTextViewFragment = _emptyTextView;
 		listFragment = _listView;
 	}
 	
@@ -697,7 +693,6 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 		String sharedNodesDescription = Util.getSubtitleDescription(sharedNodes);
 
 		holder.textViewContent.setText(sharedNodesDescription);
-
 		
 		holder.imageButtonThreeDots.setTag(holder);
 		holder.imageButtonThreeDots.setOnClickListener(this);	
