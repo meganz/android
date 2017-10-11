@@ -7374,6 +7374,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				log("nodes: "+nodes.size());
 				fbFLol.hideMultipleSelect();
 				fbFLol.setNodes(nodes);
+				fbFLol.setOverviewLayout();
 				fbFLol.getRecyclerView().invalidate();
 			}
 			else{
@@ -13023,7 +13024,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					inSFLol.findNodes();
 				}
 			}
-			setToolbarTitle();
 		}
 
 		if (iFLol != null){
@@ -13067,6 +13067,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 		}
 
+		setToolbarTitle();
 		supportInvalidateOptionsMenu();
 	}
 
