@@ -5087,13 +5087,16 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			else if (drawerItem == DrawerItem.INBOX){
 				if (iFLol != null){
 					//Show
-					sortByMenuItem.setVisible(true);
 
 					if(iFLol.getItemCount()>0){
 						selectMenuItem.setVisible(true);
+						sortByMenuItem.setVisible(true);
+
 					}
 					else{
 						selectMenuItem.setVisible(false);
+						sortByMenuItem.setVisible(false);
+
 					}
 
 					if (isList){
@@ -5138,7 +5141,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				if(index==0){
 					inSFLol = (IncomingSharesFragmentLollipop) sharesPageAdapter.instantiateItem(viewPagerShares, 0);
 					if (inSFLol != null){
-						sortByMenuItem.setVisible(true);
 						thumbViewMenuItem.setVisible(true);
 
 						addMenuItem.setEnabled(true);
@@ -5178,9 +5180,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 						if(inSFLol.getItemCount()>0){
 							selectMenuItem.setVisible(true);
+							sortByMenuItem.setVisible(true);
+
 						}
 						else{
 							selectMenuItem.setVisible(false);
+							sortByMenuItem.setVisible(false);
+
 						}
 						searchMenuItem.setVisible(true);
 
@@ -5213,7 +5219,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					outSFLol = (OutgoingSharesFragmentLollipop) sharesPageAdapter.instantiateItem(viewPagerShares, 1);
 					if (outSFLol != null){
 
-						sortByMenuItem.setVisible(true);
 						thumbViewMenuItem.setVisible(true);
 
 						log("parentHandleOutgoing: "+parentHandleOutgoing);
@@ -5228,9 +5233,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 						if(outSFLol.getItemCount()>0){
 							selectMenuItem.setVisible(true);
+							sortByMenuItem.setVisible(true);
+
 						}
 						else{
 							selectMenuItem.setVisible(false);
+							sortByMenuItem.setVisible(false);
+
 						}
 						searchMenuItem.setVisible(true);
 
@@ -5275,7 +5284,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 					//Show
 					addContactMenuItem.setVisible(true);
-					sortByMenuItem.setVisible(true);
 					thumbViewMenuItem.setVisible(true);
 					upgradeAccountMenuItem.setVisible(true);
 					searchMenuItem.setVisible(true);
@@ -5283,9 +5291,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					if (cFLol != null) {
 						if(cFLol.getItemCount()>0){
 							selectMenuItem.setVisible(true);
+							sortByMenuItem.setVisible(true);
 						}
 						else{
 							selectMenuItem.setVisible(false);
+							sortByMenuItem.setVisible(false);
 						}
 					}
 					else{

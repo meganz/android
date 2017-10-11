@@ -130,9 +130,8 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 					if (documents.size()==1){
 						((ManagerActivityLollipop) context).showRenameDialog(documents.get(0), documents.get(0).getName());
 					}
-					hideMultipleSelect();
 					clearSelections();
-
+					hideMultipleSelect();
 					break;
 				}
 				case R.id.cab_menu_copy:{
