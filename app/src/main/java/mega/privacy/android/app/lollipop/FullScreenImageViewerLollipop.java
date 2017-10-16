@@ -186,13 +186,12 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	ArrayList<MegaOffline> mOffListImages;
 
 
-
-
 	@Override
 	public void onDestroy(){
 		if(megaApi != null)
 		{	
 			megaApi.removeRequestListener(this);
+			megaApi.removeGlobalListener(this);
 		}
 		
 		super.onDestroy();
