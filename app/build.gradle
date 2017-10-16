@@ -6,7 +6,7 @@ android {
 
     defaultConfig {
         applicationId "mega.privacy.android.app"
-        minSdkVersion 11
+        minSdkVersion 14
         targetSdkVersion 25
         versionCode 155
         versionName "3.2.4 (155)"
