@@ -13099,17 +13099,21 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		if(sharesPageAdapter!=null){
 			outSFLol = (OutgoingSharesFragmentLollipop) sharesPageAdapter.instantiateItem(viewPagerShares, 1);
 			if (outSFLol != null){
-				outSFLol.refresh();
+				if(outSFLol.isAdded()){
+					outSFLol.refresh();
+				}
 			}
 
 			inSFLol = (IncomingSharesFragmentLollipop) sharesPageAdapter.instantiateItem(viewPagerShares, 0);
 			if (inSFLol != null){
 				MegaNode node = megaApi.getNodeByHandle(parentHandleIncoming);
-				if (node != null){
-					inSFLol.setNodes(megaApi.getChildren(node, orderOthers));
-				}
-				else{
-					inSFLol.findNodes();
+				if(inSFLol.isAdded()){
+					if (node != null){
+						inSFLol.setNodes(megaApi.getChildren(node, orderOthers));
+					}
+					else{
+						inSFLol.findNodes();
+					}
 				}
 			}
 		}
@@ -13379,10 +13383,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			if(!transfer.isFolderTransfer()){
 				transfersInProgress.add(transfer.getTag());
 
-				fbFLol = (FileBrowserFragmentLollipop) cloudPageAdapter.instantiateItem(viewPagerCDrive, 0);
-				if (fbFLol != null){
-					if(fbFLol.isAdded()){
-						fbFLol.setOverviewLayout();
+				if(cloudPageAdapter!=null){
+					fbFLol = (FileBrowserFragmentLollipop) cloudPageAdapter.instantiateItem(viewPagerCDrive, 0);
+					if (fbFLol != null){
+						if(fbFLol.isAdded()){
+							fbFLol.setOverviewLayout();
+						}
 					}
 				}
 
