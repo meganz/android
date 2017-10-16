@@ -3360,13 +3360,21 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				break;
 			}
 			case SEARCH:{
+				aB.setSubtitle(null);
 				if(parentHandleSearch==-1){
 					if(searchQuery!=null){
 						if(!searchQuery.isEmpty()){
-							aB.setSubtitle(null);
 							log("aB.setHomeAsUpIndicator_4911");
 							aB.setTitle(getString(R.string.action_search)+": "+searchQuery);
 						}
+						else{
+							log("aB.setHomeAsUpIndicator_481");
+							aB.setTitle(getString(R.string.action_search)+": "+"");
+						}
+					}
+					else{
+						log("aB.setHomeAsUpIndicator_6611");
+						aB.setTitle(getString(R.string.action_search)+": "+"");
 					}
 				}
 				else{
@@ -4733,6 +4741,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				log("On collapse search menu item");
 				drawerItem = DrawerItem.CLOUD_DRIVE;
 				selectDrawerItemLollipop(DrawerItem.CLOUD_DRIVE);
+				textSubmitted = true;
 				return true;
 			}
 		});
