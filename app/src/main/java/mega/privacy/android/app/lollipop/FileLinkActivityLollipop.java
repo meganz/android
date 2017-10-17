@@ -399,7 +399,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 	}
 
 	public static void log(String message) {
-		Util.log("OpenPasswordLinkActivity", message);
+		Util.log("FileLinkActivityLollipop", message);
 	}
 
 	@Override
@@ -444,12 +444,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 					importButton.setVisibility(View.INVISIBLE);
 				}
 				else{
-					if (megaApi.getRootNode() == null){
-						importButton.setVisibility(View.INVISIBLE);
-					}
-					else{
-						importButton.setVisibility(View.VISIBLE);
-					}
+					importButton.setVisibility(View.VISIBLE);
 				}
 
 				Bitmap preview = null;

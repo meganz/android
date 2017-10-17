@@ -12,6 +12,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.ViewHolder;
 import android.text.Spannable;
 import android.text.SpannableString;
+import android.text.TextUtils;
 import android.text.style.ForegroundColorSpan;
 import android.util.DisplayMetrics;
 import android.util.SparseBooleanArray;
@@ -36,6 +37,7 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.components.EmojiconTextView;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.listeners.ChatListNonContactNameListener;
@@ -114,7 +116,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
     	TextView contactInitialLetter;
 //        ImageView imageView;
         TextView textViewContactName;
-        TextView textViewContent;
+        EmojiconTextView textViewContent;
 		TextView textViewDate;
         ImageButton imageButtonThreeDots;
         RelativeLayout itemLayout;
@@ -477,7 +479,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		holder.textViewContactName = (TextView) v.findViewById(R.id.recent_chat_list_name);
 		holder.textViewContactName.setMaxWidth(Util.scaleWidthPx(194, outMetrics));
 
-		holder.textViewContent = (TextView) v.findViewById(R.id.recent_chat_list_content);
+		holder.textViewContent = (EmojiconTextView) v.findViewById(R.id.recent_chat_list_content);
 		holder.textViewContent.setMaxWidth(Util.scaleWidthPx(194, outMetrics));
 
 		holder.textViewDate = (TextView) v.findViewById(R.id.recent_chat_list_date);
@@ -913,19 +915,31 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 				if(state == MegaChatApi.STATUS_ONLINE){
 					log("This user is connected");
+					holder.contactStateIcon.setVisibility(View.VISIBLE);
 					holder.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_online));
 				}
 				else if(state == MegaChatApi.STATUS_AWAY){
 					log("This user is away");
+					holder.contactStateIcon.setVisibility(View.VISIBLE);
 					holder.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_away));
 				}
 				else if(state == MegaChatApi.STATUS_BUSY){
 					log("This user is busy");
+					holder.contactStateIcon.setVisibility(View.VISIBLE);
 					holder.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_busy));
+				}
+				else if(state == MegaChatApi.STATUS_OFFLINE){
+					log("This user is offline");
+					holder.contactStateIcon.setVisibility(View.VISIBLE);
+					holder.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_offline));
+				}
+				else if(state == MegaChatApi.STATUS_INVALID){
+					log("INVALID status: "+state);
+					holder.contactStateIcon.setVisibility(View.GONE);
 				}
 				else{
 					log("This user status is: "+state);
-					holder.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_offline));
+					holder.contactStateIcon.setVisibility(View.GONE);
 				}
 			}
 			else{
@@ -1135,12 +1149,12 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 					log("getLastMessageSender: the last message is mine: "+lastMsgSender);
 					Spannable me = new SpannableString("Me: ");
 					me.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.file_list_first_row)), 0, me.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-					holder.textViewContent.setText(me);
 
 					if(lastMessageString!=null) {
 						Spannable myMessage = new SpannableString(lastMessageString);
 						myMessage.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.file_list_second_row)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-						holder.textViewContent.append(myMessage);
+						CharSequence indexedText = TextUtils.concat(me, myMessage);
+						holder.textViewContent.setText(indexedText);
 					}
 				}
 				else{
@@ -1166,20 +1180,21 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 					if(chat.isGroup()){
 						Spannable name = new SpannableString(fullNameAction+": ");
 						name.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.black)), 0, name.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-						holder.textViewContent.setText(name);
 
 						if(chat.getUnreadCount()==0){
 							log("Message READ");
 
 							Spannable myMessage = new SpannableString(lastMessageString);
 							myMessage.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.file_list_second_row)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-							holder.textViewContent.append(myMessage);
+							CharSequence indexedText = TextUtils.concat(name, myMessage);
+							holder.textViewContent.setText(indexedText);
 						}
 						else{
 							log("Message NOt read");
 							Spannable myMessage = new SpannableString(lastMessageString);
 							myMessage.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.accentColor)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-							holder.textViewContent.append(myMessage);
+							CharSequence indexedText = TextUtils.concat(name, myMessage);
+							holder.textViewContent.setText(indexedText);
 						}
 					}
 					else{
@@ -1248,6 +1263,38 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		}
 		
 		return info;
+	}
+
+	public void updateMultiselectionPosition(int oldPosition){
+		log("updateMultiselectionPosition");
+
+		List<Integer> selected = getSelectedItems();
+		boolean movedSelected = false;
+
+		if(isItemChecked(oldPosition)){
+			movedSelected=true;
+		}
+
+		selectedItems.clear();
+
+		if(movedSelected){
+			selectedItems.put(0, true);
+		}
+
+		for(int i=0;i<selected.size();i++){
+			int pos = selected.get(i);
+			if(pos!=oldPosition){
+				if(pos<oldPosition){
+					selectedItems.put(pos+1, true);
+				}
+				else{
+					selectedItems.put(pos, true);
+				}
+			}
+
+//			notifyItemChanged(pos);
+//			notifyItemChanged(pos+1);
+		}
 	}
 
 	public void modifyChat(ArrayList<MegaChatListItem> chats, int position){

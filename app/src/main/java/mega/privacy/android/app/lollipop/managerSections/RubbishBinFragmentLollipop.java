@@ -120,6 +120,8 @@ public class RubbishBinFragmentLollipop extends Fragment {
 					if (documents.size()==1){
 						((ManagerActivityLollipop) context).showRenameDialog(documents.get(0), documents.get(0).getName());
 					}
+					hideMultipleSelect();
+
 					break;
 				}
 				case R.id.cab_menu_copy:{
@@ -130,6 +132,8 @@ public class RubbishBinFragmentLollipop extends Fragment {
 
 					NodeController nC = new NodeController(context);
 					nC.chooseLocationToCopyNodes(handleList);
+					clearSelections();
+					hideMultipleSelect();
 					break;
 				}
 				case R.id.cab_menu_trash:{
@@ -142,6 +146,7 @@ public class RubbishBinFragmentLollipop extends Fragment {
 					break;
 				}
 				case R.id.cab_menu_select_all:{
+					((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_RED);
 					selectAll();
 					break;
 				}
@@ -400,6 +405,7 @@ public class RubbishBinFragmentLollipop extends Fragment {
 			if (adapter.getItemCount() == 0){
 				
 				recyclerView.setVisibility(View.GONE);
+				contentTextLayout.setVisibility(View.GONE);
 				emptyImageView.setVisibility(View.VISIBLE);
 				emptyTextView.setVisibility(View.VISIBLE);
 
@@ -413,6 +419,7 @@ public class RubbishBinFragmentLollipop extends Fragment {
 			}
 			else{
 				recyclerView.setVisibility(View.VISIBLE);
+				contentTextLayout.setVisibility(View.VISIBLE);
 				emptyImageView.setVisibility(View.GONE);
 				emptyTextView.setVisibility(View.GONE);
 			}
@@ -471,6 +478,7 @@ public class RubbishBinFragmentLollipop extends Fragment {
 			if (adapter.getItemCount() == 0){
 				
 				recyclerView.setVisibility(View.GONE);
+				contentTextLayout.setVisibility(View.GONE);
 				emptyImageView.setVisibility(View.VISIBLE);
 				emptyTextView.setVisibility(View.VISIBLE);
 
@@ -484,6 +492,7 @@ public class RubbishBinFragmentLollipop extends Fragment {
 			}
 			else{
 				recyclerView.setVisibility(View.VISIBLE);
+				contentTextLayout.setVisibility(View.VISIBLE);
 				emptyImageView.setVisibility(View.GONE);
 				emptyTextView.setVisibility(View.GONE);
 			}	
@@ -509,6 +518,8 @@ public class RubbishBinFragmentLollipop extends Fragment {
 			List<MegaNode> selectedNodes = adapter.getSelectedNodes();
 			if (selectedNodes.size() > 0){
 				updateActionModeTitle();
+				((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_RED);
+
 			}
 		}
 		else{
@@ -547,6 +558,7 @@ public class RubbishBinFragmentLollipop extends Fragment {
 				//If folder has no files
 				if (adapter.getItemCount() == 0){
 					recyclerView.setVisibility(View.GONE);
+					contentTextLayout.setVisibility(View.GONE);
 					emptyImageView.setVisibility(View.VISIBLE);
 					emptyTextView.setVisibility(View.VISIBLE);
 					if (megaApi.getRubbishNode().getHandle()==parentHandle||parentHandle==-1) {
@@ -559,6 +571,7 @@ public class RubbishBinFragmentLollipop extends Fragment {
 				}
 				else{
 					recyclerView.setVisibility(View.VISIBLE);
+					contentTextLayout.setVisibility(View.VISIBLE);
 					emptyImageView.setVisibility(View.GONE);
 					emptyTextView.setVisibility(View.GONE);
 				}
@@ -662,6 +675,8 @@ public class RubbishBinFragmentLollipop extends Fragment {
 	 */
 	public void hideMultipleSelect() {
 		adapter.setMultipleSelect(false);
+		((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_TRANSPARENT_BLACK);
+
 		if (actionMode != null) {
 			actionMode.finish();
 		}
@@ -680,6 +695,7 @@ public class RubbishBinFragmentLollipop extends Fragment {
 		MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(parentHandle));
 		if (parentNode != null){
 			recyclerView.setVisibility(View.VISIBLE);
+			contentTextLayout.setVisibility(View.VISIBLE);
 			emptyImageView.setVisibility(View.GONE);
 			emptyTextView.setVisibility(View.GONE);
 			if (parentNode.getHandle() == megaApi.getRubbishNode().getHandle()){
@@ -788,6 +804,7 @@ public class RubbishBinFragmentLollipop extends Fragment {
 			adapter.setNodes(nodes);
 			if (adapter.getItemCount() == 0){
 				recyclerView.setVisibility(View.GONE);
+				contentTextLayout.setVisibility(View.GONE);
 				emptyImageView.setVisibility(View.VISIBLE);
 				emptyTextView.setVisibility(View.VISIBLE);
 				if (megaApi.getRubbishNode().getHandle()==parentHandle||parentHandle==-1) {
@@ -800,6 +817,7 @@ public class RubbishBinFragmentLollipop extends Fragment {
 			}
 			else{
 				recyclerView.setVisibility(View.VISIBLE);
+				contentTextLayout.setVisibility(View.VISIBLE);
 				emptyImageView.setVisibility(View.GONE);
 				emptyTextView.setVisibility(View.GONE);
 			}			

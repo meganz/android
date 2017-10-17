@@ -5,7 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ZipBrowserAtivityLollipop"
-    android:fitsSystemWindows="true" >
+    android:fitsSystemWindows="true"
+	android:background="@color/white">
     
     <android.support.v7.widget.Toolbar
 	    android:id="@+id/toolbar"
@@ -15,11 +16,18 @@
 	    app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
 	    app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
 
-    <ListView
-        android:id="@+id/zip_list_view_browser"
-		android:layout_below="@+id/toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-    </ListView>
+    <!--<ListView-->
+        <!--android:id="@+id/zip_list_view_browser"-->
+		<!--android:layout_below="@+id/toolbar"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent">-->
+    <!--</ListView>-->
+
+	<android.support.v7.widget.RecyclerView
+		android:id="@+id/zip_list_view_browser"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		android:layout_below="@id/toolbar"
+		android:choiceMode="multipleChoice" />
 
 </RelativeLayout>
