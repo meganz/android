@@ -44,7 +44,7 @@
             android:layout_centerVertical="true"
             android:layout_toRightOf="@id/name_chip"
             android:contentDescription="@null"
-            android:src="@drawable/ic_dark_chip_remove" />
+            android:src="@drawable/ic_chip_remove" />
     </RelativeLayout>
 
 </RelativeLayout>

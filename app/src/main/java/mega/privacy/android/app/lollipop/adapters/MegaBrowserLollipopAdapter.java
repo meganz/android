@@ -154,7 +154,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 			log("adapter type is LIST");
 			MegaBrowserLollipopAdapter.ViewHolderBrowserList view = (MegaBrowserLollipopAdapter.ViewHolderBrowserList) listFragment.findViewHolderForLayoutPosition(pos);
 			if(view!=null){
-				log("Start animation: "+pos);
+				log("Start animation: "+pos+" multiselection state: "+isMultipleSelect());
 				Animation flipAnimation = AnimationUtils.loadAnimation(context, R.anim.multiselect_flip);
 				flipAnimation.setAnimationListener(new Animation.AnimationListener() {
 					@Override
@@ -415,7 +415,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 		
 		switch (type) {
 			case Constants.FILE_BROWSER_ADAPTER: {
-				((ManagerActivityLollipop) context).setParentHandleBrowser(parentHandle);
+//				((ManagerActivityLollipop) context).setParentHandleBrowser(parentHandle);
 				break;
 			}
 			case Constants.CONTACT_FILE_ADAPTER: {
@@ -423,7 +423,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 				break;
 			}
 			case Constants.RUBBISH_BIN_ADAPTER: {
-				((ManagerActivityLollipop) context).setParentHandleRubbish(parentHandle);
+//				((ManagerActivityLollipop) context).setParentHandleRubbish(parentHandle);
 				break;
 			}		
 			case Constants.FOLDER_LINK_ADAPTER: {
@@ -440,7 +440,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 			}
 			case Constants.INCOMING_SHARES_ADAPTER: {
 				incoming=true;
-				((ManagerActivityLollipop) context).setParentHandleIncoming(parentHandle);
+//				((ManagerActivityLollipop) context).setParentHandleIncoming(parentHandle);
 				break;
 			}
 			case Constants.INBOX_ADAPTER: {
@@ -1568,47 +1568,6 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 
 	public void setParentHandle(long parentHandle) {
 		this.parentHandle = parentHandle;
-		switch (type) {
-		case Constants.FILE_BROWSER_ADAPTER: {
-			log("setParentHandleBrowser -FILE_BROWSER_ADAPTER");
-			((ManagerActivityLollipop) context).setParentHandleBrowser(parentHandle);
-			break;
-		}
-		case Constants.CONTACT_FILE_ADAPTER: {
-			((ContactFileListActivityLollipop) context).setParentHandle(parentHandle);
-			break;
-		}
-		case Constants.RUBBISH_BIN_ADAPTER: {
-			((ManagerActivityLollipop) context).setParentHandleRubbish(parentHandle);
-			break;
-		}
-		case Constants.FOLDER_LINK_ADAPTER: {
-			break;
-		}
-		case Constants.SEARCH_ADAPTER: {
-			((ManagerActivityLollipop) context).setParentHandleSearch(parentHandle);
-			break;
-		}
-		case Constants.INBOX_ADAPTER: {
-			log("setParentHandleBrowser -INBOX_ADAPTER");
-			((ManagerActivityLollipop) context).setParentHandleInbox(parentHandle);
-			break;
-		}
-		case Constants.INCOMING_SHARES_ADAPTER: {
-			((ManagerActivityLollipop) context).setParentHandleIncoming(parentHandle);
-			break;
-		}
-		case Constants.OUTGOING_SHARES_ADAPTER: {
-			log("setParentHandleOutgoing -ManagerActivityLollipop.OUTGOING_SHARES_ADAPTER");
-			((ManagerActivityLollipop) context).setParentHandleOutgoing(parentHandle);
-			break;
-		}
-		default: {
-			log("setParentHandle -default");
-//			((ManagerActivityLollipop) context).setParentHandleCloud(parentHandle);
-			break;
-		}
-		}
 	}
 
 	public boolean isMultipleSelect() {
@@ -1616,7 +1575,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 	}
 
 	public void setMultipleSelect(boolean multipleSelect) {
-		log("setMultipleSelect");
+		log("setMultipleSelect: "+multipleSelect);
 		if (this.multipleSelect != multipleSelect) {
 			this.multipleSelect = multipleSelect;
 		}
