@@ -355,6 +355,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 					break;
 				}
 				case R.id.cab_menu_select_all:{
+					((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_RED);
 					selectAll();
 					break;
 				}
@@ -459,6 +460,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 						}
 					}
 
+
 					if(selected.size() == nodes.size()){
 						menu.findItem(R.id.cab_menu_select_all).setVisible(false);
 						menu.findItem(R.id.cab_menu_unselect_all).setVisible(true);
@@ -472,6 +474,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 					menu.findItem(R.id.cab_menu_select_all).setVisible(true);
 					menu.findItem(R.id.cab_menu_unselect_all).setVisible(false);
 				}
+
 			}
 			else if(adapterGrid!=null){
 				log("GRID onPrepareActionMode");
@@ -656,10 +659,11 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 
 				bSkip.setText(getString(R.string.cam_sync_skip));
 				bOK.setText(getString(R.string.cam_sync_ok));
-
 				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 					bSkip.setBackground(ContextCompat.getDrawable(context, R.drawable.white_rounded_corners_button));
 					bOK.setBackground(ContextCompat.getDrawable(context, R.drawable.ripple_upgrade));
+				}else{
+					bSkip.setBackgroundResource(R.drawable.black_button_border);
 				}
 
 				bOK.setOnClickListener(this);
@@ -818,15 +822,18 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 				
 				if (nodesArray.size() == 0){
 					emptyImageView.setVisibility(View.VISIBLE);
+					emptyTextView.setVisibility(View.VISIBLE);
 					listView.setVisibility(View.GONE);	
 				}
 				else{
 					emptyImageView.setVisibility(View.GONE);
+					emptyTextView.setVisibility(View.GONE);
 					listView.setVisibility(View.VISIBLE);
 				}
 			}
 			else{
 				emptyImageView.setVisibility(View.VISIBLE);
+				emptyTextView.setVisibility(View.VISIBLE);
 				listView.setVisibility(View.GONE);
 			}
 			
@@ -892,7 +899,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			RelativeLayout.LayoutParams p = (RelativeLayout.LayoutParams) listView.getLayoutParams();
 			p.addRule(RelativeLayout.ABOVE, R.id.file_grid_browser_camera_upload_on_off);
 			listView.setLayoutParams(p);
-			
+
 			emptyImageView = (ImageView) v.findViewById(R.id.file_grid_empty_image);
 			emptyTextView = (TextView) v.findViewById(R.id.file_grid_empty_text);
 			
@@ -947,7 +954,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			
 			listView.setVisibility(View.VISIBLE);
 			emptyImageView.setVisibility(View.GONE);
-			emptyTextView.setVisibility(View.GONE);			
+			emptyTextView.setVisibility(View.GONE);
  
 		    int totalWidth = outMetrics.widthPixels;
 		    		    
@@ -1073,15 +1080,19 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 				if (!thereAreImages){
 					monthPics.clear();
 					emptyImageView.setVisibility(View.VISIBLE);
+					emptyTextView.setVisibility(View.VISIBLE);
 					listView.setVisibility(View.GONE);
 				}
 				else{
+
 					emptyImageView.setVisibility(View.GONE);
+					emptyTextView.setVisibility(View.GONE);
 					listView.setVisibility(View.VISIBLE);
 				}
 			}
 			else {
 				emptyImageView.setVisibility(View.VISIBLE);
+				emptyTextView.setVisibility(View.VISIBLE);
 				listView.setVisibility(View.GONE);
 			}
 
@@ -1499,7 +1510,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 		
 		PhotoSyncHolder psHPosition = nodesArray.get(position);
-		
+
 		if (isList){
 			log("isList");
 			if (adapterList.isMultipleSelect()){
@@ -1507,7 +1518,8 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 				List<PhotoSyncHolder> documents = adapterList.getSelectedDocuments();
 				if (documents.size() > 0){
 					updateActionModeTitle();
-					adapterList.notifyDataSetChanged();
+                    ((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_RED);
+                    adapterList.notifyDataSetChanged();
 				}
 				else{
 					hideMultipleSelect();
@@ -1597,6 +1609,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 				if(adapterList.isMultipleSelect()){
 					adapterList.clearSelections();
 				}
+				hideMultipleSelect();
 				updateActionModeTitle();
 			}
 		}
@@ -1605,6 +1618,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 				if(adapterGrid.isMultipleSelect()){
 					adapterGrid.clearSelections();
 				}
+				hideMultipleSelect();
 				updateActionModeTitle();
 			}
 		}
@@ -1686,6 +1700,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 				adapterGrid.setMultipleSelect(false);
 			}
 		}
+		((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_TRANSPARENT_BLACK);
 
 		if (actionMode != null) {
 			actionMode.finish();
@@ -1836,16 +1851,17 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 				if (adapterList.getItemCount() == 0){
 					if (listView != null){
 						listView.setVisibility(View.GONE);
-					}					
-					emptyImageView.setVisibility(View.VISIBLE);
-					emptyTextView.setVisibility(View.VISIBLE);
+						emptyImageView.setVisibility(View.VISIBLE);
+						emptyTextView.setVisibility(View.VISIBLE);
+					}
 				}
 				else{
 					if (listView != null){
 						listView.setVisibility(View.VISIBLE);
+						emptyImageView.setVisibility(View.GONE);
+						emptyTextView.setVisibility(View.GONE);
 					}					
-					emptyImageView.setVisibility(View.GONE);
-					emptyTextView.setVisibility(View.GONE);
+
 				}			
 			}	
 		}
@@ -1861,7 +1877,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 
 			listView.setVisibility(View.VISIBLE);
 			emptyImageView.setVisibility(View.GONE);
-			emptyTextView.setVisibility(View.GONE);			
+			emptyTextView.setVisibility(View.GONE);
  
 		    int totalWidth = outMetrics.widthPixels;
 		    		    
@@ -2002,10 +2018,12 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			if (!thereAreImages){
 				monthPics.clear();
 				emptyImageView.setVisibility(View.VISIBLE);
+				emptyTextView.setVisibility(View.VISIBLE);
 				listView.setVisibility(View.GONE);
 			}
 			else{
 				emptyImageView.setVisibility(View.GONE);
+				emptyTextView.setVisibility(View.GONE);
 				listView.setVisibility(View.VISIBLE);
 			}
 			

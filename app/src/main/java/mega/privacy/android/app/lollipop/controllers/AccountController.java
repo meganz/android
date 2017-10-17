@@ -140,6 +140,7 @@ public class AccountController {
         }
 
         String key = megaApi.exportMasterKey();
+        megaApi.masterKeyExported((ManagerActivityLollipop) context);
 
         BufferedWriter out;
         try {
@@ -162,7 +163,7 @@ public class AccountController {
             ((ManagerActivityLollipop) context).invalidateOptionsMenu();
             MyAccountFragmentLollipop mAF = ((ManagerActivityLollipop) context).getMyAccountFragment();
             if(mAF!=null){
-                mAF.updateMKButton();
+                mAF.setMkButtonText();
             }
             Util.showAlert(((ManagerActivityLollipop) context), message, null);
 
@@ -213,6 +214,7 @@ public class AccountController {
     public void copyMK(){
         log("copyMK");
         String key = megaApi.exportMasterKey();
+        megaApi.masterKeyExported((ManagerActivityLollipop) context);
         android.content.ClipboardManager clipboard = (android.content.ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
         android.content.ClipData clip = android.content.ClipData.newPlainText("Copied Text", key);
         clipboard.setPrimaryClip(clip);
@@ -237,7 +239,7 @@ public class AccountController {
         ((ManagerActivityLollipop) context).invalidateOptionsMenu();
         MyAccountFragmentLollipop mAF = ((ManagerActivityLollipop) context).getMyAccountFragment();
         if(mAF!=null){
-            mAF.updateMKButton();
+            mAF.setMkButtonText();;
         }
         Util.showAlert(((ManagerActivityLollipop) context), message, null);
     }

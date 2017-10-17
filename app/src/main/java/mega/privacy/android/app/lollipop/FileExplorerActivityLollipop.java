@@ -356,7 +356,6 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 				window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
 				window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
 				window.setStatusBarColor(ContextCompat.getColor(this, R.color.transparent_black));
-
 			}
 
 			log("hide action bar");
@@ -1040,7 +1039,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			finish();
 		}
 		else if(mode == UPLOAD_SELFIE){
-		
+			log("Start to upload selfie");
 			long parentHandle = handle;
 			MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
 			if(parentNode == null){
@@ -1061,6 +1060,8 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			
 		}
 		else if (mode == UPLOAD){
+
+
 			log("mode UPLOAD");
 			
 			if (filePreparedInfos == null){

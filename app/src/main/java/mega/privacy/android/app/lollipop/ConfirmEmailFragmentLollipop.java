@@ -90,31 +90,9 @@ public class ConfirmEmailFragmentLollipop extends Fragment implements MegaReques
 		mispelled = (TextView) v.findViewById(R.id.confirm_email_misspelled);
 		resendButton = (Button) v.findViewById(R.id.confirm_email_new_email_resend);
 
-		RelativeLayout.LayoutParams iconParams = (RelativeLayout.LayoutParams) icon.getLayoutParams();
-		iconParams.setMargins(Util.scaleWidthPx(16, outMetrics), Util.scaleHeightPx(106, outMetrics), 0, 0);
-		icon.setLayoutParams(iconParams);
-
-		RelativeLayout.LayoutParams awaitingParams = (RelativeLayout.LayoutParams) awaiting.getLayoutParams();
-		awaitingParams.setMargins(Util.scaleWidthPx(24, outMetrics), Util.scaleHeightPx(20, outMetrics), 0, 0);
-		awaiting.setLayoutParams(awaitingParams);
-
-		RelativeLayout.LayoutParams explanationParams = (RelativeLayout.LayoutParams) explanation.getLayoutParams();
-		explanationParams.setMargins(Util.scaleWidthPx(24, outMetrics), Util.scaleHeightPx(10, outMetrics), Util.scaleWidthPx(56, outMetrics), 0);
-		explanation.setLayoutParams(explanationParams);
-
-		RelativeLayout.LayoutParams  textET = (RelativeLayout.LayoutParams)et_newEmail.getLayoutParams();
-		textET.setMargins(Util.scaleWidthPx(24, outMetrics), Util.scaleHeightPx(49, outMetrics), Util.scaleWidthPx(24, outMetrics), 0);
-		et_newEmail.setLayoutParams(textET);
 		et_newEmail.setCursorVisible(true);
 		et_newEmail.setText(emailTemp);
-
-		RelativeLayout.LayoutParams mispelledParams = (RelativeLayout.LayoutParams) mispelled.getLayoutParams();
-		mispelledParams.setMargins(Util.scaleWidthPx(24, outMetrics), Util.scaleHeightPx(20, outMetrics), Util.scaleWidthPx(56, outMetrics), 0);
-		mispelled.setLayoutParams(mispelledParams);
-
-		RelativeLayout.LayoutParams resendButtonParams = (RelativeLayout.LayoutParams)resendButton.getLayoutParams();
-		resendButtonParams.setMargins(Util.scaleWidthPx(24, outMetrics), Util.scaleWidthPx(24, outMetrics), 0, 0);
-		resendButton.setLayoutParams(resendButtonParams);
+		et_newEmail.requestFocus();
 
 		resendButton.setOnClickListener(this);
 

@@ -927,6 +927,7 @@
     <string name="online_status" context="Info label about the status of the user">Conectado</string>
     <string name="away_status" context="Info label about the status of the user">Ausente</string>
     <string name="busy_status" context="Info label about the status of the user">Ocupado</string>
+    <string name="invalid_status" context="Info label about the status of the user">Sin conexión</string>
 
     <string name="text_deleted_message" context="Text shown when a message has been deleted in the chat">Mensaje eliminado</string>
     <string name="history_cleared_message" context="Text shown when the chat history was cleared by me">La historia del chat ha sido eliminada</string>

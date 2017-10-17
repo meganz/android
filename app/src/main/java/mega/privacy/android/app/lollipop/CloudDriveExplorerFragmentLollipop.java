@@ -440,7 +440,7 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 	public void onClick(View v) {
 		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 		switch(v.getId()){
-			case R.id.action_text:{				
+			case R.id.action_text:{
 				dbH.setLastCloudFolder(Long.toString(parentHandle));
 				if(((FileExplorerActivityLollipop)context).multiselect){
 					log("Send several files to chat");
@@ -831,23 +831,25 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 				folders++;
 			}
 		}
+
+
 		Resources res = getActivity().getResources();
-		String format = "%d %s";
-		String filesStr = String.format(format, files,
-				res.getQuantityString(R.plurals.general_num_files, files));
-		String foldersStr = String.format(format, folders,
-				res.getQuantityString(R.plurals.general_num_folders, folders));
+
 		String title;
+		int sum=files+folders;
+
 		if (files == 0 && folders == 0) {
-			title = foldersStr + ", " + filesStr;
+			title = Integer.toString(sum);
 		} else if (files == 0) {
-			title = foldersStr;
+			title = Integer.toString(folders);
 		} else if (folders == 0) {
-			title = filesStr;
+			title = Integer.toString(files);
 		} else {
-			title = foldersStr + ", " + filesStr;
+			title = Integer.toString(sum);
 		}
 		actionMode.setTitle(title);
+
+
 		try {
 			actionMode.invalidate();
 		} catch (NullPointerException e) {

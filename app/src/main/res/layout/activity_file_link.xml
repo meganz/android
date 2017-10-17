@@ -6,14 +6,14 @@
     android:layout_height="match_parent"
     android:background="@color/white"
     android:fitsSystemWindows="true"
-    tools:context=".OpenPasswordLinkActivity" >
+    tools:context=".lollipop.FileLinkActivityLollipop" >
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar_file_link"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-        tools:context=".OpenPasswordLinkActivity" />
+        tools:context=".lollipop.FileLinkActivityLollipop" />
 
     <LinearLayout
         android:id="@+id/options_file_link_layout"

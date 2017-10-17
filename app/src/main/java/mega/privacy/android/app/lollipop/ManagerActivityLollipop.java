@@ -12,6 +12,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.BitmapShader;
@@ -22,6 +23,7 @@ import android.graphics.PorterDuff;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.graphics.Shader.TileMode;
+import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -68,6 +70,8 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.animation.TranslateAnimation;
@@ -1421,7 +1425,16 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 		//PRO PANEL
 		getProLayout=(LinearLayout) findViewById(R.id.get_pro_account);
+		String getProTextString = getString(R.string.get_pro_account);
+		try {
+			getProTextString = getProTextString.replace("[A]", "\n");
+		}
+		catch(Exception e){
+			log("Formatted string: " + getProTextString);
+		}
+
 		getProText= (TextView) findViewById(R.id.get_pro_account_text);
+		getProText.setText(getProTextString);
 		rightUpgradeButton = (TextView) findViewById(R.id.btnRight_upgrade);
 		leftCancelButton = (TextView) findViewById(R.id.btnLeft_cancel);
 
@@ -1445,6 +1458,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		//TABS section Contacts
 		tabLayoutContacts =  (TabLayout) findViewById(R.id.sliding_tabs_contacts);
 		viewPagerContacts = (ViewPager) findViewById(R.id.contact_tabs_pager);
+
+		if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+			tabLayoutContacts.setTabMode(TabLayout.MODE_FIXED);
+		}else{
+			tabLayoutContacts.setTabMode(TabLayout.MODE_SCROLLABLE);
+		}
 
 		//TABS section Shared Items
 		tabLayoutShares =  (TabLayout) findViewById(R.id.sliding_tabs_shares);
@@ -2299,7 +2318,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					}
 
 					final Intent cancelIntent = tempIntent;
-					AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+					AlertDialog.Builder builder = new AlertDialog.Builder(this);
 //					builder.setTitle(title);
 		            builder.setMessage(text);
 
@@ -3053,7 +3072,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		});
 		inputMail.setImeActionLabel(getString(R.string.title_edit_profile_info),EditorInfo.IME_ACTION_DONE);
 
-		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setTitle(getString(R.string.title_edit_profile_info));
 
 		builder.setPositiveButton(getString(R.string.title_edit_profile_info), new DialogInterface.OnClickListener() {
@@ -3450,13 +3469,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 		};
 
-		AlertDialog.Builder builder;
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-			builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-		}
-		else{
-			builder = new AlertDialog.Builder(this);
-		}
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		try {
 			builder.setMessage(R.string.confirmation_to_reconnect).setPositiveButton(R.string.cam_sync_ok, dialogClickListener)
 					.setNegativeButton(R.string.general_cancel, dialogClickListener).show().setCanceledOnTouchOutside(false);
@@ -4484,45 +4497,39 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
     		case INBOX:{
 
     			tB.setVisibility(View.VISIBLE);
+				iFLol = new InboxFragmentLollipop().newInstance();
 
-    			if (iFLol == null){
-    				iFLol = new InboxFragmentLollipop();
-    			}
-    			else{
-					log("Inbox Fragment is not NULL");
-//    				iFLol.setParentHandle(parentHandleInbox);
-					MegaNode node = megaApi.getNodeByHandle(parentHandleInbox);
-					log("Selected Inbox with parent: "+parentHandleInbox);
+				MegaNode node = megaApi.getNodeByHandle(parentHandleInbox);
+				log("Selected Inbox with parent: "+parentHandleInbox);
 //					log("inSFLol deepBrowserTreeIncoming: "+deepBrowserTreeInbox);
-					if (node != null){
-						log("Go to inbox node: "+node.getName());
-						iFLol.setParentHandle(parentHandleInbox);
+				if (node != null){
+					log("Go to inbox node: "+node.getName());
+					iFLol.setParentHandle(parentHandleInbox);
 
-						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleInbox), orderCloud);
-						iFLol.setNodes(nodes);
+					ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleInbox), orderCloud);
+					iFLol.setNodes(nodes);
 
-						if(parentHandleInbox==megaApi.getInboxNode().getHandle()){
-							aB.setTitle(getResources().getString(R.string.section_inbox));
-							log("aB.setHomeAsUpIndicator_886");
-							aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
-							firstNavigationLevel = true;
-						}
-						else{
-							aB.setTitle(node.getName());
-							log("indicator_arrow_back_893");
-							aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
-							firstNavigationLevel = false;
-						}
-					}
-					else{
-						log("The Node is NULL");
-						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getInboxNode(), orderCloud);
-						iFLol.setNodes(nodes);
+					if(parentHandleInbox==megaApi.getInboxNode().getHandle()){
 						aB.setTitle(getResources().getString(R.string.section_inbox));
-						log("aB.setHomeAsUpIndicator_16");
+						log("aB.setHomeAsUpIndicator_886");
 						aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 						firstNavigationLevel = true;
 					}
+					else{
+						aB.setTitle(node.getName());
+						log("indicator_arrow_back_893");
+						aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+						firstNavigationLevel = false;
+					}
+				}
+				else{
+					log("The Node is NULL");
+					ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getInboxNode(), orderCloud);
+					iFLol.setNodes(nodes);
+					aB.setTitle(getResources().getString(R.string.section_inbox));
+					log("aB.setHomeAsUpIndicator_16");
+					aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+					firstNavigationLevel = true;
 				}
 
     			tabLayoutCloud.setVisibility(View.GONE);
@@ -4605,10 +4612,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
     			tB.setVisibility(View.VISIBLE);
 
-    			if (sFLol == null){
-    				sFLol = new SearchFragmentLollipop();
-        		}
-
 				if (nV != null){
 					Menu nVMenu = nV.getMenu();
 					MenuItem hidden = nVMenu.findItem(R.id.navigation_item_hidden);
@@ -4640,11 +4643,15 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				}
     			drawerItem = DrawerItem.SEARCH;
 
-    			sFLol.setSearchNodes(searchNodes);
-    			sFLol.setNodes(searchNodes);
-    			sFLol.setSearchQuery(searchQuery);
-    			sFLol.setParentHandle(parentHandleSearch);
-    			sFLol.setLevels(levelsSearch);
+				if (sFLol == null){
+					sFLol = new SearchFragmentLollipop();
+				}
+
+				sFLol.setNodes(searchNodes);
+				sFLol.setSearchQuery(searchQuery);
+				sFLol.setParentHandle(parentHandleSearch);
+				sFLol.setLevels(levelsSearch);
+				aB.setTitle(getString(R.string.action_search)+": "+searchQuery);
 
     			tabLayoutCloud.setVisibility(View.GONE);
     			viewPagerCDrive.setVisibility(View.GONE);
@@ -5469,13 +5476,27 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				setStatusMenuItem.setVisible(false);
 				if (index == 0){
 					log("createOptions TAB CONTACTS");
+					String contactsTag = getFragmentTag(R.id.contact_tabs_pager, 0);
+					cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(contactsTag);
+
 					//Show
 					addContactMenuItem.setVisible(true);
-					selectMenuItem.setVisible(true);
 					sortByMenuItem.setVisible(true);
 					thumbViewMenuItem.setVisible(true);
 					upgradeAccountMenuItem.setVisible(true);
 					searchMenuItem.setVisible(true);
+
+					if (cFLol != null) {
+						if(cFLol.getItemCount()>0){
+							selectMenuItem.setVisible(true);
+						}
+						else{
+							selectMenuItem.setVisible(false);
+						}
+					}
+					else{
+						log("The CONTACTS tab is null");
+					}
 
 					//Hide
 					pauseTransfersMenuIcon.setVisible(false);
@@ -5508,10 +5529,22 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				}
 				else if (index == 1){
 					log("createOptions TAB SENT requests");
+
+					String contactsTag = getFragmentTag(R.id.contact_tabs_pager, 1);
+					sRFLol = (SentRequestsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(contactsTag);
+
 					//Show
-					selectMenuItem.setVisible(true);
 					addContactMenuItem.setVisible(true);
 					upgradeAccountMenuItem.setVisible(true);
+
+					if (sRFLol != null) {
+						if(sRFLol.getItemCount()>0){
+							selectMenuItem.setVisible(true);
+						}
+						else{
+							selectMenuItem.setVisible(false);
+						}
+					}
 
 					//Hide
 					sortByMenuItem.setVisible(false);
@@ -5540,9 +5573,21 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				}
 				else{
 					log("createOptions TAB RECEIVED requests");
+
+					String contactsTag = getFragmentTag(R.id.contact_tabs_pager, 2);
+					rRFLol = (ReceivedRequestsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(contactsTag);
+
 					//Show
-					selectMenuItem.setVisible(true);
 					upgradeAccountMenuItem.setVisible(true);
+
+					if (rRFLol != null) {
+						if(rRFLol.getItemCount()>0){
+							selectMenuItem.setVisible(true);
+						}
+						else{
+							selectMenuItem.setVisible(false);
+						}
+					}
 
 					//Hide
 					searchMenuItem.setVisible(false);
@@ -6003,7 +6048,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	@Override
     public boolean onOptionsItemSelected(MenuItem item) {
 		fromTakePicture = -1;
-		log("onOptionsItemSelectedLollipop");
+		log("onOptionsItemSelected");
 		if (megaApi == null){
 			megaApi = ((MegaApplication)getApplication()).getMegaApi();
 		}
@@ -6020,6 +6065,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			case android.R.id.home:{
 				if (firstNavigationLevel){
 					log("firstNavigationLevel is TRUE");
+
 					drawerLayout.openDrawer(nV);
 				}
 				else{
@@ -6292,7 +6338,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 							}
 							else if(megaApi.checkAccess(checkNode, MegaShare.ACCESS_READ).getErrorCode() == MegaError.API_OK){
 								log("Not permissions to upload");
-								AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+								AlertDialog.Builder builder = new AlertDialog.Builder(this);
 					            builder.setMessage(getString(R.string.no_permissions_upload));
 //								builder.setTitle(R.string.op_not_allowed);
 								builder.setCancelable(false).setPositiveButton(R.string.cam_sync_ok, new DialogInterface.OnClickListener() {
@@ -6337,7 +6383,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
             				if (rubbishBinFLol.showSelectMenuItem()){
             					selectMenuItem.setVisible(true);
             					unSelectMenuItem.setVisible(false);
-            				}
+								changeStatusBarColor(Constants.COLOR_STATUS_BAR_RED);
+							}
             				else{
             					selectMenuItem.setVisible(false);
             					unSelectMenuItem.setVisible(true);
@@ -6353,6 +6400,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
                 			if (fbFLol.showSelectMenuItem()){
                 				selectMenuItem.setVisible(true);
                 				unSelectMenuItem.setVisible(false);
+								changeStatusBarColor(Constants.COLOR_STATUS_BAR_RED);
                 			}
                 			else{
                 				selectMenuItem.setVisible(false);
@@ -6375,6 +6423,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 								if (cFLol.showSelectMenuItem()){
 									selectMenuItem.setVisible(true);
 									unSelectMenuItem.setVisible(false);
+									changeStatusBarColor(Constants.COLOR_STATUS_BAR_RED);
 								}
 								else{
 									selectMenuItem.setVisible(false);
@@ -6391,6 +6440,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 								if (sRFLol.showSelectMenuItem()){
 									selectMenuItem.setVisible(true);
 									unSelectMenuItem.setVisible(false);
+									changeStatusBarColor(Constants.COLOR_STATUS_BAR_RED);
 								}
 								else{
 									selectMenuItem.setVisible(false);
@@ -6407,6 +6457,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 								if (rRFLol.showSelectMenuItem()){
 									selectMenuItem.setVisible(true);
 									unSelectMenuItem.setVisible(false);
+									changeStatusBarColor(Constants.COLOR_STATUS_BAR_RED);
 								}
 								else{
 									selectMenuItem.setVisible(false);
@@ -6427,7 +6478,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		        			if (inSFLol.showSelectMenuItem()){
 		        				selectMenuItem.setVisible(true);
 		        				unSelectMenuItem.setVisible(false);
-		        			}
+								changeStatusBarColor(Constants.COLOR_STATUS_BAR_RED);
+							}
 		        			else{
 		        				selectMenuItem.setVisible(false);
 		        				unSelectMenuItem.setVisible(true);
@@ -6442,7 +6494,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		        			if (outSFLol.showSelectMenuItem()){
 		        				selectMenuItem.setVisible(true);
 		        				unSelectMenuItem.setVisible(false);
-		        			}
+								changeStatusBarColor(Constants.COLOR_STATUS_BAR_RED);
+							}
 		        			else{
 		        				selectMenuItem.setVisible(false);
 		        				unSelectMenuItem.setVisible(true);
@@ -6457,7 +6510,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	    				if (oFLol.showSelectMenuItem()){
 	        				selectMenuItem.setVisible(true);
 	        				unSelectMenuItem.setVisible(false);
-	        			}
+							changeStatusBarColor(Constants.COLOR_STATUS_BAR_RED);
+						}
 	        			else{
 	        				selectMenuItem.setVisible(false);
 	        				unSelectMenuItem.setVisible(true);
@@ -6470,6 +6524,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						if (rChatFL.showSelectMenuItem()){
 							selectMenuItem.setVisible(true);
 							unSelectMenuItem.setVisible(false);
+							changeStatusBarColor(Constants.COLOR_STATUS_BAR_RED);
 						}
 						else{
 							selectMenuItem.setVisible(false);
@@ -6483,7 +6538,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	    				if (iFLol.showSelectMenuItem()){
 	        				selectMenuItem.setVisible(true);
 	        				unSelectMenuItem.setVisible(false);
-	        			}
+							changeStatusBarColor(Constants.COLOR_STATUS_BAR_RED);
+						}
 	        			else{
 	        				selectMenuItem.setVisible(false);
 	        				unSelectMenuItem.setVisible(true);
@@ -6496,7 +6552,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	    				if (sFLol.showSelectMenuItem()){
 	        				selectMenuItem.setVisible(true);
 	        				unSelectMenuItem.setVisible(false);
-	        			}
+							changeStatusBarColor(Constants.COLOR_STATUS_BAR_RED);
+						}
 	        			else{
 	        				selectMenuItem.setVisible(false);
 	        				unSelectMenuItem.setVisible(true);
@@ -6509,7 +6566,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	        			if (muFLol.showSelectMenuItem()){
 	        				selectMenuItem.setVisible(true);
 	        				unSelectMenuItem.setVisible(false);
-	        			}
+							changeStatusBarColor(Constants.COLOR_STATUS_BAR_RED);
+						}
 	        			else{
 	        				selectMenuItem.setVisible(false);
 	        				unSelectMenuItem.setVisible(true);
@@ -6522,6 +6580,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	        			if (cuFL.showSelectMenuItem()){
 	        				selectMenuItem.setVisible(true);
 	        				unSelectMenuItem.setVisible(false);
+							changeStatusBarColor(Constants.COLOR_STATUS_BAR_RED);
 	        			}
 	        			else{
 	        				selectMenuItem.setVisible(false);
@@ -6982,7 +7041,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
         		ViewGroup.MarginLayoutParams smallestMLP = (ViewGroup.MarginLayoutParams) smallestCheck.getLayoutParams();
         		smallestMLP.setMargins(Util.scaleWidthPx(15, outMetrics), Util.scaleHeightPx(10, outMetrics), 0, Util.scaleHeightPx(10, outMetrics));
 
-        		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+        		AlertDialog.Builder builder = new AlertDialog.Builder(this);
         		builder.setView(dialoglayout);
 				TextView textViewTitle = new TextView(ManagerActivityLollipop.this);
 				textViewTitle.setText(getString(R.string.action_sort_by));
@@ -7260,13 +7319,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		        		largestCheck.setVisibility(View.GONE);
 		        		smallestCheck.setVisibility(View.GONE);
 
-
 		        		if (viewPagerShares.getCurrentItem()==0){
-
-							sortByNameTV.setText(getString(R.string.sortby_owner_mail));
-		        		}
-		        		else{
-
+							if(firstNavigationLevel){
+								sortByNameTV.setText(getString(R.string.sortby_owner_mail));
+							}
+							else{
+								log("No first level navigation on Incoming Shares");
+							}
 		        		}
 
 		        		ascendingCheck.setOnClickListener(new OnClickListener() {
@@ -7278,7 +7337,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 								if(orderOthers!=MegaApiJava.ORDER_DEFAULT_ASC){
 									selectSortByIncoming(MegaApiJava.ORDER_DEFAULT_ASC);
 									selectSortByOutgoing(MegaApiJava.ORDER_DEFAULT_ASC);
-
 								}
 
 			        			if (dialog != null){
@@ -7770,6 +7828,20 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	public void updateAliveFragments(){
 		log("updateAliveFragments");
 		//Needed to update view when changing list<->grid from other section
+
+		updateCloudSection();
+
+		updateRubbishSection();
+
+		updateIncomingSection();
+
+		updateOutgoingSection();
+
+		updateContactsSection();
+	}
+
+	public void updateCloudSection(){
+		log("updateCloudSection");
 		String cloudTag = getFragmentTag(R.id.cloud_drive_tabs_pager, 0);
 		fbFLol = (FileBrowserFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cloudTag);
 		if (fbFLol != null){
@@ -7785,9 +7857,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			fragTransaction.attach(fbFLol);
 			fragTransaction.commitNowAllowingStateLoss();
 		}
+	}
 
-		cloudTag = getFragmentTag(R.id.cloud_drive_tabs_pager, 1);
-		rubbishBinFLol = (RubbishBinFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cloudTag);
+	public void updateRubbishSection(){
+		log("updateRubbishSection");
+		String rubbishTag = getFragmentTag(R.id.cloud_drive_tabs_pager, 1);
+		rubbishBinFLol = (RubbishBinFragmentLollipop) getSupportFragmentManager().findFragmentByTag(rubbishTag);
 		if (rubbishBinFLol != null){
 			log("RubbishBinFragment is not NULL -> UPDATE");
 			rubbishBinFLol.hideMultipleSelect();
@@ -7801,7 +7876,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			fragTransaction.attach(rubbishBinFLol);
 			fragTransaction.commitNowAllowingStateLoss();
 		}
+	}
 
+	public void updateIncomingSection(){
+		log("updateIncomingSection");
 		String sharesTag = getFragmentTag(R.id.shares_tabs_pager, 0);
 		inSFLol = (IncomingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(sharesTag);
 		if (inSFLol != null){
@@ -7817,8 +7895,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			fragTransaction.attach(inSFLol);
 			fragTransaction.commitNowAllowingStateLoss();
 		}
+	}
 
-		sharesTag = getFragmentTag(R.id.shares_tabs_pager, 1);
+	public void updateOutgoingSection(){
+		log("updateOutgoingSection");
+		String sharesTag = getFragmentTag(R.id.shares_tabs_pager, 1);
 		outSFLol = (OutgoingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(sharesTag);
 		if (outSFLol != null){
 			log("OutgoingFragment is not NULL -> UPDATE");
@@ -7833,7 +7914,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			fragTransaction.attach(outSFLol);
 			fragTransaction.commitNowAllowingStateLoss();
 		}
+	}
 
+	public void updateContactsSection(){
+		log("updateContactsSection");
 		String contactsTag = getFragmentTag(R.id.contact_tabs_pager, 0);
 		cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(contactsTag);
 		if (cFLol != null){
@@ -8361,7 +8445,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		final long [] hashesC = hashes;
 		final long sizeC=size;
 
-		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		LinearLayout confirmationLayout = new LinearLayout(this);
 		confirmationLayout.setOrientation(LinearLayout.VERTICAL);
 		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -8406,7 +8490,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		final long [] hashesC = hashes;
 		final long sizeC=size;
 
-		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		LinearLayout confirmationLayout = new LinearLayout(this);
 		confirmationLayout.setOrientation(LinearLayout.VERTICAL);
 		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -8452,7 +8536,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		final long sizeC = size;
 		final ChatController chatC = new ChatController(this);
 
-		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		LinearLayout confirmationLayout = new LinearLayout(this);
 		confirmationLayout.setOrientation(LinearLayout.VERTICAL);
 		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -8614,7 +8698,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 		});
 
-		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setTitle(getString(R.string.context_rename) + " "	+ new String(document.getName()));
 		builder.setPositiveButton(getString(R.string.context_rename),
 				new DialogInterface.OnClickListener() {
@@ -8722,8 +8806,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				if (p.getHandle() != megaApi.getRubbishNode().getHandle()){
 
 					setMoveToRubbish(true);
-					AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-//				builder.setTitle(getResources().getString(R.string.section_rubbish_bin));
+
+					AlertDialog.Builder builder = new AlertDialog.Builder(this);
 					builder.setMessage(getResources().getString(R.string.confirmation_move_to_rubbish));
 
 					builder.setPositiveButton(R.string.general_move, dialogClickListener);
@@ -8733,9 +8817,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				else{
 
 					setMoveToRubbish(false);
-					AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-//				builder.setTitle(getResources().getString(R.string.title_delete_from_mega));
 
+					AlertDialog.Builder builder = new AlertDialog.Builder(this);
 					builder.setMessage(getResources().getString(R.string.confirmation_delete_from_mega));
 
 					//builder.setPositiveButton(R.string.context_delete, dialogClickListener);
@@ -8773,7 +8856,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		input.setImeOptions(EditorInfo.IME_ACTION_DONE);
 		input.setInputType(InputType.TYPE_CLASS_TEXT|InputType.TYPE_TEXT_VARIATION_PASSWORD);
 
-		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		if(cancelAccount){
 			log("cancelAccount action");
 			input.setOnEditorActionListener(new OnEditorActionListener() {
@@ -8916,7 +8999,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 		};
 
-		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setTitle(getString(R.string.delete_account));
 
 		builder.setMessage(getResources().getString(R.string.delete_account_text));
@@ -9000,7 +9083,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 		});
 
-		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setTitle(getString(R.string.context_open_link_title));
 		builder.setPositiveButton(getString(R.string.context_open_link),
 				new DialogInterface.OnClickListener() {
@@ -9158,7 +9241,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 	public void showCancelMessage(){
 		AlertDialog cancelDialog;
-		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 //		builder.setTitle(getString(R.string.title_cancel_subscriptions));
 
 		LayoutInflater inflater = getLayoutInflater();
@@ -9209,7 +9292,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	public void showPresenceStatusDialog(){
 		log("showPresenceStatusDialog");
 
-		AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
 		final CharSequence[] items = {getString(R.string.online_status), getString(R.string.away_status), getString(R.string.busy_status), getString(R.string.offline_status)};
 		int statusToShow = megaChatApi.getOnlineStatus();
 		switch(statusToShow){
@@ -9281,7 +9364,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		    }
 		};
 
-		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setMessage(R.string.confirmation_cancel_subscriptions).setPositiveButton(R.string.general_yes, dialogClickListener)
 		    .setNegativeButton(R.string.general_no, dialogClickListener).show();
 
@@ -9387,7 +9470,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 		});
 
-		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setTitle(getString(R.string.menu_new_folder));
 		builder.setPositiveButton(getString(R.string.general_create),
 				new DialogInterface.OnClickListener() {
@@ -9471,7 +9554,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 		});
 
-		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setTitle(getString(R.string.title_dialog_set_autoaway_value));
 		builder.setPositiveButton(getString(R.string.button_set),
 				new DialogInterface.OnClickListener() {
@@ -9603,7 +9686,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			text = editText;
 		}
 
-		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 //		builder.setTitle(getString(R.string.context_clear_rubbish));
 		builder.setMessage(getString(R.string.clear_rubbish_confirmation));
 		/*builder.setPositiveButton(getString(R.string.context_delete),new DialogInterface.OnClickListener() {
@@ -9672,7 +9755,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	public void showPanelSetPinLock(){
 		log("showPanelSetPinLock");
 
-		AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
 		final CharSequence[] items = {getString(R.string.four_pin_lock), getString(R.string.six_pin_lock), getString(R.string.AN_pin_lock)};
 
 		dialogBuilder.setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
@@ -9952,7 +10035,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 		});
 
-		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setTitle(getString(R.string.menu_add_contact));
 		builder.setPositiveButton(getString(R.string.general_add),
 				new DialogInterface.OnClickListener() {
@@ -10111,7 +10194,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		    }
 		};
 
-		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 //		builder.setTitle(getResources().getString(R.string.alert_leave_share));
 		String message= getResources().getString(R.string.confirmation_leave_share_folder);
 		builder.setMessage(message).setPositiveButton(R.string.general_leave, dialogClickListener)
@@ -10136,7 +10219,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 		};
 
-		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 //		builder.setTitle(getResources().getString(R.string.alert_leave_share));
 		int size = shareList.size();
 		String message = getResources().getQuantityString(R.plurals.confirmation_remove_outgoing_shares, size, size);
@@ -10162,7 +10245,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 		};
 
-		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 //		builder.setTitle(getResources().getString(R.string.alert_leave_share));
 		String message= getResources().getString(R.string.context_remove_link_warning_text);
 		builder.setMessage(message).setPositiveButton(R.string.general_remove, dialogClickListener)
@@ -10191,7 +10274,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		    }
 		};
 
-		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 //		builder.setTitle(getResources().getString(R.string.alert_leave_share));
 		String message= getResources().getString(R.string.confirmation_leave_share_folder);
 		builder.setMessage(message).setPositiveButton(R.string.general_leave, dialogClickListener)
@@ -10218,7 +10301,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 		};
 
-		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setTitle(getResources().getString(R.string.title_confirmation_leave_group_chat));
 		String message= getResources().getString(R.string.confirmation_leave_group_chat);
 		builder.setMessage(message).setPositiveButton(R.string.general_leave, dialogClickListener)
@@ -10244,7 +10327,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 		};
 
-		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setTitle(getResources().getString(R.string.title_confirmation_leave_group_chat));
 		String message= getResources().getString(R.string.confirmation_leave_group_chat);
 		builder.setMessage(message).setPositiveButton(R.string.general_leave, dialogClickListener)
@@ -10282,7 +10365,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 		};
 
-		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setTitle(getResources().getString(R.string.title_confirmation_leave_group_chat));
 		String message= getResources().getString(R.string.confirmation_leave_group_chat);
 		builder.setMessage(message).setPositiveButton(R.string.general_leave, dialogClickListener)
@@ -10311,7 +10394,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 		};
 
-		android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this);
 		String message= getResources().getString(R.string.confirmation_clear_group_chat);
 		builder.setTitle(R.string.title_confirmation_clear_group_chat);
 		builder.setMessage(message).setPositiveButton(R.string.general_clear, dialogClickListener)
@@ -10340,7 +10423,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 		};
 
-		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		String message= getResources().getString(R.string.email_verification_text_change_pass);
 		builder.setMessage(message).setPositiveButton(R.string.cam_sync_ok, dialogClickListener)
 				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
@@ -10369,7 +10452,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 		};
 
-		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setTitle(getResources().getString(R.string.title_dialog_insert_MK));
 		String message= getResources().getString(R.string.text_reset_pass_logged_in);
 		builder.setMessage(message).setPositiveButton(R.string.pin_lock_enter, dialogClickListener)
@@ -10507,15 +10590,26 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	}
 
 	public int getHeightToPanel(BottomSheetDialogFragment dialog){
+		
 		if(dialog instanceof NodeOptionsBottomSheetDialogFragment){
-			if(fragmentContainer != null && aB != null && tabLayoutCloud != null){
+			if(fragmentContainer != null && aB != null && tabLayoutCloud != null && tabLayoutCloud.getHeight() != 0){
 				final Rect r = new Rect();
 				fragmentContainer.getWindowVisibleDisplayFrame(r);
 				return (r.height() - aB.getHeight() - tabLayoutCloud.getHeight());
 			}
+			else if(fragmentContainer != null && aB != null && tabLayoutShares != null && tabLayoutShares.getHeight() != 0){
+				final Rect r = new Rect();
+				fragmentContainer.getWindowVisibleDisplayFrame(r);
+				return (r.height() - aB.getHeight() - tabLayoutShares.getHeight());
+			}
+			else if(fragmentContainer != null && aB != null && tabLayoutTransfers != null && tabLayoutTransfers.getHeight() != 0){
+				final Rect r = new Rect();
+				fragmentContainer.getWindowVisibleDisplayFrame(r);
+				return (r.height() - aB.getHeight() - tabLayoutTransfers.getHeight());
+			}
 		}
 		else if(dialog instanceof ContactsBottomSheetDialogFragment){
-			if(fragmentContainer != null && aB != null && tabLayoutContacts != null){
+			if(fragmentContainer != null && aB != null && tabLayoutContacts != null && tabLayoutContacts.getHeight() != 0){
 				final Rect r = new Rect();
 				fragmentContainer.getWindowVisibleDisplayFrame(r);
 				return (r.height() - aB.getHeight() - tabLayoutContacts.getHeight());
@@ -10529,7 +10623,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		dbH.setCamSyncEnabled(false);
 
 		if(overquotaDialog==null){
-			AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+			AlertDialog.Builder builder = new AlertDialog.Builder(this);
 			builder.setTitle(getString(R.string.overquota_alert_title));
 			LayoutInflater inflater = getLayoutInflater();
 			View dialoglayout = inflater.inflate(R.layout.dialog_overquota_error, null);
@@ -10681,7 +10775,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		this.setOrderOthers(orderOthers);
 		if (inSFLol != null){
 			inSFLol.setOrder(orderOthers);
-			inSFLol.findNodes();
+			inSFLol.setOrderNodes();
 		}
 	}
 
@@ -10978,13 +11072,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 		};
 
-		AlertDialog.Builder builder;
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-			builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-		}
-		else{
-			builder = new AlertDialog.Builder(this);
-		}
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
 		builder.setMessage(R.string.remove_key_confirmation).setPositiveButton(R.string.general_remove, dialogClickListener)
 				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
 	}
@@ -11019,13 +11108,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 		};
 
-		AlertDialog.Builder builder;
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-			builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-		}
-		else{
-			builder = new AlertDialog.Builder(this);
-		}
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
 		builder.setMessage(R.string.confirmation_delete_from_save_for_offline).setPositiveButton(R.string.general_remove, dialogClickListener)
 				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
 	}
@@ -11051,13 +11135,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 		};
 
-		AlertDialog.Builder builder;
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-			builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-		}
-		else{
-			builder = new AlertDialog.Builder(this);
-		}
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
 		builder.setMessage(R.string.enable_log_text_dialog).setPositiveButton(R.string.general_enable, dialogClickListener)
 				.setNegativeButton(R.string.general_cancel, dialogClickListener).show().setCanceledOnTouchOutside(false);
@@ -11084,13 +11162,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 		};
 
-		AlertDialog.Builder builder;
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-			builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-		}
-		else{
-			builder = new AlertDialog.Builder(this);
-		}
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
 		builder.setMessage(R.string.enable_log_text_dialog).setPositiveButton(R.string.general_enable, dialogClickListener)
 				.setNegativeButton(R.string.general_cancel, dialogClickListener).show().setCanceledOnTouchOutside(false);
@@ -11135,13 +11207,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 		};
 
-		AlertDialog.Builder builder;
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-			builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-		}
-		else{
-			builder = new AlertDialog.Builder(this);
-		}
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
 		builder.setMessage(R.string.confirmation_delete_avatar).setPositiveButton(R.string.context_delete, dialogClickListener)
 				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
 	}
@@ -11264,7 +11331,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			final ArrayList<String> selectedContacts = intent.getStringArrayListExtra("SELECTED_CONTACTS");
 			final long folderHandle = intent.getLongExtra("SELECT", 0);
 
-			AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+			AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
 			dialogBuilder.setTitle(getString(R.string.file_properties_shared_folder_permissions));
 			final CharSequence[] items = {getString(R.string.file_properties_shared_folder_read_only), getString(R.string.file_properties_shared_folder_read_write), getString(R.string.file_properties_shared_folder_full_access)};
 			dialogBuilder.setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
@@ -11314,7 +11381,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						//One file to share
 						final long nodeHandle = intent.getLongExtra(ContactsExplorerActivityLollipop.EXTRA_NODE_HANDLE, -1);
 
-						AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+						AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
 						dialogBuilder.setTitle(getString(R.string.file_properties_shared_folder_permissions));
 						final CharSequence[] items = {getString(R.string.file_properties_shared_folder_read_only), getString(R.string.file_properties_shared_folder_read_write), getString(R.string.file_properties_shared_folder_full_access)};
 						dialogBuilder.setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
@@ -11436,7 +11503,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 			int i = 0;
 			long parentHandleUpload=-1;
+			log("On section: "+drawerItem);
 			if (drawerItem == DrawerItem.CLOUD_DRIVE){
+				String cloudTag = getFragmentTag(R.id.cloud_drive_tabs_pager, 0);
+				fbFLol = (FileBrowserFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cloudTag);
 				if(fbFLol!=null)
 				{
 					parentHandleUpload = fbFLol.getParentHandle();
@@ -11463,7 +11533,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					}
 				}
 			}
+			else if (drawerItem == DrawerItem.SEARCH){
+				if(sFLol!=null)
+				{
+					parentHandleUpload = sFLol.getParentHandle();
+				}
+			}
 			else{
+				log("Return - nothing to be done");
 				return;
 			}
 
@@ -11591,8 +11668,16 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		else if (requestCode == Constants.TAKE_PHOTO_CODE){
 			log("TAKE_PHOTO_CODE");
 			if(resultCode == Activity.RESULT_OK){
-				Intent intentPicture = new Intent(this, SecureSelfiePreviewActivityLollipop.class);
-				startActivity(intentPicture);
+				String filePath = Environment.getExternalStorageDirectory().getAbsolutePath() +"/"+ Util.temporalPicDIR + "/picture.jpg";
+				File imgFile = new File(filePath);
+
+				String name = Util.getPhotoSyncName(imgFile.lastModified(), imgFile.getAbsolutePath());
+				log("Taken picture Name: "+name);
+				String newPath = Environment.getExternalStorageDirectory().getAbsolutePath() +"/"+ Util.temporalPicDIR + "/"+name;
+				log("----NEW Name: "+newPath);
+				File newFile = new File(newPath);
+				imgFile.renameTo(newFile);
+				showFileChooser(newPath);
 			}
 			else{
 				log("TAKE_PHOTO_CODE--->ERROR!");
@@ -11602,12 +11687,34 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		else if (requestCode == Constants.TAKE_PICTURE_PROFILE_CODE){
 			log("TAKE_PICTURE_PROFILE_CODE");
 			if(resultCode == Activity.RESULT_OK){
-				Intent intentPicture = new Intent(this, SecureSelfiePreviewActivityLollipop.class);
-				intentPicture.putExtra("PICTURE_PROFILE", 1);
-				intentPicture.putExtra("MY_MAIL", myAccountInfo.getMyUser().getEmail());
-				startActivity(intentPicture);
-			}
-			else{
+
+				String myEmail =  myAccountInfo.getMyUser().getEmail();
+				String filePath = Environment.getExternalStorageDirectory().getAbsolutePath() +"/"+ Util.profilePicDIR + "/picture.jpg";;
+				File imgFile = new File(filePath);
+
+				String newPath = null;
+				if (getExternalCacheDir() != null){
+					newPath = getExternalCacheDir().getAbsolutePath() + "/" + myEmail + "Temp.jpg";
+				}else{
+					log("getExternalCacheDir() is NULL");
+					newPath = getCacheDir().getAbsolutePath() + "/" + myEmail + "Temp.jpg";
+				}
+
+				if(newPath!=null) {
+					File newFile = new File(newPath);
+					log("NEW - the destination of the avatar is: " + newPath);
+					if (newFile != null) {
+						MegaUtilsAndroid.createAvatar(imgFile, newFile);
+						megaApi.setAvatar(newFile.getAbsolutePath(), this);
+
+					} else {
+						log("Error new path avatar!!");
+					}
+
+				}else{
+					log("ERROR! Destination PATH is NULL");
+				}
+			}else{
 				log("TAKE_PICTURE_PROFILE_CODE--->ERROR!");
 			}
 
@@ -11796,6 +11903,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 		@Override
 		public void run(){
+
+			log("Run Upload Service Task");
 
 			MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
 			if (parentNode == null){
@@ -12433,6 +12542,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						rChatFL.onlineStatusUpdate(megaChatApi.getOnlineStatus());
 					}
 				}
+
+				megaChatApi.setBackgroundStatus(true);
+				megaChatApi.setBackgroundStatus(false);
 			}
 			else{
 				log("EEEERRRRROR WHEN CONNECTING " + e.getErrorString());
@@ -12623,6 +12735,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					errorUserAttibutes=0;
 					aC.setCount(0);
 				}
+			}
+			else if(request.getParamType() == MegaApiJava.USER_ATTR_PWD_REMINDER){
+				log("MK exported - USER_ATTR_PWD_REMINDER finished");
 			}
 			if (request.getParamType() == MegaApiJava.USER_ATTR_AVATAR) {
 
@@ -13047,18 +13162,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				else if (drawerItem == DrawerItem.INBOX){
 
 					if (iFLol != null){
-//						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(inSFLol.getParentHandle()), orderGetChildren);
-						//TODO: ojo con los hijos
-//						inSFLol.setNodes(nodes);
 						iFLol.getRecyclerView().invalidate();
 					}
 				}
 				else if (drawerItem == DrawerItem.SAVED_FOR_OFFLINE){
 
 					if (oFLol != null){
-//						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(inSFLol.getParentHandle()), orderGetChildren);
-						//TODO: ojo con los hijos
-//						inSFLol.setNodes(nodes);
 						oFLol.getRecyclerView().invalidate();
 					}
 				}
@@ -13393,237 +13502,172 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		}
 		catch (Exception ex) {}
 
+		boolean updateContacts = false;
+
 		if(updatedNodes!=null){
 			//Verify is it is a new item to the inbox
 			for(int i=0;i<updatedNodes.size(); i++){
-				MegaNode updateNode = updatedNodes.get(i);
-				if(updateNode.getParentHandle()==inboxNode.getHandle()){
+				MegaNode updatedNode = updatedNodes.get(i);
+
+				if(!updateContacts){
+					if(updatedNode.isInShare()){
+						updateContacts = true;
+					}
+				}
+
+				if(updatedNode.getParentHandle()==inboxNode.getHandle()){
 					log("New element to Inbox!!");
 					setInboxNavigationDrawer();
 				}
 			}
 		}
 
-		if (drawerItem == DrawerItem.CLOUD_DRIVE){
-			log("DrawerItem.CLOUD_DRIVE");
-
-			if(viewPagerCDrive!=null) {
-				int index = viewPagerCDrive.getCurrentItem();
-				log("Fragment Index: " + index);
-				if (index == 1) {
-					log("Rubbish bin shown");
-					String cloudTag = getFragmentTag(R.id.cloud_drive_tabs_pager, 0);
-					fbFLol = (FileBrowserFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cloudTag);
-					if (fbFLol != null){
-						log("FileBrowser is not NULL");
-						ArrayList<MegaNode> nodes;
-						if(parentHandleBrowser==-1||parentHandleBrowser==megaApi.getRootNode().getHandle()){
-							nodes = megaApi.getChildren(megaApi.getRootNode(), orderCloud);
-						}
-						else{
-							nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbFLol.getParentHandle()), orderCloud);
-						}
-						fbFLol.setNodes(nodes);
-						fbFLol.setContentText();
-						fbFLol.getRecyclerView().invalidate();
-					}
-
-					String rubbishTag = getFragmentTag(R.id.cloud_drive_tabs_pager, 1);
-					rubbishBinFLol = (RubbishBinFragmentLollipop) getSupportFragmentManager().findFragmentByTag(rubbishTag);
-					if (rubbishBinFLol != null){
-						if (isClearRubbishBin){
-							isClearRubbishBin = false;
-							parentHandleRubbish = megaApi.getRubbishNode().getHandle();
-							aB.setTitle(getString(R.string.section_rubbish_bin));
-							log("aB.setHomeAsUpIndicator_24");
-							aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
-							this.firstNavigationLevel = true;
-
-							ArrayList<MegaNode> nodes;
-							if(rubbishBinFLol.getParentHandle()==-1){
-								nodes = megaApi.getChildren(megaApi.getNodeByHandle(megaApi.getRubbishNode().getHandle()), orderCloud);
-							}
-							else{
-								nodes = megaApi.getChildren(megaApi.getNodeByHandle(rubbishBinFLol.getParentHandle()), orderCloud);
-							}
-							rubbishBinFLol.setParentHandle(megaApi.getRubbishNode().getHandle());
-							rubbishBinFLol.setNodes(nodes);
-							rubbishBinFLol.getRecyclerView().invalidate();
-
-						}
-						else{
-
-							ArrayList<MegaNode> nodes;
-							if(rubbishBinFLol.getParentHandle()==-1){
-								nodes = megaApi.getChildren(megaApi.getNodeByHandle(megaApi.getRubbishNode().getHandle()), orderCloud);
-							}
-							else{
-								nodes = megaApi.getChildren(megaApi.getNodeByHandle(rubbishBinFLol.getParentHandle()), orderCloud);
-							}
-							rubbishBinFLol.setNodes(nodes);
-							rubbishBinFLol.getRecyclerView().invalidate();
-
-						}
-					}
-				}
-				else {
-					//Cloud Drive TAB
-					log("Cloud drive shown");
-
-					String rubbishTag = getFragmentTag(R.id.cloud_drive_tabs_pager, 1);
-					rubbishBinFLol = (RubbishBinFragmentLollipop) getSupportFragmentManager().findFragmentByTag(rubbishTag);
-					if (rubbishBinFLol != null){
-						if (isClearRubbishBin){
-							isClearRubbishBin = false;
-							parentHandleRubbish = megaApi.getRubbishNode().getHandle();
-							aB.setTitle(getString(R.string.section_rubbish_bin));
-							log("aB.setHomeAsUpIndicator_24");
-							aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
-							this.firstNavigationLevel = true;
-
-							ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getRubbishNode(), orderCloud);
-							rubbishBinFLol.setParentHandle(megaApi.getRubbishNode().getHandle());
-							rubbishBinFLol.setNodes(nodes);
-							rubbishBinFLol.getRecyclerView().invalidate();
-
-						}
-						else{
-							log("NOT clearRubbish");
-							ArrayList<MegaNode> nodes;
-							if(parentHandleRubbish==-1||parentHandleRubbish==megaApi.getRubbishNode().getHandle()){
-								nodes = megaApi.getChildren(megaApi.getRubbishNode(), orderCloud);
-							}
-							else{
-								nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleRubbish), orderCloud);
-							}
-							if(nodes!=null){
-								rubbishBinFLol.setNodes(nodes);
-								rubbishBinFLol.getRecyclerView().invalidate();
-							}
-						}
-					}
-
-					String cloudTag = getFragmentTag(R.id.cloud_drive_tabs_pager, 0);
-					fbFLol = (FileBrowserFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cloudTag);
-					if (fbFLol != null){
-						log("FileBrowser is not NULL");
-						ArrayList<MegaNode> nodes;
-						if(parentHandleBrowser==-1||parentHandleBrowser==megaApi.getRootNode().getHandle()){
-							nodes = megaApi.getChildren(megaApi.getRootNode(), orderCloud);
-						}
-						else{
-							nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbFLol.getParentHandle()), orderCloud);
-						}
-						if(nodes!=null){
-							fbFLol.setNodes(nodes);
-							fbFLol.setContentText();
-							fbFLol.getRecyclerView().invalidate();
-						}
-					}
-				}
-			}
-		}
-		else if (drawerItem == DrawerItem.SEARCH){
-			log("SEARCH shown");
-			if (sFLol != null){
-				sFLol.refresh();
-			}
-		}
-		else if (drawerItem == DrawerItem.INBOX){
-			log("INBOX shown");
-			if (iFLol != null){
-				iFLol.refresh();
-//				iFLol.getListView().invalidateViews();
+		if(updateContacts){
+			String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);
+			cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
+			if (cFLol != null){
+				log("Incoming update - update contacts section");
+				cFLol.updateShares();
 			}
 		}
 
-		else if (drawerItem == DrawerItem.SHARED_ITEMS){
-			int index = viewPagerShares.getCurrentItem();
-			if(index==1){
-				//OUTGOING
-				String cFTag2 = getFragmentTag(R.id.shares_tabs_pager, 1);
-				log("DrawerItem.SHARED_ITEMS Tag: "+ cFTag2);
-				outSFLol = (OutgoingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag2);
-				if (outSFLol != null){
-					MegaNode node = megaApi.getNodeByHandle(parentHandleOutgoing);
-					if (node != null){
-						outSFLol.setNodes(megaApi.getChildren(node, orderOthers));
-						aB.setTitle(node.getName());
-						log("indicator_arrow_back_888");
-    					aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
-    					firstNavigationLevel = false;
-					}
-					else{
-						outSFLol.refresh();
-						aB.setTitle(getResources().getString(R.string.section_shared_items));
-						log("aB.setHomeAsUpIndicator_26");
-    					aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
-    					firstNavigationLevel = true;
-					}
-				}
+		String cloudTag = getFragmentTag(R.id.cloud_drive_tabs_pager, 0);
+		fbFLol = (FileBrowserFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cloudTag);
+		if (fbFLol != null){
+			log("FileBrowser is not NULL");
+			ArrayList<MegaNode> nodes;
+			if(parentHandleBrowser==-1||parentHandleBrowser==megaApi.getRootNode().getHandle()){
+				nodes = megaApi.getChildren(megaApi.getRootNode(), orderCloud);
 			}
 			else{
-				//InCOMING
-				String cFTag1 = getFragmentTag(R.id.shares_tabs_pager, 0);
-				log("DrawerItem.SHARED_ITEMS Tag Incoming: "+ cFTag1);
-				inSFLol = (IncomingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag1);
-				if (inSFLol != null){
-					MegaNode node = megaApi.getNodeByHandle(parentHandleIncoming);
-					if (node != null){
-						inSFLol.setNodes(megaApi.getChildren(node, orderOthers));
-						aB.setTitle(node.getName());
-						log("indicator_arrow_back_889");
-    					aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
-    					firstNavigationLevel = false;
-					}
-					else{
-						inSFLol.findNodes();
-						aB.setTitle(getResources().getString(R.string.section_shared_items));
-						log("aB.setHomeAsUpIndicator_28");
-    					aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
-    					firstNavigationLevel = true;
-					}
+				nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbFLol.getParentHandle()), orderCloud);
+			}
+			fbFLol.setNodes(nodes);
+			fbFLol.setContentText();
+			fbFLol.getRecyclerView().invalidate();
+		}
+
+		String rubbishTag = getFragmentTag(R.id.cloud_drive_tabs_pager, 1);
+		rubbishBinFLol = (RubbishBinFragmentLollipop) getSupportFragmentManager().findFragmentByTag(rubbishTag);
+		if (rubbishBinFLol != null){
+			if (isClearRubbishBin){
+				isClearRubbishBin = false;
+				parentHandleRubbish = megaApi.getRubbishNode().getHandle();
+				aB.setTitle(getString(R.string.section_rubbish_bin));
+				log("aB.setHomeAsUpIndicator_24");
+				aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+				this.firstNavigationLevel = true;
+
+				ArrayList<MegaNode> nodes;
+				if(rubbishBinFLol.getParentHandle()==-1){
+					nodes = megaApi.getChildren(megaApi.getNodeByHandle(megaApi.getRubbishNode().getHandle()), orderCloud);
+				}
+				else{
+					nodes = megaApi.getChildren(megaApi.getNodeByHandle(rubbishBinFLol.getParentHandle()), orderCloud);
+				}
+				rubbishBinFLol.setParentHandle(megaApi.getRubbishNode().getHandle());
+				rubbishBinFLol.setNodes(nodes);
+				rubbishBinFLol.getRecyclerView().invalidate();
+
+			}
+			else{
+
+				ArrayList<MegaNode> nodes;
+				if(rubbishBinFLol.getParentHandle()==-1){
+					nodes = megaApi.getChildren(megaApi.getNodeByHandle(megaApi.getRubbishNode().getHandle()), orderCloud);
+				}
+				else{
+					nodes = megaApi.getChildren(megaApi.getNodeByHandle(rubbishBinFLol.getParentHandle()), orderCloud);
+				}
+				rubbishBinFLol.setNodes(nodes);
+				rubbishBinFLol.getRecyclerView().invalidate();
+
+			}
+		}
+
+		if (sFLol != null){
+			sFLol.refresh();
+		}
+
+		String cFTag2 = getFragmentTag(R.id.shares_tabs_pager, 1);
+		log("DrawerItem.SHARED_ITEMS Tag: "+ cFTag2);
+		outSFLol = (OutgoingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag2);
+		if (outSFLol != null){
+			MegaNode node = megaApi.getNodeByHandle(parentHandleOutgoing);
+			if (node != null){
+				outSFLol.setNodes(megaApi.getChildren(node, orderOthers));
+				aB.setTitle(node.getName());
+				log("indicator_arrow_back_888");
+				aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+				firstNavigationLevel = false;
+			}
+			else{
+				outSFLol.refresh();
+				aB.setTitle(getResources().getString(R.string.section_shared_items));
+				log("aB.setHomeAsUpIndicator_26");
+				aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+				firstNavigationLevel = true;
+			}
+		}
+
+		String cFTag1 = getFragmentTag(R.id.shares_tabs_pager, 0);
+		log("DrawerItem.SHARED_ITEMS Tag Incoming: "+ cFTag1);
+		inSFLol = (IncomingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag1);
+		if (inSFLol != null){
+			MegaNode node = megaApi.getNodeByHandle(parentHandleIncoming);
+			if (node != null){
+				inSFLol.setNodes(megaApi.getChildren(node, orderOthers));
+				aB.setTitle(node.getName());
+				log("indicator_arrow_back_889");
+				aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+				firstNavigationLevel = false;
+			}
+			else{
+				inSFLol.findNodes();
+				aB.setTitle(getResources().getString(R.string.section_shared_items));
+				log("aB.setHomeAsUpIndicator_28");
+				aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+				firstNavigationLevel = true;
+			}
+		}
+
+		if (iFLol != null){
+			if(iFLol.isAdded()){
+				MegaNode node = megaApi.getNodeByHandle(parentHandleInbox);
+				if (node != null){
+					log("Go to inbox node: "+node.getName());
+					iFLol.setParentHandle(parentHandleInbox);
+
+					ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleInbox), orderCloud);
+					iFLol.setNodes(nodes);
 				}
 			}
 		}
-		else if (drawerItem == DrawerItem.CAMERA_UPLOADS){
-			if (cuFL != null){
-				if(cuFL.isAdded()){
-					long cameraUploadHandle = cuFL.getPhotoSyncHandle();
-					MegaNode nps = megaApi.getNodeByHandle(cameraUploadHandle);
-					log("cameraUploadHandle: " + cameraUploadHandle);
-					if (nps != null){
-						log("nps != null");
-						ArrayList<MegaNode> nodes = megaApi.getChildren(nps, MegaApiJava.ORDER_MODIFICATION_DESC);
+
+		if (cuFL != null){
+			if(cuFL.isAdded()){
+				long cameraUploadHandle = cuFL.getPhotoSyncHandle();
+				MegaNode nps = megaApi.getNodeByHandle(cameraUploadHandle);
+				log("cameraUploadHandle: " + cameraUploadHandle);
+				if (nps != null){
+					log("nps != null");
+					ArrayList<MegaNode> nodes = megaApi.getChildren(nps, MegaApiJava.ORDER_MODIFICATION_DESC);
 //						cuFL.setNodes(megaApi.getFileFolderChildren(nps, MegaApiJava.ORDER_MODIFICATION_DESC));
-						cuFL.setNodes(nodes);
-					}
+					cuFL.setNodes(nodes);
 				}
 			}
 		}
-		else if (drawerItem == DrawerItem.MEDIA_UPLOADS){
-			if (muFLol != null){
-				if(muFLol.isAdded()){
-					long cameraUploadHandle = muFLol.getPhotoSyncHandle();
-					MegaNode nps = megaApi.getNodeByHandle(cameraUploadHandle);
-					log("mediaUploadsHandle: " + cameraUploadHandle);
-					if (nps != null){
-						log("nps != null");
-						ArrayList<MegaNode> nodes = megaApi.getChildren(nps, MegaApiJava.ORDER_MODIFICATION_DESC);
+
+		if (muFLol != null){
+			if(muFLol.isAdded()){
+				long cameraUploadHandle = muFLol.getPhotoSyncHandle();
+				MegaNode nps = megaApi.getNodeByHandle(cameraUploadHandle);
+				log("mediaUploadsHandle: " + cameraUploadHandle);
+				if (nps != null){
+					log("nps != null");
+					ArrayList<MegaNode> nodes = megaApi.getChildren(nps, MegaApiJava.ORDER_MODIFICATION_DESC);
 //						muFLol.setNodes(megaApi.getFileFolderChildren(nps, MegaApiJava.ORDER_MODIFICATION_DESC));
-						muFLol.setNodes(nodes);
-					}
-				}
-			}
-		}
-		else if (drawerItem == DrawerItem.CONTACTS){
-			int index = viewPagerContacts.getCurrentItem();
-			if (index == 0){
-				String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);
-				cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
-				if (cFLol != null){
-					log("Share finish");
-					cFLol.updateShares();
+					muFLol.setNodes(nodes);
 				}
 			}
 		}
@@ -13657,6 +13701,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				MegaContactRequest req = requests.get(i);
 				if(req.isOutgoing()){
 					log("SENT REQUEST");
+					log("STATUS: "+req.getStatus()+" targetEmail: "+req.getTargetEmail()+" contactHandle: "+req.getHandle());
+					if(req.getStatus()==MegaContactRequest.STATUS_ACCEPTED){
+						cC.addContactDB(req.getTargetEmail());
+					}
 					updateContactsView(true, true, false);
 				}
 				else{
@@ -13723,7 +13771,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 		};
 
-		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 //		builder.setTitle(getResources().getString(R.string.cancel_transfer_title));
 
 		builder.setMessage(getResources().getString(R.string.confirmation_to_clear_completed_transfers));
@@ -13760,7 +13808,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 		};
 
-		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 //		builder.setTitle(getResources().getString(R.string.cancel_transfer_title));
 		if(cancel){
 
@@ -13806,7 +13854,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 		};
 
-		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 //		builder.setTitle(getResources().getString(R.string.cancel_transfer_title));
 
 		builder.setMessage(getResources().getString(R.string.cancel_all_transfer_confirmation));
@@ -14345,6 +14393,43 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 				break;
 			}
+			case SEARCH:{
+				if(sFLol!=null){
+					log("parentHandleSearch: "+parentHandleSearch);
+
+					if(sFLol.getLevels()<0){
+						fabButton.setVisibility(View.GONE);
+					}
+					else{
+						long parentHandleSearch = sFLol.getParentHandle();
+						if(parentHandleSearch!=-1){
+							MegaNode node = megaApi.getNodeByHandle(parentHandleSearch);
+							if(node.isInShare()){
+								log("Node is incoming folder");
+								int accessLevel = megaApi.getAccess(node);
+
+								if(accessLevel== MegaShare.ACCESS_FULL||accessLevel== MegaShare.ACCESS_OWNER){
+									fabButton.setVisibility(View.VISIBLE);
+								}
+								else if(accessLevel== MegaShare.ACCESS_READWRITE){
+									fabButton.setVisibility(View.VISIBLE);
+								}
+								else{
+									fabButton.setVisibility(View.GONE);
+								}
+							}
+							else{
+								fabButton.setVisibility(View.VISIBLE);
+							}
+						}
+						else{
+							fabButton.setVisibility(View.GONE);
+						}
+
+					}
+				}
+				break;
+			}
 			default:{
 				log("showFabButton: default GONE fabButton");
 				fabButton.setVisibility(View.GONE);
@@ -14726,4 +14811,39 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		log("networkUnavailable: network NOT available");
 		showOfflineMode();
 	}
+
+	public void showFileChooser(String imagePath){
+
+		log("showFileChooser: "+imagePath);
+		Intent intent = new Intent(this, FileExplorerActivityLollipop.class);
+		intent.setAction(FileExplorerActivityLollipop.ACTION_UPLOAD_SELFIE);
+		intent.putExtra("IMAGE_PATH", imagePath);
+		startActivity(intent);
+		//finish();
+	}
+
+	public void changeStatusBarColor(int option) {
+
+		if (option == 1) {
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+				Window window = this.getWindow();
+				window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+				window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+				window.setStatusBarColor(ContextCompat.getColor(this, R.color.lollipop_dark_primary_color));
+			}
+			drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+
+
+		} else if (option == 2) {
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+				Window window = this.getWindow();
+				window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+				window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+				window.setStatusBarColor(ContextCompat.getColor(this, R.color.transparent_transparent_black));
+			}
+			drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
+		}
+
+	}
+
 }

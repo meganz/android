@@ -694,6 +694,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 					finish();
 				}
 				else {
+					log("Mode.PICK_FILE");
 					if(adapter.getSelectedCount()<=0){
 						Snackbar.make(viewContainer, getString(R.string.error_no_selection), Snackbar.LENGTH_LONG).show();
 						break;
@@ -710,6 +711,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 								if(document != null)
 								{
 									File file = document.getFile();
+									log("Add to files selected: "+file.getAbsolutePath());
 									files.add(file.getAbsolutePath());
 								}
 								
@@ -717,25 +719,26 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 							return null;	
 						}
 						
-						public ArrayList<String> getFiles(File folder)
-						{
-							ArrayList<String> selectedFiles = new ArrayList<String>();
-							File[] files= folder.listFiles();
-							for (int i = 0; i < files.length; i++) {
-							      if (files[i].isFile()) {
-							    	  selectedFiles.add(files[i].getAbsolutePath());
-							      } else if (files[i].isDirectory()) {
-							    	  selectedFiles.addAll(getFiles(folder));
-							      }
-							
-							}
-							return selectedFiles;
-						}
+//						public ArrayList<String> getFiles(File folder)
+//						{
+//							ArrayList<String> selectedFiles = new ArrayList<String>();
+//							File[] files= folder.listFiles();
+//							for (int i = 0; i < files.length; i++) {
+//							      if (files[i].isFile()) {
+//							    	  selectedFiles.add(files[i].getAbsolutePath());
+//							      } else if (files[i].isDirectory()) {
+//							    	  selectedFiles.addAll(getFiles(folder));
+//							      }
+//
+//							}
+//							return selectedFiles;
+//						}
 						
 						@Override
 						public void onPostExecute(Void a)
 						{
-							setResultFiles(files);	
+
+							setResultFiles(files);
 						}
 					}.execute();			
 				}
@@ -861,6 +864,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	 * activity
 	 */
 	private void setResultFiles(ArrayList<String> files) {
+		log("setResultFiles: "+files.size() + "files selected");
 		Intent intent = new Intent();
 		intent.putStringArrayListExtra(EXTRA_FILES, files);
 		intent.putExtra(EXTRA_PATH, path.getAbsolutePath());
