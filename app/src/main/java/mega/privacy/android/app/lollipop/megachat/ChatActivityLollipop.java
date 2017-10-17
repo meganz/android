@@ -4,6 +4,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -51,10 +52,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.ListIterator;
 
-import io.github.rockerhieu.emojicon.EmojiconEditText;
-import io.github.rockerhieu.emojicon.EmojiconGridFragment;
-import io.github.rockerhieu.emojicon.EmojiconsFragment;
-import io.github.rockerhieu.emojicon.emoji.Emojicon;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
@@ -100,7 +97,13 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUser;
 
-public class ChatActivityLollipop extends PinActivityLollipop implements MegaChatRequestListenerInterface, MegaRequestListenerInterface, MegaChatRoomListenerInterface, RecyclerView.OnItemTouchListener, GestureDetector.OnGestureListener, View.OnClickListener, EmojiconGridFragment.OnEmojiconClickedListener, EmojiconsFragment.OnEmojiconBackspaceClickedListener {
+import mega.privacy.android.app.components.emojicon.EmojiconsFragment;
+import mega.privacy.android.app.components.emojicon.EmojiconEditText;
+import mega.privacy.android.app.components.emojicon.EmojiconGridFragment;
+import mega.privacy.android.app.components.emojicon.emoji.Emojicon;
+
+
+public class ChatActivityLollipop extends PinActivityLollipop implements MegaChatRequestListenerInterface, MegaRequestListenerInterface, MegaChatRoomListenerInterface, RecyclerView.OnItemTouchListener, GestureDetector.OnGestureListener, View.OnClickListener, EmojiconGridFragment.OnEmojiconClickedListener,EmojiconsFragment.OnEmojiconBackspaceClickedListener {
 
     public static int NUMBER_MESSAGES_TO_LOAD = 20;
     public static int NUMBER_MESSAGES_TO_UPDATE_UI = 7;
@@ -166,6 +169,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     long userTypingTimeStamp = -1;
 //    TextView inviteText;
     ImageButton keyboardButton;
+
     EmojiconEditText textChat;
     ImageButton sendIcon;
     RelativeLayout messagesContainerLayout;
@@ -218,7 +222,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     private ActionMode actionMode;
 
-    @Override
+
     public void onEmojiconClicked(Emojicon emojicon) {
         EmojiconsFragment.input(textChat, emojicon);
     }
@@ -455,6 +459,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             public boolean onTouch(View v, MotionEvent event) {
 
                 if (emojiKeyboardShown){
+                    keyboardButton.setImageResource(R.drawable.ic_emoticon_white);
 //                    int inputType = textChat.getInputType();
 //                    textChat.setInputType(InputType.TYPE_NULL);
 //                    textChat.onTouchEvent(event);
@@ -778,9 +783,17 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             log("This user is busy");
             aB.setSubtitle(getString(R.string.busy_status));
         }
+        else if(state == MegaChatApi.STATUS_OFFLINE){
+            log("This user is offline");
+            aB.setSubtitle(getString(R.string.offline_status));
+        }
+        else if(state == MegaChatApi.STATUS_INVALID){
+            log("INVALID status: "+state);
+            aB.setSubtitle(getString(R.string.invalid_status));
+        }
         else{
             log("This user status is: "+state);
-            aB.setSubtitle(getString(R.string.offline_status));
+            aB.setSubtitle(getString(R.string.invalid_status));
         }
     }
 
@@ -903,6 +916,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         log("setEmojiconFragment(" + useSystemDefault + ")");
         if (firstTimeEmoji) {
             emojiconsFragment = EmojiconsFragment.newInstance(useSystemDefault);
+
+
             getSupportFragmentManager()
                     .beginTransaction()
                     .replace(R.id.chat_emoji_keyboard, emojiconsFragment)
@@ -1354,6 +1369,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
 
         if (emojiKeyboardShown) {
+            keyboardButton.setImageResource(R.drawable.ic_emoticon_white);
             removeEmojiconFragment();
         }
         else{
@@ -1413,8 +1429,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     textChat.requestFocus();
                     InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                     imm.showSoftInput(textChat, InputMethodManager.SHOW_IMPLICIT);
-                }
-                else{
+                    keyboardButton.setImageResource(R.drawable.ic_emoticon_white);
+
+                } else{
                     InputMethodManager imm = (InputMethodManager) getSystemService(this.INPUT_METHOD_SERVICE);
 
                     if (softKeyboardShown){
@@ -1425,6 +1442,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     else{
                         setEmojiconFragment(false);
                     }
+                    keyboardButton.setImageResource(R.drawable.ic_keyboard_white);
+
                 }
                 break;
             }
@@ -1498,7 +1517,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 adapter.addMessage(messages, index+1);
                 final int indexToScroll = index+1;
 
-                mLayoutManager.scrollToPositionWithOffset(indexToScroll,20);
+                mLayoutManager.scrollToPositionWithOffset(indexToScroll,Util.scaleHeightPx(20, outMetrics));
 //                Handler handler = new Handler();
 //                handler.postDelayed(new Runnable() {
 //
@@ -1519,7 +1538,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     }
 
     public void sendMessageToUI(MegaChatMessage msgSent){
-        log("sendMessage: msgSent");
+        log("sendMessageToUI");
+        int infoToShow = -1;
         AndroidMegaChatMessage androidMsgSent = new AndroidMegaChatMessage(msgSent);
         int index = messages.size()-1;
         if(msgSent!=null){
@@ -1552,7 +1572,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
                 messages.add(index, androidMsgSent);
 
-                adjustInfoToShow(index);
+                infoToShow = adjustInfoToShow(index);
             }
             if (adapter == null){
                 log("adapter NULL");
@@ -1564,11 +1584,14 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }
             else{
                 log("adapter is NOT null");
-                final int indexToScroll = index;
+                adapter.addMessage(messages, index);
 
-                mLayoutManager.scrollToPositionWithOffset(indexToScroll,20);
-
-                adapter.addMessage(messages, index+1);
+                if(infoToShow==Constants.CHAT_ADAPTER_SHOW_ALL){
+                    mLayoutManager.scrollToPositionWithOffset(index, Util.scaleHeightPx(50, outMetrics));
+                }
+                else{
+                    mLayoutManager.scrollToPositionWithOffset(index, Util.scaleHeightPx(20, outMetrics));
+                }
             }
         }
         else{
@@ -2084,19 +2107,23 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         boolean positionFound = false;
         List<Long> ids = new ArrayList<>();
         for(int i=0; i<messages.size();i++){
-            MegaChatMessage msg = messages.get(i).getMessage();
-            if(msg.getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT){
-                ids.add(msg.getMsgId());
+            AndroidMegaChatMessage androidMessage = messages.get(i);
+            if(!androidMessage.isUploading()){
+                MegaChatMessage msg = androidMessage.getMessage();
 
-                if(msg.getMsgId()==msgId){
-                    positionFound=true;
-                }
-                if(!positionFound){
-                    MegaNodeList nodeList = msg.getMegaNodeList();
-                    if(nodeList.size()==1){
-                        MegaNode node = nodeList.get(0);
-                        if(MimeTypeList.typeForName(node.getName()).isImage()){
-                            position++;
+                if(msg.getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT){
+                    ids.add(msg.getMsgId());
+
+                    if(msg.getMsgId()==msgId){
+                        positionFound=true;
+                    }
+                    if(!positionFound){
+                        MegaNodeList nodeList = msg.getMegaNodeList();
+                        if(nodeList.size()==1){
+                            MegaNode node = nodeList.get(0);
+                            if(MimeTypeList.typeForName(node.getName()).isImage()){
+                                position++;
+                            }
                         }
                     }
                 }
@@ -2651,7 +2678,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                             log("onMessageLoaded: message position to scroll: "+positionToScroll+" content: "+messages.get(positionToScroll).getMessage().getContent());
                             messages.get(positionToScroll).setInfoToShow(Constants.CHAT_ADAPTER_SHOW_ALL);
                             adapter.notifyItemChanged(positionToScroll+1);
-                            mLayoutManager.scrollToPositionWithOffset(positionToScroll+1,20);
+                            mLayoutManager.scrollToPositionWithOffset(positionToScroll+1,Util.scaleHeightPx(20, outMetrics));
                         }
                         else{
                             log("Error, the position to scroll is more than size of messages");
@@ -2663,6 +2690,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             if(!pendingMessagesLoaded){
                 pendingMessagesLoaded = true;
                 loadPendingMessages();
+                if(positionToScroll<=0){
+                    log("positionToScroll is 0 - no unread messages");
+                    mLayoutManager.scrollToPosition(messages.size());
+                }
             }
 
             if(messages.size()<NUMBER_MESSAGES_BEFORE_LOAD){
@@ -2717,9 +2748,14 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         AndroidMegaChatMessage androidMsg = new AndroidMegaChatMessage(msg);
         appendMessagePosition(androidMsg);
 
-        int firstVisiblePosition = mLayoutManager.findLastVisibleItemPosition();
-        log("The last item visible: "+firstVisiblePosition+" the last message: "+messages.size());
-        mLayoutManager.scrollToPosition(messages.size()-1);
+        if(mLayoutManager.findLastCompletelyVisibleItemPosition()==messages.size()-1){
+            log("Do scroll to end");
+            mLayoutManager.scrollToPosition(messages.size());
+        }
+        else{
+            log("DONT scroll to end");
+        }
+
 //        mLayoutManager.setStackFromEnd(true);
 //        mLayoutManager.scrollToPosition(0);
         log("------------------------------------------");
@@ -2950,7 +2986,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             if(scrollToP!=-1){
                 if(msg.getMessage().getStatus()==MegaChatMessage.STATUS_SERVER_RECEIVED){
                     log("modifyAttachmentReceived: need to scroll to position: "+indexToChange);
-                    mLayoutManager.scrollToPositionWithOffset(scrollToP, 20);
+                    mLayoutManager.scrollToPositionWithOffset(scrollToP, Util.scaleHeightPx(20, outMetrics));
                 }
             }
         }
@@ -3066,7 +3102,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 if(scrollToP!=-1){
                     if(msg.getMessage().getStatus()==MegaChatMessage.STATUS_SERVER_RECEIVED){
                         log("modifyMessageReceived: need to scroll to position: "+indexToChange);
-                        mLayoutManager.scrollToPositionWithOffset(scrollToP, 20);
+                        mLayoutManager.scrollToPositionWithOffset(scrollToP, Util.scaleHeightPx(20, outMetrics));
                     }
                 }
                 log("modifyMessageReceived: messages size 2: "+messages.size());
@@ -3291,7 +3327,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         return lastIndex;
     }
 
-    public void adjustInfoToShow(int index) {
+    public int adjustInfoToShow(int index) {
         log("adjustInfoToShow");
 
         AndroidMegaChatMessage msg = messages.get(index);
@@ -3512,6 +3548,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
             }
         }
+        return msg.getInfoToShow();
     }
 
     public boolean isGroup(){
@@ -4028,4 +4065,16 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }
         }
     }
+
+   @Override
+    protected void onResume(){
+        log("onResume");
+        super.onResume();
+
+        if (emojiKeyboardShown){
+            keyboardButton.setImageResource(R.drawable.ic_emoticon_white);
+            removeEmojiconFragment();
+        }
+    }
+
 }

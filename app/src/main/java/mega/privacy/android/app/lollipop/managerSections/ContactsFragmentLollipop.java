@@ -112,7 +112,10 @@ public class ContactsFragmentLollipop extends Fragment{
 					if (users.size()>0){
 						ContactController cC = new ContactController(context);
 						cC.pickFolderToShare(users);
-					}										
+						clearSelections();
+						hideMultipleSelect();
+					}
+
 					break;
 				}
 				case R.id.cab_menu_send_file:{
@@ -150,6 +153,7 @@ public class ContactsFragmentLollipop extends Fragment{
 					break;
 				}
 				case R.id.cab_menu_select_all:{
+					((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_RED);
 					selectAll();
 					actionMode.invalidate();
 					break;
@@ -204,8 +208,6 @@ public class ContactsFragmentLollipop extends Fragment{
 					menu.findItem(R.id.cab_menu_start_conversation_more).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 				}
 
-
-
 				if(selected.size()==adapter.getItemCount()){
 					menu.findItem(R.id.cab_menu_select_all).setVisible(false);
 					unselect.setTitle(getString(R.string.action_unselect_all));
@@ -224,7 +226,7 @@ public class ContactsFragmentLollipop extends Fragment{
 			
 			menu.findItem(R.id.cab_menu_help).setVisible(false);
 			menu.findItem(R.id.cab_menu_upgrade_account).setVisible(false);
-			menu.findItem(R.id.cab_menu_settings).setVisible(false);
+			//menu.findItem(R.id.cab_menu_settings).setVisible(false);
 //			menu.findItem(R.id.cab_menu_leave_multiple_share).setVisible(false);
 			return false;
 		}		
@@ -235,7 +237,11 @@ public class ContactsFragmentLollipop extends Fragment{
 	 */
 	public void hideMultipleSelect() {
 		log("hideMultipleSelect");
-		adapter.setMultipleSelect(false);
+		if(adapter!=null){
+			adapter.setMultipleSelect(false);
+		}
+
+		((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_TRANSPARENT_BLACK);
 		if (actionMode != null) {
 			actionMode.finish();
 		}
@@ -411,6 +417,8 @@ public class ContactsFragmentLollipop extends Fragment{
 				emptyTextView.setVisibility(View.GONE);
 			}
 
+			((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
+
 			if (aB != null){
 				aB.setTitle(getString(R.string.section_contacts));
 			}
@@ -481,6 +489,8 @@ public class ContactsFragmentLollipop extends Fragment{
 				emptyImageView.setVisibility(View.GONE);
 				emptyTextView.setVisibility(View.GONE);
 			}
+
+			((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 
 			if (aB != null){
 				aB.setTitle(getString(R.string.section_contacts));
@@ -557,6 +567,7 @@ public class ContactsFragmentLollipop extends Fragment{
 			List<MegaUser> users = adapter.getSelectedUsers();
 			if (users.size() > 0){
 				updateActionModeTitle();
+				((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_RED);
 			}
 		}
 		else{
@@ -726,6 +737,13 @@ public class ContactsFragmentLollipop extends Fragment{
 		}
 		
 		return false;
+	}
+
+	public int getItemCount(){
+		if(adapter!=null){
+			return adapter.getItemCount();
+		}
+		return 0;
 	}
 	
 	public void setOrder(int orderContacts){

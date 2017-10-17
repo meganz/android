@@ -13,6 +13,7 @@ public class MegaAttributes {
 	String extendedAccountDetailsTimeStamp="";
 	String invalidateSdkCache = "false";
 	String fileLoggerKarere = "false";
+	String useHttpsOnly = "false";
 	
 	public MegaAttributes(String online, int attemps, String askSizeDownload, String askNoAppDownload, String fileLogger, String accountDetailsTimeStamp, String paymentMethodsTimeStamp, String pricingTimeStamp, String extendedAccountDetailsTimeStamp, String invalidateSdkCache, String fileLoggerKarere) {
 		this.online = online;
@@ -26,6 +27,22 @@ public class MegaAttributes {
 		this.extendedAccountDetailsTimeStamp = extendedAccountDetailsTimeStamp;
 		this.invalidateSdkCache = invalidateSdkCache;
 		this.fileLoggerKarere = fileLoggerKarere;
+		this.useHttpsOnly = "false";
+	}
+
+	public MegaAttributes(String online, int attemps, String askSizeDownload, String askNoAppDownload, String fileLogger, String accountDetailsTimeStamp, String paymentMethodsTimeStamp, String pricingTimeStamp, String extendedAccountDetailsTimeStamp, String invalidateSdkCache, String fileLoggerKarere, String useHttpsOnly) {
+		this.online = online;
+		this.attemps = attemps;
+		this.askNoAppDownload = askNoAppDownload;
+		this.askSizeDownload = askSizeDownload;
+		this.fileLoggerSDK = fileLogger;
+		this.accountDetailsTimeStamp = accountDetailsTimeStamp;
+		this.paymentMethodsTimeStamp = paymentMethodsTimeStamp;
+		this.pricingTimeStamp = pricingTimeStamp;
+		this.extendedAccountDetailsTimeStamp = extendedAccountDetailsTimeStamp;
+		this.invalidateSdkCache = invalidateSdkCache;
+		this.fileLoggerKarere = fileLoggerKarere;
+		this.useHttpsOnly = useHttpsOnly;
 	}
 	
 	public String getOnline(){
@@ -114,5 +131,13 @@ public class MegaAttributes {
 
 	public void setInvalidateSdkCache(String invalidateSdkCache){
 		this.invalidateSdkCache = invalidateSdkCache;
+	}
+
+	public String getUseHttpsOnly() {
+		return useHttpsOnly;
+	}
+
+	public void setUseHttpsOnly(String useHttpsOnly) {
+		this.useHttpsOnly = useHttpsOnly;
 	}
 }

@@ -4,16 +4,20 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.BottomSheetDialogFragment;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Display;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -58,10 +62,15 @@ public class ContactFileListBottomSheetDialogFragment extends BottomSheetDialogF
     private LinearLayout optionMove;
     private LinearLayout optionRename;
     private LinearLayout optionRubbish;
+    private LinearLayout items_layout;
 
     private DisplayMetrics outMetrics;
 
     private Bitmap thumb = null;
+
+    private int height = -1;
+    private boolean heightseted = false;
+    private int heightReal = -1;
 
     private MegaApiAndroid megaApi;
     private DatabaseHandler dbH;
@@ -106,6 +115,13 @@ public class ContactFileListBottomSheetDialogFragment extends BottomSheetDialogF
 
         mainLinearLayout = (LinearLayout) contentView.findViewById(R.id.contact_file_list_bottom_sheet);
 
+        mainLinearLayout.post(new Runnable() {
+            @Override
+            public void run() {
+                heightReal = mainLinearLayout.getHeight();
+            }
+        });
+
         nodeThumb = (ImageView) contentView.findViewById(R.id.contact_file_list_thumbnail);
         nodeName = (TextView) contentView.findViewById(R.id.contact_file_list_name_text);
         nodeInfo  = (TextView) contentView.findViewById(R.id.contact_file_list_info_text);
@@ -120,6 +136,8 @@ public class ContactFileListBottomSheetDialogFragment extends BottomSheetDialogF
         optionMove = (LinearLayout) contentView.findViewById(R.id.option_move_layout);
         optionRename = (LinearLayout) contentView.findViewById(R.id.option_rename_layout);
         optionRubbish = (LinearLayout) contentView.findViewById(R.id.option_rubbish_bin_layout);
+
+        items_layout = (LinearLayout) contentView.findViewById(R.id.item_list_bottom_sheet_contact_file);
 
         optionDownload.setOnClickListener(this);
         optionInfo.setOnClickListener(this);
@@ -241,6 +259,43 @@ public class ContactFileListBottomSheetDialogFragment extends BottomSheetDialogF
             dialog.setContentView(contentView);
             mBehavior = BottomSheetBehavior.from((View) mainLinearLayout.getParent());
             mBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+
+            final ContactFileListBottomSheetDialogFragment thisclass = this;
+
+            mBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
+                @Override
+                public void onStateChanged(@NonNull View bottomSheet, int newState) {
+                    if(newState == BottomSheetBehavior.STATE_HIDDEN){
+                        dismissAllowingStateLoss();
+                    }
+                }
+
+                @Override
+                public void onSlide(@NonNull View bottomSheet, float slideOffset) {
+                    if(slideOffset> 0 && !heightseted){
+                        if(context instanceof ContactFileListBottomSheetDialogFragment.CustomHeight){
+                            height = ((ContactFileListBottomSheetDialogFragment.CustomHeight) context).getHeightToPanel(thisclass);
+                        }
+                        if(height != -1 && heightReal != -1){
+                            heightseted = true;
+                            int numSons = 0;
+                            int num = items_layout.getChildCount();
+                            for(int i=0; i<num; i++){
+                                View v = items_layout.getChildAt(i);
+                                if(v.getVisibility() == View.VISIBLE){
+                                    numSons++;
+                                }
+                            }
+
+                            if(heightReal > height){
+                                ViewGroup.LayoutParams params = bottomSheet.getLayoutParams();
+                                params.height = height;
+                                bottomSheet.setLayoutParams(params);
+                            }
+                        }
+                    }
+                }
+            });
         }
         else{
             log("Node NULL");
@@ -378,6 +433,10 @@ public class ContactFileListBottomSheetDialogFragment extends BottomSheetDialogF
         long handle = node.getHandle();
         log("Handle of the node: "+handle);
         outState.putLong("handle", handle);
+    }
+
+    public interface CustomHeight{
+        int getHeightToPanel(BottomSheetDialogFragment dialog);
     }
 
     private static void log(String log) {

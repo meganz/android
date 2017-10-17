@@ -119,6 +119,9 @@ public class InboxFragmentLollipop extends Fragment{
 
 					NodeController nC = new NodeController(context);
 					nC.prepareForDownload(handleList);
+
+					clearSelections();
+					hideMultipleSelect();
 					break;
 				}
 				case R.id.cab_menu_rename:{
@@ -126,6 +129,9 @@ public class InboxFragmentLollipop extends Fragment{
 					if (documents.size()==1){
 						((ManagerActivityLollipop) context).showRenameDialog(documents.get(0), documents.get(0).getName());
 					}
+
+					clearSelections();
+					hideMultipleSelect();
 					break;
 				}
 				case R.id.cab_menu_copy:{
@@ -136,6 +142,9 @@ public class InboxFragmentLollipop extends Fragment{
 
 					NodeController nC = new NodeController(context);
 					nC.chooseLocationToCopyNodes(handleList);
+
+					clearSelections();
+					hideMultipleSelect();
 					break;
 				}	
 				case R.id.cab_menu_move:{
@@ -146,6 +155,9 @@ public class InboxFragmentLollipop extends Fragment{
 
 					NodeController nC = new NodeController(context);
 					nC.chooseLocationToMoveNodes(handleList);
+
+					clearSelections();
+					hideMultipleSelect();
 					break;
 				}
 				case R.id.cab_menu_trash:{
@@ -155,9 +167,13 @@ public class InboxFragmentLollipop extends Fragment{
 					}
 
 					((ManagerActivityLollipop) context).askConfirmationMoveToRubbish(handleList);
+
+					clearSelections();
+					hideMultipleSelect();
 					break;
 				}
 				case R.id.cab_menu_select_all:{
+					((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_RED);
 					selectAll();
 					break;
 				}
@@ -207,15 +223,18 @@ public class InboxFragmentLollipop extends Fragment{
 					menu.findItem(R.id.cab_menu_select_all).setVisible(true);
 					unselect.setTitle(getString(R.string.action_unselect_all));
 					unselect.setVisible(true);
-
-					if(megaApi.checkAccess(selected.get(0), MegaShare.ACCESS_FULL).getErrorCode() == MegaError.API_OK) {
-						showRename = true;
-					}
 				}
 				else{
 					menu.findItem(R.id.cab_menu_select_all).setVisible(true);
 					unselect.setTitle(getString(R.string.action_unselect_all));
 					unselect.setVisible(true);
+				}
+
+				if(selected.size()==1){
+					showRename = true;
+				}
+				else{
+					showRename = false;
 				}
 
 				showDownload = true;
@@ -493,6 +512,7 @@ public class InboxFragmentLollipop extends Fragment{
 			List<MegaNode> selectedNodes = adapter.getSelectedNodes();
 			if (selectedNodes.size() > 0){
 				updateActionModeTitle();
+				((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_RED);
 			}
 		}
 		else{
@@ -683,9 +703,16 @@ public class InboxFragmentLollipop extends Fragment{
 	public void hideMultipleSelect() {
 		log("hideMultipleSelect");
 		adapter.setMultipleSelect(false);
+		((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_TRANSPARENT_BLACK);
 		if (actionMode != null) {
 			actionMode.finish();
 		}
+	}
+
+	public static InboxFragmentLollipop newInstance() {
+		log("newInstance");
+		InboxFragmentLollipop fragment = new InboxFragmentLollipop();
+		return fragment;
 	}
 	
 	public int onBackPressed(){

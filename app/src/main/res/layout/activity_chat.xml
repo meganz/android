@@ -21,14 +21,12 @@
             android:id="@+id/chat_emoji_keyboard"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_alignParentBottom="true"
-            />
+            android:layout_alignParentBottom="true" />
 
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_above="@id/chat_emoji_keyboard"
-            >
+            android:layout_above="@id/chat_emoji_keyboard">
 
             <android.support.v7.widget.Toolbar
                 android:id="@+id/toolbar_chat"
@@ -53,7 +51,6 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-
                 <RelativeLayout
                     android:id="@+id/writing_linear_layout_chat"
                     android:layout_width="match_parent"
@@ -66,8 +63,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:background="@null"
-                        android:tint="@color/transparency_white"
-                        android:src="@drawable/ic_insert_emoticon"
+                        android:tint="@color/transparent_black"
+                        android:src="@drawable/ic_emoticon_white"
                         android:layout_alignBottom="@+id/edit_text_chat"
                         android:layout_marginLeft="10dp"
                         android:layout_marginBottom="2dp"
@@ -85,7 +82,7 @@
                         android:src="@drawable/ic_send_black"
                         android:layout_marginBottom="3dp"/>
 
-                    <io.github.rockerhieu.emojicon.EmojiconEditText
+                    <mega.privacy.android.app.components.emojicon.EmojiconEditText
                         android:id="@id/edit_text_chat"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"

@@ -106,4 +106,21 @@
     <color name="transparent_transparent_black">#35000000</color>
     <color name="status_bar_login">#33000000</color>
     <color name="less_transparent_white">#80FFFFFF</color>
+
+    <color name="grey_my_account_background">#FFF9F9F9</color>
+    <color name="grey_my_account_separator">#80FFFFFF</color>
+
+    <color name="grey_achievements_background">#E6FFFFFF</color>
+    <color name="grey_achievements_title">#FF777777</color>
+
+    <color name="grey_achievements_invite_friends">#FF666666</color>
+    <color name="grey_achievements_invite_friends_sub">#FF999999</color>
+
+    <color name="blue_unlocked_rewards">#FF2BA6DE</color>
+    <color name="green_unlocked_rewards">#FF31B500</color>
+
+    <color name="grey_text_chip">#FF535353</color>
+    <color name="grey_background_chip">#FFE0E0E0</color>
+    <color name="invite_button_deactivated">#424F4F4F</color>
+
 </resources>
