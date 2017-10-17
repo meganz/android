@@ -4754,7 +4754,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				return true;
 			}
 		});
-
+		searchView.setMaxWidth(Integer.MAX_VALUE);
 		searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
 
 			@Override
