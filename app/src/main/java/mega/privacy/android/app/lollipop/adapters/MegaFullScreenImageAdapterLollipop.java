@@ -4,14 +4,21 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.PointF;
 import android.os.AsyncTask;
 import android.os.Build;
+import android.support.design.widget.AppBarLayout;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.ActionBar;
+import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.util.SparseArray;
 import android.view.Display;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
+import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -19,6 +26,7 @@ import android.view.animation.TranslateAnimation;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
+import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -41,8 +49,7 @@ import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaTransferListenerInterface;
 import nz.mega.sdk.MegaUtilsAndroid;
 
-
-public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements OnClickListener, MegaRequestListenerInterface, MegaTransferListenerInterface  {
+public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements OnClickListener, MegaRequestListenerInterface, MegaTransferListenerInterface {
 	
 	private Activity activity;
 	private MegaFullScreenImageAdapterLollipop megaFullScreenImageAdapter;
@@ -55,7 +62,8 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 	private ArrayList<Long> pendingFullImages = new ArrayList<Long>();
 	
 	MegaApiAndroid megaApi;
-	
+	Context context;
+
 	/*view holder class*/
     public class ViewHolderFullImage {
     	public TouchImageView imgDisplay;
@@ -63,7 +71,8 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
     	public ProgressBar downloadProgressBar;
     	public long document;
     	public int position;
-    }
+
+	}
     
     private class PreviewAsyncTask extends AsyncTask<Long, Void, Integer>{
 		
@@ -268,11 +277,13 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 	}
 	
 	// constructor
-	public MegaFullScreenImageAdapterLollipop(Activity activity, ArrayList<Long> imageHandles, MegaApiAndroid megaApi) {
+	public MegaFullScreenImageAdapterLollipop(Context context ,Activity activity, ArrayList<Long> imageHandles, MegaApiAndroid megaApi) {
 		this.activity = activity;
 		this.imageHandles = imageHandles;
 		this.megaApi = megaApi;
 		this.megaFullScreenImageAdapter = this;
+		this.context = context;
+
 	}
 
 	@Override
@@ -315,11 +326,12 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 		holder.imgDisplay = (TouchImageView) viewLayout.findViewById(R.id.full_screen_image_viewer_image);
 		holder.imgDisplay.setImageResource(MimeTypeMime.typeForName(node.getName()).getIconResourceId());
 		holder.imgDisplay.setOnClickListener(this);
+
 		holder.progressBar = (ProgressBar) viewLayout.findViewById(R.id.full_screen_image_viewer_progress_bar);
 		holder.downloadProgressBar = (ProgressBar) viewLayout.findViewById(R.id.full_screen_image_viewer_download_progress_bar);
 		holder.downloadProgressBar.setVisibility(View.GONE);
 		holder.document = imageHandles.get(position);
-		
+
 		visibleImgs.put(position, holder);
         
 		Bitmap preview = null;
@@ -392,7 +404,7 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 	public void onClick(View v) {
 		switch(v.getId()){
 			case R.id.full_screen_image_viewer_image:{
-				
+
 				Display display = activity.getWindowManager().getDefaultDisplay();
 				DisplayMetrics outMetrics = new DisplayMetrics ();
 			    display.getMetrics(outMetrics);
@@ -400,48 +412,10 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 				
 			    float scaleW = Util.getScaleW(outMetrics, density);
 			    float scaleH = Util.getScaleH(outMetrics, density);
-			    
-			    RelativeLayout bottomLayout = (RelativeLayout) activity.findViewById(R.id.image_viewer_layout_bottom);
-			    RelativeLayout topLayout = (RelativeLayout) activity.findViewById(R.id.image_viewer_layout_top);
-			    ListView overflowMenuList = (ListView) activity.findViewById(R.id.image_viewer_overflow_menu_list);
-			    
-			    if (menuVisible){
-//			    	AlphaAnimation a = new AlphaAnimation(0.2f, 1.0f);
-//			    	a.setDuration(1000);
-//			    	overflowMenuList.startAnimation(a);
-			    	overflowMenuList.setVisibility(View.GONE);
-			    	
-			    	menuVisible = false;
-			    }
-			    else{
-					if (aBshown){
-						TranslateAnimation animBottom = new TranslateAnimation(0, 0, 0, Util.px2dp(48, outMetrics));
-						animBottom.setDuration(1000);
-						animBottom.setFillAfter( true );
-						bottomLayout.setAnimation(animBottom);
-						
-						TranslateAnimation animTop = new TranslateAnimation(0, 0, 0, Util.px2dp(-48, outMetrics));
-						animTop.setDuration(1000);
-						animTop.setFillAfter( true );
-						topLayout.setAnimation(animTop);
-						
-						aBshown = false;
-					}
-					else{					
-						TranslateAnimation animBottom = new TranslateAnimation(0, 0, Util.px2dp(48, outMetrics), 0);
-						animBottom.setDuration(1000);
-						animBottom.setFillAfter( true );
-						bottomLayout.setAnimation(animBottom);
-						
-						TranslateAnimation animTop = new TranslateAnimation(0, 0, Util.px2dp(-48, outMetrics), 0);
-						animTop.setDuration(1000);
-						animTop.setFillAfter( true );
-						topLayout.setAnimation(animTop);
-						
-						aBshown = true;
-					}
-			    }
-				
+
+				((FullScreenImageViewerLollipop) context).touchImage();
+
+
 				RelativeLayout activityLayout = (RelativeLayout) activity.findViewById(R.id.full_image_viewer_parent_layout);
 				activityLayout.invalidate();
 				
@@ -629,4 +603,5 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 	{
 		return true;
 	}
+
 }

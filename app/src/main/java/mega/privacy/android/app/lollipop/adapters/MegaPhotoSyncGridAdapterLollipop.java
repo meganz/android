@@ -247,6 +247,7 @@ public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaP
 				}
 				
 				if(selected.size() == nodes.size()){
+
 					menu.findItem(R.id.cab_menu_select_all).setVisible(false);
 					menu.findItem(R.id.cab_menu_unselect_all).setVisible(true);			
 				}

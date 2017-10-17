@@ -725,7 +725,11 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 //                et_user.getBackground().mutate().setColorFilter(porterDuffColorFilter);
 				Drawable background = oldPassword_background.mutate().getConstantState().newDrawable();
 				background.setColorFilter(porterDuffColorFilter);
-				oldPasswordView.setBackground(background);
+				if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.JELLY_BEAN) {
+					oldPasswordView.setBackgroundDrawable(background);
+				} else{
+					oldPasswordView.setBackground(background);
+				}
 				LinearLayout.LayoutParams textParamsEditText = (LinearLayout.LayoutParams)oldPasswordView.getLayoutParams();
 				textParamsEditText.setMargins(Util.scaleWidthPx(60, outMetrics), 0, 0, 0);
 				oldPasswordView.setLayoutParams(textParamsEditText);
@@ -738,7 +742,11 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 //                et_user.getBackground().mutate().setColorFilter(porterDuffColorFilter);
 				Drawable background = newPassword_background.mutate().getConstantState().newDrawable();
 				background.setColorFilter(porterDuffColorFilter);
-				newPassword1View.setBackground(background);
+				if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.JELLY_BEAN) {
+					newPassword1View.setBackgroundDrawable(background);
+				} else{
+					newPassword1View.setBackground(background);
+				}
 				LinearLayout.LayoutParams textParamsEditText = (LinearLayout.LayoutParams) newPassword1View.getLayoutParams();
 				textParamsEditText.setMargins(Util.scaleWidthPx(60, outMetrics), 0, 0, 0);
 				newPassword1View.setLayoutParams(textParamsEditText);
@@ -751,7 +759,11 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 //                et_user.getBackground().mutate().setColorFilter(porterDuffColorFilter);
 				Drawable background = newPassword2_background.mutate().getConstantState().newDrawable();
 				background.setColorFilter(porterDuffColorFilter);
-				newPassword2View.setBackground(background);
+				if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.JELLY_BEAN) {
+					newPassword2View.setBackgroundDrawable(background);
+				} else{
+					newPassword2View.setBackground(background);
+				}
 				LinearLayout.LayoutParams textParamsEditText = (LinearLayout.LayoutParams) newPassword2View.getLayoutParams();
 				textParamsEditText.setMargins(Util.scaleWidthPx(60, outMetrics), 0, 0, 0);
 				newPassword2View.setLayoutParams(textParamsEditText);
@@ -765,7 +777,11 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 			case R.id.change_password_oldPassword:{
 				if(oldPasswordErrorView.getVisibility() != View.GONE){
 					oldPasswordErrorView.setVisibility(View.GONE);
-					oldPasswordView.setBackground(oldPassword_background);
+					if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.JELLY_BEAN) {
+						oldPasswordView.setBackgroundDrawable(oldPassword_background);
+					} else{
+						oldPasswordView.setBackground(oldPassword_background);
+					}
 					LinearLayout.LayoutParams textParamsEditText = (LinearLayout.LayoutParams)oldPasswordView.getLayoutParams();
 					textParamsEditText.setMargins(Util.scaleWidthPx(60, outMetrics), 0, 0, Util.scaleWidthPx(10, outMetrics));
 					oldPasswordView.setLayoutParams(textParamsEditText);
@@ -775,7 +791,11 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 			case R.id.change_password_newPassword1:{
 				if(newPassword1ErrorView.getVisibility() != View.GONE){
 					newPassword1ErrorView.setVisibility(View.GONE);
-					newPassword1View.setBackground(newPassword_background);
+					if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.JELLY_BEAN) {
+						newPassword1View.setBackgroundDrawable(newPassword_background);
+					} else{
+						newPassword1View.setBackground(newPassword_background);
+					}
 					LinearLayout.LayoutParams textParamsEditText = (LinearLayout.LayoutParams) newPassword1View.getLayoutParams();
 					textParamsEditText.setMargins(Util.scaleWidthPx(60, outMetrics), 0, 0, Util.scaleWidthPx(10, outMetrics));
 					newPassword1View.setLayoutParams(textParamsEditText);
@@ -785,7 +805,11 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 			case R.id.change_password_newPassword2:{
 				if(newPassword2ErrorView.getVisibility() != View.GONE){
 					newPassword2ErrorView.setVisibility(View.GONE);
-					newPassword2View.setBackground(newPassword2_background);
+					if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.JELLY_BEAN) {
+						newPassword2View.setBackgroundDrawable(newPassword2_background);
+					} else{
+						newPassword2View.setBackground(newPassword2_background);
+					}
 					LinearLayout.LayoutParams textParamsEditText = (LinearLayout.LayoutParams) newPassword2View.getLayoutParams();
 					textParamsEditText.setMargins(Util.scaleWidthPx(60, outMetrics), 0, 0, Util.scaleWidthPx(10, outMetrics));
 					newPassword2View.setLayoutParams(textParamsEditText);

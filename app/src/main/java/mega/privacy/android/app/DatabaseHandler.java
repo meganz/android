@@ -26,7 +26,7 @@ import nz.mega.sdk.MegaChatApi;
 
 public class DatabaseHandler extends SQLiteOpenHelper {
 	
-	private static final int DATABASE_VERSION = 34;
+	private static final int DATABASE_VERSION = 35;
     private static final String DATABASE_NAME = "megapreferences"; 
     private static final String TABLE_PREFERENCES = "preferences";
     private static final String TABLE_CREDENTIALS = "credentials";
@@ -95,6 +95,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	private static final String KEY_PREFERRED_SORT_OTHERS = "preferredsortothers";
 	private static final String KEY_FILE_LOGGER_SDK = "filelogger";
 	private static final String KEY_FILE_LOGGER_KARERE = "fileloggerkarere";
+	private static final String KEY_USE_HTTPS_ONLY = "usehttpsonly";
 
 	private static final String KEY_ACCOUNT_DETAILS_TIMESTAMP = "accountdetailstimestamp";
 	private static final String KEY_PAYMENT_METHODS_TIMESTAMP = "paymentmethodsstimestamp";
@@ -197,7 +198,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         String CREATE_ATTRIBUTES_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_ATTRIBUTES + "("
         		+ KEY_ID + " INTEGER PRIMARY KEY, " + KEY_ATTR_ONLINE + " TEXT, " + KEY_ATTR_INTENTS + " TEXT, " + 
         		KEY_ATTR_ASK_SIZE_DOWNLOAD+ "	BOOLEAN, "+KEY_ATTR_ASK_NOAPP_DOWNLOAD+ " BOOLEAN, " + KEY_FILE_LOGGER_SDK +" TEXT, " + KEY_ACCOUNT_DETAILS_TIMESTAMP +" TEXT, " +
-				KEY_PAYMENT_METHODS_TIMESTAMP +" TEXT, " + KEY_PRICING_TIMESTAMP +" TEXT, " + KEY_EXTENDED_ACCOUNT_DETAILS_TIMESTAMP +" TEXT, " + KEY_INVALIDATE_SDK_CACHE + " TEXT, " + KEY_FILE_LOGGER_KARERE +" TEXT" + ")";
+				KEY_PAYMENT_METHODS_TIMESTAMP +" TEXT, " + KEY_PRICING_TIMESTAMP +" TEXT, " + KEY_EXTENDED_ACCOUNT_DETAILS_TIMESTAMP +" TEXT, " + KEY_INVALIDATE_SDK_CACHE + " TEXT, " + KEY_FILE_LOGGER_KARERE +" TEXT, " + KEY_USE_HTTPS_ONLY +" TEXT" + ")";
         db.execSQL(CREATE_ATTRIBUTES_TABLE);
 
         String CREATE_CONTACTS_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_CONTACTS + "("
@@ -523,6 +524,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		if (oldVersion <= 33){
 			db.execSQL("ALTER TABLE " + TABLE_ATTRIBUTES + " ADD COLUMN " + KEY_FILE_LOGGER_KARERE + " TEXT;");
 			db.execSQL("UPDATE " + TABLE_ATTRIBUTES + " SET " + KEY_FILE_LOGGER_KARERE + " = '" + encrypt("false") + "';");
+		}
+
+		if (oldVersion <= 34){
+			db.execSQL("ALTER TABLE " + TABLE_ATTRIBUTES + " ADD COLUMN " + KEY_USE_HTTPS_ONLY + " TEXT;");
+			db.execSQL("UPDATE " + TABLE_ATTRIBUTES + " SET " + KEY_USE_HTTPS_ONLY + " = '" + encrypt("false") + "';");
 		}
 	} 
 	
@@ -1386,6 +1392,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		values.put(KEY_EXTENDED_ACCOUNT_DETAILS_TIMESTAMP, encrypt(attr.getExtendedAccountDetailsTimeStamp()));
 		values.put(KEY_INVALIDATE_SDK_CACHE, encrypt(attr.getInvalidateSdkCache()));
 		values.put(KEY_FILE_LOGGER_KARERE, encrypt(attr.getFileLoggerKarere()));
+		values.put(KEY_USE_HTTPS_ONLY, encrypt(attr.getUseHttpsOnly()));
 		db.insert(TABLE_ATTRIBUTES, null, values);
 	}
 	
@@ -1407,11 +1414,12 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			String extendedAccountDetailsTimeStamp = decrypt(cursor.getString(9));
 			String invalidateSdkCache = decrypt(cursor.getString(10));
 			String fileLoggerKarere = decrypt(cursor.getString(11));
+			String useHttpsOnly = decrypt(cursor.getString(12));
 			if(intents!=null){
-				attr = new MegaAttributes(online, Integer.parseInt(intents), askSizeDownload, askNoAppDownload, fileLoggerSDK, accountDetailsTimeStamp, paymentMethodsTimeStamp, pricingTimeStamp, extendedAccountDetailsTimeStamp, invalidateSdkCache, fileLoggerKarere);
+				attr = new MegaAttributes(online, Integer.parseInt(intents), askSizeDownload, askNoAppDownload, fileLoggerSDK, accountDetailsTimeStamp, paymentMethodsTimeStamp, pricingTimeStamp, extendedAccountDetailsTimeStamp, invalidateSdkCache, fileLoggerKarere, useHttpsOnly);
 			}
 			else{
-				attr = new MegaAttributes(online, 0, askSizeDownload, askNoAppDownload, fileLoggerSDK, accountDetailsTimeStamp, paymentMethodsTimeStamp, pricingTimeStamp, extendedAccountDetailsTimeStamp, invalidateSdkCache, fileLoggerKarere);
+				attr = new MegaAttributes(online, 0, askSizeDownload, askNoAppDownload, fileLoggerSDK, accountDetailsTimeStamp, paymentMethodsTimeStamp, pricingTimeStamp, extendedAccountDetailsTimeStamp, invalidateSdkCache, fileLoggerKarere, useHttpsOnly);
 			}
 		}
 		cursor.close();
@@ -1624,7 +1632,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	}
 	
 	public long setOfflineFile (MegaOffline offline){
-		log("setOfflineFile");
+		log("setOfflineFile: "+offline.getHandle());
         ContentValues values = new ContentValues();
         
         MegaOffline checkInsert = null;
@@ -1638,7 +1646,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             values.put(KEY_OFF_NAME, encrypt(offline.getName()));
             values.put(KEY_OFF_PARENT, offline.getparentId());
             values.put(KEY_OFF_TYPE, encrypt(offline.getType()));
-            values.put(KEY_OFF_INCOMING, offline.isIncoming());
+            values.put(KEY_OFF_INCOMING, offline.getOrigin());
             values.put(KEY_OFF_HANDLE_INCOMING, encrypt(offline.getHandleIncoming()));
             
             long ret = db.insert(TABLE_OFFLINE, nullColumnHack, values);
@@ -1663,7 +1671,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             values.put(KEY_OFF_NAME, encrypt(offline.getName()));
             values.put(KEY_OFF_PARENT, offline.getparentId());
             values.put(KEY_OFF_TYPE, encrypt(offline.getType()));
-            values.put(KEY_OFF_INCOMING, offline.isIncoming());
+            values.put(KEY_OFF_INCOMING, offline.getOrigin());
             values.put(KEY_OFF_HANDLE_INCOMING, encrypt(offline.getHandleIncoming()));
             
             long ret = db.insert(TABLE_OFFLINE, nullColumnHack, values);
@@ -1688,7 +1696,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             values.put(KEY_OFF_NAME, (offline.getName()));
             values.put(KEY_OFF_PARENT, offline.getparentId());
             values.put(KEY_OFF_TYPE, (offline.getType()));
-            values.put(KEY_OFF_INCOMING, offline.isIncoming());
+            values.put(KEY_OFF_INCOMING, offline.getOrigin());
             values.put(KEY_OFF_HANDLE_INCOMING, (offline.getHandleIncoming()));
             
             long ret = db.insert(TABLE_OFFLINE, nullColumnHack, values);
@@ -1713,7 +1721,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             values.put(KEY_OFF_NAME, (offline.getName()));
             values.put(KEY_OFF_PARENT, offline.getparentId());
             values.put(KEY_OFF_TYPE, (offline.getType()));
-            values.put(KEY_OFF_INCOMING, offline.isIncoming());
+            values.put(KEY_OFF_INCOMING, offline.getOrigin());
             values.put(KEY_OFF_HANDLE_INCOMING, (offline.getHandleIncoming()));
             
             long ret = db.insert(TABLE_OFFLINE, nullColumnHack, values);
@@ -1738,7 +1746,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				String name = decrypt(cursor.getString(3));
 				int parent = cursor.getInt(4);				
 				String type = decrypt(cursor.getString(5));				
-				boolean incoming = (cursor.getInt(6) == 1);
+				int incoming = cursor.getInt(6);
 				String handleIncoming = decrypt(cursor.getString(7));
 				MegaOffline offline = new MegaOffline(id,handle, path, name, parent, type, incoming, handleIncoming);
 				listOffline.add(offline);
@@ -1764,7 +1772,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				String name = (cursor.getString(3));
 				int parent = cursor.getInt(4);				
 				String type = (cursor.getString(5));				
-				boolean incoming = (cursor.getInt(6) == 1);
+				int incoming = cursor.getInt(6);
 				String handleIncoming = (cursor.getString(7));
 				MegaOffline offline = new MegaOffline(id,handle, path, name, parent, type, incoming, handleIncoming);
 				listOffline.add(offline);
@@ -1814,7 +1822,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				String _path = null;
 				String _name = null;
 				String _type = null;
-				boolean _incoming = false;
+				int _incoming = 0;
 				String _handleIncoming = null;
 
 				_id = Integer.parseInt(cursor.getString(0));
@@ -1823,7 +1831,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				_name = decrypt(cursor.getString(3));
 				_parent = cursor.getInt(4);
 				_type = decrypt(cursor.getString(5));
-				_incoming = (cursor.getInt(6) == 1);
+				_incoming = cursor.getInt(6);
 				_handleIncoming = decrypt(cursor.getString(7));
 				offline = new MegaOffline(_id,_handle, _path, _name, _parent, _type, _incoming, _handleIncoming);
 				cursor.close();
@@ -1851,7 +1859,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				String _path = null;
 				String _name = null;
 				String _type = null;
-				boolean _incoming = false;
+				int _incoming = 0;
 				String _handleIncoming = null;
 				
 				_id = Integer.parseInt(cursor.getString(0));
@@ -1860,7 +1868,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				_name = decrypt(cursor.getString(3));
 				_parent = cursor.getInt(4);
 				_type = decrypt(cursor.getString(5));
-				_incoming = (cursor.getInt(6) == 1);
+				_incoming = cursor.getInt(6);
 				_handleIncoming = decrypt(cursor.getString(7));
 				
 				offline = new MegaOffline(_id,_handle, _path, _name, _parent, _type,  _incoming, _handleIncoming);
@@ -1890,7 +1898,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				String _path = null;
 				String _name = null;
 				String _type = null;
-				boolean _incoming = false;
+				int _incoming = 0;
 				String _handleIncoming = null;
 				
 				_id = Integer.parseInt(cursor.getString(0));
@@ -1899,7 +1907,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				_name = decrypt(cursor.getString(3));
 				_parent = cursor.getInt(4);
 				_type = decrypt(cursor.getString(5));
-				_incoming = (cursor.getInt(6) == 1);
+				_incoming = cursor.getInt(6);
 				_handleIncoming = decrypt(cursor.getString(7));
 				
 				offline = new MegaOffline(_id,_handle, _path, _name, _parent, _type,  _incoming, _handleIncoming);
@@ -1929,7 +1937,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 					String _path = null;
 					String _name = null;
 					String _type = null;
-					boolean _incoming = false;
+					int _incoming = 0;
 					String _handleIncoming = null;
 					
 					_id = Integer.parseInt(cursor.getString(0));
@@ -1938,7 +1946,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 					_name = decrypt(cursor.getString(3));
 					_parent = cursor.getInt(4);
 					_type = decrypt(cursor.getString(5));
-					_incoming = (cursor.getInt(6) == 1);
+					_incoming = cursor.getInt(6);
 					_handleIncoming = decrypt(cursor.getString(7));
 					
 					listOffline.add(new MegaOffline(_id,_handle, _path, _name, _parent, _type, _incoming, _handleIncoming));
@@ -1965,7 +1973,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 					String _path = null;
 					String _name = null;
 					String _type = null;
-					boolean _incoming = false;
+					int _incoming = 0;
 					String _handleIncoming = null;
 					
 					_id = Integer.parseInt(cursor.getString(0));
@@ -1974,7 +1982,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 					_name = decrypt(cursor.getString(3));
 					_parent = cursor.getInt(4);
 					_type = decrypt(cursor.getString(5));
-					_incoming = (cursor.getInt(6) == 1);
+					_incoming = cursor.getInt(6);
 					_handleIncoming = decrypt(cursor.getString(7));
 					
 					mOffline = new MegaOffline (_id,_handle, _path, _name, _parent, _type, _incoming, _handleIncoming);
@@ -2011,7 +2019,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 					String _path = null;
 					String _name = null;
 					String _type = null;
-					boolean _incoming = false;
+					int _incoming = 0;
 					String _handleIncoming = null;
 	
 					_id = Integer.parseInt(cursor.getString(0));
@@ -2020,7 +2028,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 					_name = decrypt(cursor.getString(3));
 					_parent = cursor.getInt(4);
 					_type = decrypt(cursor.getString(5));
-					_incoming = (cursor.getInt(6) == 1);
+					_incoming = cursor.getInt(6);
 					_handleIncoming = decrypt(cursor.getString(7));
 					
 					listOffline.add(new MegaOffline(_id,_handle, _path, _name, _parent, _type, _incoming, _handleIncoming));
@@ -2047,7 +2055,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 					String _path = null;
 					String _name = null;
 					String _type = null;
-					boolean _incoming = false;
+					int _incoming = 0;
 					String _handleIncoming = null;
 					
 					_id = Integer.parseInt(cursor.getString(0));
@@ -2056,7 +2064,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 					_name = decrypt(cursor.getString(3));
 					_parent = cursor.getInt(4);
 					_type = decrypt(cursor.getString(5));
-					_incoming = (cursor.getInt(6) == 1);
+					_incoming = cursor.getInt(6);
 					_handleIncoming = decrypt(cursor.getString(7));
 					
 					mOffline = new MegaOffline (_id,_handle, _path, _name, _parent, _type, _incoming, _handleIncoming);
@@ -2076,7 +2084,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		String _path = null;
 		String _name = null;
 		String _type = null;
-		boolean _incoming = false;
+		int _incoming = 0;
 		String _handleIncoming = null;
 		
 		//Get the foreign key of the node 
@@ -2092,7 +2100,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			_name = decrypt(cursor.getString(3));
 			_parent = cursor.getInt(4);
 			_type = decrypt(cursor.getString(5));
-			_incoming = (cursor.getInt(6) == 1);
+			_incoming = cursor.getInt(6);
 			_handleIncoming = cursor.getString(7);
 		}
 		
@@ -2113,7 +2121,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 					_name = decrypt(cursor.getString(3));
 					_parent = cursor.getInt(4);
 					_type = decrypt(cursor.getString(5));
-					_incoming = (cursor.getInt(6) == 1);
+					_incoming = cursor.getInt(6);
 					_handleIncoming = cursor.getString(7);
 					
 					MegaOffline offline = new MegaOffline(_handle, _path, _name, _parent, _type, _incoming, _handleIncoming);
@@ -2792,6 +2800,37 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			db.insert(TABLE_ATTRIBUTES, null, values);
 		}
 		cursor.close();
+	}
+
+	public void setUseHttpsOnly (boolean useHttpsOnly){
+		String selectQuery = "SELECT * FROM " + TABLE_ATTRIBUTES;
+		ContentValues values = new ContentValues();
+		Cursor cursor = db.rawQuery(selectQuery, null);
+		if (cursor.moveToFirst()){
+			String UPDATE_ATTRIBUTES_TABLE = "UPDATE " + TABLE_ATTRIBUTES + " SET " + KEY_USE_HTTPS_ONLY + "='" + encrypt(useHttpsOnly + "") + "' WHERE " + KEY_ID + " ='1'";
+			db.execSQL(UPDATE_ATTRIBUTES_TABLE);
+			log("UPDATE_ATTRIBUTES_TABLE : " + UPDATE_ATTRIBUTES_TABLE);
+		}
+		else{
+			values.put(KEY_USE_HTTPS_ONLY, encrypt(useHttpsOnly + ""));
+			db.insert(TABLE_ATTRIBUTES, null, values);
+		}
+		cursor.close();
+	}
+
+
+	public String getUseHttpsOnly(){
+
+		String selectQuery = "SELECT " + KEY_USE_HTTPS_ONLY + " FROM " + TABLE_ATTRIBUTES + " WHERE " + KEY_ID + " = '1'";
+		Cursor cursor = db.rawQuery(selectQuery, null);
+		if (cursor.moveToFirst()){
+
+			String useHttpsOnly = decrypt(cursor.getString(0));
+			return useHttpsOnly;
+		}
+		cursor.close();
+
+		return "false";
 	}
 
 	public void setInvalidateSdkCache(boolean invalidateSdkCache){

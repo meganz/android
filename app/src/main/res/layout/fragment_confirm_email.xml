@@ -35,7 +35,7 @@
                 android:textColor="#df000000"
                 android:fontFamily="sans-serif-light"
                 android:layout_marginTop="20dp"
-                android:layout_marginLeft="24dp"
+                android:layout_marginLeft="26dp"
                 android:layout_below="@id/confirm_email_icon"/>
 
             <TextView
@@ -48,7 +48,7 @@
                 android:fontFamily="sans-serif-light"
                 android:layout_below="@id/confirm_email_awaiting"
                 android:layout_marginTop="10dp"
-                android:layout_marginLeft="24dp"
+                android:layout_marginLeft="26dp"
                 android:layout_marginRight="56dp"/>
 
             <EditText
@@ -73,7 +73,7 @@
                 android:text="@string/confirm_email_misspelled"
                 android:textSize="14sp"
                 android:layout_marginTop="20dp"
-                android:layout_marginLeft="24dp"
+                android:layout_marginLeft="26dp"
                 android:layout_marginRight="56dp"
                 android:layout_below="@id/confirm_email_new_email"/>
 
@@ -84,10 +84,9 @@
                 android:layout_below="@id/confirm_email_misspelled"
                 android:paddingLeft="10dp"
                 android:paddingRight="10dp"
-                android:paddingTop="-3dp"
-                android:paddingBottom="-3dp"
                 android:layout_marginTop="24dp"
-                android:layout_marginLeft="24dp"
+                android:layout_marginLeft="26dp"
+                android:layout_marginBottom="12dp"
                 android:textColor="@color/white"
                 android:text="@string/confirm_email_misspelled_resend"
                 android:background="@color/accentColor"

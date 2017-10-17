@@ -68,14 +68,6 @@ LIBUV_SOURCE_FOLDER=libuv-v${LIBUV_VERSION}
 LIBUV_DOWNLOAD_URL=http://dist.libuv.org/dist/v${LIBUV_VERSION}/${LIBUV_SOURCE_FILE}
 LIBUV_SHA1="91ea51844ec0fac1c6358a7ad3e8bba128e9d0cc"
 
-LIBEXPAT=libexpat
-LIBEXPAT_VERSION=2.1.1
-LIBEXPAT_SOURCE_FILE=expat-${LIBEXPAT_VERSION}.tar.bz2
-LIBEXPAT_SOURCE_FOLDER=expat-${LIBEXPAT_VERSION}
-LIBEXPAT_DOWNLOAD_URL=http://downloads.sourceforge.net/project/expat/expat/2.1.1/expat-${LIBEXPAT_VERSION}.tar.bz2
-LIBEXPAT_CONFIGURED=${LIBEXPAT}/${LIBEXPAT}/expat_config.h
-LIBEXPAT_SHA1="ff91419882ac52151050dad0ee8190645fbeee08"
-
 function downloadCheckAndUnpack()
 {
     local URL=$1
@@ -184,8 +176,6 @@ if [ "$1" == "clean" ]; then
     rm -rf ${SODIUM}/${SODIUM}
     rm -rf ${LIBUV}/${LIBUV_SOURCE_FOLDER}
     rm -rf ${LIBUV}/${LIBUV}
-    rm -rf ${LIBEXPAT}/${LIBEXPAT}
-    rm -rf ${LIBEXPAT}/${LIBEXPAT_SOURCE_FOLDER}
 
     echo "* Deleting tarballs"
     rm -rf ${CRYPTOPP}/${CRYPTOPP_SOURCE_FILE}
@@ -201,8 +191,6 @@ if [ "$1" == "clean" ]; then
     rm -rf ${SODIUM}/${SODIUM_SOURCE_FILE}.ready
     rm -rf ${LIBUV}/${LIBUV_SOURCE_FILE}
     rm -rf ${LIBUV}/${LIBUV_SOURCE_FILE}.ready
-    rm -rf ${LIBEXPAT}/${LIBEXPAT_SOURCE_FILE}
-    rm -rf ${LIBEXPAT}/${LIBEXPAT_SOURCE_FILE}.ready
 	rm -rf ../obj/local/armeabi/
 	rm -rf ../obj/local/x86
         
@@ -241,14 +229,6 @@ if [ ! -f ${SODIUM}/${SODIUM_SOURCE_FILE}.ready ]; then
     touch ${SODIUM}/${SODIUM_SOURCE_FILE}.ready
 fi
 echo "* libsodium is ready"
-
-echo "* Setting up libexpat"
-if [ ! -f ${LIBEXPAT}/${LIBEXPAT_SOURCE_FILE}.ready ]; then
-    downloadCheckAndUnpack ${LIBEXPAT_DOWNLOAD_URL} ${LIBEXPAT}/${LIBEXPAT_SOURCE_FILE} ${LIBEXPAT_SHA1} ${LIBEXPAT}
-    ln -sf ${LIBEXPAT_SOURCE_FOLDER} ${LIBEXPAT}/${LIBEXPAT}
-    touch ${LIBEXPAT}/${LIBEXPAT_SOURCE_FILE}.ready
-fi
-echo "* libexpat is ready"
 
 echo "* Setting up Crypto++"
 if [ ! -f ${CRYPTOPP}/${CRYPTOPP_SOURCE_FILE}.ready ]; then

@@ -6,6 +6,10 @@ public class MegaOffline {
 	
 	public static String FOLDER = "1";
 	public static String FILE = "0";
+
+	public static int INCOMING = 1;
+	public static int INBOX = 2;
+	public static int OTHER = 0;
 	
 	int id = -1;	
 	String handle = "";
@@ -13,27 +17,27 @@ public class MegaOffline {
 	String name = "";
 	int parentId = -1;
 	String type = "";	
-	boolean incoming = false;
+	int origin = OTHER;
 	String handleIncoming = "";
 	
-	public MegaOffline(String handle, String path, String name, int parentId, String type, boolean incoming, String handleIncoming) {
+	public MegaOffline(String handle, String path, String name, int parentId, String type, int origin, String handleIncoming) {
 		this.handle = handle;
 		this.path = path;
 		this.name = name;
 		this.parentId = parentId;
 		this.type = type;
-		this.incoming = incoming;
+		this.origin = origin;
 		this.handleIncoming = handleIncoming;
 	}
 	
-	public MegaOffline(int id, String handle, String path, String name, int parentId, String type, boolean incoming, String handleIncoming) {
+	public MegaOffline(int id, String handle, String path, String name, int parentId, String type, int origin, String handleIncoming) {
 		this.id=id;
 		this.handle = handle;
 		this.path = path;
 		this.name = name;
 		this.parentId = parentId;
 		this.type = type;
-		this.incoming = incoming;
+		this.origin = origin;
 		this.handleIncoming = handleIncoming;
 	}
 	
@@ -93,14 +97,6 @@ public class MegaOffline {
 		this.parentId = parentId;
 	}
 
-	public boolean isIncoming() {
-		return incoming;
-	}
-
-	public void setIncoming(boolean incoming) {
-		this.incoming = incoming;
-	}
-
 	public String getHandleIncoming() {
 		return handleIncoming;
 	}
@@ -119,6 +115,14 @@ public class MegaOffline {
 			log("isFolder type is NULL");
 		}
 		return false;
+	}
+
+	public int getOrigin() {
+		return origin;
+	}
+
+	public void setOrigin(int origin) {
+		this.origin = origin;
 	}
 
 	private static void log(String log) {

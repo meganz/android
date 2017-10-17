@@ -60,17 +60,18 @@
         android:showAsAction="never"
         MEGA:showAsAction="never" />
     
-    <item
-        android:id="@+id/cab_menu_settings"
-        android:icon="@drawable/ic_delete"
-        android:orderInCategory="125"
-        android:title="@string/action_settings"
-        android:showAsAction="never"
-        MEGA:showAsAction="never" />
+    <!--<item-->
+        <!--android:id="@+id/cab_menu_settings"-->
+        <!--android:icon="@drawable/ic_delete"-->
+        <!--android:orderInCategory="125"-->
+        <!--android:title="@string/action_settings"-->
+        <!--android:showAsAction="never"-->
+        <!--MEGA:showAsAction="never" />-->
 
     <item
         android:id="@+id/cab_menu_delete"
         android:orderInCategory="135"
+        android:icon="@drawable/ic_delete"
         android:title="@string/context_remove"
         android:showAsAction="never"
         MEGA:showAsAction="never" />
