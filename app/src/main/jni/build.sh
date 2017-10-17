@@ -68,14 +68,6 @@ LIBUV_SOURCE_FOLDER=libuv-v${LIBUV_VERSION}
 LIBUV_DOWNLOAD_URL=http://dist.libuv.org/dist/v${LIBUV_VERSION}/${LIBUV_SOURCE_FILE}
 LIBUV_SHA1="91ea51844ec0fac1c6358a7ad3e8bba128e9d0cc"
 
-LIBEXPAT=libexpat
-LIBEXPAT_VERSION=2.1.1
-LIBEXPAT_SOURCE_FILE=expat-${LIBEXPAT_VERSION}.tar.bz2
-LIBEXPAT_SOURCE_FOLDER=expat-${LIBEXPAT_VERSION}
-LIBEXPAT_DOWNLOAD_URL=http://downloads.sourceforge.net/project/expat/expat/2.1.1/expat-${LIBEXPAT_VERSION}.tar.bz2
-LIBEXPAT_CONFIGURED=${LIBEXPAT}/${LIBEXPAT}/expat_config.h
-LIBEXPAT_SHA1="ff91419882ac52151050dad0ee8190645fbeee08"
-
 LIBWEBSOCKETS=libwebsockets
 LIBWEBSOCKETS_VERSION=2.2.2
 LIBWEBSOCKETS_SOURCE_FILE=libwebsockets-${LIBWEBSOCKETS_VERSION}.tar.gz
@@ -257,14 +249,6 @@ if [ ! -f ${SODIUM}/${SODIUM_SOURCE_FILE}.ready ]; then
     touch ${SODIUM}/${SODIUM_SOURCE_FILE}.ready
 fi
 echo "* libsodium is ready"
-
-echo "* Setting up libexpat"
-if [ ! -f ${LIBEXPAT}/${LIBEXPAT_SOURCE_FILE}.ready ]; then
-    downloadCheckAndUnpack ${LIBEXPAT_DOWNLOAD_URL} ${LIBEXPAT}/${LIBEXPAT_SOURCE_FILE} ${LIBEXPAT_SHA1} ${LIBEXPAT}
-    ln -sf ${LIBEXPAT_SOURCE_FOLDER} ${LIBEXPAT}/${LIBEXPAT}
-    touch ${LIBEXPAT}/${LIBEXPAT_SOURCE_FILE}.ready
-fi
-echo "* libexpat is ready"
 
 echo "* Setting up Crypto++"
 if [ ! -f ${CRYPTOPP}/${CRYPTOPP_SOURCE_FILE}.ready ]; then
