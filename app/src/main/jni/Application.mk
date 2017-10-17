@@ -1,5 +1,5 @@
-DISABLE_WEBRTC = true
-USE_LIBWEBSOCKETS = false
+DISABLE_WEBRTC = false
+USE_LIBWEBSOCKETS = true
 
 ifeq ($(DISABLE_WEBRTC),true)
 APP_PLATFORM = android-9
