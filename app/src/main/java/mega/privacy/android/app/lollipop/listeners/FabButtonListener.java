@@ -32,6 +32,7 @@ public class FabButtonListener implements FloatingActionButton.OnClickListener{
                     drawerItem = ((ManagerActivityLollipop)context).getDrawerItem();
                     switch (drawerItem){
                         case CLOUD_DRIVE:
+                        case SEARCH:
                         case SHARED_ITEMS:{
                             log("Cloud Drive SECTION");
                             if(!Util.isOnline(context)){

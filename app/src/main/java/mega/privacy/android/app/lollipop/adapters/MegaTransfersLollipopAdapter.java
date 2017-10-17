@@ -53,7 +53,6 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
 	Context context;
 //	SparseArray<TransfersHolder> transfersListArray;
 	ArrayList<MegaTransfer> tL = null;
-	MegaTransfer currentTransfer = null;
 	int positionClicked;
 	TransfersFragmentLollipop fragment;
 	MegaApiAndroid megaApi;
@@ -61,71 +60,7 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
 	boolean multipleSelect;
 	
 	RecyclerView listFragment;
-	
-//	public MegaTransfersAdapter(Context _context, SparseArray<TransfersHolder> _transfers, ActionBar aB) {
-//		this.context = _context;
-//		this.transfersListArray = _transfers;
-//		this.positionClicked = -1;
-//		this.aB = aB;
-//		
-//		if (megaApi == null){
-//			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
-//		}
-//	}
-	
-	
-	private class TransferThumbnailAsyncTask extends AsyncTask<String, Void, Bitmap>{
-		
-		ViewHolderTransfer holder;
-    	String currentPath;
-    	
-    	public TransferThumbnailAsyncTask(ViewHolderTransfer holder) {
-			this.holder = holder;
-		}
-    	
-    	@Override
-		protected Bitmap doInBackground(String... params) {
-    		currentPath = params[0];
-			File currentFile = new File(currentPath);
-			
-			BitmapFactory.Options options = new BitmapFactory.Options();
-			options.inJustDecodeBounds = true;
-			Bitmap thumb = BitmapFactory.decodeFile(currentFile.getAbsolutePath(), options);
-			
-			ExifInterface exif;
-			int orientation = ExifInterface.ORIENTATION_NORMAL;
-			try {
-				exif = new ExifInterface(currentFile.getAbsolutePath());
-				orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_UNDEFINED);
-			} catch (IOException e) {}  
-			
-			// Calculate inSampleSize
-		    options.inSampleSize = Util.calculateInSampleSize(options, 120, 120);
-		    
-		    // Decode bitmap with inSampleSize set
-		    options.inJustDecodeBounds = false;
-		    
-		    thumb = BitmapFactory.decodeFile(currentFile.getAbsolutePath(), options);
-			if (thumb != null){
-				thumb = Util.rotateBitmap(thumb, orientation);
-				ThumbnailUtils.setThumbnailCache(holder.currentPath, thumb);
-				return thumb;
-			}
-			
-			return null;
-    	}
-    	
-    	@Override
-		protected void onPostExecute(Bitmap thumb){
-    		if (holder.currentPath.compareTo(currentPath) == 0){
-				holder.imageView.setImageBitmap(thumb);
-				Animation fadeInAnimation = AnimationUtils.loadAnimation(context, R.anim.fade_in);
-				holder.imageView.startAnimation(fadeInAnimation);
-			}
-    	}
-	}
-	
-	
+
 	public MegaTransfersLollipopAdapter(Context _context, TransfersFragmentLollipop _fragment, ArrayList<MegaTransfer> _transfers, RecyclerView _listView) {
 		this.context = _context;
 		this.tL = _transfers;
@@ -137,7 +72,6 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
 		}
 	}
-
 		
     public static class ViewHolderTransfer extends RecyclerView.ViewHolder{
     	public ViewHolderTransfer(View v) {
@@ -217,21 +151,7 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
 
 		float scaleW = Util.getScaleW(outMetrics, density);
 
-		MegaTransfer transfer = null;
-		MegaTransfer transferFromList = (MegaTransfer) getItem(position);
-		if (currentTransfer == null){
-			log("currentTransfer == null");
-			transfer = transferFromList;
-		}
-		else{
-			if (transferFromList.getTag() == currentTransfer.getTag()){
-				log("transfer is the currentTransfer");
-				transfer = currentTransfer;
-			}
-			else{
-				transfer = transferFromList;
-			}
-		}
+		MegaTransfer transfer = (MegaTransfer) getItem(position);
 
 		if(transfer==null){
 			log("The recovered transfer is NULL - do not update");
@@ -408,7 +328,11 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
 	}
 	
 	public Object getItem(int position) {
-		return tL.get(position);
+		if(position>=0){
+			return tL.get(position);
+		}
+		log("getItem error: position NOT valid: "+position);
+		return null;
 	}
 	
     @Override
@@ -429,22 +353,27 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
 		log("onClick");
 		
 		ViewHolderTransfer holder = (ViewHolderTransfer) v.getTag();
-		int currentPosition = holder.getAdapterPosition();
-		
-		switch(v.getId()){
-			case R.id.transfers_list_option_remove:{
-				log("click to cancel transfer");
-				MegaTransfer t = (MegaTransfer) getItem(currentPosition);
+		if(holder!=null){
+			int currentPosition = holder.getAdapterPosition();
 
-				((ManagerActivityLollipop) context).showConfirmationCancelTransfer(t, true);
-				break;
+			switch(v.getId()){
+				case R.id.transfers_list_option_remove:{
+					log("click to cancel transfer");
+					MegaTransfer t = (MegaTransfer) getItem(currentPosition);
+
+					((ManagerActivityLollipop) context).showConfirmationCancelTransfer(t, true);
+					break;
+				}
+				case R.id.transfers_list_option_pause:{
+					log("click to pause/play transfer");
+					MegaTransfer t = (MegaTransfer) getItem(currentPosition);
+					((ManagerActivityLollipop) context).pauseIndividualTransfer(t);
+					break;
+				}
 			}
-			case R.id.transfers_list_option_pause:{
-				log("click to pause/play transfer");
-				MegaTransfer t = (MegaTransfer) getItem(currentPosition);
-                ((ManagerActivityLollipop) context).pauseIndividualTransfer(t);
-				break;
-			}
+		}
+		else{
+			log("Holder is NULL- not action performed");
 		}
 	}
 
