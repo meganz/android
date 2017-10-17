@@ -181,8 +181,6 @@ if [ "$1" == "clean" ]; then
     rm -rf ${SODIUM}/${SODIUM}
     rm -rf ${LIBUV}/${LIBUV_SOURCE_FOLDER}
     rm -rf ${LIBUV}/${LIBUV}
-    rm -rf ${LIBEXPAT}/${LIBEXPAT}
-    rm -rf ${LIBEXPAT}/${LIBEXPAT_SOURCE_FOLDER}
 
     echo "* Deleting tarballs"
     rm -rf ${CRYPTOPP}/${CRYPTOPP_SOURCE_FILE}
@@ -198,8 +196,6 @@ if [ "$1" == "clean" ]; then
     rm -rf ${SODIUM}/${SODIUM_SOURCE_FILE}.ready
     rm -rf ${LIBUV}/${LIBUV_SOURCE_FILE}
     rm -rf ${LIBUV}/${LIBUV_SOURCE_FILE}.ready
-    rm -rf ${LIBEXPAT}/${LIBEXPAT_SOURCE_FILE}
-    rm -rf ${LIBEXPAT}/${LIBEXPAT_SOURCE_FILE}.ready
 
     echo "* Deleting object files"
     rm -rf ../obj/local/armeabi-v7a/	
