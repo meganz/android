@@ -10691,6 +10691,47 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
 	}
 
+	public void showConfirmationRemoveSomeFromOffline(final List<MegaOffline> documents){
+		log("showConfirmationRemoveSomeFromOffline");
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+			boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
+			if (!hasStoragePermission) {
+				ActivityCompat.requestPermissions(this,
+						new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+						Constants.REQUEST_WRITE_STORAGE);
+			}
+		}
+
+		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				switch (which){
+					case DialogInterface.BUTTON_POSITIVE: {
+
+						String pathNavigation = getPathNavigationOffline();
+						NodeController nC = new NodeController(managerActivity);
+
+						for (int i=0;i<documents.size();i++){
+							nC.deleteOffline(documents.get(i), pathNavigation);
+						}
+						updateOfflineView(documents.get(0));
+						break;
+					}
+					case DialogInterface.BUTTON_NEGATIVE: {
+						break;
+					}
+				}
+			}
+		};
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+		builder.setMessage(R.string.confirmation_delete_from_save_for_offline).setPositiveButton(R.string.general_remove, dialogClickListener)
+				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
+	}
+
+
+
 	public void showConfirmationEnableLogsSDK(){
 		log("showConfirmationEnableLogsSDK");
 
