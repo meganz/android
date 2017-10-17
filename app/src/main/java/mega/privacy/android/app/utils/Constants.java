@@ -81,6 +81,8 @@ public class Constants {
 
 	final public static int ACHIEVEMENTS_FRAGMENT = 8000;
 	final public static int BONUSES_FRAGMENT = 8001;
+	final public static int INVITE_FRIENDS_FRAGMENT = 8002;
+	final public static int INFO_ACHIEVEMENTS_FRAGMENT = 8003;
 
 	public static final int REQUEST_WRITE_STORAGE = 1;
 	public static final int REQUEST_CAMERA = 2;
@@ -91,6 +93,9 @@ public class Constants {
 	public static final int PRO_I = 1;
 	public static final int PRO_II = 2;
 	public static final int PRO_III = 3;
+
+	public static final int COLOR_STATUS_BAR_RED = 1;
+	public static final int COLOR_STATUS_BAR_TRANSPARENT_BLACK = 2;
 
 	public static String ACTION_OPEN_MEGA_LINK = "OPEN_MEGA_LINK";
 	public static String ACTION_OPEN_MEGA_FOLDER_LINK = "OPEN_MEGA_FOLDER_LINK";
@@ -178,6 +183,7 @@ public class Constants {
 	public static int NOTIFICATION_PUSH_CLOUD_DRIVE = 7;
 	public static int NOTIFICATION_PUSH_CHAT = 8;
 	public static int NOTIFICATION_PUSH_CONTACT = 9;
+	public static int NOTIFICATION_STREAMING_OVERQUOTA= 10;
 
 	public static String CHAT_FOLDER = "My chat files";
 

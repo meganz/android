@@ -330,7 +330,7 @@ echo "* libwebsockets is ready"
 echo "* Checking WebRTC"
 if grep ^DISABLE_WEBRTC Application.mk | grep --quiet false; then
     if [ ! -d megachat/webrtc/include ]; then
-        echo "ERROR: WebRTC not ready. Please download it from this link: https://mega.nz/#!NxlCyS5Y!NVyJDUPMF95Wcg9dpGV5JkwcMi1Hr5x3xH6mPYdbaE0"
+        echo "ERROR: WebRTC not ready. Please download it from this link: https://mega.nz/#!lxNFnYqA!A7zXNm0JBCSVgowjIrFTkRUwj0zbNHJ37iHXF58rzc4"
         echo "and uncompress it in megachat/webrtc"
         exit 1
     else

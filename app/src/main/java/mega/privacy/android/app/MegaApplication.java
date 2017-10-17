@@ -83,7 +83,7 @@ import nz.mega.sdk.MegaUser;
 
 public class MegaApplication extends Application implements MegaListenerInterface, MegaChatListenerInterface, MegaChatRequestListenerInterface {
 	final String TAG = "MegaApplication";
-	static final String USER_AGENT = "MEGAAndroid/3.2.3.1_152";
+	static final String USER_AGENT = "MEGAAndroid/3.2.4_155";
 
 	DatabaseHandler dbH;
 	MegaApiAndroid megaApi;
@@ -721,9 +721,12 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 						.setContentIntent(pendingIntent);
 
 				if(crToShow!=null){
-					Bitmap largeIcon = createDefaultAvatar(crToShow.getSourceEmail());
-					if(largeIcon!=null){
-						notificationBuilder.setLargeIcon(largeIcon);
+
+					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+						Bitmap largeIcon = createDefaultAvatar(crToShow.getSourceEmail());
+						if(largeIcon!=null){
+							notificationBuilder.setLargeIcon(largeIcon);
+						}
 					}
 				}
 
@@ -737,15 +740,25 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 			log("Exception when showing IPC request: "+e.getMessage());
 		}
 	}
-
 	public Bitmap createDefaultAvatar(String email){
 		log("createDefaultAvatar()");
 
 		Bitmap defaultAvatar = Bitmap.createBitmap(Constants.DEFAULT_AVATAR_WIDTH_HEIGHT,Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
 		Canvas c = new Canvas(defaultAvatar);
-		Paint p = new Paint();
-		p.setAntiAlias(true);
-		p.setColor(ContextCompat.getColor(this, R.color.lollipop_primary_color));
+		Paint paintText = new Paint();
+		Paint paintCircle = new Paint();
+
+		paintCircle.setColor(ContextCompat.getColor(this, R.color.lollipop_primary_color));
+		paintText.setColor(Color.WHITE);
+		paintText.setTextSize(150);
+		paintCircle.setAntiAlias(true);
+		paintText.setAntiAlias(true);
+		paintText.setTextAlign(Paint.Align.CENTER);
+		Typeface face = Typeface.SANS_SERIF;
+		paintText.setTypeface(face);
+		paintText.setAntiAlias(true);
+		paintText.setSubpixelText(true);
+		paintText.setStyle(Paint.Style.FILL);
 
 		int radius;
 		if (defaultAvatar.getWidth() < defaultAvatar.getHeight())
@@ -753,7 +766,7 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 		else
 			radius = defaultAvatar.getHeight()/2;
 
-		c.drawCircle(defaultAvatar.getWidth()/2, defaultAvatar.getHeight()/2, radius, p);
+		c.drawCircle(defaultAvatar.getWidth()/2, defaultAvatar.getHeight()/2, radius, paintCircle);
 
 		if(email!=null){
 			if(!email.isEmpty()){
@@ -763,34 +776,12 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 				if(!firstLetter.equals("(")){
 
 					log("Draw letter: "+firstLetter);
-					Paint text = new Paint();
-					Typeface face = Typeface.SANS_SERIF;
-					text.setTypeface(face);
-					text.setAntiAlias(true);
-					text.setSubpixelText(true);
-					text.setStyle(Paint.Style.FILL);
-					text.setColor(Color.WHITE);
-					text.setTextSize(150);
-					text.setTextAlign(Paint.Align.CENTER);
+					Rect bounds = new Rect();
 
-					Rect r = new Rect();
-					c.getClipBounds(r);
-					int cHeight = r.height();
-					int cWidth = r.width();
-					text.setTextAlign(Paint.Align.LEFT);
-					text.getTextBounds(firstLetter, 0, firstLetter.length(), r);
-					float x = 0;
-					float y = 0;
-					if(firstLetter.toUpperCase(Locale.getDefault()).equals("A")){
-						x = cWidth / 2f - r.width() / 2f - r.left - 10;
-						y = cHeight / 2f + r.height() / 2f - r.bottom + 10;
-					}
-					else{
-						x = cWidth / 2f - r.width() / 2f - r.left;
-						y = cHeight / 2f + r.height() / 2f - r.bottom;
-					}
-
-					c.drawText(firstLetter.toUpperCase(Locale.getDefault()), x, y, text);
+					paintText.getTextBounds(firstLetter,0,firstLetter.length(),bounds);
+					int xPos = (c.getWidth()/2);
+					int yPos = (int)((c.getHeight()/2)-((paintText.descent()+paintText.ascent()/2))+20);
+					c.drawText(firstLetter.toUpperCase(Locale.getDefault()), xPos, yPos, paintText);
 				}
 
 			}
@@ -825,7 +816,9 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 					firstTs=-1;
 				}
 				else{
+
 					if (!recentChatsFragmentVisible) {
+						log("NOt recentFragment visible");
 						if (openChatId != item.getChatId()) {
 							if (isFirstConnect()) {
 								log("onChatListItemUpdateMegaApplication. FIRSTCONNECT " + item.getTitle() + "Unread count: " + item.getUnreadCount() + " hasChanged(CHANGE_TYPE_UNREAD_COUNT): " + item.hasChanged(MegaChatListItem.CHANGE_TYPE_UNREAD_COUNT) + " hasChanged(CHANGE_TYPE_LAST_TS):" + item.hasChanged(MegaChatListItem.CHANGE_TYPE_LAST_TS));
@@ -853,6 +846,12 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 							}
 						}
 					}
+//					else{
+//						log("In section chat");
+//						if ((openChatId!=-1)&&(openChatId != item.getChatId())) {
+//							showNotification(item);
+//						}
+//					}
 				}
 			}
 			catch (Exception e){

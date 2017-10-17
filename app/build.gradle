@@ -6,10 +6,10 @@ android {
 
     defaultConfig {
         applicationId "mega.privacy.android.app"
-        minSdkVersion 11
+        minSdkVersion 14
         targetSdkVersion 25
-        versionCode 152
-        versionName "3.2.3.1 (152)"
+        versionCode 155
+        versionName "3.2.4 (155)"
     }
 
     sourceSets.main {
@@ -61,6 +61,7 @@ dependencies {
     compile 'io.github.rockerhieu:emojicon:1.4.1'
     compile 'com.google.firebase:firebase-messaging:10.0.0'
     compile 'com.android.support:cardview-v7:25.3.1'
+    compile 'com.vdurmont:emoji-java:3.3.0'
 }
 
 apply plugin: 'com.google.gms.google-services'

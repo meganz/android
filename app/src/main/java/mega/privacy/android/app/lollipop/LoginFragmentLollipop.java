@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
+import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -159,10 +160,10 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
     private String emailTemp = null;
     private String passwdTemp = null;
 
-    private RelativeLayout login_email_error_layout;
-    private RelativeLayout login_password_error_layout;
-    private TextView login_email_error_text;
-    private TextView login_password_error_text;
+    private RelativeLayout loginEmailErrorLayout;
+    private RelativeLayout loginPasswordErrorLayout;
+    private TextView loginEmailErrorText;
+    private TextView loginPasswordErrorText;
 
     private Drawable login_background;
     private Drawable password_background;
@@ -267,6 +268,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
         et_user.setCursorVisible(true);
         et_user.getBackground().clearColorFilter();
+        et_user.requestFocus();
 
         et_user.addTextChangedListener(new TextWatcher() {
             @Override
@@ -287,10 +289,10 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
         login_background = et_user.getBackground().mutate().getConstantState().newDrawable();
 
-        login_email_error_layout = (RelativeLayout) v.findViewById(R.id.login_email_text_error);
-        login_email_error_layout.setVisibility(View.GONE);
+        loginEmailErrorLayout = (RelativeLayout) v.findViewById(R.id.login_email_text_error);
+        loginEmailErrorLayout.setVisibility(View.GONE);
 
-        login_email_error_text = (TextView) v.findViewById(R.id.login_email_text_error_text);
+        loginEmailErrorText = (TextView) v.findViewById(R.id.login_email_text_error_text);
 
         et_password = (EditText) v.findViewById(R.id.login_password_text);
 
@@ -326,10 +328,10 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
         password_background = et_password.getBackground().mutate().getConstantState().newDrawable();
 
-        login_password_error_layout = (RelativeLayout) v.findViewById(R.id.login_password_text_error);
-        login_password_error_layout.setVisibility(View.GONE);
+        loginPasswordErrorLayout = (RelativeLayout) v.findViewById(R.id.login_password_text_error);
+        loginPasswordErrorLayout.setVisibility(View.GONE);
 
-        login_password_error_text = (TextView) v.findViewById(R.id.login_password_text_error_text);
+        loginPasswordErrorText = (TextView) v.findViewById(R.id.login_password_text_error_text);
 
         loginThreeDots = (ImageView) v.findViewById(R.id.login_three_dots);
         LinearLayout.LayoutParams textThreeDots = (LinearLayout.LayoutParams)loginThreeDots.getLayoutParams();
@@ -350,6 +352,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if(!isChecked){
                     et_password.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+                    et_password.setTypeface(Typeface.SANS_SERIF,Typeface.NORMAL);
                     et_password.setSelection(et_password.getText().length());
                 }else{
                     et_password.setInputType(InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
@@ -546,52 +549,32 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     return v;
                 }
                 else{
+
+                    if(intentReceived.getAction()!=null){
+                        action = intentReceived.getAction();
+                        log("Action: "+action);
+                    }
+
                     if(intentReceived.getAction().equals(Constants.ACTION_OPEN_MEGA_FOLDER_LINK)){
-                        action = Constants.ACTION_OPEN_MEGA_FOLDER_LINK;
                         url = intentReceived.getDataString();
                     }
                     else if(intentReceived.getAction().equals(Constants.ACTION_IMPORT_LINK_FETCH_NODES)){
-                        action = Constants.ACTION_OPEN_MEGA_LINK;
                         url = intentReceived.getDataString();
-                    }
-                    else if (intentReceived.getAction().equals(Constants.ACTION_CANCEL_CAM_SYNC)){
-                        action = intentReceived.getAction();
                     }
                     else if(intentReceived.getAction().equals(Constants.ACTION_CHANGE_MAIL)){
                         log("intent received ACTION_CHANGE_MAIL");
-                        action = Constants.ACTION_CHANGE_MAIL;
                         url = intentReceived.getDataString();
                     }
                     else if(intentReceived.getAction().equals(Constants.ACTION_CANCEL_ACCOUNT)){
                         log("intent received ACTION_CANCEL_ACCOUNT");
-                        action = Constants.ACTION_CANCEL_ACCOUNT;
                         url = intentReceived.getDataString();
                     }
-//					else if (intentReceived.getAction().equals(ManagerActivityLollipop.ACTION_FILE_EXPLORER_UPLOAD)){
-//						action = ManagerActivityLollipop.ACTION_FILE_EXPLORER_UPLOAD;
-//						uriData = intentReceived.getData();
-//						log("URI: "+uriData);
-//						extras = intentReceived.getExtras();
-//						url = null;
-//						Snackbar.make(scrollView,getString(R.string.login_before_share),Snackbar.LENGTH_LONG).show();
-//					}
                     else if (intentReceived.getAction().equals(Constants.ACTION_FILE_PROVIDER)){
-                        action = Constants.ACTION_FILE_PROVIDER;
                         uriData = intentReceived.getData();
                         extras = intentReceived.getExtras();
                         url = null;
                     }
-                    else if (intentReceived.getAction().equals(Constants.ACTION_EXPORT_MASTER_KEY)){
-                        action = Constants.ACTION_EXPORT_MASTER_KEY;
-                    }
-                    else if (intentReceived.getAction().equals(Constants.ACTION_IPC)){
-                        action = Constants.ACTION_IPC;
-                    }
-                    else if (intentReceived.getAction().equals(Constants.ACTION_SHOW_TRANSFERS)){
-                        action = intentReceived.getAction();
-                    }
-                    if(intentReceived.getAction().equals(Constants.ACTION_OPEN_HANDLE_NODE)){
-                        action = Constants.ACTION_OPEN_HANDLE_NODE;
+                    else if(intentReceived.getAction().equals(Constants.ACTION_OPEN_HANDLE_NODE)){
                         url = intentReceived.getDataString();
                     }
 
@@ -2322,23 +2305,31 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         }
         switch (editText.getId()){
             case R.id.login_email_text:{
-                login_email_error_layout.setVisibility(View.VISIBLE);
-                login_email_error_text.setText(error);
+                loginEmailErrorLayout.setVisibility(View.VISIBLE);
+                loginEmailErrorText.setText(error);
                 PorterDuffColorFilter porterDuffColorFilter = new PorterDuffColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
 //                et_user.getBackground().mutate().setColorFilter(porterDuffColorFilter);
                 Drawable background = login_background.mutate().getConstantState().newDrawable();
                 background.setColorFilter(porterDuffColorFilter);
-                et_user.setBackground(background);
+                if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.JELLY_BEAN) {
+                    et_user.setBackgroundDrawable(background);
+                } else{
+                    et_user.setBackground(background);
+                }
                 break;
             }
             case R.id.login_password_text:{
-                login_password_error_layout.setVisibility(View.VISIBLE);
-                login_password_error_text.setText(error);
+                loginPasswordErrorLayout.setVisibility(View.VISIBLE);
+                loginPasswordErrorText.setText(error);
                 PorterDuffColorFilter porterDuffColorFilter = new PorterDuffColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
 //                et_password.getBackground().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
                 Drawable background = password_background.mutate().getConstantState().newDrawable();
                 background.setColorFilter(porterDuffColorFilter);
-                et_password.setBackground(background);
+                if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.JELLY_BEAN) {
+                    et_password.setBackgroundDrawable(background);
+                } else{
+                    et_password.setBackground(background);
+                }
                 break;
             }
         }
@@ -2347,19 +2338,27 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
     private void quitError(EditText editText){
         switch (editText.getId()){
             case R.id.login_email_text:{
-                if(login_email_error_layout.getVisibility() != View.GONE){
-                    login_email_error_layout.setVisibility(View.GONE);
-                    et_user.setBackground(login_background);
+                if(loginEmailErrorLayout.getVisibility() != View.GONE){
+                    loginEmailErrorLayout.setVisibility(View.GONE);
+                    if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.JELLY_BEAN) {
+                        et_user.setBackgroundDrawable(login_background);
+                    } else{
+                        et_user.setBackground(login_background);
+                    }
                 }
+                break;
             }
-            break;
             case R.id.login_password_text:{
-                if(login_password_error_layout.getVisibility() != View.GONE){
-                    login_password_error_layout.setVisibility(View.GONE);
-                    et_password.setBackground(password_background);
+                if(loginPasswordErrorLayout.getVisibility() != View.GONE){
+                    loginPasswordErrorLayout.setVisibility(View.GONE);
+                    if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.JELLY_BEAN) {
+                        et_password.setBackgroundDrawable(password_background);
+                    } else{
+                        et_password.setBackground(password_background);
+                    }
                 }
+                break;
             }
-            break;
         }
     }
 

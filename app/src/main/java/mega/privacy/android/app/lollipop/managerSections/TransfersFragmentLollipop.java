@@ -189,9 +189,11 @@ public class TransfersFragmentLollipop extends Fragment {
 		int index = 0;
 		while(li.hasNext()) {
 			MegaTransfer next = (MegaTransfer) li.next();
-			if(next.getTag() == transfer.getTag()){
-				index=li.previousIndex();
-				break;
+			if(next!=null){
+				if(next.getTag() == transfer.getTag()){
+					index=li.previousIndex();
+					break;
+				}
 			}
 		}
 		tL.set(index, transfer);
