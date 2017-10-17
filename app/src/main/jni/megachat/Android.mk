@@ -12,7 +12,7 @@ ifneq ($(DISABLE_WEBRTC),true)
   include $(CLEAR_VARS)
   LOCAL_MODULE := webrtc
   LOCAL_SRC_FILES := $(LOCAL_PATH)/webrtc/libwebrtc_$(TARGET_ARCH).a
-  LOCAL_EXPORT_C_INCLUDES := $(LOCAL_PATH)/webrtc/include $(LOCAL_PATH)/webrtc/include/third_party/boringssl/src/include 
+  LOCAL_EXPORT_C_INCLUDES := $(LOCAL_PATH)/webrtc/include $(LOCAL_PATH)/webrtc/include/webrtc $(LOCAL_PATH)/webrtc/include/third_party/boringssl/src/include $(LOCAL_PATH)/webrtc/include/third_party/libyuv/include
   LOCAL_EXPORT_CFLAGS := -DENABLE_WEBRTC -DWEBRTC_POSIX -DWEBRTC_LINUX -DWEBRTC_ANDROID
   include $(PREBUILT_STATIC_LIBRARY)
 endif
@@ -56,8 +56,14 @@ LOCAL_SRC_FILES += $(addprefix sdk/src/, net/libwsIO.cpp waiter/libeventWaiter.c
 LOCAL_STATIC_LIBRARIES += libws
 endif
 
+ifeq ($(DISABLE_WEBRTC),false)
+LOCAL_SRC_FILES += $(addprefix sdk/src/, rtcCrypto.cpp)
+LOCAL_SRC_FILES += $(addprefix sdk/src/rtcModule/, webrtc.cpp webrtcAdapter.cpp rtcStats.cpp)
+LOCAL_STATIC_LIBRARIES += webrtc
+else
 LOCAL_CFLAGS += -DKARERE_DISABLE_WEBRTC=1 -DSVC_DISABLE_STROPHE
 LOCAL_EXPORT_CFLAGS += -DKARERE_DISABLE_WEBRTC=1 -DSVC_DISABLE_STROPHE
+endif
 
 include $(BUILD_STATIC_LIBRARY)
 

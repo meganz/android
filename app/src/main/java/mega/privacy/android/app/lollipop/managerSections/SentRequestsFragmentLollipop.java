@@ -85,6 +85,7 @@ public class SentRequestsFragmentLollipop extends Fragment {
 
 			switch(item.getItemId()){
 				case R.id.cab_menu_select_all:{
+					((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_RED);
 					selectAll();
 					actionMode.invalidate();
 					break;
@@ -202,6 +203,7 @@ public class SentRequestsFragmentLollipop extends Fragment {
 	public void hideMultipleSelect() {
 		log("hideMultipleSelect");
 		adapterList.setMultipleSelect(false);
+		((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_TRANSPARENT_BLACK);
 		if (actionMode != null) {
 			actionMode.finish();
 		}
@@ -404,6 +406,7 @@ public class SentRequestsFragmentLollipop extends Fragment {
 			List<MegaContactRequest> users = adapterList.getSelectedRequest();
 			if (users.size() > 0){
 				updateActionModeTitle();
+				((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_RED);
 			}
 		}
 		else{

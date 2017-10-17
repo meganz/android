@@ -83,13 +83,25 @@ public final class NotificationBuilder {
 
     public void sendBundledNotification(Uri uriParameter, MegaChatListItem item, String vibration, String email) {
 
+        log("SDK android version: "+Build.VERSION.SDK_INT);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             log("more than Build.VERSION_CODES.N");
-            Notification notification = buildNotification(uriParameter, item, vibration, GROUP_KEY, email);
-            log("Notification id: "+getNotificationIdByHandle(item.getChatId()));
-            notificationManager.notify(getNotificationIdByHandle(item.getChatId()), notification);
-            Notification summary = buildSummary(GROUP_KEY);
-            notificationManager.notify(SUMMARY_ID, summary);
+
+            String manufacturer = "xiaomi";
+            if(!manufacturer.equalsIgnoreCase(android.os.Build.MANUFACTURER)) {
+                Notification notification = buildNotification(uriParameter, item, vibration, GROUP_KEY, email);
+                log("Notification id--- "+getNotificationIdByHandle(item.getChatId()));
+                notificationManager.notify(getNotificationIdByHandle(item.getChatId()), notification);
+                Notification summary = buildSummary(GROUP_KEY);
+                notificationManager.notify(SUMMARY_ID, summary);
+            }
+            else{
+                Notification notification = buildNotificationPreN(uriParameter, item, vibration, GROUP_KEY, email);
+                log("Notification XIAOMI id: "+getNotificationIdByHandle(item.getChatId()));
+                if(notification!=null){
+                    notificationManager.notify(getNotificationIdByHandle(item.getChatId()), notification);
+                }
+            }
         }
         else if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
             log("more than Build.VERSION_CODES.LOLLIPOP");

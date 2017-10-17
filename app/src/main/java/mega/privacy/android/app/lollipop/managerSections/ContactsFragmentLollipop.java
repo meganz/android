@@ -153,6 +153,7 @@ public class ContactsFragmentLollipop extends Fragment{
 					break;
 				}
 				case R.id.cab_menu_select_all:{
+					((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_RED);
 					selectAll();
 					actionMode.invalidate();
 					break;
@@ -207,8 +208,6 @@ public class ContactsFragmentLollipop extends Fragment{
 					menu.findItem(R.id.cab_menu_start_conversation_more).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 				}
 
-
-
 				if(selected.size()==adapter.getItemCount()){
 					menu.findItem(R.id.cab_menu_select_all).setVisible(false);
 					unselect.setTitle(getString(R.string.action_unselect_all));
@@ -238,7 +237,11 @@ public class ContactsFragmentLollipop extends Fragment{
 	 */
 	public void hideMultipleSelect() {
 		log("hideMultipleSelect");
-		adapter.setMultipleSelect(false);
+		if(adapter!=null){
+			adapter.setMultipleSelect(false);
+		}
+
+		((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_TRANSPARENT_BLACK);
 		if (actionMode != null) {
 			actionMode.finish();
 		}
@@ -384,7 +387,7 @@ public class ContactsFragmentLollipop extends Fragment{
 			contentText = (TextView) v.findViewById(R.id.contact_list_content_text);
 
 			if (adapter == null){
-				adapter = new MegaContactsLollipopAdapter(context, this, visibleContacts, emptyImageView, emptyTextView, recyclerView, MegaContactsLollipopAdapter.ITEM_VIEW_TYPE_LIST);
+				adapter = new MegaContactsLollipopAdapter(context, this, visibleContacts, recyclerView, MegaContactsLollipopAdapter.ITEM_VIEW_TYPE_LIST);
 			}
 			else{
 				adapter.setContacts(visibleContacts);
@@ -456,7 +459,7 @@ public class ContactsFragmentLollipop extends Fragment{
 			contentText = (TextView) v.findViewById(R.id.contact_content_text_grid);
 
 			if (adapter == null){
-				adapter = new MegaContactsLollipopAdapter(context, this, visibleContacts, emptyImageView, emptyTextView, recyclerView, MegaContactsLollipopAdapter.ITEM_VIEW_TYPE_GRID);
+				adapter = new MegaContactsLollipopAdapter(context, this, visibleContacts, recyclerView, MegaContactsLollipopAdapter.ITEM_VIEW_TYPE_GRID);
 			}
 			else{
 				adapter.setContacts(visibleContacts);
@@ -564,6 +567,7 @@ public class ContactsFragmentLollipop extends Fragment{
 			List<MegaUser> users = adapter.getSelectedUsers();
 			if (users.size() > 0){
 				updateActionModeTitle();
+				((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_RED);
 			}
 		}
 		else{
