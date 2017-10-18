@@ -1111,6 +1111,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			log("savedInstanceState -> parentHandleBrowser: "+parentHandleBrowser);
 			parentHandleRubbish = savedInstanceState.getLong("parentHandleRubbish", -1);
 			parentHandleIncoming = savedInstanceState.getLong("parentHandleIncoming", -1);
+            log("savedInstanceState -> parentHandleIncoming: "+parentHandleIncoming);
 			parentHandleOutgoing = savedInstanceState.getLong("parentHandleOutgoing", -1);
 			log("savedInstanceState -> parentHandleOutgoing: "+parentHandleOutgoing);
 			parentHandleSearch = savedInstanceState.getLong("parentHandleSearch", -1);
@@ -1342,10 +1343,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		tB.setVisibility(View.VISIBLE);
 		setSupportActionBar(tB);
 		aB = getSupportActionBar();
-		log("aB.setHomeAsUpIndicator_1");
-		aB.setTitle(getString(R.string.section_cloud_drive));
-        aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
-        aB.setHomeButtonEnabled(true);
+		aB.setHomeButtonEnabled(true);
         aB.setDisplayHomeAsUpEnabled(true);
 //        aB.setDisplayShowHomeEnabled(true);
 //        getSupportActionBar().setCustomView(R.layout.custom_action_bar_top);
@@ -3237,6 +3235,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						MegaNode parentNode = megaApi.getNodeByHandle(parentHandleBrowser);
 						if (parentNode != null){
 							if (parentNode.getHandle() == megaApi.getRootNode().getHandle() || parentHandleBrowser == -1){
+								log("setToolbarTitle: cloud DRIVE 202");
 								aB.setTitle(getString(R.string.section_cloud_drive));
 								aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 								firstNavigationLevel = true;
@@ -3250,6 +3249,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						}
 						else{
 							parentHandleBrowser = megaApi.getRootNode().getHandle();
+							log("setToolbarTitle: cloud DRIVE 204");
 							aB.setTitle(getString(R.string.section_cloud_drive));
 							aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 							firstNavigationLevel = true;
@@ -4753,7 +4753,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				return true;
 			}
 		});
-
+		searchView.setMaxWidth(Integer.MAX_VALUE);
 		searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
 
 			@Override
@@ -7405,13 +7405,16 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			iFLol.refresh();
 
 			//Refresh Rubbish Fragment
-			rubbishBinFLol = (RubbishBinFragmentLollipop) cloudPageAdapter.instantiateItem(viewPagerCDrive, 1);
-			if (rubbishBinFLol != null){
-				ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleRubbish), orderCloud);
-				rubbishBinFLol.setNodes(nodes);
-				rubbishBinFLol.getRecyclerView().invalidate();
+			if(cloudPageAdapter!=null){
+				rubbishBinFLol = (RubbishBinFragmentLollipop) cloudPageAdapter.instantiateItem(viewPagerCDrive, 1);
+				if (rubbishBinFLol != null){
+					if(rubbishBinFLol.isAdded()){
+						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleRubbish), orderCloud);
+						rubbishBinFLol.setNodes(nodes);
+						rubbishBinFLol.getRecyclerView().invalidate();
+					}
+				}
 			}
-
 		}
 		else if (drawerItem == DrawerItem.SHARED_ITEMS){
 			outSFLol = (OutgoingSharesFragmentLollipop) sharesPageAdapter.instantiateItem(viewPagerShares, 1);
@@ -7419,18 +7422,22 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			outSFLol.refresh();
 
 			//Refresh Rubbish Fragment
-			rubbishBinFLol = (RubbishBinFragmentLollipop) cloudPageAdapter.instantiateItem(viewPagerCDrive, 1);
-			if (rubbishBinFLol != null){
-				ArrayList<MegaNode> nodes;
-				if(parentHandleRubbish == -1){
-					nodes = megaApi.getChildren(megaApi.getRubbishNode(), orderCloud);
-				}
-				else{
-					nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleRubbish), orderCloud);
-				}
+			if(cloudPageAdapter!=null){
+				rubbishBinFLol = (RubbishBinFragmentLollipop) cloudPageAdapter.instantiateItem(viewPagerCDrive, 1);
+				if (rubbishBinFLol != null){
+					if(rubbishBinFLol.isAdded()){
+						ArrayList<MegaNode> nodes;
+						if(parentHandleRubbish == -1){
+							nodes = megaApi.getChildren(megaApi.getRubbishNode(), orderCloud);
+						}
+						else{
+							nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleRubbish), orderCloud);
+						}
 
-				rubbishBinFLol.setNodes(nodes);
-				rubbishBinFLol.getRecyclerView().invalidate();
+						rubbishBinFLol.setNodes(nodes);
+						rubbishBinFLol.getRecyclerView().invalidate();
+					}
+				}
 			}
 		}
 		setToolbarTitle();
@@ -7447,23 +7454,27 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			iFLol.hideMultipleSelect();
 			iFLol.refresh();
 
-			fbFLol = (FileBrowserFragmentLollipop) cloudPageAdapter.instantiateItem(viewPagerCDrive, 0);
-			if (fbFLol != null){
-				ArrayList<MegaNode> nodes;
-				if(parentHandleBrowser==-1){
-					nodes = megaApi.getChildren(megaApi.getNodeByHandle(megaApi.getRootNode().getHandle()), orderCloud);
+			if(cloudPageAdapter!=null){
+				fbFLol = (FileBrowserFragmentLollipop) cloudPageAdapter.instantiateItem(viewPagerCDrive, 0);
+				if (fbFLol != null){
+					if(fbFLol.isAdded()){
+						ArrayList<MegaNode> nodes;
+						if(parentHandleBrowser==-1){
+							nodes = megaApi.getChildren(megaApi.getNodeByHandle(megaApi.getRootNode().getHandle()), orderCloud);
+						}
+						else{
+							nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleBrowser), orderCloud);
+						}
+						log("nodes: "+nodes.size());
+						fbFLol.hideMultipleSelect();
+						fbFLol.setNodes(nodes);
+						fbFLol.setOverviewLayout();
+						fbFLol.getRecyclerView().invalidate();
+					}
 				}
 				else{
-					nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleBrowser), orderCloud);
+					log("FileBrowser is NULL after move");
 				}
-				log("nodes: "+nodes.size());
-				fbFLol.hideMultipleSelect();
-				fbFLol.setNodes(nodes);
-				fbFLol.setOverviewLayout();
-				fbFLol.getRecyclerView().invalidate();
-			}
-			else{
-				log("FileBrowser is NULL after move");
 			}
 
 		}
@@ -10679,6 +10690,47 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
 	}
 
+	public void showConfirmationRemoveSomeFromOffline(final List<MegaOffline> documents){
+		log("showConfirmationRemoveSomeFromOffline");
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+			boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
+			if (!hasStoragePermission) {
+				ActivityCompat.requestPermissions(this,
+						new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+						Constants.REQUEST_WRITE_STORAGE);
+			}
+		}
+
+		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				switch (which){
+					case DialogInterface.BUTTON_POSITIVE: {
+
+						String pathNavigation = getPathNavigationOffline();
+						NodeController nC = new NodeController(managerActivity);
+
+						for (int i=0;i<documents.size();i++){
+							nC.deleteOffline(documents.get(i), pathNavigation);
+						}
+						updateOfflineView(documents.get(0));
+						break;
+					}
+					case DialogInterface.BUTTON_NEGATIVE: {
+						break;
+					}
+				}
+			}
+		};
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+		builder.setMessage(R.string.confirmation_delete_from_save_for_offline).setPositiveButton(R.string.general_remove, dialogClickListener)
+				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
+	}
+
+
+
 	public void showConfirmationEnableLogsSDK(){
 		log("showConfirmationEnableLogsSDK");
 
@@ -12530,10 +12582,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			log("MegaRequest.TYPE_PAUSE_TRANSFERS");
 			if (e.getErrorCode() == MegaError.API_OK) {
 
-				fbFLol = (FileBrowserFragmentLollipop) cloudPageAdapter.instantiateItem(viewPagerCDrive, 0);
-				if(fbFLol!=null){
-					if(fbFLol.isAdded()){
-						fbFLol.updateTransferButton();
+				if(cloudPageAdapter!=null){
+					fbFLol = (FileBrowserFragmentLollipop) cloudPageAdapter.instantiateItem(viewPagerCDrive, 0);
+					if(fbFLol!=null){
+						if(fbFLol.isAdded()){
+							fbFLol.updateTransferButton();
+						}
 					}
 				}
 
@@ -12584,10 +12638,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			log("MegaRequest.TYPE_CANCEL_TRANSFERS");
 			//After cancelling all the transfers
 			if (e.getErrorCode() == MegaError.API_OK){
-				fbFLol = (FileBrowserFragmentLollipop) cloudPageAdapter.instantiateItem(viewPagerCDrive, 0);
-				if (fbFLol != null){
-					if(fbFLol.isAdded()){
-						fbFLol.setOverviewLayout();
+				if(cloudPageAdapter!=null){
+					fbFLol = (FileBrowserFragmentLollipop) cloudPageAdapter.instantiateItem(viewPagerCDrive, 0);
+					if (fbFLol != null){
+						if(fbFLol.isAdded()){
+							fbFLol.setOverviewLayout();
+						}
 					}
 				}
 
@@ -12612,11 +12668,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			if (e.getErrorCode() == MegaError.API_OK){
 
 				log("REQUEST OK - wait for onTransferFinish()");
-
-				fbFLol = (FileBrowserFragmentLollipop) cloudPageAdapter.instantiateItem(viewPagerCDrive, 0);
-				if (fbFLol != null){
-					if(fbFLol.isAdded()){
-						fbFLol.setOverviewLayout();
+				if(cloudPageAdapter!=null){
+					fbFLol = (FileBrowserFragmentLollipop) cloudPageAdapter.instantiateItem(viewPagerCDrive, 0);
+					if (fbFLol != null){
+						if(fbFLol.isAdded()){
+							fbFLol.setOverviewLayout();
+						}
 					}
 				}
 				supportInvalidateOptionsMenu();
@@ -13059,8 +13116,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);
 			cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
 			if (cFLol != null){
-				log("Incoming update - update contacts section");
-				cFLol.updateShares();
+				if(cFLol.isAdded()){
+					log("Incoming update - update contacts section");
+					cFLol.updateShares();
+				}
 			}
 		}
 
@@ -13068,41 +13127,45 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			//Rubbish bin
 			rubbishBinFLol = (RubbishBinFragmentLollipop) cloudPageAdapter.instantiateItem(viewPagerCDrive, 1);
 			if (rubbishBinFLol != null){
-				rubbishBinFLol.hideMultipleSelect();
+				if(rubbishBinFLol.isAdded()){
+					rubbishBinFLol.hideMultipleSelect();
 
-				if (isClearRubbishBin){
-					isClearRubbishBin = false;
-					parentHandleRubbish = megaApi.getRubbishNode().getHandle();
-					ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getRubbishNode(), orderCloud);
-					rubbishBinFLol.setNodes(nodes);
-					rubbishBinFLol.getRecyclerView().invalidate();
-				}
-				else{
-					ArrayList<MegaNode> nodes;
-					if(parentHandleRubbish==-1){
-						nodes = megaApi.getChildren(megaApi.getRubbishNode(), orderCloud);
+					if (isClearRubbishBin){
+						isClearRubbishBin = false;
+						parentHandleRubbish = megaApi.getRubbishNode().getHandle();
+						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getRubbishNode(), orderCloud);
+						rubbishBinFLol.setNodes(nodes);
+						rubbishBinFLol.getRecyclerView().invalidate();
 					}
 					else{
-						nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleRubbish), orderCloud);
+						ArrayList<MegaNode> nodes;
+						if(parentHandleRubbish==-1){
+							nodes = megaApi.getChildren(megaApi.getRubbishNode(), orderCloud);
+						}
+						else{
+							nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleRubbish), orderCloud);
+						}
+						rubbishBinFLol.setNodes(nodes);
+						rubbishBinFLol.getRecyclerView().invalidate();
 					}
-					rubbishBinFLol.setNodes(nodes);
-					rubbishBinFLol.getRecyclerView().invalidate();
 				}
 			}
 
 			fbFLol = (FileBrowserFragmentLollipop) cloudPageAdapter.instantiateItem(viewPagerCDrive, 0);
 			if (fbFLol != null){
-				ArrayList<MegaNode> nodes;
-				if(parentHandleBrowser==-1){
-					nodes = megaApi.getChildren(megaApi.getNodeByHandle(megaApi.getRootNode().getHandle()), orderCloud);
+				if(fbFLol.isAdded()){
+					ArrayList<MegaNode> nodes;
+					if(parentHandleBrowser==-1){
+						nodes = megaApi.getChildren(megaApi.getNodeByHandle(megaApi.getRootNode().getHandle()), orderCloud);
+					}
+					else{
+						nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleBrowser), orderCloud);
+					}
+					log("nodes: "+nodes.size());
+					fbFLol.hideMultipleSelect();
+					fbFLol.setNodes(nodes);
+					fbFLol.getRecyclerView().invalidate();
 				}
-				else{
-					nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleBrowser), orderCloud);
-				}
-				log("nodes: "+nodes.size());
-				fbFLol.hideMultipleSelect();
-				fbFLol.setNodes(nodes);
-				fbFLol.getRecyclerView().invalidate();
 			}
 			else{
 				log("FileBrowser is NULL after move");
@@ -13470,10 +13533,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 //					showSnackbar(getString(R.string.message_transfers_completed));
 				}
 
-				fbFLol = (FileBrowserFragmentLollipop) cloudPageAdapter.instantiateItem(viewPagerCDrive, 0);
-				if (fbFLol != null){
-					if(fbFLol.isAdded()){
-						fbFLol.setOverviewLayout();
+				if(cloudPageAdapter!=null){
+					fbFLol = (FileBrowserFragmentLollipop) cloudPageAdapter.instantiateItem(viewPagerCDrive, 0);
+					if (fbFLol != null){
+						if(fbFLol.isAdded()){
+							fbFLol.setOverviewLayout();
+						}
 					}
 				}
 
@@ -13504,10 +13569,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				if(transferCallback<transfer.getNotificationNumber()){
 					transferCallback = transfer.getNotificationNumber();
 
-					fbFLol = (FileBrowserFragmentLollipop) cloudPageAdapter.instantiateItem(viewPagerCDrive, 0);
-					if (fbFLol != null){
-						if(fbFLol.isAdded()){
-							fbFLol.setOverviewLayout();
+					if(cloudPageAdapter!=null){
+						fbFLol = (FileBrowserFragmentLollipop) cloudPageAdapter.instantiateItem(viewPagerCDrive, 0);
+						if (fbFLol != null){
+							if(fbFLol.isAdded()){
+								fbFLol.setOverviewLayout();
+							}
 						}
 					}
 
@@ -13530,10 +13597,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 		if(e.getErrorCode() == MegaError.API_EOVERQUOTA){
 			log("API_EOVERQUOTA error!!");
-			fbFLol = (FileBrowserFragmentLollipop) cloudPageAdapter.instantiateItem(viewPagerCDrive, 0);
-			if (fbFLol != null){
-				if(fbFLol.isAdded()){
-					fbFLol.setOverviewLayout();
+			if(cloudPageAdapter!=null){
+				fbFLol = (FileBrowserFragmentLollipop) cloudPageAdapter.instantiateItem(viewPagerCDrive, 0);
+				if (fbFLol != null){
+					if(fbFLol.isAdded()){
+						fbFLol.setOverviewLayout();
+					}
 				}
 			}
 		}
