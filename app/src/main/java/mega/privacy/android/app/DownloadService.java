@@ -1700,7 +1700,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 					boolean chatEnabled = Boolean.parseBoolean(chatSettings.getEnabled());
 					if(chatEnabled){
 						log("Chat enabled-->connect");
-						megaChatApi.connect(this);
+						megaChatApi.connectInBackground(this);
 						isLoggingIn = false;
 						MegaApplication.setLoggingIn(isLoggingIn);
 					}
@@ -1801,6 +1801,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 			if(e.getErrorCode()==MegaChatError.ERROR_OK){
 				log("Connected to chat!");
+                MegaApplication.setChatConnection(true);
 			}
 			else{
 				log("EEEERRRRROR WHEN CONNECTING " + e.getErrorString());
