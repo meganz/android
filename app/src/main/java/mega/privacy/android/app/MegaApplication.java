@@ -29,6 +29,7 @@ import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Handler;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
 import android.text.Html;
@@ -83,7 +84,7 @@ import nz.mega.sdk.MegaUser;
 
 public class MegaApplication extends Application implements MegaListenerInterface, MegaChatListenerInterface, MegaChatRequestListenerInterface {
 	final String TAG = "MegaApplication";
-	static final String USER_AGENT = "MEGAAndroid/3.2.4_155";
+	static final String USER_AGENT = "MEGAAndroid/3.2.5_156";
 
 	DatabaseHandler dbH;
 	MegaApiAndroid megaApi;
@@ -190,10 +191,46 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 		}
 		
 	}
-	
+
+	private final int interval = 3000;
+	private Handler keepAliveHandler = new Handler();
+
+	private Runnable keepAliveRunnable = new Runnable() {
+		@Override
+		public void run() {
+			if (previousActivityVisible != activityVisible){
+				previousActivityVisible = activityVisible;
+				if (activityVisible){
+					log("CHANGE TO KEEPALIVE");
+					if (chatConnection){
+						megaChatApi.setBackgroundStatus(false);
+					}
+				}
+				else{
+					log("CHANGE TO KEEPALIVEAWAY");
+					if (chatConnection){
+						megaChatApi.setBackgroundStatus(true);
+					}
+				}
+			}
+			if (activityVisible) {
+				log("Handler KEEPALIVE: " + System.currentTimeMillis());
+			}
+			else{
+				log("Handler KEEPALIVEAWAY: " + System.currentTimeMillis());
+			}
+			keepAliveHandler.postAtTime(keepAliveRunnable, System.currentTimeMillis()+interval);
+			keepAliveHandler.postDelayed(keepAliveRunnable, interval);
+
+		}
+	};
+
 	@Override
 	public void onCreate() {
 		super.onCreate();
+
+		keepAliveHandler.postAtTime(keepAliveRunnable, System.currentTimeMillis()+interval);
+		keepAliveHandler.postDelayed(keepAliveRunnable, interval);
 
 		MegaApiAndroid.addLoggerObject(new AndroidLogger());
 		MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_MAX);
@@ -417,6 +454,13 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 		return firstConnect;
 	}
 
+	public static void setChatConnection(boolean chatConnection){
+		MegaApplication.chatConnection = chatConnection;
+	}
+
+	public static boolean isChatConnection(){
+		return chatConnection;
+	}
 
 	public static long getFirstTs() {
 		return firstTs;
@@ -437,8 +481,10 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 	}
 
 	private static boolean activityVisible = false;
+	private static boolean previousActivityVisible = false;
 	private static boolean isLoggingIn = false;
 	private static boolean firstConnect = true;
+	private static boolean chatConnection = false;
 	private static boolean recentChatsFragmentVisible = false;
 	public static boolean isFireBaseConnection = false;
 	private static long firstTs = -1;
@@ -988,6 +1034,9 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 	@Override
 	public void onRequestFinish(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
 		log("onRequestFinish: Chat " + request.getRequestString());
+		if (request.getType() == MegaChatRequest.TYPE_SET_BACKGROUND_STATUS){
+			log("SET_BACKGROUND_STATUS: " + request.getFlag());
+		}
 		if (request.getType() == MegaChatRequest.TYPE_LOGOUT) {
 			log("CHAT_TYPE_LOGOUT: " + e.getErrorCode() + "__" + e.getErrorString());
 			try{
