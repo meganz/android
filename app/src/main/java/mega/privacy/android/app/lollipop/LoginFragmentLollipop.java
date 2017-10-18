@@ -549,52 +549,32 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     return v;
                 }
                 else{
+
+                    if(intentReceived.getAction()!=null){
+                        action = intentReceived.getAction();
+                        log("Action: "+action);
+                    }
+
                     if(intentReceived.getAction().equals(Constants.ACTION_OPEN_MEGA_FOLDER_LINK)){
-                        action = Constants.ACTION_OPEN_MEGA_FOLDER_LINK;
                         url = intentReceived.getDataString();
                     }
                     else if(intentReceived.getAction().equals(Constants.ACTION_IMPORT_LINK_FETCH_NODES)){
-                        action = Constants.ACTION_OPEN_MEGA_LINK;
                         url = intentReceived.getDataString();
-                    }
-                    else if (intentReceived.getAction().equals(Constants.ACTION_CANCEL_CAM_SYNC)){
-                        action = intentReceived.getAction();
                     }
                     else if(intentReceived.getAction().equals(Constants.ACTION_CHANGE_MAIL)){
                         log("intent received ACTION_CHANGE_MAIL");
-                        action = Constants.ACTION_CHANGE_MAIL;
                         url = intentReceived.getDataString();
                     }
                     else if(intentReceived.getAction().equals(Constants.ACTION_CANCEL_ACCOUNT)){
                         log("intent received ACTION_CANCEL_ACCOUNT");
-                        action = Constants.ACTION_CANCEL_ACCOUNT;
                         url = intentReceived.getDataString();
                     }
-//					else if (intentReceived.getAction().equals(ManagerActivityLollipop.ACTION_FILE_EXPLORER_UPLOAD)){
-//						action = ManagerActivityLollipop.ACTION_FILE_EXPLORER_UPLOAD;
-//						uriData = intentReceived.getData();
-//						log("URI: "+uriData);
-//						extras = intentReceived.getExtras();
-//						url = null;
-//						Snackbar.make(scrollView,getString(R.string.login_before_share),Snackbar.LENGTH_LONG).show();
-//					}
                     else if (intentReceived.getAction().equals(Constants.ACTION_FILE_PROVIDER)){
-                        action = Constants.ACTION_FILE_PROVIDER;
                         uriData = intentReceived.getData();
                         extras = intentReceived.getExtras();
                         url = null;
                     }
-                    else if (intentReceived.getAction().equals(Constants.ACTION_EXPORT_MASTER_KEY)){
-                        action = Constants.ACTION_EXPORT_MASTER_KEY;
-                    }
-                    else if (intentReceived.getAction().equals(Constants.ACTION_IPC)){
-                        action = Constants.ACTION_IPC;
-                    }
-                    else if (intentReceived.getAction().equals(Constants.ACTION_SHOW_TRANSFERS)){
-                        action = intentReceived.getAction();
-                    }
-                    if(intentReceived.getAction().equals(Constants.ACTION_OPEN_HANDLE_NODE)){
-                        action = Constants.ACTION_OPEN_HANDLE_NODE;
+                    else if(intentReceived.getAction().equals(Constants.ACTION_OPEN_HANDLE_NODE)){
                         url = intentReceived.getDataString();
                     }
 

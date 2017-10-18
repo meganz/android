@@ -149,6 +149,7 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 
 			if(e.getErrorCode()==MegaChatError.ERROR_OK){
 				log("Connected to chat!");
+				MegaApplication.setChatConnection(true);
 			}
 			else{
 				log("EEEERRRRROR WHEN CONNECTING " + e.getErrorString());
@@ -622,10 +623,9 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 		}
 		else{
 			MegaNode n = megaApi.getNodeByHandle(cameraUploadHandle);
-			log("If ERROR with the handler (the node may not longer exist): Create the folder Camera Uploads");
 			if(n==null){
+				log("Node with cameraUploadHandle is not NULL");
 				cameraUploadHandle = -1;
-				log("Find the Camera Uploads folder of the old PhotoSync");
 				for (int i=0;i<nl.size();i++){
 					if ((CAMERA_UPLOADS.compareTo(nl.get(i).getName()) == 0) && (nl.get(i).isFolder())){
 						cameraUploadHandle = nl.get(i).getHandle();
@@ -638,9 +638,8 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 					}
 				}
 
-				log("If not Camera Uploads nor Photosync");
 				if (cameraUploadHandle == -1){
-					log("must create the folder");
+					log("If not Camera Uploads nor Photosync--- must create the folder");
 					if (!running){
 						running = true;
 						megaApi.createFolder(CAMERA_UPLOADS, megaApi.getRootNode(), this);
@@ -788,7 +787,7 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 	}
 
 	void initSync() throws SecurityException{
-		log("void initSync() throws SecurityException");
+		log("initSync");
 
 		if(!wl.isHeld()){
 			wl.acquire();
@@ -1018,6 +1017,7 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 					}
 					ArrayList<DocumentFile> auxCameraFilesExternalSDCard = new ArrayList<DocumentFile>();
 					for (int i=0;i<files.length;i++){
+						log("Name to check: "+ files[i].getName());
 						switch(Integer.parseInt(prefs.getCamSyncFileUpload())){
 							case MegaPreferences.ONLY_PHOTOS:{
 								String fileType = files[i].getType();
@@ -1025,6 +1025,12 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 									if (fileType.startsWith("image/")){
 										auxCameraFilesExternalSDCard.add(files[i]);
 									}
+									else{
+										log("No image");
+									}
+								}
+								else{
+									log("File is null");
 								}
 								break;
 							}
@@ -2065,7 +2071,7 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 					boolean chatEnabled = Boolean.parseBoolean(chatSettings.getEnabled());
 					if(chatEnabled){
 						log("Chat enabled-->connect");
-						megaChatApi.connect(this);
+						megaChatApi.connectInBackground(this);
 						isLoggingIn = false;
 						MegaApplication.setLoggingIn(isLoggingIn);
 						retryLaterShortTime();

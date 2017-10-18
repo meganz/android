@@ -186,13 +186,12 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	ArrayList<MegaOffline> mOffListImages;
 
 
-
-
 	@Override
 	public void onDestroy(){
 		if(megaApi != null)
 		{	
 			megaApi.removeRequestListener(this);
+			megaApi.removeGlobalListener(this);
 		}
 		
 		super.onDestroy();
@@ -333,10 +332,12 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			if(adapterType==Constants.CONTACT_FILE_ADAPTER){
 				shareIcon.setVisible(false);
 				menu.findItem(R.id.full_image_viewer_share).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
-
 			}else{
-
 				if(fromShared){
+					shareIcon.setVisible(false);
+					menu.findItem(R.id.full_image_viewer_share).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+				}
+				if(isFolderLink){
 					shareIcon.setVisible(false);
 					menu.findItem(R.id.full_image_viewer_share).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
 				}
@@ -344,6 +345,8 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 
 			downloadIcon.setVisible(true);
 			menu.findItem(R.id.full_image_viewer_download).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+
+			copyIcon.setVisible(true);
 
 			if(node.isExported()){
 				getlinkIcon.setVisible(false);
@@ -353,40 +356,38 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				menu.findItem(R.id.full_image_viewer_remove_link).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
 			}else{
-				getlinkIcon.setVisible(true);
-				menu.findItem(R.id.full_image_viewer_get_link).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-
-				removelinkIcon.setVisible(false);
-				menu.findItem(R.id.full_image_viewer_remove_link).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
 
 				if(adapterType==Constants.CONTACT_FILE_ADAPTER){
+
 					getlinkIcon.setVisible(false);
 					menu.findItem(R.id.full_image_viewer_get_link).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+					removelinkIcon.setVisible(false);
+					menu.findItem(R.id.full_image_viewer_remove_link).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
 
-					removelinkIcon.setVisible(true);
-					menu.findItem(R.id.full_image_viewer_remove_link).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-				}
-				else{
+				}else{
+
 					if(fromShared){
-						getlinkIcon.setVisible(false);
-						menu.findItem(R.id.full_image_viewer_get_link).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
-
-						removelinkIcon.setVisible(true);
-						menu.findItem(R.id.full_image_viewer_remove_link).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-					}
-					else{
-						getlinkIcon.setVisible(true);
-						menu.findItem(R.id.full_image_viewer_get_link).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-
 						removelinkIcon.setVisible(false);
-						menu.findItem(R.id.full_image_viewer_remove_link).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+						getlinkIcon.setVisible(false);
+
+					} else{
+						if(isFolderLink){
+							getlinkIcon.setVisible(false);
+							removelinkIcon.setVisible(false);
+
+						}else{
+							getlinkIcon.setVisible(true);
+							menu.findItem(R.id.full_image_viewer_get_link).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+							removelinkIcon.setVisible(false);
+						}
+
 					}
 				}
 			}
 
 			if(fromShared){
+				removeIcon.setVisible(false);
 				node = megaApi.getNodeByHandle(imageHandles.get(positionG));
-
 				int accessLevel = megaApi.getAccess(node);
 
 				switch(accessLevel){
@@ -395,31 +396,18 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 					case MegaShare.ACCESS_FULL:{
 						renameIcon.setVisible(true);
 						moveIcon.setVisible(true);
-						copyIcon.setVisible(true);
 						moveToTrashIcon.setVisible(true);
-						removeIcon.setVisible(false);
-						removelinkIcon.setVisible(false);
 						break;
 					}
 					case MegaShare.ACCESS_READWRITE:
 					case MegaShare.ACCESS_READ:{
 						renameIcon.setVisible(false);
 						moveIcon.setVisible(false);
-						copyIcon.setVisible(true);
 						moveToTrashIcon.setVisible(false);
-						removeIcon.setVisible(false);
-						removelinkIcon.setVisible(false);
 						break;
 					}
 				}
-			}
-			else{
-
-				renameIcon.setVisible(true);
-				moveIcon.setVisible(true);
-				copyIcon .setVisible(true);
-				moveToTrashIcon.setVisible(true);
-				removeIcon.setVisible(false);
+			}else{
 
 				if(isFolderLink){
 					propertiesIcon.setVisible(false);
@@ -427,39 +415,60 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 
 					moveToTrashIcon.setVisible(false);
 					removeIcon.setVisible(false);
-					getlinkIcon.setVisible(false);
 					renameIcon.setVisible(false);
-					shareIcon.setVisible(false);
-					propertiesIcon.setVisible(false);
 					moveIcon.setVisible(false);
 					copyIcon.setVisible(false);
-					removelinkIcon.setVisible(false);
-				}
-				else{
+
+				}else{
 					propertiesIcon.setVisible(true);
 					menu.findItem(R.id.full_image_viewer_properties).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
-					node = megaApi.getNodeByHandle(imageHandles.get(positionG));
-					final long handle = node.getHandle();
-					MegaNode parent = megaApi.getNodeByHandle(handle);
-					while (megaApi.getParentNode(parent) != null){
-						parent = megaApi.getParentNode(parent);
-					}
-
-					if (parent.getHandle() != megaApi.getRubbishNode().getHandle()){
-						moveToTrashIcon.setVisible(true);
+					if(adapterType==Constants.CONTACT_FILE_ADAPTER){
 						removeIcon.setVisible(false);
-					}
-					else{
-						moveToTrashIcon.setVisible(false);
-						removeIcon.setVisible(true);
+						node = megaApi.getNodeByHandle(imageHandles.get(positionG));
+						int accessLevel = megaApi.getAccess(node);
+						switch(accessLevel){
+
+							case MegaShare.ACCESS_OWNER:
+							case MegaShare.ACCESS_FULL:{
+								renameIcon.setVisible(true);
+								moveIcon.setVisible(true);
+								moveToTrashIcon.setVisible(true);
+								break;
+							}
+							case MegaShare.ACCESS_READWRITE:
+							case MegaShare.ACCESS_READ:{
+								renameIcon.setVisible(false);
+								moveIcon.setVisible(false);
+								moveToTrashIcon.setVisible(false);
+								break;
+							}
+						}
+
+					}else{
+						renameIcon.setVisible(true);
+						moveIcon.setVisible(true);
+						node = megaApi.getNodeByHandle(imageHandles.get(positionG));
+						final long handle = node.getHandle();
+						MegaNode parent = megaApi.getNodeByHandle(handle);
+						while (megaApi.getParentNode(parent) != null){
+							parent = megaApi.getParentNode(parent);
+						}
+
+						if (parent.getHandle() != megaApi.getRubbishNode().getHandle()){
+							moveToTrashIcon.setVisible(true);
+							removeIcon.setVisible(false);
+
+						}else{
+							moveToTrashIcon.setVisible(false);
+							removeIcon.setVisible(true);
+							getlinkIcon.setVisible(false);
+							removelinkIcon.setVisible(false);
+						}
 					}
 				}
-
 			}
-
 		}
-
 		return super.onCreateOptionsMenu(menu);
 	}
 

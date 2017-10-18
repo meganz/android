@@ -800,19 +800,23 @@ public class LoginActivityLollipop extends AppCompatActivity implements MegaGlob
         log("onRequestFinish - " + request.getRequestString() + "_" + e.getErrorCode());
 
         if (request.getType() == MegaRequest.TYPE_CREATE_ACCOUNT){
-            if (request.getParamType() == 1){
-                if (e.getErrorCode() == MegaError.API_OK){
-                    waitingForConfirmAccount = true;
-                    visibleFragment = Constants.CONFIRM_EMAIL_FRAGMENT;
-                    showFragment(visibleFragment);
+            try {
+                if (request.getParamType() == 1) {
+                    if (e.getErrorCode() == MegaError.API_OK) {
+                        waitingForConfirmAccount = true;
+                        visibleFragment = Constants.CONFIRM_EMAIL_FRAGMENT;
+                        showFragment(visibleFragment);
 
+                    } else {
+                        dbH.clearEphemeral();
+                        waitingForConfirmAccount = false;
+                        visibleFragment = Constants.LOGIN_FRAGMENT;
+                        showFragment(visibleFragment);
+                    }
                 }
-                else{
-                    dbH.clearEphemeral();
-                    waitingForConfirmAccount = false;
-                    visibleFragment = Constants.LOGIN_FRAGMENT;
-                    showFragment(visibleFragment);
-                }
+            }
+            catch (Exception exc){
+                log("ExceptionManager");
             }
         }
     }

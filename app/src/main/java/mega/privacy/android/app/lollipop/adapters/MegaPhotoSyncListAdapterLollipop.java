@@ -59,6 +59,7 @@ public class MegaPhotoSyncListAdapterLollipop extends RecyclerView.Adapter<MegaP
 	ActionBar aB;
 	
 	boolean multipleSelect;
+
 	
 	int orderGetChildren = MegaApiJava.ORDER_MODIFICATION_DESC;
 	
@@ -207,7 +208,10 @@ public class MegaPhotoSyncListAdapterLollipop extends RecyclerView.Adapter<MegaP
 			if (selectedItems.valueAt(i) == true) {
 				PhotoSyncHolder document = getNodeAt(selectedItems.keyAt(i));
 				if (document != null){
-					nodes.add(document);
+					if(document.isNode ){
+						nodes.add(document);
+
+					}
 				}
 			}
 		}
@@ -233,6 +237,7 @@ public class MegaPhotoSyncListAdapterLollipop extends RecyclerView.Adapter<MegaP
 	
 	public void selectAll(){
 		for (int i= 0; i<this.getItemCount();i++){
+
 			if(!isItemChecked(i)){
 				toggleSelection(i);
 			}
