@@ -819,27 +819,30 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 
 					if (!recentChatsFragmentVisible) {
 						log("NOt recentFragment visible");
-						if (openChatId != item.getChatId()) {
-							if (isFirstConnect()) {
-								log("onChatListItemUpdateMegaApplication. FIRSTCONNECT " + item.getTitle() + "Unread count: " + item.getUnreadCount() + " hasChanged(CHANGE_TYPE_UNREAD_COUNT): " + item.hasChanged(MegaChatListItem.CHANGE_TYPE_UNREAD_COUNT) + " hasChanged(CHANGE_TYPE_LAST_TS):" + item.hasChanged(MegaChatListItem.CHANGE_TYPE_LAST_TS));
-							} else {
-								log("onChatListItemUpdateMegaApplication. NOTFIRSTCONNECT " + item.getTitle() + "Unread count: " + item.getUnreadCount() + " hasChanged(CHANGE_TYPE_UNREAD_COUNT): " + item.hasChanged(MegaChatListItem.CHANGE_TYPE_UNREAD_COUNT) + " hasChanged(CHANGE_TYPE_LAST_TS):" + item.hasChanged(MegaChatListItem.CHANGE_TYPE_LAST_TS));
 
-								if(firstTs==-1){
-									log("First TS is -1 -- SHOW NOTIF");
-									showNotification(item);
-								}
-								else{
+						if(item.getLastMessageSender()!=megaChatApi.getMyUserHandle()){
+							if (openChatId != item.getChatId()) {
+								if (isFirstConnect()) {
+									log("onChatListItemUpdateMegaApplication. FIRSTCONNECT " + item.getTitle() + "Unread count: " + item.getUnreadCount() + " hasChanged(CHANGE_TYPE_UNREAD_COUNT): " + item.hasChanged(MegaChatListItem.CHANGE_TYPE_UNREAD_COUNT) + " hasChanged(CHANGE_TYPE_LAST_TS):" + item.hasChanged(MegaChatListItem.CHANGE_TYPE_LAST_TS));
+								} else {
+									log("onChatListItemUpdateMegaApplication. NOTFIRSTCONNECT " + item.getTitle() + "Unread count: " + item.getUnreadCount() + " hasChanged(CHANGE_TYPE_UNREAD_COUNT): " + item.hasChanged(MegaChatListItem.CHANGE_TYPE_UNREAD_COUNT) + " hasChanged(CHANGE_TYPE_LAST_TS):" + item.hasChanged(MegaChatListItem.CHANGE_TYPE_LAST_TS));
 
-									MegaChatMessage lastMessage = megaChatApi.getMessage(item.getChatId(), item.getLastMessageId());
-									if(lastMessage!=null){
-										if(firstTs>lastMessage.getTimestamp()){
-											log("DO NOT SHOW NOTIF - FirstTS when logging "+firstTs+ " > last message timestamp: "+lastMessage.getTimestamp());
-										}
-										else{
-											log("FirstTS when logging "+firstTs+ " < last message timestamp: "+lastMessage.getTimestamp());
-											showNotification(item);
-											firstTs=-1;
+									if(firstTs==-1){
+										log("First TS is -1 -- SHOW NOTIF");
+										showNotification(item);
+									}
+									else{
+
+										MegaChatMessage lastMessage = megaChatApi.getMessage(item.getChatId(), item.getLastMessageId());
+										if(lastMessage!=null){
+											if(firstTs>lastMessage.getTimestamp()){
+												log("DO NOT SHOW NOTIF - FirstTS when logging "+firstTs+ " > last message timestamp: "+lastMessage.getTimestamp());
+											}
+											else{
+												log("FirstTS when logging "+firstTs+ " < last message timestamp: "+lastMessage.getTimestamp());
+												showNotification(item);
+												firstTs=-1;
+											}
 										}
 									}
 								}
