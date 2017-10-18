@@ -87,6 +87,7 @@ import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaGlobalListenerInterface;
 import nz.mega.sdk.MegaNode;
+import nz.mega.sdk.MegaNodeList;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaShare;
@@ -144,6 +145,10 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
     private ArrayList<String> paths;
     
     int adapterType = 0;
+
+	int countChat = 0;
+	int errorSent = 0;
+	int successSent = 0;
     
     public static int REQUEST_CODE_SELECT_MOVE_FOLDER = 1001;
 	public static int REQUEST_CODE_SELECT_COPY_FOLDER = 1002;
@@ -1993,15 +1998,23 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			long[] chatHandles = intent.getLongArrayExtra("SELECTED_CHATS");
 			log("Send to "+chatHandles.length+" chats");
 
-
-
 			long[] nodeHandles = intent.getLongArrayExtra("NODE_HANDLES");
 			log("Send "+nodeHandles.length+" nodes");
+
+			countChat = chatHandles.length;
+			if(countChat==1){
+				megaChatApi.attachNode(chatHandles[0], nodeHandles[0], this);
+			}
+			else if(countChat>1){
+
+				for(int i=0; i<chatHandles.length; i++){
+					megaChatApi.attachNode(chatHandles[i], nodeHandles[0], this);
+				}
+			}
 //			megaChatApi.attachNode();
 
 		}
 	}
-	
 
 	// Get list of all child files
 
@@ -2270,7 +2283,45 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 
 	@Override
 	public void onRequestFinish(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
+		log("onRequestFinish");
+		if(request.getType() == MegaChatRequest.TYPE_ATTACH_NODE_MESSAGE){
 
+			if(e.getErrorCode()==MegaChatError.ERROR_OK){
+				log("File sent correctly");
+				successSent++;
+
+			}
+			else{
+				log("File NOT sent: "+e.getErrorCode()+"___"+e.getErrorString());
+				errorSent++;
+			}
+
+			if(countChat==errorSent+successSent){
+				if(successSent==countChat){
+					if(countChat==1){
+						long handle = request.getChatHandle();
+						MegaChatListItem chatItem = megaChatApi.getChatListItem(handle);
+						if(chatItem!=null){
+							Intent intent = new Intent(this, ManagerActivityLollipop.class);
+							intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+							intent.setAction(Constants.ACTION_CHAT_NOTIFICATION_MESSAGE);
+							intent.putExtra("CHAT_ID", handle);
+							startActivity(intent);
+							finish();
+						}
+					}
+					else{
+						showSnackbar(getString(R.string.success_attaching_node_from_cloud_chats, countChat));
+					}
+				}
+				else if(errorSent==countChat){
+					showSnackbar(getString(R.string.error_attaching_node_from_cloud));
+				}
+				else{
+					showSnackbar(getString(R.string.error_attaching_node_from_cloud_chats));
+				}
+			}
+		}
 	}
 
 	@Override
