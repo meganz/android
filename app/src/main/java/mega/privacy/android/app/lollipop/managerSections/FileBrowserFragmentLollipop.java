@@ -525,38 +525,15 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 		if (((ManagerActivityLollipop)context).parentHandleBrowser == -1||((ManagerActivityLollipop)context).parentHandleBrowser ==megaApi.getRootNode().getHandle()){
 			log("After consulting... the parent keeps -1 or ROOTNODE: "+((ManagerActivityLollipop)context).parentHandleBrowser);
 
-			if(aB!=null){
-				aB.setTitle(getString(R.string.section_cloud_drive));
-				log("indicator_menu_white_435");
-				aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
-				((ManagerActivityLollipop)context).setFirstNavigationLevel(true);
-			}
-
 			nodes = megaApi.getChildren(megaApi.getRootNode(), ((ManagerActivityLollipop)context).orderCloud);
-
-			((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 		}
 		else{
 			MegaNode parentNode = megaApi.getNodeByHandle(((ManagerActivityLollipop)context).parentHandleBrowser);
 
-			if(parentNode!=null){
-				log("The parent node is: "+parentNode.getName());
-
-				if(aB!=null){
-					aB.setTitle(parentNode.getName());
-					log("indicator_arrow_back_035");
-					aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
-					((ManagerActivityLollipop)context).setFirstNavigationLevel(false);
-				}
-				else {
-					log("AB still is NULL");
-				}
-			}
 			nodes = megaApi.getChildren(parentNode, ((ManagerActivityLollipop)context).orderCloud);
-
-			((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 		}
-
+		((ManagerActivityLollipop)context).setToolbarTitle();
+		((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
 		if (((ManagerActivityLollipop)context).isList){
