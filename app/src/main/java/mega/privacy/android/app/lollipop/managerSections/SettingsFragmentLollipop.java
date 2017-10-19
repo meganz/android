@@ -1806,7 +1806,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 
 			version = Build.VERSION.RELEASE;
 			model = getDeviceName();
-			body = "---------------------------------------------\nDevice model  "+model+"\nAndroid version  "+version;
+			body = "Device model  "+model+"\nAndroid version  "+version;
 			emailAndroid = MAIL_ANDROID;
 			versionApp = (getString(R.string.app_version));
 			subject = "Feedback v"+versionApp;
