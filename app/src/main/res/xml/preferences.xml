@@ -171,6 +171,17 @@
 	        android:key="settings_advanced_features_offline"
 	        android:title="@string/settings_advanced_features_offline" />
 	</PreferenceCategory>
+
+	<PreferenceCategory
+		android:key="advanced_help"
+		android:layout="@layout/my_category_preference"
+		android:title="@string/settings_help" >
+
+		<Preference
+			android:key="settings_help_send_feedfack"
+			android:title="@string/settings_help_preference" />
+
+	</PreferenceCategory>
 	
     <PreferenceCategory 
         android:key="settings_about"

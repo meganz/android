@@ -1587,4 +1587,9 @@
     </plurals>
 
     <string name="no_folders_shared" context="Info of a contact if there is no folders shared with him">No folders shared</string>
+
+    <string name="settings_help" context="Settings category title for Help">Help</string>
+    <string name="settings_help_preference" context="Settings preference title for send feedback">Send Feedback</string>
+
+
 </resources>
