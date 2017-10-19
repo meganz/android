@@ -225,13 +225,9 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 	String version = "";
 	String model  = "";
 	String body  = "";
-
 	String emailAndroid = "";
 	String versionApp  = "";
 	String subject  = "";
-
-	final static String MAIL_ANDROID = "android@mega.co.nz";
-
 
 	boolean useHttpsOnlyValue = false;
 	
@@ -1806,12 +1802,12 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 
 			version = Build.VERSION.RELEASE;
 			model = getDeviceName();
-			body = "Device model  "+model+"\nAndroid version  "+version;
-			emailAndroid = MAIL_ANDROID;
+			body = getString(R.string.setting_feedback_body)+"\n\n\n\n\n\n\n\n\n\n\n"+getString(R.string.settings_feedback_body_device_model)+"  "+model+"\n"+getString(R.string.settings_feedback_body_android_version)+"  "+version;
+			emailAndroid = Constants.MAIL_ANDROID;
 			versionApp = (getString(R.string.app_version));
-			subject = "Feedback v"+versionApp;
-			Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:" + emailAndroid));
+			subject = getString(R.string.setting_feedback_subject)+" v"+versionApp;
 
+			Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:" + emailAndroid));
 			emailIntent.putExtra(Intent.EXTRA_SUBJECT, subject);
 			emailIntent.putExtra(Intent.EXTRA_TEXT, body);
 			startActivity(Intent.createChooser(emailIntent, " "));
