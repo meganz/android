@@ -5562,6 +5562,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						changePass.setVisible(true);
 						logoutMenuItem.setVisible(true);
 						forgotPassMenuItem.setVisible(true);
+						searchMenuItem.setVisible(false);
 
 						int index = viewPagerMyAccount.getCurrentItem();
 						if(index==0){
