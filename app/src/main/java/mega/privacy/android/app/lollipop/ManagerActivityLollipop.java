@@ -5589,10 +5589,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						else{
 							cancelSubscription.setVisible(false);
 						}
-
 					}
 					else{
-
 						refreshMenuItem.setVisible(true);
 						killAllSessions.setVisible(false);
 						upgradeAccountMenuItem.setVisible(false);
