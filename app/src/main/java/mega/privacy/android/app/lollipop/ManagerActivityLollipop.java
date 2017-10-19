@@ -189,6 +189,8 @@ import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatApiJava;
+import nz.mega.sdk.MegaChatCall;
+import nz.mega.sdk.MegaChatCallListenerInterface;
 import nz.mega.sdk.MegaChatError;
 import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatListenerInterface;
@@ -211,7 +213,7 @@ import nz.mega.sdk.MegaTransferListenerInterface;
 import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUtilsAndroid;
 
-public class ManagerActivityLollipop extends PinActivityLollipop implements NetworkStateReceiver.NetworkStateReceiverListener, MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatRequestListenerInterface, OnNavigationItemSelectedListener, MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener,
+public class ManagerActivityLollipop extends PinActivityLollipop implements NetworkStateReceiver.NetworkStateReceiverListener, MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatCallListenerInterface,MegaChatRequestListenerInterface, OnNavigationItemSelectedListener, MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener,
 			NodeOptionsBottomSheetDialogFragment.CustomHeight, ContactsBottomSheetDialogFragment.CustomHeight{
 
 	public int accountFragment;
@@ -1182,6 +1184,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			megaChatApi = app.getMegaChatApi();
 			log("addChatListener");
 			megaChatApi.addChatListener(this);
+			megaChatApi.addChatCallListener(this);
 		}
 		else{
 			megaChatApi=null;
@@ -3137,6 +3140,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 		if (megaChatApi != null){
 			megaChatApi.removeChatListener(this);
+			megaChatApi.removeChatCallListener(this);
 		}
 
 		if(networkStateReceiver!=null){
@@ -14432,4 +14436,30 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			log("onConfigurationChanged: changed to PORTRAIT");
 		}
 	}
+
+	@Override
+	public void onChatCallStart(MegaChatApiJava api, MegaChatCall call) {
+		log("onChatCallStart");
+	}
+
+	@Override
+	public void onChatCallIncoming(MegaChatApiJava api, MegaChatCall call) {
+		log("onChatCallIncoming");
+	}
+
+	@Override
+	public void onChatCallStateChange(MegaChatApiJava api, MegaChatCall call) {
+		log("onChatCallStateChange");
+	}
+
+	@Override
+	public void onChatCallTemporaryError(MegaChatApiJava api, MegaChatCall call, MegaChatError error) {
+		log("onChatCallTemporaryError");
+	}
+
+	@Override
+	public void onChatCallFinish(MegaChatApiJava api, MegaChatCall call, MegaChatError error) {
+		log("onChatCallFinish");
+	}
+
 }
