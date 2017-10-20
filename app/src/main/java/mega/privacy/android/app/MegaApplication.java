@@ -198,30 +198,36 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 	private Runnable keepAliveRunnable = new Runnable() {
 		@Override
 		public void run() {
-			if (previousActivityVisible != activityVisible){
-				previousActivityVisible = activityVisible;
-				if (activityVisible){
-					log("CHANGE TO KEEPALIVE");
-					if (chatConnection){
-						megaChatApi.setBackgroundStatus(false);
+			try {
+				if (previousActivityVisible != activityVisible) {
+					previousActivityVisible = activityVisible;
+					if (activityVisible) {
+						log("CHANGE TO KEEPALIVE");
+						if (chatConnection) {
+							if (megaChatApi != null) {
+								megaChatApi.setBackgroundStatus(false);
+							}
+						}
+					} else {
+						log("CHANGE TO KEEPALIVEAWAY");
+						if (chatConnection) {
+							if (megaChatApi != null) {
+								megaChatApi.setBackgroundStatus(true);
+							}
+						}
 					}
 				}
-				else{
-					log("CHANGE TO KEEPALIVEAWAY");
-					if (chatConnection){
-						megaChatApi.setBackgroundStatus(true);
-					}
+				if (activityVisible) {
+					log("Handler KEEPALIVE: " + System.currentTimeMillis());
+				} else {
+					log("Handler KEEPALIVEAWAY: " + System.currentTimeMillis());
 				}
+				keepAliveHandler.postAtTime(keepAliveRunnable, System.currentTimeMillis() + interval);
+				keepAliveHandler.postDelayed(keepAliveRunnable, interval);
 			}
-			if (activityVisible) {
-				log("Handler KEEPALIVE: " + System.currentTimeMillis());
+			catch (Exception exc){
+				log("Exception in keepAliveRunnable");
 			}
-			else{
-				log("Handler KEEPALIVEAWAY: " + System.currentTimeMillis());
-			}
-			keepAliveHandler.postAtTime(keepAliveRunnable, System.currentTimeMillis()+interval);
-			keepAliveHandler.postDelayed(keepAliveRunnable, interval);
-
 		}
 	};
 
