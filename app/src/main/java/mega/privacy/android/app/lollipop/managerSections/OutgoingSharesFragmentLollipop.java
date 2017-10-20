@@ -436,20 +436,14 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 			if (((ManagerActivityLollipop)context).parentHandleOutgoing == -1){
 				log("ParentHandle -1");
 				findNodes();
-				aB.setTitle(getString(R.string.section_shared_items));
-				log("aB.setHomeAsUpIndicator_333");
-				aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
-				((ManagerActivityLollipop)context).setFirstNavigationLevel(true);
 			}
 			else{
 				MegaNode parentNode = megaApi.getNodeByHandle(((ManagerActivityLollipop)context).parentHandleOutgoing);
 				log("ParentHandle: "+((ManagerActivityLollipop)context).parentHandleOutgoing);
 				nodes = megaApi.getChildren(parentNode, ((ManagerActivityLollipop)context).orderOthers);
-				aB.setTitle(parentNode.getName());
-				log("aB.setHomeAsUpIndicator_68");
-				aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
-				((ManagerActivityLollipop)context).setFirstNavigationLevel(false);
 			}
+
+			((ManagerActivityLollipop)context).setToolbarTitle();
 			adapter.setNodes(nodes);
 			((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 			adapter.setMultipleSelect(false);

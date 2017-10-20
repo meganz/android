@@ -1,0 +1,226 @@
+    <android.support.design.widget.CoordinatorLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:rounded="http://schemas.android.com/apk/res-auto"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/file_info_fragment_container"
+        android:fitsSystemWindows="true"
+        tools:context=".lollipop.megachat.calls.ChatCallActivity">
+
+        <android.support.design.widget.AppBarLayout
+            android:id="@+id/app_bar"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fitsSystemWindows="true">
+
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <!-- Background -->
+
+                <RelativeLayout
+                    android:id="@+id/call_chat_contact_image_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@color/black">
+
+                    <ImageView
+                        android:id="@+id/call_chat_contact_video"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:adjustViewBounds="true"
+                        android:background="@color/blue"
+                        android:visibility="gone"/>
+
+                    <RelativeLayout
+                        android:id="@+id/call_chat_contact_image_rl"
+                        android:layout_centerInParent="true"
+                        android:layout_width="120dp"
+                        android:layout_height="120dp"
+                        android:gravity="center_horizontal|center_vertical"
+                        android:background="@android:color/transparent">
+                        <mega.privacy.android.app.components.RoundedImageView
+                            android:id="@+id/call_chat_contact_image"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:scaleType="fitCenter"
+                            android:layout_centerInParent="true"
+                            rounded:border_color="#4DFFFFFF"
+                            rounded:border_width="3dp"
+                            rounded:corner_radius="60dp" />
+                        <TextView
+                            android:id="@+id/call_chat_contact_image_initial_letter"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_centerInParent="true"
+                            android:gravity="center_horizontal|center_vertical"
+                            android:paddingBottom="3dp"
+                            android:visibility="gone"/>
+                    </RelativeLayout>
+
+                </RelativeLayout>
+
+                <!-- Toolbar -->
+
+                <android.support.v7.widget.Toolbar
+                    android:id="@+id/call_toolbar"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/gradient_shape_callschat"
+                    app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+                    app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+                    android:fitsSystemWindows="true"/>
+
+                <SurfaceView
+                    android:id="@+id/surfaceView1"
+                    android:layout_width="60dp"
+                    android:layout_height="90dp"
+                    android:layout_above="@+id/linear_buttons"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginRight="20dp"
+                    android:layout_marginBottom="25dp"
+                    android:visibility="gone"/>
+
+
+                <!-- My avatar -->
+
+                <RelativeLayout
+                    android:id="@+id/call_chat_my_image_layout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_above="@+id/linear_buttons"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginRight="20dp"
+                    android:layout_marginBottom="25dp"
+                    android:background="@android:color/transparent"
+                    android:visibility="visible">
+
+                    <RelativeLayout
+                        android:id="@+id/call_chat_my_video"
+                        android:layout_width="60dp"
+                        android:layout_height="90dp"
+                        android:background="@drawable/shape_call_chat_video"
+                        android:visibility="gone">
+
+                    </RelativeLayout>
+
+
+
+                    <RelativeLayout
+                        android:id="@+id/call_chat_my_image_rl"
+                        android:layout_width="80dp"
+                        android:layout_height="80dp"
+                        android:background="@drawable/shape_call_chat">
+
+
+                        <mega.privacy.android.app.components.RoundedImageView
+                            android:id="@+id/call_chat_my_image"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:scaleType="fitCenter"
+                            android:layout_centerInParent="true"
+                            rounded:border_color="#4DFFFFFF"
+                            rounded:border_width="3dp"
+                            rounded:corner_radius="40dp" />
+
+                        <TextView
+                            android:id="@+id/call_chat_my_image_initial_letter"
+                            android:layout_width="fill_parent"
+                            android:layout_height="fill_parent"
+                            android:layout_centerInParent="true"
+                            android:gravity="center_horizontal|center_vertical"
+                            android:paddingBottom="3dp" />
+                    </RelativeLayout>
+
+
+
+
+                </RelativeLayout>
+
+                <!-- Buttons -->
+                <LinearLayout
+                    android:id="@+id/linear_buttons"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentBottom="true"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginBottom="32dp"
+                    android:orientation="horizontal">
+
+                    <android.support.design.widget.FloatingActionButton
+                        android:id="@+id/first_fab"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="bottom|end"
+                        android:layout_marginBottom="12dp"
+                        android:layout_marginLeft="16dp"
+                        android:layout_marginRight="16dp"
+                        android:scaleType="center"
+                        android:src="@drawable/ic_videocam_white"
+                        app:backgroundTint="@color/accentColor"
+                        app:borderWidth="0dp"
+                        app:elevation="6dp"
+                        app:fabSize="normal"
+                        app:pressedTranslationZ="12dp" />
+
+
+                    <android.support.design.widget.FloatingActionButton
+                        android:id="@+id/second_fab"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="bottom|end"
+                        android:layout_marginBottom="12dp"
+                        android:layout_marginLeft="16dp"
+                        android:layout_marginRight="16dp"
+                        android:scaleType="center"
+                        android:src="@drawable/ic_record_audio_w"
+                        app:backgroundTint="@color/accentColor"
+                        app:borderWidth="0dp"
+                        app:elevation="6dp"
+                        app:fabSize="normal"
+                        app:pressedTranslationZ="12dp" />
+
+                    <android.support.design.widget.FloatingActionButton
+                        android:id="@+id/answer_call_fab"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="bottom|end"
+                        android:layout_marginBottom="12dp"
+                        android:layout_marginLeft="16dp"
+                        android:layout_marginRight="16dp"
+                        android:scaleType="center"
+                        android:src="@drawable/ic_phone"
+                        app:backgroundTint="@color/accentColor"
+                        app:borderWidth="0dp"
+                        app:elevation="6dp"
+                        app:fabSize="normal"
+                        app:pressedTranslationZ="12dp" />
+
+                    <android.support.design.widget.FloatingActionButton
+                        android:id="@+id/third_fab"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="bottom|end"
+                        android:layout_marginBottom="12dp"
+                        android:layout_marginLeft="16dp"
+                        android:layout_marginRight="16dp"
+                        android:scaleType="center"
+                        android:src="@drawable/ic_close_white"
+                        app:backgroundTint="@color/delete_account"
+                        app:borderWidth="0dp"
+                        app:elevation="6dp"
+                        app:fabSize="normal"
+                        app:pressedTranslationZ="12dp" />
+
+                </LinearLayout>
+
+            </RelativeLayout>
+
+        </android.support.design.widget.AppBarLayout>
+
+
+    </android.support.design.widget.CoordinatorLayout>

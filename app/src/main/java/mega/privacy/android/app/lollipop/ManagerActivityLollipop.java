@@ -3,7 +3,6 @@ package mega.privacy.android.app.lollipop;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.app.SearchManager;
@@ -20,17 +19,14 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
-import android.graphics.Point;
 import android.graphics.Rect;
 import android.graphics.Shader.TileMode;
-import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.provider.MediaStore;
-import android.support.design.widget.BottomSheetDialog;
 import android.support.design.widget.BottomSheetDialogFragment;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
@@ -50,7 +46,6 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.SearchView;
-import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.Html;
@@ -58,7 +53,6 @@ import android.text.InputType;
 import android.text.Spanned;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.Display;
 import android.view.Gravity;
@@ -81,8 +75,6 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CheckedTextView;
-import android.widget.CompoundButton;
-import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -99,15 +91,12 @@ import com.google.firebase.iid.FirebaseInstanceId;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Locale;
-import java.util.TimeZone;
 
 import mega.privacy.android.app.AndroidCompletedTransfer;
 import mega.privacy.android.app.CameraSyncService;
@@ -163,6 +152,7 @@ import mega.privacy.android.app.lollipop.managerSections.UpgradeAccountFragmentL
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.lollipop.megachat.RecentChatsFragmentLollipop;
+import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.lollipop.tasks.CheckOfflineNodesTask;
 import mega.privacy.android.app.lollipop.tasks.FilePrepareTask;
 import mega.privacy.android.app.lollipop.tasks.FillDBContactsTask;
@@ -189,6 +179,8 @@ import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatApiJava;
+import nz.mega.sdk.MegaChatCall;
+import nz.mega.sdk.MegaChatCallListenerInterface;
 import nz.mega.sdk.MegaChatError;
 import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatListenerInterface;
@@ -201,7 +193,6 @@ import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaGlobalListenerInterface;
 import nz.mega.sdk.MegaNode;
-import nz.mega.sdk.MegaNodeList;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaShare;
@@ -211,7 +202,7 @@ import nz.mega.sdk.MegaTransferListenerInterface;
 import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUtilsAndroid;
 
-public class ManagerActivityLollipop extends PinActivityLollipop implements NetworkStateReceiver.NetworkStateReceiverListener, MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatRequestListenerInterface, OnNavigationItemSelectedListener, MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener,
+public class ManagerActivityLollipop extends PinActivityLollipop implements NetworkStateReceiver.NetworkStateReceiverListener, MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatCallListenerInterface,MegaChatRequestListenerInterface, OnNavigationItemSelectedListener, MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener,
 			NodeOptionsBottomSheetDialogFragment.CustomHeight, ContactsBottomSheetDialogFragment.CustomHeight{
 
 	public int accountFragment;
@@ -1111,6 +1102,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			log("savedInstanceState -> parentHandleBrowser: "+parentHandleBrowser);
 			parentHandleRubbish = savedInstanceState.getLong("parentHandleRubbish", -1);
 			parentHandleIncoming = savedInstanceState.getLong("parentHandleIncoming", -1);
+            log("savedInstanceState -> parentHandleIncoming: "+parentHandleIncoming);
 			parentHandleOutgoing = savedInstanceState.getLong("parentHandleOutgoing", -1);
 			log("savedInstanceState -> parentHandleOutgoing: "+parentHandleOutgoing);
 			parentHandleSearch = savedInstanceState.getLong("parentHandleSearch", -1);
@@ -1181,6 +1173,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			megaChatApi = app.getMegaChatApi();
 			log("addChatListener");
 			megaChatApi.addChatListener(this);
+			megaChatApi.addChatCallListener(this);
 		}
 		else{
 			megaChatApi=null;
@@ -1342,10 +1335,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		tB.setVisibility(View.VISIBLE);
 		setSupportActionBar(tB);
 		aB = getSupportActionBar();
-		log("aB.setHomeAsUpIndicator_1");
-		aB.setTitle(getString(R.string.section_cloud_drive));
-        aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
-        aB.setHomeButtonEnabled(true);
+		aB.setHomeButtonEnabled(true);
         aB.setDisplayHomeAsUpEnabled(true);
 //        aB.setDisplayShowHomeEnabled(true);
 //        getSupportActionBar().setCustomView(R.layout.custom_action_bar_top);
@@ -3139,6 +3129,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 		if (megaChatApi != null){
 			megaChatApi.removeChatListener(this);
+			megaChatApi.removeChatCallListener(this);
 		}
 
 		if(networkStateReceiver!=null){
@@ -3238,6 +3229,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						MegaNode parentNode = megaApi.getNodeByHandle(parentHandleBrowser);
 						if (parentNode != null){
 							if (parentNode.getHandle() == megaApi.getRootNode().getHandle() || parentHandleBrowser == -1){
+								log("setToolbarTitle: cloud DRIVE 202");
 								aB.setTitle(getString(R.string.section_cloud_drive));
 								aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 								firstNavigationLevel = true;
@@ -3251,6 +3243,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						}
 						else{
 							parentHandleBrowser = megaApi.getRootNode().getHandle();
+							log("setToolbarTitle: cloud DRIVE 204");
 							aB.setTitle(getString(R.string.section_cloud_drive));
 							aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 							firstNavigationLevel = true;
@@ -4754,7 +4747,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				return true;
 			}
 		});
-
+		searchView.setMaxWidth(Integer.MAX_VALUE);
 		searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
 
 			@Override
@@ -7406,13 +7399,16 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			iFLol.refresh();
 
 			//Refresh Rubbish Fragment
-			rubbishBinFLol = (RubbishBinFragmentLollipop) cloudPageAdapter.instantiateItem(viewPagerCDrive, 1);
-			if (rubbishBinFLol != null){
-				ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleRubbish), orderCloud);
-				rubbishBinFLol.setNodes(nodes);
-				rubbishBinFLol.getRecyclerView().invalidate();
+			if(cloudPageAdapter!=null){
+				rubbishBinFLol = (RubbishBinFragmentLollipop) cloudPageAdapter.instantiateItem(viewPagerCDrive, 1);
+				if (rubbishBinFLol != null){
+					if(rubbishBinFLol.isAdded()){
+						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleRubbish), orderCloud);
+						rubbishBinFLol.setNodes(nodes);
+						rubbishBinFLol.getRecyclerView().invalidate();
+					}
+				}
 			}
-
 		}
 		else if (drawerItem == DrawerItem.SHARED_ITEMS){
 			outSFLol = (OutgoingSharesFragmentLollipop) sharesPageAdapter.instantiateItem(viewPagerShares, 1);
@@ -7420,18 +7416,22 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			outSFLol.refresh();
 
 			//Refresh Rubbish Fragment
-			rubbishBinFLol = (RubbishBinFragmentLollipop) cloudPageAdapter.instantiateItem(viewPagerCDrive, 1);
-			if (rubbishBinFLol != null){
-				ArrayList<MegaNode> nodes;
-				if(parentHandleRubbish == -1){
-					nodes = megaApi.getChildren(megaApi.getRubbishNode(), orderCloud);
-				}
-				else{
-					nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleRubbish), orderCloud);
-				}
+			if(cloudPageAdapter!=null){
+				rubbishBinFLol = (RubbishBinFragmentLollipop) cloudPageAdapter.instantiateItem(viewPagerCDrive, 1);
+				if (rubbishBinFLol != null){
+					if(rubbishBinFLol.isAdded()){
+						ArrayList<MegaNode> nodes;
+						if(parentHandleRubbish == -1){
+							nodes = megaApi.getChildren(megaApi.getRubbishNode(), orderCloud);
+						}
+						else{
+							nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleRubbish), orderCloud);
+						}
 
-				rubbishBinFLol.setNodes(nodes);
-				rubbishBinFLol.getRecyclerView().invalidate();
+						rubbishBinFLol.setNodes(nodes);
+						rubbishBinFLol.getRecyclerView().invalidate();
+					}
+				}
 			}
 		}
 		setToolbarTitle();
@@ -7448,23 +7448,27 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			iFLol.hideMultipleSelect();
 			iFLol.refresh();
 
-			fbFLol = (FileBrowserFragmentLollipop) cloudPageAdapter.instantiateItem(viewPagerCDrive, 0);
-			if (fbFLol != null){
-				ArrayList<MegaNode> nodes;
-				if(parentHandleBrowser==-1){
-					nodes = megaApi.getChildren(megaApi.getNodeByHandle(megaApi.getRootNode().getHandle()), orderCloud);
+			if(cloudPageAdapter!=null){
+				fbFLol = (FileBrowserFragmentLollipop) cloudPageAdapter.instantiateItem(viewPagerCDrive, 0);
+				if (fbFLol != null){
+					if(fbFLol.isAdded()){
+						ArrayList<MegaNode> nodes;
+						if(parentHandleBrowser==-1){
+							nodes = megaApi.getChildren(megaApi.getNodeByHandle(megaApi.getRootNode().getHandle()), orderCloud);
+						}
+						else{
+							nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleBrowser), orderCloud);
+						}
+						log("nodes: "+nodes.size());
+						fbFLol.hideMultipleSelect();
+						fbFLol.setNodes(nodes);
+						fbFLol.setOverviewLayout();
+						fbFLol.getRecyclerView().invalidate();
+					}
 				}
 				else{
-					nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleBrowser), orderCloud);
+					log("FileBrowser is NULL after move");
 				}
-				log("nodes: "+nodes.size());
-				fbFLol.hideMultipleSelect();
-				fbFLol.setNodes(nodes);
-				fbFLol.setOverviewLayout();
-				fbFLol.getRecyclerView().invalidate();
-			}
-			else{
-				log("FileBrowser is NULL after move");
 			}
 
 		}
@@ -10680,6 +10684,47 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
 	}
 
+	public void showConfirmationRemoveSomeFromOffline(final List<MegaOffline> documents){
+		log("showConfirmationRemoveSomeFromOffline");
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+			boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
+			if (!hasStoragePermission) {
+				ActivityCompat.requestPermissions(this,
+						new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+						Constants.REQUEST_WRITE_STORAGE);
+			}
+		}
+
+		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				switch (which){
+					case DialogInterface.BUTTON_POSITIVE: {
+
+						String pathNavigation = getPathNavigationOffline();
+						NodeController nC = new NodeController(managerActivity);
+
+						for (int i=0;i<documents.size();i++){
+							nC.deleteOffline(documents.get(i), pathNavigation);
+						}
+						updateOfflineView(documents.get(0));
+						break;
+					}
+					case DialogInterface.BUTTON_NEGATIVE: {
+						break;
+					}
+				}
+			}
+		};
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+		builder.setMessage(R.string.confirmation_delete_from_save_for_offline).setPositiveButton(R.string.general_remove, dialogClickListener)
+				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
+	}
+
+
+
 	public void showConfirmationEnableLogsSDK(){
 		log("showConfirmationEnableLogsSDK");
 
@@ -12531,10 +12576,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			log("MegaRequest.TYPE_PAUSE_TRANSFERS");
 			if (e.getErrorCode() == MegaError.API_OK) {
 
-				fbFLol = (FileBrowserFragmentLollipop) cloudPageAdapter.instantiateItem(viewPagerCDrive, 0);
-				if(fbFLol!=null){
-					if(fbFLol.isAdded()){
-						fbFLol.updateTransferButton();
+				if(cloudPageAdapter!=null){
+					fbFLol = (FileBrowserFragmentLollipop) cloudPageAdapter.instantiateItem(viewPagerCDrive, 0);
+					if(fbFLol!=null){
+						if(fbFLol.isAdded()){
+							fbFLol.updateTransferButton();
+						}
 					}
 				}
 
@@ -12585,10 +12632,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			log("MegaRequest.TYPE_CANCEL_TRANSFERS");
 			//After cancelling all the transfers
 			if (e.getErrorCode() == MegaError.API_OK){
-				fbFLol = (FileBrowserFragmentLollipop) cloudPageAdapter.instantiateItem(viewPagerCDrive, 0);
-				if (fbFLol != null){
-					if(fbFLol.isAdded()){
-						fbFLol.setOverviewLayout();
+				if(cloudPageAdapter!=null){
+					fbFLol = (FileBrowserFragmentLollipop) cloudPageAdapter.instantiateItem(viewPagerCDrive, 0);
+					if (fbFLol != null){
+						if(fbFLol.isAdded()){
+							fbFLol.setOverviewLayout();
+						}
 					}
 				}
 
@@ -12613,11 +12662,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			if (e.getErrorCode() == MegaError.API_OK){
 
 				log("REQUEST OK - wait for onTransferFinish()");
-
-				fbFLol = (FileBrowserFragmentLollipop) cloudPageAdapter.instantiateItem(viewPagerCDrive, 0);
-				if (fbFLol != null){
-					if(fbFLol.isAdded()){
-						fbFLol.setOverviewLayout();
+				if(cloudPageAdapter!=null){
+					fbFLol = (FileBrowserFragmentLollipop) cloudPageAdapter.instantiateItem(viewPagerCDrive, 0);
+					if (fbFLol != null){
+						if(fbFLol.isAdded()){
+							fbFLol.setOverviewLayout();
+						}
 					}
 				}
 				supportInvalidateOptionsMenu();
@@ -13060,8 +13110,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);
 			cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
 			if (cFLol != null){
-				log("Incoming update - update contacts section");
-				cFLol.updateShares();
+				if(cFLol.isAdded()){
+					log("Incoming update - update contacts section");
+					cFLol.updateShares();
+				}
 			}
 		}
 
@@ -13069,41 +13121,45 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			//Rubbish bin
 			rubbishBinFLol = (RubbishBinFragmentLollipop) cloudPageAdapter.instantiateItem(viewPagerCDrive, 1);
 			if (rubbishBinFLol != null){
-				rubbishBinFLol.hideMultipleSelect();
+				if(rubbishBinFLol.isAdded()){
+					rubbishBinFLol.hideMultipleSelect();
 
-				if (isClearRubbishBin){
-					isClearRubbishBin = false;
-					parentHandleRubbish = megaApi.getRubbishNode().getHandle();
-					ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getRubbishNode(), orderCloud);
-					rubbishBinFLol.setNodes(nodes);
-					rubbishBinFLol.getRecyclerView().invalidate();
-				}
-				else{
-					ArrayList<MegaNode> nodes;
-					if(parentHandleRubbish==-1){
-						nodes = megaApi.getChildren(megaApi.getRubbishNode(), orderCloud);
+					if (isClearRubbishBin){
+						isClearRubbishBin = false;
+						parentHandleRubbish = megaApi.getRubbishNode().getHandle();
+						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getRubbishNode(), orderCloud);
+						rubbishBinFLol.setNodes(nodes);
+						rubbishBinFLol.getRecyclerView().invalidate();
 					}
 					else{
-						nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleRubbish), orderCloud);
+						ArrayList<MegaNode> nodes;
+						if(parentHandleRubbish==-1){
+							nodes = megaApi.getChildren(megaApi.getRubbishNode(), orderCloud);
+						}
+						else{
+							nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleRubbish), orderCloud);
+						}
+						rubbishBinFLol.setNodes(nodes);
+						rubbishBinFLol.getRecyclerView().invalidate();
 					}
-					rubbishBinFLol.setNodes(nodes);
-					rubbishBinFLol.getRecyclerView().invalidate();
 				}
 			}
 
 			fbFLol = (FileBrowserFragmentLollipop) cloudPageAdapter.instantiateItem(viewPagerCDrive, 0);
 			if (fbFLol != null){
-				ArrayList<MegaNode> nodes;
-				if(parentHandleBrowser==-1){
-					nodes = megaApi.getChildren(megaApi.getNodeByHandle(megaApi.getRootNode().getHandle()), orderCloud);
+				if(fbFLol.isAdded()){
+					ArrayList<MegaNode> nodes;
+					if(parentHandleBrowser==-1){
+						nodes = megaApi.getChildren(megaApi.getNodeByHandle(megaApi.getRootNode().getHandle()), orderCloud);
+					}
+					else{
+						nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleBrowser), orderCloud);
+					}
+					log("nodes: "+nodes.size());
+					fbFLol.hideMultipleSelect();
+					fbFLol.setNodes(nodes);
+					fbFLol.getRecyclerView().invalidate();
 				}
-				else{
-					nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleBrowser), orderCloud);
-				}
-				log("nodes: "+nodes.size());
-				fbFLol.hideMultipleSelect();
-				fbFLol.setNodes(nodes);
-				fbFLol.getRecyclerView().invalidate();
 			}
 			else{
 				log("FileBrowser is NULL after move");
@@ -13471,10 +13527,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 //					showSnackbar(getString(R.string.message_transfers_completed));
 				}
 
-				fbFLol = (FileBrowserFragmentLollipop) cloudPageAdapter.instantiateItem(viewPagerCDrive, 0);
-				if (fbFLol != null){
-					if(fbFLol.isAdded()){
-						fbFLol.setOverviewLayout();
+				if(cloudPageAdapter!=null){
+					fbFLol = (FileBrowserFragmentLollipop) cloudPageAdapter.instantiateItem(viewPagerCDrive, 0);
+					if (fbFLol != null){
+						if(fbFLol.isAdded()){
+							fbFLol.setOverviewLayout();
+						}
 					}
 				}
 
@@ -13505,10 +13563,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				if(transferCallback<transfer.getNotificationNumber()){
 					transferCallback = transfer.getNotificationNumber();
 
-					fbFLol = (FileBrowserFragmentLollipop) cloudPageAdapter.instantiateItem(viewPagerCDrive, 0);
-					if (fbFLol != null){
-						if(fbFLol.isAdded()){
-							fbFLol.setOverviewLayout();
+					if(cloudPageAdapter!=null){
+						fbFLol = (FileBrowserFragmentLollipop) cloudPageAdapter.instantiateItem(viewPagerCDrive, 0);
+						if (fbFLol != null){
+							if(fbFLol.isAdded()){
+								fbFLol.setOverviewLayout();
+							}
 						}
 					}
 
@@ -13531,10 +13591,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 		if(e.getErrorCode() == MegaError.API_EOVERQUOTA){
 			log("API_EOVERQUOTA error!!");
-			fbFLol = (FileBrowserFragmentLollipop) cloudPageAdapter.instantiateItem(viewPagerCDrive, 0);
-			if (fbFLol != null){
-				if(fbFLol.isAdded()){
-					fbFLol.setOverviewLayout();
+			if(cloudPageAdapter!=null){
+				fbFLol = (FileBrowserFragmentLollipop) cloudPageAdapter.instantiateItem(viewPagerCDrive, 0);
+				if (fbFLol != null){
+					if(fbFLol.isAdded()){
+						fbFLol.setOverviewLayout();
+					}
 				}
 			}
 		}
@@ -14363,4 +14425,34 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			log("onConfigurationChanged: changed to PORTRAIT");
 		}
 	}
+
+	@Override
+	public void onChatCallStart(MegaChatApiJava api, MegaChatCall call) {
+		log("onChatCallStart");
+	}
+
+	@Override
+	public void onChatCallIncoming(MegaChatApiJava api, MegaChatCall call) {
+		log("onChatCallIncoming");
+		Intent i = new Intent(this, ChatCallActivity.class);
+		i.putExtra("chatHandle", call.getChatid());
+		i.putExtra("callId", call.getId());
+		startActivity(i);
+	}
+
+	@Override
+	public void onChatCallStateChange(MegaChatApiJava api, MegaChatCall call) {
+		log("onChatCallStateChange: "+call.getStatus());
+	}
+
+	@Override
+	public void onChatCallTemporaryError(MegaChatApiJava api, MegaChatCall call, MegaChatError error) {
+		log("onChatCallTemporaryError");
+	}
+
+	@Override
+	public void onChatCallFinish(MegaChatApiJava api, MegaChatCall call, MegaChatError error) {
+		log("onChatCallFinish");
+	}
+
 }

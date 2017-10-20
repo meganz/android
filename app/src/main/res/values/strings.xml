@@ -1587,4 +1587,6 @@
     </plurals>
 
     <string name="no_folders_shared" context="Info of a contact if there is no folders shared with him">No folders shared</string>
+
 </resources>
+
