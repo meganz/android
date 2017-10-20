@@ -314,7 +314,6 @@ public class RubbishBinFragmentLollipop extends Fragment {
 			log("Parent is the Rubbish: "+((ManagerActivityLollipop)context).parentHandleRubbish);
 
 			nodes = megaApi.getChildren(megaApi.getRubbishNode(), ((ManagerActivityLollipop)context).orderCloud);
-			((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 
 		}
 		else{
@@ -325,21 +324,12 @@ public class RubbishBinFragmentLollipop extends Fragment {
 				nodes = megaApi.getChildren(parentNode, ((ManagerActivityLollipop)context).orderCloud);
 			
 				((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
-
-				if(aB!=null){
-					aB.setTitle(parentNode.getName());
-					log("indicator_arrow_back_035");
-					aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
-					((ManagerActivityLollipop)context).setFirstNavigationLevel(false);
-				}
-				else {
-					log("AB still is NULL");
-				}
-
 			}
 			nodes = megaApi.getChildren(parentNode, ((ManagerActivityLollipop)context).orderCloud);
-			((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 		}
+
+		((ManagerActivityLollipop)context).setToolbarTitle();
+		((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 
 		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
@@ -369,7 +359,7 @@ public class RubbishBinFragmentLollipop extends Fragment {
 			}
 
 			if(megaApi.getRubbishNode()!=null){
-				log("setContent of the Rubbish Bin");
+				log("setContent of the Rubbish Bin: "+((ManagerActivityLollipop)context).parentHandleRubbish);
 				if (((ManagerActivityLollipop)context).parentHandleRubbish == megaApi.getRubbishNode().getHandle()||((ManagerActivityLollipop)context).parentHandleRubbish==-1){
 					contentText.setText(MegaApiUtils.getInfoFolder(megaApi.getRubbishNode(), context));
 

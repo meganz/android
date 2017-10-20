@@ -4,7 +4,6 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.res.ColorStateList;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -40,13 +39,9 @@ import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
-import android.widget.ScrollView;
 import android.widget.TextView;
 
-import org.w3c.dom.NodeList;
-
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
@@ -66,6 +61,7 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PinActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.listeners.MultipleGroupChatRequestListener;
+import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaChatLollipopAdapter;
 import mega.privacy.android.app.lollipop.tasks.FilePrepareTask;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.AttachmentUploadBottomSheetDialogFragment;
@@ -1084,11 +1080,25 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 break;
             }
             case R.id.cab_menu_call_chat:{
-                showSnackbar("Coming soon...");
+                if (chatRoom.isGroup())
+                {
+                    showSnackbar("Coming soon...!");
+                }
+                else
+                {
+                    megaChatApi.startChatCall(chatRoom.getChatId(), false, this);
+                }
                 break;
             }
             case R.id.cab_menu_video_chat:{
-                showSnackbar("Coming soon...");
+                if (chatRoom.isGroup())
+                {
+                    showSnackbar("Coming soon...!");
+                }
+                else
+                {
+                    megaChatApi.startChatCall(chatRoom.getChatId(), true, this);
+                }
                 break;
             }
             case R.id.cab_menu_invite_chat:{
@@ -3670,9 +3680,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         } else {
             adapter.setMessages(messages);
         }
-
     }
-
 
     @Override
     public void onRequestStart(MegaChatApiJava api, MegaChatRequest request) {
@@ -3697,6 +3705,18 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             else{
                 log("Error clearing history: "+e.getErrorString());
                 showSnackbar(getString(R.string.clear_history_error));
+            }
+        }
+        else if(request.getType() == MegaChatRequest.TYPE_START_CHAT_CALL){
+            if(e.getErrorCode()==MegaChatError.ERROR_OK){
+                log("TYPE_START_CHAT_CALL finished with success");
+                Intent i = new Intent(this, ChatCallActivity.class);
+                i.putExtra("chatHandle", chatRoom.getChatId());
+                startActivity(i);
+            }
+            else{
+                log("EEEERRRRROR WHEN TYPE_START_CHAT_CALL " + e.getErrorString());
+                showSnackbar("EEEERRRRROR WHEN TYPE_START_CHAT_CALL");
             }
         }
         else if(request.getType() == MegaChatRequest.TYPE_REMOVE_FROM_CHATROOM){
