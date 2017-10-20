@@ -7,7 +7,7 @@
         android:layout_height="match_parent"
         android:id="@+id/file_info_fragment_container"
         android:fitsSystemWindows="true"
-        tools:context=".lollipop.megachat.calls.CallsChat">
+        tools:context=".lollipop.megachat.calls.ChatCallActivity">
 
         <android.support.design.widget.AppBarLayout
             android:id="@+id/app_bar"
@@ -184,6 +184,21 @@
                         app:fabSize="normal"
                         app:pressedTranslationZ="12dp" />
 
+                    <android.support.design.widget.FloatingActionButton
+                        android:id="@+id/answer_call_fab"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="bottom|end"
+                        android:layout_marginBottom="12dp"
+                        android:layout_marginLeft="16dp"
+                        android:layout_marginRight="16dp"
+                        android:scaleType="center"
+                        android:src="@drawable/ic_phone"
+                        app:backgroundTint="@color/accentColor"
+                        app:borderWidth="0dp"
+                        app:elevation="6dp"
+                        app:fabSize="normal"
+                        app:pressedTranslationZ="12dp" />
 
                     <android.support.design.widget.FloatingActionButton
                         android:id="@+id/third_fab"

@@ -1,27 +1,20 @@
 package mega.privacy.android.app.lollipop.megachat.calls;
 
 import android.annotation.SuppressLint;
-import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffXfermode;
-import android.graphics.Rect;
-import android.graphics.RectF;
 import android.hardware.Camera;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.AppBarLayout;
-import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
-import android.support.v7.graphics.Palette;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.view.Display;
@@ -29,19 +22,15 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
-import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.io.File;
-import java.util.List;
 import java.util.Locale;
 
 import mega.privacy.android.app.DatabaseHandler;
@@ -49,14 +38,8 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
-import mega.privacy.android.app.components.tokenautocomplete.ContactInfo;
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
-import mega.privacy.android.app.lollipop.MyAccountInfo;
 import mega.privacy.android.app.lollipop.PinActivityLollipop;
-import mega.privacy.android.app.lollipop.adapters.MegaContactsLollipopAdapter;
-import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
-import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -76,7 +59,7 @@ import nz.mega.sdk.MegaUser;
 
 import static mega.privacy.android.app.utils.Util.context;
 
-public class CallsChat extends PinActivityLollipop implements MegaChatRequestListenerInterface, MegaChatCallListenerInterface, MegaRequestListenerInterface, View.OnTouchListener, SurfaceHolder.Callback, View.OnClickListener {
+public class ChatCallActivity extends PinActivityLollipop implements MegaChatRequestListenerInterface, MegaChatCallListenerInterface, MegaRequestListenerInterface, View.OnTouchListener, SurfaceHolder.Callback, View.OnClickListener {
 
     DatabaseHandler dbH = null;
     ChatItemPreferences chatPrefs = null;
@@ -112,7 +95,7 @@ public class CallsChat extends PinActivityLollipop implements MegaChatRequestLis
     TextView contactInitialLetter;
     RelativeLayout contactImageBorder;
 
-    static CallsChat callsChatActivity = null;
+    static ChatCallActivity chatCallActivityActivity = null;
 
     private MenuItem firstIcon;
     private MenuItem secondIcon;
@@ -178,7 +161,7 @@ public class CallsChat extends PinActivityLollipop implements MegaChatRequestLis
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_calls_chat);
 
-        callsChatActivity = this;
+        chatCallActivityActivity = this;
 
         display = getWindowManager().getDefaultDisplay();
         outMetrics = new DisplayMetrics();
@@ -305,6 +288,7 @@ public class CallsChat extends PinActivityLollipop implements MegaChatRequestLis
             }
             else{
                 answerCallFAB.setVisibility(View.VISIBLE);
+                answerCallFAB.setOnClickListener(this);
                 videoFAB.setVisibility(View.GONE);
                 microFAB.setVisibility(View.GONE);
             }
@@ -678,7 +662,7 @@ public class CallsChat extends PinActivityLollipop implements MegaChatRequestLis
 
     @Override
     protected void onResume() {
-        log("onResume-CallsChat");
+        log("onResume-ChatCallActivity");
         super.onResume();
 
         ((MegaApplication) getApplication()).sendSignalPresenceActivity();
@@ -781,6 +765,18 @@ public class CallsChat extends PinActivityLollipop implements MegaChatRequestLis
         if(request.getType() == MegaChatRequest.TYPE_HANG_CHAT_CALL){
             finish();
         }
+        else if(request.getType() == MegaChatRequest.TYPE_ANSWER_CHAT_CALL){
+            if(e.getErrorCode()==MegaChatError.ERROR_OK){
+                log("Ok. CAll answered");
+                videoFAB.setVisibility(View.VISIBLE);
+                microFAB.setVisibility(View.VISIBLE);
+                answerCallFAB.setVisibility(View.GONE);
+            }
+            else{
+                log("Error call: "+e.getErrorString());
+//                showSnackbar(getString(R.string.clear_history_error));
+            }
+        }
     }
 
     @Override
@@ -870,19 +866,18 @@ public class CallsChat extends PinActivityLollipop implements MegaChatRequestLis
             }
             case R.id.first_fab:{
                 log("First FAB");
-//                if(callChatMyVideo.isShown()){
-//                    callChatMyVideo.setVisibility(View.GONE);
-//                    myImageBorder.setVisibility(View.VISIBLE);
-//                    videoFAB.setBackgroundTintList(ColorStateList.valueOf(Color.BLACK));
-//
-//
-//                }else{
-//                    callChatMyVideo.setVisibility(View.VISIBLE);
-//                    myImageBorder.setVisibility(View.GONE);
-//                    videoFAB.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.accentColor)));
-//                }
+                if(callChatMyVideo.isShown()){
+                    callChatMyVideo.setVisibility(View.GONE);
+                    myImageBorder.setVisibility(View.VISIBLE);
+                    videoFAB.setBackgroundTintList(ColorStateList.valueOf(Color.BLACK));
 
-                megaChatApi.answerChatCall(chatHandle, false, this);
+
+                }else{
+                    callChatMyVideo.setVisibility(View.VISIBLE);
+                    myImageBorder.setVisibility(View.GONE);
+                    videoFAB.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.accentColor)));
+                }
+
                 //  surfaceView.setVisibility(View.VISIBLE);
                 // start_camera();
                 break;
@@ -906,10 +901,15 @@ public class CallsChat extends PinActivityLollipop implements MegaChatRequestLis
                 megaChatApi.hangChatCall(chatHandle, this);
                 break;
             }
+            case R.id.answer_call_fab:{
+                megaChatApi.answerChatCall(chatHandle, false, this);
+                break;
+            }
+
         }
     }
 
     public static void log(String message) {
-        Util.log("CallsChat", message);
+        Util.log("ChatCallActivity", message);
     }
 }
