@@ -12,6 +12,7 @@
     <uses-feature android:name="android.hardware.camera.autofocus" android:required="false" />
     <uses-feature android:name="android.hardware.camera" android:required="false"/>
     <uses-feature android:name="android.hardware.screen.portrait" android:required="false" />
+    <uses-feature android:name="android.hardware.camera.front" android:required="false" />
     <uses-feature android:name="android.hardware.touchscreen" android:required="false" />
 
     <supports-screens android:resizeable="true"
@@ -22,6 +23,7 @@
         android:anyDensity="true"/>
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.WAKE_LOCK"/>
     <uses-permission android:name="android.permission.CAMERA" />
@@ -302,6 +304,11 @@
 
         <activity
             android:name="mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop"
+            android:label="@string/app_name">
+        </activity>
+
+        <activity
+            android:name="mega.privacy.android.app.lollipop.megachat.calls.CallsChat"
             android:label="@string/app_name">
         </activity>
 
