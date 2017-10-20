@@ -41,8 +41,10 @@ import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.lollipop.MyAccountInfo;
 import mega.privacy.android.app.lollipop.adapters.MegaContactsLollipopAdapter;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
+import mega.privacy.android.app.lollipop.megachat.calls.CallsChat;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -56,6 +58,9 @@ public class ContactsFragmentLollipop extends Fragment{
 	public static final String ARG_OBJECT = "object";
 	
 	MegaApiAndroid megaApi;
+	MyAccountInfo myAccountInfo;
+	TextView initialLetter;
+
 
 	Context context;
 	ActionBar aB;
@@ -333,6 +338,11 @@ public class ContactsFragmentLollipop extends Fragment{
 //			}
 //		}
 
+		if(myAccountInfo == null){
+			myAccountInfo = ((ManagerActivityLollipop)context).getMyAccountInfo();
+
+		}
+
 		for (int i=0;i<contacts.size();i++){
 
 //			MegaContact contactDB = dbH.findContactByHandle(String.valueOf(contacts.get(i).getHandle()));
@@ -571,9 +581,16 @@ public class ContactsFragmentLollipop extends Fragment{
 			}
 		}
 		else{
-	
-			Intent i = new Intent(context, ContactInfoActivityLollipop.class);
+
+
+				String myLetter=myAccountInfo.getFirstLetter();
+
+			/*Intent i = new Intent(context, ContactInfoActivityLollipop.class);
 			i.putExtra("name", visibleContacts.get(position).getMegaUser().getEmail());
+			startActivity(i);*/
+			Intent i = new Intent(context, CallsChat.class);
+			i.putExtra("name", visibleContacts.get(position).getMegaUser().getEmail());
+			i.putExtra("initialLetter",myLetter);
 			startActivity(i);
 		}
     }

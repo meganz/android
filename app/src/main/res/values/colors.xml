@@ -97,6 +97,7 @@
     <color name="status_invisible_layout">#bfbfbf</color>
 
     <color name="sliding_panel_separator">#dcdcdcdc</color>
+<<<<<<< HEAD
     <color name="login_warning">#FFFF333A</color>
     <color name="login_title">#FFD90007</color>
 
@@ -122,5 +123,8 @@
     <color name="grey_text_chip">#FF535353</color>
     <color name="grey_background_chip">#FFE0E0E0</color>
     <color name="invite_button_deactivated">#424F4F4F</color>
+
+    <color name="very_transparent_black">#40000000</color>
+    <color name="very_very_transparent_black">#10000000</color>
 
 </resources>
