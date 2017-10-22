@@ -76,6 +76,10 @@ extern int sdkVersion;
     Swig::LocalRefGuard $1_refguard(jenv, $input);
 %}
 
+%apply (char *STRING, size_t LENGTH) {(char *buffer, size_t size)};
+%typemap(directorargout) (char *buffer, size_t size)
+%{ jenv->DeleteLocalRef($input); %}
+
 //Make the "delete" method protected
 %typemap(javadestruct, methodname="delete", methodmodifiers="protected synchronized") SWIGTYPE 
 {   
