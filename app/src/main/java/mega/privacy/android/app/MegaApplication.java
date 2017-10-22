@@ -43,6 +43,14 @@ import android.util.Log;
 import android.view.Display;
 import android.view.View;
 
+import org.webrtc.AndroidVideoTrackSourceObserver;
+import org.webrtc.Camera1Enumerator;
+import org.webrtc.Camera2Enumerator;
+import org.webrtc.CameraEnumerator;
+import org.webrtc.ContextUtils;
+import org.webrtc.SurfaceTextureHelper;
+import org.webrtc.VideoCapturer;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Locale;
@@ -282,6 +290,76 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 //		new MegaTest(getMegaApi()).start();
 	}	
 	
+
+	static private VideoCapturer createCameraCapturer(CameraEnumerator enumerator) {
+		final String[] deviceNames = enumerator.getDeviceNames();
+
+		// First, try to find front facing camera
+		for (String deviceName : deviceNames) {
+			if (enumerator.isFrontFacing(deviceName)) {
+				VideoCapturer videoCapturer = enumerator.createCapturer(deviceName, null);
+
+				if (videoCapturer != null) {
+					return videoCapturer;
+				}
+			}
+		}
+
+		// Front facing camera not found, try something else
+		for (String deviceName : deviceNames) {
+			if (!enumerator.isFrontFacing(deviceName)) {
+				VideoCapturer videoCapturer = enumerator.createCapturer(deviceName, null);
+
+				if (videoCapturer != null) {
+					return videoCapturer;
+				}
+			}
+		}
+
+		return null;
+	}
+
+	static VideoCapturer videoCapturer = null;
+	static public void startVideoCapture(long nativeAndroidVideoTrackSource, SurfaceTextureHelper surfaceTextureHelper) {
+		// Settings
+		boolean useCamera2 = false;
+		boolean captureToTexture = true;
+		int videoWidth = 480;
+		int videoHeight = 320;
+		int videoFps = 15;
+
+		Context context = ContextUtils.getApplicationContext();
+		if (videoCapturer == null) {
+			if (Camera2Enumerator.isSupported(context) && useCamera2) {
+				videoCapturer = createCameraCapturer(new Camera2Enumerator(context));
+			} else {
+				videoCapturer = createCameraCapturer(new Camera1Enumerator(captureToTexture));
+			}
+
+			if (videoCapturer == null) {
+				log("Unable to create video capturer");
+				return;
+			}
+		}
+		else {
+			// Workaround to be able to reuse the video capturer
+			// It shouldn't be needed to do it here because the capture
+			// should be stopped at the end of video calls
+			try {
+				videoCapturer.stopCapture();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+
+		// Link the capturer with the surfaceTextureHelper and the native video source
+		VideoCapturer.CapturerObserver capturerObserver = new AndroidVideoTrackSourceObserver(nativeAndroidVideoTrackSource);
+		videoCapturer.initialize(surfaceTextureHelper, context, capturerObserver);
+
+		// Start the capture!
+		videoCapturer.startCapture(videoWidth, videoHeight, videoFps);
+	}
+
 //	private void initializeGA(){
 //		// Set the log level to verbose.
 //		GoogleAnalytics.getInstance(this).getLogger().setLogLevel(LogLevel.VERBOSE);
