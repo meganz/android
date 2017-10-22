@@ -902,7 +902,7 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
                 break;
             }
             case R.id.answer_call_fab:{
-                megaChatApi.answerChatCall(chatHandle, false, this);
+                megaChatApi.answerChatCall(chatHandle, true, this);
                 break;
             }
 

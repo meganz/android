@@ -11,7 +11,7 @@
 package org.webrtc;
 
 /** An implementation of CapturerObserver that forwards all calls from Java to the C layer. */
-class AndroidVideoTrackSourceObserver implements VideoCapturer.CapturerObserver {
+public class AndroidVideoTrackSourceObserver implements VideoCapturer.CapturerObserver {
   // Pointer to VideoTrackSourceProxy proxying AndroidVideoTrackSource.
   private final long nativeSource;
 
