@@ -115,7 +115,7 @@ public class ViESurfaceRenderer implements Callback {
             catch (Exception e) {
             }
         }
-        bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565);
+        bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         srcRect.left = 0;
         srcRect.top = 0;
         srcRect.bottom = height;

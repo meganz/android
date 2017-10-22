@@ -30,7 +30,10 @@ import android.view.WindowManager;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import org.webrtc.videoengine.ViESurfaceRenderer;
+
 import java.io.File;
+import java.nio.ByteBuffer;
 import java.util.Locale;
 
 import mega.privacy.android.app.DatabaseHandler;
@@ -52,6 +55,7 @@ import nz.mega.sdk.MegaChatError;
 import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaChatRoom;
+import nz.mega.sdk.MegaChatVideoListenerInterface;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
@@ -59,7 +63,7 @@ import nz.mega.sdk.MegaUser;
 
 import static mega.privacy.android.app.utils.Util.context;
 
-public class ChatCallActivity extends PinActivityLollipop implements MegaChatRequestListenerInterface, MegaChatCallListenerInterface, MegaRequestListenerInterface, View.OnTouchListener, SurfaceHolder.Callback, View.OnClickListener {
+public class ChatCallActivity extends PinActivityLollipop implements MegaChatRequestListenerInterface, MegaChatCallListenerInterface, MegaChatVideoListenerInterface, MegaRequestListenerInterface, View.OnTouchListener, SurfaceHolder.Callback, View.OnClickListener {
 
     DatabaseHandler dbH = null;
     ChatItemPreferences chatPrefs = null;
@@ -107,6 +111,7 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
 
     Camera camera;
     SurfaceView surfaceView;
+    ViESurfaceRenderer renderer;
     SurfaceHolder surfaceHolder;
 
     int var1=0;
@@ -190,6 +195,7 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
         }
 
         megaChatApi.addChatCallListener(this);
+        megaChatApi.addChatRemoteVideoListener(this);
 
         myUser = megaApi.getMyUser();
 
@@ -210,10 +216,11 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
         aB.setHomeButtonEnabled(true);
         aB.setDisplayHomeAsUpEnabled(true);
 
-        //surfaceView = (SurfaceView)findViewById(R.id.surfaceView1);
+        surfaceView = (SurfaceView)findViewById(R.id.surfaceView1);
         //surfaceHolder = surfaceView.getHolder();
         //surfaceHolder.addCallback(this);
         //surfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);*/
+        renderer = new ViESurfaceRenderer(surfaceView);
 
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
@@ -674,6 +681,11 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
             camera.release();
             camera = null;
         }
+
+        if (megaChatApi != null) {
+            megaChatApi.removeChatCallListener(this);
+            megaChatApi.removeChatVideoListener(this);
+        }
     }
 
 
@@ -807,6 +819,37 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
     @Override
     public void onChatCallFinish(MegaChatApiJava api, MegaChatCall call, MegaChatError error) {
         log("onChatCallFinish");
+    }
+
+    int width = 0;
+    int height = 0;
+    Bitmap bitmap;
+
+    @Override
+    public void onChatVideoData(MegaChatApiJava api, MegaChatCall chatCall, int width, int height, byte[] byteBuffer)
+    {
+        //log("onChatVideoData");
+        if (this.width != width || this.height != height)
+        {
+            this.width = width;
+            this.height = height;
+            this.bitmap = renderer.CreateBitmap(width, height);
+        }
+
+        // Colors seem to be in a wrong order
+        // Also, it's not very efficient to have an alpha channel
+        // This require investigation and improvements
+        for(int i = 0; i < width * height * 4; i += 4) {
+            byte tmp = byteBuffer[i];
+            byteBuffer[i] = byteBuffer[i + 2];
+            byteBuffer[i + 2] = tmp;
+        }
+
+        bitmap.copyPixelsFromBuffer(ByteBuffer.wrap(byteBuffer));
+
+        // Instead of using this WebRTC renderer, we should probably draw the image by ourselves.
+        // The renderer has been modified a bit and an update of WebRTC could break our app
+        renderer.DrawBitmap();
     }
 
     //  private Bitmap getRoundedCornerBitmap(Bitmap bitmap){
