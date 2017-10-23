@@ -69,7 +69,7 @@ import mega.privacy.android.app.MegaStreamingService;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.MegaLinearLayoutManager;
-import mega.privacy.android.app.components.SimpleDividerItemDecoration;
+import mega.privacy.android.app.components.DividerItemDecoration;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.MegaMonthPicLollipop;
@@ -83,6 +83,7 @@ import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaChildren;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
@@ -95,6 +96,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 
 	
 	public static int GRID_WIDTH = 154;
+
 	
 	public static int GRID_LARGE = 3;
 	public static int GRID_SMALL = 7;
@@ -679,7 +681,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			detector = new GestureDetectorCompat(getActivity(), new RecyclerViewOnGestureListener());
 			
 			listView = (RecyclerView) v.findViewById(R.id.file_list_view_browser);
-			listView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
+			listView.addItemDecoration(new DividerItemDecoration(context, outMetrics));
 			mLayoutManager = new MegaLinearLayoutManager(context);
 			listView.setLayoutManager(mLayoutManager);
 			listView.addOnItemTouchListener(this);
