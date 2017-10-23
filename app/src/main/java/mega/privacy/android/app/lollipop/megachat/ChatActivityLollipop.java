@@ -3461,7 +3461,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                                 msg.setInfoToShow(Constants.CHAT_ADAPTER_SHOW_ALL);
                             }
                         }
-
                     }
 
                 } else {
