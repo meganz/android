@@ -14437,6 +14437,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		Intent i = new Intent(this, ChatCallActivity.class);
 		i.putExtra("chatHandle", call.getChatid());
 		i.putExtra("callId", call.getId());
+
 		startActivity(i);
 	}
 

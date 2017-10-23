@@ -63,7 +63,7 @@
                     </RelativeLayout>
 
                     <SurfaceView
-                        android:id="@+id/surfaceView1"
+                        android:id="@+id/surface_remote_video"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_alignParentTop="true"
@@ -160,7 +160,7 @@
                     android:orientation="horizontal">
 
                     <android.support.design.widget.FloatingActionButton
-                        android:id="@+id/first_fab"
+                        android:id="@+id/video_fab"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="bottom|end"
@@ -177,7 +177,7 @@
 
 
                     <android.support.design.widget.FloatingActionButton
-                        android:id="@+id/second_fab"
+                        android:id="@+id/micro_fab"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="bottom|end"
@@ -209,7 +209,7 @@
                         app:pressedTranslationZ="12dp" />
 
                     <android.support.design.widget.FloatingActionButton
-                        android:id="@+id/third_fab"
+                        android:id="@+id/hang_fab"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="bottom|end"
