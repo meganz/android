@@ -306,8 +306,6 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		}
 		else{
 			log("User has credentials");
-
-
 		}
 		
 		if (savedInstanceState != null){
@@ -434,7 +432,6 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH, WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH);
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL, WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL);
-
 
 	}
 	

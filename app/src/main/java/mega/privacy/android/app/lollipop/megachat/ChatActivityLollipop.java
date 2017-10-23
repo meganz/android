@@ -3729,6 +3729,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             if(e.getErrorCode()==MegaChatError.ERROR_OK){
                 log("File sent correctly");
                 MegaNodeList nodeList = request.getMegaNodeList();
+
                 for(int i = 0; i<nodeList.size();i++){
                     log("Node name: "+nodeList.get(i).getName());
                 }
