@@ -1,6 +1,9 @@
 package mega.privacy.android.app.lollipop.megachat.calls;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -13,6 +16,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
@@ -41,8 +45,10 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
+import mega.privacy.android.app.lollipop.PhoneContactsActivityLollipop;
 import mega.privacy.android.app.lollipop.PinActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
+import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -61,6 +67,7 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUser;
 
+import static android.view.View.GONE;
 import static mega.privacy.android.app.utils.Util.context;
 
 public class ChatCallActivity extends PinActivityLollipop implements MegaChatRequestListenerInterface, MegaChatCallListenerInterface, MegaChatVideoListenerInterface, MegaRequestListenerInterface, View.OnTouchListener, SurfaceHolder.Callback, View.OnClickListener {
@@ -218,6 +225,22 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
         aB.setHomeButtonEnabled(true);
         aB.setDisplayHomeAsUpEnabled(true);
 
+        videoFAB = (FloatingActionButton) findViewById(R.id.video_fab);
+        videoFAB.setOnClickListener(this);
+
+        microFAB = (FloatingActionButton) findViewById(R.id.micro_fab);
+        microFAB.setOnClickListener(this);
+
+        hangFAB = (FloatingActionButton) findViewById(R.id.hang_fab);
+        hangFAB.setOnClickListener(this);
+
+        answerCallFAB = (FloatingActionButton) findViewById(R.id.answer_call_fab);
+
+        videoFAB.setVisibility(GONE);
+        answerCallFAB.setVisibility(GONE);
+        hangFAB.setVisibility(GONE);
+        microFAB.setVisibility(GONE);
+
         surfaceView = (SurfaceView)findViewById(R.id.surface_remote_video);
         //surfaceHolder = surfaceView.getHolder();
         //surfaceHolder.addCallback(this);
@@ -237,7 +260,7 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
 
             myImage = (RoundedImageView) findViewById(R.id.call_chat_my_image);
             myImageBorder = (RelativeLayout) findViewById(R.id.call_chat_my_image_rl);
-            myImageBorder.setVisibility(View.GONE);
+            myImageBorder.setVisibility(GONE);
             callChatMyVideo = (RelativeLayout) findViewById(R.id.call_chat_my_video);
             callChatMyVideo.setVisibility(View.VISIBLE);
             myInitialLetter = (TextView) findViewById(R.id.call_chat_my_image_initial_letter);
@@ -248,70 +271,48 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
             contactImage = (RoundedImageView) findViewById(R.id.call_chat_contact_image);
             contactInitialLetter = (TextView) findViewById(R.id.call_chat_contact_image_initial_letter);
 
-            videoFAB = (FloatingActionButton) findViewById(R.id.video_fab);
-            videoFAB.setOnClickListener(this);
-
-            microFAB = (FloatingActionButton) findViewById(R.id.micro_fab);
-            microFAB.setOnClickListener(this);
-
-            hangFAB = (FloatingActionButton) findViewById(R.id.hang_fab);
-            hangFAB.setOnClickListener(this);
-
-            answerCallFAB = (FloatingActionButton) findViewById(R.id.answer_call_fab);
-            answerCallFAB.setVisibility(View.GONE);
-
             setProfileMyAvatar();
-        }
 
-        //Contact's avatar
-        chatHandle = extras.getLong("chatHandle", -1);
-        log("Chat handle to call: "+chatHandle);
-        if (chatHandle != -1) {
-            chat = megaChatApi.getChatRoom(chatHandle);
-            call = megaChatApi.getChatCallByChatId(chatHandle);
+            //Contact's avatar
+            chatHandle = extras.getLong("chatHandle", -1);
+            log("Chat handle to call: " + chatHandle);
+            if (chatHandle != -1) {
+                chat = megaChatApi.getChatRoom(chatHandle);
+                call = megaChatApi.getChatCallByChatId(chatHandle);
 
-            int callStatus = call.getStatus();
-            log("The status of the call is: "+callStatus);
-            switch(callStatus){
-                case MegaChatCall.CALL_STATUS_IN_PROGRESS:{
-                    break;
+                int callStatus = call.getStatus();
+                log("The status of the call is: " + callStatus);
+                switch (callStatus) {
+                    case MegaChatCall.CALL_STATUS_IN_PROGRESS: {
+                        break;
+                    }
                 }
-            }
 
-            long callId = extras.getLong("callId", -1);
-            if(callId==-1){
-                videoFAB.setVisibility(View.VISIBLE);
-                microFAB.setVisibility(View.VISIBLE);
-                answerCallFAB.setVisibility(View.GONE);
-            }
-            else{
-                answerCallFAB.setVisibility(View.VISIBLE);
-                answerCallFAB.setOnClickListener(this);
-                videoFAB.setVisibility(View.GONE);
-                microFAB.setVisibility(View.GONE);
-            }
+                fullName = chat.getPeerFullname(0);
+                email = chat.getPeerEmail(0);
+                userHandle = chat.getPeerHandle(0);
 
-            fullName = chat.getPeerFullname(0);
-            email = chat.getPeerEmail(0);
-            userHandle = chat.getPeerHandle(0);
-
-            if(fullName.trim()!=null){
-                if (fullName.trim().isEmpty()) {
-                    log("1 - Put email as fullname");
+                if (fullName.trim() != null) {
+                    if (fullName.trim().isEmpty()) {
+                        log("1 - Put email as fullname");
+                        String[] splitEmail = email.split("[@._]");
+                        fullName = splitEmail[0];
+                    }
+                } else {
+                    log("2 - Put email as fullname");
                     String[] splitEmail = email.split("[@._]");
                     fullName = splitEmail[0];
                 }
-            }
-            else{
-                log("2 - Put email as fullname");
-                String[] splitEmail = email.split("[@._]");
-                fullName = splitEmail[0];
-            }
 
-            aB.setTitle(fullName);
-            aB.setSubtitle("01:20");
+                aB.setTitle(fullName);
+                aB.setSubtitle("01:20");
 
-            setUserProfileAvatar(userHandle, fullName);
+                setUserProfileAvatar(userHandle, fullName);
+            }
+        }
+
+        if(checkPermissions()){
+            showFABs();
         }
     }
 
@@ -388,7 +389,7 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
                 bitmap = ThumbnailUtilsLollipop.getRoundedRectBitmap(context, bitmap, 3);
                 if (bitmap != null) {
                     contactImage.setImageBitmap(bitmap);
-                    contactInitialLetter.setVisibility(View.GONE);
+                    contactInitialLetter.setVisibility(GONE);
                 }
                 else{
                     createDefaultAvatar(userHandle, fullName);
@@ -466,7 +467,7 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
                 if (myBitmap != null) {
 
                     myImage.setImageBitmap(myBitmap);
-                    myInitialLetter.setVisibility(View.GONE);
+                    myInitialLetter.setVisibility(GONE);
 
                 }
                 else{
@@ -486,14 +487,10 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
         if (event.getAction() == MotionEvent.ACTION_DOWN) {
             if(aB.isShowing()){
                 hideActionBar();
-                videoFAB.hide();
-                microFAB.hide();
-                hangFAB.hide();
+                showFABs();
             }else{
                 showActionBar();
-                videoFAB.show();
-                microFAB.show();
-                hangFAB.show();
+                showFABs();
             }
             //if(videoFAB.isShown()){
             //    hideFabButton();
@@ -503,7 +500,6 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
         }
         return false;
     }
-
 
     protected void hideActionBar(){
         if (aB != null && aB.isShowing()) {
@@ -655,7 +651,7 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
                     log("Ok. CAll answered");
                     videoFAB.setVisibility(View.VISIBLE);
                     microFAB.setVisibility(View.VISIBLE);
-                    answerCallFAB.setVisibility(View.GONE);
+                    answerCallFAB.setVisibility(GONE);
                 }
                 else{
                     log("Rejected call");
@@ -788,14 +784,14 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
             }
             case R.id.video_fab:{
                 if(callChatMyVideo.isShown()){
-                    callChatMyVideo.setVisibility(View.GONE);
+                    callChatMyVideo.setVisibility(GONE);
                     myImageBorder.setVisibility(View.VISIBLE);
                     videoFAB.setBackgroundTintList(ColorStateList.valueOf(Color.BLACK));
 
 
                 }else{
                     callChatMyVideo.setVisibility(View.VISIBLE);
-                    myImageBorder.setVisibility(View.GONE);
+                    myImageBorder.setVisibility(GONE);
                     videoFAB.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.accentColor)));
                 }
 
@@ -835,6 +831,70 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
                 break;
             }
 
+        }
+    }
+
+    public boolean checkPermissions(){
+        log("checkPermissions");
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+
+            boolean hasCameraPermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED);
+            if (!hasCameraPermission) {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, Constants.REQUEST_CAMERA);
+                return false;
+            }
+
+            boolean hasRecordAudioPermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED);
+            if (!hasRecordAudioPermission) {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, Constants.RECORD_AUDIO);
+                return false;
+            }
+
+            return true;
+        }
+        return true;
+    }
+
+    public void showFABs(){
+        if(call.getStatus()==MegaChatCall.CALL_STATUS_RING_IN){
+            answerCallFAB.setVisibility(View.VISIBLE);
+            answerCallFAB.setOnClickListener(this);
+            hangFAB.setVisibility(View.VISIBLE);
+            videoFAB.setVisibility(GONE);
+            microFAB.setVisibility(GONE);
+        }
+        else{
+            videoFAB.setVisibility(View.VISIBLE);
+            microFAB.setVisibility(View.VISIBLE);
+            answerCallFAB.setVisibility(GONE);
+            hangFAB.setVisibility(View.VISIBLE);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        log("onRequestPermissionsResult");
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode) {
+            case Constants.REQUEST_CAMERA: {
+                log("REQUEST_CAMERA");
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    if(checkPermissions()){
+                       showFABs();
+                    }
+                }
+                break;
+            }
+            case Constants.RECORD_AUDIO: {
+                log("RECORD_AUDIO");
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    if(checkPermissions()){
+                        showFABs();
+                    }
+                }
+                break;
+            }
         }
     }
 
