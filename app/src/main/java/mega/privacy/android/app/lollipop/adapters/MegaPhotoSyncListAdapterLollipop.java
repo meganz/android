@@ -30,6 +30,7 @@ import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaNode;
 
 
@@ -39,7 +40,9 @@ public class MegaPhotoSyncListAdapterLollipop extends RecyclerView.Adapter<MegaP
 		public String filePath;
 		public long timestamp;
 	}
-	
+	public static final int ITEM_VIEW_TYPE_NODE= 0;
+	public static final int ITEM_VIEW_TYPE_MONTH = 1;
+
 	private SparseBooleanArray selectedItems = new SparseBooleanArray();;
 	
 	ViewHolderPhotoSyncList holder = null;
@@ -280,7 +283,7 @@ public class MegaPhotoSyncListAdapterLollipop extends RecyclerView.Adapter<MegaP
 		}
 		else{
 			if(this.isItemChecked(position)){
-				holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.new_file_list_selected_row));
+				holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.new_multiselect_color));
 			}
 			else{
 				holder.itemLayout.setBackgroundColor(Color.WHITE);
@@ -352,6 +355,16 @@ public class MegaPhotoSyncListAdapterLollipop extends RecyclerView.Adapter<MegaP
 			holder.itemLayout.setVisibility(View.GONE);
 			holder.monthLayout.setVisibility(View.VISIBLE);
 			
+		}
+	}
+	@Override
+	public int getItemViewType(int position) {
+		log("getItemViewType: position"+position);
+		PhotoSyncHolder psh = (PhotoSyncHolder) getItem(position);
+		if (psh.isNode){
+				return ITEM_VIEW_TYPE_NODE;
+		} else{
+			return ITEM_VIEW_TYPE_MONTH;
 		}
 	}
 
