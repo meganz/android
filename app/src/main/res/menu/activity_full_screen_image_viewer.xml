@@ -27,6 +27,14 @@
         android:visible="true"/>
 
     <item
+        android:id="@+id/full_image_viewer_chat"
+        android:orderInCategory="110"
+        android:title="@string/general_share"
+        android:icon="@drawable/ic_chat_white"
+        MEGA:showAsAction="always"
+        android:visible="true"/>
+
+    <item
         android:id="@+id/full_image_viewer_properties"
         android:orderInCategory="105"
         android:title="@string/general_file_info"

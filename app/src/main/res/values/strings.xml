@@ -1504,7 +1504,10 @@
 
     <string name="general_view_with_revoke" formatted="false" context="Menu option">View files (%1$d deleted)</string>
 
+    <string name="success_attaching_node_from_cloud" context="Success message when the attachment has been sent to a chat">File sent to %1$s</string>
+    <string name="success_attaching_node_from_cloud_chats" context="Success message when the attachment has been sent to a many chats">File sent to %1$d chats</string>
     <string name="error_attaching_node_from_cloud" context="Error message when the attachment cannot be sent">Error. The file has not been sent</string>
+    <string name="error_attaching_node_from_cloud_chats" context="Error message when the attachment cannot be sent to any of the selected chats">Error. The file has not been sent to any of the selected chats</string>
     <string name="error_revoking_node" context="Error message when the attachment cannot be revoked">Error. The attachment has not been removed</string>
 
     <string name="settings_set_up_automatic_uploads" context="settings option">Set up automatic uploads</string>

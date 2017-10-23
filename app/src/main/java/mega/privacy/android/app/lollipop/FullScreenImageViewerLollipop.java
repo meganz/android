@@ -3,7 +3,6 @@ package mega.privacy.android.app.lollipop;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
-import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -11,7 +10,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
-import android.graphics.PorterDuff;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -26,11 +24,7 @@ import android.support.v4.content.FileProvider;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.support.v7.app.ActionBar;
-import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
-import android.text.Editable;
-import android.text.TextWatcher;
-import android.text.format.DateUtils;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Display;
@@ -39,41 +33,25 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.View.OnClickListener;
-import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
-import android.view.animation.TranslateAnimation;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.CheckedTextView;
-import android.widget.CompoundButton;
-import android.widget.DatePicker;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
 
 import java.io.File;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Locale;
 import java.util.Map;
-import java.util.TimeZone;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.DownloadService;
@@ -89,7 +67,7 @@ import mega.privacy.android.app.components.TouchImageView;
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop.Mode;
 import mega.privacy.android.app.lollipop.adapters.MegaFullScreenImageAdapterLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaOfflineFullScreenImageAdapterLollipop;
-import mega.privacy.android.app.lollipop.controllers.NodeController;
+import mega.privacy.android.app.lollipop.megachat.ChatExplorerActivity;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.PreviewUtils;
@@ -97,10 +75,19 @@ import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaChatApiAndroid;
+import nz.mega.sdk.MegaChatApiJava;
+import nz.mega.sdk.MegaChatError;
+import nz.mega.sdk.MegaChatListItem;
+import nz.mega.sdk.MegaChatListenerInterface;
+import nz.mega.sdk.MegaChatPresenceConfig;
+import nz.mega.sdk.MegaChatRequest;
+import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaGlobalListenerInterface;
 import nz.mega.sdk.MegaNode;
+import nz.mega.sdk.MegaNodeList;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaShare;
@@ -108,7 +95,7 @@ import nz.mega.sdk.MegaUser;
 
 import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.TYPE_EXPORT_REMOVE;
 
-public class FullScreenImageViewerLollipop extends PinActivityLollipop implements OnPageChangeListener, MegaRequestListenerInterface, OnItemClickListener, MegaGlobalListenerInterface {
+public class FullScreenImageViewerLollipop extends PinActivityLollipop implements OnPageChangeListener, MegaRequestListenerInterface, OnItemClickListener, MegaGlobalListenerInterface, MegaChatRequestListenerInterface {
 	
 	private DisplayMetrics outMetrics;
 
@@ -145,6 +132,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	private MenuItem moveToTrashIcon;
 	private MenuItem removeIcon;
 	private MenuItem removelinkIcon;
+	private MenuItem chatIcon;
 
 
 	private RelativeLayout bottomLayout;
@@ -152,14 +140,20 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	
 	static FullScreenImageViewerLollipop fullScreenImageViewer;
     private MegaApiAndroid megaApi;
+	MegaChatApiAndroid megaChatApi;
 
     private ArrayList<String> paths;
     
     int adapterType = 0;
+
+	int countChat = 0;
+	int errorSent = 0;
+	int successSent = 0;
     
     public static int REQUEST_CODE_SELECT_MOVE_FOLDER = 1001;
 	public static int REQUEST_CODE_SELECT_COPY_FOLDER = 1002;
 	public static int REQUEST_CODE_SELECT_LOCAL_FOLDER = 1004;
+	public static int REQUEST_CODE_SELECT_CHAT = 1005;
 	
 	MegaNode node;
 
@@ -226,6 +220,14 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		copyIcon = menu.findItem(R.id.full_image_viewer_copy);
 		moveToTrashIcon = menu.findItem(R.id.full_image_viewer_move_to_trash);
 		removeIcon = menu.findItem(R.id.full_image_viewer_remove);
+		chatIcon = menu.findItem(R.id.full_image_viewer_chat);
+
+		if(Util.isChatEnabled()){
+			chatIcon.setVisible(true);
+		}
+		else{
+			chatIcon.setVisible(false);
+		}
 
 		Intent intent = getIntent();
 		adapterType = intent.getIntExtra("adapterType", 0);
@@ -505,6 +507,27 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 
 			}
 
+			case R.id.full_image_viewer_chat:{
+
+//				node = megaApi.getNodeByHandle(imageHandles.get(positionG));
+
+//				ArrayList<Long> handleList = new ArrayList<Long>();
+//				handleList.add(node.getHandle());
+//
+//				long[] longArray = new long[handleList.size()];
+//				for (int i=0; i<handleList.size(); i++){
+//					longArray[i] = handleList.get(i);
+//				}
+
+				long[] longArray = new long[1];
+				longArray[0] = imageHandles.get(positionG);
+
+				Intent i = new Intent(this, ChatExplorerActivity.class);
+				i.putExtra("NODE_HANDLES", longArray);
+				startActivityForResult(i, REQUEST_CODE_SELECT_CHAT);
+				break;
+			}
+
 			case R.id.full_image_viewer_remove_link: {
 				shareIt = false;
 				android.support.v7.app.AlertDialog removeLinkDialog;
@@ -739,6 +762,14 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		else{
 			megaApi = app.getMegaApi();
 		}
+
+		if(Util.isChatEnabled()){
+			megaChatApi = app.getMegaChatApi();
+		}
+		else{
+			megaChatApi=null;
+		}
+
 		dbH = DatabaseHandler.getDbHandler(this);
 		handler = new Handler();
 
@@ -1599,9 +1630,6 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		});
 	}
 
-
-
-
 	private void rename(String newName){
 		if (newName.equals(node.getName())) {
 			return;
@@ -1985,8 +2013,27 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				}
 			}
 		}
+		else if (requestCode == REQUEST_CODE_SELECT_CHAT && resultCode == RESULT_OK){
+			long[] chatHandles = intent.getLongArrayExtra("SELECTED_CHATS");
+			log("Send to "+chatHandles.length+" chats");
+
+			long[] nodeHandles = intent.getLongArrayExtra("NODE_HANDLES");
+			log("Send "+nodeHandles.length+" nodes");
+
+			countChat = chatHandles.length;
+			if(countChat==1){
+				megaChatApi.attachNode(chatHandles[0], nodeHandles[0], this);
+			}
+			else if(countChat>1){
+
+				for(int i=0; i<chatHandles.length; i++){
+					megaChatApi.attachNode(chatHandles[i], nodeHandles[0], this);
+				}
+			}
+//			megaChatApi.attachNode();
+
+		}
 	}
-	
 
 	// Get list of all child files
 
@@ -2242,4 +2289,62 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	@Override
 	public void onContactRequestsUpdate(MegaApiJava api, ArrayList<MegaContactRequest> requests) {}
 
+
+	@Override
+	public void onRequestStart(MegaChatApiJava api, MegaChatRequest request) {
+
+	}
+
+	@Override
+	public void onRequestUpdate(MegaChatApiJava api, MegaChatRequest request) {
+
+	}
+
+	@Override
+	public void onRequestFinish(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
+		log("onRequestFinish");
+		if(request.getType() == MegaChatRequest.TYPE_ATTACH_NODE_MESSAGE){
+
+			if(e.getErrorCode()==MegaChatError.ERROR_OK){
+				log("File sent correctly");
+				successSent++;
+
+			}
+			else{
+				log("File NOT sent: "+e.getErrorCode()+"___"+e.getErrorString());
+				errorSent++;
+			}
+
+			if(countChat==errorSent+successSent){
+				if(successSent==countChat){
+					if(countChat==1){
+						long handle = request.getChatHandle();
+						MegaChatListItem chatItem = megaChatApi.getChatListItem(handle);
+						if(chatItem!=null){
+							Intent intent = new Intent(this, ManagerActivityLollipop.class);
+							intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+							intent.setAction(Constants.ACTION_CHAT_NOTIFICATION_MESSAGE);
+							intent.putExtra("CHAT_ID", handle);
+							startActivity(intent);
+							finish();
+						}
+					}
+					else{
+						showSnackbar(getString(R.string.success_attaching_node_from_cloud_chats, countChat));
+					}
+				}
+				else if(errorSent==countChat){
+					showSnackbar(getString(R.string.error_attaching_node_from_cloud));
+				}
+				else{
+					showSnackbar(getString(R.string.error_attaching_node_from_cloud_chats));
+				}
+			}
+		}
+	}
+
+	@Override
+	public void onRequestTemporaryError(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
+
+	}
 }
