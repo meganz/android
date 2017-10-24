@@ -221,14 +221,6 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 	String pinLockCodeTxt = "";
 	int chatStatus = -1;
 
-	//Feedback
-	String version = "";
-	String model  = "";
-	String body  = "";
-	String emailAndroid = "";
-	String versionApp  = "";
-	String subject  = "";
-
 	boolean useHttpsOnlyValue = false;
 	
 	//Secondary Folder
@@ -1800,12 +1792,10 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 
 		}else if (preference.getKey().compareTo(KEY_HELP_SEND_FEEDBACK) == 0){
 
-			version = Build.VERSION.RELEASE;
-			model = getDeviceName();
-			body = getString(R.string.setting_feedback_body)+"\n\n\n\n\n\n\n\n\n\n\n"+getString(R.string.settings_feedback_body_device_model)+"  "+model+"\n"+getString(R.string.settings_feedback_body_android_version)+"  "+version;
-			emailAndroid = Constants.MAIL_ANDROID;
-			versionApp = (getString(R.string.app_version));
-			subject = getString(R.string.setting_feedback_subject)+" v"+versionApp;
+			String body = getString(R.string.setting_feedback_body)+"\n\n\n\n\n\n\n\n\n\n\n"+getString(R.string.settings_feedback_body_device_model)+"  "+getDeviceName()+"\n"+getString(R.string.settings_feedback_body_android_version)+"  "+Build.VERSION.RELEASE+" "+Build.DISPLAY;
+			String emailAndroid = Constants.MAIL_ANDROID;
+			String versionApp = (getString(R.string.app_version));
+			String subject = getString(R.string.setting_feedback_subject)+" v"+versionApp;
 
 			Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:" + emailAndroid));
 			emailIntent.putExtra(Intent.EXTRA_SUBJECT, subject);
