@@ -233,7 +233,6 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		adapterType = intent.getIntExtra("adapterType", 0);
 
 		if (adapterType == Constants.OFFLINE_ADAPTER){
-
 			getlinkIcon.setVisible(false);
 			menu.findItem(R.id.full_image_viewer_get_link).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
 
@@ -254,6 +253,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			copyIcon .setVisible(false);
 			moveToTrashIcon.setVisible(false);
 			removeIcon.setVisible(false);
+			chatIcon.setVisible(false);
 
 		}else if (adapterType == Constants.ZIP_ADAPTER){
 
@@ -277,10 +277,9 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			copyIcon .setVisible(false);
 			moveToTrashIcon.setVisible(false);
 			removeIcon.setVisible(false);
-
+			chatIcon.setVisible(false);
 
 		}else if(adapterType == Constants.SEARCH_ADAPTER){
-
 			node = megaApi.getNodeByHandle(imageHandles.get(positionG));
 
 			if(node.isExported()){
@@ -310,6 +309,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			renameIcon.setVisible(true);
 			moveIcon.setVisible(true);
 			copyIcon .setVisible(true);
+			chatIcon.setVisible(true);
 
 			node = megaApi.getNodeByHandle(imageHandles.get(positionG));
 			final long handle = node.getHandle();
@@ -399,6 +399,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 						renameIcon.setVisible(true);
 						moveIcon.setVisible(true);
 						moveToTrashIcon.setVisible(true);
+						chatIcon.setVisible(true);
 						break;
 					}
 					case MegaShare.ACCESS_READWRITE:
@@ -406,6 +407,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 						renameIcon.setVisible(false);
 						moveIcon.setVisible(false);
 						moveToTrashIcon.setVisible(false);
+						chatIcon.setVisible(false);
 						break;
 					}
 				}
@@ -420,6 +422,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 					renameIcon.setVisible(false);
 					moveIcon.setVisible(false);
 					copyIcon.setVisible(false);
+					chatIcon.setVisible(false);
 
 				}else{
 					propertiesIcon.setVisible(true);
@@ -436,6 +439,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 								renameIcon.setVisible(true);
 								moveIcon.setVisible(true);
 								moveToTrashIcon.setVisible(true);
+								chatIcon.setVisible(true);
 								break;
 							}
 							case MegaShare.ACCESS_READWRITE:
@@ -443,11 +447,13 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 								renameIcon.setVisible(false);
 								moveIcon.setVisible(false);
 								moveToTrashIcon.setVisible(false);
+								chatIcon.setVisible(false);
 								break;
 							}
 						}
 
 					}else{
+						chatIcon.setVisible(true);
 						renameIcon.setVisible(true);
 						moveIcon.setVisible(true);
 						node = megaApi.getNodeByHandle(imageHandles.get(positionG));
