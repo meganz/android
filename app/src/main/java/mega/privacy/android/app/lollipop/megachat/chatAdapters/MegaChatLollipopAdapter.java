@@ -586,35 +586,35 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                             catch(Exception e){
                                 //Too many AsyncTasks
                             }
-
-                            String name = names.get(0);
-                            log("Node Name: " + name);
-
-                            if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-                                log("Landscape configuration");
-                                float width = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MAX_WIDTH_FILENAME_LAND, context.getResources().getDisplayMetrics());
-                                ((ViewHolderMessageChat)holder).contentOwnMessageFileName.setMaxWidth((int) width);
-                                ((ViewHolderMessageChat)holder).contentOwnMessageFileSize.setMaxWidth((int) width);
-                            }
-                            else{
-                                log("Portrait configuration");
-                                float width = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MAX_WIDTH_FILENAME_PORT, context.getResources().getDisplayMetrics());
-                                ((ViewHolderMessageChat)holder).contentOwnMessageFileName.setMaxWidth((int) width);
-                                ((ViewHolderMessageChat)holder).contentOwnMessageFileSize.setMaxWidth((int) width);
-                            }
-
-                            ((ViewHolderMessageChat) holder).contentOwnMessageFileName.setText(name);
-
-                            ((ViewHolderMessageChat) holder).contentOwnMessageFileThumb.setImageResource(MimeTypeList.typeForName(name).getIconResourceId());
-
-                            log("State of the message: "+message.getPendingMessage().getState());
-                            if(message.getPendingMessage().getState()== PendingMessage.STATE_ERROR){
-                                ((ViewHolderMessageChat)holder).contentOwnMessageFileSize.setText(R.string.attachment_uploading_state_error);
-                            }
-                            else{
-                                ((ViewHolderMessageChat)holder).contentOwnMessageFileSize.setText(R.string.attachment_uploading_state_uploading);
-                            }
                         }
+                    }
+
+                    String name = names.get(0);
+                    log("Node Name: " + name);
+
+                    if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+                        log("Landscape configuration");
+                        float width = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MAX_WIDTH_FILENAME_LAND, context.getResources().getDisplayMetrics());
+                        ((ViewHolderMessageChat)holder).contentOwnMessageFileName.setMaxWidth((int) width);
+                        ((ViewHolderMessageChat)holder).contentOwnMessageFileSize.setMaxWidth((int) width);
+                    }
+                    else{
+                        log("Portrait configuration");
+                        float width = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MAX_WIDTH_FILENAME_PORT, context.getResources().getDisplayMetrics());
+                        ((ViewHolderMessageChat)holder).contentOwnMessageFileName.setMaxWidth((int) width);
+                        ((ViewHolderMessageChat)holder).contentOwnMessageFileSize.setMaxWidth((int) width);
+                    }
+
+                    ((ViewHolderMessageChat) holder).contentOwnMessageFileName.setText(name);
+
+                    ((ViewHolderMessageChat) holder).contentOwnMessageFileThumb.setImageResource(MimeTypeList.typeForName(name).getIconResourceId());
+
+                    log("State of the message: "+message.getPendingMessage().getState());
+                    if(message.getPendingMessage().getState()== PendingMessage.STATE_ERROR){
+                        ((ViewHolderMessageChat)holder).contentOwnMessageFileSize.setText(R.string.attachment_uploading_state_error);
+                    }
+                    else{
+                        ((ViewHolderMessageChat)holder).contentOwnMessageFileSize.setText(R.string.attachment_uploading_state_uploading);
                     }
                 }
                 else{
