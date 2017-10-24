@@ -10,6 +10,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -84,6 +85,19 @@ public class ChatExplorerActivity extends PinActivityLollipop implements View.On
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         ft.replace(R.id.fragment_container_chat_explorer, chatExplorerFragment, "chatExplorerFragment");
         ft.commitNow();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        log("onOptionsItemSelected");
+
+        switch (item.getItemId()) {
+            case android.R.id.home: {
+                finish();
+                break;
+            }
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     public void chooseChats(ArrayList<MegaChatListItem> chatListItems){
