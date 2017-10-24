@@ -476,7 +476,6 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 	
 	@Override
 	public void onClick(View v) {
-		;
 		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 		switch(v.getId()){
 			case R.id.action_text:{
@@ -535,6 +534,10 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 			listView.setVisibility(View.VISIBLE);
 			emptyImageView.setVisibility(View.GONE);
 			emptyTextView.setVisibility(View.GONE);
+		}
+
+		if(nodeMoveCopy){
+			activateButton(true);
 		}
 	}
 
@@ -796,7 +799,6 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 	 */
 	public void setDisableNodes(ArrayList<Long> disabledNodes) {
 		log("setDisableNodes");
-		log("disbledNodes: "+disabledNodes);
 		if (adapter == null){
 			log("Adapter is NULL");
 			adapter = new MegaExplorerLollipopAdapter(context, nodes, parentHandle, listView, selectFile);
@@ -943,7 +945,7 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 	}
 
 	public ArrayList<Long> recoverNodesHandles(){
-        nodeHandleMoveCopy = ((FileExplorerActivityLollipop)context).getNodeHandleMoveCopy();
+		nodeHandleMoveCopy = ((FileExplorerActivityLollipop)context).getNodeHandleMoveCopy();
 		return nodeHandleMoveCopy;
 	}
 

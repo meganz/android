@@ -1387,8 +1387,6 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 						cDriveExplorer.navigateToFolder(request.getNodeHandle());
 						parentHandleCloud = request.getNodeHandle();
 						log("The handle of the created folder is: "+parentHandleCloud);
-						cDriveExplorer.activateButton(true);
-
 					}						
 				}
 				else{
@@ -1398,8 +1396,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 					if (iSharesExplorer != null){
 						iSharesExplorer.navigateToFolder(request.getNodeHandle());
 						parentHandleIncoming = request.getNodeHandle();
-						iSharesExplorer.activateButton(true);
-					}	
+					}
 				}
 			}
 		}
