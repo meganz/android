@@ -944,7 +944,7 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 		return listView;
 	}
 
-	public ArrayList<Long> recoverNodesHandles(){
+	public ArrayList<Long> recoverNodeHandle(){
 		nodeHandleMoveCopy = ((FileExplorerActivityLollipop)context).getNodeHandleMoveCopy();
 		return nodeHandleMoveCopy;
 	}

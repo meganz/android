@@ -274,7 +274,7 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 						holder.permissionsIcon.setVisibility(View.GONE);
 						Boolean moveNode = ((CloudDriveExplorerFragmentLollipop) fragment).isNodeMoveCopy();
 						if(moveNode){
-							ArrayList<Long> nodesHandles = ((CloudDriveExplorerFragmentLollipop) fragment).recoverNodesHandles();
+							ArrayList<Long> nodesHandles = ((CloudDriveExplorerFragmentLollipop) fragment).recoverNodeHandle();
 
 							for (Long nodeHandle : nodesHandles) {
 								if(node.getHandle()==nodeHandle){
