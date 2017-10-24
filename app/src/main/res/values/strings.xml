@@ -1590,4 +1590,12 @@
     </plurals>
 
     <string name="no_folders_shared" context="Info of a contact if there is no folders shared with him">No folders shared</string>
+
+    <string name="settings_help" context="Settings category title for Help">Help</string>
+    <string name="settings_help_preference" context="Settings preference title for send feedback">Send Feedback</string>
+    <string name="setting_feedback_subject" context="mail subject">Feedback</string>
+    <string name="setting_feedback_body" context="mail body">Please, write your feedback here:</string>
+    <string name="settings_feedback_body_device_model" context="mail body">Device model</string>
+    <string name="settings_feedback_body_android_version" context="mail body">Android version</string>
+
 </resources>
