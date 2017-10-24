@@ -2,6 +2,7 @@ package mega.privacy.android.app.lollipop.megachat.calls;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
@@ -11,6 +12,9 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.hardware.Camera;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
+import android.media.RingtoneManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -80,7 +84,7 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
     long chatHandle;
     long callId;
     MegaChatRoom chat;
-    MegaChatCall call;
+    MegaChatCall callChat;
     private MegaApiAndroid megaApi = null;
     MegaChatApiAndroid megaChatApi = null;
     private Handler handler;
@@ -119,6 +123,8 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
     SurfaceView surfaceView;
     ViESurfaceRenderer renderer;
     SurfaceHolder surfaceHolder;
+    AudioManager audioManager;
+    MediaPlayer thePlayer;
 
     String fullName = "";
     String email = "";
@@ -278,13 +284,26 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
             log("Chat handle to call: " + chatHandle);
             if (chatHandle != -1) {
                 chat = megaChatApi.getChatRoom(chatHandle);
-                call = megaChatApi.getChatCallByChatId(chatHandle);
+                callChat = megaChatApi.getChatCallByChatId(chatHandle);
 
-                int callStatus = call.getStatus();
-                log("The status of the call is: " + callStatus);
+                int callStatus = callChat.getStatus();
+                log("The status of the callChat is: " + callStatus);
                 switch (callStatus) {
                     case MegaChatCall.CALL_STATUS_IN_PROGRESS: {
                         break;
+                    }
+                    case MegaChatCall.CALL_STATUS_RING_IN:{
+
+                        audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+                        thePlayer = MediaPlayer.create(getApplicationContext(), RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE));
+
+                        try {
+                            thePlayer.setVolume((float) (audioManager.getStreamVolume(AudioManager.STREAM_NOTIFICATION) / 7.0), (float) (audioManager.getStreamVolume(AudioManager.STREAM_NOTIFICATION) / 7.0));
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+
+                        thePlayer.start();
                     }
                 }
 
@@ -683,6 +702,12 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
     @Override
     public void onChatCallStateChange(MegaChatApiJava api, MegaChatCall call) {
         log("onChatCallStateChange");
+
+        int callStatus = call.getStatus();
+        log("The status of the call is: " + callStatus);
+        if(callStatus!=MegaChatCall.CALL_STATUS_RING_IN){
+            thePlayer.stop();
+        }
     }
 
     @Override
@@ -813,8 +838,8 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
                 break;
             }
             case R.id.hang_fab: {
-                if(call!=null){
-                    if(call.getStatus()==MegaChatCall.CALL_STATUS_RING_IN){
+                if(callChat!=null){
+                    if(callChat.getStatus()==MegaChatCall.CALL_STATUS_RING_IN){
                         log("Reject call");
                         megaChatApi.rejectChatCall(chatHandle, this);
                     }
@@ -857,7 +882,7 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
     }
 
     public void showFABs(){
-        if(call.getStatus()==MegaChatCall.CALL_STATUS_RING_IN){
+        if(callChat.getStatus()==MegaChatCall.CALL_STATUS_RING_IN){
             answerCallFAB.setVisibility(View.VISIBLE);
             answerCallFAB.setOnClickListener(this);
             hangFAB.setVisibility(View.VISIBLE);
