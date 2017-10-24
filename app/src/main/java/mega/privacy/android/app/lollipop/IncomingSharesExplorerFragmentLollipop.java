@@ -180,27 +180,22 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 		else if (modeCloud == FileExplorerActivityLollipop.UPLOAD){
 			optionButton.setText(getString(R.string.context_upload).toUpperCase(Locale.getDefault()));
 			copyNodes = false;
-
 		}
 		else if (modeCloud == FileExplorerActivityLollipop.IMPORT){
 			optionButton.setText(getString(R.string.general_import).toUpperCase(Locale.getDefault()));
 			copyNodes = false;
-
 		}
 		else if (modeCloud == FileExplorerActivityLollipop.SELECT || modeCloud == FileExplorerActivityLollipop.SELECT_CAMERA_FOLDER){
 			optionButton.setText(getString(R.string.general_select).toUpperCase(Locale.getDefault()));
 			copyNodes = false;
-
 		}
 		else if(modeCloud == FileExplorerActivityLollipop.UPLOAD_SELFIE){
 			optionButton.setText(getString(R.string.context_upload).toUpperCase(Locale.getDefault()));
 			copyNodes = false;
-
 		}	
 		else {
 			optionButton.setText(getString(R.string.general_select).toUpperCase(Locale.getDefault()));
 			copyNodes = false;
-
 		}
 
 
@@ -354,6 +349,11 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 			emptyImageView.setVisibility(View.GONE);
 			emptyTextView.setVisibility(View.GONE);
 		}
+		if(copyNodes){
+			activateButton(true);
+		}
+
+
 
 	}
 
