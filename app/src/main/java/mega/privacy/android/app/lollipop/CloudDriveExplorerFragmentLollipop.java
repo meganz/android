@@ -48,6 +48,7 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 	Context context;
 	MegaApiAndroid megaApi;
 	ArrayList<MegaNode> nodes;
+
 	public long parentHandle = -1;
 	
 	MegaExplorerLollipopAdapter adapter;
@@ -56,7 +57,6 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 	boolean selectFile=false;
 	MegaPreferences prefs;
 	DatabaseHandler dbH;
-
 	public ActionMode actionMode;
 	
 //	public String name;
@@ -72,6 +72,10 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 	Button optionButton;
 	Button cancelButton;
 	View separator;
+
+    boolean nodeMoveCopy = false;
+	boolean nodeMove = false;
+	ArrayList<Long> nodeHandleMoveCopy;
 
 	Stack<Integer> lastPositionStack;
 
@@ -242,8 +246,7 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 		}		
 		
 		MegaNode chosenNode = megaApi.getNodeByHandle(parentHandle);
-		if(chosenNode == null)
-		{
+		if(chosenNode == null) {
 			log("chosenNode is NULL");
 		
 			if(megaApi.getRootNode()!=null){
@@ -252,18 +255,16 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 			}
 			
 			changeActionBarTitle(context.getString(R.string.section_cloud_drive));
-		}
-		else if(chosenNode.getType() == MegaNode.TYPE_ROOT)
-		{
+		}else if(chosenNode.getType() == MegaNode.TYPE_ROOT) {
 			log("chosenNode is ROOT");
 			parentHandle = megaApi.getRootNode().getHandle();
 			nodes = megaApi.getChildren(chosenNode);
 			changeActionBarTitle(context.getString(R.string.section_cloud_drive));
-		}
-		else {
+
+		}else {
 			log("ChosenNode not null and not ROOT");
 			
-			MegaNode parentNode = megaApi.getParentNode(chosenNode);			
+			MegaNode parentNode = megaApi.getParentNode(chosenNode);
 			if(parentNode!=null){
 				log("ParentNode NOT NULL");
 				MegaNode grandParentNode = megaApi.getParentNode(parentNode);
@@ -297,26 +298,60 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 
 
 		if (modeCloud == FileExplorerActivityLollipop.MOVE) {
-			optionButton.setText(getString(R.string.context_move));
+			optionButton.setText(getString(R.string.context_move).toUpperCase(Locale.getDefault()));
+            nodeMoveCopy = true;
+			nodeMove = true;
+
+			Long parent = ((FileExplorerActivityLollipop)context).parentHandleMoveCopy();
+			if(parent == chosenNode.getHandle()) {
+				activateButton(false);
+			}else{
+				activateButton(true);
+			}
+
 		}
 		else if (modeCloud == FileExplorerActivityLollipop.COPY){
 			optionButton.setText(getString(R.string.context_copy).toUpperCase(Locale.getDefault()));
+			nodeMoveCopy = true;
+            nodeMove = false;
+
+			Long parent = ((FileExplorerActivityLollipop)context).parentHandleMoveCopy();
+			if(parent == chosenNode.getHandle()) {
+				activateButton(false);
+			}else{
+				activateButton(true);
+			}
 		}
 		else if (modeCloud == FileExplorerActivityLollipop.UPLOAD){
 			optionButton.setText(getString(R.string.context_upload).toUpperCase(Locale.getDefault()));
+            nodeMoveCopy = false;
+            nodeMove = false;
+
 		}
 		else if (modeCloud == FileExplorerActivityLollipop.IMPORT){
 			optionButton.setText(getString(R.string.general_import).toUpperCase(Locale.getDefault()));
+            nodeMoveCopy = false;
+            nodeMove = false;
+
 		}
 		else if (modeCloud == FileExplorerActivityLollipop.SELECT || modeCloud == FileExplorerActivityLollipop.SELECT_CAMERA_FOLDER){
 			optionButton.setText(getString(R.string.general_select).toUpperCase(Locale.getDefault()));
+            nodeMoveCopy = false;
+            nodeMove = false;
+
 		}
 		else if(modeCloud == FileExplorerActivityLollipop.UPLOAD_SELFIE){
 			optionButton.setText(getString(R.string.context_upload).toUpperCase(Locale.getDefault()));
-		}	
+            nodeMoveCopy = false;
+            nodeMove = false;
+
+		}
 		else {
 			optionButton.setText(getString(R.string.general_select).toUpperCase(Locale.getDefault()));
-		}	
+            nodeMoveCopy = false;
+            nodeMove = false;
+
+		}
 
 		if(modeCloud==FileExplorerActivityLollipop.SELECT){
 			if(selectFile)
@@ -355,8 +390,7 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 				log("Mode SELECT FILE ON");
 			}
 
-			if(((FileExplorerActivityLollipop)context).multiselect){
-
+//			if(((FileExplorerActivityLollipop)context).multiselect){
 				adapter = new MegaExplorerLollipopAdapter(context, this, nodes, parentHandle, listView, selectFile);
 				log("SetOnItemClickListener");
 				adapter.SetOnItemClickListener(new MegaExplorerLollipopAdapter.OnItemClickListener() {
@@ -367,19 +401,20 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 						itemClick(view, position);
 					}
 				});
-			}
-			else{
-				adapter = new MegaExplorerLollipopAdapter(context, nodes, parentHandle, listView, selectFile);
-				log("SetOnItemClickListener");
-				adapter.SetOnItemClickListener(new MegaExplorerLollipopAdapter.OnItemClickListener() {
-
-					@Override
-					public void onItemClick(View view, int position) {
-						log("item click listener trigger!!");
-						itemClick(view, position);
-					}
-				});
-			}
+//			}
+//			else{
+//
+//				adapter = new MegaExplorerLollipopAdapter(context, nodes, parentHandle, listView, selectFile);
+//				log("SetOnItemClickListener");
+//				adapter.SetOnItemClickListener(new MegaExplorerLollipopAdapter.OnItemClickListener() {
+//
+//					@Override
+//					public void onItemClick(View view, int position) {
+//						log("item click listener trigger!!");
+//						itemClick(view, position);
+//					}
+//				});
+//			}
 		}
 		else{
 			adapter.setParentHandle(parentHandle);
@@ -408,6 +443,9 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 			listView.setVisibility(View.VISIBLE);
 			emptyImageView.setVisibility(View.GONE);
 			emptyTextView.setVisibility(View.GONE);
+
+
+
 		}
 
 		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
@@ -438,6 +476,7 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 	
 	@Override
 	public void onClick(View v) {
+		;
 		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 		switch(v.getId()){
 			case R.id.action_text:{
@@ -504,7 +543,6 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
 		if (nodes.get(position).isFolder()){
-
 			if(selectFile) {
 				if(((FileExplorerActivityLollipop)context).multiselect){
 					if(adapter.isMultipleSelect()){
@@ -581,15 +619,28 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 					emptyImageView.setImageResource(R.drawable.ic_empty_folder);
 					emptyTextView.setText(R.string.file_browser_empty_folder);
 				}
+				if(nodeMoveCopy){
+					activateButton(true);
+				}
+
 			}
 			else{
 				listView.setVisibility(View.VISIBLE);
 				emptyImageView.setVisibility(View.GONE);
 				emptyTextView.setVisibility(View.GONE);
+
+				if(nodeMoveCopy){
+					Long parent = ((FileExplorerActivityLollipop)context).parentHandleMoveCopy();
+					if(parent == parentHandle) {
+						activateButton(false);
+					}else{
+						activateButton(true);
+					}
+				}
 			}
+
 		}
-		else
-		{
+		else {
 			//Is file
 			if(selectFile)
 			{
@@ -622,11 +673,15 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 						((FileExplorerActivityLollipop) context).buttonClick(nFile.getHandle());
 					}
 				}
+
 			}
 			else{
 				log("Not select file enabled!");
 			}
 		}
+
+
+
 	}	
 
 	public int onBackPressed(){
@@ -641,10 +696,11 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 		}
 		
 		parentHandle = adapter.getParentHandle();
-		
+
 		MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(parentHandle));
+
 		if (parentNode != null){
-			
+
 			if(parentNode.getType()==MegaNode.TYPE_ROOT){
 				parentHandle=-1;
 				changeActionBarTitle(context.getString(R.string.section_cloud_drive));
@@ -667,6 +723,7 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 						}
 					}
 				}
+
 			}
 			else{
 //				String path=parentNode.getName();
@@ -697,11 +754,20 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 				}
 				parentHandle = parentNode.getHandle();
 			}
-			
+
+			if(nodeMoveCopy){
+				Long parent = ((FileExplorerActivityLollipop)context).parentHandleMoveCopy();
+				if(parent == parentNode.getHandle()) {
+					activateButton(false);
+				}else{
+					activateButton(true);
+				}
+			}
+
 			listView.setVisibility(View.VISIBLE);
 			emptyImageView.setVisibility(View.GONE);
-			emptyTextView.setVisibility(View.GONE);			
-			
+			emptyTextView.setVisibility(View.GONE);
+
 			nodes = megaApi.getChildren(parentNode);
 			adapter.setNodes(nodes);
 			int lastVisiblePosition = 0;
@@ -717,6 +783,7 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 			adapter.setParentHandle(parentHandle);
 			((FileExplorerActivityLollipop)context).setParentHandle(parentHandle);
 
+
 			return 2;
 		}
 		else{
@@ -729,6 +796,7 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 	 */
 	public void setDisableNodes(ArrayList<Long> disabledNodes) {
 		log("setDisableNodes");
+		log("disbledNodes: "+disabledNodes);
 		if (adapter == null){
 			log("Adapter is NULL");
 			adapter = new MegaExplorerLollipopAdapter(context, nodes, parentHandle, listView, selectFile);
@@ -873,4 +941,23 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 	public RecyclerView getListView(){
 		return listView;
 	}
+
+	public ArrayList<Long> recoverNodesHandles(){
+        nodeHandleMoveCopy = ((FileExplorerActivityLollipop)context).getNodeHandleMoveCopy();
+		return nodeHandleMoveCopy;
+	}
+
+    public boolean isNodeMoveCopy() {
+        return nodeMoveCopy;
+    }
+
+	public void activateButton(boolean show){
+		optionButton.setEnabled(show);
+		if(show){
+			optionButton.setTextColor(getResources().getColor(R.color.accentColor));
+		}else{
+			optionButton.setTextColor(getResources().getColor(R.color.invite_button_deactivated));
+		}
+	}
+
 }
