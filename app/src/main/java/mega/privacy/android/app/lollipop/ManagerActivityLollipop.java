@@ -14412,7 +14412,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 			drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
 		}
-
 	}
 
 	public long getParentHandleInbox() {
