@@ -222,13 +222,6 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		removeIcon = menu.findItem(R.id.full_image_viewer_remove);
 		chatIcon = menu.findItem(R.id.full_image_viewer_chat);
 
-		if(Util.isChatEnabled()){
-			chatIcon.setVisible(true);
-		}
-		else{
-			chatIcon.setVisible(false);
-		}
-
 		Intent intent = getIntent();
 		adapterType = intent.getIntExtra("adapterType", 0);
 
@@ -309,7 +302,13 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			renameIcon.setVisible(true);
 			moveIcon.setVisible(true);
 			copyIcon .setVisible(true);
-			chatIcon.setVisible(true);
+
+			if(Util.isChatEnabled()){
+				chatIcon.setVisible(true);
+			}
+			else{
+				chatIcon.setVisible(false);
+			}
 
 			node = megaApi.getNodeByHandle(imageHandles.get(positionG));
 			final long handle = node.getHandle();
@@ -399,7 +398,12 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 						renameIcon.setVisible(true);
 						moveIcon.setVisible(true);
 						moveToTrashIcon.setVisible(true);
-						chatIcon.setVisible(true);
+						if(Util.isChatEnabled()){
+							chatIcon.setVisible(true);
+						}
+						else{
+							chatIcon.setVisible(false);
+						}
 						break;
 					}
 					case MegaShare.ACCESS_READWRITE:
@@ -439,7 +443,12 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 								renameIcon.setVisible(true);
 								moveIcon.setVisible(true);
 								moveToTrashIcon.setVisible(true);
-								chatIcon.setVisible(true);
+								if(Util.isChatEnabled()){
+									chatIcon.setVisible(true);
+								}
+								else{
+									chatIcon.setVisible(false);
+								}
 								break;
 							}
 							case MegaShare.ACCESS_READWRITE:
@@ -453,7 +462,12 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 						}
 
 					}else{
-						chatIcon.setVisible(true);
+						if(Util.isChatEnabled()){
+							chatIcon.setVisible(true);
+						}
+						else{
+							chatIcon.setVisible(false);
+						}
 						renameIcon.setVisible(true);
 						moveIcon.setVisible(true);
 						node = megaApi.getNodeByHandle(imageHandles.get(positionG));
