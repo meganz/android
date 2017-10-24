@@ -109,6 +109,9 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 	TextView fetchingNodesText;
 	TextView prepareNodesText;
 
+	MegaNode parentMoveCopy;
+    ArrayList<Long> nodeHandleMoveCopy;
+
 	MenuItem createFolderMenuItem;
 
 	FrameLayout cloudDriveFrameLayout;
@@ -568,9 +571,17 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 					}
 
 					ArrayList<Long> list = new ArrayList<Long>(moveFromHandles.length);
-					for (long n : moveFromHandles){
+                    nodeHandleMoveCopy = new ArrayList<Long>(moveFromHandles.length);
+					MegaNode p;
+					for (long n : moveFromHandles) {
 						list.add(n);
-					}
+                        nodeHandleMoveCopy.add(n);
+						p = megaApi.getNodeByHandle(n);
+						p = megaApi.getParentNode(p);
+                        parentMoveCopy = p;
+                    }
+
+
 					String cFTag = getFragmentTag(R.id.explorer_tabs_pager, 0);
 					cDriveExplorer = (CloudDriveExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
 					if(cDriveExplorer!=null){
@@ -588,13 +599,17 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 						mTabsAdapterExplorer = new FileExplorerPagerAdapter(getSupportFragmentManager(),this);
 						viewPagerExplorer.setAdapter(mTabsAdapterExplorer);
 						tabLayoutExplorer.setupWithViewPager(viewPagerExplorer);
-
 					}
 
+					MegaNode p;
+                    nodeHandleMoveCopy = new ArrayList<Long>(copyFromHandles.length);
 					ArrayList<Long> list = new ArrayList<Long>(copyFromHandles.length);
 					for (long n : copyFromHandles){
-//					log("Disabled nodes to copy: "+n);
 						list.add(n);
+                        nodeHandleMoveCopy.add(n);
+						p = megaApi.getNodeByHandle(n);
+						p = megaApi.getParentNode(p);
+                        parentMoveCopy = p;
 					}
 					String cFTag = getFragmentTag(R.id.explorer_tabs_pager, 0);
 					cDriveExplorer = (CloudDriveExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
@@ -1372,6 +1387,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 						cDriveExplorer.navigateToFolder(request.getNodeHandle());
 						parentHandleCloud = request.getNodeHandle();
 						log("The handle of the created folder is: "+parentHandleCloud);
+						cDriveExplorer.activateButton(true);
 
 					}						
 				}
@@ -1382,6 +1398,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 					if (iSharesExplorer != null){
 						iSharesExplorer.navigateToFolder(request.getNodeHandle());
 						parentHandleIncoming = request.getNodeHandle();
+						iSharesExplorer.activateButton(true);
 					}	
 				}
 			}
@@ -1682,4 +1699,12 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 	public void setSelectFile(boolean selectFile) {
 		this.selectFile = selectFile;
 	}
+
+	public Long parentHandleMoveCopy(){
+		return parentMoveCopy.getHandle();
+	}
+
+    public ArrayList<Long> getNodeHandleMoveCopy() {
+        return nodeHandleMoveCopy;
+    }
 }
