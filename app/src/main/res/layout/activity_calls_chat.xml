@@ -18,7 +18,8 @@
 
             <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="match_parent"
+                android:keepScreenOn="true">
 
                 <!-- Background -->
 
@@ -61,6 +62,8 @@
                             android:paddingBottom="3dp"
                             android:visibility="gone"/>
                     </RelativeLayout>
+
+
 
                     <SurfaceView
                         android:id="@+id/surface_remote_video"
@@ -224,7 +227,9 @@
                         app:fabSize="normal"
                         app:pressedTranslationZ="12dp" />
 
+
                 </LinearLayout>
+
 
             </RelativeLayout>
 

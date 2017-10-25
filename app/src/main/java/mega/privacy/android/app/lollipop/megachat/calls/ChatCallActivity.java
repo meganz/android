@@ -248,6 +248,8 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
         powerManager = (PowerManager) getSystemService(POWER_SERVICE);
         wakeLock = powerManager.newWakeLock(field, getLocalClassName());
 
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
         tB = (Toolbar) findViewById(R.id.call_toolbar);
         if (tB == null) {
             log("Tb is Null");
@@ -969,7 +971,6 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
             if(!wakeLock.isHeld()) {
                 wakeLock.acquire();
             }
-
         } else {
             //Turn on Screen
             if(wakeLock.isHeld()) {
