@@ -726,6 +726,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				break;
 			}
 			case R.id.full_image_viewer_move_to_trash: {
+				positionToRemove = positionG;
 				moveToTrash();
 				break;
 			}

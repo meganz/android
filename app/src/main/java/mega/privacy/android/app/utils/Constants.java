@@ -190,6 +190,6 @@ public class Constants {
 	public static int TAKE_PICTURE_OPTION = 0;
 	public static int TAKE_PROFILE_PICTURE = 1;
 
-	final public static String MAIL_ANDROID = "android@mega.co.nz";
+	final public static String MAIL_ANDROID = "androidfeedback@mega.nz";
 
 }
