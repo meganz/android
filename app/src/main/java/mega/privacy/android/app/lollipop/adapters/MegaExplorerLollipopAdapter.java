@@ -68,6 +68,8 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 	OnItemClickListener mItemClickListener;
 	RecyclerView listFragment;
 
+	private ArrayList<Long> disabledNodesCloudDrive;
+
 	/*public static view holder class*/
     public class ViewHolderExplorerLollipop extends RecyclerView.ViewHolder implements View.OnClickListener{
     	public ImageView imageView;
@@ -76,8 +78,9 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
     	public TextView textViewFileSize;
     	public RelativeLayout itemLayout;
     	public int currentPosition;
-    	public long document;    	
-    	
+    	public long document;
+
+
     	public ViewHolderExplorerLollipop(View itemView) {
 			super(itemView);
 //            itemView.setOnClickListener(this);
@@ -101,7 +104,7 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 	
 	ViewHolderExplorerLollipop holder = null;    
     
-	
+
 	public MegaExplorerLollipopAdapter(Context _context, ArrayList<MegaNode> _nodes, long _parentHandle, RecyclerView listView, boolean selectFile){
 		this.context = _context;
 		this.nodes = _nodes;
@@ -111,13 +114,16 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 		this.positionClicked = -1;
 		this.imageIds = new ArrayList<Integer>();
 		this.names = new ArrayList<String>();
-		
+
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
 		}
 
 		dbH = DatabaseHandler.getDbHandler(context);
-	}
+        disabledNodesCloudDrive = new ArrayList<Long>();
+
+
+    }
 
 	public MegaExplorerLollipopAdapter(Context _context, Object fragment, ArrayList<MegaNode> _nodes, long _parentHandle, RecyclerView listView, boolean selectFile){
 		this.context = _context;
@@ -135,6 +141,8 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 		}
 
 		dbH = DatabaseHandler.getDbHandler(context);
+		disabledNodesCloudDrive = new ArrayList<Long>();
+
 	}
 	
 	@Override
@@ -199,7 +207,6 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 
 	@Override
 	public void onBindViewHolder(ViewHolderExplorerLollipop holder, int position){
-		
 		Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
 		DisplayMetrics outMetrics = new DisplayMetrics ();
 	    display.getMetrics(outMetrics);
@@ -233,6 +240,7 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 
 			holder.permissionsIcon.setVisibility(View.VISIBLE);
 			if (disabledNodes != null){
+
 				if (disabledNodes.contains(node.getHandle())){
 					log("Disabled!");
 					holder.imageView.setAlpha(.4f);
@@ -260,10 +268,47 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 				}
 			}
 			else{
-				holder.imageView.setAlpha(1.0f);
-				holder.textViewFileName.setTextColor(context.getResources().getColor(android.R.color.black));
-				holder.itemView.setOnClickListener(holder);
-				holder.permissionsIcon.setVisibility(View.GONE);
+
+				if(fragment!=null){
+					if(fragment instanceof CloudDriveExplorerFragmentLollipop){
+						holder.permissionsIcon.setVisibility(View.GONE);
+						boolean moveNode = ((CloudDriveExplorerFragmentLollipop) fragment).isNodeMove();
+						if(moveNode){
+							ArrayList<Long> nodesHandles = ((CloudDriveExplorerFragmentLollipop) fragment).recoverNodeHandle();
+
+							for (long nodeHandle : nodesHandles) {
+								if(node.getHandle()==nodeHandle){
+
+									holder.imageView.setAlpha(.4f);
+									holder.textViewFileName.setTextColor(context.getResources().getColor(R.color.text_secondary));
+									holder.itemView.setOnClickListener(null);
+									disabledNodesCloudDrive.add(node.getHandle());
+									break;
+								}else{
+
+									if(disabledNodesCloudDrive.size() != 0){
+										for(long handle : disabledNodesCloudDrive){
+											if(handle != node.getHandle()) {
+												holder.imageView.setAlpha(1.0f);
+												holder.textViewFileName.setTextColor(context.getResources().getColor(android.R.color.black));
+												holder.itemView.setOnClickListener(holder);
+											}
+										}
+									}else{
+										holder.imageView.setAlpha(1.0f);
+										holder.textViewFileName.setTextColor(context.getResources().getColor(android.R.color.black));
+										holder.itemView.setOnClickListener(holder);
+									}
+								}
+							}
+						}else{
+							holder.imageView.setAlpha(1.0f);
+							holder.textViewFileName.setTextColor(context.getResources().getColor(android.R.color.black));
+							holder.itemView.setOnClickListener(holder);
+						}
+
+					}
+				}
 			}
 
 			if(node.isInShare()){
@@ -293,7 +338,6 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 						}
 					}
 				}
-
 			}
 			else{
 				holder.imageView.setImageResource(R.drawable.ic_folder_list);
@@ -651,7 +695,7 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 	
 	public void setNodes(ArrayList<MegaNode> nodes){
 		this.nodes = nodes;
-		positionClicked = -1;	
+		positionClicked = -1;
 		notifyDataSetChanged();
 	}
 	
@@ -681,5 +725,6 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 	private static void log(String log) {
 		Util.log("MegaExplorerLollipopAdapter", log);
 	}
+
 
 }
