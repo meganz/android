@@ -13703,26 +13703,24 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		deepBrowserTreeIncoming++;
 	}
 
-
 	public void decreaseDeepBrowserTreeIncoming() {
 		deepBrowserTreeIncoming--;
 	}
 
 	public int getDeepBrowserTreeOutgoing() {
-		if(sharesPageAdapter!=null){
-			outSFLol = (OutgoingSharesFragmentLollipop) sharesPageAdapter.instantiateItem(viewPagerShares, 1);
-			if(outSFLol!=null) {
-				return outSFLol.getDeepBrowserTree();
-			}
-			else{
-				return -1;
-			}
-		}
-		return -1;
+		return deepBrowserTreeOutgoing;
 	}
 
-	public void setDeepBrowserTreeOutgoing(int deepBrowserTreeOutgoing) {
-		this.deepBrowserTreeOutgoing = deepBrowserTreeOutgoing;
+	public void setDeepBrowserTreeOutgoing(int deep) {
+		this.deepBrowserTreeOutgoing = deep;
+	}
+
+	public void increaseDeepBrowserTreeOutgoing() {
+		deepBrowserTreeOutgoing++;
+	}
+
+	public void decreaseDeepBrowserTreeOutgoing() {
+		deepBrowserTreeOutgoing--;
 	}
 
 	public static DrawerItem getDrawerItem() {
@@ -13906,8 +13904,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						log("showFabButton: OUTGOING TAB");
 						outSFLol = (OutgoingSharesFragmentLollipop) sharesPageAdapter.instantiateItem(viewPagerShares, 1);
 						if(outSFLol!=null){
-							int deepBrowserTreeOut = outSFLol.getDeepBrowserTree();
-							if(deepBrowserTreeOut<=0){
+							if(deepBrowserTreeOutgoing<=0){
 								fabButton.setVisibility(View.GONE);
 							}
 							else {

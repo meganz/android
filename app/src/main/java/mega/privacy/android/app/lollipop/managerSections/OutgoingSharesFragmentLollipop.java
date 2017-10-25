@@ -83,8 +83,6 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 
 	MegaApiAndroid megaApi;
 		
-	int deepBrowserTree = 0;
-
 	ArrayList<MegaNode> nodes;
 
 	public ActionMode actionMode;
@@ -388,13 +386,6 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 	    display.getMetrics(outMetrics);
 	    density  = getResources().getDisplayMetrics().density;		
 
-		if (((ManagerActivityLollipop)context).parentHandleOutgoing == -1){
-			deepBrowserTree = ((ManagerActivityLollipop)context).getDeepBrowserTreeOutgoing();
-		}
-		else{
-			log("The parent is not -1: "+((ManagerActivityLollipop)context).parentHandleOutgoing);
-		}
-
 		((ManagerActivityLollipop)context).showFabButton();
 		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
@@ -509,7 +500,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 				nodes = megaApi.getChildren(parentNode, ((ManagerActivityLollipop)context).orderOthers);
 			}
 			((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
-			if (deepBrowserTree == 0){
+			if (((ManagerActivityLollipop) context).deepBrowserTreeOutgoing == 0){
 				contentText.setText(MegaApiUtils.getInfoNodeOnlyFolders(nodes, context));
 			}
 			else{
@@ -611,7 +602,6 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 
 	public void findNodes(){	
 		log("findNodes");
-		deepBrowserTree=0;
 		ArrayList<MegaShare> outNodeList = megaApi.getOutShares();
 		nodes.clear();
 		long lastFolder=-1;		
@@ -659,9 +649,9 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 		}
 		else{
 			if (nodes.get(position).isFolder()){
-				
-				deepBrowserTree = deepBrowserTree+1;
-				log("deepBrowserTree "+deepBrowserTree);
+
+				((ManagerActivityLollipop) context).increaseDeepBrowserTreeOutgoing();
+				log("deepBrowserTree after clicking folder"+((ManagerActivityLollipop) context).deepBrowserTreeOutgoing);
 				
 				MegaNode n = nodes.get(position);
 
@@ -974,15 +964,15 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 		log("onBackPressed");
 		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
-		log("deepBrowserTree "+deepBrowserTree);
+		log("deepBrowserTree "+((ManagerActivityLollipop) context).deepBrowserTreeOutgoing);
 					
 		if (adapter == null){
 			return 0;
 		}
 
-		deepBrowserTree = deepBrowserTree-1;
+		((ManagerActivityLollipop) context).decreaseDeepBrowserTreeOutgoing();
 		((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
-		if(deepBrowserTree<=0){
+		if(((ManagerActivityLollipop) context).deepBrowserTreeOutgoing==0){
 			log("deepBrowserTree==0");
 			//In the beginning of the navigation
 			((ManagerActivityLollipop)context).setParentHandleOutgoing(-1);
@@ -1020,7 +1010,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 			((ManagerActivityLollipop) context).showFabButton();
 			return 3;
 		}
-		else if (deepBrowserTree>0){
+		else if (((ManagerActivityLollipop) context).deepBrowserTreeOutgoing>0){
 			log("Keep navigation");
 
 			MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(((ManagerActivityLollipop)context).parentHandleOutgoing));
@@ -1069,7 +1059,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 			emptyImageView.setVisibility(View.GONE);
 			emptyTextView.setVisibility(View.GONE);
 //			((ManagerActivityLollipop)context).setParentHandleBrowser(megaApi.getRootNode().getHandle());
-			deepBrowserTree=0;
+			((ManagerActivityLollipop) context).deepBrowserTreeOutgoing=0;
 			return 0;
 		}
 	}
@@ -1137,11 +1127,4 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 		Util.log("OutgoingSharesFragmentLollipop", log);
 	}
 
-	public int getDeepBrowserTree() {
-		return deepBrowserTree;
-	}
-
-	public void setDeepBrowserTree(int deepBrowserTree) {
-		this.deepBrowserTree = deepBrowserTree;
-	}
 }
