@@ -184,8 +184,8 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 		}
 		else if(modeCloud == FileExplorerActivityLollipop.UPLOAD_SELFIE){
 			optionButton.setText(getString(R.string.context_upload).toUpperCase(Locale.getDefault()));
-		}	
-		else {
+		}
+		else{
 			optionButton.setText(getString(R.string.general_select).toUpperCase(Locale.getDefault()));
 		}
 
@@ -340,6 +340,11 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 			emptyImageView.setVisibility(View.GONE);
 			emptyTextView.setVisibility(View.GONE);
 		}
+		if (modeCloud == FileExplorerActivityLollipop.COPY){
+			activateButton(true);
+		}
+
+
 
 	}
 
@@ -389,11 +394,22 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 				emptyTextView.setText(R.string.file_browser_empty_folder);
 				emptyImageView.setVisibility(View.VISIBLE);
 				emptyTextView.setVisibility(View.VISIBLE);
+				if (modeCloud == FileExplorerActivityLollipop.COPY){
+					activateButton(true);
+				}
 			}
 			else{
 				listView.setVisibility(View.VISIBLE);
 				emptyImageView.setVisibility(View.GONE);
 				emptyTextView.setVisibility(View.GONE);
+				if (modeCloud == FileExplorerActivityLollipop.COPY){
+					long parent = ((FileExplorerActivityLollipop)context).parentHandleMoveCopy();
+					if(parent == parentHandle) {
+						activateButton(false);
+					}else{
+						activateButton(true);
+					}
+				}
 			}
 		}
 		else
@@ -467,6 +483,8 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 		}
 		else if (deepBrowserTree>0){
 			parentHandle = adapter.getParentHandle();
+
+
 			
 			MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(parentHandle));				
 
@@ -475,6 +493,15 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 				
 				parentHandle = parentNode.getHandle();
 				nodes = megaApi.getChildren(parentNode);
+
+				if (modeCloud == FileExplorerActivityLollipop.COPY){
+					long parent = ((FileExplorerActivityLollipop)context).parentHandleMoveCopy();
+					if(parent == parentHandle) {
+						activateButton(false);
+					}else{
+						activateButton(true);
+					}
+				}
 
 				adapter.setNodes(nodes);
 				int lastVisiblePosition = 0;
@@ -582,5 +609,14 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 
 	public void setDeepBrowserTree(int deepBrowserTree) {
 		this.deepBrowserTree = deepBrowserTree;
+	}
+
+	public void activateButton(boolean show){
+		optionButton.setEnabled(show);
+		if(show){
+			optionButton.setTextColor(getResources().getColor(R.color.accentColor));
+		}else{
+			optionButton.setTextColor(getResources().getColor(R.color.invite_button_deactivated));
+		}
 	}
 }
