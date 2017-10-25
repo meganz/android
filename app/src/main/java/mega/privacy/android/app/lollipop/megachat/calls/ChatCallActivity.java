@@ -2,6 +2,8 @@ package mega.privacy.android.app.lollipop.megachat.calls;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.KeyguardManager;
+import android.app.admin.DevicePolicyManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -12,12 +14,17 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.hardware.Camera;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.RingtoneManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.PowerManager;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
@@ -74,7 +81,7 @@ import nz.mega.sdk.MegaUser;
 import static android.view.View.GONE;
 import static mega.privacy.android.app.utils.Util.context;
 
-public class ChatCallActivity extends PinActivityLollipop implements MegaChatRequestListenerInterface, MegaChatCallListenerInterface, MegaChatVideoListenerInterface, MegaRequestListenerInterface, View.OnTouchListener, SurfaceHolder.Callback, View.OnClickListener {
+public class ChatCallActivity extends PinActivityLollipop implements MegaChatRequestListenerInterface, MegaChatCallListenerInterface, MegaChatVideoListenerInterface, MegaRequestListenerInterface, View.OnTouchListener, SurfaceHolder.Callback, View.OnClickListener, SensorEventListener {
 
     DatabaseHandler dbH = null;
     ChatItemPreferences chatPrefs = null;
@@ -132,6 +139,11 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
 
     int var1=0;
     int var2=0;
+
+    private SensorManager mSensorManager;
+    private Sensor mSensor;
+    PowerManager powermanager;
+    PowerManager.WakeLock wakeLock;
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -217,6 +229,9 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
         dbH = DatabaseHandler.getDbHandler(getApplicationContext());
         handler = new Handler();
 
+        mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+        mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY);
+
         tB = (Toolbar) findViewById(R.id.call_toolbar);
         if (tB == null) {
             log("Tb is Null");
@@ -248,6 +263,10 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
         microFAB.setVisibility(GONE);
 
         surfaceView = (SurfaceView)findViewById(R.id.surface_remote_video);
+
+        powermanager=  ((PowerManager)context.getSystemService(Context.POWER_SERVICE));
+        wakeLock=powermanager.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP, "tag");
+
         //surfaceHolder = surfaceView.getHolder();
         //surfaceHolder.addCallback(this);
         //surfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);*/
@@ -333,6 +352,8 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
         if(checkPermissions()){
             showFABs();
         }
+
+
     }
 
     @Override
@@ -549,6 +570,7 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
 
     @Override public void onPause(){
         super.onPause();
+       mSensorManager.unregisterListener(this);
         if (camera != null) {
             camera.stopPreview();
         }
@@ -558,7 +580,7 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
     protected void onResume() {
         log("onResume-ChatCallActivity");
         super.onResume();
-
+        mSensorManager.registerListener(this, mSensor, SensorManager.SENSOR_DELAY_NORMAL);
         ((MegaApplication) getApplication()).sendSignalPresenceActivity();
     }
     @Override public void onDestroy(){
@@ -925,5 +947,21 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
 
     public static void log(String message) {
         Util.log("ChatCallActivity", message);
+    }
+
+    @Override
+    public void onSensorChanged(SensorEvent event) {
+
+
+        if (event.values[0] == 0) {
+
+        } else {
+
+        }
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+
     }
 }
