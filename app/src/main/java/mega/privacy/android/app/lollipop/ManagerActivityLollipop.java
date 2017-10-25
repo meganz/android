@@ -10846,6 +10846,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				return;
 			}
 
+			log("Intent action: "+intent.getAction());
+			log("Intent action: "+intent.getType());
+
 			intent.setAction(Intent.ACTION_GET_CONTENT);
 			FilePrepareTask filePrepareTask = new FilePrepareTask(this);
 			filePrepareTask.execute(intent);
