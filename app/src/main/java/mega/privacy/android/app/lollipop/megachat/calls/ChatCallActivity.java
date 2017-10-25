@@ -2,8 +2,11 @@ package mega.privacy.android.app.lollipop.megachat.calls;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.app.ActivityManager;
 import android.app.KeyguardManager;
 import android.app.admin.DevicePolicyManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -25,6 +28,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.PowerManager;
+import android.os.SystemClock;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
@@ -42,12 +46,15 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.webrtc.videoengine.ViESurfaceRenderer;
 
 import java.io.File;
+import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
 import java.util.Locale;
 
@@ -142,8 +149,10 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
 
     private SensorManager mSensorManager;
     private Sensor mSensor;
-    PowerManager powermanager;
-    PowerManager.WakeLock wakeLock;
+
+    private PowerManager powerManager;
+    private PowerManager.WakeLock wakeLock;
+    private int field = 0x00000020;
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -232,6 +241,13 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
         mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY);
 
+        try {
+            field = PowerManager.class.getClass().getField("PROXIMITY_SCREEN_OFF_WAKE_LOCK").getInt(null);
+        } catch (Throwable ignored) {}
+
+        powerManager = (PowerManager) getSystemService(POWER_SERVICE);
+        wakeLock = powerManager.newWakeLock(field, getLocalClassName());
+
         tB = (Toolbar) findViewById(R.id.call_toolbar);
         if (tB == null) {
             log("Tb is Null");
@@ -263,9 +279,6 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
         microFAB.setVisibility(GONE);
 
         surfaceView = (SurfaceView)findViewById(R.id.surface_remote_video);
-
-        powermanager=  ((PowerManager)context.getSystemService(Context.POWER_SERVICE));
-        wakeLock=powermanager.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP, "tag");
 
         //surfaceHolder = surfaceView.getHolder();
         //surfaceHolder.addCallback(this);
@@ -391,7 +404,7 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
             p.setColor(Color.parseColor(color));
         } else {
             log("Default color to the avatar");
-            p.setColor(context.getResources().getColor(R.color.lollipop_primary_color));
+            p.setColor(ContextCompat.getColor(this, R.color.lollipop_primary_color));
         }
 
         int radius;
@@ -402,8 +415,7 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
 
         c.drawCircle(defaultAvatar.getWidth()/2, defaultAvatar.getHeight()/2, radius, p);
         contactImage.setImageBitmap(defaultAvatar);
-
-        contactInitialLetter.setText(fullName.charAt(0));
+        contactInitialLetter.setText(fullName.charAt(0)+"");
         contactInitialLetter.setTextSize(60);
         contactInitialLetter.setTextColor(Color.WHITE);
         contactInitialLetter.setVisibility(View.VISIBLE);
@@ -952,16 +964,21 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
     @Override
     public void onSensorChanged(SensorEvent event) {
 
-
         if (event.values[0] == 0) {
+            //Turn off Screen
+            if(!wakeLock.isHeld()) {
+                wakeLock.acquire();
+            }
 
         } else {
-
+            //Turn on Screen
+            if(wakeLock.isHeld()) {
+                wakeLock.release();
+            }
         }
     }
 
     @Override
-    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {}
 
-    }
 }
