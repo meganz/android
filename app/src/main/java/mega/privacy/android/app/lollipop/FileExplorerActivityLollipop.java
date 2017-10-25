@@ -1697,7 +1697,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		this.selectFile = selectFile;
 	}
 
-	public Long parentHandleMoveCopy(){
+	public long parentHandleMoveCopy(){
 		return parentMoveCopy.getHandle();
 	}
 

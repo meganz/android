@@ -45,8 +45,6 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 	int modeCloud;
 	boolean selectFile;
 
-	boolean copyNodes = false;
-
 	RecyclerView listView;
 	LinearLayoutManager mLayoutManager;
 	ImageView emptyImageView;
@@ -171,31 +169,24 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 		
 		if (modeCloud == FileExplorerActivityLollipop.MOVE) {
 			optionButton.setText(getString(R.string.context_move).toUpperCase(Locale.getDefault()));
-			copyNodes = false;
 		}
 		else if (modeCloud == FileExplorerActivityLollipop.COPY){
 			optionButton.setText(getString(R.string.context_copy).toUpperCase(Locale.getDefault()));
-			copyNodes = true;
 		}
 		else if (modeCloud == FileExplorerActivityLollipop.UPLOAD){
 			optionButton.setText(getString(R.string.context_upload).toUpperCase(Locale.getDefault()));
-			copyNodes = false;
 		}
 		else if (modeCloud == FileExplorerActivityLollipop.IMPORT){
 			optionButton.setText(getString(R.string.general_import).toUpperCase(Locale.getDefault()));
-			copyNodes = false;
 		}
 		else if (modeCloud == FileExplorerActivityLollipop.SELECT || modeCloud == FileExplorerActivityLollipop.SELECT_CAMERA_FOLDER){
 			optionButton.setText(getString(R.string.general_select).toUpperCase(Locale.getDefault()));
-			copyNodes = false;
 		}
 		else if(modeCloud == FileExplorerActivityLollipop.UPLOAD_SELFIE){
 			optionButton.setText(getString(R.string.context_upload).toUpperCase(Locale.getDefault()));
-			copyNodes = false;
-		}	
-		else {
+		}
+		else{
 			optionButton.setText(getString(R.string.general_select).toUpperCase(Locale.getDefault()));
-			copyNodes = false;
 		}
 
 
@@ -349,7 +340,7 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 			emptyImageView.setVisibility(View.GONE);
 			emptyTextView.setVisibility(View.GONE);
 		}
-		if(copyNodes){
+		if (modeCloud == FileExplorerActivityLollipop.COPY){
 			activateButton(true);
 		}
 
@@ -403,7 +394,7 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 				emptyTextView.setText(R.string.file_browser_empty_folder);
 				emptyImageView.setVisibility(View.VISIBLE);
 				emptyTextView.setVisibility(View.VISIBLE);
-				if(copyNodes){
+				if (modeCloud == FileExplorerActivityLollipop.COPY){
 					activateButton(true);
 				}
 			}
@@ -411,8 +402,8 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 				listView.setVisibility(View.VISIBLE);
 				emptyImageView.setVisibility(View.GONE);
 				emptyTextView.setVisibility(View.GONE);
-				if(copyNodes){
-					Long parent = ((FileExplorerActivityLollipop)context).parentHandleMoveCopy();
+				if (modeCloud == FileExplorerActivityLollipop.COPY){
+					long parent = ((FileExplorerActivityLollipop)context).parentHandleMoveCopy();
 					if(parent == parentHandle) {
 						activateButton(false);
 					}else{
@@ -503,8 +494,8 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 				parentHandle = parentNode.getHandle();
 				nodes = megaApi.getChildren(parentNode);
 
-				if(copyNodes){
-					Long parent = ((FileExplorerActivityLollipop)context).parentHandleMoveCopy();
+				if (modeCloud == FileExplorerActivityLollipop.COPY){
+					long parent = ((FileExplorerActivityLollipop)context).parentHandleMoveCopy();
 					if(parent == parentHandle) {
 						activateButton(false);
 					}else{
