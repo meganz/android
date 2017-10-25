@@ -272,11 +272,11 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 				if(fragment!=null){
 					if(fragment instanceof CloudDriveExplorerFragmentLollipop){
 						holder.permissionsIcon.setVisibility(View.GONE);
-						Boolean moveNode = ((CloudDriveExplorerFragmentLollipop) fragment).isNodeMoveCopy();
+						boolean moveNode = ((CloudDriveExplorerFragmentLollipop) fragment).isNodeMove();
 						if(moveNode){
 							ArrayList<Long> nodesHandles = ((CloudDriveExplorerFragmentLollipop) fragment).recoverNodeHandle();
 
-							for (Long nodeHandle : nodesHandles) {
+							for (long nodeHandle : nodesHandles) {
 								if(node.getHandle()==nodeHandle){
 
 									holder.imageView.setAlpha(.4f);
@@ -287,7 +287,7 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 								}else{
 
 									if(disabledNodesCloudDrive.size() != 0){
-										for(Long handle : disabledNodesCloudDrive){
+										for(long handle : disabledNodesCloudDrive){
 											if(handle != node.getHandle()) {
 												holder.imageView.setAlpha(1.0f);
 												holder.textViewFileName.setTextColor(context.getResources().getColor(android.R.color.black));
