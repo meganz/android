@@ -84,8 +84,6 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 	DisplayMetrics outMetrics;
 	Display display;
 
-	int deepBrowserTree = 0;
-
 	ArrayList<MegaNode> nodes;
 	MegaNode selectedNode;
 
@@ -260,7 +258,7 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 					showTrash = false;
 				}
 
-				if (deepBrowserTree == 0){
+				if (((ManagerActivityLollipop)context).deepBrowserTreeIncoming == 0){
                     showTrash = false;
 					menu.findItem(R.id.cab_menu_leave_multiple_share).setVisible(true);
 					menu.findItem(R.id.cab_menu_leave_multiple_share).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
@@ -421,6 +419,8 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 
 			contentText.setText(MegaApiUtils.getInfoNodeOnlyFolders(nodes, context));
 
+			log("Deep browser tree: "+((ManagerActivityLollipop)context).deepBrowserTreeIncoming);
+
 			return v;
 		}
 		else{
@@ -467,7 +467,7 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 			}
 			((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 
-			if (deepBrowserTree == 0){
+			if (((ManagerActivityLollipop)context).deepBrowserTreeIncoming == 0){
 				contentText.setText(MegaApiUtils.getInfoNodeOnlyFolders(nodes, context));
 			}
 			else{
@@ -548,7 +548,7 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 		}
 		((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 
-		if(deepBrowserTree==0){
+		if(((ManagerActivityLollipop)context).deepBrowserTreeIncoming==0){
 			contentText.setText(MegaApiUtils.getInfoNodeOnlyFolders(nodes, context));
 		}
 		else{
@@ -600,9 +600,8 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 		}
 		else{
 			if (nodes.get(position).isFolder()){
-				log("Is folder");
-				deepBrowserTree = deepBrowserTree+1;
-				
+				((ManagerActivityLollipop)context).increaseDeepBrowserTreeIncoming();
+				log("Is folder deep: "+((ManagerActivityLollipop)context).deepBrowserTreeIncoming);
 				MegaNode n = nodes.get(position);
 
 				int lastFirstVisiblePosition = 0;
@@ -724,17 +723,6 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 
 	public void findNodes(){
 		log("findNodes");
-//		deepBrowserTree=0;
-//		ArrayList<MegaUser> contacts = megaApi.getContacts();
-//		nodes.clear();
-//		for (int i=0;i<contacts.size();i++){
-//			ArrayList<MegaNode> nodeContact=megaApi.getInShares(contacts.get(i));
-//			if(nodeContact!=null){
-//				if(nodeContact.size()>0){
-//					nodes.addAll(nodeContact);
-//				}
-//			}
-//		}
 		nodes=megaApi.getInShares();
 		for(int i=0;i<nodes.size();i++){
 			log("NODE: "+nodes.get(i).getName());
@@ -866,18 +854,18 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 	}
 	
 	public int onBackPressed(){
-		log("onBackPressed deepBrowserTree:"+deepBrowserTree);
+		log("onBackPressed deepBrowserTree:"+((ManagerActivityLollipop)context).deepBrowserTreeIncoming);
 		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
 		if (adapter == null){
 			return 0;
 		}
 
-		deepBrowserTree = deepBrowserTree-1;
+		((ManagerActivityLollipop)context).decreaseDeepBrowserTreeIncoming();
 		((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
-		if(deepBrowserTree<=0){
+		if(((ManagerActivityLollipop)context).deepBrowserTreeIncoming==0){
 			//In the beginning of the navigation
-			log("deepTree==0");
+			log("deepBrowserTree==0");
 			((ManagerActivityLollipop)context).setParentHandleIncoming(-1);
 			aB.setTitle(getString(R.string.section_shared_items));
 			log("aB.setHomeAsUpIndicator_62");
@@ -911,7 +899,7 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 			emptyTextView.setVisibility(View.GONE);
 			return 3;
 		}
-		else if (deepBrowserTree>0){
+		else if (((ManagerActivityLollipop)context).deepBrowserTreeIncoming>0){
 			log("deepTree>0");
 
 			MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(((ManagerActivityLollipop)context).parentHandleIncoming));
@@ -961,7 +949,7 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 			contentTextLayout.setVisibility(View.VISIBLE);
 			emptyImageView.setVisibility(View.GONE);
 			emptyTextView.setVisibility(View.GONE);
-			deepBrowserTree=0;
+			((ManagerActivityLollipop)context).deepBrowserTreeIncoming=0;
 			return 0;
 		}
 	}
@@ -1012,6 +1000,10 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 		return 0;
 	}
 
+	public int getDeepBrowserTree(){
+		return ((ManagerActivityLollipop)context).deepBrowserTreeIncoming;
+	}
+
 	public boolean isMultipleselect(){
 		return adapter.isMultipleSelect();
 	}
@@ -1020,13 +1012,4 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 		Util.log("IncomingSharesFragmentLollipop", log);
 	}
 
-	public int getDeepBrowserTree() {
-		log("getDeepBrowserTree:" + deepBrowserTree);
-		return deepBrowserTree;
-	}
-
-	public void setDeepBrowserTree(int deepBrowserTree) {
-		log("setDeepBrowserTree:" + deepBrowserTree);
-		this.deepBrowserTree = deepBrowserTree;
-	}
 }

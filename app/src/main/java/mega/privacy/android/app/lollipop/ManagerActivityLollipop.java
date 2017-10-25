@@ -407,8 +407,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	public long parentHandleSearch;
 	public long parentHandleInbox;
 	public String pathNavigationOffline;
-	public int deepBrowserTreeIncoming;
-	public int deepBrowserTreeOutgoing;
+	public int deepBrowserTreeIncoming = 0;
+	public int deepBrowserTreeOutgoing = 0;
 	int indexShares = -1;
 	int indexCloud = -1;
 	int indexContacts = -1;
@@ -1020,8 +1020,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			log("DrawerItem is null");
 		}
 		super.onSaveInstanceState(outState);
-		int deepBrowserTreeIncoming = 0;
-		int deepBrowserTreeOutgoing = 0;
 		int indexShares = 0;
 		int indexCloud = 0;
 		int indexContacts = 0;
@@ -1036,18 +1034,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		outState.putSerializable("drawerItem", drawerItem);
 
 		if(parentHandleIncoming!=-1){
-			if(inSFLol!=null){
-				deepBrowserTreeIncoming = inSFLol.getDeepBrowserTree();
-			}
+			outState.putInt("deepBrowserTreeIncoming", deepBrowserTreeIncoming);
 		}
-		outState.putInt("deepBrowserTreeIncoming", deepBrowserTreeIncoming);
 
 		if(parentHandleOutgoing!=-1){
-			if(outSFLol!=null){
-				deepBrowserTreeOutgoing = outSFLol.getDeepBrowserTree();
-			}
+			outState.putInt("deepBrowserTreeOutgoing", deepBrowserTreeOutgoing);
 		}
-		outState.putInt("deepBrowserTreeOutgoing", deepBrowserTreeOutgoing);
 
 		if (viewPagerShares != null) {
 			indexShares = viewPagerShares.getCurrentItem();
@@ -1116,8 +1108,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			log("savedInstanceState -> parentHandleOutgoing: "+parentHandleOutgoing);
 			parentHandleSearch = savedInstanceState.getLong("parentHandleSearch", -1);
 			parentHandleInbox = savedInstanceState.getLong("parentHandleInbox", -1);
-			deepBrowserTreeIncoming = savedInstanceState.getInt("deepBrowserTreeIncoming", deepBrowserTreeIncoming);
-			deepBrowserTreeOutgoing = savedInstanceState.getInt("deepBrowserTreeOutgoing", deepBrowserTreeOutgoing);
+			deepBrowserTreeIncoming = savedInstanceState.getInt("deepBrowserTreeIncoming", 0);
+			deepBrowserTreeOutgoing = savedInstanceState.getInt("deepBrowserTreeOutgoing", 0);
 			drawerItem = (DrawerItem) savedInstanceState.getSerializable("drawerItem");
 			log("DrawerItem onCreate = " + drawerItem);
 			log("savedInstanceState -> drawerItem: "+drawerItem);
@@ -1144,7 +1136,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			parentHandleOutgoing = -1;
 			parentHandleSearch = -1;
 			parentHandleInbox = -1;
-
+			deepBrowserTreeIncoming = 0;
+			deepBrowserTreeOutgoing = 0;
 			chatConnection = MegaApplication.isChatConnection();
 
 			this.setPathNavigationOffline("/");
@@ -5957,7 +5950,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		    				//InCOMING
 		    				inSFLol = (IncomingSharesFragmentLollipop) sharesPageAdapter.instantiateItem(viewPagerShares, 0);
 							if (inSFLol != null){
-								log("deepBrowserTree get from inSFlol: "+inSFLol.getDeepBrowserTree());
 		    					inSFLol.onBackPressed();
 		    				}
 
@@ -13700,21 +13692,20 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	}
 
 	public int getDeepBrowserTreeIncoming() {
-		if(sharesPageAdapter!=null){
-			inSFLol = (IncomingSharesFragmentLollipop) sharesPageAdapter.instantiateItem(viewPagerShares, 0);
-			if(inSFLol!=null) {
-				return inSFLol.getDeepBrowserTree();
-			}
-			else{
-				return -1;
-			}
-		}
-		return -1;
+		return deepBrowserTreeIncoming;
 	}
 
-	public void setDeepBrowserTreeIncoming(int deepBrowserTreeIncoming) {
-		log("setDeepBrowserTreeIncoming: "+deepBrowserTreeIncoming);
-		this.deepBrowserTreeIncoming = deepBrowserTreeIncoming;
+	public void setDeepBrowserTreeIncoming(int deep) {
+		deepBrowserTreeIncoming=deep;
+	}
+
+	public void increaseDeepBrowserTreeIncoming() {
+		deepBrowserTreeIncoming++;
+	}
+
+
+	public void decreaseDeepBrowserTreeIncoming() {
+		deepBrowserTreeIncoming--;
 	}
 
 	public int getDeepBrowserTreeOutgoing() {
@@ -13880,8 +13871,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						log("showFabButton: INCOMING TAB");
 						inSFLol = (IncomingSharesFragmentLollipop) sharesPageAdapter.instantiateItem(viewPagerShares, 0);
 						if(inSFLol!=null){
-							int deepBrowserTreeIn = inSFLol.getDeepBrowserTree();
-							if(deepBrowserTreeIn<=0){
+							if(deepBrowserTreeIncoming<=0){
 								log("showFabButton: fabButton GONE");
 								fabButton.setVisibility(View.GONE);
 							}
