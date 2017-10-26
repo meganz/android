@@ -7,6 +7,7 @@
         android:layout_height="match_parent"
         android:id="@+id/file_info_fragment_container"
         android:fitsSystemWindows="true"
+        android:keepScreenOn="true"
         tools:context=".lollipop.megachat.calls.ChatCallActivity">
 
         <android.support.design.widget.AppBarLayout
@@ -18,8 +19,7 @@
 
             <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:keepScreenOn="true">
+                android:layout_height="match_parent">
 
                 <!-- Background -->
 
