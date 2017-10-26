@@ -1,6 +1,7 @@
 package mega.privacy.android.app.lollipop.megachat.calls;
 
 import android.Manifest;
+import android.animation.Animator;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ActivityManager;
@@ -31,6 +32,7 @@ import android.os.PowerManager;
 import android.os.SystemClock;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
@@ -47,6 +49,8 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.view.animation.AnimationUtils;
+import android.view.animation.Interpolator;
 import android.widget.Button;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -542,7 +546,7 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
         if (event.getAction() == MotionEvent.ACTION_DOWN) {
             if(aB.isShowing()){
                 hideActionBar();
-                showFABs();
+                hideFABs();
             }else{
                 showActionBar();
                 showFABs();
@@ -580,6 +584,21 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
                 tB.animate().translationY(0).setDuration(800L).start();
 
             }
+        }
+    }
+
+    protected void hideFABs(){
+        if(videoFAB.getVisibility() == View.VISIBLE){
+            videoFAB.hide();
+        }
+        if(microFAB.getVisibility() == View.VISIBLE){
+            microFAB.hide();
+        }
+        if(hangFAB.getVisibility() == View.VISIBLE){
+            hangFAB.hide();
+        }
+        if(answerCallFAB.getVisibility() == View.VISIBLE){
+            answerCallFAB.hide();
         }
     }
 
@@ -743,7 +762,9 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
         int callStatus = call.getStatus();
         log("The status of the call is: " + callStatus);
         if(callStatus!=MegaChatCall.CALL_STATUS_RING_IN){
+        if(thePlayer!=null){
             thePlayer.stop();
+            }
         }
     }
 
@@ -920,16 +941,26 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
 
     public void showFABs(){
         if(callChat.getStatus()==MegaChatCall.CALL_STATUS_RING_IN){
+
+            answerCallFAB.show();
             answerCallFAB.setVisibility(View.VISIBLE);
             answerCallFAB.setOnClickListener(this);
+
+            hangFAB.show();
             hangFAB.setVisibility(View.VISIBLE);
+
             videoFAB.setVisibility(GONE);
             microFAB.setVisibility(GONE);
         }
         else{
+            videoFAB.show();
             videoFAB.setVisibility(View.VISIBLE);
+
+            microFAB.show();
             microFAB.setVisibility(View.VISIBLE);
+
             answerCallFAB.setVisibility(GONE);
+            hangFAB.show();
             hangFAB.setVisibility(View.VISIBLE);
         }
     }
@@ -982,5 +1013,6 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {}
+
 
 }
