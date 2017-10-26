@@ -1658,6 +1658,15 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						finish();
 						return;
 					}
+                    else if(getIntent().getAction().equals(Constants.ACTION_CHAT_SUMMARY)) {
+                        Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
+                        intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        intent.setAction(Constants.ACTION_CHAT_SUMMARY);
+                        startActivity(intent);
+                        finish();
+                        return;
+                    }
 					else if (getIntent().getAction().equals(Constants.ACTION_INCOMING_SHARED_FOLDER_NOTIFICATION)){
 						Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
 						intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
