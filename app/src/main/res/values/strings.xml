@@ -239,6 +239,8 @@
     <string name="section_shared_items" context="title of the screen that shows all the shared items">Shared folders</string>
     <string name="section_rubbish_bin" context="The title of the trash bin in the tree of the file manager.">Rubbish bin</string>
     <string name="section_contacts" context="Title of the contact list">Contacts</string>
+    <string name="section_contacts_with_notification" context="Item of the navigation title for the contacts section when there is any pending incoming request">Contacts [A](%1$d)[/A]</string>
+
     <string name="tab_sent_requests" context="Title of the sent requests tab. Capital letters">&#160;SENT REQUESTS&#160;</string>
     <string name="tab_received_requests" context="Title of the received requests tab. Capital letters">RECEIVED REQUESTS</string>
     <string name="sent_requests_empty" context="the user has not sent any contact request to other users">No sent requests</string>
