@@ -13,6 +13,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.BitmapShader;
@@ -29,6 +30,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
+import android.provider.ContactsContract;
 import android.provider.MediaStore;
 import android.support.design.widget.BottomSheetDialog;
 import android.support.design.widget.BottomSheetDialogFragment;
@@ -12007,15 +12009,88 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			Snackbar.make(fragmentContainer, getString(R.string.upload_can_not_open), Snackbar.LENGTH_LONG).show();
 		}
 		else {
-			Snackbar.make(fragmentContainer, getString(R.string.upload_began), Snackbar.LENGTH_LONG).show();
 			for (ShareInfo info : infos) {
-				Intent intent = new Intent(this, UploadService.class);
-				intent.putExtra(UploadService.EXTRA_FILEPATH, info.getFileAbsolutePath());
-				intent.putExtra(UploadService.EXTRA_NAME, info.getTitle());
-				intent.putExtra(UploadService.EXTRA_PARENT_HASH, parentNode.getHandle());
-				intent.putExtra(UploadService.EXTRA_SIZE, info.getSize());
-				startService(intent);
+				if(info.isContact){
+					uploadContactInfo(info, parentNode);
+				}
+				else{
+					Snackbar.make(fragmentContainer, getString(R.string.upload_began), Snackbar.LENGTH_LONG).show();
+					Intent intent = new Intent(this, UploadService.class);
+					intent.putExtra(UploadService.EXTRA_FILEPATH, info.getFileAbsolutePath());
+					intent.putExtra(UploadService.EXTRA_NAME, info.getTitle());
+					intent.putExtra(UploadService.EXTRA_PARENT_HASH, parentNode.getHandle());
+					intent.putExtra(UploadService.EXTRA_SIZE, info.getSize());
+					startService(intent);
+				}
 			}
+		}
+	}
+
+	public void uploadContactInfo(ShareInfo info, MegaNode parentNode){
+		log("Upload contact info");
+		Cursor cursorID = getContentResolver().query(info.contactUri, null, null, null, null);
+
+		if (cursorID != null) {
+			if (cursorID.moveToFirst()) {
+				log("It is a contact");
+
+				String id = cursorID.getString(cursorID.getColumnIndex(ContactsContract.Contacts._ID));
+				String name = cursorID.getString(cursorID.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
+				Integer hasPhone = cursorID.getInt(cursorID.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER));
+
+				// get the user's email address
+				String email = null;
+				Cursor ce = getContentResolver().query(ContactsContract.CommonDataKinds.Email.CONTENT_URI, null,
+						ContactsContract.CommonDataKinds.Email.CONTACT_ID + " = ?", new String[]{id}, null);
+				if (ce != null && ce.moveToFirst()) {
+					email = ce.getString(ce.getColumnIndex(ContactsContract.CommonDataKinds.Email.DATA));
+					ce.close();
+				}
+
+				// get the user's phone number
+				String phone = null;
+				if (hasPhone > 0) {
+					Cursor cp = getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null,
+							ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = ?", new String[]{id}, null);
+					if (cp != null && cp.moveToFirst()) {
+						phone = cp.getString(cp.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+						cp.close();
+					}
+				}
+
+				StringBuilder data = new StringBuilder();
+				data.append(name);
+				if(phone!=null){
+					data.append(", "+phone);
+				}
+
+				if(email!=null){
+					data.append(", "+email);
+				}
+
+				createFile(name, data.toString(), parentNode);
+			}
+		}
+		else{
+			showSnackbar(getString(R.string.error_temporary_unavaible));
+		}
+	}
+
+	private void createFile(String name, String data, MegaNode parentNode){
+
+		File file = Util.createTemporalTextFile(name, data);
+		if(file!=null){
+			Snackbar.make(fragmentContainer,getString(R.string.upload_began),Snackbar.LENGTH_LONG).show();
+
+			Intent intent = new Intent(this, UploadService.class);
+			intent.putExtra(UploadService.EXTRA_FILEPATH, file.getAbsolutePath());
+			intent.putExtra(UploadService.EXTRA_NAME, file.getName());
+			intent.putExtra(UploadService.EXTRA_PARENT_HASH, parentNode.getHandle());
+			intent.putExtra(UploadService.EXTRA_SIZE, file.getTotalSpace());
+			startService(intent);
+		}
+		else{
+			Snackbar.make(fragmentContainer,getString(R.string.email_verification_text_error),Snackbar.LENGTH_LONG).show();
 		}
 	}
 
