@@ -163,13 +163,7 @@ public class LoginActivityLollipop extends AppCompatActivity implements MegaGlob
             megaApi.resumeCreateAccount(sessionTemp, this);
         }
 
-
-//		visibleFragment = Constants.CHOOSE_ACCOUNT_FRAGMENT;
-//		visibleFragment = Constants.CONFIRM_EMAIL_FRAGMENT;
         showFragment(visibleFragment);
-
-
-
     }
 
     public void showSnackbar(String message) {
