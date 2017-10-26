@@ -1109,7 +1109,6 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 					}
 
 					showNewFileDialog(parentNode,body.toString());
-
 					return;
 				}
 			}
@@ -1212,30 +1211,8 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 
     private void createFile(String name, String data, MegaNode parentNode){
 
-		String path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.advancesDevicesDIR + "/";
-		File tempDownDirectory = new File(path);
-		if(!tempDownDirectory.exists()){
-			tempDownDirectory.mkdirs();
-		}
-
-		String fileName = name+".txt";
-		final File file = new File(path, fileName);
-
-		// Save your stream, don't forget to flush() it before closing it.
-
-		try
-		{
-			file.createNewFile();
-			FileOutputStream fOut = new FileOutputStream(file);
-			OutputStreamWriter myOutWriter = new OutputStreamWriter(fOut);
-			myOutWriter.append(data);
-
-			myOutWriter.close();
-
-			fOut.flush();
-			fOut.close();
-
-
+		File file = Util.createTemporalTextFile(name, data);
+		if(file!=null){
 			Snackbar.make(fragmentContainer,getString(R.string.upload_began),Snackbar.LENGTH_LONG).show();
 
 			Intent intent = new Intent(this, UploadService.class);
@@ -1249,11 +1226,9 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			this.backToCloud(parentNode.getHandle());
 			finish();
 		}
-		catch (IOException e)
-		{
-			log("File write failed: " + e.toString());
+		else{
+			Snackbar.make(fragmentContainer,getString(R.string.email_verification_text_error),Snackbar.LENGTH_LONG).show();
 		}
-
 	}
 
 	private void createFolder(String title) {
