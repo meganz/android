@@ -37,6 +37,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.view.Display;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -330,12 +331,12 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
 
                         audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
                         thePlayer = MediaPlayer.create(getApplicationContext(), RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE));
-
-                        try {
-                            thePlayer.setVolume((float) (audioManager.getStreamVolume(AudioManager.STREAM_NOTIFICATION) / 7.0), (float) (audioManager.getStreamVolume(AudioManager.STREAM_NOTIFICATION) / 7.0));
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
+                        this.setVolumeControlStream(AudioManager.STREAM_MUSIC);
+                        this.setVolumeControlStream(AudioManager.STREAM_RING);
+                        this.setVolumeControlStream(AudioManager.STREAM_ALARM);
+                        this.setVolumeControlStream(AudioManager.STREAM_NOTIFICATION);
+                        this.setVolumeControlStream(AudioManager.STREAM_SYSTEM);
+                        this.setVolumeControlStream(AudioManager.STREAM_VOICE_CALL);
 
                         thePlayer.start();
                     }
