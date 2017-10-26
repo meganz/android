@@ -166,7 +166,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 //	long gParentHandle;
 	long parentHandleIncoming;
 	long parentHandleCloud;
-	int deepBrowserTree;
+	int deepBrowserTree = 0;
 
 	Intent intent = null;
 
@@ -260,7 +260,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			log("savedInstanceState -> parentHandleCloud: "+parentHandleCloud);
 			parentHandleIncoming = savedInstanceState.getLong("parentHandleIncoming", -1);
 			log("savedInstanceState -> parentHandleIncoming: "+parentHandleIncoming);
-			deepBrowserTree = savedInstanceState.getInt("deepBrowserTree", deepBrowserTree);
+			deepBrowserTree = savedInstanceState.getInt("deepBrowserTree", 0);
 			log("savedInstanceState -> deepBrowserTree: "+deepBrowserTree);
 		}
 		else{
@@ -1761,4 +1761,21 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
     public ArrayList<Long> getNodeHandleMoveCopy() {
         return nodeHandleMoveCopy;
     }
+
+	public int getDeepBrowserTree() {
+		return deepBrowserTree;
+	}
+
+	public void setDeepBrowserTree(int deep) {
+		deepBrowserTree=deep;
+	}
+
+	public void increaseDeepBrowserTree() {
+		deepBrowserTree++;
+	}
+
+	public void decreaseDeepBrowserTree() {
+		deepBrowserTree--;
+	}
+
 }

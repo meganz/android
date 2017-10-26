@@ -780,7 +780,7 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 		log("setDisableNodes");
 		if (adapter == null){
 			log("Adapter is NULL");
-			adapter = new MegaExplorerLollipopAdapter(context, nodes, parentHandle, listView, selectFile);
+			adapter = new MegaExplorerLollipopAdapter(context, this, nodes, parentHandle, listView, selectFile);
 
 			adapter.SetOnItemClickListener(new MegaExplorerLollipopAdapter.OnItemClickListener() {
 
