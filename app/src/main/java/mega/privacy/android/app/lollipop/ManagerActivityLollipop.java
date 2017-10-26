@@ -296,6 +296,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	int countUserAttributes=0;
 	int errorUserAttibutes=0;
 
+	ShareInfo infoManager;
+	MegaNode parentNodeManager;
+
 	boolean firstNavigationLevel = true;
     DrawerLayout drawerLayout;
 
@@ -885,6 +888,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						this.startActivity(phoneContactIntent);
 					}
 				}
+				break;
+			}
+			case Constants.REQUEST_UPLOAD_CONTACT:{
+				uploadContactInfo(infoManager, parentNodeManager);
 				break;
 			}
 	        case Constants.REQUEST_CAMERA:{
@@ -12011,7 +12018,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		else {
 			for (ShareInfo info : infos) {
 				if(info.isContact){
-					uploadContactInfo(info, parentNode);
+					requestContactsPermissions(info, parentNode);
 				}
 				else{
 					Snackbar.make(fragmentContainer, getString(R.string.upload_began), Snackbar.LENGTH_LONG).show();
@@ -12026,8 +12033,27 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		}
 	}
 
+	public void requestContactsPermissions(ShareInfo info, MegaNode parentNode){
+		log("requestContactsPermissions");
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+			boolean hasReadContactsPermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED);
+			if (!hasReadContactsPermission) {
+				log("No read contacts permission");
+				infoManager = info;
+				parentNodeManager = parentNode;
+				ActivityCompat.requestPermissions(this,	new String[]{Manifest.permission.READ_CONTACTS}, Constants.REQUEST_UPLOAD_CONTACT);
+			} else {
+				uploadContactInfo(info, parentNode);
+			}
+		}
+		else{
+			uploadContactInfo(info, parentNode);
+		}
+	}
+
 	public void uploadContactInfo(ShareInfo info, MegaNode parentNode){
 		log("Upload contact info");
+
 		Cursor cursorID = getContentResolver().query(info.contactUri, null, null, null, null);
 
 		if (cursorID != null) {
