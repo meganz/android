@@ -857,15 +857,6 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
             this.bitmap = renderer.CreateBitmap(width, height);
         }
 
-        // Colors seem to be in a wrong order
-        // Also, it's not very efficient to have an alpha channel
-        // This require investigation and improvements
-        for(int i = 0; i < width * height * 4; i += 4) {
-            byte tmp = byteBuffer[i];
-            byteBuffer[i] = byteBuffer[i + 2];
-            byteBuffer[i + 2] = tmp;
-        }
-
         bitmap.copyPixelsFromBuffer(ByteBuffer.wrap(byteBuffer));
 
         // Instead of using this WebRTC renderer, we should probably draw the image by ourselves.
