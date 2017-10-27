@@ -100,7 +100,7 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
     MegaUser myUser;
 
     String myUserMail;
-    long chatHandle;
+    long chatId;
     long callId;
     MegaChatRoom chat;
     MegaChatCall callChat;
@@ -290,7 +290,7 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
         //surfaceHolder = surfaceView.getHolder();
         //surfaceHolder.addCallback(this);
         //surfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);*/
-        renderer = new ViESurfaceRenderer(surfaceView);
+
 //        surfaceView.setVisibility(View.GONE);
 
         Bundle extras = getIntent().getExtras();
@@ -319,11 +319,11 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
             setProfileMyAvatar();
 
             //Contact's avatar
-            chatHandle = extras.getLong("chatHandle", -1);
-            log("Chat handle to call: " + chatHandle);
-            if (chatHandle != -1) {
-                chat = megaChatApi.getChatRoom(chatHandle);
-                callChat = megaChatApi.getChatCallByChatId(chatHandle);
+            chatId = extras.getLong("chatHandle", -1);
+            log("Chat handle to call: " + chatId);
+            if (chatId != -1) {
+                chat = megaChatApi.getChatRoom(chatId);
+                callChat = megaChatApi.getChatCallByChatId(chatId);
 
                 int callStatus = callChat.getStatus();
                 log("The status of the callChat is: " + callStatus);
@@ -344,6 +344,21 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
 
                         thePlayer.start();
                     }
+                }
+
+                if(callStatus!=MegaChatCall.CALL_STATUS_RING_IN){
+                    if(callChat.hasVideo(false)){
+                        log("Video remote connected");
+                        renderer = new ViESurfaceRenderer(surfaceView);
+                        surfaceView.setVisibility(View.VISIBLE);
+                    }
+                    else{
+                        log("Video remote NOT connected");
+                        surfaceView.setVisibility(View.GONE);
+                    }
+                }
+                else{
+                    surfaceView.setVisibility(View.GONE);
                 }
 
                 fullName = chat.getPeerFullname(0);
@@ -378,7 +393,7 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
 
     @Override
     public void onRequestStart(MegaApiJava api, MegaRequest request) {
-        log("onRequestStart: " + request.getName());
+        log("onRequestStart: " + request.getType());
     }
 
     @Override
@@ -628,6 +643,7 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
         if (megaChatApi != null) {
             megaChatApi.removeChatCallListener(this);
             megaChatApi.removeChatVideoListener(this);
+
         }
     }
 
@@ -705,7 +721,7 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
     @Override
     public void onRequestStart(MegaChatApiJava api, MegaChatRequest request) {
         log("onRequestStart");
-        log("Type: "+request.getRequestString());
+        log("Type: "+request.getType());
     }
 
     @Override
@@ -738,6 +754,37 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
 //                showSnackbar(getString(R.string.clear_history_error));
             }
         }
+        else if(request.getType() == MegaChatRequest.TYPE_DISABLE_AUDIO_VIDEO_CALL){
+            if(e.getErrorCode()==MegaChatError.ERROR_OK){
+
+                if(request.getParamType()==MegaChatRequest.AUDIO){
+                    if(request.getFlag()==true){
+                        log("Enable audio");
+                    }
+                    else{
+                        log("Disable audio");
+                    }
+                }
+                else if(request.getParamType()==MegaChatRequest.VIDEO){
+                    if(request.getFlag()==true){
+                        log("Enable video");
+                        callChatMyVideo.setVisibility(View.VISIBLE);
+                        myImageBorder.setVisibility(GONE);
+                        videoFAB.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.accentColor)));
+                    }
+                    else{
+                        log("Disable video");
+                        callChatMyVideo.setVisibility(GONE);
+                        myImageBorder.setVisibility(View.VISIBLE);
+                        videoFAB.setBackgroundTintList(ColorStateList.valueOf(Color.BLACK));
+                    }
+                }
+            }
+            else{
+                log("Error changing audio: "+e.getErrorString());
+//                showSnackbar(getString(R.string.clear_history_error));
+            }
+        }
     }
 
     @Override
@@ -746,37 +793,53 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
     }
 
     @Override
-    public void onChatCallStart(MegaChatApiJava api, MegaChatCall call) {
-        log("onChatCallStart");
-    }
-
-    @Override
-    public void onChatCallIncoming(MegaChatApiJava api, MegaChatCall call) {
-        log("onChatCallIncoming");
-    }
-
-    @Override
-    public void onChatCallStateChange(MegaChatApiJava api, MegaChatCall call) {
+    public void onChatCallUpdate(MegaChatApiJava api, MegaChatCall call) {
         log("onChatCallStateChange");
 
-        int callStatus = call.getStatus();
-        log("The status of the call is: " + callStatus);
-        if(callStatus!=MegaChatCall.CALL_STATUS_RING_IN){
-        if(thePlayer!=null){
-            thePlayer.stop();
+        this.callChat = call;
+        if(callChat.hasChanged(MegaChatCall.CHANGE_TYPE_STATUS)){
+            int callStatus = callChat.getStatus();
+            log("The status of the call is: " + callStatus);
+            switch (callStatus){
+                case MegaChatCall.CALL_STATUS_RING_IN:{
+                    if(thePlayer!=null){
+                        thePlayer.stop();
+                    }
+                    break;
+                }
+                case MegaChatCall.CALL_STATUS_IN_PROGRESS:{
+                    if(callChat.hasVideo(false)){
+                        log("Video remote connected");
+                        renderer = new ViESurfaceRenderer(surfaceView);
+                        surfaceView.setVisibility(View.VISIBLE);
+                    }
+                    else{
+                        log("Video remote NOT connected");
+                        surfaceView.setVisibility(View.GONE);
+                    }
+                    break;
+                }
+                case MegaChatCall.CALL_STATUS_DESTROYED:{
+                    finish();
+                    break;
+                }
             }
         }
-    }
-
-    @Override
-    public void onChatCallTemporaryError(MegaChatApiJava api, MegaChatCall call, MegaChatError error) {
-        log("onChatCallTemporaryError");
-    }
-
-    @Override
-    public void onChatCallFinish(MegaChatApiJava api, MegaChatCall call, MegaChatError error) {
-        log("onChatCallFinish");
-        finish();
+        else if(call.hasChanged(MegaChatCall.CHANGE_TYPE_REMOTE_AVFLAGS)){
+            log("Call remote flags has changed");
+            if(call.getStatus()!=MegaChatCall.CALL_STATUS_RING_IN){
+                if(callChat.hasVideo(false)){
+                    log("Video remote connected");
+                    renderer = new ViESurfaceRenderer(surfaceView);
+                    surfaceView.setVisibility(View.VISIBLE);
+                }
+                else{
+                    log("Video remote NOT connected");
+                    surfaceView.setVisibility(View.GONE);
+                }
+            }
+        }
+        showFABs();
     }
 
     int width = 0;
@@ -784,9 +847,9 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
     Bitmap bitmap;
 
     @Override
-    public void onChatVideoData(MegaChatApiJava api, MegaChatCall chatCall, int width, int height, byte[] byteBuffer)
+    public void onChatVideoData(MegaChatApiJava api, long chatid, int width, int height, byte[] byteBuffer)
     {
-        //log("onChatVideoData");
+//        log("onChatVideoData");
         if (this.width != width || this.height != height)
         {
             this.width = width;
@@ -866,18 +929,13 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
                 break;
             }
             case R.id.video_fab:{
-                if(callChatMyVideo.isShown()){
-                    callChatMyVideo.setVisibility(GONE);
-                    myImageBorder.setVisibility(View.VISIBLE);
-                    videoFAB.setBackgroundTintList(ColorStateList.valueOf(Color.BLACK));
 
-
-                }else{
-                    callChatMyVideo.setVisibility(View.VISIBLE);
-                    myImageBorder.setVisibility(GONE);
-                    videoFAB.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.accentColor)));
+                if(callChat.hasVideo()){
+                    megaChatApi.disableVideo(chatId, this);
                 }
-
+                else{
+                    megaChatApi.enableVideo(chatId, this);
+                }
                 //  surfaceView.setVisibility(View.VISIBLE);
 //                 start_camera();
                 break;
@@ -899,18 +957,18 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
                 if(callChat!=null){
                     if(callChat.getStatus()==MegaChatCall.CALL_STATUS_RING_IN){
                         log("Reject call");
-                        megaChatApi.rejectChatCall(chatHandle, this);
+                        megaChatApi.rejectChatCall(chatId, this);
                     }
                     else{
                         log("Hang call");
-                        megaChatApi.hangChatCall(chatHandle, this);
+                        megaChatApi.hangChatCall(chatId, this);
                     }
                 }
 
                 break;
             }
             case R.id.answer_call_fab:{
-                megaChatApi.answerChatCall(chatHandle, true, this);
+                megaChatApi.answerChatCall(chatId, true, this);
                 break;
             }
 

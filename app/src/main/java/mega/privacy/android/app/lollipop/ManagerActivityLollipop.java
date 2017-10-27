@@ -14407,7 +14407,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 			drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
 		}
-
 	}
 
 	public long getParentHandleInbox() {
@@ -14427,33 +14426,17 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	}
 
 	@Override
-	public void onChatCallStart(MegaChatApiJava api, MegaChatCall call) {
-		log("onChatCallStart");
-	}
+	public void onChatCallUpdate(MegaChatApiJava api, MegaChatCall call) {
+		log("onChatCallUpdate");
 
-	@Override
-	public void onChatCallIncoming(MegaChatApiJava api, MegaChatCall call) {
-		log("onChatCallIncoming");
-		Intent i = new Intent(this, ChatCallActivity.class);
-		i.putExtra("chatHandle", call.getChatid());
-		i.putExtra("callId", call.getId());
-
-		startActivity(i);
-	}
-
-	@Override
-	public void onChatCallStateChange(MegaChatApiJava api, MegaChatCall call) {
-		log("onChatCallStateChange: "+call.getStatus());
-	}
-
-	@Override
-	public void onChatCallTemporaryError(MegaChatApiJava api, MegaChatCall call, MegaChatError error) {
-		log("onChatCallTemporaryError");
-	}
-
-	@Override
-	public void onChatCallFinish(MegaChatApiJava api, MegaChatCall call, MegaChatError error) {
-		log("onChatCallFinish");
+		if(call.hasChanged(MegaChatCall.CHANGE_TYPE_STATUS)){
+			if(call.getStatus()==MegaChatCall.CALL_STATUS_RING_IN){
+				Intent i = new Intent(this, ChatCallActivity.class);
+				i.putExtra("chatHandle", call.getChatid());
+				i.putExtra("callId", call.getId());
+				startActivity(i);
+			}
+		}
 	}
 
 }
