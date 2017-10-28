@@ -14,6 +14,7 @@
     <uses-feature android:name="android.hardware.screen.portrait" android:required="false" />
     <uses-feature android:name="android.hardware.camera.front" android:required="false" />
     <uses-feature android:name="android.hardware.touchscreen" android:required="false" />
+    <uses-feature android:name="android.hardware.sensor.proximity" android:required="false" />
 
     <supports-screens android:resizeable="true"
         android:smallScreens="true"
