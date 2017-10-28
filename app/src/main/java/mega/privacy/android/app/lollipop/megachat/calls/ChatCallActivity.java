@@ -830,6 +830,7 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
                     break;
                 }
             }
+            showFABs();
         }
         else if(call.hasChanged(MegaChatCall.CHANGE_TYPE_REMOTE_AVFLAGS)){
             log("Call remote flags has changed");
@@ -845,7 +846,6 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
                 }
             }
         }
-        showFABs();
     }
 
     int width = 0;
@@ -939,12 +939,13 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
             }
             case R.id.micro_fab: {
                 if(var1==1){
-
                     microFAB.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.accentColor)));
+                    megaChatApi.enableAudio(chatId, this);
 
                     var1=0;
                 }else{
                     microFAB.setBackgroundTintList(ColorStateList.valueOf(Color.BLACK));
+                    megaChatApi.disableAudio(chatId, this);
 
                     var1=1;
                 }
