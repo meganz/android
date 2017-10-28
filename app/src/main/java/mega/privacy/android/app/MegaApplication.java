@@ -320,6 +320,18 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 	}
 
 	static VideoCapturer videoCapturer = null;
+
+	static public void stopVideoCapture() {
+		if (videoCapturer != null) {
+			try {
+				videoCapturer.stopCapture();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			videoCapturer = null;
+		}
+	}
+
 	static public void startVideoCapture(long nativeAndroidVideoTrackSource, SurfaceTextureHelper surfaceTextureHelper) {
 		// Settings
 		boolean useCamera2 = false;
@@ -328,28 +340,17 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 		int videoHeight = 320;
 		int videoFps = 15;
 
+		stopVideoCapture();
 		Context context = ContextUtils.getApplicationContext();
-		if (videoCapturer == null) {
-			if (Camera2Enumerator.isSupported(context) && useCamera2) {
-				videoCapturer = createCameraCapturer(new Camera2Enumerator(context));
-			} else {
-				videoCapturer = createCameraCapturer(new Camera1Enumerator(captureToTexture));
-			}
-
-			if (videoCapturer == null) {
-				log("Unable to create video capturer");
-				return;
-			}
+		if (Camera2Enumerator.isSupported(context) && useCamera2) {
+			videoCapturer = createCameraCapturer(new Camera2Enumerator(context));
+		} else {
+			videoCapturer = createCameraCapturer(new Camera1Enumerator(captureToTexture));
 		}
-		else {
-			// Workaround to be able to reuse the video capturer
-			// It shouldn't be needed to do it here because the capture
-			// should be stopped at the end of video calls
-			try {
-				videoCapturer.stopCapture();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+
+		if (videoCapturer == null) {
+			log("Unable to create video capturer");
+			return;
 		}
 
 		// Link the capturer with the surfaceTextureHelper and the native video source
