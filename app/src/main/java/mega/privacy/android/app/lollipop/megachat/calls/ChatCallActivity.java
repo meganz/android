@@ -159,6 +159,8 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
     private PowerManager.WakeLock wakeLock;
     private int field = 0x00000020;
 
+    AppRTCAudioManager rtcAudioManager;
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         log("onCreateOptionsMenu");
@@ -286,6 +288,7 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
         microFAB.setVisibility(GONE);
 
         surfaceView = (SurfaceView)findViewById(R.id.surface_remote_video);
+        rtcAudioManager = AppRTCAudioManager.create(getApplicationContext());
 
         //surfaceHolder = surfaceView.getHolder();
         //surfaceHolder.addCallback(this);
@@ -808,10 +811,12 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
                     break;
                 }
                 case MegaChatCall.CALL_STATUS_IN_PROGRESS:{
+                    rtcAudioManager.start(null);
                     if(callChat.hasVideo(false)){
                         log("Video remote connected");
                         renderer = new ViESurfaceRenderer(surfaceView);
                         surfaceView.setVisibility(View.VISIBLE);
+
                     }
                     else{
                         log("Video remote NOT connected");
@@ -820,6 +825,7 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
                     break;
                 }
                 case MegaChatCall.CALL_STATUS_DESTROYED:{
+                    rtcAudioManager.stop();
                     finish();
                     break;
                 }
