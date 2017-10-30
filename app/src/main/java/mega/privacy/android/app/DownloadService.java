@@ -81,6 +81,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	public static String DB_FOLDER = "1";
 
 	private int errorCount = 0;
+	private int alreadyDownloaded = 0;
 
 	private boolean isForeground = false;
 	private boolean canceled;
@@ -324,6 +325,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
         if(!checkCurrentFile(currentDocument)){
             log("checkCurrentFile == false");
 
+			alreadyDownloaded++;
             if ((megaApi.getNumPendingDownloads() == 0) && (megaApiFolder.getNumPendingDownloads() == 0)){
                 onQueueComplete();
             }
@@ -453,6 +455,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			megaApiFolder.resetTotalDownloads();
 			megaApiFolder.resetTotalUploads();
 			errorCount = 0;
+			alreadyDownloaded = 0;
 		}
 	}
 
@@ -501,15 +504,32 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		String notificationTitle, size;
 
         int totalDownloads = megaApi.getTotalDownloads() + megaApiFolder.getTotalDownloads();
-        notificationTitle = getResources().getQuantityString(R.plurals.download_service_final_notification, totalDownloads, totalDownloads);
 
-        if (errorCount > 0){
-            size = getResources().getQuantityString(R.plurals.download_service_failed, errorCount, errorCount);
-        }
-        else{
-            String totalBytes = Formatter.formatFileSize(DownloadService.this, megaApi.getTotalDownloadedBytes()+megaApiFolder.getTotalDownloadedBytes());
-            size = getString(R.string.general_total_size, totalBytes);
-        }
+		if(alreadyDownloaded>0 && errorCount>0){
+			int totalNumber = totalDownloads + errorCount + alreadyDownloaded;
+			notificationTitle = getResources().getQuantityString(R.plurals.download_service_final_notification_with_details, totalNumber, totalDownloads, totalNumber);
+
+			String copiedString = getResources().getQuantityString(R.plurals.already_downloaded_service, alreadyDownloaded, alreadyDownloaded);;
+			String errorString = getResources().getQuantityString(R.plurals.upload_service_failed, errorCount, errorCount);
+			size = copiedString+", "+errorString;
+		}
+		else if(alreadyDownloaded>0){
+			int totalNumber = totalDownloads + alreadyDownloaded;
+			notificationTitle = getResources().getQuantityString(R.plurals.download_service_final_notification_with_details, totalNumber, totalDownloads, totalNumber);
+
+			size = getResources().getQuantityString(R.plurals.already_downloaded_service, alreadyDownloaded, alreadyDownloaded);
+		}
+		else if(errorCount>0){
+			int totalNumber = totalDownloads + errorCount;
+			notificationTitle = getResources().getQuantityString(R.plurals.download_service_final_notification_with_details, totalNumber, totalDownloads, totalNumber);
+
+			size = getResources().getQuantityString(R.plurals.download_service_failed, errorCount, errorCount);
+		}
+		else{
+			notificationTitle = getResources().getQuantityString(R.plurals.download_service_final_notification, totalDownloads, totalDownloads);
+			String totalBytes = Formatter.formatFileSize(DownloadService.this, megaApi.getTotalDownloadedBytes()+megaApiFolder.getTotalDownloadedBytes());
+			size = getString(R.string.general_total_size, totalBytes);
+		}
 
 		Intent intent = null;
 		if(totalDownloads != 1)
@@ -1680,7 +1700,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 					boolean chatEnabled = Boolean.parseBoolean(chatSettings.getEnabled());
 					if(chatEnabled){
 						log("Chat enabled-->connect");
-						megaChatApi.connect(this);
+						megaChatApi.connectInBackground(this);
 						isLoggingIn = false;
 						MegaApplication.setLoggingIn(isLoggingIn);
 					}
@@ -1781,6 +1801,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 			if(e.getErrorCode()==MegaChatError.ERROR_OK){
 				log("Connected to chat!");
+                MegaApplication.setChatConnection(true);
 			}
 			else{
 				log("EEEERRRRROR WHEN CONNECTING " + e.getErrorString());

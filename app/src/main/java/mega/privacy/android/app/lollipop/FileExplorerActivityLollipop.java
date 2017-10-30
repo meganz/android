@@ -183,6 +183,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			MegaApplication.setLoggingIn(false);
 			if(e.getErrorCode()==MegaChatError.ERROR_OK){
 				log("Connected to chat!");
+				MegaApplication.setChatConnection(true);
 			}
 			else{
 				log("ERROR WHEN CONNECTING " + e.getErrorString());

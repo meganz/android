@@ -59,6 +59,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 	public static final int CHECK_FILE_TO_UPLOAD_SAME_FILE_IN_FOLDER = 1003;
 	
 	private int errorCount = 0;
+	private int copiedCount = 0;
 	
 	private boolean isForeground = false;
 	private boolean canceled;
@@ -203,6 +204,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 				}
 				case CHECK_FILE_TO_UPLOAD_COPY:{
 					log("CHECK_FILE_TO_UPLOAD_COPY");
+					copiedCount++;
 					break;
 				}
 				case CHECK_FILE_TO_UPLOAD_OVERWRITE:{
@@ -306,6 +308,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 			megaApi.resetTotalUploads();
 			megaApi.resetTotalDownloads();
 			errorCount = 0;
+			copiedCount = 0;
 		}
 
 		log("stopping service!!!!!!!!!!:::::::::::::::!!!!!!!!!!!!");
@@ -336,7 +339,15 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 		int totalUploads = megaApi.getTotalUploads();
 		notificationTitle = getResources().getQuantityString(R.plurals.upload_service_final_notification, totalUploads, totalUploads);
 
-		if (errorCount > 0){
+		if(copiedCount>0 && errorCount>0){
+			String copiedString = getResources().getQuantityString(R.plurals.copied_service_upload, copiedCount, copiedCount);;
+			String errorString = getResources().getQuantityString(R.plurals.upload_service_failed, errorCount, errorCount);
+			size = copiedString+", "+errorString;
+		}
+		else if(copiedCount>0){
+			size = getResources().getQuantityString(R.plurals.copied_service_upload, copiedCount, copiedCount);
+		}
+		else if(errorCount>0){
 			size = getResources().getQuantityString(R.plurals.upload_service_failed, errorCount, errorCount);
 		}
 		else{
