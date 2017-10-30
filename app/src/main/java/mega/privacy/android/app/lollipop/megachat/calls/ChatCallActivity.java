@@ -56,8 +56,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.webrtc.videoengine.ViESurfaceRenderer;
-
 import java.io.File;
 import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
@@ -140,7 +138,7 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
 
     Camera camera;
     SurfaceView surfaceView;
-    ViESurfaceRenderer renderer;
+    MegaSurfaceRenderer renderer;
     SurfaceHolder surfaceHolder;
     AudioManager audioManager;
     MediaPlayer thePlayer;
@@ -288,6 +286,7 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
         microFAB.setVisibility(GONE);
 
         surfaceView = (SurfaceView)findViewById(R.id.surface_remote_video);
+        renderer = new MegaSurfaceRenderer(surfaceView);
         rtcAudioManager = AppRTCAudioManager.create(getApplicationContext());
 
         //surfaceHolder = surfaceView.getHolder();
@@ -352,7 +351,6 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
                 if(callStatus!=MegaChatCall.CALL_STATUS_RING_IN){
                     if(callChat.hasVideo(false)){
                         log("Video remote connected");
-                        renderer = new ViESurfaceRenderer(surfaceView);
                         surfaceView.setVisibility(View.VISIBLE);
                     }
                     else{
@@ -814,7 +812,6 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
                     rtcAudioManager.start(null);
                     if(callChat.hasVideo(false)){
                         log("Video remote connected");
-                        renderer = new ViESurfaceRenderer(surfaceView);
                         surfaceView.setVisibility(View.VISIBLE);
 
                     }
@@ -837,7 +834,6 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
             if(call.getStatus()!=MegaChatCall.CALL_STATUS_RING_IN){
                 if(callChat.hasVideo(false)){
                     log("Video remote connected");
-                    renderer = new ViESurfaceRenderer(surfaceView);
                     surfaceView.setVisibility(View.VISIBLE);
                 }
                 else{
