@@ -890,12 +890,27 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         display.getMetrics(outMetrics);
         float density  = getResources().getDisplayMetrics().density;
 
+
         int avatarTextSize = getAvatarTextSize(density);
         log("DENSITY: " + density + ":::: " + avatarTextSize);
 
-        initialLetter.setTextColor(Color.WHITE);
-        initialLetter.setVisibility(View.VISIBLE);
-        initialLetter.setTextSize(24);
+
+        String firstLetter = initialLetter.getText().toString();
+
+        if(firstLetter.trim().isEmpty()){
+            initialLetter.setVisibility(View.INVISIBLE);
+        }
+        else{
+            if(firstLetter.equals("(")){
+                initialLetter.setVisibility(View.INVISIBLE);
+            }
+            else{
+                initialLetter.setText(firstLetter);
+                initialLetter.setTextColor(Color.WHITE);
+                initialLetter.setVisibility(View.VISIBLE);
+                initialLetter.setTextSize(24);
+            }
+        }
     }
 
     private int getAvatarTextSize (float density){
