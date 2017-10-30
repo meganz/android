@@ -837,7 +837,10 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
                 }
                 else{
                     log("Video remote NOT connected");
-                    surfaceView.setVisibility(View.GONE);
+                    // This seems to break the view
+                    // It seems that it doesn't work when it becomes visible again
+                    // It could be easier to show / hide the avatar on top instead
+                    //surfaceView.setVisibility(View.GONE);
                 }
             }
         }
