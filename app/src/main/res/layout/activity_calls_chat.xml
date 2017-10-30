@@ -23,6 +23,14 @@
 
                 <!-- Background -->
 
+                <SurfaceView
+                    android:id="@+id/surface_remote_video"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_alignParentTop="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignParentEnd="true" />
+
                 <RelativeLayout
                     android:id="@+id/call_chat_contact_image_layout"
                     android:layout_width="match_parent"
@@ -63,16 +71,6 @@
                             android:visibility="gone"/>
                     </RelativeLayout>
 
-
-
-                    <SurfaceView
-                        android:id="@+id/surface_remote_video"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_alignParentTop="true"
-                        android:layout_alignParentRight="true"
-                        android:layout_alignParentEnd="true" />
-
                 </RelativeLayout>
 
                 <!-- Toolbar -->
@@ -86,19 +84,17 @@
                     app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
                     android:fitsSystemWindows="true"/>
 
-                <SurfaceView
-                    android:id="@+id/surfaceView1"
-                    android:layout_width="60dp"
-                    android:layout_height="90dp"
+                <FrameLayout
+                    android:id="@+id/fragment_container_local_camera"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:layout_above="@+id/linear_buttons"
                     android:layout_alignParentRight="true"
                     android:layout_marginRight="20dp"
                     android:layout_marginBottom="25dp"
-                    android:visibility="gone"/>
-
+                    app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
 
                 <!-- My avatar -->
-
                 <RelativeLayout
                     android:id="@+id/call_chat_my_image_layout"
                     android:layout_width="wrap_content"
@@ -107,26 +103,13 @@
                     android:layout_alignParentRight="true"
                     android:layout_marginRight="20dp"
                     android:layout_marginBottom="25dp"
-                    android:background="@android:color/transparent"
-                    android:visibility="visible">
-
-                    <RelativeLayout
-                        android:id="@+id/call_chat_my_video"
-                        android:layout_width="60dp"
-                        android:layout_height="90dp"
-                        android:background="@drawable/shape_call_chat_video"
-                        android:visibility="gone">
-
-                    </RelativeLayout>
-
-
+                    android:background="@android:color/transparent">
 
                     <RelativeLayout
                         android:id="@+id/call_chat_my_image_rl"
                         android:layout_width="80dp"
                         android:layout_height="80dp"
                         android:background="@drawable/shape_call_chat">
-
 
                         <mega.privacy.android.app.components.RoundedImageView
                             android:id="@+id/call_chat_my_image"
@@ -146,9 +129,6 @@
                             android:gravity="center_horizontal|center_vertical"
                             android:paddingBottom="3dp" />
                     </RelativeLayout>
-
-
-
 
                 </RelativeLayout>
 
@@ -226,8 +206,6 @@
                         app:elevation="6dp"
                         app:fabSize="normal"
                         app:pressedTranslationZ="12dp" />
-
-
                 </LinearLayout>
 
 
