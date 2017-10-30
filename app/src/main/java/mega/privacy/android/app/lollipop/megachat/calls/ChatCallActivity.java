@@ -634,7 +634,6 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
         ((MegaApplication) getApplication()).sendSignalPresenceActivity();
     }
     @Override public void onDestroy(){
-        super.onDestroy();
         if (camera != null) {
             camera.stopPreview();
             camera.release();
@@ -644,8 +643,8 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
         if (megaChatApi != null) {
             megaChatApi.removeChatCallListener(this);
             megaChatApi.removeChatVideoListener(this);
-
         }
+        super.onDestroy();
     }
 
 
