@@ -1,15 +1,8 @@
 package mega.privacy.android.app.lollipop.megachat.calls;
 
 import android.Manifest;
-import android.animation.Animator;
 import android.annotation.SuppressLint;
-import android.app.Activity;
-import android.app.ActivityManager;
-import android.app.KeyguardManager;
-import android.app.admin.DevicePolicyManager;
-import android.content.ComponentName;
 import android.content.Context;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
@@ -17,7 +10,6 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.hardware.Camera;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -29,10 +21,8 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.PowerManager;
-import android.os.SystemClock;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
@@ -40,35 +30,31 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.view.Display;
-import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
-import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.view.animation.AnimationUtils;
-import android.view.animation.Interpolator;
-import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.io.File;
-import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Locale;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
-import mega.privacy.android.app.lollipop.PhoneContactsActivityLollipop;
 import mega.privacy.android.app.lollipop.PinActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
 import mega.privacy.android.app.utils.Constants;
@@ -104,6 +90,7 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
     String myUserMail;
     long chatId;
     long callId;
+    boolean isVideoOutgoing;
     MegaChatRoom chat;
     MegaChatCall callChat;
     private MegaApiAndroid megaApi = null;
@@ -118,8 +105,12 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
     Toolbar tB;
     ActionBar aB;
 
+    Timer timer;
+    MyTimerTask myTimerTask;
+    long milliseconds = 0;
+
     //my avatar
-    RelativeLayout callChatMyVideo;
+    RelativeLayout myAvatarLayout;
     RelativeLayout myImageBorder;
     RoundedImageView myImage;
     TextView myInitialLetter;
@@ -134,8 +125,7 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
 
     static ChatCallActivity chatCallActivityActivity = null;
 
-    private MenuItem firstIcon;
-    private MenuItem secondIcon;
+    private MenuItem remoteAudioIcon;
 
     FloatingActionButton videoFAB;
     FloatingActionButton microFAB;
@@ -147,7 +137,7 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
     AudioManager audioManager;
     MediaPlayer thePlayer;
 
-    FrameLayout fragmentContainer;
+    FrameLayout fragmentContainerLocalCamera;
 
     String fullName = "";
     String email = "";
@@ -162,34 +152,6 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
 
     AppRTCAudioManager rtcAudioManager;
 
-//    private class LocalVideoDataListener implements MegaChatVideoListenerInterface{
-//
-//        Context context;
-//
-//        int width = 0;
-//        int height = 0;
-//        Bitmap bitmap;
-//
-//        public LocalVideoDataListener(Context context) {
-//            this.context = context;
-//        }
-//
-//        @Override
-//        public void onChatVideoData(MegaChatApiJava api, long chatid, int width, int height, byte[] byteBuffer) {
-//            if (this.width != width || this.height != height)
-//            {
-//                this.width = width;
-//                this.height = height;
-//                this.bitmap = localRenderer.CreateBitmap(width, height);
-//            }
-//
-//            bitmap.copyPixelsFromBuffer(ByteBuffer.wrap(byteBuffer));
-//
-//            log("Local data - DrawBitmap");
-//            localRenderer.DrawBitmap();
-//        }
-//    }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         log("onCreateOptionsMenu");
@@ -197,15 +159,23 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.activity_calls_chat, menu);
 
-        firstIcon = menu.findItem(R.id.action_first_icon);
-        secondIcon = menu.findItem(R.id.action_second_icon);
-
         return super.onCreateOptionsMenu(menu);
     }
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         log("onPrepareOptionsMenu");
+
+        remoteAudioIcon = menu.findItem(R.id.info_remote_audio);
+        if(callChat.hasAudio(false)){
+            log("Audio remote connected");
+            remoteAudioIcon.setIcon(ContextCompat.getDrawable(this, R.drawable.ic_volume_up_white));
+        }
+        else{
+            log("Audio remote NOT connected");
+            remoteAudioIcon.setIcon(ContextCompat.getDrawable(this, R.drawable.ic_volume_off_white));
+        }
+
         return super.onPrepareOptionsMenu(menu);
     }
 
@@ -220,14 +190,6 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
                 log("Hang call");
                 megaChatApi.hangChatCall(chatId, null);
                 finish();
-                break;
-            }
-            case R.id.action_first_icon: {
-
-                break;
-            }
-            case R.id.action_second_icon: {
-
                 break;
             }
         }
@@ -248,7 +210,6 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
         density = getResources().getDisplayMetrics().density;
         appBarLayout = (AppBarLayout) findViewById(R.id.app_bar);
 
-
         scaleW = Util.getScaleW(outMetrics, density);
         scaleH = Util.getScaleH(outMetrics, density);
 
@@ -268,7 +229,6 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
         }
 
         megaChatApi.addChatCallListener(this);
-        megaChatApi.addChatRemoteVideoListener(this);
 
         myUser = megaApi.getMyUser();
 
@@ -318,11 +278,12 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
         microFAB.setVisibility(GONE);
 
         remoteSurfaceView = (SurfaceView)findViewById(R.id.surface_remote_video);
+        remoteSurfaceView.setOnTouchListener(this);
         remoteRenderer = new MegaSurfaceRenderer(remoteSurfaceView);
         rtcAudioManager = AppRTCAudioManager.create(getApplicationContext());
 
-        fragmentContainer = (FrameLayout) findViewById(R.id.fragment_container_local_camera);
-        fragmentContainer.setVisibility(View.GONE);
+        fragmentContainerLocalCamera = (FrameLayout) findViewById(R.id.fragment_container_local_camera);
+        fragmentContainerLocalCamera.setVisibility(View.GONE);
 
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
@@ -334,7 +295,7 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
                 window.setStatusBarColor(ContextCompat.getColor(this, R.color.very_transparent_black));
             }
 
-            callChatMyVideo = (RelativeLayout) findViewById(R.id.call_chat_my_image_layout);
+            myAvatarLayout = (RelativeLayout) findViewById(R.id.call_chat_my_image_layout);
             myImage = (RoundedImageView) findViewById(R.id.call_chat_my_image);
             myImageBorder = (RelativeLayout) findViewById(R.id.call_chat_my_image_rl);
 
@@ -342,14 +303,17 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
 
             contactAvatarLayout = (RelativeLayout) findViewById(R.id.call_chat_contact_image_layout);
             contactAvatarLayout.setOnTouchListener(this);
-            contactImageBorder = (RelativeLayout) findViewById(R.id.call_chat_contact_image_rl);
             contactImage = (RoundedImageView) findViewById(R.id.call_chat_contact_image);
             contactInitialLetter = (TextView) findViewById(R.id.call_chat_contact_image_initial_letter);
 
             setProfileMyAvatar();
 
+            contactAvatarLayout.setVisibility(View.VISIBLE);
+            videoFAB.setBackgroundTintList(ColorStateList.valueOf(Color.BLACK));
+
             //Contact's avatar
             chatId = extras.getLong("chatHandle", -1);
+            isVideoOutgoing =  extras.getBoolean("isVideo", false);
             log("Chat handle to call: " + chatId);
             if (chatId != -1) {
                 chat = megaChatApi.getChatRoom(chatId);
@@ -357,40 +321,22 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
 
                 int callStatus = callChat.getStatus();
                 log("The status of the callChat is: " + callStatus);
-                switch (callStatus) {
-                    case MegaChatCall.CALL_STATUS_IN_PROGRESS: {
-                        break;
-                    }
-                    case MegaChatCall.CALL_STATUS_RING_IN:{
 
-                        audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-                        thePlayer = MediaPlayer.create(getApplicationContext(), RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE));
-                        this.setVolumeControlStream(AudioManager.STREAM_MUSIC);
-                        this.setVolumeControlStream(AudioManager.STREAM_RING);
-                        this.setVolumeControlStream(AudioManager.STREAM_ALARM);
-                        this.setVolumeControlStream(AudioManager.STREAM_NOTIFICATION);
-                        this.setVolumeControlStream(AudioManager.STREAM_SYSTEM);
-                        this.setVolumeControlStream(AudioManager.STREAM_VOICE_CALL);
-
-                        thePlayer.start();
-                    }
-                }
-
-                if(callStatus!=MegaChatCall.CALL_STATUS_RING_IN){
-                    if(callChat.hasVideo(false)){
-                        log("Video remote connected");
-//                        surfaceView.setVisibility(View.VISIBLE);
-                        contactAvatarLayout.setVisibility(View.GONE);
-                    }
-                    else{
-                        log("Video remote NOT connected");
-//                        surfaceView.setVisibility(View.GONE);
-                        contactAvatarLayout.setVisibility(View.VISIBLE);
-                    }
+                if(callStatus==MegaChatCall.CALL_STATUS_RING_IN){
+                    log("Incoming call");
+                    audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+                    thePlayer = MediaPlayer.create(getApplicationContext(), RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE));
+                    this.setVolumeControlStream(AudioManager.STREAM_MUSIC);
+                    this.setVolumeControlStream(AudioManager.STREAM_RING);
+                    this.setVolumeControlStream(AudioManager.STREAM_ALARM);
+                    this.setVolumeControlStream(AudioManager.STREAM_NOTIFICATION);
+                    this.setVolumeControlStream(AudioManager.STREAM_SYSTEM);
+                    this.setVolumeControlStream(AudioManager.STREAM_VOICE_CALL);
+//
+                    thePlayer.start();
                 }
                 else{
-//                    surfaceView.setVisibility(View.GONE);
-                    contactAvatarLayout.setVisibility(View.VISIBLE);
+                    log("Outgoing call");
                 }
 
                 fullName = chat.getPeerFullname(0);
@@ -410,14 +356,13 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
                 }
 
                 aB.setTitle(fullName);
-                aB.setSubtitle("01:20");
 
                 setUserProfileAvatar(userHandle, fullName);
             }
         }
 
         if(checkPermissions()){
-            showFABs();
+            showInitialFABConfiguration();
         }
     }
 
@@ -594,7 +539,7 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
                 hideFABs();
             }else{
                 showActionBar();
-                showFABs();
+                showInitialFABConfiguration();
             }
             //if(videoFAB.isShown()){
             //    hideFabButton();
@@ -666,6 +611,10 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
             megaChatApi.removeChatCallListener(this);
             megaChatApi.removeChatVideoListener(this);
         }
+        if (timer!=null){
+            timer.cancel();
+            timer = null;
+        }
         super.onDestroy();
     }
 
@@ -733,13 +682,13 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
 //                else if(request.getParamType()==MegaChatRequest.VIDEO){
 //                    if(request.getFlag()==true){
 //                        log("Enable video");
-//                        callChatMyVideo.setVisibility(View.VISIBLE);
+//                        myAvatarLayout.setVisibility(View.VISIBLE);
 //                        myImageBorder.setVisibility(GONE);
 //                        videoFAB.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.accentColor)));
 //                    }
 //                    else{
 //                        log("Disable video");
-//                        callChatMyVideo.setVisibility(GONE);
+//                        myAvatarLayout.setVisibility(GONE);
 //                        myImageBorder.setVisibility(View.VISIBLE);
 //                        videoFAB.setBackgroundTintList(ColorStateList.valueOf(Color.BLACK));
 //                    }
@@ -766,30 +715,19 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
             int callStatus = callChat.getStatus();
             log("The status of the call is: " + callStatus);
             switch (callStatus){
-                case MegaChatCall.CALL_STATUS_RING_IN:{
+                case MegaChatCall.CALL_STATUS_IN_PROGRESS:{
                     if(thePlayer!=null){
                         thePlayer.stop();
+                        thePlayer.release();
+                        thePlayer=null;
                     }
-                    break;
-                }
-                case MegaChatCall.CALL_STATUS_IN_PROGRESS:{
+
                     rtcAudioManager.start(null);
-                    if(callChat.hasVideo(false)){
-                        log("Video remote connected");
-                        contactAvatarLayout.setVisibility(View.GONE);
 
-                    }
-                    else{
-                        log("Video remote NOT connected");
-                        contactAvatarLayout.setVisibility(View.VISIBLE);
-                    }
-
-                    if(callChat.hasVideo(true)){
-                        log("Video local connected");
-
-                    }
-                    else{
-                        log("Video local NOT connected");
+                    showInitialFABConfiguration();
+                    startClock();
+                    if(isVideoOutgoing){
+                        updateLocalVideoStatus();
                     }
                     break;
                 }
@@ -799,65 +737,16 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
                     break;
                 }
             }
-            showFABs();
         }
         else if(call.hasChanged(MegaChatCall.CHANGE_TYPE_REMOTE_AVFLAGS)){
-            log("Call remote flags has changed");
-            if(call.getStatus()!=MegaChatCall.CALL_STATUS_RING_IN){
-                if(callChat.hasVideo(false)){
-                    log("Video remote connected");
-//                    surfaceView.setVisibility(View.VISIBLE);
-                    contactAvatarLayout.setVisibility(View.GONE);
-                }
-                else{
-                    log("Video remote NOT connected");
-                    // This seems to break the view
-                    // It seems that it doesn't work when it becomes visible again
-                    // It could be easier to show / hide the avatar on top instead
-                    //surfaceView.setVisibility(View.GONE);
-                    contactAvatarLayout.setVisibility(View.VISIBLE);
-                }
-            }
+            log("Remote flags have changed");
+            updateRemoteVideoStatus();
+            updateRemoteAudioStatus();
         }
         else if(call.hasChanged(MegaChatCall.CHANGE_TYPE_LOCAL_AVFLAGS)){
-
-            if(callChat.hasVideo(true)){
-                log("Video local connected");
-                callChatMyVideo.setVisibility(GONE);
-                videoFAB.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.accentColor)));
-
-                localCameraFragment = new LocalCameraCallFragment();
-                fragmentContainer.setVisibility(View.VISIBLE);
-
-                FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-                ft.replace(R.id.fragment_container_local_camera, localCameraFragment, "localCameraFragment");
-                ft.commitNow();
-
-            }
-            else{
-                log("Video local NOT connected");
-                fragmentContainer.setVisibility(View.GONE);
-                if(localCameraFragment!=null){
-                    localCameraFragment.setVideoFrame(false);
-
-
-                    FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-                    ft.remove(localCameraFragment);
-                    localCameraFragment = null;
-                }
-
-                callChatMyVideo.setVisibility(View.VISIBLE);
-                videoFAB.setBackgroundTintList(ColorStateList.valueOf(Color.BLACK));
-            }
-
-            if(callChat.hasAudio(true)){
-                log("Audio local connected");
-                microFAB.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.accentColor)));
-            }
-            else{
-                log("Audio local NOT connected");
-                microFAB.setBackgroundTintList(ColorStateList.valueOf(Color.BLACK));
-            }
+            log("Local flags have changed");
+            updateLocalAudioStatus();
+            updateLocalVideoStatus();
         }
     }
 
@@ -1004,9 +893,8 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
         return true;
     }
 
-    public void showFABs(){
+    public void showInitialFABConfiguration(){
         if(callChat.getStatus()==MegaChatCall.CALL_STATUS_RING_IN){
-
             answerCallFAB.show();
             answerCallFAB.setVisibility(View.VISIBLE);
             answerCallFAB.setOnClickListener(this);
@@ -1030,6 +918,65 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
         }
     }
 
+    public void updateLocalVideoStatus(){
+        if(callChat.hasVideo(true)){
+            log("Video local connected");
+            myAvatarLayout.setVisibility(GONE);
+            videoFAB.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.accentColor)));
+
+            localCameraFragment = new LocalCameraCallFragment();
+            fragmentContainerLocalCamera.setVisibility(View.VISIBLE);
+
+            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            ft.replace(R.id.fragment_container_local_camera, localCameraFragment, "localCameraFragment");
+            ft.commitNow();
+        }
+        else{
+            log("Video local NOT connected");
+            fragmentContainerLocalCamera.setVisibility(View.GONE);
+            if(localCameraFragment!=null){
+                localCameraFragment.setVideoFrame(false);
+
+                FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+                ft.remove(localCameraFragment);
+                localCameraFragment = null;
+            }
+
+            myAvatarLayout.setVisibility(View.VISIBLE);
+            videoFAB.setBackgroundTintList(ColorStateList.valueOf(Color.BLACK));
+        }
+    }
+
+    public void updateLocalAudioStatus(){
+        if(callChat.hasAudio(true)){
+            log("Audio local connected");
+            microFAB.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.accentColor)));
+        }
+        else{
+            log("Audio local NOT connected");
+            microFAB.setBackgroundTintList(ColorStateList.valueOf(Color.BLACK));
+        }
+    }
+
+    public void updateRemoteVideoStatus(){
+        if(callChat.hasVideo(false)){
+            log("Video remote connected");
+            contactAvatarLayout.setVisibility(View.GONE);
+            remoteSurfaceView.setOnTouchListener(this);
+            megaChatApi.addChatRemoteVideoListener(this);
+        }
+        else{
+            log("Video remote NOT connected");
+            contactAvatarLayout.setVisibility(View.VISIBLE);
+            remoteSurfaceView.setOnTouchListener(null);
+            megaChatApi.removeChatVideoListener(this);
+        }
+    }
+
+    public void updateRemoteAudioStatus(){
+        supportInvalidateOptionsMenu();
+    }
+
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         log("onRequestPermissionsResult");
@@ -1039,7 +986,7 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
                 log("REQUEST_CAMERA");
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     if(checkPermissions()){
-                       showFABs();
+                       showInitialFABConfiguration();
                     }
                 }
                 break;
@@ -1048,7 +995,7 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
                 log("RECORD_AUDIO");
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     if(checkPermissions()){
-                        showFABs();
+                        showInitialFABConfiguration();
                     }
                 }
                 break;
@@ -1079,5 +1026,58 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {}
 
+    private void startClock(){
+//        Thread t = new Thread() {
+//
+//            @Override
+//            public void run() {
+//                try {
+//                    while (!isInterrupted()) {
+//                        Thread.sleep(1000);
+//                        runOnUiThread(new Runnable() {
+//                            @Override
+//                            public void run() {
+//                                Calendar c = Calendar.getInstance();
+//
+//                                int hours = c.get(Calendar.HOUR_OF_DAY);
+//                                int minutes = c.get(Calendar.MINUTE);
+//                                int seconds = c.get(Calendar.SECOND);
+//
+//                                String curTime = String.format("%02d  %02d  %02d", hours, minutes, seconds);
+//                                aB.setSubtitle(curTime); //change clock to your textview
+//                            }
+//                        });
+//                    }
+//                } catch (InterruptedException e) {
+//                }
+//            }
+//        };
+//
+//        t.start();
+
+        timer = new Timer();
+        myTimerTask = new MyTimerTask();
+
+        timer.schedule(myTimerTask, 0, 1000);
+
+    }
+
+    private class MyTimerTask extends TimerTask {
+
+        @Override
+        public void run() {
+            milliseconds = milliseconds +1000;
+            SimpleDateFormat formatter = new SimpleDateFormat("mm:ss", Locale.getDefault());
+            final String strDate = formatter.format(new Date(milliseconds));
+
+            runOnUiThread(new Runnable(){
+
+                @Override
+                public void run() {
+                    aB.setSubtitle(strDate);
+                }});
+        }
+
+    }
 
 }
