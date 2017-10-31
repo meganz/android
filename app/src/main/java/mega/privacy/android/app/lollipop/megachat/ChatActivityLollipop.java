@@ -2052,12 +2052,19 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                             MegaNodeList nodeList = m.getMessage().getMegaNodeList();
                             if(nodeList.size()==1){
                                 MegaNode node = nodeList.get(0);
-                                if(node.hasPreview()){
-                                    log("Show full screen viewer");
-                                    showFullScreenViewer(m.getMessage().getMsgId());
+
+                                if (MimeTypeList.typeForName(node.getName()).isImage()){
+                                    if(node.hasPreview()){
+                                        log("Show full screen viewer");
+                                        showFullScreenViewer(m.getMessage().getMsgId());
+                                    }
+                                    else{
+                                        log("Image without preview - show node attachment panel for one node");
+                                        showNodeAttachmentBottomSheet(m, position);
+                                    }
                                 }
                                 else{
-                                    log("show node attachment panel for one node");
+                                    log("NOT Image - show node attachment panel for one node");
                                     showNodeAttachmentBottomSheet(m, position);
                                 }
                             }
