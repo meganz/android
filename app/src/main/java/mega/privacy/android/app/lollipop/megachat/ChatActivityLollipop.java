@@ -3709,8 +3709,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         else if(request.getType() == MegaChatRequest.TYPE_START_CHAT_CALL){
             if(e.getErrorCode()==MegaChatError.ERROR_OK){
                 log("TYPE_START_CHAT_CALL finished with success");
+                //getFlag - Returns true if it is a video-audio call or false for audio call
                 Intent i = new Intent(this, ChatCallActivity.class);
                 i.putExtra("chatHandle", chatRoom.getChatId());
+                i.putExtra("isVideo", request.getFlag());
                 startActivity(i);
             }
             else{
