@@ -167,6 +167,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
             result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
         } else {
             result = Html.fromHtml(textToShow);
+
         }
 
         emptyTextViewInvite.setText(result);
