@@ -29,36 +29,40 @@
         android:layout_below="@id/offline_content_grid_text_layout"
         android:columnWidth="172dp"/>
 
-    <ImageView
-        android:id="@+id/offline_empty_image_grid"
+    <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
         android:layout_centerInParent="true"
-        android:gravity="center_horizontal" />
+        android:gravity="center_horizontal">
 
-    <LinearLayout
-        android:id="@+id/offline_empty_text_grid"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_below="@id/offline_empty_image_grid"
-        android:layout_marginTop="@dimen/standard_margin"
-        android:layout_centerHorizontal="true">
-        <TextView
-            android:id="@+id/offline_empty_text_grid_first"
+        <ImageView
+            android:id="@+id/offline_empty_image_grid"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="@color/text_secondary"
-            android:fontFamily="sans-serif"
-            android:textSize="18sp"/>
-        <TextView
-            android:id="@+id/offline_empty_text_grid_second"
+            android:layout_centerHorizontal="true"/>
+
+        <LinearLayout
+            android:id="@+id/offline_empty_text_grid"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:fontFamily="sans-serif"
-            android:textColor="@color/black"
-            android:textSize="18sp"/>
-    </LinearLayout>
+            android:orientation="horizontal"
+            android:layout_below="@id/offline_empty_image_grid"
+            android:layout_centerHorizontal="true">
+            <TextView
+                android:id="@+id/offline_empty_text_grid_first"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/text_secondary"
+                android:fontFamily="sans-serif"
+                android:textSize="18sp"/>
+            <TextView
+                android:id="@+id/offline_empty_text_grid_second"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif"
+                android:textColor="@color/black"
+                android:textSize="18sp"/>
+        </LinearLayout>
+    </RelativeLayout>
 
 </RelativeLayout>
