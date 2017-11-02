@@ -199,17 +199,11 @@ public class OfflineFragmentLollipop extends Fragment{
 					break;
 				}
 				case R.id.cab_menu_delete:{
-					NodeController nC = new NodeController(context);
-					for (int i=0;i<documents.size();i++){
-						nC.deleteOffline(documents.get(i), pathNavigation);
-					}					
-
-					refreshPaths(documents.get(0));
+					((ManagerActivityLollipop) context).showConfirmationRemoveSomeFromOffline(documents);
 					break;
 				}
 				case R.id.cab_menu_select_all:{
 					((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_RED);
-
 					selectAll();
 					break;
 				}
@@ -1492,8 +1486,8 @@ public class OfflineFragmentLollipop extends Fragment{
 		else{
 			pathNavigation="/";
 		}		
-	}	
-	
+	}
+
 	public void setPathNavigation(String _pathNavigation){
 		log("setPathNavigation: "+pathNavigation);
 		this.pathNavigation = _pathNavigation;

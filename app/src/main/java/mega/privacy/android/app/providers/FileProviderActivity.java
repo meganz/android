@@ -916,6 +916,7 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 
 			if(e.getErrorCode()==MegaChatError.ERROR_OK){
 				log("Connected to chat!");
+				MegaApplication.setChatConnection(true);
 			}
 			else{
 				log("ERROR WHEN CONNECTING " + e.getErrorString());

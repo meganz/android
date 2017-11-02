@@ -19,6 +19,8 @@ import java.util.Properties;
 import java.util.StringTokenizer;
 import java.util.TimeZone;
 
+import mega.privacy.android.app.lollipop.managerSections.FileBrowserFragmentLollipop;
+import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
@@ -26,6 +28,8 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaTransferListenerInterface;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Handler;
 import android.webkit.MimeTypeMap;
 import android.widget.Toast;
@@ -107,6 +111,7 @@ public class MegaProxyServer
 	MegaApiAndroid megaApiFolder;
 	ServerSocket myServerSocket;
 	Thread myThread;
+	Context context;
 	
 	boolean folderLink = false;
 	
@@ -114,11 +119,12 @@ public class MegaProxyServer
 	 * Starts a HTTP server to given port.<p>
 	 * Throws an IOException if the socket is already in use
 	 */
-	public MegaProxyServer( int port, MegaApiAndroid api, MegaApiAndroid apiFolder, MegaApplication app, Handler handler) throws IOException
+	public MegaProxyServer(int port, MegaApiAndroid api, MegaApiAndroid apiFolder, MegaApplication app, Handler handler, Context context) throws IOException
 	{
 		this.guiHandler = handler;
 		this.app = app;
 		this.megaApi = api;
+		this.context = context;
 		this.megaApiFolder = apiFolder;
 		myServerSocket = new ServerSocket( port );
 		myThread = new Thread( new Runnable()
@@ -432,7 +438,15 @@ public class MegaProxyServer
 			@Override
 			public void onTransferTemporaryError(MegaApiJava api, MegaTransfer transfer, MegaError e)
 			{
-				System.out.println("Temporary Error");
+				log("onTransferTemporaryError");
+
+                if(e.getErrorCode() == MegaError.API_EOVERQUOTA){
+                    log("API_EOVERQUOTA error!!");
+
+					Intent overquotaIntent = new Intent(context, MegaStreamingService.class);
+					overquotaIntent.setAction(MegaStreamingService.ACTION_OVERQUOTA_ERROR);
+					context.startService(overquotaIntent);
+                }
 			}
 
 			@Override
@@ -733,6 +747,10 @@ public class MegaProxyServer
 			}
 		});
 	}
+
+    public static void log(String log){
+        Util.log("MegaProxyServer", log);
+    }
 	
 	/**
 	 * GMT date formatter
