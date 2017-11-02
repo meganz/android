@@ -45,37 +45,40 @@
             android:visibility="gone" />
     </RelativeLayout>
 
-    <ImageView
-        android:id="@+id/file_grid_empty_image"
+    <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
         android:layout_centerInParent="true"
-        android:gravity="center_horizontal" />
+        android:gravity="center_horizontal">
+        <ImageView
+            android:id="@+id/file_grid_empty_image"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"/>
 
-    <LinearLayout
-        android:id="@+id/file_grid_empty_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_below="@id/file_grid_empty_image"
-        android:layout_marginTop="@dimen/standard_margin"
-        android:layout_centerHorizontal="true">
-        <TextView
-            android:id="@+id/file_grid_empty_text_first"
+        <LinearLayout
+            android:id="@+id/file_grid_empty_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="@color/text_secondary"
-            android:fontFamily="sans-serif"
-            android:textSize="18sp"/>
-        <TextView
-            android:id="@+id/file_grid_empty_text_second"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:fontFamily="sans-serif"
-            android:textColor="@color/black"
-            android:textSize="18sp"/>
-    </LinearLayout>
+            android:orientation="horizontal"
+            android:layout_below="@id/file_grid_empty_image"
+            android:layout_centerHorizontal="true">
+            <TextView
+                android:id="@+id/file_grid_empty_text_first"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/text_secondary"
+                android:fontFamily="sans-serif"
+                android:textSize="18sp"/>
+            <TextView
+                android:id="@+id/file_grid_empty_text_second"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif"
+                android:textColor="@color/black"
+                android:textSize="18sp"/>
+        </LinearLayout>
+    </RelativeLayout>
 
 
 

@@ -172,7 +172,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
         emptyTextViewInvite.setText(result);
 
         LinearLayout.LayoutParams emptyTextViewParams1 = (LinearLayout.LayoutParams)emptyTextViewInvite.getLayoutParams();
-        emptyTextViewParams1.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleHeightPx(50, outMetrics), Util.scaleWidthPx(20, outMetrics), Util.scaleHeightPx(24, outMetrics));
+        emptyTextViewParams1.setMargins(0, Util.scaleHeightPx(50, outMetrics), 0, Util.scaleHeightPx(24, outMetrics));
         emptyTextViewInvite.setLayoutParams(emptyTextViewParams1);
 
         LinearLayout.LayoutParams emptyTextViewParams2 = (LinearLayout.LayoutParams)emptyTextView.getLayoutParams();

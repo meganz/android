@@ -2,6 +2,7 @@ package mega.privacy.android.app.lollipop;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -47,8 +48,12 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 
 	RecyclerView listView;
 	LinearLayoutManager mLayoutManager;
+
 	ImageView emptyImageView;
-	TextView emptyTextView;
+	LinearLayout emptyTextView;
+	TextView emptyTextViewFirst;
+	TextView emptyTextViewSecond;
+
 	TextView contentText;
 	View separator;
 	Button optionButton;
@@ -125,10 +130,18 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 		contentText.setVisibility(View.GONE);
 
 		emptyImageView = (ImageView) v.findViewById(R.id.file_list_empty_image);
-		emptyTextView = (TextView) v.findViewById(R.id.file_list_empty_text);
+		emptyTextView = (LinearLayout) v.findViewById(R.id.file_list_empty_text);
+		emptyTextViewFirst = (TextView) v.findViewById(R.id.file_list_empty_text_first);
+		emptyTextViewSecond = (TextView) v.findViewById(R.id.file_list_empty_text_second);
 
-		emptyImageView.setImageResource(R.drawable.incoming_shares_empty);			
-		emptyTextView.setText(R.string.file_browser_empty_incoming_shares);
+		if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+			emptyImageView.setImageResource(R.drawable.incoming_empty_landscape);
+		}else{
+			emptyImageView.setImageResource(R.drawable.incoming_shares_empty);
+		}
+		emptyTextViewFirst.setText(R.string.context_empty_contacts);
+		String text = getString(R.string.context_empty_incoming);
+		emptyTextViewSecond.setText(" "+text+".");
 
 		parentHandle = ((FileExplorerActivityLollipop)context).parentHandleIncoming;
 
@@ -328,7 +341,7 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 		if (adapter.getItemCount() == 0){
 			listView.setVisibility(View.GONE);
 			emptyImageView.setImageResource(R.drawable.ic_empty_folder);
-			emptyTextView.setText(R.string.file_browser_empty_folder);
+			emptyTextViewFirst.setText(R.string.file_browser_empty_folder);
 			emptyImageView.setVisibility(View.VISIBLE);
 			emptyTextView.setVisibility(View.VISIBLE);
 		}
@@ -388,7 +401,7 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 			if (adapter.getItemCount() == 0){
 				listView.setVisibility(View.GONE);
 				emptyImageView.setImageResource(R.drawable.ic_empty_folder);
-				emptyTextView.setText(R.string.file_browser_empty_folder);
+				emptyTextViewFirst.setText(R.string.file_browser_empty_folder);
 				emptyImageView.setVisibility(View.VISIBLE);
 				emptyTextView.setVisibility(View.VISIBLE);
 				if (modeCloud == FileExplorerActivityLollipop.COPY){
@@ -462,8 +475,14 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 
 			separator.setVisibility(View.GONE);
 			optionsBar.setVisibility(View.GONE);
-			emptyImageView.setImageResource(R.drawable.incoming_shares_empty);
-			emptyTextView.setText(R.string.file_browser_empty_incoming_shares);
+			if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+				emptyImageView.setImageResource(R.drawable.incoming_empty_landscape);
+			}else{
+				emptyImageView.setImageResource(R.drawable.incoming_shares_empty);
+			}
+			emptyTextViewFirst.setText(R.string.context_empty_contacts);
+			String text = getString(R.string.context_empty_incoming);
+			emptyTextViewSecond.setText(" "+text+".");
 
 			if (adapter.getItemCount() != 0){
 				emptyImageView.setVisibility(View.GONE);
@@ -520,7 +539,7 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 				}
 				else{
 					emptyImageView.setImageResource(R.drawable.ic_empty_folder);
-					emptyTextView.setText(R.string.file_browser_empty_folder);
+					emptyTextViewFirst.setText(R.string.file_browser_empty_folder);
 					emptyImageView.setVisibility(View.VISIBLE);
 					emptyTextView.setVisibility(View.VISIBLE);
 					listView.setVisibility(View.GONE);
@@ -581,11 +600,17 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 				emptyImageView.setVisibility(View.VISIBLE);
 				emptyTextView.setVisibility(View.VISIBLE);
 				if (megaApi.getRootNode().getHandle()==parentHandle) {
-					emptyImageView.setImageResource(R.drawable.ic_empty_cloud_drive);
-					emptyTextView.setText(R.string.file_browser_empty_cloud_drive);
+					if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+						emptyImageView.setImageResource(R.drawable.incoming_empty_landscape);
+					}else{
+						emptyImageView.setImageResource(R.drawable.incoming_shares_empty);
+					}
+					emptyTextViewFirst.setText(R.string.context_empty_contacts);
+					String text = getString(R.string.context_empty_incoming);
+					emptyTextViewSecond.setText(" "+text+".");
 				} else {
 					emptyImageView.setImageResource(R.drawable.ic_empty_folder);
-					emptyTextView.setText(R.string.file_browser_empty_folder);
+					emptyTextViewFirst.setText(R.string.file_browser_empty_folder);
 				}
 			}
 			else{
