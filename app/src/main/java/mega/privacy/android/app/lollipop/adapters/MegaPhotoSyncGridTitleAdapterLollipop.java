@@ -90,7 +90,7 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
 
     private RecyclerView listFragment;
     private ImageView emptyImageViewFragment;
-    private TextView emptyTextViewFragment;
+    private LinearLayout emptyTextViewFragment;
     private ActionBar aB;
 
     private int numberOfCells;
@@ -887,7 +887,7 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
 
     }
 
-    public MegaPhotoSyncGridTitleAdapterLollipop(Context _context, ArrayList<MegaMonthPicLollipop> _monthPics, long _photosyncHandle, RecyclerView listView, ImageView emptyImageView, TextView emptyTextView, ActionBar aB, ArrayList<MegaNode> _nodes, int numberOfCells, int gridWidth, Object fragment, int type, int count, int countTitles, List<ItemInformation> itemInformationList) {
+    public MegaPhotoSyncGridTitleAdapterLollipop(Context _context, ArrayList<MegaMonthPicLollipop> _monthPics, long _photosyncHandle, RecyclerView listView, ImageView emptyImageView, LinearLayout emptyTextView, ActionBar aB, ArrayList<MegaNode> _nodes, int numberOfCells, int gridWidth, Object fragment, int type, int count, int countTitles, List<ItemInformation> itemInformationList) {
         this.context = _context;
         this.monthPics = _monthPics;
         this.photosyncHandle = _photosyncHandle;

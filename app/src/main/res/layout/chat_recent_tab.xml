@@ -15,9 +15,9 @@
             android:id="@+id/empty_text_chat_recent_invite"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:maxWidth="300dp"
             android:gravity="center"
             android:layout_gravity="center_horizontal"
-            android:text="@string/recent_chat_empty_invite"
             android:textColor="@color/mail_my_account"
             android:textSize="16sp" />
 
@@ -25,8 +25,7 @@
             android:id="@+id/empty_image_view_chat"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:src="@drawable/ic_empty_chat_list"/>
+            android:layout_gravity="center_horizontal"/>
 
         <TextView
             android:id="@+id/empty_text_chat_recent"
@@ -53,17 +52,17 @@
             android:elevation="@dimen/elevation_upgrade_high"
             android:tint="@android:color/white" />
 
-<!--        <Button
-            android:id="@+id/get_started_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/accentColor"
-            android:paddingLeft="12dp"
-            android:paddingRight="12dp"
-            android:text="@string/get_started_button"
-            android:background="@drawable/white_rounded_corners_button"
-            android:elevation="@dimen/elevation_upgrade_low"
-            android:stateListAnimator="@anim/button_upgrade_elevation"/>-->
+        <!--        <Button
+                    android:id="@+id/get_started_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/accentColor"
+                    android:paddingLeft="12dp"
+                    android:paddingRight="12dp"
+                    android:text="@string/get_started_button"
+                    android:background="@drawable/white_rounded_corners_button"
+                    android:elevation="@dimen/elevation_upgrade_low"
+                    android:stateListAnimator="@anim/button_upgrade_elevation"/>-->
     </LinearLayout>
 
     <android.support.v7.widget.RecyclerView
