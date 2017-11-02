@@ -22,6 +22,7 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -59,7 +60,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 	
 	RecyclerView listFragment;
 	ImageView emptyImageViewFragment;
-	TextView emptyTextViewFragment;
+	LinearLayout emptyTextViewFragment;
 	ActionBar aB;
 	SparseBooleanArray selectedItems;
 	OfflineFragmentLollipop fragment;
@@ -336,7 +337,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 		return nodes;
 	}
 	
-	public MegaOfflineLollipopAdapter(OfflineFragmentLollipop _fragment, Context _context, ArrayList<MegaOffline> _mOffList, RecyclerView listView, ImageView emptyImageView, TextView emptyTextView, ActionBar aB, int adapterType) {
+	public MegaOfflineLollipopAdapter(OfflineFragmentLollipop _fragment, Context _context, ArrayList<MegaOffline> _mOffList, RecyclerView listView, ImageView emptyImageView, LinearLayout emptyTextView, ActionBar aB, int adapterType) {
 		log("MegaOfflineListAdapter");
 		this.fragment = _fragment;
 		this.context = _context;

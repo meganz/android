@@ -28,21 +28,37 @@
         android:layout_height="match_parent" 
         android:choiceMode="multipleChoice"
         android:layout_below="@id/inbox_list_content_text_layout" />
-    
-    <ImageView
-	    android:id="@+id/inbox_list_empty_image"
-	    android:layout_width="wrap_content"
-	    android:layout_height="wrap_content"
-	    android:layout_centerInParent="true" />
-    
-    <TextView
-	    android:id="@+id/inbox_list_empty_text"
-	    android:layout_width="wrap_content"
-	    android:layout_height="wrap_content"
-	    android:textColor="@color/text_secondary"
-	    android:textSize="16sp"
-	    android:layout_below="@id/inbox_list_empty_image"
-	    android:layout_marginTop="@dimen/standard_margin"
-	    android:layout_centerHorizontal="true"/>
+
+	<ImageView
+		android:id="@+id/inbox_list_empty_image"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_centerHorizontal="true"
+		android:layout_centerInParent="true"
+		android:gravity="center_horizontal" />
+
+	<LinearLayout
+		android:id="@+id/inbox_list_empty_text"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:orientation="horizontal"
+		android:layout_below="@id/inbox_list_empty_image"
+		android:layout_marginTop="@dimen/standard_margin"
+		android:layout_centerHorizontal="true">
+		<TextView
+			android:id="@+id/inbox_list_empty_text_first"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:textColor="@color/text_secondary"
+			android:fontFamily="sans-serif"
+			android:textSize="18sp"/>
+		<TextView
+			android:id="@+id/inbox_list_empty_text_second"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:fontFamily="sans-serif"
+			android:textColor="@color/black"
+			android:textSize="18sp"/>
+	</LinearLayout>
     
 </RelativeLayout>

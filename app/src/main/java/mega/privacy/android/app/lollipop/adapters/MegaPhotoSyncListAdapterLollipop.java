@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -58,7 +59,7 @@ public class MegaPhotoSyncListAdapterLollipop extends RecyclerView.Adapter<MegaP
 	
 	RecyclerView listFragment;
 	ImageView emptyImageViewFragment;
-	TextView emptyTextViewFragment;
+	LinearLayout emptyTextViewFragment;
 	ActionBar aB;
 	
 	boolean multipleSelect;
@@ -86,7 +87,7 @@ public class MegaPhotoSyncListAdapterLollipop extends RecyclerView.Adapter<MegaP
     	public long document;
     }
 	
-	public MegaPhotoSyncListAdapterLollipop(Context _context, ArrayList<PhotoSyncHolder> _nodesArray, long _photosyncHandle, RecyclerView listView, ImageView emptyImageView, TextView emptyTextView, ActionBar aB, ArrayList<MegaNode> _nodes, Object fragment, int type) {
+	public MegaPhotoSyncListAdapterLollipop(Context _context, ArrayList<PhotoSyncHolder> _nodesArray, long _photosyncHandle, RecyclerView listView, ImageView emptyImageView, LinearLayout emptyTextView, ActionBar aB, ArrayList<MegaNode> _nodes, Object fragment, int type) {
 		this.context = _context;
 		this.nodesArray = _nodesArray;
 		this.photosyncHandle = _photosyncHandle;

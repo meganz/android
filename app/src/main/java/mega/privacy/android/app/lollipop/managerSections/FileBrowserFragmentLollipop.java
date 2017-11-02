@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.media.Image;
 import android.net.Uri;
@@ -27,6 +28,7 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -72,8 +74,12 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 	Context context;
 	ActionBar aB;
 	RecyclerView recyclerView;
+
 	ImageView emptyImageView;
-	TextView emptyTextView;
+	LinearLayout emptyTextView;
+	TextView emptyTextViewFirst;
+	TextView emptyTextViewSecond;
+
 	MegaBrowserLollipopAdapter adapter;
 	FileBrowserFragmentLollipop fileBrowserFragment = this;
 	TextView contentText;
@@ -547,10 +553,13 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			mLayoutManager = new LinearLayoutManager(context);
 			recyclerView.setLayoutManager(mLayoutManager);
 			recyclerView.setHasFixedSize(true);
-			recyclerView.setItemAnimator(new DefaultItemAnimator()); 
+			recyclerView.setItemAnimator(new DefaultItemAnimator());
 
 			emptyImageView = (ImageView) v.findViewById(R.id.file_list_empty_image);
-			emptyTextView = (TextView) v.findViewById(R.id.file_list_empty_text);
+			emptyTextView = (LinearLayout) v.findViewById(R.id.file_list_empty_text);
+			emptyTextViewFirst = (TextView) v.findViewById(R.id.file_list_empty_text_first);
+			emptyTextViewSecond = (TextView) v.findViewById(R.id.file_list_empty_text_second);
+
 			contentTextLayout = (RelativeLayout) v.findViewById(R.id.content_text_layout);
 			contentText = (TextView) v.findViewById(R.id.content_text);
 
@@ -619,7 +628,10 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			progressBar = (ProgressBar) v.findViewById(R.id.file_grid_download_progress_bar);
 
 			emptyImageView = (ImageView) v.findViewById(R.id.file_grid_empty_image);
-			emptyTextView = (TextView) v.findViewById(R.id.file_grid_empty_text);			
+			emptyTextView = (LinearLayout) v.findViewById(R.id.file_grid_empty_text);
+			emptyTextViewFirst = (TextView) v.findViewById(R.id.file_grid_empty_text_first);
+			emptyTextViewSecond = (TextView) v.findViewById(R.id.file_grid_empty_text_second);
+
 			contentTextLayout = (RelativeLayout) v.findViewById(R.id.content_grid_text_layout);
 
 			contentText = (TextView) v.findViewById(R.id.content_grid_text);			
@@ -1017,11 +1029,19 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			emptyTextView.setVisibility(View.VISIBLE);
 
 			if (megaApi.getRootNode().getHandle()==n.getHandle()) {
-				emptyImageView.setImageResource(R.drawable.ic_empty_cloud_drive);
-				emptyTextView.setText(R.string.file_browser_empty_cloud_drive);
+
+				if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+					emptyImageView.setImageResource(R.drawable.cloud_empty_landscape);
+				}else{
+					emptyImageView.setImageResource(R.drawable.ic_empty_cloud_drive);
+				}
+				emptyTextViewFirst.setText(R.string.context_empty_inbox);
+				String text = getString(R.string.section_cloud_drive);
+				emptyTextViewSecond.setText(" "+text+".");
+
 			} else {
 				emptyImageView.setImageResource(R.drawable.ic_empty_folder);
-				emptyTextView.setText(R.string.file_browser_empty_folder);
+				emptyTextViewFirst.setText(R.string.file_browser_empty_folder);
 			}
 		}
 		else{
@@ -1202,11 +1222,19 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 					emptyTextView.setVisibility(View.VISIBLE);
 
 					if (megaApi.getRootNode().getHandle()==((ManagerActivityLollipop)context).parentHandleBrowser||((ManagerActivityLollipop)context).parentHandleBrowser==-1) {
-						emptyImageView.setImageResource(R.drawable.ic_empty_cloud_drive);
-						emptyTextView.setText(R.string.file_browser_empty_cloud_drive);
+
+						if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+							emptyImageView.setImageResource(R.drawable.cloud_empty_landscape);
+						}else{
+							emptyImageView.setImageResource(R.drawable.ic_empty_cloud_drive);
+						}
+						emptyTextViewFirst.setText(R.string.context_empty_inbox);
+						String text = getString(R.string.section_cloud_drive);
+						emptyTextViewSecond.setText(" "+text+".");
+
 					} else {
 						emptyImageView.setImageResource(R.drawable.ic_empty_folder);
-						emptyTextView.setText(R.string.file_browser_empty_folder);
+						emptyTextViewFirst.setText(R.string.file_browser_empty_folder);
 					}
 				}
 				else{
@@ -1228,11 +1256,19 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 					emptyTextView.setVisibility(View.VISIBLE);
 
 					if (megaApi.getRootNode().getHandle()==((ManagerActivityLollipop)context).parentHandleBrowser) {
-						emptyImageView.setImageResource(R.drawable.ic_empty_cloud_drive);
-						emptyTextView.setText(R.string.file_browser_empty_cloud_drive);
+
+						if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+							emptyImageView.setImageResource(R.drawable.cloud_empty_landscape);
+						}else{
+							emptyImageView.setImageResource(R.drawable.ic_empty_cloud_drive);
+						}
+						emptyTextViewFirst.setText(R.string.context_empty_inbox);
+						String text = getString(R.string.section_cloud_drive);
+						emptyTextViewSecond.setText(" "+text+".");
+
 					} else {
 						emptyImageView.setImageResource(R.drawable.ic_empty_folder);
-						emptyTextView.setText(R.string.file_browser_empty_folder);
+						emptyTextViewFirst.setText(R.string.file_browser_empty_folder);
 					}
 				}
 				else{
