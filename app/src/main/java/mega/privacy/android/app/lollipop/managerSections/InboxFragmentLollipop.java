@@ -72,8 +72,7 @@ public class InboxFragmentLollipop extends Fragment{
 	MegaNode inboxNode;
 	boolean isList = true;
 	long parentHandle = -1;
-	int orderGetChildren;
-	
+
 	ArrayList<MegaNode> nodes;
 	MegaNode selectedNode;
 	
@@ -334,8 +333,6 @@ public class InboxFragmentLollipop extends Fragment{
 	    display.getMetrics(outMetrics);
 	    density  = getResources().getDisplayMetrics().density;
 
-		orderGetChildren = ((ManagerActivityLollipop)context).getOrderCloud();
-
 		if (parentHandle == -1){
 
 			long parentHandleInbox = ((ManagerActivityLollipop)context).getParentHandleInbox();
@@ -352,7 +349,7 @@ public class InboxFragmentLollipop extends Fragment{
 				inboxNode = megaApi.getInboxNode();
 				parentHandle = inboxNode.getHandle();
 				//		((ManagerActivityLollipop)context).setParentHandleRubbish(parentHandle);
-				nodes = megaApi.getChildren(inboxNode, orderGetChildren);
+				nodes = megaApi.getChildren(inboxNode, ((ManagerActivityLollipop)context).orderCloud);
 			}
 			aB.setTitle(getString(R.string.section_inbox));
 			aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
@@ -365,7 +362,7 @@ public class InboxFragmentLollipop extends Fragment{
 
 			if(parentNode!=null){
 				log("parentNode: "+parentNode.getName());
-				nodes = megaApi.getChildren(parentNode, orderGetChildren);
+				nodes = megaApi.getChildren(parentNode, ((ManagerActivityLollipop)context).orderCloud);
 				aB.setTitle(parentNode.getName());
 				aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
 				((ManagerActivityLollipop)context).setFirstNavigationLevel(false);
@@ -477,13 +474,13 @@ public class InboxFragmentLollipop extends Fragment{
 	public void refresh(){
 		log("refresh");
 		if(parentHandle==-1||parentHandle==inboxNode.getHandle()){
-			nodes = megaApi.getChildren(inboxNode, orderGetChildren);
+			nodes = megaApi.getChildren(inboxNode, ((ManagerActivityLollipop)context).orderCloud);
 		}
 		else{
 			MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
 			if(parentNode!=null){
 				log("parentNode: "+parentNode.getName());
-				nodes = megaApi.getChildren(parentNode, orderGetChildren);
+				nodes = megaApi.getChildren(parentNode, ((ManagerActivityLollipop)context).orderCloud);
 			}
 		}
 
@@ -544,7 +541,7 @@ public class InboxFragmentLollipop extends Fragment{
 				MegaNode infoNode = megaApi.getNodeByHandle(parentHandle);
 				contentText.setText(MegaApiUtils.getInfoFolder(infoNode, context));
 				adapter.setParentHandle(parentHandle);
-				nodes = megaApi.getChildren(nodes.get(position), orderGetChildren);
+				nodes = megaApi.getChildren(nodes.get(position), ((ManagerActivityLollipop)context).orderCloud);
 				adapter.setNodes(nodes);
 				recyclerView.scrollToPosition(0);
 
@@ -584,7 +581,7 @@ public class InboxFragmentLollipop extends Fragment{
 					if(accountInfo!=null){
 						intent.putExtra("typeAccount", accountInfo.getAccountType());
 					}
-					intent.putExtra("orderGetChildren", orderGetChildren);
+					intent.putExtra("orderGetChildren", ((ManagerActivityLollipop)context).orderCloud);
 					startActivity(intent);
 				}
 				else if (MimeTypeList.typeForName(nodes.get(position).getName()).isVideo() || MimeTypeList.typeForName(nodes.get(position).getName()).isAudio() ){
@@ -745,7 +742,7 @@ public class InboxFragmentLollipop extends Fragment{
 
 			parentHandle = parentNode.getHandle();
 			((ManagerActivityLollipop)context).setParentHandleInbox(parentHandle);
-			nodes = megaApi.getChildren(parentNode, orderGetChildren);
+			nodes = megaApi.getChildren(parentNode, ((ManagerActivityLollipop)context).orderCloud);
 			adapter.setNodes(nodes);
 
 			int lastVisiblePosition = 0;
@@ -829,12 +826,7 @@ public class InboxFragmentLollipop extends Fragment{
 			adapter.notifyDataSetChanged();
 		}
 	}
-	
-	public void setOrder(int orderGetChildren){
-		log("setOrder:Inbox");
-		this.orderGetChildren = orderGetChildren;
-	}
-	
+
 	private static void log(String log) {
 		Util.log("InboxFragmentLollipop", log);
 	}

@@ -1509,7 +1509,7 @@ public class Util {
 		}
 		else {
 			if (numFiles == 0){
-				info = numFiles +  " " + context.getResources().getQuantityString(R.plurals.general_num_folders, numFolders);
+				info = context.getString(R.string.no_folders_shared);
 			}
 			else{
 				info = numFiles +  " " + context.getResources().getQuantityString(R.plurals.general_num_files, numFiles);

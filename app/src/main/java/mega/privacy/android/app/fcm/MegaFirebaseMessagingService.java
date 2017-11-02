@@ -287,7 +287,7 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
                 if (Util.isChatEnabled()) {
                         log("Chat enabled-->connect");
                     MegaApplication.isFireBaseConnection=true;
-                        megaChatApi.connect(this);
+                        megaChatApi.connectInBackground(this);
                 }
                 else{
                     log("Chat NOT enabled - sendNotification");
@@ -321,6 +321,18 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
 
         if(request.getType()==MegaChatRequest.TYPE_CONNECT){
 //            MegaApplication.isFireBaseConnection=false;
+            log("TYPE CONNECT");
+            //megaChatApi.setBackgroundStatus(true, this);
+            if(e.getErrorCode()==MegaChatError.ERROR_OK){
+                log("Connected to chat!");
+                MegaApplication.setChatConnection(true);
+            }
+            else{
+                log("EEEERRRRROR WHEN CONNECTING " + e.getErrorString());
+            }
+        }
+        else if (request.getType() == MegaChatRequest.TYPE_SET_BACKGROUND_STATUS){
+            log("TYPE SETBACKGROUNDSTATUS");
         }
 
     }
