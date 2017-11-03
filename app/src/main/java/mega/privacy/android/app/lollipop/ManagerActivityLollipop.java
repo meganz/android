@@ -3332,6 +3332,22 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				}
 				break;
 			}
+			case INBOX:{
+				if(parentHandleInbox==megaApi.getInboxNode().getHandle()||parentHandleInbox==-1){
+					aB.setTitle(getResources().getString(R.string.section_inbox));
+					log("aB.setHomeAsUpIndicator_886");
+					aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+					firstNavigationLevel = true;
+				}
+				else{
+					MegaNode node = megaApi.getNodeByHandle(parentHandleInbox);
+					aB.setTitle(node.getName());
+					log("indicator_arrow_back_893");
+					aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+					firstNavigationLevel = false;
+				}
+				break;
+			}
 			case CONTACTS:{
 				aB.setSubtitle(null);
 				aB.setTitle(getString(R.string.section_contacts));
@@ -4319,38 +4335,37 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
     			tB.setVisibility(View.VISIBLE);
 				iFLol = new InboxFragmentLollipop().newInstance();
 
-				MegaNode node = megaApi.getNodeByHandle(parentHandleInbox);
-				log("Selected Inbox with parent: "+parentHandleInbox);
-//					log("inSFLol deepBrowserTreeIncoming: "+deepBrowserTreeInbox);
-				if (node != null){
-					log("Go to inbox node: "+node.getName());
-					iFLol.setParentHandle(parentHandleInbox);
-
-					ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleInbox), orderCloud);
-					iFLol.setNodes(nodes);
-
-					if(parentHandleInbox==megaApi.getInboxNode().getHandle()){
-						aB.setTitle(getResources().getString(R.string.section_inbox));
-						log("aB.setHomeAsUpIndicator_886");
-						aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
-						firstNavigationLevel = true;
-					}
-					else{
-						aB.setTitle(node.getName());
-						log("indicator_arrow_back_893");
-						aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
-						firstNavigationLevel = false;
-					}
-				}
-				else{
-					log("The Node is NULL");
-					ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getInboxNode(), orderCloud);
-					iFLol.setNodes(nodes);
-					aB.setTitle(getResources().getString(R.string.section_inbox));
-					log("aB.setHomeAsUpIndicator_16");
-					aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
-					firstNavigationLevel = true;
-				}
+//				MegaNode node = megaApi.getNodeByHandle(parentHandleInbox);
+//				log("Selected Inbox with parent: "+parentHandleInbox);
+////					log("inSFLol deepBrowserTreeIncoming: "+deepBrowserTreeInbox);
+//				if (node != null){
+//					log("Go to inbox node: "+node.getName());
+//
+//					ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleInbox), orderCloud);
+//					iFLol.setNodes(nodes);
+//
+//					if(parentHandleInbox==megaApi.getInboxNode().getHandle()){
+//						aB.setTitle(getResources().getString(R.string.section_inbox));
+//						log("aB.setHomeAsUpIndicator_886");
+//						aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+//						firstNavigationLevel = true;
+//					}
+//					else{
+//						aB.setTitle(node.getName());
+//						log("indicator_arrow_back_893");
+//						aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+//						firstNavigationLevel = false;
+//					}
+//				}
+//				else{
+//					log("The Node is NULL");
+//					ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getInboxNode(), orderCloud);
+//					iFLol.setNodes(nodes);
+//					aB.setTitle(getResources().getString(R.string.section_inbox));
+//					log("aB.setHomeAsUpIndicator_16");
+//					aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+//					firstNavigationLevel = true;
+//				}
 
     			tabLayoutCloud.setVisibility(View.GONE);
     			viewPagerCDrive.setVisibility(View.GONE);
@@ -4372,6 +4387,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
     			drawerLayout.closeDrawer(Gravity.LEFT);
 
     			supportInvalidateOptionsMenu();
+				setToolbarTitle();
 				showFabButton();
     			break;
     		}
@@ -13279,8 +13295,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				MegaNode node = megaApi.getNodeByHandle(parentHandleInbox);
 				if (node != null){
 					log("Go to inbox node: "+node.getName());
-					iFLol.setParentHandle(parentHandleInbox);
-
 					ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleInbox), orderCloud);
 					iFLol.setNodes(nodes);
 				}
