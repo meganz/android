@@ -418,15 +418,6 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 			params.addRule(RelativeLayout.BELOW, contentTextLayout.getId());
 			recyclerView.setLayoutParams(params);
 
-			if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-				emptyImageView.setImageResource(R.drawable.outgoing_empty_landscape);
-			}else{
-				emptyImageView.setImageResource(R.drawable.outgoing_shares_empty);
-			}
-			emptyTextViewFirst.setText(R.string.context_empty_contacts);
-			String text = getString(R.string.context_empty_outgoing);
-			emptyTextViewSecond.setText(" "+text+".");
-
 			transfersOverViewLayout = (RelativeLayout) v.findViewById(R.id.transfers_overview_item_layout);
 			transfersOverViewLayout.setVisibility(View.GONE);
 			
@@ -441,8 +432,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 			if (((ManagerActivityLollipop)context).parentHandleOutgoing == -1){
 				log("ParentHandle -1");
 				findNodes();
-			}
-			else{
+			}else{
 				MegaNode parentNode = megaApi.getNodeByHandle(((ManagerActivityLollipop)context).parentHandleOutgoing);
 				log("ParentHandle: "+((ManagerActivityLollipop)context).parentHandleOutgoing);
 				nodes = megaApi.getChildren(parentNode, ((ManagerActivityLollipop)context).orderOthers);
@@ -461,7 +451,24 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 					recyclerView.setVisibility(View.GONE);
 					contentTextLayout.setVisibility(View.GONE);
 					emptyImageView.setVisibility(View.VISIBLE);
-					emptyTextView.setVisibility(View.VISIBLE);	
+					emptyTextView.setVisibility(View.VISIBLE);
+
+					if (megaApi.getRootNode().getHandle()==((ManagerActivityLollipop)context).parentHandleOutgoing||((ManagerActivityLollipop)context).parentHandleOutgoing==-1) {
+						if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+							emptyImageView.setImageResource(R.drawable.outgoing_empty_landscape);
+						}else{
+							emptyImageView.setImageResource(R.drawable.outgoing_shares_empty);
+						}
+						emptyTextViewFirst.setText(R.string.context_empty_contacts);
+						String text = getString(R.string.context_empty_outgoing);
+						emptyTextViewSecond.setText(" "+text+".");
+						emptyTextViewSecond.setVisibility(View.VISIBLE);
+
+					}else {
+						emptyImageView.setImageResource(R.drawable.ic_empty_folder);
+						emptyTextViewFirst.setText(R.string.file_browser_empty_folder);
+						emptyTextViewSecond.setVisibility(View.GONE);
+					}
 				}
 				else{
 					recyclerView.setVisibility(View.VISIBLE);
@@ -495,15 +502,6 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 
 			contentTextLayout = (RelativeLayout) v.findViewById(R.id.content_grid_text_layout);
 			contentText = (TextView) v.findViewById(R.id.content_grid_text);
-
-			if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-				emptyImageView.setImageResource(R.drawable.outgoing_empty_landscape);
-			}else{
-				emptyImageView.setImageResource(R.drawable.outgoing_shares_empty);
-			}
-			emptyTextViewFirst.setText(R.string.context_empty_contacts);
-			String text = getString(R.string.context_empty_outgoing);
-			emptyTextViewSecond.setText(" "+text+".");
 
 			if (adapter == null){
 				adapter = new MegaBrowserLollipopAdapter(context, this, nodes, ((ManagerActivityLollipop)context).parentHandleOutgoing, recyclerView, aB, Constants.OUTGOING_SHARES_ADAPTER, MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_GRID);
@@ -539,7 +537,26 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 				recyclerView.setVisibility(View.GONE);
 				contentTextLayout.setVisibility(View.GONE);
 				emptyImageView.setVisibility(View.VISIBLE);
-				emptyTextView.setVisibility(View.VISIBLE);	
+				emptyTextView.setVisibility(View.VISIBLE);
+
+				if (megaApi.getRootNode().getHandle()==((ManagerActivityLollipop)context).parentHandleOutgoing||((ManagerActivityLollipop)context).parentHandleOutgoing==-1) {
+
+					if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+						emptyImageView.setImageResource(R.drawable.outgoing_empty_landscape);
+					}else{
+						emptyImageView.setImageResource(R.drawable.outgoing_shares_empty);
+					}
+					emptyTextViewFirst.setText(R.string.context_empty_contacts);
+					String text = getString(R.string.context_empty_outgoing);
+					emptyTextViewSecond.setText(" "+text+".");
+					emptyTextViewSecond.setVisibility(View.VISIBLE);
+
+				}else {
+
+					emptyImageView.setImageResource(R.drawable.ic_empty_folder);
+					emptyTextViewFirst.setText(R.string.file_browser_empty_folder);
+					emptyTextViewSecond.setVisibility(View.GONE);
+				}
 			}
 			else{
 				recyclerView.setVisibility(View.VISIBLE);
@@ -572,9 +589,29 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
                     contentTextLayout.setVisibility(View.GONE);
                     emptyImageView.setVisibility(View.VISIBLE);
                     emptyTextView.setVisibility(View.VISIBLE);
+
+					if (megaApi.getRootNode().getHandle()==((ManagerActivityLollipop)context).parentHandleOutgoing||((ManagerActivityLollipop)context).parentHandleOutgoing==-1) {
+
+						if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+							emptyImageView.setImageResource(R.drawable.outgoing_empty_landscape);
+						}else{
+							emptyImageView.setImageResource(R.drawable.outgoing_shares_empty);
+						}
+						emptyTextViewFirst.setText(R.string.context_empty_contacts);
+						String text = getString(R.string.context_empty_outgoing);
+						emptyTextViewSecond.setText(" "+text+".");
+						emptyTextViewSecond.setVisibility(View.VISIBLE);
+
+					}else {
+
+						emptyImageView.setImageResource(R.drawable.ic_empty_folder);
+						emptyTextViewFirst.setText(R.string.file_browser_empty_folder);
+						emptyTextViewSecond.setVisibility(View.GONE);
+					}
                 }
                 else{
-                    log("adapter.getItemCount() != 0");
+
+					log("adapter.getItemCount() != 0");
                     recyclerView.setVisibility(View.VISIBLE);
                     contentTextLayout.setVisibility(View.VISIBLE);
                     emptyImageView.setVisibility(View.GONE);
@@ -605,6 +642,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
                 emptyTextView.setVisibility(View.VISIBLE);
 
                 if (megaApi.getRootNode().getHandle()==n.getHandle()) {
+
 					if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
 						emptyImageView.setImageResource(R.drawable.outgoing_empty_landscape);
 					}else{
@@ -613,10 +651,15 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 					emptyTextViewFirst.setText(R.string.context_empty_contacts);
 					String text = getString(R.string.context_empty_outgoing);
 					emptyTextViewSecond.setText(" "+text+".");
-                } else {
-                    emptyImageView.setImageResource(R.drawable.ic_empty_folder);
+					emptyTextViewSecond.setVisibility(View.VISIBLE);
+
+				} else {
+
+					emptyImageView.setImageResource(R.drawable.ic_empty_folder);
                     emptyTextViewFirst.setText(R.string.file_browser_empty_folder);
-                }
+					emptyTextViewSecond.setVisibility(View.GONE);
+
+				}
             }
             else{
                 recyclerView.setVisibility(View.VISIBLE);
@@ -664,7 +707,6 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 
     public void itemClick(int position) {
 		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
-	
     	if (adapter.isMultipleSelect()){
 			log("multiselect ON");
 			adapter.toggleSelection(position);
@@ -720,6 +762,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 					emptyTextView.setVisibility(View.VISIBLE);
 
 					if (megaApi.getRootNode().getHandle()==n.getHandle()) {
+
 						if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
 							emptyImageView.setImageResource(R.drawable.outgoing_empty_landscape);
 						}else{
@@ -728,9 +771,13 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 						emptyTextViewFirst.setText(R.string.context_empty_contacts);
 						String text = getString(R.string.context_empty_outgoing);
 						emptyTextViewSecond.setText(" "+text+".");
-					} else {
+						emptyTextViewSecond.setVisibility(View.VISIBLE);
+
+					}else {
 						emptyImageView.setImageResource(R.drawable.ic_empty_folder);
 						emptyTextViewFirst.setText(R.string.file_browser_empty_folder);
+						emptyTextViewSecond.setVisibility(View.GONE);
+
 					}
 				}
 				else{
@@ -829,6 +876,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 	}
 
 	public void setNodes(ArrayList<MegaNode> nodes){
+		log("setNodes");
 		this.nodes = nodes;
 		if(((ManagerActivityLollipop)context).orderOthers == MegaApiJava.ORDER_DEFAULT_DESC){
 			sortByNameDescending();
