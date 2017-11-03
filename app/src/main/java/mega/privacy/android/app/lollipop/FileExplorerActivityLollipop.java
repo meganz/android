@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -1083,33 +1084,39 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			if (Intent.ACTION_SEND.equals(intent.getAction()) && intent.getType() != null) {
 				if ("text/plain".equals(intent.getType())) {
 					log("Handle intent of text plain");
-					StringBuilder body = new StringBuilder();
-					String sharedText2 = intent.getStringExtra(Intent.EXTRA_SUBJECT);
-					if (sharedText2 != null) {
-						body.append(getString(R.string.new_file_subject_when_uploading)+": ");
-						body.append(sharedText2);
-					}
-					String sharedText = intent.getStringExtra(Intent.EXTRA_TEXT);
-					if (sharedText != null) {
-						body.append("\n");
-						body.append(getString(R.string.new_file_content_when_uploading)+": ");
-						body.append(sharedText);
-					}
-					String sharedText3 = intent.getStringExtra(Intent.EXTRA_EMAIL);
-					if (sharedText3 != null) {
-						body.append("\n");
-						body.append(getString(R.string.new_file_email_when_uploading)+": ");
-						body.append(sharedText3);
-					}
 
-					long parentHandle = handle;
-					MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
-					if(parentNode == null){
-						parentNode = megaApi.getRootNode();
-					}
+					Bundle extras = intent.getExtras();
+					if(extras!=null){
+						if (!extras.containsKey(Intent.EXTRA_STREAM)) {
+							StringBuilder body = new StringBuilder();
+							String sharedText2 = intent.getStringExtra(Intent.EXTRA_SUBJECT);
+							if (sharedText2 != null) {
+								body.append(getString(R.string.new_file_subject_when_uploading)+": ");
+								body.append(sharedText2);
+							}
+							String sharedText = intent.getStringExtra(Intent.EXTRA_TEXT);
+							if (sharedText != null) {
+								body.append("\n");
+								body.append(getString(R.string.new_file_content_when_uploading)+": ");
+								body.append(sharedText);
+							}
+							String sharedText3 = intent.getStringExtra(Intent.EXTRA_EMAIL);
+							if (sharedText3 != null) {
+								body.append("\n");
+								body.append(getString(R.string.new_file_email_when_uploading)+": ");
+								body.append(sharedText3);
+							}
 
-					showNewFileDialog(parentNode,body.toString());
-					return;
+							long parentHandle = handle;
+							MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
+							if(parentNode == null){
+								parentNode = megaApi.getRootNode();
+							}
+
+							showNewFileDialog(parentNode,body.toString());
+							return;
+						}
+					}
 				}
 			}
 
