@@ -7414,9 +7414,23 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 		}
 		else if (drawerItem == DrawerItem.SHARED_ITEMS){
-			outSFLol = (OutgoingSharesFragmentLollipop) sharesPageAdapter.instantiateItem(viewPagerShares, 1);
-			outSFLol.hideMultipleSelect();
-			outSFLol.refresh();
+			if(sharesPageAdapter!=null){
+				outSFLol = (OutgoingSharesFragmentLollipop) sharesPageAdapter.instantiateItem(viewPagerShares, 1);
+				if(outSFLol!=null){
+					if(outSFLol.isAdded()){
+						outSFLol.hideMultipleSelect();
+						outSFLol.refreshContent();
+					}
+				}
+
+				inSFLol = (IncomingSharesFragmentLollipop) sharesPageAdapter.instantiateItem(viewPagerShares, 0);
+				if(inSFLol!=null){
+					if(inSFLol.isAdded()){
+						inSFLol.hideMultipleSelect();
+						inSFLol.refresh();
+					}
+				}
+			}
 
 			//Refresh Rubbish Fragment
 			if(cloudPageAdapter!=null){
@@ -12956,11 +12970,25 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 			if (e.getErrorCode() == MegaError.API_OK){
 				showSnackbar(getString(R.string.context_folder_created));
-				if (fbFLol != null){
-					if (drawerItem == DrawerItem.CLOUD_DRIVE){
+				if (drawerItem == DrawerItem.CLOUD_DRIVE){
+					if (fbFLol != null){
 						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleBrowser), orderCloud);
 						fbFLol.setNodes(nodes);
 						fbFLol.getRecyclerView().invalidate();
+					}
+				}
+				else if (drawerItem == DrawerItem.SHARED_ITEMS){
+					inSFLol = (IncomingSharesFragmentLollipop) sharesPageAdapter.instantiateItem(viewPagerShares, 0);
+					if (inSFLol != null){
+						if(inSFLol.isAdded()) {
+							inSFLol.refresh();
+						}
+					}
+					outSFLol = (OutgoingSharesFragmentLollipop) sharesPageAdapter.instantiateItem(viewPagerShares, 1);
+					if (outSFLol != null){
+						if(outSFLol.isAdded()) {
+							outSFLol.refreshContent();
+						}
 					}
 				}
 			}
@@ -13278,14 +13306,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 			inSFLol = (IncomingSharesFragmentLollipop) sharesPageAdapter.instantiateItem(viewPagerShares, 0);
 			if (inSFLol != null){
-				MegaNode node = megaApi.getNodeByHandle(parentHandleIncoming);
 				if(inSFLol.isAdded()){
-					if (node != null){
-						inSFLol.setNodes(megaApi.getChildren(node, orderOthers));
-					}
-					else{
-						inSFLol.findNodes();
-					}
+					inSFLol.refresh();
 				}
 			}
 		}

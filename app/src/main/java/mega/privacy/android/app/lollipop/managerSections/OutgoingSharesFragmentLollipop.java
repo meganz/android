@@ -600,6 +600,64 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
         ((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 	}
 
+	public void refreshContent (){
+		log("refreshContent with parentHandle: "+((ManagerActivityLollipop)context).parentHandleOutgoing);
+
+		if (((ManagerActivityLollipop)context).parentHandleOutgoing == -1){
+			findNodes();
+			if(adapter != null){
+				log("adapter != null");
+				adapter.setNodes(nodes);
+
+				if (adapter.getItemCount() == 0){
+					log("adapter.getItemCount() = 0");
+					recyclerView.setVisibility(View.GONE);
+					contentTextLayout.setVisibility(View.GONE);
+					emptyImageView.setVisibility(View.VISIBLE);
+					emptyTextView.setVisibility(View.VISIBLE);
+				}
+				else{
+					log("adapter.getItemCount() != 0");
+					recyclerView.setVisibility(View.VISIBLE);
+					contentTextLayout.setVisibility(View.VISIBLE);
+					emptyImageView.setVisibility(View.GONE);
+					emptyTextView.setVisibility(View.GONE);
+				}
+				contentText.setText(MegaApiUtils.getInfoNodeOnlyFolders(nodes, context));
+			}
+		}
+		else{
+			MegaNode n = megaApi.getNodeByHandle(((ManagerActivityLollipop)context).parentHandleOutgoing);
+			contentText.setText(MegaApiUtils.getInfoFolder(n, context));
+
+			nodes = megaApi.getChildren(n, ((ManagerActivityLollipop)context).orderOthers);
+			adapter.setNodes(nodes);
+
+			//If folder has no files
+			if (adapter.getItemCount() == 0){
+				recyclerView.setVisibility(View.GONE);
+				contentTextLayout.setVisibility(View.GONE);
+				emptyImageView.setVisibility(View.VISIBLE);
+				emptyTextView.setVisibility(View.VISIBLE);
+
+				if (megaApi.getRootNode().getHandle()==n.getHandle()) {
+					emptyImageView.setImageResource(R.drawable.ic_empty_cloud_drive);
+					emptyTextView.setText(R.string.file_browser_empty_cloud_drive);
+				} else {
+					emptyImageView.setImageResource(R.drawable.ic_empty_folder);
+					emptyTextView.setText(R.string.file_browser_empty_folder);
+				}
+			}
+			else{
+				recyclerView.setVisibility(View.VISIBLE);
+				contentTextLayout.setVisibility(View.VISIBLE);
+				emptyImageView.setVisibility(View.GONE);
+				emptyTextView.setVisibility(View.GONE);
+			}
+		}
+		((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
+	}
+
 	public void findNodes(){	
 		log("findNodes");
 		ArrayList<MegaShare> outNodeList = megaApi.getOutShares();
