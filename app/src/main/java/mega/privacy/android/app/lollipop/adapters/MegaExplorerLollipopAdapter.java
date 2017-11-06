@@ -235,47 +235,9 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 				}
 			}
 			else{
-
-				if(fragment!=null){
-					if(fragment instanceof CloudDriveExplorerFragmentLollipop){
-						holder.permissionsIcon.setVisibility(View.GONE);
-						boolean moveNode = ((CloudDriveExplorerFragmentLollipop) fragment).isNodeMove();
-						if(moveNode){
-							ArrayList<Long> nodesHandles = ((CloudDriveExplorerFragmentLollipop) fragment).recoverNodeHandle();
-
-							for (long nodeHandle : nodesHandles) {
-								if(node.getHandle()==nodeHandle){
-
-									holder.imageView.setAlpha(.4f);
-									holder.textViewFileName.setTextColor(context.getResources().getColor(R.color.text_secondary));
-									holder.itemView.setOnClickListener(null);
-									disabledNodesCloudDrive.add(node.getHandle());
-									break;
-								}else{
-
-									if(disabledNodesCloudDrive.size() != 0){
-										for(long handle : disabledNodesCloudDrive){
-											if(handle != node.getHandle()) {
-												holder.imageView.setAlpha(1.0f);
-												holder.textViewFileName.setTextColor(context.getResources().getColor(android.R.color.black));
-												holder.itemView.setOnClickListener(holder);
-											}
-										}
-									}else{
-										holder.imageView.setAlpha(1.0f);
-										holder.textViewFileName.setTextColor(context.getResources().getColor(android.R.color.black));
-										holder.itemView.setOnClickListener(holder);
-									}
-								}
-							}
-						}else{
-							holder.imageView.setAlpha(1.0f);
-							holder.textViewFileName.setTextColor(context.getResources().getColor(android.R.color.black));
-							holder.itemView.setOnClickListener(holder);
-						}
-
-					}
-				}
+				holder.imageView.setAlpha(1.0f);
+				holder.textViewFileName.setTextColor(context.getResources().getColor(android.R.color.black));
+				holder.itemView.setOnClickListener(holder);
 			}
 
 			if(node.isInShare()){

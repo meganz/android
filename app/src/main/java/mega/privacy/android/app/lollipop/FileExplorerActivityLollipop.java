@@ -613,11 +613,6 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 						p = megaApi.getParentNode(p);
                         parentMoveCopy = p;
 					}
-					String cFTag = getFragmentTag(R.id.explorer_tabs_pager, 0);
-					cDriveExplorer = (CloudDriveExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
-					if(cDriveExplorer!=null){
-						cDriveExplorer.setDisableNodes(list);
-					}
 				}
 				else if (intent.getAction().equals(ACTION_CHOOSE_MEGA_FOLDER_SYNC)){
 					log("action = ACTION_CHOOSE_MEGA_FOLDER_SYNC");
@@ -1761,8 +1756,9 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		this.selectFile = selectFile;
 	}
 
-	public long parentHandleMoveCopy(){
-		return parentMoveCopy.getHandle();
+	public MegaNode parentMoveCopy(){
+			return parentMoveCopy;
+
 	}
 
     public ArrayList<Long> getNodeHandleMoveCopy() {
