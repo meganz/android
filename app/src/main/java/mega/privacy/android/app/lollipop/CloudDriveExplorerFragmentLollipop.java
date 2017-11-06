@@ -305,23 +305,36 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 		if (modeCloud == FileExplorerActivityLollipop.MOVE) {
 			optionButton.setText(getString(R.string.context_move).toUpperCase(Locale.getDefault()));
 
-			long parent = ((FileExplorerActivityLollipop)context).parentHandleMoveCopy();
-			if(parent == chosenNode.getHandle()) {
-				activateButton(false);
+			MegaNode parent = ((FileExplorerActivityLollipop)context).parentMoveCopy();
+			if(parent != null){
+				if(parent.getHandle() == chosenNode.getHandle()) {
+					activateButton(false);
+				}else{
+					activateButton(true);
+				}
 			}else{
 				activateButton(true);
+
 			}
+
+			nodeHandleMoveCopy = ((FileExplorerActivityLollipop)context).getNodeHandleMoveCopy();
+			setDisableNodes(nodeHandleMoveCopy);
 
 		}
 		else if (modeCloud == FileExplorerActivityLollipop.COPY){
 			optionButton.setText(getString(R.string.context_copy).toUpperCase(Locale.getDefault()));
 
-			long parent = ((FileExplorerActivityLollipop)context).parentHandleMoveCopy();
-			if(parent == chosenNode.getHandle()) {
-				activateButton(false);
+			MegaNode parent = ((FileExplorerActivityLollipop)context).parentMoveCopy();
+			if(parent != null){
+				if(parent.getHandle() == chosenNode.getHandle()) {
+					activateButton(false);
+				}else{
+					activateButton(true);
+				}
 			}else{
 				activateButton(true);
 			}
+
 		}
 		else if (modeCloud == FileExplorerActivityLollipop.UPLOAD){
 			optionButton.setText(getString(R.string.context_upload).toUpperCase(Locale.getDefault()));
@@ -471,6 +484,7 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 	
 	@Override
 	public void onClick(View v) {
+		log("onClick");
 		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 		switch(v.getId()){
 			case R.id.action_text:{
@@ -634,9 +648,14 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 				emptyTextView.setVisibility(View.GONE);
 
 				if((modeCloud == FileExplorerActivityLollipop.MOVE) || (modeCloud == FileExplorerActivityLollipop.COPY)){
-					long parent = ((FileExplorerActivityLollipop)context).parentHandleMoveCopy();
-					if(parent == parentHandle) {
-						activateButton(false);
+
+					MegaNode parent = ((FileExplorerActivityLollipop)context).parentMoveCopy();
+					if(parent != null){
+						if(parent.getHandle() == parentHandle) {
+							activateButton(false);
+						}else{
+							activateButton(true);
+						}
 					}else{
 						activateButton(true);
 					}
@@ -690,7 +709,6 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 
 	public int onBackPressed(){
 		log("onBackPressed");
-
 		if(selectFile) {
 			if(((FileExplorerActivityLollipop)context).multiselect){
 				if(adapter.isMultipleSelect()){
@@ -760,11 +778,16 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 			}
 
 			if((modeCloud == FileExplorerActivityLollipop.MOVE) || (modeCloud == FileExplorerActivityLollipop.COPY)){
-				long parent = ((FileExplorerActivityLollipop)context).parentHandleMoveCopy();
-				if(parent == parentNode.getHandle()) {
-					activateButton(false);
+				MegaNode parent = ((FileExplorerActivityLollipop)context).parentMoveCopy();
+				if(parent != null){
+					if(parent.getHandle() == parentNode.getHandle()) {
+						activateButton(false);
+					}else{
+						activateButton(true);
+					}
 				}else{
 					activateButton(true);
+
 				}
 			}
 
@@ -826,10 +849,12 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 	}
 	
 	public long getParentHandle(){
+		log("getParentHandle");
 		return adapter.getParentHandle();
 	}
 	
 	public void setParentHandle(long parentHandle){
+		log("setParentHandle");
 		this.parentHandle = parentHandle;
 		if (adapter != null){
 			adapter.setParentHandle(parentHandle);
@@ -838,6 +863,7 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 	}
 	
 	public void setNodes(ArrayList<MegaNode> nodes){
+		log("setNodes");
 		this.nodes = nodes;
 		if (adapter != null){
 			adapter.setNodes(nodes);
@@ -951,18 +977,6 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 		return listView;
 	}
 
-	public ArrayList<Long> recoverNodeHandle(){
-		nodeHandleMoveCopy = ((FileExplorerActivityLollipop)context).getNodeHandleMoveCopy();
-		return nodeHandleMoveCopy;
-	}
-
-    public boolean isNodeMove() {
-		if(modeCloud == FileExplorerActivityLollipop.MOVE){
-			return true;
-		}else{
-			return false;
-		}
-	}
 
 	public void activateButton(boolean show){
 		optionButton.setEnabled(show);

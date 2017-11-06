@@ -738,8 +738,13 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			}
 		}
 		else{
-
-			setContentText();
+			if (adapter.getItemCount() == 0){
+				contentTextLayout.setVisibility(View.GONE);
+			}
+			else{
+				contentTextLayout.setVisibility(View.VISIBLE);
+				setContentText();
+			}
 		}
 
 	}

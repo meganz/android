@@ -269,6 +269,7 @@
 
         <activity
             android:name="mega.privacy.android.app.lollipop.GetLinkActivityLollipop"
+            android:configChanges="screenSize|orientation"
             android:label="@string/context_get_link_menu">
         </activity>
 
