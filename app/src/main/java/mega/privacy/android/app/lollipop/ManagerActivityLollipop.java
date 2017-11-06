@@ -9697,7 +9697,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 		};
 
-		AlertDialog.Builder builder = new AlertDialog.Builder(managerActivity, R.style.AppCompatAlertDialogStyle);
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		String title = getResources().getQuantityString(R.plurals.title_confirmation_remove_contact, 1);
 		builder.setTitle(title);
 		String message= getResources().getQuantityString(R.plurals.confirmation_remove_contact, 1);
@@ -9723,7 +9723,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 		};
 
-		AlertDialog.Builder builder = new AlertDialog.Builder(managerActivity, R.style.AppCompatAlertDialogStyle);
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		String title = getResources().getQuantityString(R.plurals.title_confirmation_remove_contact, c.size());
 		builder.setTitle(title);
 		String message= getResources().getQuantityString(R.plurals.confirmation_remove_contact, c.size());
@@ -9749,7 +9749,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 		};
 
-		AlertDialog.Builder builder = new AlertDialog.Builder(managerActivity, R.style.AppCompatAlertDialogStyle);
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		String message= getResources().getString(R.string.confirmation_delete_contact_request,r.getTargetEmail());
 		builder.setMessage(message).setPositiveButton(R.string.context_remove, dialogClickListener)
 				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
@@ -9774,7 +9774,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		};
 
 		String message="";
-		AlertDialog.Builder builder = new AlertDialog.Builder(managerActivity, R.style.AppCompatAlertDialogStyle);
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		if(r.size()==1){
 			message= getResources().getString(R.string.confirmation_delete_contact_request,r.get(0).getTargetEmail());
 		}else{
