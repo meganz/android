@@ -3,6 +3,7 @@ package mega.privacy.android.app.lollipop.managerSections;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -22,6 +23,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -61,8 +63,12 @@ public class ContactsFragmentLollipop extends Fragment{
 	ActionBar aB;
 	RecyclerView recyclerView;
 	MegaContactsLollipopAdapter adapter;
+
 	ImageView emptyImageView;
-	TextView emptyTextView;
+	LinearLayout emptyTextView;
+	TextView emptyTextViewFirst;
+	TextView emptyTextViewSecond;
+
 	TextView contentText;
 	RelativeLayout contentTextLayout;
 	private ActionMode actionMode;
@@ -377,13 +383,14 @@ public class ContactsFragmentLollipop extends Fragment{
 			recyclerView.setHasFixedSize(true);
 			LinearLayoutManager linearLayoutManager = new LinearLayoutManager(context);
 		    recyclerView.setLayoutManager(linearLayoutManager);
-		    recyclerView.setItemAnimator(new DefaultItemAnimator()); 			
-		
+		    recyclerView.setItemAnimator(new DefaultItemAnimator());
+
 			emptyImageView = (ImageView) v.findViewById(R.id.contact_list_empty_image);
-			emptyTextView = (TextView) v.findViewById(R.id.contact_list_empty_text);
+			emptyTextView = (LinearLayout) v.findViewById(R.id.contact_list_empty_text);
+			emptyTextViewFirst = (TextView) v.findViewById(R.id.contact_list_empty_text_first);
+			emptyTextViewSecond = (TextView) v.findViewById(R.id.contact_list_empty_text_second);
 
 			contentTextLayout = (RelativeLayout) v.findViewById(R.id.contact_list_content_text_layout);
-
 			contentText = (TextView) v.findViewById(R.id.contact_list_content_text);
 
 			if (adapter == null){
@@ -401,16 +408,22 @@ public class ContactsFragmentLollipop extends Fragment{
 			adapter.setPositionClicked(-1);
 			recyclerView.setAdapter(adapter);
 						
-			if (adapter.getItemCount() == 0){				
-		
-				emptyImageView.setImageResource(R.drawable.ic_empty_contacts);
-				emptyTextView.setText(R.string.contacts_list_empty_text);
-				recyclerView.setVisibility(View.GONE);
-				contentTextLayout.setVisibility(View.GONE);
-				emptyImageView.setVisibility(View.VISIBLE);
-				emptyTextView.setVisibility(View.VISIBLE);
-			}
-			else{
+			if (adapter.getItemCount() == 0){
+                recyclerView.setVisibility(View.GONE);
+                contentTextLayout.setVisibility(View.GONE);
+                emptyImageView.setVisibility(View.VISIBLE);
+                emptyTextView.setVisibility(View.VISIBLE);
+
+				if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+					emptyImageView.setImageResource(R.drawable.contacts_empty_landscape);
+				}else{
+					emptyImageView.setImageResource(R.drawable.ic_empty_contacts);
+				}
+				emptyTextViewFirst.setText(R.string.context_empty_contacts);
+				String text = getString(R.string.section_contacts);
+				emptyTextViewSecond.setText(" "+text+".");
+
+			}else{
 				recyclerView.setVisibility(View.VISIBLE);
 				contentTextLayout.setVisibility(View.VISIBLE);
 				emptyImageView.setVisibility(View.GONE);
@@ -434,6 +447,7 @@ public class ContactsFragmentLollipop extends Fragment{
 			return v;
 		}
 		else{
+			log("isGrid View");
 			View v = inflater.inflate(R.layout.fragment_contactsgrid, container, false);
 			
 			recyclerView = (RecyclerView) v.findViewById(R.id.contacts_grid_view);
@@ -449,10 +463,12 @@ public class ContactsFragmentLollipop extends Fragment{
 				}
 			});
 
-			recyclerView.setItemAnimator(new DefaultItemAnimator());			
-				
+			recyclerView.setItemAnimator(new DefaultItemAnimator());
+
 			emptyImageView = (ImageView) v.findViewById(R.id.contact_grid_empty_image);
-			emptyTextView = (TextView) v.findViewById(R.id.contact_grid_empty_text);
+			emptyTextView = (LinearLayout) v.findViewById(R.id.contact_grid_empty_text);
+			emptyTextViewFirst = (TextView) v.findViewById(R.id.contact_grid_empty_text_first);
+			emptyTextViewSecond = (TextView) v.findViewById(R.id.contact_grid_empty_text_second);
 
 			contentTextLayout = (RelativeLayout) v.findViewById(R.id.contact_content_grid_text_layout);
 
@@ -474,16 +490,23 @@ public class ContactsFragmentLollipop extends Fragment{
 			adapter.setMultipleSelect(false);
 			recyclerView.setAdapter(adapter);
 						
-			if (adapter.getItemCount() == 0){				
-		
-				emptyImageView.setImageResource(R.drawable.ic_empty_contacts);
-				emptyTextView.setText(R.string.contacts_list_empty_text);
-				recyclerView.setVisibility(View.GONE);
-				contentTextLayout.setVisibility(View.GONE);
-				emptyImageView.setVisibility(View.VISIBLE);
-				emptyTextView.setVisibility(View.VISIBLE);
-			}
-			else{
+			if (adapter.getItemCount() == 0){
+
+                recyclerView.setVisibility(View.GONE);
+                contentTextLayout.setVisibility(View.GONE);
+                emptyImageView.setVisibility(View.VISIBLE);
+                emptyTextView.setVisibility(View.VISIBLE);
+
+				if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+					emptyImageView.setImageResource(R.drawable.contacts_empty_landscape);
+				}else{
+					emptyImageView.setImageResource(R.drawable.ic_empty_contacts);
+				}
+				emptyTextViewFirst.setText(R.string.context_empty_contacts);
+				String text = getString(R.string.section_contacts);
+				emptyTextViewSecond.setText(" "+text+".");
+
+			}else{
 				recyclerView.setVisibility(View.VISIBLE);
 				contentTextLayout.setVisibility(View.VISIBLE);
 				emptyImageView.setVisibility(View.GONE);
@@ -635,8 +658,16 @@ public class ContactsFragmentLollipop extends Fragment{
 			recyclerView.setVisibility(View.GONE);
 			emptyImageView.setVisibility(View.VISIBLE);
 			emptyTextView.setVisibility(View.VISIBLE);
-			emptyImageView.setImageResource(R.drawable.ic_empty_contacts);
-			emptyTextView.setText(R.string.contacts_list_empty_text);
+
+			if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+				emptyImageView.setImageResource(R.drawable.contacts_empty_landscape);
+			}else{
+				emptyImageView.setImageResource(R.drawable.ic_empty_contacts);
+			}
+			emptyTextViewFirst.setText(R.string.context_empty_contacts);
+			String text = getString(R.string.section_contacts);
+			emptyTextViewSecond.setText(" "+text+".");
+
 		}
 		else{
 			log("CONTACTS SIZE != 0 ---> "+visibleContacts.size());

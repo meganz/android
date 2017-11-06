@@ -239,10 +239,11 @@
     <string name="section_shared_items" context="title of the screen that shows all the shared items">Shared folders</string>
     <string name="section_rubbish_bin" context="The title of the trash bin in the tree of the file manager.">Rubbish bin</string>
     <string name="section_contacts" context="Title of the contact list">Contacts</string>
-    <string name="section_contacts_with_notification" context="Item of the navigation title for the contacts section when there is any pending incoming request">Contacts [A](%1$d)[/A]</string>
 
-    <string name="tab_sent_requests" context="Title of the sent requests tab. Capital letters">&#160;SENT REQUESTS&#160;</string>
-    <string name="tab_received_requests" context="Title of the received requests tab. Capital letters">RECEIVED REQUESTS</string>
+    <string name="tab_sent_requests" context="Title of the sent requests tab. Capital letters">Sent requests</string>
+    <string name="tab_received_requests" context="Title of the received requests tab. Capital letters">Received requests</string>
+
+    <string name="section_contacts_with_notification" context="Item of the navigation title for the contacts section when there is any pending incoming request">Contacts [A](%1$d)[/A]</string>
     <string name="sent_requests_empty" context="the user has not sent any contact request to other users">No sent requests</string>
     <string name="received_requests_empty" context="the user has not received any contact request from other users">No received requests</string>
     <string name="section_transfers" context="Title for the file transfer screen (with the up &amp; download)">Transfers</string>
@@ -1606,4 +1607,14 @@
     <string name="new_file_subject_when_uploading" context="Title of the field subject when a new file is created to upload">SUBJECT</string>
     <string name="new_file_content_when_uploading" context="Title of the field content when a new file is created to upload">CONTENT</string>
     <string name="new_file_email_when_uploading" context="Title of the field email when a new contact is created to upload">EMAIL</string>
+
+    <string name="context_empty" context="Empty">Empty</string>
+    <string name="context_empty_inbox" context="Title of the empty text when a fragment is empty">No files on your</string>
+    <string name="context_empty_contacts" context="Title of the empty text when a fragment is empty">No</string>
+    <string name="context_empty_offline" context="Title of the empty text when a fragment is empty">No files</string>
+    <string name="context_empty_incoming" context="Title of the empty text when a fragment is empty">Incoming shared folders</string>
+    <string name="context_empty_outgoing" context="Title of the empty text when a fragment is empty">Outgoing shared folders</string>
+    <string name="context_empty_camera_uploads" context="Title of the empty text when a fragment is empty">No media on</string>
+    <string name="context_empty_chat_recent" context="Title of the empty text when a fragment is empty">[B]Invite friends to [/B][A]Chat[/A][B] and enjoy our encrypted platform with privacy and security.[/B]</string>
+
 </resources>

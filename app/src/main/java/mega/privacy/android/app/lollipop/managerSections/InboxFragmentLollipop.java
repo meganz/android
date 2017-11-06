@@ -3,6 +3,7 @@ package mega.privacy.android.app.lollipop.managerSections;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Bundle;
@@ -23,6 +24,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -75,7 +77,10 @@ public class InboxFragmentLollipop extends Fragment{
 	MegaNode selectedNode;
 	
 	ImageView emptyImageView;
-	TextView emptyTextView;
+	LinearLayout emptyTextView;
+	TextView emptyTextViewFirst;
+	TextView emptyTextViewSecond;
+
 	TextView contentText;
 	RelativeLayout contentTextLayout;
 	Stack<Integer> lastPositionStack;
@@ -360,13 +365,15 @@ public class InboxFragmentLollipop extends Fragment{
 			recyclerView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
 			mLayoutManager = new LinearLayoutManager(context);
 			recyclerView.setLayoutManager(mLayoutManager);
-			recyclerView.setItemAnimator(new DefaultItemAnimator());      
-	
+			recyclerView.setItemAnimator(new DefaultItemAnimator());
+
 			emptyImageView = (ImageView) v.findViewById(R.id.inbox_list_empty_image);
-			emptyTextView = (TextView) v.findViewById(R.id.inbox_list_empty_text);
+			emptyTextView = (LinearLayout) v.findViewById(R.id.inbox_list_empty_text);
+			emptyTextViewFirst = (TextView) v.findViewById(R.id.inbox_list_empty_text_first);
+			emptyTextViewSecond = (TextView) v.findViewById(R.id.inbox_list_empty_text_second);
 
 			contentTextLayout = (RelativeLayout) v.findViewById(R.id.inbox_list_content_text_layout);
-			contentText = (TextView) v.findViewById(R.id.inbox_list_content_text);			
+			contentText = (TextView) v.findViewById(R.id.inbox_list_content_text);
 
 			if (adapter == null){
 				adapter = new MegaBrowserLollipopAdapter(context, this, nodes, ((ManagerActivityLollipop) context).parentHandleInbox, recyclerView, aB, Constants.INBOX_ADAPTER, MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST);
@@ -384,10 +391,10 @@ public class InboxFragmentLollipop extends Fragment{
 			setNodes(nodes);
 
 			setContentText();
-
 			return v;
 		}
 		else{
+			log("isGrid View");
 			View v = inflater.inflate(R.layout.fragment_inboxgrid, container, false);
 			
 			recyclerView = (CustomizedGridRecyclerView) v.findViewById(R.id.inbox_grid_view);
@@ -396,10 +403,15 @@ public class InboxFragmentLollipop extends Fragment{
 
 			recyclerView.setItemAnimator(new DefaultItemAnimator());
 
-	        emptyImageView = (ImageView) v.findViewById(R.id.inbox_grid_empty_image);
-			emptyTextView = (TextView) v.findViewById(R.id.inbox_grid_empty_text);
-			emptyImageView.setImageResource(R.drawable.inbox_empty);
-			emptyTextView.setText(R.string.empty_inbox);
+
+			emptyImageView = (ImageView) v.findViewById(R.id.inbox_grid_empty_image);
+			emptyTextView = (LinearLayout) v.findViewById(R.id.inbox_grid_empty_text);
+			emptyTextViewFirst = (TextView) v.findViewById(R.id.inbox_grid_empty_text_first);
+			emptyTextViewSecond = (TextView) v.findViewById(R.id.inbox_grid_empty_text_second);
+
+
+//			emptyImageView.setImageResource(R.drawable.inbox_empty);
+//			emptyTextView.setText(R.string.empty_inbox);
 
 			contentTextLayout = (RelativeLayout) v.findViewById(R.id.inbox_grid_content_text_layout);
 			contentText = (TextView) v.findViewById(R.id.inbox_content_grid_text);			
@@ -726,13 +738,20 @@ public class InboxFragmentLollipop extends Fragment{
 				emptyImageView.setVisibility(View.VISIBLE);
 				emptyTextView.setVisibility(View.VISIBLE);
 				contentTextLayout.setVisibility(View.GONE);
+        
+				if (megaApi.getInboxNode().getHandle()==parentHandle||parentHandle==-1) {
+					if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+						emptyImageView.setImageResource(R.drawable.inbox_empty_landscape);
+					}else{
+						emptyImageView.setImageResource(R.drawable.inbox_empty);
+					}
+					emptyTextViewFirst.setText(R.string.context_empty_inbox);
+					String text = getString(R.string.section_inbox);
+					emptyTextViewSecond.setText(" "+text+".");
 
-				if (megaApi.getInboxNode().getHandle()==((ManagerActivityLollipop) context).parentHandleInbox||((ManagerActivityLollipop) context).parentHandleInbox==-1) {
-					emptyImageView.setImageResource(R.drawable.inbox_empty);
-					emptyTextView.setText(R.string.empty_inbox);
 				} else {
 					emptyImageView.setImageResource(R.drawable.ic_empty_folder);
-					emptyTextView.setText(R.string.file_browser_empty_folder);
+					emptyTextViewFirst.setText(R.string.file_browser_empty_folder);
 				}
 			}
 			else{
@@ -745,9 +764,6 @@ public class InboxFragmentLollipop extends Fragment{
 
 					contentText.setText(MegaApiUtils.getInfoFolder(inboxNode, context));
 				} else {
-					emptyImageView.setImageResource(R.drawable.ic_empty_folder);
-					emptyTextView.setText(R.string.file_browser_empty_folder);
-
 					MegaNode parentNode = megaApi.getNodeByHandle(((ManagerActivityLollipop) context).parentHandleInbox);
 
 					if(parentNode!=null){
