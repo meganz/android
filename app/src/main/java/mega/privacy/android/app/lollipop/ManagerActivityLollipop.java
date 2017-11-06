@@ -313,7 +313,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				case CAMERA_UPLOADS: return context.getString(R.string.section_photo_sync);
 				case INBOX: return context.getString(R.string.section_inbox);
 				case SHARED_ITEMS: return context.getString(R.string.section_shared_items);
-				case CONTACTS: return context.getString(R.string.section_contacts);
+				case CONTACTS: {
+					context.getString(R.string.section_contacts);
+				}
 				case SETTINGS: return context.getString(R.string.action_settings);
 				case ACCOUNT: return context.getString(R.string.section_account);
 				case SEARCH: return context.getString(R.string.action_search);
@@ -324,6 +326,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			return null;
 		}
 	}
+
+
 
 	static DrawerItem drawerItem = null;
 	static DrawerItem lastDrawerItem = null;
@@ -1029,9 +1033,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			log("DrawerItem is null");
 		}
 		super.onSaveInstanceState(outState);
-		int indexShares = 0;
-		int indexCloud = 0;
-		int indexContacts = 0;
 		outState.putLong("parentHandleBrowser", parentHandleBrowser);
 		outState.putLong("parentHandleRubbish", parentHandleRubbish);
 		outState.putLong("parentHandleIncoming", parentHandleIncoming);
@@ -1126,7 +1127,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			log("savedInstanceState -> indexShares: "+indexShares);
 			indexCloud = savedInstanceState.getInt("indexCloud", indexCloud);
 			log("savedInstanceState -> indexCloud: "+indexCloud);
-			indexContacts = savedInstanceState.getInt("indexContacts", indexContacts);
+			indexContacts = savedInstanceState.getInt("indexContacts", 0);
 			pathNavigationOffline = savedInstanceState.getString("pathNavigationOffline", pathNavigationOffline);
 			log("savedInstanceState -> pathNavigationOffline: "+pathNavigationOffline);
 			accountFragment = savedInstanceState.getInt("accountFragment", -1);
@@ -1145,6 +1146,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			parentHandleOutgoing = -1;
 			parentHandleSearch = -1;
 			parentHandleInbox = -1;
+			indexContacts = -1;
 			deepBrowserTreeIncoming = 0;
 			deepBrowserTreeOutgoing = 0;
 			chatConnection = MegaApplication.isChatConnection();
@@ -1656,6 +1658,15 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						finish();
 						return;
 					}
+                    else if(getIntent().getAction().equals(Constants.ACTION_CHAT_SUMMARY)) {
+                        Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
+                        intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        intent.setAction(Constants.ACTION_CHAT_SUMMARY);
+                        startActivity(intent);
+                        finish();
+                        return;
+                    }
 					else if (getIntent().getAction().equals(Constants.ACTION_INCOMING_SHARED_FOLDER_NOTIFICATION)){
 						Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
 						intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
@@ -2005,35 +2016,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					log("Already connected");
 				}
 
-				if (nV != null){
-					Menu nVMenu = nV.getMenu();
-					MenuItem chat = nVMenu.findItem(R.id.navigation_item_chat);
-					int numberUnread = megaChatApi.getUnreadChats();
-					if(numberUnread==0){
-						chat.setTitle(getString(R.string.section_chat));
-					}
-					else{
-						String textToShow = String.format(getString(R.string.section_chat_with_notification), numberUnread);
-						try {
-							textToShow = textToShow.replace("[A]", "<font color=\'#ff333a\'>");
-							textToShow = textToShow.replace("[/A]", "</font>");
-						}
-						catch(Exception e){
-							log("Formatted string: " + textToShow);
-						}
-
-						log("TEXTTOSHOW: " + textToShow);
-						Spanned result = null;
-						if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-							result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
-						} else {
-							result = Html.fromHtml(textToShow);
-						}
-						chat.setTitle(result);
-					}
-				}
+				setChatTitleSection();
 			}
 
+			log("onCreate - Check if there any INCOMING pendingRequest contacts");
+			setContactTitleSection();
 
 			if (drawerItem == null) {
 	        	log("DRAWERITEM NULL");
@@ -3345,23 +3332,27 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				}
 				break;
 			}
+			case INBOX:{
+				if(parentHandleInbox==megaApi.getInboxNode().getHandle()||parentHandleInbox==-1){
+					aB.setTitle(getResources().getString(R.string.section_inbox));
+					log("aB.setHomeAsUpIndicator_886");
+					aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+					firstNavigationLevel = true;
+				}
+				else{
+					MegaNode node = megaApi.getNodeByHandle(parentHandleInbox);
+					aB.setTitle(node.getName());
+					log("indicator_arrow_back_893");
+					aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+					firstNavigationLevel = false;
+				}
+				break;
+			}
 			case CONTACTS:{
 				aB.setSubtitle(null);
 				aB.setTitle(getString(R.string.section_contacts));
 				aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 				firstNavigationLevel = true;
-//				int indexContacts = getTabItemContacts();
-//				switch(indexContacts){
-//					case 0:
-//					case 1:{
-//
-//						break;
-//					}
-//					default:{
-//
-//						break;
-//					}
-//				}
 				break;
 			}
 			case CHAT:{
@@ -3739,30 +3730,35 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			tabLayoutContacts.setupWithViewPager(viewPagerContacts);
 
 			log("The index of the TAB CONTACTS is: " + indexContacts);
-			if(indexContacts!=-1) {
-				if (viewPagerContacts != null) {
-					switch (indexContacts){
-						case 1:{
-							viewPagerContacts.setCurrentItem(1);
-							log("Select Sent Requests TAB");
-							break;
-						}
-						case 2:{
-							viewPagerContacts.setCurrentItem(2);
-							log("Select Received Request TAB");
-							break;
-						}
-						default:{
-							viewPagerContacts.setCurrentItem(0);
-							log("Select Contacts TAB");
-							break;
-						}
+			if(indexContacts==-1) {
+				log("The index os contacts is -1");
+				ArrayList<MegaContactRequest> requests = megaApi.getIncomingContactRequests();
+				if(requests!=null) {
+					int pendingRequest = requests.size();
+					if (pendingRequest != 0) {
+						indexContacts = 2;
 					}
 				}
 			}
-			else{
-				//No bundle, no change of orientation
-				log("indexContacts is NOT -1");
+
+			if (viewPagerContacts != null) {
+				switch (indexContacts){
+					case 1:{
+						viewPagerContacts.setCurrentItem(1);
+						log("Select Sent Requests TAB");
+						break;
+					}
+					case 2:{
+						viewPagerContacts.setCurrentItem(2);
+						log("Select Received Request TAB");
+						break;
+					}
+					default:{
+						viewPagerContacts.setCurrentItem(0);
+						log("Select Contacts TAB");
+						break;
+					}
+				}
 			}
 		}
 		else{
@@ -3774,25 +3770,23 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			sharesTag = getFragmentTag(R.id.contact_tabs_pager, 2);
 			rRFLol = (ReceivedRequestsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(sharesTag);
 
-			if(indexContacts!=-1) {
-				log("The index of the TAB CONTACTS is: " + indexContacts);
-				if (viewPagerContacts != null) {
-					switch (indexContacts) {
-						case 1: {
-							viewPagerContacts.setCurrentItem(1);
-							log("Select Sent Requests TAB");
-							break;
-						}
-						case 2: {
-							viewPagerContacts.setCurrentItem(2);
-							log("Select Received Request TAB");
-							break;
-						}
-						default: {
-							viewPagerContacts.setCurrentItem(0);
-							log("Select Contacts TAB");
-							break;
-						}
+			log("The index of the TAB CONTACTS is: " + indexContacts);
+			if (viewPagerContacts != null) {
+				switch (indexContacts) {
+					case 1: {
+						viewPagerContacts.setCurrentItem(1);
+						log("Select Sent Requests TAB");
+						break;
+					}
+					case 2: {
+						viewPagerContacts.setCurrentItem(2);
+						log("Select Received Request TAB");
+						break;
+					}
+					default: {
+						viewPagerContacts.setCurrentItem(0);
+						log("Select Contacts TAB");
+						break;
 					}
 				}
 			}
@@ -3803,11 +3797,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			@Override
 			public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
 				log("onPageScrolled");
+				indexContacts = position;
 			}
 
 			@Override
 			public void onPageSelected(int position) {
 				log("onPageSelected");
+				indexContacts = position;
+
 				String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);
 				cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
 				if(cFLol!=null){
@@ -4338,38 +4335,37 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
     			tB.setVisibility(View.VISIBLE);
 				iFLol = new InboxFragmentLollipop().newInstance();
 
-				MegaNode node = megaApi.getNodeByHandle(parentHandleInbox);
-				log("Selected Inbox with parent: "+parentHandleInbox);
-//					log("inSFLol deepBrowserTreeIncoming: "+deepBrowserTreeInbox);
-				if (node != null){
-					log("Go to inbox node: "+node.getName());
-					iFLol.setParentHandle(parentHandleInbox);
-
-					ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleInbox), orderCloud);
-					iFLol.setNodes(nodes);
-
-					if(parentHandleInbox==megaApi.getInboxNode().getHandle()){
-						aB.setTitle(getResources().getString(R.string.section_inbox));
-						log("aB.setHomeAsUpIndicator_886");
-						aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
-						firstNavigationLevel = true;
-					}
-					else{
-						aB.setTitle(node.getName());
-						log("indicator_arrow_back_893");
-						aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
-						firstNavigationLevel = false;
-					}
-				}
-				else{
-					log("The Node is NULL");
-					ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getInboxNode(), orderCloud);
-					iFLol.setNodes(nodes);
-					aB.setTitle(getResources().getString(R.string.section_inbox));
-					log("aB.setHomeAsUpIndicator_16");
-					aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
-					firstNavigationLevel = true;
-				}
+//				MegaNode node = megaApi.getNodeByHandle(parentHandleInbox);
+//				log("Selected Inbox with parent: "+parentHandleInbox);
+////					log("inSFLol deepBrowserTreeIncoming: "+deepBrowserTreeInbox);
+//				if (node != null){
+//					log("Go to inbox node: "+node.getName());
+//
+//					ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleInbox), orderCloud);
+//					iFLol.setNodes(nodes);
+//
+//					if(parentHandleInbox==megaApi.getInboxNode().getHandle()){
+//						aB.setTitle(getResources().getString(R.string.section_inbox));
+//						log("aB.setHomeAsUpIndicator_886");
+//						aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+//						firstNavigationLevel = true;
+//					}
+//					else{
+//						aB.setTitle(node.getName());
+//						log("indicator_arrow_back_893");
+//						aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+//						firstNavigationLevel = false;
+//					}
+//				}
+//				else{
+//					log("The Node is NULL");
+//					ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getInboxNode(), orderCloud);
+//					iFLol.setNodes(nodes);
+//					aB.setTitle(getResources().getString(R.string.section_inbox));
+//					log("aB.setHomeAsUpIndicator_16");
+//					aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+//					firstNavigationLevel = true;
+//				}
 
     			tabLayoutCloud.setVisibility(View.GONE);
     			viewPagerCDrive.setVisibility(View.GONE);
@@ -4391,6 +4387,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
     			drawerLayout.closeDrawer(Gravity.LEFT);
 
     			supportInvalidateOptionsMenu();
+				setToolbarTitle();
 				showFabButton();
     			break;
     		}
@@ -7417,9 +7414,23 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 		}
 		else if (drawerItem == DrawerItem.SHARED_ITEMS){
-			outSFLol = (OutgoingSharesFragmentLollipop) sharesPageAdapter.instantiateItem(viewPagerShares, 1);
-			outSFLol.hideMultipleSelect();
-			outSFLol.refresh();
+			if(sharesPageAdapter!=null){
+				outSFLol = (OutgoingSharesFragmentLollipop) sharesPageAdapter.instantiateItem(viewPagerShares, 1);
+				if(outSFLol!=null){
+					if(outSFLol.isAdded()){
+						outSFLol.hideMultipleSelect();
+						outSFLol.refreshContent();
+					}
+				}
+
+				inSFLol = (IncomingSharesFragmentLollipop) sharesPageAdapter.instantiateItem(viewPagerShares, 0);
+				if(inSFLol!=null){
+					if(inSFLol.isAdded()){
+						inSFLol.hideMultipleSelect();
+						inSFLol.refresh();
+					}
+				}
+			}
 
 			//Refresh Rubbish Fragment
 			if(cloudPageAdapter!=null){
@@ -12959,11 +12970,25 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 			if (e.getErrorCode() == MegaError.API_OK){
 				showSnackbar(getString(R.string.context_folder_created));
-				if (fbFLol != null){
-					if (drawerItem == DrawerItem.CLOUD_DRIVE){
+				if (drawerItem == DrawerItem.CLOUD_DRIVE){
+					if (fbFLol != null){
 						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleBrowser), orderCloud);
 						fbFLol.setNodes(nodes);
 						fbFLol.getRecyclerView().invalidate();
+					}
+				}
+				else if (drawerItem == DrawerItem.SHARED_ITEMS){
+					inSFLol = (IncomingSharesFragmentLollipop) sharesPageAdapter.instantiateItem(viewPagerShares, 0);
+					if (inSFLol != null){
+						if(inSFLol.isAdded()) {
+							inSFLol.refresh();
+						}
+					}
+					outSFLol = (OutgoingSharesFragmentLollipop) sharesPageAdapter.instantiateItem(viewPagerShares, 1);
+					if (outSFLol != null){
+						if(outSFLol.isAdded()) {
+							outSFLol.refreshContent();
+						}
 					}
 				}
 			}
@@ -13281,14 +13306,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 			inSFLol = (IncomingSharesFragmentLollipop) sharesPageAdapter.instantiateItem(viewPagerShares, 0);
 			if (inSFLol != null){
-				MegaNode node = megaApi.getNodeByHandle(parentHandleIncoming);
 				if(inSFLol.isAdded()){
-					if (node != null){
-						inSFLol.setNodes(megaApi.getChildren(node, orderOthers));
-					}
-					else{
-						inSFLol.findNodes();
-					}
+					inSFLol.refresh();
 				}
 			}
 		}
@@ -13298,8 +13317,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				MegaNode node = megaApi.getNodeByHandle(parentHandleInbox);
 				if (node != null){
 					log("Go to inbox node: "+node.getName());
-					iFLol.setParentHandle(parentHandleInbox);
-
 					ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleInbox), orderCloud);
 					iFLol.setNodes(nodes);
 				}
@@ -13374,6 +13391,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				}
 				else{
 					log("RECEIVED REQUEST");
+					setContactTitleSection();
 					log("STATUS: "+req.getStatus()+" sourceEmail: "+req.getSourceEmail()+" contactHandle: "+req.getHandle());
 					if(req.getStatus()==MegaContactRequest.STATUS_ACCEPTED){
 						cC.addContactDB(req.getSourceEmail());
@@ -14333,33 +14351,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		if(Util.isChatEnabled()){
 			if(item.hasChanged(MegaChatListItem.CHANGE_TYPE_UNREAD_COUNT)) {
 				log("Change unread count: " + item.getTitle());
-				if (nV != null){
-					Menu nVMenu = nV.getMenu();
-					MenuItem chat = nVMenu.findItem(R.id.navigation_item_chat);
-					int numberUnread = megaChatApi.getUnreadChats();
-					if(numberUnread==0){
-						chat.setTitle(getString(R.string.section_chat));
-					}
-					else{
-                        String textToShow = String.format(getString(R.string.section_chat_with_notification), numberUnread);
-                        try {
-                            textToShow = textToShow.replace("[A]", "<font color=\'#ff333a\'>");
-                            textToShow = textToShow.replace("[/A]", "</font>");
-                        }
-                        catch(Exception e){
-                            log("Formatted string: " + textToShow);
-                        }
-
-						log("TEXTTOSHOW: " + textToShow);
-						Spanned result = null;
-						if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-							result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
-						} else {
-							result = Html.fromHtml(textToShow);
-						}
-						chat.setTitle(result);
-					}
-				}
+				setChatTitleSection();
 			}
 		}
 	}
@@ -14518,6 +14510,71 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		}else{
 
 			log("onConfigurationChanged: changed to PORTRAIT");
+		}
+	}
+
+	public void setContactTitleSection(){
+		ArrayList<MegaContactRequest> requests = megaApi.getIncomingContactRequests();
+
+		if (nV != null) {
+			Menu nVMenu = nV.getMenu();
+			MenuItem contacts = nVMenu.findItem(R.id.navigation_item_contacts);
+			if(requests!=null){
+				int pendingRequest = requests.size();
+				if(pendingRequest==0){
+					contacts.setTitle(getString(R.string.section_contacts));
+				}
+				else{
+					String textToShow = String.format(getString(R.string.section_contacts_with_notification), pendingRequest);
+					try {
+						textToShow = textToShow.replace("[A]", "<font color=\'#ff333a\'>");
+						textToShow = textToShow.replace("[/A]", "</font>");
+					}
+					catch(Exception e){
+						log("Formatted string: " + textToShow);
+					}
+
+					log("TEXTTOSHOW: " + textToShow);
+					Spanned result = null;
+					if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+						result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
+					} else {
+						result = Html.fromHtml(textToShow);
+					}
+					contacts.setTitle(result);
+				}
+			}
+		}
+
+	}
+
+	public void setChatTitleSection(){
+		if (nV != null){
+			Menu nVMenu = nV.getMenu();
+			MenuItem chat = nVMenu.findItem(R.id.navigation_item_chat);
+			int numberUnread = megaChatApi.getUnreadChats();
+			if(numberUnread==0){
+				chat.setTitle(getString(R.string.section_chat));
+			}
+			else{
+				String textToShow = String.format(getString(R.string.section_chat_with_notification), numberUnread);
+				try {
+					textToShow = textToShow.replace("[A]", "<font color=\'#ff333a\'>");
+					textToShow = textToShow.replace("[/A]", "</font>");
+				}
+				catch(Exception e){
+					log("Formatted string: " + textToShow);
+				}
+
+				log("TEXTTOSHOW: " + textToShow);
+				Spanned result = null;
+				if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+					result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
+				} else {
+					result = Html.fromHtml(textToShow);
+				}
+				chat.setTitle(result);
+			}
 		}
 	}
 }

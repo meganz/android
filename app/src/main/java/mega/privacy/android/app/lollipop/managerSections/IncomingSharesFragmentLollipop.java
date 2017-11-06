@@ -545,43 +545,22 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 //		findNodes();
 //	}
 	
-	public void refresh (long _parentHandle){
 
-		MegaNode parentNode=null;
-		if (_parentHandle == -1){
-
+	public void refresh (){
+		log("refresh");
+		MegaNode parentNode = null;
+		if (((ManagerActivityLollipop)context).parentHandleIncoming == -1){
 			log("ParentHandle is -1");
 			findNodes();
-			adapter.setParentHandle(-1);
-
-			aB.setTitle(getString(R.string.section_shared_items));
-			log("aB.setHomeAsUpIndicator_112");
-			aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
-			((ManagerActivityLollipop)context).setFirstNavigationLevel(true);
 		}
 		else{
 			if (megaApi.getNodeByHandle(((ManagerActivityLollipop)context).parentHandleIncoming) == null){
 				findNodes();
-
-				adapter.setParentHandle(-1);
-
-				aB.setTitle(getString(R.string.section_shared_items));
-				log("aB.setHomeAsUpIndicator_111");
-				aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
-				((ManagerActivityLollipop)context).setFirstNavigationLevel(true);
 			}
 			else {
-				adapter.setParentHandle(_parentHandle);
-				parentNode = megaApi.getNodeByHandle(_parentHandle);
-				log("ParentHandle: " + _parentHandle);
-
+				parentNode = megaApi.getNodeByHandle(((ManagerActivityLollipop)context).parentHandleIncoming);
 				nodes = megaApi.getChildren(parentNode, ((ManagerActivityLollipop)context).orderOthers);
 				adapter.setNodes(nodes);
-
-				aB.setTitle(parentNode.getName());
-				log("aB.setHomeAsUpIndicator_60");
-				aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
-				((ManagerActivityLollipop) context).setFirstNavigationLevel(false);
 			}
 		}
 		((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
@@ -593,7 +572,6 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 			if(parentNode!=null){
 				contentText.setText(MegaApiUtils.getInfoFolder(parentNode, context));
 			}
-
 		}
 
 		//If folder has no files
@@ -627,7 +605,6 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 			emptyImageView.setVisibility(View.GONE);
 			emptyTextView.setVisibility(View.GONE);
 		}
-	
 	}
 
 	@Override

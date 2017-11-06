@@ -244,7 +244,9 @@ public class ReceivedRequestsFragmentLollipop extends Fragment {
 			}
 		}
 		else{
-			log("nothing, not multiple select");
+			log("not multiple select - show menu");
+			MegaContactRequest c = contacts.get(position);
+			((ManagerActivityLollipop) context).showReceivedRequestOptionsPanel(c);
 		}
 	}
 

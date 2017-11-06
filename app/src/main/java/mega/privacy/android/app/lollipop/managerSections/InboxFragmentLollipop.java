@@ -72,8 +72,6 @@ public class InboxFragmentLollipop extends Fragment{
 	MegaBrowserLollipopAdapter adapter;
 	public InboxFragmentLollipop inboxFragment = this;
 	MegaNode inboxNode;
-	boolean isList = true;
-	long parentHandle = -1;
 
 	ArrayList<MegaNode> nodes;
 	MegaNode selectedNode;
@@ -338,48 +336,29 @@ public class InboxFragmentLollipop extends Fragment{
 	    display.getMetrics(outMetrics);
 	    density  = getResources().getDisplayMetrics().density;
 
-		if (parentHandle == -1){
-
-			long parentHandleInbox = ((ManagerActivityLollipop)context).getParentHandleInbox();
-			if(parentHandleInbox!=-1){
-				log("After consulting... the parent is: "+parentHandleInbox);
-				parentHandle = parentHandleInbox;
-			}
-		}
-
-		if (parentHandle == -1||parentHandle==megaApi.getInboxNode().getHandle()) {
+		if (((ManagerActivityLollipop) context).parentHandleInbox == -1||((ManagerActivityLollipop) context).parentHandleInbox==megaApi.getInboxNode().getHandle()) {
 			log("parentHandle -1");
 
 			if (megaApi.getInboxNode() != null){
 				inboxNode = megaApi.getInboxNode();
-				parentHandle = inboxNode.getHandle();
-				//		((ManagerActivityLollipop)context).setParentHandleRubbish(parentHandle);
 				nodes = megaApi.getChildren(inboxNode, ((ManagerActivityLollipop)context).orderCloud);
 			}
-			aB.setTitle(getString(R.string.section_inbox));
-			aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
-			((ManagerActivityLollipop)context).setFirstNavigationLevel(true);
-
 		}
 		else{
-			log("parentHandle: " + parentHandle);
-			MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
+			log("parentHandle: " + ((ManagerActivityLollipop) context).parentHandleInbox);
+			MegaNode parentNode = megaApi.getNodeByHandle(((ManagerActivityLollipop) context).parentHandleInbox);
 
 			if(parentNode!=null){
 				log("parentNode: "+parentNode.getName());
 				nodes = megaApi.getChildren(parentNode, ((ManagerActivityLollipop)context).orderCloud);
-				aB.setTitle(parentNode.getName());
-				aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
-				((ManagerActivityLollipop)context).setFirstNavigationLevel(false);
 			}
 
 		}
 		((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
-	    isList = ((ManagerActivityLollipop)context).isList();
 
 		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 	    
-		if (isList){
+		if (((ManagerActivityLollipop) context).isList){
 			View v = inflater.inflate(R.layout.fragment_inboxlist, container, false);
 
 			recyclerView = (RecyclerView) v.findViewById(R.id.inbox_list_view);
@@ -397,10 +376,10 @@ public class InboxFragmentLollipop extends Fragment{
 			contentText = (TextView) v.findViewById(R.id.inbox_list_content_text);
 
 			if (adapter == null){
-				adapter = new MegaBrowserLollipopAdapter(context, this, nodes, parentHandle, recyclerView, aB, Constants.INBOX_ADAPTER, MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST);
+				adapter = new MegaBrowserLollipopAdapter(context, this, nodes, ((ManagerActivityLollipop) context).parentHandleInbox, recyclerView, aB, Constants.INBOX_ADAPTER, MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST);
 			}
 			else{
-				adapter.setParentHandle(parentHandle);
+				adapter.setParentHandle(((ManagerActivityLollipop) context).parentHandleInbox);
 				adapter.setNodes(nodes);
 				adapter.setAdapterType(MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST);
 			}	
@@ -408,37 +387,10 @@ public class InboxFragmentLollipop extends Fragment{
 			adapter.setMultipleSelect(false);
 
 			recyclerView.setAdapter(adapter);
-			contentText.setText(MegaApiUtils.getInfoFolder(inboxNode, context));
 
-			log("call to setNodes");
 			setNodes(nodes);
 
-			if (adapter.getItemCount() == 0){
-
-				recyclerView.setVisibility(View.GONE);
-				emptyImageView.setVisibility(View.VISIBLE);
-				emptyTextView.setVisibility(View.VISIBLE);
-
-				if (megaApi.getInboxNode().getHandle()==parentHandle||parentHandle==-1) {
-					if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-						emptyImageView.setImageResource(R.drawable.inbox_empty_landscape);
-					}else{
-						emptyImageView.setImageResource(R.drawable.inbox_empty);
-					}
-					emptyTextViewFirst.setText(R.string.context_empty_inbox);
-					String text = getString(R.string.section_inbox);
-					emptyTextViewSecond.setText(" "+text+".");
-				} else {
-					emptyImageView.setImageResource(R.drawable.ic_empty_folder);
-					emptyTextViewFirst.setText(R.string.file_browser_empty_folder);
-				}
-			}
-			else{
-				recyclerView.setVisibility(View.VISIBLE);
-				emptyImageView.setVisibility(View.GONE);
-				emptyTextView.setVisibility(View.GONE);
-			}
-
+			setContentText();
 			return v;
 		}
 		else{
@@ -465,32 +417,19 @@ public class InboxFragmentLollipop extends Fragment{
 			contentText = (TextView) v.findViewById(R.id.inbox_content_grid_text);			
 
 			if (adapter == null){
-				adapter = new MegaBrowserLollipopAdapter(context, this, nodes, parentHandle, recyclerView, aB, Constants.INBOX_ADAPTER, MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_GRID);
+				adapter = new MegaBrowserLollipopAdapter(context, this, nodes, ((ManagerActivityLollipop) context).parentHandleInbox, recyclerView, aB, Constants.INBOX_ADAPTER, MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_GRID);
 			}
 			else{
-				adapter.setParentHandle(parentHandle);
+				adapter.setParentHandle(((ManagerActivityLollipop) context).parentHandleInbox);
 				adapter.setNodes(nodes);
 				adapter.setAdapterType(MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_GRID);
 			}
 
 			recyclerView.setAdapter(adapter);
 
-			contentText.setText(MegaApiUtils.getInfoFolder(inboxNode, context));
 			setNodes(nodes);
 
-			if (megaApi.getInboxNode().getHandle()==parentHandle||parentHandle==-1) {
-				if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-					emptyImageView.setImageResource(R.drawable.inbox_empty_landscape);
-				}else{
-					emptyImageView.setImageResource(R.drawable.inbox_empty);
-				}
-				emptyTextViewFirst.setText(R.string.context_empty_inbox);
-				String text = getString(R.string.section_inbox);
-				emptyTextViewSecond.setText(" "+text+".");
-			} else {
-				emptyImageView.setImageResource(R.drawable.ic_empty_folder);
-				emptyTextViewFirst.setText(R.string.file_browser_empty_folder);
-			}
+			setContentText();
 
 			return v;	
 		}
@@ -498,11 +437,11 @@ public class InboxFragmentLollipop extends Fragment{
 	
 	public void refresh(){
 		log("refresh");
-		if(parentHandle==-1||parentHandle==inboxNode.getHandle()){
+		if(((ManagerActivityLollipop) context).parentHandleInbox==-1||((ManagerActivityLollipop) context).parentHandleInbox==inboxNode.getHandle()){
 			nodes = megaApi.getChildren(inboxNode, ((ManagerActivityLollipop)context).orderCloud);
 		}
 		else{
-			MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
+			MegaNode parentNode = megaApi.getNodeByHandle(((ManagerActivityLollipop) context).parentHandleInbox);
 			if(parentNode!=null){
 				log("parentNode: "+parentNode.getName());
 				nodes = megaApi.getChildren(parentNode, ((ManagerActivityLollipop)context).orderCloud);
@@ -543,7 +482,7 @@ public class InboxFragmentLollipop extends Fragment{
 				MegaNode n = nodes.get(position);
 
 				int lastFirstVisiblePosition = 0;
-				if(isList){
+				if(((ManagerActivityLollipop) context).isList){
 					lastFirstVisiblePosition = mLayoutManager.findFirstCompletelyVisibleItemPosition();
 				}
 				else{
@@ -562,42 +501,13 @@ public class InboxFragmentLollipop extends Fragment{
 				((ManagerActivityLollipop)context).setFirstNavigationLevel(false);
 				((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 
-				parentHandle = nodes.get(position).getHandle();
-				MegaNode infoNode = megaApi.getNodeByHandle(parentHandle);
-				contentText.setText(MegaApiUtils.getInfoFolder(infoNode, context));
-				adapter.setParentHandle(parentHandle);
+				((ManagerActivityLollipop) context).setParentHandleInbox(nodes.get(position).getHandle());
 				nodes = megaApi.getChildren(nodes.get(position), ((ManagerActivityLollipop)context).orderCloud);
 				adapter.setNodes(nodes);
+
+				setContentText();
+
 				recyclerView.scrollToPosition(0);
-
-				//If folder has no files
-				if (adapter.getItemCount() == 0){
-
-                    recyclerView.setVisibility(View.GONE);
-                    emptyImageView.setVisibility(View.VISIBLE);
-                    emptyTextView.setVisibility(View.VISIBLE);
-
-					if (megaApi.getInboxNode().getHandle()==n.getHandle()||parentHandle==-1) {
-						if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-							emptyImageView.setImageResource(R.drawable.inbox_empty_landscape);
-						}else{
-							emptyImageView.setImageResource(R.drawable.inbox_empty);
-						}
-						emptyTextViewFirst.setText(R.string.context_empty_inbox);
-						String text = getString(R.string.section_inbox);
-						emptyTextViewSecond.setText(" "+text+".");
-					} else {
-						emptyImageView.setImageResource(R.drawable.ic_empty_folder);
-						emptyTextViewFirst.setText(R.string.file_browser_empty_folder);
-					}
-
-				}
-				else{
-					recyclerView.setVisibility(View.VISIBLE);
-					emptyImageView.setVisibility(View.GONE);
-					emptyTextView.setVisibility(View.GONE);
-				}
-
 			}
 			else{
 				if (MimeTypeList.typeForName(nodes.get(position).getName()).isImage()){
@@ -753,12 +663,9 @@ public class InboxFragmentLollipop extends Fragment{
 			return 0;
 		}
 
-		MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(parentHandle));
+		MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(((ManagerActivityLollipop) context).parentHandleInbox));
 		if (parentNode != null) {
 			log("ParentNode: "+parentNode.getName());
-			recyclerView.setVisibility(View.VISIBLE);
-			emptyImageView.setVisibility(View.GONE);
-			emptyTextView.setVisibility(View.GONE);
 
 			if (parentNode.getHandle() == megaApi.getInboxNode().getHandle()){
 				aB.setTitle(getString(R.string.section_inbox));
@@ -773,10 +680,10 @@ public class InboxFragmentLollipop extends Fragment{
 
 			((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 
-			parentHandle = parentNode.getHandle();
-			((ManagerActivityLollipop)context).setParentHandleInbox(parentHandle);
+			((ManagerActivityLollipop) context).setParentHandleInbox(parentNode.getHandle());
 			nodes = megaApi.getChildren(parentNode, ((ManagerActivityLollipop)context).orderCloud);
 			adapter.setNodes(nodes);
+			setContentText();
 
 			int lastVisiblePosition = 0;
 			if(!lastPositionStack.empty()){
@@ -787,17 +694,13 @@ public class InboxFragmentLollipop extends Fragment{
 
 			if(lastVisiblePosition>=0){
 
-				if(isList){
+				if(((ManagerActivityLollipop) context).isList){
 					mLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
 				}
 				else{
 					gridLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
 				}
 			}
-
-			adapter.setParentHandle(parentHandle);
-
-			contentText.setText(MegaApiUtils.getInfoFolder(parentNode, context));
 			return 2;
 		}
 		else{
@@ -805,25 +708,14 @@ public class InboxFragmentLollipop extends Fragment{
 		}
 	}
 
-	public void setIsList(boolean isList){
-		this.isList = isList;
-	}
-	
 	public boolean getIsList(){
-		return isList;
+		return ((ManagerActivityLollipop) context).isList;
 	}
 	
 	public long getParentHandle(){
-		return adapter.getParentHandle();
+		return ((ManagerActivityLollipop) context).parentHandleInbox;
 	}
-	
-	public void setParentHandle(long parentHandle){
-		this.parentHandle = parentHandle;
-		if (adapter != null){
-			adapter.setParentHandle(parentHandle);
-		}
-	}
-	
+
 	public RecyclerView getRecyclerView(){
 		return recyclerView;
 	}
@@ -833,11 +725,20 @@ public class InboxFragmentLollipop extends Fragment{
 		this.nodes = nodes;
 		if (adapter != null){
 			adapter.setNodes(nodes);
+			setContentText();
+		}	
+	}
+
+	public void setContentText(){
+		log("setContentText");
+		if (((ManagerActivityLollipop) context).isList){
 			if (adapter.getItemCount() == 0){
+
 				recyclerView.setVisibility(View.GONE);
 				emptyImageView.setVisibility(View.VISIBLE);
 				emptyTextView.setVisibility(View.VISIBLE);
-
+				contentTextLayout.setVisibility(View.GONE);
+        
 				if (megaApi.getInboxNode().getHandle()==parentHandle||parentHandle==-1) {
 					if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
 						emptyImageView.setImageResource(R.drawable.inbox_empty_landscape);
@@ -847,6 +748,7 @@ public class InboxFragmentLollipop extends Fragment{
 					emptyTextViewFirst.setText(R.string.context_empty_inbox);
 					String text = getString(R.string.section_inbox);
 					emptyTextViewSecond.setText(" "+text+".");
+
 				} else {
 					emptyImageView.setImageResource(R.drawable.ic_empty_folder);
 					emptyTextViewFirst.setText(R.string.file_browser_empty_folder);
@@ -856,8 +758,20 @@ public class InboxFragmentLollipop extends Fragment{
 				recyclerView.setVisibility(View.VISIBLE);
 				emptyImageView.setVisibility(View.GONE);
 				emptyTextView.setVisibility(View.GONE);
-			}			
-		}	
+				contentTextLayout.setVisibility(View.VISIBLE);
+
+				if (megaApi.getInboxNode().getHandle()==((ManagerActivityLollipop) context).parentHandleInbox||((ManagerActivityLollipop) context).parentHandleInbox==-1) {
+
+					contentText.setText(MegaApiUtils.getInfoFolder(inboxNode, context));
+				} else {
+					MegaNode parentNode = megaApi.getNodeByHandle(((ManagerActivityLollipop) context).parentHandleInbox);
+
+					if(parentNode!=null){
+						contentText.setText(MegaApiUtils.getInfoFolder(parentNode, context));
+					}
+				}
+			}
+		}
 	}
 
 	public void notifyDataSetChanged(){

@@ -32,7 +32,7 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaUser;
 
 
-public class IncomingSharesProviderFragmentLollipop extends Fragment implements RecyclerView.OnItemTouchListener{
+public class IncomingSharesProviderFragmentLollipop extends Fragment{
 
 	Context context;
 	MegaApiAndroid megaApi;
@@ -42,7 +42,6 @@ public class IncomingSharesProviderFragmentLollipop extends Fragment implements 
 	long [] hashes;
 	
 	MegaProviderLollipopAdapter adapter;
-	GestureDetectorCompat detector;
 	public String name;
 
 //	boolean first = false;
@@ -101,8 +100,7 @@ public class IncomingSharesProviderFragmentLollipop extends Fragment implements 
 		listView.addItemDecoration(new SimpleDividerItemDecoration(context, metrics));
 		mLayoutManager = new LinearLayoutManager(context);
 		listView.setLayoutManager(mLayoutManager);
-		listView.addOnItemTouchListener(this);
-		listView.setItemAnimator(new DefaultItemAnimator()); 		
+		listView.setItemAnimator(new DefaultItemAnimator());
 		
 		contentText = (TextView) v.findViewById(R.id.provider_content_text);
 		contentText.setVisibility(View.GONE);
@@ -391,23 +389,5 @@ public class IncomingSharesProviderFragmentLollipop extends Fragment implements 
 
 	public void setDeepBrowserTree(int deepBrowserTree) {
 		this.deepBrowserTree = deepBrowserTree;
-	}
-
-	@Override
-	public boolean onInterceptTouchEvent(RecyclerView arg0, MotionEvent arg1) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public void onRequestDisallowInterceptTouchEvent(boolean arg0) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void onTouchEvent(RecyclerView arg0, MotionEvent arg1) {
-		// TODO Auto-generated method stub
-		
 	}
 }

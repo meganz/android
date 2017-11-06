@@ -3,8 +3,10 @@ package mega.privacy.android.app.lollipop.providers;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
+import android.util.TypedValue;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,13 +20,17 @@ import android.widget.TextView;
 import java.util.ArrayList;
 
 import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.lollipop.CloudDriveExplorerFragmentLollipop;
 import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
+import nz.mega.sdk.MegaShare;
+import nz.mega.sdk.MegaUser;
 
 
 public class MegaProviderLollipopAdapter extends RecyclerView.Adapter<MegaProviderLollipopAdapter.ViewHolderLollipopProvider> implements OnClickListener{
@@ -138,17 +144,35 @@ public class MegaProviderLollipopAdapter extends RecyclerView.Adapter<MegaProvid
 		Util.setViewAlpha(holder.imageView, 1);
 		holder.textViewFileName.setTextColor(context.getResources().getColor(android.R.color.black));		
 		if (node.isFolder()){
-			holder.textViewFileSize.setText(MegaApiUtils.getInfoFolder(node, context));
+			RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
+			params.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
+			params.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
+			params.setMargins(36, 0, 0, 0);
+			holder.imageView.setLayoutParams(params);
+
+			holder.itemLayout.setBackgroundColor(Color.WHITE);
 			holder.imageView.setImageResource(R.drawable.ic_folder_list);
+			holder.textViewFileSize.setText(MegaApiUtils.getInfoFolder(node, context));
 		}
 		else{
-//			Util.setViewAlpha(holder.imageView, .4f);
-//			holder.textViewFileName.setTextColor(context.getResources().getColor(R.color.text_secondary));
+
 			long nodeSize = node.getSize();
 			holder.textViewFileSize.setText(Util.getSizeString(nodeSize));
 			holder.imageView.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
-			
+			RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
+			params.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
+			params.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
+			params.setMargins(36, 0, 0, 0);
+			holder.imageView.setLayoutParams(params);
+
 			if (node.hasThumbnail()){
+
+				RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
+				params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
+				params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
+				params1.setMargins(54, 0, 12, 0);
+				holder.imageView.setLayoutParams(params1);
+
 				thumb = ThumbnailUtilsLollipop.getThumbnailFromCache(node);
 				if (thumb != null){
 					holder.imageView.setImageBitmap(thumb);
@@ -158,35 +182,45 @@ public class MegaProviderLollipopAdapter extends RecyclerView.Adapter<MegaProvid
 					if (thumb != null){
 						holder.imageView.setImageBitmap(thumb);
 					}
-					else{ 
+					else{
 						try{
 							thumb = ThumbnailUtilsLollipop.getThumbnailFromMegaProvider(node, context, holder, megaApi, this);
 						}
 						catch(Exception e){} //Too many AsyncTasks
-						
+
 						if (thumb != null){
 							holder.imageView.setImageBitmap(thumb);
 						}
 					}
 				}
-			}
-			else{
+			}else{
 				thumb = ThumbnailUtilsLollipop.getThumbnailFromCache(node);
 				if (thumb != null){
+					RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
+					params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
+					params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
+					params1.setMargins(54, 0, 12, 0);
+					holder.imageView.setLayoutParams(params1);
 					holder.imageView.setImageBitmap(thumb);
 				}
 				else{
 					thumb = ThumbnailUtilsLollipop.getThumbnailFromFolder(node, context);
 					if (thumb != null){
+						RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
+						params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
+						params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
+						params1.setMargins(54, 0, 12, 0);
+
+						holder.imageView.setLayoutParams(params1);
 						holder.imageView.setImageBitmap(thumb);
 					}
-					else{ 
+					else{
 						try{
 							ThumbnailUtilsLollipop.createThumbnailProviderLollipop(context, node, holder, megaApi, this);
 						}
-						catch(Exception e){} //Too many AsyncTasks
+						catch(Exception e){}//Too many AsyncTasks
 					}
-				}			
+				}
 			}
 		}
 	}
