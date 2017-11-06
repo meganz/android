@@ -169,6 +169,20 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 		}
 		else if (modeCloud == FileExplorerActivityLollipop.COPY){
 			optionButton.setText(getString(R.string.context_copy).toUpperCase(Locale.getDefault()));
+
+			if (((FileExplorerActivityLollipop)context).deepBrowserTree > 0){
+				MegaNode parent = ((FileExplorerActivityLollipop)context).parentMoveCopy();
+				if(parent != null){
+					if(parent.getHandle() == parentHandle) {
+						activateButton(false);
+					}else{
+						activateButton(true);
+					}
+				}else{
+					activateButton(true);
+
+				}
+			}
 		}
 		else if (modeCloud == FileExplorerActivityLollipop.UPLOAD){
 			optionButton.setText(getString(R.string.context_upload).toUpperCase(Locale.getDefault()));
@@ -337,6 +351,7 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 			emptyImageView.setVisibility(View.GONE);
 			emptyTextView.setVisibility(View.GONE);
 		}
+
 		if (modeCloud == FileExplorerActivityLollipop.COPY){
 			activateButton(true);
 		}
@@ -399,12 +414,20 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 				listView.setVisibility(View.VISIBLE);
 				emptyImageView.setVisibility(View.GONE);
 				emptyTextView.setVisibility(View.GONE);
+
 				if (modeCloud == FileExplorerActivityLollipop.COPY){
-					long parent = ((FileExplorerActivityLollipop)context).parentHandleMoveCopy();
-					if(parent == parentHandle) {
-						activateButton(false);
-					}else{
-						activateButton(true);
+					if (((FileExplorerActivityLollipop)context).deepBrowserTree > 0){
+						MegaNode parent = ((FileExplorerActivityLollipop)context).parentMoveCopy();
+						if(parent != null){
+							if(parent.getHandle() == parentHandle) {
+								activateButton(false);
+							}else{
+								activateButton(true);
+							}
+						}else{
+							activateButton(true);
+
+						}
 					}
 				}
 			}
@@ -492,11 +515,18 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 				nodes = megaApi.getChildren(parentNode);
 
 				if (modeCloud == FileExplorerActivityLollipop.COPY){
-					long parent = ((FileExplorerActivityLollipop)context).parentHandleMoveCopy();
-					if(parent == parentHandle) {
-						activateButton(false);
-					}else{
-						activateButton(true);
+					if (((FileExplorerActivityLollipop)context).deepBrowserTree > 0){
+						MegaNode parent = ((FileExplorerActivityLollipop)context).parentMoveCopy();
+						if(parent != null){
+							if(parent.getHandle() == parentHandle) {
+								activateButton(false);
+							}else{
+								activateButton(true);
+							}
+						}else{
+							activateButton(true);
+
+						}
 					}
 				}
 
