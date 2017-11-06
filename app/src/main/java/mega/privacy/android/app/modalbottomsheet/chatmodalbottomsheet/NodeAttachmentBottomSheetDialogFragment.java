@@ -45,6 +45,7 @@ import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatMessage;
+import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaNodeList;
 import nz.mega.sdk.MegaShare;
@@ -55,6 +56,7 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
     Context context;
     MegaNode node = null;
     MegaNodeList nodeList;
+    MegaChatMessage messageMega;
     AndroidMegaChatMessage message = null;
     long chatId;
     long messageId;
@@ -76,6 +78,7 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
     LinearLayout optionDownload;
     LinearLayout optionImport;
     LinearLayout optionSaveOffline;
+    LinearLayout optionRemove;
 
     DisplayMetrics outMetrics;
 
@@ -106,7 +109,7 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
             messageId = savedInstanceState.getLong("messageId", -1);
             log("Handle of the message: "+messageId);
             handle = savedInstanceState.getLong("handle", -1);
-            MegaChatMessage messageMega = megaChatApi.getMessage(chatId, messageId);
+            messageMega = megaChatApi.getMessage(chatId, messageId);
             if(messageMega!=null){
                 message = new AndroidMegaChatMessage(messageMega);
             }
@@ -125,7 +128,7 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
             }
 
             log("Id Chat and Message id: "+chatId+ "___"+messageId);
-            MegaChatMessage messageMega = megaChatApi.getMessage(chatId, messageId);
+            messageMega = megaChatApi.getMessage(chatId, messageId);
             if(messageMega!=null){
                 message = new AndroidMegaChatMessage(messageMega);
             }
@@ -158,11 +161,30 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
         optionView = (LinearLayout) contentView.findViewById(R.id.option_view_layout);
         optionViewText = (TextView) contentView.findViewById(R.id.option_view_text);
         optionSaveOffline = (LinearLayout) contentView.findViewById(R.id.option_save_offline_layout);
+        optionRemove = (LinearLayout) contentView.findViewById(R.id.option_remove_layout);
+
+        if(message.getMessage().getUserHandle() == megaChatApi.getMyUserHandle()){
+            if(messageMega.isDeletable()){
+                log("Message DELETABLE");
+                optionRemove.setVisibility(View.VISIBLE);
+            }
+            else{
+                log("Message NOT DELETABLE");
+                optionRemove.setVisibility(View.GONE);
+            }
+        }else{
+            optionRemove.setVisibility(View.GONE);
+
+        }
+
+
+
         optionImport = (LinearLayout) contentView.findViewById(R.id.option_import_layout);
 
         optionDownload.setOnClickListener(this);
         optionView.setOnClickListener(this);
         optionSaveOffline.setOnClickListener(this);
+        optionRemove.setOnClickListener(this);
         optionImport.setOnClickListener(this);
 
         nodeIconLayout.setVisibility(View.GONE);
@@ -391,6 +413,28 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
                     }
                     else if(context instanceof NodeAttachmentActivityLollipop){
                         chatC.saveForOffline(((NodeAttachmentActivityLollipop) context).selectedNode);
+                    }
+
+                    break;
+                }
+                case R.id.option_remove_layout:{
+                    log("Remove option ");
+                    if(node==null){
+                        log("The selected node is NULL");
+                        return;
+                    }
+
+                    MegaChatRoom mChatRoom = ((ChatActivityLollipop)context).getChatRoom();
+                    if(context instanceof ChatActivityLollipop){
+
+                        if(message!=null){
+                            chatC.deleteMessage(message.getMessage(), mChatRoom.getChatId());
+                        }
+                        else{
+                            log("Message is NULL");
+                        }
+                    }
+                    else if(context instanceof NodeAttachmentActivityLollipop){
                     }
 
                     break;
