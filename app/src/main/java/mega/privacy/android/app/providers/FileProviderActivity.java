@@ -121,7 +121,8 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 	private String lastPassword;
 	private String gPublicKey;
 	private String gPrivateKey;
-	
+
+
 	private MenuItem searchMenuItem;
 
 	CountDownTimer timer;
