@@ -166,19 +166,16 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 		holder.permissionsIcon = (ImageView) v.findViewById(R.id.file_explorer_permissions);
 
 		if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-			log("Landscape configuration");
-			float width = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MAX_WIDTH_FILENAME_LAND, context.getResources().getDisplayMetrics());
-			holder.textViewFileName.setMaxWidth((int) width);
-			holder.textViewFileSize.setMaxWidth((int) width);
+			holder.textViewFileName.setMaxWidth(Util.scaleWidthPx(260, outMetrics));
+			holder.textViewFileSize.setMaxWidth(Util.scaleWidthPx(260, outMetrics));
 
 		}
 		else{
-			log("Portrait configuration");
-			float width = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MAX_WIDTH_FILENAME_PORT, context.getResources().getDisplayMetrics());
-			holder.textViewFileName.setMaxWidth((int) width);
-			holder.textViewFileSize.setMaxWidth((int) width);
+			holder.textViewFileName.setMaxWidth(Util.scaleWidthPx(200, outMetrics));
+			holder.textViewFileSize.setMaxWidth(Util.scaleWidthPx(200, outMetrics));
 
 		}
+
 
 		v.setTag(holder);
 		return holder;
