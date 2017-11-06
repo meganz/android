@@ -2,6 +2,7 @@ package mega.privacy.android.app.lollipop;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -66,8 +67,12 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 	LinearLayout optionsBar;
 	RecyclerView listView;
 	LinearLayoutManager mLayoutManager;
+
 	ImageView emptyImageView;
-	TextView emptyTextView;
+	LinearLayout emptyTextView;
+	TextView emptyTextViewFirst;
+	TextView emptyTextViewSecond;
+
 	TextView contentText;
 	Button optionButton;
 	Button cancelButton;
@@ -207,9 +212,11 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 		
 		contentText = (TextView) v.findViewById(R.id.content_text);
 		contentText.setVisibility(View.GONE);
-		
+
 		emptyImageView = (ImageView) v.findViewById(R.id.file_list_empty_image);
-		emptyTextView = (TextView) v.findViewById(R.id.file_list_empty_text);
+		emptyTextView = (LinearLayout) v.findViewById(R.id.file_list_empty_text);
+		emptyTextViewFirst = (TextView) v.findViewById(R.id.file_list_empty_text_first);
+		emptyTextViewSecond = (TextView) v.findViewById(R.id.file_list_empty_text_second);
 
 		modeCloud = ((FileExplorerActivityLollipop)context).getMode();
 		selectFile = ((FileExplorerActivityLollipop)context).isSelectFile();
@@ -424,12 +431,21 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 			emptyImageView.setVisibility(View.VISIBLE);
 			emptyTextView.setVisibility(View.VISIBLE);
 			if (megaApi.getRootNode().getHandle()==parentHandle) {
-				emptyImageView.setImageResource(R.drawable.ic_empty_cloud_drive);
-				emptyTextView.setText(R.string.file_browser_empty_cloud_drive);
+
+				if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+					emptyImageView.setImageResource(R.drawable.cloud_empty_landscape);
+				}else{
+					emptyImageView.setImageResource(R.drawable.ic_empty_cloud_drive);
+				}
+				emptyTextViewFirst.setText(R.string.context_empty_inbox);
+				String text = getString(R.string.section_cloud_drive);
+				emptyTextViewSecond.setText(" "+text+".");
+
 			} else {
 				emptyImageView.setImageResource(R.drawable.ic_empty_folder);
-				emptyTextView.setText(R.string.file_browser_empty_folder);
+				emptyTextViewFirst.setText(R.string.file_browser_empty_folder);
 			}
+
 		}
 		else{
 			listView.setVisibility(View.VISIBLE);
@@ -521,7 +537,7 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 			emptyImageView.setVisibility(View.VISIBLE);
 			emptyTextView.setVisibility(View.VISIBLE);
 			emptyImageView.setImageResource(R.drawable.ic_empty_folder);
-			emptyTextView.setText(R.string.file_browser_empty_folder);
+			emptyTextViewFirst.setText(R.string.file_browser_empty_folder);
 		}
 		else{
 			listView.setVisibility(View.VISIBLE);
@@ -609,11 +625,17 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 				emptyImageView.setVisibility(View.VISIBLE);
 				emptyTextView.setVisibility(View.VISIBLE);
 				if (megaApi.getRootNode().getHandle()==n.getHandle()) {
-					emptyImageView.setImageResource(R.drawable.ic_empty_cloud_drive);
-					emptyTextView.setText(R.string.file_browser_empty_cloud_drive);
+					if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+						emptyImageView.setImageResource(R.drawable.cloud_empty_landscape);
+					}else{
+						emptyImageView.setImageResource(R.drawable.ic_empty_cloud_drive);
+					}
+					emptyTextViewFirst.setText(R.string.context_empty_inbox);
+					String text = getString(R.string.section_cloud_drive);
+					emptyTextViewSecond.setText(" "+text+".");
 				} else {
 					emptyImageView.setImageResource(R.drawable.ic_empty_folder);
-					emptyTextView.setText(R.string.file_browser_empty_folder);
+					emptyTextViewFirst.setText(R.string.file_browser_empty_folder);
 				}
 				if((modeCloud == FileExplorerActivityLollipop.MOVE) || (modeCloud == FileExplorerActivityLollipop.COPY)){
 					activateButton(true);
@@ -850,11 +872,17 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 				emptyImageView.setVisibility(View.VISIBLE);
 				emptyTextView.setVisibility(View.VISIBLE);
 				if (megaApi.getRootNode().getHandle()==parentHandle) {
-					emptyImageView.setImageResource(R.drawable.ic_empty_cloud_drive);
-					emptyTextView.setText(R.string.file_browser_empty_cloud_drive);
+					if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+						emptyImageView.setImageResource(R.drawable.cloud_empty_landscape);
+					}else{
+						emptyImageView.setImageResource(R.drawable.ic_empty_cloud_drive);
+					}
+					emptyTextViewFirst.setText(R.string.context_empty_inbox);
+					String text = getString(R.string.section_cloud_drive);
+					emptyTextViewSecond.setText(" "+text+".");
 				} else {
 					emptyImageView.setImageResource(R.drawable.ic_empty_folder);
-					emptyTextView.setText(R.string.file_browser_empty_folder);
+					emptyTextViewFirst.setText(R.string.file_browser_empty_folder);
 				}
 			}
 			else{

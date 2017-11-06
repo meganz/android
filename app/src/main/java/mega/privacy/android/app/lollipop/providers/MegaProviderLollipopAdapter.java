@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -52,7 +53,7 @@ public class MegaProviderLollipopAdapter extends RecyclerView.Adapter<MegaProvid
 	Object fragment;
 	RecyclerView listFragment;
 	ImageView emptyImageViewFragment;
-	TextView emptyTextViewFragment;
+	LinearLayout emptyTextViewFragment;
 	
 	/*public static view holder class*/
     public class ViewHolderLollipopProvider extends RecyclerView.ViewHolder{
@@ -67,7 +68,7 @@ public class MegaProviderLollipopAdapter extends RecyclerView.Adapter<MegaProvid
     	public long document;
     }
 	
-	public MegaProviderLollipopAdapter(Context _context, Object fragment, ArrayList<MegaNode> _nodes, long _parentHandle, RecyclerView listView, ImageView emptyImageView, TextView emptyTextView){
+	public MegaProviderLollipopAdapter(Context _context, Object fragment, ArrayList<MegaNode> _nodes, long _parentHandle, RecyclerView listView, ImageView emptyImageView, LinearLayout emptyTextView){
 		this.context = _context;
 		this.nodes = _nodes;
 		this.parentHandle = _parentHandle;
