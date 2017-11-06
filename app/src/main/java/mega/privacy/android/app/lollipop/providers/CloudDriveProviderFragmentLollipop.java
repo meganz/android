@@ -33,7 +33,7 @@ import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 
 
-public class CloudDriveProviderFragmentLollipop extends Fragment implements RecyclerView.OnItemTouchListener, GestureDetector.OnGestureListener{
+public class CloudDriveProviderFragmentLollipop extends Fragment{
 
 	Context context;
 	MegaApiAndroid megaApi;
@@ -41,7 +41,6 @@ public class CloudDriveProviderFragmentLollipop extends Fragment implements Recy
 	long parentHandle = -1;
 	
 	MegaProviderLollipopAdapter adapter;
-	GestureDetectorCompat detector;
 	MegaPreferences prefs;
 	DatabaseHandler dbH;
 	
@@ -58,21 +57,6 @@ public class CloudDriveProviderFragmentLollipop extends Fragment implements Recy
 	Stack<Integer> lastPositionStack;
 	
 	long [] hashes;
-	
-	public class RecyclerViewOnGestureListener extends SimpleOnGestureListener{
-
-		public void onLongPress(MotionEvent e) {
-			View view = listView.findChildViewUnder(e.getX(), e.getY());
-			int position = listView.getChildPosition(view);
-
-			// handle long press
-			if (adapter.getPositionClicked() == -1){
-				//TODO: multiselect
-				itemClick(position);
-			}  
-			super.onLongPress(e);
-		}
-	}
 
 	public static CloudDriveProviderFragmentLollipop newInstance() {
 		log("newInstance");
@@ -108,15 +92,12 @@ public class CloudDriveProviderFragmentLollipop extends Fragment implements Recy
 		
 		DisplayMetrics metrics = new DisplayMetrics();
 		display.getMetrics(metrics);
-		
-		detector = new GestureDetectorCompat(getActivity(), new RecyclerViewOnGestureListener());
 
 		listView = (RecyclerView) v.findViewById(R.id.provider_list_view_browser);
 		listView.addItemDecoration(new SimpleDividerItemDecoration(context, metrics));
 		mLayoutManager = new LinearLayoutManager(context);
 		listView.setLayoutManager(mLayoutManager);
-		listView.addOnItemTouchListener(this);
-		listView.setItemAnimator(new DefaultItemAnimator()); 
+		listView.setItemAnimator(new DefaultItemAnimator());
 		
 		contentText = (TextView) v.findViewById(R.id.provider_content_text);
 		contentText.setVisibility(View.GONE);
@@ -207,7 +188,7 @@ public class CloudDriveProviderFragmentLollipop extends Fragment implements Recy
     }
 
     public void itemClick(int position) {
-		log("onItemClick");
+		log("itemClick");
 		
 		if (nodes.get(position).isFolder()){
 					
@@ -341,61 +322,5 @@ public class CloudDriveProviderFragmentLollipop extends Fragment implements Recy
 	
 	public RecyclerView getListView(){
 		return listView;
-	}
-
-	@Override
-	public boolean onDown(MotionEvent e) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public void onShowPress(MotionEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public boolean onSingleTapUp(MotionEvent e) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX,
-			float distanceY) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public void onLongPress(MotionEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
-			float velocityY) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean onInterceptTouchEvent(RecyclerView rV, MotionEvent e) {
-		detector.onTouchEvent(e);
-		return false;
-	}
-
-	@Override
-	public void onRequestDisallowInterceptTouchEvent(boolean arg0) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void onTouchEvent(RecyclerView arg0, MotionEvent arg1) {
-		// TODO Auto-generated method stub
-		
 	}
 }
