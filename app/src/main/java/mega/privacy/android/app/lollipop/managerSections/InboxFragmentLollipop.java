@@ -389,8 +389,6 @@ public class InboxFragmentLollipop extends Fragment{
 			recyclerView.setAdapter(adapter);
 
 			setNodes(nodes);
-
-			setContentText();
 			return v;
 		}
 		else{
@@ -449,10 +447,6 @@ public class InboxFragmentLollipop extends Fragment{
 		}
 
 		setNodes(nodes);
-		contentText.setText(MegaApiUtils.getInfoFolder(inboxNode, context));
-		if(adapter != null){				
-			adapter.notifyDataSetChanged();
-		}		
 	}
 
 	@Override
@@ -682,8 +676,7 @@ public class InboxFragmentLollipop extends Fragment{
 
 			((ManagerActivityLollipop) context).setParentHandleInbox(parentNode.getHandle());
 			nodes = megaApi.getChildren(parentNode, ((ManagerActivityLollipop)context).orderCloud);
-			adapter.setNodes(nodes);
-			setContentText();
+			setNodes(nodes);
 
 			int lastVisiblePosition = 0;
 			if(!lastPositionStack.empty()){
@@ -739,7 +732,7 @@ public class InboxFragmentLollipop extends Fragment{
 				emptyTextView.setVisibility(View.VISIBLE);
 				contentTextLayout.setVisibility(View.GONE);
         
-				if (megaApi.getInboxNode().getHandle()==parentHandle||parentHandle==-1) {
+				if (megaApi.getInboxNode().getHandle()==((ManagerActivityLollipop)context).parentHandleInbox||((ManagerActivityLollipop)context).parentHandleInbox==-1) {
 					if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
 						emptyImageView.setImageResource(R.drawable.inbox_empty_landscape);
 					}else{
