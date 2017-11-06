@@ -1447,7 +1447,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			}
 		};
 
-		AlertDialog.Builder builder = new AlertDialog.Builder(contactInfoActivityLollipop, R.style.AppCompatAlertDialogStyle);
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		String title = getResources().getQuantityString(R.plurals.title_confirmation_remove_contact, 1);
 		builder.setTitle(title);
 		String message= getResources().getQuantityString(R.plurals.confirmation_remove_contact, 1);
