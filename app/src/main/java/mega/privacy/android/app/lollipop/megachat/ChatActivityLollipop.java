@@ -1764,92 +1764,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
             if (selected.size() !=0) {
 //                MenuItem unselect = menu.findItem(R.id.cab_menu_unselect_all);
-                if (selected.size() == 1) {
 
-                    if(selected.get(0).isUploading()){
-                        menu.findItem(R.id.chat_cab_menu_copy).setVisible(false);
-                        menu.findItem(R.id.chat_cab_menu_delete).setVisible(false);
-                        menu.findItem(R.id.chat_cab_menu_edit).setVisible(false);
-                        menu.findItem(R.id.chat_cab_menu_forward).setVisible(false);
-                    }
-                    else if(selected.get(0).getMessage().getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT){
-                        log("TYPE_NODE_ATTACHMENT selected");
-                        menu.findItem(R.id.chat_cab_menu_copy).setVisible(false);
-                        menu.findItem(R.id.chat_cab_menu_edit).setVisible(false);
+                if(chatRoom.getOwnPrivilege()==MegaChatRoom.PRIV_RM||chatRoom.getOwnPrivilege()==MegaChatRoom.PRIV_RO){
 
-                        if(selected.get(0).getMessage().getUserHandle()==myUserHandle){
-                            if(selected.get(0).getMessage().isDeletable()){
-                                log("one message Message DELETABLE");
-                                menu.findItem(R.id.chat_cab_menu_delete).setVisible(true);
-                            }
-                            else{
-                                log("one message Message NOT DELETABLE");
-                                menu.findItem(R.id.chat_cab_menu_delete).setVisible(false);
-                            }
-                            menu.findItem(R.id.chat_cab_menu_forward).setVisible(true);
-
-                        }
-                        else{
-                            menu.findItem(R.id.chat_cab_menu_delete).setVisible(false);
-                            menu.findItem(R.id.chat_cab_menu_forward).setVisible(false);
-                        }
-                    }
-                    else if(selected.get(0).getMessage().getType()==MegaChatMessage.TYPE_CONTACT_ATTACHMENT){
-                        menu.findItem(R.id.chat_cab_menu_copy).setVisible(false);
-                        menu.findItem(R.id.chat_cab_menu_edit).setVisible(false);
-
-                        if(selected.get(0).getMessage().isDeletable()){
-                            log("one message Message DELETABLE");
-                            menu.findItem(R.id.chat_cab_menu_delete).setVisible(true);
-                        }
-                        else{
-                            log("one message Message NOT DELETABLE");
-                            menu.findItem(R.id.chat_cab_menu_delete).setVisible(false);
-                        }
-
-                        if(selected.get(0).getMessage().getUserHandle()==myUserHandle){
-                            menu.findItem(R.id.chat_cab_menu_forward).setVisible(true);
-                        }
-                        else{
-                            menu.findItem(R.id.chat_cab_menu_forward).setVisible(false);
-                        }
-                    }
-                    else{
-                        MegaChatMessage messageSelected= megaChatApi.getMessage(idChat, selected.get(0).getMessage().getMsgId());
-
-                        menu.findItem(R.id.chat_cab_menu_copy).setVisible(true);
-
-                        if(messageSelected.getUserHandle()==myUserHandle){
-                            if(messageSelected.isEditable()){
-                                log("Message EDITABLE");
-                                menu.findItem(R.id.chat_cab_menu_edit).setVisible(true);
-                            }
-                            else{
-                                log("Message NOT EDITABLE");
-                                menu.findItem(R.id.chat_cab_menu_edit).setVisible(false);
-                            }
-                            if(messageSelected.isDeletable()){
-                                log("Message DELETABLE");
-                                menu.findItem(R.id.chat_cab_menu_delete).setVisible(true);
-                            }
-                            else{
-                                log("Message NOT DELETABLE");
-                                menu.findItem(R.id.chat_cab_menu_delete).setVisible(false);
-                            }
-                            menu.findItem(R.id.chat_cab_menu_forward).setVisible(true);
-                        }
-                        else{
-                            menu.findItem(R.id.chat_cab_menu_edit).setVisible(false);
-                            menu.findItem(R.id.chat_cab_menu_delete).setVisible(false);
-                            menu.findItem(R.id.chat_cab_menu_forward).setVisible(false);
-                        }
-                    }
-                }
-                else{
-                    log("Many items selected");
-                    boolean showDelete = true;
                     boolean showCopy = true;
-                    boolean showForward = true;
 
                     for(int i=0; i<selected.size();i++) {
 
@@ -1858,36 +1776,140 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                                 showCopy = false;
                             }
                         }
+                    }
 
-                        if (showDelete) {
-                            if (selected.get(i).getMessage().getUserHandle() == myUserHandle) {
-                                if (selected.get(i).getMessage().getType() == MegaChatMessage.TYPE_NORMAL || selected.get(i).getMessage().getType() == MegaChatMessage.TYPE_NODE_ATTACHMENT || selected.get(i).getMessage().getType() == MegaChatMessage.TYPE_CONTACT_ATTACHMENT) {
-                                    if (!(selected.get(i).getMessage().isDeletable())) {
+                    menu.findItem(R.id.chat_cab_menu_edit).setVisible(false);
+                    menu.findItem(R.id.chat_cab_menu_copy).setVisible(showCopy);
+                    menu.findItem(R.id.chat_cab_menu_delete).setVisible(false);
+                    menu.findItem(R.id.chat_cab_menu_forward).setVisible(false);
+                }
+                else{
+                    log("Chat with permissions");
+                    if (selected.size() == 1) {
+
+                        if(selected.get(0).isUploading()){
+                            menu.findItem(R.id.chat_cab_menu_copy).setVisible(false);
+                            menu.findItem(R.id.chat_cab_menu_delete).setVisible(false);
+                            menu.findItem(R.id.chat_cab_menu_edit).setVisible(false);
+                            menu.findItem(R.id.chat_cab_menu_forward).setVisible(false);
+                        }
+                        else if(selected.get(0).getMessage().getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT){
+                            log("TYPE_NODE_ATTACHMENT selected");
+                            menu.findItem(R.id.chat_cab_menu_copy).setVisible(false);
+                            menu.findItem(R.id.chat_cab_menu_edit).setVisible(false);
+
+                            if(selected.get(0).getMessage().getUserHandle()==myUserHandle){
+                                if(selected.get(0).getMessage().isDeletable()){
+                                    log("one message Message DELETABLE");
+                                    menu.findItem(R.id.chat_cab_menu_delete).setVisible(true);
+                                }
+                                else{
+                                    log("one message Message NOT DELETABLE");
+                                    menu.findItem(R.id.chat_cab_menu_delete).setVisible(false);
+                                }
+                                menu.findItem(R.id.chat_cab_menu_forward).setVisible(true);
+
+                            }
+                            else{
+                                menu.findItem(R.id.chat_cab_menu_delete).setVisible(false);
+                                menu.findItem(R.id.chat_cab_menu_forward).setVisible(false);
+                            }
+                        }
+                        else if(selected.get(0).getMessage().getType()==MegaChatMessage.TYPE_CONTACT_ATTACHMENT){
+                            menu.findItem(R.id.chat_cab_menu_copy).setVisible(false);
+                            menu.findItem(R.id.chat_cab_menu_edit).setVisible(false);
+
+                            if(selected.get(0).getMessage().isDeletable()){
+                                log("one message Message DELETABLE");
+                                menu.findItem(R.id.chat_cab_menu_delete).setVisible(true);
+                            }
+                            else{
+                                log("one message Message NOT DELETABLE");
+                                menu.findItem(R.id.chat_cab_menu_delete).setVisible(false);
+                            }
+
+                            if(selected.get(0).getMessage().getUserHandle()==myUserHandle){
+                                menu.findItem(R.id.chat_cab_menu_forward).setVisible(true);
+                            }
+                            else{
+                                menu.findItem(R.id.chat_cab_menu_forward).setVisible(false);
+                            }
+                        }
+                        else{
+                            MegaChatMessage messageSelected= megaChatApi.getMessage(idChat, selected.get(0).getMessage().getMsgId());
+
+                            menu.findItem(R.id.chat_cab_menu_copy).setVisible(true);
+
+                            if(messageSelected.getUserHandle()==myUserHandle){
+                                if(messageSelected.isEditable()){
+                                    log("Message EDITABLE");
+                                    menu.findItem(R.id.chat_cab_menu_edit).setVisible(true);
+                                }
+                                else{
+                                    log("Message NOT EDITABLE");
+                                    menu.findItem(R.id.chat_cab_menu_edit).setVisible(false);
+                                }
+                                if(messageSelected.isDeletable()){
+                                    log("Message DELETABLE");
+                                    menu.findItem(R.id.chat_cab_menu_delete).setVisible(true);
+                                }
+                                else{
+                                    log("Message NOT DELETABLE");
+                                    menu.findItem(R.id.chat_cab_menu_delete).setVisible(false);
+                                }
+                                menu.findItem(R.id.chat_cab_menu_forward).setVisible(true);
+                            }
+                            else{
+                                menu.findItem(R.id.chat_cab_menu_edit).setVisible(false);
+                                menu.findItem(R.id.chat_cab_menu_delete).setVisible(false);
+                                menu.findItem(R.id.chat_cab_menu_forward).setVisible(false);
+                            }
+                        }
+                    }
+                    else{
+                        log("Many items selected");
+                        boolean showDelete = true;
+                        boolean showCopy = true;
+                        boolean showForward = true;
+
+                        for(int i=0; i<selected.size();i++) {
+
+                            if (showCopy) {
+                                if (selected.get(i).getMessage().getType() == MegaChatMessage.TYPE_NODE_ATTACHMENT || selected.get(i).getMessage().getType() == MegaChatMessage.TYPE_CONTACT_ATTACHMENT) {
+                                    showCopy = false;
+                                }
+                            }
+
+                            if (showDelete) {
+                                if (selected.get(i).getMessage().getUserHandle() == myUserHandle) {
+                                    if (selected.get(i).getMessage().getType() == MegaChatMessage.TYPE_NORMAL || selected.get(i).getMessage().getType() == MegaChatMessage.TYPE_NODE_ATTACHMENT || selected.get(i).getMessage().getType() == MegaChatMessage.TYPE_CONTACT_ATTACHMENT) {
+                                        if (!(selected.get(i).getMessage().isDeletable())) {
+                                            showDelete = false;
+                                        }
+                                    } else {
                                         showDelete = false;
                                     }
                                 } else {
                                     showDelete = false;
                                 }
-                            } else {
-                                showDelete = false;
                             }
-                        }
 
-                        if (showForward) {
-                            if (selected.get(i).getMessage().getUserHandle() == myUserHandle) {
-                                if (selected.get(i).getMessage().getType() == MegaChatMessage.TYPE_TRUNCATE) {
+                            if (showForward) {
+                                if (selected.get(i).getMessage().getUserHandle() == myUserHandle) {
+                                    if (selected.get(i).getMessage().getType() == MegaChatMessage.TYPE_TRUNCATE) {
+                                        showForward = false;
+                                    }
+                                } else {
                                     showForward = false;
                                 }
-                            } else {
-                                showForward = false;
                             }
                         }
-                    }
 
-                    menu.findItem(R.id.chat_cab_menu_edit).setVisible(false);
-                    menu.findItem(R.id.chat_cab_menu_copy).setVisible(showCopy);
-                    menu.findItem(R.id.chat_cab_menu_delete).setVisible(showDelete);
-                    menu.findItem(R.id.chat_cab_menu_forward).setVisible(showForward);
+                        menu.findItem(R.id.chat_cab_menu_edit).setVisible(false);
+                        menu.findItem(R.id.chat_cab_menu_copy).setVisible(showCopy);
+                        menu.findItem(R.id.chat_cab_menu_delete).setVisible(showDelete);
+                        menu.findItem(R.id.chat_cab_menu_forward).setVisible(showForward);
+                    }
                 }
             }
             return false;
