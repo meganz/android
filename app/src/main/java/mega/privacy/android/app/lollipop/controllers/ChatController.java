@@ -249,10 +249,9 @@ public class ChatController {
         return text;
     }
 
-    public String createManagementString(AndroidMegaChatMessage androidMessage, MegaChatRoom chatRoom) {
+    public String createManagementString(MegaChatMessage message, MegaChatRoom chatRoom) {
         log("createManagementString");
 
-        MegaChatMessage message = androidMessage.getMessage();
         long userHandle = message.getUserHandle();
 
         if (message.getType() == MegaChatMessage.TYPE_ALTER_PARTICIPANTS) {
@@ -668,6 +667,13 @@ public class ChatController {
                 }
             }
         }
+    }
+
+    public String createManagementString(AndroidMegaChatMessage androidMessage, MegaChatRoom chatRoom) {
+        log("createManagementString with AndroidMessage");
+
+        MegaChatMessage message = androidMessage.getMessage();
+        return createManagementString(message, chatRoom);
     }
 
     public String getFirstName(long userHandle, MegaChatRoom chatRoom){
