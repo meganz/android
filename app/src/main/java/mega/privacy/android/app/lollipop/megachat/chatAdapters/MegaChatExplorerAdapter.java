@@ -240,12 +240,22 @@ public class MegaChatExplorerAdapter extends RecyclerView.Adapter<MegaChatExplor
 			holder.itemView.setOnClickListener(null);
 		}
 		else{
-			holder.muteIcon.setAlpha(1.0f);
-			holder.textViewContactName.setAlpha(1.0f);
-			holder.textViewContent.setAlpha(1.0f);
-			holder.textViewDate.setAlpha(1.0f);
-			holder.contactStateIcon.setAlpha(1.0f);
-			holder.itemView.setOnClickListener(this);
+			if(((ChatExplorerFragment)fragment).getChatIdFrom()==chat.getChatId()){
+				holder.muteIcon.setAlpha(0.4f);
+				holder.textViewContactName.setAlpha(0.4f);
+				holder.textViewContent.setAlpha(0.4f);
+				holder.textViewDate.setAlpha(0.4f);
+				holder.contactStateIcon.setAlpha(0.4f);
+				holder.itemView.setOnClickListener(null);
+			}
+			else{
+				holder.muteIcon.setAlpha(1.0f);
+				holder.textViewContactName.setAlpha(1.0f);
+				holder.textViewContent.setAlpha(1.0f);
+				holder.textViewDate.setAlpha(1.0f);
+				holder.contactStateIcon.setAlpha(1.0f);
+				holder.itemView.setOnClickListener(this);
+			}
 		}
 	}
 
