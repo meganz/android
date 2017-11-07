@@ -4,7 +4,6 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.res.ColorStateList;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -40,13 +39,9 @@ import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
-import android.widget.ScrollView;
 import android.widget.TextView;
 
-import org.w3c.dom.NodeList;
-
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
@@ -59,7 +54,6 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.components.NpaLinearLayoutManager;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
-import mega.privacy.android.app.lollipop.ChatFullScreenImageViewer;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
@@ -1776,6 +1770,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         menu.findItem(R.id.chat_cab_menu_copy).setVisible(false);
                         menu.findItem(R.id.chat_cab_menu_delete).setVisible(false);
                         menu.findItem(R.id.chat_cab_menu_edit).setVisible(false);
+                        menu.findItem(R.id.chat_cab_menu_forward).setVisible(false);
                     }
                     else if(selected.get(0).getMessage().getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT){
                         log("TYPE_NODE_ATTACHMENT selected");
@@ -1791,9 +1786,12 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                                 log("one message Message NOT DELETABLE");
                                 menu.findItem(R.id.chat_cab_menu_delete).setVisible(false);
                             }
+                            menu.findItem(R.id.chat_cab_menu_forward).setVisible(true);
+
                         }
                         else{
                             menu.findItem(R.id.chat_cab_menu_delete).setVisible(false);
+                            menu.findItem(R.id.chat_cab_menu_forward).setVisible(false);
                         }
                     }
                     else if(selected.get(0).getMessage().getType()==MegaChatMessage.TYPE_CONTACT_ATTACHMENT){
@@ -1807,6 +1805,13 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         else{
                             log("one message Message NOT DELETABLE");
                             menu.findItem(R.id.chat_cab_menu_delete).setVisible(false);
+                        }
+
+                        if(selected.get(0).getMessage().getUserHandle()==myUserHandle){
+                            menu.findItem(R.id.chat_cab_menu_forward).setVisible(true);
+                        }
+                        else{
+                            menu.findItem(R.id.chat_cab_menu_forward).setVisible(false);
                         }
                     }
                     else{
@@ -1831,51 +1836,58 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                                 log("Message NOT DELETABLE");
                                 menu.findItem(R.id.chat_cab_menu_delete).setVisible(false);
                             }
+                            menu.findItem(R.id.chat_cab_menu_forward).setVisible(true);
                         }
                         else{
                             menu.findItem(R.id.chat_cab_menu_edit).setVisible(false);
                             menu.findItem(R.id.chat_cab_menu_delete).setVisible(false);
+                            menu.findItem(R.id.chat_cab_menu_forward).setVisible(false);
                         }
                     }
                 }
                 else{
                     log("Many items selected");
                     boolean showDelete = true;
-                    menu.findItem(R.id.chat_cab_menu_edit).setVisible(false);
-                    menu.findItem(R.id.chat_cab_menu_copy).setVisible(true);
-                    menu.findItem(R.id.chat_cab_menu_delete).setVisible(true);
+                    boolean showCopy = true;
+                    boolean showForward = true;
 
-                    for(int i=0; i<selected.size();i++){
-                        if(selected.get(i).getMessage().getUserHandle()==myUserHandle){
+                    for(int i=0; i<selected.size();i++) {
 
-                            if(selected.get(i).getMessage().getType()==MegaChatMessage.TYPE_NORMAL||selected.get(i).getMessage().getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT||selected.get(i).getMessage().getType()==MegaChatMessage.TYPE_CONTACT_ATTACHMENT){
-                               log("Message TYPE_NORMAL");
-                                if(!(selected.get(i).getMessage().isDeletable())){
-                                    log("onPrepareActionMode: not deletable");
-                                    menu.findItem(R.id.chat_cab_menu_delete).setVisible(false);
-                                    break;
+                        if (showCopy) {
+                            if (selected.get(i).getMessage().getType() == MegaChatMessage.TYPE_NODE_ATTACHMENT || selected.get(i).getMessage().getType() == MegaChatMessage.TYPE_CONTACT_ATTACHMENT) {
+                                showCopy = false;
+                            }
+                        }
+
+                        if (showDelete) {
+                            if (selected.get(i).getMessage().getUserHandle() == myUserHandle) {
+                                if (selected.get(i).getMessage().getType() == MegaChatMessage.TYPE_NORMAL || selected.get(i).getMessage().getType() == MegaChatMessage.TYPE_NODE_ATTACHMENT || selected.get(i).getMessage().getType() == MegaChatMessage.TYPE_CONTACT_ATTACHMENT) {
+                                    if (!(selected.get(i).getMessage().isDeletable())) {
+                                        showDelete = false;
+                                    }
+                                } else {
+                                    showDelete = false;
                                 }
-                            }
-                            else if(selected.get(i).getMessage().getType()==MegaChatMessage.TYPE_TRUNCATE){
-                                menu.findItem(R.id.chat_cab_menu_delete).setVisible(false);
-                                break;
+                            } else {
+                                showDelete = false;
                             }
                         }
-                        else{
-                            log("onPrepareActionMode: not MY message");
-                            menu.findItem(R.id.chat_cab_menu_delete).setVisible(false);
+
+                        if (showForward) {
+                            if (selected.get(i).getMessage().getUserHandle() == myUserHandle) {
+                                if (selected.get(i).getMessage().getType() == MegaChatMessage.TYPE_TRUNCATE) {
+                                    showForward = false;
+                                }
+                            } else {
+                                showForward = false;
+                            }
                         }
                     }
 
-                    for(int i=0; i<selected.size();i++){
-                        if(selected.get(i).getMessage().getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT||selected.get(i).getMessage().getType()==MegaChatMessage.TYPE_CONTACT_ATTACHMENT){
-                            menu.findItem(R.id.chat_cab_menu_copy).setVisible(false);
-                            break;
-                        }
-                        else{
-                            menu.findItem(R.id.chat_cab_menu_copy).setVisible(true);
-                        }
-                    }
+                    menu.findItem(R.id.chat_cab_menu_edit).setVisible(false);
+                    menu.findItem(R.id.chat_cab_menu_copy).setVisible(showCopy);
+                    menu.findItem(R.id.chat_cab_menu_delete).setVisible(showDelete);
+                    menu.findItem(R.id.chat_cab_menu_forward).setVisible(showForward);
                 }
             }
             return false;

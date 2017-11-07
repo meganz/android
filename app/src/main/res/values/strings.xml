@@ -1617,4 +1617,6 @@
     <string name="context_empty_camera_uploads" context="Title of the empty text when a fragment is empty">No media on</string>
     <string name="context_empty_chat_recent" context="Title of the empty text when a fragment is empty">[B]Invite friends to [/B][A]Chat[/A][B] and enjoy our encrypted platform with privacy and security.[/B]</string>
 
+    <string name="forward_menu_item" context="Item of a menu to forward a message chat to another chatroom">Forward</string>
+
 </resources>
