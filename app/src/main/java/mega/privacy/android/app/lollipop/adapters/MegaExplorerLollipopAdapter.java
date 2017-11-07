@@ -297,8 +297,8 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 			params.setMargins(36, 0, 0, 0);
 			holder.imageView.setLayoutParams(params);
 
-			if(selectFile)
-			{
+			if(selectFile){
+
 				holder.imageView.setAlpha(1.0f);
 				holder.textViewFileName.setTextColor(context.getResources().getColor(android.R.color.black));
 				holder.itemView.setOnClickListener(holder);
