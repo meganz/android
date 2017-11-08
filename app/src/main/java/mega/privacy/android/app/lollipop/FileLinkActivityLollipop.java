@@ -619,18 +619,9 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 	
 	void importNode(){
 
-		if (megaApi.getRootNode() == null){
-			Intent intent = new Intent(this, ManagerActivityLollipop.class);
-			intent.setAction(Constants.ACTION_IMPORT_LINK_FETCH_NODES);
-			intent.setData(Uri.parse(url));
-			startActivity(intent);
-			finish();
-		}
-		else{
-			Intent intent = new Intent(this, FileExplorerActivityLollipop.class);
-			intent.setAction(FileExplorerActivityLollipop.ACTION_PICK_IMPORT_FOLDER);
-			startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_IMPORT_FOLDER);
-		}		
+		Intent intent = new Intent(this, FileExplorerActivityLollipop.class);
+		intent.setAction(FileExplorerActivityLollipop.ACTION_PICK_IMPORT_FOLDER);
+		startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_IMPORT_FOLDER);
 	}
 	
 	String urlM;
