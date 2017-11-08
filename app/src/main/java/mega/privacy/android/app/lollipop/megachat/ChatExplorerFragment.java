@@ -400,6 +400,10 @@ public class ChatExplorerFragment extends Fragment{
         }
     }
 
+    public long getChatIdFrom(){
+        return ((ChatExplorerActivity)context).chatIdFrom;
+    }
+
     private static void log(String log) {
         Util.log("ChatExplorerFragment", log);
     }

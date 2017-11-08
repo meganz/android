@@ -40,6 +40,8 @@ public class Constants {
 	public static String ACTION_CONFIRM = "MEGA_ACTION_CONFIRM";
 	public static String EXTRA_CONFIRMATION = "MEGA_EXTRA_CONFIRMATION";
 
+	public static String ACTION_FORWARD_MESSAGES = "ACTION_FORWARD_MESSAGES";
+
 	public static String SHOW_REPEATED_UPLOAD = "SHOW_REPEATED_UPLOAD";
 
 	//MultipleRequestListener options
