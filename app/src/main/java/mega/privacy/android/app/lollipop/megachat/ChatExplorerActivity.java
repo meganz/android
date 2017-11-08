@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.PinActivityLollipop;
+import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaChatListItem;
 
@@ -31,8 +32,10 @@ public class ChatExplorerActivity extends PinActivityLollipop implements View.On
     FrameLayout fragmentContainer;
     ChatExplorerFragment chatExplorerFragment;
     FloatingActionButton fab;
+    public long chatIdFrom=-1;
 
     private long[] nodeHandles;
+    private long[] messagesIds;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,11 +73,21 @@ public class ChatExplorerActivity extends PinActivityLollipop implements View.On
         showFabButton(false);
 
         Intent intent = getIntent();
+
         if(intent!=null){
             log("Intent received");
-            nodeHandles = intent.getLongArrayExtra("NODE_HANDLES");
-            if(nodeHandles!=null){
-                log("Node handle is: "+nodeHandles[0]);
+            if(intent.getAction()!=null){
+                if(intent.getAction()== Constants.ACTION_FORWARD_MESSAGES){
+                    messagesIds = intent.getLongArrayExtra("ID_MESSAGES");
+                    log("No of messages to forward: "+messagesIds.length);
+                    chatIdFrom = intent.getLongExtra("ID_CHAT_FROM", -1);
+                }
+            }
+            else{
+                nodeHandles = intent.getLongArrayExtra("NODE_HANDLES");
+                if(nodeHandles!=null){
+                    log("Node handle is: "+nodeHandles[0]);
+                }
             }
         }
 
@@ -110,7 +123,15 @@ public class ChatExplorerActivity extends PinActivityLollipop implements View.On
 
         Intent intent = new Intent();
         intent.putExtra("SELECTED_CHATS", longArray);
-        intent.putExtra("NODE_HANDLES", nodeHandles);
+
+        if(nodeHandles!=null){
+            intent.putExtra("NODE_HANDLES", nodeHandles);
+        }
+
+        if(messagesIds!=null){
+            intent.putExtra("ID_MESSAGES", messagesIds);
+        }
+
         setResult(RESULT_OK, intent);
         log("finish!");
         finish();
