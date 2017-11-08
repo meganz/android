@@ -53,6 +53,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import mega.privacy.android.app.BuildConfig;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.DownloadService;
 import mega.privacy.android.app.MegaApplication;
@@ -608,7 +609,8 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				break;
 			}
 			case R.id.full_image_viewer_share: {
-
+				log("Share option");
+				File previewFile = null;
 				if (adapterType == Constants.OFFLINE_ADAPTER){
 					String offlineDirectory;
 					if (Environment.getExternalStorageDirectory() != null){
@@ -619,53 +621,19 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 					}
 
 					String fileName = offlineDirectory + mOffListImages.get(positionG).getPath() + mOffListImages.get(positionG).getName();
-					File previewFile = new File(fileName);
-
-					if (previewFile.exists()){
-						Intent share = new Intent(android.content.Intent.ACTION_SEND);
-						share.setType("image/*");
-						share.putExtra(Intent.EXTRA_STREAM, Uri.parse("file://" + previewFile));
-						startActivity(Intent.createChooser(share, getString(R.string.context_share_image)));
-					}
-					else{
-						Snackbar.make(fragmentContainer, fileName + ": "  + getString(R.string.full_image_viewer_not_preview), Snackbar.LENGTH_LONG).show();
-					}
-
-					break;
+					previewFile = new File(fileName);
 				}else if (adapterType == Constants.ZIP_ADAPTER){
 
 					String fileName = paths.get(positionG);
-					File previewFile = new File(fileName);
-
-					if (previewFile.exists()){
-						Intent share = new Intent(android.content.Intent.ACTION_SEND);
-						share.setType("image/*");
-						share.putExtra(Intent.EXTRA_STREAM, Uri.parse("file://" + previewFile));
-						startActivity(Intent.createChooser(share, getString(R.string.context_share_image)));
-					}
-					else{
-						Snackbar.make(fragmentContainer, getString(R.string.full_image_viewer_not_preview), Snackbar.LENGTH_LONG).show();
-					}
-					break;
+					previewFile = new File(fileName);
 				}else{
 					node = megaApi.getNodeByHandle(imageHandles.get(positionG));
 					File previewFolder = PreviewUtils.getPreviewFolder(this);
-					File previewFile = new File(previewFolder, node.getBase64Handle() + ".jpg");
-
-					if (previewFile.exists()){
-						Intent share = new Intent(android.content.Intent.ACTION_SEND);
-						share.setType("image/*");
-						share.putExtra(Intent.EXTRA_STREAM, Uri.parse("file://" + previewFile));
-						startActivity(Intent.createChooser(share, getString(R.string.context_share_image)));
-					}
-					else{
-						Snackbar.make(fragmentContainer, getString(R.string.full_image_viewer_not_preview), Snackbar.LENGTH_LONG).show();
-					}
-
-					break;
-
+					previewFile = new File(previewFolder, node.getBase64Handle() + ".jpg");
 
 				}
+				intentToSendFile(previewFile);
+				break;
 			}
 			case R.id.full_image_viewer_properties: {
 
@@ -736,6 +704,35 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			}
 		}
 		return super.onOptionsItemSelected(item);
+	}
+
+	public void intentToSendFile(File previewFile){
+		log("intentToSendFile");
+
+		if(previewFile!=null){
+			if (previewFile.exists()){
+				Intent share = new Intent(android.content.Intent.ACTION_SEND);
+				share.setType("image/*");
+
+				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+					log("Use provider to share");
+					Uri uri = FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider",previewFile);
+					share.putExtra(Intent.EXTRA_STREAM, Uri.parse(uri.toString()));
+					share.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+				}
+				else{
+					share.putExtra(Intent.EXTRA_STREAM, Uri.parse("file://" + previewFile));
+				}
+
+				startActivity(Intent.createChooser(share, getString(R.string.context_share_image)));
+			}
+			else{
+				Snackbar.make(fragmentContainer, getString(R.string.full_image_viewer_not_preview), Snackbar.LENGTH_LONG).show();
+			}
+		}
+		else{
+			Snackbar.make(fragmentContainer, getString(R.string.full_image_viewer_not_preview), Snackbar.LENGTH_LONG).show();
+		}
 	}
 
 	@Override

@@ -2,6 +2,7 @@ package mega.privacy.android.app.lollipop.providers;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
@@ -19,6 +20,7 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
+import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.MimeTypeList;
@@ -45,6 +47,8 @@ public class MegaProviderLollipopAdapter extends RecyclerView.Adapter<MegaProvid
 	ArrayList<Integer> imageIds;
 	ArrayList<String> names;
 	ArrayList<MegaNode> nodes;
+
+	DatabaseHandler dbH = null;
 	
 	long parentHandle = -1;
 	
@@ -61,6 +65,7 @@ public class MegaProviderLollipopAdapter extends RecyclerView.Adapter<MegaProvid
 			super(v);
 		}
 		public ImageView imageView;
+		public ImageView permissionsIcon;
     	public TextView textViewFileName;
     	public TextView textViewFileSize;
     	public RelativeLayout itemLayout;
@@ -83,6 +88,8 @@ public class MegaProviderLollipopAdapter extends RecyclerView.Adapter<MegaProvid
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
 		}
+
+		dbH = DatabaseHandler.getDbHandler(context);
 	}
 	
 	ViewHolderLollipopProvider holder = null;
@@ -108,10 +115,7 @@ public class MegaProviderLollipopAdapter extends RecyclerView.Adapter<MegaProvid
 		Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
 		DisplayMetrics outMetrics = new DisplayMetrics ();
 	    display.getMetrics(outMetrics);
-	    float density  = ((Activity)context).getResources().getDisplayMetrics().density;
-		
-	    float scaleW = Util.getScaleW(outMetrics, density);
-	    float scaleH = Util.getScaleH(outMetrics, density);
+
 
 		View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_file_explorer, parent, false);
 
@@ -120,9 +124,17 @@ public class MegaProviderLollipopAdapter extends RecyclerView.Adapter<MegaProvid
 		holder.itemLayout.setOnClickListener(this);
 		holder.imageView = (ImageView) v.findViewById(R.id.file_explorer_thumbnail);
 		holder.textViewFileName = (TextView) v.findViewById(R.id.file_explorer_filename);
-		holder.textViewFileName.getLayoutParams().height = RelativeLayout.LayoutParams.WRAP_CONTENT;
-		holder.textViewFileName.getLayoutParams().width = Util.px2dp((225*scaleW), outMetrics);
+
 		holder.textViewFileSize = (TextView) v.findViewById(R.id.file_explorer_filesize);
+		holder.permissionsIcon = (ImageView) v.findViewById(R.id.file_explorer_permissions);
+
+		if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+			holder.textViewFileName.setMaxWidth(Util.scaleWidthPx(260, outMetrics));
+			holder.textViewFileSize.setMaxWidth(Util.scaleWidthPx(260, outMetrics));
+		}else{
+			holder.textViewFileName.setMaxWidth(Util.scaleWidthPx(200, outMetrics));
+			holder.textViewFileSize.setMaxWidth(Util.scaleWidthPx(200, outMetrics));
+		}
 			
 		v.setTag(holder);
 
@@ -142,7 +154,8 @@ public class MegaProviderLollipopAdapter extends RecyclerView.Adapter<MegaProvid
 		holder.textViewFileName.setText(node.getName());
 		
 		Util.setViewAlpha(holder.imageView, 1);
-		holder.textViewFileName.setTextColor(context.getResources().getColor(android.R.color.black));		
+		holder.textViewFileName.setTextColor(context.getResources().getColor(android.R.color.black));
+
 		if (node.isFolder()){
 			RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
 			params.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
@@ -151,10 +164,56 @@ public class MegaProviderLollipopAdapter extends RecyclerView.Adapter<MegaProvid
 			holder.imageView.setLayoutParams(params);
 
 			holder.itemLayout.setBackgroundColor(Color.WHITE);
-			holder.imageView.setImageResource(R.drawable.ic_folder_list);
-			holder.textViewFileSize.setText(MegaApiUtils.getInfoFolder(node, context));
+
+			if(node.isInShare()){
+				holder.imageView.setImageResource(R.drawable.ic_folder_incoming_list);
+				ArrayList<MegaShare> sharesIncoming = megaApi.getInSharesList();
+				for(int j=0; j<sharesIncoming.size(); j++){
+					MegaShare mS = sharesIncoming.get(j);
+					if(mS.getNodeHandle() == node.getHandle()){
+						MegaUser user = megaApi.getContact(mS.getUser());
+						if(user != null){
+							MegaContactDB contactDB = dbH.findContactByHandle(String.valueOf(user.getHandle()));
+							if(contactDB != null){
+								if(!contactDB.getName().equals("")){
+									holder.textViewFileSize.setText(contactDB.getName()+" "+contactDB.getLastName());
+								}
+								else{
+									holder.textViewFileSize.setText(user.getEmail());
+								}
+							}
+							else{
+								log("The contactDB is null: ");
+								holder.textViewFileSize.setText(user.getEmail());
+							}
+						}
+						else{
+							holder.textViewFileSize.setText(mS.getUser());
+						}
+					}
+				}
+
+				holder.permissionsIcon.setVisibility(View.VISIBLE);
+				int accessLevel = megaApi.getAccess(node);
+
+				if(accessLevel == MegaShare.ACCESS_FULL){
+					holder.permissionsIcon.setImageResource(R.drawable.ic_shared_fullaccess);
+				}
+				else if(accessLevel == MegaShare.ACCESS_READ){
+					holder.permissionsIcon.setImageResource(R.drawable.ic_shared_read);
+				}
+				else{
+					holder.permissionsIcon.setImageResource(R.drawable.ic_shared_read_write);
+				}
+			}
+			else{
+				holder.permissionsIcon.setVisibility(View.GONE);
+				holder.imageView.setImageResource(R.drawable.ic_folder_list);
+				holder.textViewFileSize.setText(MegaApiUtils.getInfoFolder(node, context));
+			}
 		}
 		else{
+			holder.permissionsIcon.setVisibility(View.GONE);
 
 			long nodeSize = node.getSize();
 			holder.textViewFileSize.setText(Util.getSizeString(nodeSize));
