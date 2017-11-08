@@ -2,9 +2,7 @@ package mega.privacy.android.app.lollipop.controllers;
 
 import android.Manifest;
 import android.app.Activity;
-import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.media.RingtoneManager;
@@ -15,17 +13,12 @@ import android.os.StatFs;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
-import android.support.v7.app.AlertDialog;
 import android.text.Html;
 import android.text.Spanned;
-import android.widget.Toast;
-
-import org.w3c.dom.NodeList;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import mega.privacy.android.app.DatabaseHandler;
@@ -35,10 +28,9 @@ import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.lollipop.ChatFullScreenImageViewer;
+import mega.privacy.android.app.lollipop.megachat.ChatFullScreenImageViewer;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
-import mega.privacy.android.app.lollipop.FileStorageActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.ZipBrowserActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.AndroidMegaChatMessage;
@@ -257,10 +249,9 @@ public class ChatController {
         return text;
     }
 
-    public String createManagementString(AndroidMegaChatMessage androidMessage, MegaChatRoom chatRoom) {
+    public String createManagementString(MegaChatMessage message, MegaChatRoom chatRoom) {
         log("createManagementString");
 
-        MegaChatMessage message = androidMessage.getMessage();
         long userHandle = message.getUserHandle();
 
         if (message.getType() == MegaChatMessage.TYPE_ALTER_PARTICIPANTS) {
@@ -676,6 +667,13 @@ public class ChatController {
                 }
             }
         }
+    }
+
+    public String createManagementString(AndroidMegaChatMessage androidMessage, MegaChatRoom chatRoom) {
+        log("createManagementString with AndroidMessage");
+
+        MegaChatMessage message = androidMessage.getMessage();
+        return createManagementString(message, chatRoom);
     }
 
     public String getFirstName(long userHandle, MegaChatRoom chatRoom){

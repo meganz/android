@@ -52,6 +52,7 @@ import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatMessage;
+import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaUser;
 
@@ -228,6 +229,33 @@ public class MegaChatExplorerAdapter extends RecyclerView.Adapter<MegaChatExplor
 		else{
 			log("Chat prefs is NULL");
 			holder.muteIcon.setVisibility(View.GONE);
+		}
+
+		if(chat.getOwnPrivilege()== MegaChatRoom.PRIV_RO||chat.getOwnPrivilege()== MegaChatRoom.PRIV_RM){
+			holder.muteIcon.setAlpha(0.4f);
+			holder.textViewContactName.setAlpha(0.4f);
+			holder.textViewContent.setAlpha(0.4f);
+			holder.textViewDate.setAlpha(0.4f);
+			holder.contactStateIcon.setAlpha(0.4f);
+			holder.itemView.setOnClickListener(null);
+		}
+		else{
+			if(((ChatExplorerFragment)fragment).getChatIdFrom()==chat.getChatId()){
+				holder.muteIcon.setAlpha(0.4f);
+				holder.textViewContactName.setAlpha(0.4f);
+				holder.textViewContent.setAlpha(0.4f);
+				holder.textViewDate.setAlpha(0.4f);
+				holder.contactStateIcon.setAlpha(0.4f);
+				holder.itemView.setOnClickListener(null);
+			}
+			else{
+				holder.muteIcon.setAlpha(1.0f);
+				holder.textViewContactName.setAlpha(1.0f);
+				holder.textViewContent.setAlpha(1.0f);
+				holder.textViewDate.setAlpha(1.0f);
+				holder.contactStateIcon.setAlpha(1.0f);
+				holder.itemView.setOnClickListener(this);
+			}
 		}
 	}
 
@@ -428,8 +456,6 @@ public class MegaChatExplorerAdapter extends RecyclerView.Adapter<MegaChatExplor
 
 		holder.contactStateIcon = (ImageView) v.findViewById(R.id.recent_chat_list_contact_state);
 		holder.contactStateIcon.setVisibility(View.GONE);
-
-		holder.itemLayout.setOnClickListener(this);
 
 		v.setTag(holder);
 
