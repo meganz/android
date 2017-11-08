@@ -1999,6 +1999,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 							selectDrawerItemLollipop(drawerItem);
 						}
 					}
+					else if (getIntent().getAction().equals(Constants.ACTION_IMPORT_LINK_FETCH_NODES)){
+						getIntent().setAction(null);
+						setIntent(null);
+					}
 				}
 	        }
 
