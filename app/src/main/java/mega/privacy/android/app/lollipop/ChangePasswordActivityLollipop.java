@@ -280,25 +280,19 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 		});		
 				
 		changePasswordButton = (Button) findViewById(R.id.action_change_password);
-		
-		changePasswordButton.setText(getString(R.string.change_pass).toUpperCase(Locale.getDefault()));
 
 		LinearLayout.LayoutParams params = (LinearLayout.LayoutParams)changePasswordButton.getLayoutParams();
 		if(this.getApplicationContext().getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
 			log("onCreate: Landscape configuration");
-			params.setMargins(0, 0, Util.scaleHeightPx(37, outMetrics), 0);
+			params.setMargins(0, 0, Util.scaleWidthPx(14, outMetrics), 0);
 		}
 		else {
-			params.setMargins(0, 0, Util.scaleHeightPx(7, outMetrics), 0);
+			params.setMargins(0, 0, Util.scaleWidthPx(10, outMetrics), 0);
 		}
 		changePasswordButton.setLayoutParams(params);
-		
 		changePasswordButton.setOnClickListener(this);
 
 		cancelChangePasswordButton = (Button) findViewById(R.id.cancel_change_password);
-
-		cancelChangePasswordButton.setText(getString(R.string.general_cancel).toUpperCase(Locale.getDefault()));
-
 		cancelChangePasswordButton.setOnClickListener(this);
 		
 		progress = new ProgressDialog(this);
