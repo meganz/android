@@ -19,13 +19,23 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Path;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
+import android.graphics.RectF;
+import android.util.TypedValue;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.SurfaceHolder.Callback;
 
 import org.webrtc.Logging;
+
+import mega.privacy.android.app.R;
 
 public class MegaSurfaceRenderer implements Callback {
 
@@ -42,6 +52,7 @@ public class MegaSurfaceRenderer implements Callback {
 
     int surfaceWidth = 0;
     int surfaceHeight = 0;
+
 
     public MegaSurfaceRenderer(SurfaceView view) {
         surfaceHolder = view.getHolder();
@@ -182,20 +193,49 @@ public class MegaSurfaceRenderer implements Callback {
             return;
         byteBuffer.rewind();
         bitmap.copyPixelsFromBuffer(byteBuffer);
-        DrawBitmap();
+        DrawBitmap(false);
     }
 
-    public void DrawBitmap() {
+    public void DrawBitmap(boolean flag) {
         if(bitmap == null)
             return;
-
+//
         Canvas canvas = surfaceHolder.lockCanvas();
+
         if(canvas != null) {
             // The follow line is for debug only
             // saveBitmapToJPEG(srcRect.right - srcRect.left,
             //                  srcRect.bottom - srcRect.top);
-            canvas.drawBitmap(bitmap, srcRect, dstRect, null);
+
+            if(flag){
+                Bitmap roundB = getRoundedCornerBitmap(bitmap, 70);
+                canvas.drawBitmap(roundB, srcRect, dstRect, null);
+            }else{
+                 canvas.drawBitmap(bitmap, srcRect, dstRect, null);
+            }
+
             surfaceHolder.unlockCanvasAndPost(canvas);
         }
+    }
+
+    public static Bitmap getRoundedCornerBitmap(Bitmap bitmap, int pixels) {
+        Bitmap output = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(output);
+
+        final int color = 0xff424242;
+        final Paint paint = new Paint();
+        final Rect rect = new Rect(0, 0, bitmap.getWidth(), bitmap.getHeight());
+        final RectF rectF = new RectF(rect);
+        final float roundPx = pixels;
+
+        paint.setAntiAlias(true);
+        canvas.drawARGB(0, 0, 0, 0);
+        paint.setColor(color);
+        canvas.drawRoundRect(rectF, roundPx, roundPx, paint);
+
+        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
+        canvas.drawBitmap(bitmap, rect, rect, paint);
+
+        return output;
     }
 }

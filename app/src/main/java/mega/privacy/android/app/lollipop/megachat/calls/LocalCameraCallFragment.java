@@ -3,10 +3,12 @@ package mega.privacy.android.app.lollipop.megachat.calls;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.PixelFormat;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
+import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
@@ -57,6 +59,8 @@ public class LocalCameraCallFragment extends Fragment implements MegaChatVideoLi
 
         localSurfaceView = (SurfaceView)v.findViewById(R.id.surface_local_video);
         localSurfaceView.setZOrderOnTop(true);
+        SurfaceHolder localSurfaceHolder = localSurfaceView.getHolder();
+        localSurfaceHolder.setFormat(PixelFormat.TRANSPARENT);
         localRenderer = new MegaSurfaceRenderer(localSurfaceView);
 
         megaChatApi.addChatLocalVideoListener(this);
@@ -76,7 +80,7 @@ public class LocalCameraCallFragment extends Fragment implements MegaChatVideoLi
 
         bitmap.copyPixelsFromBuffer(ByteBuffer.wrap(byteBuffer));
 
-        localRenderer.DrawBitmap();
+        localRenderer.DrawBitmap(true);
     }
 
     @Override
