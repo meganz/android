@@ -2,7 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="80dp"
     android:layout_height="120dp"
-    android:background="@color/white"
+	android:background="@android:color/transparent"
     tools:context=".LocalCameraCallFragment" >
 
 	<SurfaceView

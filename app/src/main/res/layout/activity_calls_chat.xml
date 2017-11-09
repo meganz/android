@@ -1,4 +1,16 @@
-    <android.support.design.widget.CoordinatorLayout
+    <!--<android.support.design.widget.CoordinatorLayout-->
+        <!--xmlns:android="http://schemas.android.com/apk/res/android"-->
+        <!--xmlns:rounded="http://schemas.android.com/apk/res-auto"-->
+        <!--xmlns:app="http://schemas.android.com/apk/res-auto"-->
+        <!--xmlns:tools="http://schemas.android.com/tools"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent"-->
+        <!--android:id="@+id/file_info_fragment_container"-->
+        <!--android:fitsSystemWindows="true"-->
+        <!--android:keepScreenOn="true"-->
+        <!--tools:context=".lollipop.megachat.calls.ChatCallActivity">-->
+
+    <RelativeLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:rounded="http://schemas.android.com/apk/res-auto"
         xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -22,54 +34,53 @@
                 android:layout_height="match_parent">
 
                 <!-- Background -->
-
                 <SurfaceView
                     android:id="@+id/surface_remote_video"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_alignParentTop="true"
                     android:layout_alignParentRight="true"
-                    android:layout_alignParentEnd="true" />
+                    android:layout_alignParentEnd="true">
+                </SurfaceView>
 
                 <RelativeLayout
                     android:id="@+id/call_chat_contact_image_layout"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:background="@color/black">
-
-                    <ImageView
-                        android:id="@+id/call_chat_contact_video"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:adjustViewBounds="true"
-                        android:background="@color/blue"
-                        android:visibility="gone"/>
-
-                    <RelativeLayout
-                        android:id="@+id/call_chat_contact_image_rl"
-                        android:layout_centerInParent="true"
-                        android:layout_width="120dp"
-                        android:layout_height="120dp"
-                        android:gravity="center_horizontal|center_vertical"
-                        android:background="@android:color/transparent">
-                        <mega.privacy.android.app.components.RoundedImageView
-                            android:id="@+id/call_chat_contact_image"
+                        <ImageView
+                            android:id="@+id/call_chat_contact_video"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:scaleType="fitCenter"
-                            android:layout_centerInParent="true"
-                            rounded:border_color="#4DFFFFFF"
-                            rounded:border_width="3dp"
-                            rounded:corner_radius="60dp" />
-                        <TextView
-                            android:id="@+id/call_chat_contact_image_initial_letter"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:layout_centerInParent="true"
-                            android:gravity="center_horizontal|center_vertical"
-                            android:paddingBottom="3dp"
+                            android:adjustViewBounds="true"
+                            android:background="@color/blue"
                             android:visibility="gone"/>
-                    </RelativeLayout>
+
+                        <RelativeLayout
+                            android:id="@+id/call_chat_contact_image_rl"
+                            android:layout_centerInParent="true"
+                            android:layout_width="120dp"
+                            android:layout_height="120dp"
+                            android:gravity="center_horizontal|center_vertical"
+                            android:background="@android:color/transparent">
+                            <mega.privacy.android.app.components.RoundedImageView
+                                android:id="@+id/call_chat_contact_image"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:scaleType="fitCenter"
+                                android:layout_centerInParent="true"
+                                rounded:border_color="#4DFFFFFF"
+                                rounded:border_width="3dp"
+                                rounded:corner_radius="60dp" />
+                            <TextView
+                                android:id="@+id/call_chat_contact_image_initial_letter"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:layout_centerInParent="true"
+                                android:gravity="center_horizontal|center_vertical"
+                                android:paddingBottom="3dp"
+                                android:visibility="gone"/>
+                        </RelativeLayout>
 
                 </RelativeLayout>
 
@@ -84,15 +95,34 @@
                     app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
                     android:fitsSystemWindows="true"/>
 
-                <FrameLayout
-                    android:id="@+id/fragment_container_local_camera"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_above="@+id/linear_buttons"
-                    android:layout_alignParentRight="true"
-                    android:layout_marginRight="20dp"
-                    android:layout_marginBottom="25dp"
-                    app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
+
+                <!--<RelativeLayout-->
+                    <!--android:id="@+id/parentLayout"-->
+                    <!--android:layout_width="match_parent"-->
+                    <!--android:layout_height="match_parent"-->
+                    <!--android:layout_above="@+id/linear_buttons"-->
+                    <!--android:layout_marginLeft="20dp"-->
+                    <!--android:layout_marginRight="20dp"-->
+                    <!--android:background="@color/blue">-->
+                    <FrameLayout
+                        android:id="@+id/fragment_container_local_camera"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="25dp"
+                        android:layout_marginRight="20dp"
+                        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+                        android:background="@android:color/transparent"/>
+                <!--</RelativeLayout>-->
+
+                <!--<FrameLayout-->
+                    <!--android:id="@+id/fragment_container_local_camera"-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:layout_marginRight="20dp"-->
+                    <!--android:layout_marginBottom="25dp"-->
+                    <!--app:layout_behavior="@string/appbar_scrolling_view_behavior"-->
+                    <!--android:background="@android:color/transparent"/>-->
+
 
                 <!-- My avatar -->
                 <RelativeLayout
@@ -214,4 +244,5 @@
         </android.support.design.widget.AppBarLayout>
 
 
-    </android.support.design.widget.CoordinatorLayout>
+    </RelativeLayout>
+        <!--</android.support.design.widget.CoordinatorLayout>-->
