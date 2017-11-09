@@ -569,7 +569,7 @@
     <!--
     <string name="warning_out_space" context="Warning in Cloud drive when the user is runningut of space">You\'re running out of space!\n Do you want to upgrade your account?</string>
     -->
-    <string name="overquota_alert_title" context="Title dialog overquota error">Overquota Alert!</string>
+    <string name="overquota_alert_title" context="Title dialog overquota error">Storage over quota</string>
     <string name="overquota_alert_text" context="Dialod text overquota error">Operation not allowed, you will exceed the storage limit of your account. Do you want to upgrade your account?</string>
 
     <!--
