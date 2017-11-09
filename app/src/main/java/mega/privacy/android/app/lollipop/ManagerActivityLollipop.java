@@ -10236,10 +10236,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		if(overquotaDialog==null){
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
 			builder.setTitle(getString(R.string.overquota_alert_title));
-			LayoutInflater inflater = getLayoutInflater();
-			View dialoglayout = inflater.inflate(R.layout.dialog_overquota_error, null);
-			TextView textOverquota = (TextView) dialoglayout.findViewById(R.id.dialog_overquota);
-			builder.setView(dialoglayout);
+			builder.setMessage(getString(R.string.overquota_alert_text));
 
 			builder.setPositiveButton(getString(R.string.my_account_upgrade_pro), new android.content.DialogInterface.OnClickListener() {
 
