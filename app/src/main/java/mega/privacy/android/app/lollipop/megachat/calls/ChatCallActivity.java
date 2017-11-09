@@ -783,7 +783,7 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
 
         // Instead of using this WebRTC renderer, we should probably draw the image by ourselves.
         // The renderer has been modified a bit and an update of WebRTC could break our app
-        remoteRenderer.DrawBitmap();
+        remoteRenderer.DrawBitmap(false);
     }
 
     //  private Bitmap getRoundedCornerBitmap(Bitmap bitmap){
