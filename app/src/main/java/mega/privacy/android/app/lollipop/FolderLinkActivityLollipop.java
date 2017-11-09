@@ -1108,7 +1108,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 					log("OVERQUOTA ERROR: "+e.getErrorCode());
 					
 					Intent intent = new Intent(this, ManagerActivityLollipop.class);
-					intent.setAction(Constants.ACTION_OVERQUOTA_ALERT);
+					intent.setAction(Constants.ACTION_OVERQUOTA_STORAGE);
 					startActivity(intent);
 					finish();
 				}

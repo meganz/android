@@ -2341,7 +2341,7 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 
 				Intent intent = null;
 				intent = new Intent(this, ManagerActivityLollipop.class);
-				intent.setAction(Constants.ACTION_OVERQUOTA_ALERT);
+				intent.setAction(Constants.ACTION_OVERQUOTA_STORAGE);
 				intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 				startActivity(intent);
 
