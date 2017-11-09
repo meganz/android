@@ -20,7 +20,6 @@ import android.os.PowerManager.WakeLock;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.FileProvider;
 import android.text.format.Formatter;
-import android.util.SparseArray;
 import android.widget.RemoteViews;
 import android.widget.Toast;
 
@@ -36,7 +35,6 @@ import java.util.Map;
 
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
-import mega.privacy.android.app.lollipop.ZipBrowserActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
@@ -823,8 +821,8 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		}
 	}
 
-	private void showOverquotaNotification(){
-		log("showOverquotaNotification");
+	private void showTransferOverquotaNotification(){
+		log("showTransferOverquotaNotification");
 
 		long totalSizePendingTransfer = megaApi.getTotalDownloadBytes() + megaApiFolder.getTotalDownloadBytes();
 		long totalSizeTransferred = megaApi.getTotalDownloadedBytes() + megaApiFolder.getTotalDownloadedBytes();
@@ -1662,16 +1660,18 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		if(e.getErrorCode() == MegaError.API_EOVERQUOTA) {
 			log("API_EOVERQUOTA error!!");
 
-			UserCredentials credentials = dbH.getCredentials();
-			if(credentials!=null){
-				log("Credentials is NOT null");
+			if(transfer.getType()==MegaTransfer.TYPE_DOWNLOAD){
+				UserCredentials credentials = dbH.getCredentials();
+				if(credentials!=null){
+					log("Credentials is NOT null");
+				}
+
+				downloadedBytesToOverquota = megaApi.getTotalDownloadedBytes() + megaApiFolder.getTotalDownloadedBytes();
+				isOverquota = true;
+				log("downloaded bytes to reach overquota: "+downloadedBytesToOverquota);
+
+				showTransferOverquotaNotification();
 			}
-
-			downloadedBytesToOverquota = megaApi.getTotalDownloadedBytes() + megaApiFolder.getTotalDownloadedBytes();
-			isOverquota = true;
-			log("downloaded bytes to reach overquota: "+downloadedBytesToOverquota);
-
-			showOverquotaNotification();
 		}
 	}
 

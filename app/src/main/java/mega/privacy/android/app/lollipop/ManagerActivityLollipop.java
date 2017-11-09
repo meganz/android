@@ -3,7 +3,6 @@ package mega.privacy.android.app.lollipop;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.app.SearchManager;
@@ -21,10 +20,8 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
-import android.graphics.Point;
 import android.graphics.Rect;
 import android.graphics.Shader.TileMode;
-import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -32,7 +29,6 @@ import android.os.Environment;
 import android.os.Handler;
 import android.provider.ContactsContract;
 import android.provider.MediaStore;
-import android.support.design.widget.BottomSheetDialog;
 import android.support.design.widget.BottomSheetDialogFragment;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
@@ -52,7 +48,6 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.SearchView;
-import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.Html;
@@ -60,7 +55,6 @@ import android.text.InputType;
 import android.text.Spanned;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.Display;
 import android.view.Gravity;
@@ -83,8 +77,6 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CheckedTextView;
-import android.widget.CompoundButton;
-import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -101,15 +93,12 @@ import com.google.firebase.iid.FirebaseInstanceId;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Locale;
-import java.util.TimeZone;
 
 import mega.privacy.android.app.AndroidCompletedTransfer;
 import mega.privacy.android.app.CameraSyncService;
@@ -203,7 +192,6 @@ import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaGlobalListenerInterface;
 import nz.mega.sdk.MegaNode;
-import nz.mega.sdk.MegaNodeList;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaShare;
@@ -1695,6 +1683,15 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						finish();
 						return;
 					}
+					else if (getIntent().getAction().equals(Constants.ACTION_OVERQUOTA_STORAGE)){
+						Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
+						intent.putExtra("visibleFragment", Constants.LOGIN_FRAGMENT);
+						intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+						intent.setAction(Constants.ACTION_OVERQUOTA_STORAGE);
+						startActivity(intent);
+						finish();
+						return;
+					}
 				}
 			}
 			Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
@@ -2331,7 +2328,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						cloudPageAdapter.notifyDataSetChanged();
 					}
     			}
-    			else if(intent.getAction().equals(Constants.ACTION_OVERQUOTA_ALERT)){
+    			else if(intent.getAction().equals(Constants.ACTION_OVERQUOTA_STORAGE)){
 	    			showOverquotaAlert();
 	    		}
 	    		else if(intent.getAction().equals(Constants.ACTION_OVERQUOTA_TRANSFER)){
@@ -10249,20 +10246,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
 					//Show UpgradeAccountActivity
-					FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-					if(upAFL==null){
-						upAFL = new UpgradeAccountFragmentLollipop();
-						ft.replace(R.id.fragment_container, upAFL, "upAFL");
-						drawerItem = DrawerItem.ACCOUNT;
-						accountFragment=Constants.OVERQUOTA_ALERT;
-						ft.commitNow();
-					}
-					else{
-						ft.replace(R.id.fragment_container, upAFL, "upAFL");
-						drawerItem = DrawerItem.ACCOUNT;
-						accountFragment=Constants.OVERQUOTA_ALERT;
-						ft.commitNow();
-					}
+					drawerItem = DrawerItem.ACCOUNT;
+					accountFragment=Constants.UPGRADE_ACCOUNT_FRAGMENT;
+					selectDrawerItemAccount();
 				}
 			});
 			builder.setNegativeButton(getString(R.string.general_cancel), new android.content.DialogInterface.OnClickListener() {
@@ -10275,8 +10261,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			});
 
 			overquotaDialog = builder.create();
+			overquotaDialog.setCanceledOnTouchOutside(false);
 			overquotaDialog.show();
 //			Util.brandAlertDialog(overquotaDialog);
+		}
+		else{
+			overquotaDialog.show();
 		}
 	}
 

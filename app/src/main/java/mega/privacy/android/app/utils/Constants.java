@@ -112,7 +112,7 @@ public class Constants {
 	public static String EXTRA_PATH_ZIP = "PATH_ZIP";
 	public static String EXTRA_OPEN_FOLDER = "EXTRA_OPEN_FOLER";
 	public static String ACTION_REFRESH_PARENTHANDLE_BROWSER = "REFRESH_PARENTHANDLE_BROWSER";
-	public static String ACTION_OVERQUOTA_ALERT = "OVERQUOTA_ALERT";
+	public static String ACTION_OVERQUOTA_STORAGE = "OVERQUOTA_STORAGE";
 	public static String ACTION_TAKE_SELFIE = "TAKE_SELFIE";
 	public static String ACTION_SHOW_TRANSFERS = "SHOW_TRANSFERS";
 	public static String ACTION_EXPORT_MASTER_KEY = "EXPORT_MASTER_KEY";
