@@ -336,7 +336,7 @@
     <!--
     <string name="download_cancel_downloading" context="Confirmation text when attempting to cancel the download">Do you want to cancel the download?</string>
     -->
-    <string name="download_touch_to_cancel" context="Hint how to cancel the download">Toquer pour annuler</string>
+    <string name="download_touch_to_cancel" context="Hint how to cancel the download">Toucher pour annuler</string>
     <string name="download_touch_to_show" context="Hint how to cancel the download">Visualiser les transferts</string>
     <string name="error_file_size_greater_than_4gb" context="Warning message">La plupart des appareils ne peuvent pas télécharger des fichiers supérieurs à 4 Go. Votre téléchargement échouera probablement</string>
     <string name="intent_not_available" context="message when trying to open a downloaded file but there isn\'t any app that open that file. Example: a user downloads a pdf but doesn\'t have any app to read a pdf">Aucune appli installée sur votre appareil ne peut exécuter ce fichier</string>
@@ -796,12 +796,12 @@
     <string name="sortby_date" context="category in sort by action">Date</string>
     <string name="sortby_creation_date" context="category in sort by action">Date de création</string>
     <string name="sortby_modification_date" context="category in sort by action">Date de modification</string>
-    <string name="sortby_date_newest" context="sort files by date newest first">du plus récent</string>
-    <string name="sortby_date_oldest" context="sort files by date oldest first">du plus ancien</string>
+    <string name="sortby_date_newest" context="sort files by date newest first">Du plus récent</string>
+    <string name="sortby_date_oldest" context="sort files by date oldest first">Du plus ancien</string>
 
     <string name="sortby_size" context="category in sort by action">Taille</string>
-    <string name="sortby_size_largest_first" context="sort files by size largest first">du plus grand</string>
-    <string name="sortby_size_smallest_first" context="sort files by size smallest first">du plus petit</string>
+    <string name="sortby_size_largest_first" context="sort files by size largest first">Du plus grand</string>
+    <string name="sortby_size_smallest_first" context="sort files by size smallest first">Du plus petit</string>
 
     <string name="per_month" context="in payments, for example: 4.99€ per month">par mois</string>
     <string name="per_year" context="in payments, for example: 49.99€ per year">par an</string>
@@ -1014,7 +1014,7 @@
     <string name="my_account_my_credentials" context="Title of the label in the my account section. It shows the credentials of the current user so it can be used to be verified by other contacts">Mes authentifiants</string>
     <string name="limited_bandwith" context="Word to indicate the limited bandwidth of the free accounts">Limités</string>
 
-    <string name="section_chat" context="Item of the navigation title for the chat section">Dialogue en ligne</string>
+    <string name="section_chat" context="Item of the navigation title for the chat section">Clavardage</string>
     <string name="section_chat_with_notification" context="Item of the navigation title for the chat section when there is any unread message">Conversations [A](%1$d)[/A]</string>
 
     <string name="tab_archive_chat" context="Title of the archived chats tab. Capital letters">Archive</string>
@@ -1027,7 +1027,7 @@
     -->
     <string name="recent_chat_empty" context="Message shown when the user has no archived chats">Aucune conversation</string>
 
-    <string name="recent_chat_enable_chat" context="Message shown when the user has no archived chats">Le dialogue en ligne est désactivé</string>
+    <string name="recent_chat_enable_chat" context="Message shown when the user has no archived chats">Le clavardage est désactivé</string>
     <string name="recent_chat_enable_chat_button" context="Message shown when the user has no archived chats">Activer le dialogue en ligne</string>
 
     <!--
@@ -1179,7 +1179,7 @@
 
     <string name="message_participant_left_group_chat" context="chat message when a participant left a group chat">[A]%1$s[/A][B] a quitté la conversation de groupe[/B]</string>
 
-    <string name="manual_retry_alert" context="chat message alert when the message have to been manually">Le message n\'a pas été envoyé. Toquer pour accéder aux options</string>
+    <string name="manual_retry_alert" context="chat message alert when the message have to been manually">Le message n\'a pas été envoyé. Toucher pour accéder aux options</string>
 
     <string name="chat_status_title" context="settings of the chat to choose the status">État</string>
     <!--
@@ -1279,7 +1279,7 @@
     <string name="storage_space" context="Title of the section about the storage space in the storage tab in My Account Section">Espace de stockage</string>
     <string name="transfer_quota" context="Title of the section about the transfer quota in the storage tab in My Account Section">de quota de transfert</string>
 
-    <string name="available_space" context="Label in section the storage tab in My Account Section">Disponible</string>
+    <string name="available_space" context="Label in section the storage tab in My Account Section">Disponibles</string>
     <string name="not_available" context="Label in section the storage tab in My Account Section when no info info is received">non disponible</string>
 
     <string name="no_bylling_cycle" context="Label in section the storage tab when the account is Free">Aucun cycle de facturation</string>
