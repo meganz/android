@@ -38,6 +38,7 @@ import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.CustomizedGridRecyclerView;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
+import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.MyAccountInfo;
 import mega.privacy.android.app.lollipop.adapters.MegaContactsLollipopAdapter;
@@ -579,16 +580,8 @@ public class ContactsFragmentLollipop extends Fragment{
 			}
 		}
 		else{
-
-
-				String myLetter=myAccountInfo.getFirstLetter();
-
-			/*Intent i = new Intent(context, ContactInfoActivityLollipop.class);
+			Intent i = new Intent(context, ContactInfoActivityLollipop.class);
 			i.putExtra("name", visibleContacts.get(position).getMegaUser().getEmail());
-			startActivity(i);*/
-			Intent i = new Intent(context, ChatCallActivity.class);
-			i.putExtra("name", visibleContacts.get(position).getMegaUser().getEmail());
-			i.putExtra("initialLetter",myLetter);
 			startActivity(i);
 		}
     }

@@ -214,7 +214,7 @@
                         android:layout_marginLeft="16dp"
                         android:layout_marginRight="16dp"
                         android:scaleType="center"
-                        android:src="@drawable/ic_phone"
+                        android:src="@drawable/ic_phone_white"
                         app:backgroundTint="@color/accentColor"
                         app:borderWidth="0dp"
                         app:elevation="6dp"

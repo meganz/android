@@ -352,24 +352,28 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
                 chat = megaChatApi.getChatRoom(chatId);
                 callChat = megaChatApi.getChatCallByChatId(chatId);
 
+                audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+                this.setVolumeControlStream(AudioManager.STREAM_MUSIC);
+                this.setVolumeControlStream(AudioManager.STREAM_RING);
+                this.setVolumeControlStream(AudioManager.STREAM_ALARM);
+                this.setVolumeControlStream(AudioManager.STREAM_NOTIFICATION);
+                this.setVolumeControlStream(AudioManager.STREAM_SYSTEM);
+                this.setVolumeControlStream(AudioManager.STREAM_VOICE_CALL);
+
                 int callStatus = callChat.getStatus();
                 log("The status of the callChat is: " + callStatus);
 
                 if(callStatus==MegaChatCall.CALL_STATUS_RING_IN){
                     log("Incoming call");
-                    audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-                    thePlayer = MediaPlayer.create(getApplicationContext(), RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE));
-                    this.setVolumeControlStream(AudioManager.STREAM_MUSIC);
-                    this.setVolumeControlStream(AudioManager.STREAM_RING);
-                    this.setVolumeControlStream(AudioManager.STREAM_ALARM);
-                    this.setVolumeControlStream(AudioManager.STREAM_NOTIFICATION);
-                    this.setVolumeControlStream(AudioManager.STREAM_SYSTEM);
-                    this.setVolumeControlStream(AudioManager.STREAM_VOICE_CALL);
 
+                    thePlayer = MediaPlayer.create(getApplicationContext(), RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE));
                     thePlayer.start();
                 }
                 else{
                     log("Outgoing call");
+                    thePlayer = MediaPlayer.create(getApplicationContext(), R.raw.outgoing_voice_video_call);
+                    thePlayer.setLooping(true);
+                    thePlayer.start();
                 }
 
                 fullName = chat.getPeerFullname(0);
@@ -664,20 +668,21 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
         }
         else if(request.getType() == MegaChatRequest.TYPE_ANSWER_CHAT_CALL){
             if(e.getErrorCode()==MegaChatError.ERROR_OK){
-                log("Ok. CAll answered");
-                if(request.getParamType()==1){
-                    log("Ok. CAll answered");
-                    videoFAB.setVisibility(View.VISIBLE);
-                    microFAB.setVisibility(View.VISIBLE);
-                    answerCallFAB.setVisibility(GONE);
+                videoFAB.setVisibility(View.VISIBLE);
+                microFAB.setVisibility(View.VISIBLE);
+                answerCallFAB.setVisibility(GONE);
+                if(request.getFlag()==true){
+                    log("Ok answer with video");
+//                    updateLocalVideoStatus();
                 }
                 else{
-                    log("Rejected call");
-                    finish();
+                    log("Ok answer with NO video - ");
+//                    updateLocalVideoStatus();
                 }
             }
             else{
                 log("Error call: "+e.getErrorString());
+                finish();
 //                showSnackbar(getString(R.string.clear_history_error));
             }
         }
@@ -746,6 +751,13 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
                     break;
                 }
                 case MegaChatCall.CALL_STATUS_DESTROYED:{
+
+                    if(thePlayer!=null){
+                        thePlayer.stop();
+                        thePlayer.release();
+                        thePlayer=null;
+                    }
+
                     rtcAudioManager.stop();
                     finish();
                     break;
@@ -832,7 +844,7 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
 
     @Override
     public void onClick(View v) {
-
+        log("onClick");
         if (megaChatApi.isSignalActivityRequired()) {
             megaChatApi.signalPresenceActivity();
         }
@@ -864,24 +876,15 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
                 break;
             }
             case R.id.hang_fab: {
-                if(callChat!=null){
-                    if(callChat.getStatus()==MegaChatCall.CALL_STATUS_RING_IN){
-                        log("Reject call");
-                        megaChatApi.hangChatCall(chatId, this);
-                    }
-                    else{
-                        log("Hang call");
-                        megaChatApi.hangChatCall(chatId, this);
-                    }
-                }
-
+                log("Click on hang fab");
+                megaChatApi.hangChatCall(chatId, this);
                 break;
             }
             case R.id.answer_call_fab:{
+                log("Click on answer fab");
                 megaChatApi.answerChatCall(chatId, false, this);
                 break;
             }
-
         }
     }
 
@@ -1100,39 +1103,11 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
     public void onAccuracyChanged(Sensor sensor, int accuracy) {}
 
     private void startClock(){
-//        Thread t = new Thread() {
-//
-//            @Override
-//            public void run() {
-//                try {
-//                    while (!isInterrupted()) {
-//                        Thread.sleep(1000);
-//                        runOnUiThread(new Runnable() {
-//                            @Override
-//                            public void run() {
-//                                Calendar c = Calendar.getInstance();
-//
-//                                int hours = c.get(Calendar.HOUR_OF_DAY);
-//                                int minutes = c.get(Calendar.MINUTE);
-//                                int seconds = c.get(Calendar.SECOND);
-//
-//                                String curTime = String.format("%02d  %02d  %02d", hours, minutes, seconds);
-//                                aB.setSubtitle(curTime); //change clock to your textview
-//                            }
-//                        });
-//                    }
-//                } catch (InterruptedException e) {
-//                }
-//            }
-//        };
-//
-//        t.start();
 
         timer = new Timer();
         myTimerTask = new MyTimerTask();
 
         timer.schedule(myTimerTask, 0, 1000);
-
     }
 
     private class MyTimerTask extends TimerTask {
@@ -1150,8 +1125,6 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
                     aB.setSubtitle(strDate);
                 }});
         }
-
     }
-
 
 }
