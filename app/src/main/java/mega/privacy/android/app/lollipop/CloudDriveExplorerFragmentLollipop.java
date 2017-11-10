@@ -206,6 +206,8 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 		cancelButton.setText(getString(R.string.general_cancel).toUpperCase(Locale.getDefault()));
 
 		listView = (RecyclerView) v.findViewById(R.id.file_list_view_browser);
+		listView.setScrollBarStyle(View.SCROLLBARS_OUTSIDE_INSET);
+
 		listView.addItemDecoration(new SimpleDividerItemDecoration(context, metrics));
 		mLayoutManager = new LinearLayoutManager(context);
 		listView.setLayoutManager(mLayoutManager);
