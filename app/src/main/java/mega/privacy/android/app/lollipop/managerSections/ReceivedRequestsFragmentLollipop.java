@@ -298,6 +298,7 @@ public class ReceivedRequestsFragmentLollipop extends Fragment {
      
 	        View v = inflater.inflate(R.layout.contacts_received_requests_tab, container, false);			
 	        listView = (RecyclerView) v.findViewById(R.id.incoming_contacts_list_view);
+			listView.setScrollBarStyle(View.SCROLLBARS_OUTSIDE_INSET);
 
 			listView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
 			mLayoutManager = new LinearLayoutManager(context);

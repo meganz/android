@@ -58,13 +58,29 @@
 				android:textSize="18sp"/>
 		</LinearLayout>
 	</RelativeLayout>
-   
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/file_list_view_browser"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/separator"
-        android:choiceMode="multipleChoice" />
+
+    <!--<android.support.v7.widget.RecyclerView-->
+        <!--android:id="@+id/file_list_view_browser"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent"-->
+        <!--android:layout_below="@id/separator"-->
+        <!--android:choiceMode="multipleChoice" />-->
+
+	<android.support.v7.widget.RecyclerView
+		android:id="@+id/file_list_view_browser"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		android:layout_below="@id/separator"
+		android:choiceMode="multipleChoice"
+		android:adjustViewBounds="true"
+		android:layout_marginBottom="3dp"
+		android:layout_marginTop="3dp"
+		android:fadeScrollbars="true"
+		android:scrollbars="vertical"
+		android:scrollbarThumbVertical="@color/grey_info_menu"
+		android:scrollbarSize="4dp"
+		android:dividerHeight="3dp"/>
+
 
     <!--<ImageButton
         android:id="@+id/file_upload_button"

@@ -27,7 +27,15 @@
         android:layout_height="match_parent"
         android:choiceMode="multipleChoice" 
 		android:layout_below="@id/inbox_grid_content_text_layout"
-		android:columnWidth="172dp"/>
+		android:columnWidth="172dp"
+		android:adjustViewBounds="true"
+		android:layout_marginBottom="3dp"
+		android:layout_marginTop="3dp"
+		android:fadeScrollbars="true"
+		android:scrollbars="vertical"
+		android:scrollbarThumbVertical="@color/grey_info_menu"
+		android:scrollbarSize="4dp"
+		android:dividerHeight="3dp"/>
 
 	<RelativeLayout
 		android:layout_width="wrap_content"

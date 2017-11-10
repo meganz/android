@@ -547,6 +547,8 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			View v = inflater.inflate(R.layout.fragment_filebrowserlist, container, false);
 
 			recyclerView = (RecyclerView) v.findViewById(R.id.file_list_view_browser);
+			recyclerView.setScrollBarStyle(View.SCROLLBARS_OUTSIDE_INSET);
+
 			recyclerView.setPadding(0, 0, 0, Util.scaleHeightPx(85, outMetrics));
 			recyclerView.setClipToPadding(false);
 			recyclerView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
