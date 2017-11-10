@@ -684,11 +684,13 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			detector = new GestureDetectorCompat(getActivity(), new RecyclerViewOnGestureListener());
 			
 			listView = (RecyclerView) v.findViewById(R.id.file_list_view_browser);
-			listView.addItemDecoration(new DividerItemDecoration(context, outMetrics));
+			listView.setScrollBarStyle(View.SCROLLBARS_OUTSIDE_INSET);
 			mLayoutManager = new MegaLinearLayoutManager(context);
 			listView.setLayoutManager(mLayoutManager);
+
 			listView.addOnItemTouchListener(this);
-			listView.setItemAnimator(new DefaultItemAnimator()); 
+			listView.setItemAnimator(new DefaultItemAnimator());
+			listView.addItemDecoration(new DividerItemDecoration(context, outMetrics));
 
 			final TextView turnOnOff = (TextView) v.findViewById(R.id.file_list_browser_camera_upload_on_off);
 			turnOnOff.setVisibility(View.VISIBLE);
@@ -870,6 +872,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			detector = new GestureDetectorCompat(getActivity(), new RecyclerViewOnGestureListener());
 			
 			listView = (RecyclerView) v.findViewById(R.id.file_grid_view_browser);
+			//listView.setScrollBarStyle(View.SCROLLBARS_OUTSIDE_INSET);
 //			listView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
 //			listView.addOnItemTouchListener(this);
 //			listView.setItemAnimator(new DefaultItemAnimator());

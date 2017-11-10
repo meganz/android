@@ -26,7 +26,15 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:choiceMode="multipleChoice"
-        android:layout_below="@id/rubbishbin_content_text_layout" />
+        android:layout_below="@id/rubbishbin_content_text_layout"
+		android:adjustViewBounds="true"
+		android:layout_marginBottom="3dp"
+		android:layout_marginTop="3dp"
+		android:fadeScrollbars="true"
+		android:scrollbars="vertical"
+		android:scrollbarThumbVertical="@color/grey_info_menu"
+		android:scrollbarSize="4dp"
+		android:dividerHeight="3dp"/>
 
 	<RelativeLayout
 		android:layout_width="wrap_content"

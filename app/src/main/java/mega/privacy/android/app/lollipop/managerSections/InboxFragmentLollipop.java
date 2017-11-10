@@ -362,6 +362,8 @@ public class InboxFragmentLollipop extends Fragment{
 			View v = inflater.inflate(R.layout.fragment_inboxlist, container, false);
 
 			recyclerView = (RecyclerView) v.findViewById(R.id.inbox_list_view);
+			recyclerView.setScrollBarStyle(View.SCROLLBARS_OUTSIDE_INSET);
+
 			recyclerView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
 			mLayoutManager = new LinearLayoutManager(context);
 			recyclerView.setLayoutManager(mLayoutManager);

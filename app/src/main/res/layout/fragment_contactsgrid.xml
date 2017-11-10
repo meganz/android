@@ -28,7 +28,15 @@
         android:choiceMode="multipleChoice"
         android:layout_below="@id/contact_content_grid_text_layout"
         android:layout_centerHorizontal="true"
-        android:columnWidth="174dp"/>
+        android:columnWidth="174dp"
+        android:adjustViewBounds="true"
+        android:layout_marginBottom="3dp"
+        android:layout_marginTop="3dp"
+        android:fadeScrollbars="true"
+        android:scrollbars="vertical"
+        android:scrollbarThumbVertical="@color/grey_info_menu"
+        android:scrollbarSize="4dp"
+        android:dividerHeight="3dp"/>
 
     <RelativeLayout
         android:layout_width="wrap_content"

@@ -343,6 +343,8 @@ public class RubbishBinFragmentLollipop extends Fragment {
 			View v = inflater.inflate(R.layout.fragment_rubbishbinlist, container, false);
 			
 			recyclerView = (RecyclerView) v.findViewById(R.id.rubbishbin_list_view);
+			recyclerView.setScrollBarStyle(View.SCROLLBARS_OUTSIDE_INSET);
+
 			recyclerView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
 			mLayoutManager = new LinearLayoutManager(context);
 			recyclerView.setLayoutManager(mLayoutManager);
