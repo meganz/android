@@ -62,6 +62,7 @@ import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.lollipop.megachat.NotificationBuilder;
 import mega.privacy.android.app.lollipop.megachat.RecentChatsFragmentLollipop;
+import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaChatLollipopAdapter;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaListChatLollipopAdapter;
 import mega.privacy.android.app.utils.Constants;
@@ -71,6 +72,8 @@ import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatApiJava;
+import nz.mega.sdk.MegaChatCall;
+import nz.mega.sdk.MegaChatCallListenerInterface;
 import nz.mega.sdk.MegaChatError;
 import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatListenerInterface;
@@ -89,7 +92,7 @@ import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaUser;
 
 
-public class MegaApplication extends Application implements MegaListenerInterface, MegaChatListenerInterface, MegaChatRequestListenerInterface {
+public class MegaApplication extends Application implements MegaListenerInterface, MegaChatListenerInterface, MegaChatRequestListenerInterface, MegaChatCallListenerInterface {
 	final String TAG = "MegaApplication";
 	static final String USER_AGENT = "MEGAAndroid/3.2.4_155";
 
@@ -402,6 +405,7 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 				megaChatApi = new MegaChatApiAndroid(megaApi);
 				megaChatApi.addChatListener(this);
 				megaChatApi.addChatRequestListener(this);
+				megaChatApi.addChatCallListener(this);
 			}
 		}
 
@@ -413,6 +417,7 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 			if (megaChatApi != null) {
 				megaChatApi.removeChatListener(this);
 				megaChatApi.removeChatRequestListener(this);
+				megaChatApi.removeChatCallListener(this);
 			}
 		}
 		catch (Exception e){}
@@ -1073,6 +1078,7 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 				if (megaChatApi != null){
 					megaChatApi.removeChatListener(this);
 					megaChatApi.removeChatRequestListener(this);
+					megaChatApi.removeChatCallListener(this);
 				}
 			}
 			catch (Exception exc){}
@@ -1085,4 +1091,20 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 	public void onRequestTemporaryError(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
 		log("onRequestTemporaryError: Chat");
 	}
+
+
+	@Override
+	public void onChatCallUpdate(MegaChatApiJava api, MegaChatCall call) {
+		log("onChatCallUpdate");
+
+//		if(call.hasChanged(MegaChatCall.CHANGE_TYPE_STATUS)){
+//			if(call.getStatus()==MegaChatCall.CALL_STATUS_RING_IN){
+//				Intent i = new Intent(this, ChatCallActivity.class);
+//				i.putExtra("chatHandle", call.getChatid());
+//				i.putExtra("callId", call.getId());
+//				startActivity(i);
+//			}
+//		}
+	}
+
 }
