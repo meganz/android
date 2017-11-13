@@ -1,15 +1,18 @@
 package mega.privacy.android.app.lollipop.megachat;
 
+import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.app.ActionBar;
@@ -125,6 +128,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     Handler handlerSend;
 
     boolean pendingMessagesLoaded = false;
+
+    boolean startVideo = false;
 
 //    AndroidMegaChatMessage selectedMessage;
     int selectedPosition;
@@ -1080,24 +1085,33 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 break;
             }
             case R.id.cab_menu_call_chat:{
+
+
                 if (chatRoom.isGroup())
                 {
                     showSnackbar("Coming soon...!");
                 }
                 else
                 {
-                    megaChatApi.startChatCall(chatRoom.getChatId(), false, this);
+                    startVideo = false;
+                    if(checkPermissions()){
+                        startCall();
+                    }
                 }
                 break;
             }
             case R.id.cab_menu_video_chat:{
+
                 if (chatRoom.isGroup())
                 {
                     showSnackbar("Coming soon...!");
                 }
                 else
                 {
-                    megaChatApi.startChatCall(chatRoom.getChatId(), true, this);
+                    startVideo = true;
+                    if(checkPermissions()){
+                        startCall();
+                    }
                 }
                 break;
             }
@@ -1130,6 +1144,65 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    public void startCall(){
+        if(startVideo){
+            log("Start video call");
+            megaChatApi.startChatCall(chatRoom.getChatId(), startVideo, this);
+        }
+        else{
+            log("Start audio call");
+            megaChatApi.startChatCall(chatRoom.getChatId(), startVideo, this);
+        }
+    }
+
+    public boolean checkPermissions(){
+        log("checkPermissions");
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+
+            boolean hasCameraPermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED);
+            if (!hasCameraPermission) {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, Constants.REQUEST_CAMERA);
+                return false;
+            }
+
+            boolean hasRecordAudioPermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED);
+            if (!hasRecordAudioPermission) {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, Constants.RECORD_AUDIO);
+                return false;
+            }
+
+            return true;
+        }
+        return true;
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        log("onRequestPermissionsResult");
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode) {
+            case Constants.REQUEST_CAMERA: {
+                log("REQUEST_CAMERA");
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    if(checkPermissions()){
+                        startCall();
+                    }
+                }
+                break;
+            }
+            case Constants.RECORD_AUDIO: {
+                log("RECORD_AUDIO");
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    if(checkPermissions()){
+                        startCall();
+                    }
+                }
+                break;
+            }
+        }
     }
 
     public void chooseAddParticipantDialog(){
