@@ -1286,7 +1286,6 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 					}
 				}
 			}
-
 		}
 		
 		//Check if is an offline file to show the red arrow
