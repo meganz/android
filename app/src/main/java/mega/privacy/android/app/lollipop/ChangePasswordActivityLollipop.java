@@ -402,8 +402,15 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 		inputMethodManager.hideSoftInputFromWindow(newPassword1View.getWindowToken(), 0);
 		inputMethodManager.hideSoftInputFromWindow(newPassword2View.getWindowToken(), 0);
 
+		final String oldPassword = oldPasswordView.getText().toString();
 		String newPassword1 = newPassword1View.getText().toString();
 		String newPassword2 = newPassword2View.getText().toString();
+
+		if(oldPassword.equals(newPassword1)){
+			log("old password and new password are equals");
+			setError(newPassword1View, getString(R.string.old_and_new_passwords_equals));
+			return;
+		}
 
 		if (!newPassword1.equals(newPassword2)){
 			log("no new password repeat");
@@ -447,7 +454,13 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 		final String oldPassword = oldPasswordView.getText().toString();
 		String newPassword1 = newPassword1View.getText().toString();
 		String newPassword2 = newPassword2View.getText().toString();
-		
+
+		if(oldPassword.equals(newPassword1)){
+			log("old password and new password are equals");
+			setError(newPassword1View, getString(R.string.old_and_new_passwords_equals));
+			return;
+		}
+
 		if (!newPassword1.equals(newPassword2)){
 			log("no new password repeat");
 //			newPassword2View.setError(getString(R.string.my_account_change_password_dont_match));
