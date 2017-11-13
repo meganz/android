@@ -291,7 +291,7 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
         microFAB.setVisibility(GONE);
 
         remoteSurfaceView = (SurfaceView)findViewById(R.id.surface_remote_video);
-        remoteSurfaceView.setOnTouchListener(this);
+//        remoteSurfaceView.setOnTouchListener(this);
 
         remoteRenderer = new MegaSurfaceRenderer(remoteSurfaceView);
         rtcAudioManager = AppRTCAudioManager.create(getApplicationContext());
@@ -335,7 +335,7 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
             myInitialLetter = (TextView) findViewById(R.id.call_chat_my_image_initial_letter);
 
             contactAvatarLayout = (RelativeLayout) findViewById(R.id.call_chat_contact_image_layout);
-            contactAvatarLayout.setOnTouchListener(this);
+//            contactAvatarLayout.setOnTouchListener(this);
             contactImage = (RoundedImageView) findViewById(R.id.call_chat_contact_image);
             contactInitialLetter = (TextView) findViewById(R.id.call_chat_contact_image_initial_letter);
 
@@ -983,6 +983,7 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
         if(callChat.hasVideo(false)){
             log("Video remote connected");
             contactAvatarLayout.setVisibility(View.GONE);
+            contactAvatarLayout.setOnTouchListener(null);
             remoteSurfaceView.setOnTouchListener(this);
             megaChatApi.addChatRemoteVideoListener(this);
         }
@@ -990,6 +991,7 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
             log("Video remote NOT connected");
             contactAvatarLayout.setVisibility(View.VISIBLE);
             remoteSurfaceView.setOnTouchListener(null);
+            contactAvatarLayout.setOnTouchListener(this);
             megaChatApi.removeChatVideoListener(this);
         }
     }
