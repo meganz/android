@@ -35,6 +35,7 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -46,6 +47,7 @@ import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.components.scrollBar.SectionTitleProvider;
 import mega.privacy.android.app.lollipop.ContactFileListActivityLollipop;
 import mega.privacy.android.app.lollipop.ContactFileListFragmentLollipop;
 import mega.privacy.android.app.lollipop.FolderLinkActivityLollipop;
@@ -68,7 +70,7 @@ import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaUser;
 
-public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowserLollipopAdapter.ViewHolderBrowser> implements OnClickListener, View.OnLongClickListener {
+public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowserLollipopAdapter.ViewHolderBrowser> implements OnClickListener, View.OnLongClickListener, SectionTitleProvider {
 	
 	public static final int ITEM_VIEW_TYPE_LIST = 0;
 	public static final int ITEM_VIEW_TYPE_GRID = 1;
@@ -94,6 +96,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 	boolean multipleSelect;
 	int type = Constants.FILE_BROWSER_ADAPTER;
 	int adapterType;
+
 
 //	int orderGetChildren = MegaApiJava.ORDER_DEFAULT_ASC;
 
@@ -881,7 +884,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 		
 		log("Node to show: "+position+" "+node.getName());
 		holder.textViewFileName.setText(node.getName());
-	
+
 		holder.textViewFileSize.setText("");
 		
 		holder.publicLinkImage.setVisibility(View.INVISIBLE);
@@ -1358,6 +1361,11 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 //	}
 
 
+	private String getItemNode(int position) {
+		return nodes.get(position).getName();
+	}
+
+
 	@Override
 	public int getItemCount() {
 		// TODO Auto-generated method stub
@@ -1380,6 +1388,11 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 		}
 		
 		return null;
+	}
+
+	@Override
+	public String getSectionTitle(int position) {
+		return getItemNode(position).substring(0, 1);
 	}
 
 	@Override
@@ -1561,6 +1574,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 		}
 		return null;
 	}
+
 
 	public long getParentHandle() {
 		return parentHandle;

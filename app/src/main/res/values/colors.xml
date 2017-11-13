@@ -124,7 +124,7 @@
     <color name="invite_button_deactivated">#424F4F4F</color>
 
     <color name="camera_uploads_list_view">#FFF5F5F5</color>
-    <color name="camera_uploads_scroll_bar">#727272</color>
-
+    <color name="scroll_bubble">#727272</color>
+    <color name="scroll_handle">#90d90007</color>
 
 </resources>
