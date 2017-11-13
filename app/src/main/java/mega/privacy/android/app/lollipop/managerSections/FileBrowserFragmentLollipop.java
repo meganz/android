@@ -51,6 +51,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.CustomizedGridLayoutManager;
 import mega.privacy.android.app.components.CustomizedGridRecyclerView;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
+import mega.privacy.android.app.components.scrollBar.FastScroller;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop.DrawerItem;
@@ -74,6 +75,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 	Context context;
 	ActionBar aB;
 	RecyclerView recyclerView;
+	FastScroller fastScroller;
 
 	ImageView emptyImageView;
 	LinearLayout emptyTextView;
@@ -547,7 +549,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			View v = inflater.inflate(R.layout.fragment_filebrowserlist, container, false);
 
 			recyclerView = (RecyclerView) v.findViewById(R.id.file_list_view_browser);
-			recyclerView.setScrollBarStyle(View.SCROLLBARS_OUTSIDE_INSET);
+			fastScroller = (FastScroller) v.findViewById(R.id.fastscroll);
 
 			recyclerView.setPadding(0, 0, 0, Util.scaleHeightPx(85, outMetrics));
 			recyclerView.setClipToPadding(false);
@@ -587,8 +589,10 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			
 			adapter.setMultipleSelect(false);
 
-			recyclerView.setAdapter(adapter);			
-			
+			recyclerView.setAdapter(adapter);
+			fastScroller.setRecyclerView(recyclerView);
+
+
 			setNodes(nodes);
 			
 			if (adapter.getItemCount() == 0){				
@@ -614,6 +618,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			View v = inflater.inflate(R.layout.fragment_filebrowsergrid, container, false);
 
 			recyclerView = (CustomizedGridRecyclerView) v.findViewById(R.id.file_grid_view_browser);
+			fastScroller = (FastScroller) v.findViewById(R.id.fastscroll);
 			recyclerView.setPadding(0, 0, 0, Util.scaleHeightPx(80, outMetrics));
 			recyclerView.setClipToPadding(false);
 
@@ -658,8 +663,9 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 
 			adapter.setMultipleSelect(false);
 
-			recyclerView.setAdapter(adapter);			
-			
+			recyclerView.setAdapter(adapter);
+			fastScroller.setRecyclerView(recyclerView);
+
 			setNodes(nodes);
 			
 			if (adapter.getItemCount() == 0){				

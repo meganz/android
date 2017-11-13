@@ -30,4 +30,6 @@
     <dimen name="width_image_pending_message_three_digits">36dp</dimen>
     <dimen name="width_image_pending_message_four_digits">44dp</dimen>
 
+    <dimen name="fastscroll__bubble_corner">20dp</dimen>
+
 </resources>
