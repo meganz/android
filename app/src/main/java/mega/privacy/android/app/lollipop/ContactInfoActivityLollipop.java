@@ -867,7 +867,6 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 				break;
 			}*/
 			case R.id.cab_menu_start_conversation:{
-				showSnackbar("Start conversation");
 
 				if(!Util.isOnline(this)){
 
