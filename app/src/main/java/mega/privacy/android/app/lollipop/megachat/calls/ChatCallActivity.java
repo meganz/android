@@ -668,11 +668,13 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
                 if(request.getFlag()==true){
                     log("Ok answer with video");
 //                    updateLocalVideoStatus();
+
                 }
                 else{
                     log("Ok answer with NO video - ");
 //                    updateLocalVideoStatus();
                 }
+                updateLocalVideoStatus();
             }
             else{
                 log("Error call: "+e.getErrorString());
@@ -849,12 +851,18 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
             }
             case R.id.video_fab:{
 
-                if(callChat.hasVideo(true)){
-                    megaChatApi.disableVideo(chatId, this);
+                if(callChat.getStatus()==MegaChatCall.CALL_STATUS_RING_IN){
+                    megaChatApi.answerChatCall(chatId, true, this);
                 }
                 else{
-                    megaChatApi.enableVideo(chatId, this);
+                    if(callChat.hasVideo(true)){
+                        megaChatApi.disableVideo(chatId, this);
+                    }
+                    else{
+                        megaChatApi.enableVideo(chatId, this);
+                    }
                 }
+
                 //  surfaceView.setVisibility(View.VISIBLE);
 //                 start_camera();
                 break;
@@ -913,7 +921,9 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
             hangFAB.show();
             hangFAB.setVisibility(View.VISIBLE);
 
-            videoFAB.setVisibility(GONE);
+            videoFAB.setVisibility(View.VISIBLE);
+            videoFAB.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.accentColor)));
+
             microFAB.setVisibility(GONE);
         }
         else{
@@ -939,11 +949,9 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
             parent.setVisibility(View.VISIBLE);
             fragmentContainerLocalCamera.setVisibility(View.VISIBLE);
 
-
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             ft.replace(R.id.fragment_container_local_camera, localCameraFragment, "localCameraFragment");
             ft.commitNow();
-
         }
         else{
             log("Video local NOT connected");

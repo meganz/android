@@ -183,6 +183,22 @@
                     android:orientation="horizontal">
 
                     <android.support.design.widget.FloatingActionButton
+                        android:id="@+id/answer_call_fab"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="bottom|end"
+                        android:layout_marginBottom="12dp"
+                        android:layout_marginLeft="16dp"
+                        android:layout_marginRight="16dp"
+                        android:scaleType="center"
+                        android:src="@drawable/ic_phone_white"
+                        app:backgroundTint="@color/accentColor"
+                        app:borderWidth="0dp"
+                        app:elevation="6dp"
+                        app:fabSize="normal"
+                        app:pressedTranslationZ="12dp" />
+
+                    <android.support.design.widget.FloatingActionButton
                         android:id="@+id/video_fab"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -198,7 +214,6 @@
                         app:fabSize="normal"
                         app:pressedTranslationZ="12dp" />
 
-
                     <android.support.design.widget.FloatingActionButton
                         android:id="@+id/micro_fab"
                         android:layout_width="wrap_content"
@@ -209,22 +224,6 @@
                         android:layout_marginRight="16dp"
                         android:scaleType="center"
                         android:src="@drawable/ic_record_audio_w"
-                        app:backgroundTint="@color/accentColor"
-                        app:borderWidth="0dp"
-                        app:elevation="6dp"
-                        app:fabSize="normal"
-                        app:pressedTranslationZ="12dp" />
-
-                    <android.support.design.widget.FloatingActionButton
-                        android:id="@+id/answer_call_fab"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="bottom|end"
-                        android:layout_marginBottom="12dp"
-                        android:layout_marginLeft="16dp"
-                        android:layout_marginRight="16dp"
-                        android:scaleType="center"
-                        android:src="@drawable/ic_phone_white"
                         app:backgroundTint="@color/accentColor"
                         app:borderWidth="0dp"
                         app:elevation="6dp"
