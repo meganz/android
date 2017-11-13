@@ -201,15 +201,32 @@ public class MegaSurfaceRenderer implements Callback {
             return;
 //
         Canvas canvas = surfaceHolder.lockCanvas();
+        final Paint paint = new Paint();
+        final Rect rect = new Rect(dstRect);
+        final RectF rectF = new RectF(rect);
+
+
 
         if(canvas != null) {
             // The follow line is for debug only
             // saveBitmapToJPEG(srcRect.right - srcRect.left,
             //                  srcRect.bottom - srcRect.top);
 
+            final float roundPx = 20;
+            paint.setAntiAlias(true);
+            canvas.drawARGB(0, 0, 0, 0);
+            canvas.drawRoundRect(rectF, roundPx, roundPx, paint);
+            paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
+
             if(flag){
-                Bitmap roundB = getRoundedCornerBitmap(bitmap, 70);
-                canvas.drawBitmap(roundB, srcRect, dstRect, null);
+                //Bitmap roundB = getRoundedCornerBitmap(bitmap, 70);
+                //canvas.drawBitmap(roundB, srcRect, dstRect, null);
+
+                canvas.drawBitmap(bitmap, srcRect, rect, paint);
+
+
+                //canvas.drawBitmap(bitmap, srcRect, dstRect, null);
+
             }else{
                  canvas.drawBitmap(bitmap, srcRect, dstRect, null);
             }
@@ -222,7 +239,6 @@ public class MegaSurfaceRenderer implements Callback {
         Bitmap output = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(output);
 
-        final int color = 0xff424242;
         final Paint paint = new Paint();
         final Rect rect = new Rect(0, 0, bitmap.getWidth(), bitmap.getHeight());
         final RectF rectF = new RectF(rect);
@@ -230,7 +246,7 @@ public class MegaSurfaceRenderer implements Callback {
 
         paint.setAntiAlias(true);
         canvas.drawARGB(0, 0, 0, 0);
-        paint.setColor(color);
+        paint.setColor(Color.BLUE);
         canvas.drawRoundRect(rectF, roundPx, roundPx, paint);
 
         paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));

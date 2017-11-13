@@ -95,24 +95,34 @@
                     app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
                     android:fitsSystemWindows="true"/>
 
-
-                <!--<RelativeLayout-->
-                    <!--android:id="@+id/parentLayout"-->
-                    <!--android:layout_width="match_parent"-->
-                    <!--android:layout_height="match_parent"-->
-                    <!--android:layout_above="@+id/linear_buttons"-->
-                    <!--android:layout_marginLeft="20dp"-->
+                <!--<FrameLayout-->
+                    <!--android:id="@+id/fragment_container_local_camera"-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:layout_marginBottom="25dp"-->
                     <!--android:layout_marginRight="20dp"-->
-                    <!--android:background="@color/blue">-->
+                    <!--app:layout_behavior="@string/appbar_scrolling_view_behavior"-->
+                    <!--android:background="@android:color/transparent"/>-->
+
+
+                <RelativeLayout
+                    android:id="@+id/parentLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginRight="5dp"
+                    android:layout_marginBottom="100dp"
+                    android:layout_marginTop="60dp"
+                    android:background="@android:color/transparent">
                     <FrameLayout
                         android:id="@+id/fragment_container_local_camera"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="25dp"
+                        android:layout_marginBottom="10dp"
                         android:layout_marginRight="20dp"
                         app:layout_behavior="@string/appbar_scrolling_view_behavior"
                         android:background="@android:color/transparent"/>
-                <!--</RelativeLayout>-->
+                </RelativeLayout>
 
                 <!--<FrameLayout-->
                     <!--android:id="@+id/fragment_container_local_camera"-->

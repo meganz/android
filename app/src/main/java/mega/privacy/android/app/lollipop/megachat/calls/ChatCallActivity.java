@@ -94,7 +94,7 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
     float dX, dY;
     float widthScreenPX, heightScreenPX;
 
-    //ViewGroup parent;
+    ViewGroup parent;
 
     String myUserMail;
     long chatId;
@@ -273,7 +273,7 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
         aB.setDisplayHomeAsUpEnabled(false);
         aB.setTitle(" ");
 
-        //parent = (ViewGroup) findViewById(R.id.hola);
+        parent = (ViewGroup) findViewById(R.id.parentLayout);
 
         videoFAB = (FloatingActionButton) findViewById(R.id.video_fab);
         videoFAB.setOnClickListener(this);
@@ -299,12 +299,13 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
         fragmentContainerLocalCamera = (FrameLayout) findViewById(R.id.fragment_container_local_camera);
         RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams)fragmentContainerLocalCamera.getLayoutParams();
         params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-       // params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-        params.addRule(RelativeLayout.ABOVE,R.id.linear_buttons);
+        params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+        //**params.addRule(RelativeLayout.ABOVE,R.id.linear_buttons);
 
         fragmentContainerLocalCamera.setLayoutParams(params);
-        fragmentContainerLocalCamera.setOnTouchListener(this);
-        //parent.setVisibility(View.GONE);
+        //****fragmentContainerLocalCamera.setOnTouchListener(this);
+        fragmentContainerLocalCamera.setOnTouchListener(new OnDragTouchListener(fragmentContainerLocalCamera,parent));
+        parent.setVisibility(View.GONE);
         fragmentContainerLocalCamera.setVisibility(View.GONE);
 
         Bundle extras = getIntent().getExtras();
@@ -320,13 +321,6 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
                 requestWindowFeature(Window.FEATURE_NO_TITLE);
                 this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
             }
-
-//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-//                Window window = this.getWindow();
-//                window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-//                window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-//                window.setStatusBarColor(ContextCompat.getColor(this, R.color.very_transparent_black));
-//            }
 
             myAvatarLayout = (RelativeLayout) findViewById(R.id.call_chat_my_image_layout);
             myImage = (RoundedImageView) findViewById(R.id.call_chat_my_image);
@@ -942,7 +936,7 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
             videoFAB.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.accentColor)));
 
             localCameraFragment = new LocalCameraCallFragment();
-           // parent.setVisibility(View.VISIBLE);
+            parent.setVisibility(View.VISIBLE);
             fragmentContainerLocalCamera.setVisibility(View.VISIBLE);
 
 
@@ -953,7 +947,7 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
         }
         else{
             log("Video local NOT connected");
-           // parent.setVisibility(View.GONE);
+            parent.setVisibility(View.GONE);
             fragmentContainerLocalCamera.setVisibility(View.GONE);
             if(localCameraFragment!=null){
                 localCameraFragment.setVideoFrame(false);
@@ -1052,8 +1046,8 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
             final int X = (int) event.getRawX();
             final int Y = (int) event.getRawY();
 
-            float xCamera =  fragmentContainerLocalCamera.getX() ;
-            float yCamera = fragmentContainerLocalCamera.getY();
+//            float xCamera =  fragmentContainerLocalCamera.getX() ;
+//            float yCamera = fragmentContainerLocalCamera.getY();
 
             switch (event.getAction() & MotionEvent.ACTION_MASK) {
                 case MotionEvent.ACTION_DOWN:
@@ -1065,30 +1059,31 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
                             showActionBar();
                             showInitialFABConfiguration();
                         }
-                    }else if(view.getId() == R.id.fragment_container_local_camera){
-                        dX = view.getX() - event.getRawX();
-                        dY = view.getY() - event.getRawY();
                     }
+//                    }else if(view.getId() == R.id.fragment_container_local_camera){
+//                        dX = view.getX() - event.getRawX();
+//                        dY = view.getY() - event.getRawY();
+//                    }
                     break;
 
                 case MotionEvent.ACTION_MOVE:
-                    if(view.getId() == R.id.fragment_container_local_camera){
-                        if(flag){
-                            RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams)view.getLayoutParams();
-                            params.leftMargin = (int )view.getX();
-                            params.topMargin = (int )view.getY();
-                            params.addRule(RelativeLayout.ABOVE, 0);
-                            params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT,0);
-                           //** params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM,0);
-                            view.setLayoutParams(params);
-                            flag = false;
-                        }
-                        view.animate()
-                            .x(event.getRawX() + dX)
-                            .y(event.getRawY() + dY)
-                            .setDuration(0)
-                            .start();
-                    }
+//                    if(view.getId() == R.id.fragment_container_local_camera){
+//                        if(flag){
+//                            RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams)view.getLayoutParams();
+//                            params.leftMargin = (int )view.getX();
+//                            params.topMargin = (int )view.getY();
+//                            //***params.addRule(RelativeLayout.ABOVE, 0);
+//                            params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT,0);
+//                            params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM,0);
+//                            view.setLayoutParams(params);
+//                            flag = false;
+//                        }
+//                        view.animate()
+//                            .x(event.getRawX() + dX)
+//                            .y(event.getRawY() + dY)
+//                            .setDuration(0)
+//                            .start();
+//                    }
                     break;
 
                 default:
