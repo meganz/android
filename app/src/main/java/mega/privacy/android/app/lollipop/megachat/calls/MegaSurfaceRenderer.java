@@ -49,7 +49,10 @@ public class MegaSurfaceRenderer implements Callback {
     private Rect srcRect = new Rect();
     // Rect of the destination canvas to draw to
     private Rect dstRect = new Rect();
-
+    private RectF dstRectf = new RectF();
+    Paint paint;
+    PorterDuffXfermode modesrcover;
+    PorterDuffXfermode modesrcin;
     int surfaceWidth = 0;
     int surfaceHeight = 0;
 
@@ -59,6 +62,9 @@ public class MegaSurfaceRenderer implements Callback {
         if(surfaceHolder == null)
             return;
         surfaceHolder.addCallback(this);
+        paint = new Paint();
+        modesrcover = new PorterDuffXfermode(PorterDuff.Mode.SRC_OVER);
+        modesrcin = new PorterDuffXfermode(PorterDuff.Mode.SRC_IN);
     }
 
     // surfaceChanged and surfaceCreated share this function
@@ -67,6 +73,7 @@ public class MegaSurfaceRenderer implements Callback {
         dstRect.left = 0;
         dstRect.right = dstWidth;
         dstRect.bottom = dstHeight;
+        dstRectf = new RectF(dstRect);
 
         adjustAspectRatio();
     }
@@ -82,11 +89,13 @@ public class MegaSurfaceRenderer implements Callback {
                     float decrease = dstRect.height() - newHeight;
                     dstRect.top += decrease / 2;
                     dstRect.bottom -= decrease / 2;
+                    dstRectf = new RectF(dstRect);
                 } else {
                     float newWidth = dstRect.height() * srcaspectratio;
                     float decrease = dstRect.width() - newWidth;
                     dstRect.left += decrease / 2;
                     dstRect.right -= decrease / 2;
+                    dstRectf = new RectF(dstRect);
                 }
             }
         }
@@ -199,36 +208,20 @@ public class MegaSurfaceRenderer implements Callback {
     public void DrawBitmap(boolean flag) {
         if(bitmap == null)
             return;
-//
+
         Canvas canvas = surfaceHolder.lockCanvas();
-        final Paint paint = new Paint();
-        final Rect rect = new Rect(dstRect);
-        final RectF rectF = new RectF(rect);
+        if (canvas != null) {
+            canvas.scale(-1, 1);
+            canvas.translate(-dstRect.width(), 0);
 
-
-
-        if(canvas != null) {
-            // The follow line is for debug only
-            // saveBitmapToJPEG(srcRect.right - srcRect.left,
-            //                  srcRect.bottom - srcRect.top);
-
-            final float roundPx = 20;
-            paint.setAntiAlias(true);
-            canvas.drawARGB(0, 0, 0, 0);
-            canvas.drawRoundRect(rectF, roundPx, roundPx, paint);
-            paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
-
-            if(flag){
-                //Bitmap roundB = getRoundedCornerBitmap(bitmap, 70);
-                //canvas.drawBitmap(roundB, srcRect, dstRect, null);
-
-                canvas.drawBitmap(bitmap, srcRect, rect, paint);
-
-
-                //canvas.drawBitmap(bitmap, srcRect, dstRect, null);
-
-            }else{
-                 canvas.drawBitmap(bitmap, srcRect, dstRect, null);
+            if (flag) {
+                paint.reset();
+                paint.setXfermode(modesrcover);
+                canvas.drawRoundRect(dstRectf, 20, 20, paint);
+                paint.setXfermode(modesrcin);
+                canvas.drawBitmap(bitmap, srcRect, dstRect, paint);
+            } else {
+                canvas.drawBitmap(bitmap, srcRect, dstRect, null);
             }
 
             surfaceHolder.unlockCanvasAndPost(canvas);
