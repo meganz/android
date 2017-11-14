@@ -14388,6 +14388,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					log("Status update for the user: "+userHandle);
 					if(rChatFL!=null){
 						if(rChatFL.isAdded()){
+							log("Update Recent chats view");
 							rChatFL.contactStatusUpdate(userHandle, status);
 						}
 					}
@@ -14396,6 +14397,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
 					if(cFLol!=null){
 						if(cFLol.isAdded()){
+							log("Update Contacts view");
 							cFLol.contactStatusUpdate(userHandle, status);
 						}
 					}
