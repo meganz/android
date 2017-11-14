@@ -866,9 +866,11 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 					log("Show notification ALWAYS");
 					showNotification(item);
 					firstTs=-1;
+					isFireBaseConnection=false;
 				}
 				else{
 					if (activityVisible){
+						log("Activity Visible is TRUE");
 						if (!recentChatsFragmentVisible) {
 							log("NOt recentFragment visible");
 
