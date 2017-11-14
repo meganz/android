@@ -76,6 +76,9 @@ import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatError;
+import nz.mega.sdk.MegaChatListItem;
+import nz.mega.sdk.MegaChatListenerInterface;
+import nz.mega.sdk.MegaChatPresenceConfig;
 import nz.mega.sdk.MegaHandleList;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatPeerList;
@@ -97,7 +100,7 @@ import mega.privacy.android.app.components.emojicon.EmojiconGridFragment;
 import mega.privacy.android.app.components.emojicon.emoji.Emojicon;
 
 
-public class ChatActivityLollipop extends PinActivityLollipop implements MegaChatRequestListenerInterface, MegaRequestListenerInterface, MegaChatRoomListenerInterface, RecyclerView.OnItemTouchListener, GestureDetector.OnGestureListener, View.OnClickListener, EmojiconGridFragment.OnEmojiconClickedListener,EmojiconsFragment.OnEmojiconBackspaceClickedListener {
+public class ChatActivityLollipop extends PinActivityLollipop implements MegaChatRequestListenerInterface, MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatRoomListenerInterface, RecyclerView.OnItemTouchListener, GestureDetector.OnGestureListener, View.OnClickListener, EmojiconGridFragment.OnEmojiconClickedListener,EmojiconsFragment.OnEmojiconBackspaceClickedListener {
 
     public static int NUMBER_MESSAGES_TO_LOAD = 20;
     public static int NUMBER_MESSAGES_TO_UPDATE_UI = 7;
@@ -342,6 +345,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             MegaApplication app = (MegaApplication) getApplication();
             megaChatApi = app.getMegaChatApi();
         }
+
+        log("addChatListener");
+        megaChatApi.addChatListener(this);
 
         dbH = DatabaseHandler.getDbHandler(this);
 
@@ -3916,6 +3922,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         log("onDestroy()");
 
         megaChatApi.closeChatRoom(idChat, this);
+        log("removeChatListener");
+        megaChatApi.removeChatListener(this);
 
         MegaApplication.setOpenChatId(-1);
 
@@ -4230,4 +4238,25 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
     }
 
+
+    @Override
+    public void onChatListItemUpdate(MegaChatApiJava api, MegaChatListItem item) {
+
+    }
+
+    @Override
+    public void onChatInitStateUpdate(MegaChatApiJava api, int newState) {
+
+    }
+
+    @Override
+    public void onChatPresenceConfigUpdate(MegaChatApiJava api, MegaChatPresenceConfig config) {
+
+    }
+
+    @Override
+    public void onChatOnlineStatusUpdate(MegaChatApiJava api, long userHandle, int status, boolean inProgress) {
+        log("onChatOnlineStatusUpdate: " + status + "___" + inProgress);
+        setChatPermissions();
+    }
 }
