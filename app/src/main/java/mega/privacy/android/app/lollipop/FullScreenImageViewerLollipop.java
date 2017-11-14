@@ -389,6 +389,8 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 
 			if(fromShared){
 				removeIcon.setVisible(false);
+				chatIcon.setVisible(false);
+
 				node = megaApi.getNodeByHandle(imageHandles.get(positionG));
 				int accessLevel = megaApi.getAccess(node);
 
@@ -399,12 +401,6 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 						renameIcon.setVisible(true);
 						moveIcon.setVisible(true);
 						moveToTrashIcon.setVisible(true);
-						if(Util.isChatEnabled()){
-							chatIcon.setVisible(true);
-						}
-						else{
-							chatIcon.setVisible(false);
-						}
 						break;
 					}
 					case MegaShare.ACCESS_READWRITE:
@@ -412,7 +408,6 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 						renameIcon.setVisible(false);
 						moveIcon.setVisible(false);
 						moveToTrashIcon.setVisible(false);
-						chatIcon.setVisible(false);
 						break;
 					}
 				}
