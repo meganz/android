@@ -111,7 +111,6 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 		boolean showCopy = false;
 		boolean showTrash =false;
 
-
 		@Override
 		public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
 			((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
@@ -164,6 +163,8 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 
 					NodeController nC = new NodeController(context);
 					nC.chooseLocationToMoveNodes(handleList);
+					hideMultipleSelect();
+
 					break;
 				}
 				case R.id.cab_menu_share_link:{
@@ -219,40 +220,32 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 
 			if (selected.size() != 0) {
 
-				showMove = false;
 				showCopy = true;
+				showMove = false;
 				showTrash =false;
 				showRename=false;
 
-				if(selected.size()==adapter.getItemCount()){
 
+				if(selected.size()==adapter.getItemCount()){
                     menu.findItem(R.id.cab_menu_select_all).setVisible(false);
 					unselect.setTitle(getString(R.string.action_unselect_all));
 					unselect.setVisible(true);
 					showRename = false;
-					showMove = false;
-					showTrash=false;
-
 
 				}else if(selected.size()==1){
 
                     menu.findItem(R.id.cab_menu_select_all).setVisible(true);
 					unselect.setTitle(getString(R.string.action_unselect_all));
 					unselect.setVisible(true);
-					showTrash = false;
 
 					if((megaApi.checkAccess(selected.get(0), MegaShare.ACCESS_FULL).getErrorCode() == MegaError.API_OK)){
 						showRename = true;
-                        showMove = true;
 
-                    }else if(megaApi.checkAccess(selected.get(0), MegaShare.ACCESS_READWRITE).getErrorCode() == MegaError.API_OK){
+					}else if(megaApi.checkAccess(selected.get(0), MegaShare.ACCESS_READWRITE).getErrorCode() == MegaError.API_OK){
 						showRename = false;
-                        showMove = false;
 
-                    }else if(megaApi.checkAccess(selected.get(0), MegaShare.ACCESS_READ).getErrorCode() == MegaError.API_OK){
+					}else if(megaApi.checkAccess(selected.get(0), MegaShare.ACCESS_READ).getErrorCode() == MegaError.API_OK){
 						showRename = false;
-						showMove = false;
-
 					}
 				}else{
 
@@ -260,31 +253,35 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 					unselect.setTitle(getString(R.string.action_unselect_all));
 					unselect.setVisible(true);
 					showRename = false;
-					showMove = false;
-					showTrash = false;
 				}
 
 				if (((ManagerActivityLollipop)context).deepBrowserTreeIncoming == 0){
-                    showTrash = false;
+
+					showTrash = false;
+					showMove = false;
 					menu.findItem(R.id.cab_menu_leave_multiple_share).setVisible(true);
 					menu.findItem(R.id.cab_menu_leave_multiple_share).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+
 				}else{
-                    if((megaApi.checkAccess(selected.get(0), MegaShare.ACCESS_FULL).getErrorCode() == MegaError.API_OK)){
-                        showTrash = true;
+
+					if((megaApi.checkAccess(selected.get(0), MegaShare.ACCESS_FULL).getErrorCode() == MegaError.API_OK)){
+						showTrash = true;
+						showMove = true;
 					}else{
-                        showTrash = false;
+						showTrash = false;
+						showMove = false;
 					}
 
 					menu.findItem(R.id.cab_menu_leave_multiple_share).setVisible(false);
 					menu.findItem(R.id.cab_menu_leave_multiple_share).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
 				}
 
-				for(int i=0; i<selected.size();i++)	{
-                    if(megaApi.checkMove(selected.get(i), megaApi.getRubbishNode()).getErrorCode() != MegaError.API_OK)	{
-                        showMove = false;
-						break;
-					}
-				}
+//				for(int i=0; i<selected.size();i++)	{
+//                    if(megaApi.checkMove(selected.get(i), megaApi.getRubbishNode()).getErrorCode() != MegaError.API_OK)	{
+//                        showTrash = false;
+//						break;
+//					}
+//				}
 			}
 			else{
                 menu.findItem(R.id.cab_menu_select_all).setVisible(true);
