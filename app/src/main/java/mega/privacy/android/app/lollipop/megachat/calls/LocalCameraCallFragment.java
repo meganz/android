@@ -76,6 +76,20 @@ public class LocalCameraCallFragment extends Fragment implements MegaChatVideoLi
             this.width = width;
             this.height = height;
             this.bitmap = localRenderer.CreateBitmap(width, height);
+
+            SurfaceHolder holder = localSurfaceView.getHolder();
+            if (holder != null) {
+                int viewWidth = localSurfaceView.getWidth();
+                int viewHeight = localSurfaceView.getHeight();
+                int holderWidth = viewWidth < width ? viewWidth : width;
+                int holderHeight = holderWidth * viewHeight / viewWidth;
+                if (holderHeight > viewHeight)
+                {
+                    holderHeight = viewHeight;
+                    holderWidth = holderHeight * viewWidth / viewHeight;
+                }
+                holder.setFixedSize(holderWidth, holderHeight);
+            }
         }
 
         bitmap.copyPixelsFromBuffer(ByteBuffer.wrap(byteBuffer));

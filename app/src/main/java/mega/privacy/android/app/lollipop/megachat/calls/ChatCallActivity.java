@@ -36,6 +36,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
+import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
@@ -785,6 +786,20 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
             this.width = width;
             this.height = height;
             this.bitmap = remoteRenderer.CreateBitmap(width, height);
+
+            SurfaceHolder holder = remoteSurfaceView.getHolder();
+            if (holder != null) {
+                int viewWidth = remoteSurfaceView.getWidth();
+                int viewHeight = remoteSurfaceView.getHeight();
+                int holderWidth = viewWidth < width ? viewWidth : width;
+                int holderHeight = holderWidth * viewHeight / viewWidth;
+                if (holderHeight > viewHeight)
+                {
+                    holderHeight = viewHeight;
+                    holderWidth = holderHeight * viewWidth / viewHeight;
+                }
+                holder.setFixedSize(holderWidth, holderHeight);
+            }
         }
 
         bitmap.copyPixelsFromBuffer(ByteBuffer.wrap(byteBuffer));
