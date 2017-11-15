@@ -99,6 +99,7 @@ public class AchievementsFragment extends Fragment implements OnClickListener{
 	long transferQuota = 0;
 	TextView textUnlockedRewardTransfer;
 
+	TextView titleReferralBonuses;
 	TextView figureReferralBonusesStorage;
 	TextView figureReferralBonusesTransfer;
 	long storageReferrals;
@@ -113,6 +114,7 @@ public class AchievementsFragment extends Fragment implements OnClickListener{
 	TextView textBaseQuotaStorage;
 	TextView textBaseQuotaTransfer;
 
+	TextView titleInstallApp;
 	TextView figureInstallAppStorage;
 	TextView figureInstallAppTransfer;
 	long storageInstallApp;
@@ -123,6 +125,7 @@ public class AchievementsFragment extends Fragment implements OnClickListener{
 	TextView textInstallAppTransfer;
 	TextView daysLeftInstallAppText;
 
+	TextView titleRegistration;
 	TextView figureRegistrationStorage;
 	TextView figureRegistrationTransfer;
 	long storageRegistration;
@@ -133,6 +136,7 @@ public class AchievementsFragment extends Fragment implements OnClickListener{
 	TextView textRegistrationTransfer;
 	TextView daysLeftRegistrationText;
 
+	TextView titleInstallDesktop;
 	TextView figureInstallDesktopStorage;
 	TextView figureInstallDesktopTransfer;
 	long storageInstallDesktop;
@@ -188,6 +192,13 @@ public class AchievementsFragment extends Fragment implements OnClickListener{
 		referralBonusesLayout = (RelativeLayout) v.findViewById(R.id.referral_bonuses_layout);
 		referralBonusesLayout.setOnClickListener(this);
 
+		titleReferralBonuses = (TextView) v.findViewById(R.id.title_referral_bonuses);
+		if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+			titleReferralBonuses.setMaxWidth(Util.scaleWidthPx(250, outMetrics));
+		}else{
+			titleReferralBonuses.setMaxWidth(Util.scaleWidthPx(190, outMetrics));
+		}
+
 		figuresReferralBonusesLayout = (LinearLayout) v.findViewById(R.id.figures_referral_bonuses_layout);
 		figuresReferralBonusesLayout.setVisibility(View.GONE);
 
@@ -196,10 +207,24 @@ public class AchievementsFragment extends Fragment implements OnClickListener{
         registrationLayout = (RelativeLayout) v.findViewById(R.id.registration_layout);
         registrationLayout.setOnClickListener(this);
 
+		titleRegistration = (TextView) v.findViewById(R.id.title_registration);
+		if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+			titleRegistration.setMaxWidth(Util.scaleWidthPx(250, outMetrics));
+		}else{
+			titleRegistration.setMaxWidth(Util.scaleWidthPx(190, outMetrics));
+		}
+
 		figuresRegistrationLayout = (LinearLayout) v.findViewById(R.id.figures_registration_layout);
 
         installAppLayout = (RelativeLayout) v.findViewById(R.id.install_app_layout);
         installAppLayout.setOnClickListener(this);
+
+		titleInstallApp = (TextView) v.findViewById(R.id.title_install_app);
+		if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+			titleInstallApp.setMaxWidth(Util.scaleWidthPx(250, outMetrics));
+		}else{
+			titleInstallApp.setMaxWidth(Util.scaleWidthPx(190, outMetrics));
+		}
 
 		figuresInstallAppLayout = (LinearLayout) v.findViewById(R.id.figures_install_app_layout);
 		figuresInstallAppLayout.setVisibility(View.GONE);
@@ -208,6 +233,13 @@ public class AchievementsFragment extends Fragment implements OnClickListener{
 
         installDesktopLayout = (RelativeLayout) v.findViewById(R.id.install_desktop_layout);
         installDesktopLayout.setOnClickListener(this);
+
+		titleInstallDesktop = (TextView) v.findViewById(R.id.title_install_desktop);
+		if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+			titleInstallDesktop.setMaxWidth(Util.scaleWidthPx(250, outMetrics));
+		}else{
+			titleInstallDesktop.setMaxWidth(Util.scaleWidthPx(190, outMetrics));
+		}
 
 		figuresInstallDesktopLayout = (LinearLayout) v.findViewById(R.id.figures_install_desktop_layout);
 		figuresInstallDesktopLayout.setVisibility(View.GONE);
@@ -492,9 +524,7 @@ public class AchievementsFragment extends Fragment implements OnClickListener{
 					daysLeftInstallAppText.setBackground(ContextCompat.getDrawable(context, R.drawable.expired_border));
 					figuresInstallAppLayout.setAlpha(0.5f);
 					installAppIcon.setAlpha(0.5f);
-					RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) daysLeftRegistrationText.getLayoutParams();
-					params.setMargins(0,0,Util.scaleWidthPx(12,outMetrics),0);
-					daysLeftInstallAppText.setLayoutParams(params);
+					daysLeftInstallAppText.setPadding(Util.scaleWidthPx(8,outMetrics), Util.scaleHeightPx(4,outMetrics),Util.scaleWidthPx(8,outMetrics),Util.scaleHeightPx(4,outMetrics));
 					daysLeftInstallAppText.setText(context.getResources().getString(R.string.expired_achievement));
 				}
 
@@ -554,9 +584,7 @@ public class AchievementsFragment extends Fragment implements OnClickListener{
                     daysLeftInstallDesktopText.setBackground(ContextCompat.getDrawable(context, R.drawable.expired_border));
 					figuresInstallDesktopLayout.setAlpha(0.5f);
 					installDesktopIcon.setAlpha(0.5f);
-					RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) daysLeftRegistrationText.getLayoutParams();
-					params.setMargins(0,0,Util.scaleWidthPx(12,outMetrics),0);
-					daysLeftInstallDesktopText.setLayoutParams(params);
+					daysLeftInstallDesktopText.setPadding(Util.scaleWidthPx(8,outMetrics), Util.scaleHeightPx(4,outMetrics),Util.scaleWidthPx(8,outMetrics),Util.scaleHeightPx(4,outMetrics));
 					daysLeftInstallDesktopText.setText(context.getResources().getString(R.string.expired_achievement));
 				}
 
@@ -611,9 +639,7 @@ public class AchievementsFragment extends Fragment implements OnClickListener{
                     daysLeftRegistrationText.setBackground(ContextCompat.getDrawable(context, R.drawable.expired_border));
 					figuresRegistrationLayout.setAlpha(0.5f);
 					registrationIcon.setAlpha(0.5f);
-					RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) daysLeftRegistrationText.getLayoutParams();
-					params.setMargins(0,0,Util.scaleWidthPx(12,outMetrics),0);
-					daysLeftRegistrationText.setLayoutParams(params);
+					daysLeftRegistrationText.setPadding(Util.scaleWidthPx(8,outMetrics), Util.scaleHeightPx(4,outMetrics),Util.scaleWidthPx(8,outMetrics),Util.scaleHeightPx(4,outMetrics));
 					daysLeftRegistrationText.setText(context.getResources().getString(R.string.expired_achievement));
 				}
 			}

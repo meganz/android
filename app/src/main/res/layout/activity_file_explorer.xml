@@ -12,10 +12,13 @@
         android:id="@+id/toolbar_explorer"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
+        android:minHeight="?attr/actionBarSize"
+        app:titleTextAppearance="@style/ToolbarTitle"
         android:background="?attr/colorPrimary"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
         app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
         tools:context=".FileProviderActivityLollipop" />
+
 
     <!-- THE Cloud Drive TABS -->
     <LinearLayout
@@ -40,6 +43,7 @@
             android:layout_height="0dp"
             android:layout_weight="1"/>
     </LinearLayout>
+
 
     <FrameLayout
         android:id="@+id/cloudDriveFrameLayout"

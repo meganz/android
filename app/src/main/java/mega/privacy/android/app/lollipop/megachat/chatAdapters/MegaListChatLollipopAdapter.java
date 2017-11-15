@@ -944,20 +944,27 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 			if(state == MegaChatApi.STATUS_ONLINE){
 				log("This user is connected");
 				holder.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_online));
+				holder.contactStateIcon.setVisibility(View.VISIBLE);
 			}
 			else if(state == MegaChatApi.STATUS_AWAY){
 				log("This user is away");
 				holder.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_away));
+				holder.contactStateIcon.setVisibility(View.VISIBLE);
 			}
 			else if(state == MegaChatApi.STATUS_BUSY){
 				log("This user is busy");
 				holder.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_busy));
+				holder.contactStateIcon.setVisibility(View.VISIBLE);
+			}
+			else if(state == MegaChatApi.STATUS_OFFLINE){
+				log("This user is offline");
+				holder.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_offline));
+				holder.contactStateIcon.setVisibility(View.VISIBLE);
 			}
 			else{
 				log("This user status is: "+state);
-				holder.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_offline));
+				holder.contactStateIcon.setVisibility(View.GONE);
 			}
-
 		}
 		else{
 			log("Holder is NULL");
