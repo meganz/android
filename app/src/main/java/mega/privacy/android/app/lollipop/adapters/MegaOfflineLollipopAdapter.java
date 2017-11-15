@@ -77,7 +77,6 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 		ImageView imageView;
         TextView textViewFileName;
         TextView textViewFileSize;
-        ImageButton imageButtonThreeDots;
         RelativeLayout itemLayout;
         
         int currentPosition;
@@ -89,13 +88,14 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
     	public ViewHolderOfflineList (View v){
     		super(v);
     	}
+		RelativeLayout threeDotsLayout;
     }
     
     public class ViewHolderOfflineGrid extends ViewHolderOffline{
     	public ViewHolderOfflineGrid (View v){
     		super(v);
     	}
-    	
+		ImageButton imageButtonThreeDots;
     	public View separator;
     }
     
@@ -419,13 +419,8 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 			holder.textViewFileName.getLayoutParams().height = RelativeLayout.LayoutParams.WRAP_CONTENT;
 			holder.textViewFileName.getLayoutParams().width = Util.px2dp(210, outMetrics);
 			holder.textViewFileSize = (TextView) v.findViewById(R.id.offline_list_filesize);
-			holder.imageButtonThreeDots = (ImageButton) v.findViewById(R.id.offline_list_three_dots);
-			
-			//Right margin
-			RelativeLayout.LayoutParams actionButtonParams = (RelativeLayout.LayoutParams)holder.imageButtonThreeDots.getLayoutParams();
-			actionButtonParams.setMargins(0, 0, Util.scaleWidthPx(10, outMetrics), 0); 
-			holder.imageButtonThreeDots.setLayoutParams(actionButtonParams);
-		
+			holder.threeDotsLayout = (RelativeLayout) v.findViewById(R.id.offline_list_three_dots_layout);
+
 			holder.itemLayout.setOnClickListener(this);
 			holder.itemLayout.setOnLongClickListener(this);
 			holder.itemLayout.setTag(holder);
@@ -655,9 +650,9 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 				holder.textViewFileSize.setText(Util.getSizeString(nodeSize));
 			}			
 			holder.imageView.setImageResource(MimeTypeList.typeForName(currentNode.getName()).getIconResourceId());
-			holder.imageButtonThreeDots.setVisibility(View.VISIBLE);
-			holder.imageButtonThreeDots.setTag(holder);
-			holder.imageButtonThreeDots.setOnClickListener(this);
+			holder.threeDotsLayout.setVisibility(View.VISIBLE);
+			holder.threeDotsLayout.setTag(holder);
+			holder.threeDotsLayout.setOnClickListener(this);
 			return;
 		}
 		
@@ -831,9 +826,8 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 			}
 		}
 
-		
-		holder.imageButtonThreeDots.setTag(holder);
-		holder.imageButtonThreeDots.setOnClickListener(this);
+		holder.threeDotsLayout.setTag(holder);
+		holder.threeDotsLayout.setOnClickListener(this);
 	}
 	
 	@Override
@@ -888,7 +882,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 				fragment.itemClick(currentPosition);								
 				break;
 			}			
-			case R.id.offline_list_three_dots:
+			case R.id.offline_list_three_dots_layout:
 			case R.id.offline_grid_three_dots:{
 
 				if(context instanceof ManagerActivityLollipop){

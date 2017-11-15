@@ -3930,7 +3930,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         super.onDestroy();
     }
 
-
     @Override
     protected void onNewIntent(Intent intent){
         log("onNewIntent");

@@ -174,7 +174,7 @@ public class MegaSharedFolderLollipopAdapter extends RecyclerView.Adapter<MegaSh
 //        ImageView imageView;
         TextView textViewContactName; 
         TextView textViewPermissions;
-        ImageButton imageButtonThreeDots;
+        RelativeLayout threeDotsLayout;
         RelativeLayout itemLayout;
 //        LinearLayout optionsLayout;
 //        RelativeLayout optionPermissions;
@@ -232,7 +232,7 @@ public class MegaSharedFolderLollipopAdapter extends RecyclerView.Adapter<MegaSh
 		
 		holder.textViewContactName = (TextView) v.findViewById(R.id.shared_folder_contact_name);
 		holder.textViewPermissions = (TextView) v.findViewById(R.id.shared_folder_contact_permissions);
-		holder.imageButtonThreeDots = (ImageButton) v.findViewById(R.id.shared_folder_contact_three_dots);
+		holder.threeDotsLayout = (RelativeLayout) v.findViewById(R.id.shared_folder_three_dots_layout);
 
 		v.setTag(holder); 
 		
@@ -409,8 +409,8 @@ public class MegaSharedFolderLollipopAdapter extends RecyclerView.Adapter<MegaSh
 			}
 		}
 		
-        holder.imageButtonThreeDots.setTag(holder);
-		holder.imageButtonThreeDots.setOnClickListener(this);
+        holder.threeDotsLayout.setTag(holder);
+		holder.threeDotsLayout.setOnClickListener(this);
 	}
 	
 	public void createDefaultAvatar(ViewHolderShareList holder, MegaUser contact){
@@ -528,7 +528,7 @@ public class MegaSharedFolderLollipopAdapter extends RecyclerView.Adapter<MegaSh
 		final MegaShare s = (MegaShare) getItem(currentPosition);
 				
 		switch (v.getId()){			
-			case R.id.shared_folder_contact_three_dots:{
+			case R.id.shared_folder_three_dots_layout:{
 				if(multipleSelect){
 					((FileContactListActivityLollipop) context).itemClick(currentPosition);
 				}
