@@ -89,6 +89,7 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
         log("onMessageReceived");
+        MegaApplication.isFireBaseConnection=true;
         // [START_EXCLUDE]
         // There are two types of messages data messages and notification messages. Data messages are handled
         // here in onMessageReceived whether the app is in the foreground or background. Data messages are the type
@@ -285,9 +286,9 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
             if (e.getErrorCode() == MegaError.API_OK){
                 log("OK fetch nodes");
                 if (Util.isChatEnabled()) {
-                        log("Chat enabled-->connect");
-                    MegaApplication.isFireBaseConnection=true;
-                        megaChatApi.connectInBackground(this);
+                    log("Chat enabled-->connect");
+//                    MegaApplication.isFireBaseConnection=true;
+                    megaChatApi.connectInBackground(this);
                 }
                 else{
                     log("Chat NOT enabled - sendNotification");

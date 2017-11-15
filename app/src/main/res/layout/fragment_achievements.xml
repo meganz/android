@@ -191,10 +191,10 @@
                 <RelativeLayout
                     android:id="@+id/referral_bonuses_layout"
                     android:layout_width="match_parent"
-                    android:layout_height="96dp">
+                    android:layout_height="wrap_content">
 
                     <LinearLayout
-                        android:id="@+id/referal_bonuses_linear_layout"
+                        android:id="@+id/referral_bonuses_linear_layout"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:gravity="center_vertical"
@@ -210,7 +210,9 @@
                         <RelativeLayout
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginLeft="20dp">
+                            android:layout_marginLeft="20dp"
+                            android:layout_marginBottom="16dp"
+                            android:layout_marginTop="16dp">
 
                             <TextView
                                 android:id="@+id/title_referral_bonuses"
@@ -221,6 +223,9 @@
                                 android:layout_marginRight="21dp"
                                 android:layout_marginBottom="14dp"
                                 android:textSize="16dp"
+                                android:singleLine="false"
+                                android:maxLines="2"
+                                android:ellipsize="end"
                                 android:textColor="@color/name_my_account"/>
 
                             <TextView
@@ -303,7 +308,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_alignParentRight="true"
                                 android:src="@drawable/ic_chevron_right_grey"
-                                android:layout_marginRight="13dp"/>
+                                android:layout_marginRight="8dp"/>
                         </RelativeLayout>
 
                     </LinearLayout>
@@ -450,7 +455,7 @@
                     android:id="@+id/install_app_layout"
                     android:layout_width="match_parent"
                     android:layout_below="@+id/separator_base_quota"
-                    android:layout_height="96dp">
+                    android:layout_height="wrap_content">
 
                     <LinearLayout
                         android:id="@+id/install_app_linear_layout"
@@ -469,7 +474,9 @@
                         <RelativeLayout
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginLeft="20dp">
+                            android:layout_marginLeft="20dp"
+                            android:layout_marginBottom="16dp"
+                            android:layout_marginTop="16dp">
 
                             <TextView
                                 android:id="@+id/title_install_app"
@@ -477,9 +484,11 @@
                                 android:layout_height="wrap_content"
                                 android:layout_alignParentTop="true"
                                 android:text="@string/title_install_app"
-                                android:layout_marginRight="21dp"
-                                android:layout_marginBottom="14dp"
+                                 android:layout_marginBottom="14dp"
                                 android:textSize="16dp"
+                                android:singleLine="false"
+                                android:maxLines="2"
+                                android:ellipsize="end"
                                 android:textColor="@color/name_my_account"/>
 
                             <TextView
@@ -564,14 +573,10 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_alignParentRight="true"
-                                android:layout_marginRight="5dp"
+                                android:layout_marginRight="12dp"
                                 android:textSize="14dp"
                                 android:gravity="right"
                                 android:textColor="@color/mail_my_account"
-                                android:paddingTop="4dp"
-                                android:paddingBottom="4dp"
-                                android:paddingLeft="8dp"
-                                android:paddingRight="8dp"
                                 android:layout_column="0"/>
                         </RelativeLayout>
 
@@ -592,7 +597,7 @@
                     android:id="@+id/registration_layout"
                     android:layout_width="match_parent"
                     android:layout_below="@+id/separator_install_app"
-                    android:layout_height="96dp">
+                    android:layout_height="wrap_content">
 
                     <LinearLayout
                         android:id="@+id/registration_linear_layout"
@@ -611,7 +616,9 @@
                         <RelativeLayout
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginLeft="20dp">
+                            android:layout_marginLeft="20dp"
+                            android:layout_marginBottom="16dp"
+                            android:layout_marginTop="16dp">
 
                             <TextView
                                 android:id="@+id/title_registration"
@@ -621,6 +628,9 @@
                                 android:text="@string/title_regitration"
                                 android:layout_marginRight="21dp"
                                 android:layout_marginBottom="14dp"
+                                android:singleLine="false"
+                                android:maxLines="2"
+                                android:ellipsize="end"
                                 android:textSize="16dp"
                                 android:textColor="@color/name_my_account"/>
 
@@ -698,14 +708,10 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_alignParentRight="true"
-                                android:layout_marginRight="5dp"
+                                android:layout_marginRight="12dp"
                                 android:textSize="14dp"
                                 android:gravity="right"
                                 android:textColor="@color/mail_my_account"
-                                android:paddingTop="4dp"
-                                android:paddingBottom="4dp"
-                                android:paddingLeft="8dp"
-                                android:paddingRight="8dp"
                                 android:layout_column="0"/>
                         </RelativeLayout>
 
@@ -726,7 +732,7 @@
                     android:id="@+id/install_desktop_layout"
                     android:layout_width="match_parent"
                     android:layout_below="@+id/separator_registration"
-                    android:layout_height="96dp">
+                    android:layout_height="wrap_content">
 
                     <LinearLayout
                         android:id="@+id/install_desktop_linear_layout"
@@ -745,6 +751,8 @@
                         <RelativeLayout
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_marginBottom="16dp"
+                            android:layout_marginTop="16dp"
                             android:layout_marginLeft="20dp">
 
                             <TextView
@@ -756,6 +764,9 @@
                                 android:layout_marginRight="21dp"
                                 android:layout_marginBottom="14dp"
                                 android:textSize="16dp"
+                                android:singleLine="false"
+                                android:maxLines="2"
+                                android:ellipsize="end"
                                 android:textColor="@color/name_my_account"/>
 
                             <TextView
@@ -840,14 +851,10 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_alignParentRight="true"
-                                android:layout_marginRight="5dp"
+                                android:layout_marginRight="12dp"
                                 android:textSize="14dp"
                                 android:gravity="right"
                                 android:textColor="@color/mail_my_account"
-                                android:paddingTop="4dp"
-                                android:paddingBottom="4dp"
-                                android:paddingLeft="8dp"
-                                android:paddingRight="8dp"
                                 android:layout_column="0"/>
                         </RelativeLayout>
 

@@ -36,6 +36,7 @@ import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatListItem;
@@ -213,18 +214,32 @@ public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment imp
                     optionClearHistory.setVisibility(View.VISIBLE);
                 }
             }
-
 		}
 		else{
-			infoChatText.setText(getString(R.string.contact_properties_activity));
-			optionLeaveChat.setVisibility(View.GONE);
+            long userHandle = chat.getPeerHandle();
+            MegaUser contact = megaApi.getContact(MegaApiJava.handleToBase64(userHandle));
+            if(contact!=null){
+                if(contact.getVisibility()==MegaUser.VISIBILITY_VISIBLE){
+                    optionInfoChat.setVisibility(View.VISIBLE);
+                    infoChatText.setText(getString(R.string.contact_properties_activity));
 
-            if(chat.getLastMessageType()== MegaChatMessage.TYPE_INVALID){
-                optionClearHistory.setVisibility(View.GONE);
+                    if(chat.getLastMessageType()== MegaChatMessage.TYPE_INVALID){
+                        optionClearHistory.setVisibility(View.GONE);
+                    }
+                    else{
+                        optionClearHistory.setVisibility(View.VISIBLE);
+                    }
+                }
+                else{
+                    optionInfoChat.setVisibility(View.GONE);
+                    optionClearHistory.setVisibility(View.GONE);
+                }
             }
             else{
-                optionClearHistory.setVisibility(View.VISIBLE);
+                optionInfoChat.setVisibility(View.GONE);
+                optionClearHistory.setVisibility(View.GONE);
             }
+			optionLeaveChat.setVisibility(View.GONE);
 		}
 
 		chatPrefs = dbH.findChatPreferencesByHandle(String.valueOf(chat.getChatId()));
