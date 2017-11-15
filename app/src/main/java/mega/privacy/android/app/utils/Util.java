@@ -27,6 +27,7 @@ import android.os.StatFs;
 import android.provider.MediaStore;
 import android.provider.MediaStore.Images;
 import android.provider.MediaStore.Video;
+import android.support.design.widget.Snackbar;
 import android.support.v4.content.FileProvider;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
@@ -47,6 +48,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
@@ -77,6 +79,7 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaAttributes;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaError;
@@ -94,12 +97,12 @@ public class Util {
 	public static double percScreenLoginReturning = 0.8;
 	
 	// Debug flag to enable logging and some other things
-	public static boolean DEBUG = true;
+	public static boolean DEBUG = false;
 
 	public static String mainDIR = "/MEGA";
 	public static String offlineDIR = "MEGA/MEGA Offline";
 	public static String downloadDIR ="MEGA/MEGA Downloads";
-	public static String temporalPicDIR ="MEGA/MEGA Selfies";
+	public static String temporalPicDIR ="MEGA/MEGA AppTemp";
 	public static String profilePicDIR ="MEGA/MEGA Profile Images";
 	public static String logDIR = "MEGA/MEGA Logs";
 	public static String advancesDevicesDIR = "MEGA/MEGA Temp";
@@ -146,7 +149,39 @@ public class Util {
 	public static void showErrorAlertDialogFinish(MegaError error, Activity activity) {
 		showErrorAlertDialog(error.getErrorString(), true, activity);
 	}
-	
+
+	public static File createTemporalTextFile(String name, String data){
+
+		String path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.temporalPicDIR + "/";
+		File tempDownDirectory = new File(path);
+		if(!tempDownDirectory.exists()){
+			tempDownDirectory.mkdirs();
+		}
+
+		String fileName = name+".txt";
+		final File file = new File(path, fileName);
+
+		try
+		{
+			file.createNewFile();
+			FileOutputStream fOut = new FileOutputStream(file);
+			OutputStreamWriter myOutWriter = new OutputStreamWriter(fOut);
+			myOutWriter.append(data);
+
+			myOutWriter.close();
+
+			fOut.flush();
+			fOut.close();
+
+			return file;
+		}
+		catch (IOException e)
+		{
+			log("File write failed: " + e.toString());
+			return null;
+		}
+	}
+
 	/*
 	 * Build error dialog
 	 * @param message Message to display

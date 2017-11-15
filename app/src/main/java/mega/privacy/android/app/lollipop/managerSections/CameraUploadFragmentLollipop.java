@@ -69,7 +69,7 @@ import mega.privacy.android.app.MegaStreamingService;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.MegaLinearLayoutManager;
-import mega.privacy.android.app.components.SimpleDividerItemDecoration;
+import mega.privacy.android.app.components.DividerItemDecoration;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.MegaMonthPicLollipop;
@@ -83,6 +83,7 @@ import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaChildren;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
@@ -95,6 +96,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 
 	
 	public static int GRID_WIDTH = 154;
+
 	
 	public static int GRID_LARGE = 3;
 	public static int GRID_SMALL = 7;
@@ -108,8 +110,11 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	private GestureDetectorCompat detector;
 	private RecyclerView.LayoutManager mLayoutManager;
 
-	private ImageView emptyImageView;
-	private TextView emptyTextView;
+	ImageView emptyImageView;
+	LinearLayout emptyTextView;
+	TextView emptyTextViewFirst;
+	TextView emptyTextViewSecond;
+
 	private RelativeLayout contentTextLayout;
 //	Button turnOnOff;
 	private RelativeLayout transfersOverViewLayout;
@@ -679,7 +684,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			detector = new GestureDetectorCompat(getActivity(), new RecyclerViewOnGestureListener());
 			
 			listView = (RecyclerView) v.findViewById(R.id.file_list_view_browser);
-			listView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
+			listView.addItemDecoration(new DividerItemDecoration(context, outMetrics));
 			mLayoutManager = new MegaLinearLayoutManager(context);
 			listView.setLayoutManager(mLayoutManager);
 			listView.addOnItemTouchListener(this);
@@ -723,14 +728,21 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			RelativeLayout.LayoutParams p = (RelativeLayout.LayoutParams) listView.getLayoutParams();
 			p.addRule(RelativeLayout.ABOVE, R.id.file_list_browser_camera_upload_on_off);
 			listView.setLayoutParams(p);
-			
-			emptyImageView = (ImageView) v.findViewById(R.id.file_list_empty_image);
-			emptyTextView = (TextView) v.findViewById(R.id.file_list_empty_text);
-			
-			emptyImageView.setImageResource(R.drawable.ic_empty_camera_uploads);
-			emptyTextView.setText(R.string.camera_uploads_empty);
 
-			
+			emptyImageView = (ImageView) v.findViewById(R.id.file_list_empty_image);
+			emptyTextView = (LinearLayout) v.findViewById(R.id.file_list_empty_text);
+			emptyTextViewFirst = (TextView) v.findViewById(R.id.file_list_empty_text_first);
+			emptyTextViewSecond = (TextView) v.findViewById(R.id.file_list_empty_text_second);
+
+			if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+				emptyImageView.setImageResource(R.drawable.uploads_empty_landscape);
+			}else{
+				emptyImageView.setImageResource(R.drawable.ic_empty_camera_uploads);
+			}
+			emptyTextViewFirst.setText(R.string.context_empty_camera_uploads);
+			String text = getString(R.string.section_photo_sync);
+			emptyTextViewSecond.setText(" "+text+".");
+
 			emptyImageView.setVisibility(View.VISIBLE);			
 			emptyTextView.setVisibility(View.VISIBLE);
 			listView.setVisibility(View.GONE);
@@ -903,10 +915,18 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			listView.setLayoutParams(p);
 
 			emptyImageView = (ImageView) v.findViewById(R.id.file_grid_empty_image);
-			emptyTextView = (TextView) v.findViewById(R.id.file_grid_empty_text);
-			
-			emptyImageView.setImageResource(R.drawable.ic_empty_camera_uploads);
-			emptyTextView.setText(R.string.camera_uploads_empty);
+			emptyTextView = (LinearLayout) v.findViewById(R.id.file_grid_empty_text);
+			emptyTextViewFirst = (TextView) v.findViewById(R.id.file_grid_empty_text_first);
+			emptyTextViewSecond = (TextView) v.findViewById(R.id.file_grid_empty_text_second);
+
+			if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+				emptyImageView.setImageResource(R.drawable.uploads_empty_landscape);
+			}else{
+				emptyImageView.setImageResource(R.drawable.ic_empty_camera_uploads);
+			}
+			emptyTextViewFirst.setText(R.string.context_empty_camera_uploads);
+			String text = getString(R.string.section_photo_sync);
+			emptyTextViewSecond.setText(" "+text+".");
 			
 			emptyImageView.setVisibility(View.VISIBLE);
 			emptyTextView.setVisibility(View.VISIBLE);

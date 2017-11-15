@@ -59,6 +59,9 @@ import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatPresenceConfig;
 import nz.mega.sdk.MegaNode;
 
+import android.provider.Settings.Secure;
+
+
 //import android.support.v4.preference.PreferenceFragment;
 
 @SuppressLint("NewApi")
@@ -124,6 +127,8 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 	public static String KEY_ABOUT_KARERE_VERSION = "settings_about_karere_version";
 	public static String KEY_ABOUT_APP_VERSION = "settings_about_app_version";
 	public static String KEY_ABOUT_CODE_LINK = "settings_about_code_link";
+
+	public static String KEY_HELP_SEND_FEEDBACK= "settings_help_send_feedfack";
 	
 	public final static int CAMERA_UPLOAD_WIFI_OR_DATA_PLAN = 1001;
 	public final static int CAMERA_UPLOAD_WIFI = 1002;
@@ -169,6 +174,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 	Preference localCameraUploadFolder;
 	Preference localCameraUploadFolderSDCard;
 	Preference megaCameraFolder;
+	Preference helpSendFeedback;
 	Preference aboutPrivacy;
 	Preference aboutTOS;
 	Preference aboutSDK;
@@ -373,6 +379,9 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 		advancedFeaturesCache.setOnPreferenceClickListener(this);
 		advancedFeaturesOffline = findPreference(KEY_OFFLINE);
 		advancedFeaturesOffline.setOnPreferenceClickListener(this);
+
+		helpSendFeedback = findPreference(KEY_HELP_SEND_FEEDBACK);
+		helpSendFeedback.setOnPreferenceClickListener(this);
 		
 		aboutPrivacy = findPreference(KEY_ABOUT_PRIVACY_POLICY);
 		aboutPrivacy.setOnPreferenceClickListener(this);
@@ -1780,6 +1789,19 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			Intent intent = new Intent(context, FileExplorerActivityLollipop.class);
 			intent.setAction(FileExplorerActivityLollipop.ACTION_CHOOSE_MEGA_FOLDER_SYNC);
 			startActivityForResult(intent, REQUEST_MEGA_CAMERA_FOLDER);
+
+		}else if (preference.getKey().compareTo(KEY_HELP_SEND_FEEDBACK) == 0){
+
+			String body = getString(R.string.setting_feedback_body)+"\n\n\n\n\n\n\n\n\n\n\n"+getString(R.string.settings_feedback_body_device_model)+"  "+getDeviceName()+"\n"+getString(R.string.settings_feedback_body_android_version)+"  "+Build.VERSION.RELEASE+" "+Build.DISPLAY;
+			String emailAndroid = Constants.MAIL_ANDROID;
+			String versionApp = (getString(R.string.app_version));
+			String subject = getString(R.string.setting_feedback_subject)+" v"+versionApp;
+
+			Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:" + emailAndroid));
+			emailIntent.putExtra(Intent.EXTRA_SUBJECT, subject);
+			emailIntent.putExtra(Intent.EXTRA_TEXT, body);
+			startActivity(Intent.createChooser(emailIntent, " "));
+
 		}
 		else if (preference.getKey().compareTo(KEY_ABOUT_PRIVACY_POLICY) == 0){
 			Intent viewIntent = new Intent(Intent.ACTION_VIEW);
@@ -2179,6 +2201,29 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 		}
 		else{
 			hidePreferencesChat();
+		}
+	}
+
+	public String getDeviceName() {
+		String manufacturer = Build.MANUFACTURER;
+		String model = Build.MODEL;
+		if (model.startsWith(manufacturer)) {
+			return capitalize(model);
+		} else {
+			return capitalize(manufacturer) + " " + model;
+		}
+	}
+
+
+	private String capitalize(String s) {
+		if (s == null || s.length() == 0) {
+			return "";
+		}
+		char first = s.charAt(0);
+		if (Character.isUpperCase(first)) {
+			return s;
+		} else {
+			return Character.toUpperCase(first) + s.substring(1);
 		}
 	}
 

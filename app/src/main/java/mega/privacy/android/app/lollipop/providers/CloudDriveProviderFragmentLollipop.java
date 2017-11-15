@@ -2,6 +2,7 @@ package mega.privacy.android.app.lollipop.providers;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.GestureDetectorCompat;
@@ -17,6 +18,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -33,7 +35,7 @@ import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 
 
-public class CloudDriveProviderFragmentLollipop extends Fragment implements RecyclerView.OnItemTouchListener, GestureDetector.OnGestureListener{
+public class CloudDriveProviderFragmentLollipop extends Fragment{
 
 	Context context;
 	MegaApiAndroid megaApi;
@@ -41,7 +43,6 @@ public class CloudDriveProviderFragmentLollipop extends Fragment implements Recy
 	long parentHandle = -1;
 	
 	MegaProviderLollipopAdapter adapter;
-	GestureDetectorCompat detector;
 	MegaPreferences prefs;
 	DatabaseHandler dbH;
 	
@@ -51,28 +52,17 @@ public class CloudDriveProviderFragmentLollipop extends Fragment implements Recy
 //	private boolean folderSelected = false;
 	RecyclerView listView;
 	LinearLayoutManager mLayoutManager;
+
 	ImageView emptyImageView;
-	TextView emptyTextView;
+	LinearLayout emptyTextView;
+	TextView emptyTextViewFirst;
+	TextView emptyTextViewSecond;
+
 	TextView contentText;
 
 	Stack<Integer> lastPositionStack;
 	
 	long [] hashes;
-	
-	public class RecyclerViewOnGestureListener extends SimpleOnGestureListener{
-
-		public void onLongPress(MotionEvent e) {
-			View view = listView.findChildViewUnder(e.getX(), e.getY());
-			int position = listView.getChildPosition(view);
-
-			// handle long press
-			if (adapter.getPositionClicked() == -1){
-				//TODO: multiselect
-				itemClick(position);
-			}  
-			super.onLongPress(e);
-		}
-	}
 
 	public static CloudDriveProviderFragmentLollipop newInstance() {
 		log("newInstance");
@@ -108,21 +98,20 @@ public class CloudDriveProviderFragmentLollipop extends Fragment implements Recy
 		
 		DisplayMetrics metrics = new DisplayMetrics();
 		display.getMetrics(metrics);
-		
-		detector = new GestureDetectorCompat(getActivity(), new RecyclerViewOnGestureListener());
 
 		listView = (RecyclerView) v.findViewById(R.id.provider_list_view_browser);
 		listView.addItemDecoration(new SimpleDividerItemDecoration(context, metrics));
 		mLayoutManager = new LinearLayoutManager(context);
 		listView.setLayoutManager(mLayoutManager);
-		listView.addOnItemTouchListener(this);
-		listView.setItemAnimator(new DefaultItemAnimator()); 
+		listView.setItemAnimator(new DefaultItemAnimator());
 		
 		contentText = (TextView) v.findViewById(R.id.provider_content_text);
 		contentText.setVisibility(View.GONE);
-		
+
 		emptyImageView = (ImageView) v.findViewById(R.id.provider_list_empty_image);
-		emptyTextView = (TextView) v.findViewById(R.id.provider_list_empty_text);
+		emptyTextView = (LinearLayout) v.findViewById(R.id.provider_list_empty_text);
+		emptyTextViewFirst = (TextView) v.findViewById(R.id.provider_list_empty_text_first);
+		emptyTextViewSecond = (TextView) v.findViewById(R.id.provider_list_empty_text_second);
 
 		if (context instanceof FileProviderActivity){
 			parentHandle = ((FileProviderActivity)context).getParentHandle();
@@ -207,7 +196,7 @@ public class CloudDriveProviderFragmentLollipop extends Fragment implements Recy
     }
 
     public void itemClick(int position) {
-		log("onItemClick");
+		log("itemClick");
 		
 		if (nodes.get(position).isFolder()){
 					
@@ -324,11 +313,20 @@ public class CloudDriveProviderFragmentLollipop extends Fragment implements Recy
 				emptyImageView.setVisibility(View.VISIBLE);
 				emptyTextView.setVisibility(View.VISIBLE);
 				if (megaApi.getRootNode().getHandle()==parentHandle) {
-					emptyImageView.setImageResource(R.drawable.ic_empty_cloud_drive);
-					emptyTextView.setText(R.string.file_browser_empty_cloud_drive);
+					if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+						emptyImageView.setImageResource(R.drawable.cloud_empty_landscape);
+					}else{
+						emptyImageView.setImageResource(R.drawable.ic_empty_cloud_drive);
+					}
+					emptyTextViewFirst.setText(R.string.context_empty_inbox);
+					String text = getString(R.string.section_cloud_drive);
+					emptyTextViewSecond.setText(" "+text+".");
+					emptyTextViewSecond.setVisibility(View.VISIBLE);
+
 				} else {
 					emptyImageView.setImageResource(R.drawable.ic_empty_folder);
-					emptyTextView.setText(R.string.file_browser_empty_folder);
+					emptyTextViewFirst.setText(R.string.file_browser_empty_folder);
+					emptyTextViewSecond.setVisibility(View.GONE);
 				}
 			}
 			else{
@@ -341,61 +339,5 @@ public class CloudDriveProviderFragmentLollipop extends Fragment implements Recy
 	
 	public RecyclerView getListView(){
 		return listView;
-	}
-
-	@Override
-	public boolean onDown(MotionEvent e) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public void onShowPress(MotionEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public boolean onSingleTapUp(MotionEvent e) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX,
-			float distanceY) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public void onLongPress(MotionEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
-			float velocityY) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean onInterceptTouchEvent(RecyclerView rV, MotionEvent e) {
-		detector.onTouchEvent(e);
-		return false;
-	}
-
-	@Override
-	public void onRequestDisallowInterceptTouchEvent(boolean arg0) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void onTouchEvent(RecyclerView arg0, MotionEvent arg1) {
-		// TODO Auto-generated method stub
-		
 	}
 }

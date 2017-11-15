@@ -1509,6 +1509,9 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                                     intent.setData(Uri.parse(url));
                                 }
                             }
+                            else{
+                                log("The intent action is NULL");
+                            }
                         }
                         else{
                             log("initialCam YESSSS");
