@@ -1143,7 +1143,9 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 					RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
 					params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
 					params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-					params1.setMargins(20, 0, 12, 0);
+					int left = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 6, context.getResources().getDisplayMetrics());
+					params1.setMargins(left, 0, 0, 0);
+
 					holder.imageView.setLayoutParams(params1);
 
 					thumb = ThumbnailUtils.getThumbnailFromCache(node);
@@ -1175,20 +1177,22 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 						RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
 						params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
 						params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-						params1.setMargins(20, 0, 12, 0);
+						int left = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 6, context.getResources().getDisplayMetrics());
+						params1.setMargins(left, 0, 0, 0);
+
 						holder.imageView.setLayoutParams(params1);
 
 						holder.imageView.setImageBitmap(thumb);
 
 
 					} else {
-						thumb = ThumbnailUtils
-								.getThumbnailFromFolder(node, context);
+						thumb = ThumbnailUtils.getThumbnailFromFolder(node, context);
 						if (thumb != null) {
 							RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
 							params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
 							params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-							params1.setMargins(20, 0, 12, 0);
+							int left = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 6, context.getResources().getDisplayMetrics());
+							params1.setMargins(left, 0, 0, 0);
 
 							holder.imageView.setLayoutParams(params1);
 							holder.imageView.setImageBitmap(thumb);
@@ -1223,7 +1227,9 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 						RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
 						params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
 						params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-						params1.setMargins(18, 0, 18, 0);
+						int left = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 6, context.getResources().getDisplayMetrics());
+						params1.setMargins(left, 0, 0, 0);
+
 						holder.imageView.setLayoutParams(params1);
 
 						thumb = ThumbnailUtils.getThumbnailFromCache(node);
@@ -1256,20 +1262,21 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 							RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
 							params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
 							params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-							params1.setMargins(20, 0, 12, 0);
-							holder.imageView.setLayoutParams(params1);
+							int left = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 6, context.getResources().getDisplayMetrics());
+							params1.setMargins(left, 0, 0, 0);
 
+							holder.imageView.setLayoutParams(params1);
 							holder.imageView.setImageBitmap(thumb);
 
 
 						} else {
-							thumb = ThumbnailUtils
-									.getThumbnailFromFolder(node, context);
+							thumb = ThumbnailUtils.getThumbnailFromFolder(node, context);
 							if (thumb != null) {
 								RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
 								params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
 								params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-								params1.setMargins(20, 0, 12, 0);
+								int left = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 6, context.getResources().getDisplayMetrics());
+								params1.setMargins(left, 0, 0, 0);
 
 								holder.imageView.setLayoutParams(params1);
 								holder.imageView.setImageBitmap(thumb);

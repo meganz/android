@@ -176,7 +176,6 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 
 		}
 
-
 		v.setTag(holder);
 		return holder;
 	}
@@ -209,7 +208,8 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 			RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
 			params.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
 			params.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
-			params.setMargins(36, 0, 0, 0);
+			params.setMargins(0, 0, 0, 0);
+
 			holder.imageView.setLayoutParams(params);
 
 			holder.itemLayout.setBackgroundColor(Color.WHITE);
@@ -294,7 +294,8 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 			RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
 			params.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
 			params.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
-			params.setMargins(36, 0, 0, 0);
+			params.setMargins(0, 0, 0, 0);
+
 			holder.imageView.setLayoutParams(params);
 
 			if(selectFile){
@@ -331,7 +332,9 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 				RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
 				params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
 				params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-				params1.setMargins(54, 0, 12, 0);
+				int left = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 6, context.getResources().getDisplayMetrics());
+				params1.setMargins(left, 0, 0, 0);
+
 				holder.imageView.setLayoutParams(params1);
 
 				thumb = ThumbnailUtilsLollipop.getThumbnailFromCache(node);
@@ -361,7 +364,9 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 					RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
 					params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
 					params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-					params1.setMargins(54, 0, 12, 0);
+					int left = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 6, context.getResources().getDisplayMetrics());
+					params1.setMargins(left, 0, 0, 0);
+
 					holder.imageView.setLayoutParams(params1);
 					holder.imageView.setImageBitmap(thumb);
 				}
@@ -371,7 +376,8 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 						RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
 						params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
 						params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-						params1.setMargins(54, 0, 12, 0);
+						int left = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 6, context.getResources().getDisplayMetrics());
+						params1.setMargins(left, 0, 0, 0);
 
 						holder.imageView.setLayoutParams(params1);
 						holder.imageView.setImageBitmap(thumb);
