@@ -97,7 +97,6 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
 
     ViewGroup parent;
 
-    String myUserMail;
     long chatId;
     long callId;
     boolean isVideoOutgoing;
@@ -533,9 +532,9 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
         if (context != null) {
             log("context is not null");
             if (context.getExternalCacheDir() != null) {
-                avatar = new File(context.getExternalCacheDir().getAbsolutePath(), myUserMail + ".jpg");
+                avatar = new File(context.getExternalCacheDir().getAbsolutePath(), megaChatApi.getMyEmail() + ".jpg");
             } else {
-                avatar = new File(context.getCacheDir().getAbsolutePath(), myUserMail + ".jpg");
+                avatar = new File(context.getCacheDir().getAbsolutePath(), megaChatApi.getMyEmail() + ".jpg");
             }
         }
         if (avatar.exists()) {
