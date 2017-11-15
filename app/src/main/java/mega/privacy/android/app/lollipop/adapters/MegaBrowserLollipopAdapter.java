@@ -110,7 +110,6 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 		public TextView textViewFileSize;
 		public long document;
 		public RelativeLayout itemLayout;
-		public ImageButton imageButtonThreeDots;
 	}
 
 	public static class ViewHolderBrowserList extends ViewHolderBrowser{
@@ -121,6 +120,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 		public ImageView imageView;
 		public RelativeLayout itemLayout;
 		public ImageView permissionsIcon;
+		public RelativeLayout threeDotsLayout;
 	}
 	
 	public static class ViewHolderBrowserGrid extends ViewHolderBrowser{
@@ -135,6 +135,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 		public ImageView imageViewVideoIcon;
 		public TextView videoDuration;
 		public RelativeLayout videoInfoLayout;
+		public ImageButton imageButtonThreeDots;
 	}
 
 	public void toggleAllSelection(int pos) {
@@ -499,7 +500,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 
 			holderList.textViewFileSize = (TextView) v.findViewById(R.id.file_list_filesize);
 
-			holderList.imageButtonThreeDots = (ImageButton) v.findViewById(R.id.file_list_three_dots);
+			holderList.threeDotsLayout = (RelativeLayout) v.findViewById(R.id.file_list_three_dots_layout);
 
 			holderList.savedOffline.setVisibility(View.INVISIBLE);
 		
@@ -511,8 +512,8 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 			holderList.itemLayout.setOnClickListener(this);
 			holderList.itemLayout.setOnLongClickListener(this);
 			
-			holderList.imageButtonThreeDots.setTag(holderList);
-			holderList.imageButtonThreeDots.setOnClickListener(this);
+			holderList.threeDotsLayout.setTag(holderList);
+			holderList.threeDotsLayout.setOnClickListener(this);
 
 			v.setTag(holderList);
 			
@@ -1404,7 +1405,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 		final MegaNode n = (MegaNode) getItem(currentPosition);
 
 		switch (v.getId()) {
-			case R.id.file_list_three_dots:
+			case R.id.file_list_three_dots_layout:
 			case R.id.file_grid_three_dots:{
 
 				log("onClick: file_list_three_dots: "+currentPosition);

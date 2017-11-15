@@ -702,7 +702,6 @@ public class ContactsFragmentLollipop extends Fragment{
 			log("Index to replace: " + indexToReplace);
 			adapter.updateContactStatus(indexToReplace, userHandle, status);
 		}
-
 	}
 
 	public void sortBy(int orderContacts){
