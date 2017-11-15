@@ -614,6 +614,11 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
         log("onResume-ChatCallActivity");
         super.onResume();
         mSensorManager.registerListener(this, mSensor, SensorManager.SENSOR_DELAY_NORMAL);
+
+        this.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
+        this.getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
+        this.getWindow().addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
+
         ((MegaApplication) getApplication()).sendSignalPresenceActivity();
     }
 
