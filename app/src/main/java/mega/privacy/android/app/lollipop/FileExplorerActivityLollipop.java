@@ -6,9 +6,11 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
@@ -38,6 +40,9 @@ import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -109,6 +114,9 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 	TextView fetchingNodesText;
 	TextView prepareNodesText;
 
+	MegaNode parentMoveCopy;
+    ArrayList<Long> nodeHandleMoveCopy;
+
 	MenuItem createFolderMenuItem;
 
 	FrameLayout cloudDriveFrameLayout;
@@ -159,7 +167,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 //	long gParentHandle;
 	long parentHandleIncoming;
 	long parentHandleCloud;
-	int deepBrowserTree;
+	int deepBrowserTree = 0;
 
 	Intent intent = null;
 
@@ -253,7 +261,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			log("savedInstanceState -> parentHandleCloud: "+parentHandleCloud);
 			parentHandleIncoming = savedInstanceState.getLong("parentHandleIncoming", -1);
 			log("savedInstanceState -> parentHandleIncoming: "+parentHandleIncoming);
-			deepBrowserTree = savedInstanceState.getInt("deepBrowserTree", deepBrowserTree);
+			deepBrowserTree = savedInstanceState.getInt("deepBrowserTree", 0);
 			log("savedInstanceState -> deepBrowserTree: "+deepBrowserTree);
 		}
 		else{
@@ -306,8 +314,6 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		}
 		else{
 			log("User has credentials");
-
-
 		}
 		
 		if (savedInstanceState != null){
@@ -434,7 +440,6 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH, WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH);
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL, WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL);
-
 
 	}
 	
@@ -568,9 +573,17 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 					}
 
 					ArrayList<Long> list = new ArrayList<Long>(moveFromHandles.length);
-					for (long n : moveFromHandles){
+                    nodeHandleMoveCopy = new ArrayList<Long>(moveFromHandles.length);
+					MegaNode p;
+					for (long n : moveFromHandles) {
 						list.add(n);
-					}
+                        nodeHandleMoveCopy.add(n);
+						p = megaApi.getNodeByHandle(n);
+						p = megaApi.getParentNode(p);
+                        parentMoveCopy = p;
+                    }
+
+
 					String cFTag = getFragmentTag(R.id.explorer_tabs_pager, 0);
 					cDriveExplorer = (CloudDriveExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
 					if(cDriveExplorer!=null){
@@ -588,18 +601,17 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 						mTabsAdapterExplorer = new FileExplorerPagerAdapter(getSupportFragmentManager(),this);
 						viewPagerExplorer.setAdapter(mTabsAdapterExplorer);
 						tabLayoutExplorer.setupWithViewPager(viewPagerExplorer);
-
 					}
 
+					MegaNode p;
+                    nodeHandleMoveCopy = new ArrayList<Long>(copyFromHandles.length);
 					ArrayList<Long> list = new ArrayList<Long>(copyFromHandles.length);
 					for (long n : copyFromHandles){
-//					log("Disabled nodes to copy: "+n);
 						list.add(n);
-					}
-					String cFTag = getFragmentTag(R.id.explorer_tabs_pager, 0);
-					cDriveExplorer = (CloudDriveExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
-					if(cDriveExplorer!=null){
-						cDriveExplorer.setDisableNodes(list);
+                        nodeHandleMoveCopy.add(n);
+						p = megaApi.getNodeByHandle(n);
+						p = megaApi.getParentNode(p);
+                        parentMoveCopy = p;
 					}
 				}
 				else if (intent.getAction().equals(ACTION_CHOOSE_MEGA_FOLDER_SYNC)){
@@ -1062,9 +1074,47 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		}
 		else if (mode == UPLOAD){
 
-
 			log("mode UPLOAD");
-			
+
+			if (Intent.ACTION_SEND.equals(intent.getAction()) && intent.getType() != null) {
+				if ("text/plain".equals(intent.getType())) {
+					log("Handle intent of text plain");
+
+					Bundle extras = intent.getExtras();
+					if(extras!=null){
+						if (!extras.containsKey(Intent.EXTRA_STREAM)) {
+							StringBuilder body = new StringBuilder();
+							String sharedText2 = intent.getStringExtra(Intent.EXTRA_SUBJECT);
+							if (sharedText2 != null) {
+								body.append(getString(R.string.new_file_subject_when_uploading)+": ");
+								body.append(sharedText2);
+							}
+							String sharedText = intent.getStringExtra(Intent.EXTRA_TEXT);
+							if (sharedText != null) {
+								body.append("\n");
+								body.append(getString(R.string.new_file_content_when_uploading)+": ");
+								body.append(sharedText);
+							}
+							String sharedText3 = intent.getStringExtra(Intent.EXTRA_EMAIL);
+							if (sharedText3 != null) {
+								body.append("\n");
+								body.append(getString(R.string.new_file_email_when_uploading)+": ");
+								body.append(sharedText3);
+							}
+
+							long parentHandle = handle;
+							MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
+							if(parentNode == null){
+								parentNode = megaApi.getRootNode();
+							}
+
+							showNewFileDialog(parentNode,body.toString());
+							return;
+						}
+					}
+				}
+			}
+
 			if (filePreparedInfos == null){
 //				Intent prueba = getIntent();
 //				Bundle bundle = prueba.getExtras();
@@ -1153,64 +1203,6 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		startActivity(startIntent);
 	}
 
-	public void showNewFolderDialog(String editText){
-		
-		String text;
-		if (editText == null || editText.equals("")){
-			text = getString(R.string.context_new_folder_name);
-		}
-		else{
-			text = editText;
-		}
-		
-		final EditText input = new EditText(this);
-//		input.setId(EDIT_TEXT_ID);
-		input.setSingleLine();
-		input.setSelectAllOnFocus(true);
-		input.setImeOptions(EditorInfo.IME_ACTION_DONE);
-		input.setOnEditorActionListener(new OnEditorActionListener() {
-			@Override
-			public boolean onEditorAction(TextView v, int actionId,
-					KeyEvent event) {
-				if (actionId == EditorInfo.IME_ACTION_DONE) {
-					String value = v.getText().toString().trim();
-					if (value.length() == 0) {
-						return true;
-					}
-					createFolder(value);
-					newFolderDialog.dismiss();
-					return true;
-				}
-				return false;
-			}
-		});
-		input.setImeActionLabel(getString(R.string.general_create),
-				KeyEvent.KEYCODE_ENTER);
-		input.setText(text);
-		input.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-			@Override
-			public void onFocusChange(View v, boolean hasFocus) {
-				if (hasFocus) {
-					showKeyboardDelayed(v);
-				}
-			}
-		});
-		AlertDialog.Builder builder = Util.getCustomAlertBuilder(this, getString(R.string.menu_new_folder),null, input);
-		builder.setPositiveButton(getString(R.string.general_create),
-				new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int whichButton) {
-						String value = input.getText().toString().trim();
-						if (value.length() == 0) {
-							return;
-						}
-						createFolder(value);
-					}
-				});
-		builder.setNegativeButton(getString(android.R.string.cancel), null);
-		newFolderDialog = builder.create();
-		newFolderDialog.show();
-	}
-
     public void showSnackbar(String s){
         log("showSnackbar: "+s);
         Snackbar snackbar = Snackbar.make(fragmentContainer, s, Snackbar.LENGTH_LONG);
@@ -1218,6 +1210,28 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
         snackbarTextView.setMaxLines(5);
         snackbar.show();
     }
+
+    private void createFile(String name, String data, MegaNode parentNode){
+
+		File file = Util.createTemporalTextFile(name, data);
+		if(file!=null){
+			Snackbar.make(fragmentContainer,getString(R.string.upload_began),Snackbar.LENGTH_LONG).show();
+
+			Intent intent = new Intent(this, UploadService.class);
+			intent.putExtra(UploadService.EXTRA_FILEPATH, file.getAbsolutePath());
+			intent.putExtra(UploadService.EXTRA_NAME, file.getName());
+			intent.putExtra(UploadService.EXTRA_PARENT_HASH, parentNode.getHandle());
+			intent.putExtra(UploadService.EXTRA_SIZE, file.getTotalSpace());
+			startService(intent);
+
+			log("After UPLOAD click - back to Cloud");
+			this.backToCloud(parentNode.getHandle());
+			finish();
+		}
+		else{
+			Snackbar.make(fragmentContainer,getString(R.string.email_verification_text_error),Snackbar.LENGTH_LONG).show();
+		}
+	}
 
 	private void createFolder(String title) {
 	
@@ -1372,7 +1386,6 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 						cDriveExplorer.navigateToFolder(request.getNodeHandle());
 						parentHandleCloud = request.getNodeHandle();
 						log("The handle of the created folder is: "+parentHandleCloud);
-
 					}						
 				}
 				else{
@@ -1382,7 +1395,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 					if (iSharesExplorer != null){
 						iSharesExplorer.navigateToFolder(request.getNodeHandle());
 						parentHandleIncoming = request.getNodeHandle();
-					}	
+					}
 				}
 			}
 		}
@@ -1651,6 +1664,66 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		newFolderDialog.show();
 	}
 
+	public void showNewFileDialog(final MegaNode parentNode, final String data){
+		log("showNewFileDialog");
+
+		LinearLayout layout = new LinearLayout(this);
+		layout.setOrientation(LinearLayout.VERTICAL);
+		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+		params.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleWidthPx(20, outMetrics), Util.scaleWidthPx(17, outMetrics), 0);
+
+		final EditText input = new EditText(this);
+		layout.addView(input, params);
+
+//		input.setId(EDIT_TEXT_ID);
+		input.setSingleLine();
+		input.setTextColor(getResources().getColor(R.color.text_secondary));
+		input.setHint(getString(R.string.context_new_file_name));
+//		input.setSelectAllOnFocus(true);
+		input.setImeOptions(EditorInfo.IME_ACTION_DONE);
+		input.setOnEditorActionListener(new OnEditorActionListener() {
+			@Override
+			public boolean onEditorAction(TextView v, int actionId,KeyEvent event) {
+				if (actionId == EditorInfo.IME_ACTION_DONE) {
+					String value = v.getText().toString().trim();
+					if (value.length() == 0) {
+						return true;
+					}
+					createFile(value, data, parentNode);
+					newFolderDialog.dismiss();
+					return true;
+				}
+				return false;
+			}
+		});
+		input.setImeActionLabel(getString(R.string.general_create),EditorInfo.IME_ACTION_DONE);
+		input.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+			@Override
+			public void onFocusChange(View v, boolean hasFocus) {
+				if (hasFocus) {
+					showKeyboardDelayed(v);
+				}
+			}
+		});
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		builder.setTitle(getString(R.string.dialog_title_new_file));
+		builder.setPositiveButton(getString(R.string.general_create),
+				new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int whichButton) {
+						String value = input.getText().toString().trim();
+						if (value.length() == 0) {
+							return;
+						}
+						createFile(value, data, parentNode);
+					}
+				});
+		builder.setNegativeButton(getString(android.R.string.cancel), null);
+		builder.setView(layout);
+		newFolderDialog = builder.create();
+		newFolderDialog.show();
+	}
+
 	public long getParentHandleCloud() {
 		return parentHandleCloud;
 	}
@@ -1682,4 +1755,30 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 	public void setSelectFile(boolean selectFile) {
 		this.selectFile = selectFile;
 	}
+
+	public MegaNode parentMoveCopy(){
+			return parentMoveCopy;
+
+	}
+
+    public ArrayList<Long> getNodeHandleMoveCopy() {
+        return nodeHandleMoveCopy;
+    }
+
+	public int getDeepBrowserTree() {
+		return deepBrowserTree;
+	}
+
+	public void setDeepBrowserTree(int deep) {
+		deepBrowserTree=deep;
+	}
+
+	public void increaseDeepBrowserTree() {
+		deepBrowserTree++;
+	}
+
+	public void decreaseDeepBrowserTree() {
+		deepBrowserTree--;
+	}
+
 }
