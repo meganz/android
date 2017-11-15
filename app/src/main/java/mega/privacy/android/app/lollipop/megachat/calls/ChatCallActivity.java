@@ -17,7 +17,9 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.media.Ringtone;
 import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -117,6 +119,8 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
     Timer timer;
     MyTimerTask myTimerTask;
     long milliseconds = 0;
+
+    Ringtone ringtone = null;
 
     //my avatar
     RelativeLayout myAvatarLayout;
@@ -359,9 +363,9 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
 
                 if(callStatus==MegaChatCall.CALL_STATUS_RING_IN){
                     log("Incoming call");
-
-                    thePlayer = MediaPlayer.create(getApplicationContext(), RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE));
-                    thePlayer.start();
+                    Uri ringtoneUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE);
+                    ringtone = RingtoneManager.getRingtone(this, ringtoneUri);
+                    ringtone.play();
                 }
                 else{
                     log("Outgoing call");
@@ -742,6 +746,10 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
                         thePlayer=null;
                     }
 
+                    if(ringtone!=null){
+                        ringtone.stop();
+                    }
+
                     rtcAudioManager.start(null);
 
                     showInitialFABConfiguration();
@@ -757,6 +765,10 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
                         thePlayer.stop();
                         thePlayer.release();
                         thePlayer=null;
+                    }
+
+                    if(ringtone!=null){
+                        ringtone.stop();
                     }
 
                     rtcAudioManager.stop();
