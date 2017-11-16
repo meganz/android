@@ -106,11 +106,35 @@
 		android:layout_centerVertical="true"
         android:src="@drawable/ic_dots_vertical_grey" />
 
+    <!--<RelativeLayout-->
+        <!--android:id="@+id/recent_chat_list_unread_layout"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_marginRight="18dp"-->
+        <!--android:layout_centerVertical="true"-->
+        <!--android:layout_toLeftOf="@+id/recent_chat_list_three_dots">-->
+
+        <!--<ImageView-->
+            <!--android:id="@+id/recent_chat_list_unread_circle"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:scaleType="fitCenter"/>-->
+
+        <!--<TextView-->
+            <!--android:id="@+id/recent_chat_list_unread_number"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:textSize="14sp"-->
+            <!--android:layout_centerHorizontal="true"-->
+            <!--android:textColor="@color/white"-->
+            <!--android:paddingBottom="1dp" />-->
+    <!--</RelativeLayout>-->
+
     <RelativeLayout
         android:id="@+id/recent_chat_list_unread_layout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginRight="18dp"
+        android:layout_gravity="right"
         android:layout_centerVertical="true"
         android:layout_toLeftOf="@+id/recent_chat_list_three_dots">
 
@@ -118,6 +142,7 @@
             android:id="@+id/recent_chat_list_unread_circle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
             android:scaleType="fitCenter"/>
 
         <TextView

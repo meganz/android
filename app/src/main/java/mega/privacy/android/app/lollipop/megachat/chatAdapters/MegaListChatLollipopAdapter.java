@@ -16,6 +16,7 @@ import android.text.TextUtils;
 import android.text.style.ForegroundColorSpan;
 import android.util.DisplayMetrics;
 import android.util.SparseBooleanArray;
+import android.util.TypedValue;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -486,6 +487,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		holder.imageButtonThreeDots = (ImageButton) v.findViewById(R.id.recent_chat_list_three_dots);
 
 		holder.layoutPendingMessages = (RelativeLayout) v.findViewById(R.id.recent_chat_list_unread_layout);
+
 		holder.circlePendingMessages = (ImageView) v.findViewById(R.id.recent_chat_list_unread_circle);
 		holder.numberPendingMessages = (TextView) v.findViewById(R.id.recent_chat_list_unread_number);
 
@@ -529,12 +531,23 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 				log("drawing circle for one digit");
 				holder.circlePendingMessages.setImageResource(R.drawable.ic_unread_1);
 				holder.layoutPendingMessages.setVisibility(View.VISIBLE);
+				RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) holder.layoutPendingMessages.getLayoutParams();
+				int right = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 7, context.getResources().getDisplayMetrics());
+				int left = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 2, context.getResources().getDisplayMetrics());
+				params.setMargins(left, 0, right, 0);
+				holder.layoutPendingMessages.setLayoutParams(params);
+
 				break;
 			}
 			case 2:{
 				log("drawing oval for two digits");
 				holder.circlePendingMessages.setImageResource(R.drawable.ic_unread_2);
 				holder.layoutPendingMessages.setVisibility(View.VISIBLE);
+				RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) holder.layoutPendingMessages.getLayoutParams();
+				int right = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 6, context.getResources().getDisplayMetrics());
+				int left = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 2, context.getResources().getDisplayMetrics());
+				params.setMargins(left, 0, right, 0);
+				holder.layoutPendingMessages.setLayoutParams(params);
 
 				break;
 			}
@@ -542,12 +555,20 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 				log("drawing oval for three digits");
 				holder.circlePendingMessages.setImageResource(R.drawable.ic_unread_3);
 				holder.layoutPendingMessages.setVisibility(View.VISIBLE);
+				RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) holder.layoutPendingMessages.getLayoutParams();
+				int left = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 2, context.getResources().getDisplayMetrics());
+				params.setMargins(left, 0, 0, 0);
+				holder.layoutPendingMessages.setLayoutParams(params);
 				break;
 			}
 			default:{
 				log("drawing oval for DEFAULT");
 				holder.circlePendingMessages.setImageResource(R.drawable.ic_unread_4);
 				holder.layoutPendingMessages.setVisibility(View.VISIBLE);
+				RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) holder.layoutPendingMessages.getLayoutParams();
+				int left = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 2, context.getResources().getDisplayMetrics());
+				params.setMargins(left, 0, 0, 0);
+				holder.layoutPendingMessages.setLayoutParams(params);
 				break;
 			}
 		}
