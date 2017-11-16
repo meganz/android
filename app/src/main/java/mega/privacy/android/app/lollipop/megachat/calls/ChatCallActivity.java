@@ -971,16 +971,21 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
     public void updateLocalVideoStatus(){
         if(callChat.hasVideo(true)){
             log("Video local connected");
-            myAvatarLayout.setVisibility(GONE);
-            videoFAB.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.accentColor)));
+            if(myAvatarLayout.getVisibility()==View.VISIBLE){
+                myAvatarLayout.setVisibility(GONE);
+                videoFAB.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.accentColor)));
 
-            localCameraFragment = new LocalCameraCallFragment();
-            parent.setVisibility(View.VISIBLE);
-            fragmentContainerLocalCamera.setVisibility(View.VISIBLE);
+                localCameraFragment = new LocalCameraCallFragment();
+                parent.setVisibility(View.VISIBLE);
+                fragmentContainerLocalCamera.setVisibility(View.VISIBLE);
 
-            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            ft.replace(R.id.fragment_container_local_camera, localCameraFragment, "localCameraFragment");
-            ft.commitNow();
+                FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+                ft.replace(R.id.fragment_container_local_camera, localCameraFragment, "localCameraFragment");
+                ft.commitNow();
+            }
+            else{
+                log("No needed to refresh");
+            }
         }
         else{
             log("Video local NOT connected");
