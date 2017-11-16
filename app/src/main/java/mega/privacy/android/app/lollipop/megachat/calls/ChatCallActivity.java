@@ -2,7 +2,10 @@ package mega.privacy.android.app.lollipop.megachat.calls;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
@@ -34,6 +37,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.view.Display;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -86,7 +90,7 @@ import nz.mega.sdk.MegaUser;
 import static android.view.View.GONE;
 import static mega.privacy.android.app.utils.Util.context;
 
-public class ChatCallActivity extends PinActivityLollipop implements MegaChatRequestListenerInterface,View.OnTouchListener, MegaChatCallListenerInterface, MegaChatVideoListenerInterface, MegaRequestListenerInterface, View.OnClickListener, SensorEventListener {
+public class ChatCallActivity extends PinActivityLollipop implements MegaChatRequestListenerInterface,View.OnTouchListener, MegaChatCallListenerInterface, MegaChatVideoListenerInterface, MegaRequestListenerInterface, View.OnClickListener, SensorEventListener, KeyEvent.Callback {
 
     DatabaseHandler dbH = null;
     ChatItemPreferences chatPrefs = null;
@@ -351,12 +355,6 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
                 callChat = megaChatApi.getChatCallByChatId(chatId);
 
                 audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-                this.setVolumeControlStream(AudioManager.STREAM_MUSIC);
-                this.setVolumeControlStream(AudioManager.STREAM_RING);
-                this.setVolumeControlStream(AudioManager.STREAM_ALARM);
-                this.setVolumeControlStream(AudioManager.STREAM_NOTIFICATION);
-                this.setVolumeControlStream(AudioManager.STREAM_SYSTEM);
-                this.setVolumeControlStream(AudioManager.STREAM_VOICE_CALL);
 
                 int callStatus = callChat.getStatus();
                 log("The status of the callChat is: " + callStatus);
@@ -1163,4 +1161,41 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
         }
     }
 
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        log("onKeyDown");
+        switch (keyCode) {
+
+            case KeyEvent.KEYCODE_VOLUME_UP: {
+
+                if(callChat.getStatus()==MegaChatCall.CALL_STATUS_RING_IN){
+                    audioManager.adjustStreamVolume(AudioManager.STREAM_RING, AudioManager.ADJUST_RAISE, AudioManager.FLAG_SHOW_UI);
+                }
+                else if(callChat.getStatus()==MegaChatCall.CALL_STATUS_REQUEST_SENT){
+                    audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_RAISE, AudioManager.FLAG_SHOW_UI);
+                }
+                else {
+                    audioManager.adjustStreamVolume(AudioManager.STREAM_VOICE_CALL, AudioManager.ADJUST_RAISE, AudioManager.FLAG_SHOW_UI);
+                }
+
+                return true;
+            }
+            case KeyEvent.KEYCODE_VOLUME_DOWN: {
+
+                if(callChat.getStatus()==MegaChatCall.CALL_STATUS_RING_IN){
+                    audioManager.adjustStreamVolume(AudioManager.STREAM_RING, AudioManager.ADJUST_LOWER, AudioManager.FLAG_SHOW_UI);
+                }
+                else if(callChat.getStatus()==MegaChatCall.CALL_STATUS_REQUEST_SENT){
+                    audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_LOWER, AudioManager.FLAG_SHOW_UI);
+                }
+                else {
+                    audioManager.adjustStreamVolume(AudioManager.STREAM_VOICE_CALL, AudioManager.ADJUST_LOWER, AudioManager.FLAG_SHOW_UI);
+                }
+                return true;
+            }
+            default: {
+                return super.onKeyDown(keyCode, event);
+            }
+        }
+    }
 }
