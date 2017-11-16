@@ -1181,7 +1181,6 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 						params1.setMargins(left, 0, 0, 0);
 
 						holder.imageView.setLayoutParams(params1);
-
 						holder.imageView.setImageBitmap(thumb);
 
 
