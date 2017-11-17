@@ -225,7 +225,7 @@ public class MegaProviderLollipopAdapter extends RecyclerView.Adapter<MegaProvid
 						RelativeLayout.LayoutParams paramsMultiselect = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
 						paramsMultiselect.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
 						paramsMultiselect.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
-						paramsMultiselect.setMargins(36, 0, 0, 0);
+						paramsMultiselect.setMargins(0, 0, 0, 0);
 						holder.imageView.setLayoutParams(paramsMultiselect);
 
 						holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.new_multiselect_color));
@@ -251,7 +251,7 @@ public class MegaProviderLollipopAdapter extends RecyclerView.Adapter<MegaProvid
 						RelativeLayout.LayoutParams paramsMultiselect = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
 						paramsMultiselect.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
 						paramsMultiselect.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
-						paramsMultiselect.setMargins(36, 0, 0, 0);
+						paramsMultiselect.setMargins(0, 0, 0, 0);
 						holder.imageView.setLayoutParams(paramsMultiselect);
 
 						holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.new_multiselect_color));
@@ -280,28 +280,24 @@ public class MegaProviderLollipopAdapter extends RecyclerView.Adapter<MegaProvid
 			if(!multipleSelect){
 				log("Not multiselect");
 				holder.imageView.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
+
 				RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
 				params.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
 				params.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
-				params.setMargins(36, 0, 0, 0);
+				params.setMargins(0, 0, 0, 0);
 				holder.imageView.setLayoutParams(params);
+
 				holder.itemLayout.setBackgroundColor(Color.WHITE);
 
-				RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
-				params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-				params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-				int left = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 6, context.getResources().getDisplayMetrics());
-				params1.setMargins(left, 0, 0, 0);
-
-				holder.imageView.setLayoutParams(params1);
 
 				if (node.hasThumbnail()){
 
-					RelativeLayout.LayoutParams params4 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
-					params4.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-					params4.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-					params4.setMargins(54, 0, 12, 0);
-					holder.imageView.setLayoutParams(params4);
+					RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
+					params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
+					params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
+					int left = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 6, context.getResources().getDisplayMetrics());
+					params1.setMargins(left, 0, 0, 0);
+					holder.imageView.setLayoutParams(params1);
 
 					thumb = ThumbnailUtilsLollipop.getThumbnailFromCache(node);
 					if (thumb != null){
@@ -326,22 +322,23 @@ public class MegaProviderLollipopAdapter extends RecyclerView.Adapter<MegaProvid
 				}else{
 					thumb = ThumbnailUtilsLollipop.getThumbnailFromCache(node);
 					if (thumb != null){
-						params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
+						RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
 						params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
 						params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-						left = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 6, context.getResources().getDisplayMetrics());
+						int left = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 6, context.getResources().getDisplayMetrics());
 						params1.setMargins(left, 0, 0, 0);
-
 						holder.imageView.setLayoutParams(params1);
+
 						holder.imageView.setImageBitmap(thumb);
 					}
 					else{
 						thumb = ThumbnailUtilsLollipop.getThumbnailFromFolder(node, context);
 						if (thumb != null){
-							RelativeLayout.LayoutParams params5 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
-							params5.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-							params5.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-							params5.setMargins(54, 0, 12, 0);
+							RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
+							params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
+							params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
+							int left = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 6, context.getResources().getDisplayMetrics());
+							params1.setMargins(left, 0, 0, 0);
 
 							holder.imageView.setLayoutParams(params1);
 							holder.imageView.setImageBitmap(thumb);
@@ -361,7 +358,7 @@ public class MegaProviderLollipopAdapter extends RecyclerView.Adapter<MegaProvid
 					RelativeLayout.LayoutParams paramsMultiselect = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
 					paramsMultiselect.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
 					paramsMultiselect.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
-					paramsMultiselect.setMargins(36, 0, 0, 0);
+					paramsMultiselect.setMargins(0, 0, 0, 0);
 					holder.imageView.setLayoutParams(paramsMultiselect);
 
 					holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.new_multiselect_color));
@@ -375,7 +372,6 @@ public class MegaProviderLollipopAdapter extends RecyclerView.Adapter<MegaProvid
 						RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
 						params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
 						params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-
 						int left = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 6, context.getResources().getDisplayMetrics());
 						params1.setMargins(left, 0, 0, 0);
 
@@ -404,11 +400,14 @@ public class MegaProviderLollipopAdapter extends RecyclerView.Adapter<MegaProvid
 					}else{
 						thumb = ThumbnailUtilsLollipop.getThumbnailFromCache(node);
 						if (thumb != null){
+
 							RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
 							params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
 							params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-							params1.setMargins(54, 0, 12, 0);
+							int left = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 6, context.getResources().getDisplayMetrics());
+							params1.setMargins(left, 0, 0, 0);
 							holder.imageView.setLayoutParams(params1);
+
 							holder.imageView.setImageBitmap(thumb);
 						}
 						else{
@@ -417,9 +416,10 @@ public class MegaProviderLollipopAdapter extends RecyclerView.Adapter<MegaProvid
 								RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
 								params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
 								params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-								params1.setMargins(54, 0, 12, 0);
-
+								int left = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 6, context.getResources().getDisplayMetrics());
+								params1.setMargins(left, 0, 0, 0);
 								holder.imageView.setLayoutParams(params1);
+
 								holder.imageView.setImageBitmap(thumb);
 							}
 							else{
