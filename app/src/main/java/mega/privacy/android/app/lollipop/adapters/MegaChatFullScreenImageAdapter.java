@@ -15,8 +15,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.view.animation.TranslateAnimation;
-import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 
@@ -38,11 +36,9 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
-import nz.mega.sdk.MegaTransfer;
-import nz.mega.sdk.MegaTransferListenerInterface;
 import nz.mega.sdk.MegaUtilsAndroid;
 
-import mega.privacy.android.app.lollipop.ChatFullScreenImageViewer;
+import mega.privacy.android.app.lollipop.megachat.ChatFullScreenImageViewer;
 
 
 

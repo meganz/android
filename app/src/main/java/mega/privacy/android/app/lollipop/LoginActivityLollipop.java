@@ -163,13 +163,7 @@ public class LoginActivityLollipop extends AppCompatActivity implements MegaGlob
             megaApi.resumeCreateAccount(sessionTemp, this);
         }
 
-
-//		visibleFragment = Constants.CHOOSE_ACCOUNT_FRAGMENT;
-//		visibleFragment = Constants.CONFIRM_EMAIL_FRAGMENT;
         showFragment(visibleFragment);
-
-
-
     }
 
     public void showSnackbar(String message) {
@@ -550,7 +544,8 @@ public class LoginActivityLollipop extends AppCompatActivity implements MegaGlob
                     } catch (Exception ex) {
                         startService(cancelIntent);
                     }
-                } else if (intent.getAction().equals(Constants.ACTION_CANCEL_DOWNLOAD)) {
+                }
+                else if (intent.getAction().equals(Constants.ACTION_CANCEL_DOWNLOAD)) {
                     showConfirmationCancelAllTransfers();
                 }
                 else if (intent.getAction().equals(Constants.ACTION_OVERQUOTA_TRANSFER)) {
@@ -800,19 +795,23 @@ public class LoginActivityLollipop extends AppCompatActivity implements MegaGlob
         log("onRequestFinish - " + request.getRequestString() + "_" + e.getErrorCode());
 
         if (request.getType() == MegaRequest.TYPE_CREATE_ACCOUNT){
-            if (request.getParamType() == 1){
-                if (e.getErrorCode() == MegaError.API_OK){
-                    waitingForConfirmAccount = true;
-                    visibleFragment = Constants.CONFIRM_EMAIL_FRAGMENT;
-                    showFragment(visibleFragment);
+            try {
+                if (request.getParamType() == 1) {
+                    if (e.getErrorCode() == MegaError.API_OK) {
+                        waitingForConfirmAccount = true;
+                        visibleFragment = Constants.CONFIRM_EMAIL_FRAGMENT;
+                        showFragment(visibleFragment);
 
+                    } else {
+                        dbH.clearEphemeral();
+                        waitingForConfirmAccount = false;
+                        visibleFragment = Constants.LOGIN_FRAGMENT;
+                        showFragment(visibleFragment);
+                    }
                 }
-                else{
-                    dbH.clearEphemeral();
-                    waitingForConfirmAccount = false;
-                    visibleFragment = Constants.LOGIN_FRAGMENT;
-                    showFragment(visibleFragment);
-                }
+            }
+            catch (Exception exc){
+                log("ExceptionManager");
             }
         }
     }
@@ -836,11 +835,5 @@ public class LoginActivityLollipop extends AppCompatActivity implements MegaGlob
     protected void onPause() {
         log("onPause");
         super.onPause();
-    }
-
-    @Override
-    protected void onPostResume() {
-        log("onPostResume");
-        super.onPostResume();
     }
 }

@@ -610,7 +610,7 @@ public class NodeController {
                         log("Node: "+ node.getName());
 
                         if(node.isFile()){
-                            Intent checkIntent = new Intent(Intent.ACTION_VIEW, null);
+                            Intent checkIntent = new Intent(Intent.ACTION_GET_CONTENT, null);
                             log("MimeTypeList: "+ MimeTypeList.typeForName(node.getName()).getType());
 
                             checkIntent.setType(MimeTypeList.typeForName(node.getName()).getType());

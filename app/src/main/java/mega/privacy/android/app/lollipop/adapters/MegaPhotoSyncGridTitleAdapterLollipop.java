@@ -90,7 +90,7 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
 
     private RecyclerView listFragment;
     private ImageView emptyImageViewFragment;
-    private TextView emptyTextViewFragment;
+    private LinearLayout emptyTextViewFragment;
     private ActionBar aB;
 
     private int numberOfCells;
@@ -145,7 +145,6 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
                         handleList.add(documents.get(i).getHandle());
                     }
                     clearSelections();
-                    hideMultipleSelect();
                     NodeController nC = new NodeController(context);
                     nC.prepareForDownload(handleList);
                     break;
@@ -156,7 +155,6 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
                         handleList.add(documents.get(i).getHandle());
                     }
                     clearSelections();
-                    hideMultipleSelect();
                     NodeController nC = new NodeController(context);
                     nC.chooseLocationToCopyNodes(handleList);
                     break;
@@ -167,14 +165,12 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
                         handleList.add(documents.get(i).getHandle());
                     }
                     clearSelections();
-                    hideMultipleSelect();
                     NodeController nC = new NodeController(context);
                     nC.chooseLocationToMoveNodes(handleList);
                     break;
                 }
                 case R.id.cab_menu_share_link:{
                     clearSelections();
-                    hideMultipleSelect();
                     if (documents.size()==1){
                         //NodeController nC = new NodeController(context);
                         //nC.exportLink(documents.get(0));
@@ -189,7 +185,6 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
                 case R.id.cab_menu_share_link_remove:{
 
                     clearSelections();
-                    hideMultipleSelect();
                     if (documents.size()==1){
                         //NodeController nC = new NodeController(context);
                         //nC.removeLink(documents.get(0));
@@ -209,7 +204,6 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
                         handleList.add(documents.get(i).getHandle());
                     }
                     clearSelections();
-                    hideMultipleSelect();
                     ((ManagerActivityLollipop) context).askConfirmationMoveToRubbish(handleList);
                     break;
                 }
@@ -220,7 +214,6 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
                 }
                 case R.id.cab_menu_unselect_all:{
                     clearSelections();
-                    hideMultipleSelect();
                     break;
                 }
             }
@@ -238,8 +231,8 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
         @Override
         public void onDestroyActionMode(ActionMode mode) {
             log("onDestroyActionMode");
-            multipleSelect = false;
             clearSelections();
+            multipleSelect = false;
             actionMode = null;
         }
 
@@ -270,7 +263,8 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
                 else{
                     showRemoveLink=false;
                     showLink=true;
-                }			}
+                }
+            }
 
             if (selected.size() != 0) {
                 showDownload = true;
@@ -893,7 +887,7 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
 
     }
 
-    public MegaPhotoSyncGridTitleAdapterLollipop(Context _context, ArrayList<MegaMonthPicLollipop> _monthPics, long _photosyncHandle, RecyclerView listView, ImageView emptyImageView, TextView emptyTextView, ActionBar aB, ArrayList<MegaNode> _nodes, int numberOfCells, int gridWidth, Object fragment, int type, int count, int countTitles, List<ItemInformation> itemInformationList) {
+    public MegaPhotoSyncGridTitleAdapterLollipop(Context _context, ArrayList<MegaMonthPicLollipop> _monthPics, long _photosyncHandle, RecyclerView listView, ImageView emptyImageView, LinearLayout emptyTextView, ActionBar aB, ArrayList<MegaNode> _nodes, int numberOfCells, int gridWidth, Object fragment, int type, int count, int countTitles, List<ItemInformation> itemInformationList) {
         this.context = _context;
         this.monthPics = _monthPics;
         this.photosyncHandle = _photosyncHandle;
@@ -968,9 +962,11 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
      * Disable selection
      */
     public void hideMultipleSelect() {
+        log("hideMultipleSelect");
+
         this.multipleSelect = false;
         ((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_TRANSPARENT_BLACK);
-        clearSelections();
+//        clearSelections();
 
         if (actionMode != null) {
             actionMode.finish();
@@ -1003,6 +999,8 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
 
     public void clearSelections() {
         log("clearSelections");
+
+        hideMultipleSelect();
         for (int i = 0; i < checkedItems.size(); i++) {
             if (checkedItems.valueAt(i) == true) {
                 int checkedPosition = checkedItems.keyAt(i);
@@ -1011,7 +1009,6 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
         }
         this.multipleSelect = false;
         updateActionModeTitle();
-
         notifyDataSetChanged();
     }
 
@@ -1110,7 +1107,8 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
                 notifyItemChanged(holder.getPositionOnAdapter());
             }
             else{
-                hideMultipleSelect();
+//                hideMultipleSelect();
+                clearSelections();
             }
         }
     }
@@ -1157,6 +1155,7 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
                 folders++;
             }
         }
+
         Resources res = context.getResources();
         String title;
         int sum=files+folders;
@@ -1177,6 +1176,8 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
             e.printStackTrace();
             log("oninvalidate error");
         }
+
+
         // actionMode.
     }
 

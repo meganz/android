@@ -42,15 +42,22 @@
         android:ellipsize="end"
         android:maxLines="1"/> --> 
        	
-    <ImageButton 
-        android:id="@+id/file_list_three_dots"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/ic_dots_vertical_grey"
-		android:background="@null"
-		android:layout_marginRight="10dp"
-        android:layout_alignParentRight="true"
-		android:layout_centerVertical="true" />
+    <RelativeLayout
+		android:id="@+id/file_list_three_dots_layout"
+		android:layout_width="wrap_content"
+		android:layout_height="match_parent"
+		android:layout_alignParentRight="true">
+
+		<ImageView
+			android:id="@+id/file_list_three_dots"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:src="@drawable/ic_dots_vertical_grey"
+			android:background="@null"
+			android:layout_marginRight="10dp"
+			android:layout_centerVertical="true" />
+
+	</RelativeLayout>
 
 	<ImageView
 		android:id="@+id/file_list_incoming_permissions"
@@ -61,7 +68,7 @@
 		android:background="@null"
 		android:layout_marginRight="12dp"
 		android:layout_marginLeft="12dp"
-		android:layout_toLeftOf="@id/file_list_three_dots"
+		android:layout_toLeftOf="@id/file_list_three_dots_layout"
 		android:layout_centerVertical="true"
 		android:visibility="gone"/>
     
@@ -75,7 +82,7 @@
         android:layout_centerVertical="true"
 		android:layout_marginRight="12dp"
 		android:layout_marginLeft="12dp"
-        android:layout_toLeftOf="@id/file_list_three_dots"/> 
+        android:layout_toLeftOf="@id/file_list_three_dots_layout"/>
         
 	<TextView
 		android:id="@+id/file_list_filename"

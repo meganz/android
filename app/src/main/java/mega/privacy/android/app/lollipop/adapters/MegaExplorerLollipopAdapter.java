@@ -68,6 +68,8 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 	OnItemClickListener mItemClickListener;
 	RecyclerView listFragment;
 
+	private ArrayList<Long> disabledNodesCloudDrive;
+
 	/*public static view holder class*/
     public class ViewHolderExplorerLollipop extends RecyclerView.ViewHolder implements View.OnClickListener{
     	public ImageView imageView;
@@ -76,8 +78,9 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
     	public TextView textViewFileSize;
     	public RelativeLayout itemLayout;
     	public int currentPosition;
-    	public long document;    	
-    	
+    	public long document;
+
+
     	public ViewHolderExplorerLollipop(View itemView) {
 			super(itemView);
 //            itemView.setOnClickListener(this);
@@ -100,24 +103,6 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 	}
 	
 	ViewHolderExplorerLollipop holder = null;    
-    
-	
-	public MegaExplorerLollipopAdapter(Context _context, ArrayList<MegaNode> _nodes, long _parentHandle, RecyclerView listView, boolean selectFile){
-		this.context = _context;
-		this.nodes = _nodes;
-		this.parentHandle = _parentHandle;
-		this.listFragment = listView;
-		this.selectFile = selectFile;
-		this.positionClicked = -1;
-		this.imageIds = new ArrayList<Integer>();
-		this.names = new ArrayList<String>();
-		
-		if (megaApi == null){
-			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
-		}
-
-		dbH = DatabaseHandler.getDbHandler(context);
-	}
 
 	public MegaExplorerLollipopAdapter(Context _context, Object fragment, ArrayList<MegaNode> _nodes, long _parentHandle, RecyclerView listView, boolean selectFile){
 		this.context = _context;
@@ -135,6 +120,8 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 		}
 
 		dbH = DatabaseHandler.getDbHandler(context);
+		disabledNodesCloudDrive = new ArrayList<Long>();
+
 	}
 	
 	@Override
@@ -179,17 +166,13 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 		holder.permissionsIcon = (ImageView) v.findViewById(R.id.file_explorer_permissions);
 
 		if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-			log("Landscape configuration");
-			float width = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MAX_WIDTH_FILENAME_LAND, context.getResources().getDisplayMetrics());
-			holder.textViewFileName.setMaxWidth((int) width);
-			holder.textViewFileSize.setMaxWidth((int) width);
+			holder.textViewFileName.setMaxWidth(Util.scaleWidthPx(260, outMetrics));
+			holder.textViewFileSize.setMaxWidth(Util.scaleWidthPx(260, outMetrics));
 
 		}
 		else{
-			log("Portrait configuration");
-			float width = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MAX_WIDTH_FILENAME_PORT, context.getResources().getDisplayMetrics());
-			holder.textViewFileName.setMaxWidth((int) width);
-			holder.textViewFileSize.setMaxWidth((int) width);
+			holder.textViewFileName.setMaxWidth(Util.scaleWidthPx(200, outMetrics));
+			holder.textViewFileSize.setMaxWidth(Util.scaleWidthPx(200, outMetrics));
 
 		}
 
@@ -199,7 +182,6 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 
 	@Override
 	public void onBindViewHolder(ViewHolderExplorerLollipop holder, int position){
-		
 		Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
 		DisplayMetrics outMetrics = new DisplayMetrics ();
 	    display.getMetrics(outMetrics);
@@ -226,18 +208,18 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 			RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
 			params.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
 			params.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
-			params.setMargins(36, 0, 0, 0);
+			params.setMargins(0, 0, 0, 0);
+
 			holder.imageView.setLayoutParams(params);
 
 			holder.itemLayout.setBackgroundColor(Color.WHITE);
 
-			holder.permissionsIcon.setVisibility(View.VISIBLE);
 			if (disabledNodes != null){
+
 				if (disabledNodes.contains(node.getHandle())){
 					log("Disabled!");
 					holder.imageView.setAlpha(.4f);
 					holder.textViewFileName.setTextColor(context.getResources().getColor(R.color.text_secondary));
-					holder.permissionsIcon.setImageResource(R.drawable.ic_shared_read);
 					holder.permissionsIcon.setAlpha(.2f);
 					holder.itemView.setOnClickListener(null);
 				}
@@ -246,16 +228,6 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 					holder.imageView.setAlpha(1.0f);
 					holder.textViewFileName.setTextColor(context.getResources().getColor(android.R.color.black));
 					holder.itemView.setOnClickListener(holder);
-
-					int accessLevel = megaApi.getAccess(node);
-
-					if(accessLevel== MegaShare.ACCESS_FULL){
-						holder.permissionsIcon.setImageResource(R.drawable.ic_shared_fullaccess);
-					}
-					else{
-						holder.permissionsIcon.setImageResource(R.drawable.ic_shared_read_write);
-					}
-
 					holder.permissionsIcon.setAlpha(.35f);
 				}
 			}
@@ -263,7 +235,6 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 				holder.imageView.setAlpha(1.0f);
 				holder.textViewFileName.setTextColor(context.getResources().getColor(android.R.color.black));
 				holder.itemView.setOnClickListener(holder);
-				holder.permissionsIcon.setVisibility(View.GONE);
 			}
 
 			if(node.isInShare()){
@@ -294,8 +265,22 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 					}
 				}
 
+				//Check permissions
+				holder.permissionsIcon.setVisibility(View.VISIBLE);
+				int accessLevel = megaApi.getAccess(node);
+
+				if(accessLevel== MegaShare.ACCESS_FULL){
+					holder.permissionsIcon.setImageResource(R.drawable.ic_shared_fullaccess);
+				}
+				else if(accessLevel== MegaShare.ACCESS_READ){
+					holder.permissionsIcon.setImageResource(R.drawable.ic_shared_read);
+				}
+				else{
+					holder.permissionsIcon.setImageResource(R.drawable.ic_shared_read_write);
+				}
 			}
 			else{
+				holder.permissionsIcon.setVisibility(View.GONE);
 				holder.imageView.setImageResource(R.drawable.ic_folder_list);
 				holder.textViewFileSize.setText(MegaApiUtils.getInfoFolder(node, context));
 			}
@@ -309,11 +294,12 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 			RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
 			params.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
 			params.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
-			params.setMargins(36, 0, 0, 0);
+			params.setMargins(0, 0, 0, 0);
+
 			holder.imageView.setLayoutParams(params);
 
-			if(selectFile)
-			{
+			if(selectFile){
+
 				holder.imageView.setAlpha(1.0f);
 				holder.textViewFileName.setTextColor(context.getResources().getColor(android.R.color.black));
 				holder.itemView.setOnClickListener(holder);
@@ -346,7 +332,9 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 				RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
 				params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
 				params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-				params1.setMargins(54, 0, 12, 0);
+				int left = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 6, context.getResources().getDisplayMetrics());
+				params1.setMargins(left, 0, 0, 0);
+
 				holder.imageView.setLayoutParams(params1);
 
 				thumb = ThumbnailUtilsLollipop.getThumbnailFromCache(node);
@@ -376,7 +364,9 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 					RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
 					params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
 					params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-					params1.setMargins(54, 0, 12, 0);
+					int left = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 6, context.getResources().getDisplayMetrics());
+					params1.setMargins(left, 0, 0, 0);
+
 					holder.imageView.setLayoutParams(params1);
 					holder.imageView.setImageBitmap(thumb);
 				}
@@ -386,7 +376,8 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 						RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
 						params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
 						params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-						params1.setMargins(54, 0, 12, 0);
+						int left = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 6, context.getResources().getDisplayMetrics());
+						params1.setMargins(left, 0, 0, 0);
 
 						holder.imageView.setLayoutParams(params1);
 						holder.imageView.setImageBitmap(thumb);
@@ -651,7 +642,7 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 	
 	public void setNodes(ArrayList<MegaNode> nodes){
 		this.nodes = nodes;
-		positionClicked = -1;	
+		positionClicked = -1;
 		notifyDataSetChanged();
 	}
 	
@@ -681,5 +672,6 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 	private static void log(String log) {
 		Util.log("MegaExplorerLollipopAdapter", log);
 	}
+
 
 }

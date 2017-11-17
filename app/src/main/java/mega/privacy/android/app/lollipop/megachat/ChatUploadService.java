@@ -11,12 +11,10 @@ import android.media.MediaMetadataRetriever;
 import android.net.wifi.WifiManager;
 import android.net.wifi.WifiManager.WifiLock;
 import android.os.Build;
-import android.os.Environment;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 import android.support.v4.app.NotificationCompat;
-import android.text.format.Formatter;
 import android.widget.RemoteViews;
 
 import java.io.File;
@@ -464,7 +462,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
                     log("OVERQUOTA ERROR: "+error.getErrorCode());
                     Intent intent;
                     intent = new Intent(this, ManagerActivityLollipop.class);
-                    intent.setAction(Constants.ACTION_OVERQUOTA_ALERT);
+                    intent.setAction(Constants.ACTION_OVERQUOTA_STORAGE);
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
                     startActivity(intent);

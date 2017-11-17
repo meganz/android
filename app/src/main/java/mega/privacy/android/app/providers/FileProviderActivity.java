@@ -121,7 +121,8 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 	private String lastPassword;
 	private String gPublicKey;
 	private String gPrivateKey;
-	
+
+
 	private MenuItem searchMenuItem;
 
 	CountDownTimer timer;
@@ -182,7 +183,7 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 	ProgressDialog statusDialog;
 
 	LinearLayout optionsBar;
-	TextView cancelText;
+	Button cancelButton;
 
 	TabLayout tabLayoutProvider;
 	LinearLayout providerSectionLayout;
@@ -367,13 +368,13 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 
 				optionsBar = (LinearLayout) findViewById(R.id.options_provider_layout);
 
-				cancelText = (TextView) findViewById(R.id.cancel_text);
-				cancelText.setOnClickListener(this);
-				cancelText.setText(getString(R.string.general_cancel).toUpperCase(Locale.getDefault()));
+				cancelButton = (Button) findViewById(R.id.cancel_button);
+				cancelButton.setOnClickListener(this);
+				cancelButton.setText(getString(R.string.general_cancel).toUpperCase(Locale.getDefault()));
 				//Left and Right margin
-				LinearLayout.LayoutParams cancelTextParams = (LinearLayout.LayoutParams)cancelText.getLayoutParams();
-				cancelTextParams.setMargins(Util.scaleWidthPx(10, metrics), 0, Util.scaleWidthPx(20, metrics), 0);
-				cancelText.setLayoutParams(cancelTextParams);
+				LinearLayout.LayoutParams cancelButtonParams = (LinearLayout.LayoutParams)cancelButton.getLayoutParams();
+				cancelButtonParams.setMargins(Util.scaleWidthPx(10, metrics), 0, Util.scaleWidthPx(20, metrics), 0);
+				cancelButton.setLayoutParams(cancelButtonParams);
 
 				//TABS section
 				providerSectionLayout= (LinearLayout)findViewById(R.id.tabhost_provider);
@@ -796,7 +797,7 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 //					break;
 //				}
 //			}
-			case R.id.cancel_text:{
+			case R.id.cancel_button:{
 				finish();
 			}
 		}
@@ -916,6 +917,7 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 
 			if(e.getErrorCode()==MegaChatError.ERROR_OK){
 				log("Connected to chat!");
+				MegaApplication.setChatConnection(true);
 			}
 			else{
 				log("ERROR WHEN CONNECTING " + e.getErrorString());
@@ -1263,13 +1265,14 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 
 		optionsBar = (LinearLayout) findViewById(R.id.options_provider_layout);
 
-		cancelText = (TextView) findViewById(R.id.cancel_text);
-		cancelText.setOnClickListener(this);
-		cancelText.setText(getString(R.string.general_cancel).toUpperCase(Locale.getDefault()));
+		cancelButton = (Button) findViewById(R.id.cancel_button);
+		cancelButton.setOnClickListener(this);
+		cancelButton.setText(getString(R.string.general_cancel).toUpperCase(Locale.getDefault()));
 		//Left and Right margin
-		LinearLayout.LayoutParams cancelTextParams = (LinearLayout.LayoutParams)cancelText.getLayoutParams();
-		cancelTextParams.setMargins(Util.scaleWidthPx(10, metrics), 0, Util.scaleWidthPx(20, metrics), 0);
-		cancelText.setLayoutParams(cancelTextParams);
+		LinearLayout.LayoutParams cancelButtonParams = (LinearLayout.LayoutParams)cancelButton.getLayoutParams();
+		cancelButtonParams.setMargins(Util.scaleWidthPx(10, metrics), 0, Util.scaleWidthPx(20, metrics), 0);
+		cancelButton.setLayoutParams(cancelButtonParams);
+
 		//TABS section
 		providerSectionLayout= (LinearLayout)findViewById(R.id.tabhost_provider);
 		tabLayoutProvider =  (TabLayout) findViewById(R.id.sliding_tabs_provider);
