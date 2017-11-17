@@ -127,8 +127,7 @@ public class MegaSharedFolderLollipopAdapter extends RecyclerView.Adapter<MegaSh
 				}
 			}
 			else{
-				log("E: " + e.getErrorCode() + "_" + e.getErrorString());	
-				//TODO Si no tiene avatar, holder.imageView.setImageBitmap(IMAGEN_POR_DEFECTO);
+				log("E: " + e.getErrorCode() + "_" + e.getErrorString());
 			}
 		}
 
@@ -140,10 +139,8 @@ public class MegaSharedFolderLollipopAdapter extends RecyclerView.Adapter<MegaSh
 
 		@Override
 		public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
-			// TODO Auto-generated method stub
-			
+
 		}
-		
 	}
 	
 	public MegaSharedFolderLollipopAdapter(Context _context, MegaNode node, ArrayList<MegaShare> _shareList, RecyclerView _lv) {
