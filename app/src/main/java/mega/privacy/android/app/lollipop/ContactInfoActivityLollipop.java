@@ -1634,7 +1634,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			if(e.getErrorCode()==MegaChatError.ERROR_OK){
 				log("Chat CREATEDD!!!---> open it!");
 				Intent intent = new Intent(this, ChatActivityLollipop.class);
-				intent.setAction(Constants.ACTION_CHAT_NEW);
+				intent.setAction(Constants.ACTION_NEW_CHAT);
 				intent.putExtra("CHAT_ID", request.getChatHandle());
 				this.startActivity(intent);
 				finish();

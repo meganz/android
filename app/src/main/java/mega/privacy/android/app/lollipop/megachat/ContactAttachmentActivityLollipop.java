@@ -497,7 +497,7 @@ public class ContactAttachmentActivityLollipop extends PinActivityLollipop imple
 
 				log("open new chat");
 				Intent intent = new Intent(this, ChatActivityLollipop.class);
-				intent.setAction(Constants.ACTION_CHAT_NEW);
+				intent.setAction(Constants.ACTION_NEW_CHAT);
 				intent.putExtra("CHAT_ID", request.getChatHandle());
 				finish();
 				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
