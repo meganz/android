@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <TextView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="40dp"
-    android:layout_height="40dp"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
     android:gravity="center"
-    android:textSize="12sp"
+    android:textSize="10sp"
     android:background="@drawable/fastscroll__default_bubble"
-    android:visibility="invisible"
-    android:elevation="2dp"
-    android:layout_margin="1dp"
+    android:paddingRight="10dp"
+    android:paddingLeft="10dp"
+    android:paddingTop="5dp"
+    android:paddingBottom="5dp"
     tools:text="A"
-    tools:visibility="visible" />
+     />

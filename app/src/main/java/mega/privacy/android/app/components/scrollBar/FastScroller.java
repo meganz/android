@@ -16,6 +16,11 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.scrollBar.viewprovider.DefaultScrollerViewProvider;
 import mega.privacy.android.app.components.scrollBar.viewprovider.ScrollerViewProvider;
 
+//            bubbleColor = getResources().getColor(R.color.scroll_bubble);
+//            handleColor = getResources().getColor(R.color.scroll_handle);
+//            bubbleTextAppearance = R.style.StyledScrollerTextAppearance;
+
+
 public class FastScroller extends LinearLayout {
 
     private static final int STYLE_NONE = -1;
@@ -27,8 +32,8 @@ public class FastScroller extends LinearLayout {
     private TextView bubbleTextView;
 
     private int bubbleOffset;
-    private int handleColor;
-    private int bubbleColor;
+    //private int handleColor;
+   // private int bubbleColor;
     private int bubbleTextAppearance;
     private int scrollerOrientation;
 
@@ -50,28 +55,21 @@ public class FastScroller extends LinearLayout {
     public FastScroller(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         setClipChildren(false);
-
-        bubbleColor = getResources().getColor(R.color.scroll_bubble);
-        handleColor = getResources().getColor(R.color.scroll_handle);
-        bubbleTextAppearance = R.style.StyledScrollerTextAppearance;
-        //TypedArray style = context.obtainStyledAttributes(attrs, R.styleable.fastscroll__fastScroller, R.attr.fastscroll__style, 0);
-       // try {
-//            bubbleColor = style.getColor( getResources().getColor(R.color.camera_uploads_scroll_bar) ,STYLE_NONE);
-//            handleColor = style.getColor(R.styleable.fastscroll__fastScroller_fastscroll__handleColor, STYLE_NONE);
-//            bubbleTextAppearance = style.getResourceId(R.styleable.fastscroll__fastScroller_fastscroll__bubbleTextAppearance, STYLE_NONE);
-//            bubbleColor = getResources().getColor(R.color.camera_uploads_scroll_bar);
-//            handleColor = getResources().getColor(R.color.tour_bar_red);
-//            bubbleTextAppearance = R.style.StyledScrollerTextAppearance;
-//
-//        } finally {
-//            style.recycle();
-       // }
+        TypedArray style = context.obtainStyledAttributes(attrs, R.styleable.fastscroll__fastScroller, R.attr.fastscroll__style, 0);
+        try {
+            //bubbleColor = style.getColor(R.styleable.fastscroll__fastScroller_fastscroll__bubbleColor, getResources().getColor(R.color.scroll_bubble));
+            //handleColor = style.getColor(R.styleable.fastscroll__fastScroller_fastscroll__handleColor, getResources().getColor(R.color.scroll_handle));
+            bubbleTextAppearance = style.getResourceId(R.styleable.fastscroll__fastScroller_fastscroll__bubbleTextAppearance, R.style.StyledScrollerTextAppearance);
+        } finally {
+            style.recycle();
+        }
         maxVisibility = getVisibility();
         setViewProvider(new DefaultScrollerViewProvider());
     }
 
     /**
      * Enables custom layout for {@link FastScroller}.
+     *
      * @param viewProvider A {@link ScrollerViewProvider} for the {@link FastScroller} to use when building layout.
      */
     public void setViewProvider(ScrollerViewProvider viewProvider) {
@@ -89,11 +87,13 @@ public class FastScroller extends LinearLayout {
      * Attach the {@link FastScroller} to {@link RecyclerView}. Should be used after the adapter is set
      * to the {@link RecyclerView}. If the adapter implements SectionTitleProvider, the FastScroller
      * will show a bubble with title.
+     *
      * @param recyclerView A {@link RecyclerView} to attach the {@link FastScroller} to.
      */
     public void setRecyclerView(RecyclerView recyclerView) {
         this.recyclerView = recyclerView;
-        if(recyclerView.getAdapter() instanceof SectionTitleProvider) titleProvider = (SectionTitleProvider) recyclerView.getAdapter();
+        if (recyclerView.getAdapter() instanceof SectionTitleProvider)
+            titleProvider = (SectionTitleProvider) recyclerView.getAdapter();
         recyclerView.addOnScrollListener(scrollListener);
         invalidateVisibility();
         recyclerView.setOnHierarchyChangeListener(new OnHierarchyChangeListener() {
@@ -114,6 +114,7 @@ public class FastScroller extends LinearLayout {
      * should generally match the orientation of connected  {@link RecyclerView} for good UX but it's not enforced.
      * Note: This method is overridden from {@link LinearLayout#setOrientation(int)} but for {@link FastScroller}
      * it has a totally different meaning.
+     *
      * @param orientation of the {@link FastScroller}. {@link #VERTICAL} or {@link #HORIZONTAL}
      */
     @Override
@@ -126,37 +127,36 @@ public class FastScroller extends LinearLayout {
 
     /**
      * Set the background color of the bubble.
+     *
      * @param color Color in hex notation with alpha channel, e.g. 0xFFFFFFFF
      */
-    public void setBubbleColor(int color) {
-        bubbleColor = color;
-        invalidate();
-    }
+//    public void setBubbleColor(int color) {
+//        bubbleColor = color;
+//        invalidate();
+//    }
 
     /**
      * Set the background color of the handle.
+     *
      * @param color Color in hex notation with alpha channel, e.g. 0xFFFFFFFF
      */
-    public void setHandleColor(int color) {
-        handleColor = color;
-        invalidate();
-    }
+//    public void setHandleColor(int color) {
+//        handleColor = color;
+//        invalidate();
+//    }
 
     /**
      * Sets the text appearance of the bubble.
+     *
      * @param textAppearanceResourceId The id of the resource to be used as text appearance of the bubble.
      */
-    public void setBubbleTextAppearance(int textAppearanceResourceId){
+    public void setBubbleTextAppearance(int textAppearanceResourceId) {
         bubbleTextAppearance = textAppearanceResourceId;
         invalidate();
     }
 
-    /**
-     * Add a {@link import mega.privacy.android.app.components.scrollBar.RecyclerViewScrollListener.ScrollerListener;}
-     * to be notified of user scrolling
-     * @param listener
-     */
-    public void addScrollerListener(RecyclerViewScrollListener.ScrollerListener listener){
+
+    public void addScrollerListener(RecyclerViewScrollListener.ScrollerListener listener) {
         scrollListener.addScrollerListener(listener);
     }
 
@@ -176,14 +176,15 @@ public class FastScroller extends LinearLayout {
     }
 
     private void applyStyling() {
-        if(bubbleColor!=STYLE_NONE) setBackgroundTint(bubbleTextView, bubbleColor);
-        if(handleColor!=STYLE_NONE) setBackgroundTint(handle, handleColor);
-        if(bubbleTextAppearance!=STYLE_NONE) TextViewCompat.setTextAppearance(bubbleTextView, bubbleTextAppearance);
+       // if (bubbleColor != STYLE_NONE) setBackgroundTint(bubbleTextView, bubbleColor);
+       // if (handleColor != STYLE_NONE) setBackgroundTint(handle, handleColor);
+        if (bubbleTextAppearance != STYLE_NONE)
+            TextViewCompat.setTextAppearance(bubbleTextView, bubbleTextAppearance);
     }
 
     private void setBackgroundTint(View view, int color) {
         final Drawable background = DrawableCompat.wrap(view.getBackground());
-        if(background==null) return;
+        if (background == null) return;
         DrawableCompat.setTint(background.mutate(), color);
         Utils.setBackground(view, background);
     }
@@ -194,7 +195,8 @@ public class FastScroller extends LinearLayout {
             public boolean onTouch(View v, MotionEvent event) {
                 requestDisallowInterceptTouchEvent(true);
                 if (event.getAction() == MotionEvent.ACTION_DOWN || event.getAction() == MotionEvent.ACTION_MOVE) {
-                    if(titleProvider!=null && event.getAction() == MotionEvent.ACTION_DOWN) viewProvider.onHandleGrabbed();
+                    if (titleProvider != null && event.getAction() == MotionEvent.ACTION_DOWN)
+                        viewProvider.onHandleGrabbed();
                     manuallyChangingPosition = true;
                     float relativePos = getRelativeTouchPosition(event);
                     setScrollerPosition(relativePos);
@@ -202,9 +204,7 @@ public class FastScroller extends LinearLayout {
                     return true;
                 } else if (event.getAction() == MotionEvent.ACTION_UP) {
                     manuallyChangingPosition = false;
-                    if(titleProvider!=null)
-                        viewProvider.onHandleReleased();
-
+                    if (titleProvider != null) viewProvider.onHandleReleased();
                     return true;
                 }
                 return false;
@@ -212,8 +212,8 @@ public class FastScroller extends LinearLayout {
         });
     }
 
-    private float getRelativeTouchPosition(MotionEvent event){
-        if(isVertical()){
+    private float getRelativeTouchPosition(MotionEvent event) {
+        if (isVertical()) {
             float yInParent = event.getRawY() - Utils.getViewRawY(handle);
             return yInParent / (getHeight() - handle.getHeight());
         } else {
@@ -229,13 +229,13 @@ public class FastScroller extends LinearLayout {
     }
 
     private void invalidateVisibility() {
-        if(
-                recyclerView.getAdapter()==null ||
-                        recyclerView.getAdapter().getItemCount()==0 ||
-                        recyclerView.getChildAt(0)==null ||
+        if (
+                recyclerView.getAdapter() == null ||
+                        recyclerView.getAdapter().getItemCount() == 0 ||
+                        recyclerView.getChildAt(0) == null ||
                         isRecyclerViewNotScrollable() ||
                         maxVisibility != View.VISIBLE
-                ){
+                ) {
             super.setVisibility(INVISIBLE);
         } else {
             super.setVisibility(VISIBLE);
@@ -243,7 +243,7 @@ public class FastScroller extends LinearLayout {
     }
 
     private boolean isRecyclerViewNotScrollable() {
-        if(isVertical()) {
+        if (isVertical()) {
             return recyclerView.getChildAt(0).getHeight() * recyclerView.getAdapter().getItemCount() <= recyclerView.getHeight();
         } else {
             return recyclerView.getChildAt(0).getWidth() * recyclerView.getAdapter().getItemCount() <= recyclerView.getWidth();
@@ -255,11 +255,14 @@ public class FastScroller extends LinearLayout {
         int itemCount = recyclerView.getAdapter().getItemCount();
         int targetPos = (int) Utils.getValueInRange(0, itemCount - 1, (int) (relativePos * (float) itemCount));
         recyclerView.scrollToPosition(targetPos);
-        if(titleProvider!=null && bubbleTextView!=null) bubbleTextView.setText(titleProvider.getSectionTitle(targetPos));
+        if (titleProvider != null && bubbleTextView != null)
+            bubbleTextView.setText(titleProvider.getSectionTitle(targetPos));
+            //bubbleTextView.setText("text");
+
     }
 
     void setScrollerPosition(float relativePos) {
-        if(isVertical()) {
+        if (isVertical()) {
             bubble.setY(Utils.getValueInRange(
                     0,
                     getHeight() - bubble.getHeight(),
@@ -284,12 +287,12 @@ public class FastScroller extends LinearLayout {
         }
     }
 
-    public boolean isVertical(){
+    public boolean isVertical() {
         return scrollerOrientation == VERTICAL;
     }
 
     boolean shouldUpdateHandlePosition() {
-        return handle!=null && !manuallyChangingPosition && recyclerView.getChildCount() > 0;
+        return handle != null && !manuallyChangingPosition && recyclerView.getChildCount() > 0;
     }
 
     ScrollerViewProvider getViewProvider() {
