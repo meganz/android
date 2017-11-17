@@ -135,7 +135,6 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 						handleList.add(documents.get(i).getHandle());
 					}
 					((ManagerActivityLollipop) context).askConfirmationMoveToRubbish(handleList);
-					hideMultipleSelect();
 					break;
 				}
 				case R.id.cab_menu_rename:{
@@ -143,6 +142,8 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 					if (documents.size()==1){
 						((ManagerActivityLollipop) context).showRenameDialog(documents.get(0), documents.get(0).getName());
 					}
+					clearSelections();
+					hideMultipleSelect();
 					break;
 				}
 				case R.id.cab_menu_copy:{
@@ -153,6 +154,8 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 
 					NodeController nC = new NodeController(context);
 					nC.chooseLocationToCopyNodes(handleList);
+					clearSelections();
+					hideMultipleSelect();
 					break;
 				}	
 				case R.id.cab_menu_move:{
@@ -163,6 +166,8 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 
 					NodeController nC = new NodeController(context);
 					nC.chooseLocationToMoveNodes(handleList);
+
+					clearSelections();
 					hideMultipleSelect();
 
 					break;
@@ -230,7 +235,13 @@ public class IncomingSharesFragmentLollipop extends Fragment{
                     menu.findItem(R.id.cab_menu_select_all).setVisible(false);
 					unselect.setTitle(getString(R.string.action_unselect_all));
 					unselect.setVisible(true);
-					showRename = false;
+          if(selected.size()==1){
+               showRename=true;
+          }else{
+                        showRename=false;
+                    }
+					showMove = false;
+					showTrash=false;
 
 				}else if(selected.size()==1){
 

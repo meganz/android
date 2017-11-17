@@ -153,8 +153,8 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 					if (documents.size()==1){
 						((ManagerActivityLollipop) context).showRenameDialog(documents.get(0), documents.get(0).getName());
 					}
+					clearSelections();
 					hideMultipleSelect();
-
 					break;
 				}
 				case R.id.cab_menu_copy:{
