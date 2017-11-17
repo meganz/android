@@ -138,7 +138,11 @@ public class ContactsFragmentLollipop extends Fragment{
 						log("Selected contact NULL");
 						break;
 					}
+
 					((ManagerActivityLollipop) context).startOneToOneChat(users.get(0));
+
+					clearSelections();
+					hideMultipleSelect();
 
 					break;
 				}
@@ -151,6 +155,9 @@ public class ContactsFragmentLollipop extends Fragment{
 					}
 
 					((ManagerActivityLollipop)context).startGroupConversation(contactHandles);
+
+					clearSelections();
+					hideMultipleSelect();
 
 					break;
 				}
