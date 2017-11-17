@@ -53,8 +53,6 @@ import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PinActivityLollipop;
-import mega.privacy.android.app.lollipop.adapters.MegaContactsLollipopAdapter;
-import mega.privacy.android.app.lollipop.adapters.MegaSharedFolderLollipopAdapter;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.lollipop.listeners.FileContactMultipleRequestListener;
