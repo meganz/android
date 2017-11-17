@@ -12164,7 +12164,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 				log("open new chat: " + request.getChatHandle());
 				Intent intent = new Intent(this, ChatActivityLollipop.class);
-				intent.setAction(Constants.ACTION_CHAT_NEW);
+				intent.setAction(Constants.ACTION_NEW_CHAT);
 				intent.putExtra("CHAT_ID", request.getChatHandle());
 				this.startActivity(intent);
 

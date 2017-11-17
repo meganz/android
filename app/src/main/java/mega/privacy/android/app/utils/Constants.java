@@ -132,7 +132,6 @@ public class Constants {
 	public static String ACTION_INCOMING_SHARED_FOLDER_NOTIFICATION = "ACTION_INCOMING_SHARED_FOLDER_NOTIFICATION";
 	public static String ACTION_OPEN_HANDLE_NODE = "ACTION_OPEN_HANDLE_NODE";
 
-	public static String ACTION_CHAT_NEW = "CHAT_NEW";
 	public static String ACTION_CHAT_SHOW_MESSAGES = "CHAT_SHOW_MESSAGES";
 	public static String ACTION_NEW_CHAT = "NEW_CHAT";
 	public static String ACTION_CLEAR_CHAT = "CLEAR_CHAT";

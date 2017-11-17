@@ -669,7 +669,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         aB.setTitle(chatRoom.getTitle());
                         setChatPermissions();
 
-                        if (intentAction.equals(Constants.ACTION_CHAT_NEW)) {
+                        if (intentAction.equals(Constants.ACTION_NEW_CHAT)) {
                             log("ACTION_CHAT_NEW");
                             textChat.setOnFocusChangeListener(focus);
                         } else if (intentAction.equals(Constants.ACTION_CHAT_SHOW_MESSAGES)) {
@@ -3899,11 +3899,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
                 log("open new chat");
                 Intent intent = new Intent(this, ChatActivityLollipop.class);
-                intent.setAction(Constants.ACTION_CHAT_NEW);
+                intent.setAction(Constants.ACTION_NEW_CHAT);
                 intent.putExtra("CHAT_ID", request.getChatHandle());
                 finish();
                 this.startActivity(intent);
-
             }
             else{
                 log("EEEERRRRROR WHEN CREATING CHAT " + e.getErrorString());
