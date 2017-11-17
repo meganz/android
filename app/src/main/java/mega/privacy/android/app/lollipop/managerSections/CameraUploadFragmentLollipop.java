@@ -70,6 +70,8 @@ import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.MegaLinearLayoutManager;
 import mega.privacy.android.app.components.DividerItemDecoration;
+import mega.privacy.android.app.components.SimpleDividerItemDecoration;
+import mega.privacy.android.app.components.scrollBar.FastScroller;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.MegaMonthPicLollipop;
@@ -109,6 +111,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	private RecyclerView listView;
 	private GestureDetectorCompat detector;
 	private RecyclerView.LayoutManager mLayoutManager;
+	FastScroller fastScroller;
 
 	ImageView emptyImageView;
 	LinearLayout emptyTextView;
@@ -684,13 +687,19 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			detector = new GestureDetectorCompat(getActivity(), new RecyclerViewOnGestureListener());
 			
 			listView = (RecyclerView) v.findViewById(R.id.file_list_view_browser);
-			listView.setScrollBarStyle(View.SCROLLBARS_OUTSIDE_INSET);
+			fastScroller = (FastScroller) v.findViewById(R.id.fastscroll);
+
+//			listView.setScrollBarStyle(View.SCROLLBARS_OUTSIDE_INSET);
 			mLayoutManager = new MegaLinearLayoutManager(context);
 			listView.setLayoutManager(mLayoutManager);
 
 			listView.addOnItemTouchListener(this);
 			listView.setItemAnimator(new DefaultItemAnimator());
 			listView.addItemDecoration(new DividerItemDecoration(context, outMetrics));
+
+			listView.setPadding(0, 0, 0, Util.scaleHeightPx(85, outMetrics));
+			listView.setClipToPadding(false);
+			listView.setHasFixedSize(true);
 
 			final TextView turnOnOff = (TextView) v.findViewById(R.id.file_list_browser_camera_upload_on_off);
 			turnOnOff.setVisibility(View.VISIBLE);
@@ -862,6 +871,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			adapterList.setMultipleSelect(false);
 
 			listView.setAdapter(adapterList);
+			fastScroller.setRecyclerView(listView);
 
 
 			return v;
@@ -872,6 +882,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			detector = new GestureDetectorCompat(getActivity(), new RecyclerViewOnGestureListener());
 			
 			listView = (RecyclerView) v.findViewById(R.id.file_grid_view_browser);
+			//fastScroller = (FastScroller) v.findViewById(R.id.fastscroll);
 			//listView.setScrollBarStyle(View.SCROLLBARS_OUTSIDE_INSET);
 //			listView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
 //			listView.addOnItemTouchListener(this);
@@ -1152,7 +1163,9 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			listView.setLayoutManager(mLayoutManager);
 			
 			listView.setAdapter(adapterGrid);
-			
+			//fastScroller.setRecyclerView(listView);
+
+
 			return v;
 		}
 	}

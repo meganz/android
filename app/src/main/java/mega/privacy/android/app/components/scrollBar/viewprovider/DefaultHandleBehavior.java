@@ -1,6 +1,7 @@
 package mega.privacy.android.app.components.scrollBar.viewprovider;
 
 import android.os.Handler;
+import android.util.Log;
 
 public class DefaultHandleBehavior implements ViewBehavior {
 
@@ -10,10 +11,23 @@ public class DefaultHandleBehavior implements ViewBehavior {
         this.animationManager = animationManager;
     }
     @Override
-    public void onHandleGrabbed() {}
+    public void onHandleGrabbed() {
+        //animationManager.show();
+
+    }
 
     @Override
-    public void onHandleReleased() {}
+    public void onHandleReleased() {
+       // animationManager.hide();
+//        Log.d("******","**** HANDLE onHandleReleased");
+//        Handler handler = new Handler();
+//        handler.postDelayed(new Runnable() {
+//            public void run() {
+//                animationManager.hide();
+//            }
+//        }, 2000);
+
+    }
 
     @Override
     public void onScrollStarted() {
@@ -22,14 +36,14 @@ public class DefaultHandleBehavior implements ViewBehavior {
 
     @Override
     public void onScrollFinished() {
-//        Handler handler = new Handler();
+
 //        handler.postDelayed(new Runnable() {
 //            public void run() {
 //                animationManager.hide();
 //            }
-//        }, 3000);   //3 seconds
+//        }, 2000);
 
-        animationManager.hide();
+     //   animationManager.hide();
 
     }
 }

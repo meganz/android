@@ -1,5 +1,8 @@
 package mega.privacy.android.app.components.scrollBar.viewprovider;
 
+import android.os.Handler;
+import android.util.Log;
+
 public class DefaultBubbleBehavior implements ViewBehavior {
 
     private final VisibilityAnimationManager animationManager;
@@ -25,7 +28,6 @@ public class DefaultBubbleBehavior implements ViewBehavior {
 
     @Override
     public void onScrollFinished() {
-
     }
 
 }
