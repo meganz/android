@@ -2,6 +2,7 @@ package mega.privacy.android.app.lollipop;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -47,10 +48,13 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 
 	RecyclerView listView;
 	LinearLayoutManager mLayoutManager;
+
 	ImageView emptyImageView;
-	TextView emptyTextView;
+	LinearLayout emptyTextView;
+	TextView emptyTextViewFirst;
+	TextView emptyTextViewSecond;
+
 	TextView contentText;
-	public int deepBrowserTree = 0;
 	View separator;
 	Button optionButton;
 	Button cancelButton;
@@ -77,7 +81,6 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 			return;
 		}
 
-		deepBrowserTree=0;
 		parentHandle = -1;
 
 		lastPositionStack = new Stack<>();
@@ -127,13 +130,11 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 		contentText.setVisibility(View.GONE);
 
 		emptyImageView = (ImageView) v.findViewById(R.id.file_list_empty_image);
-		emptyTextView = (TextView) v.findViewById(R.id.file_list_empty_text);
-
-		emptyImageView.setImageResource(R.drawable.incoming_shares_empty);			
-		emptyTextView.setText(R.string.file_browser_empty_incoming_shares);
+		emptyTextView = (LinearLayout) v.findViewById(R.id.file_list_empty_text);
+		emptyTextViewFirst = (TextView) v.findViewById(R.id.file_list_empty_text_first);
+		emptyTextViewSecond = (TextView) v.findViewById(R.id.file_list_empty_text_second);
 
 		parentHandle = ((FileExplorerActivityLollipop)context).parentHandleIncoming;
-		deepBrowserTree = ((FileExplorerActivityLollipop)context).deepBrowserTree;
 
 		modeCloud = ((FileExplorerActivityLollipop)context).getMode();
 		selectFile = ((FileExplorerActivityLollipop)context).isSelectFile();
@@ -147,7 +148,7 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 		}
 		
 		if (adapter == null){
-			adapter = new MegaExplorerLollipopAdapter(context, nodes, parentHandle, listView, selectFile);
+			adapter = new MegaExplorerLollipopAdapter(context, this, nodes, parentHandle, listView, selectFile);
 			adapter.SetOnItemClickListener(new MegaExplorerLollipopAdapter.OnItemClickListener() {
 				
 				@Override
@@ -172,6 +173,20 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 		}
 		else if (modeCloud == FileExplorerActivityLollipop.COPY){
 			optionButton.setText(getString(R.string.context_copy).toUpperCase(Locale.getDefault()));
+
+			if (((FileExplorerActivityLollipop)context).deepBrowserTree > 0){
+				MegaNode parent = ((FileExplorerActivityLollipop)context).parentMoveCopy();
+				if(parent != null){
+					if(parent.getHandle() == parentHandle) {
+						activateButton(false);
+					}else{
+						activateButton(true);
+					}
+				}else{
+					activateButton(true);
+
+				}
+			}
 		}
 		else if (modeCloud == FileExplorerActivityLollipop.UPLOAD){
 			optionButton.setText(getString(R.string.context_upload).toUpperCase(Locale.getDefault()));
@@ -184,14 +199,14 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 		}
 		else if(modeCloud == FileExplorerActivityLollipop.UPLOAD_SELFIE){
 			optionButton.setText(getString(R.string.context_upload).toUpperCase(Locale.getDefault()));
-		}	
-		else {
+		}
+		else{
 			optionButton.setText(getString(R.string.general_select).toUpperCase(Locale.getDefault()));
 		}
 
 
-		log("deepBrowserTree value: "+deepBrowserTree);
-		if (deepBrowserTree <= 0){
+		log("deepBrowserTree value: "+((FileExplorerActivityLollipop)context).deepBrowserTree);
+		if (((FileExplorerActivityLollipop)context).deepBrowserTree <= 0){
 			separator.setVisibility(View.GONE);
 			optionsBar.setVisibility(View.GONE);
 		}
@@ -210,11 +225,29 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 			emptyImageView.setVisibility(View.GONE);
 			emptyTextView.setVisibility(View.GONE);
 			listView.setVisibility(View.VISIBLE);
-		}
-		else{
+
+		}else{
 			emptyImageView.setVisibility(View.VISIBLE);
 			emptyTextView.setVisibility(View.VISIBLE);
 			listView.setVisibility(View.GONE);
+			if (parentHandle==-1) {
+				if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+					emptyImageView.setImageResource(R.drawable.incoming_empty_landscape);
+				}else{
+					emptyImageView.setImageResource(R.drawable.incoming_shares_empty);
+				}
+				emptyTextViewFirst.setText(R.string.context_empty_contacts);
+				String text = getString(R.string.context_empty_incoming);
+				emptyTextViewSecond.setText(" "+text+".");
+				emptyTextViewSecond.setVisibility(View.VISIBLE);
+
+			}else{
+
+				emptyImageView.setImageResource(R.drawable.ic_empty_folder);
+				emptyTextViewFirst.setText(R.string.file_browser_empty_folder);
+				emptyTextViewSecond.setVisibility(View.GONE);
+			}
+
 		}
 
 		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
@@ -224,7 +257,7 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 	
 	public void findNodes(){
 		log("findNodes");
-		deepBrowserTree=0;
+		((FileExplorerActivityLollipop)context).setDeepBrowserTree(0);
 
 		separator.setVisibility(View.GONE);
 		optionsBar.setVisibility(View.GONE);
@@ -295,9 +328,9 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 	public void navigateToFolder(long handle) {
 		log("navigateToFolder");
 
-		deepBrowserTree = deepBrowserTree+1;
-		log("deepBrowserTree value: "+deepBrowserTree);
-		if (deepBrowserTree <= 0){
+		((FileExplorerActivityLollipop)context).increaseDeepBrowserTree();
+		log("((FileExplorerActivityLollipop)context).deepBrowserTree value: "+((FileExplorerActivityLollipop)context).deepBrowserTree);
+		if (((FileExplorerActivityLollipop)context).deepBrowserTree <= 0){
 			separator.setVisibility(View.GONE);
 			optionsBar.setVisibility(View.GONE);
 		}
@@ -331,9 +364,11 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 		if (adapter.getItemCount() == 0){
 			listView.setVisibility(View.GONE);
 			emptyImageView.setImageResource(R.drawable.ic_empty_folder);
-			emptyTextView.setText(R.string.file_browser_empty_folder);
+			emptyTextViewFirst.setText(R.string.file_browser_empty_folder);
+
 			emptyImageView.setVisibility(View.VISIBLE);
 			emptyTextView.setVisibility(View.VISIBLE);
+			emptyTextViewSecond.setVisibility(View.GONE);
 		}
 		else{
 			listView.setVisibility(View.VISIBLE);
@@ -341,17 +376,23 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 			emptyTextView.setVisibility(View.GONE);
 		}
 
+		if (modeCloud == FileExplorerActivityLollipop.COPY){
+			activateButton(true);
+		}
+
+
+
 	}
 
     public void itemClick(View view, int position) {
-		log("------------------itemClick: "+deepBrowserTree);
+		log("------------------itemClick: "+((FileExplorerActivityLollipop)context).deepBrowserTree);
 		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
 		if (nodes.get(position).isFolder()){
-					
-			deepBrowserTree = deepBrowserTree+1;
-			log("deepBrowserTree value: "+deepBrowserTree);
-			if (deepBrowserTree <= 0){
+
+			((FileExplorerActivityLollipop)context).increaseDeepBrowserTree();
+			log("deepBrowserTree value: "+((FileExplorerActivityLollipop)context).deepBrowserTree);
+			if (((FileExplorerActivityLollipop)context).deepBrowserTree <= 0){
 				separator.setVisibility(View.GONE);
 				optionsBar.setVisibility(View.GONE);
 			}
@@ -386,14 +427,34 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 			if (adapter.getItemCount() == 0){
 				listView.setVisibility(View.GONE);
 				emptyImageView.setImageResource(R.drawable.ic_empty_folder);
-				emptyTextView.setText(R.string.file_browser_empty_folder);
+				emptyTextViewFirst.setText(R.string.file_browser_empty_folder);
+				emptyTextViewSecond.setVisibility(View.GONE);
 				emptyImageView.setVisibility(View.VISIBLE);
 				emptyTextView.setVisibility(View.VISIBLE);
+				if (modeCloud == FileExplorerActivityLollipop.COPY){
+					activateButton(true);
+				}
 			}
 			else{
 				listView.setVisibility(View.VISIBLE);
 				emptyImageView.setVisibility(View.GONE);
 				emptyTextView.setVisibility(View.GONE);
+
+				if (modeCloud == FileExplorerActivityLollipop.COPY){
+					if (((FileExplorerActivityLollipop)context).deepBrowserTree > 0){
+						MegaNode parent = ((FileExplorerActivityLollipop)context).parentMoveCopy();
+						if(parent != null){
+							if(parent.getHandle() == parentHandle) {
+								activateButton(false);
+							}else{
+								activateButton(true);
+							}
+						}else{
+							activateButton(true);
+
+						}
+					}
+				}
 			}
 		}
 		else
@@ -422,12 +483,12 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 
 	public int onBackPressed(){
 
-		log("deepBrowserTree "+deepBrowserTree);
-		deepBrowserTree = deepBrowserTree-1;
+		log("deepBrowserTree "+((FileExplorerActivityLollipop)context).deepBrowserTree);
+		((FileExplorerActivityLollipop)context).decreaseDeepBrowserTree();
 
 		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
-		if(deepBrowserTree==0){
+		if(((FileExplorerActivityLollipop)context).deepBrowserTree==0){
 			parentHandle=-1;
 			changeActionBarTitle(getString(R.string.title_incoming_shares_explorer));
 //			uploadButton.setText(getString(R.string.choose_folder_explorer));
@@ -449,8 +510,6 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 
 			separator.setVisibility(View.GONE);
 			optionsBar.setVisibility(View.GONE);
-			emptyImageView.setImageResource(R.drawable.incoming_shares_empty);
-			emptyTextView.setText(R.string.file_browser_empty_incoming_shares);
 
 			if (adapter.getItemCount() != 0){
 				emptyImageView.setVisibility(View.GONE);
@@ -461,13 +520,24 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 				emptyImageView.setVisibility(View.VISIBLE);
 				emptyTextView.setVisibility(View.VISIBLE);
 				listView.setVisibility(View.GONE);
+
+				if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+					emptyImageView.setImageResource(R.drawable.incoming_empty_landscape);
+				}else{
+					emptyImageView.setImageResource(R.drawable.incoming_shares_empty);
+				}
+				emptyTextViewFirst.setText(R.string.context_empty_contacts);
+				String text = getString(R.string.context_empty_incoming);
+				emptyTextViewSecond.setText(" "+text+".");
+				emptyTextViewSecond.setVisibility(View.VISIBLE);
+
 			}
 
 			return 3;
 		}
-		else if (deepBrowserTree>0){
+		else if (((FileExplorerActivityLollipop)context).deepBrowserTree>0){
 			parentHandle = adapter.getParentHandle();
-			
+
 			MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(parentHandle));				
 
 			if (parentNode != null){
@@ -475,6 +545,22 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 				
 				parentHandle = parentNode.getHandle();
 				nodes = megaApi.getChildren(parentNode);
+
+				if (modeCloud == FileExplorerActivityLollipop.COPY){
+					if (((FileExplorerActivityLollipop)context).deepBrowserTree > 0){
+						MegaNode parent = ((FileExplorerActivityLollipop)context).parentMoveCopy();
+						if(parent != null){
+							if(parent.getHandle() == parentHandle) {
+								activateButton(false);
+							}else{
+								activateButton(true);
+							}
+						}else{
+							activateButton(true);
+
+						}
+					}
+				}
 
 				adapter.setNodes(nodes);
 				int lastVisiblePosition = 0;
@@ -496,9 +582,10 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 				}
 				else{
 					emptyImageView.setImageResource(R.drawable.ic_empty_folder);
-					emptyTextView.setText(R.string.file_browser_empty_folder);
+					emptyTextViewFirst.setText(R.string.file_browser_empty_folder);
 					emptyImageView.setVisibility(View.VISIBLE);
 					emptyTextView.setVisibility(View.VISIBLE);
+					emptyTextViewSecond.setVisibility(View.GONE);
 					listView.setVisibility(View.GONE);
 				}
 				return 2;
@@ -521,7 +608,7 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 			emptyTextView.setVisibility(View.GONE);
 			separator.setVisibility(View.GONE);
 			optionsBar.setVisibility(View.GONE);
-			deepBrowserTree=0;
+			((FileExplorerActivityLollipop)context).deepBrowserTree=0;
 			return 0;
 		}
 	}
@@ -556,12 +643,22 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 				listView.setVisibility(View.GONE);
 				emptyImageView.setVisibility(View.VISIBLE);
 				emptyTextView.setVisibility(View.VISIBLE);
+
 				if (megaApi.getRootNode().getHandle()==parentHandle) {
-					emptyImageView.setImageResource(R.drawable.ic_empty_cloud_drive);
-					emptyTextView.setText(R.string.file_browser_empty_cloud_drive);
+					if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+						emptyImageView.setImageResource(R.drawable.incoming_empty_landscape);
+					}else{
+						emptyImageView.setImageResource(R.drawable.incoming_shares_empty);
+					}
+					emptyTextViewFirst.setText(R.string.context_empty_contacts);
+					String text = getString(R.string.context_empty_incoming);
+					emptyTextViewSecond.setText(" "+text+".");
+					emptyTextViewSecond.setVisibility(View.VISIBLE);
 				} else {
 					emptyImageView.setImageResource(R.drawable.ic_empty_folder);
-					emptyTextView.setText(R.string.file_browser_empty_folder);
+					emptyTextViewFirst.setText(R.string.file_browser_empty_folder);
+					emptyTextViewSecond.setVisibility(View.GONE);
+
 				}
 			}
 			else{
@@ -577,10 +674,15 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 	}
 
 	public int getDeepBrowserTree() {
-		return deepBrowserTree;
+		return ((FileExplorerActivityLollipop)context).deepBrowserTree;
 	}
 
-	public void setDeepBrowserTree(int deepBrowserTree) {
-		this.deepBrowserTree = deepBrowserTree;
+	public void activateButton(boolean show){
+		optionButton.setEnabled(show);
+		if(show){
+			optionButton.setTextColor(getResources().getColor(R.color.accentColor));
+		}else{
+			optionButton.setTextColor(getResources().getColor(R.color.invite_button_deactivated));
+		}
 	}
 }

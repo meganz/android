@@ -110,7 +110,6 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 		public TextView textViewFileSize;
 		public long document;
 		public RelativeLayout itemLayout;
-		public ImageButton imageButtonThreeDots;
 	}
 
 	public static class ViewHolderBrowserList extends ViewHolderBrowser{
@@ -121,6 +120,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 		public ImageView imageView;
 		public RelativeLayout itemLayout;
 		public ImageView permissionsIcon;
+		public RelativeLayout threeDotsLayout;
 	}
 	
 	public static class ViewHolderBrowserGrid extends ViewHolderBrowser{
@@ -135,6 +135,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 		public ImageView imageViewVideoIcon;
 		public TextView videoDuration;
 		public RelativeLayout videoInfoLayout;
+		public ImageButton imageButtonThreeDots;
 	}
 
 	public void toggleAllSelection(int pos) {
@@ -499,7 +500,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 
 			holderList.textViewFileSize = (TextView) v.findViewById(R.id.file_list_filesize);
 
-			holderList.imageButtonThreeDots = (ImageButton) v.findViewById(R.id.file_list_three_dots);
+			holderList.threeDotsLayout = (RelativeLayout) v.findViewById(R.id.file_list_three_dots_layout);
 
 			holderList.savedOffline.setVisibility(View.INVISIBLE);
 		
@@ -511,8 +512,8 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 			holderList.itemLayout.setOnClickListener(this);
 			holderList.itemLayout.setOnLongClickListener(this);
 			
-			holderList.imageButtonThreeDots.setTag(holderList);
-			holderList.imageButtonThreeDots.setOnClickListener(this);
+			holderList.threeDotsLayout.setTag(holderList);
+			holderList.threeDotsLayout.setOnClickListener(this);
 
 			v.setTag(holderList);
 			
@@ -1143,7 +1144,9 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 					RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
 					params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
 					params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-					params1.setMargins(20, 0, 12, 0);
+					int left = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 6, context.getResources().getDisplayMetrics());
+					params1.setMargins(left, 0, 0, 0);
+
 					holder.imageView.setLayoutParams(params1);
 
 					thumb = ThumbnailUtils.getThumbnailFromCache(node);
@@ -1175,20 +1178,21 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 						RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
 						params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
 						params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-						params1.setMargins(20, 0, 12, 0);
-						holder.imageView.setLayoutParams(params1);
+						int left = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 6, context.getResources().getDisplayMetrics());
+						params1.setMargins(left, 0, 0, 0);
 
+						holder.imageView.setLayoutParams(params1);
 						holder.imageView.setImageBitmap(thumb);
 
 
 					} else {
-						thumb = ThumbnailUtils
-								.getThumbnailFromFolder(node, context);
+						thumb = ThumbnailUtils.getThumbnailFromFolder(node, context);
 						if (thumb != null) {
 							RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
 							params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
 							params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-							params1.setMargins(20, 0, 12, 0);
+							int left = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 6, context.getResources().getDisplayMetrics());
+							params1.setMargins(left, 0, 0, 0);
 
 							holder.imageView.setLayoutParams(params1);
 							holder.imageView.setImageBitmap(thumb);
@@ -1223,7 +1227,9 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 						RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
 						params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
 						params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-						params1.setMargins(18, 0, 18, 0);
+						int left = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 6, context.getResources().getDisplayMetrics());
+						params1.setMargins(left, 0, 0, 0);
+
 						holder.imageView.setLayoutParams(params1);
 
 						thumb = ThumbnailUtils.getThumbnailFromCache(node);
@@ -1256,20 +1262,21 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 							RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
 							params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
 							params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-							params1.setMargins(20, 0, 12, 0);
-							holder.imageView.setLayoutParams(params1);
+							int left = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 6, context.getResources().getDisplayMetrics());
+							params1.setMargins(left, 0, 0, 0);
 
+							holder.imageView.setLayoutParams(params1);
 							holder.imageView.setImageBitmap(thumb);
 
 
 						} else {
-							thumb = ThumbnailUtils
-									.getThumbnailFromFolder(node, context);
+							thumb = ThumbnailUtils.getThumbnailFromFolder(node, context);
 							if (thumb != null) {
 								RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
 								params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
 								params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-								params1.setMargins(20, 0, 12, 0);
+								int left = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 6, context.getResources().getDisplayMetrics());
+								params1.setMargins(left, 0, 0, 0);
 
 								holder.imageView.setLayoutParams(params1);
 								holder.imageView.setImageBitmap(thumb);
@@ -1404,7 +1411,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 		final MegaNode n = (MegaNode) getItem(currentPosition);
 
 		switch (v.getId()) {
-			case R.id.file_list_three_dots:
+			case R.id.file_list_three_dots_layout:
 			case R.id.file_grid_three_dots:{
 
 				log("onClick: file_list_three_dots: "+currentPosition);

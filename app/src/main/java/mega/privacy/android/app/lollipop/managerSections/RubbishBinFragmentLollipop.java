@@ -3,6 +3,7 @@ package mega.privacy.android.app.lollipop.managerSections;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -22,6 +23,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -67,7 +69,10 @@ public class RubbishBinFragmentLollipop extends Fragment {
 	MegaNode selectedNode = null;
 	
 	ImageView emptyImageView;
-	TextView emptyTextView;
+	LinearLayout emptyTextView;
+	TextView emptyTextViewFirst;
+	TextView emptyTextViewSecond;
+
 	TextView contentText;
 	RelativeLayout contentTextLayout;
 
@@ -316,7 +321,6 @@ public class RubbishBinFragmentLollipop extends Fragment {
 			log("Parent is the Rubbish: "+((ManagerActivityLollipop)context).parentHandleRubbish);
 
 			nodes = megaApi.getChildren(megaApi.getRubbishNode(), ((ManagerActivityLollipop)context).orderCloud);
-			((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 
 		}
 		else{
@@ -327,21 +331,12 @@ public class RubbishBinFragmentLollipop extends Fragment {
 				nodes = megaApi.getChildren(parentNode, ((ManagerActivityLollipop)context).orderCloud);
 			
 				((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
-
-				if(aB!=null){
-					aB.setTitle(parentNode.getName());
-					log("indicator_arrow_back_035");
-					aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
-					((ManagerActivityLollipop)context).setFirstNavigationLevel(false);
-				}
-				else {
-					log("AB still is NULL");
-				}
-
 			}
 			nodes = megaApi.getChildren(parentNode, ((ManagerActivityLollipop)context).orderCloud);
-			((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 		}
+
+		((ManagerActivityLollipop)context).setToolbarTitle();
+		((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 
 		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
@@ -356,10 +351,12 @@ public class RubbishBinFragmentLollipop extends Fragment {
 			recyclerView.setItemAnimator(new DefaultItemAnimator());
 			
 			emptyImageView = (ImageView) v.findViewById(R.id.rubbishbin_list_empty_image);
-			emptyTextView = (TextView) v.findViewById(R.id.rubbishbin_list_empty_text);
+			emptyTextView = (LinearLayout) v.findViewById(R.id.rubbishbin_list_empty_text);
+			emptyTextViewFirst = (TextView) v.findViewById(R.id.rubbishbin_list_empty_text_first);
+			emptyTextViewSecond = (TextView) v.findViewById(R.id.rubbishbin_list_empty_text_second);
 
 			contentTextLayout = (RelativeLayout) v.findViewById(R.id.rubbishbin_content_text_layout);
-			contentText = (TextView) v.findViewById(R.id.rubbishbin_list_content_text);			
+			contentText = (TextView) v.findViewById(R.id.rubbishbin_list_content_text);
 
 			if (adapter == null){
 				adapter = new MegaBrowserLollipopAdapter(context, this, nodes, ((ManagerActivityLollipop)context).parentHandleRubbish, recyclerView, aB, Constants.RUBBISH_BIN_ADAPTER, MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST);
@@ -371,7 +368,7 @@ public class RubbishBinFragmentLollipop extends Fragment {
 			}
 
 			if(megaApi.getRubbishNode()!=null){
-				log("setContent of the Rubbish Bin");
+				log("setContent of the Rubbish Bin: "+((ManagerActivityLollipop)context).parentHandleRubbish);
 				if (((ManagerActivityLollipop)context).parentHandleRubbish == megaApi.getRubbishNode().getHandle()||((ManagerActivityLollipop)context).parentHandleRubbish==-1){
 					contentText.setText(MegaApiUtils.getInfoFolder(megaApi.getRubbishNode(), context));
 
@@ -394,11 +391,17 @@ public class RubbishBinFragmentLollipop extends Fragment {
 				emptyTextView.setVisibility(View.VISIBLE);
 
 				if (megaApi.getRubbishNode().getHandle()==((ManagerActivityLollipop)context).parentHandleRubbish||((ManagerActivityLollipop)context).parentHandleRubbish==-1) {
-					emptyImageView.setImageResource(R.drawable.rubbish_bin_empty);
-					emptyTextView.setText(R.string.empty_rubbish_bin);
+					if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+						emptyImageView.setImageResource(R.drawable.rubbish_bin_empty_landscape);
+					}else{
+						emptyImageView.setImageResource(R.drawable.rubbish_bin_empty);
+					}
+					emptyTextViewFirst.setText(R.string.context_empty);
+					String text = getString(R.string.section_rubbish_bin);
+					emptyTextViewSecond.setText(" "+text+".");
 				} else {
 					emptyImageView.setImageResource(R.drawable.ic_empty_folder);
-					emptyTextView.setText(R.string.file_browser_empty_folder);
+					emptyTextViewFirst.setText(R.string.file_browser_empty_folder);
 				}
 			}
 			else{
@@ -427,9 +430,9 @@ public class RubbishBinFragmentLollipop extends Fragment {
 			recyclerView.setItemAnimator(new DefaultItemAnimator());
 			
 			emptyImageView = (ImageView) v.findViewById(R.id.rubbishbin_grid_empty_image);
-			emptyTextView = (TextView) v.findViewById(R.id.rubbishbin_grid_empty_text);
-			emptyImageView.setImageResource(R.drawable.rubbish_bin_empty);
-			emptyTextView.setText(R.string.file_browser_empty_folder);
+			emptyTextView = (LinearLayout) v.findViewById(R.id.rubbishbin_grid_empty_text);
+			emptyTextViewFirst = (TextView) v.findViewById(R.id.rubbishbin_grid_empty_text_first);
+			emptyTextViewSecond = (TextView) v.findViewById(R.id.rubbishbin_grid_empty_text_second);
 
 			contentTextLayout = (RelativeLayout) v.findViewById(R.id.rubbishbin_grid_content_text_layout);
 			contentText = (TextView) v.findViewById(R.id.rubbishbin_grid_content_text);			
@@ -467,11 +470,17 @@ public class RubbishBinFragmentLollipop extends Fragment {
 				emptyTextView.setVisibility(View.VISIBLE);
 
 				if (megaApi.getRubbishNode().getHandle()==((ManagerActivityLollipop)context).parentHandleRubbish||((ManagerActivityLollipop)context).parentHandleRubbish==-1) {
-					emptyImageView.setImageResource(R.drawable.rubbish_bin_empty);
-					emptyTextView.setText(R.string.empty_rubbish_bin);
+					if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+						emptyImageView.setImageResource(R.drawable.rubbish_bin_empty_landscape);
+					}else{
+						emptyImageView.setImageResource(R.drawable.rubbish_bin_empty);
+					}
+					emptyTextViewFirst.setText(R.string.context_empty);
+					String text = getString(R.string.section_rubbish_bin);
+					emptyTextViewSecond.setText(" "+text+".");
 				} else {
 					emptyImageView.setImageResource(R.drawable.ic_empty_folder);
-					emptyTextView.setText(R.string.file_browser_empty_folder);
+					emptyTextViewFirst.setText(R.string.file_browser_empty_folder);
 				}
 			}
 			else{
@@ -546,12 +555,18 @@ public class RubbishBinFragmentLollipop extends Fragment {
 					contentTextLayout.setVisibility(View.GONE);
 					emptyImageView.setVisibility(View.VISIBLE);
 					emptyTextView.setVisibility(View.VISIBLE);
+
 					if (megaApi.getRubbishNode().getHandle()==((ManagerActivityLollipop)context).parentHandleRubbish||((ManagerActivityLollipop)context).parentHandleRubbish==-1) {
-						emptyImageView.setImageResource(R.drawable.rubbish_bin_empty);
-						emptyTextView.setText(R.string.empty_rubbish_bin);
+						if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+							emptyImageView.setImageResource(R.drawable.rubbish_bin_empty_landscape);
+						}else{
+							emptyImageView.setImageResource(R.drawable.rubbish_bin_empty);
+						}						emptyTextViewFirst.setText(R.string.context_empty);
+						String text = getString(R.string.section_rubbish_bin);
+						emptyTextViewSecond.setText(" "+text+".");
 					} else {
 						emptyImageView.setImageResource(R.drawable.ic_empty_folder);
-						emptyTextView.setText(R.string.file_browser_empty_folder);
+						emptyTextViewFirst.setText(R.string.file_browser_empty_folder);
 					}
 				}
 				else{
@@ -775,12 +790,19 @@ public class RubbishBinFragmentLollipop extends Fragment {
 				contentTextLayout.setVisibility(View.GONE);
 				emptyImageView.setVisibility(View.VISIBLE);
 				emptyTextView.setVisibility(View.VISIBLE);
+
 				if (megaApi.getRubbishNode().getHandle()==((ManagerActivityLollipop)context).parentHandleRubbish||((ManagerActivityLollipop)context).parentHandleRubbish==-1) {
-					emptyImageView.setImageResource(R.drawable.rubbish_bin_empty);
-					emptyTextView.setText(R.string.empty_rubbish_bin);
+					if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+						emptyImageView.setImageResource(R.drawable.rubbish_bin_empty_landscape);
+					}else{
+						emptyImageView.setImageResource(R.drawable.rubbish_bin_empty);
+					}
+					emptyTextViewFirst.setText(R.string.context_empty);
+					String text = getString(R.string.section_rubbish_bin);
+					emptyTextViewSecond.setText(" "+text+".");
 				} else {
 					emptyImageView.setImageResource(R.drawable.ic_empty_folder);
-					emptyTextView.setText(R.string.file_browser_empty_folder);
+					emptyTextViewFirst.setText(R.string.file_browser_empty_folder);
 				}
 			}
 			else{

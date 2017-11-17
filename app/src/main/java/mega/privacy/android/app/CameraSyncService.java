@@ -94,6 +94,8 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 	static public boolean running = false;
 	private boolean canceled;
 
+	private boolean isOverquota = false;
+
 	private Handler handler;
 
 //	private CameraObserver cameraObserver;
@@ -149,6 +151,7 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 
 			if(e.getErrorCode()==MegaChatError.ERROR_OK){
 				log("Connected to chat!");
+				MegaApplication.setChatConnection(true);
 			}
 			else{
 				log("EEEERRRRROR WHEN CONNECTING " + e.getErrorString());
@@ -214,6 +217,7 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 
 		handler = new Handler();
 		canceled = false;
+		isOverquota = false;
 		newFileList = false;
 //		waitForOnNodesUpdate = false;
 
@@ -622,10 +626,9 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 		}
 		else{
 			MegaNode n = megaApi.getNodeByHandle(cameraUploadHandle);
-			log("If ERROR with the handler (the node may not longer exist): Create the folder Camera Uploads");
 			if(n==null){
+				log("Node with cameraUploadHandle is not NULL");
 				cameraUploadHandle = -1;
-				log("Find the Camera Uploads folder of the old PhotoSync");
 				for (int i=0;i<nl.size();i++){
 					if ((CAMERA_UPLOADS.compareTo(nl.get(i).getName()) == 0) && (nl.get(i).isFolder())){
 						cameraUploadHandle = nl.get(i).getHandle();
@@ -638,9 +641,8 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 					}
 				}
 
-				log("If not Camera Uploads nor Photosync");
 				if (cameraUploadHandle == -1){
-					log("must create the folder");
+					log("If not Camera Uploads nor Photosync--- must create the folder");
 					if (!running){
 						running = true;
 						megaApi.createFolder(CAMERA_UPLOADS, megaApi.getRootNode(), this);
@@ -788,7 +790,7 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 	}
 
 	void initSync() throws SecurityException{
-		log("void initSync() throws SecurityException");
+		log("initSync");
 
 		if(!wl.isHeld()){
 			wl.acquire();
@@ -1018,6 +1020,7 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 					}
 					ArrayList<DocumentFile> auxCameraFilesExternalSDCard = new ArrayList<DocumentFile>();
 					for (int i=0;i<files.length;i++){
+						log("Name to check: "+ files[i].getName());
 						switch(Integer.parseInt(prefs.getCamSyncFileUpload())){
 							case MegaPreferences.ONLY_PHOTOS:{
 								String fileType = files[i].getType();
@@ -1025,6 +1028,12 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 									if (fileType.startsWith("image/")){
 										auxCameraFilesExternalSDCard.add(files[i]);
 									}
+									else{
+										log("No image");
+									}
+								}
+								else{
+									log("File is null");
 								}
 								break;
 							}
@@ -1899,12 +1908,35 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 		if((wl != null) && (wl.isHeld()))
 			try{ wl.release(); } catch(Exception ex) {}
 
+		if(isOverquota){
+			showStorageOverquotaNotification();
+		}
+
 		canceled = true;
 		isForeground = false;
 		running = false;
 		stopForeground(true);
 		mNotificationManager.cancel(notificationId);
 		stopSelf();
+	}
+
+	private void showStorageOverquotaNotification(){
+		log("showStorageOverquotaNotification");
+
+		String contentText = getString(R.string.download_show_info);
+		String message = getString(R.string.overquota_alert_title);
+
+		Intent intent = new Intent(this, ManagerActivityLollipop.class);
+		intent.setAction(Constants.ACTION_OVERQUOTA_STORAGE);
+
+		mBuilderCompat
+				.setSmallIcon(R.drawable.ic_stat_camera_sync)
+				.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
+				.setAutoCancel(true).setTicker(contentText)
+				.setContentTitle(message).setContentText(contentText)
+				.setOngoing(false);
+
+		mNotificationManager.notify(notificationIdFinal, mBuilderCompat.build());
 	}
 
 	public void retryLater(){
@@ -2065,7 +2097,7 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 					boolean chatEnabled = Boolean.parseBoolean(chatSettings.getEnabled());
 					if(chatEnabled){
 						log("Chat enabled-->connect");
-						megaChatApi.connect(this);
+						megaChatApi.connectInBackground(this);
 						isLoggingIn = false;
 						MegaApplication.setLoggingIn(isLoggingIn);
 						retryLaterShortTime();
@@ -2253,6 +2285,11 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 			CameraSyncService.this.cancel();
 		}
 		else{
+
+			if(isOverquota){
+				return;
+			}
+
 			if (e.getErrorCode() == MegaError.API_OK) {
 				log("Image Sync OK: " + transfer.getFileName());
 				totalSizeUploaded += transfer.getTransferredBytes();
@@ -2333,11 +2370,9 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 			else if(e.getErrorCode()==MegaError.API_EOVERQUOTA){
 				log("OVERQUOTA ERROR: "+e.getErrorCode());
 
-				Intent intent = null;
-				intent = new Intent(this, ManagerActivityLollipop.class);
-				intent.setAction(Constants.ACTION_OVERQUOTA_ALERT);
-				intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-				startActivity(intent);
+				isOverquota = true;
+
+				CameraSyncService.this.cancel();
 
 			}
 			else{
@@ -2362,6 +2397,10 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 			return;
 		}
 
+		if(isOverquota){
+			return;
+		}
+
 		final long bytes = transfer.getTransferredBytes();
 //		log("Transfer update: " + transfer.getFileName() + "  Bytes: " + bytes);
 		updateProgressNotification(totalSizeUploaded + bytes);
@@ -2370,20 +2409,6 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 	@Override
 	public void onTransferTemporaryError(MegaApiJava api, MegaTransfer transfer, MegaError e) {
 		log("onTransferTemporaryError: " + transfer.getFileName());
-
-		if(e.getErrorCode() == MegaError.API_EOVERQUOTA) {
-			log("API_EOVERQUOTA error!!");
-
-			Intent intent = null;
-			intent = new Intent(this, ManagerActivityLollipop.class);
-			intent.setAction(Constants.ACTION_OVERQUOTA_TRANSFER);
-			intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-			startActivity(intent);
-
-			megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD, this);
-			CameraSyncService.this.cancel();
-			//Cancel all tranfers too - discuss
-		}
 	}
 
 	@SuppressWarnings("deprecation")

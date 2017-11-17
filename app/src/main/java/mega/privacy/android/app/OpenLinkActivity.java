@@ -33,6 +33,8 @@ public class OpenLinkActivity extends PinActivity implements MegaRequestListener
 	MegaApiAndroid megaApi;
 	MegaChatApiAndroid megaChatApi;
 	DatabaseHandler dbH = null;
+
+	static OpenLinkActivity openLinkActivity = null;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState){
@@ -45,6 +47,8 @@ public class OpenLinkActivity extends PinActivity implements MegaRequestListener
 		Intent intent = getIntent();
 		String url = intent.getDataString();
 		log("Original url: " + url);
+
+		openLinkActivity = this;
 		
 		try {
 			url = URLDecoder.decode(url, "UTF-8");
@@ -185,6 +189,40 @@ public class OpenLinkActivity extends PinActivity implements MegaRequestListener
 					builder.setPositiveButton(getString(R.string.cam_sync_ok),
 							new DialogInterface.OnClickListener() {
 								public void onClick(DialogInterface dialog, int whichButton) {
+									finish();
+								}
+							});
+					builder.show();
+				}
+			}
+			return;
+		}
+
+		// New mwssage chat- user must be logged IN
+		if (url != null && (url.matches("^https://mega.co.nz/#fm/chat")||url.matches("^https://mega.nz/#fm/chat"))) {
+			log("new message chat url");
+
+			if (dbH == null){
+				dbH = DatabaseHandler.getDbHandler(getApplicationContext());
+			}
+			if (dbH != null) {
+				if (dbH.getCredentials() != null) {
+					log("Logged IN"); //Check fetch nodes is already done in ManagerActivity
+					Intent chatIntent = new Intent(this, ManagerActivityLollipop.class);
+					chatIntent.setAction(Constants.ACTION_CHAT_SUMMARY);
+					startActivity(chatIntent);
+					finish();
+				} else {
+					log("Not logged");
+					AlertDialog.Builder builder;
+					builder = new AlertDialog.Builder(this);
+					builder.setMessage(R.string.alert_not_logged_in);
+					builder.setPositiveButton(getString(R.string.cam_sync_ok),	new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog, int whichButton) {
+									Intent intent = new Intent(openLinkActivity, LoginActivityLollipop.class);
+									intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
+									intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+									startActivity(intent);
 									finish();
 								}
 							});

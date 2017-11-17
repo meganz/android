@@ -20,7 +20,6 @@ import android.os.PowerManager.WakeLock;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.FileProvider;
 import android.text.format.Formatter;
-import android.util.SparseArray;
 import android.widget.RemoteViews;
 import android.widget.Toast;
 
@@ -36,7 +35,6 @@ import java.util.Map;
 
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
-import mega.privacy.android.app.lollipop.ZipBrowserActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
@@ -596,15 +594,21 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 						if (MegaApiUtils.isIntentAvailable(this, viewIntent))
 							startActivity(viewIntent);
 						else {
-							Intent intentShare = new Intent(Intent.ACTION_SEND);
-							if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-								intentShare.setDataAndType(FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
-							} else {
-								intentShare.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
+							viewIntent.setAction(Intent.ACTION_GET_CONTENT);
+
+							if (MegaApiUtils.isIntentAvailable(this, viewIntent))
+								startActivity(viewIntent);
+							else {
+								Intent intentShare = new Intent(Intent.ACTION_SEND);
+								if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+									intentShare.setDataAndType(FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
+								} else {
+									intentShare.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
+								}
+								intentShare.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+								intentShare.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+								startActivity(intentShare);
 							}
-							intentShare.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-							intentShare.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-							startActivity(intentShare);
 						}
 					} else if (MimeTypeList.typeForName(currentFile.getName()).isImage()) {
 						log("Download is IMAGE");
@@ -643,14 +647,25 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 						}
 						intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 
-						if (!MegaApiUtils.isIntentAvailable(DownloadService.this, intent)) {
-							intent.setAction(Intent.ACTION_SEND);
-							if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-								intent.setDataAndType(FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
-							} else {
-								intent.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
+						if (MegaApiUtils.isIntentAvailable(this, intent))
+							startActivity(intent);
+						else {
+							log("Not intent available for ACTION_VIEW");
+							intent.setAction(Intent.ACTION_GET_CONTENT);
+
+							if (MegaApiUtils.isIntentAvailable(this, intent))
+								startActivity(intent);
+							else {
+								log("Not intent available for ACTION_GET_CONTENT");
+								intent.setAction(Intent.ACTION_SEND);
+								if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+									intent.setDataAndType(FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
+								} else {
+									intent.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
+								}
+								intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+								startActivity(intent);
 							}
-							intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 						}
 
 						log("Show notification");
@@ -806,8 +821,8 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		}
 	}
 
-	private void showOverquotaNotification(){
-		log("showOverquotaNotification");
+	private void showTransferOverquotaNotification(){
+		log("showTransferOverquotaNotification");
 
 		long totalSizePendingTransfer = megaApi.getTotalDownloadBytes() + megaApiFolder.getTotalDownloadBytes();
 		long totalSizeTransferred = megaApi.getTotalDownloadedBytes() + megaApiFolder.getTotalDownloadedBytes();
@@ -1645,16 +1660,18 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		if(e.getErrorCode() == MegaError.API_EOVERQUOTA) {
 			log("API_EOVERQUOTA error!!");
 
-			UserCredentials credentials = dbH.getCredentials();
-			if(credentials!=null){
-				log("Credentials is NOT null");
+			if(transfer.getType()==MegaTransfer.TYPE_DOWNLOAD){
+				UserCredentials credentials = dbH.getCredentials();
+				if(credentials!=null){
+					log("Credentials is NOT null");
+				}
+
+				downloadedBytesToOverquota = megaApi.getTotalDownloadedBytes() + megaApiFolder.getTotalDownloadedBytes();
+				isOverquota = true;
+				log("downloaded bytes to reach overquota: "+downloadedBytesToOverquota);
+
+				showTransferOverquotaNotification();
 			}
-
-			downloadedBytesToOverquota = megaApi.getTotalDownloadedBytes() + megaApiFolder.getTotalDownloadedBytes();
-			isOverquota = true;
-			log("downloaded bytes to reach overquota: "+downloadedBytesToOverquota);
-
-			showOverquotaNotification();
 		}
 	}
 
@@ -1700,7 +1717,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 					boolean chatEnabled = Boolean.parseBoolean(chatSettings.getEnabled());
 					if(chatEnabled){
 						log("Chat enabled-->connect");
-						megaChatApi.connect(this);
+						megaChatApi.connectInBackground(this);
 						isLoggingIn = false;
 						MegaApplication.setLoggingIn(isLoggingIn);
 					}
@@ -1801,6 +1818,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 			if(e.getErrorCode()==MegaChatError.ERROR_OK){
 				log("Connected to chat!");
+                MegaApplication.setChatConnection(true);
 			}
 			else{
 				log("EEEERRRRROR WHEN CONNECTING " + e.getErrorString());

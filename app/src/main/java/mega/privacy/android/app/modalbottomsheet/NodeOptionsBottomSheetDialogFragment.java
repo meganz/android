@@ -320,6 +320,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                         optionRemove.setVisibility(View.GONE);
                         optionLeaveShares.setVisibility(View.GONE);
                         optionOpenFolder.setVisibility(View.GONE);
+
                     } else if (tabSelected == 1) {
                         log("show Rubbish bottom sheet");
                         if (node.isFolder()) {
@@ -333,7 +334,6 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                         optionMove.setVisibility(View.VISIBLE);
                         optionRemove.setVisibility(View.VISIBLE);
                         optionInfo.setVisibility(View.VISIBLE);
-                        optionDownload.setVisibility(View.VISIBLE);
                         optionRename.setVisibility(View.VISIBLE);
                         optionCopy.setVisibility(View.VISIBLE);
 
@@ -346,6 +346,8 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                         optionLink.setVisibility(View.GONE);
                         optionRemoveLink.setVisibility(View.GONE);
                         optionOpenFolder.setVisibility(View.GONE);
+                        optionDownload.setVisibility(View.GONE);
+
                     }
                     break;
 
@@ -475,12 +477,16 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                                 optionRemoveLink.setVisibility(View.GONE);
                                 optionClearShares.setVisibility(View.GONE);
                                 optionRename.setVisibility(View.VISIBLE);
-                                optionMove.setVisibility(View.GONE);
+                                //optionMove.setVisibility(View.GONE);
 
                                 if (dBT > 0) {
                                     optionRubbishBin.setVisibility(View.VISIBLE);
+                                    optionMove.setVisibility(View.VISIBLE);
+
                                 } else {
                                     optionRubbishBin.setVisibility(View.GONE);
+                                    optionMove.setVisibility(View.GONE);
+
                                 }
 
                                 break;
