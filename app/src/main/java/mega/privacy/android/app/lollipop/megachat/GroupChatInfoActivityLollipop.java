@@ -759,7 +759,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         else{
             log("There is already a chat, open it!");
             Intent intentOpenChat = new Intent(this, ChatActivityLollipop.class);
-            intentOpenChat.setAction(Constants.ACTION_CHAT_SHOW_MESSAGES);
+            intentOpenChat.setAction(Constants.ACTION_NEW_CHAT);
             intentOpenChat.putExtra("CHAT_ID", chat.getChatId());
             this.startActivity(intentOpenChat);
         }
@@ -1521,10 +1521,9 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
                 log("open new chat");
                 Intent intent = new Intent(this, ChatActivityLollipop.class);
-                intent.setAction(Constants.ACTION_CHAT_NEW);
+                intent.setAction(Constants.ACTION_NEW_CHAT);
                 intent.putExtra("CHAT_ID", request.getChatHandle());
                 this.startActivity(intent);
-
             }
             else{
                 log("EEEERRRRROR WHEN CREATING CHAT " + e.getErrorString());

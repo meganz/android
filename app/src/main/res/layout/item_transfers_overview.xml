@@ -5,27 +5,39 @@
     android:background="@drawable/statelist_item_layout"
     android:id="@+id/transfers_overview_item_layout" >
 
-    <ImageButton 
-        android:id="@+id/transfers_overview_three_dots"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/ic_dots_vertical_grey"
-		android:background="@null"
-		android:layout_marginRight="10dp"
-        android:layout_alignParentRight="true"
-		android:layout_centerVertical="true" />
+	<RelativeLayout
+		android:id="@+id/transfers_overview_three_dots_layout"
+		android:layout_width="wrap_content"
+		android:layout_height="match_parent"
+		android:layout_alignParentRight="true">
 
-    <ImageButton
-        android:id="@+id/transfers_overview_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-		android:background="@null"
-        android:layout_centerVertical="true"
-		android:layout_marginRight="12dp"
-		android:layout_marginLeft="12dp"
-		android:alpha="0.54"
-		android:src="@drawable/ic_pause"
-        android:layout_toLeftOf="@id/transfers_overview_three_dots"/>
+		<ImageView
+			android:id="@+id/transfers_overview_three_dots"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:src="@drawable/ic_dots_vertical_grey"
+			android:background="@null"
+			android:layout_marginRight="10dp"
+			android:layout_centerVertical="true" />
+	</RelativeLayout>
+
+	<RelativeLayout
+		android:id="@+id/transfers_overview_action_layout"
+		android:layout_width="wrap_content"
+		android:layout_height="match_parent"
+		android:layout_centerVertical="true"
+		android:gravity="center_vertical"
+		android:layout_toLeftOf="@id/transfers_overview_three_dots_layout">
+		<ImageView
+			android:id="@+id/transfers_overview_button"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:background="@null"
+			android:layout_marginRight="12dp"
+			android:layout_marginLeft="12dp"
+			android:alpha="0.54"
+			android:src="@drawable/ic_pause"/>
+	</RelativeLayout>
         
 	<TextView
 		android:id="@+id/transfers_overview_title"

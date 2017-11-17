@@ -477,12 +477,16 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                                 optionRemoveLink.setVisibility(View.GONE);
                                 optionClearShares.setVisibility(View.GONE);
                                 optionRename.setVisibility(View.VISIBLE);
-                                optionMove.setVisibility(View.GONE);
+                                //optionMove.setVisibility(View.GONE);
 
                                 if (dBT > 0) {
                                     optionRubbishBin.setVisibility(View.VISIBLE);
+                                    optionMove.setVisibility(View.VISIBLE);
+
                                 } else {
                                     optionRubbishBin.setVisibility(View.GONE);
+                                    optionMove.setVisibility(View.GONE);
+
                                 }
 
                                 break;

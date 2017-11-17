@@ -110,24 +110,27 @@
         android:id="@+id/recent_chat_list_unread_layout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginRight="18dp"
         android:layout_centerVertical="true"
-        android:layout_toLeftOf="@+id/recent_chat_list_three_dots">
+        android:layout_toLeftOf="@+id/recent_chat_list_three_dots"
+        android:layout_toRightOf="@id/recent_chat_list_content">
 
-        <ImageView
+        <RelativeLayout
             android:id="@+id/recent_chat_list_unread_circle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:scaleType="fitCenter"/>
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="2dp"
+            android:scaleType="fitCenter">
 
-        <TextView
-            android:id="@+id/recent_chat_list_unread_number"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="14sp"
-            android:layout_centerHorizontal="true"
-            android:textColor="@color/white"
-            android:paddingBottom="1dp" />
+            <TextView
+                android:id="@+id/recent_chat_list_unread_number"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:layout_centerInParent="true"
+                android:textColor="@color/white"
+                android:paddingBottom="1dp"/>
+            </RelativeLayout>
     </RelativeLayout>
 
 </RelativeLayout>

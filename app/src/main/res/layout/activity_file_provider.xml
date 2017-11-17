@@ -23,7 +23,7 @@
         android:layout_height="48dp"
         android:gravity="right|center_vertical"
         android:layout_alignParentBottom="true"
-        android:background="@color/white"
+        android:background="@color/participants_layout"
         android:orientation="horizontal" >
 
         <Button
@@ -32,7 +32,8 @@
             android:layout_height="wrap_content"
             android:textColor="@color/accentColor"
             android:stateListAnimator="@null"
-            android:background="@color/white"
+            android:background="@color/participants_layout"
+            android:text="@string/general_cancel"
             android:gravity="center_vertical|center_horizontal"/>
 
         <Button
@@ -41,8 +42,10 @@
             android:layout_height="wrap_content"
             android:textColor="@color/accentColor"
             android:stateListAnimator="@null"
-            android:background="@color/white"
+            android:text="@string/general_attach"
+            android:background="@color/participants_layout"
             android:gravity="center_vertical|center_horizontal"/>
+
     </LinearLayout>
 
     <View

@@ -3,14 +3,23 @@
     android:layout_height="72dp"
     android:descendantFocusability="blocksDescendants"
     android:id="@+id/offline_list_item_layout" >
-    
+
+    <ImageView
+        android:id="@+id/file_list_saved_offline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_cloud_saved_offline"
+        android:background="@null"
+        android:layout_centerVertical="true"
+        android:visibility="invisible"/>
+
     <ImageView
         android:id="@+id/offline_list_thumbnail"
         android:layout_width="48dp"
         android:layout_height="48dp"
-        android:layout_marginLeft="12dp" 
         android:scaleType="fitCenter"
-        android:layout_centerVertical="true"/>
+        android:layout_centerVertical="true"
+        android:layout_toRightOf="@id/file_list_saved_offline"/>
     
     <TextView
         android:id="@+id/offline_list_filename"
@@ -36,15 +45,23 @@
         android:textSize="14sp"
         android:ellipsize="end"
         android:maxLines="1"/>   
-    
-    <ImageButton 
-        android:id="@+id/offline_list_three_dots"
+
+    <RelativeLayout
+        android:id="@+id/offline_list_three_dots_layout"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/ic_dots_vertical_grey"
-		android:background="@null" 
-        android:layout_alignParentRight="true"
-		android:layout_centerVertical="true" />
+        android:layout_height="match_parent"
+        android:layout_alignParentRight="true">
+
+        <ImageView
+            android:id="@+id/offline_list_three_dots"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_dots_vertical_grey"
+            android:background="@null"
+            android:layout_marginRight="10dp"
+            android:layout_centerVertical="true" />
+
+    </RelativeLayout>
      <!--
     <ImageView
         android:id="@+id/offline_list_arrow_selection"
