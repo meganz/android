@@ -124,7 +124,8 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 	private String lastPassword;
 	private String gPublicKey;
 	private String gPrivateKey;
-	
+
+
 	private MenuItem searchMenuItem;
 
 	CountDownTimer timer;
@@ -387,7 +388,6 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 				LinearLayout.LayoutParams cancelButtonParams = (LinearLayout.LayoutParams)cancelButton.getLayoutParams();
 				cancelButtonParams.setMargins(Util.scaleWidthPx(10, metrics), 0, 0, 0);
 				cancelButton.setLayoutParams(cancelButtonParams);
-
 
 				attachButton = (Button) findViewById(R.id.attach_button);
 				attachButton.setOnClickListener(this);
@@ -822,7 +822,6 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 				break;
 			}
 			case R.id.attach_button:{
-
 				ProgressDialog temp = null;
 				try{
 					temp = new ProgressDialog(this);
@@ -1334,15 +1333,9 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 
 		cancelButton = (Button) findViewById(R.id.cancel_button);
 		cancelButton.setOnClickListener(this);
-		cancelButton.setText(getString(R.string.general_cancel).toUpperCase(Locale.getDefault()));
-		//Left and Right margin
-		LinearLayout.LayoutParams cancelButtonParams = (LinearLayout.LayoutParams)cancelButton.getLayoutParams();
-		cancelButtonParams.setMargins(Util.scaleWidthPx(10, metrics), 0, 0, 0);
-		cancelButton.setLayoutParams(cancelButtonParams);
 
 		attachButton = (Button) findViewById(R.id.attach_button);
 		attachButton.setOnClickListener(this);
-		attachButton.setText(getString(R.string.general_attach));
 		activateButton(false);
 
 		//TABS section

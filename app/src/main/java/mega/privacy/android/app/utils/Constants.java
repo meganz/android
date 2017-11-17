@@ -40,6 +40,8 @@ public class Constants {
 	public static String ACTION_CONFIRM = "MEGA_ACTION_CONFIRM";
 	public static String EXTRA_CONFIRMATION = "MEGA_EXTRA_CONFIRMATION";
 
+	public static String ACTION_FORWARD_MESSAGES = "ACTION_FORWARD_MESSAGES";
+
 	public static String SHOW_REPEATED_UPLOAD = "SHOW_REPEATED_UPLOAD";
 
 	//MultipleRequestListener options
@@ -110,7 +112,7 @@ public class Constants {
 	public static String EXTRA_PATH_ZIP = "PATH_ZIP";
 	public static String EXTRA_OPEN_FOLDER = "EXTRA_OPEN_FOLER";
 	public static String ACTION_REFRESH_PARENTHANDLE_BROWSER = "REFRESH_PARENTHANDLE_BROWSER";
-	public static String ACTION_OVERQUOTA_ALERT = "OVERQUOTA_ALERT";
+	public static String ACTION_OVERQUOTA_STORAGE = "OVERQUOTA_STORAGE";
 	public static String ACTION_TAKE_SELFIE = "TAKE_SELFIE";
 	public static String ACTION_SHOW_TRANSFERS = "SHOW_TRANSFERS";
 	public static String ACTION_EXPORT_MASTER_KEY = "EXPORT_MASTER_KEY";
@@ -130,7 +132,6 @@ public class Constants {
 	public static String ACTION_INCOMING_SHARED_FOLDER_NOTIFICATION = "ACTION_INCOMING_SHARED_FOLDER_NOTIFICATION";
 	public static String ACTION_OPEN_HANDLE_NODE = "ACTION_OPEN_HANDLE_NODE";
 
-	public static String ACTION_CHAT_NEW = "CHAT_NEW";
 	public static String ACTION_CHAT_SHOW_MESSAGES = "CHAT_SHOW_MESSAGES";
 	public static String ACTION_NEW_CHAT = "NEW_CHAT";
 	public static String ACTION_CLEAR_CHAT = "CLEAR_CHAT";

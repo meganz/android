@@ -98,8 +98,9 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 	RelativeLayout transfersOverViewLayout;
 	TextView transfersTitleText;
 	TextView transfersNumberText;
-	ImageButton playButton;
-	ImageButton dotsOptionsTransfers;
+	ImageView playButton;
+	RelativeLayout actionLayout;
+	RelativeLayout dotsOptionsTransfersLayout;
 
 	float density;
 	DisplayMetrics outMetrics;
@@ -566,8 +567,9 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			transfersOverViewLayout = (RelativeLayout) v.findViewById(R.id.transfers_overview_item_layout);
 			transfersTitleText = (TextView) v.findViewById(R.id.transfers_overview_title);
 			transfersNumberText = (TextView) v.findViewById(R.id.transfers_overview_number);
-			playButton = (ImageButton) v.findViewById(R.id.transfers_overview_button);
-			dotsOptionsTransfers = (ImageButton) v.findViewById(R.id.transfers_overview_three_dots);
+			playButton = (ImageView) v.findViewById(R.id.transfers_overview_button);
+			actionLayout = (RelativeLayout) v.findViewById(R.id.transfers_overview_action_layout);
+			dotsOptionsTransfersLayout = (RelativeLayout) v.findViewById(R.id.transfers_overview_three_dots_layout);
 			progressBar = (ProgressBar) v.findViewById(R.id.transfers_overview_progress_bar);
 
 			transfersOverViewLayout.setOnClickListener(this);
@@ -693,8 +695,8 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 				log("Transfers in progress");
 				contentTextLayout.setVisibility(View.GONE);
 				transfersOverViewLayout.setVisibility(View.VISIBLE);
-				dotsOptionsTransfers.setOnClickListener(this);
-				playButton.setOnClickListener(this);
+				dotsOptionsTransfersLayout.setOnClickListener(this);
+				actionLayout.setOnClickListener(this);
 
 				updateTransferButton();
 
@@ -729,8 +731,8 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 					setContentText();
 				}
 				transfersOverViewLayout.setVisibility(View.GONE);
-				dotsOptionsTransfers.setOnClickListener(null);
-				playButton.setOnClickListener(null);
+				dotsOptionsTransfersLayout.setOnClickListener(null);
+				actionLayout.setOnClickListener(null);
 
 				RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) recyclerView.getLayoutParams();
 				params.addRule(RelativeLayout.BELOW, contentTextLayout.getId());
@@ -763,12 +765,12 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 		switch(v.getId()) {
 
-			case R.id.transfers_overview_three_dots:{
+			case R.id.transfers_overview_three_dots_layout:{
 				log("click show options");
 				((ManagerActivityLollipop) getActivity()).showTransfersPanel();
 				break;
 			}
-			case R.id.transfers_overview_button:{
+			case R.id.transfers_overview_action_layout:{
 				log("click play/pause");
 
 				((ManagerActivityLollipop) getActivity()).changeTransfersStatus();
