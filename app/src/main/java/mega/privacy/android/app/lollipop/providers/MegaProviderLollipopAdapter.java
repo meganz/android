@@ -31,6 +31,7 @@ import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
+import mega.privacy.android.app.utils.ThumbnailUtils;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -365,7 +366,7 @@ public class MegaProviderLollipopAdapter extends RecyclerView.Adapter<MegaProvid
 					holder.imageView.setImageResource(R.drawable.ic_select_folder);
 				}
 				else{
-					holder.itemLayout.setBackgroundColor(Color.WHITE);
+					holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.white));
 
 					if (node.hasThumbnail()){
 
@@ -377,12 +378,12 @@ public class MegaProviderLollipopAdapter extends RecyclerView.Adapter<MegaProvid
 
 						holder.imageView.setLayoutParams(params1);
 
-						thumb = ThumbnailUtilsLollipop.getThumbnailFromCache(node);
+						thumb = ThumbnailUtils.getThumbnailFromCache(node);
 						if (thumb != null){
 							holder.imageView.setImageBitmap(thumb);
 						}
 						else{
-							thumb = ThumbnailUtilsLollipop.getThumbnailFromFolder(node, context);
+							thumb = ThumbnailUtils.getThumbnailFromFolder(node, context);
 							if (thumb != null){
 								holder.imageView.setImageBitmap(thumb);
 							}
@@ -398,7 +399,7 @@ public class MegaProviderLollipopAdapter extends RecyclerView.Adapter<MegaProvid
 							}
 						}
 					}else{
-						thumb = ThumbnailUtilsLollipop.getThumbnailFromCache(node);
+						thumb = ThumbnailUtils.getThumbnailFromCache(node);
 						if (thumb != null){
 
 							RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
@@ -411,7 +412,7 @@ public class MegaProviderLollipopAdapter extends RecyclerView.Adapter<MegaProvid
 							holder.imageView.setImageBitmap(thumb);
 						}
 						else{
-							thumb = ThumbnailUtilsLollipop.getThumbnailFromFolder(node, context);
+							thumb = ThumbnailUtils.getThumbnailFromFolder(node, context);
 							if (thumb != null){
 								RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
 								params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
@@ -423,6 +424,7 @@ public class MegaProviderLollipopAdapter extends RecyclerView.Adapter<MegaProvid
 								holder.imageView.setImageBitmap(thumb);
 							}
 							else{
+								holder.imageView.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
 								try{
 									ThumbnailUtilsLollipop.createThumbnailProviderLollipop(context, node, holder, megaApi, this);
 								}
