@@ -40,6 +40,7 @@ import mega.privacy.android.app.lollipop.FolderLinkActivityLollipop;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.GetLinkActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.ZipBrowserActivityLollipop;
 import mega.privacy.android.app.lollipop.listeners.MultipleRequestListener;
 import mega.privacy.android.app.utils.Constants;
@@ -715,6 +716,20 @@ public class NodeController {
 
                             context.startActivity(intentZip);
 
+                        }
+                        if (MimeTypeList.typeForName(tempNode.getName()).isPdf()){
+                            log("Pdf file");
+                            File pdfFile = new File(localPath);
+
+                            Intent pdfIntent = new Intent(context, PdfViewerActivityLollipop.class);
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                                pdfIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", new File(localPath)), MimeTypeList.typeForName(tempNode.getName()).getType());
+                            }
+                            else{
+                                pdfIntent.setDataAndType(Uri.fromFile(new File(localPath)), MimeTypeList.typeForName(tempNode.getName()).getType());
+                            }
+                            pdfIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                            context.startActivity(pdfIntent);
                         }
                         else {
                             log("MimeTypeList other file");

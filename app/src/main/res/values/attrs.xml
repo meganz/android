@@ -91,4 +91,11 @@
     </declare-styleable>
     <!-- Default style for the Switch widget. -->
     <attr name="mySwitchStyleAttr" format="reference" />
+
+    <declare-styleable name="ScrollBar">
+        <attr name="sb_handlerColor" format="color|reference" />
+        <attr name="sb_indicatorColor" format="color|reference" />
+        <attr name="sb_indicatorTextColor" format="color|reference" />
+        <attr name="sb_horizontal" format="boolean|reference" />
+    </declare-styleable>
 </resources>
