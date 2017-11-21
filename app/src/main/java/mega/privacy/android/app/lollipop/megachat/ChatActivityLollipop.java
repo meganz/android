@@ -46,6 +46,7 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.regex.Pattern;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
