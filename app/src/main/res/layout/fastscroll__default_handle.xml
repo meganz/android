@@ -17,4 +17,5 @@
     android:layout_marginRight="-20dp"
     android:padding="10dp"
     android:layout_alignParentTop="true"
-    android:layout_marginLeft="5dp"/>
+    android:layout_marginLeft="5dp"
+    android:visibility="invisible"/>

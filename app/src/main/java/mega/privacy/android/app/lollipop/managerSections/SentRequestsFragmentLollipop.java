@@ -320,7 +320,6 @@ public class SentRequestsFragmentLollipop extends Fragment {
     	if (isList){
 	        View v = inflater.inflate(R.layout.contacts_sent_requests_tab, container, false);			
 	        listView = (RecyclerView) v.findViewById(R.id.incoming_contacts_list_view);
-			listView.setScrollBarStyle(View.SCROLLBARS_OUTSIDE_INSET);
 			listView.setPadding(0, 0, 0, Util.scaleHeightPx(85, outMetrics));
 	        listView.setClipToPadding(false);;
 			

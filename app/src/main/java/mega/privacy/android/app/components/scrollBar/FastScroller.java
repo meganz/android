@@ -16,11 +16,6 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.scrollBar.viewprovider.DefaultScrollerViewProvider;
 import mega.privacy.android.app.components.scrollBar.viewprovider.ScrollerViewProvider;
 
-//            bubbleColor = getResources().getColor(R.color.scroll_bubble);
-//            handleColor = getResources().getColor(R.color.scroll_handle);
-//            bubbleTextAppearance = R.style.StyledScrollerTextAppearance;
-
-
 public class FastScroller extends LinearLayout {
 
     private static final int STYLE_NONE = -1;
@@ -32,10 +27,9 @@ public class FastScroller extends LinearLayout {
     private TextView bubbleTextView;
 
     private int bubbleOffset;
-    //private int handleColor;
-   // private int bubbleColor;
     private int bubbleTextAppearance;
     private int scrollerOrientation;
+    private boolean handleVisibility;
 
     private int maxVisibility;
 
@@ -57,8 +51,6 @@ public class FastScroller extends LinearLayout {
         setClipChildren(false);
         TypedArray style = context.obtainStyledAttributes(attrs, R.styleable.fastscroll__fastScroller, R.attr.fastscroll__style, 0);
         try {
-            //bubbleColor = style.getColor(R.styleable.fastscroll__fastScroller_fastscroll__bubbleColor, getResources().getColor(R.color.scroll_bubble));
-            //handleColor = style.getColor(R.styleable.fastscroll__fastScroller_fastscroll__handleColor, getResources().getColor(R.color.scroll_handle));
             bubbleTextAppearance = style.getResourceId(R.styleable.fastscroll__fastScroller_fastscroll__bubbleTextAppearance, R.style.StyledScrollerTextAppearance);
         } finally {
             style.recycle();
@@ -67,33 +59,24 @@ public class FastScroller extends LinearLayout {
         setViewProvider(new DefaultScrollerViewProvider());
     }
 
-    /**
-     * Enables custom layout for {@link FastScroller}.
-     *
-     * @param viewProvider A {@link ScrollerViewProvider} for the {@link FastScroller} to use when building layout.
-     */
     public void setViewProvider(ScrollerViewProvider viewProvider) {
         removeAllViews();
         this.viewProvider = viewProvider;
         viewProvider.setFastScroller(this);
         bubble = viewProvider.provideBubbleView(this);
-        handle = viewProvider.provideHandleView(this);
         bubbleTextView = viewProvider.provideBubbleTextView();
         addView(bubble);
+        handle = viewProvider.provideHandleView(this);
         addView(handle);
+
     }
 
-    /**
-     * Attach the {@link FastScroller} to {@link RecyclerView}. Should be used after the adapter is set
-     * to the {@link RecyclerView}. If the adapter implements SectionTitleProvider, the FastScroller
-     * will show a bubble with title.
-     *
-     * @param recyclerView A {@link RecyclerView} to attach the {@link FastScroller} to.
-     */
     public void setRecyclerView(RecyclerView recyclerView) {
         this.recyclerView = recyclerView;
+
         if (recyclerView.getAdapter() instanceof SectionTitleProvider)
             titleProvider = (SectionTitleProvider) recyclerView.getAdapter();
+
         recyclerView.addOnScrollListener(scrollListener);
         invalidateVisibility();
         recyclerView.setOnHierarchyChangeListener(new OnHierarchyChangeListener() {
@@ -109,52 +92,16 @@ public class FastScroller extends LinearLayout {
         });
     }
 
-    /**
-     * Set the orientation of the {@link FastScroller}. The orientation of the {@link FastScroller}
-     * should generally match the orientation of connected  {@link RecyclerView} for good UX but it's not enforced.
-     * Note: This method is overridden from {@link LinearLayout#setOrientation(int)} but for {@link FastScroller}
-     * it has a totally different meaning.
-     *
-     * @param orientation of the {@link FastScroller}. {@link #VERTICAL} or {@link #HORIZONTAL}
-     */
     @Override
     public void setOrientation(int orientation) {
         scrollerOrientation = orientation;
-        //switching orientation, because orientation in linear layout
-        //is something different than orientation of fast scroller
         super.setOrientation(orientation == HORIZONTAL ? VERTICAL : HORIZONTAL);
     }
 
-    /**
-     * Set the background color of the bubble.
-     *
-     * @param color Color in hex notation with alpha channel, e.g. 0xFFFFFFFF
-     */
-//    public void setBubbleColor(int color) {
-//        bubbleColor = color;
-//        invalidate();
-//    }
-
-    /**
-     * Set the background color of the handle.
-     *
-     * @param color Color in hex notation with alpha channel, e.g. 0xFFFFFFFF
-     */
-//    public void setHandleColor(int color) {
-//        handleColor = color;
-//        invalidate();
-//    }
-
-    /**
-     * Sets the text appearance of the bubble.
-     *
-     * @param textAppearanceResourceId The id of the resource to be used as text appearance of the bubble.
-     */
     public void setBubbleTextAppearance(int textAppearanceResourceId) {
         bubbleTextAppearance = textAppearanceResourceId;
         invalidate();
     }
-
 
     public void addScrollerListener(RecyclerViewScrollListener.ScrollerListener listener) {
         scrollListener.addScrollerListener(listener);
@@ -169,15 +116,11 @@ public class FastScroller extends LinearLayout {
 
         applyStyling();
         if (!isInEditMode()) {
-            //sometimes recycler starts with a defined scroll (e.g. when coming from saved state)
             scrollListener.updateHandlePosition(recyclerView);
         }
-
     }
 
     private void applyStyling() {
-       // if (bubbleColor != STYLE_NONE) setBackgroundTint(bubbleTextView, bubbleColor);
-       // if (handleColor != STYLE_NONE) setBackgroundTint(handle, handleColor);
         if (bubbleTextAppearance != STYLE_NONE)
             TextViewCompat.setTextAppearance(bubbleTextView, bubbleTextAppearance);
     }
@@ -229,13 +172,7 @@ public class FastScroller extends LinearLayout {
     }
 
     private void invalidateVisibility() {
-        if (
-                recyclerView.getAdapter() == null ||
-                        recyclerView.getAdapter().getItemCount() == 0 ||
-                        recyclerView.getChildAt(0) == null ||
-                        isRecyclerViewNotScrollable() ||
-                        maxVisibility != View.VISIBLE
-                ) {
+        if (recyclerView.getAdapter() == null || recyclerView.getAdapter().getItemCount() == 0 || recyclerView.getChildAt(0) == null || isRecyclerViewNotScrollable() || maxVisibility != View.VISIBLE) {
             super.setVisibility(INVISIBLE);
         } else {
             super.setVisibility(VISIBLE);
@@ -253,37 +190,24 @@ public class FastScroller extends LinearLayout {
     private void setRecyclerViewPosition(float relativePos) {
         if (recyclerView == null) return;
         int itemCount = recyclerView.getAdapter().getItemCount();
-        int targetPos = (int) Utils.getValueInRange(0, itemCount - 1, (int) (relativePos * (float) itemCount));
+        int targetPos = (int) Utils.getValueInRange(0, itemCount - 1, (int)(relativePos * (float)itemCount));
         recyclerView.scrollToPosition(targetPos);
-        if (titleProvider != null && bubbleTextView != null)
-            bubbleTextView.setText(titleProvider.getSectionTitle(targetPos));
-            //bubbleTextView.setText("text");
-
+        if (titleProvider != null && bubbleTextView != null){
+            if(titleProvider.getSectionTitle(targetPos) != null){
+                bubbleTextView.setText(titleProvider.getSectionTitle(targetPos));
+            }
+        }
+        setScrollerPosition(relativePos);
     }
 
     void setScrollerPosition(float relativePos) {
+
         if (isVertical()) {
-            bubble.setY(Utils.getValueInRange(
-                    0,
-                    getHeight() - bubble.getHeight(),
-                    relativePos * (getHeight() - handle.getHeight()) + bubbleOffset)
-            );
-            handle.setY(Utils.getValueInRange(
-                    0,
-                    getHeight() - handle.getHeight(),
-                    relativePos * (getHeight() - handle.getHeight()))
-            );
+            bubble.setY(Utils.getValueInRange(0, getHeight() - bubble.getHeight(), relativePos * (getHeight() - handle.getHeight())+ bubbleOffset));
+            handle.setY(Utils.getValueInRange(0, getHeight() - handle.getHeight(), relativePos * (getHeight() - handle.getHeight())));
         } else {
-            bubble.setX(Utils.getValueInRange(
-                    0,
-                    getWidth() - bubble.getWidth(),
-                    relativePos * (getWidth() - handle.getWidth()) + bubbleOffset)
-            );
-            handle.setX(Utils.getValueInRange(
-                    0,
-                    getWidth() - handle.getWidth(),
-                    relativePos * (getWidth() - handle.getWidth()))
-            );
+            bubble.setX(Utils.getValueInRange(0, getWidth() - bubble.getWidth(), relativePos * (getWidth() - handle.getWidth()) + bubbleOffset));
+            handle.setX(Utils.getValueInRange(0, getWidth() - handle.getWidth(), relativePos * (getWidth() - handle.getWidth())));
         }
     }
 

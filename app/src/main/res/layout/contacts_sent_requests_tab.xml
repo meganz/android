@@ -27,15 +27,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/contact_requests_list_content_text_layout"
-        android:choiceMode="multipleChoice"
-        android:adjustViewBounds="true"
-        android:layout_marginBottom="3dp"
-        android:layout_marginTop="3dp"
-        android:fadeScrollbars="true"
-        android:scrollbars="vertical"
-        android:scrollbarThumbVertical="@color/grey_info_menu"
-        android:scrollbarSize="4dp"
-        android:dividerHeight="3dp"/>
+        android:choiceMode="multipleChoice"/>
 
 
     <RelativeLayout
