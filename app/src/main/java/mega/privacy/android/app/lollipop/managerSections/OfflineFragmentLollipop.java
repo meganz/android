@@ -422,7 +422,6 @@ public class OfflineFragmentLollipop extends Fragment{
 			log("onCreateList");
 			View v = inflater.inflate(R.layout.fragment_offlinelist, container, false);
 			recyclerView = (RecyclerView) v.findViewById(R.id.offline_view_browser);
-			recyclerView.setScrollBarStyle(View.SCROLLBARS_OUTSIDE_INSET);
 			recyclerView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
 			mLayoutManager = new LinearLayoutManager(context);
 			recyclerView.setLayoutManager(mLayoutManager);

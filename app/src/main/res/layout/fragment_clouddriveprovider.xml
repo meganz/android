@@ -57,15 +57,7 @@
         android:layout_height="match_parent"
         android:layout_below="@id/provider_content_text"
         android:layout_above="@id/separator"
-        android:choiceMode="multipleChoice"
-        android:adjustViewBounds="true"
-        android:layout_marginBottom="3dp"
-        android:layout_marginTop="3dp"
-        android:fadeScrollbars="true"
-        android:scrollbars="vertical"
-        android:scrollbarThumbVertical="@color/grey_info_menu"
-        android:scrollbarSize="4dp"
-        android:dividerHeight="3dp"/>
+        android:choiceMode="multipleChoice" />
 
 
 </RelativeLayout>

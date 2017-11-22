@@ -151,6 +151,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 		public boolean isNode;
 		public long handle;
 		public String monthYear;
+		public String nodeDate;
 	}
 	
 	public class PhotoSyncGridHolder{
@@ -159,6 +160,8 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 		public long handle1;
 		public long handle2;
 		public long handle3;
+		public String nodeDate;
+
 	}
 
 	private ImageView initialImageView;
@@ -701,16 +704,15 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			listView.setClipToPadding(false);
 			listView.setHasFixedSize(true);
 
+			final RelativeLayout relativeLayoutTurnOnOff = (RelativeLayout) v.findViewById(R.id.relative_layout_file_list_browser_camera_upload_on_off);
 			final TextView turnOnOff = (TextView) v.findViewById(R.id.file_list_browser_camera_upload_on_off);
-			turnOnOff.setVisibility(View.VISIBLE);
+			relativeLayoutTurnOnOff.setVisibility(View.VISIBLE);
 			if(type==TYPE_CAMERA){
 				turnOnOff.setText(getString(R.string.settings_camera_upload_turn_on).toUpperCase(Locale.getDefault()));
 			}
 			else{
 				turnOnOff.setText(getString(R.string.settings_set_up_automatic_uploads).toUpperCase(Locale.getDefault()));
 			}
-
-			turnOnOff.setGravity(Gravity.CENTER);
 
 			transfersOverViewLayout = (RelativeLayout) v.findViewById(R.id.transfers_overview_item_layout);
 			transfersOverViewLayout.setVisibility(View.GONE);
@@ -721,24 +723,24 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 				if (prefs.getCamSyncEnabled() != null){
 					if (Boolean.parseBoolean(prefs.getCamSyncEnabled())){
 						log("Hide option Turn on Camera Uploads");
-						turnOnOff.setVisibility(View.GONE);
+						relativeLayoutTurnOnOff.setVisibility(View.GONE);
 						camEnabled = true;
 					}
 					else{
 						log("SHOW option Turn on Camera Uploads");
-						turnOnOff.setVisibility(View.VISIBLE);
+						relativeLayoutTurnOnOff.setVisibility(View.VISIBLE);
 						camEnabled = false;
 					}
 				}
 			}
-			turnOnOff.setOnClickListener(this);
+			relativeLayoutTurnOnOff.setOnClickListener(this);
 	
 			contentTextLayout = (RelativeLayout) v.findViewById(R.id.content_text_layout);
 			contentTextLayout.setVisibility(View.GONE);
 			
-			RelativeLayout.LayoutParams p = (RelativeLayout.LayoutParams) listView.getLayoutParams();
-			p.addRule(RelativeLayout.ABOVE, R.id.file_list_browser_camera_upload_on_off);
-			listView.setLayoutParams(p);
+//			RelativeLayout.LayoutParams p = (RelativeLayout.LayoutParams) listView.getLayoutParams();
+//			p.addRule(RelativeLayout.ABOVE, R.id.file_list_browser_camera_upload_on_off);
+//			listView.setLayoutParams(p);
 
 			emptyImageView = (ImageView) v.findViewById(R.id.file_list_empty_image);
 			emptyTextView = (LinearLayout) v.findViewById(R.id.file_list_empty_text);
@@ -828,6 +830,9 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 					if ((month == d.getMonth()) && (year == d.getYear())){
 						psh.isNode = true;
 						psh.handle = nodes.get(i).getHandle();
+						month = d.getMonth();
+						year = d.getYear();
+						psh.nodeDate = getImageDateString(month, year);
 						nodesArray.add(psh);
 					}
 					else{
@@ -872,7 +877,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 
 			listView.setAdapter(adapterList);
 			fastScroller.setRecyclerView(listView);
-
+			visibilityFastScroller();
 
 			return v;
 		}
@@ -882,17 +887,14 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			detector = new GestureDetectorCompat(getActivity(), new RecyclerViewOnGestureListener());
 			
 			listView = (RecyclerView) v.findViewById(R.id.file_grid_view_browser);
-			//fastScroller = (FastScroller) v.findViewById(R.id.fastscroll);
-			//listView.setScrollBarStyle(View.SCROLLBARS_OUTSIDE_INSET);
-//			listView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
-//			listView.addOnItemTouchListener(this);
-//			listView.setItemAnimator(new DefaultItemAnimator());
+			fastScroller = (FastScroller) v.findViewById(R.id.fastscroll);
+
 			listView.setDrawingCacheEnabled(true);
 			listView.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
 
-
+			final RelativeLayout relativeLayoutTurnOnOff = (RelativeLayout) v.findViewById(R.id.relative_layout_file_grid_browser_camera_upload_on_off);
 			final TextView turnOnOff = (TextView) v.findViewById(R.id.file_grid_browser_camera_upload_on_off);
-			turnOnOff.setVisibility(View.VISIBLE);
+			relativeLayoutTurnOnOff.setVisibility(View.VISIBLE);
 			if(type==TYPE_CAMERA){
 				turnOnOff.setText(getString(R.string.settings_camera_upload_turn_on).toUpperCase(Locale.getDefault()));
 			}
@@ -900,23 +902,23 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 				turnOnOff.setText(getString(R.string.settings_set_up_automatic_uploads).toUpperCase(Locale.getDefault()));
 			}
 
-			turnOnOff.setGravity(Gravity.CENTER);
+//			turnOnOff.setGravity(Gravity.CENTER);
 
 			boolean camEnabled = false;
 			prefs=dbH.getPreferences();
 			if (prefs != null){
 				if (prefs.getCamSyncEnabled() != null){
 					if (Boolean.parseBoolean(prefs.getCamSyncEnabled())){
-						turnOnOff.setVisibility(View.GONE);
+						relativeLayoutTurnOnOff.setVisibility(View.GONE);
 						camEnabled = true;
 					}
 					else{
 						camEnabled = false;
-						turnOnOff.setVisibility(View.VISIBLE);
+						relativeLayoutTurnOnOff.setVisibility(View.VISIBLE);
 					}
 				}
 			}
-			turnOnOff.setOnClickListener(this);
+			relativeLayoutTurnOnOff.setOnClickListener(this);
 	
 			contentTextLayout = (RelativeLayout) v.findViewById(R.id.content_grid_text_layout);		
 			contentTextLayout.setVisibility(View.GONE);
@@ -924,9 +926,9 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			fragmentContainer = (RelativeLayout) v.findViewById(R.id.fragment_container_file_browser_grid);
 			fragmentContainer.setBackgroundColor(ContextCompat.getColor(context, R.color.white));
 			
-			RelativeLayout.LayoutParams p = (RelativeLayout.LayoutParams) listView.getLayoutParams();
-			p.addRule(RelativeLayout.ABOVE, R.id.file_grid_browser_camera_upload_on_off);
-			listView.setLayoutParams(p);
+//			RelativeLayout.LayoutParams p = (RelativeLayout.LayoutParams) listView.getLayoutParams();
+//			p.addRule(RelativeLayout.ABOVE, R.id.file_grid_browser_camera_upload_on_off);
+//			listView.setLayoutParams(p);
 
 			emptyImageView = (ImageView) v.findViewById(R.id.file_grid_empty_image);
 			emptyTextView = (LinearLayout) v.findViewById(R.id.file_grid_empty_text);
@@ -1067,27 +1069,22 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 						else{
 							itemInformationList.add(new MegaPhotoSyncGridTitleAdapterLollipop.ItemInformation(MegaPhotoSyncGridTitleAdapterLollipop.TYPE_ITEM_VIDEO, n, monthPic));
 						}
-//						monthPics.add(monthPic);
-//						monthPic = new MegaMonthPicLollipop();
-//						i--;
+
 					}
 					else if ((month == d.getMonth()) && (year == d.getYear())){
 
-//						if (monthPic.nodeHandles.size() == numberOfCells){
-//							monthPics.add(monthPic);
-//							monthPic = new MegaMonthPicLollipop();
-//							monthPic.nodeHandles.add(nodes.get(i).getHandle());
-//						}
-//						else{
-							monthPic.nodeHandles.add(n.getHandle());
-							monthPic.setPosition(n, i);
+						monthPic.nodeHandles.add(n.getHandle());
+						monthPic.setPosition(n, i);
+//						month = d.getMonth();
+//						year = d.getYear();
+						monthPic.monthYearString = getImageDateString(month, year);
+
 						if(!Util.isVideoFile(n.getName())){
 							itemInformationList.add(new MegaPhotoSyncGridTitleAdapterLollipop.ItemInformation(MegaPhotoSyncGridTitleAdapterLollipop.TYPE_ITEM_IMAGE, n, monthPic));
 						}
 						else{
 							itemInformationList.add(new MegaPhotoSyncGridTitleAdapterLollipop.ItemInformation(MegaPhotoSyncGridTitleAdapterLollipop.TYPE_ITEM_VIDEO, n, monthPic));
 						}
-//						}
 					}
 					else{
 						month = d.getMonth();
@@ -1163,8 +1160,8 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			listView.setLayoutManager(mLayoutManager);
 			
 			listView.setAdapter(adapterGrid);
-			//fastScroller.setRecyclerView(listView);
-
+			fastScroller.setRecyclerView(listView);
+			visibilityFastScroller();
 
 			return v;
 		}
@@ -1480,8 +1477,8 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
 		switch(v.getId()){
-			case R.id.file_grid_browser_camera_upload_on_off:
-			case R.id.file_list_browser_camera_upload_on_off:{
+			case R.id.relative_layout_file_grid_browser_camera_upload_on_off:
+			case R.id.relative_layout_file_list_browser_camera_upload_on_off:{
 				if(type==TYPE_CAMERA){
 					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 						boolean hasStoragePermission = (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
@@ -1546,7 +1543,6 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	}
 	
 	public void itemClick(int position) {
-		log("itemClick");
 		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 		
 		PhotoSyncHolder psHPosition = nodesArray.get(position);
@@ -1563,7 +1559,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 				}
 				else{
 					clearSelections();
-				}					
+				}
 			}
 			else{
 				if (psHPosition.isNode){
@@ -1859,7 +1855,6 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 
 	public void setNodes(ArrayList<MegaNode> nodes){
 		this.nodes = nodes;
-		
 		if (((ManagerActivityLollipop)context).isListCameraUploads()){
 			this.nodesArray.clear();
 			int month = 0;
@@ -1887,6 +1882,8 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			}
 			if (adapterList != null){
 				adapterList.setNodes(nodesArray, nodes);
+
+				visibilityFastScroller();
 				if (adapterList.getItemCount() == 0){
 					if (listView != null){
 						listView.setVisibility(View.GONE);
@@ -2053,6 +2050,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			if (nodes.size() > 0){
 				monthPics.add(monthPic);
 			}
+			visibilityFastScroller();
 			
 			if (!thereAreImages){
 				monthPics.clear();
@@ -2141,8 +2139,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 
 	@Override
 	public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
-		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
@@ -2168,8 +2165,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	@Override
 	public void onRequestTemporaryError(MegaApiJava api, MegaRequest request,
 			MegaError e) {
-		// TODO Auto-generated method stub
-		
+
 	}
 
 	public boolean getIsLargeGrid() {
@@ -2188,39 +2184,33 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 
 	@Override
 	public boolean onDown(MotionEvent e) {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
 	public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
 			float velocityY) {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
 	public void onLongPress(MotionEvent e) {
-		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX,
 			float distanceY) {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
 	public void onShowPress(MotionEvent e) {
-		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public boolean onSingleTapUp(MotionEvent e) {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
@@ -2233,13 +2223,28 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 
 	@Override
 	public void onRequestDisallowInterceptTouchEvent(boolean arg0) {
-		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void onTouchEvent(RecyclerView arg0, MotionEvent arg1) {
-		// TODO Auto-generated method stub
-		
+
+	}
+
+	public void visibilityFastScroller(){
+		if(((ManagerActivityLollipop)context).isLargeGridCameraUploads){
+			if (nodes.size() < Constants.MIN_ITEMS_SCROLLBAR) {
+				fastScroller.setVisibility(View.GONE);
+			} else {
+				fastScroller.setVisibility(View.VISIBLE);
+			}
+
+		}else {
+			if (nodes.size() < Constants.MIN_ITEMS_SCROLLBAR_GRID) {
+				fastScroller.setVisibility(View.GONE);
+			} else {
+				fastScroller.setVisibility(View.VISIBLE);
+			}
+		}
 	}
 }

@@ -11,4 +11,4 @@
     android:paddingTop="5dp"
     android:paddingBottom="5dp"
     tools:text="A"
-     />
+    android:visibility="invisible"/>

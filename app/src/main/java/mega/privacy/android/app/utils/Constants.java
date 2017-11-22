@@ -195,4 +195,7 @@ public class Constants {
 
 	final public static String MAIL_ANDROID = "androidfeedback@mega.nz";
 
+	public static int MIN_ITEMS_SCROLLBAR = 30;
+	public static int MIN_ITEMS_SCROLLBAR_GRID = 200;
+
 }
