@@ -717,7 +717,7 @@ public class NodeController {
                             context.startActivity(intentZip);
 
                         }
-                        if (MimeTypeList.typeForName(tempNode.getName()).isPdf()){
+                        else if (MimeTypeList.typeForName(tempNode.getName()).isPdf()){
                             log("Pdf file");
                             File pdfFile = new File(localPath);
 
