@@ -97,7 +97,6 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 	int type = Constants.FILE_BROWSER_ADAPTER;
 	int adapterType;
 
-
 //	int orderGetChildren = MegaApiJava.ORDER_DEFAULT_ASC;
 
 	/* public static view holder class */
@@ -882,9 +881,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 		holder.document = node.getHandle();
 		Bitmap thumb = null;
 		
-		log("Node to show: "+position+" "+node.getName());
 		holder.textViewFileName.setText(node.getName());
-
 		holder.textViewFileSize.setText("");
 		
 		holder.publicLinkImage.setVisibility(View.INVISIBLE);
@@ -1368,11 +1365,9 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 
 	@Override
 	public int getItemCount() {
-		// TODO Auto-generated method stub
-		if (nodes != null){		
+		if (nodes != null){
 			return nodes.size();
-		}
-		else{
+		}else{
 			return 0;
 		}
 	}

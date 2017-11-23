@@ -923,7 +923,6 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 	}
 
 	public void visibilityFastScroller(){
-		log("************Items: "+ adapter.getItemCount());
 		if(adapter.getItemCount() < Constants.MIN_ITEMS_SCROLLBAR){
 			fastScroller.setVisibility(View.GONE);
 		}else{
