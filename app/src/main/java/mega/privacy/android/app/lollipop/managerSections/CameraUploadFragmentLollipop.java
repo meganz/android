@@ -160,8 +160,6 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 		public long handle1;
 		public long handle2;
 		public long handle3;
-		public String nodeDate;
-
 	}
 
 	private ImageView initialImageView;
@@ -692,7 +690,6 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			listView = (RecyclerView) v.findViewById(R.id.file_list_view_browser);
 			fastScroller = (FastScroller) v.findViewById(R.id.fastscroll);
 
-//			listView.setScrollBarStyle(View.SCROLLBARS_OUTSIDE_INSET);
 			mLayoutManager = new MegaLinearLayoutManager(context);
 			listView.setLayoutManager(mLayoutManager);
 
