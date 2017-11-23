@@ -2,6 +2,7 @@ package mega.privacy.android.app.lollipop.adapters;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapShader;
 import android.graphics.Canvas;
@@ -81,7 +82,8 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 
 	Object fragment;
 	long parentHandle = -1;
-	
+	DisplayMetrics outMetrics;
+
 	private SparseBooleanArray selectedItems;
 
 	RecyclerView listFragment;
@@ -482,6 +484,9 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 	@Override
 	public ViewHolderBrowser onCreateViewHolder(ViewGroup parent, int viewType) {
 		log("onCreateViewHolder");
+		Display display = ((Activity) context).getWindowManager().getDefaultDisplay();
+		outMetrics = new DisplayMetrics();
+		display.getMetrics(outMetrics);
 
 		if (viewType == MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST){
 			log("onCreateViewHolder -> type: ITEM_VIEW_TYPE_LIST");
@@ -539,6 +544,11 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 			holderGrid.videoDuration = (TextView) v.findViewById(R.id.file_grid_title_video_duration);
 			holderGrid.videoInfoLayout = (RelativeLayout) v.findViewById(R.id.item_file_videoinfo_layout);
 
+			if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+				holderGrid.textViewFileSize.setMaxWidth(Util.scaleWidthPx(70, outMetrics));
+			} else{
+				holderGrid.textViewFileSize.setMaxWidth(Util.scaleWidthPx(130, outMetrics));
+			}
 			if(holderGrid.textViewFileSize!=null){
 				holderGrid.textViewFileSize.setVisibility(View.VISIBLE);
 			}
