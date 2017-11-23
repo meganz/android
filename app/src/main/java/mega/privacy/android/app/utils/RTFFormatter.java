@@ -25,7 +25,7 @@ public class RTFFormatter {
 
         String noEmojisContent = EmojiParser.removeAllEmojis(messageContent);
 
-        boolean  italic = Pattern.matches("(.*\\s+)*_.*_(\\s+.*)*", noEmojisContent);
+        boolean  italic = Pattern.matches("(.*\\s+)*_.*_(\\s+.*)*[?|!|\\.|,|;|:|\\)|%]*", noEmojisContent);
 //                                boolean  italic = Pattern.matches(".*_.*_.*", messageContent);
         if(italic){
             char a = messageContent.charAt(0);
@@ -178,14 +178,16 @@ public class RTFFormatter {
                     }
                     else{
                         log("End position: "+end);
-                        messageContent =  messageContent.replaceFirst("_ ", " ");
+                        sb = new StringBuilder(messageContent);
+                        sb.deleteCharAt(end);
+                        messageContent = sb.toString();
                         log("Message content D: "+messageContent);
 
-                        substring = messageContent.substring(start, end);
+                        substring = messageContent.substring(0, end);
                         ssb.append(substring, new StyleSpan(Typeface.ITALIC));
 
                         sb = new StringBuilder(messageContent);
-                        sb.delete(start, end);
+                        sb.delete(0, end);
                         messageContent = sb.toString();
 
                         start = messageContent.indexOf(" _");
@@ -256,6 +258,10 @@ public class RTFFormatter {
 
             log("SubstringB is: "+substringB);
             ssb.append(substringB, new StyleSpan(Typeface.BOLD), new StyleSpan(Typeface.ITALIC));
+
+            sbB = new StringBuilder(subMessageContent);
+            sbB.delete(0, endB);
+            subMessageContent = sbB.toString();
         }
         else{
             log("endB position: "+endB);
@@ -269,21 +275,21 @@ public class RTFFormatter {
             subMessageContent = sbB.toString();
             log("(11) Message content B: "+subMessageContent);
 
-            startB = subMessageContent.indexOf(" \\*");
+            startB = subMessageContent.indexOf(" *");
             while(startB!=-1){
 
                 startB = startB +1;
 
-                sbB = new StringBuilder(messageContent);
+                sbB = new StringBuilder(subMessageContent);
                 sbB.deleteCharAt(startB);
-                messageContent = sbB.toString();
+                subMessageContent = sbB.toString();
 
                 log("(B) startB position: "+startB);
-                substringB = subMessageContent.substring(endB, startB);
+                substringB = subMessageContent.substring(0, startB);
                 ssb.append(substringB, new StyleSpan(Typeface.ITALIC));
 
                 sbB = new StringBuilder(subMessageContent);
-                sbB.delete(endB, startB);
+                sbB.delete(0, startB);
                 subMessageContent = sbB.toString();
 
                 log("Message content C: "+subMessageContent);
@@ -291,24 +297,32 @@ public class RTFFormatter {
                 if(endB==-1){
                     endB = subMessageContent.lastIndexOf("*");
                     log("(B)FINISH endB position: "+endB);
-                    substringB = subMessageContent.substring(startB, endB);
+
+                    sbB = new StringBuilder(subMessageContent);
+                    sbB.deleteCharAt(endB);
+                    subMessageContent = sbB.toString();
+
+                    log("(B)FINISH End position: "+endB);
+                    substringB = subMessageContent.substring(0, endB);
                     ssb.append(substringB, new StyleSpan(Typeface.BOLD), new StyleSpan(Typeface.ITALIC));
 
                     sbB = new StringBuilder(subMessageContent);
-                    sbB.delete(endB, startB);
+                    sbB.delete(0, endB);
                     subMessageContent = sbB.toString();
                     break;
                 }
                 else{
                     log("endB position: "+endB);
-                    subMessageContent =  subMessageContent.replaceFirst("\\* ", " ");
+                    sbB = new StringBuilder(subMessageContent);
+                    sbB.deleteCharAt(endB);
+                    subMessageContent = sbB.toString();
                     log("Message content D: "+subMessageContent);
 
-                    substringB = subMessageContent.substring(startB, endB);
+                    substringB = subMessageContent.substring(0, endB);
                     ssb.append(substringB, new StyleSpan(Typeface.BOLD), new StyleSpan(Typeface.ITALIC));
 
                     sbB = new StringBuilder(subMessageContent);
-                    sbB.delete(endB, startB);
+                    sbB.delete(0, endB);
                     subMessageContent = sbB.toString();
 
                     startB = subMessageContent.indexOf(" *");
