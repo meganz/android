@@ -16,6 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -44,6 +45,8 @@ public class MyStorageFragmentLollipop extends Fragment implements MegaRequestLi
 	MegaUser myUser;
 
 	LinearLayout parentLinearLayout;
+
+	RelativeLayout expirationAccountLayout;
 
 	TextView typeAccountText;
 	TextView expirationAccountText;
@@ -116,6 +119,7 @@ public class MyStorageFragmentLollipop extends Fragment implements MegaRequestLi
 
 		typeAccountText = (TextView) v.findViewById(R.id.my_storage_account_plan_text);
 		storageAvailableText = (TextView) v.findViewById(R.id.my_storage_account_space_text);
+		expirationAccountLayout = (RelativeLayout) v.findViewById(R.id.my_storage_account_expiration_layout);
 		expirationAccountText = (TextView) v.findViewById(R.id.my_storage_account_expiration_text);
 		transferQuotaUsedText = (TextView) v.findViewById(R.id.my_storage_account_transfer_text);
 
@@ -194,7 +198,7 @@ public class MyStorageFragmentLollipop extends Fragment implements MegaRequestLi
 
 				case 0:{
 					typeAccountText.setText(R.string.free_account);
-					expirationAccountText.setText(getString(R.string.no_bylling_cycle));
+					expirationAccountLayout.setVisibility(View.GONE);
 					break;
 				}
 
