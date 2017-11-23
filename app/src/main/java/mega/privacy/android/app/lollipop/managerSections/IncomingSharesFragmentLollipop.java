@@ -989,7 +989,6 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 				
 				((ManagerActivityLollipop)context).setParentHandleIncoming(parentNode.getHandle());
 				nodes = megaApi.getChildren(parentNode, ((ManagerActivityLollipop)context).orderOthers);
-				//TODO
 				adapter.setNodes(nodes);
 				int lastVisiblePosition = 0;
 				if(!lastPositionStack.empty()){
