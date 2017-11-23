@@ -76,6 +76,7 @@ import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.PendingMessage;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.PreviewUtils;
+import mega.privacy.android.app.utils.RTFFormatter;
 import mega.privacy.android.app.utils.ThumbnailUtils;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.TimeChatUtils;
@@ -90,7 +91,6 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaNodeList;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
-import nz.mega.sdk.MegaUser;
 
 public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
 
@@ -1524,94 +1524,12 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                             ((ViewHolderMessageChat)holder).contentOwnMessageContactName.setVisibility(View.GONE);
                             ((ViewHolderMessageChat)holder).contentOwnMessageContactEmail.setVisibility(View.GONE);
 
-                            SpannableString ss1 = null;
+
                             SimpleSpanBuilder ssb = null;
                             if(message.getContent()!=null){
                                 messageContent = message.getContent();
-
-                                boolean  italic = Pattern.matches("(.*\\s+)*_.*_(\\s+.*)*", messageContent);
-//                                boolean  italic = Pattern.matches(".*_.*_.*", messageContent);
-                                if(italic){
-                                    log("Italic found: "+messageContent);
-
-                                    char a = messageContent.charAt(0);
-                                    int start;
-                                    int end;
-
-                                    ssb = new SimpleSpanBuilder();
-
-                                    if(a =='_'){
-                                        start = 0;
-                                    }
-                                    else{
-                                        start = messageContent.indexOf(" _");
-                                        start++;
-                                    }
-
-                                    messageContent = messageContent.replaceFirst("_", "");
-                                    log("Start position: "+start);
-                                    end = messageContent.indexOf("_ ");
-                                    if(end==-1){
-                                        end = messageContent.lastIndexOf("_");
-                                        log("FINISH End position: "+end);
-                                        String substring = messageContent.substring(start, end);
-                                        ssb.append(substring, new StyleSpan(Typeface.ITALIC));
-                                    }
-                                    else{
-                                        log("End position: "+end);
-                                        messageContent =  messageContent.replaceFirst("_ ", " ");
-                                        log("Message content B: "+messageContent);
-                                        String substring = messageContent.substring(start, end);
-                                        ssb.append(substring, new StyleSpan(Typeface.ITALIC));
-
-                                        start = messageContent.indexOf(" _");
-                                        while(start!=-1){
-
-                                            start = start +1;
-                                            log("(B) Start position: "+start);
-                                            substring = messageContent.substring(end, start);
-                                            ssb.append(substring);
-
-                                            messageContent =  messageContent.replaceFirst("_", "");
-                                            log("Message content C: "+messageContent);
-                                            end = messageContent.indexOf("_ ");
-                                            if(end==-1){
-                                                end = messageContent.lastIndexOf("_");
-                                                log("(B)FINISH End position: "+end);
-                                                substring = messageContent.substring(start, end);
-                                                ssb.append(substring, new StyleSpan(Typeface.ITALIC));
-                                                break;
-                                            }
-                                            else{
-                                                log("End position: "+end);
-                                                messageContent =  messageContent.replaceFirst("_ ", " ");
-                                                log("Message content D: "+messageContent);
-
-                                                substring = messageContent.substring(start, end);
-                                                ssb.append(substring, new StyleSpan(Typeface.ITALIC));
-
-                                                start = messageContent.indexOf(" _");
-                                            }
-                                        }
-
-                                        if(end<messageContent.length()-1){
-                                            substring = messageContent.substring(end, messageContent.length());
-                                            ssb.append(substring);
-                                        }
-                                    }
-
-                                }
-                                else{
-                                    log("NOT Italic found: "+messageContent);
-                                }
-//                                italic = Pattern.matches("(\\t\\n\\x0B\\f\\r]_.*_[\\t\\n\\x0B\\f\\r])", messageContent);
-//                                if(italic){
-//                                    log("Italic found: "+messageContent);
-//                                }
-//                                else{
-//                                    log("NOT Italic found "+messageContent);
-//                                }
-
+                                RTFFormatter formatter = new RTFFormatter(messageContent);
+                                ssb = formatter.setRTFFormat();
 
                             }
 
@@ -1674,6 +1592,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                             else{
                                 ((ViewHolderMessageChat)holder).contentOwnMessageText.setText(messageContent);
                             }
+
+//                            Markwon.setMarkdown(((ViewHolderMessageChat)holder).contentOwnMessageText, messageContent);
 
 
                             ((ViewHolderMessageChat)holder).contentOwnMessageText.setLinksClickable(true);
