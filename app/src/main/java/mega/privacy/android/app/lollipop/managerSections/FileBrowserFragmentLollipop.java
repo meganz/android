@@ -51,6 +51,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.CustomizedGridLayoutManager;
 import mega.privacy.android.app.components.CustomizedGridRecyclerView;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
+import mega.privacy.android.app.components.scrollBar.FastScroller;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop.DrawerItem;
@@ -74,6 +75,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 	Context context;
 	ActionBar aB;
 	RecyclerView recyclerView;
+	FastScroller fastScroller;
 
 	ImageView emptyImageView;
 	LinearLayout emptyTextView;
@@ -94,7 +96,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 	Stack<Integer> lastPositionStack;
 
 	MegaApiAndroid megaApi;
-
 	RelativeLayout transfersOverViewLayout;
 	TextView transfersTitleText;
 	TextView transfersNumberText;
@@ -110,10 +111,8 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 	MegaPreferences prefs;
 
 	ArrayList<MegaNode> nodes;
-
 	public ActionMode actionMode;
 
-//    FloatingActionButton fabButton;
 	LinearLayoutManager mLayoutManager;
 	CustomizedGridLayoutManager gridLayoutManager;
 	MegaNode selectedNode = null;
@@ -453,27 +452,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 
 	}
 
-//	private class ScrollToPositionRunnable implements Runnable{
-//
-//		int position;
-//
-//		public ScrollToPositionRunnable(int position) {
-//			this.position = position;
-//		}
-//
-//		@Override
-//		public void run()
-//		{
-//			log("ScrollToPositionRunnable: run ->scroll to position: "+position);
-//			recyclerView.scrollToPosition(position);
-//			View v = recyclerView.getChildAt(position);
-//			if (v != null)
-//			{
-//				v.requestFocus();
-//			}
-//		}
-//	}
-
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
 		log("onSaveInstanceState");
@@ -548,6 +526,8 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			View v = inflater.inflate(R.layout.fragment_filebrowserlist, container, false);
 
 			recyclerView = (RecyclerView) v.findViewById(R.id.file_list_view_browser);
+			fastScroller = (FastScroller) v.findViewById(R.id.fastscroll);
+
 			recyclerView.setPadding(0, 0, 0, Util.scaleHeightPx(85, outMetrics));
 			recyclerView.setClipToPadding(false);
 			recyclerView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
@@ -587,17 +567,17 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			
 			adapter.setMultipleSelect(false);
 
-			recyclerView.setAdapter(adapter);			
-			
+			recyclerView.setAdapter(adapter);
+			fastScroller.setRecyclerView(recyclerView);
+
 			setNodes(nodes);
-			
+
 			if (adapter.getItemCount() == 0){				
 				log("itemCount is 0");
 				recyclerView.setVisibility(View.GONE);
 				emptyImageView.setVisibility(View.VISIBLE);
 				emptyTextView.setVisibility(View.VISIBLE);
-			}
-			else{
+			}else{
 				log("itemCount is " + adapter.getItemCount());
 				recyclerView.setVisibility(View.VISIBLE);
 				emptyImageView.setVisibility(View.GONE);
@@ -614,6 +594,8 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			View v = inflater.inflate(R.layout.fragment_filebrowsergrid, container, false);
 
 			recyclerView = (CustomizedGridRecyclerView) v.findViewById(R.id.file_grid_view_browser);
+			fastScroller = (FastScroller) v.findViewById(R.id.fastscroll);
+
 			recyclerView.setPadding(0, 0, 0, Util.scaleHeightPx(80, outMetrics));
 			recyclerView.setClipToPadding(false);
 
@@ -658,12 +640,13 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 
 			adapter.setMultipleSelect(false);
 
-			recyclerView.setAdapter(adapter);			
-			
+			recyclerView.setAdapter(adapter);
+			fastScroller.setRecyclerView(recyclerView);
+
 			setNodes(nodes);
-			
-			if (adapter.getItemCount() == 0){				
-				
+
+			if (adapter.getItemCount() == 0){
+
 				recyclerView.setVisibility(View.GONE);
 				emptyImageView.setVisibility(View.VISIBLE);
 				emptyTextView.setVisibility(View.VISIBLE);
@@ -734,9 +717,9 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 				dotsOptionsTransfersLayout.setOnClickListener(null);
 				actionLayout.setOnClickListener(null);
 
-				RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) recyclerView.getLayoutParams();
-				params.addRule(RelativeLayout.BELOW, contentTextLayout.getId());
-				recyclerView.setLayoutParams(params);
+				//RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) recyclerView.getLayoutParams();
+				//params.addRule(RelativeLayout.BELOW, contentTextLayout.getId());
+				//recyclerView.setLayoutParams(params);
 			}
 		}
 		else{
@@ -1029,6 +1012,8 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 		adapter.setNodes(nodes);
 		recyclerView.scrollToPosition(0);
 
+		visibilityFastScroller();
+
 		//If folder has no files
 		if (adapter.getItemCount() == 0){
 			recyclerView.setVisibility(View.GONE);
@@ -1182,6 +1167,8 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 				nodes = megaApi.getChildren(parentNode, ((ManagerActivityLollipop)context).orderCloud);
 				adapter.setNodes(nodes);
 
+				visibilityFastScroller();
+
 				setOverviewLayout();
 
 				int lastVisiblePosition = 0;
@@ -1219,10 +1206,14 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 	
 	public void setNodes(ArrayList<MegaNode> nodes){
 		log("setNodes: "+nodes.size());
+
+		visibilityFastScroller();
+
 		this.nodes = nodes;
 		if (((ManagerActivityLollipop)context).isList){
 			if (adapter != null){
 				adapter.setNodes(nodes);
+
 				if (adapter.getItemCount() == 0){
 					recyclerView.setVisibility(View.GONE);
 					emptyImageView.setVisibility(View.VISIBLE);
@@ -1253,10 +1244,10 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			else{
 				log("adapter is NULL----------------");
 			}
-		}
-		else{
+		}else{
 			if (adapter != null){
 				adapter.setNodes(nodes);
+
 				if (adapter.getItemCount() == 0){
 					recyclerView.setVisibility(View.GONE);
 					emptyImageView.setVisibility(View.VISIBLE);
@@ -1345,6 +1336,11 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 		return 0;
 	}
 
-
-
+	public void visibilityFastScroller(){
+		if(adapter.getItemCount() < Constants.MIN_ITEMS_SCROLLBAR){
+			fastScroller.setVisibility(View.GONE);
+		}else{
+			fastScroller.setVisibility(View.VISIBLE);
+		}
+	}
 }
