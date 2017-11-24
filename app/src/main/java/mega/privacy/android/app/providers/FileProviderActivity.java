@@ -5,6 +5,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.app.SearchManager;
+import android.content.ClipData;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -21,6 +22,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewPager;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.SwitchCompat;
@@ -55,6 +57,7 @@ import android.widget.Toast;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -160,6 +163,7 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 	MySwitch loginSwitch;
 	Button bRegister;
 	Button bLogin;
+	RelativeLayout relativeLayout;
 	
 	public static int CLOUD_TAB = 0;
 	public static int INCOMING_TAB = 1;
@@ -184,6 +188,7 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 
 	LinearLayout optionsBar;
 	Button cancelButton;
+	Button attachButton;
 
 	TabLayout tabLayoutProvider;
 	LinearLayout providerSectionLayout;
@@ -195,6 +200,13 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 	long gParentHandle=-1;
 	long incParentHandle=-1;
 	String gcFTag = "";
+
+
+    List<MegaNode> selectedNodes;
+    int totalTransfers = 0;
+	int progressTransfersFinish = 0;
+	ClipData clipDataTransfers;
+	ArrayList<Uri> contentUris = new ArrayList<>();
 	
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
@@ -228,6 +240,7 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 		}
 
 		DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
+		relativeLayout = (RelativeLayout) findViewById(R.id.provider_container);
 
 		if (savedInstanceState != null){
 			folderSelected = savedInstanceState.getBoolean("folderSelected", false);
@@ -370,11 +383,16 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 
 				cancelButton = (Button) findViewById(R.id.cancel_button);
 				cancelButton.setOnClickListener(this);
-				cancelButton.setText(getString(R.string.general_cancel).toUpperCase(Locale.getDefault()));
+				cancelButton.setText(getString(R.string.general_cancel));
 				//Left and Right margin
 				LinearLayout.LayoutParams cancelButtonParams = (LinearLayout.LayoutParams)cancelButton.getLayoutParams();
-				cancelButtonParams.setMargins(Util.scaleWidthPx(10, metrics), 0, Util.scaleWidthPx(20, metrics), 0);
+				cancelButtonParams.setMargins(Util.scaleWidthPx(10, metrics), 0, 0, 0);
 				cancelButton.setLayoutParams(cancelButtonParams);
+
+				attachButton = (Button) findViewById(R.id.attach_button);
+				attachButton.setOnClickListener(this);
+				attachButton.setText(getString(R.string.general_attach));
+				activateButton(false);
 
 				//TABS section
 				providerSectionLayout= (LinearLayout)findViewById(R.id.tabhost_provider);
@@ -639,17 +657,6 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 						Constants.REQUEST_WRITE_STORAGE);
 			}
 		}
-		
-		ProgressDialog temp = null;
-		try{
-			temp = new ProgressDialog(this);
-			temp.setMessage(getString(R.string.context_preparing_provider));
-			temp.show();
-		}
-		catch(Exception e){
-			return;
-		}
-		statusDialog = temp;
 
 		File destination = null;	
 		
@@ -661,74 +668,97 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 			StatFs stat = new StatFs(destination.getPath());
 			availableFreeSpace = (double)stat.getAvailableBlocks() * (double)stat.getBlockSize();
 		}
-		catch(Exception ex){}		
-
-		if (hashes != null&&hashes.length>0){			
-
+		catch(Exception ex){}
+		Map<MegaNode, String> dlFiles = new HashMap<MegaNode, String>();
+		if (hashes != null&&hashes.length>0){
 			for (long hash : hashes) {
-
 				MegaNode tempNode = megaApi.getNodeByHandle(hash);
-
 				String localPath = Util.getLocalFile(this, tempNode.getName(), tempNode.getSize(), pathToDownload);
-
-				if(localPath != null){	
-					try { 
+				if(localPath != null){
+					try {
 						log("COPY_FILE");
 						File fileToShare = new File(pathToDownload, tempNode.getName());
-						Util.copyFile(new File(localPath), fileToShare); 
-						
+						Util.copyFile(new File(localPath), fileToShare);
+
 						if(fileToShare.exists()){
 							Uri contentUri = FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", fileToShare);
 							grantUriPermission("*", contentUri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
 							log("CONTENT URI: "+contentUri);
-							//Send it
-							Intent result = new Intent();
-							result.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-							result.setData(contentUri);
-							result.setAction(Intent.ACTION_GET_CONTENT);
-							
-							
-							if (getParent() == null) {
-							    setResult(Activity.RESULT_OK, result);
-							} else {
-							    getParent().setResult(Activity.RESULT_OK, result);
-							}
+							if(totalTransfers == 0) {
+								Intent result = new Intent();
+								result.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+								result.setData(contentUri);
+								result.setAction(Intent.ACTION_GET_CONTENT);
 
-							finish();	
+								if (getParent() == null) {
+									setResult(Activity.RESULT_OK, result);
+								} else {
+									getParent().setResult(Activity.RESULT_OK, result);
+								}
+								finish();
+							}
+							else{
+								contentUris.add(contentUri);
+								progressTransfersFinish++;
+								//Send it
+								if (progressTransfersFinish == totalTransfers) {
+									Intent result = new Intent();
+									result.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+									if (clipDataTransfers == null){
+										clipDataTransfers = ClipData.newUri(getContentResolver(), "", contentUris.get(0));
+									}
+									else{
+										clipDataTransfers.addItem(new ClipData.Item(contentUris.get(0)));
+									}
+									if (contentUris.size() >= 0) {
+										for (int i = 1; i < contentUris.size(); i++) {
+											clipDataTransfers.addItem(new ClipData.Item(contentUris.get(i)));
+										}
+									}
+									result.setClipData(clipDataTransfers);
+									result.setAction(Intent.ACTION_GET_CONTENT);
+
+									if (getParent() == null) {
+										setResult(Activity.RESULT_OK, result);
+									} else {
+										getParent().setResult(Activity.RESULT_OK, result);
+									}
+									totalTransfers = 0;
+									finish();
+								}
+							}
 						}
-					
+
 					}
 					catch(Exception e) {
 						finish();
 					}
 				}
-
-
 				if(tempNode != null){
-					Map<MegaNode, String> dlFiles = new HashMap<MegaNode, String>();
 					dlFiles.put(tempNode, pathToDownload);
-
-					for (MegaNode document : dlFiles.keySet()) {
-
-						String path = dlFiles.get(document);
-
-						if(availableFreeSpace < document.getSize()){
-							Util.showErrorAlertDialog(getString(R.string.error_not_enough_free_space) + " (" + new String(document.getName()) + ")", false, this);
-							continue;
-						}
-
-						Intent service = new Intent(this, DownloadService.class);
-						service.putExtra(DownloadService.EXTRA_HASH, document.getHandle());
-						service.putExtra(DownloadService.EXTRA_SIZE, document.getSize());
-						service.putExtra(DownloadService.EXTRA_PATH, path);
-						service.putExtra(DownloadService.EXTRA_OPEN_FILE, false);
-						startService(service);
-					}
 				}
 			}
-//			}
+		}
+		if(dlFiles.size() >0){
+			for (MegaNode document : dlFiles.keySet()) {
+
+				String path = dlFiles.get(document);
+
+				if(availableFreeSpace < document.getSize()){
+					Util.showErrorAlertDialog(getString(R.string.error_not_enough_free_space) + " (" + new String(document.getName()) + ")", false, this);
+					continue;
+				}
+
+				Intent service = new Intent(this, DownloadService.class);
+				service.putExtra(DownloadService.EXTRA_HASH, document.getHandle());
+				service.putExtra(DownloadService.EXTRA_SIZE, document.getSize());
+				service.putExtra(DownloadService.EXTRA_PATH, path);
+				service.putExtra(DownloadService.EXTRA_OPEN_FILE, false);
+				startService(service);
+			}
 		}
 	}
+
 	
 	@Override
 	protected void onSaveInstanceState(Bundle bundle) {
@@ -787,20 +817,56 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 				onLoginClick(v);
 				break;
 			}
-//			case R.id.file_provider_back:{
-//				onBackPressed();
-//				break;
-//			}
-//			case R.id.file_provider_window_title:{
-//				if (backVisible){
-//					onBackPressed();
-//					break;
-//				}
-//			}
 			case R.id.cancel_button:{
 				finish();
+				break;
+			}
+			case R.id.attach_button:{
+				ProgressDialog temp = null;
+				try{
+					temp = new ProgressDialog(this);
+					temp.setMessage(getString(R.string.context_preparing_provider));
+					temp.show();
+				}
+				catch(Exception e){
+					return;
+				}
+				statusDialog = temp;
+
+				progressTransfersFinish = 0;
+				clipDataTransfers = null;
+                long[] hashes = new long[selectedNodes.size()];
+				ArrayList<Long> totalHashes = new ArrayList<>();
+
+                for (int i=0; i<selectedNodes.size(); i++){
+                    hashes[i] = selectedNodes.get(i).getHandle();
+					getTotalTransfers(selectedNodes.get(i), totalHashes);
+                }
+
+				hashes = new long[totalTransfers];
+				for (int i=0; i<totalHashes.size(); i++){
+					hashes[i] = totalHashes.get(i);
+				}
+                downloadTo(selectedNodes.size(), hashes);
+				break;
 			}
 		}
+	}
+
+	public void getTotalTransfers (MegaNode n, ArrayList<Long> totalHashes){
+		int total = 0;
+		if(n.isFile()){
+			totalTransfers++;
+			totalHashes.add(n.getHandle());
+		}
+		else{
+			ArrayList<MegaNode> nodes = megaApi.getChildren(n);
+			for (int i=0; i<nodes.size(); i++){
+				getTotalTransfers(nodes.get(i), totalHashes);
+			}
+			totalTransfers += total;
+		}
+
 	}
 	
 	public void onLoginClick(View v){
@@ -1267,11 +1333,10 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 
 		cancelButton = (Button) findViewById(R.id.cancel_button);
 		cancelButton.setOnClickListener(this);
-		cancelButton.setText(getString(R.string.general_cancel).toUpperCase(Locale.getDefault()));
-		//Left and Right margin
-		LinearLayout.LayoutParams cancelButtonParams = (LinearLayout.LayoutParams)cancelButton.getLayoutParams();
-		cancelButtonParams.setMargins(Util.scaleWidthPx(10, metrics), 0, Util.scaleWidthPx(20, metrics), 0);
-		cancelButton.setLayoutParams(cancelButtonParams);
+
+		attachButton = (Button) findViewById(R.id.attach_button);
+		attachButton.setOnClickListener(this);
+		activateButton(false);
 
 		//TABS section
 		providerSectionLayout= (LinearLayout)findViewById(R.id.tabhost_provider);
@@ -1419,29 +1484,61 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 	public void onTransferFinish(MegaApiJava api, MegaTransfer transfer,
 			MegaError e) {
 		log("onTransferFinish: "+transfer.getPath());
-
 		try {
 			//Get the URI of the file
 			File fileToShare = new File(transfer.getPath());
 			//		File newFile = new File(fileToShare, "default_image.jpg");
 			Uri contentUri = FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", fileToShare);
 			grantUriPermission("*", contentUri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
-			log("CONTENT URI: " + contentUri);
-			//Send it
-			Intent result = new Intent();
-			result.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-			result.setData(contentUri);
-			result.setAction(Intent.ACTION_GET_CONTENT);
+		
+			if(totalTransfers == 0) {
+				log("CONTENT URI: " + contentUri);
+				//Send it
+				Intent result = new Intent();
+				result.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+				result.setData(contentUri);
+				result.setAction(Intent.ACTION_GET_CONTENT);
 
 
-			if (getParent() == null) {
-				setResult(Activity.RESULT_OK, result);
-			} else {
-				Toast.makeText(this, "ENTROOO parent no null", Toast.LENGTH_LONG).show();
-				getParent().setResult(Activity.RESULT_OK, result);
+				if (getParent() == null) {
+					setResult(Activity.RESULT_OK, result);
+				} else {
+					Toast.makeText(this, "ENTROOO parent no null", Toast.LENGTH_LONG).show();
+					getParent().setResult(Activity.RESULT_OK, result);
+				}
+
+				finish();
 			}
+			else {
+				contentUris.add(contentUri);
+				progressTransfersFinish++;
+				if(progressTransfersFinish == totalTransfers) {
+					Intent result = new Intent();
+					result.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+					if (clipDataTransfers == null){
+						clipDataTransfers = ClipData.newUri(getContentResolver(), "", contentUris.get(0));
+					}
+					else{
+						clipDataTransfers.addItem(new ClipData.Item(contentUris.get(0)));
+					}
+					if (contentUris.size() >= 0) {
+						for (int i = 1; i < contentUris.size(); i++) {
+							clipDataTransfers.addItem(new ClipData.Item(contentUris.get(i)));
+						}
+					}
+					result.setClipData(clipDataTransfers);
+					result.setAction(Intent.ACTION_GET_CONTENT);
 
-			finish();
+					if (getParent() == null) {
+						setResult(Activity.RESULT_OK, result);
+					} else {
+						Toast.makeText(this, "ENTROOO parent no null", Toast.LENGTH_LONG).show();
+						getParent().setResult(Activity.RESULT_OK, result);
+					}
+					totalTransfers = 0;
+					finish();
+				}
+			}
 		}
 		catch (Exception exception){
 			finish();
@@ -1482,6 +1579,21 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 		
 	}
 
+	public void activateButton (Boolean show){
+		attachButton.setEnabled(show);
+		if(show){
+			attachButton.setTextColor(getResources().getColor(R.color.accentColor));
+		}
+		else{
+			attachButton.setTextColor(getResources().getColor(R.color.invite_button_deactivated));
+		}
+	}
+
+	public void attachFiles (List<MegaNode> nodes){
+        this.selectedNodes = nodes;
+
+    }
+
 	public int getIncomingDeepBrowserTree() {
 		return incomingDeepBrowserTree;
 	}
@@ -1493,4 +1605,5 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 	public int getTabShown() {
 		return tabShown;
 	}
+
 }
