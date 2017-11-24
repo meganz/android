@@ -1616,6 +1616,7 @@
 
     <string name="forward_menu_item" context="Item of a menu to forward a message chat to another chatroom">Forward</string>
 
-    <string name="old_and_new_passwords_equals" context="when changing the password , the old password and new password are equals">Old and new passwords are equals</string>
+    <string name="general_attach" context="name of the button to attach file from MEGA to another app">Attach</string>
 
+    <string name="old_and_new_passwords_equals" context="when changing the password , the old password and new password are equals">Passwords cannot be the same</string>
 </resources>
