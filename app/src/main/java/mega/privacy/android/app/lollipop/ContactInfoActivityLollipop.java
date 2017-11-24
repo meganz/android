@@ -101,8 +101,11 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 
 	ContactController cC;
 
-	public static int MAX_WIDTH_FILENAME_LAND=470;
-	public static int MAX_WIDTH_FILENAME_PORT=190;
+	public static int MAX_WIDTH_FILENAME_LAND=450;
+	public static int MAX_WIDTH_FILENAME_PORT=170;
+	public static int MAX_WIDTH_APPBAR_LAND=250;
+	public static int MAX_WIDTH_APPBAR_PORT=350;
+
 
 	RelativeLayout imageLayout;
 	android.app.AlertDialog permissionsDialog;
@@ -229,6 +232,8 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			appBarLayout = (AppBarLayout) findViewById(R.id.app_bar);
 			setSupportActionBar(toolbar);
 			aB = getSupportActionBar();
+
+
 			imageLayout = (RelativeLayout) findViewById(R.id.chat_contact_properties_image_layout);
 
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -251,6 +256,11 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 
 			if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
 				log("Landscape configuration");
+
+				CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) appBarLayout.getLayoutParams();
+				params.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MAX_WIDTH_APPBAR_LAND, context.getResources().getDisplayMetrics());
+				appBarLayout.setLayoutParams(params);
+
 				float width = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MAX_WIDTH_FILENAME_LAND, getResources().getDisplayMetrics());
 				nameContact.setMaxWidth((int) width);
 				nameLength.setMaxWidth((int) width);
@@ -263,6 +273,11 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			}
 			else{
 				log("Portrait configuration");
+
+				CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) appBarLayout.getLayoutParams();
+				params.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MAX_WIDTH_APPBAR_PORT, context.getResources().getDisplayMetrics());
+				appBarLayout.setLayoutParams(params);
+
 				float width = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MAX_WIDTH_FILENAME_PORT, getResources().getDisplayMetrics());
 				nameContact.setMaxWidth((int) width);
 				nameLength.setMaxWidth((int) width);
