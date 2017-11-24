@@ -215,6 +215,7 @@ public class CloudDriveProviderFragmentLollipop extends Fragment{
 		display.getMetrics(metrics);
 
 		listView = (RecyclerView) v.findViewById(R.id.provider_list_view_browser);
+
 		listView.addItemDecoration(new SimpleDividerItemDecoration(context, metrics));
 		mLayoutManager = new LinearLayoutManager(context);
 		listView.setLayoutManager(mLayoutManager);
