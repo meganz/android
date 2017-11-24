@@ -765,7 +765,8 @@
     -->
 
     <string name="my_account_title" context="title of the My Account screen">Account Type</string>
-    <string name="expires_on" context="title of the Expiration Date">Renews on&#160;</string>
+    <string name="renews_on" context="title of the Expiration Date">Renews on&#160;</string>
+    <string name="expires_on" context="title of the Expiration Date">Expires on&#160;</string>
     <string name="free_account">FREE</string>
     <string name="prolite_account" context="Not translate">Lite</string>
     <string name="pro1_account" context="Not translate">PRO I</string>

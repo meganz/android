@@ -27,6 +27,7 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.MyAccountInfo;
 import mega.privacy.android.app.utils.DBUtil;
 import mega.privacy.android.app.utils.Util;
+import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
@@ -49,6 +50,7 @@ public class MyStorageFragmentLollipop extends Fragment implements MegaRequestLi
 	RelativeLayout expirationAccountLayout;
 
 	TextView typeAccountText;
+	TextView expirationAccountTitle;
 	TextView expirationAccountText;
 	TextView storageAvailableText;
 	TextView transferQuotaUsedText;
@@ -120,6 +122,7 @@ public class MyStorageFragmentLollipop extends Fragment implements MegaRequestLi
 		typeAccountText = (TextView) v.findViewById(R.id.my_storage_account_plan_text);
 		storageAvailableText = (TextView) v.findViewById(R.id.my_storage_account_space_text);
 		expirationAccountLayout = (RelativeLayout) v.findViewById(R.id.my_storage_account_expiration_layout);
+		expirationAccountTitle = (TextView) v.findViewById(R.id.my_storage_account_expiration_title);
 		expirationAccountText = (TextView) v.findViewById(R.id.my_storage_account_expiration_text);
 		transferQuotaUsedText = (TextView) v.findViewById(R.id.my_storage_account_transfer_text);
 
@@ -194,6 +197,11 @@ public class MyStorageFragmentLollipop extends Fragment implements MegaRequestLi
 		}
 		else{
 			storageAvailableText.setText(myAccountInfo.getTotalFormatted());
+
+			log("ExpirationTime: "+Util.getDateString(myAccountInfo.getAccountInfo().getProExpiration()));
+			log("Subscription cycle: "+myAccountInfo.getAccountInfo().getSubscriptionCycle());
+			log("Renews on: "+Util.getDateString(myAccountInfo.getAccountInfo().getSubscriptionRenewTime()));
+
 			switch(myAccountInfo.getAccountType()){
 
 				case 0:{
@@ -201,31 +209,54 @@ public class MyStorageFragmentLollipop extends Fragment implements MegaRequestLi
 					expirationAccountLayout.setVisibility(View.GONE);
 					break;
 				}
-
 				case 1:{
 					typeAccountText.setText(getString(R.string.pro1_account));
-					expirationAccountText.setText(Util.getDateString(myAccountInfo.getAccountInfo().getProExpiration()));
+					if(myAccountInfo.getAccountInfo().getSubscriptionStatus()== MegaAccountDetails.SUBSCRIPTION_STATUS_VALID){
+						expirationAccountTitle.setText(getString(R.string.renews_on));
+						expirationAccountText.setText(Util.getDateString(myAccountInfo.getAccountInfo().getSubscriptionRenewTime()));
+					}
+					else{
+						expirationAccountTitle.setText(getString(R.string.expires_on));
+						expirationAccountText.setText(Util.getDateString(myAccountInfo.getAccountInfo().getProExpiration()));
+					}
 					break;
 				}
-
 				case 2:{
 					typeAccountText.setText(getString(R.string.pro2_account));
-					expirationAccountText.setText(Util.getDateString(myAccountInfo.getAccountInfo().getProExpiration()));
+					if(myAccountInfo.getAccountInfo().getSubscriptionStatus()== MegaAccountDetails.SUBSCRIPTION_STATUS_VALID){
+						expirationAccountTitle.setText(getString(R.string.renews_on));
+						expirationAccountText.setText(Util.getDateString(myAccountInfo.getAccountInfo().getSubscriptionRenewTime()));
+					}
+					else{
+						expirationAccountTitle.setText(getString(R.string.expires_on));
+						expirationAccountText.setText(Util.getDateString(myAccountInfo.getAccountInfo().getProExpiration()));
+					}
 					break;
 				}
-
 				case 3:{
 					typeAccountText.setText(getString(R.string.pro3_account));
-					expirationAccountText.setText(Util.getDateString(myAccountInfo.getAccountInfo().getProExpiration()));
+					if(myAccountInfo.getAccountInfo().getSubscriptionStatus()== MegaAccountDetails.SUBSCRIPTION_STATUS_VALID){
+						expirationAccountTitle.setText(getString(R.string.renews_on));
+						expirationAccountText.setText(Util.getDateString(myAccountInfo.getAccountInfo().getSubscriptionRenewTime()));
+					}
+					else{
+						expirationAccountTitle.setText(getString(R.string.expires_on));
+						expirationAccountText.setText(Util.getDateString(myAccountInfo.getAccountInfo().getProExpiration()));
+					}
 					break;
 				}
-
 				case 4:{
 					typeAccountText.setText(getString(R.string.prolite_account));
-					expirationAccountText.setText(Util.getDateString(myAccountInfo.getAccountInfo().getProExpiration()));
+					if(myAccountInfo.getAccountInfo().getSubscriptionStatus()== MegaAccountDetails.SUBSCRIPTION_STATUS_VALID){
+						expirationAccountTitle.setText(getString(R.string.renews_on));
+						expirationAccountText.setText(Util.getDateString(myAccountInfo.getAccountInfo().getSubscriptionRenewTime()));
+					}
+					else{
+						expirationAccountTitle.setText(getString(R.string.expires_on));
+						expirationAccountText.setText(Util.getDateString(myAccountInfo.getAccountInfo().getProExpiration()));
+					}
 					break;
 				}
-
 			}
 		}
 
