@@ -204,7 +204,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     boolean emojiKeyboardShown = false;
     boolean softKeyboardShown = false;
-    boolean keyboardTextIsShown = false;
 
     ArrayList<AndroidMegaChatMessage> messages;
     ArrayList<AndroidMegaChatMessage> bufferMessages;
@@ -460,7 +459,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         textChat.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                keyboardTextIsShown = true;
                 if (emojiKeyboardShown){
                     keyboardButton.setImageResource(R.drawable.ic_emoticon_white);
                     removeEmojiconFragment();
@@ -481,7 +479,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 textChat.requestFocus();
                 InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                 imm.showSoftInput(textChat, InputMethodManager.SHOW_IMPLICIT);
-                keyboardTextIsShown = true;
 
                 return false;
             }
@@ -1514,7 +1511,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                     imm.showSoftInput(textChat, InputMethodManager.SHOW_IMPLICIT);
                     keyboardButton.setImageResource(R.drawable.ic_emoticon_white);
-                    keyboardTextIsShown = true;
 
                 } else{
                     InputMethodManager imm = (InputMethodManager) getSystemService(this.INPUT_METHOD_SERVICE);
@@ -1523,7 +1519,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         log("imm.isAcceptingText()");
                         imm.hideSoftInputFromWindow(textChat.getWindowToken(), 0);
                         shouldShowEmojiKeyboard = true;
-                        keyboardTextIsShown=false;
                     }
                     else{
                         setEmojiconFragment(false);
