@@ -755,6 +755,18 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
                     if(isVideoOutgoing){
                         updateLocalVideoStatus();
                     }
+                    if(callChat.hasAudio(false)){
+                        log("Remote audio is connected");
+                    }
+                    else{
+                        log("Remote audio is NOT connected");
+                    }
+                    if(callChat.hasVideo(false)){
+                        log("Remote video is connected");
+                    }
+                    else{
+                        log("Remote video is NOT connected");
+                    }
                     break;
                 }
                 case MegaChatCall.CALL_STATUS_DESTROYED:{
@@ -784,6 +796,12 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
             log("Local flags have changed");
             updateLocalAudioStatus();
             updateLocalVideoStatus();
+        }
+        else if(call.hasChanged(MegaChatCall.CHANGE_TYPE_RINGING_STATUS)){
+            log("CHANGE_TYPE_RINGING_STATUS");
+        }
+        else{
+            log("CHANGE_TYPE_RINGING_STATUS: "+call.getChanges());
         }
     }
 

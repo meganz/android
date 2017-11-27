@@ -14523,6 +14523,19 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				startActivity(i);
 			}
 		}
+
+		if(call.hasAudio(false)){
+			log("Remote audio is connected");
+		}
+		else{
+			log("Remote audio is NOT connected");
+		}
+		if(call.hasVideo(false)){
+			log("Remote video is connected");
+		}
+		else{
+			log("Remote video is NOT connected");
+		}
 	}
 
 	public void setContactTitleSection(){
