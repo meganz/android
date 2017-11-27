@@ -1,8 +1,6 @@
 package mega.privacy.android.app.lollipop.megachat;
 
-import android.app.Activity;
 import android.app.Notification;
-import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
@@ -26,7 +24,6 @@ import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.content.ContextCompat;
 import android.text.Html;
 import android.text.Spanned;
-import android.widget.RemoteViews;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -35,12 +32,9 @@ import java.util.Comparator;
 import java.util.Locale;
 
 import mega.privacy.android.app.DatabaseHandler;
-import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
-import mega.privacy.android.app.lollipop.controllers.ChatController;
-import mega.privacy.android.app.lollipop.listeners.ChatListNonContactNameListener;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -81,14 +75,17 @@ public final class NotificationBuilder {
         this.megaChatApi = megaChatApi;
     }
 
-    public void sendBundledNotification(Uri uriParameter, MegaChatListItem item, String vibration, String email) {
+    public void sendBundledNotification(Uri uriParameter, ArrayList<MegaChatListItem> unreadChats, String vibration, String email) {
+
+        MegaChatListItem item = unreadChats.get(0);
+        log("Last item: "+unreadChats.get(0));
 
         log("SDK android version: "+Build.VERSION.SDK_INT);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             log("more than Build.VERSION_CODES.N");
 
             String manufacturer = "xiaomi";
-            if(!manufacturer.equalsIgnoreCase(android.os.Build.MANUFACTURER)) {
+            if(!manufacturer.equalsIgnoreCase(Build.MANUFACTURER)) {
                 Notification notification = buildNotification(uriParameter, item, vibration, GROUP_KEY, email);
                 log("Notification id--- "+getNotificationIdByHandle(item.getChatId()));
                 notificationManager.notify(getNotificationIdByHandle(item.getChatId()), notification);
@@ -96,7 +93,7 @@ public final class NotificationBuilder {
                 notificationManager.notify(SUMMARY_ID, summary);
             }
             else{
-                Notification notification = buildNotificationPreN(uriParameter, item, vibration, GROUP_KEY, email);
+                Notification notification = buildNotificationPreN(uriParameter, unreadChats, vibration, GROUP_KEY, email);
                 log("Notification XIAOMI id: "+getNotificationIdByHandle(item.getChatId()));
                 if(notification!=null){
                     notificationManager.notify(getNotificationIdByHandle(item.getChatId()), notification);
@@ -105,7 +102,7 @@ public final class NotificationBuilder {
         }
         else if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
             log("more than Build.VERSION_CODES.LOLLIPOP");
-            Notification notification = buildNotificationPreN(uriParameter, item, vibration, GROUP_KEY, email);
+            Notification notification = buildNotificationPreN(uriParameter, unreadChats, vibration, GROUP_KEY, email);
             log("Notification id: "+getNotificationIdByHandle(item.getChatId()));
             if(notification!=null){
                 notificationManager.notify(getNotificationIdByHandle(item.getChatId()), notification);
@@ -119,17 +116,15 @@ public final class NotificationBuilder {
         }
     }
 
-    public Notification buildNotificationPreN(Uri uriParameter, MegaChatListItem item, String vibration, String groupKey, String email){
+    public Notification buildNotificationPreN(Uri uriParameter, ArrayList<MegaChatListItem> unreadChats, String vibration, String groupKey, String email){
         log("buildNotificationPreN");
 
-        ArrayList<MegaChatListItem> unreadChats = megaChatApi.getUnreadChatListItems();
-        log("Size of unread: "+unreadChats.size());
         if(unreadChats.size()>1){
             Intent intent = new Intent(context, ManagerActivityLollipop.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             intent.setAction(Constants.ACTION_CHAT_SUMMARY);
             intent.putExtra("CHAT_ID", -1);
-            PendingIntent pendingIntent = PendingIntent.getActivity(context, (int)item.getChatId() , intent, PendingIntent.FLAG_ONE_SHOT);
+            PendingIntent pendingIntent = PendingIntent.getActivity(context, (int)unreadChats.get(0).getChatId() , intent, PendingIntent.FLAG_ONE_SHOT);
 
             NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context)
                     .setSmallIcon(R.drawable.ic_stat_notify_download)
@@ -147,16 +142,6 @@ public final class NotificationBuilder {
 
             Spanned firstLine = null;
 
-            Collections.sort(unreadChats, new Comparator<MegaChatListItem>(){
-
-                public int compare(MegaChatListItem c1, MegaChatListItem c2) {
-                    long timestamp1 = c1.getLastTimestamp();
-                    long timestamp2 = c2.getLastTimestamp();
-
-                    long result = timestamp2 - timestamp1;
-                    return (int)result;
-                }
-            });
 
             for(int i =0; i<unreadChats.size();i++){
 
@@ -174,7 +159,7 @@ public final class NotificationBuilder {
                 }
 
                 Spanned notificationContent;
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                     notificationContent = Html.fromHtml(lineToShow,Html.FROM_HTML_MODE_LEGACY);
                 } else {
                     notificationContent = Html.fromHtml(lineToShow);
@@ -205,7 +190,7 @@ public final class NotificationBuilder {
             return notificationBuilder.build();
         }
         else if (unreadChats.size()==1){
-            return buildNotification(uriParameter, item, vibration, GROUP_KEY, email);
+            return buildNotification(uriParameter, unreadChats.get(0), vibration, GROUP_KEY, email);
         }
         else{
             return null;
@@ -252,7 +237,7 @@ public final class NotificationBuilder {
             title = item.getTitle();
         }
 
-        if (android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP)
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP)
         {
             log("Notification pre lollipop");
 
@@ -316,7 +301,7 @@ public final class NotificationBuilder {
                 else{
                     String source = "<b>"+nameAction+": </b>"+item.getLastMessage();
 
-                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                         notificationContent = Html.fromHtml(source,Html.FROM_HTML_MODE_LEGACY);
                     } else {
                         notificationContent = Html.fromHtml(source);
