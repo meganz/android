@@ -1528,9 +1528,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                             SimpleSpanBuilder ssb = null;
                             if(message.getContent()!=null){
                                 messageContent = message.getContent();
-                                RTFFormatter formatter = new RTFFormatter(messageContent);
+                                RTFFormatter formatter = new RTFFormatter(messageContent, context);
                                 ssb = formatter.setRTFFormat();
-
                             }
 
                             int status = message.getStatus();
@@ -1586,7 +1585,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
 //                            ((ViewHolderMessageChat)holder).contentOwnMessageText.setText(messageContent);
                             if(ssb!=null){
-
                                 ((ViewHolderMessageChat)holder).contentOwnMessageText.setText(ssb.build(), TextView.BufferType.SPANNABLE);
                             }
                             else{
