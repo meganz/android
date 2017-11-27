@@ -23,6 +23,7 @@ import android.text.Html;
 import android.text.Spanned;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
+import android.util.TypedValue;
 import android.view.Display;
 import android.view.GestureDetector;
 import android.view.Menu;
@@ -203,6 +204,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     boolean emojiKeyboardShown = false;
     boolean softKeyboardShown = false;
+    boolean keyboardTextIsShown = false;
 
     ArrayList<AndroidMegaChatMessage> messages;
     ArrayList<AndroidMegaChatMessage> bufferMessages;
@@ -458,29 +460,29 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         textChat.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-
+                keyboardTextIsShown = true;
                 if (emojiKeyboardShown){
                     keyboardButton.setImageResource(R.drawable.ic_emoticon_white);
-//                    int inputType = textChat.getInputType();
-//                    textChat.setInputType(InputType.TYPE_NULL);
-//                    textChat.onTouchEvent(event);
-//                    textChat.setInputType(inputType);
-//
-//                    float x = event.getX();
-//                    float y = event.getY();
-//
-//                    int touchPosition = textChat.getOffsetForPosition(x, y);
-//                    Toast.makeText(ChatActivityLollipop.this, "X: " + x + "__ Y " + y + "__TOUCHPOSITION: " + touchPosition, Toast.LENGTH_SHORT).show();
-//                    if (touchPosition  > 0){
-//                        textChat.setSelection(touchPosition);
-//                    }
-////                    InputMethodManager imm = (InputMethodManager) getSystemService(ChatActivityLollipop.this.INPUT_METHOD_SERVICE);
-////                    imm.hideSoftInputFromWindow(textChat.getWindowToken(), 0);
-//
-//                    return true;
-
                     removeEmojiconFragment();
                 }
+                return false;
+            }
+        });
+
+        textChat.setOnLongClickListener(new View.OnLongClickListener() {
+
+            @Override
+            public boolean onLongClick(View v) {
+                if (emojiKeyboardShown){
+                    keyboardButton.setImageResource(R.drawable.ic_emoticon_white);
+                    removeEmojiconFragment();
+                }
+
+                textChat.requestFocus();
+                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.showSoftInput(textChat, InputMethodManager.SHOW_IMPLICIT);
+                keyboardTextIsShown = true;
+
                 return false;
             }
         });
@@ -581,15 +583,14 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         if (!emojiKeyboardShown){
                             softKeyboardShown = true;
                         }
-                    }
-                    else{
+                    }else{
                         softKeyboardShown = false;
                     }
-
                     if (shouldShowEmojiKeyboard){
                         setEmojiconFragment(false);
                         shouldShowEmojiKeyboard = false;
                     }
+
                 }
             });
         }
@@ -929,7 +930,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         if (keyboardSize != -1) {
             if (keyboardSize == 0){
                 RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) emojiKeyboardLayout.getLayoutParams();
-                params.height = 660;
+                params.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 300, getResources().getDisplayMetrics());
                 emojiKeyboardLayout.setLayoutParams(params);
             }
             else {
@@ -943,7 +944,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         else{
             if (emojiKeyboardLayout != null) {
                 RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) emojiKeyboardLayout.getLayoutParams();
-                params.height = 660;
+                params.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 300, getResources().getDisplayMetrics());
                 emojiKeyboardLayout.setLayoutParams(params);
             }
         }
@@ -1513,6 +1514,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                     imm.showSoftInput(textChat, InputMethodManager.SHOW_IMPLICIT);
                     keyboardButton.setImageResource(R.drawable.ic_emoticon_white);
+                    keyboardTextIsShown = true;
 
                 } else{
                     InputMethodManager imm = (InputMethodManager) getSystemService(this.INPUT_METHOD_SERVICE);
@@ -1521,6 +1523,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         log("imm.isAcceptingText()");
                         imm.hideSoftInputFromWindow(textChat.getWindowToken(), 0);
                         shouldShowEmojiKeyboard = true;
+                        keyboardTextIsShown=false;
                     }
                     else{
                         setEmojiconFragment(false);
