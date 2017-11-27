@@ -21,6 +21,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.support.v4.app.NotificationCompat;
@@ -30,13 +31,18 @@ import android.widget.Toast;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
-import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
+import mega.privacy.android.app.lollipop.megachat.NotificationBuilder;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -47,6 +53,7 @@ import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatCall;
 import nz.mega.sdk.MegaChatCallListenerInterface;
 import nz.mega.sdk.MegaChatError;
+import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaError;
@@ -65,6 +72,8 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
     boolean isLoggingIn = false;
 
     String remoteMessageType = "";
+
+    private NotificationBuilder notificationBuilder;
 
     @Override
     public void onCreate() {
@@ -92,7 +101,6 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
         log("onMessageReceived");
-        MegaApplication.isFireBaseConnection=true;
         // [START_EXCLUDE]
         // There are two types of messages data messages and notification messages. Data messages are handled
         // here in onMessageReceived whether the app is in the foreground or background. Data messages are the type
@@ -103,9 +111,10 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
         // messages. For more see: https://firebase.google.com/docs/cloud-messaging/concept-options
         // [END_EXCLUDE]
 
-        // TODO(developer): Handle FCM messages here.
         // Not getting messages here? See why this may be: https://goo.gl/39bRNJ
         log("From: " + remoteMessage.getFrom());
+
+        notificationBuilder =  NotificationBuilder.newInstance(this, megaApi, megaChatApi);
 
         // Check if message contains a data payload.
         if (remoteMessage.getData().size() > 0) {
@@ -156,7 +165,13 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
                     }
                 }
                 else{
-                    sendNotification(remoteMessage.getData().get("type"));
+
+                    String type = remoteMessage.getData().get("type");
+                    if(type.equals("2")){
+                        log("Chat notification");
+                        showNotification();
+                    }
+
                 }
             }
         }
@@ -179,78 +194,6 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
     }
     // [END receive_message]
 
-    /**
-     * Create and show a simple notification containing the received FCM message.
-     *
-     * @param type type received
-     */
-    private void sendNotification(String type) {
-        log("sendNotification: " + type);
-//        Intent intent = new Intent(this, ManagerActivityLollipop.class);
-//        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-//
-//        String notificationContent = "";
-//        String notificationTitle = "";
-//        int notificationId = 0;
-//
-//        try{
-//            String email = "";
-//            if (megaApi != null) {
-//                if (megaApi.getMyUser() != null) {
-//                    if (megaApi.getMyUser().getEmail() != null) {
-//                        email = megaApi.getMyUser().getEmail();
-//                    }
-//                }
-//            }
-//
-//
-//            int typeInt = Integer.parseInt(type);
-//            switch (typeInt){
-//                case 1:{
-//                    notificationTitle = "Cloud activity (" + email + ")";
-//                    notificationContent = "A folder has been shared with you";
-//                    notificationId = Constants.NOTIFICATION_PUSH_CLOUD_DRIVE;
-//                    intent.setAction(Constants.ACTION_INCOMING_SHARED_FOLDER_NOTIFICATION);
-//                    break;
-//                }
-//                case 2:{
-//                    notificationTitle = "Chat activity (" + email + ")";
-//                    notificationContent = "You have received a message";
-//                    notificationId = Constants.NOTIFICATION_PUSH_CHAT;
-//                    intent.setAction(Constants.ACTION_CHAT_NOTIFICATION_MESSAGE);
-//                    break;
-//                }
-//                case 3:{
-//                    notificationTitle = "Contact activity (" + email + ")";
-//                    notificationContent = "You have a new contact request";
-//                    notificationId = Constants.NOTIFICATION_PUSH_CONTACT;
-//                    intent.setAction(Constants.ACTION_IPC);
-//                    break;
-//                }
-//            }
-//
-//
-//            PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
-//                    PendingIntent.FLAG_ONE_SHOT);
-//
-//            Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-//            NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
-//                    .setSmallIcon(R.drawable.ic_stat_notify_download)
-//                    .setContentTitle(notificationTitle)
-//                    .setContentText(notificationContent)
-//                    .setAutoCancel(true)
-//                    .setSound(defaultSoundUri)
-//                    .setContentIntent(pendingIntent);
-//
-//            NotificationManager notificationManager =
-//                    (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-//
-//            notificationManager.notify(notificationId, notificationBuilder.build());
-//
-//
-//        }
-//        catch(Exception e){}
-    }
 
     public static void log(String message) {
         Util.log("MegaFirebaseMessagingService", "FCM " + message);
@@ -296,7 +239,6 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
                 else{
                     log("Chat NOT enabled - sendNotification");
                 }
-                sendNotification(remoteMessageType);
             }
             else {
                 log("ERROR: " + e.getErrorString());
@@ -330,6 +272,7 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
             if(e.getErrorCode()==MegaChatError.ERROR_OK){
                 log("Connected to chat!");
                 MegaApplication.setChatConnection(true);
+                showNotification();
             }
             else{
                 log("EEEERRRRROR WHEN CONNECTING " + e.getErrorString());
@@ -338,7 +281,6 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
         else if (request.getType() == MegaChatRequest.TYPE_SET_BACKGROUND_STATUS){
             log("TYPE SETBACKGROUNDSTATUS");
         }
-
     }
 
     @Override
@@ -349,6 +291,105 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
     @Override
     public void onChatCallUpdate(MegaChatApiJava api, MegaChatCall call) {
         log("onChatCallUpdate");
+    }
 
+    public void showNotification(){
+        log("showNotification");
+
+        ArrayList<MegaChatListItem> unreadChats = megaChatApi.getUnreadChatListItems();
+        log("Size of unread: "+unreadChats.size());
+        Collections.sort(unreadChats, new Comparator<MegaChatListItem>(){
+
+            public int compare(MegaChatListItem c1, MegaChatListItem c2) {
+                long timestamp1 = c1.getLastTimestamp();
+                long timestamp2 = c2.getLastTimestamp();
+
+                long result = timestamp2 - timestamp1;
+                return (int)result;
+            }
+        });
+
+        MegaChatListItem item = unreadChats.get(0);
+        log("showNotification last item: "+item.getTitle()+ " message: "+item.getLastMessage());
+
+        ChatSettings chatSettings = dbH.getChatSettings();
+        String email = megaChatApi.getContactEmail(item.getPeerHandle());
+
+        if(chatSettings!=null){
+            if(chatSettings.getNotificationsEnabled().equals("true")){
+                log("Notifications ON for all chats");
+
+                ChatItemPreferences chatItemPreferences = dbH.findChatPreferencesByHandle(String.valueOf(item.getChatId()));
+
+                if(chatItemPreferences==null){
+                    log("No preferences for this item");
+                    String soundString = chatSettings.getNotificationsSound();
+                    Uri uri = Uri.parse(soundString);
+                    log("Uri: "+uri);
+
+                    if(soundString.equals("true")||soundString.equals("")){
+
+                        Uri defaultSoundUri2 = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+                        notificationBuilder.sendBundledNotification(defaultSoundUri2, unreadChats, chatSettings.getVibrationEnabled(), email);
+                    }
+                    else if(soundString.equals("-1")){
+                        log("Silent notification");
+                        notificationBuilder.sendBundledNotification(null, unreadChats, chatSettings.getVibrationEnabled(), email);
+                    }
+                    else{
+                        Ringtone sound = RingtoneManager.getRingtone(this, uri);
+                        if(sound==null){
+                            log("Sound is null");
+                            notificationBuilder.sendBundledNotification(null, unreadChats, chatSettings.getVibrationEnabled(), email);
+                        }
+                        else{
+                            notificationBuilder.sendBundledNotification(uri, unreadChats, chatSettings.getVibrationEnabled(), email);
+                        }
+                    }
+                }
+                else{
+                    log("Preferences FOUND for this item");
+                    if(chatItemPreferences.getNotificationsEnabled().equals("true")){
+                        log("Notifications ON for this chat");
+                        String soundString = chatItemPreferences.getNotificationsSound();
+                        Uri uri = Uri.parse(soundString);
+                        log("Uri: "+uri);
+
+                        if(soundString.equals("true")){
+
+                            Uri defaultSoundUri2 = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+                            notificationBuilder.sendBundledNotification(defaultSoundUri2, unreadChats, chatSettings.getVibrationEnabled(), email);
+                        }
+                        else if(soundString.equals("-1")){
+                            log("Silent notification");
+                            notificationBuilder.sendBundledNotification(null, unreadChats, chatSettings.getVibrationEnabled(), email);
+                        }
+                        else{
+                            Ringtone sound = RingtoneManager.getRingtone(this, uri);
+                            if(sound==null){
+                                log("Sound is null");
+                                notificationBuilder.sendBundledNotification(null, unreadChats, chatSettings.getVibrationEnabled(), email);
+                            }
+                            else{
+                                notificationBuilder.sendBundledNotification(uri, unreadChats, chatSettings.getVibrationEnabled(), email);
+
+                            }
+                        }
+                    }
+                    else{
+                        log("Notifications OFF for this chats");
+                    }
+                }
+            }
+            else{
+                log("Notifications OFF");
+            }
+        }
+        else{
+            log("Notifications DEFAULT ON");
+
+            Uri defaultSoundUri2 = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+            notificationBuilder.sendBundledNotification(defaultSoundUri2, unreadChats, "true", email);
+        }
     }
 }
