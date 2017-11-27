@@ -170,7 +170,8 @@ public class RTFFormatter {
             ssb.append(substring, new ForegroundColorSpan(Color.BLUE));
 
             sb = new StringBuilder(messageContent);
-            sb.delete(0, end+3);
+            sb.delete(0, end);
+            sb.insert(0, '\n');
             messageContent = sb.toString();
         }
         else{
