@@ -1,6 +1,9 @@
 package mega.privacy.android.app.utils;
 
+import android.content.Context;
+import android.graphics.Color;
 import android.graphics.Typeface;
+import android.text.style.ForegroundColorSpan;
 import android.text.style.StyleSpan;
 
 import com.vdurmont.emoji.EmojiManager;
@@ -14,9 +17,11 @@ public class RTFFormatter {
 
     String messageContent;
     SimpleSpanBuilder ssb = null;
+    Context context;
 
-    public RTFFormatter(String messageContent) {
+    public RTFFormatter(String messageContent, Context context) {
         this.messageContent = messageContent;
+        this.context = context;
     }
 
     public SimpleSpanBuilder setRTFFormat(){
@@ -26,6 +31,41 @@ public class RTFFormatter {
         String noEmojisContent = EmojiParser.removeAllEmojis(messageContent);
 
         if(!messageContent.isEmpty()){
+
+            boolean  multiquote = Pattern.matches("(.*\\s+)*```.*```(\\s+.*)*[?|!|\\.|,|;|:|\\)|%]*", noEmojisContent);
+//                                boolean  italic = Pattern.matches(".*_.*_.*", messageContent);
+            if(multiquote) {
+
+                boolean bold = Pattern.matches("(.*\\s+)*\\*.*\\*(\\s+.*)*[?|!|\\.|,|;|:|\\)|%]*", noEmojisContent);
+//                                boolean  italic = Pattern.matches(".*_.*_.*", messageContent);
+                int startBold = -1;
+                int startMultiquote = -1;
+                if (bold) {
+                    startBold = messageContent.indexOf(("*"));
+                    startMultiquote = messageContent.indexOf(("```"));
+                    if (startMultiquote < startBold) {
+                        applyMultiQuoteFormat();
+                        return ssb;
+                    }
+                }
+
+                boolean  italic = Pattern.matches("(.*\\s+)*_.*_(\\s+.*)*[?|!|\\.|,|;|:|\\)|%]*", noEmojisContent);
+                int startItalic = -1;
+                if(italic) {
+                    startItalic = messageContent.indexOf(("_"));
+                    startMultiquote = messageContent.indexOf(("```"));
+                    if (startMultiquote < startItalic) {
+                        applyMultiQuoteFormat();
+                        return ssb;
+                    }
+                }
+
+                if(!bold && !italic){
+                    applyMultiQuoteFormat();
+                    return ssb;
+                }
+            }
+
             boolean  italic = Pattern.matches("(.*\\s+)*_.*_(\\s+.*)*[?|!|\\.|,|;|:|\\)|%]*", noEmojisContent);
 //                                boolean  italic = Pattern.matches(".*_.*_.*", messageContent);
             if(italic) {
@@ -46,14 +86,14 @@ public class RTFFormatter {
                     return ssb;
                 }
             }
-        }
 
-        if(!messageContent.isEmpty()){
-            boolean bold = Pattern.matches("(.*\\s+)*\\*.*\\*(\\s+.*)*[?|!|\\.|,|;|:|\\)|%]*", noEmojisContent);
+            if(!messageContent.isEmpty()){
+                boolean bold = Pattern.matches("(.*\\s+)*\\*.*\\*(\\s+.*)*[?|!|\\.|,|;|:|\\)|%]*", noEmojisContent);
 //                                boolean  italic = Pattern.matches(".*_.*_.*", messageContent);
-            if(bold){
-                applyBoldFormat();
-                return ssb;
+                if(bold){
+                    applyBoldFormat();
+                    return ssb;
+                }
             }
         }
 
@@ -64,6 +104,102 @@ public class RTFFormatter {
         Util.log("RTFFormatter", log);
     }
 
+    public void applyMultiQuoteFormat(){
+        log("applyMultiQuoteFormat");
+
+        String a = messageContent.substring(0,3);
+        int start;
+        int end;
+
+        if(ssb==null){
+            ssb = new SimpleSpanBuilder();
+        }
+
+        String substring = null;
+
+        if(a.equals("```")){
+
+            StringBuilder sb = new StringBuilder(messageContent);
+            sb.delete(0,3);
+            messageContent = sb.toString();
+        }
+        else{
+            start = messageContent.indexOf(" ```");
+
+            if(start==-1){
+                log("Check if there is emoji at the beginning of the string");
+                start = messageContent.indexOf("```");
+                String emoji = messageContent.substring(0, start);
+                if(EmojiManager.isEmoji(emoji)){
+                    log("The first element is emoji");
+                    substring = messageContent.substring(0, start);
+                    ssb.append(substring);
+
+                    StringBuilder sb = new StringBuilder(messageContent);
+                    sb.delete(0, start+4);
+                    sb.insert(0, '\n');
+                    messageContent = sb.toString();
+                }
+            }
+            else{
+                start++;
+                substring = messageContent.substring(0, start);
+                ssb.append(substring);
+
+                StringBuilder sb = new StringBuilder(messageContent);
+                sb.delete(0, start+3);
+                sb.insert(0, '\n');
+                messageContent = sb.toString();
+            }
+        }
+
+        log("Message content: "+messageContent);
+        end = messageContent.indexOf("``` ");
+        if(end==-1){
+            end = messageContent.lastIndexOf("```");
+            log("FINISH End position: "+end);
+
+            StringBuilder sb = new StringBuilder(messageContent);
+            sb.delete(end, end+3);
+            messageContent = sb.toString();
+
+            log("Message content: "+messageContent);
+
+            substring = messageContent.substring(0, end);
+
+            ssb.append(substring, new ForegroundColorSpan(Color.BLUE));
+
+            sb = new StringBuilder(messageContent);
+            sb.delete(0, end+3);
+            messageContent = sb.toString();
+        }
+        else{
+            log("End position: "+end);
+            StringBuilder sb = new StringBuilder(messageContent);
+            sb.delete(end, end+3);
+            messageContent = sb.toString();
+
+            log("Message content B: "+messageContent);
+            substring = messageContent.substring(0, end);
+
+            ssb.append(substring, new ForegroundColorSpan(Color.BLUE));
+
+            sb = new StringBuilder(messageContent);
+            sb.delete(0, end+1);
+            sb.insert(0, '\n');
+            messageContent = sb.toString();
+
+            log("Message content T: "+messageContent);
+        }
+
+        if(!messageContent.isEmpty()){
+            log("Append more...");
+            ssb.append(messageContent);
+        }
+        else{
+            log("End value: "+end+" messageContent length: "+messageContent.length());
+        }
+    }
 
     public void applyItalicFormat(){
         char a = messageContent.charAt(0);
@@ -148,6 +284,7 @@ public class RTFFormatter {
             }
             else if(Pattern.matches("(.*\\s+)*```.*```(\\s+.*)*[?|!|\\.|,|;|:|\\)|%]*", substring)){
                 log("Multiquote");
+                applyItalicMultiQuoteFormat(substring, Typeface.ITALIC);
             }
             else{
                 ssb.append(substring, new StyleSpan(Typeface.ITALIC));
@@ -170,6 +307,10 @@ public class RTFFormatter {
 //                                boolean  italic = Pattern.matches(".*_.*_.*", messageContent);
             if(bold){
                 applyItalicBoldFormat(substring);
+            }
+            else if(Pattern.matches("(.*\\s+)*```.*```(\\s+.*)*[?|!|\\.|,|;|:|\\)|%]*", substring)){
+                log("Multiquote");
+                applyItalicMultiQuoteFormat(substring, Typeface.ITALIC);
             }
             else{
                 ssb.append(substring, new StyleSpan(Typeface.ITALIC));
@@ -372,6 +513,152 @@ public class RTFFormatter {
         return ssb;
     }
 
+    public SimpleSpanBuilder applyItalicMultiQuoteFormat(String subMessageContent, int format){
+        log("applyItalicMultiQuoteFormat: "+subMessageContent);
+//        char b = subMessageContent.charAt(0);
+        String b = subMessageContent.substring(0,3);
+        int startB;
+        int endB;
+
+        if(ssb==null){
+            ssb = new SimpleSpanBuilder();
+        }
+
+        String substringB = null;
+        Typeface typeFace = Typeface.createFromAsset(context.getAssets(), "font/RobotoMono-Medium.ttf");
+
+        if(b.equals("```")){
+            StringBuilder sb = new StringBuilder(subMessageContent);
+            sb.delete(0,3);
+            subMessageContent = sb.toString();
+        }
+        else{
+            startB = subMessageContent.indexOf(" ```");
+            startB=startB+1;
+            substringB = subMessageContent.substring(0, startB);
+            log("SubstringB is: "+substringB);
+            ssb.append(substringB, new StyleSpan(format));
+
+            StringBuilder sb = new StringBuilder(subMessageContent);
+            sb.delete(0, startB+3);
+            sb.insert(0, '\n');
+            subMessageContent = sb.toString();
+            log("(8) messageContent: "+subMessageContent);
+        }
+
+        endB = subMessageContent.indexOf("``` ");
+        if(endB==-1){
+            endB = subMessageContent.lastIndexOf("```");
+            log("FINISH endB position: "+endB);
+
+            StringBuilder sbB = new StringBuilder(subMessageContent);
+            sbB.delete(endB, endB+3);
+
+            subMessageContent = sbB.toString();
+
+            log("(9) messageContent: "+subMessageContent);
+
+            substringB = subMessageContent.substring(0, endB);
+
+            log("SubstringB is: "+substringB);
+            StringBuilder sbBMultiQuote = new StringBuilder(substringB);
+            substringB = sbBMultiQuote.toString();
+
+            ssb.append(substringB, new ForegroundColorSpan(Color.BLUE), new StyleSpan(format));
+
+            sbB = new StringBuilder(subMessageContent);
+            sbB.delete(0, endB+3);
+            subMessageContent = sbB.toString();
+        }
+        else{
+            log("endB position: "+endB);
+            log("(10) Message content B: "+subMessageContent);
+            substringB = subMessageContent.substring(0, endB);
+//            ssb.append(substringB, new StyleSpan(typeFace.getStyle()), new StyleSpan(Typeface.ITALIC));
+            StringBuilder sbBMultiQuote = new StringBuilder(substringB);
+            sbBMultiQuote.append('\n');
+            substringB = sbBMultiQuote.toString();
+
+            ssb.append(substringB, new ForegroundColorSpan(Color.BLUE), new StyleSpan(format));
+
+            endB++;
+            StringBuilder sbB = new StringBuilder(subMessageContent);
+            sbB.delete(0, endB+3);
+            subMessageContent = sbB.toString();
+            log("(11) Message content B: "+subMessageContent);
+
+//            startB = subMessageContent.indexOf(" ```");
+//            while(startB!=-1){
+//
+//                startB = startB +3;
+//
+//                sbB = new StringBuilder(subMessageContent);
+//                sbB.deleteCharAt(startB);
+//                subMessageContent = sbB.toString();
+//
+//                log("(B) startB position: "+startB);
+//                substringB = subMessageContent.substring(0, startB);
+//                ssb.append(substringB, new StyleSpan(Typeface.ITALIC));
+//
+//                sbB = new StringBuilder(subMessageContent);
+//                sbB.delete(0, startB);
+//                subMessageContent = sbB.toString();
+//
+//                log("Message content C: "+subMessageContent);
+//                endB = subMessageContent.indexOf("``` ");
+//                if(endB==-1){
+//                    endB = subMessageContent.lastIndexOf("```");
+//                    log("(B)FINISH endB position: "+endB);
+//
+//                    sbB = new StringBuilder(subMessageContent);
+//                    sbB.delete(0, endB+3);
+//                    subMessageContent = sbB.toString();
+//
+//                    log("(B)FINISH End position: "+endB);
+//                    substringB = subMessageContent.substring(0, endB);
+//                    sbBMultiQuote = new StringBuilder(substringB);
+//                    sbBMultiQuote.append('\n');
+//                    substringB = sbBMultiQuote.toString();
+//
+//                    ssb.append(substringB, new ForegroundColorSpan(Color.BLUE), new StyleSpan(Typeface.ITALIC));
+//
+//                    sbB = new StringBuilder(subMessageContent);
+//                    sbB.delete(0, endB+3);
+//                    subMessageContent = sbB.toString();
+//                    break;
+//                }
+//                else{
+//                    log("endB position: "+endB);
+//                    sbB = new StringBuilder(subMessageContent);
+//                    sbB.delete(0, endB+3);
+//                    subMessageContent = sbB.toString();
+//                    log("Message content D: "+subMessageContent);
+//
+//                    substringB = subMessageContent.substring(0, endB);
+//
+//                    sbBMultiQuote = new StringBuilder(substringB);
+//                    sbBMultiQuote.append('\n');
+//                    substringB = sbBMultiQuote.toString();
+//
+//                    ssb.append(substringB, new ForegroundColorSpan(Color.BLUE), new StyleSpan(Typeface.ITALIC));
+//
+//                    sbB = new StringBuilder(subMessageContent);
+//                    sbB.delete(0, endB+3);
+//                    subMessageContent = sbB.toString();
+//
+//                    startB = subMessageContent.indexOf(" ```");
+//                }
+//            }
+        }
+
+        if(!subMessageContent.isEmpty()){
+            log("(ITALICMULTIQUOTE: Append more...");
+            ssb.append(subMessageContent, new StyleSpan(format));
+        }
+
+        return ssb;
+    }
+
     public void applyBoldFormat(){
         char a = messageContent.charAt(0);
         int start;
@@ -455,6 +742,7 @@ public class RTFFormatter {
             }
             else if(Pattern.matches("(.*\\s+)*```.*```(\\s+.*)*[?|!|\\.|,|;|:|\\)|%]*", substring)){
                 log("Multiquote");
+                applyItalicMultiQuoteFormat(substring, Typeface.BOLD);
             }
             else{
                 ssb.append(substring, new StyleSpan(Typeface.BOLD));
@@ -480,6 +768,7 @@ public class RTFFormatter {
             }
             else if(Pattern.matches("(.*\\s+)*```.*```(\\s+.*)*[?|!|\\.|,|;|:|\\)|%]*", substring)){
                 log("Multiquote");
+                applyItalicMultiQuoteFormat(substring, Typeface.BOLD);
             }
             else{
                 ssb.append(substring, new StyleSpan(Typeface.BOLD));
