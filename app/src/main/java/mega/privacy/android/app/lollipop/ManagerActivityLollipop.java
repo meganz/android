@@ -2570,6 +2570,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 	public void setDefaultAvatar(){
 		log("setDefaultAvatar");
+
 		float density  = getResources().getDisplayMetrics().density;
 		Bitmap defaultAvatar = Bitmap.createBitmap(Constants.DEFAULT_AVATAR_WIDTH_HEIGHT,Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
 		Canvas c = new Canvas(defaultAvatar);
@@ -2599,9 +2600,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 		String firstLetter = myAccountInfo.getFirstLetter();
 		nVPictureProfileTextView.setText(firstLetter);
-		nVPictureProfileTextView.setTextSize(32);
+		nVPictureProfileTextView.setTextSize(30);
 		nVPictureProfileTextView.setTextColor(Color.WHITE);
 		nVPictureProfileTextView.setVisibility(View.VISIBLE);
+
 	}
 
 	public void setOfflineAvatar(String email, long myHandle, String firstLetter){
