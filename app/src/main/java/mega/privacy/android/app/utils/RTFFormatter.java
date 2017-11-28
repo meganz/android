@@ -136,7 +136,7 @@ public class RTFFormatter {
                     ssb.append(substring);
 
                     StringBuilder sb = new StringBuilder(messageContent);
-                    sb.delete(0, start+4);
+                    sb.delete(0, start+3);
                     sb.insert(0, '\n');
                     messageContent = sb.toString();
                 }
@@ -171,7 +171,7 @@ public class RTFFormatter {
 
             sb = new StringBuilder(messageContent);
             sb.delete(0, end);
-            sb.insert(0, '\n');
+//            sb.insert(0, '\n');
             messageContent = sb.toString();
         }
         else{
