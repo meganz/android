@@ -716,6 +716,7 @@ public class NodeController {
                             context.startActivity(intentZip);
 
                         }
+                        //PDF
                         else {
                             log("MimeTypeList other file");
                             try {

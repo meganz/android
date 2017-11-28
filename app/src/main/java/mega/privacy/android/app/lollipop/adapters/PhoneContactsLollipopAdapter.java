@@ -101,10 +101,7 @@ public class PhoneContactsLollipopAdapter extends RecyclerView.Adapter<PhoneCont
 	MegaApiAndroid megaApi;
 	OnItemClickListener mItemClickListener;
 	private List<PhoneContactInfo> phoneContacts;
-//	private List<PhoneContactInfo> selectedContacts;
-//	private List<PhoneContactInfo> contactsFromPhone;
 	SparseBooleanArray selectedContacts;
-//	private boolean megaContacts = true;
 
 	private OnItemCheckClickListener checkClickListener;
 
@@ -138,11 +135,7 @@ public class PhoneContactsLollipopAdapter extends RecyclerView.Adapter<PhoneCont
 	public void setContacts(List<PhoneContactInfo> phoneContacts){
 		this.phoneContacts = phoneContacts;
 		notifyDataSetChanged();
-	}
 
-	public void setSelectedContacts(SparseBooleanArray selectedContacts){
-		this.selectedContacts = selectedContacts;
-		notifyDataSetChanged();
 	}
 
 	public PhoneContactInfo getDocumentAt(int position)
@@ -239,12 +232,11 @@ public class PhoneContactsLollipopAdapter extends RecyclerView.Adapter<PhoneCont
 
 	@Override
 	public void onBindViewHolder(ViewHolderPhoneContactsLollipop holder, int position) {
-//		boolean isCheckable = mode == Mode.PICK_FILE;
 
 		boolean isCheckable = false;
 		LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-		PhoneContactInfo contact = (PhoneContactInfo) getItem(position);
+		PhoneContactInfo contact = getItem(position);
 
 		holder.currentPosition = position;
 		holder.contactMail = contact.getEmail();
@@ -254,35 +246,9 @@ public class PhoneContactsLollipopAdapter extends RecyclerView.Adapter<PhoneCont
 		holder.contactNameTextView.setText(contact.getName());
 		holder.phoneEmailTextView.setText(contact.getEmail());
 
-		if (selectedContacts != null) {
-			for (int i = 0; i < selectedContacts.size(); i++) {
-				if (selectedContacts.get(position) == true) {
-					holder.contactLayout.setBackgroundColor(mContext.getResources().getColor(R.color.new_file_list_selected_row));
-				}
-				else{
-					holder.contactLayout.setBackgroundColor(Color.WHITE);
-				}
-			}
-		}
-		else{
-			holder.contactLayout.setBackgroundColor(Color.WHITE);
-		}
+		holder.contactLayout.setBackgroundColor(Color.WHITE);
 
 		createDefaultAvatar(holder, false);
-
-//		if (isCheckable) {
-//			View checkArea = rowView.findViewById(R.id.checkbox);
-//			checkArea.setOnClickListener(new OnClickListener() {
-//				@Override
-//				public void onClick(View v) {
-//					checkClickListener.onItemCheckClick(position);
-//				}
-//			});
-//		}
-
-
-
-//		ContactPicture task = new ContactPicture(mContext, holder, this);
 
 		try {
 			InputStream inputStream = ContactsContract.Contacts.openContactPhotoInputStream(mContext.getContentResolver(),
