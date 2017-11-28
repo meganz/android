@@ -2017,6 +2017,10 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 			megaApi.removeRequestListener(this);
 		}
 
+        if (megaChatApi != null){
+            megaChatApi.saveCurrentState();
+        }
+
 		super.onDestroy();
 	}
 
