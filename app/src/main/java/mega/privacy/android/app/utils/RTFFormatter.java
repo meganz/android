@@ -67,7 +67,7 @@ public class RTFFormatter {
                 }
             }
 
-            boolean  quote = Pattern.matches("(.*\\s+)*`.*`(\\s+.*)*[?|!|\\.|,|;|:|\\)|%|\\*]*", noEmojisContent);
+            boolean  quote = Pattern.matches("(.*\\s+)*`.*`(\\s+.*)*[?|!|\\.|,|;|:|\\)|%]*", noEmojisContent);
 //                                boolean  italic = Pattern.matches(".*_.*_.*", messageContent);
             if(quote) {
 
@@ -129,6 +129,13 @@ public class RTFFormatter {
                     applyBoldFormat();
                     return ssb;
                 }
+            }
+
+            boolean  quote2 = Pattern.matches("(.*\\s+)*`.*`(\\s+.*)*[?|!|\\.|,|;|:|\\)|%|\\*]*", noEmojisContent);
+//                                boolean  italic = Pattern.matches(".*_.*_.*", messageContent);
+            if(quote2) {
+                applyQuoteFormat();
+                return ssb;
             }
         }
 
