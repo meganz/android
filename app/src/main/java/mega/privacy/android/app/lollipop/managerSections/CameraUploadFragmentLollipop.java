@@ -1159,7 +1159,6 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			listView.setAdapter(adapterGrid);
 			fastScroller.setRecyclerView(listView);
 			visibilityFastScroller();
-
 			return v;
 		}
 	}
@@ -1881,6 +1880,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 				adapterList.setNodes(nodesArray, nodes);
 
 				visibilityFastScroller();
+
 				if (adapterList.getItemCount() == 0){
 					if (listView != null){
 						listView.setVisibility(View.GONE);
@@ -2048,7 +2048,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 				monthPics.add(monthPic);
 			}
 			visibilityFastScroller();
-			
+
 			if (!thereAreImages){
 				monthPics.clear();
 				emptyImageView.setVisibility(View.VISIBLE);
@@ -2229,18 +2229,21 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	}
 
 	public void visibilityFastScroller(){
-		if(((ManagerActivityLollipop)context).isLargeGridCameraUploads){
-			if (nodes.size() < Constants.MIN_ITEMS_SCROLLBAR) {
-				fastScroller.setVisibility(View.GONE);
-			} else {
-				fastScroller.setVisibility(View.VISIBLE);
-			}
-
-		}else {
-			if (nodes.size() < Constants.MIN_ITEMS_SCROLLBAR_GRID) {
-				fastScroller.setVisibility(View.GONE);
-			} else {
-				fastScroller.setVisibility(View.VISIBLE);
+		if(nodes == null){
+			fastScroller.setVisibility(View.GONE);
+		}else{
+			if(((ManagerActivityLollipop)context).isLargeGridCameraUploads){
+				if (nodes.size() < Constants.MIN_ITEMS_SCROLLBAR) {
+					fastScroller.setVisibility(View.GONE);
+				} else {
+					fastScroller.setVisibility(View.VISIBLE);
+				}
+			}else {
+				if (nodes.size() < Constants.MIN_ITEMS_SCROLLBAR_GRID) {
+					fastScroller.setVisibility(View.GONE);
+				} else {
+					fastScroller.setVisibility(View.VISIBLE);
+				}
 			}
 		}
 	}
