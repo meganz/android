@@ -631,7 +631,6 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 			holder.publicLinkImage.setVisibility(View.VISIBLE);
 			if(node.isExpired()){
 				log("Node exported but expired!!");
-				holder.publicLinkImage.setVisibility(View.INVISIBLE);
 			}
 		}
 		else{
@@ -903,7 +902,6 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 			holder.publicLinkImage.setVisibility(View.VISIBLE);
 			if(node.isExpired()){
 				log("Node exported but expired!!");
-				holder.publicLinkImage.setVisibility(View.INVISIBLE);
 			}
 		}
 		else{
