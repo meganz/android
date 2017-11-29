@@ -1526,10 +1526,17 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
 
                             SimpleSpanBuilder ssb = null;
-                            if(message.getContent()!=null){
-                                messageContent = message.getContent();
-                                RTFFormatter formatter = new RTFFormatter(messageContent, context);
-                                ssb = formatter.setRTFFormat();
+
+                            try{
+                                if(message.getContent()!=null){
+                                    messageContent = message.getContent();
+                                    RTFFormatter formatter = new RTFFormatter(messageContent, context);
+                                    ssb = formatter.setRTFFormat();
+                                }
+                            }
+                            catch (Exception e){
+                                log("FORMATTER EXCEPTION!!!");
+                                ssb = null;
                             }
 
                             int status = message.getStatus();
@@ -1590,9 +1597,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                             else{
                                 ((ViewHolderMessageChat)holder).contentOwnMessageText.setText(messageContent);
                             }
-
-//                            Markwon.setMarkdown(((ViewHolderMessageChat)holder).contentOwnMessageText, messageContent);
-
 
                             ((ViewHolderMessageChat)holder).contentOwnMessageText.setLinksClickable(true);
                             Linkify.addLinks(((ViewHolderMessageChat)holder).contentOwnMessageText, Linkify.WEB_URLS);
@@ -2336,18 +2340,76 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                 ((ViewHolderMessageChat)holder).contentContactMessageText.setEmojiconSizeSp(20);
                             }
 
+                            //Color always status SENT
+                            ((ViewHolderMessageChat)holder).contentContactMessageText.setTextColor(ContextCompat.getColor(context, R.color.name_my_account));
+
                             if(chatRoom.isGroup()){
-                                Spannable name = new SpannableString(((ViewHolderMessageChat)holder).fullNameTitle+"\n");
+
+                                String name = ((ViewHolderMessageChat)holder).fullNameTitle+"\n";
+                                SimpleSpanBuilder ssb = new SimpleSpanBuilder();
                                 if(color!=null){
                                     log("The color to set the avatar is "+color);
-                                    name.setSpan(new ForegroundColorSpan(Color.parseColor(color)), 0, name.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                                    ssb.append(name, new ForegroundColorSpan(Color.parseColor(color)));
                                 }
                                 else{
                                     log("Default color to the avatar");
-                                    name.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.accentColor)), 0, name.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                                    ssb.append(name, new ForegroundColorSpan(ContextCompat.getColor(context, R.color.accentColor)));
                                 }
-                                CharSequence indexedText = TextUtils.concat(name, messageContent);
-                                ((ViewHolderMessageChat)holder).contentContactMessageText.setText(indexedText);
+
+                                RTFFormatter formatter = null;
+                                try{
+                                    if(message.getContent()!=null){
+                                        messageContent = message.getContent();
+                                        formatter = new RTFFormatter(messageContent, context, ssb);
+                                        ssb = formatter.setRTFFormat();
+                                    }
+
+                                    if(formatter!=null){
+                                        if(formatter.isFormatted()){
+                                            ((ViewHolderMessageChat)holder).contentContactMessageText.setText(ssb.build(), TextView.BufferType.SPANNABLE);
+                                        }
+                                        else {
+                                            Spannable nameSpannable = new SpannableString(name);
+                                            if(color!=null){
+                                                log("The color to set the avatar is "+color);
+                                                nameSpannable.setSpan(new ForegroundColorSpan(Color.parseColor(color)), 0, name.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                                            }
+                                            else{
+                                                log("Default color to the avatar");
+                                                nameSpannable.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.accentColor)), 0, name.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                                            }
+                                            CharSequence indexedText = TextUtils.concat(nameSpannable, messageContent);
+                                            ((ViewHolderMessageChat)holder).contentContactMessageText.setText(indexedText);
+                                        }
+                                    }
+                                    else{
+                                        Spannable nameSpannable = new SpannableString(name);
+                                        if(color!=null){
+                                            log("The color to set the avatar is "+color);
+                                            nameSpannable.setSpan(new ForegroundColorSpan(Color.parseColor(color)), 0, name.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                                        }
+                                        else{
+                                            log("Default color to the avatar");
+                                            nameSpannable.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.accentColor)), 0, name.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                                        }
+                                        CharSequence indexedText = TextUtils.concat(nameSpannable, messageContent);
+                                        ((ViewHolderMessageChat)holder).contentContactMessageText.setText(indexedText);
+                                    }
+                                }
+                                catch (Exception e){
+                                    log("FORMATTER EXCEPTION!!!");
+                                    Spannable nameSpannable = new SpannableString(name);
+                                    if(color!=null){
+                                        log("The color to set the avatar is "+color);
+                                        nameSpannable.setSpan(new ForegroundColorSpan(Color.parseColor(color)), 0, name.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                                    }
+                                    else{
+                                        log("Default color to the avatar");
+                                        nameSpannable.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.accentColor)), 0, name.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                                    }
+                                    CharSequence indexedText = TextUtils.concat(nameSpannable, messageContent);
+                                    ((ViewHolderMessageChat)holder).contentContactMessageText.setText(indexedText);
+                                }
                             }
                             else{
                                 ((ViewHolderMessageChat)holder).contentContactMessageText.setText(messageContent);
@@ -2355,8 +2417,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                             ((ViewHolderMessageChat)holder).contentContactMessageText.setLinksClickable(true);
                             Linkify.addLinks(((ViewHolderMessageChat)holder).contentContactMessageText, Linkify.WEB_URLS);
-
-                            ((ViewHolderMessageChat)holder).contentContactMessageText.setTextColor(ContextCompat.getColor(context, R.color.name_my_account));
 
                         }
                         else if(message.getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT){
