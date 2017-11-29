@@ -370,7 +370,22 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 			availableOfflineView = (TextView) findViewById(R.id.file_properties_available_offline_text);
 
 			offlineSwitch = (SwitchCompat) findViewById(R.id.file_properties_switch);
-			offlineSwitch.setOnClickListener(this);
+
+			final long handleNode = node.getHandle();
+			MegaNode parent = megaApi.getNodeByHandle(handleNode);
+			while (megaApi.getParentNode(parent) != null){
+				parent = megaApi.getParentNode(parent);
+			}
+
+			if (parent.getHandle() != megaApi.getRubbishNode().getHandle()){
+				offlineSwitch.setEnabled(true);
+				offlineSwitch.setOnClickListener(this);
+				availableOfflineView.setTextColor(getResources().getColor(R.color.name_my_account));
+			}else{
+				offlineSwitch.setEnabled(false);
+				availableOfflineView.setTextColor(getResources().getColor(R.color.invite_button_deactivated));
+
+			}
 
 			//Share with Layout
 

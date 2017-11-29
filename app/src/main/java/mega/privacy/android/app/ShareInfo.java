@@ -3,6 +3,7 @@ package mega.privacy.android.app;
 import android.annotation.SuppressLint;
 import android.content.ClipData;
 import android.content.ContentProviderClient;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -10,7 +11,9 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.RemoteException;
+import android.provider.ContactsContract;
 import android.provider.MediaStore;
+import android.text.TextUtils;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -40,7 +43,8 @@ public class ShareInfo {
 	public InputStream inputStream = null;
 	public long size = -1;
 	private File file = null;
-	public boolean failed = false;
+	public boolean isContact = false;
+	public Uri contactUri = null;
 	
 	/*
 	 * Get ShareInfo from File
@@ -368,6 +372,11 @@ public class ShareInfo {
 				size = file.length();
 				log("The file is accesible!");
 				return;
+			}
+			else{
+				log("The file is not accesible!");
+				isContact = true;
+				contactUri = uri;
 			}
 		}
 		log("END processUri");

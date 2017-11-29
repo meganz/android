@@ -118,8 +118,7 @@
                 android:layout_weight="5"
                 android:layout_marginLeft="72dp"
                 android:text="@string/file_properties_available_offline"
-                android:textSize="16sp"
-                android:textColor="@color/name_my_account"/>
+                android:textSize="16sp"/>
 
             <android.support.v7.widget.SwitchCompat
                 android:id="@+id/file_properties_switch"

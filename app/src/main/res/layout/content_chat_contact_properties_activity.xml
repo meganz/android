@@ -169,7 +169,7 @@
                 android:layout_gravity="left|center_vertical"
                 android:layout_marginLeft="32dp"
                 android:layout_toRightOf="@id/chat_contact_properties_shared_folder_icon"
-                android:text="@string/incoming_shares_label"
+                android:text="@string/title_incoming_shares_explorer"
                 android:textColor="@color/name_my_account"
                 android:textSize="16sp" />
 
