@@ -16,6 +16,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.util.SparseBooleanArray;
+import android.util.TypedValue;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -65,6 +66,8 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 	public static final int ITEM_VIEW_TYPE_LIST = 0;
 	public static final int ITEM_VIEW_TYPE_GRID = 1;
 	public static final int ITEM_VIEW_TYPE_LIST_ADD_CONTACT = 2;
+	public static int MAX_WIDTH_CONTACT_NAME_LAND=450;
+	public static int MAX_WIDTH_CONTACT_NAME_PORT=200;
 
 	private Context context;
 	private int positionClicked;
@@ -146,7 +149,6 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 
 		@Override
 		public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
-			// TODO Auto-generated method stub			
 		}
 		
 	}
@@ -231,10 +233,14 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 
 			if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
 				log("onCreate: Landscape configuration");
-				holderList.textViewContactName.setMaxWidth(Util.scaleWidthPx(290, outMetrics));
+				//holderList.textViewContactName.setMaxWidth(Util.scaleWidthPx(290, outMetrics));
+				float width = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MAX_WIDTH_CONTACT_NAME_LAND, context.getResources().getDisplayMetrics());
+				holderList.textViewContactName.setMaxWidth((int) width);
 			}
 			else{
-				holderList.textViewContactName.setMaxWidth(Util.scaleWidthPx(240, outMetrics));
+				//holderList.textViewContactName.setMaxWidth(Util.scaleWidthPx(240, outMetrics));
+				float width = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MAX_WIDTH_CONTACT_NAME_PORT, context.getResources().getDisplayMetrics());
+				holderList.textViewContactName.setMaxWidth((int) width);
 			}
 
 		    holderList.itemLayout.setTag(holderList);

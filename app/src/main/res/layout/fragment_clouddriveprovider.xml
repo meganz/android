@@ -59,4 +59,5 @@
         android:layout_above="@id/separator"
         android:choiceMode="multipleChoice" />
 
+
 </RelativeLayout>

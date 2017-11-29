@@ -765,7 +765,8 @@
     -->
 
     <string name="my_account_title" context="title of the My Account screen">Account Type</string>
-    <string name="expires_on" context="title of the Expiration Date">Renews on&#160;</string>
+    <string name="renews_on" context="title of the Expiration Date">Renews on&#160;</string>
+    <string name="expires_on" context="title of the Expiration Date">Expires on&#160;</string>
     <string name="free_account">FREE</string>
     <string name="prolite_account" context="Not translate">Lite</string>
     <string name="pro1_account" context="Not translate">PRO I</string>
@@ -1616,6 +1617,7 @@
 
     <string name="forward_menu_item" context="Item of a menu to forward a message chat to another chatroom">Forward</string>
 
-    <string name="old_and_new_passwords_equals" context="when changing the password , the old password and new password are equals">Old and new passwords are equals</string>
+    <string name="general_attach" context="name of the button to attach file from MEGA to another app">Attach</string>
 
+    <string name="old_and_new_passwords_equals" context="when changing the password , the old password and new password are equals">Passwords cannot be the same</string>
 </resources>
