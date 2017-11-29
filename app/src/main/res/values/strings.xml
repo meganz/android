@@ -1620,4 +1620,6 @@
     <string name="general_attach" context="name of the button to attach file from MEGA to another app">Attach</string>
 
     <string name="old_and_new_passwords_equals" context="when changing the password , the old password and new password are equals">Passwords cannot be the same</string>
+
+    <string name="user_account_feedback" context="Label to include info of the user email in the feedback form">User account</string>
 </resources>
