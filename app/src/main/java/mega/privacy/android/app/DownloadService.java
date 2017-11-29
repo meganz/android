@@ -174,6 +174,10 @@ public class DownloadService extends Service implements MegaTransferListenerInte
             megaApi.removeTransferListener(this);
 		}
 
+		if (megaChatApi != null){
+			megaChatApi.saveCurrentState();
+		}
+
 		super.onDestroy();
 	}
 
