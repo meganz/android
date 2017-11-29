@@ -133,28 +133,21 @@ public class ContactsFragmentLollipop extends Fragment{
 					break;
 				}
 				case R.id.cab_menu_start_conversation:{
+					ArrayList<Long> contactHandles = new ArrayList<>();
 
 					if(users.get(0)==null){
 						log("Selected contact NULL");
 						break;
 					}
+					if(users.size()  == 1){
+						((ManagerActivityLollipop) context).startOneToOneChat(users.get(0));
+					}else{
+						for(int i=0;i<users.size();i++){
+							contactHandles.add(users.get(i).getHandle());
+						}
 
-					((ManagerActivityLollipop) context).startOneToOneChat(users.get(0));
-
-					clearSelections();
-					hideMultipleSelect();
-
-					break;
-				}
-				case R.id.cab_menu_start_conversation_more:{
-
-					ArrayList<Long> contactHandles = new ArrayList<>();
-
-					for(int i=0;i<users.size();i++){
-						contactHandles.add(users.get(i).getHandle());
+						((ManagerActivityLollipop)context).startGroupConversation(contactHandles);
 					}
-
-					((ManagerActivityLollipop)context).startGroupConversation(contactHandles);
 
 					clearSelections();
 					hideMultipleSelect();
@@ -209,17 +202,8 @@ public class ContactsFragmentLollipop extends Fragment{
 				menu.findItem(R.id.cab_menu_send_file).setVisible(true);
 				menu.findItem(R.id.cab_menu_send_file).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
-				if(selected.size() ==1){
-					menu.findItem(R.id.cab_menu_start_conversation_more).setVisible(false);
-					menu.findItem(R.id.cab_menu_start_conversation_more).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
-					menu.findItem(R.id.cab_menu_start_conversation).setVisible(true);
-					menu.findItem(R.id.cab_menu_start_conversation).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-				}else{
-					menu.findItem(R.id.cab_menu_start_conversation).setVisible(false);
-					menu.findItem(R.id.cab_menu_start_conversation).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
-					menu.findItem(R.id.cab_menu_start_conversation_more).setVisible(true);
-					menu.findItem(R.id.cab_menu_start_conversation_more).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-				}
+				menu.findItem(R.id.cab_menu_start_conversation).setVisible(true);
+				menu.findItem(R.id.cab_menu_start_conversation).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
 				if(selected.size()==adapter.getItemCount()){
 					menu.findItem(R.id.cab_menu_select_all).setVisible(false);

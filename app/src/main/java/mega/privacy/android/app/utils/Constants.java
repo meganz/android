@@ -161,6 +161,8 @@ public class Constants {
 	final public static int OUTGOING_REQUEST_ADAPTER = 2013;
 	final public static int CAMERA_UPLOAD_ADAPTER = 2014;
 	final public static int NODE_ATTACHMENT_ADAPTER = 2015;
+	final public static int INCOMING_SHARES_PROVIDER_ADAPTER = 2016;
+	final public static int CLOUD_DRIVE_PROVIDER_ADAPTER = 2017;
 
 	final public static int ACCOUNT_DETAILS_MIN_DIFFERENCE = 5;
 	final public static int PAYMENT_METHODS_MIN_DIFFERENCE = 720;
@@ -193,5 +195,8 @@ public class Constants {
 	public static int TAKE_PROFILE_PICTURE = 1;
 
 	final public static String MAIL_ANDROID = "androidfeedback@mega.nz";
+
+	public static int MIN_ITEMS_SCROLLBAR = 30;
+	public static int MIN_ITEMS_SCROLLBAR_GRID = 200;
 
 }

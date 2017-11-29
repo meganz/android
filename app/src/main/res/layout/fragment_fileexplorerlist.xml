@@ -137,7 +137,7 @@
         android:clipToPadding="false"
         android:choiceMode="multipleChoice"
         android:layout_below="@id/content_text"
-        android:layout_above="@id/separator"/>    
+        android:layout_above="@id/separator" />
     
     
 </RelativeLayout>

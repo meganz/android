@@ -24,6 +24,8 @@ import java.util.List;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.components.scrollBar.SectionTitleProvider;
+import mega.privacy.android.app.lollipop.MegaMonthPicLollipop;
 import mega.privacy.android.app.lollipop.managerSections.CameraUploadFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.CameraUploadFragmentLollipop.PhotoSyncHolder;
 import mega.privacy.android.app.utils.Constants;
@@ -35,7 +37,7 @@ import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaNode;
 
 
-public class MegaPhotoSyncListAdapterLollipop extends RecyclerView.Adapter<MegaPhotoSyncListAdapterLollipop.ViewHolderPhotoSyncList> implements OnClickListener {
+public class MegaPhotoSyncListAdapterLollipop extends RecyclerView.Adapter<MegaPhotoSyncListAdapterLollipop.ViewHolderPhotoSyncList> implements OnClickListener, SectionTitleProvider {
 	
 	private class Media {
 		public String filePath;
@@ -71,7 +73,7 @@ public class MegaPhotoSyncListAdapterLollipop extends RecyclerView.Adapter<MegaP
 	int type = Constants.CAMERA_UPLOAD_ADAPTER;
 	
 	/*public static view holder class*/
-    public class ViewHolderPhotoSyncList extends RecyclerView.ViewHolder {
+    public static class ViewHolderPhotoSyncList extends RecyclerView.ViewHolder {
     	
     	public ViewHolderPhotoSyncList(View v){
     		super(v);
@@ -366,6 +368,19 @@ public class MegaPhotoSyncListAdapterLollipop extends RecyclerView.Adapter<MegaP
 				return ITEM_VIEW_TYPE_NODE;
 		} else{
 			return ITEM_VIEW_TYPE_MONTH;
+		}
+	}
+//	private MegaNode getItemNode(int position) {
+//		return nodes.get(position);
+//	}
+
+	@Override
+	public String getSectionTitle(int position) {
+		PhotoSyncHolder psh = (PhotoSyncHolder) getItem(position);
+		if (psh.isNode){
+			return psh.nodeDate;
+		} else{
+			return null;
 		}
 	}
 

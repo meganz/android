@@ -122,6 +122,7 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 //		cancelButton.setLayoutParams(cancelTextParams);
 		
 		listView = (RecyclerView) v.findViewById(R.id.file_list_view_browser);
+
 		listView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
 		mLayoutManager = new LinearLayoutManager(context);
 		listView.setLayoutManager(mLayoutManager);

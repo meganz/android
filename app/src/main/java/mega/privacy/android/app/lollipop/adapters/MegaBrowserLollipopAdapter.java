@@ -2,6 +2,7 @@ package mega.privacy.android.app.lollipop.adapters;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapShader;
 import android.graphics.Canvas;
@@ -35,6 +36,7 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -46,6 +48,7 @@ import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.components.scrollBar.SectionTitleProvider;
 import mega.privacy.android.app.lollipop.ContactFileListActivityLollipop;
 import mega.privacy.android.app.lollipop.ContactFileListFragmentLollipop;
 import mega.privacy.android.app.lollipop.FolderLinkActivityLollipop;
@@ -68,7 +71,7 @@ import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaUser;
 
-public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowserLollipopAdapter.ViewHolderBrowser> implements OnClickListener, View.OnLongClickListener {
+public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowserLollipopAdapter.ViewHolderBrowser> implements OnClickListener, View.OnLongClickListener, SectionTitleProvider {
 	
 	public static final int ITEM_VIEW_TYPE_LIST = 0;
 	public static final int ITEM_VIEW_TYPE_GRID = 1;
@@ -81,7 +84,8 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 
 	Object fragment;
 	long parentHandle = -1;
-	
+	DisplayMetrics outMetrics;
+
 	private SparseBooleanArray selectedItems;
 
 	RecyclerView listFragment;
@@ -482,6 +486,9 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 	@Override
 	public ViewHolderBrowser onCreateViewHolder(ViewGroup parent, int viewType) {
 		log("onCreateViewHolder");
+		Display display = ((Activity) context).getWindowManager().getDefaultDisplay();
+		outMetrics = new DisplayMetrics();
+		display.getMetrics(outMetrics);
 
 		if (viewType == MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST){
 			log("onCreateViewHolder -> type: ITEM_VIEW_TYPE_LIST");
@@ -539,6 +546,11 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 			holderGrid.videoDuration = (TextView) v.findViewById(R.id.file_grid_title_video_duration);
 			holderGrid.videoInfoLayout = (RelativeLayout) v.findViewById(R.id.item_file_videoinfo_layout);
 
+			if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+				holderGrid.textViewFileSize.setMaxWidth(Util.scaleWidthPx(70, outMetrics));
+			} else{
+				holderGrid.textViewFileSize.setMaxWidth(Util.scaleWidthPx(130, outMetrics));
+			}
 			if(holderGrid.textViewFileSize!=null){
 				holderGrid.textViewFileSize.setVisibility(View.VISIBLE);
 			}
@@ -880,9 +892,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 		holder.document = node.getHandle();
 		Bitmap thumb = null;
 		
-		log("Node to show: "+position+" "+node.getName());
 		holder.textViewFileName.setText(node.getName());
-	
 		holder.textViewFileSize.setText("");
 		
 		holder.publicLinkImage.setVisibility(View.INVISIBLE);
@@ -1293,7 +1303,6 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 					}
 				}
 			}
-
 		}
 		
 		//Check if is an offline file to show the red arrow
@@ -1365,13 +1374,16 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 //	}
 
 
+	private String getItemNode(int position) {
+		return nodes.get(position).getName();
+	}
+
+
 	@Override
 	public int getItemCount() {
-		// TODO Auto-generated method stub
-		if (nodes != null){		
+		if (nodes != null){
 			return nodes.size();
-		}
-		else{
+		}else{
 			return 0;
 		}
 	}
@@ -1387,6 +1399,11 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 		}
 		
 		return null;
+	}
+
+	@Override
+	public String getSectionTitle(int position) {
+		return getItemNode(position).substring(0, 1);
 	}
 
 	@Override
@@ -1568,6 +1585,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 		}
 		return null;
 	}
+
 
 	public long getParentHandle() {
 		return parentHandle;

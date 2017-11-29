@@ -6,7 +6,7 @@
     android:fitsSystemWindows="true"
     android:orientation="vertical"
     android:id="@+id/provider_container"
-    tools:context=".FileProviderActivityLollipop" >
+    tools:context=".providers.FileProviderActivity" >
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar_provider"
@@ -34,6 +34,17 @@
             android:layout_height="wrap_content"
             android:textColor="@color/accentColor"
             android:stateListAnimator="@null"
+            android:background="@color/participants_layout"
+            android:text="@string/general_cancel"
+            android:gravity="center_vertical|center_horizontal"/>
+
+        <Button
+            android:id="@+id/attach_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/accentColor"
+            android:stateListAnimator="@null"
+            android:text="@string/general_attach"
             android:background="@color/participants_layout"
             android:gravity="center_vertical|center_horizontal"/>
 
