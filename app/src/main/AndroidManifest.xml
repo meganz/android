@@ -2,8 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="mega.privacy.android.app"
     android:installLocation="auto"
-    android:versionCode="160"
-    android:versionName="3.2.5.1 (160)" >
+    android:versionCode="164"
+    android:versionName="3.2.6.1 (164)" >
 
     <uses-sdk
         android:minSdkVersion="14"
@@ -134,7 +134,7 @@
         </activity>
 
         <activity
-            android:name="mega.privacy.android.app.lollipop.ChatFullScreenImageViewer"
+            android:name="mega.privacy.android.app.lollipop.megachat.ChatFullScreenImageViewer"
             android:label="@string/full_screen_image_viewer_label"
             android:launchMode="singleTop"
             android:uiOptions="splitActionBarWhenNarrow" >
@@ -170,6 +170,11 @@
 
                 <data android:mimeType="*/*" />
             </intent-filter>
+        </activity>
+
+        <activity
+            android:name="mega.privacy.android.app.lollipop.megachat.ChatExplorerActivity"
+            android:label="@string/app_name">
         </activity>
 
         <activity android:name="mega.privacy.android.app.providers.PinFileProviderActivity"
@@ -264,6 +269,7 @@
 
         <activity
             android:name="mega.privacy.android.app.lollipop.GetLinkActivityLollipop"
+            android:configChanges="screenSize|orientation"
             android:label="@string/context_get_link_menu">
         </activity>
 

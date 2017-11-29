@@ -33,7 +33,6 @@ public class FilePrepareTask extends AsyncTask<Intent, Void, List<ShareInfo>> {
     @Override
     protected void onPostExecute(List<ShareInfo> info) {
         log("FilePrepareTask::onPostExecute");
-//        filePreparedInfos = info;
         if(context instanceof ManagerActivityLollipop){
             ((ManagerActivityLollipop)context).onIntentProcessed(info);
         }

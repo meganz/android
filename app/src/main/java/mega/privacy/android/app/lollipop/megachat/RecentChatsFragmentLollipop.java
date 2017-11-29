@@ -3,6 +3,7 @@ package mega.privacy.android.app.lollipop.megachat;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -14,6 +15,8 @@ import android.support.v7.view.ActionMode;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
+import android.text.Spanned;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.LayoutInflater;
@@ -149,6 +152,26 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
         emptyTextViewInvite.setWidth(Util.scaleWidthPx(236, outMetrics));
         emptyTextView = (TextView) v.findViewById(R.id.empty_text_chat_recent);
 
+        StringBuilder builder = new StringBuilder();
+        String textToShow = String.format(context.getString(R.string.context_empty_chat_recent));
+
+        try{
+            textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
+            textToShow = textToShow.replace("[/A]", "</font>");
+            textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
+            textToShow = textToShow.replace("[/B]", "</font>");
+        }
+        catch (Exception e){}
+        Spanned result = null;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+            result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
+        } else {
+            result = Html.fromHtml(textToShow);
+
+        }
+
+        emptyTextViewInvite.setText(result);
+
         LinearLayout.LayoutParams emptyTextViewParams1 = (LinearLayout.LayoutParams)emptyTextViewInvite.getLayoutParams();
         emptyTextViewParams1.setMargins(0, Util.scaleHeightPx(50, outMetrics), 0, Util.scaleHeightPx(24, outMetrics));
         emptyTextViewInvite.setLayoutParams(emptyTextViewParams1);
@@ -158,7 +181,11 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
         emptyTextView.setLayoutParams(emptyTextViewParams2);
 
         emptyImageView = (ImageView) v.findViewById(R.id.empty_image_view_chat);
-
+        if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+            emptyImageView.setImageResource(R.drawable.chat_empty_landscape);
+        }else{
+            emptyImageView.setImageResource(R.drawable.ic_empty_chat_list);
+        }
         inviteButton = (Button) v.findViewById(R.id.invite_button);
         inviteButton.setOnClickListener(this);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -367,7 +394,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
                     break;
                 }
                 case R.id.chat_list_leave_chat_layout:{
-                  //Leave group chat
+                    //Leave group chat
                     ((ManagerActivityLollipop)context).showConfirmationLeaveChats(chats);
                     break;
                 }
@@ -630,6 +657,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
                         chats.set(indexToReplace, item);
                         if(item.getUnreadCount()==0){
                             onUnreadCountChange(indexToReplace, false);
+                            onLastMessageChange(indexToReplace);
                         }
                         else{
                             onUnreadCountChange(indexToReplace, true);
@@ -1113,7 +1141,6 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
     public void onPause() {
         log("onPause");
         lastFirstVisiblePosition = ((LinearLayoutManager)listView.getLayoutManager()).findFirstCompletelyVisibleItemPosition();
-        MegaApplication.setRecentChatsFragmentVisible(false);
         super.onPause();
     }
 
@@ -1126,7 +1153,6 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
             (listView.getLayoutManager()).scrollToPosition(0);
         }
         lastFirstVisiblePosition=0;
-        MegaApplication.setRecentChatsFragmentVisible(true);
         super.onResume();
     }
 

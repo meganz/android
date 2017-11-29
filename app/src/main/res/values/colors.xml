@@ -123,4 +123,7 @@
     <color name="grey_background_chip">#FFE0E0E0</color>
     <color name="invite_button_deactivated">#424F4F4F</color>
 
+    <color name="camera_uploads_list_view">#FFF5F5F5</color>
+
+
 </resources>

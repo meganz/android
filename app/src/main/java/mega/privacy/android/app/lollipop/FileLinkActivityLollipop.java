@@ -566,7 +566,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 				if(e.getErrorCode()==MegaError.API_EOVERQUOTA){
 					log("OVERQUOTA ERROR: "+e.getErrorCode());					
 					Intent intent = new Intent(this, ManagerActivityLollipop.class);
-					intent.setAction(Constants.ACTION_OVERQUOTA_ALERT);
+					intent.setAction(Constants.ACTION_OVERQUOTA_STORAGE);
 					startActivity(intent);
 					finish();
 

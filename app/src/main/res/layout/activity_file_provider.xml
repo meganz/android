@@ -23,17 +23,18 @@
         android:layout_height="48dp"
         android:gravity="right|center_vertical"
         android:layout_alignParentBottom="true"
-        android:background="@color/white"
+        android:background="@color/participants_layout"
         android:orientation="horizontal" >
 
-        <TextView
-            android:id="@+id/cancel_text"
-            android:fontFamily="sans-serif-medium"
+        <Button
+            android:id="@+id/cancel_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@color/accentColor"
-            android:gravity="center_vertical|center_horizontal"
-            android:textSize="14sp"/>
+            android:stateListAnimator="@null"
+            android:background="@color/participants_layout"
+            android:gravity="center_vertical|center_horizontal"/>
+
     </LinearLayout>
 
     <View
