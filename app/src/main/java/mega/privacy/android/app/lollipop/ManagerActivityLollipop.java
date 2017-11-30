@@ -14421,6 +14421,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		}
 	}
 
+	@Override
+	public void onChatConnectionStateUpdate(MegaChatApiJava api, long chatid, int newState) {
+		log("onChatConnectionStateUpdate: "+chatid);
+	}
+
 	public boolean isMkLayoutVisible() {
 		return mkLayoutVisible;
 	}

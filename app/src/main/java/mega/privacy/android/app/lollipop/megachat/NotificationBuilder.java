@@ -1,6 +1,7 @@
 package mega.privacy.android.app.lollipop.megachat;
 
 import android.app.Notification;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
@@ -54,6 +55,10 @@ public final class NotificationBuilder {
     DatabaseHandler dbH;
     MegaApiAndroid megaApi;
     MegaChatApiAndroid megaChatApi;
+
+    private NotificationCompat.Builder mBuilderCompat;
+    private Notification.Builder mBuilder;
+    private NotificationManager mNotificationManager;
 
     public static NotificationBuilder newInstance(Context context, MegaApiAndroid megaApi, MegaChatApiAndroid megaChatApi) {
         Context appContext = context.getApplicationContext();
@@ -587,6 +592,30 @@ public final class NotificationBuilder {
         else{
             return id;
         }
+    }
+
+    public void showSimpleNotification(){
+        log("showSimpleNotification");
+
+        mBuilderCompat = new NotificationCompat.Builder(context);
+
+        mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+
+        Intent intent = new Intent(context, ManagerActivityLollipop.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        intent.setAction(Constants.ACTION_CHAT_SUMMARY);
+        intent.putExtra("CHAT_ID", -1);
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0 , intent, PendingIntent.FLAG_ONE_SHOT);
+
+        mBuilderCompat
+                .setSmallIcon(R.drawable.ic_stat_notify_download)
+                .setContentIntent(pendingIntent)
+                .setAutoCancel(true).setTicker("Chat activity")
+                .setColor(ContextCompat.getColor(context,R.color.mega))
+                .setContentTitle("Chat activity").setContentText("You may have new messages")
+                .setOngoing(false);
+
+        mNotificationManager.notify(Constants.NOTIFICATION_PUSH_CHAT, mBuilderCompat.build());
     }
 
     public static void log(String message) {

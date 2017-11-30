@@ -24,6 +24,9 @@ import android.content.Intent;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
+import android.os.CountDownTimer;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.widget.Toast;
@@ -52,13 +55,15 @@ import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatError;
 import nz.mega.sdk.MegaChatListItem;
+import nz.mega.sdk.MegaChatListenerInterface;
+import nz.mega.sdk.MegaChatPresenceConfig;
 import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 
-public class MegaFirebaseMessagingService extends FirebaseMessagingService implements MegaRequestListenerInterface, MegaChatRequestListenerInterface {
+public class MegaFirebaseMessagingService extends FirebaseMessagingService implements MegaRequestListenerInterface, MegaChatRequestListenerInterface, MegaChatListenerInterface {
 
     MegaApplication app;
     MegaApiAndroid megaApi;
@@ -71,7 +76,13 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
 
     String remoteMessageType = "";
 
+    boolean shown = false;
+
     private NotificationBuilder notificationBuilder;
+
+    CountDownTimer countDownTimer;
+
+    Handler h;
 
     @Override
     public void onCreate() {
@@ -81,7 +92,10 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
         app = (MegaApplication) getApplication();
         megaApi = app.getMegaApi();
         megaChatApi = app.getMegaChatApi();
+        megaChatApi.addChatListener(this);
         dbH = DatabaseHandler.getDbHandler(getApplicationContext());
+
+        shown = false;
     }
 
     @Override
@@ -161,13 +175,36 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
 
                         megaApi.fastLogin(gSession, this);
                     }
+
+                    String type = remoteMessage.getData().get("type");
+                    if(type.equals("2")){
+                        h = new Handler(Looper.getMainLooper());
+                        h.postDelayed(
+                                new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        if(!shown){
+                                            log("Show simple notification - no connection finished");
+                                            shown=true;
+                                            notificationBuilder.showSimpleNotification();
+                                        }
+                                        else{
+                                            log("Notification already shown");
+                                        }
+                                    }
+                                },
+                                10000
+                        );
+                    }
                 }
                 else{
 
                     String type = remoteMessage.getData().get("type");
                     if(type.equals("2")){
                         log("Chat notification");
-                        showNotification();
+                        if(!shown){
+                            showNotification();
+                        }
                     }
 
                 }
@@ -270,7 +307,6 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
             if(e.getErrorCode()==MegaChatError.ERROR_OK){
                 log("Connected to chat!");
                 MegaApplication.setChatConnection(true);
-                showNotification();
             }
             else{
                 log("EEEERRRRROR WHEN CONNECTING " + e.getErrorString());
@@ -289,8 +325,16 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
     public void showNotification(){
         log("showNotification");
 
+        shown = true;
+        megaChatApi.removeChatListener(this);
+
         ArrayList<MegaChatListItem> unreadChats = megaChatApi.getUnreadChatListItems();
         log("Size of unread: "+unreadChats.size());
+
+        for(int i=0; i< unreadChats.size();i++){
+            MegaChatListItem itemA = unreadChats.get(i);
+            log("Item: "+itemA.getTitle()+ " message: "+itemA.getLastMessage());
+        }
         Collections.sort(unreadChats, new Comparator<MegaChatListItem>(){
 
             public int compare(MegaChatListItem c1, MegaChatListItem c2) {
@@ -383,6 +427,37 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
 
             Uri defaultSoundUri2 = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
             notificationBuilder.sendBundledNotification(defaultSoundUri2, unreadChats, "true", email);
+        }
+    }
+
+    @Override
+    public void onChatListItemUpdate(MegaChatApiJava api, MegaChatListItem item) {
+
+    }
+
+    @Override
+    public void onChatInitStateUpdate(MegaChatApiJava api, int newState) {
+
+    }
+
+    @Override
+    public void onChatOnlineStatusUpdate(MegaChatApiJava api, long userhandle, int status, boolean inProgress) {
+
+    }
+
+    @Override
+    public void onChatPresenceConfigUpdate(MegaChatApiJava api, MegaChatPresenceConfig config) {
+
+    }
+
+    @Override
+    public void onChatConnectionStateUpdate(MegaChatApiJava api, long chatid, int newState) {
+        log("onChatConnectionStateUpdate: "+chatid + " "+newState);
+        if(newState==MegaChatApi.CHAT_CONNECTION_ONLINE && chatid==-1){
+            log("Online Connection: "+chatid);
+            if(!shown){
+                showNotification();
+            }
         }
     }
 }
