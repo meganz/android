@@ -4298,4 +4298,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         log("onChatOnlineStatusUpdate: " + status + "___" + inProgress);
         setChatPermissions();
     }
+
+    @Override
+    public void onChatConnectionStateUpdate(MegaChatApiJava api, long chatid, int newState) {
+
+    }
 }
