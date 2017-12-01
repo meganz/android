@@ -336,49 +336,53 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
     public void showSharedFolderNotification() {
         log("showSharedFolderNotification");
 
-        String source = "Tap to get more info";
-        Spanned notificationContent;
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-            notificationContent = Html.fromHtml(source,Html.FROM_HTML_MODE_LEGACY);
-        } else {
-            notificationContent = Html.fromHtml(source);
+        try{
+            String source = "Tap to get more info";
+            Spanned notificationContent;
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                notificationContent = Html.fromHtml(source,Html.FROM_HTML_MODE_LEGACY);
+            } else {
+                notificationContent = Html.fromHtml(source);
+            }
+
+            int notificationId = Constants.NOTIFICATION_PUSH_CLOUD_DRIVE;
+
+            Intent intent = new Intent(this, ManagerActivityLollipop.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            intent.setAction(Constants.ACTION_INCOMING_SHARED_FOLDER_NOTIFICATION);
+            PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
+                    PendingIntent.FLAG_ONE_SHOT);
+
+            Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+            NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
+                    .setSmallIcon(R.drawable.ic_stat_notify_download)
+                    .setContentTitle(getString(R.string.title_incoming_folder_notification))
+                    .setContentText(notificationContent)
+                    .setStyle(new NotificationCompat.BigTextStyle()
+                            .bigText(notificationContent))
+                    .setAutoCancel(true)
+                    .setSound(defaultSoundUri)
+                    .setColor(ContextCompat.getColor(this,R.color.mega))
+                    .setContentIntent(pendingIntent);
+
+            Drawable d;
+
+            if(android.os.Build.VERSION.SDK_INT >=  Build.VERSION_CODES.LOLLIPOP){
+                d = getResources().getDrawable(R.drawable.ic_folder_incoming, getTheme());
+            } else {
+                d = getResources().getDrawable(R.drawable.ic_folder_incoming);
+            }
+
+            notificationBuilder.setLargeIcon(((BitmapDrawable)d).getBitmap());
+
+            NotificationManager notificationManager =
+                    (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+            notificationManager.notify(notificationId, notificationBuilder.build());
         }
-
-        int notificationId = Constants.NOTIFICATION_PUSH_CLOUD_DRIVE;
-
-        Intent intent = new Intent(this, ManagerActivityLollipop.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        intent.setAction(Constants.ACTION_INCOMING_SHARED_FOLDER_NOTIFICATION);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
-                PendingIntent.FLAG_ONE_SHOT);
-
-        Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
-                .setSmallIcon(R.drawable.ic_stat_notify_download)
-                .setContentTitle(getString(R.string.title_incoming_folder_notification))
-                .setContentText(notificationContent)
-                .setStyle(new NotificationCompat.BigTextStyle()
-                        .bigText(notificationContent))
-                .setAutoCancel(true)
-                .setSound(defaultSoundUri)
-                .setColor(ContextCompat.getColor(this,R.color.mega))
-                .setContentIntent(pendingIntent);
-
-        Drawable d;
-
-        if(android.os.Build.VERSION.SDK_INT >=  Build.VERSION_CODES.LOLLIPOP){
-            d = getResources().getDrawable(R.drawable.ic_folder_incoming, getTheme());
-        } else {
-            d = getResources().getDrawable(R.drawable.ic_folder_incoming);
+        catch(Exception e){
+            log("Exception when showing shared folder notification: "+e.getMessage());
         }
-
-        notificationBuilder.setLargeIcon(((BitmapDrawable)d).getBitmap());
-
-        NotificationManager notificationManager =
-                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-
-        notificationManager.notify(notificationId, notificationBuilder.build());
-
     }
 
     public void showContactRequestNotification() {
