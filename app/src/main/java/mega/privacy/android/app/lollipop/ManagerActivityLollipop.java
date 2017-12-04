@@ -215,6 +215,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	public long transferCallback = 0;
 
 	boolean chatConnection = false;
+	boolean cameraUploadsBoolean = false;
 
 	TransfersBottomSheetDialogFragment transfersBottomSheet = null;
 
@@ -5957,12 +5958,17 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		int id = item.getItemId();
 		switch(id){
 			case android.R.id.home:{
+				log("*****************1 click the arrow");
 				if (firstNavigationLevel){
+					log("*****************2 firstNavigationLevel == TRUE");
+
 					log("firstNavigationLevel is TRUE");
 					drawerLayout.openDrawer(nV);
 
 				}
 				else{
+					log("*****************3 firstNavigationLevel == FALSE");
+
 					log("NOT firstNavigationLevel");
 		    		if (drawerItem == DrawerItem.CLOUD_DRIVE){
 		    			int index = viewPagerCDrive.getCurrentItem();
@@ -6000,6 +6006,25 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 		    			}
 		    		}
+					else if (drawerItem == DrawerItem.CAMERA_UPLOADS){
+						if (cuFL != null){
+							if(cuFL.isAdded()){
+								long cameraUploadHandle = cuFL.getPhotoSyncHandle();
+								MegaNode nps = megaApi.getNodeByHandle(cameraUploadHandle);
+								if (nps != null){
+									ArrayList<MegaNode> nodes = megaApi.getChildren(nps, MegaApiJava.ORDER_MODIFICATION_DESC);
+									cuFL.setNodes(nodes);
+									aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+									setFirstNavigationLevel(true);
+									aB.setTitle(getString(R.string.section_shared_items));
+									aB.setTitle(getString(R.string.section_photo_sync));
+								}
+								return true;
+							}
+
+						}
+
+					}
 		    		else if (drawerItem == DrawerItem.SAVED_FOR_OFFLINE){
 		    			if (oFLol != null){
 		    				oFLol.onBackPressed();
@@ -14635,16 +14660,17 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	}
 
 	public void searchDate(long[] searchByDate, ArrayList<MegaNode> nodes ){
-		log("******* total nodes: "+nodes.size());
 
-		log("indicator_arrow_back_887");
 		aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+		setFirstNavigationLevel(false);
+		cameraUploadsBoolean = true;
+
 		ArrayList<MegaNode> nodesResult = new ArrayList<>();
 		Calendar cal = Calendar.getInstance();
 		Calendar calTo = Calendar.getInstance();
 
 		if(searchByDate[0] == 1){
-			log("******* search by DAY");
+			log("search by DAY");
 			cal.setTimeInMillis(searchByDate[1]);
 			int selectedYear = cal.get(Calendar.YEAR);
 			int selectedMonth = (cal.get(Calendar.MONTH) + 1);
@@ -14677,7 +14703,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 			if(searchByDate[2] == 1){
 
-				log("******* search by LAST MONTH");
+				log("search by LAST MONTH");
 				int selectedDay = cal.get(Calendar.DAY_OF_MONTH);
 				int selectedMonth = (cal.get(Calendar.MONTH) + 1);
 				int selectedYear = cal.get(Calendar.YEAR);
@@ -14720,10 +14746,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				cuFL.setNodes(nodesResult);
 
 			}else if(searchByDate[2] == 2){
-				log("******* search by LAST YEAR");
+				log("*search by LAST YEAR");
 
 				//LAST YEAR
 				int selectedYear = (cal.get(Calendar.YEAR) - 1);
+
+				//Title
+				String formattedDate = String.valueOf(selectedYear);
+				aB.setTitle(formattedDate);
 
 				int nodeYear;
 				SimpleDateFormat df = new SimpleDateFormat("yyyy");
@@ -14739,7 +14769,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 
 		}else if(searchByDate[0] == 3){
-			log("******* option PERIOD");
+			log("option PERIOD");
 
 			cal.setTimeInMillis(searchByDate[3]);
 			int selectedYearFrom = cal.get(Calendar.YEAR);
@@ -14750,6 +14780,21 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			int selectedYearTo = calTo.get(Calendar.YEAR);
 			int selectedMonthTo = (calTo.get(Calendar.MONTH) + 1);
 			int selectedDayTo = calTo.get(Calendar.DAY_OF_MONTH);
+
+			//Title
+			SimpleDateFormat titleFormat = new SimpleDateFormat("d MMM");
+			Calendar calTitleFrom = Calendar.getInstance();
+			Calendar calTitleTo = Calendar.getInstance();
+			calTitleFrom.set(selectedYearFrom, cal.get(Calendar.MONTH), selectedDayFrom);
+			calTitleTo.set(selectedYearTo, calTo.get(Calendar.MONTH), selectedDayTo);
+			Date dateFrom = calTitleFrom.getTime();
+			Date dateTo = calTitleTo.getTime();
+
+			String formattedDateFrom = titleFormat.format(dateFrom);
+			String formattedDateTo = titleFormat.format(dateTo);
+
+			String formattedDate = formattedDateFrom +" - "+ formattedDateTo;
+			aB.setTitle(formattedDate);
 
 			int nodeDay, nodeMonth, nodeYear;
 			SimpleDateFormat df = new SimpleDateFormat("yyyy");
