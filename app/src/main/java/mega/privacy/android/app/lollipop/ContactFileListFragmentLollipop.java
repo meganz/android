@@ -6,10 +6,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
@@ -28,6 +30,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -594,7 +597,8 @@ public class ContactFileListFragmentLollipop extends Fragment{
 						handleList.add(contactNodes.get(position).getHandle());
 						((ContactFileListActivityLollipop)context).onFileClick(handleList);
 			  		}
-				} else {
+				}
+				else {
 					adapter.notifyDataSetChanged();
 					ArrayList<Long> handleList = new ArrayList<Long>();
 					handleList.add(contactNodes.get(position).getHandle());
