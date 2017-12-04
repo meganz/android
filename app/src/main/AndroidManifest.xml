@@ -274,6 +274,12 @@
         </activity>
 
         <activity
+            android:name="mega.privacy.android.app.lollipop.SearchByDateActivityLollipop"
+            android:configChanges="screenSize|orientation"
+            android:label="@string/action_search_by_date">
+        </activity>
+
+        <activity
             android:name="mega.privacy.android.app.lollipop.PinLockActivityLollipop"
             android:label="@string/settings_pin_lock"
             android:windowSoftInputMode="stateVisible">

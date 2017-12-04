@@ -22,6 +22,8 @@ import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.graphics.Shader.TileMode;
+import android.icu.text.NumberFormat;
+import android.icu.text.SimpleDateFormat;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -96,6 +98,7 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Locale;
@@ -477,6 +480,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	private MenuItem exportMK;
 	private MenuItem removeMK;
 	private MenuItem takePicture;
+	private MenuItem searchByDate;
 	private MenuItem cancelSubscription;
 	private MenuItem killAllSessions;
 	private MenuItem cancelAllTransfersMenuItem;
@@ -4810,6 +4814,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		changePass = menu.findItem(R.id.action_menu_change_pass);
 
 		takePicture = menu.findItem(R.id.action_take_picture);
+		searchByDate = menu.findItem(R.id.action_search_by_date);
 
 		cancelSubscription = menu.findItem(R.id.action_menu_cancel_subscriptions);
 		cancelSubscription.setVisible(false);
@@ -4885,6 +4890,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 							searchMenuItem.setVisible(true);
 
 							//Hide
+							searchByDate.setVisible(false);
 							refreshMenuItem.setVisible(false);
 							pauseTransfersMenuIcon.setVisible(false);
 							playTransfersMenuIcon.setVisible(false);
@@ -4944,6 +4950,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 							searchMenuItem.setVisible(true);
 
 							//Hide
+							searchByDate.setVisible(false);
 							pauseTransfersMenuIcon.setVisible(false);
 							playTransfersMenuIcon.setVisible(false);
 							addContactMenuItem.setVisible(false);
@@ -4996,6 +5003,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					}
 					searchMenuItem.setVisible(true);
 
+					//Hide
+					searchByDate.setVisible(false);
 					upgradeAccountMenuItem.setVisible(false);
 					refreshMenuItem.setVisible(false);
 					pauseTransfersMenuIcon.setVisible(false);
@@ -5033,6 +5042,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					//Show
 					upgradeAccountMenuItem.setVisible(true);
 					takePicture.setVisible(true);
+					searchByDate.setVisible(true);
 
 					//Hide
 					sortByMenuItem.setVisible(false);
@@ -5094,6 +5104,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					//Show
 					upgradeAccountMenuItem.setVisible(true);
 					takePicture.setVisible(true);
+					searchByDate.setVisible(true);
 
 					//Hide
 					sortByMenuItem.setVisible(false);
@@ -5153,7 +5164,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			else if (drawerItem == DrawerItem.INBOX){
 				if (iFLol != null){
 					//Show
-
 					if(iFLol.getItemCount()>0){
 						selectMenuItem.setVisible(true);
 						sortByMenuItem.setVisible(true);
@@ -5176,6 +5186,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					thumbViewMenuItem.setVisible(true);
 
 					//Hide
+					searchByDate.setVisible(false);
 					refreshMenuItem.setVisible(false);
 					pauseTransfersMenuIcon.setVisible(false);
 					playTransfersMenuIcon.setVisible(false);
@@ -5257,6 +5268,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						searchMenuItem.setVisible(true);
 
 						//Hide
+						searchByDate.setVisible(false);
 						pauseTransfersMenuIcon.setVisible(false);
 						playTransfersMenuIcon.setVisible(false);
 						addContactMenuItem.setVisible(false);
@@ -5310,6 +5322,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						searchMenuItem.setVisible(true);
 
 						//Hide
+						searchByDate.setVisible(false);
 						upgradeAccountMenuItem.setVisible(true);
 						pauseTransfersMenuIcon.setVisible(false);
 						playTransfersMenuIcon.setVisible(false);
@@ -5369,6 +5382,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					}
 
 					//Hide
+					searchByDate.setVisible(false);
 					pauseTransfersMenuIcon.setVisible(false);
 					playTransfersMenuIcon.setVisible(false);
 					log("createFolderMenuItem.setVisible_21");
@@ -5417,6 +5431,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					}
 
 					//Hide
+					searchByDate.setVisible(false);
 					sortByMenuItem.setVisible(false);
 					thumbViewMenuItem.setVisible(false);
 					searchMenuItem.setVisible(false);
@@ -5460,6 +5475,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					}
 
 					//Hide
+					searchByDate.setVisible(false);
 					searchMenuItem.setVisible(false);
 					addContactMenuItem.setVisible(false);
 					sortByMenuItem.setVisible(false);
@@ -5490,7 +5506,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				log("createOptions search");
 				if (sFLol != null){
 					if (createFolderMenuItem != null){
+
 						//Hide
+						searchByDate.setVisible(false);
 						upgradeAccountMenuItem.setVisible(true);
 						cancelAllTransfersMenuItem.setVisible(false);
 						clearCompletedTransfers.setVisible(false);
@@ -5543,6 +5561,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				if (createFolderMenuItem != null) {
 
 					//Hide
+					searchByDate.setVisible(false);
 					helpMenuItem.setVisible(false);
 					pauseTransfersMenuIcon.setVisible(false);
 					playTransfersMenuIcon.setVisible(false);
@@ -5617,8 +5636,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 			else if (drawerItem == DrawerItem.TRANSFERS){
 				log("in Transfers Section");
-				searchMenuItem.setVisible(false);
+
 				//Hide
+				searchByDate.setVisible(false);
+				searchMenuItem.setVisible(false);
 				createFolderMenuItem.setVisible(false);
 				addContactMenuItem.setVisible(false);
 				addMenuItem.setVisible(false);
@@ -5685,8 +5706,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			else if (drawerItem == DrawerItem.SETTINGS){
 				log("in Settings Section");
 				if (sttFLol != null){
-					searchMenuItem.setVisible(false);
+
 					//Hide
+					searchByDate.setVisible(false);
+					searchMenuItem.setVisible(false);
 					log("createFolderMenuItem.setVisible_settings");
 					createFolderMenuItem.setVisible(false);
 					addContactMenuItem.setVisible(false);
@@ -5741,6 +5764,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					}
 
 					//Hide
+					searchByDate.setVisible(false);
 					searchMenuItem.setVisible(false);
 					createFolderMenuItem.setVisible(false);
 					addMenuItem.setVisible(false);
@@ -5768,6 +5792,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				}
 				else{
 					//Hide ALL
+					searchByDate.setVisible(false);
 					newChatMenuItem.setVisible(false);
 					setStatusMenuItem.setVisible(false);
 					addContactMenuItem.setVisible(false);
@@ -5817,6 +5842,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					}
 
 					//Hide
+					searchByDate.setVisible(false);
 					addContactMenuItem.setVisible(false);
 					searchMenuItem.setVisible(false);
 					createFolderMenuItem.setVisible(false);
@@ -5845,6 +5871,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				else {
 					log("onCreateOptionsMenu: HIDE ALL options chat disabled");
 					//Hide ALL
+					searchByDate.setVisible(false);
 					newChatMenuItem.setVisible(false);
 					setStatusMenuItem.setVisible(false);
 					addContactMenuItem.setVisible(false);
@@ -5877,6 +5904,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			else{
 				log("onCreateOptionsMenu: HIDE ALL options without NET");
 				//Hide ALL
+				searchByDate.setVisible(false);
 				newChatMenuItem.setVisible(false);
 				setStatusMenuItem.setVisible(false);
 				addContactMenuItem.setVisible(false);
@@ -7312,6 +7340,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	        	}
 	        	return true;
 	        }
+			case R.id.action_search_by_date:{
+				Intent intent = new Intent(this, SearchByDateActivityLollipop.class);
+				startActivityForResult(intent, Constants.ACTION_SEARCH_BY_DATE);
+				return  true;
+			}
 	        case R.id.action_menu_help:{
 	        	Intent intent = new Intent();
 	            intent.setAction(Intent.ACTION_VIEW);
@@ -9884,7 +9917,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		    public void onClick(DialogInterface dialog, int which) {
 		        switch (which){
 		        case DialogInterface.BUTTON_POSITIVE: {
-					//TODO remove the incoming shares
 					nC.leaveIncomingShare(n);
 					break;
 				}
@@ -10951,6 +10983,26 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			final long fileHandle = intent.getLongExtra("SELECT", 0);
 
 			nC.sendToInbox(fileHandle, selectedContacts);
+		}
+		else if(requestCode == Constants.ACTION_SEARCH_BY_DATE && resultCode == RESULT_OK){
+			if (intent == null) {
+				log("Return.....");
+				return;
+			}
+			final long[] searchByDate = intent.getLongArrayExtra("SELECTED_DATE");
+
+			if (cuFL != null){
+				if(cuFL.isAdded()){
+					long cameraUploadHandle = cuFL.getPhotoSyncHandle();
+					MegaNode nps = megaApi.getNodeByHandle(cameraUploadHandle);
+					if (nps != null){
+						ArrayList<MegaNode> nodes = megaApi.getChildren(nps, MegaApiJava.ORDER_MODIFICATION_DESC);
+						searchDate(searchByDate, nodes);
+						//cuFL.setNodes(nodes);
+					}
+				}
+			}
+
 		}
 		else if (requestCode == Constants.REQUEST_CODE_SELECT_FOLDER && resultCode == RESULT_OK) {
 			log("REQUEST_CODE_SELECT_FOLDER");
@@ -13333,6 +13385,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					log("nps != null");
 					ArrayList<MegaNode> nodes = megaApi.getChildren(nps, MegaApiJava.ORDER_MODIFICATION_DESC);
 //						cuFL.setNodes(megaApi.getFileFolderChildren(nps, MegaApiJava.ORDER_MODIFICATION_DESC));
+
 					cuFL.setNodes(nodes);
 				}
 			}
@@ -14580,4 +14633,170 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 		}
 	}
+
+	public void searchDate(long[] searchByDate, ArrayList<MegaNode> nodes ){
+		log("******* total nodes: "+nodes.size());
+
+		log("indicator_arrow_back_887");
+		aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+		ArrayList<MegaNode> nodesResult = new ArrayList<>();
+		Calendar cal = Calendar.getInstance();
+		Calendar calTo = Calendar.getInstance();
+
+		if(searchByDate[0] == 1){
+			log("******* search by DAY");
+			cal.setTimeInMillis(searchByDate[1]);
+			int selectedYear = cal.get(Calendar.YEAR);
+			int selectedMonth = (cal.get(Calendar.MONTH) + 1);
+			int selectedDay = cal.get(Calendar.DAY_OF_MONTH);
+
+			//Title
+			SimpleDateFormat titleFormat = new SimpleDateFormat("d MMM");
+			Calendar calTitle = Calendar.getInstance();
+			calTitle.set(selectedYear, selectedMonth, selectedDay);
+			Date date = calTitle.getTime();
+			String formattedDate = titleFormat.format(date);
+			aB.setTitle(formattedDate);
+
+			int nodeDay, nodeMonth, nodeYear;
+			SimpleDateFormat df = new SimpleDateFormat("yyyy");
+
+			for (MegaNode node : nodes){
+				Date d = new Date(node.getModificationTime()*1000);
+				nodeDay = d.getDay();
+				nodeMonth = (d.getMonth() + 1);
+				nodeYear = Integer.parseInt(df.format(d));
+
+				if((selectedYear == nodeYear) && (selectedMonth == nodeMonth) && (selectedDay == nodeDay )){
+					nodesResult.add(node);
+				}
+			}
+			cuFL.setNodes(nodesResult);
+
+		}else if(searchByDate[0] == 2){
+
+			if(searchByDate[2] == 1){
+
+				log("******* search by LAST MONTH");
+				int selectedDay = cal.get(Calendar.DAY_OF_MONTH);
+				int selectedMonth = (cal.get(Calendar.MONTH) + 1);
+				int selectedYear = cal.get(Calendar.YEAR);
+
+				if(selectedMonth == 1){
+					selectedMonth = 12;
+					selectedYear = selectedYear - 1;
+				}else{
+					selectedMonth = selectedMonth - 1;
+				}
+
+				//Title
+				int selectedMonthTitle = selectedMonth;
+				SimpleDateFormat titleFormat = new SimpleDateFormat("MMMM");
+				Calendar calTitle = Calendar.getInstance();
+				if (selectedMonthTitle == 1){
+					selectedMonthTitle = 12;
+
+				}else{
+					selectedMonthTitle = selectedMonthTitle - 1;
+
+				}
+				calTitle.set(selectedYear, selectedMonthTitle, selectedDay);
+				Date date = calTitle.getTime();
+				String formattedDate = titleFormat.format(date);
+				aB.setTitle(formattedDate);
+
+				int nodeMonth, nodeYear;
+				SimpleDateFormat df = new SimpleDateFormat("yyyy");
+
+				for (MegaNode node : nodes){
+					Date d = new Date(node.getModificationTime()*1000);
+					nodeMonth = (d.getMonth() + 1);
+					nodeYear = Integer.parseInt(df.format(d));
+
+					if((selectedYear == nodeYear) && (selectedMonth == nodeMonth)){
+						nodesResult.add(node);
+					}
+				}
+				cuFL.setNodes(nodesResult);
+
+			}else if(searchByDate[2] == 2){
+				log("******* search by LAST YEAR");
+
+				//LAST YEAR
+				int selectedYear = (cal.get(Calendar.YEAR) - 1);
+
+				int nodeYear;
+				SimpleDateFormat df = new SimpleDateFormat("yyyy");
+
+				for (MegaNode node : nodes){
+					Date d = new Date(node.getModificationTime()*1000);
+					nodeYear = Integer.parseInt(df.format(d));
+					if(selectedYear == nodeYear){
+						nodesResult.add(node);
+					}
+				}
+				cuFL.setNodes(nodesResult);
+			}
+
+		}else if(searchByDate[0] == 3){
+			log("******* option PERIOD");
+
+			cal.setTimeInMillis(searchByDate[3]);
+			int selectedYearFrom = cal.get(Calendar.YEAR);
+			int selectedMonthFrom = (cal.get(Calendar.MONTH) + 1);
+			int selectedDayFrom = cal.get(Calendar.DAY_OF_MONTH);
+
+			calTo.setTimeInMillis(searchByDate[4]);
+			int selectedYearTo = calTo.get(Calendar.YEAR);
+			int selectedMonthTo = (calTo.get(Calendar.MONTH) + 1);
+			int selectedDayTo = calTo.get(Calendar.DAY_OF_MONTH);
+
+			int nodeDay, nodeMonth, nodeYear;
+			SimpleDateFormat df = new SimpleDateFormat("yyyy");
+
+
+			for (MegaNode node : nodes){
+				int period = 0;
+				Date d = new Date(node.getModificationTime()*1000);
+				nodeDay = d.getDay();
+				nodeMonth = (d.getMonth() + 1);
+				nodeYear = Integer.parseInt(df.format(d));
+
+				//Period From
+				if(selectedYearFrom < nodeYear){
+					period ++;
+				}else if(selectedYearFrom == nodeYear){
+					if(selectedMonthFrom < nodeMonth){
+						period ++;
+					}else if(selectedMonthFrom == nodeMonth){
+
+						if(selectedDayFrom <= nodeDay){
+							period ++;
+						}
+					}
+				}
+
+				//Period To
+				if(selectedYearTo > nodeYear){
+					period ++;
+				}else if(selectedYearTo == nodeYear){
+					if(selectedMonthTo > nodeMonth){
+						period ++;
+					}else if(selectedMonthTo == nodeMonth){
+
+						if(selectedDayTo >= nodeDay){
+							period ++;
+						}
+					}
+				}
+
+				if(period == 2){
+					nodesResult.add(node);
+				}
+			}
+
+			cuFL.setNodes(nodesResult);
+		}
+	}
+
 }
