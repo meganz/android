@@ -1766,6 +1766,8 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 		
 		return 0;
 	}
+
+
 	
 	public long getPhotoSyncHandle(){
 
