@@ -1,6 +1,8 @@
 package mega.privacy.android.app.lollipop;
 
-public class PhoneContactInfo {
+import android.support.annotation.NonNull;
+
+public class PhoneContactInfo implements  Comparable<PhoneContactInfo>{
     long id;
     String name;
     String email;
@@ -27,5 +29,14 @@ public class PhoneContactInfo {
 
     public String getPhoneNumber(){
         return phoneNumber;
+    }
+
+    @Override
+    public int compareTo(PhoneContactInfo contactInfo) {
+
+        String a = new String(String.valueOf(this.getName()));
+        String b = new String (String.valueOf(contactInfo.getName()));
+
+        return a.compareTo(b);
     }
 }
