@@ -44,6 +44,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.CustomizedGridLayoutManager;
 import mega.privacy.android.app.components.CustomizedGridRecyclerView;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
+import mega.privacy.android.app.components.scrollBar.FastScroller;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop.DrawerItem;
@@ -68,6 +69,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 	RecyclerView recyclerView;
 	LinearLayoutManager mLayoutManager;
 	CustomizedGridLayoutManager gridLayoutManager;
+	FastScroller fastScroller;
 
 	ImageView emptyImageView;
 	LinearLayout emptyLinearLayout;
@@ -409,6 +411,8 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 			View v = inflater.inflate(R.layout.fragment_filebrowserlist, container, false);
 			
 			recyclerView = (RecyclerView) v.findViewById(R.id.file_list_view_browser);
+			fastScroller = (FastScroller) v.findViewById(R.id.fastscroll);
+
 			recyclerView.setPadding(0, 0, 0, Util.scaleHeightPx(85, outMetrics));
 			recyclerView.setClipToPadding(false);
 			recyclerView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
@@ -453,10 +457,13 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 			((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 			adapter.setMultipleSelect(false);
 			
-			recyclerView.setAdapter(adapter);		
-			
+			recyclerView.setAdapter(adapter);
+			fastScroller.setRecyclerView(recyclerView);
+
 			if (adapter != null){
 				adapter.setNodes(nodes);
+				visibilityFastScroller();
+
 				if (adapter.getItemCount() == 0){
 					recyclerView.setVisibility(View.GONE);
 					contentTextLayout.setVisibility(View.GONE);
@@ -498,6 +505,8 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 			View v = inflater.inflate(R.layout.fragment_filebrowsergrid, container, false);
 			
 			recyclerView = (CustomizedGridRecyclerView) v.findViewById(R.id.file_grid_view_browser);
+			fastScroller = (FastScroller) v.findViewById(R.id.fastscroll);
+
 			recyclerView.setPadding(0, 0, 0, Util.scaleHeightPx(80, outMetrics));
 			recyclerView.setClipToPadding(false);
 			recyclerView.setHasFixedSize(true);
@@ -541,8 +550,9 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 			}
 			adapter.setMultipleSelect(false);
 			
-			recyclerView.setAdapter(adapter);		
-
+			recyclerView.setAdapter(adapter);
+			fastScroller.setRecyclerView(recyclerView);
+			visibilityFastScroller();
 			if (adapter.getItemCount() == 0){
 				recyclerView.setVisibility(View.GONE);
 				contentTextLayout.setVisibility(View.GONE);
@@ -592,6 +602,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
             if(adapter != null){
                 log("adapter != null");
                 adapter.setNodes(nodes);
+				visibilityFastScroller();
 
                 if (adapter.getItemCount() == 0){
                     log("adapter.getItemCount() = 0");
@@ -643,6 +654,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 
             nodes = megaApi.getChildren(n, ((ManagerActivityLollipop)context).orderOthers);
             adapter.setNodes(nodes);
+			visibilityFastScroller();
 
             //If folder has no files
             if (adapter.getItemCount() == 0){
@@ -688,6 +700,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 			if(adapter != null){
 				log("adapter != null");
 				adapter.setNodes(nodes);
+				visibilityFastScroller();
 
 				if (adapter.getItemCount() == 0){
 					log("adapter.getItemCount() = 0");
@@ -712,6 +725,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 
 			nodes = megaApi.getChildren(n, ((ManagerActivityLollipop)context).orderOthers);
 			adapter.setNodes(nodes);
+			visibilityFastScroller();
 
 			//If folder has no files
 			if (adapter.getItemCount() == 0){
@@ -830,7 +844,8 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 				nodes = megaApi.getChildren(nodes.get(position), ((ManagerActivityLollipop)context).orderOthers);
 				adapter.setNodes(nodes);
 				recyclerView.scrollToPosition(0);
-				
+				visibilityFastScroller();
+
 				//If folder has no files
 				if (adapter.getItemCount() == 0){
 					recyclerView.setVisibility(View.GONE);
@@ -1144,6 +1159,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 			findNodes();
 
 			adapter.setNodes(nodes);
+			visibilityFastScroller();
 
 			int lastVisiblePosition = 0;
 			if(!lastPositionStack.empty()){
@@ -1190,6 +1206,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 
 				nodes = megaApi.getChildren(parentNode, ((ManagerActivityLollipop)context).orderOthers);
 				adapter.setNodes(nodes);
+				visibilityFastScroller();
 
 				int lastVisiblePosition = 0;
 				if(!lastPositionStack.empty()){
@@ -1287,4 +1304,16 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 		Util.log("OutgoingSharesFragmentLollipop", log);
 	}
 
+	public void visibilityFastScroller(){
+		if(adapter == null){
+			fastScroller.setVisibility(View.GONE);
+		}else{
+			if(adapter.getItemCount() < Constants.MIN_ITEMS_SCROLLBAR){
+				fastScroller.setVisibility(View.GONE);
+			}else{
+				fastScroller.setVisibility(View.VISIBLE);
+			}
+		}
+
+	}
 }

@@ -76,6 +76,7 @@ import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.PendingMessage;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.PreviewUtils;
+import mega.privacy.android.app.utils.RTFFormatter;
 import mega.privacy.android.app.utils.ThumbnailUtils;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.TimeChatUtils;
@@ -90,7 +91,6 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaNodeList;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
-import nz.mega.sdk.MegaUser;
 
 public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
 
@@ -1524,95 +1524,19 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                             ((ViewHolderMessageChat)holder).contentOwnMessageContactName.setVisibility(View.GONE);
                             ((ViewHolderMessageChat)holder).contentOwnMessageContactEmail.setVisibility(View.GONE);
 
-                            SpannableString ss1 = null;
+
                             SimpleSpanBuilder ssb = null;
-                            if(message.getContent()!=null){
-                                messageContent = message.getContent();
 
-                                boolean  italic = Pattern.matches("(.*\\s+)*_.*_(\\s+.*)*", messageContent);
-//                                boolean  italic = Pattern.matches(".*_.*_.*", messageContent);
-                                if(italic){
-                                    log("Italic found: "+messageContent);
-
-                                    char a = messageContent.charAt(0);
-                                    int start;
-                                    int end;
-
-                                    ssb = new SimpleSpanBuilder();
-
-                                    if(a =='_'){
-                                        start = 0;
-                                    }
-                                    else{
-                                        start = messageContent.indexOf(" _");
-                                        start++;
-                                    }
-
-                                    messageContent = messageContent.replaceFirst("_", "");
-                                    log("Start position: "+start);
-                                    end = messageContent.indexOf("_ ");
-                                    if(end==-1){
-                                        end = messageContent.lastIndexOf("_");
-                                        log("FINISH End position: "+end);
-                                        String substring = messageContent.substring(start, end);
-                                        ssb.append(substring, new StyleSpan(Typeface.ITALIC));
-                                    }
-                                    else{
-                                        log("End position: "+end);
-                                        messageContent =  messageContent.replaceFirst("_ ", " ");
-                                        log("Message content B: "+messageContent);
-                                        String substring = messageContent.substring(start, end);
-                                        ssb.append(substring, new StyleSpan(Typeface.ITALIC));
-
-                                        start = messageContent.indexOf(" _");
-                                        while(start!=-1){
-
-                                            start = start +1;
-                                            log("(B) Start position: "+start);
-                                            substring = messageContent.substring(end, start);
-                                            ssb.append(substring);
-
-                                            messageContent =  messageContent.replaceFirst("_", "");
-                                            log("Message content C: "+messageContent);
-                                            end = messageContent.indexOf("_ ");
-                                            if(end==-1){
-                                                end = messageContent.lastIndexOf("_");
-                                                log("(B)FINISH End position: "+end);
-                                                substring = messageContent.substring(start, end);
-                                                ssb.append(substring, new StyleSpan(Typeface.ITALIC));
-                                                break;
-                                            }
-                                            else{
-                                                log("End position: "+end);
-                                                messageContent =  messageContent.replaceFirst("_ ", " ");
-                                                log("Message content D: "+messageContent);
-
-                                                substring = messageContent.substring(start, end);
-                                                ssb.append(substring, new StyleSpan(Typeface.ITALIC));
-
-                                                start = messageContent.indexOf(" _");
-                                            }
-                                        }
-
-                                        if(end<messageContent.length()-1){
-                                            substring = messageContent.substring(end, messageContent.length());
-                                            ssb.append(substring);
-                                        }
-                                    }
-
+                            try{
+                                if(message.getContent()!=null){
+                                    messageContent = message.getContent();
+                                    RTFFormatter formatter = new RTFFormatter(messageContent, context);
+                                    ssb = formatter.setRTFFormat();
                                 }
-                                else{
-                                    log("NOT Italic found: "+messageContent);
-                                }
-//                                italic = Pattern.matches("(\\t\\n\\x0B\\f\\r]_.*_[\\t\\n\\x0B\\f\\r])", messageContent);
-//                                if(italic){
-//                                    log("Italic found: "+messageContent);
-//                                }
-//                                else{
-//                                    log("NOT Italic found "+messageContent);
-//                                }
-
-
+                            }
+                            catch (Exception e){
+                                log("FORMATTER EXCEPTION!!!");
+                                ssb = null;
                             }
 
                             int status = message.getStatus();
@@ -1668,13 +1592,11 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
 //                            ((ViewHolderMessageChat)holder).contentOwnMessageText.setText(messageContent);
                             if(ssb!=null){
-
                                 ((ViewHolderMessageChat)holder).contentOwnMessageText.setText(ssb.build(), TextView.BufferType.SPANNABLE);
                             }
                             else{
                                 ((ViewHolderMessageChat)holder).contentOwnMessageText.setText(messageContent);
                             }
-
 
                             ((ViewHolderMessageChat)holder).contentOwnMessageText.setLinksClickable(true);
                             Linkify.addLinks(((ViewHolderMessageChat)holder).contentOwnMessageText, Linkify.WEB_URLS);
@@ -2418,18 +2340,76 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                 ((ViewHolderMessageChat)holder).contentContactMessageText.setEmojiconSizeSp(20);
                             }
 
+                            //Color always status SENT
+                            ((ViewHolderMessageChat)holder).contentContactMessageText.setTextColor(ContextCompat.getColor(context, R.color.name_my_account));
+
                             if(chatRoom.isGroup()){
-                                Spannable name = new SpannableString(((ViewHolderMessageChat)holder).fullNameTitle+"\n");
+
+                                String name = ((ViewHolderMessageChat)holder).fullNameTitle+"\n";
+                                SimpleSpanBuilder ssb = new SimpleSpanBuilder();
                                 if(color!=null){
                                     log("The color to set the avatar is "+color);
-                                    name.setSpan(new ForegroundColorSpan(Color.parseColor(color)), 0, name.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                                    ssb.append(name, new ForegroundColorSpan(Color.parseColor(color)));
                                 }
                                 else{
                                     log("Default color to the avatar");
-                                    name.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.accentColor)), 0, name.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                                    ssb.append(name, new ForegroundColorSpan(ContextCompat.getColor(context, R.color.accentColor)));
                                 }
-                                CharSequence indexedText = TextUtils.concat(name, messageContent);
-                                ((ViewHolderMessageChat)holder).contentContactMessageText.setText(indexedText);
+
+                                RTFFormatter formatter = null;
+                                try{
+                                    if(message.getContent()!=null){
+                                        messageContent = message.getContent();
+                                        formatter = new RTFFormatter(messageContent, context, ssb);
+                                        ssb = formatter.setRTFFormat();
+                                    }
+
+                                    if(formatter!=null){
+                                        if(formatter.isFormatted()){
+                                            ((ViewHolderMessageChat)holder).contentContactMessageText.setText(ssb.build(), TextView.BufferType.SPANNABLE);
+                                        }
+                                        else {
+                                            Spannable nameSpannable = new SpannableString(name);
+                                            if(color!=null){
+                                                log("The color to set the avatar is "+color);
+                                                nameSpannable.setSpan(new ForegroundColorSpan(Color.parseColor(color)), 0, name.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                                            }
+                                            else{
+                                                log("Default color to the avatar");
+                                                nameSpannable.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.accentColor)), 0, name.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                                            }
+                                            CharSequence indexedText = TextUtils.concat(nameSpannable, messageContent);
+                                            ((ViewHolderMessageChat)holder).contentContactMessageText.setText(indexedText);
+                                        }
+                                    }
+                                    else{
+                                        Spannable nameSpannable = new SpannableString(name);
+                                        if(color!=null){
+                                            log("The color to set the avatar is "+color);
+                                            nameSpannable.setSpan(new ForegroundColorSpan(Color.parseColor(color)), 0, name.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                                        }
+                                        else{
+                                            log("Default color to the avatar");
+                                            nameSpannable.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.accentColor)), 0, name.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                                        }
+                                        CharSequence indexedText = TextUtils.concat(nameSpannable, messageContent);
+                                        ((ViewHolderMessageChat)holder).contentContactMessageText.setText(indexedText);
+                                    }
+                                }
+                                catch (Exception e){
+                                    log("FORMATTER EXCEPTION!!!");
+                                    Spannable nameSpannable = new SpannableString(name);
+                                    if(color!=null){
+                                        log("The color to set the avatar is "+color);
+                                        nameSpannable.setSpan(new ForegroundColorSpan(Color.parseColor(color)), 0, name.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                                    }
+                                    else{
+                                        log("Default color to the avatar");
+                                        nameSpannable.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.accentColor)), 0, name.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                                    }
+                                    CharSequence indexedText = TextUtils.concat(nameSpannable, messageContent);
+                                    ((ViewHolderMessageChat)holder).contentContactMessageText.setText(indexedText);
+                                }
                             }
                             else{
                                 ((ViewHolderMessageChat)holder).contentContactMessageText.setText(messageContent);
@@ -2437,8 +2417,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                             ((ViewHolderMessageChat)holder).contentContactMessageText.setLinksClickable(true);
                             Linkify.addLinks(((ViewHolderMessageChat)holder).contentContactMessageText, Linkify.WEB_URLS);
-
-                            ((ViewHolderMessageChat)holder).contentContactMessageText.setTextColor(ContextCompat.getColor(context, R.color.name_my_account));
 
                         }
                         else if(message.getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT){

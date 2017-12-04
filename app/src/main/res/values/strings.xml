@@ -765,7 +765,8 @@
     -->
 
     <string name="my_account_title" context="title of the My Account screen">Account Type</string>
-    <string name="expires_on" context="title of the Expiration Date">Renews on&#160;</string>
+    <string name="renews_on" context="title of the Expiration Date">Renews on&#160;</string>
+    <string name="expires_on" context="title of the Expiration Date">Expires on&#160;</string>
     <string name="free_account">FREE</string>
     <string name="prolite_account" context="Not translate">Lite</string>
     <string name="pro1_account" context="Not translate">PRO I</string>
@@ -1593,7 +1594,7 @@
 
     <string name="settings_help" context="Settings category title for Help">Help</string>
     <string name="settings_help_preference" context="Settings preference title for send feedback">Send Feedback</string>
-    <string name="setting_feedback_subject" context="mail subject">Feedback</string>
+    <string name="setting_feedback_subject" context="mail subject">Android feedback</string>
     <string name="setting_feedback_body" context="mail body">Please, write your feedback here:</string>
     <string name="settings_feedback_body_device_model" context="mail body">Device model</string>
     <string name="settings_feedback_body_android_version" context="mail body">Android version</string>
@@ -1616,10 +1617,13 @@
 
     <string name="forward_menu_item" context="Item of a menu to forward a message chat to another chatroom">Forward</string>
 
-    <string name="old_and_new_passwords_equals" context="when changing the password , the old password and new password are equals">Old and new passwords are equals</string>
+    <string name="general_attach" context="name of the button to attach file from MEGA to another app">Attach</string>
 
     <string name="type_contact" context="when add or share a file with a new contact, it can type by name or mail">Contact\'s name or email</string>
 
-    <string name="max_add_contact" context="when add or share a file with a new contact, message displayed to warn that the maximum number has been reached">It can not add more contacts. It has reached the maximum number allowed</string>
+    <string name="max_add_contact" context="when add or share a file with a new contact, message displayed to warn that the maximum number has been reached">No more contacts can be added at a time</string>
 
+    <string name="old_and_new_passwords_equals" context="when changing the password , the old password and new password are equals">Passwords cannot be the same</string>
+
+    <string name="user_account_feedback" context="Label to include info of the user email in the feedback form">User account</string>
 </resources>
