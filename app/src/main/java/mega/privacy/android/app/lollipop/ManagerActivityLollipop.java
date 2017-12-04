@@ -2010,8 +2010,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				if(!chatConnection){
 					log("Connection goes!!!");
 					megaChatApi.connect(this);
-					log("timestamp: "+System.currentTimeMillis()/1000);
-                    MegaApplication.setFirstTs(System.currentTimeMillis()/1000);
 				}
 				else{
 					log("Already connected");
@@ -4133,13 +4131,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 //			maFLol.setMKLayoutVisible(mkLayoutVisible);
 		}
 		log("show chats");
-		MegaApplication.setRecentChatsFragmentVisible(true);
 		drawerLayout.closeDrawer(Gravity.LEFT);
 	}
 	@SuppressLint("NewApi")
 	public void selectDrawerItemLollipop(DrawerItem item){
     	log("selectDrawerItemLollipop: "+item);
-		MegaApplication.setRecentChatsFragmentVisible(false);
 
     	switch (item){
 			case CLOUD_DRIVE:{
@@ -12224,7 +12220,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 			if (MegaApplication.isFirstConnect()){
 				log("Set first connect to false");
-				MegaApplication.isFireBaseConnection=false;
 				MegaApplication.setFirstConnect(false);
 			}
 
@@ -14437,6 +14432,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		else{
 			log("Config is null");
 		}
+	}
+
+	@Override
+	public void onChatConnectionStateUpdate(MegaChatApiJava api, long chatid, int newState) {
+		log("onChatConnectionStateUpdate: "+chatid);
 	}
 
 	public boolean isMkLayoutVisible() {

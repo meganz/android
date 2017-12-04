@@ -130,6 +130,10 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 			megaApi.removeTransferListener(this);
 		}
 
+        if (megaChatApi != null){
+            megaChatApi.saveCurrentState();
+        }
+
 		super.onDestroy();
 	}
 
