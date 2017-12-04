@@ -1619,6 +1619,10 @@
 
     <string name="general_attach" context="name of the button to attach file from MEGA to another app">Attach</string>
 
+    <string name="type_contact" context="when add or share a file with a new contact, it can type by name or mail">Contact\'s name or email</string>
+
+    <string name="max_add_contact" context="when add or share a file with a new contact, message displayed to warn that the maximum number has been reached">No more contacts can be added at a time</string>
+
     <string name="old_and_new_passwords_equals" context="when changing the password , the old password and new password are equals">Passwords cannot be the same</string>
 
     <string name="user_account_feedback" context="Label to include info of the user email in the feedback form">User account</string>
