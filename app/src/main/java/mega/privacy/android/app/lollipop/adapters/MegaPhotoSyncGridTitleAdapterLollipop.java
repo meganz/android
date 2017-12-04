@@ -41,6 +41,7 @@ import mega.privacy.android.app.MegaStreamingService;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.MimeTypeThumbnail;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.components.scrollBar.SectionTitleProvider;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
@@ -62,7 +63,7 @@ import nz.mega.sdk.MegaShare;
  * Created by mega on 4/08/17.
  */
 
-public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<MegaPhotoSyncGridTitleAdapterLollipop.ViewHolderPhotoTitleSyncGridTitle>{
+public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<MegaPhotoSyncGridTitleAdapterLollipop.ViewHolderPhotoTitleSyncGridTitle> implements SectionTitleProvider {
 
     private class Media {
         public String filePath;
@@ -109,6 +110,8 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
 
     private int count;
     private int countTitles;
+    private ItemInformation dateNode;
+    private String dateNodeText = null;
 
     private List<ItemInformation> itemInformationList;
 
@@ -956,6 +959,21 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
 
     public long getPhotoSyncHandle(){
         return photosyncHandle;
+    }
+
+    @Override
+    public String getSectionTitle(int position) {
+        dateNode = getInformationOfPosition(position);
+        if(dateNode != null){
+            if(dateNode.megaMonthPic.monthYearString != null){
+                if(dateNodeText == null){
+                    dateNodeText = dateNode.megaMonthPic.monthYearString;
+                }else if(!dateNodeText.equals(dateNode.megaMonthPic.monthYearString)){
+                    dateNodeText = dateNode.megaMonthPic.monthYearString;
+                }
+            }
+        }
+        return dateNodeText;
     }
 
     /*

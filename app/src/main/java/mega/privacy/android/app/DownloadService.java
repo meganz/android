@@ -31,10 +31,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
@@ -579,7 +581,20 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 					//
 					//					log("Lanzo intent al manager.....");
 					//				}
-					if (MimeTypeList.typeForName(currentFile.getName()).isDocument()) {
+					if (MimeTypeList.typeForName(currentFile.getName()).isPdf()){
+						log("Pdf file");
+						Intent pdfIntent = new Intent(this, PdfViewerActivityLollipop.class);
+						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+							pdfIntent.setDataAndType(FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
+						}
+						else{
+							pdfIntent.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
+						}
+						pdfIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+						pdfIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+						startActivity(pdfIntent);
+					}
+					else if (MimeTypeList.typeForName(currentFile.getName()).isDocument()) {
 						log("Download is document");
 
 						Intent viewIntent = new Intent(Intent.ACTION_VIEW);
