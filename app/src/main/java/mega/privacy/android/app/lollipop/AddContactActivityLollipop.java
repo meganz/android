@@ -263,7 +263,6 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         log("onPrepareOptionsMenu");
 
         return super.onPrepareOptionsMenu(menu);
-
     }
 
     @Override
