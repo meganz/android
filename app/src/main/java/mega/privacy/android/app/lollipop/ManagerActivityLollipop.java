@@ -5958,17 +5958,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		int id = item.getItemId();
 		switch(id){
 			case android.R.id.home:{
-				log("*****************1 click the arrow");
 				if (firstNavigationLevel){
-					log("*****************2 firstNavigationLevel == TRUE");
-
-					log("firstNavigationLevel is TRUE");
 					drawerLayout.openDrawer(nV);
-
-				}
-				else{
-					log("*****************3 firstNavigationLevel == FALSE");
-
+				}else{
 					log("NOT firstNavigationLevel");
 		    		if (drawerItem == DrawerItem.CLOUD_DRIVE){
 		    			int index = viewPagerCDrive.getCurrentItem();
