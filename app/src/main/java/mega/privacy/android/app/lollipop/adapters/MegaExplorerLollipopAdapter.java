@@ -278,8 +278,12 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 				else{
 					holder.permissionsIcon.setImageResource(R.drawable.ic_shared_read_write);
 				}
-			}
-			else{
+			}else if(node.isOutShare()) {
+				holder.permissionsIcon.setVisibility(View.GONE);
+				holder.imageView.setImageResource(R.drawable.ic_folder_outgoing_list);
+				holder.textViewFileSize.setText(MegaApiUtils.getInfoFolder(node, context));
+
+			}else{
 				holder.permissionsIcon.setVisibility(View.GONE);
 				holder.imageView.setImageResource(R.drawable.ic_folder_list);
 				holder.textViewFileSize.setText(MegaApiUtils.getInfoFolder(node, context));
