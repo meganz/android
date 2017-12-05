@@ -29,11 +29,13 @@ import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.GestureDetector;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -280,7 +282,6 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                     inviteContacts(addedContactsPhone);
                 }
                 else if (contactType == Constants.CONTACT_TYPE_MEGA){
-                    //writeMailMenuItem.setVisible(false);
                     setResultContacts(addedContactsMEGA, true);
                 }
                 break;
@@ -353,6 +354,39 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         relativeLayout = (RelativeLayout) findViewById(R.id.relative_container_add_contact);
 
         addContactEditText = (EditText) findViewById(R.id.addcontact_edittext);
+        addContactEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if ((event != null && (event.getKeyCode() == KeyEvent.KEYCODE_ENTER)) || (actionId == EditorInfo.IME_ACTION_SEND)) {
+                    if (contactType == Constants.CONTACT_TYPE_DEVICE){
+                        if (addedContactsPhone.isEmpty()|| addedContactsPhone == null) {
+                            View view = getCurrentFocus();
+                            if (view != null) {
+                                InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                                inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
+                            }
+                        }
+                        else {
+                            inviteContacts(addedContactsPhone);
+                        }
+                    }
+                    else if (contactType == Constants.CONTACT_TYPE_MEGA){
+                        if (addedContactsMEGA.isEmpty() || addedContactsMEGA == null) {
+                            View view = getCurrentFocus();
+                            if (view != null) {
+                                InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                                inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
+                            }
+                        }
+                        else {
+                            setResultContacts(addedContactsMEGA, true);
+                        }
+                    }
+                }
+
+                return false;
+            }
+        });
         addContactEditText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
