@@ -32,6 +32,7 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
+import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.FileInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.FileLinkActivityLollipop;
@@ -730,6 +731,20 @@ public class NodeController {
                             }
                             pdfIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                             context.startActivity(pdfIntent);
+                        }
+                        else if (MimeTypeList.typeForName(tempNode.getName()).isVideo()) {
+                            log("Video file");
+                            File videoFile = new File(localPath);
+
+                            Intent videoIntent = new Intent(context, AudioVideoPlayerLollipop.class);
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                                videoIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", videoFile), MimeTypeList.typeForName(tempNode.getName()).getType());
+                            }
+                            else{
+                                videoIntent.setDataAndType(Uri.fromFile(videoFile), MimeTypeList.typeForName(tempNode.getName()).getType());
+                            }
+                            videoIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                            context.startActivity(videoIntent);
                         }
                         else {
                             log("MimeTypeList other file");
