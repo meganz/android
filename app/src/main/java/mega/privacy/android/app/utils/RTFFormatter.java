@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.StyleSpan;
+import android.text.style.TypefaceSpan;
 
 import com.vdurmont.emoji.EmojiManager;
 import com.vdurmont.emoji.EmojiParser;
@@ -12,6 +13,7 @@ import com.vdurmont.emoji.EmojiParser;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import mega.privacy.android.app.components.CustomTypefaceSpan;
 import mega.privacy.android.app.components.SimpleSpanBuilder;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaChatLollipopAdapter;
 
@@ -21,6 +23,7 @@ public class RTFFormatter {
     SimpleSpanBuilder ssb = null;
     Context context;
     boolean formatted = false;
+    Typeface font;
 
     public boolean isFormatted() {
         return formatted;
@@ -44,6 +47,8 @@ public class RTFFormatter {
         String noEmojisContent = EmojiParser.removeAllEmojis(messageContent);
 
         if(!messageContent.isEmpty()){
+
+            font = Typeface.createFromAsset(context.getAssets(), "font/RobotoMono-Regular.ttf");
 
             boolean  multiquote = Pattern.matches("(.*\\s+)*```.*```(\\s+.*)*[?|!|\\.|,|;|:|\\)|%]*", noEmojisContent);
 //                                boolean  italic = Pattern.matches(".*_.*_.*", messageContent);
@@ -235,7 +240,7 @@ public class RTFFormatter {
 //            sbBMultiQuote.append('\n');
 //            substring = sbBMultiQuote.toString();
 
-            ssb.append(substring, new ForegroundColorSpan(Color.BLUE));
+            ssb.append(substring, new CustomTypefaceSpan("", font));
 
             sb = new StringBuilder(messageContent);
             sb.delete(0, end);
@@ -250,7 +255,7 @@ public class RTFFormatter {
             log("Message content B: "+messageContent);
             substring = messageContent.substring(0, end);
 
-            ssb.append(substring, new ForegroundColorSpan(Color.BLUE));
+            ssb.append(substring, new CustomTypefaceSpan("", font));
 
             sb = new StringBuilder(messageContent);
             sb.delete(0, end+1);
@@ -369,7 +374,7 @@ public class RTFFormatter {
 
             substring = messageContent.substring(0, end);
 
-            ssb.append(substring, new ForegroundColorSpan(Color.BLUE));
+            ssb.append(substring, new CustomTypefaceSpan("", font));
 
             sb = new StringBuilder(messageContent);
             sb.delete(0, end);
@@ -385,7 +390,7 @@ public class RTFFormatter {
             log("Message content B: "+messageContent);
             substring = messageContent.substring(0, end);
 
-            ssb.append(substring, new ForegroundColorSpan(Color.BLUE));
+            ssb.append(substring, new CustomTypefaceSpan("", font));
 
             sb = new StringBuilder(messageContent);
             sb.delete(0, end);
@@ -421,7 +426,7 @@ public class RTFFormatter {
 
                     log("(B)FINISH End position: "+end);
                     substring = messageContent.substring(0, end);
-                    ssb.append(substring, new ForegroundColorSpan(Color.BLUE));
+                    ssb.append(substring, new CustomTypefaceSpan("", font));
 
                     sb = new StringBuilder(messageContent);
                     sb.delete(0, end);
@@ -437,7 +442,7 @@ public class RTFFormatter {
                     log("Message content D: "+messageContent);
 
                     substring = messageContent.substring(0, end);
-                    ssb.append(substring, new ForegroundColorSpan(Color.BLUE));
+                    ssb.append(substring, new CustomTypefaceSpan("", font));
 
                     sb = new StringBuilder(messageContent);
                     sb.delete(0, end);
@@ -950,7 +955,7 @@ public class RTFFormatter {
             substringB = subMessageContent.substring(0, endB);
 
             log("SubstringB is: "+substringB);
-            ssb.append(substringB, new ForegroundColorSpan(Color.BLUE), new StyleSpan(Typeface.BOLD), new StyleSpan(Typeface.ITALIC));
+            ssb.append(substringB, new CustomTypefaceSpan("", font), new StyleSpan(Typeface.BOLD), new StyleSpan(Typeface.ITALIC));
 
             sbB = new StringBuilder(subMessageContent);
             sbB.delete(0, endB);
@@ -960,7 +965,7 @@ public class RTFFormatter {
             log("endB position: "+endB);
             log("(10) Message content B: "+subMessageContent);
             substringB = subMessageContent.substring(0, endB);
-            ssb.append(substringB, new ForegroundColorSpan(Color.BLUE), new StyleSpan(Typeface.BOLD), new StyleSpan(Typeface.ITALIC));
+            ssb.append(substringB, new CustomTypefaceSpan("", font), new StyleSpan(Typeface.BOLD), new StyleSpan(Typeface.ITALIC));
 
             endB++;
             StringBuilder sbB = new StringBuilder(subMessageContent);
@@ -997,7 +1002,7 @@ public class RTFFormatter {
 
                     log("(B)FINISH End position: "+endB);
                     substringB = subMessageContent.substring(0, endB);
-                    ssb.append(substringB, new ForegroundColorSpan(Color.BLUE), new StyleSpan(Typeface.BOLD), new StyleSpan(Typeface.ITALIC));
+                    ssb.append(substringB, new CustomTypefaceSpan("", font), new StyleSpan(Typeface.BOLD), new StyleSpan(Typeface.ITALIC));
 
                     sbB = new StringBuilder(subMessageContent);
                     sbB.delete(0, endB);
@@ -1012,7 +1017,7 @@ public class RTFFormatter {
                     log("Message content D: "+subMessageContent);
 
                     substringB = subMessageContent.substring(0, endB);
-                    ssb.append(substringB, new ForegroundColorSpan(Color.BLUE), new StyleSpan(Typeface.BOLD), new StyleSpan(Typeface.ITALIC));
+                    ssb.append(substringB, new CustomTypefaceSpan("", font), new StyleSpan(Typeface.BOLD), new StyleSpan(Typeface.ITALIC));
 
                     sbB = new StringBuilder(subMessageContent);
                     sbB.delete(0, endB);
@@ -1078,7 +1083,7 @@ public class RTFFormatter {
             substringB = subMessageContent.substring(0, endB);
 
             log("SubstringB is: "+substringB);
-            ssb.append(substringB, new ForegroundColorSpan(Color.BLUE), new StyleSpan(format));
+            ssb.append(substringB, new CustomTypefaceSpan("", font), new StyleSpan(format));
 
             sbB = new StringBuilder(subMessageContent);
             sbB.delete(0, endB);
@@ -1088,7 +1093,7 @@ public class RTFFormatter {
             log("endB position: "+endB);
             log("(10) Message content B: "+subMessageContent);
             substringB = subMessageContent.substring(0, endB);
-            ssb.append(substringB, new ForegroundColorSpan(Color.BLUE), new StyleSpan(format));
+            ssb.append(substringB, new CustomTypefaceSpan("", font), new StyleSpan(format));
 
             endB++;
             StringBuilder sbB = new StringBuilder(subMessageContent);
@@ -1125,7 +1130,7 @@ public class RTFFormatter {
 
                     log("(B)FINISH End position: "+endB);
                     substringB = subMessageContent.substring(0, endB);
-                    ssb.append(substringB, new ForegroundColorSpan(Color.BLUE), new StyleSpan(format));
+                    ssb.append(substringB, new CustomTypefaceSpan("", font), new StyleSpan(format));
 
                     sbB = new StringBuilder(subMessageContent);
                     sbB.delete(0, endB);
@@ -1140,7 +1145,7 @@ public class RTFFormatter {
                     log("Message content D: "+subMessageContent);
 
                     substringB = subMessageContent.substring(0, endB);
-                    ssb.append(substringB, new ForegroundColorSpan(Color.BLUE), new StyleSpan(format));
+                    ssb.append(substringB, new CustomTypefaceSpan("", font), new StyleSpan(format));
 
                     sbB = new StringBuilder(subMessageContent);
                     sbB.delete(0, endB);
@@ -1161,7 +1166,7 @@ public class RTFFormatter {
     }
 
     public SimpleSpanBuilder applyTwoFormatsAndMultiQuoteFormat(String subMessageContent){
-        log("applyOneFormatAndMultiQuoteFormat: "+subMessageContent);
+        log("applyTwoFormatsAndMultiQuoteFormat: "+subMessageContent);
 //        char b = subMessageContent.charAt(0);
         String b = subMessageContent.substring(0,3);
         int startB;
@@ -1207,7 +1212,7 @@ public class RTFFormatter {
 
             substringB = subMessageContent.substring(0, endB);
             log("SubstringB is: "+substringB);
-            ssb.append(substringB, new ForegroundColorSpan(Color.BLUE), new StyleSpan(Typeface.BOLD), new StyleSpan(Typeface.ITALIC));
+            ssb.append(substringB, new CustomTypefaceSpan("", font), new StyleSpan(Typeface.BOLD), new StyleSpan(Typeface.ITALIC));
 
             sbB = new StringBuilder(subMessageContent);
             sbB.delete(0, endB+3);
@@ -1218,8 +1223,7 @@ public class RTFFormatter {
             log("(10) Message content B: "+subMessageContent);
             substringB = subMessageContent.substring(0, endB);
 
-            ssb.append(substringB, new ForegroundColorSpan(Color.BLUE), new StyleSpan(Typeface.BOLD), new StyleSpan(Typeface.ITALIC));
-
+            ssb.append(substringB, new CustomTypefaceSpan("", font), new StyleSpan(Typeface.BOLD), new StyleSpan(Typeface.ITALIC));
             endB++;
             StringBuilder sbB = new StringBuilder(subMessageContent);
             sbB.delete(0, endB+3);
@@ -1229,8 +1233,8 @@ public class RTFFormatter {
 
         if(!subMessageContent.isEmpty()){
             log("(ITALICMULTIQUOTE: Append more...");
-            StringBuilder sbBMultiQuote = new StringBuilder(subMessageContent);
-            sbBMultiQuote.insert(0, '\n');
+            StringBuilder sbBMultiQuote = new StringBuilder('\n'+subMessageContent);
+//            sbBMultiQuote.insert(0, '\n');
             subMessageContent = sbBMultiQuote.toString();
             ssb.append(subMessageContent, new StyleSpan(Typeface.BOLD), new StyleSpan(Typeface.ITALIC));
         }
@@ -1286,7 +1290,7 @@ public class RTFFormatter {
 
             substringB = subMessageContent.substring(0, endB);
             log("SubstringB is: "+substringB);
-            ssb.append(substringB, new ForegroundColorSpan(Color.BLUE), new StyleSpan(format));
+            ssb.append(substringB, new CustomTypefaceSpan("", font), new StyleSpan(format));
 
             sbB = new StringBuilder(subMessageContent);
             sbB.delete(0, endB+3);
@@ -1298,7 +1302,7 @@ public class RTFFormatter {
             substringB = subMessageContent.substring(0, endB);
 //            ssb.append(substringB, new StyleSpan(typeFace.getStyle()), new StyleSpan(Typeface.ITALIC));
 
-            ssb.append(substringB, new ForegroundColorSpan(Color.BLUE), new StyleSpan(format));
+            ssb.append(substringB, new CustomTypefaceSpan("", font), new StyleSpan(format));
             endB++;
             StringBuilder sbB = new StringBuilder(subMessageContent);
             sbB.delete(0, endB+3);
