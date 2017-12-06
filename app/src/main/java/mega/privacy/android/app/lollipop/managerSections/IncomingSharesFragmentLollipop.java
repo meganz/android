@@ -45,6 +45,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.CustomizedGridLayoutManager;
 import mega.privacy.android.app.components.CustomizedGridRecyclerView;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
+import mega.privacy.android.app.components.scrollBar.FastScroller;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.MyAccountInfo;
@@ -68,6 +69,7 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 	RecyclerView recyclerView;
 	LinearLayoutManager mLayoutManager;
 	CustomizedGridLayoutManager gridLayoutManager;
+	FastScroller fastScroller;
 
 	ImageView emptyImageView;
 	LinearLayout emptyTextView;
@@ -135,7 +137,6 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 						handleList.add(documents.get(i).getHandle());
 					}
 					((ManagerActivityLollipop) context).askConfirmationMoveToRubbish(handleList);
-					hideMultipleSelect();
 					break;
 				}
 				case R.id.cab_menu_rename:{
@@ -143,6 +144,8 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 					if (documents.size()==1){
 						((ManagerActivityLollipop) context).showRenameDialog(documents.get(0), documents.get(0).getName());
 					}
+					clearSelections();
+					hideMultipleSelect();
 					break;
 				}
 				case R.id.cab_menu_copy:{
@@ -153,6 +156,8 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 
 					NodeController nC = new NodeController(context);
 					nC.chooseLocationToCopyNodes(handleList);
+					clearSelections();
+					hideMultipleSelect();
 					break;
 				}	
 				case R.id.cab_menu_move:{
@@ -163,6 +168,8 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 
 					NodeController nC = new NodeController(context);
 					nC.chooseLocationToMoveNodes(handleList);
+
+					clearSelections();
 					hideMultipleSelect();
 
 					break;
@@ -230,7 +237,13 @@ public class IncomingSharesFragmentLollipop extends Fragment{
                     menu.findItem(R.id.cab_menu_select_all).setVisible(false);
 					unselect.setTitle(getString(R.string.action_unselect_all));
 					unselect.setVisible(true);
-					showRename = false;
+          if(selected.size()==1){
+               showRename=true;
+          }else{
+                        showRename=false;
+                    }
+					showMove = false;
+					showTrash=false;
 
 				}else if(selected.size()==1){
 
@@ -352,6 +365,8 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 			View v = inflater.inflate(R.layout.fragment_filebrowserlist, container, false);
 			
 			recyclerView = (RecyclerView) v.findViewById(R.id.file_list_view_browser);
+			fastScroller = (FastScroller) v.findViewById(R.id.fastscroll);
+
 			recyclerView.setPadding(0, 0, 0, Util.scaleHeightPx(85, outMetrics));
 			recyclerView.setClipToPadding(false);
 			recyclerView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
@@ -405,7 +420,9 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 			adapter.setMultipleSelect(false);
 			
 			recyclerView.setAdapter(adapter);
-			
+			fastScroller.setRecyclerView(recyclerView);
+			visibilityFastScroller();
+
 			if (adapter.getItemCount() == 0){
 				recyclerView.setVisibility(View.GONE);
 				contentTextLayout.setVisibility(View.GONE);
@@ -448,6 +465,8 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 			View v = inflater.inflate(R.layout.fragment_filebrowsergrid, container, false);
 			
 			recyclerView = (CustomizedGridRecyclerView) v.findViewById(R.id.file_grid_view_browser);
+			fastScroller = (FastScroller) v.findViewById(R.id.fastscroll);
+
 			recyclerView.setPadding(0, 0, 0, Util.scaleHeightPx(80, outMetrics));
 			recyclerView.setClipToPadding(false);
 			recyclerView.setHasFixedSize(true);
@@ -498,7 +517,9 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 			
 			adapter.setMultipleSelect(false);
 			
-			recyclerView.setAdapter(adapter);		
+			recyclerView.setAdapter(adapter);
+			fastScroller.setRecyclerView(recyclerView);
+			visibilityFastScroller();
 
 			if (adapter.getItemCount() == 0){
 				recyclerView.setVisibility(View.GONE);
@@ -570,6 +591,7 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 				contentText.setText(MegaApiUtils.getInfoFolder(parentNode, context));
 			}
 		}
+		visibilityFastScroller();
 
 		//If folder has no files
 		if (adapter.getItemCount() == 0){
@@ -660,7 +682,8 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 				nodes = megaApi.getChildren(nodes.get(position), ((ManagerActivityLollipop)context).orderOthers);
 				adapter.setNodes(nodes);
 				recyclerView.scrollToPosition(0);
-				
+				visibilityFastScroller();
+
 				//If folder has no files
 				if (adapter.getItemCount() == 0){
 					recyclerView.setVisibility(View.GONE);
@@ -922,6 +945,7 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 
 		((ManagerActivityLollipop)context).decreaseDeepBrowserTreeIncoming();
 		((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
+
 		if(((ManagerActivityLollipop)context).deepBrowserTreeIncoming==0){
 			//In the beginning of the navigation
 			log("deepBrowserTree==0");
@@ -931,6 +955,7 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 			aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 			((ManagerActivityLollipop)context).setFirstNavigationLevel(true);
 			findNodes();
+			visibilityFastScroller();
 //				adapterList.setNodes(nodes);
 			recyclerView.setVisibility(View.VISIBLE);
 			contentTextLayout.setVisibility(View.VISIBLE);
@@ -978,8 +1003,8 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 				
 				((ManagerActivityLollipop)context).setParentHandleIncoming(parentNode.getHandle());
 				nodes = megaApi.getChildren(parentNode, ((ManagerActivityLollipop)context).orderOthers);
-				//TODO
 				adapter.setNodes(nodes);
+				visibilityFastScroller();
 				int lastVisiblePosition = 0;
 				if(!lastPositionStack.empty()){
 					lastVisiblePosition = lastPositionStack.pop();
@@ -1070,5 +1095,19 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 	private static void log(String log) {
 		Util.log("IncomingSharesFragmentLollipop", log);
 	}
+
+	public void visibilityFastScroller(){
+		if(adapter == null){
+			fastScroller.setVisibility(View.GONE);
+		}else{
+			if(adapter.getItemCount() < Constants.MIN_ITEMS_SCROLLBAR){
+				fastScroller.setVisibility(View.GONE);
+			}else{
+				fastScroller.setVisibility(View.VISIBLE);
+			}
+		}
+
+	}
+
 
 }

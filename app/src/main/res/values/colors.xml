@@ -126,6 +126,7 @@
 
     <color name="very_transparent_black">#40000000</color>
     <color name="very_very_transparent_black">#10000000</color>
-
+    <color name="scroll_bubble">#90727272</color>
+    <color name="scroll_handle">#90d90007</color>
     <color name="camera_uploads_list_view">#FFF5F5F5</color>
 </resources>

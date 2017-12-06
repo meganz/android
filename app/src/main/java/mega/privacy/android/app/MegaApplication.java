@@ -75,7 +75,7 @@ import nz.mega.sdk.MegaUser;
 
 public class MegaApplication extends Application implements MegaListenerInterface, MegaChatRequestListenerInterface {
 	final String TAG = "MegaApplication";
-	static final String USER_AGENT = "MEGAAndroid/3.2.6.1_164";
+	static final String USER_AGENT = "MEGAAndroid/3.2.6.2_168";
 
 	DatabaseHandler dbH;
 	MegaApiAndroid megaApi;
@@ -423,7 +423,6 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 			else{
 				megaChatApi = new MegaChatApiAndroid(megaApi);
 				megaChatApi.addChatRequestListener(this);
-				megaChatApi.addChatCallListener(this);
 			}
 		}
 
@@ -434,7 +433,6 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 		try {
 			if (megaChatApi != null) {
 				megaChatApi.removeChatRequestListener(this);
-				megaChatApi.removeChatCallListener(this);
 			}
 		}
 		catch (Exception e){}
@@ -631,96 +629,96 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 
 	@Override
 	public void onNodesUpdate(MegaApiJava api, ArrayList<MegaNode> updatedNodes) {
-		if (megaApi == null){
-			megaApi = getMegaApi();
-		}
-
-		if (updatedNodes != null) {
-			log("updatedNodes: " + updatedNodes.size());
-
-			for (int i = 0; i < updatedNodes.size(); i++) {
-				MegaNode n = updatedNodes.get(i);
-				if (n.isInShare() && n.hasChanged(MegaNode.CHANGE_TYPE_INSHARE)){
-					log("updatedNodes name: " + n.getName() + " isInshared: " + n.isInShare() + " getchanges: " + n.getChanges() + " haschanged(TYPE_INSHARE): " + n.hasChanged(MegaNode.CHANGE_TYPE_INSHARE));
-
-					try {
-						ArrayList<MegaShare> sharesIncoming = megaApi.getInSharesList();
-						String name = "";
-						for(int j=0; j<sharesIncoming.size();j++) {
-							MegaShare mS = sharesIncoming.get(j);
-							if (mS.getNodeHandle() == n.getHandle()) {
-								MegaUser user = megaApi.getContact(mS.getUser());
-								if (user != null) {
-									MegaContactDB contactDB = dbH.findContactByHandle(String.valueOf(user.getHandle()));
-
-									if (contactDB != null) {
-										if (!contactDB.getName().equals("")) {
-											name = contactDB.getName() + " " + contactDB.getLastName();
-
-										} else {
-											name = user.getEmail();
-
-										}
-									} else {
-										log("The contactDB is null: ");
-										name = user.getEmail();
-
-									}
-								} else {
-									name = user.getEmail();
-								}
-							}
-						}
-
-						String source = "<b>"+n.getName()+"</b> "+getString(R.string.incoming_folder_notification)+" "+name;
-						Spanned notificationContent;
-						if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-							notificationContent = Html.fromHtml(source,Html.FROM_HTML_MODE_LEGACY);
-						} else {
-							notificationContent = Html.fromHtml(source);
-						}
-
-						int notificationId = Constants.NOTIFICATION_PUSH_CLOUD_DRIVE;
-
-						Intent intent = new Intent(this, ManagerActivityLollipop.class);
-						intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-						intent.setAction(Constants.ACTION_INCOMING_SHARED_FOLDER_NOTIFICATION);
-						PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
-								PendingIntent.FLAG_ONE_SHOT);
-
-						Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-						NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
-								.setSmallIcon(R.drawable.ic_stat_notify_download)
-								.setContentTitle(getString(R.string.title_incoming_folder_notification))
-								.setContentText(notificationContent)
-								.setStyle(new NotificationCompat.BigTextStyle()
-										.bigText(notificationContent))
-								.setAutoCancel(true)
-								.setSound(defaultSoundUri)
-								.setColor(ContextCompat.getColor(this,R.color.mega))
-								.setContentIntent(pendingIntent);
-
-						Drawable d;
-
-						if(android.os.Build.VERSION.SDK_INT >=  Build.VERSION_CODES.LOLLIPOP){
-							d = getResources().getDrawable(R.drawable.ic_folder_incoming, getTheme());
-						} else {
-							d = getResources().getDrawable(R.drawable.ic_folder_incoming);
-						}
-
-						notificationBuilder.setLargeIcon(((BitmapDrawable)d).getBitmap());
-
-						NotificationManager notificationManager =
-								(NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-
-						notificationManager.notify(notificationId, notificationBuilder.build());
-					}
-					catch(Exception e){
-						log("Exception: "+e.toString());
-					}
-				}
-			}
-		}
+//		if (megaApi == null){
+//			megaApi = getMegaApi();
+//		}
+//
+//		if (updatedNodes != null) {
+//			log("updatedNodes: " + updatedNodes.size());
+//
+//			for (int i = 0; i < updatedNodes.size(); i++) {
+//				MegaNode n = updatedNodes.get(i);
+//				if (n.isInShare() && n.hasChanged(MegaNode.CHANGE_TYPE_INSHARE)){
+//					log("updatedNodes name: " + n.getName() + " isInshared: " + n.isInShare() + " getchanges: " + n.getChanges() + " haschanged(TYPE_INSHARE): " + n.hasChanged(MegaNode.CHANGE_TYPE_INSHARE));
+//
+//					try {
+//						ArrayList<MegaShare> sharesIncoming = megaApi.getInSharesList();
+//						String name = "";
+//						for(int j=0; j<sharesIncoming.size();j++) {
+//							MegaShare mS = sharesIncoming.get(j);
+//							if (mS.getNodeHandle() == n.getHandle()) {
+//								MegaUser user = megaApi.getContact(mS.getUser());
+//								if (user != null) {
+//									MegaContactDB contactDB = dbH.findContactByHandle(String.valueOf(user.getHandle()));
+//
+//									if (contactDB != null) {
+//										if (!contactDB.getName().equals("")) {
+//											name = contactDB.getName() + " " + contactDB.getLastName();
+//
+//										} else {
+//											name = user.getEmail();
+//
+//										}
+//									} else {
+//										log("The contactDB is null: ");
+//										name = user.getEmail();
+//
+//									}
+//								} else {
+//									name = user.getEmail();
+//								}
+//							}
+//						}
+//
+//						String source = "<b>"+n.getName()+"</b> "+getString(R.string.incoming_folder_notification)+" "+name;
+//						Spanned notificationContent;
+//						if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+//							notificationContent = Html.fromHtml(source,Html.FROM_HTML_MODE_LEGACY);
+//						} else {
+//							notificationContent = Html.fromHtml(source);
+//						}
+//
+//						int notificationId = Constants.NOTIFICATION_PUSH_CLOUD_DRIVE;
+//
+//						Intent intent = new Intent(this, ManagerActivityLollipop.class);
+//						intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+//						intent.setAction(Constants.ACTION_INCOMING_SHARED_FOLDER_NOTIFICATION);
+//						PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
+//								PendingIntent.FLAG_ONE_SHOT);
+//
+//						Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+//						NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
+//								.setSmallIcon(R.drawable.ic_stat_notify_download)
+//								.setContentTitle(getString(R.string.title_incoming_folder_notification))
+//								.setContentText(notificationContent)
+//								.setStyle(new NotificationCompat.BigTextStyle()
+//										.bigText(notificationContent))
+//								.setAutoCancel(true)
+//								.setSound(defaultSoundUri)
+//								.setColor(ContextCompat.getColor(this,R.color.mega))
+//								.setContentIntent(pendingIntent);
+//
+//						Drawable d;
+//
+//						if(android.os.Build.VERSION.SDK_INT >=  Build.VERSION_CODES.LOLLIPOP){
+//							d = getResources().getDrawable(R.drawable.ic_folder_incoming, getTheme());
+//						} else {
+//							d = getResources().getDrawable(R.drawable.ic_folder_incoming);
+//						}
+//
+//						notificationBuilder.setLargeIcon(((BitmapDrawable)d).getBitmap());
+//
+//						NotificationManager notificationManager =
+//								(NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+//
+//						notificationManager.notify(notificationId, notificationBuilder.build());
+//					}
+//					catch(Exception e){
+//						log("Exception: "+e.toString());
+//					}
+//				}
+//			}
+//		}
 	}
 
 	@Override
@@ -765,74 +763,74 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 	public void onContactRequestsUpdate(MegaApiJava api, ArrayList<MegaContactRequest> requests) {
 		log("onContactRequestUpdate");
 
-		try {
-			if (requests == null) {
-				log("Return REQUESTS are NULL");
-				return;
-			}
-			MegaContactRequest crToShow = null;
-			boolean showNotification = false;
-			for (int i = 0; i < requests.size(); i++) {
-				MegaContactRequest cr = requests.get(i);
-				if (cr != null) {
-					if ((cr.getStatus() == MegaContactRequest.STATUS_UNRESOLVED) && (!cr.isOutgoing())) {
-						showNotification = true;
-						crToShow = cr;
-						log("onContactRequestUpdate: " + cr.getSourceEmail() + " cr.isOutgoing: " + cr.isOutgoing() + " cr.getStatus: " + cr.getStatus());
-					}
-				}
-			}
-
-			if (showNotification) {
-
-				String notificationContent;
-				if(crToShow!=null){
-					notificationContent = crToShow.getSourceEmail();
-				}
-				else{
-					log("Return because the request is NULL");
-					return;
-				}
-
-				int notificationId = Constants.NOTIFICATION_PUSH_CONTACT;
-
-				Intent intent = new Intent(this, ManagerActivityLollipop.class);
-				intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-				intent.setAction(Constants.ACTION_IPC);
-				PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
-						PendingIntent.FLAG_ONE_SHOT);
-
-				Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-				NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
-						.setSmallIcon(R.drawable.ic_stat_notify_download)
-						.setContentTitle(getString(R.string.title_contact_request_notification))
-						.setContentText(notificationContent)
-						.setStyle(new NotificationCompat.BigTextStyle()
-								.bigText(notificationContent))
-						.setAutoCancel(true)
-						.setSound(defaultSoundUri)
-						.setColor(ContextCompat.getColor(this,R.color.mega))
-						.setContentIntent(pendingIntent);
-
-				if(crToShow!=null){
-
-					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
-						Bitmap largeIcon = createDefaultAvatar(crToShow.getSourceEmail());
-						if(largeIcon!=null){
-							notificationBuilder.setLargeIcon(largeIcon);
-						}
-					}
-				}
-
-				NotificationManager notificationManager =
-						(NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-
-				notificationManager.notify(notificationId, notificationBuilder.build());
-			}
-		}
-		catch(Exception e){
-			log("Exception when showing IPC request: "+e.getMessage());
-		}
+//		try {
+//			if (requests == null) {
+//				log("Return REQUESTS are NULL");
+//				return;
+//			}
+//			MegaContactRequest crToShow = null;
+//			boolean showNotification = false;
+//			for (int i = 0; i < requests.size(); i++) {
+//				MegaContactRequest cr = requests.get(i);
+//				if (cr != null) {
+//					if ((cr.getStatus() == MegaContactRequest.STATUS_UNRESOLVED) && (!cr.isOutgoing())) {
+//						showNotification = true;
+//						crToShow = cr;
+//						log("onContactRequestUpdate: " + cr.getSourceEmail() + " cr.isOutgoing: " + cr.isOutgoing() + " cr.getStatus: " + cr.getStatus());
+//					}
+//				}
+//			}
+//
+//			if (showNotification) {
+//
+//				String notificationContent;
+//				if(crToShow!=null){
+//					notificationContent = crToShow.getSourceEmail();
+//				}
+//				else{
+//					log("Return because the request is NULL");
+//					return;
+//				}
+//
+//				int notificationId = Constants.NOTIFICATION_PUSH_CONTACT;
+//
+//				Intent intent = new Intent(this, ManagerActivityLollipop.class);
+//				intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+//				intent.setAction(Constants.ACTION_IPC);
+//				PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
+//						PendingIntent.FLAG_ONE_SHOT);
+//
+//				Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+//				NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
+//						.setSmallIcon(R.drawable.ic_stat_notify_download)
+//						.setContentTitle(getString(R.string.title_contact_request_notification))
+//						.setContentText(notificationContent)
+//						.setStyle(new NotificationCompat.BigTextStyle()
+//								.bigText(notificationContent))
+//						.setAutoCancel(true)
+//						.setSound(defaultSoundUri)
+//						.setColor(ContextCompat.getColor(this,R.color.mega))
+//						.setContentIntent(pendingIntent);
+//
+//				if(crToShow!=null){
+//
+//					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+//						Bitmap largeIcon = createDefaultAvatar(crToShow.getSourceEmail());
+//						if(largeIcon!=null){
+//							notificationBuilder.setLargeIcon(largeIcon);
+//						}
+//					}
+//				}
+//
+//				NotificationManager notificationManager =
+//						(NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+//
+//				notificationManager.notify(notificationId, notificationBuilder.build());
+//			}
+//		}
+//		catch(Exception e){
+//			log("Exception when showing IPC request: "+e.getMessage());
+//		}
 	}
 	public Bitmap createDefaultAvatar(String email){
 		log("createDefaultAvatar()");
@@ -915,7 +913,6 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 			try{
 				if (megaChatApi != null){
 					megaChatApi.removeChatRequestListener(this);
-					megaChatApi.removeChatCallListener(this);
 				}
 			}
 			catch (Exception exc){}
@@ -928,20 +925,4 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 	public void onRequestTemporaryError(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
 		log("onRequestTemporaryError: Chat");
 	}
-
-
-	@Override
-	public void onChatCallUpdate(MegaChatApiJava api, MegaChatCall call) {
-		log("onChatCallUpdate");
-
-//		if(call.hasChanged(MegaChatCall.CHANGE_TYPE_STATUS)){
-//			if(call.getStatus()==MegaChatCall.CALL_STATUS_RING_IN){
-//				Intent i = new Intent(this, ChatCallActivity.class);
-//				i.putExtra("chatHandle", call.getChatid());
-//				i.putExtra("callId", call.getId());
-//				startActivity(i);
-//			}
-//		}
-	}
-
 }

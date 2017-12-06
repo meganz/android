@@ -137,6 +137,8 @@ public class OfflineFragmentLollipop extends Fragment{
 						}
 						((ManagerActivityLollipop) context).showRenameDialog(n, n.getName());
 					}
+					clearSelections();
+					hideMultipleSelect();
 					break;
 				}
 				case R.id.cab_menu_share_link:{
@@ -169,6 +171,8 @@ public class OfflineFragmentLollipop extends Fragment{
 
 					NodeController nC = new NodeController(context);
 					nC.selectContactToShareFolders(handleList);
+					clearSelections();
+					hideMultipleSelect();
 					break;
 				}
 				case R.id.cab_menu_move:{					
@@ -182,9 +186,10 @@ public class OfflineFragmentLollipop extends Fragment{
 						}
 						handleList.add(n.getHandle());
 					}
-
 					NodeController nC = new NodeController(context);
 					nC.chooseLocationToMoveNodes(handleList);
+					clearSelections();
+					hideMultipleSelect();
 					break;
 				}
 				case R.id.cab_menu_copy:{
@@ -201,6 +206,8 @@ public class OfflineFragmentLollipop extends Fragment{
 
 					NodeController nC = new NodeController(context);
 					nC.chooseLocationToCopyNodes(handleList);
+					clearSelections();
+					hideMultipleSelect();
 					break;
 				}
 				case R.id.cab_menu_delete:{
@@ -248,7 +255,7 @@ public class OfflineFragmentLollipop extends Fragment{
 					
 					if(selected.size()==adapter.getItemCount()){
 						menu.findItem(R.id.cab_menu_select_all).setVisible(false);
-						menu.findItem(R.id.cab_menu_unselect_all).setVisible(true);			
+						menu.findItem(R.id.cab_menu_unselect_all).setVisible(true);
 					}
 					else{
 						menu.findItem(R.id.cab_menu_select_all).setVisible(true);

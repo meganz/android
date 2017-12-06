@@ -12,7 +12,7 @@
         <android.support.design.widget.AppBarLayout
         android:id="@+id/app_bar"
         android:layout_width="match_parent"
-        android:layout_height="350dp"
+        android:layout_height="wrap_content"
         android:fitsSystemWindows="true">
 
             <android.support.design.widget.CollapsingToolbarLayout
@@ -43,7 +43,7 @@
                         <ImageView
                             android:id="@+id/chat_contact_properties_toolbar_image"
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
+                            android:layout_height="match_parent"
                             android:adjustViewBounds="true"
                             android:fitsSystemWindows="true"
                             android:scaleType="centerCrop" />

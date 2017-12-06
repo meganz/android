@@ -16,6 +16,7 @@ import android.text.TextUtils;
 import android.text.style.ForegroundColorSpan;
 import android.util.DisplayMetrics;
 import android.util.SparseBooleanArray;
+import android.util.TypedValue;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -114,13 +115,13 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		}
     	RoundedImageView imageView;
     	TextView contactInitialLetter;
-//        ImageView imageView;
         TextView textViewContactName;
         EmojiconTextView textViewContent;
 		TextView textViewDate;
         ImageButton imageButtonThreeDots;
         RelativeLayout itemLayout;
-		ImageView circlePendingMessages;
+		RelativeLayout circlePendingMessages;
+
 		TextView numberPendingMessages;
 		RelativeLayout layoutPendingMessages;
         ImageView muteIcon;
@@ -458,16 +459,16 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		holder.imageView = (RoundedImageView) v.findViewById(R.id.recent_chat_list_thumbnail);
 		holder.contactInitialLetter = (TextView) v.findViewById(R.id.recent_chat_list_initial_letter);
 		holder.textViewContactName = (TextView) v.findViewById(R.id.recent_chat_list_name);
-		holder.textViewContactName.setMaxWidth(Util.scaleWidthPx(194, outMetrics));
+		holder.textViewContactName.setMaxWidth(Util.scaleWidthPx(185, outMetrics));
 
 		holder.textViewContent = (EmojiconTextView) v.findViewById(R.id.recent_chat_list_content);
-		holder.textViewContent.setMaxWidth(Util.scaleWidthPx(194, outMetrics));
+		holder.textViewContent.setMaxWidth(Util.scaleWidthPx(185, outMetrics));
 
 		holder.textViewDate = (TextView) v.findViewById(R.id.recent_chat_list_date);
 		holder.imageButtonThreeDots = (ImageButton) v.findViewById(R.id.recent_chat_list_three_dots);
 
 		holder.layoutPendingMessages = (RelativeLayout) v.findViewById(R.id.recent_chat_list_unread_layout);
-		holder.circlePendingMessages = (ImageView) v.findViewById(R.id.recent_chat_list_unread_circle);
+		holder.circlePendingMessages = (RelativeLayout) v.findViewById(R.id.recent_chat_list_unread_circle);
 		holder.numberPendingMessages = (TextView) v.findViewById(R.id.recent_chat_list_unread_number);
 
 		holder.contactStateIcon = (ImageView) v.findViewById(R.id.recent_chat_list_contact_state);
@@ -508,27 +509,30 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 			}
 			case 1:{
 				log("drawing circle for one digit");
-				holder.circlePendingMessages.setImageResource(R.drawable.ic_unread_1);
+				holder.circlePendingMessages.setBackground(context.getResources().getDrawable(R.drawable.ic_unread_1));
 				holder.layoutPendingMessages.setVisibility(View.VISIBLE);
+
 				break;
 			}
 			case 2:{
 				log("drawing oval for two digits");
-				holder.circlePendingMessages.setImageResource(R.drawable.ic_unread_2);
+				holder.circlePendingMessages.setBackground(context.getResources().getDrawable(R.drawable.ic_unread_2));
 				holder.layoutPendingMessages.setVisibility(View.VISIBLE);
 
 				break;
 			}
 			case 3:{
 				log("drawing oval for three digits");
-				holder.circlePendingMessages.setImageResource(R.drawable.ic_unread_3);
+				holder.circlePendingMessages.setBackground(context.getResources().getDrawable(R.drawable.ic_unread_3));
 				holder.layoutPendingMessages.setVisibility(View.VISIBLE);
+
 				break;
 			}
 			default:{
 				log("drawing oval for DEFAULT");
-				holder.circlePendingMessages.setImageResource(R.drawable.ic_unread_4);
+				holder.circlePendingMessages.setBackground(context.getResources().getDrawable(R.drawable.ic_unread_4));
 				holder.layoutPendingMessages.setVisibility(View.VISIBLE);
+
 				break;
 			}
 		}
