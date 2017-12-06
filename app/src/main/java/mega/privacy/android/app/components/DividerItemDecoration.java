@@ -37,7 +37,7 @@ public class DividerItemDecoration extends RecyclerView.ItemDecoration {
         int leftNode = (int) context.getResources().getDimension(R.dimen.recycler_view_separator);
         int rightNode = parent.getWidth() - parent.getPaddingRight();
 
-        int rightMonth = parent.getWidth();
+        int rightMonth = parent.getWidth() - parent.getPaddingRight();
         int leftMonth= 0;
 
 

@@ -652,6 +652,11 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 			adapter.toggleSelection(position);
 			updateActionModeTitle();
 		}
+		else{
+			Intent i = new Intent(this, ContactInfoActivityLollipop.class);
+			i.putExtra("name", listContacts.get(position).getUser());
+			startActivity(i);
+		}
 	}
 
 	@Override

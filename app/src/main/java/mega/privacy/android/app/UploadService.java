@@ -31,6 +31,7 @@ import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
@@ -63,6 +64,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 
 	MegaApplication app;
 	MegaApiAndroid megaApi;
+	MegaChatApiAndroid megaChatApi;
 
 	WifiLock lock;
 	WakeLock wl;
@@ -94,6 +96,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 
 		app = (MegaApplication)getApplication();
 		megaApi = app.getMegaApi();
+		megaChatApi = app.getMegaChatApi();
 
 		megaApi.addTransferListener(this);
 
@@ -135,6 +138,10 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 			megaApi.removeRequestListener(this);
 			megaApi.removeTransferListener(this);
 		}
+
+        if (megaChatApi != null){
+            megaChatApi.saveCurrentState();
+        }
 
 		super.onDestroy();
 	}

@@ -83,7 +83,6 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 	public static String ACTION_SELECT_FOLDER = "ACTION_SELECT_FOLDER";
 	public static String ACTION_SELECT_FOLDER_TO_SHARE = "ACTION_SELECT_FOLDER_TO_SHARE";
 	public static String ACTION_SELECT_FILE = "ACTION_SELECT_FILE";
-	public static String ACTION_UPLOAD_SELFIE = "ACTION_UPLOAD_SELFIE";	
 	public static String ACTION_CHOOSE_MEGA_FOLDER_SYNC = "ACTION_CHOOSE_MEGA_FOLDER_SYNC";
 	public static String ACTION_MULTISELECT_FILE = "ACTION_MULTISELECT_FILE";
 
@@ -93,7 +92,6 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 	public static int CAMERA = 3;
 	public static int IMPORT = 4;
 	public static int SELECT = 5;
-	public static int UPLOAD_SELFIE = 6;
 	public static int SELECT_CAMERA_FOLDER = 7;
 
 	public static int NO_TABS = -1;
@@ -655,20 +653,6 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 					}
 
 				}
-				else if(intent.getAction().equals(ACTION_UPLOAD_SELFIE)){
-					log("action = ACTION_UPLOAD_SELFIE");
-					mode = UPLOAD_SELFIE;
-					imagePath=intent.getStringExtra("IMAGE_PATH");
-
-					if (mTabsAdapterExplorer == null){
-						fileExplorerSectionLayout.setVisibility(View.VISIBLE);
-						viewPagerExplorer.setVisibility(View.VISIBLE);
-						mTabsAdapterExplorer = new FileExplorerPagerAdapter(getSupportFragmentManager(),this);
-						viewPagerExplorer.setAdapter(mTabsAdapterExplorer);
-						tabLayoutExplorer.setupWithViewPager(viewPagerExplorer);
-
-					}
-				}
 				else{
 					log("action = UPLOAD");
 					mode = UPLOAD;
@@ -1050,27 +1034,6 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			setResult(RESULT_OK, intent);
 			log("finish!");
 			finish();
-		}
-		else if(mode == UPLOAD_SELFIE){
-			log("Start to upload selfie");
-			long parentHandle = handle;
-			MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
-			if(parentNode == null){
-				parentNode = megaApi.getRootNode();
-			}
-		
-			Intent intent = new Intent(this, UploadService.class);
-			File selfie = new File(imagePath);
-			intent.putExtra(UploadService.EXTRA_FILEPATH, selfie.getAbsolutePath());
-			intent.putExtra(UploadService.EXTRA_NAME, selfie.getName());
-			intent.putExtra(UploadService.EXTRA_PARENT_HASH, parentNode.getHandle());
-			intent.putExtra(UploadService.EXTRA_SIZE, selfie.length());
-			startService(intent);
-			
-			Intent intentResult = new Intent();
-			setResult(RESULT_OK, intentResult);
-			finish();
-			
 		}
 		else if (mode == UPLOAD){
 
