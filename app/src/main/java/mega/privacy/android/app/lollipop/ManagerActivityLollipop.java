@@ -4479,7 +4479,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 				ft.replace(R.id.fragment_container, sFLol, "sFLol");
-    			ft.commitNow();
+    			ft.commitNowAllowingStateLoss();
 
 				showFabButton();
     			break;
