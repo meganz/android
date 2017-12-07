@@ -1625,5 +1625,8 @@
 
     <string name="old_and_new_passwords_equals" context="when changing the password , the old password and new password are equals">Passwords cannot be the same</string>
 
+    <string name="corrupt_pdf_dialog_text" context="when open PDF Viewer, the pdf that it try to open is damaged or does not exist">Error. The pdf file is corrupted or does not exist.</string>
+    <string name="general_accept" context="in any case, a button that contains the value of accepting">Accept</string>
+
     <string name="user_account_feedback" context="Label to include info of the user email in the feedback form">User account</string>
 </resources>

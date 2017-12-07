@@ -431,6 +431,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
             }
             else{
                 log("currentDir is not a directory");
+
             }
         }
     }
