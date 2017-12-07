@@ -283,7 +283,6 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                             optionRemoveLink.setVisibility(View.VISIBLE);
                             if(node.isExpired()){
                                 log("Node exported but expired!!");
-                                nodeIconLayout.setVisibility(View.GONE);
                             }
                         }
                         else{
@@ -369,7 +368,6 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                         optionRemoveLink.setVisibility(View.VISIBLE);
                         if(node.isExpired()){
                             log("Node exported but expired!!");
-                            nodeIconLayout.setVisibility(View.GONE);
                         }
                     }
                     else{
@@ -532,7 +530,6 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                             optionRemoveLink.setVisibility(View.VISIBLE);
                             if(node.isExpired()){
                                 log("Node exported but expired!!");
-                                nodeIconLayout.setVisibility(View.GONE);
                             }
                         }
                         else{
@@ -589,7 +586,6 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                         optionRemoveLink.setVisibility(View.VISIBLE);
                         if(node.isExpired()){
                             log("Node exported but expired!!");
-                            nodeIconLayout.setVisibility(View.GONE);
                         }
                     }
                     else{
