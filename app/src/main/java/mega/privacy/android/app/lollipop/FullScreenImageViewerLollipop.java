@@ -2219,14 +2219,15 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	protected void hideActionBar(){
 		if (aB != null && aB.isShowing()) {
 			if(tB != null) {
-				tB.animate().translationY(-220).setDuration(800L)
+				tB.animate().translationY(-220).setDuration(400L)
 						.withEndAction(new Runnable() {
 							@Override
 							public void run() {
 								aB.hide();
 							}
 						}).start();
-				bottomLayout.animate().translationY(220).setDuration(800L).start();
+				bottomLayout.animate().translationY(220).setDuration(400L).start();
+				getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 			} else {
 				aB.hide();
 			}
@@ -2236,10 +2237,10 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		if (aB != null && !aB.isShowing()) {
 			aB.show();
 			if(tB != null) {
-				tB.animate().translationY(0).setDuration(800L).start();
-				bottomLayout.animate().translationY(0).setDuration(800L).start();
+				tB.animate().translationY(0).setDuration(400L).start();
+				bottomLayout.animate().translationY(0).setDuration(400L).start();
+				getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 			}
-
 		}
 	}
 

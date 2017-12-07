@@ -603,6 +603,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 						log("Video file");
 
 						Intent videoIntent = new Intent(this, AudioVideoPlayerLollipop.class);
+						videoIntent.putExtra("HANDLE", currentDocument.getHandle());
 						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
 							videoIntent.setDataAndType(FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
 						}
@@ -611,6 +612,20 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 						}
 						videoIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 						startActivity(videoIntent);
+					}
+					else if (MimeTypeList.typeForName(currentFile.getName()).isAudio()) {
+						log("Audio file");
+
+						Intent audioIntent = new Intent(this, AudioVideoPlayerLollipop.class);
+						audioIntent.putExtra("HANDLE", currentDocument.getHandle());
+						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+							audioIntent.setDataAndType(FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
+						}
+						else{
+							audioIntent.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
+						}
+						audioIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+						startActivity(audioIntent);
 					}
 					else if (MimeTypeList.typeForName(currentFile.getName()).isDocument()) {
 						log("Download is document");

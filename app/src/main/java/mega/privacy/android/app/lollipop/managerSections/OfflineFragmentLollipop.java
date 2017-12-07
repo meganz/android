@@ -45,6 +45,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.CustomizedGridLayoutManager;
 import mega.privacy.android.app.components.CustomizedGridRecyclerView;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
+import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.MyAccountInfo;
@@ -1058,6 +1059,34 @@ public class OfflineFragmentLollipop extends Fragment{
 						}
 
 						startActivity(intent);
+					}
+					else if (MimeTypeList.typeForName(currentFile.getName()).isVideo()) {
+						log("Video file");
+
+						Intent videoIntent = new Intent(context, AudioVideoPlayerLollipop.class);
+						videoIntent.putExtra("HANDLE", Long.parseLong(currentNode.getHandle()));
+						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+							videoIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
+						}
+						else{
+							videoIntent.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
+						}
+						videoIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+						startActivity(videoIntent);
+					}
+					else if (MimeTypeList.typeForName(currentFile.getName()).isAudio()) {
+						log("Audio file");
+
+						Intent audioIntent = new Intent(context, AudioVideoPlayerLollipop.class);
+						audioIntent.putExtra("HANDLE", Long.parseLong(currentNode.getHandle()));
+						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+							audioIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
+						}
+						else{
+							audioIntent.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
+						}
+						audioIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+						startActivity(audioIntent);
 					}
 					else{
 						openFile(currentFile);
