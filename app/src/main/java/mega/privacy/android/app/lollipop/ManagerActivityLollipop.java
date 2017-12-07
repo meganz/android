@@ -8866,6 +8866,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	}
 
 	public void showCancelMessage(){
+		log("showCancelMessage");
 		AlertDialog cancelDialog;
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 //		builder.setTitle(getString(R.string.title_cancel_subscriptions));
