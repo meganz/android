@@ -1,11 +1,24 @@
 package mega.privacy.android.app.lollipop;
 
-import android.app.Activity;
 import android.content.Intent;
+import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.provider.OpenableColumns;
+import android.support.design.widget.AppBarLayout;
+import android.support.design.widget.Snackbar;
+import android.support.v7.app.ActionBar;
+import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.Surface;
+import android.view.View;
+import android.view.WindowManager;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.ExoPlaybackException;
@@ -29,6 +42,7 @@ import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.trackselection.TrackSelection;
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 import com.google.android.exoplayer2.trackselection.TrackSelector;
+import com.google.android.exoplayer2.ui.PlaybackControlView;
 import com.google.android.exoplayer2.ui.SimpleExoPlayerView;
 import com.google.android.exoplayer2.upstream.BandwidthMeter;
 import com.google.android.exoplayer2.upstream.DataSource;
@@ -37,13 +51,45 @@ import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
 import com.google.android.exoplayer2.video.VideoRendererEventListener;
 
+import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.MimeTypeMime;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.lollipop.megachat.ChatExplorerActivity;
+import mega.privacy.android.app.utils.Constants;
+import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaChatApiAndroid;
+import nz.mega.sdk.MegaChatApiJava;
+import nz.mega.sdk.MegaChatError;
+import nz.mega.sdk.MegaChatListItem;
+import nz.mega.sdk.MegaChatRequest;
+import nz.mega.sdk.MegaChatRequestListenerInterface;
+import nz.mega.sdk.MegaNode;
 
-public class AudioVideoPlayerLollipop extends Activity implements VideoRendererEventListener {
+public class AudioVideoPlayerLollipop extends PinActivityLollipop implements VideoRendererEventListener, MegaChatRequestListenerInterface {
+
+    public static int REQUEST_CODE_SELECT_CHAT = 1005;
+
+    private MegaApiAndroid megaApi;
+    private MegaChatApiAndroid megaChatApi;
 
     Handler handler;
     private SimpleExoPlayerView simpleExoPlayerView;
     private SimpleExoPlayer player;
+    private Uri uri;
+
+    private AppBarLayout appBarLayout;
+    private Toolbar tB;
+    private ActionBar aB;
+
+    private MenuItem shareIcon;
+    private MenuItem propertiesIcon;
+    private MenuItem chatIcon;
+
+    private RelativeLayout audioContainer;
+    private long handle;
+    int countChat = 0;
+    int successSent = 0;
+    int errorSent = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,15 +104,54 @@ public class AudioVideoPlayerLollipop extends Activity implements VideoRendererE
             finish();
             return;
         }
+        Bundle bundle = intent.getExtras();
+        handle = bundle.getLong("HANDLE");
 
-        Uri uri = intent.getData();
+        uri = intent.getData();
         //Uri uri = Uri.parse("https://youtu.be/upUpVb3cLfk");
         if (uri == null){
             log("uri null");
             finish();
             return;
         }
+
+        appBarLayout = (AppBarLayout) findViewById(R.id.app_bar);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            getWindow().setStatusBarColor(getResources().getColor(R.color.black));
+        }
+
+        tB = (Toolbar) findViewById(R.id.call_toolbar);
+        if (tB == null) {
+            log("Tb is Null");
+            return;
+        }
+
+        tB.setVisibility(View.VISIBLE);
+        setSupportActionBar(tB);
+        aB = getSupportActionBar();
+        log("aB.setHomeAsUpIndicator_1");
+        aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+        aB.setHomeButtonEnabled(true);
+        aB.setDisplayHomeAsUpEnabled(true);
+        aB.setTitle(getFileName(uri));
+
+        audioContainer = (RelativeLayout) findViewById(R.id.audio_container);
+        audioContainer.setVisibility(View.VISIBLE);
+
         handler = new Handler();
+
+        MegaApplication app = (MegaApplication)getApplication();
+        megaApi = app.getMegaApi();
+
+        if(mega.privacy.android.app.utils.Util.isChatEnabled()){
+            megaChatApi = app.getMegaChatApi();
+        }
+        else{
+            megaChatApi=null;
+        }
 
         //Create a default TrackSelector
         BandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
@@ -86,7 +171,16 @@ public class AudioVideoPlayerLollipop extends Activity implements VideoRendererE
 
         //Bind the player to the view
         simpleExoPlayerView.setPlayer(player);
-
+        simpleExoPlayerView.setControllerVisibilityListener(new PlaybackControlView.VisibilityListener() {
+            @Override
+            public void onVisibilityChange(int visibility) {
+                if(aB.isShowing()){
+                    hideActionStatusBar();
+                }else{
+                    showActionStatusBar();
+                }
+            }
+        });
         //Measures bandwidth during playback. Can be null if not required.
         DefaultBandwidthMeter defaultBandwidthMeter = new DefaultBandwidthMeter();
         //Produces DataSource instances through which meida data is loaded
@@ -98,9 +192,10 @@ public class AudioVideoPlayerLollipop extends Activity implements VideoRendererE
 
         MediaSource mediaSource = new ExtractorMediaSource(uri, dataSourceFactory, extractorsFactory, null, null);
         //MediaSource mediaSource = new HlsMediaSource(uri, dataSourceFactory, 1, null, null);
+
         final LoopingMediaSource loopingMediaSource = new LoopingMediaSource(mediaSource);
 
-        player.prepare(mediaSource);
+        player.prepare(loopingMediaSource);
 
         player.addListener(new ExoPlayer.EventListener() {
             @Override
@@ -156,14 +251,174 @@ public class AudioVideoPlayerLollipop extends Activity implements VideoRendererE
                 log("onSeekProcessed");
             }
         });
-
         player.setPlayWhenReady(true);
         player.setVideoDebugListener(this);
+    }
+
+    public String getFileName(Uri uri) {
+        String result = null;
+        if (uri.getScheme().equals("content")) {
+            Cursor cursor = getContentResolver().query(uri, null, null, null, null);
+            try {
+                if (cursor != null && cursor.moveToFirst()) {
+                    result = cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME));
+                }
+            } finally {
+                if (cursor != null) {
+                    cursor.close();
+                }
+            }
+        }
+        if (result == null) {
+            result = uri.getLastPathSegment();
+        }
+        return result;
+    }
+
+    protected void hideActionStatusBar(){
+        if (aB != null && aB.isShowing()) {
+            if(tB != null) {
+                tB.animate().translationY(-220).setDuration(400L)
+                        .withEndAction(new Runnable() {
+                            @Override
+                            public void run() {
+                                aB.hide();
+                            }
+                        }).start();
+                getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+            }
+            else {
+                aB.hide();
+            }
+        }
+    }
+    protected void showActionStatusBar(){
+        if (aB != null && !aB.isShowing()) {
+            aB.show();
+            if(tB != null) {
+                tB.animate().translationY(0).setDuration(400L).start();
+                getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+            }
+
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        log("onCreateOptionsMenu");
+
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.activity_audiovideoplayer, menu);
+
+        shareIcon = menu.findItem(R.id.full_video_viewer_share);
+        propertiesIcon = menu.findItem(R.id.full_image_viewer_properties);
+        chatIcon = menu.findItem(R.id.full_image_viewer_chat);
+
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        log("onPrepareOptionsMenu");
+        return super.onPrepareOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        log("onOptionsItemSelected");
+        ((MegaApplication) getApplication()).sendSignalPresenceActivity();
+
+        int id = item.getItemId();
+        switch (id) {
+            case android.R.id.home: {
+                onBackPressed();
+                break;
+            }
+            case R.id.full_video_viewer_chat:{
+                log("Chat option");
+                long[] longArray = new long[1];
+
+                longArray[0] = handle;
+
+                Intent i = new Intent(this, ChatExplorerActivity.class);
+                i.putExtra("NODE_HANDLES", longArray);
+                startActivityForResult(i, REQUEST_CODE_SELECT_CHAT);
+                break;
+            }
+            case R.id.full_video_viewer_share: {
+                log("Share option");
+
+                intentToSendFile(uri);
+
+                break;
+            }
+            case R.id.full_video_viewer_properties: {
+                log("Info option");
+
+                MegaNode node = megaApi.getNodeByHandle(handle);
+                Intent i = new Intent(this, FileInfoActivityLollipop.class);
+                i.putExtra("handle", node.getHandle());
+                i.putExtra("imageId", MimeTypeMime.typeForName(node.getName()).getIconResourceId());
+                i.putExtra("name", node.getName());
+                startActivity(i);
+                break;
+            }
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    public void intentToSendFile(Uri uri){
+        log("intentToSendFile");
+
+        if(uri!=null){
+            Intent share = new Intent(android.content.Intent.ACTION_SEND);
+            share.setType("application/pdf");
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                log("Use provider to share");
+                share.putExtra(Intent.EXTRA_STREAM, Uri.parse(uri.toString()));
+                share.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            }
+            else{
+                share.putExtra(Intent.EXTRA_STREAM, uri);
+            }
+            startActivity(Intent.createChooser(share, getString(R.string.context_share_image)));
+        }
+        else{
+            Snackbar.make(this.getCurrentFocus(), getString(R.string.full_image_viewer_not_preview), Snackbar.LENGTH_LONG).show();
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
+
+        if (intent == null) {
+            return;
+        }
+
+        if (requestCode == REQUEST_CODE_SELECT_CHAT && resultCode == RESULT_OK){
+            long[] chatHandles = intent.getLongArrayExtra("SELECTED_CHATS");
+            log("Send to "+chatHandles.length+" chats");
+
+            long[] nodeHandles = intent.getLongArrayExtra("NODE_HANDLES");
+            log("Send "+nodeHandles.length+" nodes");
+
+            countChat = chatHandles.length;
+            if(countChat==1){
+                megaChatApi.attachNode(chatHandles[0], nodeHandles[0], this);
+            }
+            else if(countChat>1){
+
+                for(int i=0; i<chatHandles.length; i++){
+                    megaChatApi.attachNode(chatHandles[i], nodeHandles[0], this);
+                }
+            }
+        }
     }
 
     @Override
     public void onVideoEnabled(DecoderCounters counters) {
         log("onVideoEnabled");
+        audioContainer.setVisibility(View.GONE);
     }
 
     @Override
@@ -229,5 +484,71 @@ public class AudioVideoPlayerLollipop extends Activity implements VideoRendererE
 
     public static void log(String message) {
         mega.privacy.android.app.utils.Util.log("AudioVideoPlayerLollipop", message);
+    }
+
+    @Override
+    public void onRequestStart(MegaChatApiJava api, MegaChatRequest request) {
+
+    }
+
+    @Override
+    public void onRequestUpdate(MegaChatApiJava api, MegaChatRequest request) {
+
+    }
+
+    @Override
+    public void onRequestFinish(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
+        log("onRequestFinish");
+        if(request.getType() == MegaChatRequest.TYPE_ATTACH_NODE_MESSAGE){
+
+            if(e.getErrorCode()==MegaChatError.ERROR_OK){
+                log("File sent correctly");
+                successSent++;
+
+            }
+            else{
+                log("File NOT sent: "+e.getErrorCode()+"___"+e.getErrorString());
+                errorSent++;
+            }
+
+            if(countChat==errorSent+successSent){
+                if(successSent==countChat){
+                    if(countChat==1){
+                        long handle = request.getChatHandle();
+                        MegaChatListItem chatItem = megaChatApi.getChatListItem(handle);
+                        if(chatItem!=null){
+                            Intent intent = new Intent(this, ManagerActivityLollipop.class);
+                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                            intent.setAction(Constants.ACTION_CHAT_NOTIFICATION_MESSAGE);
+                            intent.putExtra("CHAT_ID", handle);
+                            startActivity(intent);
+                            finish();
+                        }
+                    }
+                    else{
+                        showSnackbar(getString(R.string.success_attaching_node_from_cloud_chats, countChat));
+                    }
+                }
+                else if(errorSent==countChat){
+                    showSnackbar(getString(R.string.error_attaching_node_from_cloud));
+                }
+                else{
+                    showSnackbar(getString(R.string.error_attaching_node_from_cloud_chats));
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onRequestTemporaryError(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
+
+    }
+
+    public void showSnackbar(String s){
+        log("showSnackbar");
+        Snackbar snackbar = Snackbar.make(getCurrentFocus(), s, Snackbar.LENGTH_LONG);
+        TextView snackbarTextView = (TextView)snackbar.getView().findViewById(android.support.design.R.id.snackbar_text);
+        snackbarTextView.setMaxLines(5);
+        snackbar.show();
     }
 }

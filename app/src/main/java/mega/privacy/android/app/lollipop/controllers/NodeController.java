@@ -737,6 +737,7 @@ public class NodeController {
                             File videoFile = new File(localPath);
 
                             Intent videoIntent = new Intent(context, AudioVideoPlayerLollipop.class);
+                            videoIntent.putExtra("HANDLE", tempNode.getHandle());
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                                 videoIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", videoFile), MimeTypeList.typeForName(tempNode.getName()).getType());
                             }
@@ -745,6 +746,21 @@ public class NodeController {
                             }
                             videoIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                             context.startActivity(videoIntent);
+                        }
+                        else if (MimeTypeList.typeForName(tempNode.getName()).isAudio()) {
+                            log("Audio file");
+                            File audioFile = new File(localPath);
+
+                            Intent audioIntent = new Intent(context, AudioVideoPlayerLollipop.class);
+                            audioIntent.putExtra("HANDLE", tempNode.getHandle());
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                                audioIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", audioFile), MimeTypeList.typeForName(tempNode.getName()).getType());
+                            }
+                            else{
+                                audioIntent.setDataAndType(Uri.fromFile(audioFile), MimeTypeList.typeForName(tempNode.getName()).getType());
+                            }
+                            audioIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                            context.startActivity(audioIntent);
                         }
                         else {
                             log("MimeTypeList other file");

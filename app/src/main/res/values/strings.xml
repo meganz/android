@@ -1626,4 +1626,6 @@
     <string name="old_and_new_passwords_equals" context="when changing the password , the old password and new password are equals">Passwords cannot be the same</string>
 
     <string name="user_account_feedback" context="Label to include info of the user email in the feedback form">User account</string>
+
+    <string name="audio_play" context="Label shown when audio file is playing">Audio File</string>
 </resources>
