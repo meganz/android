@@ -346,9 +346,6 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 		else if (modeCloud == FileExplorerActivityLollipop.SELECT || modeCloud == FileExplorerActivityLollipop.SELECT_CAMERA_FOLDER){
 			optionButton.setText(getString(R.string.general_select).toUpperCase(Locale.getDefault()));
 		}
-		else if(modeCloud == FileExplorerActivityLollipop.UPLOAD_SELFIE){
-			optionButton.setText(getString(R.string.context_upload).toUpperCase(Locale.getDefault()));
-		}
 		else {
 			optionButton.setText(getString(R.string.general_select).toUpperCase(Locale.getDefault()));
 		}

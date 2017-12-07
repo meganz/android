@@ -2010,8 +2010,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				if(!chatConnection){
 					log("Connection goes!!!");
 					megaChatApi.connect(this);
-					log("timestamp: "+System.currentTimeMillis()/1000);
-                    MegaApplication.setFirstTs(System.currentTimeMillis()/1000);
 				}
 				else{
 					log("Already connected");
@@ -4133,13 +4131,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 //			maFLol.setMKLayoutVisible(mkLayoutVisible);
 		}
 		log("show chats");
-		MegaApplication.setRecentChatsFragmentVisible(true);
 		drawerLayout.closeDrawer(Gravity.LEFT);
 	}
 	@SuppressLint("NewApi")
 	public void selectDrawerItemLollipop(DrawerItem item){
     	log("selectDrawerItemLollipop: "+item);
-		MegaApplication.setRecentChatsFragmentVisible(false);
 
     	switch (item){
 			case CLOUD_DRIVE:{
@@ -8870,6 +8866,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	}
 
 	public void showCancelMessage(){
+		log("showCancelMessage");
 		AlertDialog cancelDialog;
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 //		builder.setTitle(getString(R.string.title_cancel_subscriptions));
@@ -11294,7 +11291,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				log("----NEW Name: "+newPath);
 				File newFile = new File(newPath);
 				imgFile.renameTo(newFile);
-				showFileChooser(newPath);
+
+				uploadTakePicture(newPath);
 			}
 			else{
 				log("TAKE_PHOTO_CODE--->ERROR!");
@@ -12223,7 +12221,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 			if (MegaApplication.isFirstConnect()){
 				log("Set first connect to false");
-				MegaApplication.isFireBaseConnection=false;
 				MegaApplication.setFirstConnect(false);
 			}
 
@@ -14438,6 +14435,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		}
 	}
 
+	@Override
+	public void onChatConnectionStateUpdate(MegaChatApiJava api, long chatid, int newState) {
+		log("onChatConnectionStateUpdate: "+chatid);
+	}
+
 	public boolean isMkLayoutVisible() {
 		return mkLayoutVisible;
 	}
@@ -14469,15 +14471,46 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		showOfflineMode();
 	}
 
-	public void showFileChooser(String imagePath){
+	public void uploadTakePicture(String imagePath){
+		log("uploadTakePicture");
 
-		log("showFileChooser: "+imagePath);
-		Intent intent = new Intent(this, FileExplorerActivityLollipop.class);
-		intent.setAction(FileExplorerActivityLollipop.ACTION_UPLOAD_SELFIE);
-		intent.putExtra("IMAGE_PATH", imagePath);
-		startActivity(intent);
-		//finish();
+		MegaNode parentNode = null;
+
+		if(cloudPageAdapter!=null) {
+			fbFLol = (FileBrowserFragmentLollipop) cloudPageAdapter.instantiateItem(viewPagerCDrive, 0);
+			if (fbFLol != null) {
+				if (fbFLol.isAdded()) {
+					if (parentHandleBrowser != -1) {
+						parentNode = megaApi.getNodeByHandle(parentHandleBrowser);
+					}
+				}
+			} else {
+				log("FileBrowser is NULL after move");
+			}
+		}
+
+		if(parentNode==null){
+			parentNode = megaApi.getRootNode();
+		}
+
+		Intent intent = new Intent(this, UploadService.class);
+		File selfie = new File(imagePath);
+		intent.putExtra(UploadService.EXTRA_FILEPATH, selfie.getAbsolutePath());
+		intent.putExtra(UploadService.EXTRA_NAME, selfie.getName());
+		intent.putExtra(UploadService.EXTRA_PARENT_HASH, parentNode.getHandle());
+		intent.putExtra(UploadService.EXTRA_SIZE, selfie.length());
+		startService(intent);
 	}
+
+//	public void showFileChooser(String imagePath){
+//
+//		log("showFileChooser: "+imagePath);
+//		Intent intent = new Intent(this, FileExplorerActivityLollipop.class);
+//		intent.setAction(FileExplorerActivityLollipop.ACTION_UPLOAD_SELFIE);
+//		intent.putExtra("IMAGE_PATH", imagePath);
+//		startActivity(intent);
+//		//finish();
+//	}
 
 	public void changeStatusBarColor(int option) {
 
