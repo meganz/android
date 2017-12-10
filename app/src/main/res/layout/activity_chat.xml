@@ -31,7 +31,8 @@
             <android.support.v7.widget.Toolbar
                 android:id="@+id/toolbar_chat"
                 android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
+                android:layout_height="wrap_content"
+                android:minHeight="?attr/actionBarSize"
                 android:background="?attr/colorPrimary"
                 app:titleTextAppearance="@style/ToolbarTitle"
                 app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
@@ -96,7 +97,7 @@
                         android:textSize="14sp"
                         android:hint="@string/type_message_hint"
                         android:layout_toLeftOf="@+id/send_message_icon_chat"
-                        android:inputType="textMultiLine|textShortMessage"
+                        android:inputType="textMultiLine"
                         emojicon:emojiconSize="16sp"
                         android:minLines="2"
                         android:lines="6"/>

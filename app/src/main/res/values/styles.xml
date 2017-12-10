@@ -220,4 +220,11 @@
         <item name="tabPaddingEnd">12dp</item>
     </style>
 
+    <style name="StyledScrollerTextAppearance" parent="@android:style/TextAppearance">
+        <item name="android:textSize">14sp</item>
+        <!--<item name="android:textStyle"></item>-->
+        <item name="android:textColor">@android:color/white</item>
+    </style>
+
+
 </resources>

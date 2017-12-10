@@ -401,7 +401,6 @@ public class InboxFragmentLollipop extends Fragment{
 
 			recyclerView.setItemAnimator(new DefaultItemAnimator());
 
-
 			emptyImageView = (ImageView) v.findViewById(R.id.inbox_grid_empty_image);
 			emptyTextView = (LinearLayout) v.findViewById(R.id.inbox_grid_empty_text);
 			emptyTextViewFirst = (TextView) v.findViewById(R.id.inbox_grid_empty_text_first);
@@ -724,44 +723,43 @@ public class InboxFragmentLollipop extends Fragment{
 
 	public void setContentText(){
 		log("setContentText");
-		if (((ManagerActivityLollipop) context).isList){
-			if (adapter.getItemCount() == 0){
 
-				recyclerView.setVisibility(View.GONE);
-				emptyImageView.setVisibility(View.VISIBLE);
-				emptyTextView.setVisibility(View.VISIBLE);
-				contentTextLayout.setVisibility(View.GONE);
-        
-				if (megaApi.getInboxNode().getHandle()==((ManagerActivityLollipop)context).parentHandleInbox||((ManagerActivityLollipop)context).parentHandleInbox==-1) {
-					if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-						emptyImageView.setImageResource(R.drawable.inbox_empty_landscape);
-					}else{
-						emptyImageView.setImageResource(R.drawable.inbox_empty);
-					}
-					emptyTextViewFirst.setText(R.string.context_empty_inbox);
-					String text = getString(R.string.section_inbox);
-					emptyTextViewSecond.setText(" "+text+".");
+		if (adapter.getItemCount() == 0){
 
-				} else {
-					emptyImageView.setImageResource(R.drawable.ic_empty_folder);
-					emptyTextViewFirst.setText(R.string.file_browser_empty_folder);
+			recyclerView.setVisibility(View.GONE);
+			emptyImageView.setVisibility(View.VISIBLE);
+			emptyTextView.setVisibility(View.VISIBLE);
+			contentTextLayout.setVisibility(View.GONE);
+
+			if (megaApi.getInboxNode().getHandle()==((ManagerActivityLollipop)context).parentHandleInbox||((ManagerActivityLollipop)context).parentHandleInbox==-1) {
+				if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+					emptyImageView.setImageResource(R.drawable.inbox_empty_landscape);
+				}else{
+					emptyImageView.setImageResource(R.drawable.inbox_empty);
 				}
+				emptyTextViewFirst.setText(R.string.context_empty_inbox);
+				String text = getString(R.string.section_inbox);
+				emptyTextViewSecond.setText(" "+text+".");
+
+			} else {
+				emptyImageView.setImageResource(R.drawable.ic_empty_folder);
+				emptyTextViewFirst.setText(R.string.file_browser_empty_folder);
 			}
-			else{
-				recyclerView.setVisibility(View.VISIBLE);
-				emptyImageView.setVisibility(View.GONE);
-				emptyTextView.setVisibility(View.GONE);
-				contentTextLayout.setVisibility(View.VISIBLE);
+		}
+		else{
+			recyclerView.setVisibility(View.VISIBLE);
+			emptyImageView.setVisibility(View.GONE);
+			emptyTextView.setVisibility(View.GONE);
+			contentTextLayout.setVisibility(View.VISIBLE);
 
-				if (megaApi.getInboxNode().getHandle()==((ManagerActivityLollipop) context).parentHandleInbox||((ManagerActivityLollipop) context).parentHandleInbox==-1) {
+			if (megaApi.getInboxNode().getHandle()==((ManagerActivityLollipop) context).parentHandleInbox||((ManagerActivityLollipop) context).parentHandleInbox==-1) {
 
-					contentText.setText(MegaApiUtils.getInfoFolder(inboxNode, context));
-				} else {
-					MegaNode parentNode = megaApi.getNodeByHandle(((ManagerActivityLollipop) context).parentHandleInbox);
+				contentText.setText(MegaApiUtils.getInfoFolder(inboxNode, context));
+			} else {
+				MegaNode parentNode = megaApi.getNodeByHandle(((ManagerActivityLollipop) context).parentHandleInbox);
 
-					if(parentNode!=null){
-						contentText.setText(MegaApiUtils.getInfoFolder(parentNode, context));
-					}
+				if(parentNode!=null){
+					contentText.setText(MegaApiUtils.getInfoFolder(parentNode, context));
 				}
 			}
 		}

@@ -5,7 +5,7 @@ LOCAL_PATH := $(call my-dir)
 # The link step uses -Wl,-dead_strip,-gc-sections to strip all unused code
 include $(CLEAR_VARS)
 LOCAL_MODULE := mega
-LOCAL_CFLAGS := -fexceptions -frtti -fdata-sections -ffunction-sections -DDEBUG
+LOCAL_CFLAGS := -fdata-sections -ffunction-sections -DDEBUG
 LOCAL_SRC_FILES := $(LOCAL_PATH)/megasdk.cpp $(LOCAL_PATH)/megachat.cpp
 LOCAL_LDLIBS := -lm -lz -llog -lGLESv2 -lOpenSLES -latomic
 LOCAL_LDFLAGS :=  -Wl,-dead_strip,-gc-sections 

@@ -122,6 +122,7 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 //		cancelButton.setLayoutParams(cancelTextParams);
 		
 		listView = (RecyclerView) v.findViewById(R.id.file_list_view_browser);
+
 		listView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
 		mLayoutManager = new LinearLayoutManager(context);
 		listView.setLayoutManager(mLayoutManager);
@@ -196,9 +197,6 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 		}
 		else if (modeCloud == FileExplorerActivityLollipop.SELECT || modeCloud == FileExplorerActivityLollipop.SELECT_CAMERA_FOLDER){
 			optionButton.setText(getString(R.string.general_select).toUpperCase(Locale.getDefault()));
-		}
-		else if(modeCloud == FileExplorerActivityLollipop.UPLOAD_SELFIE){
-			optionButton.setText(getString(R.string.context_upload).toUpperCase(Locale.getDefault()));
 		}
 		else{
 			optionButton.setText(getString(R.string.general_select).toUpperCase(Locale.getDefault()));
