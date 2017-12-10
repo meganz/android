@@ -50,6 +50,7 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.lollipop.megachat.NotificationBuilder;
+import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -99,6 +100,7 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
         megaApi = app.getMegaApi();
         megaChatApi = app.getMegaChatApi();
         megaChatApi.addChatListener(this);
+        megaChatApi.addChatCallListener(this);
         dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 
         shown = false;
@@ -153,7 +155,7 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
                     log("show ContactRequest Notification");
                     showContactRequestNotification();
                 }
-                else if(remoteMessageType.equals("2")){
+                else if(remoteMessageType.equals("2") || remoteMessageType.equals("4")){
                     String gSession = credentials.getSession();
                     if (megaApi.getRootNode() == null){
                         log("RootNode = null");
@@ -337,7 +339,32 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
 
     @Override
     public void onChatCallUpdate(MegaChatApiJava api, MegaChatCall call) {
-        log("onChatCallUpdate");
+        log("onChatCallUpdate: " + call.getChatid());
+
+        megaChatApi.removeChatCallListener(this);
+
+        if(call.hasChanged(MegaChatCall.CHANGE_TYPE_STATUS)){
+            if(call.getStatus()==MegaChatCall.CALL_STATUS_RING_IN){
+                Intent i = new Intent(this, ChatCallActivity.class);
+                i.putExtra("chatHandle", call.getChatid());
+                i.putExtra("callId", call.getId());
+                i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(i);
+            }
+        }
+
+        if(call.hasAudio(false)){
+            log("Remote audio is connected");
+        }
+        else{
+            log("Remote audio is NOT connected");
+        }
+        if(call.hasVideo(false)){
+            log("Remote video is connected");
+        }
+        else{
+            log("Remote video is NOT connected");
+        }
     }
 
     public void showSharedFolderNotification() {
@@ -450,8 +477,9 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
             }
         });
 
-        MegaChatListItem item = unreadChats.get(0);
-        log("showChatNotification last item: "+item.getTitle()+ " message: "+item.getLastMessage());
+        if (unreadChats.size() > 0) {
+            MegaChatListItem item = unreadChats.get(0);
+            log("showChatNotification last item: " + item.getTitle() + " message: " + item.getLastMessage());
 
         ChatSettings chatSettings = dbH.getChatSettings();
         String email = megaChatApi.getContactEmail(item.getPeerHandle());
