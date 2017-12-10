@@ -353,6 +353,11 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
             if (chatId != -1) {
                 chat = megaChatApi.getChatRoom(chatId);
                 callChat = megaChatApi.getChatCall(chatId);
+                if (callChat == null){
+                    megaChatApi.removeChatCallListener(this);
+                    finish();
+                    return;
+                }
 
                 audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
 
