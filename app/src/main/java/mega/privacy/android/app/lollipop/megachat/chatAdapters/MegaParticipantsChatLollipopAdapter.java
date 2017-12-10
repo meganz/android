@@ -96,7 +96,8 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
     	RoundedImageView imageView;
 		TextView contactInitialLetter;
 		TextView textViewContent;
-		ImageButton imageButtonThreeDots;
+		RelativeLayout threeDotsLayout;
+		ImageView imageButtonThreeDots;
 		ImageView statusImage;
 
 		ImageView permissionsIcon;
@@ -142,7 +143,8 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 			holderList.contactInitialLetter = (TextView) v.findViewById(R.id.participant_list_initial_letter);
 			holderList.textViewContactName = (TextView) v.findViewById(R.id.participant_list_name);
 			holderList.textViewContent = (TextView) v.findViewById(R.id.participant_list_content);
-			holderList.imageButtonThreeDots = (ImageButton) v.findViewById(R.id.participant_list_three_dots);
+			holderList.threeDotsLayout = (RelativeLayout) v.findViewById(R.id.participant_list_three_dots_layout);
+			holderList.imageButtonThreeDots = (ImageView) v.findViewById(R.id.participant_list_three_dots);
 			holderList.permissionsIcon = (ImageView) v.findViewById(R.id.participant_list_permissions);
 			holderList.statusImage = (ImageView) v.findViewById(R.id.group_participants_state_circle);
 
@@ -240,7 +242,7 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 			}
 
 			holder.textViewContactName.setText(((ViewHolderParticipantsList)holder).fullName);
-			((ViewHolderParticipantsList)holder).imageButtonThreeDots.setOnClickListener(this);
+			((ViewHolderParticipantsList)holder).threeDotsLayout.setOnClickListener(this);
 
 			createDefaultAvatar(((ViewHolderParticipantsList)holder));
 
@@ -276,7 +278,7 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 				}
 
 				((ViewHolderParticipantsList) holder).imageButtonThreeDots.setColorFilter(null);
-				((ViewHolderParticipantsList)holder).imageButtonThreeDots.setOnClickListener(this);
+				((ViewHolderParticipantsList)holder).threeDotsLayout.setOnClickListener(this);
 			}
 			else{
 				log("NOOOT me!!!");
@@ -339,7 +341,7 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 					log("NOT email- Participant is NOT contact");
 					if(position!=0){
 						((ViewHolderParticipantsList) holder).imageButtonThreeDots.setColorFilter(ContextCompat.getColor(context, R.color.chat_sliding_panel_separator));
-						((ViewHolderParticipantsList)holder).imageButtonThreeDots.setOnClickListener(null);
+						((ViewHolderParticipantsList)holder).threeDotsLayout.setOnClickListener(null);
 					}
 
 					if (context.getExternalCacheDir() != null) {
@@ -362,7 +364,7 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 				((ViewHolderParticipantsList)holder).permissionsIcon.setImageResource(R.drawable.ic_permissions_read_only);
 			}
 
-			((ViewHolderParticipantsList)holder).imageButtonThreeDots.setTag(holder);
+			((ViewHolderParticipantsList)holder).threeDotsLayout.setTag(holder);
 		}
 		else{
 			log("Bind item add participant");
@@ -596,7 +598,7 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 		}
 
 		switch (v.getId()){
-			case R.id.participant_list_three_dots:{
+			case R.id.participant_list_three_dots_layout:{
 				log("contact_list_three_dots");
 				ViewHolderParticipantsList holder = (ViewHolderParticipantsList) v.getTag();
 				int currentPosition = holder.currentPosition;

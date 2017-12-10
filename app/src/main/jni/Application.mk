@@ -15,5 +15,4 @@ APP_STL := c++_static
 APP_OPTIM := release
 APP_PIE := false
 
-APP_CPPFLAGS += -std=c++11 -Wno-extern-c-compat -mno-unaligned-access
-
+APP_CPPFLAGS += -std=c++11 -Wno-extern-c-compat -mno-unaligned-access -fexceptions -frtti

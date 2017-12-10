@@ -45,6 +45,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.CustomizedGridLayoutManager;
 import mega.privacy.android.app.components.CustomizedGridRecyclerView;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
+import mega.privacy.android.app.components.scrollBar.FastScroller;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.MyAccountInfo;
@@ -66,6 +67,7 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 	RecyclerView recyclerView;
 	LinearLayoutManager mLayoutManager;
 	CustomizedGridLayoutManager gridLayoutManager;
+	FastScroller fastScroller;
 
 	ImageView emptyImageView;
 	LinearLayout emptyTextView;
@@ -354,6 +356,8 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 			View v = inflater.inflate(R.layout.fragment_filebrowserlist, container, false);
 
 			recyclerView = (RecyclerView) v.findViewById(R.id.file_list_view_browser);
+			fastScroller = (FastScroller) v.findViewById(R.id.fastscroll);
+
 			recyclerView.setPadding(0, 0, 0, Util.scaleHeightPx(85, outMetrics));
 			recyclerView.setClipToPadding(false);
 			recyclerView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
@@ -387,6 +391,7 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 			adapter.setMultipleSelect(false);
 	
 			recyclerView.setAdapter(adapter);
+			fastScroller.setRecyclerView(recyclerView);
 
 			RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) recyclerView.getLayoutParams();
 			params.addRule(RelativeLayout.BELOW, contentTextLayout.getId());
@@ -402,6 +407,8 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 			View v = inflater.inflate(R.layout.fragment_filebrowsergrid, container, false);
 			
 			recyclerView = (RecyclerView) v.findViewById(R.id.file_grid_view_browser);
+			fastScroller = (FastScroller) v.findViewById(R.id.fastscroll);
+
 			recyclerView.setPadding(0, 0, 0, Util.scaleHeightPx(80, outMetrics));
 			recyclerView.setClipToPadding(false);
 
@@ -427,13 +434,13 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 				adapter.setAdapterType(MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_GRID);
 				adapter.setNodes(nodes);
 			}
-			
-			setNodes(nodes);
-			
 			adapter.setMultipleSelect(false);
-			
+
 			recyclerView.setAdapter(adapter);
-			
+			fastScroller.setRecyclerView(recyclerView);
+
+			setNodes(nodes);
+
 			return v;
 		}
 	}
@@ -508,9 +515,11 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 				nodes = megaApi.getChildren(n, ((ManagerActivityLollipop)context).orderCloud);
 				adapter.setNodes(nodes);
 				recyclerView.scrollToPosition(0);
-				
+
 				((ManagerActivityLollipop)context).levelsSearch++;
-				
+
+				visibilityFastScroller();
+
 				//If folder has no files
 				if (adapter.getItemCount() == 0){
 					recyclerView.setVisibility(View.GONE);
@@ -719,6 +728,9 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 
 				((ManagerActivityLollipop)context).setParentHandleSearch(parentNode.getHandle());
 				nodes = megaApi.getChildren(parentNode, ((ManagerActivityLollipop)context).orderCloud);
+
+				visibilityFastScroller();
+
 				if(nodes!=null){
 					log("nodes.size: "+nodes.size());
 					if(nodes.size()>0){
@@ -774,6 +786,8 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 			nodes = megaApi.search(((ManagerActivityLollipop)context).searchQuery);
 			adapter.setNodes(nodes);
 			setNodes(nodes);
+			visibilityFastScroller();
+
 			contentText.setText(MegaApiUtils.getInfoNode(nodes, (ManagerActivityLollipop)context));
 			if(nodes!=null){
 				log("nodes.size: "+nodes.size());
@@ -855,6 +869,8 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 		this.nodes = nodes;
 		if (adapter != null){
 			adapter.setNodes(nodes);
+			visibilityFastScroller();
+
 			if (adapter.getItemCount() == 0){
 				log("no results");
 				recyclerView.setVisibility(View.GONE);
@@ -904,6 +920,18 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 
 	private static void log(String log) {
 		Util.log("SearchFragmentLollipop", log);
+	}
+
+	public void visibilityFastScroller(){
+		if(adapter == null){
+			fastScroller.setVisibility(View.GONE);
+		}else{
+			if(adapter.getItemCount() < Constants.MIN_ITEMS_SCROLLBAR){
+				fastScroller.setVisibility(View.GONE);
+			}else{
+				fastScroller.setVisibility(View.VISIBLE);
+			}
+		}
 	}
 
 }

@@ -75,6 +75,12 @@ LIBWEBSOCKETS_SOURCE_FOLDER=libwebsockets-${LIBWEBSOCKETS_VERSION}
 LIBWEBSOCKETS_DOWNLOAD_URL=https://github.com/warmcat/libwebsockets/archive/v${LIBWEBSOCKETS_VERSION}.tar.gz
 LIBWEBSOCKETS_SHA1="09cc816c70468270fc34efb17c8fce9676b16777"
 
+PDFVIEWER=pdfviewer
+PDFVIEWER_VERSION=1.8.0
+PDFVIEWER_SOURCE_FILE=master.zip
+PDFVIEWER_DOWNLOAD_URL=https://github.com/barteksc/PdfiumAndroid/archive/${PDFVIEWER_SOURCE_FILE}
+PDFVIEWER_SHA1="4dfd78dcd7c90b00cf3d1077b0746ffd977c5208"
+
 function downloadCheckAndUnpack()
 {
     local URL=$1
@@ -181,6 +187,7 @@ if [ "$1" == "clean" ]; then
     rm -rf ${SODIUM}/${SODIUM}
     rm -rf ${LIBUV}/${LIBUV_SOURCE_FOLDER}
     rm -rf ${LIBUV}/${LIBUV}
+    rm -rf ${PDFVIEWER}/${PDFVIEWER}
 
     echo "* Deleting tarballs"
     rm -rf ${CRYPTOPP}/${CRYPTOPP_SOURCE_FILE}
@@ -207,6 +214,10 @@ if [ "$1" == "clean" ]; then
     rm -rf ../libs/armeabi
     rm -rf ../libs/x86
 
+    rm -rf ${PDFVIEWER}/${PDFVIEWER_SOURCE_FILE}
+    rm -rf ${PDFVIEWER}/${PDFVIEWER_SOURCE_FILE}.ready
+	rm -rf ../obj/local/armeabi/
+	rm -rf ../obj/local/x86
     echo "* Task finished OK"
     exit 0
 fi
@@ -320,6 +331,23 @@ else
     echo "* WebRTC is not needed"
 fi
 
+echo "* Setting up PdfViewer"
+if [ ! -f ${PDFVIEWER}/${PDFVIEWER_SOURCE_FILE}.ready ]; then
+    downloadCheckAndUnpack ${PDFVIEWER_DOWNLOAD_URL} ${PDFVIEWER}/${PDFVIEWER_SOURCE_FILE} ${PDFVIEWER_SHA1} ${PDFVIEWER}
+    cd ${PDFVIEWER}
+    mkdir ${PDFVIEWER}
+    cd ${PDFVIEWER}
+    mkdir include
+    mkdir lib
+    mkdir src
+    cp -R ../PdfiumAndroid-master/src/main/jni/include/* ./include/
+    cp -R ../PdfiumAndroid-master/src/main/jni/lib/* ./lib/
+    cp -R ../PdfiumAndroid-master/src/main/jni/src/* ./src/
+    rm -rf ../PdfiumAndroid-master
+    cd ../..
+    touch ${PDFVIEWER}/${PDFVIEWER_SOURCE_FILE}.ready
+fi
+echo "* PdfViewer is ready"
 echo "* All dependencies are prepared!"
 echo "* Running ndk-build"
 ${NDK_BUILD} -j8

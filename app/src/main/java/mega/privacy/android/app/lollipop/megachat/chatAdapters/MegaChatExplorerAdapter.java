@@ -112,7 +112,6 @@ public class MegaChatExplorerAdapter extends RecyclerView.Adapter<MegaChatExplor
 		TextView textViewDate;
         ImageButton imageButtonThreeDots;
         RelativeLayout itemLayout;
-		ImageView circlePendingMessages;
 		TextView numberPendingMessages;
 		RelativeLayout layoutPendingMessages;
         ImageView muteIcon;
@@ -450,7 +449,6 @@ public class MegaChatExplorerAdapter extends RecyclerView.Adapter<MegaChatExplor
 		holder.imageButtonThreeDots.setVisibility(View.GONE);
 
 		holder.layoutPendingMessages = (RelativeLayout) v.findViewById(R.id.recent_chat_list_unread_layout);
-		holder.circlePendingMessages = (ImageView) v.findViewById(R.id.recent_chat_list_unread_circle);
 		holder.numberPendingMessages = (TextView) v.findViewById(R.id.recent_chat_list_unread_number);
 		holder.layoutPendingMessages.setVisibility(View.GONE);
 

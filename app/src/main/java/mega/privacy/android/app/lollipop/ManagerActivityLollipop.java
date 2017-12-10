@@ -2572,6 +2572,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 	public void setDefaultAvatar(){
 		log("setDefaultAvatar");
+
 		float density  = getResources().getDisplayMetrics().density;
 		Bitmap defaultAvatar = Bitmap.createBitmap(Constants.DEFAULT_AVATAR_WIDTH_HEIGHT,Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
 		Canvas c = new Canvas(defaultAvatar);
@@ -2601,9 +2602,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 		String firstLetter = myAccountInfo.getFirstLetter();
 		nVPictureProfileTextView.setText(firstLetter);
-		nVPictureProfileTextView.setTextSize(32);
+		nVPictureProfileTextView.setTextSize(30);
 		nVPictureProfileTextView.setTextColor(Color.WHITE);
 		nVPictureProfileTextView.setVisibility(View.VISIBLE);
+
 	}
 
 	public void setOfflineAvatar(String email, long myHandle, String firstLetter){
@@ -4477,7 +4479,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 				ft.replace(R.id.fragment_container, sFLol, "sFLol");
-    			ft.commitNow();
+    			ft.commitNowAllowingStateLoss();
 
 				showFabButton();
     			break;
@@ -5154,13 +5156,16 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			else if (drawerItem == DrawerItem.INBOX){
 				if (iFLol != null){
 					//Show
-					sortByMenuItem.setVisible(true);
 
 					if(iFLol.getItemCount()>0){
 						selectMenuItem.setVisible(true);
+						sortByMenuItem.setVisible(true);
+
 					}
 					else{
 						selectMenuItem.setVisible(false);
+						sortByMenuItem.setVisible(false);
+
 					}
 
 					if (isList){
@@ -5205,7 +5210,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				if(index==0){
 					inSFLol = (IncomingSharesFragmentLollipop) sharesPageAdapter.instantiateItem(viewPagerShares, 0);
 					if (inSFLol != null){
-						sortByMenuItem.setVisible(true);
 						thumbViewMenuItem.setVisible(true);
 
 						addMenuItem.setEnabled(true);
@@ -5245,9 +5249,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 						if(inSFLol.getItemCount()>0){
 							selectMenuItem.setVisible(true);
+							sortByMenuItem.setVisible(true);
+
 						}
 						else{
 							selectMenuItem.setVisible(false);
+							sortByMenuItem.setVisible(false);
+
 						}
 						searchMenuItem.setVisible(true);
 
@@ -5280,7 +5288,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					outSFLol = (OutgoingSharesFragmentLollipop) sharesPageAdapter.instantiateItem(viewPagerShares, 1);
 					if (outSFLol != null){
 
-						sortByMenuItem.setVisible(true);
 						thumbViewMenuItem.setVisible(true);
 
 						log("parentHandleOutgoing: "+parentHandleOutgoing);
@@ -5295,9 +5302,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 						if(outSFLol.getItemCount()>0){
 							selectMenuItem.setVisible(true);
+							sortByMenuItem.setVisible(true);
+
 						}
 						else{
 							selectMenuItem.setVisible(false);
+							sortByMenuItem.setVisible(false);
+
 						}
 						searchMenuItem.setVisible(true);
 
@@ -5342,7 +5353,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 					//Show
 					addContactMenuItem.setVisible(true);
-					sortByMenuItem.setVisible(true);
 					thumbViewMenuItem.setVisible(true);
 					upgradeAccountMenuItem.setVisible(true);
 					searchMenuItem.setVisible(true);
@@ -5350,9 +5360,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					if (cFLol != null) {
 						if(cFLol.getItemCount()>0){
 							selectMenuItem.setVisible(true);
+							sortByMenuItem.setVisible(true);
 						}
 						else{
 							selectMenuItem.setVisible(false);
+							sortByMenuItem.setVisible(false);
 						}
 					}
 					else{
@@ -11283,7 +11295,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				log("----NEW Name: "+newPath);
 				File newFile = new File(newPath);
 				imgFile.renameTo(newFile);
-				showFileChooser(newPath);
+
+				uploadTakePicture(newPath);
 			}
 			else{
 				log("TAKE_PHOTO_CODE--->ERROR!");
@@ -12165,7 +12178,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 				log("open new chat: " + request.getChatHandle());
 				Intent intent = new Intent(this, ChatActivityLollipop.class);
-				intent.setAction(Constants.ACTION_CHAT_NEW);
+				intent.setAction(Constants.ACTION_NEW_CHAT);
 				intent.putExtra("CHAT_ID", request.getChatHandle());
 				this.startActivity(intent);
 
@@ -14426,6 +14439,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		}
 	}
 
+	@Override
+	public void onChatConnectionStateUpdate(MegaChatApiJava api, long chatid, int newState) {
+		log("onChatConnectionStateUpdate: "+chatid);
+	}
+
 	public boolean isMkLayoutVisible() {
 		return mkLayoutVisible;
 	}
@@ -14457,15 +14475,46 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		showOfflineMode();
 	}
 
-	public void showFileChooser(String imagePath){
+	public void uploadTakePicture(String imagePath){
+		log("uploadTakePicture");
 
-		log("showFileChooser: "+imagePath);
-		Intent intent = new Intent(this, FileExplorerActivityLollipop.class);
-		intent.setAction(FileExplorerActivityLollipop.ACTION_UPLOAD_SELFIE);
-		intent.putExtra("IMAGE_PATH", imagePath);
-		startActivity(intent);
-		//finish();
+		MegaNode parentNode = null;
+
+		if(cloudPageAdapter!=null) {
+			fbFLol = (FileBrowserFragmentLollipop) cloudPageAdapter.instantiateItem(viewPagerCDrive, 0);
+			if (fbFLol != null) {
+				if (fbFLol.isAdded()) {
+					if (parentHandleBrowser != -1) {
+						parentNode = megaApi.getNodeByHandle(parentHandleBrowser);
+					}
+				}
+			} else {
+				log("FileBrowser is NULL after move");
+			}
+		}
+
+		if(parentNode==null){
+			parentNode = megaApi.getRootNode();
+		}
+
+		Intent intent = new Intent(this, UploadService.class);
+		File selfie = new File(imagePath);
+		intent.putExtra(UploadService.EXTRA_FILEPATH, selfie.getAbsolutePath());
+		intent.putExtra(UploadService.EXTRA_NAME, selfie.getName());
+		intent.putExtra(UploadService.EXTRA_PARENT_HASH, parentNode.getHandle());
+		intent.putExtra(UploadService.EXTRA_SIZE, selfie.length());
+		startService(intent);
 	}
+
+//	public void showFileChooser(String imagePath){
+//
+//		log("showFileChooser: "+imagePath);
+//		Intent intent = new Intent(this, FileExplorerActivityLollipop.class);
+//		intent.setAction(FileExplorerActivityLollipop.ACTION_UPLOAD_SELFIE);
+//		intent.putExtra("IMAGE_PATH", imagePath);
+//		startActivity(intent);
+//		//finish();
+//	}
 
 	public void changeStatusBarColor(int option) {
 
