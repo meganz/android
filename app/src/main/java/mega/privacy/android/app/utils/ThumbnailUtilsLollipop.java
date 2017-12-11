@@ -63,7 +63,6 @@ import nz.mega.sdk.MegaUtilsAndroid;
  */
 public class ThumbnailUtilsLollipop {
 	public static File thumbDir;
-	private static int THUMBNAIL_SIZE = 120;
 	public static ThumbnailCache thumbnailCache = new ThumbnailCache();
 	public static ThumbnailCache thumbnailCachePath = new ThumbnailCache(1);
 //	public static ArrayList<Long> pendingThumbnails = new ArrayList<Long>();
@@ -1366,7 +1365,7 @@ public class ThumbnailUtilsLollipop {
 		}
 		
 		if(bmThumbnail!=null){
-			Bitmap resizedBitmap = Bitmap.createScaledBitmap(bmThumbnail, 120, 120, false);		
+			Bitmap resizedBitmap = Bitmap.createScaledBitmap(bmThumbnail, 200, 200, false);
 			
 			log("After resize thumb: "+resizedBitmap.getHeight()+" : "+resizedBitmap.getWidth());			
 			
