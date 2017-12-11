@@ -102,6 +102,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import mega.privacy.android.app.AndroidCompletedTransfer;
 import mega.privacy.android.app.CameraSyncService;
@@ -215,7 +217,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	public long transferCallback = 0;
 
 	boolean chatConnection = false;
+
 	boolean cameraUploadsBoolean = false;
+	String regex = "[*|\\?:\"<>\\{\\}\\[\\]\\\\\\/]";
 
 	TransfersBottomSheetDialogFragment transfersBottomSheet = null;
 
@@ -2015,8 +2019,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				if(!chatConnection){
 					log("Connection goes!!!");
 					megaChatApi.connect(this);
-					log("timestamp: "+System.currentTimeMillis()/1000);
-                    MegaApplication.setFirstTs(System.currentTimeMillis()/1000);
 				}
 				else{
 					log("Already connected");
@@ -2575,6 +2577,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 	public void setDefaultAvatar(){
 		log("setDefaultAvatar");
+
 		float density  = getResources().getDisplayMetrics().density;
 		Bitmap defaultAvatar = Bitmap.createBitmap(Constants.DEFAULT_AVATAR_WIDTH_HEIGHT,Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
 		Canvas c = new Canvas(defaultAvatar);
@@ -2604,9 +2607,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 		String firstLetter = myAccountInfo.getFirstLetter();
 		nVPictureProfileTextView.setText(firstLetter);
-		nVPictureProfileTextView.setTextSize(32);
+		nVPictureProfileTextView.setTextSize(30);
 		nVPictureProfileTextView.setTextColor(Color.WHITE);
 		nVPictureProfileTextView.setVisibility(View.VISIBLE);
+
 	}
 
 	public void setOfflineAvatar(String email, long myHandle, String firstLetter){
@@ -4136,13 +4140,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 //			maFLol.setMKLayoutVisible(mkLayoutVisible);
 		}
 		log("show chats");
-		MegaApplication.setRecentChatsFragmentVisible(true);
 		drawerLayout.closeDrawer(Gravity.LEFT);
 	}
 	@SuppressLint("NewApi")
 	public void selectDrawerItemLollipop(DrawerItem item){
     	log("selectDrawerItemLollipop: "+item);
-		MegaApplication.setRecentChatsFragmentVisible(false);
 
     	switch (item){
 			case CLOUD_DRIVE:{
@@ -8254,7 +8256,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 	public void showRenameDialog(final MegaNode document, String text){
 		log("showRenameDialog");
-
 		LinearLayout layout = new LinearLayout(this);
 	    layout.setOrientation(LinearLayout.VERTICAL);
 	    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -8280,6 +8281,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					else{
 						String [] s = document.getName().split("\\.");
 						if (s != null){
+
 							int numParts = s.length;
 							int lastSelectedPos = 0;
 							if (numParts == 1){
@@ -8360,16 +8362,27 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			public boolean onEditorAction(TextView v, int actionId,
 										  KeyEvent event) {
 				if (actionId == EditorInfo.IME_ACTION_DONE) {
+
 					String value = v.getText().toString().trim();
 					if (value.length() == 0) {
 						input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
 						textError.setText(getString(R.string.invalid_string));
 						error_layout.setVisibility(View.VISIBLE);
 						input.requestFocus();
-						return true;
+
+					}else{
+						boolean result=matches(regex, value);
+						if(result){
+							input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+							textError.setText(getString(R.string.invalid_characters));
+							error_layout.setVisibility(View.VISIBLE);
+							input.requestFocus();
+
+						}else{
+							nC.renameNode(document, value);
+							renameDialog.dismiss();
+						}
 					}
-					nC.renameNode(document, value);
-					renameDialog.dismiss();
 					return true;
 				}
 				return false;
@@ -8399,6 +8412,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			public void onClick(View v)
 			{
 				String value = input.getText().toString().trim();
+
 				if (value.length() == 0) {
 					input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
 					textError.setText(getString(R.string.invalid_string));
@@ -8406,11 +8420,26 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					input.requestFocus();
 				}
 				else{
-					nC.renameNode(document, value);
-					renameDialog.dismiss();
+					boolean result=matches(regex, value);
+					if(result){
+						input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+						textError.setText(getString(R.string.invalid_characters));
+						error_layout.setVisibility(View.VISIBLE);
+						input.requestFocus();
+
+					}else{
+						nC.renameNode(document, value);
+						renameDialog.dismiss();
+					}
 				}
 			}
 		});
+	}
+
+	public static boolean matches(String regex, CharSequence input) {
+		Pattern p = Pattern.compile(regex);
+		Matcher m = p.matcher(input);
+		return m.find();
 	}
 
 	public void showGetLinkActivity(long handle){
@@ -9125,14 +9154,24 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				if (actionId == EditorInfo.IME_ACTION_DONE) {
 					String value = v.getText().toString().trim();
 					if (value.length() == 0) {
-						input.getBackground().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+						input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
 						textError.setText(getString(R.string.invalid_string));
 						error_layout.setVisibility(View.VISIBLE);
 						input.requestFocus();
-						return true;
+
+					}else{
+						boolean result=matches(regex, value);
+						if(result){
+							input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+							textError.setText(getString(R.string.invalid_characters));
+							error_layout.setVisibility(View.VISIBLE);
+							input.requestFocus();
+
+						}else{
+							createFolder(value);
+							newFolderDialog.dismiss();
+						}
 					}
-					createFolder(value);
-					newFolderDialog.dismiss();
 					return true;
 				}
 				return false;
@@ -9176,15 +9215,26 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			{
 				String value = input.getText().toString().trim();
 				if (value.length() == 0) {
-					input.getBackground().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+					input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
 					textError.setText(getString(R.string.invalid_string));
 					error_layout.setVisibility(View.VISIBLE);
 					input.requestFocus();
+
+				}else{
+					boolean result=matches(regex, value);
+					if(result){
+						input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+						textError.setText(getString(R.string.invalid_characters));
+						error_layout.setVisibility(View.VISIBLE);
+						input.requestFocus();
+
+					}else{
+						createFolder(value);
+						newFolderDialog.dismiss();
+					}
 				}
-				else{
-					createFolder(value);
-					newFolderDialog.dismiss();
-				}
+
+
 			}
 		});
 	}
@@ -11360,7 +11410,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				log("----NEW Name: "+newPath);
 				File newFile = new File(newPath);
 				imgFile.renameTo(newFile);
-				showFileChooser(newPath);
+
+				uploadTakePicture(newPath);
 			}
 			else{
 				log("TAKE_PHOTO_CODE--->ERROR!");
@@ -12289,7 +12340,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 			if (MegaApplication.isFirstConnect()){
 				log("Set first connect to false");
-				MegaApplication.isFireBaseConnection=false;
 				MegaApplication.setFirstConnect(false);
 			}
 
@@ -14505,6 +14555,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		}
 	}
 
+	@Override
+	public void onChatConnectionStateUpdate(MegaChatApiJava api, long chatid, int newState) {
+		log("onChatConnectionStateUpdate: "+chatid);
+	}
+
 	public boolean isMkLayoutVisible() {
 		return mkLayoutVisible;
 	}
@@ -14536,15 +14591,46 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		showOfflineMode();
 	}
 
-	public void showFileChooser(String imagePath){
+	public void uploadTakePicture(String imagePath){
+		log("uploadTakePicture");
 
-		log("showFileChooser: "+imagePath);
-		Intent intent = new Intent(this, FileExplorerActivityLollipop.class);
-		intent.setAction(FileExplorerActivityLollipop.ACTION_UPLOAD_SELFIE);
-		intent.putExtra("IMAGE_PATH", imagePath);
-		startActivity(intent);
-		//finish();
+		MegaNode parentNode = null;
+
+		if(cloudPageAdapter!=null) {
+			fbFLol = (FileBrowserFragmentLollipop) cloudPageAdapter.instantiateItem(viewPagerCDrive, 0);
+			if (fbFLol != null) {
+				if (fbFLol.isAdded()) {
+					if (parentHandleBrowser != -1) {
+						parentNode = megaApi.getNodeByHandle(parentHandleBrowser);
+					}
+				}
+			} else {
+				log("FileBrowser is NULL after move");
+			}
+		}
+
+		if(parentNode==null){
+			parentNode = megaApi.getRootNode();
+		}
+
+		Intent intent = new Intent(this, UploadService.class);
+		File selfie = new File(imagePath);
+		intent.putExtra(UploadService.EXTRA_FILEPATH, selfie.getAbsolutePath());
+		intent.putExtra(UploadService.EXTRA_NAME, selfie.getName());
+		intent.putExtra(UploadService.EXTRA_PARENT_HASH, parentNode.getHandle());
+		intent.putExtra(UploadService.EXTRA_SIZE, selfie.length());
+		startService(intent);
 	}
+
+//	public void showFileChooser(String imagePath){
+//
+//		log("showFileChooser: "+imagePath);
+//		Intent intent = new Intent(this, FileExplorerActivityLollipop.class);
+//		intent.setAction(FileExplorerActivityLollipop.ACTION_UPLOAD_SELFIE);
+//		intent.putExtra("IMAGE_PATH", imagePath);
+//		startActivity(intent);
+//		//finish();
+//	}
 
 	public void changeStatusBarColor(int option) {
 

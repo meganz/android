@@ -1097,11 +1097,16 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 	}
 
 	public void visibilityFastScroller(){
-		if(adapter.getItemCount() < Constants.MIN_ITEMS_SCROLLBAR){
+		if(adapter == null){
 			fastScroller.setVisibility(View.GONE);
 		}else{
-			fastScroller.setVisibility(View.VISIBLE);
+			if(adapter.getItemCount() < Constants.MIN_ITEMS_SCROLLBAR){
+				fastScroller.setVisibility(View.GONE);
+			}else{
+				fastScroller.setVisibility(View.VISIBLE);
+			}
 		}
+
 	}
 
 

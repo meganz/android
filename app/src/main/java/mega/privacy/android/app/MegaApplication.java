@@ -4,7 +4,6 @@ package mega.privacy.android.app;
 //import com.google.android.gms.analytics.Logger.LogLevel;
 //import com.google.android.gms.analytics.Tracker;
 
-import android.app.Activity;
 import android.app.Application;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -14,14 +13,10 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
-import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
@@ -33,32 +28,17 @@ import android.os.Handler;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
 import android.text.Html;
-import android.text.Spannable;
-import android.text.SpannableString;
 import android.text.Spanned;
-import android.text.style.ForegroundColorSpan;
-import android.text.style.RelativeSizeSpan;
-import android.text.style.StyleSpan;
-import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.Display;
-import android.view.View;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Locale;
 
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
-import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
-import mega.privacy.android.app.lollipop.megachat.NotificationBuilder;
-import mega.privacy.android.app.lollipop.megachat.RecentChatsFragmentLollipop;
-import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaChatLollipopAdapter;
-import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaListChatLollipopAdapter;
 import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.TimeChatUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -82,9 +62,9 @@ import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaUser;
 
 
-public class MegaApplication extends Application implements MegaListenerInterface, MegaChatListenerInterface, MegaChatRequestListenerInterface {
+public class MegaApplication extends Application implements MegaListenerInterface, MegaChatRequestListenerInterface {
 	final String TAG = "MegaApplication";
-	static final String USER_AGENT = "MEGAAndroid/3.2.6_161";
+	static final String USER_AGENT = "MEGAAndroid/3.2.6.2_166";
 
 	DatabaseHandler dbH;
 	MegaApiAndroid megaApi;
@@ -96,7 +76,6 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 
 
 	MegaChatApiAndroid megaChatApi = null;
-	private NotificationBuilder notificationBuilder;
 
 //	static final String GA_PROPERTY_ID = "UA-59254318-1";
 //	
@@ -199,24 +178,23 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 		@Override
 		public void run() {
 			try {
-				if (previousActivityVisible != activityVisible) {
-					previousActivityVisible = activityVisible;
-					if (activityVisible) {
-						log("CHANGE TO KEEPALIVE");
-						if (chatConnection) {
-							if (megaChatApi != null) {
-								megaChatApi.setBackgroundStatus(false);
-							}
+
+				if (activityVisible) {
+					log("SEND KEEPALIVE");
+					if (chatConnection) {
+						if (megaChatApi != null) {
+							megaChatApi.setBackgroundStatus(false);
 						}
-					} else {
-						log("CHANGE TO KEEPALIVEAWAY");
-						if (chatConnection) {
-							if (megaChatApi != null) {
-								megaChatApi.setBackgroundStatus(true);
-							}
+					}
+				} else {
+					log("SEND KEEPALIVEAWAY");
+					if (chatConnection) {
+						if (megaChatApi != null) {
+							megaChatApi.setBackgroundStatus(true);
 						}
 					}
 				}
+
 				if (activityVisible) {
 					log("Handler KEEPALIVE: " + System.currentTimeMillis());
 				} else {
@@ -318,8 +296,6 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 			megaApi.useHttpsOnly(useHttpsOnly);
 		}
 
-		notificationBuilder =  NotificationBuilder.newInstance(this, megaApi, megaChatApi);
-		
 //		initializeGA();
 		
 //		new MegaTest(getMegaApi()).start();
@@ -364,7 +340,6 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 			}
 			else{
 				megaChatApi = new MegaChatApiAndroid(megaApi);
-				megaChatApi.addChatListener(this);
 				megaChatApi.addChatRequestListener(this);
 			}
 		}
@@ -375,7 +350,6 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 	public void disableMegaChatApi(){
 		try {
 			if (megaChatApi != null) {
-				megaChatApi.removeChatListener(this);
 				megaChatApi.removeChatRequestListener(this);
 			}
 		}
@@ -468,14 +442,6 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 		return chatConnection;
 	}
 
-	public static long getFirstTs() {
-		return firstTs;
-	}
-
-	public static void setFirstTs(long firstTs) {
-		MegaApplication.firstTs = firstTs;
-	}
-
 	public static void activityResumed() {
 		log("activityResumed()");
 		activityVisible = true;
@@ -487,13 +453,9 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 	}
 
 	private static boolean activityVisible = false;
-	private static boolean previousActivityVisible = false;
 	private static boolean isLoggingIn = false;
 	private static boolean firstConnect = true;
 	private static boolean chatConnection = false;
-	private static boolean recentChatsFragmentVisible = false;
-	public static boolean isFireBaseConnection = false;
-	private static long firstTs = -1;
 
 	private static long openChatId = -1;
 
@@ -503,10 +465,6 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 
 	public static void setLoggingIn(boolean loggingIn) {
 		isLoggingIn = loggingIn;
-	}
-
-	public static void setRecentChatsFragmentVisible(boolean recentChatsFragmentVisible){
-		MegaApplication.recentChatsFragmentVisible = recentChatsFragmentVisible;
 	}
 
 	public static void setOpenChatId(long openChatId){
@@ -841,185 +799,6 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 		return defaultAvatar;
 	}
 
-	@Override
-	public void onChatListItemUpdate(MegaChatApiJava api, MegaChatListItem item) {
-
-		if(item==null){
-			log("onChatListItemUpdate: item is NULL --> return");
-		}
-
-		log("onChatListItemUpdate: "+item.getTitle()+ " chat id: "+item.getChatId());
-		if (megaApi == null){
-			megaApi = getMegaApi();
-		}
-
-		if (megaChatApi == null){
-			megaChatApi = getMegaChatApi();
-		}
-
-		log("Unread count is: "+item.getUnreadCount());
-
-		if (item.hasChanged(MegaChatListItem.CHANGE_TYPE_LAST_MSG) && (item.getUnreadCount() != 0)){
-
-			try {
-				if(isFireBaseConnection){
-					log("Show notification ALWAYS");
-					showNotification(item);
-					firstTs=-1;
-					isFireBaseConnection=false;
-				}
-				else{
-					if (activityVisible){
-						log("Activity Visible is TRUE");
-						if (!recentChatsFragmentVisible) {
-							log("NOt recentFragment visible");
-
-							if (item.getLastMessageSender() != megaChatApi.getMyUserHandle()) {
-								if (openChatId != item.getChatId()) {
-									if (isFirstConnect()) {
-										log("onChatListItemUpdateMegaApplication. FIRSTCONNECT " + item.getTitle() + "Unread count: " + item.getUnreadCount() + " hasChanged(CHANGE_TYPE_UNREAD_COUNT): " + item.hasChanged(MegaChatListItem.CHANGE_TYPE_UNREAD_COUNT) + " hasChanged(CHANGE_TYPE_LAST_TS):" + item.hasChanged(MegaChatListItem.CHANGE_TYPE_LAST_TS));
-									} else {
-										log("onChatListItemUpdateMegaApplication. NOTFIRSTCONNECT " + item.getTitle() + "Unread count: " + item.getUnreadCount() + " hasChanged(CHANGE_TYPE_UNREAD_COUNT): " + item.hasChanged(MegaChatListItem.CHANGE_TYPE_UNREAD_COUNT) + " hasChanged(CHANGE_TYPE_LAST_TS):" + item.hasChanged(MegaChatListItem.CHANGE_TYPE_LAST_TS));
-
-										if (firstTs == -1) {
-											log("First TS is -1 -- SHOW NOTIF");
-											showNotification(item);
-										} else {
-
-											MegaChatMessage lastMessage = megaChatApi.getMessage(item.getChatId(), item.getLastMessageId());
-											if (lastMessage != null) {
-												if (firstTs > lastMessage.getTimestamp()) {
-													log("DO NOT SHOW NOTIF - FirstTS when logging " + firstTs + " > last message timestamp: " + lastMessage.getTimestamp());
-												} else {
-													log("FirstTS when logging " + firstTs + " < last message timestamp: " + lastMessage.getTimestamp());
-													showNotification(item);
-													firstTs = -1;
-												}
-											}
-										}
-									}
-								}
-							}
-						}
-					}
-//					else{
-//						log("In section chat");
-//						if ((openChatId!=-1)&&(openChatId != item.getChatId())) {
-//							showNotification(item);
-//						}
-//					}
-				}
-			}
-			catch (Exception e){
-				log("Exception when trying to show chat notification");
-			}
-
-		}
-	}
-
-	public void showNotification(MegaChatListItem item){
-		log("showNotification: "+item.getTitle()+ " message: "+item.getLastMessage());
-
-		if (megaChatApi == null){
-			megaChatApi = getMegaChatApi();
-		}
-
-		ChatSettings chatSettings = dbH.getChatSettings();
-		String email = megaChatApi.getContactEmail(item.getPeerHandle());
-
-		if(chatSettings!=null){
-			if(chatSettings.getNotificationsEnabled().equals("true")){
-				log("Notifications ON for all chats");
-
-				ChatItemPreferences chatItemPreferences = dbH.findChatPreferencesByHandle(String.valueOf(item.getChatId()));
-
-				if(chatItemPreferences==null){
-					log("No preferences for this item");
-					String soundString = chatSettings.getNotificationsSound();
-					Uri uri = Uri.parse(soundString);
-					log("Uri: "+uri);
-
-					if(soundString.equals("true")||soundString.equals("")){
-
-						Uri defaultSoundUri2 = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-						notificationBuilder.sendBundledNotification(defaultSoundUri2, item, chatSettings.getVibrationEnabled(), email);
-					}
-					else if(soundString.equals("-1")){
-						log("Silent notification");
-						notificationBuilder.sendBundledNotification(null, item, chatSettings.getVibrationEnabled(), email);
-					}
-					else{
-						Ringtone sound = RingtoneManager.getRingtone(this, uri);
-						if(sound==null){
-							log("Sound is null");
-							notificationBuilder.sendBundledNotification(null, item, chatSettings.getVibrationEnabled(), email);
-						}
-						else{
-							notificationBuilder.sendBundledNotification(uri, item, chatSettings.getVibrationEnabled(), email);
-						}
-					}
-				}
-				else{
-					log("Preferences FOUND for this item");
-					if(chatItemPreferences.getNotificationsEnabled().equals("true")){
-						log("Notifications ON for this chat");
-						String soundString = chatItemPreferences.getNotificationsSound();
-						Uri uri = Uri.parse(soundString);
-						log("Uri: "+uri);
-
-						if(soundString.equals("true")){
-
-							Uri defaultSoundUri2 = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-							notificationBuilder.sendBundledNotification(defaultSoundUri2, item, chatSettings.getVibrationEnabled(), email);
-						}
-						else if(soundString.equals("-1")){
-							log("Silent notification");
-							notificationBuilder.sendBundledNotification(null, item, chatSettings.getVibrationEnabled(), email);
-						}
-						else{
-							Ringtone sound = RingtoneManager.getRingtone(this, uri);
-							if(sound==null){
-								log("Sound is null");
-								notificationBuilder.sendBundledNotification(null, item, chatSettings.getVibrationEnabled(), email);
-							}
-							else{
-								notificationBuilder.sendBundledNotification(uri, item, chatSettings.getVibrationEnabled(), email);
-
-							}
-						}
-					}
-					else{
-						log("Notifications OFF for this chats");
-					}
-				}
-			}
-			else{
-				log("Notifications OFF");
-			}
-		}
-		else{
-			log("Notifications DEFAULT ON");
-
-			Uri defaultSoundUri2 = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-			notificationBuilder.sendBundledNotification(defaultSoundUri2, item, "true", email);
-		}
-	}
-
-	@Override
-	public void onChatInitStateUpdate(MegaChatApiJava api, int newState) {
-		log("onChatInitStateUpdate");
-	}
-
-	@Override
-	public void onChatOnlineStatusUpdate(MegaChatApiJava api, long userhandle, int status, boolean inProgress) {
-		log("onChatOnlineStatusUpdate");
-	}
-
-	@Override
-	public void onChatPresenceConfigUpdate(MegaChatApiJava api, MegaChatPresenceConfig config) {
-		log("onChatPresenceConfigUpdate");
-	}
-
 	public void sendSignalPresenceActivity(){
 		log("sendSignalPresenceActivity");
 		if(Util.isChatEnabled()){
@@ -1051,7 +830,6 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 			log("CHAT_TYPE_LOGOUT: " + e.getErrorCode() + "__" + e.getErrorString());
 			try{
 				if (megaChatApi != null){
-					megaChatApi.removeChatListener(this);
 					megaChatApi.removeChatRequestListener(this);
 				}
 			}

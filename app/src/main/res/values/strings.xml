@@ -2,9 +2,9 @@
 <resources>
 
     <string name="app_name" context="Not translate">MEGA</string>
-    <string name="app_version" context="Not translate">3.2.6 (161)</string>
-    <string name="sdk_version" context="Not translate">d139b75</string>
-    <string name="karere_version" context="Not translate">3669512</string>
+    <string name="app_version" context="Not translate">3.2.6.2 (166)</string>
+    <string name="sdk_version" context="Not translate">9aad11f</string>
+    <string name="karere_version" context="Not translate">d2156d1</string>
     <!--
     <string name="full_description_text" context="Full description text of the app in the Google Play page of the app">MEGA is a secure cloud storage service that gives you 50 GB free storage space. Unlike other cloud storage providers, your data is encrypted and decrypted by your client devices only and never by us.\nUpload your files from your smartphone or tablet then search, store, download, stream, view, share, rename or delete your files any time, from any device, anywhere. Share folders with your contacts and see their updates in real time.\nThe encryption process means we cannot access or reset your password so you MUST remember it (unless you have your Master Key backed up) or you will lose access to your stored files.\nInside the app you can upgrade your storage space and transfer quota quota with a monthly or yearly subscription.\nPRO LITE subscription: 4.99 € per month or 49.99 € per year gives you 200 GB of storage space and 1 TB of transfer quota per month.\nPRO I subscription: 9.99 € per month or 99.99 € per year gives you 500 GB of storage space and 2 TB of transfer quota per month.\nPRO II subscription: 19.99 € per month or 199.99 € per year gives you 2 TB of storage space and 4 TB of transfer quota per month.\nPRO III subscription: 29.99 € per month or 299.99 € per year gives you 4 TB of storage space and 8 TB of transfer quota per month.\nSubscriptions are renewed automatically for successive subscription periods of the same duration and at the same price as the initial period chosen. To manage your subscriptions, simply click on the Play Store icon on your handset, sign in with your Google ID (if you haven\'t already done so) and then click on the MEGA app. You\'ll be able to manage your subscription there.\nFor more info, please check our website: \n https://mega.nz/mobile_terms.html \n https://mega.nz/mobile_privacy.html \nNew Terms of Service apply effective from 20 February 2016. See https://mega.nz/TermsOfService2016.pdf \n Note: For desktop access to your files Mega needs to use HTML5 compatible browsers to handle our advanced features. We recommend Mozilla Firefox and Google Chrome. However the mobile versions of browsers cannot access the Mega cloud storage system.</string>
     -->
@@ -1594,7 +1594,7 @@
 
     <string name="settings_help" context="Settings category title for Help">Help</string>
     <string name="settings_help_preference" context="Settings preference title for send feedback">Send Feedback</string>
-    <string name="setting_feedback_subject" context="mail subject">Feedback</string>
+    <string name="setting_feedback_subject" context="mail subject">Android feedback</string>
     <string name="setting_feedback_body" context="mail body">Please, write your feedback here:</string>
     <string name="settings_feedback_body_device_model" context="mail body">Device model</string>
     <string name="settings_feedback_body_android_version" context="mail body">Android version</string>
@@ -1619,6 +1619,10 @@
 
     <string name="general_attach" context="name of the button to attach file from MEGA to another app">Attach</string>
 
+    <string name="type_contact" context="when add or share a file with a new contact, it can type by name or mail">Contact\'s name or email</string>
+
+    <string name="max_add_contact" context="when add or share a file with a new contact, message displayed to warn that the maximum number has been reached">No more contacts can be added at a time</string>
+
     <string name="old_and_new_passwords_equals" context="when changing the password , the old password and new password are equals">Passwords cannot be the same</string>
 
     <string name="action_search_by_date" context="Menu item">Search by date</string>
@@ -1630,5 +1634,8 @@
     <string name="label_set_period" context="title of a Search by period tag">Set period</string>
     <string name="snackbar_search_by_date" context="the user can't choose this date">Date required is not valid</string>
 
+    <string name="user_account_feedback" context="Label to include info of the user email in the feedback form">User account</string>
+
+    <string name="invalid_characters" context="Error when the user writes a character not allowed">Characters not allowed</string>
 
 </resources>
