@@ -34,6 +34,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
@@ -599,6 +600,34 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 						pdfIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 						pdfIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 						startActivity(pdfIntent);
+					}
+					else if (MimeTypeList.typeForName(currentFile.getName()).isVideo()) {
+						log("Video file");
+
+						Intent videoIntent = new Intent(this, AudioVideoPlayerLollipop.class);
+						videoIntent.putExtra("HANDLE", currentDocument.getHandle());
+						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+							videoIntent.setDataAndType(FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
+						}
+						else{
+							videoIntent.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
+						}
+						videoIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+						startActivity(videoIntent);
+					}
+					else if (MimeTypeList.typeForName(currentFile.getName()).isAudio()) {
+						log("Audio file");
+
+						Intent audioIntent = new Intent(this, AudioVideoPlayerLollipop.class);
+						audioIntent.putExtra("HANDLE", currentDocument.getHandle());
+						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+							audioIntent.setDataAndType(FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
+						}
+						else{
+							audioIntent.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
+						}
+						audioIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+						startActivity(audioIntent);
 					}
 					else if (MimeTypeList.typeForName(currentFile.getName()).isDocument()) {
 						log("Download is document");

@@ -2,6 +2,7 @@ package mega.privacy.android.app.lollipop.managerSections;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -9,6 +10,7 @@ import android.content.res.Resources;
 import android.media.Image;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.ActivityManagerCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
@@ -45,13 +47,13 @@ import mega.privacy.android.app.CameraSyncService;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
-import mega.privacy.android.app.MegaStreamingService;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.CustomizedGridLayoutManager;
 import mega.privacy.android.app.components.CustomizedGridRecyclerView;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.components.scrollBar.FastScroller;
+import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop.DrawerItem;
@@ -74,6 +76,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 
 	Context context;
 	ActionBar aB;
+	LinearLayout linearLayoutRecycler;
 	RecyclerView recyclerView;
 	FastScroller fastScroller;
 
@@ -525,6 +528,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			log("isList");
 			View v = inflater.inflate(R.layout.fragment_filebrowserlist, container, false);
 
+			linearLayoutRecycler = (LinearLayout) v.findViewById(R.id.linear_layout_recycler);
 			recyclerView = (RecyclerView) v.findViewById(R.id.file_list_view_browser);
 			fastScroller = (FastScroller) v.findViewById(R.id.fastscroll);
 
@@ -700,12 +704,13 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 				String progressText = getResources().getQuantityString(R.plurals.text_number_transfers, totalTransfers, inProgress, totalTransfers);
 				transfersNumberText.setText(progressText);
 
-				RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) recyclerView.getLayoutParams();
+				RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) linearLayoutRecycler.getLayoutParams();
 				params.addRule(RelativeLayout.BELOW, transfersOverViewLayout.getId());
-				recyclerView.setLayoutParams(params);
+				linearLayoutRecycler.setLayoutParams(params);
 			}
 			else{
 				log("NO TRANSFERS in progress");
+
 				if (adapter.getItemCount() == 0){
 					contentTextLayout.setVisibility(View.GONE);
 				}
@@ -717,9 +722,10 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 				dotsOptionsTransfersLayout.setOnClickListener(null);
 				actionLayout.setOnClickListener(null);
 
-				//RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) recyclerView.getLayoutParams();
-				//params.addRule(RelativeLayout.BELOW, contentTextLayout.getId());
-				//recyclerView.setLayoutParams(params);
+				RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) linearLayoutRecycler.getLayoutParams();
+				params.addRule(RelativeLayout.BELOW, contentTextLayout.getId());
+				linearLayoutRecycler.setLayoutParams(params);
+
 			}
 		}
 		else{
@@ -842,22 +848,32 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 				}
 				else if (MimeTypeList.typeForName(nodes.get(position).getName()).isVideo() || MimeTypeList.typeForName(nodes.get(position).getName()).isAudio() ){
 					MegaNode file = nodes.get(position);
-					Intent service = new Intent(context, MegaStreamingService.class);
-					context.startService(service);
-					String fileName = file.getName();
-					try {
-						fileName = URLEncoder.encode(fileName, "UTF-8").replaceAll("\\+", "%20");
-					}
-					catch (UnsupportedEncodingException e) {
-						e.printStackTrace();
+
+					if (megaApi.httpServerIsRunning() == 0) {
+						megaApi.httpServerStart();
 					}
 
-					String url = "http://127.0.0.1:4443/" + file.getBase64Handle() + "/" + fileName;
+					ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
+					ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+					activityManager.getMemoryInfo(mi);
+
+					if(mi.totalMem>Constants.BUFFER_COMP){
+						log("Total mem: "+mi.totalMem+" allocate 32 MB");
+						megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
+					}
+					else{
+						log("Total mem: "+mi.totalMem+" allocate 16 MB");
+						megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
+					}
+
+					String url = megaApi.httpServerGetLocalLink(file);
 					String mimeType = MimeTypeList.typeForName(file.getName()).getType();
-					System.out.println("FILENAME: " + fileName);
+					log("FILENAME: " + file.getName() + "TYPE: "+mimeType);
 
-					Intent mediaIntent = new Intent(Intent.ACTION_VIEW);
+					//Intent mediaIntent = new Intent(Intent.ACTION_VIEW);
+					Intent mediaIntent = new Intent(context, AudioVideoPlayerLollipop.class);
 					mediaIntent.setDataAndType(Uri.parse(url), mimeType);
+					mediaIntent.putExtra("HANDLE", file.getHandle());
 					if (MegaApiUtils.isIntentAvailable(context, mediaIntent)){
 						startActivity(mediaIntent);
 					}
