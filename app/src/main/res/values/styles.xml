@@ -225,6 +225,4 @@
         <!--<item name="android:textStyle"></item>-->
         <item name="android:textColor">@android:color/white</item>
     </style>
-
-
 </resources>
