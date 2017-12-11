@@ -8,6 +8,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
+import android.graphics.PorterDuff;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -22,6 +23,8 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.GestureDetector;
@@ -33,6 +36,7 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
@@ -52,6 +56,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Stack;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
@@ -142,7 +148,9 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	private ActionMode actionMode;
 	
 	private AlertDialog newFolderDialog;
-	
+
+	String regex = "[*|\\?:\"<>\\{\\}\\[\\]\\\\\\/]";
+
 	public class RecyclerViewOnGestureListener extends SimpleOnGestureListener{
 
 	    public void onLongPress(MotionEvent e) {
@@ -917,38 +925,109 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 			}
 		}
 	}
+
 	
 	public void showNewFolderDialog(){
 		log("showNewFolderDialog");
-		
-		LinearLayout layout = new LinearLayout(this);
-	    layout.setOrientation(LinearLayout.VERTICAL);
-	    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-	    params.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleWidthPx(20, outMetrics), Util.scaleWidthPx(17, outMetrics), 0);
 
-	    final EditText input = new EditText(this);
-	    layout.addView(input, params);		
-		
+		LinearLayout layout = new LinearLayout(this);
+		layout.setOrientation(LinearLayout.VERTICAL);
+		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+		params.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleWidthPx(20, outMetrics), Util.scaleWidthPx(17, outMetrics), 0);
+
+		final EditText input = new EditText(this);
+		layout.addView(input, params);
+
+		LinearLayout.LayoutParams params1 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+		params1.setMargins(Util.scaleWidthPx(20, outMetrics), 0, Util.scaleWidthPx(17, outMetrics), 0);
+
+		final RelativeLayout error_layout = new RelativeLayout(FileStorageActivityLollipop.this);
+		layout.addView(error_layout, params1);
+
+		final ImageView error_icon = new ImageView(FileStorageActivityLollipop.this);
+		error_icon.setImageDrawable(FileStorageActivityLollipop.this.getResources().getDrawable(R.drawable.ic_input_warning));
+		error_layout.addView(error_icon);
+		RelativeLayout.LayoutParams params_icon = (RelativeLayout.LayoutParams) error_icon.getLayoutParams();
+
+
+		params_icon.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+		error_icon.setLayoutParams(params_icon);
+
+		error_icon.setColorFilter(ContextCompat.getColor(FileStorageActivityLollipop.this, R.color.login_warning));
+
+		final TextView textError = new TextView(FileStorageActivityLollipop.this);
+		error_layout.addView(textError);
+		RelativeLayout.LayoutParams params_text_error = (RelativeLayout.LayoutParams) textError.getLayoutParams();
+		params_text_error.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+		params_text_error.width = ViewGroup.LayoutParams.WRAP_CONTENT;
+		params_text_error.addRule(RelativeLayout.CENTER_VERTICAL);
+		params_text_error.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+		params_text_error.setMargins(Util.scaleWidthPx(3, outMetrics), 0,0,0);
+		textError.setLayoutParams(params_text_error);
+
+		textError.setTextColor(ContextCompat.getColor(FileStorageActivityLollipop.this, R.color.login_warning));
+		error_layout.setVisibility(View.GONE);
+
+		input.getBackground().mutate().clearColorFilter();
+		input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
+		input.addTextChangedListener(new TextWatcher() {
+			@Override
+			public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+			}
+
+			@Override
+			public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+			}
+
+			@Override
+			public void afterTextChanged(Editable editable) {
+				if(error_layout.getVisibility() == View.VISIBLE){
+					error_layout.setVisibility(View.GONE);
+					input.getBackground().mutate().clearColorFilter();
+					input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
+				}
+			}
+		});
+
 		input.setSingleLine();
 		input.setTextColor(getResources().getColor(R.color.text_secondary));
 		input.setHint(getString(R.string.context_new_folder_name));
-//		input.setSelectAllOnFocus(true);
 		input.setImeOptions(EditorInfo.IME_ACTION_DONE);
 		input.setOnEditorActionListener(new OnEditorActionListener() {
 			@Override
 			public boolean onEditorAction(TextView v, int actionId,KeyEvent event) {
 				if (actionId == EditorInfo.IME_ACTION_DONE) {
 					String value = v.getText().toString().trim();
+
 					if (value.length() == 0) {
-						return true;
+						input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+						textError.setText(getString(R.string.invalid_string));
+						error_layout.setVisibility(View.VISIBLE);
+						input.requestFocus();
+
+					}else{
+						boolean result=matches(regex, value);
+						if(result){
+							input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+							textError.setText(getString(R.string.invalid_characters));
+							error_layout.setVisibility(View.VISIBLE);
+							input.requestFocus();
+
+						}else{
+							createFolder(value);
+							newFolderDialog.dismiss();
+						}
 					}
-					createFolder(value);
-					newFolderDialog.dismiss();
 					return true;
 				}
 				return false;
 			}
 		});
+
+
+
 		input.setImeActionLabel(getString(R.string.general_create),KeyEvent.KEYCODE_ENTER);
 		input.setOnFocusChangeListener(new View.OnFocusChangeListener() {
 			@Override
@@ -975,6 +1054,36 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		builder.setView(layout);
 		newFolderDialog = builder.create();
 		newFolderDialog.show();
+
+		newFolderDialog.getButton(android.support.v7.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener(new   View.OnClickListener()
+		{
+			@Override
+			public void onClick(View v)
+			{
+				String value = input.getText().toString().trim();
+				if (value.length() == 0) {
+					input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+					textError.setText(getString(R.string.invalid_string));
+					error_layout.setVisibility(View.VISIBLE);
+					input.requestFocus();
+
+				}else{
+					boolean result=matches(regex, value);
+					if(result){
+						input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+						textError.setText(getString(R.string.invalid_characters));
+						error_layout.setVisibility(View.VISIBLE);
+						input.requestFocus();
+
+					}else{
+						createFolder(value);
+						newFolderDialog.dismiss();
+					}
+				}
+
+
+			}
+		});
 	}
 	
 	/*
@@ -1001,6 +1110,12 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		newFolder.setExecutable(true, false);
 		setFiles(path);
 	}
+
+	public static boolean matches(String regex, CharSequence input) {
+		Pattern p = Pattern.compile(regex);
+		Matcher m = p.matcher(input);
+		return m.find();
+	}
 	
 	public static void log(String message) {
 		Util.log("FileStorageActivityLollipop", message);
@@ -1008,39 +1123,31 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 
 	@Override
 	public boolean onDown(MotionEvent e) {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
 	public void onShowPress(MotionEvent e) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
 	public boolean onSingleTapUp(MotionEvent e) {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
 	public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX,
 			float distanceY) {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
 	public void onLongPress(MotionEvent e) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
 	public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
 			float velocityY) {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
@@ -1052,13 +1159,9 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 
 	@Override
 	public void onRequestDisallowInterceptTouchEvent(boolean arg0) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
 	public void onTouchEvent(RecyclerView arg0, MotionEvent arg1) {
-		// TODO Auto-generated method stub
-		
 	}
 }
