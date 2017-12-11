@@ -14661,7 +14661,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		Calendar calTo = Calendar.getInstance();
 
 		if(searchByDate[0] == 1){
-			log("search by DAY");
+			log("option day");
 			cal.setTimeInMillis(searchByDate[1]);
 			int selectedYear = cal.get(Calendar.YEAR);
 			int selectedMonth = (cal.get(Calendar.MONTH) + 1);
@@ -14694,7 +14694,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 			if(searchByDate[2] == 1){
 
-				log("search by LAST MONTH");
+				log("option last month");
 				int selectedDay = cal.get(Calendar.DAY_OF_MONTH);
 				int selectedMonth = (cal.get(Calendar.MONTH) + 1);
 				int selectedYear = cal.get(Calendar.YEAR);
@@ -14737,9 +14737,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				cuFL.setNodes(nodesResult);
 
 			}else if(searchByDate[2] == 2){
-				log("*search by LAST YEAR");
+				log("option last year");
 
-				//LAST YEAR
 				int selectedYear = (cal.get(Calendar.YEAR) - 1);
 
 				//Title
@@ -14760,7 +14759,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 
 		}else if(searchByDate[0] == 3){
-			log("option PERIOD");
+			log("option period");
 
 			cal.setTimeInMillis(searchByDate[3]);
 			int selectedYearFrom = cal.get(Calendar.YEAR);
@@ -14830,7 +14829,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					nodesResult.add(node);
 				}
 			}
-
 			cuFL.setNodes(nodesResult);
 		}
 	}
