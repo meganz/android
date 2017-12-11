@@ -187,6 +187,8 @@ if [ "$1" == "clean" ]; then
     rm -rf ${SODIUM}/${SODIUM}
     rm -rf ${LIBUV}/${LIBUV_SOURCE_FOLDER}
     rm -rf ${LIBUV}/${LIBUV}
+    rm -rf ${LIBWEBSOCKETS}/${LIBWEBSOCKETS_SOURCE_FOLDER}
+    rm -rf ${LIBWEBSOCKETS}/${LIBWEBSOCKETS}
     rm -rf ${PDFVIEWER}/${PDFVIEWER}
 
     echo "* Deleting tarballs"
@@ -203,6 +205,8 @@ if [ "$1" == "clean" ]; then
     rm -rf ${SODIUM}/${SODIUM_SOURCE_FILE}.ready
     rm -rf ${LIBUV}/${LIBUV_SOURCE_FILE}
     rm -rf ${LIBUV}/${LIBUV_SOURCE_FILE}.ready
+    rm -rf ${LIBWEBSOCKETS}/${LIBWEBSOCKETS_SOURCE_FILE}
+    rm -rf ${LIBWEBSOCKETS}/${LIBWEBSOCKETS_SOURCE_FILE}.ready
 
     echo "* Deleting object files"
     rm -rf ../obj/local/armeabi-v7a/	
