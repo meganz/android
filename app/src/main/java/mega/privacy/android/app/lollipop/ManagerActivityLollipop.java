@@ -6010,7 +6010,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 									cuFL.setNodes(nodes);
 									aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 									setFirstNavigationLevel(true);
-									aB.setTitle(getString(R.string.section_shared_items));
 									aB.setTitle(getString(R.string.section_photo_sync));
 								}
 								return true;
@@ -6018,6 +6017,21 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 						}
 
+					}else if (drawerItem == DrawerItem.MEDIA_UPLOADS){
+						if (muFLol != null){
+							if(muFLol.isAdded()){
+								long cameraUploadHandle = muFLol.getPhotoSyncHandle();
+								MegaNode nps = megaApi.getNodeByHandle(cameraUploadHandle);
+								if (nps != null){
+									ArrayList<MegaNode> nodes = megaApi.getChildren(nps, MegaApiJava.ORDER_MODIFICATION_DESC);
+									muFLol.setNodes(nodes);
+									aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+									setFirstNavigationLevel(true);
+									aB.setTitle(getString(R.string.section_secondary_media_uploads));
+								}
+								return true;
+							}
+						}
 					}
 		    		else if (drawerItem == DrawerItem.SAVED_FOR_OFFLINE){
 		    			if (oFLol != null){
@@ -7945,6 +7959,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		else if (drawerItem == DrawerItem.CAMERA_UPLOADS){
 			if (cuFL != null){
     			if (cuFL.onBackPressed() == 0){
+
     				drawerItem = DrawerItem.CLOUD_DRIVE;
     				if (nV != null){
 						Menu nVMenu = nV.getMenu();

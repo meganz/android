@@ -1743,31 +1743,26 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	}
 
 	public int onBackPressed(){
-//		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
-		if (((ManagerActivityLollipop)context).isListCameraUploads()){
-			if (adapterList != null){
-				if (adapterList.isMultipleSelect()){
-					//hideMultipleSelect();
-					clearSelections();
-					return 2;
-				}
+		log("onBackPressed");
+		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
+
+		if(((ManagerActivityLollipop)context).isFirstNavigationLevel() == true){
+			return 0;
+		}else{
+			long cameraUploadHandle = getPhotoSyncHandle();
+			MegaNode nps = megaApi.getNodeByHandle(cameraUploadHandle);
+			if (nps != null) {
+				ArrayList<MegaNode> nodes = megaApi.getChildren(nps, MegaApiJava.ORDER_MODIFICATION_DESC);
+				setNodes(nodes);
+				aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+				((ManagerActivityLollipop)context).setFirstNavigationLevel(true);
+				aB.setTitle(getString(R.string.section_photo_sync));
+				return 1;
 			}
+			return 0;
 		}
-		else{
-			if (adapterGrid != null){
-				if (adapterGrid.isMultipleSelect()){
-					//adapterGrid.hideMultipleSelect();
-					adapterGrid.clearSelections();
-					return 2;
-				}
-			}
-		}
-		
-		return 0;
 	}
 
-
-	
 	public long getPhotoSyncHandle(){
 
 		if (type == TYPE_CAMERA){
