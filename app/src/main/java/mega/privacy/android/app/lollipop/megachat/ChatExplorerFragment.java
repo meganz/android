@@ -365,7 +365,6 @@ public class ChatExplorerFragment extends Fragment{
     public void onPause() {
         log("onPause");
         lastFirstVisiblePosition = ((LinearLayoutManager)listView.getLayoutManager()).findFirstCompletelyVisibleItemPosition();
-        MegaApplication.setRecentChatsFragmentVisible(false);
         super.onPause();
     }
 
@@ -378,7 +377,6 @@ public class ChatExplorerFragment extends Fragment{
             (listView.getLayoutManager()).scrollToPosition(0);
         }
         lastFirstVisiblePosition=0;
-        MegaApplication.setRecentChatsFragmentVisible(true);
         super.onResume();
     }
 

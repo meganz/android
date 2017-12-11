@@ -2302,6 +2302,11 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
     }
 
+    @Override
+    public void onChatConnectionStateUpdate(MegaChatApiJava api, long chatid, int newState) {
+
+    }
+
     private void setError(final EditText editText, String error){
         if(error == null || error.equals("")){
             return;

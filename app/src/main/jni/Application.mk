@@ -6,7 +6,7 @@ APP_OPTIM := release
 APP_PIE := false
 
 # then enable c++11 extentions in source code
-APP_CPPFLAGS += -std=c++11 -Wno-extern-c-compat
+APP_CPPFLAGS += -std=c++11 -Wno-extern-c-compat -fexceptions -frtti
 # or use APP_CPPFLAGS := -std=gnu++11
 
 DISABLE_WEBRTC = true

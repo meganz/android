@@ -1792,7 +1792,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 
 		}else if (preference.getKey().compareTo(KEY_HELP_SEND_FEEDBACK) == 0){
 
-			String body = getString(R.string.setting_feedback_body)+"\n\n\n\n\n\n\n\n\n\n\n"+getString(R.string.settings_feedback_body_device_model)+"  "+getDeviceName()+"\n"+getString(R.string.settings_feedback_body_android_version)+"  "+Build.VERSION.RELEASE+" "+Build.DISPLAY;
+			String body = getString(R.string.setting_feedback_body)+"\n\n\n\n\n\n\n\n\n\n\n"+getString(R.string.settings_feedback_body_device_model)+"  "+getDeviceName()+"\n"+getString(R.string.settings_feedback_body_android_version)+"  "+Build.VERSION.RELEASE+" "+Build.DISPLAY+"\n"+getString(R.string.user_account_feedback)+"  "+megaApi.getMyEmail();
 			String emailAndroid = Constants.MAIL_ANDROID;
 			String versionApp = (getString(R.string.app_version));
 			String subject = getString(R.string.setting_feedback_subject)+" v"+versionApp;
