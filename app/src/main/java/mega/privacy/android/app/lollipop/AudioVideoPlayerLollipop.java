@@ -1,5 +1,6 @@
 package mega.privacy.android.app.lollipop;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
@@ -16,6 +17,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.Surface;
 import android.view.View;
+import android.view.Window;
 import android.view.WindowManager;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -36,6 +38,8 @@ import com.google.android.exoplayer2.source.ExtractorMediaSource;
 import com.google.android.exoplayer2.source.LoopingMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.source.TrackGroupArray;
+import com.google.android.exoplayer2.source.dash.DashMediaSource;
+import com.google.android.exoplayer2.source.dash.DefaultDashChunkSource;
 import com.google.android.exoplayer2.source.hls.HlsMediaSource;
 import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
@@ -50,6 +54,9 @@ import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
 import com.google.android.exoplayer2.video.VideoRendererEventListener;
+
+import java.net.MalformedURLException;
+import java.net.URL;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeMime;
@@ -76,6 +83,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
     private SimpleExoPlayerView simpleExoPlayerView;
     private SimpleExoPlayer player;
     private Uri uri;
+    private String uriString;
 
     private AppBarLayout appBarLayout;
     private Toolbar tB;
@@ -90,6 +98,10 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
     int countChat = 0;
     int successSent = 0;
     int errorSent = 0;
+
+    private boolean video = false;
+    private boolean loading = true;
+    private ProgressDialog statusDialog = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -115,13 +127,18 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
             return;
         }
 
+        uriString = uri.toString();
+
         appBarLayout = (AppBarLayout) findViewById(R.id.app_bar);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             getWindow().clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
             getWindow().setStatusBarColor(getResources().getColor(R.color.black));
-        }
+       }
+       else {
+           getWindow().setStatusBarColor(getResources().getColor(R.color.black));
+       }
 
         tB = (Toolbar) findViewById(R.id.call_toolbar);
         if (tB == null) {
@@ -139,7 +156,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
         aB.setTitle(getFileName(uri));
 
         audioContainer = (RelativeLayout) findViewById(R.id.audio_container);
-        audioContainer.setVisibility(View.VISIBLE);
+        audioContainer.setVisibility(View.GONE);
 
         handler = new Handler();
 
@@ -191,11 +208,16 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
 
 
         MediaSource mediaSource = new ExtractorMediaSource(uri, dataSourceFactory, extractorsFactory, null, null);
-        //MediaSource mediaSource = new HlsMediaSource(uri, dataSourceFactory, 1, null, null);
+        //MediaSource mediaSource = new HlsMediaSource(uri, dataSourceFactory, handler, null);
+        //DashMediaSource mediaSource = new DashMediaSource(uri, dataSourceFactory, new DefaultDashChunkSource.Factory(dataSourceFactory), null, null);
+
 
         final LoopingMediaSource loopingMediaSource = new LoopingMediaSource(mediaSource);
 
         player.prepare(loopingMediaSource);
+
+        statusDialog = new ProgressDialog(AudioVideoPlayerLollipop.this);
+        statusDialog.setMessage(getString(R.string.general_loading));
 
         player.addListener(new ExoPlayer.EventListener() {
             @Override
@@ -216,6 +238,30 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
             @Override
             public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
                 log("onPlayerStateChanged");
+
+                if (playbackState == ExoPlayer.STATE_BUFFERING){
+                    audioContainer.setVisibility(View.GONE);
+
+                    if (loading){
+                        try {
+                            statusDialog.show();
+                        }
+                        catch(Exception e){
+                            return;
+                        }
+                    }
+                }
+                else {
+                    statusDialog.hide();
+
+                    if (!video) {
+                        audioContainer.setVisibility(View.VISIBLE);
+                    }
+                    else {
+                        audioContainer.setVisibility(View.GONE);
+                    }
+                }
+                log("loading: "+loading);
             }
 
             @Override
@@ -418,6 +464,8 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
     @Override
     public void onVideoEnabled(DecoderCounters counters) {
         log("onVideoEnabled");
+        video = true;
+        loading = false;
         audioContainer.setVisibility(View.GONE);
     }
 
