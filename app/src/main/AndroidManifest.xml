@@ -275,7 +275,6 @@
 
         <activity
             android:name="mega.privacy.android.app.lollipop.SearchByDateActivityLollipop"
-            android:configChanges="screenSize|orientation"
             android:label="@string/action_search_by_date">
         </activity>
 
