@@ -713,7 +713,7 @@ public class PDFView extends RelativeLayout {
                 builder = new AlertDialog.Builder(getContext());
             }
             builder.setCancelable(false);
-            String accept = getResources().getString(R.string.general_accept).toUpperCase();
+            String accept = getResources().getString(R.string.cam_sync_ok).toUpperCase();
             builder.setMessage(R.string.corrupt_pdf_dialog_text)
                     .setPositiveButton(accept, new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int which) {

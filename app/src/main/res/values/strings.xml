@@ -1634,14 +1634,11 @@
     <string name="label_set_period" context="title of a Search by period tag">Set period</string>
     <string name="snackbar_search_by_date" context="the user can't choose this date">Date required is not valid</string>
 
-    <string name="user_account_feedback" context="Label to include info of the user email in the feedback form">User account</string>
-
     <string name="invalid_characters" context="Error when the user writes a character not allowed">Characters not allowed</string>
 
     <string name="audio_play" context="Label shown when audio file is playing">Audio File</string>
 
     <string name="corrupt_pdf_dialog_text" context="when open PDF Viewer, the pdf that it try to open is damaged or does not exist">Error. The pdf file is corrupted or does not exist.</string>
-    <string name="general_accept" context="in any case, a button that contains the value of accepting">Accept</string>
 
     <string name="user_account_feedback" context="Label to include info of the user email in the feedback form">User account</string>
 
