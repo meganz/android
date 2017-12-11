@@ -11015,7 +11015,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					if (nps != null){
 						ArrayList<MegaNode> nodes = megaApi.getChildren(nps, MegaApiJava.ORDER_MODIFICATION_DESC);
 						searchDate(searchByDate, nodes);
-						//cuFL.setNodes(nodes);
 					}
 				}
 			}

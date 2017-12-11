@@ -538,20 +538,6 @@ public class SearchByDateActivityLollipop extends PinActivityLollipop implements
             setResult(RESULT_OK, intent);
             finish();
         }
-
-
-
-//        Calendar cal = Calendar.getInstance();
-//        cal.setTimeInMillis(tsDay);
-//        int year = cal.get(Calendar.YEAR);
-//        int month = cal.get(Calendar.MONTH);
-//        int day = cal.get(Calendar.DAY_OF_MONTH);
-//        log("******OptionSelected 0/1(day)/2(month or year)/3(period) -> "+selectedDate.get(0));
-//        log("******TimeStamp Day: -> "+selectedDate.get(1));
-//        log("******TypeSelected 0/1(month)/2(year) -> "+selectedDate.get(2));
-//        log("******TimeStamp From: -> "+selectedDate.get(3));
-//        log("******TimeStamp To: -> "+selectedDate.get(4));
-
     }
 
 
