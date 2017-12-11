@@ -16,7 +16,8 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.scrollBar.viewprovider.DefaultScrollerViewProvider;
 import mega.privacy.android.app.components.scrollBar.viewprovider.ScrollerViewProvider;
 
-public class FastScroller extends LinearLayout {
+public class FastScroller extends LinearLayout{
+
 
     private static final int STYLE_NONE = -1;
     private final RecyclerViewScrollListener scrollListener = new RecyclerViewScrollListener(this);

@@ -432,6 +432,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
             }
             else{
                 log("currentDir is not a directory");
+
             }
         }
     }
@@ -589,6 +590,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 					if (MimeTypeList.typeForName(currentFile.getName()).isPdf()){
 						log("Pdf file");
 						Intent pdfIntent = new Intent(this, PdfViewerActivityLollipop.class);
+						pdfIntent.putExtra("APP", true);
 						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
 							pdfIntent.setDataAndType(FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
 						}

@@ -49,6 +49,7 @@ import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.MyAccountInfo;
+import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaOfflineLollipopAdapter;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.utils.Constants;
@@ -1087,6 +1088,23 @@ public class OfflineFragmentLollipop extends Fragment{
 						}
 						audioIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 						startActivity(audioIntent);
+          }
+					else if (MimeTypeList.typeForName(currentFile.getName()).isPdf()){
+						log("Pdf file");
+
+						//String localPath = Util.getLocalFile(context, currentFile.getName(), currentFile.get, currentFile.getParent());
+						File pdfFile = new File(currentFile.getAbsolutePath());
+
+						Intent pdfIntent = new Intent(context, PdfViewerActivityLollipop.class);
+						pdfIntent.putExtra("APP", true);
+						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+							pdfIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", pdfFile), MimeTypeList.typeForName(currentFile.getName()).getType());
+						}
+						else{
+							pdfIntent.setDataAndType(Uri.fromFile(pdfFile), MimeTypeList.typeForName(currentFile.getName()).getType());
+						}
+						pdfIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+						context.startActivity(pdfIntent);
 					}
 					else{
 						openFile(currentFile);
