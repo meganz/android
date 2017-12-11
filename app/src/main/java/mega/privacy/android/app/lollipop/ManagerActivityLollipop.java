@@ -99,6 +99,8 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import mega.privacy.android.app.AndroidCompletedTransfer;
 import mega.privacy.android.app.CameraSyncService;
@@ -212,6 +214,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	public long transferCallback = 0;
 
 	boolean chatConnection = false;
+	String regex = "[*|\\?:\"<>\\{\\}\\[\\]\\\\\\/]";
 
 	TransfersBottomSheetDialogFragment transfersBottomSheet = null;
 
@@ -289,6 +292,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 	boolean firstNavigationLevel = true;
     DrawerLayout drawerLayout;
+
+	String values_error = "*/:><?|";
 
 	public enum DrawerItem {
 		CLOUD_DRIVE, SAVED_FOR_OFFLINE, CAMERA_UPLOADS, INBOX, SHARED_ITEMS, CONTACTS, SETTINGS, ACCOUNT, SEARCH, TRANSFERS, MEDIA_UPLOADS, CHAT;
@@ -8206,7 +8211,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 	public void showRenameDialog(final MegaNode document, String text){
 		log("showRenameDialog");
-
 		LinearLayout layout = new LinearLayout(this);
 	    layout.setOrientation(LinearLayout.VERTICAL);
 	    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -8232,6 +8236,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					else{
 						String [] s = document.getName().split("\\.");
 						if (s != null){
+
 							int numParts = s.length;
 							int lastSelectedPos = 0;
 							if (numParts == 1){
@@ -8312,16 +8317,27 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			public boolean onEditorAction(TextView v, int actionId,
 										  KeyEvent event) {
 				if (actionId == EditorInfo.IME_ACTION_DONE) {
+
 					String value = v.getText().toString().trim();
 					if (value.length() == 0) {
 						input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
 						textError.setText(getString(R.string.invalid_string));
 						error_layout.setVisibility(View.VISIBLE);
 						input.requestFocus();
-						return true;
+
+					}else{
+						boolean result=matches(regex, value);
+						if(result){
+							input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+							textError.setText(getString(R.string.invalid_characters));
+							error_layout.setVisibility(View.VISIBLE);
+							input.requestFocus();
+
+						}else{
+							nC.renameNode(document, value);
+							renameDialog.dismiss();
+						}
 					}
-					nC.renameNode(document, value);
-					renameDialog.dismiss();
 					return true;
 				}
 				return false;
@@ -8351,6 +8367,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			public void onClick(View v)
 			{
 				String value = input.getText().toString().trim();
+
 				if (value.length() == 0) {
 					input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
 					textError.setText(getString(R.string.invalid_string));
@@ -8358,11 +8375,26 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					input.requestFocus();
 				}
 				else{
-					nC.renameNode(document, value);
-					renameDialog.dismiss();
+					boolean result=matches(regex, value);
+					if(result){
+						input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+						textError.setText(getString(R.string.invalid_characters));
+						error_layout.setVisibility(View.VISIBLE);
+						input.requestFocus();
+
+					}else{
+						nC.renameNode(document, value);
+						renameDialog.dismiss();
+					}
 				}
 			}
 		});
+	}
+
+	public static boolean matches(String regex, CharSequence input) {
+		Pattern p = Pattern.compile(regex);
+		Matcher m = p.matcher(input);
+		return m.find();
 	}
 
 	public void showGetLinkActivity(long handle){
@@ -9077,14 +9109,24 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				if (actionId == EditorInfo.IME_ACTION_DONE) {
 					String value = v.getText().toString().trim();
 					if (value.length() == 0) {
-						input.getBackground().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+						input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
 						textError.setText(getString(R.string.invalid_string));
 						error_layout.setVisibility(View.VISIBLE);
 						input.requestFocus();
-						return true;
+
+					}else{
+						boolean result=matches(regex, value);
+						if(result){
+							input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+							textError.setText(getString(R.string.invalid_characters));
+							error_layout.setVisibility(View.VISIBLE);
+							input.requestFocus();
+
+						}else{
+							createFolder(value);
+							newFolderDialog.dismiss();
+						}
 					}
-					createFolder(value);
-					newFolderDialog.dismiss();
 					return true;
 				}
 				return false;
@@ -9128,15 +9170,26 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			{
 				String value = input.getText().toString().trim();
 				if (value.length() == 0) {
-					input.getBackground().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+					input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
 					textError.setText(getString(R.string.invalid_string));
 					error_layout.setVisibility(View.VISIBLE);
 					input.requestFocus();
+
+				}else{
+					boolean result=matches(regex, value);
+					if(result){
+						input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+						textError.setText(getString(R.string.invalid_characters));
+						error_layout.setVisibility(View.VISIBLE);
+						input.requestFocus();
+
+					}else{
+						createFolder(value);
+						newFolderDialog.dismiss();
+					}
 				}
-				else{
-					createFolder(value);
-					newFolderDialog.dismiss();
-				}
+
+
 			}
 		});
 	}
