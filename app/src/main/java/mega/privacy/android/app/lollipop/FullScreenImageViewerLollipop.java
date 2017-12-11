@@ -328,7 +328,6 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			}
 
 		}else {
-
 			node = megaApi.getNodeByHandle(imageHandles.get(positionG));
 
 			if(adapterType==Constants.CONTACT_FILE_ADAPTER){
@@ -412,7 +411,6 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 					}
 				}
 			}else{
-
 				if(isFolderLink){
 					propertiesIcon.setVisible(false);
 					menu.findItem(R.id.full_image_viewer_properties).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
@@ -425,6 +423,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 					chatIcon.setVisible(false);
 
 				}else{
+
 					propertiesIcon.setVisible(true);
 					menu.findItem(R.id.full_image_viewer_properties).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
@@ -466,18 +465,23 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 						}
 						renameIcon.setVisible(true);
 						moveIcon.setVisible(true);
+
 						node = megaApi.getNodeByHandle(imageHandles.get(positionG));
+
 						final long handle = node.getHandle();
 						MegaNode parent = megaApi.getNodeByHandle(handle);
+
 						while (megaApi.getParentNode(parent) != null){
 							parent = megaApi.getParentNode(parent);
 						}
 
 						if (parent.getHandle() != megaApi.getRubbishNode().getHandle()){
+
 							moveToTrashIcon.setVisible(true);
 							removeIcon.setVisible(false);
 
 						}else{
+
 							moveToTrashIcon.setVisible(false);
 							removeIcon.setVisible(true);
 							getlinkIcon.setVisible(false);
@@ -1744,8 +1748,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		    public void onClick(DialogInterface dialog, int which) {
 		        switch (which){
 		        case DialogInterface.BUTTON_POSITIVE:
-		        	//TODO remove the outgoing shares
-		    		//Check if the node is not yet in the rubbish bin (if so, remove it)			
+		    		//Check if the node is not yet in the rubbish bin (if so, remove it)
 		    		
 		    		if (moveToRubbish){
 		    			megaApi.moveNode(megaApi.getNodeByHandle(handle), rubbishNode, fullScreenImageViewer);
@@ -1773,6 +1776,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		    			}
 		    			statusDialog = temp;
 		    		}
+
 		        	
 		            break;
 
@@ -1872,6 +1876,8 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 							}
 							viewPager.setCurrentItem(positionG);
 							positionToRemove=-1;
+							supportInvalidateOptionsMenu();
+
 						}
 					}
 				}
