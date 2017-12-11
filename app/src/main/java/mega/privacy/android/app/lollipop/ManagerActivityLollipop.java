@@ -293,8 +293,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	boolean firstNavigationLevel = true;
     DrawerLayout drawerLayout;
 
-	String values_error = "*/:><?|";
-
 	public enum DrawerItem {
 		CLOUD_DRIVE, SAVED_FOR_OFFLINE, CAMERA_UPLOADS, INBOX, SHARED_ITEMS, CONTACTS, SETTINGS, ACCOUNT, SEARCH, TRANSFERS, MEDIA_UPLOADS, CHAT;
 
