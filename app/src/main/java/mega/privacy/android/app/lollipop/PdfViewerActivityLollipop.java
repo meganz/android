@@ -2,6 +2,7 @@ package mega.privacy.android.app.lollipop;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.ContentResolver;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
@@ -12,6 +13,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.OpenableColumns;
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.ActionBar;
@@ -20,6 +22,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.RelativeLayout;
 
 import com.github.barteksc.pdfviewer.PDFView;
 import com.github.barteksc.pdfviewer.listener.OnLoadCompleteListener;
@@ -28,25 +31,37 @@ import com.github.barteksc.pdfviewer.listener.OnPageErrorListener;
 import com.github.barteksc.pdfviewer.scroll.DefaultScrollHandle;
 import com.shockwave.pdfium.PdfDocument;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.UploadService;
+import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
+import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaNode;
 
 public class PdfViewerActivityLollipop extends PinActivityLollipop implements OnPageChangeListener, OnLoadCompleteListener, OnPageErrorListener, View.OnClickListener{
 
+    MegaApplication app = null;
+    MegaApiAndroid megaApi;
+
     PDFView pdfView;
+
+    AppBarLayout appBarLayout;
     Toolbar tB;
     public ActionBar aB;
+
     Uri uri;
     String pdfFileName;
     int pageNumber = 0;
+    boolean inside = false;
+
+    public RelativeLayout uploadContainer;
 
     private MenuItem shareMenuItem;
-
-    public static final String SAMPLE_FILE = "sample.pdf";
 
     @Override
     public void onCreate (Bundle savedInstanceState){
@@ -61,6 +76,11 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
             return;
         }
 
+        Bundle bundle = getIntent().getExtras();
+        if (bundle != null){
+            inside = bundle.getBoolean("APP");
+        }
+
         uri = intent.getData();
         if (uri == null){
             log("uri null");
@@ -68,7 +88,12 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
             return;
         }
 
+        app = (MegaApplication)getApplication();
+        megaApi = app.getMegaApi();
+
         setContentView(R.layout.activity_pdfviewer);
+
+        appBarLayout = (AppBarLayout) findViewById(R.id.app_bar);
 
         tB = (Toolbar) findViewById(R.id.toolbar_pdf_viewer);
         if(tB==null){
@@ -108,6 +133,104 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
 
         setTitle(pdfFileName);
         aB.setTitle(pdfFileName);
+
+        uploadContainer = (RelativeLayout) findViewById(R.id.upload_container_layout_bottom);
+        if (!inside) {
+            uploadContainer.setVisibility(View.VISIBLE);
+        }
+        else {
+            uploadContainer.setVisibility(View.GONE);
+        }
+
+        uploadContainer.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                log("onClick uploadContainer");
+
+                String folderPath = "filepath";
+                MegaNode parentNode = megaApi.getRootNode();
+                //uploadPDF();
+                UploadServiceTask uploadServiceTask = new UploadServiceTask(folderPath, parentNode.getHandle());
+                uploadServiceTask.start();
+
+                backToCloud(parentNode.getHandle());
+                finish();
+            }
+        });
+    }
+
+    private class UploadServiceTask extends Thread {
+
+        String folderPath;
+        long parentHandle;
+
+        UploadServiceTask(String folderPath, long parentHandle){
+            this.folderPath = folderPath;
+            this.parentHandle = parentHandle;
+        }
+
+        @Override
+        public void run(){
+
+            log("Run Upload Service Task");
+
+            MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
+            if (parentNode == null){
+                parentNode = megaApi.getRootNode();
+            }
+
+            try {
+                Thread.sleep(300);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            Intent uploadServiceIntent;
+            uploadServiceIntent = new Intent (PdfViewerActivityLollipop.this, UploadService.class);
+            log("Uri to download " +uri);
+            File pdfFile = new File (uri.getPath());
+
+            uploadServiceIntent.putExtra(UploadService.EXTRA_FILEPATH, pdfFile.getAbsolutePath());
+            uploadServiceIntent.putExtra(UploadService.EXTRA_NAME, pdfFile.getName());
+            log("EXTRA_FILE_PATH_dir:" + pdfFile.getAbsolutePath());
+            log("EXTRA_FOLDER_PATH:" + folderPath);
+            uploadServiceIntent.putExtra(UploadService.EXTRA_FOLDERPATH, folderPath);
+            uploadServiceIntent.putExtra(UploadService.EXTRA_PARENT_HASH, parentNode.getHandle());
+            startService(uploadServiceIntent);
+        }
+    }
+
+    public void uploadPDF () {
+        log("uploadPDF");
+
+        Intent intent = new Intent(getApplicationContext(), UploadService.class);
+        File pdfFile = new File(uri.toString());
+        MegaNode parentNode = megaApi.getRootNode();
+
+        intent.putExtra(UploadService.EXTRA_FILEPATH, pdfFile.getAbsolutePath());
+        intent.putExtra(UploadService.EXTRA_NAME, pdfFile.getName());
+        intent.putExtra(UploadService.EXTRA_PARENT_HASH, parentNode.getHandle());
+        intent.putExtra(UploadService.EXTRA_SIZE, pdfFile.getTotalSpace());
+        startService(intent);
+
+        backToCloud(parentNode.getHandle());
+        finish();
+    }
+
+    public void backToCloud(long handle){
+        log("backToCloud: "+handle);
+        Intent startIntent = new Intent(this, ManagerActivityLollipop.class);
+        if(handle!=-1){
+            startIntent.setAction(Constants.ACTION_OPEN_FOLDER);
+            startIntent.putExtra("PARENT_HANDLE", handle);
+        }
+        startActivity(startIntent);
+    }
+
+    public  void setToolbarVisibilityShow () {
+        aB.show();
+        tB.animate().translationY(0).setDuration(200L).start();
+        uploadContainer.animate().translationY(0).setDuration(200L).start();
     }
 
     public void setToolbarVisibilityHide () {
@@ -119,6 +242,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
                 aB.hide();
             }
         }).start();
+        uploadContainer.animate().translationY(220).setDuration(200L).start();
     }
 
     public void setToolbarVisibility (){
@@ -130,9 +254,11 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
                     aB.hide();
                 }
             }).start();
+            uploadContainer.animate().translationY(220).setDuration(200L).start();
         } else {
             aB.show();
             tB.animate().translationY(0).setDuration(200L).start();
+            uploadContainer.animate().translationY(0).setDuration(200L).start();
         }
     }
 

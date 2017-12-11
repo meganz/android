@@ -1629,4 +1629,6 @@
     <string name="general_accept" context="in any case, a button that contains the value of accepting">Accept</string>
 
     <string name="user_account_feedback" context="Label to include info of the user email in the feedback form">User account</string>
+
+    <string name="save_to_mega" context="Label shown in MEGA pdf-viewer when it open a PDF save in smartphone storage">Save to my \nCloud Drive</string>
 </resources>

@@ -708,7 +708,7 @@ public class PDFView extends RelativeLayout {
             Log.e("PDFView", "load pdf error", t);
             AlertDialog.Builder builder;
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                builder = new AlertDialog.Builder(getContext(), android.R.style.Theme_Material_Dialog_Alert);
+                builder = new AlertDialog.Builder(getContext(), R.style.AppCompatAlertDialogStyle);
             } else {
                 builder = new AlertDialog.Builder(getContext());
             }
@@ -720,7 +720,6 @@ public class PDFView extends RelativeLayout {
                             ((PdfViewerActivityLollipop) getContext()).finish();
                         }
                     })
-                    .setIcon(android.R.drawable.ic_dialog_alert)
                     .show();
         }
     }
