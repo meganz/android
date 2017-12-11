@@ -47,9 +47,8 @@ public class RTFFormatter {
         log("setRTFFormat: "+messageContent);
         formatted = false;
 
-        String noEmojisContent = EmojiParser.removeAllEmojis(messageContent);
-
         if(!messageContent.isEmpty()){
+            String noEmojisContent = EmojiParser.removeAllEmojis(messageContent);
 
             font = Typeface.createFromAsset(context.getAssets(), "font/RobotoMono-Regular.ttf");
 
@@ -244,11 +243,20 @@ public class RTFFormatter {
 //            sbBMultiQuote.append('\n');
 //            substring = sbBMultiQuote.toString();
 
-            ssb.append(substring, new CustomTypefaceSpan("", font));
-
             sb = new StringBuilder(messageContent);
             sb.delete(0, end);
             messageContent = sb.toString();
+
+            if(!messageContent.isEmpty()){
+                if(!messageContent.trim().isEmpty()){
+                    StringBuilder sbBMultiQuote = new StringBuilder(substring+'\n');
+                    substring = sbBMultiQuote.toString();
+                    ssb.append(substring, new CustomTypefaceSpan("", font));
+                }
+            }
+            else{
+                ssb.append(substring, new CustomTypefaceSpan("", font));
+            }
         }
         else{
             log("End position: "+end);
@@ -259,24 +267,35 @@ public class RTFFormatter {
             log("Message content B: "+messageContent);
             substring = messageContent.substring(0, end);
 
-            ssb.append(substring, new CustomTypefaceSpan("", font));
-
             sb = new StringBuilder(messageContent);
             sb.delete(0, end+1);
             messageContent = sb.toString();
 
+            if(!messageContent.isEmpty()){
+                if(!messageContent.trim().isEmpty()){
+                    StringBuilder sbBMultiQuote = new StringBuilder(substring+'\n');
+                    substring = sbBMultiQuote.toString();
+                    ssb.append(substring, new CustomTypefaceSpan("", font));
+                }
+            }
+            else{
+                ssb.append(substring, new CustomTypefaceSpan("", font));
+            }
+
             log("Message content T: "+messageContent);
         }
 
+        setRTFFormat();
+        while(formatted){
+            setRTFFormat();
+        }
         if(!messageContent.isEmpty()){
             log("Append more...");
-            StringBuilder sbBMultiQuote = new StringBuilder(messageContent);
-            sbBMultiQuote.insert(0, '\n');
-            messageContent = sbBMultiQuote.toString();
+//            StringBuilder sbBMultiQuote = new StringBuilder(messageContent);
+//            sbBMultiQuote.insert(0, '\n');
+//            messageContent = sbBMultiQuote.toString();
             ssb.append(messageContent);
-        }
-        else{
-            log("End value: "+end+" messageContent length: "+messageContent.length());
+            messageContent ="";
         }
     }
 
@@ -457,12 +476,14 @@ public class RTFFormatter {
             }
         }
 
-        if(!messageContent.isEmpty()){
-            log("Append more...");
-            ssb.append(messageContent);
+        setRTFFormat();
+        while(formatted){
+            setRTFFormat();
         }
-        else{
-            log("End value: "+end+" messageContent length: "+messageContent.length());
+        if(!messageContent.isEmpty()){
+            log("more to append...");
+            ssb.append(messageContent);
+            messageContent ="";
         }
     }
 
@@ -724,16 +745,16 @@ public class RTFFormatter {
             }
         }
 
-        while(!messageContent.isEmpty()){
-            log("More to append...");
-
-            while(formatted){
-                setRTFFormat();
-            }
-            if(!messageContent.isEmpty()){
-                ssb.append(messageContent);
-            }
+        setRTFFormat();
+        while(formatted){
+            setRTFFormat();
         }
+        if(!messageContent.isEmpty()){
+            log("more to append...");
+            ssb.append(messageContent);
+            messageContent ="";
+        }
+
     }
 
     public SimpleSpanBuilder applyItalicBoldFormat(String subMessageContent){
@@ -1586,12 +1607,14 @@ public class RTFFormatter {
             }
         }
 
-        if(!messageContent.isEmpty()){
-            log("Append more...");
-            ssb.append(messageContent);
+        setRTFFormat();
+        while(formatted){
+            setRTFFormat();
         }
-        else{
-            log("End value: "+end+" messageContent length: "+messageContent.length());
+        if(!messageContent.isEmpty()){
+            log("more to append...");
+            ssb.append(messageContent);
+            messageContent ="";
         }
     }
 
