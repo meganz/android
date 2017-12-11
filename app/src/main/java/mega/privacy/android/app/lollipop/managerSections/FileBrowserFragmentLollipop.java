@@ -53,6 +53,7 @@ import mega.privacy.android.app.components.CustomizedGridLayoutManager;
 import mega.privacy.android.app.components.CustomizedGridRecyclerView;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.components.scrollBar.FastScroller;
+import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop.DrawerItem;
@@ -867,10 +868,12 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 
 					String url = megaApi.httpServerGetLocalLink(file);
 					String mimeType = MimeTypeList.typeForName(file.getName()).getType();
-					log("FILENAME: " + file.getName());
+					log("FILENAME: " + file.getName() + "TYPE: "+mimeType);
 
-					Intent mediaIntent = new Intent(Intent.ACTION_VIEW);
+					//Intent mediaIntent = new Intent(Intent.ACTION_VIEW);
+					Intent mediaIntent = new Intent(context, AudioVideoPlayerLollipop.class);
 					mediaIntent.setDataAndType(Uri.parse(url), mimeType);
+					mediaIntent.putExtra("HANDLE", file.getHandle());
 					if (MegaApiUtils.isIntentAvailable(context, mediaIntent)){
 						startActivity(mediaIntent);
 					}

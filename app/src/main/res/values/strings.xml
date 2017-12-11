@@ -1638,4 +1638,5 @@
 
     <string name="invalid_characters" context="Error when the user writes a character not allowed">Characters not allowed</string>
 
+    <string name="audio_play" context="Label shown when audio file is playing">Audio File</string>
 </resources>

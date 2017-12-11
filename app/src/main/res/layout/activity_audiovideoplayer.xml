@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+	android:fitsSystemWindows="true"
+	android:background="@color/black"
+    android:id="@+id/audiovideoplayer_container">
+
+	<android.support.design.widget.AppBarLayout
+		android:id="@+id/app_bar"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		android:fitsSystemWindows="true"
+		android:background="@color/black">
+
+		<RelativeLayout
+			android:layout_width="match_parent"
+			android:layout_height="match_parent">
+
+			<RelativeLayout
+				android:id="@+id/full_image_viewer_layout"
+				android:layout_width="match_parent"
+				android:layout_height="match_parent"
+				android:background="@color/black">
+
+				<com.google.android.exoplayer2.ui.SimpleExoPlayerView
+					android:id="@+id/player_view"
+					android:focusable="true"
+					android:layout_width="match_parent"
+					android:layout_height="match_parent"/>
+
+
+			</RelativeLayout>
+
+			<android.support.v7.widget.Toolbar
+				android:id="@+id/call_toolbar"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:background="@color/transparent_black"
+				app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+				app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+				android:fitsSystemWindows="true"/>
+
+			<RelativeLayout
+				android:id="@+id/audio_container"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_centerHorizontal="true"
+				android:layout_centerVertical="true">
+
+
+				<ImageView
+					android:id="@+id/audio_imageview"
+					android:layout_width="100dp"
+					android:layout_height="100dp"
+					android:layout_centerHorizontal="true"
+					android:src="@drawable/ic_audiotrack_white"/>
+
+				<TextView
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_below="@id/audio_imageview"
+					android:text="@string/audio_play"
+					android:textStyle="bold"
+					android:textSize="30sp"
+					android:layout_margin="20dp"
+					android:textColor="@color/white"
+					android:layout_centerHorizontal="true"/>
+
+			</RelativeLayout>
+
+		</RelativeLayout>
+
+	</android.support.design.widget.AppBarLayout>
+
+</RelativeLayout>
