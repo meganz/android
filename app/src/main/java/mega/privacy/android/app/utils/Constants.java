@@ -199,4 +199,8 @@ public class Constants {
 	public static int MIN_ITEMS_SCROLLBAR = 30;
 	public static int MIN_ITEMS_SCROLLBAR_GRID = 200;
 
+	public static long BUFFER_COMP = 1073741824;      // 1 GB
+	public static int MAX_BUFFER_16MB = 16777216; // 16 MB
+	public static int MAX_BUFFER_32MB = 33554432; // 32 MB
+
 }
