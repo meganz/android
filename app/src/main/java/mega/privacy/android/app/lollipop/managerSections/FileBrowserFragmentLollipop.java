@@ -74,6 +74,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 
 	Context context;
 	ActionBar aB;
+	LinearLayout linearLayoutRecycler;
 	RecyclerView recyclerView;
 	FastScroller fastScroller;
 
@@ -525,6 +526,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			log("isList");
 			View v = inflater.inflate(R.layout.fragment_filebrowserlist, container, false);
 
+			linearLayoutRecycler = (LinearLayout) v.findViewById(R.id.linear_layout_recycler);
 			recyclerView = (RecyclerView) v.findViewById(R.id.file_list_view_browser);
 			fastScroller = (FastScroller) v.findViewById(R.id.fastscroll);
 
@@ -700,12 +702,13 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 				String progressText = getResources().getQuantityString(R.plurals.text_number_transfers, totalTransfers, inProgress, totalTransfers);
 				transfersNumberText.setText(progressText);
 
-				RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) recyclerView.getLayoutParams();
+				RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) linearLayoutRecycler.getLayoutParams();
 				params.addRule(RelativeLayout.BELOW, transfersOverViewLayout.getId());
-				recyclerView.setLayoutParams(params);
+				linearLayoutRecycler.setLayoutParams(params);
 			}
 			else{
 				log("NO TRANSFERS in progress");
+
 				if (adapter.getItemCount() == 0){
 					contentTextLayout.setVisibility(View.GONE);
 				}
@@ -717,9 +720,10 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 				dotsOptionsTransfersLayout.setOnClickListener(null);
 				actionLayout.setOnClickListener(null);
 
-				//RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) recyclerView.getLayoutParams();
-				//params.addRule(RelativeLayout.BELOW, contentTextLayout.getId());
-				//recyclerView.setLayoutParams(params);
+				RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) linearLayoutRecycler.getLayoutParams();
+				params.addRule(RelativeLayout.BELOW, contentTextLayout.getId());
+				linearLayoutRecycler.setLayoutParams(params);
+
 			}
 		}
 		else{
@@ -842,19 +846,14 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 				}
 				else if (MimeTypeList.typeForName(nodes.get(position).getName()).isVideo() || MimeTypeList.typeForName(nodes.get(position).getName()).isAudio() ){
 					MegaNode file = nodes.get(position);
-					Intent service = new Intent(context, MegaStreamingService.class);
-					context.startService(service);
-					String fileName = file.getName();
-					try {
-						fileName = URLEncoder.encode(fileName, "UTF-8").replaceAll("\\+", "%20");
-					}
-					catch (UnsupportedEncodingException e) {
-						e.printStackTrace();
-					}
 
-					String url = "http://127.0.0.1:4443/" + file.getBase64Handle() + "/" + fileName;
+					if (megaApi.httpServerIsRunning() == 0) {
+						megaApi.httpServerStart();
+					}
+					//					megaApi.httpServerSetMaxBufferSize(16384);
+					String url = megaApi.httpServerGetLocalLink(file);
 					String mimeType = MimeTypeList.typeForName(file.getName()).getType();
-					System.out.println("FILENAME: " + fileName);
+					log("FILENAME: " + file.getName());
 
 					Intent mediaIntent = new Intent(Intent.ACTION_VIEW);
 					mediaIntent.setDataAndType(Uri.parse(url), mimeType);
