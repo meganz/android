@@ -27,6 +27,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.PowerManager;
+import android.os.Vibrator;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
@@ -125,6 +126,7 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
     long milliseconds = 0;
 
     Ringtone ringtone = null;
+    Vibrator vibrator = null;
 
     //my avatar
     RelativeLayout myAvatarLayout;
@@ -369,6 +371,16 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
                     Uri ringtoneUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE);
                     ringtone = RingtoneManager.getRingtone(this, ringtoneUri);
                     ringtone.play();
+                    vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+                    long[] pattern = {0, 1000, 500, 500, 1000};
+                    if (vibrator != null){
+                        if (vibrator.hasVibrator()){
+                            //TODO
+                            //FOR API>=26
+                            //vibrator.vibrate(createWaveform(pattern, 0), USAGE_NOTIFICATION_RINGTONE); ??
+                            vibrator.vibrate(pattern, 0);
+                        }
+                    }
                 }
                 else{
                     log("Outgoing call");
@@ -753,6 +765,12 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
                         ringtone.stop();
                     }
 
+                    if (vibrator != null){
+                        if (vibrator.hasVibrator()){
+                            vibrator.cancel();
+                        }
+                    }
+
                     rtcAudioManager.start(null);
 
                     showInitialFABConfiguration();
@@ -784,6 +802,12 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
 
                     if(ringtone!=null){
                         ringtone.stop();
+                    }
+
+                    if (vibrator != null){
+                        if (vibrator.hasVibrator()) {
+                            vibrator.cancel();
+                        }
                     }
 
                     rtcAudioManager.stop();
