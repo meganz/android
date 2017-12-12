@@ -7,8 +7,10 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
@@ -30,6 +32,7 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -38,13 +41,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
 
+import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.CustomizedGridLayoutManager;
 import mega.privacy.android.app.components.CustomizedGridRecyclerView;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.components.scrollBar.FastScroller;
+import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop.DrawerItem;
@@ -94,6 +100,10 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 	ArrayList<MegaNode> nodes;
 
 	public ActionMode actionMode;
+
+	DatabaseHandler dbH;
+	MegaPreferences prefs;
+	String downloadLocationDefaultPath = Util.downloadDIR;
 
 	public void activateActionMode(){
 		log("activateActionMode");
@@ -375,6 +385,22 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 	public void onCreate (Bundle savedInstanceState){
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
+		}
+
+		dbH = DatabaseHandler.getDbHandler(context);
+		prefs = dbH.getPreferences();
+		if (prefs != null){
+			log("prefs != null");
+			if (prefs.getStorageAskAlways() != null){
+				if (!Boolean.parseBoolean(prefs.getStorageAskAlways())){
+					log("askMe==false");
+					if (prefs.getStorageDownloadLocation() != null){
+						if (prefs.getStorageDownloadLocation().compareTo("") != 0){
+							downloadLocationDefaultPath = prefs.getStorageDownloadLocation();
+						}
+					}
+				}
+			}
 		}
 
 		lastPositionStack = new Stack<>();
@@ -926,8 +952,25 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 					String mimeType = MimeTypeList.typeForName(file.getName()).getType();
 					log("FILENAME: " + file.getName());
 			  		
-			  		Intent mediaIntent = new Intent(Intent.ACTION_VIEW);
-			  		mediaIntent.setDataAndType(Uri.parse(url), mimeType);
+			  		//Intent mediaIntent = new Intent(Intent.ACTION_VIEW);
+					Intent mediaIntent = new Intent(context, AudioVideoPlayerLollipop.class);
+					mediaIntent.putExtra("HANDLE", file.getHandle());
+					mediaIntent.putExtra("FILENAME", file.getName());
+					String localPath = Util.getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
+					if (localPath != null){
+						File mediaFile = new File(localPath);
+						//mediaIntent.setDataAndType(Uri.parse(localPath), mimeType);
+						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+							mediaIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile), MimeTypeList.typeForName(file.getName()).getType());
+						}
+						else{
+							mediaIntent.setDataAndType(Uri.fromFile(mediaFile), MimeTypeList.typeForName(file.getName()).getType());
+						}
+						mediaIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+					}
+					else {
+						mediaIntent.setDataAndType(Uri.parse(url), mimeType);
+					}
 			  		if (MegaApiUtils.isIntentAvailable(context, mediaIntent)){
 			  			context.startActivity(mediaIntent);
 			  		}
