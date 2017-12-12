@@ -32,6 +32,7 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
+import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaChatExplorerAdapter;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaListChatLollipopAdapter;
@@ -236,14 +237,25 @@ public class ChatExplorerFragment extends Fragment{
 
         adapterList.toggleSelection(position);
         List<MegaChatListItem> chats = adapterList.getSelectedChats();
-        if (chats.size() > 0){
-            log("Show FAB button to send");
-            ((ChatExplorerActivity)context).showFabButton(true);
+
+        if(context instanceof  ChatExplorerActivity){
+            if (chats.size() > 0){
+                log("Show FAB button to send");
+                ((ChatExplorerActivity)context).showFabButton(true);
+            }
+            else{
+                ((ChatExplorerActivity)context).showFabButton(false);
+            }
         }
         else{
-            ((ChatExplorerActivity)context).showFabButton(false);
+            if (chats.size() > 0){
+                log("Show FAB button to send");
+                ((FileExplorerActivityLollipop)context).showFabButton(true);
+            }
+            else{
+                ((FileExplorerActivityLollipop)context).showFabButton(false);
+            }
         }
-
     }
     /////END Multiselect/////
 
@@ -399,7 +411,10 @@ public class ChatExplorerFragment extends Fragment{
     }
 
     public long getChatIdFrom(){
-        return ((ChatExplorerActivity)context).chatIdFrom;
+        if(context instanceof  ChatExplorerActivity){
+            return ((ChatExplorerActivity)context).chatIdFrom;
+        }
+        return -1;
     }
 
     private static void log(String log) {
