@@ -12,6 +12,7 @@ import com.vdurmont.emoji.EmojiManager;
 import com.vdurmont.emoji.EmojiParser;
 
 import java.util.List;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import mega.privacy.android.app.components.CustomTypefaceSpan;
@@ -26,6 +27,10 @@ public class RTFFormatter {
     boolean formatted = false;
     boolean recursive = false;
     Typeface font;
+    Pattern pMultiQuote = Pattern.compile("(?<=[\\W\\d]|^)(```)(.*?)(```)(?=[\\W\\d]|$)");
+    Pattern pQuote = Pattern.compile("(?<=[\\W\\d]|^)(`)(.*?)(`)(?=[\\W\\d]|$)");
+    Pattern pItalic = Pattern.compile("(?<=[\\W\\d]|^)(\\_)([^_\\n]*?)(\\_)(?=[\\W\\d]|$)");
+    Pattern pBold = Pattern.compile("(?<=[\\W\\d]|^)(\\*)([^\\s][^*\\n]*?|[^*\\n]*?[^\\s])(\\*)(?=[\\W\\d]|$)");
 
     public boolean isFormatted() {
         return formatted;
@@ -47,40 +52,52 @@ public class RTFFormatter {
         log("setRTFFormat: "+messageContent);
         formatted = false;
 
-        if(!messageContent.isEmpty()){
-            String noEmojisContent = EmojiParser.removeAllEmojis(messageContent);
+        if(!messageContent.isEmpty()) {
 
             font = Typeface.createFromAsset(context.getAssets(), "font/RobotoMono-Regular.ttf");
 
-            boolean  multiquote = Pattern.matches("(.*\\s+)*```.*```(\\s+.*)*[\\?|!|\\.|,|;|:|\\)|%]*", noEmojisContent);
-//                                boolean  italic = Pattern.matches(".*_.*_.*", messageContent);
-            if(multiquote) {
+            Matcher mMultiQuote = pMultiQuote.matcher(messageContent);
 
-                boolean bold = Pattern.matches("(.*\\s+)*\\*.*\\*(\\s+.*)*[\\?|!|\\.|,|;|:|\\)|%]*", noEmojisContent);
-//                                boolean  italic = Pattern.matches(".*_.*_.*", messageContent);
+            if (mMultiQuote != null && mMultiQuote.find()) {
+
+                log("Multiquote found!");
+
                 int startBold = -1;
                 int startMultiquote = -1;
-                if (bold) {
-                    startBold = messageContent.indexOf(("*"));
-                    startMultiquote = messageContent.indexOf(("```"));
-                    if (startMultiquote < startBold) {
-                        applyMultiQuoteFormat();
-                        formatted = true;
-                        return ssb;
+                boolean bold = false;
+                boolean italic = false;
+
+                Matcher mBold = pBold.matcher(messageContent);
+
+                if(mBold!=null){
+                    if(mBold.find()) {
+                        bold = true;
+                        startBold = messageContent.indexOf(("*"));
+                        startMultiquote = messageContent.indexOf(("```"));
+                        if (startMultiquote < startBold) {
+                            applyMultiQuoteFormat();
+                            formatted = true;
+                            return ssb;
+                        }
                     }
                 }
 
-                boolean  italic = Pattern.matches("(.*\\s+)*_.*_(\\s+.*)*[\\?|!|\\.|,|;|:|\\)|%]*", noEmojisContent);
                 int startItalic = -1;
-                if(italic) {
-                    startItalic = messageContent.indexOf(("_"));
-                    startMultiquote = messageContent.indexOf(("```"));
-                    if (startMultiquote < startItalic) {
-                        applyMultiQuoteFormat();
-                        formatted = true;
-                        return ssb;
+
+                Matcher mItalic = pItalic.matcher(messageContent);
+
+                if(mItalic!=null) {
+                    if(mItalic.find()) {
+                        italic = true;
+                        startItalic = messageContent.indexOf(("_"));
+                        startMultiquote = messageContent.indexOf(("```"));
+                        if (startMultiquote < startItalic) {
+                            applyMultiQuoteFormat();
+                            formatted = true;
+                            return ssb;
+                        }
                     }
-                }
+                 }
 
                 if(!bold && !italic){
                     applyMultiQuoteFormat();
@@ -89,33 +106,46 @@ public class RTFFormatter {
                 }
             }
 
-            boolean  quote = Pattern.matches("(.*\\s+)*`.*`(\\s+.*)*[\\?|!|\\.|,|;|:|\\)|%]*", noEmojisContent);
-//                                boolean  italic = Pattern.matches(".*_.*_.*", messageContent);
-            if(quote) {
+            Matcher mQuote = pQuote.matcher(messageContent);
 
-                boolean bold = Pattern.matches("(.*\\s+)*\\*.*\\*(\\s+.*)*[\\?|!|\\.|,|;|:|\\)|%]*", noEmojisContent);
-//                                boolean  italic = Pattern.matches(".*_.*_.*", messageContent);
+            if (mQuote != null && mQuote.find()) {
+
+                log("Quote find!");
+
                 int startBold = -1;
                 int startQuote = -1;
-                if (bold) {
-                    startBold = messageContent.indexOf(("*"));
-                    startQuote = messageContent.indexOf(("`"));
-                    if (startQuote < startBold) {
-                        applyQuoteFormat();
-                        formatted = true;
-                        return ssb;
+                boolean bold = false;
+                boolean italic = false;
+
+                Matcher mBold = pBold.matcher(messageContent);
+
+                if(mBold!=null){
+                    if(mBold.find()) {
+                        bold = true;
+                        startBold = messageContent.indexOf(("*"));
+                        startQuote = messageContent.indexOf(("`"));
+                        if (startQuote < startBold) {
+                            applyQuoteFormat();
+                            formatted = true;
+                            return ssb;
+                        }
                     }
                 }
 
-                boolean  italic = Pattern.matches("(.*\\s+)*_.*_(\\s+.*)*[\\?|!|\\.|,|;|:|\\)|%]*", noEmojisContent);
                 int startItalic = -1;
-                if(italic) {
-                    startItalic = messageContent.indexOf(("_"));
-                    startQuote = messageContent.indexOf(("`"));
-                    if (startQuote < startItalic) {
-                        applyQuoteFormat();
-                        formatted = true;
-                        return ssb;
+
+                Matcher mItalic = pItalic.matcher(messageContent);
+
+                if(mItalic!=null) {
+                    if(mItalic.find()) {
+                        italic = true;
+                        startItalic = messageContent.indexOf(("_"));
+                        startQuote = messageContent.indexOf(("`"));
+                        if (startQuote < startItalic) {
+                            applyQuoteFormat();
+                            formatted = true;
+                            return ssb;
+                        }
                     }
                 }
 
@@ -124,47 +154,67 @@ public class RTFFormatter {
                     formatted = true;
                     return ssb;
                 }
-            }
 
-            boolean  italic = Pattern.matches("(.*\\s+)*_.*_(\\s+.*)*[\\?|!|\\.|,|;|:|\\)|%]*", noEmojisContent);
-//                                boolean  italic = Pattern.matches(".*_.*_.*", messageContent);
-            if(italic) {
-                boolean bold = Pattern.matches("(.*\\s+)*\\*.*\\*(\\s+.*)*[\\?|!|\\.|,|;|:|\\)|%]*", noEmojisContent);
-//                                boolean  italic = Pattern.matches(".*_.*_.*", messageContent);
-                int startBold = -1;
-                int startItalic = -1;
-                if (bold) {
-                    startBold = messageContent.indexOf(("*"));
-                    startItalic = messageContent.indexOf(("_"));
-                    if (startItalic < startBold) {
+            }//
+
+            Matcher mItalic = pItalic.matcher(messageContent);
+
+            if(mItalic!=null) {
+                if(mItalic.find()){
+
+                    Matcher mBold = pBold.matcher(messageContent);
+
+                    int startBold = -1;
+                    int startItalic = -1;
+                    if(mBold!=null){
+                        if(mBold.find()){
+                            startBold = messageContent.indexOf(("*"));
+                            startItalic = messageContent.indexOf(("_"));
+                            if (startItalic < startBold) {
+                                applyItalicFormat();
+                                formatted = true;
+                                return ssb;
+                            }
+                        }
+                        else{
+                            applyItalicFormat();
+                            formatted = true;
+                            return ssb;
+                        }
+                    }
+                    else{
                         applyItalicFormat();
                         formatted = true;
                         return ssb;
                     }
                 }
-                else{
-                    applyItalicFormat();
-                    formatted = true;
-                    return ssb;
-                }
             }
 
             if(!messageContent.isEmpty()){
-                boolean bold = Pattern.matches("(.*\\s+)*\\*.*\\*(\\s+.*)*[\\?|!|\\.|,|;|:|\\)|%]*(\\s+.*)*", noEmojisContent);
+//                boolean bold = Pattern.matches("(?<=[\\W\\d]|^)(\\*)([^\\s][^*\\n]*?|[^*\\n]*?[^\\s])(\\*)(?=[\\W\\d]|$)", noEmojisContent);
 //                                boolean  italic = Pattern.matches(".*_.*_.*", messageContent);
-                if(bold){
+
+                Matcher mBold = pBold.matcher(messageContent);
+
+                if(mBold!=null && mBold.find()){
+                    log("Bold Found");
                     applyBoldFormat();
                     formatted = true;
                     return ssb;
                 }
             }
 
-            boolean  quote2 = Pattern.matches("(.*\\s+)*`.*`(\\s+.*)*[\\?|!|\\.|,|;|:|\\)|%|\\*]*", noEmojisContent);
-//                                boolean  italic = Pattern.matches(".*_.*_.*", messageContent);
-            if(quote2) {
-                applyQuoteFormat();
-                formatted = true;
-                return ssb;
+            Pattern pQuote2 = Pattern.compile("(?<=[\\W\\d]|^)(`)(.*?)(`)(?=[\\W\\d]|$)");
+
+            Matcher mQuote2 = pQuote2.matcher(messageContent);
+
+            if (mQuote2 != null) {
+                if (mQuote2.find()) {
+                    applyQuoteFormat();
+                    formatted = true;
+                    return ssb;
+                }
+
             }
         }
 
@@ -509,33 +559,22 @@ public class RTFFormatter {
                 end = messageContent.indexOf("*_");
                 if(end!=-1){
                     substring = messageContent.substring(0, end);
-
-                    String noEmojisContent = EmojiParser.removeAllEmojis(substring);
-
-                    if(Pattern.matches("(.*\\s+)*```.*```(\\s+.*)*[\\?|!|\\.|,|;|:|\\)|%]*", noEmojisContent)){
-                        log("Multiquote");
-                        applyTwoFormatsAndMultiQuoteFormat(substring);
-                    }
-                    else if(Pattern.matches("(.*\\s+)*`.*`(\\s+.*)*[\\?|!|\\.|,|;|:|\\)|%]*", noEmojisContent)){
-                        log("Quote");
-                        applyTwoFormatsAndQuoteFormat(substring);
-                    }
-                    else{
-                        ssb.append(substring, new StyleSpan(Typeface.BOLD), new StyleSpan(Typeface.ITALIC));
-                    }
                 }
                 else{
                     end = messageContent.indexOf("*");
 
                     substring = messageContent.substring(0, end);
+                }
 
-                    String noEmojisContent = EmojiParser.removeAllEmojis(substring);
+                Matcher mMultiQuote = pMultiQuote.matcher(substring);
 
-                    if(Pattern.matches("(.*\\s+)*```.*```(\\s+.*)*[\\?|!|\\.|,|;|:|\\)|%]*", noEmojisContent)){
-                        log("Multiquote");
-                        applyTwoFormatsAndMultiQuoteFormat(substring);
-                    }
-                    else if(Pattern.matches("(.*\\s+)*`.*`(\\s+.*)*[\\?|!|\\.|,|;|:|\\)|%]*", noEmojisContent)){
+                if (mMultiQuote != null && mMultiQuote.find()) {
+                    applyTwoFormatsAndMultiQuoteFormat(substring);
+                }
+                else{
+                    Matcher mQuote = pQuote.matcher(substring);
+
+                    if (mQuote != null && mQuote.find()) {
                         log("Quote");
                         applyTwoFormatsAndQuoteFormat(substring);
                     }
@@ -633,23 +672,30 @@ public class RTFFormatter {
 
             substring = messageContent.substring(0, end);
 
-            String noEmojisContent = EmojiParser.removeAllEmojis(substring);
+            Matcher mBold = pBold.matcher(substring);
 
-            boolean bold = Pattern.matches("(.*\\s+)*\\*.*\\*(\\s+.*)*[\\?|!|\\.|,|;|:|\\)|%]*", noEmojisContent);
-//                                boolean  italic = Pattern.matches(".*_.*_.*", messageContent);
-            if(bold){
+            if(mBold!=null && mBold.find()){
                 applyItalicBoldFormat(substring);
             }
-            else if(Pattern.matches("(.*\\s+)*```.*```(\\s+.*)*[\\?|!|\\.|,|;|:|\\)|%]*", noEmojisContent)){
-                log("Multiquote");
-                applyOneFormatAndMultiQuoteFormat(substring, Typeface.ITALIC);
-            }
-            else if(Pattern.matches("(.*\\s+)*`.*`(\\s+.*)*[\\?|!|\\.|,|;|:|\\)|%]*", noEmojisContent)){
-                log("Quote");
-                applyOneFormatAndQuoteFormat(substring, Typeface.ITALIC);
-            }
-            else{
-                ssb.append(substring, new StyleSpan(Typeface.ITALIC));
+            else {
+
+                Matcher mMultiQuote = pMultiQuote.matcher(substring);
+
+                if (mMultiQuote != null && mMultiQuote.find()) {
+                    log("Multiquote");
+                    applyOneFormatAndMultiQuoteFormat(substring, Typeface.ITALIC);
+                }
+                else{
+                    Matcher mQuote = pQuote.matcher(substring);
+
+                    if (mQuote != null && mQuote.find()) {
+                        log("Quote");
+                        applyOneFormatAndQuoteFormat(substring, Typeface.ITALIC);
+                    }
+                    else{
+                        ssb.append(substring, new StyleSpan(Typeface.ITALIC));
+                    }
+                }
             }
 
             sb = new StringBuilder(messageContent);
@@ -665,23 +711,30 @@ public class RTFFormatter {
             log("Message content B: "+messageContent);
             substring = messageContent.substring(0, end);
 
-            String noEmojisContent = EmojiParser.removeAllEmojis(substring);
+            Matcher mBold = pBold.matcher(substring);
 
-            boolean bold = Pattern.matches("(.*\\s+)*\\*.*\\*(\\s+.*)*[\\?|!|\\.|,|;|:|\\)|%]*", noEmojisContent);
-//                                boolean  italic = Pattern.matches(".*_.*_.*", messageContent);
-            if(bold){
+            if(mBold!=null && mBold.find()){
                 applyItalicBoldFormat(substring);
             }
-            else if(Pattern.matches("(.*\\s+)*```.*```(\\s+.*)*[\\?|!|\\.|,|;|:|\\)|%]*", noEmojisContent)){
-                log("Multiquote");
-                applyOneFormatAndMultiQuoteFormat(substring, Typeface.ITALIC);
-            }
-            else if(Pattern.matches("(.*\\s+)*`.*`(\\s+.*)*[\\?|!|\\.|,|;|:|\\)|%]*", noEmojisContent)){
-                log("Quote");
-                applyOneFormatAndQuoteFormat(substring, Typeface.ITALIC);
-            }
-            else{
-                ssb.append(substring, new StyleSpan(Typeface.ITALIC));
+            else {
+
+                Matcher mMultiQuote = pMultiQuote.matcher(substring);
+
+                if (mMultiQuote != null && mMultiQuote.find()) {
+                    log("Multiquote");
+                    applyOneFormatAndMultiQuoteFormat(substring, Typeface.ITALIC);
+                }
+                else{
+                    Matcher mQuote = pQuote.matcher(substring);
+
+                    if (mQuote != null && mQuote.find()) {
+                        log("Quote");
+                        applyOneFormatAndQuoteFormat(substring, Typeface.ITALIC);
+                    }
+                    else{
+                        ssb.append(substring, new StyleSpan(Typeface.ITALIC));
+                    }
+                }
             }
 
             sb = new StringBuilder(messageContent);
@@ -804,18 +857,22 @@ public class RTFFormatter {
 
             log("SubstringB is: "+substringB);
 
-            String noEmojisContent = EmojiParser.removeAllEmojis(substringB);
+            Matcher mMultiQuote = pMultiQuote.matcher(substringB);
 
-            if(Pattern.matches("(.*\\s+)*```.*```(\\s+.*)*[\\?|!|\\.|,|;|:|\\)|%]*", noEmojisContent)){
+            if (mMultiQuote != null && mMultiQuote.find()) {
                 log("Multiquote");
                 applyTwoFormatsAndMultiQuoteFormat(substringB);
             }
-            else if(Pattern.matches("(.*\\s+)*`.*`(\\s+.*)*[\\?|!|\\.|,|;|:|\\)|%]*", noEmojisContent)){
-                log("Quote");
-                applyTwoFormatsAndQuoteFormat(substringB);
-            }
             else{
-                ssb.append(substringB, new StyleSpan(Typeface.BOLD), new StyleSpan(Typeface.ITALIC));
+                Matcher mQuote = pQuote.matcher(substringB);
+
+                if (mQuote != null && mQuote.find()) {
+                    log("Quote");
+                    applyTwoFormatsAndQuoteFormat(substringB);
+                }
+                else{
+                    ssb.append(substringB, new StyleSpan(Typeface.BOLD), new StyleSpan(Typeface.ITALIC));
+                }
             }
 
             sbB = new StringBuilder(subMessageContent);
@@ -827,18 +884,22 @@ public class RTFFormatter {
             log("(10) Message content B: "+subMessageContent);
             substringB = subMessageContent.substring(0, endB);
 
-            String noEmojisContent = EmojiParser.removeAllEmojis(substringB);
+            Matcher mMultiQuote = pMultiQuote.matcher(substringB);
 
-            if(Pattern.matches("(.*\\s+)*```.*```(\\s+.*)*[\\?|!|\\.|,|;|:|\\)|%]*", noEmojisContent)){
+            if (mMultiQuote != null && mMultiQuote.find()) {
                 log("Multiquote");
                 applyTwoFormatsAndMultiQuoteFormat(substringB);
             }
-            else if(Pattern.matches("(.*\\s+)*`.*`(\\s+.*)*[\\?|!|\\.|,|;|:|\\)|%]*", noEmojisContent)){
-                log("Quote");
-                applyTwoFormatsAndQuoteFormat(substringB);
-            }
             else{
-                ssb.append(substringB, new StyleSpan(Typeface.BOLD), new StyleSpan(Typeface.ITALIC));
+                Matcher mQuote = pQuote.matcher(substringB);
+
+                if (mQuote != null && mQuote.find()) {
+                    log("Quote");
+                    applyTwoFormatsAndQuoteFormat(substringB);
+                }
+                else{
+                    ssb.append(substringB, new StyleSpan(Typeface.BOLD), new StyleSpan(Typeface.ITALIC));
+                }
             }
 
             endB++;
@@ -877,18 +938,22 @@ public class RTFFormatter {
                     log("(B)FINISH End position: "+endB);
                     substringB = subMessageContent.substring(0, endB);
 
-                    noEmojisContent = EmojiParser.removeAllEmojis(substringB);
+                    mMultiQuote = pMultiQuote.matcher(substringB);
 
-                    if(Pattern.matches("(.*\\s+)*```.*```(\\s+.*)*[\\?|!|\\.|,|;|:|\\)|%]*", noEmojisContent)){
+                    if (mMultiQuote != null && mMultiQuote.find()) {
                         log("Multiquote");
                         applyTwoFormatsAndMultiQuoteFormat(substringB);
                     }
-                    else if(Pattern.matches("(.*\\s+)*`.*`(\\s+.*)*[\\?|!|\\.|,|;|:|\\)|%]*", noEmojisContent)){
-                        log("Quote");
-                        applyTwoFormatsAndQuoteFormat(substringB);
-                    }
                     else{
-                        ssb.append(substringB, new StyleSpan(Typeface.BOLD), new StyleSpan(Typeface.ITALIC));
+                        Matcher mQuote = pQuote.matcher(substringB);
+
+                        if (mQuote != null && mQuote.find()) {
+                            log("Quote");
+                            applyTwoFormatsAndQuoteFormat(substringB);
+                        }
+                        else{
+                            ssb.append(substringB, new StyleSpan(Typeface.BOLD), new StyleSpan(Typeface.ITALIC));
+                        }
                     }
 
                     sbB = new StringBuilder(subMessageContent);
@@ -905,18 +970,22 @@ public class RTFFormatter {
 
                     substringB = subMessageContent.substring(0, endB);
 
-                    noEmojisContent = EmojiParser.removeAllEmojis(substringB);
+                    mMultiQuote = pMultiQuote.matcher(substringB);
 
-                    if(Pattern.matches("(.*\\s+)*```.*```(\\s+.*)*[\\?|!|\\.|,|;|:|\\)|%]*", noEmojisContent)){
+                    if (mMultiQuote != null && mMultiQuote.find()) {
                         log("Multiquote");
                         applyTwoFormatsAndMultiQuoteFormat(substringB);
                     }
-                    else if(Pattern.matches("(.*\\s+)*`.*`(\\s+.*)*[\\?|!|\\.|,|;|:|\\)|%]*", noEmojisContent)){
-                        log("Quote");
-                        applyTwoFormatsAndQuoteFormat(substringB);
-                    }
                     else{
-                        ssb.append(substringB, new StyleSpan(Typeface.BOLD), new StyleSpan(Typeface.ITALIC));
+                        Matcher mQuote = pQuote.matcher(substringB);
+
+                        if (mQuote != null && mQuote.find()) {
+                            log("Quote");
+                            applyTwoFormatsAndQuoteFormat(substringB);
+                        }
+                        else{
+                            ssb.append(substringB, new StyleSpan(Typeface.BOLD), new StyleSpan(Typeface.ITALIC));
+                        }
                     }
 
                     sbB = new StringBuilder(subMessageContent);
@@ -1373,33 +1442,23 @@ public class RTFFormatter {
                 end = messageContent.indexOf("_*");
                 if(end!=-1){
                     substring = messageContent.substring(0, end);
-
-                    String noEmojisContent = EmojiParser.removeAllEmojis(substring);
-
-                    if(Pattern.matches("(.*\\s+)*```.*```(\\s+.*)*[\\?|!|\\.|,|;|:|\\)|%]*", noEmojisContent)){
-                        log("Multiquote");
-                        applyTwoFormatsAndMultiQuoteFormat(substring);
-                    }
-                    else if(Pattern.matches("(.*\\s+)*`.*`(\\s+.*)*[\\?|!|\\.|,|;|:|\\)|%]*", noEmojisContent)){
-                        log("Quote");
-                        applyTwoFormatsAndQuoteFormat(substring);
-                    }
-                    else{
-                        ssb.append(substring, new StyleSpan(Typeface.BOLD), new StyleSpan(Typeface.ITALIC));
-                    }
                 }
                 else{
                     end = messageContent.indexOf("_");
 
                     substring = messageContent.substring(0, end);
+                }
 
-                    String noEmojisContent = EmojiParser.removeAllEmojis(substring);
+                Matcher mMultiQuote = pMultiQuote.matcher(substring);
 
-                    if(Pattern.matches("(.*\\s+)*```.*```(\\s+.*)*[\\?|!|\\.|,|;|:|\\)|%]*", noEmojisContent)){
-                        log("Multiquote");
-                        applyTwoFormatsAndMultiQuoteFormat(substring);
-                    }
-                    else if(Pattern.matches("(.*\\s+)*`.*`(\\s+.*)*[\\?|!|\\.|,|;|:|\\)|%]*", noEmojisContent)){
+                if (mMultiQuote != null && mMultiQuote.find()) {
+                    log("Multiquote");
+                    applyTwoFormatsAndMultiQuoteFormat(substring);
+                }
+                else{
+                    Matcher mQuote = pQuote.matcher(substring);
+
+                    if (mQuote != null && mQuote.find()) {
                         log("Quote");
                         applyTwoFormatsAndQuoteFormat(substring);
                     }
@@ -1495,23 +1554,29 @@ public class RTFFormatter {
 
             substring = messageContent.substring(0, end);
 
-            String noEmojisContent = EmojiParser.removeAllEmojis(substring);
+            Matcher mItalic = pItalic.matcher(substring);
 
-            boolean  italic = Pattern.matches("(.*\\s+)*_.*_(\\s+.*)*[\\?|!|\\.|,|;|:|\\)|%]*", noEmojisContent);
-//                                boolean  italic = Pattern.matches(".*_.*_.*", messageContent);
-            if(italic){
+            if(mItalic!=null && mItalic.find()){
                 applyBoldItalicFormat(substring);
             }
-            else if(Pattern.matches("(.*\\s+)*```.*```(\\s+.*)*[\\?|!|\\.|,|;|:|\\)|%]*", noEmojisContent)){
-                log("Multiquote");
-                applyOneFormatAndMultiQuoteFormat(substring, Typeface.BOLD);
-            }
-            else if(Pattern.matches("(.*\\s+)*`.*`(\\s+.*)*[\\?|!|\\.|,|;|:|\\)|%]*", noEmojisContent)){
-                log("Quote");
-                applyOneFormatAndQuoteFormat(substring, Typeface.BOLD);
-            }
             else{
-                ssb.append(substring, new StyleSpan(Typeface.BOLD));
+                Matcher mMultiQuote = pMultiQuote.matcher(substring);
+
+                if (mMultiQuote != null && mMultiQuote.find()) {
+                    log("Multiquote");
+                    applyOneFormatAndMultiQuoteFormat(substring, Typeface.BOLD);
+                }
+                else{
+                    Matcher mQuote = pQuote.matcher(substring);
+
+                    if (mQuote != null && mQuote.find()) {
+                        log("Quote");
+                        applyOneFormatAndQuoteFormat(substring, Typeface.BOLD);
+                    }
+                    else{
+                        ssb.append(substring, new StyleSpan(Typeface.BOLD));
+                    }
+                }
             }
 
             sb = new StringBuilder(messageContent);
@@ -1529,21 +1594,29 @@ public class RTFFormatter {
 
             String noEmojisContent = EmojiParser.removeAllEmojis(substring);
 
-            boolean  italic = Pattern.matches("(.*\\s+)*_.*_(\\s+.*)*[\\?|!|\\.|,|;|:|\\)|%]*", noEmojisContent);
-//                                boolean  italic = Pattern.matches(".*_.*_.*", messageContent);
-            if(italic){
+            Matcher mItalic = pItalic.matcher(substring);
+
+            if(mItalic!=null && mItalic.find()){
                 applyBoldItalicFormat(substring);
             }
-            else if(Pattern.matches("(.*\\s+)*```.*```(\\s+.*)*[\\?|!|\\.|,|;|:|\\)|%]*", noEmojisContent)){
-                log("Multiquote");
-                applyOneFormatAndMultiQuoteFormat(substring, Typeface.BOLD);
-            }
-            else if(Pattern.matches("(.*\\s+)*`.*`(\\s+.*)*[\\?|!|\\.|,|;|:|\\)|%]*", noEmojisContent)){
-                log("Quote");
-                applyOneFormatAndQuoteFormat(substring, Typeface.BOLD);
-            }
             else{
-                ssb.append(substring, new StyleSpan(Typeface.BOLD));
+                Matcher mMultiQuote = pMultiQuote.matcher(substring);
+
+                if (mMultiQuote != null && mMultiQuote.find()) {
+                    log("Multiquote");
+                    applyOneFormatAndMultiQuoteFormat(substring, Typeface.BOLD);
+                }
+                else{
+                    Matcher mQuote = pQuote.matcher(substring);
+
+                    if (mQuote != null && mQuote.find()) {
+                        log("Quote");
+                        applyOneFormatAndQuoteFormat(substring, Typeface.BOLD);
+                    }
+                    else{
+                        ssb.append(substring, new StyleSpan(Typeface.BOLD));
+                    }
+                }
             }
 
             sb = new StringBuilder(messageContent);
@@ -1664,18 +1737,22 @@ public class RTFFormatter {
             substringB = subMessageContent.substring(0, endB);
 
             log("SubstringB is: "+substringB);
-            String noEmojisContent = EmojiParser.removeAllEmojis(substringB);
+            Matcher mMultiQuote = pMultiQuote.matcher(substringB);
 
-            if(Pattern.matches("(.*\\s+)*```.*```(\\s+.*)*[\\?|!|\\.|,|;|:|\\)|%]*", noEmojisContent)){
+            if (mMultiQuote != null && mMultiQuote.find()) {
                 log("Multiquote");
                 applyTwoFormatsAndMultiQuoteFormat(substringB);
             }
-            else if(Pattern.matches("(.*\\s+)*`.*`(\\s+.*)*[\\?|!|\\.|,|;|:|\\)|%]*", noEmojisContent)){
-                log("Quote");
-                applyTwoFormatsAndQuoteFormat(substringB);
-            }
             else{
-                ssb.append(substringB, new StyleSpan(Typeface.BOLD), new StyleSpan(Typeface.ITALIC));
+                Matcher mQuote = pQuote.matcher(substringB);
+
+                if (mQuote != null && mQuote.find()) {
+                    log("Quote");
+                    applyTwoFormatsAndQuoteFormat(substringB);
+                }
+                else{
+                    ssb.append(substringB, new StyleSpan(Typeface.BOLD), new StyleSpan(Typeface.ITALIC));
+                }
             }
 
             sbB = new StringBuilder(subMessageContent);
@@ -1687,18 +1764,22 @@ public class RTFFormatter {
             log("(10) Message content B: "+subMessageContent);
             substringB = subMessageContent.substring(0, endB);
 
-            String noEmojisContent = EmojiParser.removeAllEmojis(substringB);
+            Matcher mMultiQuote = pMultiQuote.matcher(substringB);
 
-            if(Pattern.matches("(.*\\s+)*```.*```(\\s+.*)*[\\?|!|\\.|,|;|:|\\)|%]*", noEmojisContent)){
+            if (mMultiQuote != null && mMultiQuote.find()) {
                 log("Multiquote");
                 applyTwoFormatsAndMultiQuoteFormat(substringB);
             }
-            else if(Pattern.matches("(.*\\s+)*`.*`(\\s+.*)*[\\?|!|\\.|,|;|:|\\)|%]*", noEmojisContent)){
-                log("Quote");
-                applyTwoFormatsAndQuoteFormat(substringB);
-            }
             else{
-                ssb.append(substringB, new StyleSpan(Typeface.BOLD), new StyleSpan(Typeface.ITALIC));
+                Matcher mQuote = pQuote.matcher(substringB);
+
+                if (mQuote != null && mQuote.find()) {
+                    log("Quote");
+                    applyTwoFormatsAndQuoteFormat(substringB);
+                }
+                else{
+                    ssb.append(substringB, new StyleSpan(Typeface.BOLD), new StyleSpan(Typeface.ITALIC));
+                }
             }
 
             endB++;
@@ -1737,18 +1818,22 @@ public class RTFFormatter {
                     log("(B)FINISH End position: "+endB);
                     substringB = subMessageContent.substring(0, endB);
 
-                    noEmojisContent = EmojiParser.removeAllEmojis(substringB);
+                    mMultiQuote = pMultiQuote.matcher(substringB);
 
-                    if(Pattern.matches("(.*\\s+)*```.*```(\\s+.*)*[\\?|!|\\.|,|;|:|\\)|%]*", noEmojisContent)){
+                    if (mMultiQuote != null && mMultiQuote.find()) {
                         log("Multiquote");
                         applyTwoFormatsAndMultiQuoteFormat(substringB);
                     }
-                    else if(Pattern.matches("(.*\\s+)*`.*`(\\s+.*)*[\\?|!|\\.|,|;|:|\\)|%]*", noEmojisContent)){
-                        log("Quote");
-                        applyTwoFormatsAndQuoteFormat(substringB);
-                    }
                     else{
-                        ssb.append(substringB, new StyleSpan(Typeface.BOLD), new StyleSpan(Typeface.ITALIC));
+                        Matcher mQuote = pQuote.matcher(substringB);
+
+                        if (mQuote != null && mQuote.find()) {
+                            log("Quote");
+                            applyTwoFormatsAndQuoteFormat(substringB);
+                        }
+                        else{
+                            ssb.append(substringB, new StyleSpan(Typeface.BOLD), new StyleSpan(Typeface.ITALIC));
+                        }
                     }
 
                     sbB = new StringBuilder(subMessageContent);
@@ -1765,18 +1850,22 @@ public class RTFFormatter {
 
                     substringB = subMessageContent.substring(0, endB);
 
-                    noEmojisContent = EmojiParser.removeAllEmojis(substringB);
+                    mMultiQuote = pMultiQuote.matcher(substringB);
 
-                    if(Pattern.matches("(.*\\s+)*```.*```(\\s+.*)*[\\?|!|\\.|,|;|:|\\)|%]*", noEmojisContent)){
+                    if (mMultiQuote != null && mMultiQuote.find()) {
                         log("Multiquote");
                         applyTwoFormatsAndMultiQuoteFormat(substringB);
                     }
-                    else if(Pattern.matches("(.*\\s+)*`.*`(\\s+.*)*[\\?|!|\\.|,|;|:|\\)|%]*", noEmojisContent)){
-                        log("Quote");
-                        applyTwoFormatsAndQuoteFormat(substringB);
-                    }
                     else{
-                        ssb.append(substringB, new StyleSpan(Typeface.BOLD), new StyleSpan(Typeface.ITALIC));
+                        Matcher mQuote = pQuote.matcher(substringB);
+
+                        if (mQuote != null && mQuote.find()) {
+                            log("Quote");
+                            applyTwoFormatsAndQuoteFormat(substringB);
+                        }
+                        else{
+                            ssb.append(substringB, new StyleSpan(Typeface.BOLD), new StyleSpan(Typeface.ITALIC));
+                        }
                     }
 
                     sbB = new StringBuilder(subMessageContent);
