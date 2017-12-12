@@ -83,7 +83,6 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
     private SimpleExoPlayerView simpleExoPlayerView;
     private SimpleExoPlayer player;
     private Uri uri;
-    private String uriString;
 
     private AppBarLayout appBarLayout;
     private Toolbar tB;
@@ -102,6 +101,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
     private boolean video = false;
     private boolean loading = true;
     private ProgressDialog statusDialog = null;
+    private String fileName = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -117,7 +117,10 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
             return;
         }
         Bundle bundle = intent.getExtras();
-        handle = bundle.getLong("HANDLE");
+        if (bundle != null) {
+            handle = bundle.getLong("HANDLE");
+            fileName = bundle.getString("FILENAME");
+        }
 
         uri = intent.getData();
         //Uri uri = Uri.parse("https://youtu.be/upUpVb3cLfk");
@@ -126,9 +129,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
             finish();
             return;
         }
-
-        uriString = uri.toString();
-
+        log("uri: "+uri);
         appBarLayout = (AppBarLayout) findViewById(R.id.app_bar);
 
        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -153,7 +154,12 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
         aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
         aB.setHomeButtonEnabled(true);
         aB.setDisplayHomeAsUpEnabled(true);
-        aB.setTitle(getFileName(uri));
+        if (fileName != null) {
+            aB.setTitle(fileName);
+        }
+        else {
+            aB.setTitle(getFileName(uri));
+        }
 
         audioContainer = (RelativeLayout) findViewById(R.id.audio_container);
         audioContainer.setVisibility(View.GONE);
@@ -205,7 +211,6 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
         DefaultDataSourceFactory dataSourceFactory = new DefaultDataSourceFactory(this, Util.getUserAgent(this, "android2"), defaultBandwidthMeter);
         //Produces Extractor instances for parsing the media data
         ExtractorsFactory extractorsFactory = new DefaultExtractorsFactory();
-
 
         MediaSource mediaSource = new ExtractorMediaSource(uri, dataSourceFactory, extractorsFactory, null, null);
         //MediaSource mediaSource = new HlsMediaSource(uri, dataSourceFactory, handler, null);
