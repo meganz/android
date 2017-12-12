@@ -459,9 +459,15 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 
 
 			if (!isForeground) {
-				log("starting foreground!");
-				startForeground(notificationId, notification);
-				isForeground = true;
+				log("starting foreground");
+				try {
+					startForeground(notificationId, notification);
+					isForeground = true;
+				}
+				catch (Exception e){
+					log("startforeground exception: " + e.getMessage());
+					isForeground = false;
+				}
 			} else {
 				mNotificationManager.notify(notificationId, notification);
 			}
