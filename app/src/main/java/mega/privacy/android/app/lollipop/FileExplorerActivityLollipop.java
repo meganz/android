@@ -589,6 +589,8 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 						mTabsAdapterExplorer = new FileExplorerPagerAdapter(getSupportFragmentManager(),this);
 						viewPagerExplorer.setAdapter(mTabsAdapterExplorer);
 						tabLayoutExplorer.setupWithViewPager(viewPagerExplorer);
+
+						tabLayoutExplorer.removeTabAt(2);
 					}
 					else{
 						log("mTabsAdapterExplorer != null");
@@ -623,6 +625,8 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 						mTabsAdapterExplorer = new FileExplorerPagerAdapter(getSupportFragmentManager(),this);
 						viewPagerExplorer.setAdapter(mTabsAdapterExplorer);
 						tabLayoutExplorer.setupWithViewPager(viewPagerExplorer);
+
+						tabLayoutExplorer.removeTabAt(2);
 					}
 
 					MegaNode p;
@@ -647,6 +651,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 						viewPagerExplorer.setAdapter(mTabsAdapterExplorer);
 						tabLayoutExplorer.setupWithViewPager(viewPagerExplorer);
 
+						tabLayoutExplorer.removeTabAt(2);
 					}
 				}
 				else if (intent.getAction().equals(ACTION_PICK_IMPORT_FOLDER)){
@@ -660,6 +665,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 						viewPagerExplorer.setAdapter(mTabsAdapterExplorer);
 						tabLayoutExplorer.setupWithViewPager(viewPagerExplorer);
 
+						tabLayoutExplorer.removeTabAt(2);
 					}
 				}
 				else if ((intent.getAction().equals(ACTION_SELECT_FOLDER))){
@@ -673,8 +679,9 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 						mTabsAdapterExplorer = new FileExplorerPagerAdapter(getSupportFragmentManager(),this);
 						viewPagerExplorer.setAdapter(mTabsAdapterExplorer);
 						tabLayoutExplorer.setupWithViewPager(viewPagerExplorer);
-					}
 
+						tabLayoutExplorer.removeTabAt(2);
+					}
 				}
 				else{
 					log("action = UPLOAD");
