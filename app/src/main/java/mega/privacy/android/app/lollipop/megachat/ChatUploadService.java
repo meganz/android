@@ -406,16 +406,22 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 						PendingNodeAttachment nodeAttachment = nodesAttached.get(0);
 
 						if(nodeAttachment.getFilePath().equals(transfer.getPath())){
-                            nodeAttachment.setNodeHandle(transfer.getNodeHandle());
-							if(megaChatApi!=null){
-                                log("Send node: "+transfer.getNodeHandle()+ " to chat: "+pendMsg.getChatId());
-								megaChatApi.attachNode(pendMsg.getChatId(), transfer.getNodeHandle(), this);
+							log("NodeHANDLE of the nodeAttachment: "+nodeAttachment.getNodeHandle());
+						    if(nodeAttachment.getNodeHandle()==-1){
+                                nodeAttachment.setNodeHandle(transfer.getNodeHandle());
+                                if(megaChatApi!=null){
+                                    log("Send node: "+transfer.getNodeHandle()+ " to chat: "+pendMsg.getChatId());
+                                    megaChatApi.attachNode(pendMsg.getChatId(), transfer.getNodeHandle(), this);
 
-								if (megaApi.getNumPendingUploads() == 0 && transfersCount==0){
-									onQueueComplete();
-								}
-								return;
-							}
+                                    if (megaApi.getNumPendingUploads() == 0 && transfersCount==0){
+                                        onQueueComplete();
+                                    }
+                                    return;
+                                }
+                            }
+                            else{
+						        log("Already attached");
+                            }
 						}
 					}
 					else{
