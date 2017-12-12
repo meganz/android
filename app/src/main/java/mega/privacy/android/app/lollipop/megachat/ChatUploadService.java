@@ -173,6 +173,8 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 
 		if(chatId!=-1){
 
+			log("The chat id is: "+chatId);
+
 			PendingMessage newMessage = new PendingMessage(idPendMsg, chatId, filePaths, PendingMessage.STATE_SENDING);
 			pendingMessages.add(newMessage);
 
@@ -400,13 +402,13 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 
 					ArrayList<PendingNodeAttachment> nodesAttached = pendMsg.getNodeAttachments();
 					if(nodesAttached.size()==1){
-						log("Just one file to send in the message");
+						log("Just one file to send in the message: "+pendMsg.getId());
 						PendingNodeAttachment nodeAttachment = nodesAttached.get(0);
 
 						if(nodeAttachment.getFilePath().equals(transfer.getPath())){
                             nodeAttachment.setNodeHandle(transfer.getNodeHandle());
 							if(megaChatApi!=null){
-                                log("Send node to chat: "+transfer.getNodeHandle());
+                                log("Send node: "+transfer.getNodeHandle()+ " to chat: "+pendMsg.getChatId());
 								megaChatApi.attachNode(pendMsg.getChatId(), transfer.getNodeHandle(), this);
 
 								if (megaApi.getNumPendingUploads() == 0 && transfersCount==0){
@@ -640,6 +642,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 							long tempId = request.getMegaChatMessage().getTempId();
 							log("The tempId of the message is: "+tempId);
 							dbH.updatePendingMessage(pendMsg.getId(), tempId+"", PendingMessage.STATE_SENT);
+							pendingMessages.remove(i);
 							break;
 						}
 					}
@@ -667,6 +670,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 							long tempId = request.getMegaChatMessage().getTempId();
 							log("The tempId of the message is: "+tempId);
 							dbH.updatePendingMessage(pendMsg.getId(), tempId+"", PendingMessage.STATE_SENT);
+							pendingMessages.remove(i);
 							break;
 						}
 					}
