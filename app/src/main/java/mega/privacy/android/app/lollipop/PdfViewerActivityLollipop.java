@@ -1,21 +1,17 @@
 package mega.privacy.android.app.lollipop;
 
-import android.app.AlertDialog;
-import android.app.Dialog;
-import android.content.ContentResolver;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.OpenableColumns;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.DialogFragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -31,8 +27,13 @@ import com.github.barteksc.pdfviewer.listener.OnPageErrorListener;
 import com.github.barteksc.pdfviewer.scroll.DefaultScrollHandle;
 import com.shockwave.pdfium.PdfDocument;
 
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.List;
 
 import mega.privacy.android.app.MegaApplication;
@@ -115,18 +116,11 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
         pdfView.setBackgroundColor(Color.LTGRAY);
         pdfFileName = getFileName(uri);
 
-        try {
-            pdfView.fromUri(uri)
-                    .defaultPage(pageNumber)
-                    .onPageChange(this)
-                    .enableAnnotationRendering(true)
-                    .onLoad(this)
-                    .scrollHandle(new DefaultScrollHandle(this))
-                    .spacing(10) // in dp
-                    .onPageError(this)
-                    .load();
-        } catch (Exception e) {
-
+        if (uri.toString().contains("http://")){
+            loadStreamPDF();
+        }
+        else {
+            loadLocalPDF();
         }
 
         pdfView.setOnClickListener(this);
@@ -157,6 +151,66 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
                 finish();
             }
         });
+    }
+
+    class LoadPDFStream extends AsyncTask<String, Void, InputStream> {
+
+        @Override
+        protected InputStream doInBackground(String... strings) {
+            InputStream inputStream = null;
+
+            try {
+                URL url = new URL(strings[0]);
+                HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
+                if (httpURLConnection.getResponseCode() == 200) {
+                    inputStream = new BufferedInputStream( (httpURLConnection.getInputStream()));
+                }
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+                return null;
+            } catch (IOException e) {
+                e.printStackTrace();
+                return null;
+            }
+            return inputStream;
+        }
+
+        @Override
+        protected void onPostExecute(InputStream inputStream) {
+            try {
+                pdfView.fromStream(inputStream)
+                        .defaultPage(pageNumber)
+                        .onPageChange(PdfViewerActivityLollipop.this)
+                        .enableAnnotationRendering(true)
+                        .onLoad(PdfViewerActivityLollipop.this)
+                        .scrollHandle(new DefaultScrollHandle(PdfViewerActivityLollipop.this))
+                        .spacing(10) // in dp
+                        .onPageError(PdfViewerActivityLollipop.this)
+                        .load();
+            } catch (Exception e) {
+
+            }
+        }
+    }
+
+    private void loadStreamPDF() {
+        new LoadPDFStream().execute(uri.toString());
+    }
+
+    private void loadLocalPDF() {
+        try {
+            pdfView.fromUri(uri)
+                    .defaultPage(pageNumber)
+                    .onPageChange(this)
+                    .enableAnnotationRendering(true)
+                    .onLoad(this)
+                    .scrollHandle(new DefaultScrollHandle(this))
+                    .spacing(10) // in dp
+                    .onPageError(this)
+                    .load();
+        } catch (Exception e) {
+
+        }
     }
 
     private class UploadServiceTask extends Thread {

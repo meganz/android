@@ -78,6 +78,7 @@ import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.MegaMonthPicLollipop;
 import mega.privacy.android.app.lollipop.MyAccountInfo;
+import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaPhotoSyncGridAdapterLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaPhotoSyncGridTitleAdapterLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaPhotoSyncListAdapterLollipop;
@@ -1604,7 +1605,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 							startActivity(intent);
 									
 						}
-						else if (MimeTypeList.typeForName(psHMegaNode.getName()).isVideo() || MimeTypeList.typeForName(psHMegaNode.getName()).isAudio() ){
+						else if (MimeTypeList.typeForName(psHMegaNode.getName()).isVideo()){
 
 							if (megaApi.httpServerIsRunning() == 0) {
 								megaApi.httpServerStart();
