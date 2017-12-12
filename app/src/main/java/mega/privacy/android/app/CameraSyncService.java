@@ -2492,8 +2492,15 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 		}
 
 		if (!isForeground) {
-			log("starting foreground!");
-			startForeground(notificationId, notification);
+			log("starting foreground");
+			try {
+				startForeground(notificationId, notification);
+			}
+			catch(Exception e){
+				log("startforeground exception: " + e.getMessage());
+				retryLaterShortTime();
+				return;
+			}
 			isForeground = true;
 		} else {
 			mNotificationManager.notify(notificationId, notification);
