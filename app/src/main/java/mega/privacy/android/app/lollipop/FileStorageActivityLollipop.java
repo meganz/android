@@ -306,14 +306,8 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
     public boolean onPrepareOptionsMenu(Menu menu) {
 		log("onPrepareOptionsMenu");
 		if (mode == Mode.PICK_FOLDER) {
-			newFolderMenuItem.setVisible(true);
-			
-		}
-		else{
-			newFolderMenuItem.setVisible(false);
-		}
-		
-		if (mode == Mode.PICK_FOLDER) {
+			menu.findItem(R.id.cab_menu_select_all).setVisible(false);
+			menu.findItem(R.id.cab_menu_unselect_all).setVisible(false);
 			boolean writable = path.canWrite();
 			button.setEnabled(writable);
 			if (writable) {				
@@ -321,9 +315,11 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 			} else {
 				newFolderMenuItem.setVisible(false);
 			}
-		}
-		else{
+		}else{
 			newFolderMenuItem.setVisible(false);
+			menu.findItem(R.id.cab_menu_select_all).setVisible(true);
+			menu.findItem(R.id.cab_menu_unselect_all).setVisible(false);
+
 		}
 		return super.onPrepareOptionsMenu(menu);
 	}
