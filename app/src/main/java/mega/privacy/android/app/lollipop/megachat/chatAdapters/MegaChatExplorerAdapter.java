@@ -41,8 +41,8 @@ import mega.privacy.android.app.components.EmojiconTextView;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.lollipop.listeners.ChatListNonContactNameListener;
 import mega.privacy.android.app.lollipop.listeners.ChatUserAvatarListener;
-import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerFragment;
+import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
 import mega.privacy.android.app.lollipop.megachat.NonContactInfo;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.TimeChatUtils;
@@ -865,7 +865,7 @@ public class MegaChatExplorerAdapter extends RecyclerView.Adapter<MegaChatExplor
 			log("MessageType: "+messageType);
 			String lastMessageString = chat.getLastMessage();
 
-			if(messageType==MegaChatMessage.TYPE_INVALID){
+			if(messageType==MegaChatMessage.TYPE_INVALID||messageType==255){
 				log("Message Type -> INVALID");
 				holder.textViewContent.setText(context.getString(R.string.no_conversation_history));
 				holder.textViewContent.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
