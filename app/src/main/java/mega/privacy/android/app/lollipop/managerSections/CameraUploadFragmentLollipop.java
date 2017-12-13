@@ -3,6 +3,7 @@ package mega.privacy.android.app.lollipop.managerSections;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.ActivityManager;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -67,7 +68,6 @@ import mega.privacy.android.app.CameraSyncService;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
-import mega.privacy.android.app.MegaStreamingService;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.MegaLinearLayoutManager;
@@ -1595,19 +1595,27 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 									
 						}
 						else if (MimeTypeList.typeForName(psHMegaNode.getName()).isVideo() || MimeTypeList.typeForName(psHMegaNode.getName()).isAudio() ){
-							Intent service = new Intent(context, MegaStreamingService.class);
-					  		context.startService(service);
-					  		String fileName = psHMegaNode.getName();
-							try {
-								fileName = URLEncoder.encode(fileName, "UTF-8").replaceAll("\\+", "%20");
-							} 
-							catch (UnsupportedEncodingException e) {
-								e.printStackTrace();
+
+							if (megaApi.httpServerIsRunning() == 0) {
+								megaApi.httpServerStart();
 							}
-							
-					  		String url = "http://127.0.0.1:4443/" + psHMegaNode.getBase64Handle() + "/" + fileName;
-					  		String mimeType = MimeTypeList.typeForName(psHMegaNode.getName()).getType();
-					  		System.out.println("FILENAME: " + fileName);
+
+							ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
+							ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+							activityManager.getMemoryInfo(mi);
+
+							if(mi.totalMem>Constants.BUFFER_COMP){
+								log("Total mem: "+mi.totalMem+" allocate 32 MB");
+								megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
+							}
+							else{
+								log("Total mem: "+mi.totalMem+" allocate 16 MB");
+								megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
+							}
+
+							String url = megaApi.httpServerGetLocalLink(psHMegaNode);
+							String mimeType = MimeTypeList.typeForName(psHMegaNode.getName()).getType();
+							log("FILENAME: " + psHMegaNode.getName());
 					  		
 					  		Intent mediaIntent = new Intent(Intent.ACTION_VIEW);
 					  		mediaIntent.setDataAndType(Uri.parse(url), mimeType);

@@ -173,6 +173,8 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 
 		if(chatId!=-1){
 
+			log("The chat id is: "+chatId);
+
 			PendingMessage newMessage = new PendingMessage(idPendMsg, chatId, filePaths, PendingMessage.STATE_SENDING);
 			pendingMessages.add(newMessage);
 
@@ -394,30 +396,117 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
                     log("NOT video!");
                 }
 
-                //Find the pending message
-				for(int i=0; i<pendingMessages.size();i++){
-					PendingMessage pendMsg = pendingMessages.get(i);
+                attachNodes(transfer);
+            }
+            else{
+                log("Upload Error: " + transfer.getFileName() + "_" + error.getErrorCode() + "___" + error.getErrorString());
 
-					ArrayList<PendingNodeAttachment> nodesAttached = pendMsg.getNodeAttachments();
-					if(nodesAttached.size()==1){
-						log("Just one file to send in the message");
-						PendingNodeAttachment nodeAttachment = nodesAttached.get(0);
+                if(error.getErrorCode() == MegaError.API_EEXIST){
+                	log("Transfer API_EEXIST: "+transfer.getNodeHandle());
+				}
+				else{
+					if(error.getErrorCode()==MegaError.API_EOVERQUOTA){
+						log("OVERQUOTA ERROR: "+error.getErrorCode());
+						Intent intent;
+						intent = new Intent(this, ManagerActivityLollipop.class);
+						intent.setAction(Constants.ACTION_OVERQUOTA_STORAGE);
+						intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
-						if(nodeAttachment.getFilePath().equals(transfer.getPath())){
-                            nodeAttachment.setNodeHandle(transfer.getNodeHandle());
-							if(megaChatApi!=null){
-                                log("Send node to chat: "+transfer.getNodeHandle());
-								megaChatApi.attachNode(pendMsg.getChatId(), transfer.getNodeHandle(), this);
+						startActivity(intent);
 
-								if (megaApi.getNumPendingUploads() == 0 && transfersCount==0){
-									onQueueComplete();
+						Intent tempIntent = null;
+						tempIntent = new Intent(this, ChatUploadService.class);
+						tempIntent.setAction(ChatUploadService.ACTION_CANCEL);
+						startService(tempIntent);
+					}
+
+					//Find the pending message
+					for(int i=0; i<pendingMessages.size();i++){
+						PendingMessage pendMsg = pendingMessages.get(i);
+
+						ArrayList<PendingNodeAttachment> nodesAttached = pendMsg.getNodeAttachments();
+						if(nodesAttached.size()==1){
+							log("Just one file to send in the message");
+							PendingNodeAttachment nodeAttachment = nodesAttached.get(0);
+
+							if(nodeAttachment.getFilePath().equals(transfer.getPath())){
+								if(nodeAttachment.getFilePath().equals(transfer.getPath())){
+
+									dbH.updatePendingMessage(pendMsg.getId(), -1+"", PendingMessage.STATE_ERROR);
+									launchErrorToChat(pendMsg);
+
+									if (megaApi.getNumPendingUploads() == 0 && transfersCount==0){
+										onQueueComplete();
+									}
+									return;
 								}
-								return;
 							}
+						}
+						else{
+							log("More than one to send in message");
+//						for(int j=0; j<nodesAttached.size();j++) {
+//							PendingNodeAttachment nodeAttachment = nodesAttached.get(j);
+//
+//							if(nodeAttachment.getFilePath().equals(transfer.getPath())){
+//								nodeAttachment.setNodeHandle(transfer.getNodeHandle());
+//
+//								if(nodeAttachment.getFilePath().equals(transfer.getPath())){
+//
+//									dbH.updatePendingMessage(pendMsg.getId(), -1+"", PendingMessage.STATE_ERROR);
+//									pendMsg.setState(PendingMessage.STATE_ERROR);
+//									launchErrorToChat(pendMsg);
+//
+//									if (megaApi.getNumPendingUploads() == 0 && transfersCount==0){
+//										onQueueComplete();
+//									}
+//									return;
+//								}
+//							}
+//						}
+						}
+					}
+				}
+			}
+
+            log("IN Finish: "+transfer.getFileName()+" path: "+transfer.getPath());
+        }
+
+		if (megaApi.getNumPendingUploads() == 0 && transfersCount==0){
+			onQueueComplete();
+		}
+	}
+
+	public void attachNodes(MegaTransfer transfer){
+		//Find the pending message
+		for(int i=0; i<pendingMessages.size();i++){
+			PendingMessage pendMsg = pendingMessages.get(i);
+
+			ArrayList<PendingNodeAttachment> nodesAttached = pendMsg.getNodeAttachments();
+			if(nodesAttached.size()==1){
+				log("Just one file to send in the message: "+pendMsg.getId());
+				PendingNodeAttachment nodeAttachment = nodesAttached.get(0);
+
+				if(nodeAttachment.getFilePath().equals(transfer.getPath())){
+					log("NodeHANDLE of the nodeAttachment: "+nodeAttachment.getNodeHandle());
+					if(nodeAttachment.getNodeHandle()==-1){
+						nodeAttachment.setNodeHandle(transfer.getNodeHandle());
+						if(megaChatApi!=null){
+							log("Send node: "+transfer.getNodeHandle()+ " to chat: "+pendMsg.getChatId());
+							megaChatApi.attachNode(pendMsg.getChatId(), transfer.getNodeHandle(), this);
+
+							if (megaApi.getNumPendingUploads() == 0 && transfersCount==0){
+								onQueueComplete();
+							}
+//							return;
 						}
 					}
 					else{
-						log("More than one to send in message");
+						log("Already attached");
+					}
+				}
+			}
+			else{
+				log("More than one to send in message");
 //						for(int j=0; j<nodesAttached.size();j++) {
 //							PendingNodeAttachment nodeAttachment = nodesAttached.get(j);
 //
@@ -455,81 +544,9 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 //							}
 
 //						}
-					}
-				}
-				log("The NOT found in messages");
-            }
-            else{
-                log("Upload Error: " + transfer.getFileName() + "_" + error.getErrorCode() + "___" + error.getErrorString());
-
-                if(error.getErrorCode()==MegaError.API_EOVERQUOTA){
-                    log("OVERQUOTA ERROR: "+error.getErrorCode());
-                    Intent intent;
-                    intent = new Intent(this, ManagerActivityLollipop.class);
-                    intent.setAction(Constants.ACTION_OVERQUOTA_STORAGE);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-
-                    startActivity(intent);
-
-                    Intent tempIntent = null;
-                    tempIntent = new Intent(this, ChatUploadService.class);
-                    tempIntent.setAction(ChatUploadService.ACTION_CANCEL);
-                    startService(tempIntent);
-                }
-
-				//Find the pending message
-				for(int i=0; i<pendingMessages.size();i++){
-					PendingMessage pendMsg = pendingMessages.get(i);
-
-					ArrayList<PendingNodeAttachment> nodesAttached = pendMsg.getNodeAttachments();
-					if(nodesAttached.size()==1){
-						log("Just one file to send in the message");
-						PendingNodeAttachment nodeAttachment = nodesAttached.get(0);
-
-						if(nodeAttachment.getFilePath().equals(transfer.getPath())){
-							if(nodeAttachment.getFilePath().equals(transfer.getPath())){
-
-								dbH.updatePendingMessage(pendMsg.getId(), -1+"", PendingMessage.STATE_ERROR);
-								launchErrorToChat(pendMsg);
-
-								if (megaApi.getNumPendingUploads() == 0 && transfersCount==0){
-									onQueueComplete();
-								}
-								return;
-							}
-						}
-					}
-					else{
-						log("More than one to send in message");
-//						for(int j=0; j<nodesAttached.size();j++) {
-//							PendingNodeAttachment nodeAttachment = nodesAttached.get(j);
-//
-//							if(nodeAttachment.getFilePath().equals(transfer.getPath())){
-//								nodeAttachment.setNodeHandle(transfer.getNodeHandle());
-//
-//								if(nodeAttachment.getFilePath().equals(transfer.getPath())){
-//
-//									dbH.updatePendingMessage(pendMsg.getId(), -1+"", PendingMessage.STATE_ERROR);
-//									pendMsg.setState(PendingMessage.STATE_ERROR);
-//									launchErrorToChat(pendMsg);
-//
-//									if (megaApi.getNumPendingUploads() == 0 && transfersCount==0){
-//										onQueueComplete();
-//									}
-//									return;
-//								}
-//							}
-//						}
-					}
-				}
-            }
-
-            log("IN Finish: "+transfer.getFileName()+"path? "+transfer.getPath());
-        }
-
-		if (megaApi.getNumPendingUploads() == 0 && transfersCount==0){
-			onQueueComplete();
+			}
 		}
+		log("The NOT found in messages");
 	}
 
 	@Override
@@ -640,6 +657,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 							long tempId = request.getMegaChatMessage().getTempId();
 							log("The tempId of the message is: "+tempId);
 							dbH.updatePendingMessage(pendMsg.getId(), tempId+"", PendingMessage.STATE_SENT);
+							pendingMessages.remove(i);
 							break;
 						}
 					}
@@ -667,6 +685,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 							long tempId = request.getMegaChatMessage().getTempId();
 							log("The tempId of the message is: "+tempId);
 							dbH.updatePendingMessage(pendMsg.getId(), tempId+"", PendingMessage.STATE_SENT);
+							pendingMessages.remove(i);
 							break;
 						}
 					}

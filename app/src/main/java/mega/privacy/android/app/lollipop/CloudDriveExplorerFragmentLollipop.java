@@ -539,7 +539,6 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 		}
 		else{
 			listView.setVisibility(View.VISIBLE);
-			emptyImageView.setVisibility(View.GONE);
 			emptyTextView.setVisibility(View.GONE);
 		}
 

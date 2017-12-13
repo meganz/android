@@ -67,7 +67,7 @@
     <color name="forgot_pass_text">#91000000</color>
         
     <color name="tab_pressed">#ee0008</color>
-    
+
     <color name="transparent_black">#80000000</color>
     <color name="transparent_mega">#80db0605</color>
     
@@ -126,5 +126,8 @@
     <color name="camera_uploads_list_view">#FFF5F5F5</color>
     <color name="scroll_bubble">#90727272</color>
     <color name="scroll_handle">#90d90007</color>
+
+
+    <color name="transparent_black2">#99000000</color>
 
 </resources>

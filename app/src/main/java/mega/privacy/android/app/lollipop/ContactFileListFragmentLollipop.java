@@ -1,15 +1,18 @@
 package mega.privacy.android.app.lollipop;
 
 import android.app.Activity;
+import android.app.ActivityManager;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
@@ -28,6 +31,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -38,7 +42,6 @@ import java.util.Stack;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
-import mega.privacy.android.app.MegaStreamingService;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
@@ -569,18 +572,26 @@ public class ContactFileListFragmentLollipop extends Fragment{
 				} 
 				else if (MimeTypeList.typeForName(contactNodes.get(position).getName()).isVideo()	|| MimeTypeList.typeForName(contactNodes.get(position).getName()).isAudio()) {
 					MegaNode file = contactNodes.get(position);
-					Intent service = new Intent(context, MegaStreamingService.class);
-					((ContactFileListActivityLollipop)context).startService(service);
-					String fileName = file.getName();
-					try {
-						fileName = URLEncoder.encode(fileName, "UTF-8").replaceAll("\\+", "%20");
-					} catch (UnsupportedEncodingException e) {
-						e.printStackTrace();
+					if (megaApi.httpServerIsRunning() == 0) {
+						megaApi.httpServerStart();
 					}
 
-					String url = "http://127.0.0.1:4443/" + file.getBase64Handle() + "/" + fileName;
+					ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
+					ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+					activityManager.getMemoryInfo(mi);
+
+					if(mi.totalMem>Constants.BUFFER_COMP){
+						log("Total mem: "+mi.totalMem+" allocate 32 MB");
+						megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
+					}
+					else{
+						log("Total mem: "+mi.totalMem+" allocate 16 MB");
+						megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
+					}
+
+					String url = megaApi.httpServerGetLocalLink(file);
 					String mimeType = MimeTypeList.typeForName(file.getName()).getType();
-					System.out.println("FILENAME: " + fileName);
+					log("FILENAME: " + file.getName());
 
 					Intent mediaIntent = new Intent(Intent.ACTION_VIEW);
 					mediaIntent.setDataAndType(Uri.parse(url), mimeType);
@@ -594,7 +605,8 @@ public class ContactFileListFragmentLollipop extends Fragment{
 						handleList.add(contactNodes.get(position).getHandle());
 						((ContactFileListActivityLollipop)context).onFileClick(handleList);
 			  		}
-				} else {
+				}
+				else {
 					adapter.notifyDataSetChanged();
 					ArrayList<Long> handleList = new ArrayList<Long>();
 					handleList.add(contactNodes.get(position).getHandle());
