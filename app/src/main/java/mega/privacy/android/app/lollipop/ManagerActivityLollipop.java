@@ -297,6 +297,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	boolean firstNavigationLevel = true;
     DrawerLayout drawerLayout;
 
+    public boolean openFolderFromSearch = false;
+
 	public enum DrawerItem {
 		CLOUD_DRIVE, SAVED_FOR_OFFLINE, CAMERA_UPLOADS, INBOX, SHARED_ITEMS, CONTACTS, SETTINGS, ACCOUNT, SEARCH, TRANSFERS, MEDIA_UPLOADS, CHAT;
 
@@ -367,6 +369,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 //	String pathNavigation = "/";
 	public String searchQuery = null;
 	public boolean textSubmitted = false;
+	public boolean textsearchQuery = false;
 	boolean isSearching = false;
 	ArrayList<MegaNode> searchNodes;
 	public int levelsSearch = -1;
@@ -1086,6 +1089,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		if(searchQuery!=null){
 			outState.putInt("levelsSearch", levelsSearch);
 			outState.putString("searchQuery", searchQuery);
+			textsearchQuery = true;
+			outState.putBoolean("textsearchQuery", textsearchQuery);
+		}
+		else {
+			textsearchQuery = false;
 		}
 	}
 
@@ -1139,6 +1147,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			selectedAccountType = savedInstanceState.getInt("selectedAccountType", -1);
 			selectedPaymentMethod = savedInstanceState.getInt("selectedPaymentMethod", -1);
 			searchQuery = savedInstanceState.getString("searchQuery");
+			textsearchQuery = savedInstanceState.getBoolean("textsearchQuery");
 			levelsSearch = savedInstanceState.getInt("levelsSearch");
 			chatConnection = savedInstanceState.getBoolean("chatConnection");
 
@@ -2712,16 +2721,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 	}
 
-//	@Override
-//	protected void onPostResume() {
-//		log("onPostResume");
-//	    super.onPostResume();
-//	    if (isSearching){
-//			selectDrawerItemLollipop(DrawerItem.SEARCH);
-//    		isSearching = false;
-//	    }
-//	}
-
 	public void showDialogChangeUserAttribute(){
 		log("showDialogChangeUserAttribute");
 
@@ -3573,7 +3572,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 	public void clickDrawerItemLollipop(DrawerItem item){
 		log("clickDrawerItemLollipop: "+item);
-
 		Menu nVMenu = nV.getMenu();
 		if (nVMenu != null){
 			if(item==null){
@@ -4158,6 +4156,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
     	switch (item){
 			case CLOUD_DRIVE:{
 				selectDrawerItemCloudDrive();
+				if (openFolderFromSearch){
+					onNodesCloudDriveUpdate();
+					openFolderFromSearch = false;
+				}
     			supportInvalidateOptionsMenu();
 				setToolbarTitle();
 				showFabButton();
@@ -4403,6 +4405,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
     			drawerLayout.closeDrawer(Gravity.LEFT);
 
+				if (openFolderFromSearch){
+					onNodesInboxUpdate();
+					openFolderFromSearch = false;
+				}
     			supportInvalidateOptionsMenu();
 				setToolbarTitle();
 				showFabButton();
@@ -4411,6 +4417,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
     		case SHARED_ITEMS:{
 
 				selectDrawerItemSharedItems();
+				if (openFolderFromSearch){
+					onNodesSharedUpdate();
+					openFolderFromSearch = false;
+				}
     			supportInvalidateOptionsMenu();
 				setToolbarTitle();
 				showFabButton();
@@ -4474,7 +4484,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				}
 
     			drawerItem = DrawerItem.SEARCH;
-
 				sFLol = new SearchFragmentLollipop().newInstance();
 
     			tabLayoutCloud.setVisibility(View.GONE);
@@ -4757,6 +4766,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		MenuItemCompat.setOnActionExpandListener(searchMenuItem, new MenuItemCompat.OnActionExpandListener() {
 			@Override
 			public boolean onMenuItemActionExpand(MenuItem item) {
+				textsearchQuery = false;
+				searchQuery = "";
+				selectDrawerItemLollipop(DrawerItem.SEARCH);
 				return true;
 			}
 
@@ -4791,6 +4803,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
                 log("Searching by text: "+newText);
 				if(textSubmitted){
 					textSubmitted = false;
+				}
+				else if (textsearchQuery) {
+					selectDrawerItemLollipop(DrawerItem.SEARCH);
 				}
 				else{
 					searchQuery = newText;
@@ -8985,6 +9000,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	}
 
 	public void showCancelMessage(){
+		log("showCancelMessage");
 		AlertDialog cancelDialog;
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 //		builder.setTitle(getString(R.string.title_cancel_subscriptions));
@@ -13374,44 +13390,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		this.isSearchEnabled = isSearchEnabled;
 	}
 
-	@Override
-	public void onNodesUpdate(MegaApiJava api, ArrayList<MegaNode> updatedNodes) {
-		log("onNodesUpdateLollipop");
-		try {
-			statusDialog.dismiss();
-		}
-		catch (Exception ex) {}
-
-		boolean updateContacts = false;
-
-		if(updatedNodes!=null){
-			//Verify is it is a new item to the inbox
-			for(int i=0;i<updatedNodes.size(); i++){
-				MegaNode updatedNode = updatedNodes.get(i);
-
-				if(!updateContacts){
-					if(updatedNode.isInShare()){
-						updateContacts = true;
-					}
-				}
-
-				if(updatedNode.getParentHandle()==inboxNode.getHandle()){
-					log("New element to Inbox!!");
-					setInboxNavigationDrawer();
-				}
-			}
-		}
-
-		if(updateContacts){
-			String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);
-			cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
-			if (cFLol != null){
-				if(cFLol.isAdded()){
-					log("Incoming update - update contacts section");
-					cFLol.updateShares();
-				}
-			}
-		}
+	public void onNodesCloudDriveUpdate() {
+		log("onNodesCloudDriveUpdate");
 
 		if(cloudPageAdapter!=null){
 			//Rubbish bin
@@ -13461,10 +13441,25 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				log("FileBrowser is NULL after move");
 			}
 		}
+	}
 
-		if (sFLol != null){
-			sFLol.refresh();
+	public void onNodesInboxUpdate() {
+		log("onNodesInboxUpdate");
+
+		if (iFLol != null){
+			if(iFLol.isAdded()){
+				MegaNode node = megaApi.getNodeByHandle(parentHandleInbox);
+				if (node != null){
+					log("Go to inbox node: "+node.getName());
+					ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleInbox), orderCloud);
+					iFLol.setNodes(nodes);
+				}
+			}
 		}
+	}
+
+	public void onNodesSharedUpdate() {
+		log("onNodesSharedUpdate");
 
 		if(sharesPageAdapter!=null){
 			outSFLol = (OutgoingSharesFragmentLollipop) sharesPageAdapter.instantiateItem(viewPagerShares, 1);
@@ -13481,17 +13476,56 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				}
 			}
 		}
+	}
 
-		if (iFLol != null){
-			if(iFLol.isAdded()){
-				MegaNode node = megaApi.getNodeByHandle(parentHandleInbox);
-				if (node != null){
-					log("Go to inbox node: "+node.getName());
-					ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleInbox), orderCloud);
-					iFLol.setNodes(nodes);
+	@Override
+	public void onNodesUpdate(MegaApiJava api, ArrayList<MegaNode> updatedNodes) {
+		log("onNodesUpdateLollipop");
+		try {
+			statusDialog.dismiss();
+		}
+		catch (Exception ex) {}
+
+		boolean updateContacts = false;
+
+		if(updatedNodes!=null){
+			//Verify is it is a new item to the inbox
+			for(int i=0;i<updatedNodes.size(); i++){
+				MegaNode updatedNode = updatedNodes.get(i);
+
+				if(!updateContacts){
+					if(updatedNode.isInShare()){
+						updateContacts = true;
+					}
+				}
+
+				if(updatedNode.getParentHandle()==inboxNode.getHandle()){
+					log("New element to Inbox!!");
+					setInboxNavigationDrawer();
 				}
 			}
 		}
+
+		if(updateContacts){
+			String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);
+			cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
+			if (cFLol != null){
+				if(cFLol.isAdded()){
+					log("Incoming update - update contacts section");
+					cFLol.updateShares();
+				}
+			}
+		}
+
+		onNodesCloudDriveUpdate();
+
+		if (sFLol != null){
+			sFLol.refresh();
+		}
+
+		onNodesSharedUpdate();
+
+		onNodesInboxUpdate();
 
 		if (cuFL != null){
 			if(cuFL.isAdded()){

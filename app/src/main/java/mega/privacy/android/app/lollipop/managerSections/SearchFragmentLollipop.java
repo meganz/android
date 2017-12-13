@@ -1,6 +1,7 @@
 package mega.privacy.android.app.lollipop.managerSections;
 
 import android.app.Activity;
+import android.app.ActivityManager;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -39,7 +40,6 @@ import java.util.List;
 import java.util.Stack;
 
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MegaStreamingService;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.CustomizedGridLayoutManager;
@@ -58,7 +58,6 @@ import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
-
 
 public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 
@@ -313,7 +312,8 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		
+		log("onCreateView");
+
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
 		}
@@ -571,19 +571,27 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 				}
 				else if (MimeTypeList.typeForName(nodes.get(position).getName()).isVideo() || MimeTypeList.typeForName(nodes.get(position).getName()).isAudio() ){
 					MegaNode file = nodes.get(position);
-					Intent service = new Intent(context, MegaStreamingService.class);
-			  		context.startService(service);
-			  		String fileName = file.getName();
-					try {
-						fileName = URLEncoder.encode(fileName, "UTF-8").replaceAll("\\+", "%20");
-					} 
-					catch (UnsupportedEncodingException e) {
-						e.printStackTrace();
+
+					if (megaApi.httpServerIsRunning() == 0) {
+						megaApi.httpServerStart();
 					}
-					
-			  		String url = "http://127.0.0.1:4443/" + file.getBase64Handle() + "/" + fileName;
-			  		String mimeType = MimeTypeList.typeForName(file.getName()).getType();
-			  		System.out.println("FILENAME: " + fileName);
+
+					ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
+					ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+					activityManager.getMemoryInfo(mi);
+
+					if(mi.totalMem>Constants.BUFFER_COMP){
+						log("Total mem: "+mi.totalMem+" allocate 32 MB");
+						megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
+					}
+					else{
+						log("Total mem: "+mi.totalMem+" allocate 16 MB");
+						megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
+					}
+
+					String url = megaApi.httpServerGetLocalLink(file);
+					String mimeType = MimeTypeList.typeForName(file.getName()).getType();
+					log("FILENAME: " + file.getName());
 			  		
 			  		Intent mediaIntent = new Intent(Intent.ACTION_VIEW);
 			  		mediaIntent.setDataAndType(Uri.parse(url), mimeType);
@@ -837,7 +845,7 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 	}
 
 	public void refresh(){
-		log("refresh");
+		log("refresh ");
 		if(((ManagerActivityLollipop)context).parentHandleSearch==-1){
 			nodes = megaApi.search(((ManagerActivityLollipop)context).searchQuery);
 		}

@@ -2,6 +2,7 @@ package mega.privacy.android.app.lollipop;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.ActivityManager;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
@@ -65,7 +66,6 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.DownloadService;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
-import mega.privacy.android.app.MegaStreamingService;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
@@ -1525,19 +1525,27 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 				}
 				else if (MimeTypeList.typeForName(nodes.get(position).getName()).isVideo() || MimeTypeList.typeForName(nodes.get(position).getName()).isAudio() ){
 					MegaNode file = nodes.get(position);
-					Intent service = new Intent(this, MegaStreamingService.class);
-			  		startService(service);
-			  		String fileName = file.getName();
-					try {
-						fileName = URLEncoder.encode(fileName, "UTF-8").replaceAll("\\+", "%20");
-					} 
-					catch (UnsupportedEncodingException e) {
-						e.printStackTrace();
+
+					if (megaApi.httpServerIsRunning() == 0) {
+						megaApi.httpServerStart();
 					}
-					
-			  		String url = "http://127.0.0.1:4443/" + file.getBase64Handle() + "/" + fileName;
-			  		String mimeType = MimeTypeList.typeForName(file.getName()).getType();
-			  		System.out.println("FILENAME: " + fileName);
+
+					ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
+					ActivityManager activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+					activityManager.getMemoryInfo(mi);
+
+					if(mi.totalMem>Constants.BUFFER_COMP){
+						log("Total mem: "+mi.totalMem+" allocate 32 MB");
+						megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
+					}
+					else{
+						log("Total mem: "+mi.totalMem+" allocate 16 MB");
+						megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
+					}
+
+					String url = megaApi.httpServerGetLocalLink(file);
+					String mimeType = MimeTypeList.typeForName(file.getName()).getType();
+					log("FILENAME: " + file.getName());
 			  		
 			  		Intent mediaIntent = new Intent(Intent.ACTION_VIEW);
 			  		mediaIntent.setDataAndType(Uri.parse(url), mimeType);
