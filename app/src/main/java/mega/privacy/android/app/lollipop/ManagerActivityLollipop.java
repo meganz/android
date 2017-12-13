@@ -368,6 +368,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 //	String pathNavigation = "/";
 	public String searchQuery = null;
 	public boolean textSubmitted = false;
+	public boolean textsearchQuery = false;
 	boolean isSearching = false;
 	ArrayList<MegaNode> searchNodes;
 	public int levelsSearch = -1;
@@ -1081,6 +1082,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		if(searchQuery!=null){
 			outState.putInt("levelsSearch", levelsSearch);
 			outState.putString("searchQuery", searchQuery);
+			textsearchQuery = true;
+			outState.putBoolean("textsearchQuery", textsearchQuery);
+		}
+		else {
+			textsearchQuery = false;
 		}
 	}
 
@@ -1131,6 +1137,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			selectedAccountType = savedInstanceState.getInt("selectedAccountType", -1);
 			selectedPaymentMethod = savedInstanceState.getInt("selectedPaymentMethod", -1);
 			searchQuery = savedInstanceState.getString("searchQuery");
+			textsearchQuery = savedInstanceState.getBoolean("textsearchQuery");
 			levelsSearch = savedInstanceState.getInt("levelsSearch");
 			chatConnection = savedInstanceState.getBoolean("chatConnection");
 
@@ -2703,16 +2710,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 	}
 
-//	@Override
-//	protected void onPostResume() {
-//		log("onPostResume");
-//	    super.onPostResume();
-//	    if (isSearching){
-//			selectDrawerItemLollipop(DrawerItem.SEARCH);
-//    		isSearching = false;
-//	    }
-//	}
-
 	public void showDialogChangeUserAttribute(){
 		log("showDialogChangeUserAttribute");
 
@@ -3564,7 +3561,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 	public void clickDrawerItemLollipop(DrawerItem item){
 		log("clickDrawerItemLollipop: "+item);
-
 		Menu nVMenu = nV.getMenu();
 		if (nVMenu != null){
 			if(item==null){
@@ -4465,7 +4461,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				}
 
     			drawerItem = DrawerItem.SEARCH;
-
 				sFLol = new SearchFragmentLollipop().newInstance();
 
     			tabLayoutCloud.setVisibility(View.GONE);
@@ -4748,6 +4743,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		MenuItemCompat.setOnActionExpandListener(searchMenuItem, new MenuItemCompat.OnActionExpandListener() {
 			@Override
 			public boolean onMenuItemActionExpand(MenuItem item) {
+				textsearchQuery = false;
+				searchQuery = "";
+				selectDrawerItemLollipop(DrawerItem.SEARCH);
 				return true;
 			}
 
@@ -4782,6 +4780,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
                 log("Searching by text: "+newText);
 				if(textSubmitted){
 					textSubmitted = false;
+				}
+				else if (textsearchQuery) {
+					selectDrawerItemLollipop(DrawerItem.SEARCH);
 				}
 				else{
 					searchQuery = newText;
