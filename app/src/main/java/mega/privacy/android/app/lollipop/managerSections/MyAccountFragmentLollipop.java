@@ -75,8 +75,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 	Button upgradeButton;
 	Button logoutButton;
 	Button mkButton;
-	Button deleteAccountButton;
-	
+
 	RelativeLayout typeLayout;
 	LinearLayout lastSessionLayout;
 	LinearLayout connectionsLayout;
@@ -225,12 +224,6 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		}
 		logoutButton.setOnClickListener(this);
 		logoutButton.setVisibility(View.VISIBLE);
-
-		deleteAccountButton = (Button) v.findViewById(R.id.delete_account_button);
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-			deleteAccountButton.setBackground(ContextCompat.getDrawable(context, R.drawable.red_rounded_corners_button));
-		}
-		deleteAccountButton.setOnClickListener(this);
 
 		parentLinearLayout = (LinearLayout) v.findViewById(R.id.parent_linear_layout);
 		exportMKLayout = (RelativeLayout) v.findViewById(R.id.export_mk_full_layout);
@@ -592,11 +585,6 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 				hideMKLayout();
 				AccountController aC = new AccountController(context);
 				aC.exportMK();
-				break;
-			}
-			case R.id.delete_account_button:{
-				log("Delete Account button");
-//				((ManagerActivityLollipop)context).askConfirmationDeleteAccount();
 				break;
 			}
 			case R.id.my_account_account_type_button:{
