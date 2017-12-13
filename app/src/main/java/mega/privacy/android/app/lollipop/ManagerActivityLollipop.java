@@ -218,7 +218,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 	boolean chatConnection = false;
 
-	boolean cameraUploadsBoolean = false;
 	String regex = "[*|\\?:\"<>\\{\\}\\[\\]\\\\\\/]";
 
 	TransfersBottomSheetDialogFragment transfersBottomSheet = null;
@@ -411,6 +410,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	public long parentHandleBrowser;
 	public long parentHandleRubbish;
 	public long parentHandleIncoming;
+	public boolean isSearchEnabled;
+	public long[] typeOfSearch;
 	public long parentHandleOutgoing;
 	public long parentHandleSearch;
 	public long parentHandleInbox;
@@ -1043,6 +1044,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		outState.putBoolean("chatConnection", chatConnection);
 		outState.putSerializable("drawerItem", drawerItem);
 
+		outState.putBoolean("isSearchEnabled", isSearchEnabled);
+		outState.putLongArray("typeOfSearch",typeOfSearch);
+
+
 		if(parentHandleIncoming!=-1){
 			outState.putInt("deepBrowserTreeIncoming", deepBrowserTreeIncoming);
 		}
@@ -1125,6 +1130,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			parentHandleInbox = savedInstanceState.getLong("parentHandleInbox", -1);
 			deepBrowserTreeIncoming = savedInstanceState.getInt("deepBrowserTreeIncoming", 0);
 			deepBrowserTreeOutgoing = savedInstanceState.getInt("deepBrowserTreeOutgoing", 0);
+			isSearchEnabled = savedInstanceState.getBoolean("isSearchEnabled");
+			typeOfSearch = savedInstanceState.getLongArray("typeOfSearch");
+
 			drawerItem = (DrawerItem) savedInstanceState.getSerializable("drawerItem");
 			log("DrawerItem onCreate = " + drawerItem);
 			log("savedInstanceState -> drawerItem: "+drawerItem);
@@ -1150,6 +1158,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			parentHandleRubbish = -1;
 			parentHandleIncoming = -1;
 			parentHandleOutgoing = -1;
+			isSearchEnabled= false;
 			parentHandleSearch = -1;
 			parentHandleInbox = -1;
 			indexContacts = -1;
@@ -5060,7 +5069,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					//Show
 					upgradeAccountMenuItem.setVisible(true);
 					takePicture.setVisible(true);
-					searchByDate.setVisible(true);
+					if(firstNavigationLevel){
+						searchByDate.setVisible(true);
+					}else{
+						searchByDate.setVisible(false);
+					}
 
 					//Hide
 					sortByMenuItem.setVisible(false);
@@ -5122,7 +5135,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					//Show
 					upgradeAccountMenuItem.setVisible(true);
 					takePicture.setVisible(true);
-					searchByDate.setVisible(true);
+					if(firstNavigationLevel){
+						searchByDate.setVisible(true);
+					}else{
+						searchByDate.setVisible(false);
+					}
 
 					//Hide
 					sortByMenuItem.setVisible(false);
@@ -6025,14 +6042,33 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 									cuFL.setNodes(nodes);
 									aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 									setFirstNavigationLevel(true);
-									aB.setTitle(getString(R.string.section_shared_items));
 									aB.setTitle(getString(R.string.section_photo_sync));
+									isSearchEnabled=false;
+									invalidateOptionsMenu();
+
 								}
 								return true;
 							}
 
 						}
 
+					}else if (drawerItem == DrawerItem.MEDIA_UPLOADS){
+						if (muFLol != null){
+							if(muFLol.isAdded()){
+								long cameraUploadHandle = muFLol.getPhotoSyncHandle();
+								MegaNode nps = megaApi.getNodeByHandle(cameraUploadHandle);
+								if (nps != null){
+									ArrayList<MegaNode> nodes = megaApi.getChildren(nps, MegaApiJava.ORDER_MODIFICATION_DESC);
+									muFLol.setNodes(nodes);
+									aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+									setFirstNavigationLevel(true);
+									aB.setTitle(getString(R.string.section_secondary_media_uploads));
+									isSearchEnabled=false;
+									invalidateOptionsMenu();
+								}
+								return true;
+							}
+						}
 					}
 		    		else if (drawerItem == DrawerItem.SAVED_FOR_OFFLINE){
 		    			if (oFLol != null){
@@ -7960,6 +7996,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		else if (drawerItem == DrawerItem.CAMERA_UPLOADS){
 			if (cuFL != null){
     			if (cuFL.onBackPressed() == 0){
+					visibilitySearch(false);
     				drawerItem = DrawerItem.CLOUD_DRIVE;
     				if (nV != null){
 						Menu nVMenu = nV.getMenu();
@@ -7976,7 +8013,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		else if (drawerItem == DrawerItem.MEDIA_UPLOADS){
 			if (muFLol != null){
     			if (muFLol.onBackPressed() == 0){
-    				drawerItem = DrawerItem.CLOUD_DRIVE;
+					visibilitySearch(false);
+					drawerItem = DrawerItem.CLOUD_DRIVE;
     				if (nV != null){
 						Menu nVMenu = nV.getMenu();
 						MenuItem cloudDrive = nVMenu.findItem(R.id.navigation_item_cloud_drive);
@@ -11072,15 +11110,17 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				log("Return.....");
 				return;
 			}
-			final long[] searchByDate = intent.getLongArrayExtra("SELECTED_DATE");
-
+			final long[] searchDate = intent.getLongArrayExtra("SELECTED_DATE");
+			typeOfSearch = searchDate;
 			if (cuFL != null){
 				if(cuFL.isAdded()){
 					long cameraUploadHandle = cuFL.getPhotoSyncHandle();
 					MegaNode nps = megaApi.getNodeByHandle(cameraUploadHandle);
 					if (nps != null){
 						ArrayList<MegaNode> nodes = megaApi.getChildren(nps, MegaApiJava.ORDER_MODIFICATION_DESC);
-						searchDate(searchByDate, nodes);
+						ArrayList<MegaNode> nodesSearch = cuFL.searchDate(searchDate, nodes);
+						cuFL.setNodes(nodesSearch);
+						isSearchEnabled = true;
 					}
 				}
 			}
@@ -13339,6 +13379,17 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		}
 	}
 
+	public long[] getTypeOfSearch(){
+		return  typeOfSearch;
+	}
+
+	public boolean getIsSearchEnabled(){
+		return  isSearchEnabled;
+	}
+	public void setIsSearchEnabled(boolean isSearchEnabled){
+		this.isSearchEnabled = isSearchEnabled;
+	}
+
 	public void onNodesCloudDriveUpdate() {
 		log("onNodesCloudDriveUpdate");
 
@@ -14424,6 +14475,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	public void setSelectedPaymentMethod(int selectedPaymentMethod) {
 		this.selectedPaymentMethod = selectedPaymentMethod;
 	}
+	public void visibilitySearch(boolean visibility){
+		searchByDate.setVisible(visibility);
+	}
+
 
 	public int getSelectedAccountType() {
 		return selectedAccountType;
@@ -14767,189 +14822,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				}
 				chat.setTitle(result);
 			}
-		}
-	}
-
-	public void searchDate(long[] searchByDate, ArrayList<MegaNode> nodes ){
-
-		aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
-		setFirstNavigationLevel(false);
-		cameraUploadsBoolean = true;
-
-		ArrayList<MegaNode> nodesResult = new ArrayList<>();
-		Calendar cal = Calendar.getInstance();
-		Calendar calTo = Calendar.getInstance();
-
-		if(searchByDate[0] == 1){
-			log("option day");
-			cal.setTimeInMillis(searchByDate[1]);
-			int selectedYear = cal.get(Calendar.YEAR);
-			int selectedMonth = (cal.get(Calendar.MONTH) + 1);
-			int selectedDay = cal.get(Calendar.DAY_OF_MONTH);
-
-			//Title
-			SimpleDateFormat titleFormat = new SimpleDateFormat("d MMM");
-			Calendar calTitle = Calendar.getInstance();
-			calTitle.set(selectedYear, selectedMonth, selectedDay);
-			Date date = calTitle.getTime();
-			String formattedDate = titleFormat.format(date);
-			aB.setTitle(formattedDate);
-
-			int nodeDay, nodeMonth, nodeYear;
-			SimpleDateFormat df = new SimpleDateFormat("yyyy");
-
-			for (MegaNode node : nodes){
-				Date d = new Date(node.getModificationTime()*1000);
-				nodeDay = d.getDay();
-				nodeMonth = (d.getMonth() + 1);
-				nodeYear = Integer.parseInt(df.format(d));
-
-				if((selectedYear == nodeYear) && (selectedMonth == nodeMonth) && (selectedDay == nodeDay )){
-					nodesResult.add(node);
-				}
-			}
-			cuFL.setNodes(nodesResult);
-
-		}else if(searchByDate[0] == 2){
-
-			if(searchByDate[2] == 1){
-
-				log("option last month");
-				int selectedDay = cal.get(Calendar.DAY_OF_MONTH);
-				int selectedMonth = (cal.get(Calendar.MONTH) + 1);
-				int selectedYear = cal.get(Calendar.YEAR);
-
-				if(selectedMonth == 1){
-					selectedMonth = 12;
-					selectedYear = selectedYear - 1;
-				}else{
-					selectedMonth = selectedMonth - 1;
-				}
-
-				//Title
-				int selectedMonthTitle = selectedMonth;
-				SimpleDateFormat titleFormat = new SimpleDateFormat("MMMM");
-				Calendar calTitle = Calendar.getInstance();
-				if (selectedMonthTitle == 1){
-					selectedMonthTitle = 12;
-
-				}else{
-					selectedMonthTitle = selectedMonthTitle - 1;
-
-				}
-				calTitle.set(selectedYear, selectedMonthTitle, selectedDay);
-				Date date = calTitle.getTime();
-				String formattedDate = titleFormat.format(date);
-				aB.setTitle(formattedDate);
-
-				int nodeMonth, nodeYear;
-				SimpleDateFormat df = new SimpleDateFormat("yyyy");
-
-				for (MegaNode node : nodes){
-					Date d = new Date(node.getModificationTime()*1000);
-					nodeMonth = (d.getMonth() + 1);
-					nodeYear = Integer.parseInt(df.format(d));
-
-					if((selectedYear == nodeYear) && (selectedMonth == nodeMonth)){
-						nodesResult.add(node);
-					}
-				}
-				cuFL.setNodes(nodesResult);
-
-			}else if(searchByDate[2] == 2){
-				log("option last year");
-
-				int selectedYear = (cal.get(Calendar.YEAR) - 1);
-
-				//Title
-				String formattedDate = String.valueOf(selectedYear);
-				aB.setTitle(formattedDate);
-
-				int nodeYear;
-				SimpleDateFormat df = new SimpleDateFormat("yyyy");
-
-				for (MegaNode node : nodes){
-					Date d = new Date(node.getModificationTime()*1000);
-					nodeYear = Integer.parseInt(df.format(d));
-					if(selectedYear == nodeYear){
-						nodesResult.add(node);
-					}
-				}
-				cuFL.setNodes(nodesResult);
-			}
-
-		}else if(searchByDate[0] == 3){
-			log("option period");
-
-			cal.setTimeInMillis(searchByDate[3]);
-			int selectedYearFrom = cal.get(Calendar.YEAR);
-			int selectedMonthFrom = (cal.get(Calendar.MONTH) + 1);
-			int selectedDayFrom = cal.get(Calendar.DAY_OF_MONTH);
-
-			calTo.setTimeInMillis(searchByDate[4]);
-			int selectedYearTo = calTo.get(Calendar.YEAR);
-			int selectedMonthTo = (calTo.get(Calendar.MONTH) + 1);
-			int selectedDayTo = calTo.get(Calendar.DAY_OF_MONTH);
-
-			//Title
-			SimpleDateFormat titleFormat = new SimpleDateFormat("d MMM");
-			Calendar calTitleFrom = Calendar.getInstance();
-			Calendar calTitleTo = Calendar.getInstance();
-			calTitleFrom.set(selectedYearFrom, cal.get(Calendar.MONTH), selectedDayFrom);
-			calTitleTo.set(selectedYearTo, calTo.get(Calendar.MONTH), selectedDayTo);
-			Date dateFrom = calTitleFrom.getTime();
-			Date dateTo = calTitleTo.getTime();
-
-			String formattedDateFrom = titleFormat.format(dateFrom);
-			String formattedDateTo = titleFormat.format(dateTo);
-
-			String formattedDate = formattedDateFrom +" - "+ formattedDateTo;
-			aB.setTitle(formattedDate);
-
-			int nodeDay, nodeMonth, nodeYear;
-			SimpleDateFormat df = new SimpleDateFormat("yyyy");
-
-
-			for (MegaNode node : nodes){
-				int period = 0;
-				Date d = new Date(node.getModificationTime()*1000);
-				nodeDay = d.getDay();
-				nodeMonth = (d.getMonth() + 1);
-				nodeYear = Integer.parseInt(df.format(d));
-
-				//Period From
-				if(selectedYearFrom < nodeYear){
-					period ++;
-				}else if(selectedYearFrom == nodeYear){
-					if(selectedMonthFrom < nodeMonth){
-						period ++;
-					}else if(selectedMonthFrom == nodeMonth){
-
-						if(selectedDayFrom <= nodeDay){
-							period ++;
-						}
-					}
-				}
-
-				//Period To
-				if(selectedYearTo > nodeYear){
-					period ++;
-				}else if(selectedYearTo == nodeYear){
-					if(selectedMonthTo > nodeMonth){
-						period ++;
-					}else if(selectedMonthTo == nodeMonth){
-
-						if(selectedDayTo >= nodeDay){
-							period ++;
-						}
-					}
-				}
-
-				if(period == 2){
-					nodesResult.add(node);
-				}
-			}
-			cuFL.setNodes(nodesResult);
 		}
 	}
 
