@@ -170,6 +170,10 @@
 	    <Preference
 	        android:key="settings_advanced_features_offline"
 	        android:title="@string/settings_advanced_features_offline" />
+
+		<Preference
+			android:key="settings_advanced_features_cancel_account"
+			android:title="@string/settings_advanced_features_cancel_account"/>
 	</PreferenceCategory>
 
 	<PreferenceCategory

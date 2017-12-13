@@ -22,8 +22,6 @@ import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.graphics.Shader.TileMode;
-import android.icu.text.NumberFormat;
-import android.icu.text.SimpleDateFormat;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -98,7 +96,6 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Locale;
@@ -162,7 +159,6 @@ import mega.privacy.android.app.lollipop.megachat.RecentChatsFragmentLollipop;
 import mega.privacy.android.app.lollipop.tasks.CheckOfflineNodesTask;
 import mega.privacy.android.app.lollipop.tasks.FilePrepareTask;
 import mega.privacy.android.app.lollipop.tasks.FillDBContactsTask;
-import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ChatBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.ContactsBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.MyAccountBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment;
@@ -171,6 +167,7 @@ import mega.privacy.android.app.modalbottomsheet.ReceivedRequestBottomSheetDialo
 import mega.privacy.android.app.modalbottomsheet.SentRequestBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.TransfersBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment;
+import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ChatBottomSheetDialogFragment;
 import mega.privacy.android.app.receivers.NetworkStateReceiver;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
@@ -8641,10 +8638,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					return false;
 				}
 			});
-			input.setImeActionLabel(getString(R.string.context_delete),EditorInfo.IME_ACTION_DONE);
+			input.setImeActionLabel(getString(R.string.delete_account),EditorInfo.IME_ACTION_DONE);
 			builder.setTitle(getString(R.string.delete_account));
 			builder.setMessage(getString(R.string.delete_account_text_last_step));
-			builder.setPositiveButton(getString(R.string.context_delete),
+			builder.setNegativeButton(getString(R.string.general_dismiss), null);
+			builder.setPositiveButton(getString(R.string.delete_account),
 					new DialogInterface.OnClickListener() {
 						public void onClick(DialogInterface dialog, int whichButton) {
 
@@ -8678,6 +8676,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			input.setImeActionLabel(getString(R.string.change_pass),EditorInfo.IME_ACTION_DONE);
 			builder.setTitle(getString(R.string.change_mail_title_last_step));
 			builder.setMessage(getString(R.string.change_mail_text_last_step));
+			builder.setNegativeButton(getString(android.R.string.cancel), null);
 			builder.setPositiveButton(getString(R.string.change_pass),
 					new DialogInterface.OnClickListener() {
 						public void onClick(DialogInterface dialog, int whichButton) {
@@ -8696,11 +8695,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				}
 			}
 		});
-		builder.setNegativeButton(getString(android.R.string.cancel), null);
+
 		builder.setView(layout);
 		insertPassDialog = builder.create();
 		insertPassDialog.show();
 		if(cancelAccount){
+			builder.setNegativeButton(getString(R.string.general_dismiss), null);
 			insertPassDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View v) {
@@ -8720,6 +8720,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			});
 		}
 		else{
+			builder.setNegativeButton(getString(android.R.string.cancel), null);
 			insertPassDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View v) {
@@ -8738,7 +8739,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				}
 			});
 		}
-
 	}
 
 	public void askConfirmationDeleteAccount(){
@@ -8764,11 +8764,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 		builder.setMessage(getResources().getString(R.string.delete_account_text));
 
-		builder.setPositiveButton(R.string.delete_button, dialogClickListener);
-		builder.setNegativeButton(R.string.general_cancel, dialogClickListener);
+		builder.setPositiveButton(R.string.delete_account, dialogClickListener);
+		builder.setNegativeButton(R.string.general_dismiss, dialogClickListener);
 		builder.show();
 	}
-
 
 	public void showImportLinkDialog(){
 		log("showImportLinkDialog");
@@ -12658,8 +12657,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 				}
 			}
-
-
 		}
 		if(request.getType() == MegaRequest.TYPE_GET_CHANGE_EMAIL_LINK) {
 			log("TYPE_GET_CHANGE_EMAIL_LINK: "+request.getEmail());
@@ -12739,6 +12736,21 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				Util.showAlert(this, getString(R.string.email_verification_text_error), getString(R.string.general_error_word));
 			}
         }
+		else if(request.getType() == MegaRequest.TYPE_CONFIRM_CANCEL_LINK){
+			if (e.getErrorCode() == MegaError.API_OK){
+				log("ACCOUNT CANCELED");
+			}
+			else if (e.getErrorCode() == MegaError.API_ENOENT){
+				log("Error cancelling account: API_ENOENT"+e.getErrorCode());
+				log(e.getErrorString() + "___" + e.getErrorCode());
+				Util.showAlert(this, getString(R.string.old_password_provided_incorrect), getString(R.string.general_error_word));
+			}
+			else{
+				log("Error cancelling account: "+e.getErrorCode());
+				log(e.getErrorString() + "___" + e.getErrorCode());
+				Util.showAlert(this, getString(R.string.email_verification_text_error), getString(R.string.general_error_word));
+			}
+		}
 		else if (request.getType() == MegaRequest.TYPE_REMOVE_CONTACT){
 
 			if (e.getErrorCode() == MegaError.API_OK){
