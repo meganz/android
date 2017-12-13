@@ -312,7 +312,8 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		
+		log("onCreateView");
+
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
 		}
@@ -844,7 +845,7 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 	}
 
 	public void refresh(){
-		log("refresh");
+		log("refresh ");
 		if(((ManagerActivityLollipop)context).parentHandleSearch==-1){
 			nodes = megaApi.search(((ManagerActivityLollipop)context).searchQuery);
 		}
