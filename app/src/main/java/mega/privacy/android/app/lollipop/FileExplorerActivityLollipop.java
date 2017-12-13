@@ -56,7 +56,6 @@ import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.lollipop.adapters.FileExplorerPagerAdapter;
-import mega.privacy.android.app.lollipop.megachat.AndroidMegaChatMessage;
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerFragment;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.lollipop.megachat.ChatUploadService;
@@ -72,8 +71,10 @@ import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatError;
 import nz.mega.sdk.MegaChatListItem;
+import nz.mega.sdk.MegaChatPeerList;
 import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaChatRequestListenerInterface;
+import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaGlobalListenerInterface;
@@ -205,8 +206,6 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 	public void onRequestFinish(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
 		log("onRequestFinish(CHAT)");
 
-		DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
-
 		if (request.getType() == MegaChatRequest.TYPE_CONNECT){
 			MegaApplication.setLoggingIn(false);
 			if(e.getErrorCode()==MegaChatError.ERROR_OK){
@@ -215,6 +214,21 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			}
 			else{
 				log("ERROR WHEN CONNECTING " + e.getErrorString());
+			}
+		}
+		else if(request.getType() == MegaChatRequest.TYPE_CREATE_CHATROOM){
+			log("Create chat request finish.");
+			if(e.getErrorCode()==MegaChatError.ERROR_OK){
+				log("Chat CREATED.");
+
+				//Update chat view
+				if(chatExplorer!=null && chatExplorer.isAdded()){
+					chatExplorer.setChats();
+				}
+			}
+			else{
+				log("EEEERRRRROR WHEN CREATING CHAT " + e.getErrorString());
+				showSnackbar(getString(R.string.create_chat_error));
 			}
 		}
 	}
@@ -342,7 +356,6 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		megaApi = ((MegaApplication)getApplication()).getMegaApi();
 		
 		megaApi.addGlobalListener(this);
-
 		
 		setContentView(R.layout.activity_file_explorer);
 		
@@ -1719,10 +1732,67 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 	        	showNewFolderDialog(); 
         		break;
 			}
+			case R.id.cab_menu_new_chat:{
+				Intent in = new Intent(this, AddContactActivityLollipop.class);
+				in.putExtra("contactType", Constants.CONTACT_TYPE_MEGA);
+				startActivityForResult(in, Constants.REQUEST_CREATE_CHAT);
+			}
 		}
 		return true;
 	}
-	
+
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
+		log("-------------------onActivityResult " + requestCode + "____" + resultCode);
+
+		if (requestCode == Constants.REQUEST_CREATE_CHAT && resultCode == RESULT_OK) {
+			log("onActivityResult REQUEST_CREATE_CHAT OK");
+
+			if (intent == null) {
+				log("Return.....");
+				return;
+			}
+
+			final ArrayList<String> contactsData = intent.getStringArrayListExtra(AddContactActivityLollipop.EXTRA_CONTACTS);
+
+			if (contactsData != null){
+				if(contactsData.size()==1){
+					MegaUser user = megaApi.getContact(contactsData.get(0));
+					if(user!=null){
+						log("Chat with contact: "+contactsData.size());
+						startOneToOneChat(user);
+					}
+				}
+				else{
+					MegaChatPeerList peers = MegaChatPeerList.createInstance();
+					for (int i=0; i<contactsData.size(); i++){
+						MegaUser user = megaApi.getContact(contactsData.get(i));
+						if(user!=null){
+							peers.addPeer(user.getHandle(), MegaChatPeerList.PRIV_STANDARD);
+						}
+					}
+					log("create group chat with participants: "+peers.size());
+					megaChatApi.createChat(true, peers, this);
+				}
+			}
+		}
+	}
+
+	public void startOneToOneChat(MegaUser user){
+		log("startOneToOneChat");
+		MegaChatRoom chat = megaChatApi.getChatRoomByUser(user.getHandle());
+		MegaChatPeerList peers = MegaChatPeerList.createInstance();
+		if(chat==null){
+			log("No chat, create it!");
+			peers.addPeer(user.getHandle(), MegaChatPeerList.PRIV_STANDARD);
+			megaChatApi.createChat(false, peers, this);
+		}
+		else{
+			log("There is already a chat, open it!");
+			showSnackbar(getString(R.string.chat_already_exists));
+		}
+	}
+
 	public void showNewFolderDialog(){
 		log("showNewFolderDialog");
 
