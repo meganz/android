@@ -59,8 +59,6 @@ import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatPresenceConfig;
 import nz.mega.sdk.MegaNode;
 
-import android.provider.Settings.Secure;
-
 
 //import android.support.v4.preference.PreferenceFragment;
 
@@ -175,6 +173,8 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 	Preference localCameraUploadFolderSDCard;
 	Preference megaCameraFolder;
 	Preference helpSendFeedback;
+	Preference cancelAccount;
+
 	Preference aboutPrivacy;
 	Preference aboutTOS;
 	Preference aboutSDK;
@@ -382,6 +382,9 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 
 		helpSendFeedback = findPreference(KEY_HELP_SEND_FEEDBACK);
 		helpSendFeedback.setOnPreferenceClickListener(this);
+
+		cancelAccount = findPreference("settings_advanced_features_cancel_account");
+		cancelAccount.setOnPreferenceClickListener(this);
 		
 		aboutPrivacy = findPreference(KEY_ABOUT_PRIVACY_POLICY);
 		aboutPrivacy.setOnPreferenceClickListener(this);
@@ -1817,6 +1820,10 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			Intent viewIntent = new Intent(Intent.ACTION_VIEW);
 			viewIntent.setData(Uri.parse("https://github.com/meganz/android"));
 			startActivity(viewIntent);
+		}
+		else if (preference.getKey().compareTo("settings_advanced_features_cancel_account") == 0){
+			log("Cancel account preference");
+			((ManagerActivityLollipop)context).askConfirmationDeleteAccount();
 		}
 		
 		return true;
