@@ -4461,7 +4461,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				}
 
     			drawerItem = DrawerItem.SEARCH;
-				log("imprimiento searchquery..." + searchQuery);
 				sFLol = new SearchFragmentLollipop().newInstance();
 
     			tabLayoutCloud.setVisibility(View.GONE);
