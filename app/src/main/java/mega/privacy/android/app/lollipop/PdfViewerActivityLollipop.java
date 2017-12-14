@@ -80,6 +80,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
     boolean inside = false;
 
     public RelativeLayout uploadContainer;
+    RelativeLayout pdfviewerContainer;
 
     ProgressDialog statusDialog;
 
@@ -402,7 +403,8 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
             startActivity(Intent.createChooser(share, getString(R.string.context_share_image)));
         }
         else{
-            Snackbar.make(this.getCurrentFocus(), getString(R.string.full_image_viewer_not_preview), Snackbar.LENGTH_LONG).show();
+            pdfviewerContainer = (RelativeLayout) findViewById(R.id.pdf_viewer_container);
+            Snackbar.make(pdfviewerContainer, getString(R.string.pdf_viewer_not_download), Snackbar.LENGTH_LONG).show();
         }
     }
 
