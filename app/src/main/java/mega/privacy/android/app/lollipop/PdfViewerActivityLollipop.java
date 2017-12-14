@@ -1,9 +1,6 @@
 package mega.privacy.android.app.lollipop;
 
-import android.app.AlertDialog;
-import android.app.Dialog;
-import android.content.ContentResolver;
-import android.content.DialogInterface;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
@@ -15,13 +12,15 @@ import android.os.Bundle;
 import android.provider.OpenableColumns;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.DialogFragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.RelativeLayout;
 
 import com.github.barteksc.pdfviewer.PDFView;
@@ -31,28 +30,49 @@ import com.github.barteksc.pdfviewer.listener.OnPageErrorListener;
 import com.github.barteksc.pdfviewer.scroll.DefaultScrollHandle;
 import com.shockwave.pdfium.PdfDocument;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.List;
 
+import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.UploadService;
+import mega.privacy.android.app.UserCredentials;
+import mega.privacy.android.app.lollipop.megachat.ChatSettings;
+import mega.privacy.android.app.lollipop.tasks.FilePrepareTask;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaChatApi;
+import nz.mega.sdk.MegaChatApiAndroid;
+import nz.mega.sdk.MegaChatApiJava;
+import nz.mega.sdk.MegaChatError;
+import nz.mega.sdk.MegaChatRequest;
+import nz.mega.sdk.MegaChatRequestListenerInterface;
+import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
+import nz.mega.sdk.MegaRequest;
+import nz.mega.sdk.MegaRequestListenerInterface;
+import nz.mega.sdk.MegaUser;
 
-public class PdfViewerActivityLollipop extends PinActivityLollipop implements OnPageChangeListener, OnLoadCompleteListener, OnPageErrorListener, View.OnClickListener{
+public class PdfViewerActivityLollipop extends PinActivityLollipop implements OnPageChangeListener, OnLoadCompleteListener, OnPageErrorListener, View.OnClickListener, MegaRequestListenerInterface, MegaChatRequestListenerInterface {
 
     MegaApplication app = null;
     MegaApiAndroid megaApi;
+    MegaChatApiAndroid megaChatApi;
 
     PDFView pdfView;
 
     AppBarLayout appBarLayout;
     Toolbar tB;
     public ActionBar aB;
+
+    private String gSession;
+    UserCredentials credentials;
+    private String lastEmail;
+    DatabaseHandler dbH = null;
+    ChatSettings chatSettings;
 
     Uri uri;
     String pdfFileName;
@@ -61,7 +81,11 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
 
     public RelativeLayout uploadContainer;
 
+    ProgressDialog statusDialog;
+
     private MenuItem shareMenuItem;
+
+    private List<ShareInfo> filePreparedInfos;
 
     @Override
     public void onCreate (Bundle savedInstanceState){
@@ -146,75 +170,137 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
             @Override
             public void onClick(View v) {
                 log("onClick uploadContainer");
-
-                String folderPath = "filepath";
-                MegaNode parentNode = megaApi.getRootNode();
-                //uploadPDF();
-                UploadServiceTask uploadServiceTask = new UploadServiceTask(folderPath, parentNode.getHandle());
-                uploadServiceTask.start();
-
-                backToCloud(parentNode.getHandle());
-                finish();
+                checkLogin();
             }
         });
     }
 
-    private class UploadServiceTask extends Thread {
+    public void checkLogin(){
+        log("uploadToCloud");
 
-        String folderPath;
-        long parentHandle;
+        uploadContainer.setVisibility(View.GONE);
 
-        UploadServiceTask(String folderPath, long parentHandle){
-            this.folderPath = folderPath;
-            this.parentHandle = parentHandle;
+        dbH = DatabaseHandler.getDbHandler(this);
+        credentials = dbH.getCredentials();
+        //Start login process
+        if (credentials == null){
+            log("No credential to login");
+            Util.showAlert(this, getString(R.string.alert_not_logged_in), null);
+            uploadContainer.setVisibility(View.VISIBLE);
         }
+        else{
+            if (megaApi.getRootNode() == null) {
+                if (!MegaApplication.isLoggingIn()) {
 
-        @Override
-        public void run(){
+                    MegaApplication.setLoggingIn(true);
+                    gSession = credentials.getSession();
 
-            log("Run Upload Service Task");
+                    if (Util.isChatEnabled()) {
 
-            MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
-            if (parentNode == null){
-                parentNode = megaApi.getRootNode();
+                        log("onCreate: Chat is ENABLED");
+                        if (megaChatApi == null) {
+                            megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
+                        }
+                        int ret = megaChatApi.init(gSession);
+                        log("onCreate: result of init ---> " + ret);
+                        chatSettings = dbH.getChatSettings();
+                        if (ret == MegaChatApi.INIT_NO_CACHE) {
+                            log("onCreate: condition ret == MegaChatApi.INIT_NO_CACHE");
+                            megaApi.invalidateCache();
+
+                        } else if (ret == MegaChatApi.INIT_ERROR) {
+
+                            log("onCreate: condition ret == MegaChatApi.INIT_ERROR");
+                            if (chatSettings == null) {
+
+                                log("1 - onCreate: ERROR----> Switch OFF chat");
+                                chatSettings = new ChatSettings(false + "", true + "", "", true + "");
+                                dbH.setChatSettings(chatSettings);
+                            } else {
+
+                                log("2 - onCreate: ERROR----> Switch OFF chat");
+                                dbH.setEnabledChat(false + "");
+                            }
+                            megaChatApi.logout(this);
+                        } else {
+
+                            log("onCreate: Chat correctly initialized");
+                        }
+                    }
+
+                    log("SESSION: " + gSession);
+                    megaApi.fastLogin(gSession, this);
+                }
             }
-
-            try {
-                Thread.sleep(300);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+            else{
+                ((MegaApplication) getApplication()).sendSignalPresenceActivity();
+                uploadToCloud();
             }
-
-            Intent uploadServiceIntent;
-            uploadServiceIntent = new Intent (PdfViewerActivityLollipop.this, UploadService.class);
-            log("Uri to download " +uri);
-            File pdfFile = new File (uri.getPath());
-
-            uploadServiceIntent.putExtra(UploadService.EXTRA_FILEPATH, pdfFile.getAbsolutePath());
-            uploadServiceIntent.putExtra(UploadService.EXTRA_NAME, pdfFile.getName());
-            log("EXTRA_FILE_PATH_dir:" + pdfFile.getAbsolutePath());
-            log("EXTRA_FOLDER_PATH:" + folderPath);
-            uploadServiceIntent.putExtra(UploadService.EXTRA_FOLDERPATH, folderPath);
-            uploadServiceIntent.putExtra(UploadService.EXTRA_PARENT_HASH, parentNode.getHandle());
-            startService(uploadServiceIntent);
         }
     }
 
-    public void uploadPDF () {
-        log("uploadPDF");
+    public void uploadToCloud(){
+        log("uploadToCloud");
 
-        Intent intent = new Intent(getApplicationContext(), UploadService.class);
-        File pdfFile = new File(uri.toString());
-        MegaNode parentNode = megaApi.getRootNode();
+        if (filePreparedInfos == null){
 
-        intent.putExtra(UploadService.EXTRA_FILEPATH, pdfFile.getAbsolutePath());
-        intent.putExtra(UploadService.EXTRA_NAME, pdfFile.getName());
-        intent.putExtra(UploadService.EXTRA_PARENT_HASH, parentNode.getHandle());
-        intent.putExtra(UploadService.EXTRA_SIZE, pdfFile.getTotalSpace());
-        startService(intent);
+            ProgressDialog temp = null;
+            try{
+                temp = new ProgressDialog(this);
+                temp.setMessage(getString(R.string.upload_prepare));
+                temp.show();
+            }
+            catch(Exception e){
+                return;
+            }
+            statusDialog = temp;
 
-        backToCloud(parentNode.getHandle());
-        finish();
+            FilePrepareTask filePrepareTask = new FilePrepareTask(this);
+            filePrepareTask.execute(getIntent());
+
+        }
+        else{
+            onIntentProcessed(filePreparedInfos);
+        }
+
+        if(megaApi.getRootNode()!=null){
+            this.backToCloud(megaApi.getRootNode().getHandle());
+        }
+        else{
+            log("Error on logging");
+            Util.showAlert(this, getString(R.string.alert_not_logged_in), null);
+            uploadContainer.setVisibility(View.VISIBLE);
+        }
+    }
+
+    public void onIntentProcessed(List<ShareInfo> infos) {
+
+        if (statusDialog != null) {
+            try {
+                statusDialog.dismiss();
+            }
+            catch(Exception ex){}
+        }
+
+        log("intent processed!");
+
+        if (infos == null) {
+            log("Error infos is NULL");
+            return;
+        }
+        else {
+
+            MegaNode parentNode = megaApi.getRootNode();
+            for (ShareInfo info : infos) {
+                Intent intent = new Intent(this, UploadService.class);
+                intent.putExtra(UploadService.EXTRA_FILEPATH, info.getFileAbsolutePath());
+                intent.putExtra(UploadService.EXTRA_NAME, info.getTitle());
+                intent.putExtra(UploadService.EXTRA_PARENT_HASH, parentNode.getHandle());
+                intent.putExtra(UploadService.EXTRA_SIZE, info.getSize());
+                startService(intent);
+            }
+            filePreparedInfos = null;
+        }
     }
 
     public void backToCloud(long handle){
@@ -386,5 +472,133 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
         log("onClick");
 
         setToolbarVisibility();
+    }
+
+    @Override
+    public void onRequestStart(MegaApiJava api, MegaRequest request) {
+
+    }
+
+    @Override
+    public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
+
+    }
+
+    @Override
+    public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
+        log("onRequestFinish");
+        if (request.getType() == MegaRequest.TYPE_LOGIN){
+
+            if (e.getErrorCode() != MegaError.API_OK) {
+
+                MegaApplication.setLoggingIn(false);
+
+                DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
+                dbH.clearCredentials();
+                if (dbH.getPreferences() != null){
+                    dbH.clearPreferences();
+                    dbH.setFirstTime(false);
+                }
+            }
+            else{
+                //LOGIN OK
+
+                gSession = megaApi.dumpSession();
+                credentials = new UserCredentials(lastEmail, gSession, "", "", "");
+
+                DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
+                dbH.clearCredentials();
+
+                log("Logged in: " + gSession);
+
+                megaApi.fetchNodes(this);
+            }
+        }
+        else if (request.getType() == MegaRequest.TYPE_FETCH_NODES){
+
+            if (e.getErrorCode() == MegaError.API_OK){
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    Window window = this.getWindow();
+                    window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+                    window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+                    window.setStatusBarColor(ContextCompat.getColor(this, R.color.lollipop_dark_primary_color));
+
+                }
+                DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
+
+                gSession = megaApi.dumpSession();
+                MegaUser myUser = megaApi.getMyUser();
+                String myUserHandle = "";
+                if(myUser!=null){
+                    lastEmail = megaApi.getMyUser().getEmail();
+                    myUserHandle = megaApi.getMyUser().getHandle()+"";
+                }
+
+                credentials = new UserCredentials(lastEmail, gSession, "", "", myUserHandle);
+
+                dbH.saveCredentials(credentials);
+
+                chatSettings = dbH.getChatSettings();
+                if(chatSettings!=null) {
+
+                    boolean chatEnabled = Boolean.parseBoolean(chatSettings.getEnabled());
+                    if(chatEnabled){
+
+                        log("Chat enabled-->connect");
+                        megaChatApi.connect(this);
+                        MegaApplication.setLoggingIn(false);
+                        uploadToCloud();
+                    }
+                    else{
+
+                        log("Chat NOT enabled - readyToManager");
+                        MegaApplication.setLoggingIn(false);
+                        uploadToCloud();
+                    }
+                }
+                else{
+                    log("chatSettings NULL - readyToManager");
+                    MegaApplication.setLoggingIn(false);
+                    uploadToCloud();
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) {
+
+    }
+
+    @Override
+    public void onRequestStart(MegaChatApiJava api, MegaChatRequest request) {
+
+    }
+
+    @Override
+    public void onRequestUpdate(MegaChatApiJava api, MegaChatRequest request) {
+
+    }
+
+    @Override
+    public void onRequestFinish(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
+        log("onRequestFinish - MegaChatApi");
+
+        if (request.getType() == MegaChatRequest.TYPE_CONNECT){
+            MegaApplication.setLoggingIn(false);
+            if(e.getErrorCode()==MegaChatError.ERROR_OK){
+                log("Connected to chat!");
+                MegaApplication.setChatConnection(true);
+            }
+            else{
+                log("ERROR WHEN CONNECTING " + e.getErrorString());
+            }
+        }
+    }
+
+    @Override
+    public void onRequestTemporaryError(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
+
     }
 }
