@@ -1649,4 +1649,6 @@
     <string name="save_to_mega" context="Label shown in MEGA pdf-viewer when it open a PDF save in smartphone storage">Save to my \nCloud Drive</string>
 
     <string name="chat_already_exists" context="Error message when creating a chat one to one with a contact that already has a chat">The chat already exists</string>
+
+    <string name="pdf_viewer_not_download" context="before sharing an image, the preview has to be downloaded">The file has not been downloaded yet</string>
 </resources>
