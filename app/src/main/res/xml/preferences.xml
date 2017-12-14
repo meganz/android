@@ -166,13 +166,14 @@
 		<Preference
 	        android:key="settings_advanced_features_cache"
 	        android:title="@string/settings_advanced_features_cache" />
-	    
+
 	    <Preference
 	        android:key="settings_advanced_features_offline"
 	        android:title="@string/settings_advanced_features_offline" />
 
 		<Preference
 			android:key="settings_advanced_features_cancel_account"
+			android:layout="@layout/cancel_account_preferences"
 			android:title="@string/settings_advanced_features_cancel_account"/>
 	</PreferenceCategory>
 
