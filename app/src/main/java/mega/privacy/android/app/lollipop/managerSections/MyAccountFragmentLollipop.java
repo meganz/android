@@ -451,7 +451,6 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 			}
 		}
 
-
 //		if (getPaymentMethodsBoolean == true){
 //			if (upgradeButton != null){
 //				if ((myAccountInfo.getAccountInfo().getSubscriptionStatus() == MegaAccountDetails.SUBSCRIPTION_STATUS_NONE) || (myAccountInfo.getAccountInfo().getSubscriptionStatus() == MegaAccountDetails.SUBSCRIPTION_STATUS_INVALID)){
