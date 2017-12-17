@@ -461,7 +461,6 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 		}
 		else{
 			log("Grid View");
-			
 			View v = inflater.inflate(R.layout.fragment_filebrowsergrid, container, false);
 			
 			recyclerView = (CustomizedGridRecyclerView) v.findViewById(R.id.file_grid_view_browser);
@@ -482,6 +481,7 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 			contentTextLayout = (RelativeLayout) v.findViewById(R.id.content_grid_text_layout);
 			contentText = (TextView) v.findViewById(R.id.content_grid_text);
 
+
 			if (adapter == null){
 				adapter = new MegaBrowserLollipopAdapter(context, this, nodes, ((ManagerActivityLollipop)context).parentHandleIncoming, recyclerView, aB, Constants.INCOMING_SHARES_ADAPTER, MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_GRID);
 //				adapterList.setNodes(nodes);
@@ -499,9 +499,10 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 			else{
 				MegaNode parentNode = megaApi.getNodeByHandle(((ManagerActivityLollipop)context).parentHandleIncoming);
 				log("ParentHandle: "+((ManagerActivityLollipop)context).parentHandleIncoming);
-
 				nodes = megaApi.getChildren(parentNode, ((ManagerActivityLollipop)context).orderOthers);
+				adapter.setNodes(nodes);
 			}
+
 			((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 
 			if (((ManagerActivityLollipop)context).deepBrowserTreeIncoming == 0){
@@ -520,7 +521,6 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 			recyclerView.setAdapter(adapter);
 			fastScroller.setRecyclerView(recyclerView);
 			visibilityFastScroller();
-
 			if (adapter.getItemCount() == 0){
 				recyclerView.setVisibility(View.GONE);
 				contentTextLayout.setVisibility(View.GONE);
@@ -559,7 +559,6 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 
 //	public void refresh(){
 //		log("refresh");
-//		//TODO conservar el path
 //		findNodes();
 //	}
 	
