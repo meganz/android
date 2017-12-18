@@ -7,6 +7,7 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.media.ExifInterface;
 import android.media.MediaMetadataRetriever;
 import android.net.wifi.WifiManager;
 import android.net.wifi.WifiManager.WifiLock;
@@ -22,7 +23,6 @@ import android.widget.RemoteViews;
 import java.io.File;
 import java.util.HashMap;
 
-import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.PreviewUtils;
@@ -501,7 +501,6 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 				AndroidCompletedTransfer completedTransfer = new AndroidCompletedTransfer(transfer.getFileName(), transfer.getType(), transfer.getState(), size, transfer.getNodeHandle() + "");
 				dbH.setCompletedTransfer(completedTransfer);
 			}
-
 			updateProgressNotification();
 		}
 
@@ -553,10 +552,45 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 
                             megaApi.setNodeDuration(node, secondsAprox, null);
                         }
+
+						String location = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_LOCATION);
+                        if(location!=null){
+							log("Location: "+location);
+							final int mid = location.length() / 2; //get the middle of the String
+							String[] parts = {location.substring(0, mid),location.substring(mid)};
+
+							Double lat = Double.parseDouble(parts[0]);
+							Double lon = Double.parseDouble(parts[1]);
+							log("Lat: "+lat); //first part
+							log("Long: "+lon); //second part
+
+							megaApi.setNodeCoordinates(node, lat, lon, null);
+						}
+						else{
+                        	log("No location info");
+						}
                     }
                 }
+				else if (MimeTypeList.typeForName(transfer.getPath()).isImage()){
+					log("Is image!!!");
+
+					MegaNode node = megaApi.getNodeByHandle(transfer.getNodeHandle());
+					if(node!=null){
+						try {
+							final ExifInterface exifInterface = new ExifInterface(transfer.getPath());
+							float[] latLong = new float[2];
+							if (exifInterface.getLatLong(latLong)) {
+								log("Latitude: "+latLong[0]+" Longitude: " +latLong[1]);
+								megaApi.setNodeCoordinates(node, latLong[0], latLong[1], null);
+							}
+
+						} catch (Exception e) {
+							log("Couldn't read exif info: " + transfer.getPath());
+						}
+					}
+				}
                 else{
-                    log("NOT video!");
+                    log("NOT video or image!");
                 }
             }
             else{

@@ -10,6 +10,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.media.ExifInterface;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.net.wifi.WifiManager;
@@ -2339,10 +2340,45 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 
 							megaApi.setNodeDuration(node, secondsAprox, null);
 						}
+
+						String location = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_LOCATION);
+						if(location!=null){
+							log("Location: "+location);
+							final int mid = location.length() / 2; //get the middle of the String
+							String[] parts = {location.substring(0, mid),location.substring(mid)};
+
+							Double lat = Double.parseDouble(parts[0]);
+							Double lon = Double.parseDouble(parts[1]);
+							log("Lat: "+lat); //first part
+							log("Long: "+lon); //second part
+
+							megaApi.setNodeCoordinates(node, lat, lon, null);
+						}
+						else{
+							log("No location info");
+						}
+					}
+				}
+				else if (MimeTypeList.typeForName(transfer.getPath()).isImage()){
+					log("Is image!!!");
+
+					MegaNode node = megaApi.getNodeByHandle(transfer.getNodeHandle());
+					if(node!=null){
+						try {
+							final ExifInterface exifInterface = new ExifInterface(transfer.getPath());
+							float[] latLong = new float[2];
+							if (exifInterface.getLatLong(latLong)) {
+								log("Latitude: "+latLong[0]+" Longitude: " +latLong[1]);
+								megaApi.setNodeCoordinates(node, latLong[0], latLong[1], null);
+							}
+
+						} catch (Exception exception) {
+							log("Couldn't read exif info: " + transfer.getPath());
+						}
 					}
 				}
 				else{
-					log("NOT video!");
+					log("NOT video or image!");
 				}
 
 				if (isExternalSDCard){
