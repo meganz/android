@@ -19,13 +19,18 @@
         app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
         tools:context=".FileProviderActivityLollipop" />
 
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_below="@id/toolbar_search"
+        android:background="@color/new_background_fragment"
+        android:layout_height="match_parent" >
+
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:layout_below="@+id/toolbar_search"
-        android:background="@color/new_background_fragment">
+        android:layout_below="@+id/toolbar_search">
         
         <RelativeLayout
             android:layout_width="match_parent"
@@ -304,5 +309,8 @@
         </RelativeLayout>
 
     </LinearLayout>
+
+
+</ScrollView>
 
 </RelativeLayout>

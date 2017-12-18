@@ -360,6 +360,7 @@ public class InboxFragmentLollipop extends Fragment{
 			log("parentHandle -1");
 
 			if (megaApi.getInboxNode() != null){
+				log("InboxNode != null");
 				inboxNode = megaApi.getInboxNode();
 				nodes = megaApi.getChildren(inboxNode, ((ManagerActivityLollipop)context).orderCloud);
 			}
