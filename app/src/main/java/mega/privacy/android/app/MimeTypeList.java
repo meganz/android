@@ -96,10 +96,15 @@ public class MimeTypeList {
 		String detectedType = MimeTypeMap.getSingleton()
 				.getMimeTypeFromExtension(extension);
 		if (detectedType == null) {
-			if(extension.equals("mkv"))
+			if(extension.equals("mkv")) {
 				detectedType = "video/x-matroska";
-			else
+			}
+			else if (extension.equals("heic")) {
+				detectedType = "image/heic";
+			}
+			else {
 				detectedType = "application/octet-stream";
+			}
 		}
 		if (extension == null) {
 			extension = "";
