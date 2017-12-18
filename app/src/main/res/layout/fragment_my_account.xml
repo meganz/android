@@ -134,8 +134,8 @@
                 android:layout_centerVertical="true"
                 android:paddingLeft="12dp"
                 android:paddingRight="12dp"
-				android:layout_marginTop="8dp"
-				android:layout_marginBottom="12dp"
+				android:layout_marginTop="16dp"
+				android:layout_marginBottom="16dp"
                 android:text="@string/action_export_master_key"
                 android:background="@color/white"
                 android:elevation="@dimen/elevation_upgrade_low"
@@ -357,27 +357,12 @@
 						android:paddingLeft="12dp"
 						android:paddingRight="12dp"
 						android:background="@color/white"
-						android:layout_marginTop="16dp"
+						android:layout_marginTop="24dp"
 						android:layout_marginBottom="24dp"
 						android:layout_marginLeft="72dp"
 						android:elevation="@dimen/elevation_upgrade_low"
 						android:stateListAnimator="@anim/button_upgrade_elevation" />
 
-					<Button
-						android:id="@+id/delete_account_button"
-						android:layout_width="wrap_content"
-						android:layout_height="wrap_content"
-						android:layout_alignParentRight="true"
-						android:paddingLeft="12dp"
-						android:paddingRight="12dp"
-						android:textColor="@color/white"
-						android:layout_centerVertical="true"
-						android:text="@string/delete_account"
-						android:background="@color/delete_account"
-						android:layout_marginBottom="24dp"
-						android:layout_marginLeft="72dp"
-						android:elevation="@dimen/elevation_upgrade_low"
-						android:stateListAnimator="@anim/button_upgrade_elevation" />
 				</LinearLayout>
 
 		</LinearLayout>

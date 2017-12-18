@@ -565,7 +565,9 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 				MegaNode parentNode = megaApi.getNodeByHandle(((ManagerActivityLollipop)context).parentHandleOutgoing);
 				log("ParentHandle: "+((ManagerActivityLollipop)context).parentHandleOutgoing);
 				nodes = megaApi.getChildren(parentNode, ((ManagerActivityLollipop)context).orderOthers);
+				adapter.setNodes(nodes);
 			}
+
 			((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 			if (((ManagerActivityLollipop) context).deepBrowserTreeOutgoing == 0){
 				contentText.setText(MegaApiUtils.getInfoNodeOnlyFolders(nodes, context));
