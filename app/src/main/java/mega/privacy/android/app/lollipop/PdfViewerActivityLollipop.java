@@ -7,6 +7,7 @@ import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.OpenableColumns;
@@ -29,6 +30,14 @@ import com.github.barteksc.pdfviewer.listener.OnPageChangeListener;
 import com.github.barteksc.pdfviewer.listener.OnPageErrorListener;
 import com.github.barteksc.pdfviewer.scroll.DefaultScrollHandle;
 import com.shockwave.pdfium.PdfDocument;
+
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 import java.util.List;
 
@@ -140,18 +149,11 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
         pdfView.setBackgroundColor(Color.LTGRAY);
         pdfFileName = getFileName(uri);
 
-        try {
-            pdfView.fromUri(uri)
-                    .defaultPage(pageNumber)
-                    .onPageChange(this)
-                    .enableAnnotationRendering(true)
-                    .onLoad(this)
-                    .scrollHandle(new DefaultScrollHandle(this))
-                    .spacing(10) // in dp
-                    .onPageError(this)
-                    .load();
-        } catch (Exception e) {
-
+        if (uri.toString().contains("http://")){
+            loadStreamPDF();
+        }
+        else {
+            loadLocalPDF();
         }
 
         pdfView.setOnClickListener(this);
@@ -177,7 +179,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
     }
 
     public void checkLogin(){
-        log("uploadToCloud");
+        log("checkLogin");
 
         uploadContainer.setVisibility(View.GONE);
 
