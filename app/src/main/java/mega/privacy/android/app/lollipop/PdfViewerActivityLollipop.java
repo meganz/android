@@ -32,13 +32,11 @@ import com.github.barteksc.pdfviewer.scroll.DefaultScrollHandle;
 import com.shockwave.pdfium.PdfDocument;
 
 import java.io.BufferedInputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-
 import java.util.List;
 
 import mega.privacy.android.app.DatabaseHandler;
@@ -176,6 +174,66 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
                 checkLogin();
             }
         });
+    }
+
+    class LoadPDFStream extends AsyncTask<String, Void, InputStream> {
+
+        @Override
+        protected InputStream doInBackground(String... strings) {
+            InputStream inputStream = null;
+
+            try {
+                URL url = new URL(strings[0]);
+                HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
+                if (httpURLConnection.getResponseCode() == 200) {
+                    inputStream = new BufferedInputStream( (httpURLConnection.getInputStream()));
+                }
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+                return null;
+            } catch (IOException e) {
+                e.printStackTrace();
+                return null;
+            }
+            return inputStream;
+        }
+
+        @Override
+        protected void onPostExecute(InputStream inputStream) {
+            try {
+                pdfView.fromStream(inputStream)
+                        .defaultPage(pageNumber)
+                        .onPageChange(PdfViewerActivityLollipop.this)
+                        .enableAnnotationRendering(true)
+                        .onLoad(PdfViewerActivityLollipop.this)
+                        .scrollHandle(new DefaultScrollHandle(PdfViewerActivityLollipop.this))
+                        .spacing(10) // in dp
+                        .onPageError(PdfViewerActivityLollipop.this)
+                        .load();
+            } catch (Exception e) {
+
+            }
+        }
+    }
+
+    private void loadStreamPDF() {
+        new LoadPDFStream().execute(uri.toString());
+    }
+
+    private void loadLocalPDF() {
+        try {
+            pdfView.fromUri(uri)
+                    .defaultPage(pageNumber)
+                    .onPageChange(this)
+                    .enableAnnotationRendering(true)
+                    .onLoad(this)
+                    .scrollHandle(new DefaultScrollHandle(this))
+                    .spacing(10) // in dp
+                    .onPageError(this)
+                    .load();
+        } catch (Exception e) {
+
+        }
     }
 
     public void checkLogin(){
