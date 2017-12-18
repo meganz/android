@@ -7,6 +7,7 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.media.ExifInterface;
 import android.media.MediaMetadataRetriever;
 import android.net.wifi.WifiManager;
 import android.net.wifi.WifiManager.WifiLock;
@@ -22,6 +23,7 @@ import java.util.ArrayList;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.utils.Constants;
@@ -390,10 +392,45 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 
                             megaApi.setNodeDuration(node, secondsAprox, null);
                         }
+
+						String location = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_LOCATION);
+						if(location!=null){
+							log("Location: "+location);
+							final int mid = location.length() / 2; //get the middle of the String
+							String[] parts = {location.substring(0, mid),location.substring(mid)};
+
+							Double lat = Double.parseDouble(parts[0]);
+							Double lon = Double.parseDouble(parts[1]);
+							log("Lat: "+lat); //first part
+							log("Long: "+lon); //second part
+
+							megaApi.setNodeCoordinates(node, lat, lon, null);
+						}
+						else{
+							log("No location info");
+						}
                     }
                 }
+				else if (MimeTypeList.typeForName(transfer.getPath()).isImage()){
+					log("Is image!!!");
+
+					MegaNode node = megaApi.getNodeByHandle(transfer.getNodeHandle());
+					if(node!=null){
+						try {
+							final ExifInterface exifInterface = new ExifInterface(transfer.getPath());
+							float[] latLong = new float[2];
+							if (exifInterface.getLatLong(latLong)) {
+								log("Latitude: "+latLong[0]+" Longitude: " +latLong[1]);
+								megaApi.setNodeCoordinates(node, latLong[0], latLong[1], null);
+							}
+
+						} catch (Exception exception) {
+							log("Couldn't read exif info: " + transfer.getPath());
+						}
+					}
+				}
                 else{
-                    log("NOT video!");
+                    log("NOT video not image!");
                 }
 
                 attachNodes(transfer);
