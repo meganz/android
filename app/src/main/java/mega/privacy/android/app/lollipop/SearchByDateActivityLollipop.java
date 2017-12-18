@@ -3,10 +3,7 @@ package mega.privacy.android.app.lollipop;
 import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
 import android.content.Intent;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
-import android.icu.text.DateFormat;
-import android.icu.text.SimpleDateFormat;
+import java.text.SimpleDateFormat;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -79,7 +76,8 @@ public class SearchByDateActivityLollipop extends PinActivityLollipop implements
     ImageButton removePeriodTo;
 
     String optionSelected = null;
-    int optionsPeriod = 0;
+    boolean optionPeriodFrom = false;
+    boolean optionPeriodTo = false;
     long tsDay = 0;
     long tsFrom = 0;
     long tsTo = 0;
@@ -373,7 +371,7 @@ public class SearchByDateActivityLollipop extends PinActivityLollipop implements
                 textViewFrom.setText(date);
                 textViewFrom.setTextColor(ContextCompat.getColor(this, R.color.accentColor));
                 removePeriodFrom.setVisibility(View.VISIBLE);
-                optionsPeriod ++;
+                optionPeriodFrom = true;
 
             }else{
                 showSnackbar(getString(R.string.snackbar_search_by_date));
@@ -400,7 +398,7 @@ public class SearchByDateActivityLollipop extends PinActivityLollipop implements
                 textViewTo.setText(date);
                 textViewTo.setTextColor(ContextCompat.getColor(this, R.color.accentColor));
                 removePeriodTo.setVisibility(View.VISIBLE);
-                optionsPeriod ++;
+                optionPeriodTo = true;
 
             }else{
                 showSnackbar(getString(R.string.snackbar_search_by_date));
@@ -422,7 +420,7 @@ public class SearchByDateActivityLollipop extends PinActivityLollipop implements
         buttonLastYear.setEnabled(false);
         buttonLastYear.setTextColor(ContextCompat.getColor(this, R.color.divider_upgrade_account));
 
-        if((optionsPeriod == 2)|| (option.equals(("day")))){
+        if(((optionPeriodFrom == true) && (optionPeriodTo == true))|| (option.equals(("day")))){
             buttonApply.setEnabled(true);
             buttonApply.setTextColor(ContextCompat.getColor(this, R.color.white));
             buttonApply.setBackgroundColor(ContextCompat.getColor(this, R.color.accentColor));
@@ -438,7 +436,8 @@ public class SearchByDateActivityLollipop extends PinActivityLollipop implements
         optionSelected = null;
 
         if(element.equals("day")){
-            optionsPeriod = 0;
+            optionPeriodFrom = false;
+            optionPeriodTo = false;
             tsDay = 0;
 
             textViewDay.setText(weekDay);
@@ -466,14 +465,13 @@ public class SearchByDateActivityLollipop extends PinActivityLollipop implements
             removePeriodTo.setVisibility(View.GONE);
 
         }else if(element.equals("from")){
-            optionsPeriod --;
+            optionPeriodFrom = false;
             tsFrom = 0;
             textViewFrom.setText(weekDay);
             textViewFrom.setTextColor(ContextCompat.getColor(this, R.color.divider_upgrade_account));
             removePeriodFrom.setVisibility(View.GONE);
 
-            if(optionsPeriod == 0){
-
+            if((optionPeriodFrom == false)&&(optionPeriodTo == false)){
                 textViewSetDay.setTextColor(ContextCompat.getColor(this, R.color.mail_my_account));
                 relativeLayoutDay.setEnabled(true);
 
@@ -485,13 +483,13 @@ public class SearchByDateActivityLollipop extends PinActivityLollipop implements
             }
 
         }else if(element.equals("to")){
-            optionsPeriod --;
+            optionPeriodTo = false;
             tsTo = 0;
             textViewTo.setText(weekDay);
             textViewTo.setTextColor(ContextCompat.getColor(this, R.color.divider_upgrade_account));
             removePeriodTo.setVisibility(View.GONE);
 
-            if(optionsPeriod == 0){
+            if((optionPeriodFrom == false)&&(optionPeriodTo == false)){
 
                 textViewSetDay.setTextColor(ContextCompat.getColor(this, R.color.mail_my_account));
                 relativeLayoutDay.setEnabled(true);
