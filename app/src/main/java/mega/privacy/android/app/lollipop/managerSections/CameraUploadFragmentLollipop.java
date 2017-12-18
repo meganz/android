@@ -21,6 +21,7 @@ import android.os.Handler;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.FileProvider;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -65,10 +66,13 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.DividerItemDecoration;
 import mega.privacy.android.app.components.MegaLinearLayoutManager;
 import mega.privacy.android.app.components.scrollBar.FastScroller;
+import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.MegaMonthPicLollipop;
 import mega.privacy.android.app.lollipop.MyAccountInfo;
+import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
+import mega.privacy.android.app.lollipop.adapters.MegaPhotoSyncGridAdapterLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaPhotoSyncGridTitleAdapterLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaPhotoSyncListAdapterLollipop;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
@@ -136,6 +140,8 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	private long[] searchByDate;
 
 	private ActionMode actionMode;
+
+	String downloadLocationDefaultPath = Util.downloadDIR;
 
 	private ProgressDialog statusDialog;
 	private long photosyncHandle = -1;
@@ -592,6 +598,20 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 		}
 		
 		dbH = DatabaseHandler.getDbHandler(context);
+		prefs = dbH.getPreferences();
+		if (prefs != null){
+			log("prefs != null");
+			if (prefs.getStorageAskAlways() != null){
+				if (!Boolean.parseBoolean(prefs.getStorageAskAlways())){
+					log("askMe==false");
+					if (prefs.getStorageDownloadLocation() != null){
+						if (prefs.getStorageDownloadLocation().compareTo("") != 0){
+							downloadLocationDefaultPath = prefs.getStorageDownloadLocation();
+						}
+					}
+				}
+			}
+		}
 		
 		super.onCreate(savedInstanceState);
 		Bundle args = getArguments();
@@ -1575,7 +1595,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 							startActivity(intent);
 									
 						}
-						else if (MimeTypeList.typeForName(psHMegaNode.getName()).isVideo() || MimeTypeList.typeForName(psHMegaNode.getName()).isAudio() ){
+						else if (MimeTypeList.typeForName(psHMegaNode.getName()).isVideo()){
 
 							if (megaApi.httpServerIsRunning() == 0) {
 								megaApi.httpServerStart();
@@ -1598,8 +1618,25 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 							String mimeType = MimeTypeList.typeForName(psHMegaNode.getName()).getType();
 							log("FILENAME: " + psHMegaNode.getName());
 					  		
-					  		Intent mediaIntent = new Intent(Intent.ACTION_VIEW);
-					  		mediaIntent.setDataAndType(Uri.parse(url), mimeType);
+					  		//Intent mediaIntent = new Intent(Intent.ACTION_VIEW);
+							Intent mediaIntent = new Intent(context, AudioVideoPlayerLollipop.class);
+							mediaIntent.putExtra("HANDLE", psHMegaNode.getHandle());
+							mediaIntent.putExtra("FILENAME", psHMegaNode.getName());
+							String localPath = Util.getLocalFile(context, psHMegaNode.getName(), psHMegaNode.getSize(), downloadLocationDefaultPath);
+							if (localPath != null){
+								File mediaFile = new File(localPath);
+								//mediaIntent.setDataAndType(Uri.parse(localPath), mimeType);
+								if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+									mediaIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile), MimeTypeList.typeForName(psHMegaNode.getName()).getType());
+								}
+								else{
+									mediaIntent.setDataAndType(Uri.fromFile(mediaFile), MimeTypeList.typeForName(psHMegaNode.getName()).getType());
+								}
+								mediaIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+							}
+							else {
+								mediaIntent.setDataAndType(Uri.parse(url), mimeType);
+							}
 					  		if (MegaApiUtils.isIntentAvailable(context, mediaIntent)){
 					  			startActivity(mediaIntent);
 					  		}
