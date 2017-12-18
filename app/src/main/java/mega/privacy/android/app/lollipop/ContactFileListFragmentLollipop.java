@@ -30,6 +30,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;
@@ -46,6 +47,7 @@ import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.adapters.MegaBrowserLollipopAdapter;
+import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.lollipop.listeners.FabButtonListener;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
@@ -101,6 +103,7 @@ public class ContactFileListFragmentLollipop extends Fragment{
 
 	DatabaseHandler dbH = null;
 	MegaPreferences prefs = null;
+	String downloadLocationDefaultPath = Util.downloadDIR;
 
 	public void activateActionMode(){
 		log("activateActionMode");
@@ -278,6 +281,23 @@ public class ContactFileListFragmentLollipop extends Fragment{
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
 		}
+
+		dbH = DatabaseHandler.getDbHandler(context);
+		prefs = dbH.getPreferences();
+		if (prefs != null){
+			log("prefs != null");
+			if (prefs.getStorageAskAlways() != null){
+				if (!Boolean.parseBoolean(prefs.getStorageAskAlways())){
+					log("askMe==false");
+					if (prefs.getStorageDownloadLocation() != null){
+						if (prefs.getStorageDownloadLocation().compareTo("") != 0){
+							downloadLocationDefaultPath = prefs.getStorageDownloadLocation();
+						}
+					}
+				}
+			}
+		}
+
 		lastPositionStack = new Stack<>();
 		super.onCreate(savedInstanceState);
 		log("onCreate");
@@ -593,8 +613,25 @@ public class ContactFileListFragmentLollipop extends Fragment{
 					String mimeType = MimeTypeList.typeForName(file.getName()).getType();
 					log("FILENAME: " + file.getName());
 
-					Intent mediaIntent = new Intent(Intent.ACTION_VIEW);
-					mediaIntent.setDataAndType(Uri.parse(url), mimeType);
+					//Intent mediaIntent = new Intent(Intent.ACTION_VIEW);
+					Intent mediaIntent = new Intent(context, AudioVideoPlayerLollipop.class);
+					mediaIntent.putExtra("HANDLE", file.getHandle());
+					mediaIntent.putExtra("FILENAME", file.getName());
+					String localPath = Util.getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
+					if (localPath != null){
+						File mediaFile = new File(localPath);
+						//mediaIntent.setDataAndType(Uri.parse(localPath), mimeType);
+						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+							mediaIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile), MimeTypeList.typeForName(file.getName()).getType());
+						}
+						else{
+							mediaIntent.setDataAndType(Uri.fromFile(mediaFile), MimeTypeList.typeForName(file.getName()).getType());
+						}
+						mediaIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+					}
+					else {
+						mediaIntent.setDataAndType(Uri.parse(url), mimeType);
+					}
 					if (MegaApiUtils.isIntentAvailable(context, mediaIntent)){
 			  			startActivity(mediaIntent);
 			  		}
@@ -605,6 +642,58 @@ public class ContactFileListFragmentLollipop extends Fragment{
 						handleList.add(contactNodes.get(position).getHandle());
 						((ContactFileListActivityLollipop)context).onFileClick(handleList);
 			  		}
+				}else if (MimeTypeList.typeForName(contactNodes.get(position).getName()).isPdf()){
+					MegaNode file = contactNodes.get(position);
+
+					if (megaApi.httpServerIsRunning() == 0) {
+						megaApi.httpServerStart();
+					}
+
+					ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
+					ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+					activityManager.getMemoryInfo(mi);
+
+					if(mi.totalMem>Constants.BUFFER_COMP){
+						log("Total mem: "+mi.totalMem+" allocate 32 MB");
+						megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
+					}
+					else{
+						log("Total mem: "+mi.totalMem+" allocate 16 MB");
+						megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
+					}
+
+					String url = megaApi.httpServerGetLocalLink(file);
+					String mimeType = MimeTypeList.typeForName(file.getName()).getType();
+					log("FILENAME: " + file.getName() + "TYPE: "+mimeType);
+
+					Intent pdfIntent = new Intent(context, PdfViewerActivityLollipop.class);
+					pdfIntent.putExtra("APP", true);
+					String localPath = Util.getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
+					if (localPath != null){
+						File mediaFile = new File(localPath);
+						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+							pdfIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile), MimeTypeList.typeForName(file.getName()).getType());
+						}
+						else{
+							pdfIntent.setDataAndType(Uri.fromFile(mediaFile), MimeTypeList.typeForName(file.getName()).getType());
+						}
+						pdfIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+					}
+					else {
+						pdfIntent.setDataAndType(Uri.parse(url), mimeType);
+					}
+					pdfIntent.putExtra("HANDLE", file.getHandle());
+					if (MegaApiUtils.isIntentAvailable(context, pdfIntent)){
+						startActivity(pdfIntent);
+					}
+					else{
+						Toast.makeText(context, context.getResources().getString(R.string.intent_not_available), Toast.LENGTH_LONG).show();
+
+						ArrayList<Long> handleList = new ArrayList<Long>();
+						handleList.add(contactNodes.get(position).getHandle());
+						NodeController nC = new NodeController(context);
+						nC.prepareForDownload(handleList);
+					}
 				}
 				else {
 					adapter.notifyDataSetChanged();
