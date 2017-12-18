@@ -3,6 +3,8 @@ package mega.privacy.android.app.lollipop;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -135,9 +137,6 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
             getWindow().clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
             getWindow().setStatusBarColor(getResources().getColor(R.color.black));
-       }
-       else {
-           getWindow().setStatusBarColor(getResources().getColor(R.color.black));
        }
 
         tB = (Toolbar) findViewById(R.id.call_toolbar);
@@ -357,6 +356,11 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
         inflater.inflate(R.menu.activity_audiovideoplayer, menu);
 
         shareIcon = menu.findItem(R.id.full_video_viewer_share);
+
+        Drawable share = getResources().getDrawable(R.drawable.ic_social_share_white);
+        share.setColorFilter(getResources().getColor(R.color.white), PorterDuff.Mode.SRC_ATOP);
+        shareIcon.setIcon(share);
+
         propertiesIcon = menu.findItem(R.id.full_image_viewer_properties);
         chatIcon = menu.findItem(R.id.full_image_viewer_chat);
 
