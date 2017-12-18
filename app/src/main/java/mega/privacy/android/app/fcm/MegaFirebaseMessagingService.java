@@ -17,12 +17,23 @@ package mega.privacy.android.app.fcm;
  */
 
 
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Context;
+import android.content.Intent;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Looper;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.content.ContextCompat;
+import android.text.Html;
+import android.text.Spanned;
 
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
@@ -33,10 +44,13 @@ import java.util.Comparator;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.R;
 import mega.privacy.android.app.UserCredentials;
+import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.lollipop.megachat.NotificationBuilder;
+import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -117,6 +131,7 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
         log("From: " + remoteMessage.getFrom());
 
         notificationBuilder =  NotificationBuilder.newInstance(this, megaApi, megaChatApi);
+        remoteMessageType = remoteMessage.getData().get("type");
 
         // Check if message contains a data payload.
         if (remoteMessage.getData().size() > 0) {
@@ -127,79 +142,85 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
                 return;
             }
             else{
-                remoteMessageType = remoteMessage.getData().get("type");
-                String gSession = credentials.getSession();
-                if (megaApi.getRootNode() == null){
-                    log("RootNode = null");
-                    isLoggingIn = MegaApplication.isLoggingIn();
-                    if (!isLoggingIn){
-                        isLoggingIn  = true;
-                        MegaApplication.setLoggingIn(isLoggingIn);
 
-                        if (Util.isChatEnabled()) {
-                            if (megaChatApi == null) {
-                                megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
-                            }
-                            int ret = megaChatApi.init(gSession);
-                            log("result of init ---> " + ret);
-                            chatSettings = dbH.getChatSettings();
-                            if (ret == MegaChatApi.INIT_NO_CACHE) {
-                                log("condition ret == MegaChatApi.INIT_NO_CACHE");
-                                megaApi.invalidateCache();
+                if(remoteMessageType.equals("1")){
+                    log("show SharedFolder Notification");
+                    showSharedFolderNotification();
+                }
+                else if(remoteMessageType.equals("3")){
+                    log("show ContactRequest Notification");
+                    showContactRequestNotification();
+                }
+                else if(remoteMessageType.equals("2")){
+                    String gSession = credentials.getSession();
+                    if (megaApi.getRootNode() == null){
+                        log("RootNode = null");
+                        isLoggingIn = MegaApplication.isLoggingIn();
+                        if (!isLoggingIn){
+                            isLoggingIn  = true;
+                            MegaApplication.setLoggingIn(isLoggingIn);
 
-                            } else if (ret == MegaChatApi.INIT_ERROR) {
-                                log("condition ret == MegaChatApi.INIT_ERROR");
-                                if (chatSettings == null) {
-                                    log("ERROR----> Switch OFF chat");
-                                    chatSettings = new ChatSettings(false + "", true + "", "", true + "");
-                                    dbH.setChatSettings(chatSettings);
-                                } else {
-                                    log("ERROR----> Switch OFF chat");
-                                    dbH.setEnabledChat(false + "");
+                            if (Util.isChatEnabled()) {
+                                if (megaChatApi == null) {
+                                    megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
                                 }
-                                megaChatApi.logout(this);
-                            } else {
-                                log("Chat correctly initialized");
+                                int ret = megaChatApi.init(gSession);
+                                log("result of init ---> " + ret);
+                                chatSettings = dbH.getChatSettings();
+                                if (ret == MegaChatApi.INIT_NO_CACHE) {
+                                    log("condition ret == MegaChatApi.INIT_NO_CACHE");
+                                    megaApi.invalidateCache();
+
+                                } else if (ret == MegaChatApi.INIT_ERROR) {
+                                    log("condition ret == MegaChatApi.INIT_ERROR");
+                                    if (chatSettings == null) {
+                                        log("ERROR----> Switch OFF chat");
+                                        chatSettings = new ChatSettings(false + "", true + "", "", true + "");
+                                        dbH.setChatSettings(chatSettings);
+                                    } else {
+                                        log("ERROR----> Switch OFF chat");
+                                        dbH.setEnabledChat(false + "");
+                                    }
+                                    megaChatApi.logout(this);
+                                } else {
+                                    log("Chat correctly initialized");
+                                }
                             }
+
+                            megaApi.fastLogin(gSession, this);
                         }
 
-                        megaApi.fastLogin(gSession, this);
-                    }
-
-                    String type = remoteMessage.getData().get("type");
-                    if(type.equals("2")){
-                        h = new Handler(Looper.getMainLooper());
-                        h.postDelayed(
-                                new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        if(!shown){
-                                            log("Show simple notification - no connection finished");
-                                            shown=true;
-                                            notificationBuilder.showSimpleNotification();
+                        String type = remoteMessage.getData().get("type");
+                        if(type.equals("2")){
+                            h = new Handler(Looper.getMainLooper());
+                            h.postDelayed(
+                                    new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            if(!shown){
+                                                log("Show simple notification - no connection finished");
+                                                shown=true;
+                                                notificationBuilder.showSimpleNotification();
+                                            }
+                                            else{
+                                                log("Notification already shown");
+                                            }
                                         }
-                                        else{
-                                            log("Notification already shown");
-                                        }
-                                    }
-                                },
-                                10000
-                        );
+                                    },
+                                    10000
+                            );
+                        }
                     }
-                }
-                else{
-
-                    String type = remoteMessage.getData().get("type");
-                    if(type.equals("2")){
+                    else{
                         log("Chat notification");
                         if(Util.isChatEnabled()){
-                            if(!shown){
-                                showNotification();
+                            if(!shown) {
+                                showChatNotification();
                             }
                         }
                     }
-
                 }
+
             }
         }
 //
@@ -314,8 +335,94 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
 
     }
 
-    public void showNotification(){
-        log("showNotification");
+    public void showSharedFolderNotification() {
+        log("showSharedFolderNotification");
+
+        try{
+            String source = "Tap to get more info";
+            Spanned notificationContent;
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                notificationContent = Html.fromHtml(source,Html.FROM_HTML_MODE_LEGACY);
+            } else {
+                notificationContent = Html.fromHtml(source);
+            }
+
+            int notificationId = Constants.NOTIFICATION_PUSH_CLOUD_DRIVE;
+
+            Intent intent = new Intent(this, ManagerActivityLollipop.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            intent.setAction(Constants.ACTION_INCOMING_SHARED_FOLDER_NOTIFICATION);
+            PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
+                    PendingIntent.FLAG_ONE_SHOT);
+
+            Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+            NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
+                    .setSmallIcon(R.drawable.ic_stat_notify_download)
+                    .setContentTitle(getString(R.string.title_incoming_folder_notification))
+                    .setContentText(notificationContent)
+                    .setStyle(new NotificationCompat.BigTextStyle()
+                            .bigText(notificationContent))
+                    .setAutoCancel(true)
+                    .setSound(defaultSoundUri)
+                    .setColor(ContextCompat.getColor(this,R.color.mega))
+                    .setContentIntent(pendingIntent);
+
+            Drawable d;
+
+            if(android.os.Build.VERSION.SDK_INT >=  Build.VERSION_CODES.LOLLIPOP){
+                d = getResources().getDrawable(R.drawable.ic_folder_incoming, getTheme());
+            } else {
+                d = getResources().getDrawable(R.drawable.ic_folder_incoming);
+            }
+
+            notificationBuilder.setLargeIcon(((BitmapDrawable)d).getBitmap());
+
+            NotificationManager notificationManager =
+                    (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+            notificationManager.notify(notificationId, notificationBuilder.build());
+        }
+        catch(Exception e){
+            log("Exception when showing shared folder notification: "+e.getMessage());
+        }
+    }
+
+    public void showContactRequestNotification() {
+        log("showContactRequestNotification");
+        try{
+            int notificationId = Constants.NOTIFICATION_PUSH_CONTACT;
+
+            Intent intent = new Intent(this, ManagerActivityLollipop.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            intent.setAction(Constants.ACTION_IPC);
+            PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
+                    PendingIntent.FLAG_ONE_SHOT);
+
+            String notificationContent = "Tap to get more info";
+            Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+            NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
+                    .setSmallIcon(R.drawable.ic_stat_notify_download)
+                    .setContentTitle(getString(R.string.title_contact_request_notification))
+                    .setContentText(notificationContent)
+                    .setStyle(new NotificationCompat.BigTextStyle()
+                            .bigText(notificationContent))
+                    .setAutoCancel(true)
+                    .setSound(defaultSoundUri)
+                    .setColor(ContextCompat.getColor(this,R.color.mega))
+                    .setContentIntent(pendingIntent);
+
+            NotificationManager notificationManager =
+                    (NotificationManager) getSystemService(getApplicationContext().NOTIFICATION_SERVICE);
+
+            notificationManager.notify(notificationId, notificationBuilder.build());
+        }
+        catch(Exception e){
+            log("Exception when showing IPC request: "+e.getMessage());
+        }
+    }
+
+    public void showChatNotification(){
+        log("showChatNotification");
 
         shown = true;
         megaChatApi.removeChatListener(this);
@@ -339,7 +446,7 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
         });
 
         MegaChatListItem item = unreadChats.get(0);
-        log("showNotification last item: "+item.getTitle()+ " message: "+item.getLastMessage());
+        log("showChatNotification last item: "+item.getTitle()+ " message: "+item.getLastMessage());
 
         ChatSettings chatSettings = dbH.getChatSettings();
         String email = megaChatApi.getContactEmail(item.getPeerHandle());
@@ -447,8 +554,10 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
         log("onChatConnectionStateUpdate: "+chatid + " "+newState);
         if(newState==MegaChatApi.CHAT_CONNECTION_ONLINE && chatid==-1){
             log("Online Connection: "+chatid);
-            if(!shown){
-                showNotification();
+            if(remoteMessageType.equals("2")){
+                if(!shown){
+                    showChatNotification();
+                }
             }
         }
     }
