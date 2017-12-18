@@ -563,8 +563,14 @@ public class InboxFragmentLollipop extends Fragment{
 					String mimeType = MimeTypeList.typeForName(file.getName()).getType();
 					log("FILENAME: " + file.getName());
 
-					//Intent mediaIntent = new Intent(Intent.ACTION_VIEW);
-					Intent mediaIntent = new Intent(context, AudioVideoPlayerLollipop.class);
+					Intent mediaIntent;
+					if (file.getName().contains(".avi") || file.getName().contains(".wmv") || file.getName().contains(".mpg")
+							|| file.getName().contains(".flv") || file.getName().contains(".vob") || file.getName().contains(".mts")){
+						mediaIntent = new Intent(Intent.ACTION_VIEW);
+					}
+					else {
+						mediaIntent = new Intent(context, AudioVideoPlayerLollipop.class);
+					}
 					mediaIntent.putExtra("HANDLE", file.getHandle());
 					mediaIntent.putExtra("FILENAME", file.getName());
 					String localPath = Util.getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
