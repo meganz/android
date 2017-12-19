@@ -1651,4 +1651,6 @@
     <string name="chat_already_exists" context="Error message when creating a chat one to one with a contact that already has a chat">The chat already exists</string>
 
     <string name="pdf_viewer_not_download" context="before sharing an image, the preview has to be downloaded">The file has not been downloaded yet</string>
+
+    <string name="not_permited_add_email_to_invite" context="Error shown when a user is starting a chat or adding new participants in a group chat and writes a contact mail that has not added">It is not allowed to add participants that are not your contacts</string>
 </resources>

@@ -1155,6 +1155,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
         Intent in = new Intent(this, AddContactActivityLollipop.class);
         in.putExtra("contactType", Constants.CONTACT_TYPE_MEGA);
+        in.putExtra("chat", true);
         startActivityForResult(in, Constants.REQUEST_ADD_PARTICIPANTS);
 
     }
@@ -1168,6 +1169,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
         Intent in = new Intent(this, AddContactActivityLollipop.class);
         in.putExtra("contactType", Constants.CONTACT_TYPE_MEGA);
+        in.putExtra("chat", true);
         startActivityForResult(in, Constants.REQUEST_SEND_CONTACTS);
     }
 

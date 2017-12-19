@@ -9607,6 +9607,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		Intent in = new Intent(this, AddContactActivityLollipop.class);
 		if(isMegaContact){
 			in.putExtra("contactType", Constants.CONTACT_TYPE_MEGA);
+			in.putExtra("chat", true);
 			startActivityForResult(in, Constants.REQUEST_CREATE_CHAT);
 		}
 		else{
