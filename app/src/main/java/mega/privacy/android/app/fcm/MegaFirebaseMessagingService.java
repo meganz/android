@@ -355,13 +355,13 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
             }
         }
 
-        if(call.hasAudio(false)){
+        if(call.hasRemoteAudio()){
             log("Remote audio is connected");
         }
         else{
             log("Remote audio is NOT connected");
         }
-        if(call.hasVideo(false)){
+        if(call.hasRemoteVideo()){
             log("Remote video is connected");
         }
         else{
