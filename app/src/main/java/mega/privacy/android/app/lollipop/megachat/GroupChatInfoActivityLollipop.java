@@ -697,8 +697,8 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         }
 
         Intent in = new Intent(this, AddContactActivityLollipop.class);
-//		in.putExtra("contactType", Constants.CONTACT_TYPE_MEGA);
         in.putExtra("contactType", Constants.CONTACT_TYPE_MEGA);
+        in.putExtra("chat", true);
         startActivityForResult(in, Constants.REQUEST_ADD_PARTICIPANTS);
 
     }
