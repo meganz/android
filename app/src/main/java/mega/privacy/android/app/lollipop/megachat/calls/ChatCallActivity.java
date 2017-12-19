@@ -187,7 +187,7 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
         log("onPrepareOptionsMenu");
 
         remoteAudioIcon = menu.findItem(R.id.info_remote_audio);
-        if(callChat.hasAudio(false)){
+        if(callChat.hasRemoteAudio()){
             log("Audio remote connected");
             remoteAudioIcon.setIcon(ContextCompat.getDrawable(this, R.drawable.ic_volume_up_white));
         }
@@ -778,13 +778,13 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
                     if(isVideoOutgoing){
                         updateLocalVideoStatus();
                     }
-                    if(callChat.hasAudio(false)){
+                    if(callChat.hasRemoteAudio()){
                         log("Remote audio is connected");
                     }
                     else{
                         log("Remote audio is NOT connected");
                     }
-                    if(callChat.hasVideo(false)){
+                    if(callChat.hasRemoteVideo()){
                         log("Remote video is connected");
                     }
                     else{
@@ -931,7 +931,7 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
                     megaChatApi.answerChatCall(chatId, true, this);
                 }
                 else{
-                    if(callChat.hasVideo(true)){
+                    if(callChat.hasLocalVideo()){
                         megaChatApi.disableVideo(chatId, this);
                     }
                     else{
@@ -945,7 +945,7 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
             }
             case R.id.micro_fab: {
 
-                if(callChat.hasAudio(true)){
+                if(callChat.hasLocalAudio()){
                     megaChatApi.disableAudio(chatId, this);
                 }
                 else{
@@ -1016,7 +1016,7 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
     }
 
     public void updateLocalVideoStatus(){
-        if(callChat.hasVideo(true)){
+        if(callChat.hasLocalVideo()){
             log("Video local connected");
             if(myAvatarLayout.getVisibility()==View.VISIBLE){
                 myAvatarLayout.setVisibility(GONE);
@@ -1052,7 +1052,7 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
     }
 
     public void updateLocalAudioStatus(){
-        if(callChat.hasAudio(true)){
+        if(callChat.hasLocalAudio()){
             log("Audio local connected");
             microFAB.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.accentColor)));
         }
@@ -1063,7 +1063,7 @@ public class ChatCallActivity extends PinActivityLollipop implements MegaChatReq
     }
 
     public void updateRemoteVideoStatus(){
-        if(callChat.hasVideo(false)){
+        if(callChat.hasRemoteVideo()){
             log("Video remote connected");
             contactAvatarLayout.setVisibility(View.GONE);
             contactAvatarLayout.setOnTouchListener(null);
