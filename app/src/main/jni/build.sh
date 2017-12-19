@@ -68,11 +68,18 @@ LIBUV_SOURCE_FOLDER=libuv-v${LIBUV_VERSION}
 LIBUV_DOWNLOAD_URL=http://dist.libuv.org/dist/v${LIBUV_VERSION}/${LIBUV_SOURCE_FILE}
 LIBUV_SHA1="91ea51844ec0fac1c6358a7ad3e8bba128e9d0cc"
 
+LIBWEBSOCKETS=libwebsockets
+LIBWEBSOCKETS_VERSION=2.2.2
+LIBWEBSOCKETS_SOURCE_FILE=libwebsockets-${LIBWEBSOCKETS_VERSION}.tar.gz
+LIBWEBSOCKETS_SOURCE_FOLDER=libwebsockets-${LIBWEBSOCKETS_VERSION}
+LIBWEBSOCKETS_DOWNLOAD_URL=https://github.com/warmcat/libwebsockets/archive/v${LIBWEBSOCKETS_VERSION}.tar.gz
+LIBWEBSOCKETS_SHA1="09cc816c70468270fc34efb17c8fce9676b16777"
+
 PDFVIEWER=pdfviewer
 PDFVIEWER_VERSION=1.8.0
 PDFVIEWER_SOURCE_FILE=master.zip
 PDFVIEWER_DOWNLOAD_URL=https://github.com/barteksc/PdfiumAndroid/archive/${PDFVIEWER_SOURCE_FILE}
-PDFVIEWER_SHA1="4dfd78dcd7c90b00cf3d1077b0746ffd977c5208"
+PDFVIEWER_SHA1="8219c81eae10c4ec5a08b8040c06400490425465"
 
 function downloadCheckAndUnpack()
 {
@@ -86,11 +93,11 @@ function downloadCheckAndUnpack()
         local CURRENTSHA1=`sha1sum ${FILENAME} | cut -d " " -f 1`
         if [ "${SHA1}" != "${CURRENTSHA1}" ]; then
             echo "* Invalid hash. Redownloading..."
-            wget -O ${FILENAME} ${URL} &> ${LOG_FILE}
+            wget -O ${FILENAME} ${URL} &>> ${LOG_FILE}
         fi
     else
         echo "* Downloading '${FILENAME}' ..."
-        wget -O ${FILENAME} ${URL} &> ${LOG_FILE}
+        wget -O ${FILENAME} ${URL} &>> ${LOG_FILE}
     fi
 
     local NEWSHA1=`sha1sum ${FILENAME} | cut -d " " -f 1`
@@ -101,10 +108,10 @@ function downloadCheckAndUnpack()
 
     if [[ "${FILENAME}" =~ \.tar\.[^\.]+$ ]]; then
         echo "* Extracting TAR file..."
-        tar --overwrite -xf ${FILENAME} -C ${TARGETPATH} &> ${LOG_FILE}
+        tar --overwrite -xf ${FILENAME} -C ${TARGETPATH} &>> ${LOG_FILE}
     elif [[ "${FILENAME}" =~ \.zip$ ]]; then
         echo "* Extracting ZIP file..."
-    	unzip -o ${FILENAME} -d ${TARGETPATH} &> ${LOG_FILE}
+    	unzip -o ${FILENAME} -d ${TARGETPATH} &>> ${LOG_FILE}
     else
         echo "* Dont know how to extract '${FILENAME}'"
         exit 1
@@ -117,17 +124,17 @@ function createMEGABindings
 {
     echo "* Creating MEGA Java bindings"
     mkdir -p ../java/nz/mega/sdk
-    swig -c++ -Imega/sdk/include -java -package nz.mega.sdk -outdir ${JAVA_OUTPUT_PATH}/nz/mega/sdk -o bindings/megasdk.cpp -DHAVE_LIBUV -DENABLE_CHAT mega/sdk/bindings/megaapi.i &> ${LOG_FILE}
+    swig -c++ -Imega/sdk/include -java -package nz.mega.sdk -outdir ${JAVA_OUTPUT_PATH}/nz/mega/sdk -o bindings/megasdk.cpp -DHAVE_LIBUV -DENABLE_CHAT mega/sdk/bindings/megaapi.i &>> ${LOG_FILE}
 }
 
 function createMEGAchatBindings
 {
     echo "* Creating MEGAchat Java bindings"
     mkdir -p ../java/nz/mega/sdk
-    swig -c++ -Imega/sdk/include -Imegachat/sdk/src/ -java -package nz.mega.sdk -outdir ${JAVA_OUTPUT_PATH}/nz/mega/sdk/ -o bindings/megachat.cpp megachat/megachatapi.i &> ${LOG_FILE}
-    pushd megachat/sdk/src &> ${LOG_FILE}
+    swig -c++ -Imega/sdk/include -Imegachat/sdk/src/ -java -package nz.mega.sdk -outdir ${JAVA_OUTPUT_PATH}/nz/mega/sdk/ -o bindings/megachat.cpp megachat/megachatapi.i &>> ${LOG_FILE}
+    pushd megachat/sdk/src &>> ${LOG_FILE}
     cmake -P genDbSchema.cmake
-    popd &> ${LOG_FILE}
+    popd &>> ${LOG_FILE}
 }
 
 if [ ! -d "${NDK_ROOT}" ]; then
@@ -153,20 +160,18 @@ fi
 
 if [ "$1" == "clean_mega" ]; then
     echo "* Deleting Java bindings"
-    make -C mega -f MakefileBindings clean JAVA_BASE_OUTPUT_PATH=${JAVA_OUTPUT_PATH} &> ${LOG_FILE}
+    make -C mega -f MakefileBindings clean JAVA_BASE_OUTPUT_PATH=${JAVA_OUTPUT_PATH} &>> ${LOG_FILE}
     rm -rf megachat/megachat.cpp megachat/megachat.h
-    
     echo "* Deleting tarballs"
-	rm -rf ../obj/local/armeabi/
-	rm -rf ../obj/local/x86
-        
+    rm -rf ../obj/local/armeabi
+    rm -rf ../obj/local/x86
     echo "* Task finished OK"
     exit 0
 fi
 
 if [ "$1" == "clean" ]; then
     echo "* Deleting Java bindings"
-    make -C mega -f MakefileBindings clean JAVA_BASE_OUTPUT_PATH=${JAVA_OUTPUT_PATH} &> ${LOG_FILE}
+    make -C mega -f MakefileBindings clean JAVA_BASE_OUTPUT_PATH=${JAVA_OUTPUT_PATH} &>> ${LOG_FILE}
     rm -rf megachat/megachat.cpp megachat/megachat.h
     
     echo "* Deleting source folders"    
@@ -182,6 +187,8 @@ if [ "$1" == "clean" ]; then
     rm -rf ${SODIUM}/${SODIUM}
     rm -rf ${LIBUV}/${LIBUV_SOURCE_FOLDER}
     rm -rf ${LIBUV}/${LIBUV}
+    rm -rf ${LIBWEBSOCKETS}/${LIBWEBSOCKETS_SOURCE_FOLDER}
+    rm -rf ${LIBWEBSOCKETS}/${LIBWEBSOCKETS}
     rm -rf ${PDFVIEWER}/${PDFVIEWER}
 
     echo "* Deleting tarballs"
@@ -198,11 +205,23 @@ if [ "$1" == "clean" ]; then
     rm -rf ${SODIUM}/${SODIUM_SOURCE_FILE}.ready
     rm -rf ${LIBUV}/${LIBUV_SOURCE_FILE}
     rm -rf ${LIBUV}/${LIBUV_SOURCE_FILE}.ready
+    rm -rf ${LIBWEBSOCKETS}/${LIBWEBSOCKETS_SOURCE_FILE}
+    rm -rf ${LIBWEBSOCKETS}/${LIBWEBSOCKETS_SOURCE_FILE}.ready
+
+    echo "* Deleting object files"
+    rm -rf ../obj/local/armeabi-v7a/	
+    rm -rf ../obj/local/armeabi/
+    rm -rf ../obj/local/x86
+    
+    echo "* Deleting libraries"
+    rm -rf ../libs/armeabi-v7a
+    rm -rf ../libs/armeabi
+    rm -rf ../libs/x86
+
     rm -rf ${PDFVIEWER}/${PDFVIEWER_SOURCE_FILE}
     rm -rf ${PDFVIEWER}/${PDFVIEWER_SOURCE_FILE}.ready
 	rm -rf ../obj/local/armeabi/
 	rm -rf ../obj/local/x86
-        
     echo "* Task finished OK"
     exit 0
 fi
@@ -223,18 +242,21 @@ echo "* Setting up libsodium"
 if [ ! -f ${SODIUM}/${SODIUM_SOURCE_FILE}.ready ]; then
     downloadCheckAndUnpack ${SODIUM_DOWNLOAD_URL} ${SODIUM}/${SODIUM_SOURCE_FILE} ${SODIUM_SHA1} ${SODIUM}
     ln -sf ${SODIUM_SOURCE_FOLDER} ${SODIUM}/${SODIUM}
-    pushd ${SODIUM}/${SODIUM} &> ${LOG_FILE}
+    pushd ${SODIUM}/${SODIUM} &>> ${LOG_FILE}
     export ANDROID_NDK_HOME=${NDK_ROOT}
-    ./autogen.sh &> ${LOG_FILE}
+    ./autogen.sh &>> ${LOG_FILE}
     sed -i 's/enable-minimal/enable-minimal --disable-pie/g' dist-build/android-build.sh
     echo "* Prebuilding libsodium for ARM"
-    dist-build/android-arm.sh &> ${LOG_FILE}
+    dist-build/android-arm.sh &>> ${LOG_FILE}
+    echo "* Prebuilding libsodium for ARMv7"
+    dist-build/android-armv7-a.sh &>> ${LOG_FILE}
     echo "* Prebuilding libsodium for x86"
-    dist-build/android-x86.sh &> ${LOG_FILE}
+    dist-build/android-x86.sh &>> ${LOG_FILE}
     ln -sf libsodium-android-armv6 libsodium-android-armeabi
     ln -sf libsodium-android-armv6 libsodium-android-armeabi-v7
+    ln -sf libsodium-android-armv7-a libsodium-android-armeabi-v7a
     ln -sf libsodium-android-i686 libsodium-android-x86
-    popd &> ${LOG_FILE}
+    popd &>> ${LOG_FILE}
     touch ${SODIUM}/${SODIUM_SOURCE_FILE}.ready
 fi
 echo "* libsodium is ready"
@@ -268,9 +290,9 @@ if [ ! -f ${OPENSSL}/${OPENSSL_SOURCE_FILE}.ready ]; then
     downloadCheckAndUnpack ${OPENSSL_DOWNLOAD_URL} ${OPENSSL}/${OPENSSL_SOURCE_FILE} ${OPENSSL_SHA1} ${OPENSSL}
     ln -sf ${OPENSSL_SOURCE_FOLDER} ${OPENSSL}/${OPENSSL}
     ln -sf ${LIBDIR} ${OPENSSL}/${OPENSSL_SOURCE_FOLDER}/lib
-    pushd ${OPENSSL}/${OPENSSL} &> ${LOG_FILE}
-    ./Configure android &> ${LOG_FILE}
-    popd &> ${LOG_FILE}
+    pushd ${OPENSSL}/${OPENSSL} &>> ${LOG_FILE}
+    ./Configure android &>> ${LOG_FILE}
+    popd &>> ${LOG_FILE}
     touch ${OPENSSL}/${OPENSSL_SOURCE_FILE}.ready
 fi
 echo "* OpenSSL is ready"
@@ -290,6 +312,28 @@ if [ ! -f ${CURL}/${CURL_SOURCE_FILE}.ready ]; then
     touch ${CURL}/${CURL_SOURCE_FILE}.ready
 fi
 echo "* cURL with c-ares is ready"
+
+echo "* Setting up libwebsockets"
+if [ ! -f ${LIBWEBSOCKETS}/${LIBWEBSOCKETS_SOURCE_FILE}.ready ]; then
+    downloadCheckAndUnpack ${LIBWEBSOCKETS_DOWNLOAD_URL} ${LIBWEBSOCKETS}/${LIBWEBSOCKETS_SOURCE_FILE} ${LIBWEBSOCKETS_SHA1} ${LIBWEBSOCKETS}
+    ln -sf ${LIBWEBSOCKETS_SOURCE_FOLDER} ${LIBWEBSOCKETS}/${LIBWEBSOCKETS}
+    touch ${LIBWEBSOCKETS}/${LIBWEBSOCKETS_SOURCE_FILE}.ready
+fi
+echo "* libwebsockets is ready"
+
+
+echo "* Checking WebRTC"
+if grep ^DISABLE_WEBRTC Application.mk | grep --quiet false; then
+    if [ ! -d megachat/webrtc/include ]; then
+        echo "ERROR: WebRTC not ready. Please download it from this link: https://mega.nz/#!lxNFnYqA!A7zXNm0JBCSVgowjIrFTkRUwj0zbNHJ37iHXF58rzc4"
+        echo "and uncompress it in megachat/webrtc"
+        exit 1
+    else
+        echo "* WebRTC is ready"
+    fi
+else
+    echo "* WebRTC is not needed"
+fi
 
 echo "* Setting up PdfViewer"
 if [ ! -f ${PDFVIEWER}/${PDFVIEWER_SOURCE_FILE}.ready ]; then

@@ -863,8 +863,13 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 			if (!isForeground) {
 				log("starting foreground!");
-				startForeground(notificationId, notification);
-				isForeground = true;
+				try {
+					startForeground(notificationId, notification);
+					isForeground = true;
+				}
+				catch (Exception e){
+					isForeground = false;
+				}
 			} else {
 				mNotificationManager.notify(notificationId, notification);
 			}
@@ -937,9 +942,15 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		}
 
 		if (!isForeground) {
-			log("starting foreground!");
-			startForeground(notificationId, notification);
-			isForeground = true;
+			log("starting foreground");
+			try {
+				startForeground(notificationId, notification);
+				isForeground = true;
+			}
+			catch (Exception e){
+				log("startforeground exception: " + e.getMessage());
+				isForeground = false;
+			}
 		} else {
 			mNotificationManager.notify(notificationId, notification);
 		}

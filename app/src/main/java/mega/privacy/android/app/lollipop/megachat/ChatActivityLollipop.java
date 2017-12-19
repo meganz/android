@@ -1,9 +1,11 @@
 package mega.privacy.android.app.lollipop.megachat;
 
+import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
@@ -11,6 +13,7 @@ import android.os.Handler;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.app.ActionBar;
@@ -65,6 +68,7 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PinActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.listeners.MultipleGroupChatRequestListener;
+import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaChatLollipopAdapter;
 import mega.privacy.android.app.lollipop.tasks.FilePrepareTask;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.AttachmentUploadBottomSheetDialogFragment;
@@ -133,6 +137,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     boolean pendingMessagesLoaded = false;
 
+    boolean startVideo = false;
     boolean activityVisible = false;
 
 //    AndroidMegaChatMessage selectedMessage;
@@ -1108,11 +1113,34 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 break;
             }
             case R.id.cab_menu_call_chat:{
-                showSnackbar("Coming soon...");
+
+
+                if (chatRoom.isGroup())
+                {
+                    showSnackbar("Coming soon...!");
+                }
+                else
+                {
+                    startVideo = false;
+                    if(checkPermissions()){
+                        startCall();
+                    }
+                }
                 break;
             }
             case R.id.cab_menu_video_chat:{
-                showSnackbar("Coming soon...");
+
+                if (chatRoom.isGroup())
+                {
+                    showSnackbar("Coming soon...!");
+                }
+                else
+                {
+                    startVideo = true;
+                    if(checkPermissions()){
+                        startCall();
+                    }
+                }
                 break;
             }
             case R.id.cab_menu_invite_chat:{
@@ -1144,6 +1172,65 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    public void startCall(){
+        if(startVideo){
+            log("Start video call");
+            megaChatApi.startChatCall(chatRoom.getChatId(), startVideo, this);
+        }
+        else{
+            log("Start audio call");
+            megaChatApi.startChatCall(chatRoom.getChatId(), startVideo, this);
+        }
+    }
+
+    public boolean checkPermissions(){
+        log("checkPermissions");
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+
+            boolean hasCameraPermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED);
+            if (!hasCameraPermission) {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, Constants.REQUEST_CAMERA);
+                return false;
+            }
+
+            boolean hasRecordAudioPermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED);
+            if (!hasRecordAudioPermission) {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, Constants.RECORD_AUDIO);
+                return false;
+            }
+
+            return true;
+        }
+        return true;
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        log("onRequestPermissionsResult");
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode) {
+            case Constants.REQUEST_CAMERA: {
+                log("REQUEST_CAMERA");
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    if(checkPermissions()){
+                        startCall();
+                    }
+                }
+                break;
+            }
+            case Constants.RECORD_AUDIO: {
+                log("RECORD_AUDIO");
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    if(checkPermissions()){
+                        startCall();
+                    }
+                }
+                break;
+            }
+        }
     }
 
     public void chooseAddParticipantDialog(){
@@ -3625,7 +3712,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                                 msg.setInfoToShow(Constants.CHAT_ADAPTER_SHOW_ALL);
                             }
                         }
-
                     }
 
                 } else {
@@ -3844,9 +3930,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         } else {
             adapter.setMessages(messages);
         }
-
     }
-
 
     @Override
     public void onRequestStart(MegaChatApiJava api, MegaChatRequest request) {
@@ -3871,6 +3955,20 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             else{
                 log("Error clearing history: "+e.getErrorString());
                 showSnackbar(getString(R.string.clear_history_error));
+            }
+        }
+        else if(request.getType() == MegaChatRequest.TYPE_START_CHAT_CALL){
+            if(e.getErrorCode()==MegaChatError.ERROR_OK){
+                log("TYPE_START_CHAT_CALL finished with success");
+                //getFlag - Returns true if it is a video-audio call or false for audio call
+                Intent i = new Intent(this, ChatCallActivity.class);
+                i.putExtra("chatHandle", chatRoom.getChatId());
+                i.putExtra("isVideo", request.getFlag());
+                startActivity(i);
+            }
+            else{
+                log("EEEERRRRROR WHEN TYPE_START_CHAT_CALL " + e.getErrorString());
+                showSnackbar("EEEERRRRROR WHEN TYPE_START_CHAT_CALL");
             }
         }
         else if(request.getType() == MegaChatRequest.TYPE_REMOVE_FROM_CHATROOM){
