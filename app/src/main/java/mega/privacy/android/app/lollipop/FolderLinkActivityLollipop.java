@@ -1644,6 +1644,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 						pdfIntent.setDataAndType(Uri.parse(url), mimeType);
 					}
 					pdfIntent.putExtra("HANDLE", file.getHandle());
+					pdfIntent.putExtra("isFolderLink", true);
 					if (MegaApiUtils.isIntentAvailable(FolderLinkActivityLollipop.this, pdfIntent)){
 						startActivity(pdfIntent);
 					}
