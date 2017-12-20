@@ -11,7 +11,6 @@ import android.graphics.Paint;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
@@ -38,7 +37,6 @@ import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.CheckedTextView;
-import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -55,6 +53,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
+import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.PinActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
@@ -65,6 +64,7 @@ import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatError;
@@ -163,9 +163,29 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             megaApi = app.getMegaApi();
         }
 
+        if(megaApi==null||megaApi.getRootNode()==null){
+            log("Refresh session - sdk");
+            Intent intent = new Intent(this, LoginActivityLollipop.class);
+            intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(intent);
+            finish();
+            return;
+        }
+
         if (megaChatApi == null) {
             MegaApplication app = (MegaApplication) getApplication();
             megaChatApi = app.getMegaChatApi();
+        }
+
+        if(megaChatApi==null||megaChatApi.getInitState()== MegaChatApi.INIT_ERROR){
+            log("Refresh session - karere");
+            Intent intent = new Intent(this, LoginActivityLollipop.class);
+            intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(intent);
+            finish();
+            return;
         }
 
         log("addChatListener");
@@ -697,8 +717,8 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         }
 
         Intent in = new Intent(this, AddContactActivityLollipop.class);
-//		in.putExtra("contactType", Constants.CONTACT_TYPE_MEGA);
         in.putExtra("contactType", Constants.CONTACT_TYPE_MEGA);
+        in.putExtra("chat", true);
         startActivityForResult(in, Constants.REQUEST_ADD_PARTICIPANTS);
 
     }

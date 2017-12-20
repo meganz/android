@@ -90,7 +90,8 @@ public class Constants {
 	public static final int REQUEST_WRITE_STORAGE = 1;
 	public static final int REQUEST_CAMERA = 2;
 	public static final int REQUEST_READ_CONTACTS = 3;
-	public static final int REQUEST_UPLOAD_CONTACT = 4;
+	public static final int RECORD_AUDIO = 4;
+	public static final int REQUEST_UPLOAD_CONTACT = 5;
 
 	public static final int PRO_LITE = 4;
 	public static final int FREE = 0;
@@ -140,6 +141,8 @@ public class Constants {
 	public static String ACTION_UPDATE_ATTACHMENT = "UPDATE_ATTACHMENT";
 
 	public static String ACTION_OVERQUOTA_TRANSFER = "OVERQUOTA_TRANSFER";
+
+	public static String ACTION_SHOW_UPGRADE_ACCOUNT = "ACTION_SHOW_UPGRADE_ACCOUNT";
 
 	final public static int CHAT_ADAPTER_SHOW_ALL = 2;
 	final public static int CHAT_ADAPTER_SHOW_TIME = 1;
