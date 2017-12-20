@@ -145,11 +145,11 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
         log("uri: "+uri);
         appBarLayout = (AppBarLayout) findViewById(R.id.app_bar);
 
-       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             getWindow().clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
             getWindow().setStatusBarColor(getResources().getColor(R.color.black));
-       }
+        }
 
         tB = (Toolbar) findViewById(R.id.call_toolbar);
         if (tB == null) {
@@ -202,6 +202,11 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
                 finish();
                 return;
             }
+        }
+
+        log("Overquota delay: "+megaApi.getBandwidthOverquotaDelay());
+        if(megaApi.getBandwidthOverquotaDelay()>0){
+            showTransferOverquotaDialog();
         }
 
         log("Add transfer listener");
