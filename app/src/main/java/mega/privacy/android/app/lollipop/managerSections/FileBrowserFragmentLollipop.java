@@ -889,8 +889,14 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 					String mimeType = MimeTypeList.typeForName(file.getName()).getType();
 					log("FILENAME: " + file.getName() + "TYPE: "+mimeType);
 
-					//Intent mediaIntent = new Intent(Intent.ACTION_VIEW);
-					Intent mediaIntent = new Intent(context, AudioVideoPlayerLollipop.class);
+					Intent mediaIntent;
+					if (file.getName().contains(".avi") || file.getName().contains(".wmv") || file.getName().contains(".mpg")
+							|| file.getName().contains(".flv") || file.getName().contains(".vob") || file.getName().contains(".mts")){
+						mediaIntent = new Intent(Intent.ACTION_VIEW);
+					}
+					else {
+						mediaIntent = new Intent(context, AudioVideoPlayerLollipop.class);
+					}
 					mediaIntent.putExtra("FILENAME", file.getName());
 					String localPath = Util.getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
 					if (localPath != null){

@@ -137,9 +137,6 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
             getWindow().setStatusBarColor(getResources().getColor(R.color.black));
        }
-       else {
-           getWindow().setStatusBarColor(getResources().getColor(R.color.black));
-       }
 
         tB = (Toolbar) findViewById(R.id.call_toolbar);
         if (tB == null) {
