@@ -1652,6 +1652,8 @@
 
     <string name="pdf_viewer_not_download" context="before sharing an image, the preview has to be downloaded">The file has not been downloaded yet</string>
 
+    <string name="not_permited_add_email_to_invite" context="Error shown when a user is starting a chat or adding new participants in a group chat and writes a contact mail that has not added">It is not allowed to add participants that are not your contacts</string>
+
     <string name="invalid_connection_state" context="Info label about the connectivity state of an individual chat">Chat disconnected</string>
 
     <string name="call_error" context="Message show when a call cannot be established">Error. The call cannot be established</string>

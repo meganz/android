@@ -102,6 +102,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
     ProgressBar progressBar;
     EditText addContactEditText;
     private RelativeLayout contactErrorLayout;
+    private RelativeLayout notPermitedAddContacts;
     private Drawable editTextBackground;
     RecyclerView addedContactsRecyclerView;
     LinearLayoutManager mLayoutManager_2;
@@ -138,6 +139,8 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
     public static String EXTRA_NODE_HANDLE = "node_handle";
 
     private MenuItem sendInvitationMenuItem;
+
+    private boolean comesFromChat;
 
     public class RecyclerViewOnGestureListener extends GestureDetector.SimpleOnGestureListener {
 
@@ -305,6 +308,11 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
 
         if (getIntent() != null){
             contactType = getIntent().getIntExtra("contactType", Constants.CONTACT_TYPE_MEGA);
+            Bundle bundle = getIntent().getExtras();
+            if (bundle != null) {
+                comesFromChat = bundle.getBoolean("chat");
+            }
+            log("comesFromchat: "+comesFromChat);
 
             if (contactType == Constants.CONTACT_TYPE_MEGA){
                 multipleSelectIntent = getIntent().getIntExtra("MULTISELECT", -1);
@@ -432,22 +440,27 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                             String temp = s.toString();
                             char last = s.charAt(s.length()-1);
                             if(last == ' '){
-                                temp = temp.trim();
-                                boolean isValid = isValidEmail(temp);
-                                if(isValid){
-                                    if (!heightMax){
-                                        MegaContactAdapter contact = new MegaContactAdapter(null, null, temp.trim());
-                                        addContactMEGA(contact);
-                                        addContactEditText.getText().clear();
-                                        inputString = "";
+                                if (!comesFromChat){
+                                    temp = temp.trim();
+                                    boolean isValid = isValidEmail(temp);
+                                    if(isValid){
+                                        if (!heightMax){
+                                            MegaContactAdapter contact = new MegaContactAdapter(null, null, temp.trim());
+                                            addContactMEGA(contact);
+                                            addContactEditText.getText().clear();
+                                            inputString = "";
+                                        }
+                                        else {
+                                            showSnackbar(getResources().getString(R.string.max_add_contact));
+                                            addContactEditText.getText().clear();
+                                            inputString = "";
+                                        }
                                     }
-                                    else {
-                                        showSnackbar(getResources().getString(R.string.max_add_contact));
-                                        addContactEditText.getText().clear();
-                                        inputString = "";
+                                    else{
+                                        setError();
                                     }
                                 }
-                                else{
+                                else {
                                     setError();
                                 }
                             }
@@ -508,6 +521,8 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
 
         contactErrorLayout = (RelativeLayout) findViewById(R.id.add_contact_email_error);
         contactErrorLayout.setVisibility(View.GONE);
+        notPermitedAddContacts = (RelativeLayout) findViewById(R.id.not_permited_add_contact_error);
+        notPermitedAddContacts.setVisibility(View.GONE);
         editTextBackground = addContactEditText.getBackground().mutate().getConstantState().newDrawable();
         addedContactsRecyclerView = (RecyclerView) findViewById(R.id.contact_adds_recycler_view);
 
@@ -708,7 +723,12 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
 
     private void setError(){
         log("setError");
-        contactErrorLayout.setVisibility(View.VISIBLE);
+        if (comesFromChat){
+            notPermitedAddContacts.setVisibility(View.VISIBLE);
+        }
+        else {
+            contactErrorLayout.setVisibility(View.VISIBLE);
+        }
         PorterDuffColorFilter porterDuffColorFilter = new PorterDuffColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
         Drawable background = editTextBackground.mutate().getConstantState().newDrawable();
         background.setColorFilter(porterDuffColorFilter);
@@ -719,6 +739,11 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         if(contactErrorLayout.getVisibility() != View.GONE){
             log("quitError");
             contactErrorLayout.setVisibility(View.GONE);
+            addContactEditText.setBackground(editTextBackground);
+        }
+        if(notPermitedAddContacts.getVisibility() != View.GONE){
+            log("quitError");
+            notPermitedAddContacts.setVisibility(View.GONE);
             addContactEditText.setBackground(editTextBackground);
         }
     }
