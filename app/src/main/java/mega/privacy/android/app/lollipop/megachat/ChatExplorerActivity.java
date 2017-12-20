@@ -179,6 +179,7 @@ public class ChatExplorerActivity extends PinActivityLollipop implements View.On
             case R.id.cab_menu_new_chat:{
                 Intent in = new Intent(this, AddContactActivityLollipop.class);
                 in.putExtra("contactType", Constants.CONTACT_TYPE_MEGA);
+                in.putExtra("chat", true);
                 startActivityForResult(in, Constants.REQUEST_CREATE_CHAT);
             }
         }
