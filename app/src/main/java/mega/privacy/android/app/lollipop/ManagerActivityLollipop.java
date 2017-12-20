@@ -1957,6 +1957,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						selectDrawerItemLollipop(drawerItem);
 						selectDrawerItemPending=false;
 					}
+					else if(getIntent().getAction().equals(Constants.ACTION_SHOW_UPGRADE_ACCOUNT)){
+						log("intent from chat - show my account");
+						drawerItem=DrawerItem.ACCOUNT;
+						accountFragment=Constants.UPGRADE_ACCOUNT_FRAGMENT;
+						selectDrawerItemLollipop(drawerItem);
+						selectDrawerItemPending=false;
+					}
 					else if(getIntent().getAction().equals(Constants.ACTION_OVERQUOTA_TRANSFER)){
 						log("intent overquota transfer alert!!");
 						if(alertDialogTransferOverquota==null){
