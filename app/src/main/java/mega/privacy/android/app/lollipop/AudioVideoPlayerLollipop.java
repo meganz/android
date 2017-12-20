@@ -6,6 +6,8 @@ import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -392,6 +394,11 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
         inflater.inflate(R.menu.activity_audiovideoplayer, menu);
 
         shareIcon = menu.findItem(R.id.full_video_viewer_share);
+
+        Drawable share = getResources().getDrawable(R.drawable.ic_social_share_white);
+        share.setColorFilter(getResources().getColor(R.color.white), PorterDuff.Mode.SRC_ATOP);
+        shareIcon.setIcon(share);
+
         propertiesIcon = menu.findItem(R.id.full_image_viewer_properties);
         chatIcon = menu.findItem(R.id.full_image_viewer_chat);
 
