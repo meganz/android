@@ -3,7 +3,6 @@ package mega.privacy.android.app.lollipop;
 import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
 import android.content.Intent;
-import java.text.SimpleDateFormat;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -23,11 +22,9 @@ import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import java.security.Timestamp;
-import java.util.ArrayList;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
@@ -36,14 +33,12 @@ import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaChatApi;
+import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
-import android.app.Dialog;
-import android.support.v4.app.DialogFragment;
-import android.support.v7.app.AppCompatActivity;
-import android.view.View;
 
 
 
@@ -100,6 +95,7 @@ public class SearchByDateActivityLollipop extends PinActivityLollipop implements
 
     Handler handler = new Handler();
     private MegaApiAndroid megaApi;
+    MegaChatApiAndroid megaChatApi;
 
     @SuppressLint("NewApi")
     @Override protected void onCreate(Bundle savedInstanceState) {
@@ -120,6 +116,33 @@ public class SearchByDateActivityLollipop extends PinActivityLollipop implements
         if (megaApi == null){
             megaApi = ((MegaApplication) getApplication()).getMegaApi();
         }
+
+        if(megaApi==null||megaApi.getRootNode()==null){
+            log("Refresh session - sdk");
+            Intent intent = new Intent(this, LoginActivityLollipop.class);
+            intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(intent);
+            finish();
+            return;
+        }
+
+        if(Util.isChatEnabled()){
+            if (megaChatApi == null){
+                megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
+            }
+
+            if(megaChatApi==null||megaChatApi.getInitState()== MegaChatApi.INIT_ERROR){
+                log("Refresh session - karere");
+                Intent intent = new Intent(this, LoginActivityLollipop.class);
+                intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
+                finish();
+                return;
+            }
+        }
+
         setContentView(R.layout.search_by_date_activity_layout);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {

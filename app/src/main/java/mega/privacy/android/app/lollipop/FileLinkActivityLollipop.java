@@ -63,6 +63,8 @@ import mega.privacy.android.app.utils.PreviewUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaChatApi;
+import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
@@ -72,7 +74,8 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 	
 	FileLinkActivityLollipop fileLinkActivity = this;
 	MegaApiAndroid megaApi;
-	
+	MegaChatApiAndroid megaChatApi;
+
 	Toolbar tB;
     ActionBar aB;
 	DisplayMetrics outMetrics;
@@ -126,10 +129,31 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 		
 		MegaApplication app = (MegaApplication)getApplication();
 		megaApi = app.getMegaApi();
-		if(megaApi==null){
-			log("Disconnected");
+		if(megaApi==null||megaApi.getRootNode()==null){
+			log("Refresh session - sdk");
+			Intent intent = new Intent(this, LoginActivityLollipop.class);
+			intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
+			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			startActivity(intent);
+			finish();
+			return;
 		}
-		
+		if(Util.isChatEnabled()){
+			if (megaChatApi == null){
+				megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
+			}
+
+			if(megaChatApi==null||megaChatApi.getInitState()== MegaChatApi.INIT_ERROR){
+				log("Refresh session - karere");
+				Intent intent = new Intent(this, LoginActivityLollipop.class);
+				intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
+				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+				startActivity(intent);
+				finish();
+				return;
+			}
+		}
+
 		setContentView(R.layout.activity_file_link);
 		
 		//Set toolbar

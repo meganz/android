@@ -5,10 +5,7 @@ package mega.privacy.android.app;
 //import com.google.android.gms.analytics.Tracker;
 
 import android.app.Application;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.Context;
-import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
@@ -18,17 +15,8 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Typeface;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
-import android.media.Ringtone;
-import android.media.RingtoneManager;
-import android.net.Uri;
-import android.os.Build;
 import android.os.Handler;
-import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
-import android.text.Html;
-import android.text.Spanned;
 import android.util.Log;
 
 import org.webrtc.AndroidVideoTrackSourceObserver;
@@ -39,27 +27,17 @@ import org.webrtc.ContextUtils;
 import org.webrtc.SurfaceTextureHelper;
 import org.webrtc.VideoCapturer;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Locale;
 
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
-import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
-import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatApiJava;
-import nz.mega.sdk.MegaChatCall;
-import nz.mega.sdk.MegaChatCallListenerInterface;
 import nz.mega.sdk.MegaChatError;
-import nz.mega.sdk.MegaChatListItem;
-import nz.mega.sdk.MegaChatListenerInterface;
-import nz.mega.sdk.MegaChatMessage;
-import nz.mega.sdk.MegaChatPresenceConfig;
 import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaContactRequest;
@@ -68,7 +46,6 @@ import nz.mega.sdk.MegaListenerInterface;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
-import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaUser;
 
@@ -192,17 +169,14 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 
 				if (activityVisible) {
 					log("SEND KEEPALIVE");
-					if (chatConnection) {
-						if (megaChatApi != null) {
-							megaChatApi.setBackgroundStatus(false);
-						}
+					if (megaChatApi != null) {
+						megaChatApi.setBackgroundStatus(false);
 					}
+
 				} else {
 					log("SEND KEEPALIVEAWAY");
-					if (chatConnection) {
-						if (megaChatApi != null) {
-							megaChatApi.setBackgroundStatus(true);
-						}
+					if (megaChatApi != null) {
+						megaChatApi.setBackgroundStatus(true);
 					}
 				}
 
@@ -516,14 +490,6 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 		return firstConnect;
 	}
 
-	public static void setChatConnection(boolean chatConnection){
-		MegaApplication.chatConnection = chatConnection;
-	}
-
-	public static boolean isChatConnection(){
-		return chatConnection;
-	}
-
 	public static void activityResumed() {
 		log("activityResumed()");
 		activityVisible = true;
@@ -537,7 +503,6 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 	private static boolean activityVisible = false;
 	private static boolean isLoggingIn = false;
 	private static boolean firstConnect = true;
-	private static boolean chatConnection = false;
 
 	private static long openChatId = -1;
 

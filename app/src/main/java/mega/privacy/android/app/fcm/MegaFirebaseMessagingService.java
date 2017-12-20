@@ -323,7 +323,6 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
             //megaChatApi.setBackgroundStatus(true, this);
             if(e.getErrorCode()==MegaChatError.ERROR_OK){
                 log("Connected to chat!");
-                MegaApplication.setChatConnection(true);
             }
             else{
                 log("EEEERRRRROR WHEN CONNECTING " + e.getErrorString());
