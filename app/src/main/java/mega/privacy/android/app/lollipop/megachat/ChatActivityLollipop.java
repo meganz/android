@@ -759,78 +759,90 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     public void setChatPermissions(){
         log("setChatPermissions");
-        int permission = chatRoom.getOwnPrivilege();
-        if (chatRoom.isGroup()) {
-            log("Check permissions group chat");
-            if(permission==MegaChatRoom.PRIV_RO) {
-                log("Permission RO");
-                writingContainerLayout.setVisibility(View.GONE);
-                fab.setVisibility(View.GONE);
-                aB.setSubtitle(getString(R.string.observer_permission_label_participants_panel));
-            }
-            else if(permission==MegaChatRoom.PRIV_RM) {
-                log("Permission RM");
-                writingContainerLayout.setVisibility(View.GONE);
-                fab.setVisibility(View.GONE);
-                aB.setSubtitle(null);
-            }
-            else{
-                log("permission: "+permission);
-                aB.setSubtitle(null);
-                writingContainerLayout.setVisibility(View.VISIBLE);
-                fab.setVisibility(View.VISIBLE);
-            }
+        if(megaChatApi.getConnectionState()!=MegaChatApi.CONNECTED){
+            log("Chat not connected");
+            aB.setSubtitle(getString(R.string.invalid_connection_state));
         }
         else{
-            log("Check permissions one to one chat");
-            if(permission==MegaChatRoom.PRIV_RO) {
-                log("Permission RO");
-                writingContainerLayout.setVisibility(View.GONE);
-                fab.setVisibility(View.GONE);
-                aB.setSubtitle(getString(R.string.observer_permission_label_participants_panel));
-            }
-            else if(permission==MegaChatRoom.PRIV_RM) {
-                log("Permission RM");
-                writingContainerLayout.setVisibility(View.GONE);
-                fab.setVisibility(View.GONE);
-                aB.setSubtitle(null);
+            int permission = chatRoom.getOwnPrivilege();
+            if (chatRoom.isGroup()) {
+                log("Check permissions group chat");
+                if(permission==MegaChatRoom.PRIV_RO) {
+                    log("Permission RO");
+                    writingContainerLayout.setVisibility(View.GONE);
+                    fab.setVisibility(View.GONE);
+                    aB.setSubtitle(getString(R.string.observer_permission_label_participants_panel));
+                }
+                else if(permission==MegaChatRoom.PRIV_RM) {
+                    log("Permission RM");
+                    writingContainerLayout.setVisibility(View.GONE);
+                    fab.setVisibility(View.GONE);
+                    aB.setSubtitle(null);
+                }
+                else{
+                    log("permission: "+permission);
+                    aB.setSubtitle(null);
+                    writingContainerLayout.setVisibility(View.VISIBLE);
+                    fab.setVisibility(View.VISIBLE);
+                }
             }
             else{
-                long userHandle = chatRoom.getPeerHandle(0);
-                setStatus(userHandle);
-                writingContainerLayout.setVisibility(View.VISIBLE);
-                fab.setVisibility(View.VISIBLE);
+                log("Check permissions one to one chat");
+                if(permission==MegaChatRoom.PRIV_RO) {
+                    log("Permission RO");
+                    writingContainerLayout.setVisibility(View.GONE);
+                    fab.setVisibility(View.GONE);
+                    aB.setSubtitle(getString(R.string.observer_permission_label_participants_panel));
+                }
+                else if(permission==MegaChatRoom.PRIV_RM) {
+                    log("Permission RM");
+                    writingContainerLayout.setVisibility(View.GONE);
+                    fab.setVisibility(View.GONE);
+                    aB.setSubtitle(null);
+                }
+                else{
+                    long userHandle = chatRoom.getPeerHandle(0);
+                    setStatus(userHandle);
+                    writingContainerLayout.setVisibility(View.VISIBLE);
+                    fab.setVisibility(View.VISIBLE);
+                }
             }
         }
     }
 
     public void setStatus(long userHandle){
 
-        int state = megaChatApi.getUserOnlineStatus(userHandle);
-
-        if(state == MegaChatApi.STATUS_ONLINE){
-            log("This user is connected");
-            aB.setSubtitle(getString(R.string.online_status));
-        }
-        else if(state == MegaChatApi.STATUS_AWAY){
-            log("This user is away");
-            aB.setSubtitle(getString(R.string.away_status));
-        }
-        else if(state == MegaChatApi.STATUS_BUSY){
-            log("This user is busy");
-            aB.setSubtitle(getString(R.string.busy_status));
-        }
-        else if(state == MegaChatApi.STATUS_OFFLINE){
-            log("This user is offline");
-            aB.setSubtitle(getString(R.string.offline_status));
-        }
-        else if(state == MegaChatApi.STATUS_INVALID){
-            log("INVALID status: "+state);
-            aB.setSubtitle(getString(R.string.invalid_status));
+        if(megaChatApi.getConnectionState()!=MegaChatApi.CONNECTED){
+            log("Chat not connected");
+            aB.setSubtitle(getString(R.string.invalid_connection_state));
         }
         else{
-            log("This user status is: "+state);
-            aB.setSubtitle(getString(R.string.invalid_status));
+            int state = megaChatApi.getUserOnlineStatus(userHandle);
+
+            if(state == MegaChatApi.STATUS_ONLINE){
+                log("This user is connected");
+                aB.setSubtitle(getString(R.string.online_status));
+            }
+            else if(state == MegaChatApi.STATUS_AWAY){
+                log("This user is away");
+                aB.setSubtitle(getString(R.string.away_status));
+            }
+            else if(state == MegaChatApi.STATUS_BUSY){
+                log("This user is busy");
+                aB.setSubtitle(getString(R.string.busy_status));
+            }
+            else if(state == MegaChatApi.STATUS_OFFLINE){
+                log("This user is offline");
+                aB.setSubtitle(getString(R.string.offline_status));
+            }
+            else if(state == MegaChatApi.STATUS_INVALID){
+                log("INVALID status: "+state);
+                aB.setSubtitle(getString(R.string.invalid_status));
+            }
+            else{
+                log("This user status is: "+state);
+                aB.setSubtitle(getString(R.string.invalid_status));
+            }
         }
     }
 
@@ -1032,87 +1044,103 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     public boolean onPrepareOptionsMenu(Menu menu){
         log("onPrepareOptionsMenu");
         if(chatRoom!=null){
-            int permission = chatRoom.getOwnPrivilege();
-            log("Permission in the chat: "+permission);
-            if(chatRoom.isGroup()){
 
-                if(permission==MegaChatRoom.PRIV_MODERATOR) {
-                    inviteMenuItem.setVisible(true);
+            if(megaChatApi.getConnectionState()!=MegaChatApi.CONNECTED){
+                leaveMenuItem.setVisible(false);
+                callMenuItem.setVisible(false);
+                videoMenuItem.setVisible(false);
+                clearHistoryMenuItem.setVisible(false);
+                inviteMenuItem.setVisible(false);
+            }
+            else{
+                int permission = chatRoom.getOwnPrivilege();
+                log("Permission in the chat: "+permission);
+                if(chatRoom.isGroup()){
 
-                    int lastMessageIndex = messages.size()-1;
-                    if(lastMessageIndex>=0){
-                        AndroidMegaChatMessage lastMessage = messages.get(lastMessageIndex);
-                        if(!lastMessage.isUploading()){
-                            if(lastMessage.getMessage().getType()==MegaChatMessage.TYPE_TRUNCATE){
-                                log("Last message is TRUNCATE");
-                                clearHistoryMenuItem.setVisible(false);
+                    if(permission==MegaChatRoom.PRIV_MODERATOR) {
+                        inviteMenuItem.setVisible(true);
+
+                        int lastMessageIndex = messages.size()-1;
+                        if(lastMessageIndex>=0){
+                            AndroidMegaChatMessage lastMessage = messages.get(lastMessageIndex);
+                            if(!lastMessage.isUploading()){
+                                if(lastMessage.getMessage().getType()==MegaChatMessage.TYPE_TRUNCATE){
+                                    log("Last message is TRUNCATE");
+                                    clearHistoryMenuItem.setVisible(false);
+                                }
+                                else{
+                                    log("Last message is NOT TRUNCATE");
+                                    clearHistoryMenuItem.setVisible(true);
+                                }
                             }
                             else{
-                                log("Last message is NOT TRUNCATE");
+                                log("Last message is UPLOADING");
                                 clearHistoryMenuItem.setVisible(true);
                             }
                         }
                         else{
-                            log("Last message is UPLOADING");
-                            clearHistoryMenuItem.setVisible(true);
+                            clearHistoryMenuItem.setVisible(false);
                         }
+
+                        leaveMenuItem.setVisible(true);
+                        callMenuItem.setVisible(true);
+                        videoMenuItem.setVisible(true);
+
+                    }
+                    else if(permission==MegaChatRoom.PRIV_RM) {
+                        log("Group chat PRIV_RM");
+                        leaveMenuItem.setVisible(false);
+                        callMenuItem.setVisible(false);
+                        videoMenuItem.setVisible(false);
+                        clearHistoryMenuItem.setVisible(false);
+                        inviteMenuItem.setVisible(false);
+                    }
+                    else if(permission==MegaChatRoom.PRIV_RO) {
+                        log("Group chat PRIV_RM");
+                        leaveMenuItem.setVisible(true);
+                        callMenuItem.setVisible(false);
+                        videoMenuItem.setVisible(false);
+                        clearHistoryMenuItem.setVisible(false);
+                        inviteMenuItem.setVisible(false);
                     }
                     else{
+                        log("Permission: "+permission);
+                        leaveMenuItem.setVisible(true);
+                        callMenuItem.setVisible(true);
+                        videoMenuItem.setVisible(true);
                         clearHistoryMenuItem.setVisible(false);
+                        inviteMenuItem.setVisible(false);
                     }
 
-                    leaveMenuItem.setVisible(true);
-                    callMenuItem.setVisible(true);
-                    videoMenuItem.setVisible(true);
-
-                }
-                else if(permission==MegaChatRoom.PRIV_RM) {
-                    log("Group chat PRIV_RM");
-                    leaveMenuItem.setVisible(false);
-                    callMenuItem.setVisible(false);
-                    videoMenuItem.setVisible(false);
-                    clearHistoryMenuItem.setVisible(false);
-                    inviteMenuItem.setVisible(false);
-                }
-                else if(permission==MegaChatRoom.PRIV_RO) {
-                    log("Group chat PRIV_RM");
-                    leaveMenuItem.setVisible(true);
-                    callMenuItem.setVisible(false);
-                    videoMenuItem.setVisible(false);
-                    clearHistoryMenuItem.setVisible(false);
-                    inviteMenuItem.setVisible(false);
-                }
-                else{
-                    log("Permission: "+permission);
-                    leaveMenuItem.setVisible(true);
-                    callMenuItem.setVisible(true);
-                    videoMenuItem.setVisible(true);
-                    clearHistoryMenuItem.setVisible(false);
-                    inviteMenuItem.setVisible(false);
-                }
-
-                contactInfoMenuItem.setTitle(getString(R.string.group_chat_info_label));
-                contactInfoMenuItem.setVisible(true);
-            }
-            else{
-                inviteMenuItem.setVisible(false);
-                if(permission==MegaChatRoom.PRIV_RO) {
-                    clearHistoryMenuItem.setVisible(false);
-                    contactInfoMenuItem.setVisible(false);
-                    callMenuItem.setVisible(false);
-                    videoMenuItem.setVisible(false);
-                }
-                else{
-                    clearHistoryMenuItem.setVisible(true);
-                    contactInfoMenuItem.setTitle(getString(R.string.contact_properties_activity));
+                    contactInfoMenuItem.setTitle(getString(R.string.group_chat_info_label));
                     contactInfoMenuItem.setVisible(true);
                 }
-                leaveMenuItem.setVisible(false);
+                else{
+                    inviteMenuItem.setVisible(false);
+                    if(permission==MegaChatRoom.PRIV_RO) {
+                        clearHistoryMenuItem.setVisible(false);
+                        contactInfoMenuItem.setVisible(false);
+                        callMenuItem.setVisible(false);
+                        videoMenuItem.setVisible(false);
+                    }
+                    else{
+                        clearHistoryMenuItem.setVisible(true);
+                        contactInfoMenuItem.setTitle(getString(R.string.contact_properties_activity));
+                        contactInfoMenuItem.setVisible(true);
+                    }
+                    leaveMenuItem.setVisible(false);
+                }
             }
         }
         else{
             log("Chatroom NULL on create menu");
+            leaveMenuItem.setVisible(false);
+            callMenuItem.setVisible(false);
+            videoMenuItem.setVisible(false);
+            clearHistoryMenuItem.setVisible(false);
+            inviteMenuItem.setVisible(false);
         }
+
         return super.onPrepareOptionsMenu(menu);
     }
 
@@ -4439,6 +4467,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     @Override
     public void onChatConnectionStateUpdate(MegaChatApiJava api, long chatid, int newState) {
-
+            supportInvalidateOptionsMenu();
     }
 }
