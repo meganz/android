@@ -216,8 +216,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 	public long transferCallback = 0;
 
-	boolean chatConnection = false;
-
 	String regex = "[*|\\?:\"<>\\{\\}\\[\\]\\\\\\/]";
 
 	TransfersBottomSheetDialogFragment transfersBottomSheet = null;
@@ -1041,7 +1039,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		outState.putLong("parentHandleOutgoing", parentHandleOutgoing);
 		outState.putLong("parentHandleSearch", parentHandleSearch);
 		outState.putLong("parentHandleInbox", parentHandleInbox);
-		outState.putBoolean("chatConnection", chatConnection);
 		outState.putSerializable("drawerItem", drawerItem);
 
 		outState.putBoolean("isSearchEnabled", isSearchEnabled);
@@ -1149,8 +1146,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			searchQuery = savedInstanceState.getString("searchQuery");
 			textsearchQuery = savedInstanceState.getBoolean("textsearchQuery");
 			levelsSearch = savedInstanceState.getInt("levelsSearch");
-			chatConnection = savedInstanceState.getBoolean("chatConnection");
-
 		}
 		else{
 			log("Bundle is NULL");
@@ -1164,7 +1159,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			indexContacts = -1;
 			deepBrowserTreeIncoming = 0;
 			deepBrowserTreeOutgoing = 0;
-			chatConnection = MegaApplication.isChatConnection();
 
 			this.setPathNavigationOffline("/");
 		}
@@ -2033,14 +2027,19 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 			log("onCreate - Check if there any unread chat");
 			if(Util.isChatEnabled()){
-				log("Connect to chat!");
+				log("Connect to chat!: "+megaChatApi.getInitState());
 
-				if(!chatConnection){
-					log("Connection goes!!!");
-					megaChatApi.connect(this);
+				if(megaChatApi!=null){
+					if((megaChatApi.getInitState()!=MegaChatApi.INIT_ERROR)&&(megaChatApi.getInitState()!=MegaChatApi.INIT_WAITING_NEW_SESSION)&&(megaChatApi.getInitState()!=MegaChatApi.INIT_NO_CACHE)){
+						log("Connection goes!!!");
+						megaChatApi.connect(this);
+					}
+					else{
+						log("Not connected: "+megaChatApi.getInitState());
+					}
 				}
 				else{
-					log("Already connected");
+					log("megaChatApi is NULL");
 				}
 
 				setChatTitleSection();
@@ -12405,9 +12404,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 			if(e.getErrorCode()==MegaChatError.ERROR_OK){
 				log("CONNECT CHAT finished ");
-
-				chatConnection = true;
-				MegaApplication.setChatConnection(chatConnection);
 
 				if(rChatFL!=null){
 					if(rChatFL.isAdded()){

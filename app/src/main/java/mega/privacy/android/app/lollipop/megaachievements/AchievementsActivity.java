@@ -1,7 +1,7 @@
 package mega.privacy.android.app.lollipop.megaachievements;
 
-import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
@@ -24,15 +24,16 @@ import java.util.Date;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.PinActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
-import mega.privacy.android.app.lollipop.managerSections.OutgoingSharesFragmentLollipop;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaAchievementsDetails;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
-import nz.mega.sdk.MegaContactRequest;
+import nz.mega.sdk.MegaChatApi;
+import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
@@ -52,6 +53,7 @@ public class AchievementsActivity extends PinActivityLollipop implements MegaReq
     public ArrayList<ReferralBonus> referralBonuses;
 
     MegaApiAndroid megaApi;
+    MegaChatApiAndroid megaChatApi;
 
     private android.support.v7.app.AlertDialog successDialog;
 
@@ -61,6 +63,31 @@ public class AchievementsActivity extends PinActivityLollipop implements MegaReq
 
         if (megaApi == null){
             megaApi = ((MegaApplication) getApplication()).getMegaApi();
+        }
+
+        if(megaApi==null||megaApi.getRootNode()==null){
+            log("Refresh session - sdk");
+            Intent intent = new Intent(this, LoginActivityLollipop.class);
+            intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(intent);
+            finish();
+            return;
+        }
+        if(Util.isChatEnabled()){
+            if (megaChatApi == null){
+                megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
+            }
+
+            if(megaChatApi==null||megaChatApi.getInitState()== MegaChatApi.INIT_ERROR){
+                log("Refresh session - karere");
+                Intent intent = new Intent(this, LoginActivityLollipop.class);
+                intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
+                finish();
+                return;
+            }
         }
 
         setContentView(R.layout.activity_achievements);

@@ -46,6 +46,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaContactAdapter;
@@ -55,7 +56,6 @@ import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.components.flowlayoutmanager.Alignment;
 import mega.privacy.android.app.components.flowlayoutmanager.FlowLayoutManager;
 import mega.privacy.android.app.components.tokenautocomplete.ContactInfo;
-import mega.privacy.android.app.components.tokenautocomplete.ContactsCompletionView;
 import mega.privacy.android.app.lollipop.adapters.AddContactsLollipopAdapter;
 import mega.privacy.android.app.lollipop.adapters.MegaAddContactsLollipopAdapter;
 import mega.privacy.android.app.lollipop.adapters.MegaContactsLollipopAdapter;
@@ -64,6 +64,8 @@ import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaChatApi;
+import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaUser;
 
 
@@ -76,6 +78,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
     private android.support.v7.app.AlertDialog shareFolderDialog;
     MegaApplication app;
     MegaApiAndroid megaApi;
+    MegaChatApiAndroid megaChatApi;
     DatabaseHandler dbH = null;
     int contactType = 0;
     int multipleSelectIntent;
@@ -320,6 +323,30 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
 
         app = (MegaApplication)getApplication();
         megaApi = app.getMegaApi();
+        if(megaApi==null||megaApi.getRootNode()==null){
+            log("Refresh session - sdk");
+            Intent intent = new Intent(this, LoginActivityLollipop.class);
+            intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(intent);
+            finish();
+            return;
+        }
+        if(Util.isChatEnabled()){
+            if (megaChatApi == null){
+                megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
+            }
+
+            if(megaChatApi==null||megaChatApi.getInitState()== MegaChatApi.INIT_ERROR){
+                log("Refresh session - karere");
+                Intent intent = new Intent(this, LoginActivityLollipop.class);
+                intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
+                finish();
+                return;
+            }
+        }
 
         addContactActivityLollipop = this;
 

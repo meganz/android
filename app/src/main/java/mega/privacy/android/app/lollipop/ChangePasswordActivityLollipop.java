@@ -33,8 +33,6 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import java.util.Locale;
-
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
@@ -43,6 +41,8 @@ import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaChatApi;
+import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
@@ -61,6 +61,8 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 	Display display;
 	
 	private MegaApiAndroid megaApi;
+	MegaChatApiAndroid megaChatApi;
+
 	boolean changePassword = true;
 	
 	private EditText oldPasswordView, newPassword1View, newPassword2View;
@@ -91,6 +93,32 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 		
         fragmentContainer = (RelativeLayout) findViewById(R.id.fragment_container_change_pass);
 		megaApi = ((MegaApplication)getApplication()).getMegaApi();
+		if(megaApi==null||megaApi.getRootNode()==null){
+			log("Refresh session - sdk");
+			Intent intent = new Intent(this, LoginActivityLollipop.class);
+			intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
+			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			startActivity(intent);
+			finish();
+			return;
+		}
+
+		if(Util.isChatEnabled()){
+			if (megaChatApi == null){
+				megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
+			}
+
+			if(megaChatApi==null||megaChatApi.getInitState()== MegaChatApi.INIT_ERROR){
+				log("Refresh session - karere");
+				Intent intent = new Intent(this, LoginActivityLollipop.class);
+				intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
+				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+				startActivity(intent);
+				finish();
+				return;
+			}
+		}
+
 		display = getWindowManager().getDefaultDisplay();
 		outMetrics = new DisplayMetrics ();
 	    display.getMetrics(outMetrics);
@@ -98,13 +126,6 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 		
 	    scaleW = Util.getScaleW(outMetrics, density);
 	    scaleH = Util.getScaleH(outMetrics, density);
-	    float scaleText;
-	    if (scaleH < scaleW){
-	    	scaleText = scaleH;
-	    }
-	    else{
-	    	scaleText = scaleW;
-	    }
 
 		title = (TextView) findViewById(R.id.title_change_pass);
 		LinearLayout.LayoutParams titleParams = (LinearLayout.LayoutParams)title.getLayoutParams();

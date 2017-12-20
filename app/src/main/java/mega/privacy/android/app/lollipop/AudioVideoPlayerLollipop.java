@@ -17,7 +17,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.Surface;
 import android.view.View;
-import android.view.Window;
 import android.view.WindowManager;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -38,9 +37,6 @@ import com.google.android.exoplayer2.source.ExtractorMediaSource;
 import com.google.android.exoplayer2.source.LoopingMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.source.TrackGroupArray;
-import com.google.android.exoplayer2.source.dash.DashMediaSource;
-import com.google.android.exoplayer2.source.dash.DefaultDashChunkSource;
-import com.google.android.exoplayer2.source.hls.HlsMediaSource;
 import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.trackselection.TrackSelection;
@@ -49,14 +45,10 @@ import com.google.android.exoplayer2.trackselection.TrackSelector;
 import com.google.android.exoplayer2.ui.PlaybackControlView;
 import com.google.android.exoplayer2.ui.SimpleExoPlayerView;
 import com.google.android.exoplayer2.upstream.BandwidthMeter;
-import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
 import com.google.android.exoplayer2.video.VideoRendererEventListener;
-
-import java.net.MalformedURLException;
-import java.net.URL;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeMime;
@@ -64,6 +56,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerActivity;
 import mega.privacy.android.app.utils.Constants;
 import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatError;
@@ -165,12 +158,30 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
 
         MegaApplication app = (MegaApplication)getApplication();
         megaApi = app.getMegaApi();
+        if(megaApi==null||megaApi.getRootNode()==null){
+            log("Refresh session - sdk");
+            Intent intentLogin = new Intent(this, LoginActivityLollipop.class);
+            intentLogin.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
+            intentLogin.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(intentLogin);
+            finish();
+            return;
+        }
 
         if(mega.privacy.android.app.utils.Util.isChatEnabled()){
-            megaChatApi = app.getMegaChatApi();
-        }
-        else{
-            megaChatApi=null;
+            if (megaChatApi == null){
+                megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
+            }
+
+            if(megaChatApi==null||megaChatApi.getInitState()== MegaChatApi.INIT_ERROR){
+                log("Refresh session - karere");
+                Intent intentLogin = new Intent(this, LoginActivityLollipop.class);
+                intentLogin.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
+                intentLogin.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intentLogin);
+                finish();
+                return;
+            }
         }
 
         //Create a default TrackSelector
