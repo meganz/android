@@ -523,7 +523,13 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 				}			
 			}
 
-			contentText.setText(MegaApiUtils.getInfoNodeOnlyFolders(nodes, context));
+			if (((ManagerActivityLollipop) context).deepBrowserTreeOutgoing == 0){
+				contentText.setText(MegaApiUtils.getInfoNodeOnlyFolders(nodes, context));
+			}else{
+				MegaNode infoNode = megaApi.getNodeByHandle(((ManagerActivityLollipop)context).parentHandleOutgoing);
+				contentText.setText(MegaApiUtils.getInfoFolder(infoNode, context));
+				aB.setTitle(infoNode.getName());
+			}
 
 			return v;
 		}
@@ -571,11 +577,9 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 			((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 			if (((ManagerActivityLollipop) context).deepBrowserTreeOutgoing == 0){
 				contentText.setText(MegaApiUtils.getInfoNodeOnlyFolders(nodes, context));
-			}
-			else{
+			}else{
 				MegaNode infoNode = megaApi.getNodeByHandle(((ManagerActivityLollipop)context).parentHandleOutgoing);
 				contentText.setText(MegaApiUtils.getInfoFolder(infoNode, context));
-
 				aB.setTitle(infoNode.getName());
 			}
 			adapter.setMultipleSelect(false);
@@ -669,7 +673,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
                     emptyLinearLayout.setVisibility(View.GONE);
                 }
                 contentText.setText(MegaApiUtils.getInfoNodeOnlyFolders(nodes, context));
-            }
+			}
         }
         else{
             MegaNode n = megaApi.getNodeByHandle(((ManagerActivityLollipop)context).parentHandleOutgoing);
@@ -682,7 +686,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 
             contentText.setText(MegaApiUtils.getInfoFolder(n, context));
 
-            nodes = megaApi.getChildren(n, ((ManagerActivityLollipop)context).orderOthers);
+			nodes = megaApi.getChildren(n, ((ManagerActivityLollipop)context).orderOthers);
             adapter.setNodes(nodes);
 			visibilityFastScroller();
 
@@ -747,6 +751,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 					emptyLinearLayout.setVisibility(View.GONE);
 				}
 				contentText.setText(MegaApiUtils.getInfoNodeOnlyFolders(nodes, context));
+
 			}
 		}
 		else{
@@ -955,9 +960,15 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 					String url = megaApi.httpServerGetLocalLink(file);
 					String mimeType = MimeTypeList.typeForName(file.getName()).getType();
 					log("FILENAME: " + file.getName());
-			  		
-			  		//Intent mediaIntent = new Intent(Intent.ACTION_VIEW);
-					Intent mediaIntent = new Intent(context, AudioVideoPlayerLollipop.class);
+
+					Intent mediaIntent;
+					if (file.getName().contains(".avi") || file.getName().contains(".wmv") || file.getName().contains(".mpg")
+							|| file.getName().contains(".flv") || file.getName().contains(".vob") || file.getName().contains(".mts")){
+						mediaIntent = new Intent(Intent.ACTION_VIEW);
+					}
+					else {
+						mediaIntent = new Intent(context, AudioVideoPlayerLollipop.class);
+					}
 					mediaIntent.putExtra("HANDLE", file.getHandle());
 					mediaIntent.putExtra("FILENAME", file.getName());
 					String localPath = Util.getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
@@ -1286,6 +1297,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 			}
 
 			contentText.setText(MegaApiUtils.getInfoNodeOnlyFolders(nodes, context));
+
 			recyclerView.setVisibility(View.VISIBLE);
 			contentTextLayout.setVisibility(View.VISIBLE);
 			emptyImageView.setVisibility(View.GONE);
@@ -1298,6 +1310,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 
 			MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(((ManagerActivityLollipop)context).parentHandleOutgoing));
 			contentText.setText(MegaApiUtils.getInfoFolder(parentNode, context));
+
 			if (parentNode != null){
 				recyclerView.setVisibility(View.VISIBLE);
 				contentTextLayout.setVisibility(View.VISIBLE);

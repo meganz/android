@@ -476,12 +476,17 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 				contentTextLayout.setVisibility(View.VISIBLE);
 				emptyImageView.setVisibility(View.GONE);
 				emptyTextView.setVisibility(View.GONE);
-			}	
-
-			contentText.setText(MegaApiUtils.getInfoNodeOnlyFolders(nodes, context));
+			}
 
 			log("Deep browser tree: "+((ManagerActivityLollipop)context).deepBrowserTreeIncoming);
 
+			if (((ManagerActivityLollipop)context).deepBrowserTreeIncoming == 0){
+				contentText.setText(MegaApiUtils.getInfoNodeOnlyFolders(nodes, context));
+			}else{
+				MegaNode infoNode = megaApi.getNodeByHandle(((ManagerActivityLollipop)context).parentHandleIncoming);
+				contentText.setText(MegaApiUtils.getInfoFolder(infoNode, context));
+				aB.setTitle(infoNode.getName());
+			}
 			return v;
 		}
 		else{
@@ -532,13 +537,10 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 
 			if (((ManagerActivityLollipop)context).deepBrowserTreeIncoming == 0){
 				contentText.setText(MegaApiUtils.getInfoNodeOnlyFolders(nodes, context));
-			}
-			else{
-
+			}else{
 				MegaNode infoNode = megaApi.getNodeByHandle(((ManagerActivityLollipop)context).parentHandleIncoming);
 				contentText.setText(MegaApiUtils.getInfoFolder(infoNode, context));
 				aB.setTitle(infoNode.getName());
-
 			}						
 			
 			adapter.setMultipleSelect(false);
@@ -609,8 +611,7 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 
 		if(((ManagerActivityLollipop)context).deepBrowserTreeIncoming==0){
 			contentText.setText(MegaApiUtils.getInfoNodeOnlyFolders(nodes, context));
-		}
-		else{
+		}else{
 			if(parentNode!=null){
 				contentText.setText(MegaApiUtils.getInfoFolder(parentNode, context));
 			}
@@ -789,9 +790,15 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 					String url = megaApi.httpServerGetLocalLink(file);
 					String mimeType = MimeTypeList.typeForName(file.getName()).getType();
 					log("FILENAME: " + file.getName());
-			  		
-			  		//Intent mediaIntent = new Intent(Intent.ACTION_VIEW);
-					Intent mediaIntent = new Intent(context, AudioVideoPlayerLollipop.class);
+
+					Intent mediaIntent;
+					if (file.getName().contains(".avi") || file.getName().contains(".wmv") || file.getName().contains(".mpg")
+							|| file.getName().contains(".flv") || file.getName().contains(".vob") || file.getName().contains(".mts")){
+						mediaIntent = new Intent(Intent.ACTION_VIEW);
+					}
+					else {
+						mediaIntent = new Intent(context, AudioVideoPlayerLollipop.class);
+					}
 					mediaIntent.putExtra("HANDLE", file.getHandle());
 					mediaIntent.putExtra("FILENAME", file.getName());
 					String localPath = Util.getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);

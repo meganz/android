@@ -135,6 +135,7 @@ public class MimeTypeList {
 	 * Check is MimeType of image type
 	 */
 	public boolean isImage() {
+		log("type is: " + type);
 		return type.startsWith("image/");
 	}
 	
