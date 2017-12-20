@@ -31,7 +31,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
@@ -863,8 +862,13 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 			if (!isForeground) {
 				log("starting foreground!");
-				startForeground(notificationId, notification);
-				isForeground = true;
+				try {
+					startForeground(notificationId, notification);
+					isForeground = true;
+				}
+				catch (Exception e){
+					isForeground = false;
+				}
 			} else {
 				mNotificationManager.notify(notificationId, notification);
 			}
@@ -937,9 +941,15 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		}
 
 		if (!isForeground) {
-			log("starting foreground!");
-			startForeground(notificationId, notification);
-			isForeground = true;
+			log("starting foreground");
+			try {
+				startForeground(notificationId, notification);
+				isForeground = true;
+			}
+			catch (Exception e){
+				log("startforeground exception: " + e.getMessage());
+				isForeground = false;
+			}
 		} else {
 			mNotificationManager.notify(notificationId, notification);
 		}
@@ -1868,7 +1878,6 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 			if(e.getErrorCode()==MegaChatError.ERROR_OK){
 				log("Connected to chat!");
-                MegaApplication.setChatConnection(true);
 			}
 			else{
 				log("EEEERRRRROR WHEN CONNECTING " + e.getErrorString());

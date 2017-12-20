@@ -49,6 +49,7 @@ import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop;
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop.Mode;
+import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PinActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaBrowserLollipopAdapter;
@@ -58,6 +59,7 @@ import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatError;
@@ -238,8 +240,28 @@ public class NodeAttachmentActivityLollipop extends PinActivityLollipop implemen
 		MegaApplication app = (MegaApplication)getApplication();
 		megaApi = app.getMegaApi();
 
+		if(megaApi==null||megaApi.getRootNode()==null){
+			log("Refresh session - sdk");
+			Intent intent = new Intent(this, LoginActivityLollipop.class);
+			intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
+			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			startActivity(intent);
+			finish();
+			return;
+		}
+
 		if (megaChatApi == null){
-			megaChatApi = app.getMegaChatApi();
+			megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
+		}
+
+		if(megaChatApi==null||megaChatApi.getInitState()== MegaChatApi.INIT_ERROR){
+			log("Refresh session - karere");
+			Intent intent = new Intent(this, LoginActivityLollipop.class);
+			intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
+			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			startActivity(intent);
+			finish();
+			return;
 		}
 		
 		nodeAttachmentActivity = this;

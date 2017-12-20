@@ -66,6 +66,7 @@
 
 /* to disable TLS-SRP authentication */
 /* #undef CURL_DISABLE_TLS_SRP */
+#define CURL_DISABLE_TLS_SRP 1
 
 /* to disable verbose strings */
 /* #undef CURL_DISABLE_VERBOSE_STRINGS */
@@ -977,7 +978,7 @@
 /* #undef USE_THREADS_POSIX */
 
 /* Use TLS-SRP authentication */
-#define USE_TLS_SRP 1
+// #define USE_TLS_SRP 1
 
 /* Use Unix domain sockets */
 #define USE_UNIX_SOCKETS 1

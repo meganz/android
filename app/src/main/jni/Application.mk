@@ -1,13 +1,18 @@
-APP_PLATFORM=android-9
+DISABLE_WEBRTC = false
+USE_LIBWEBSOCKETS = true
+
+ifeq ($(DISABLE_WEBRTC),true)
+APP_PLATFORM = android-9
+APP_ABI := armeabi x86
+else
+USE_LIBWEBSOCKETS = true
+APP_PLATFORM = android-16
+APP_ABI := armeabi-v7a x86
+endif
+
 NDK_TOOLCHAIN_VERSION=clang
 APP_STL := c++_static
-APP_ABI := armeabi x86
 APP_OPTIM := release
 APP_PIE := false
 
-# then enable c++11 extentions in source code
-APP_CPPFLAGS += -std=c++11 -Wno-extern-c-compat -fexceptions -frtti
-# or use APP_CPPFLAGS := -std=gnu++11
-
-DISABLE_WEBRTC = true
-
+APP_CPPFLAGS += -std=c++11 -Wno-extern-c-compat -mno-unaligned-access -fexceptions -frtti
