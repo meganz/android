@@ -4014,7 +4014,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }
             else{
                 log("EEEERRRRROR WHEN TYPE_START_CHAT_CALL " + e.getErrorString());
-                showSnackbar("EEEERRRRROR WHEN TYPE_START_CHAT_CALL");
+                showSnackbar(getString(R.string.call_error));
             }
         }
         else if(request.getType() == MegaChatRequest.TYPE_REMOVE_FROM_CHATROOM){
