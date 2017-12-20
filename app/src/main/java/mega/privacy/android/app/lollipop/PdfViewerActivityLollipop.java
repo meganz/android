@@ -71,9 +71,9 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
 
     PDFView pdfView;
 
-    AppBarLayout appBarLayout;
-    Toolbar tB;
-    public ActionBar aB;
+    private AppBarLayout appBarLayout;
+    private Toolbar tB;
+    private ActionBar aB;
 
     private String gSession;
     UserCredentials credentials;
@@ -148,7 +148,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
         }
         setContentView(R.layout.activity_pdfviewer);
 
-        appBarLayout = (AppBarLayout) findViewById(R.id.app_bar);
+        appBarLayout = (AppBarLayout) findViewById(R.id.app_bar_pdfviewer);
 
         tB = (Toolbar) findViewById(R.id.toolbar_pdf_viewer);
         if(tB==null){
@@ -398,38 +398,35 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
     }
 
     public  void setToolbarVisibilityShow () {
+        log("setToolbarVisibilityShow");
         aB.show();
-        tB.animate().translationY(0).setDuration(200L).start();
-        uploadContainer.animate().translationY(0).setDuration(200L).start();
+        if(tB != null) {
+            tB.animate().translationY(0).setDuration(200L).start();
+            uploadContainer.animate().translationY(0).setDuration(200L).start();
+        }
     }
 
     public void setToolbarVisibilityHide () {
         log("setToolbarVisibilityHide");
-
-        tB.animate().translationY(-tB.getBottom()).setDuration(200L).withEndAction(new Runnable() {
-            @Override
-            public void run() {
-                aB.hide();
-            }
-        }).start();
-        uploadContainer.animate().translationY(220).setDuration(200L).start();
-    }
-
-    public void setToolbarVisibility (){
-        log("setToolbarVisibility");
-        if (aB.isShowing()) {
-            //aB.hide();
-            tB.animate().translationY(-tB.getBottom()).setDuration(200L).withEndAction(new Runnable() {
+        if(tB != null) {
+            tB.animate().translationY(-220).setDuration(200L).withEndAction(new Runnable() {
                 @Override
                 public void run() {
                     aB.hide();
                 }
             }).start();
             uploadContainer.animate().translationY(220).setDuration(200L).start();
-        } else {
-            aB.show();
-            tB.animate().translationY(0).setDuration(200L).start();
-            uploadContainer.animate().translationY(0).setDuration(200L).start();
+        }
+        else {
+            aB.hide();
+        }
+    }
+
+    public void setToolbarVisibility (){
+        if (aB != null && aB.isShowing()) {
+            setToolbarVisibilityHide();
+        } else if (aB != null && !aB.isShowing()){
+            setToolbarVisibilityShow();
         }
     }
 
@@ -556,7 +553,6 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
     @Override
     public void onClick(View v) {
         log("onClick");
-
         setToolbarVisibility();
     }
 
