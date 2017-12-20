@@ -156,6 +156,7 @@ import mega.privacy.android.app.lollipop.managerSections.UpgradeAccountFragmentL
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.lollipop.megachat.RecentChatsFragmentLollipop;
+import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.lollipop.tasks.CheckOfflineNodesTask;
 import mega.privacy.android.app.lollipop.tasks.FilePrepareTask;
 import mega.privacy.android.app.lollipop.tasks.FillDBContactsTask;
@@ -182,6 +183,8 @@ import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatApiJava;
+import nz.mega.sdk.MegaChatCall;
+import nz.mega.sdk.MegaChatCallListenerInterface;
 import nz.mega.sdk.MegaChatError;
 import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatListenerInterface;
@@ -203,7 +206,7 @@ import nz.mega.sdk.MegaTransferListenerInterface;
 import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUtilsAndroid;
 
-public class ManagerActivityLollipop extends PinActivityLollipop implements NetworkStateReceiver.NetworkStateReceiverListener, MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatRequestListenerInterface, OnNavigationItemSelectedListener, MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener,
+public class ManagerActivityLollipop extends PinActivityLollipop implements NetworkStateReceiver.NetworkStateReceiverListener, MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatCallListenerInterface,MegaChatRequestListenerInterface, OnNavigationItemSelectedListener, MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener,
 			NodeOptionsBottomSheetDialogFragment.CustomHeight, ContactsBottomSheetDialogFragment.CustomHeight{
 
 	public int accountFragment;
@@ -212,8 +215,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	public MegaTransferData transferData;
 
 	public long transferCallback = 0;
-
-	boolean chatConnection = false;
 
 	String regex = "[*|\\?:\"<>\\{\\}\\[\\]\\\\\\/]";
 
@@ -1038,7 +1039,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		outState.putLong("parentHandleOutgoing", parentHandleOutgoing);
 		outState.putLong("parentHandleSearch", parentHandleSearch);
 		outState.putLong("parentHandleInbox", parentHandleInbox);
-		outState.putBoolean("chatConnection", chatConnection);
 		outState.putSerializable("drawerItem", drawerItem);
 
 		outState.putBoolean("isSearchEnabled", isSearchEnabled);
@@ -1146,8 +1146,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			searchQuery = savedInstanceState.getString("searchQuery");
 			textsearchQuery = savedInstanceState.getBoolean("textsearchQuery");
 			levelsSearch = savedInstanceState.getInt("levelsSearch");
-			chatConnection = savedInstanceState.getBoolean("chatConnection");
-
 		}
 		else{
 			log("Bundle is NULL");
@@ -1161,7 +1159,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			indexContacts = -1;
 			deepBrowserTreeIncoming = 0;
 			deepBrowserTreeOutgoing = 0;
-			chatConnection = MegaApplication.isChatConnection();
 
 			this.setPathNavigationOffline("/");
 		}
@@ -1198,6 +1195,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			megaChatApi = app.getMegaChatApi();
 			log("addChatListener");
 			megaChatApi.addChatListener(this);
+			megaChatApi.addChatCallListener(this);
 		}
 		else{
 			megaChatApi=null;
@@ -1959,6 +1957,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						selectDrawerItemLollipop(drawerItem);
 						selectDrawerItemPending=false;
 					}
+					else if(getIntent().getAction().equals(Constants.ACTION_SHOW_UPGRADE_ACCOUNT)){
+						log("intent from chat - show my account");
+						drawerItem=DrawerItem.ACCOUNT;
+						accountFragment=Constants.UPGRADE_ACCOUNT_FRAGMENT;
+						selectDrawerItemLollipop(drawerItem);
+						selectDrawerItemPending=false;
+					}
 					else if(getIntent().getAction().equals(Constants.ACTION_OVERQUOTA_TRANSFER)){
 						log("intent overquota transfer alert!!");
 						if(alertDialogTransferOverquota==null){
@@ -2029,14 +2034,19 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 			log("onCreate - Check if there any unread chat");
 			if(Util.isChatEnabled()){
-				log("Connect to chat!");
+				log("Connect to chat!: "+megaChatApi.getInitState());
 
-				if(!chatConnection){
-					log("Connection goes!!!");
-					megaChatApi.connect(this);
+				if(megaChatApi!=null){
+					if((megaChatApi.getInitState()!=MegaChatApi.INIT_ERROR)&&(megaChatApi.getInitState()!=MegaChatApi.INIT_WAITING_NEW_SESSION)&&(megaChatApi.getInitState()!=MegaChatApi.INIT_NO_CACHE)){
+						log("Connection goes!!!");
+						megaChatApi.connect(this);
+					}
+					else{
+						log("Not connected: "+megaChatApi.getInitState());
+					}
 				}
 				else{
-					log("Already connected");
+					log("megaChatApi is NULL");
 				}
 
 				setChatTitleSection();
@@ -3140,6 +3150,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 		if (megaChatApi != null){
 			megaChatApi.removeChatListener(this);
+			megaChatApi.removeChatCallListener(this);
 		}
 
 		if(networkStateReceiver!=null){
@@ -4498,7 +4509,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 				ft.replace(R.id.fragment_container, sFLol, "sFLol");
-    			ft.commitNow();
+    			ft.commitNowAllowingStateLoss();
 
 				showFabButton();
     			break;
@@ -12402,9 +12413,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			if(e.getErrorCode()==MegaChatError.ERROR_OK){
 				log("CONNECT CHAT finished ");
 
-				chatConnection = true;
-				MegaApplication.setChatConnection(chatConnection);
-
 				if(rChatFL!=null){
 					if(rChatFL.isAdded()){
 						rChatFL.onlineStatusUpdate(megaChatApi.getOnlineStatus());
@@ -14770,6 +14778,33 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		}else{
 
 			log("onConfigurationChanged: changed to PORTRAIT");
+		}
+	}
+
+	@Override
+	public void onChatCallUpdate(MegaChatApiJava api, MegaChatCall call) {
+		log("onChatCallUpdate");
+
+		if(call.hasChanged(MegaChatCall.CHANGE_TYPE_STATUS)){
+			if(call.getStatus()==MegaChatCall.CALL_STATUS_RING_IN){
+				Intent i = new Intent(this, ChatCallActivity.class);
+				i.putExtra("chatHandle", call.getChatid());
+				i.putExtra("callId", call.getId());
+				startActivity(i);
+			}
+		}
+
+		if(call.hasRemoteAudio()){
+			log("Remote audio is connected");
+		}
+		else{
+			log("Remote audio is NOT connected");
+		}
+		if(call.hasRemoteVideo()){
+			log("Remote video is connected");
+		}
+		else{
+			log("Remote video is NOT connected");
 		}
 	}
 

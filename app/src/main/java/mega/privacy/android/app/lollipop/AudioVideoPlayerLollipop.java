@@ -1,8 +1,13 @@
 package mega.privacy.android.app.lollipop;
 
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -10,16 +15,21 @@ import android.os.Handler;
 import android.provider.OpenableColumns;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.Snackbar;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.Surface;
 import android.view.View;
-import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.RemoteViews;
 import android.widget.TextView;
 
 import com.google.android.exoplayer2.DefaultLoadControl;
@@ -38,9 +48,6 @@ import com.google.android.exoplayer2.source.ExtractorMediaSource;
 import com.google.android.exoplayer2.source.LoopingMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.source.TrackGroupArray;
-import com.google.android.exoplayer2.source.dash.DashMediaSource;
-import com.google.android.exoplayer2.source.dash.DefaultDashChunkSource;
-import com.google.android.exoplayer2.source.hls.HlsMediaSource;
 import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.trackselection.TrackSelection;
@@ -49,14 +56,10 @@ import com.google.android.exoplayer2.trackselection.TrackSelector;
 import com.google.android.exoplayer2.ui.PlaybackControlView;
 import com.google.android.exoplayer2.ui.SimpleExoPlayerView;
 import com.google.android.exoplayer2.upstream.BandwidthMeter;
-import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
 import com.google.android.exoplayer2.video.VideoRendererEventListener;
-
-import java.net.MalformedURLException;
-import java.net.URL;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeMime;
@@ -64,20 +67,27 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerActivity;
 import mega.privacy.android.app.utils.Constants;
 import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatError;
 import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaChatRequestListenerInterface;
+import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
+import nz.mega.sdk.MegaTransfer;
+import nz.mega.sdk.MegaTransferListenerInterface;
 
-public class AudioVideoPlayerLollipop extends PinActivityLollipop implements VideoRendererEventListener, MegaChatRequestListenerInterface {
+public class AudioVideoPlayerLollipop extends PinActivityLollipop implements VideoRendererEventListener, MegaChatRequestListenerInterface, MegaTransferListenerInterface {
 
     public static int REQUEST_CODE_SELECT_CHAT = 1005;
 
     private MegaApiAndroid megaApi;
     private MegaChatApiAndroid megaChatApi;
+
+    private AlertDialog alertDialogTransferOverquota;
 
     Handler handler;
     private SimpleExoPlayerView simpleExoPlayerView;
@@ -102,6 +112,9 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
     private boolean loading = true;
     private ProgressDialog statusDialog = null;
     private String fileName = null;
+
+    private Notification.Builder mBuilder;
+    private NotificationManager mNotificationManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -137,9 +150,6 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
             getWindow().setStatusBarColor(getResources().getColor(R.color.black));
        }
-       else {
-           getWindow().setStatusBarColor(getResources().getColor(R.color.black));
-       }
 
         tB = (Toolbar) findViewById(R.id.call_toolbar);
         if (tB == null) {
@@ -168,13 +178,34 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
 
         MegaApplication app = (MegaApplication)getApplication();
         megaApi = app.getMegaApi();
+        if(megaApi==null||megaApi.getRootNode()==null){
+            log("Refresh session - sdk");
+            Intent intentLogin = new Intent(this, LoginActivityLollipop.class);
+            intentLogin.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
+            intentLogin.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(intentLogin);
+            finish();
+            return;
+        }
 
         if(mega.privacy.android.app.utils.Util.isChatEnabled()){
-            megaChatApi = app.getMegaChatApi();
+            if (megaChatApi == null){
+                megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
+            }
+
+            if(megaChatApi==null||megaChatApi.getInitState()== MegaChatApi.INIT_ERROR){
+                log("Refresh session - karere");
+                Intent intentLogin = new Intent(this, LoginActivityLollipop.class);
+                intentLogin.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
+                intentLogin.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intentLogin);
+                finish();
+                return;
+            }
         }
-        else{
-            megaChatApi=null;
-        }
+
+        log("Add transfer listener");
+        megaApi.addTransferListener(this);
 
         //Create a default TrackSelector
         BandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
@@ -249,6 +280,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
 
                     if (loading){
                         try {
+//                            statusDialog.setCanceledOnTouchOutside(false);
                             statusDialog.show();
                         }
                         catch(Exception e){
@@ -362,6 +394,11 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
         inflater.inflate(R.menu.activity_audiovideoplayer, menu);
 
         shareIcon = menu.findItem(R.id.full_video_viewer_share);
+
+        Drawable share = getResources().getDrawable(R.drawable.ic_social_share_white);
+        share.setColorFilter(getResources().getColor(R.color.white), PorterDuff.Mode.SRC_ATOP);
+        shareIcon.setIcon(share);
+
         propertiesIcon = menu.findItem(R.id.full_image_viewer_properties);
         chatIcon = menu.findItem(R.id.full_image_viewer_chat);
 
@@ -530,9 +567,14 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
 
     @Override
     protected void onDestroy() {
-        super.onDestroy();
-        log("onDestroy");
+        log("onDestroy()");
+
+        if (megaApi != null) {
+            megaApi.removeTransferListener(this);
+        }
         player.release();
+
+        super.onDestroy();
     }
 
     public static void log(String message) {
@@ -604,4 +646,147 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
         snackbarTextView.setMaxLines(5);
         snackbar.show();
     }
+
+    @Override
+    public void onTransferStart(MegaApiJava api, MegaTransfer transfer) {
+
+    }
+
+    @Override
+    public void onTransferFinish(MegaApiJava api, MegaTransfer transfer, MegaError e) {
+
+    }
+
+    @Override
+    public void onTransferUpdate(MegaApiJava api, MegaTransfer transfer) {
+
+    }
+
+    @Override
+    public void onTransferTemporaryError(MegaApiJava api, MegaTransfer transfer, MegaError e) {
+        log("onTransferTemporaryError");
+
+        if(e.getErrorCode() == MegaError.API_EOVERQUOTA){
+            log("API_EOVERQUOTA error!!");
+
+            if(alertDialogTransferOverquota==null){
+                showTransferOverquotaDialog();
+            }
+            else {
+                if (!(alertDialogTransferOverquota.isShowing())) {
+                    showTransferOverquotaDialog();
+                }
+            }
+        }
+    }
+
+    @Override
+    public boolean onTransferData(MegaApiJava api, MegaTransfer transfer, byte[] buffer) {
+        return false;
+    }
+
+
+    public void showTransferOverquotaDialog(){
+        log("showTransferOverquotaDialog");
+
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+
+        LayoutInflater inflater = this.getLayoutInflater();
+        View dialogView = inflater.inflate(R.layout.transfer_overquota_layout, null);
+        dialogBuilder.setView(dialogView);
+
+        TextView title = (TextView) dialogView.findViewById(R.id.transfer_overquota_title);
+        title.setText(getString(R.string.title_depleted_transfer_overquota));
+
+        ImageView icon = (ImageView) dialogView.findViewById(R.id.image_transfer_overquota);
+        icon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.transfer_quota_empty));
+
+        TextView text = (TextView) dialogView.findViewById(R.id.text_transfer_overquota);
+        text.setText(getString(R.string.text_depleted_transfer_overquota));
+
+        Button continueButton = (Button) dialogView.findViewById(R.id.transfer_overquota_button_dissmiss);
+
+        Button paymentButton = (Button) dialogView.findViewById(R.id.transfer_overquota_button_payment);
+        paymentButton.setText(getString(R.string.action_upgrade_account));
+
+        alertDialogTransferOverquota = dialogBuilder.create();
+
+        continueButton.setOnClickListener(new View.OnClickListener(){
+            public void onClick(View v) {
+                alertDialogTransferOverquota.dismiss();
+            }
+
+        });
+
+        paymentButton.setOnClickListener(new View.OnClickListener(){
+            public void onClick(View v) {
+                alertDialogTransferOverquota.dismiss();
+                showUpgradeAccount();
+            }
+        });
+
+        alertDialogTransferOverquota.setCancelable(false);
+        alertDialogTransferOverquota.setCanceledOnTouchOutside(false);
+        alertDialogTransferOverquota.show();
+    }
+
+    public void showUpgradeAccount(){
+        log("showUpgradeAccount");
+        Intent upgradeIntent = new Intent(this, ManagerActivityLollipop.class);
+        upgradeIntent.setAction(Constants.ACTION_SHOW_UPGRADE_ACCOUNT);
+        startActivity(upgradeIntent);
+    }
+
+    private void showOverquotaNotification(){
+        log("showOverquotaNotification");
+
+        PendingIntent pendingIntent = null;
+
+        String info = "Streaming";
+        Notification notification = null;
+
+        String contentText = getString(R.string.download_show_info);
+        String message = getString(R.string.title_depleted_transfer_overquota);
+
+        int currentapiVersion = android.os.Build.VERSION.SDK_INT;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            mBuilder
+                    .setSmallIcon(R.drawable.ic_stat_notify_download)
+                    .setOngoing(false).setContentTitle(message).setSubText(info)
+                    .setContentText(contentText)
+                    .setOnlyAlertOnce(true);
+
+            if(pendingIntent!=null){
+                mBuilder.setContentIntent(pendingIntent);
+            }
+            notification = mBuilder.build();
+        }
+        else if (currentapiVersion >= android.os.Build.VERSION_CODES.ICE_CREAM_SANDWICH)
+        {
+            mBuilder
+                    .setSmallIcon(R.drawable.ic_stat_notify_download)
+                    .setOngoing(false).setContentTitle(message).setContentInfo(info)
+                    .setContentText(contentText)
+                    .setOnlyAlertOnce(true);
+
+            if(pendingIntent!=null){
+                mBuilder.setContentIntent(pendingIntent);
+            }
+            notification = mBuilder.getNotification();
+        }
+        else
+        {
+            notification = new Notification(R.drawable.ic_stat_notify_download, null, 1);
+            notification.contentView = new RemoteViews(getApplicationContext().getPackageName(), R.layout.download_progress);
+            if(pendingIntent!=null){
+                notification.contentIntent = pendingIntent;
+            }
+            notification.contentView.setImageViewResource(R.id.status_icon, R.drawable.ic_stat_notify_download);
+            notification.contentView.setTextViewText(R.id.status_text, message);
+            notification.contentView.setTextViewText(R.id.progress_text, info);
+        }
+
+        mNotificationManager.notify(Constants.NOTIFICATION_STREAMING_OVERQUOTA, notification);
+    }
+
 }

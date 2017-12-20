@@ -3,10 +3,10 @@ package mega.privacy.android.app;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 
 
-public class PinActivity extends ActionBarActivity{
+public class PinActivity extends AppCompatActivity{
 	
 	private MegaApiAndroid megaApi;
 	
