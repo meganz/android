@@ -10,6 +10,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -210,6 +212,9 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		removelinkIcon = menu.findItem(R.id.full_image_viewer_remove_link);
 		removelinkIcon.setVisible(false);
 		shareIcon = menu.findItem(R.id.full_image_viewer_share);
+		Drawable share = getResources().getDrawable(R.drawable.ic_social_share_white);
+		share.setColorFilter(getResources().getColor(R.color.white), PorterDuff.Mode.SRC_ATOP);
+		shareIcon.setIcon(share);
 		propertiesIcon = menu.findItem(R.id.full_image_viewer_properties);
 		downloadIcon = menu.findItem(R.id.full_image_viewer_download);
 

@@ -416,6 +416,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
     }
 
     public void setToolbarVisibility (){
+        log("setToolbarVisibility");
         if (aB.isShowing()) {
             //aB.hide();
             tB.animate().translationY(-tB.getBottom()).setDuration(200L).withEndAction(new Runnable() {
