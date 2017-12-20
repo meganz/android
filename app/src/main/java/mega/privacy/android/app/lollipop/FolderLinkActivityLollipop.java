@@ -1542,7 +1542,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 					intent.putExtra("isFolderLink", true);
 					startActivity(intent);
 				}
-				else if (MimeTypeList.typeForName(nodes.get(position).getName()).isVideo() || MimeTypeList.typeForName(nodes.get(position).getName()).isAudio() ){
+				else if (MimeTypeList.typeForName(nodes.get(position).getName()).isVideoReproducible() || MimeTypeList.typeForName(nodes.get(position).getName()).isAudio() ){
 					MegaNode file = nodes.get(position);
 
 					if (megaApi.httpServerIsRunning() == 0) {
@@ -1567,8 +1567,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 					log("FILENAME: " + file.getName());
 
 					Intent mediaIntent;
-					if (file.getName().contains(".avi") || file.getName().contains(".wmv") || file.getName().contains(".mpg")
-							|| file.getName().contains(".flv") || file.getName().contains(".vob") || file.getName().contains(".mts")){
+					if (MimeTypeList.typeForName(file.getName()).isVideoNotSupported()){
 						mediaIntent = new Intent(Intent.ACTION_VIEW);
 					}
 					else {
