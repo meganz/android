@@ -76,10 +76,11 @@ LIBWEBSOCKETS_DOWNLOAD_URL=https://github.com/warmcat/libwebsockets/archive/v${L
 LIBWEBSOCKETS_SHA1="09cc816c70468270fc34efb17c8fce9676b16777"
 
 PDFVIEWER=pdfviewer
-PDFVIEWER_VERSION=1.8.0
-PDFVIEWER_SOURCE_FILE=master.zip
-PDFVIEWER_DOWNLOAD_URL=https://github.com/barteksc/PdfiumAndroid/archive/${PDFVIEWER_SOURCE_FILE}
-PDFVIEWER_SHA1="8219c81eae10c4ec5a08b8040c06400490425465"
+PDFVIEWER_VERSION=1.8.2
+PDFVIEWER_SOURCE_FILE=PdfiumAndroid-pdfium-android-${PDFVIEWER_VERSION}.zip
+PDFVIEWER_SOURCE_FOLDER=PdfiumAndroid-pdfium-android-${PDFVIEWER_VERSION}
+PDFVIEWER_DOWNLOAD_URL=https://github.com/barteksc/PdfiumAndroid/archive/pdfium-android-${PDFVIEWER_VERSION}.zip
+PDFVIEWER_SHA1="93205f9cff143d864c138534f3205351e3d6c42e"
 
 function downloadCheckAndUnpack()
 {
@@ -344,10 +345,10 @@ if [ ! -f ${PDFVIEWER}/${PDFVIEWER_SOURCE_FILE}.ready ]; then
     mkdir include
     mkdir lib
     mkdir src
-    cp -R ../PdfiumAndroid-master/src/main/jni/include/* ./include/
-    cp -R ../PdfiumAndroid-master/src/main/jni/lib/* ./lib/
-    cp -R ../PdfiumAndroid-master/src/main/jni/src/* ./src/
-    rm -rf ../PdfiumAndroid-master
+    cp -R ../${PDFVIEWER_SOURCE_FOLDER}/src/main/jni/include/* ./include/
+    cp -R ../${PDFVIEWER_SOURCE_FOLDER}/src/main/jni/lib/* ./lib/
+    cp -R ../${PDFVIEWER_SOURCE_FOLDER}/src/main/jni/src/* ./src/
+    rm -rf ../${PDFVIEWER_SOURCE_FOLDER}
     cd ../..
     touch ${PDFVIEWER}/${PDFVIEWER_SOURCE_FILE}.ready
 fi
