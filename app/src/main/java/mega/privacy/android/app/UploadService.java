@@ -534,13 +534,6 @@ public class UploadService extends Service implements MegaTransferListenerInterf
             if (error.getErrorCode() == MegaError.API_OK) {
                 log("Upload OK: " + transfer.getFileName());
 
-                File previewDir = PreviewUtils.getPreviewFolder(this);
-                File preview = new File(previewDir, MegaApiAndroid.handleToBase64(transfer.getNodeHandle())+".jpg");
-                File thumbDir = ThumbnailUtils.getThumbFolder(this);
-                File thumb = new File(thumbDir, MegaApiAndroid.handleToBase64(transfer.getNodeHandle())+".jpg");
-                megaApi.createThumbnail(transfer.getPath(), thumb.getAbsolutePath());
-                megaApi.createPreview(transfer.getPath(), preview.getAbsolutePath());
-
                 if(Util.isVideoFile(transfer.getPath())){
                     log("Is video!!!");
                     ThumbnailUtilsLollipop.createThumbnailVideo(this, transfer.getPath(), megaApi, transfer.getNodeHandle());
@@ -579,6 +572,13 @@ public class UploadService extends Service implements MegaTransferListenerInterf
                 }
 				else if (MimeTypeList.typeForName(transfer.getPath()).isImage()){
 					log("Is image!!!");
+
+					File previewDir = PreviewUtils.getPreviewFolder(this);
+					File preview = new File(previewDir, MegaApiAndroid.handleToBase64(transfer.getNodeHandle())+".jpg");
+					File thumbDir = ThumbnailUtils.getThumbFolder(this);
+					File thumb = new File(thumbDir, MegaApiAndroid.handleToBase64(transfer.getNodeHandle())+".jpg");
+					megaApi.createThumbnail(transfer.getPath(), thumb.getAbsolutePath());
+					megaApi.createPreview(transfer.getPath(), preview.getAbsolutePath());
 
 					MegaNode node = megaApi.getNodeByHandle(transfer.getNodeHandle());
 					if(node!=null){
