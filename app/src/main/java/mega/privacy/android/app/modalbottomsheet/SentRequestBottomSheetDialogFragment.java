@@ -3,6 +3,7 @@ package mega.privacy.android.app.modalbottomsheet;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -47,6 +48,7 @@ public class SentRequestBottomSheetDialogFragment extends BottomSheetDialogFragm
     public LinearLayout optionDelete;
 
     DisplayMetrics outMetrics;
+    private int heightDisplay;
 
     MegaApiAndroid megaApi;
     DatabaseHandler dbH;
@@ -83,6 +85,8 @@ public class SentRequestBottomSheetDialogFragment extends BottomSheetDialogFragm
         outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
 
+        heightDisplay = outMetrics.heightPixels;
+
         super.setupDialog(dialog, style);
         View contentView = View.inflate(getContext(), R.layout.bottom_sheet_sent_request, null);
 
@@ -110,6 +114,13 @@ public class SentRequestBottomSheetDialogFragment extends BottomSheetDialogFragm
             dialog.setContentView(contentView);
             mBehavior = BottomSheetBehavior.from((View) mainLinearLayout.getParent());
             mBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+
+            if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                mBehavior.setPeekHeight((heightDisplay / 4) * 2);
+            }
+            else if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT){
+                mBehavior.setPeekHeight(BottomSheetBehavior.PEEK_HEIGHT_AUTO);
+            }
         }
         else{
             log("Request NULL");
