@@ -476,7 +476,9 @@
         android:id="@+id/message_chat_contact_message_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@android:color/transparent"
         android:layout_below="@+id/message_chat_date_layout">
+
 
         <RelativeLayout
             android:id="@+id/title_contact_message_layout"
@@ -509,10 +511,42 @@
         </RelativeLayout>
 
         <RelativeLayout
+            android:id="@+id/layout_avatar"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginLeft="16dp"
+            android:layout_alignParentBottom="true"
+            android:background="@android:color/transparent"
+            android:layout_below="@+id/title_contact_message_layout">
+
+            <mega.privacy.android.app.components.RoundedImageView
+                android:id="@+id/contact_thumbnail"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_centerInParent="true"
+                android:background="@android:color/transparent"
+                android:scaleType="fitCenter"
+                rounded:border_color="@color/border_file_properties"
+                rounded:border_width="0dp"
+                rounded:corner_radius="40dp" />
+
+            <TextView
+                android:id="@+id/contact_initial_letter"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_centerInParent="true"
+                android:textSize="15sp"
+                android:gravity="center_horizontal|center_vertical"/>
+
+        </RelativeLayout>
+
+
+        <RelativeLayout
             android:id="@+id/contact_management_message_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="left"
+            android:layout_toRightOf="@+id/layout_avatar"
             android:layout_below="@+id/title_contact_message_layout"
             android:visibility="gone">
 
@@ -536,8 +570,9 @@
             android:id="@+id/content_contact_message_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="6dp"
+            android:layout_marginTop="6dp"
             android:background="@android:color/transparent"
+            android:layout_toRightOf="@+id/layout_avatar"
             android:layout_below="@+id/title_contact_message_layout">
 
             <mega.privacy.android.app.components.WrapEmojiconTextView
@@ -549,11 +584,10 @@
                 android:inputType="textMultiLine|textNoSuggestions"
                 android:background="@drawable/rounded_text_view_chat_contact_message"
                 android:padding="9dp"
-                android:layout_marginStart="16dp"
-                android:layout_marginLeft="16dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginLeft="8dp"
                 android:layout_marginEnd="108dp"
-                android:layout_marginRight="108dp"
-                android:gravity="left"/>
+                android:layout_marginRight="108dp" />
 
             <RelativeLayout
                 android:layout_width="wrap_content"
@@ -568,8 +602,7 @@
                     android:layout_marginStart="16dp"
                     android:layout_marginLeft="16dp"
                     android:layout_marginRight="108dp"
-                    android:layout_marginBottom="7dp"
-                    android:layout_marginTop="2dp"
+                    android:layout_marginTop="10dp"
                     android:gravity="left"
                     android:elevation="2dp"
                     android:background="@android:color/transparent">
@@ -694,11 +727,6 @@
                             android:gravity="left"/>
 
                     </RelativeLayout>
-
-
-
-
-
                 </RelativeLayout>
 
 
