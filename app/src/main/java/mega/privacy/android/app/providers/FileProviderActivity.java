@@ -1482,6 +1482,10 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 	public void onTransferFinish(MegaApiJava api, MegaTransfer transfer,
 			MegaError e) {
 		log("onTransferFinish: "+transfer.getPath());
+		if(transfer.isStreamingTransfer()){
+			return;
+		}
+
 		try {
 			//Get the URI of the file
 			File fileToShare = new File(transfer.getPath());

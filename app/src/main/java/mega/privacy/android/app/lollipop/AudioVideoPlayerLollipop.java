@@ -206,7 +206,14 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
 
         log("Overquota delay: "+megaApi.getBandwidthOverquotaDelay());
         if(megaApi.getBandwidthOverquotaDelay()>0){
-            showTransferOverquotaDialog();
+            if(alertDialogTransferOverquota==null){
+                showTransferOverquotaDialog();
+            }
+            else {
+                if (!(alertDialogTransferOverquota.isShowing())) {
+                    showTransferOverquotaDialog();
+                }
+            }
         }
 
         log("Add transfer listener");

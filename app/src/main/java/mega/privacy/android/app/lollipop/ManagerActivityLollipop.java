@@ -13792,6 +13792,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	public void onTransferStart(MegaApiJava api, MegaTransfer transfer) {
 		log("-------------------onTransferStart: " + transfer.getNotificationNumber()+ "-" + transfer.getFileName() + " - " + transfer.getTag());
 
+		if(transfer.isStreamingTransfer()){
+			return;
+		}
+
 		if(transferCallback<transfer.getNotificationNumber()) {
 
 			transferCallback = transfer.getNotificationNumber();
@@ -13825,6 +13829,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	@Override
 	public void onTransferFinish(MegaApiJava api, MegaTransfer transfer, MegaError e) {
 		log("--------------onTransferFinish: "+transfer.getFileName() + " - " + transfer.getTag() + "- " +transfer.getNotificationNumber());
+
+		if(transfer.isStreamingTransfer()){
+			return;
+		}
 
 		if(transferCallback<transfer.getNotificationNumber()) {
 
@@ -13898,6 +13906,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	@Override
 	public void onTransferUpdate(MegaApiJava api, MegaTransfer transfer) {
 //		log("onTransferUpdate: " + transfer.getFileName() + " - " + transfer.getTag());
+
+		if(transfer.isStreamingTransfer()){
+			return;
+		}
 
 		long now = Calendar.getInstance().getTimeInMillis();
 		if((now - lastTimeOnTransferUpdate)>Util.ONTRANSFERUPDATE_REFRESH_MILLIS){
