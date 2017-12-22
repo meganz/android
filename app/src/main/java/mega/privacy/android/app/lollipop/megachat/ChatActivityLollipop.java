@@ -2808,8 +2808,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }
 
             if(activityVisible){
-                boolean markAsRead = megaChatApi.setMessageSeen(idChat, msg.getMsgId());
-                log("Result of markAsRead: "+markAsRead);
+                if(megaChatApi.getConnectionState()!=MegaChatApi.CHAT_CONNECTION_LOGGING){
+                    boolean markAsRead = megaChatApi.setMessageSeen(idChat, msg.getMsgId());
+                    log("Result of markAsRead: "+markAsRead);
+                }
             }
 
             if(msg.getType()==MegaChatMessage.TYPE_REVOKE_NODE_ATTACHMENT) {
@@ -2995,6 +2997,18 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 }
             }
             getMoreHistory = true;
+
+            //Before loading pending message, mark the last one to seen
+            log("Mark last message as seen");
+            if(!messages.isEmpty()){
+                AndroidMegaChatMessage lastSeen = messages.get(messages.size()-1);
+                if(lastSeen!=null){
+                    boolean markAsRead = megaChatApi.setMessageSeen(idChat, lastSeen.getMessage().getMsgId());
+                    log("Result of markAsRead: "+markAsRead);
+                }
+            }
+
+            //Load pending messages
             if(!pendingMessagesLoaded){
                 pendingMessagesLoaded = true;
                 loadPendingMessages();
@@ -3029,6 +3043,11 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         log("TYPE: "+msg.getType());
         if(msg.getContent()!=null){
             log("CONTENT: "+msg.getContent());
+        }
+
+        if(megaChatApi.getConnectionState()==MegaChatApi.CHAT_CONNECTION_LOGGING){
+            log("CHAT_CONNECTION_LOGGING: no process message - return");
+            return;
         }
 
         if(msg.getType()==MegaChatMessage.TYPE_REVOKE_NODE_ATTACHMENT) {
