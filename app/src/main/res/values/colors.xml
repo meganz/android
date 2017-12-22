@@ -67,7 +67,7 @@
     <color name="forgot_pass_text">#91000000</color>
         
     <color name="tab_pressed">#ee0008</color>
-    
+
     <color name="transparent_black">#80000000</color>
     <color name="transparent_mega">#80db0605</color>
     
@@ -97,6 +97,7 @@
     <color name="status_invisible_layout">#bfbfbf</color>
 
     <color name="sliding_panel_separator">#dcdcdcdc</color>
+
     <color name="login_warning">#FFFF333A</color>
     <color name="login_title">#FFD90007</color>
 
@@ -123,8 +124,10 @@
     <color name="grey_background_chip">#FFE0E0E0</color>
     <color name="invite_button_deactivated">#424F4F4F</color>
 
-    <color name="camera_uploads_list_view">#FFF5F5F5</color>
+    <color name="very_transparent_black">#40000000</color>
+    <color name="very_very_transparent_black">#10000000</color>
     <color name="scroll_bubble">#90727272</color>
     <color name="scroll_handle">#90d90007</color>
-
+    <color name="camera_uploads_list_view">#FFF5F5F5</color>
+    <color name="transparent_black2">#99000000</color>
 </resources>

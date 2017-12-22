@@ -10,6 +10,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -53,7 +55,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import mega.privacy.android.app.BuildConfig;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.DownloadService;
 import mega.privacy.android.app.MegaApplication;
@@ -76,19 +77,17 @@ import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatError;
 import nz.mega.sdk.MegaChatListItem;
-import nz.mega.sdk.MegaChatListenerInterface;
-import nz.mega.sdk.MegaChatPresenceConfig;
 import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaGlobalListenerInterface;
 import nz.mega.sdk.MegaNode;
-import nz.mega.sdk.MegaNodeList;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaShare;
@@ -213,8 +212,15 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		removelinkIcon = menu.findItem(R.id.full_image_viewer_remove_link);
 		removelinkIcon.setVisible(false);
 		shareIcon = menu.findItem(R.id.full_image_viewer_share);
+		Drawable share = getResources().getDrawable(R.drawable.ic_social_share_white);
+		share.setColorFilter(getResources().getColor(R.color.white), PorterDuff.Mode.SRC_ATOP);
+		shareIcon.setIcon(share);
 		propertiesIcon = menu.findItem(R.id.full_image_viewer_properties);
 		downloadIcon = menu.findItem(R.id.full_image_viewer_download);
+
+		Drawable download = getResources().getDrawable(R.drawable.ic_download_white);
+		download.setColorFilter(getResources().getColor(R.color.white), PorterDuff.Mode.SRC_ATOP);
+		downloadIcon.setIcon(download);
 
 		renameIcon = menu.findItem(R.id.full_image_viewer_rename);
 		moveIcon = menu.findItem(R.id.full_image_viewer_move);
@@ -780,8 +786,30 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			megaApi = app.getMegaApi();
 		}
 
+		if(megaApi==null||megaApi.getRootNode()==null){
+			log("Refresh session - sdk");
+			Intent intentLogin = new Intent(this, LoginActivityLollipop.class);
+			intentLogin.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
+			intentLogin.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			startActivity(intentLogin);
+			finish();
+			return;
+		}
+
 		if(Util.isChatEnabled()){
-			megaChatApi = app.getMegaChatApi();
+			if (megaChatApi == null){
+				megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
+			}
+
+			if(megaChatApi==null||megaChatApi.getInitState()== MegaChatApi.INIT_ERROR){
+				log("Refresh session - karere");
+				Intent intentLogin = new Intent(this, LoginActivityLollipop.class);
+				intentLogin.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
+				intentLogin.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+				startActivity(intentLogin);
+				finish();
+				return;
+			}
 		}
 		else{
 			megaChatApi=null;

@@ -28,7 +28,6 @@ import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.CloudDriveExplorerFragmentLollipop;
-import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaChatLollipopAdapter;
 import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.Util;
@@ -278,6 +277,12 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 				else{
 					holder.permissionsIcon.setImageResource(R.drawable.ic_shared_read_write);
 				}
+			}
+			else if(node.isOutShare()) {
+				holder.permissionsIcon.setVisibility(View.GONE);
+				holder.imageView.setImageResource(R.drawable.ic_folder_outgoing_list);
+				holder.textViewFileSize.setText(MegaApiUtils.getInfoFolder(node, context));
+
 			}
 			else{
 				holder.permissionsIcon.setVisibility(View.GONE);

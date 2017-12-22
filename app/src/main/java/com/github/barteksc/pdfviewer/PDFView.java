@@ -15,7 +15,9 @@
  */
 package com.github.barteksc.pdfviewer;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -28,6 +30,7 @@ import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.HandlerThread;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -67,6 +70,9 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import mega.privacy.android.app.R;
+import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 
 /**
  * It supports animations, zoom, cache, and swipe.
@@ -700,6 +706,21 @@ public class PDFView extends RelativeLayout {
             onErrorListener.onError(t);
         } else {
             Log.e("PDFView", "load pdf error", t);
+            AlertDialog.Builder builder;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                builder = new AlertDialog.Builder(getContext(), R.style.AppCompatAlertDialogStyle);
+            } else {
+                builder = new AlertDialog.Builder(getContext());
+            }
+            builder.setCancelable(false);
+            String accept = getResources().getString(R.string.cam_sync_ok).toUpperCase();
+            builder.setMessage(R.string.corrupt_pdf_dialog_text)
+                    .setPositiveButton(accept, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            ((PdfViewerActivityLollipop) getContext()).finish();
+                        }
+                    })
+                    .show();
         }
     }
 

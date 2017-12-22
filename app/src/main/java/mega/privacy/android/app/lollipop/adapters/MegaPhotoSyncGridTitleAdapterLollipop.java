@@ -51,6 +51,7 @@ import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.MegaMonthPicLollipop;
 import mega.privacy.android.app.lollipop.MyAccountInfo;
+import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.lollipop.managerSections.CameraUploadFragmentLollipop;
 import mega.privacy.android.app.utils.Constants;
@@ -1141,6 +1142,59 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
                         }
                         else{
                             Toast.makeText(context, context.getResources().getString(R.string.intent_not_available), Toast.LENGTH_LONG).show();
+                            ArrayList<Long> handleList = new ArrayList<Long>();
+                            handleList.add(n.getHandle());
+                            NodeController nC = new NodeController(context);
+                            nC.prepareForDownload(handleList);
+                        }
+                    }
+                    else if (MimeTypeList.typeForName(n.getName()).isPdf()){
+                        MegaNode file = n;
+
+                        if (megaApi.httpServerIsRunning() == 0) {
+                            megaApi.httpServerStart();
+                        }
+
+                        ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
+                        ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+                        activityManager.getMemoryInfo(mi);
+
+                        if(mi.totalMem>Constants.BUFFER_COMP){
+                            log("Total mem: "+mi.totalMem+" allocate 32 MB");
+                            megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
+                        }
+                        else{
+                            log("Total mem: "+mi.totalMem+" allocate 16 MB");
+                            megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
+                        }
+
+                        String url = megaApi.httpServerGetLocalLink(file);
+                        String mimeType = MimeTypeList.typeForName(file.getName()).getType();
+                        log("FILENAME: " + file.getName() + "TYPE: "+mimeType);
+
+                        Intent pdfIntent = new Intent(context, PdfViewerActivityLollipop.class);
+                        pdfIntent.putExtra("APP", true);
+                        String localPath = Util.getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
+                        if (localPath != null){
+                            File mediaFile = new File(localPath);
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                                pdfIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile), MimeTypeList.typeForName(file.getName()).getType());
+                            }
+                            else{
+                                pdfIntent.setDataAndType(Uri.fromFile(mediaFile), MimeTypeList.typeForName(file.getName()).getType());
+                            }
+                            pdfIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                        }
+                        else {
+                            pdfIntent.setDataAndType(Uri.parse(url), mimeType);
+                        }
+                        pdfIntent.putExtra("HANDLE", file.getHandle());
+                        if (MegaApiUtils.isIntentAvailable(context, pdfIntent)){
+                            context.startActivity(pdfIntent);
+                        }
+                        else{
+                            Toast.makeText(context, context.getResources().getString(R.string.intent_not_available), Toast.LENGTH_LONG).show();
+
                             ArrayList<Long> handleList = new ArrayList<Long>();
                             handleList.add(n.getHandle());
                             NodeController nC = new NodeController(context);
