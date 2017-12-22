@@ -1543,7 +1543,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 					intent.putExtra("isFolderLink", true);
 					startActivity(intent);
 				}
-				else if (MimeTypeList.typeForName(nodes.get(position).getName()).isVideo() || MimeTypeList.typeForName(nodes.get(position).getName()).isAudio() ){
+				/*else if (MimeTypeList.typeForName(nodes.get(position).getName()).isVideo() || MimeTypeList.typeForName(nodes.get(position).getName()).isAudio() ){
 					MegaNode file = nodes.get(position);
 
 					if (megaApi.httpServerIsRunning() == 0) {
@@ -1656,7 +1656,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 						NodeController nC = new NodeController(FolderLinkActivityLollipop.this);
 						nC.prepareForDownload(handleList);
 					}
-				}
+				}*/
 				else{
 					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 						boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
