@@ -1603,8 +1603,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 					log("FILENAME: " + file.getName());
 
 					Intent mediaIntent;
-					if (file.getName().contains(".avi") || file.getName().contains(".wmv") || file.getName().contains(".mpg")
-							|| file.getName().contains(".flv") || file.getName().contains(".vob") || file.getName().contains(".mts")){
+					if (MimeTypeList.typeForName(file.getName()).isVideoNotSupported()){
 						mediaIntent = new Intent(Intent.ACTION_VIEW);
 					}
 					else {
