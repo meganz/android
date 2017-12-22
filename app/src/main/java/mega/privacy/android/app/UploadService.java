@@ -98,8 +98,6 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 		megaApi = app.getMegaApi();
 		megaChatApi = app.getMegaChatApi();
 
-		megaApi.addTransferListener(this);
-
 		transfersCopy = new HashMap<String, String>();
 
 		dbH = DatabaseHandler.getDbHandler(getApplicationContext());
@@ -136,7 +134,6 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 		if(megaApi != null)
 		{
 			megaApi.removeRequestListener(this);
-			megaApi.removeTransferListener(this);
 		}
 
         if (megaChatApi != null){
@@ -184,10 +181,10 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 		if (file.isDirectory()) {
 			String nameInMEGA = intent.getStringExtra(EXTRA_NAME);
 			if (nameInMEGA != null){
-				megaApi.startUpload(file.getAbsolutePath(), megaApi.getNodeByHandle(parentHandle), nameInMEGA);
+				megaApi.startUpload(file.getAbsolutePath(), megaApi.getNodeByHandle(parentHandle), nameInMEGA, this);
 			}
 			else{
-				megaApi.startUpload(file.getAbsolutePath(), megaApi.getNodeByHandle(parentHandle));
+				megaApi.startUpload(file.getAbsolutePath(), megaApi.getNodeByHandle(parentHandle), this);
 			}
 		}
 		else {
@@ -204,10 +201,10 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 
 					String nameInMEGA = intent.getStringExtra(EXTRA_NAME);
 					if (nameInMEGA != null){
-						megaApi.startUpload(file.getAbsolutePath(), megaApi.getNodeByHandle(parentHandle), nameInMEGA);
+						megaApi.startUpload(file.getAbsolutePath(), megaApi.getNodeByHandle(parentHandle), nameInMEGA, this);
 					}
 					else{
-						megaApi.startUpload(file.getAbsolutePath(), megaApi.getNodeByHandle(parentHandle));
+						megaApi.startUpload(file.getAbsolutePath(), megaApi.getNodeByHandle(parentHandle), this);
 					}
 					break;
 				}
@@ -230,10 +227,10 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 
 					String nameInMEGA = intent.getStringExtra(EXTRA_NAME);
 					if (nameInMEGA != null){
-						megaApi.startUpload(file.getAbsolutePath(), megaApi.getNodeByHandle(parentHandle), nameInMEGA);
+						megaApi.startUpload(file.getAbsolutePath(), megaApi.getNodeByHandle(parentHandle), nameInMEGA, this);
 					}
 					else{
-						megaApi.startUpload(file.getAbsolutePath(), megaApi.getNodeByHandle(parentHandle));
+						megaApi.startUpload(file.getAbsolutePath(), megaApi.getNodeByHandle(parentHandle), this);
 					}
 					break;
 				}
@@ -481,9 +478,11 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 	@Override
 	public void onTransferStart(MegaApiJava api, MegaTransfer transfer) {
 		log("Upload start: " + transfer.getFileName() + "_" + megaApi.getTotalUploads());
-        transfersCount++;
-		if (!transfer.isFolderTransfer()){
-			updateProgressNotification();
+		if(transfer.getType()==MegaTransfer.TYPE_UPLOAD) {
+			transfersCount++;
+			if (!transfer.isFolderTransfer()){
+				updateProgressNotification();
+			}
 		}
 	}
 
@@ -491,182 +490,185 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 	public void onTransferFinish(MegaApiJava api, MegaTransfer transfer, MegaError error) {
 		log("onTransferFinish: " + transfer.getFileName() + " size " + transfer.getTransferredBytes());
 		log("transfer.getPath:" + transfer.getPath());
+		if(transfer.getType()==MegaTransfer.TYPE_UPLOAD) {
 
-        transfersCount--;
+			transfersCount--;
 
-		if(error.getErrorCode()==MegaError.API_EOVERQUOTA){
-			if(transfer.getType()==MegaTransfer.TYPE_UPLOAD){
-				isOverquota = true;
+			if (error.getErrorCode() == MegaError.API_EOVERQUOTA) {
+				if (transfer.getType() == MegaTransfer.TYPE_UPLOAD) {
+					isOverquota = true;
+				}
 			}
-		}
 
-		if (!transfer.isFolderTransfer()) {
+			if (!transfer.isFolderTransfer()) {
 
-			if (transfer.getState() == MegaTransfer.STATE_COMPLETED) {
-				String size = Util.getSizeString(transfer.getTotalBytes());
-				AndroidCompletedTransfer completedTransfer = new AndroidCompletedTransfer(transfer.getFileName(), transfer.getType(), transfer.getState(), size, transfer.getNodeHandle() + "");
-				dbH.setCompletedTransfer(completedTransfer);
+				if (transfer.getState() == MegaTransfer.STATE_COMPLETED) {
+					String size = Util.getSizeString(transfer.getTotalBytes());
+					AndroidCompletedTransfer completedTransfer = new AndroidCompletedTransfer(transfer.getFileName(), transfer.getType(), transfer.getState(), size, transfer.getNodeHandle() + "");
+					dbH.setCompletedTransfer(completedTransfer);
+				}
+				updateProgressNotification();
 			}
-			updateProgressNotification();
-		}
 
-        if (canceled) {
-            log("Upload canceled: " + transfer.getFileName());
+			if (canceled) {
+				log("Upload canceled: " + transfer.getFileName());
 
-            if((lock != null) && (lock.isHeld()))
-                try{ lock.release(); } catch(Exception ex) {}
-            if((wl != null) && (wl.isHeld()))
-                try{ wl.release(); } catch(Exception ex) {}
+				if ((lock != null) && (lock.isHeld()))
+					try {
+						lock.release();
+					} catch (Exception ex) {
+					}
+				if ((wl != null) && (wl.isHeld()))
+					try {
+						wl.release();
+					} catch (Exception ex) {
+					}
 
-            UploadService.this.cancel();
-            log("after cancel");
-            String pathSelfie = Environment.getExternalStorageDirectory().getAbsolutePath() +"/"+ Util.temporalPicDIR;
-            File f = new File(pathSelfie);
-            //Delete recursively all files and folder
-            if (f.isDirectory()) {
-                for (File c : f.listFiles())
-                  c.delete();
-            }
-            f.delete();
+				UploadService.this.cancel();
+				log("after cancel");
+				String pathSelfie = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.temporalPicDIR;
+				File f = new File(pathSelfie);
+				//Delete recursively all files and folder
+				if (f.isDirectory()) {
+					for (File c : f.listFiles())
+						c.delete();
+				}
+				f.delete();
 
-        }
-        else{
-            if (error.getErrorCode() == MegaError.API_OK) {
-                log("Upload OK: " + transfer.getFileName());
+			} else {
+				if (error.getErrorCode() == MegaError.API_OK) {
+					log("Upload OK: " + transfer.getFileName());
 
-                File previewDir = PreviewUtils.getPreviewFolder(this);
-                File preview = new File(previewDir, MegaApiAndroid.handleToBase64(transfer.getNodeHandle())+".jpg");
-                File thumbDir = ThumbnailUtils.getThumbFolder(this);
-                File thumb = new File(thumbDir, MegaApiAndroid.handleToBase64(transfer.getNodeHandle())+".jpg");
-                megaApi.createThumbnail(transfer.getPath(), thumb.getAbsolutePath());
-                megaApi.createPreview(transfer.getPath(), preview.getAbsolutePath());
+					if (Util.isVideoFile(transfer.getPath())) {
+						log("Is video!!!");
+						ThumbnailUtilsLollipop.createThumbnailVideo(this, transfer.getPath(), megaApi, transfer.getNodeHandle());
 
-                if(Util.isVideoFile(transfer.getPath())){
-                    log("Is video!!!");
-                    ThumbnailUtilsLollipop.createThumbnailVideo(this, transfer.getPath(), megaApi, transfer.getNodeHandle());
+						MegaNode node = megaApi.getNodeByHandle(transfer.getNodeHandle());
+						if (node != null) {
+							MediaMetadataRetriever retriever = new MediaMetadataRetriever();
+							retriever.setDataSource(transfer.getPath());
+							String time = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
+							if (time != null) {
+								double seconds = Double.parseDouble(time) / 1000;
+								log("The original duration is: " + seconds);
+								int secondsAprox = (int) Math.round(seconds);
+								log("The duration aprox is: " + secondsAprox);
 
-                    MegaNode node = megaApi.getNodeByHandle(transfer.getNodeHandle());
-                    if(node!=null){
-                        MediaMetadataRetriever retriever = new MediaMetadataRetriever();
-                        retriever.setDataSource(transfer.getPath());
-                        String time = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
-                        if(time!=null){
-                            double seconds = Double.parseDouble(time)/1000;
-                            log("The original duration is: "+seconds);
-                            int secondsAprox = (int) Math.round(seconds);
-                            log("The duration aprox is: "+secondsAprox);
-
-                            megaApi.setNodeDuration(node, secondsAprox, null);
-                        }
-
-						String location = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_LOCATION);
-                        if(location!=null){
-							log("Location: "+location);
-							final int mid = location.length() / 2; //get the middle of the String
-							String[] parts = {location.substring(0, mid),location.substring(mid)};
-
-							Double lat = Double.parseDouble(parts[0]);
-							Double lon = Double.parseDouble(parts[1]);
-							log("Lat: "+lat); //first part
-							log("Long: "+lon); //second part
-
-							megaApi.setNodeCoordinates(node, lat, lon, null);
-						}
-						else{
-                        	log("No location info");
-						}
-                    }
-                }
-				else if (MimeTypeList.typeForName(transfer.getPath()).isImage()){
-					log("Is image!!!");
-
-					MegaNode node = megaApi.getNodeByHandle(transfer.getNodeHandle());
-					if(node!=null){
-						try {
-							final ExifInterface exifInterface = new ExifInterface(transfer.getPath());
-							float[] latLong = new float[2];
-							if (exifInterface.getLatLong(latLong)) {
-								log("Latitude: "+latLong[0]+" Longitude: " +latLong[1]);
-								megaApi.setNodeCoordinates(node, latLong[0], latLong[1], null);
+								megaApi.setNodeDuration(node, secondsAprox, null);
 							}
 
-						} catch (Exception e) {
-							log("Couldn't read exif info: " + transfer.getPath());
+							String location = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_LOCATION);
+							if (location != null) {
+								log("Location: " + location);
+								final int mid = location.length() / 2; //get the middle of the String
+								String[] parts = {location.substring(0, mid), location.substring(mid)};
+
+								Double lat = Double.parseDouble(parts[0]);
+								Double lon = Double.parseDouble(parts[1]);
+								log("Lat: " + lat); //first part
+								log("Long: " + lon); //second part
+
+								megaApi.setNodeCoordinates(node, lat, lon, null);
+							} else {
+								log("No location info");
+							}
 						}
+					} else if (MimeTypeList.typeForName(transfer.getPath()).isImage()) {
+						log("Is image!!!");
+
+						File previewDir = PreviewUtils.getPreviewFolder(this);
+						File preview = new File(previewDir, MegaApiAndroid.handleToBase64(transfer.getNodeHandle()) + ".jpg");
+						File thumbDir = ThumbnailUtils.getThumbFolder(this);
+						File thumb = new File(thumbDir, MegaApiAndroid.handleToBase64(transfer.getNodeHandle()) + ".jpg");
+						megaApi.createThumbnail(transfer.getPath(), thumb.getAbsolutePath());
+						megaApi.createPreview(transfer.getPath(), preview.getAbsolutePath());
+
+						MegaNode node = megaApi.getNodeByHandle(transfer.getNodeHandle());
+						if (node != null) {
+							try {
+								final ExifInterface exifInterface = new ExifInterface(transfer.getPath());
+								float[] latLong = new float[2];
+								if (exifInterface.getLatLong(latLong)) {
+									log("Latitude: " + latLong[0] + " Longitude: " + latLong[1]);
+									megaApi.setNodeCoordinates(node, latLong[0], latLong[1], null);
+								}
+
+							} catch (Exception e) {
+								log("Couldn't read exif info: " + transfer.getPath());
+							}
+						}
+					} else {
+						log("NOT video or image!");
+					}
+				} else {
+					log("Upload Error: " + transfer.getFileName() + "_" + error.getErrorCode() + "___" + error.getErrorString());
+
+					if (!transfer.isFolderTransfer()) {
+						errorCount++;
 					}
 				}
-                else{
-                    log("NOT video or image!");
-                }
-            }
-            else{
-                log("Upload Error: " + transfer.getFileName() + "_" + error.getErrorCode() + "___" + error.getErrorString());
 
-                if(!transfer.isFolderTransfer()){
-                    errorCount++;
-                }
-            }
+				if (getApplicationContext().getExternalCacheDir() != null) {
+					File localFile = new File(getApplicationContext().getExternalCacheDir(), transfer.getFileName());
+					if (localFile.exists()) {
+						log("Delete file!: " + localFile.getAbsolutePath());
+						localFile.delete();
+					}
+				} else {
+					File localFile = new File(getApplicationContext().getCacheDir(), transfer.getFileName());
+					if (localFile.exists()) {
+						log("Delete file!: " + localFile.getAbsolutePath());
+						localFile.delete();
+					}
+				}
 
-            if (getApplicationContext().getExternalCacheDir() != null){
-                File localFile = new File (getApplicationContext().getExternalCacheDir(), transfer.getFileName());
-                if (localFile.exists()){
-                    log("Delete file!: "+localFile.getAbsolutePath());
-                    localFile.delete();
-                }
-            }
-            else{
-                File localFile = new File (getApplicationContext().getCacheDir(), transfer.getFileName());
-                if (localFile.exists()){
-                    log("Delete file!: "+localFile.getAbsolutePath());
-                    localFile.delete();
-                }
-            }
+				if (isOverquota) {
+					megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD, this);
+				}
 
-            if(isOverquota){
-				megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD, this);
+				if (megaApi.getNumPendingUploads() == 0 && transfersCount == 0) {
+					onQueueComplete();
+				}
+
+				log("IN Finish: " + transfer.getFileName() + "path? " + transfer.getPath());
+				String pathSelfie = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.temporalPicDIR;
+				if (transfer.getPath() != null) {
+					if (transfer.getPath().startsWith(pathSelfie)) {
+						File f = new File(transfer.getPath());
+						f.delete();
+					}
+				} else {
+					log("transfer.getPath() is NULL");
+				}
 			}
-
-			if (megaApi.getNumPendingUploads() == 0 && transfersCount==0){
-				onQueueComplete();
-			}
-
-            log("IN Finish: "+transfer.getFileName()+"path? "+transfer.getPath());
-            String pathSelfie = Environment.getExternalStorageDirectory().getAbsolutePath() +"/"+ Util.temporalPicDIR;
-            if(transfer.getPath()!=null){
-                if(transfer.getPath().startsWith(pathSelfie)){
-                    File f = new File(transfer.getPath());
-                    f.delete();
-                }
-            }
-            else{
-                log("transfer.getPath() is NULL");
-            }
-        }
+		}
 	}
 
 	@Override
 	public void onTransferUpdate(MegaApiJava api, MegaTransfer transfer) {
-		if (!transfer.isFolderTransfer()){
-			if (canceled) {
-				log("Transfer cancel: " + transfer.getFileName());
+		if(transfer.getType()==MegaTransfer.TYPE_UPLOAD){
+			if (!transfer.isFolderTransfer()){
+				if (canceled) {
+					log("Transfer cancel: " + transfer.getFileName());
 
-				if((lock != null) && (lock.isHeld()))
-					try{ lock.release(); } catch(Exception ex) {}
-				if((wl != null) && (wl.isHeld()))
-					try{ wl.release(); } catch(Exception ex) {}
+					if((lock != null) && (lock.isHeld()))
+						try{ lock.release(); } catch(Exception ex) {}
+					if((wl != null) && (wl.isHeld()))
+						try{ wl.release(); } catch(Exception ex) {}
 
-				megaApi.cancelTransfer(transfer);
-				UploadService.this.cancel();
-				log("after cancel");
-				return;
+					megaApi.cancelTransfer(transfer);
+					UploadService.this.cancel();
+					log("after cancel");
+					return;
+				}
+
+				if(isOverquota){
+					log("after overquota alert");
+					return;
+				}
+
+				updateProgressNotification();
 			}
-
-			if(isOverquota){
-				log("after overquota alert");
-				return;
-			}
-
-			updateProgressNotification();
 		}
 	}
 

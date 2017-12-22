@@ -346,6 +346,11 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 	@Override
 	public void onTransferStart(MegaApiJava api, MegaTransfer transfer) {
 		log("Upload start: " + transfer.getFileName() + "_" + megaApi.getTotalUploads());
+
+		if(transfer.isStreamingTransfer()){
+			return;
+		}
+
         transfersCount++;
 		if (!transfer.isFolderTransfer()){
 			updateProgressNotification();
@@ -356,6 +361,10 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 	public void onTransferFinish(MegaApiJava api, MegaTransfer transfer,MegaError error) {
 		log("onTransferFinish: " + transfer.getFileName() + " size " + transfer.getTransferredBytes());
 		log("transfer.getPath:" + transfer.getPath());
+
+		if(transfer.isStreamingTransfer()){
+			return;
+		}
 
         transfersCount--;
 
@@ -594,6 +603,11 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 
 	@Override
 	public void onTransferUpdate(MegaApiJava api, MegaTransfer transfer) {
+
+		if(transfer.isStreamingTransfer()){
+			return;
+		}
+
 		if (!transfer.isFolderTransfer()){
 			if (canceled) {
 				log("Transfer cancel: " + transfer.getFileName());

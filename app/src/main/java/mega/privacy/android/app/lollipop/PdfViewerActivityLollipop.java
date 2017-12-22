@@ -90,7 +90,6 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
 
     PDFView pdfView;
 
-
     public static int REQUEST_CODE_SELECT_LOCAL_FOLDER = 1004;
 
     int orderGetChildren = MegaApiJava.ORDER_DEFAULT_ASC;
@@ -98,7 +97,6 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
     AppBarLayout appBarLayout;
     Toolbar tB;
     public ActionBar aB;
-
     private String gSession;
     UserCredentials credentials;
     private String lastEmail;
@@ -153,10 +151,33 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
 
         app = (MegaApplication)getApplication();
         megaApi = app.getMegaApi();
+        if(megaApi==null||megaApi.getRootNode()==null){
+            log("Refresh session - sdk");
+            Intent intentLogin = new Intent(this, LoginActivityLollipop.class);
+            intentLogin.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
+            intentLogin.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(intentLogin);
+            finish();
+            return;
+        }
+        if(Util.isChatEnabled()){
+            if (megaChatApi == null){
+                megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
+            }
 
+            if(megaChatApi==null||megaChatApi.getInitState()== MegaChatApi.INIT_ERROR){
+                log("Refresh session - karere");
+                Intent intentLogin = new Intent(this, LoginActivityLollipop.class);
+                intentLogin.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
+                intentLogin.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intentLogin);
+                finish();
+                return;
+            }
+        }
         setContentView(R.layout.activity_pdfviewer);
 
-        appBarLayout = (AppBarLayout) findViewById(R.id.app_bar);
+        appBarLayout = (AppBarLayout) findViewById(R.id.app_bar_pdfviewer);
 
         tB = (Toolbar) findViewById(R.id.toolbar_pdf_viewer);
         if(tB==null){
@@ -410,37 +431,35 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
     }
 
     public  void setToolbarVisibilityShow () {
+        log("setToolbarVisibilityShow");
         aB.show();
-        tB.animate().translationY(0).setDuration(200L).start();
-        uploadContainer.animate().translationY(0).setDuration(200L).start();
+        if(tB != null) {
+            tB.animate().translationY(0).setDuration(200L).start();
+            uploadContainer.animate().translationY(0).setDuration(200L).start();
+        }
     }
 
     public void setToolbarVisibilityHide () {
         log("setToolbarVisibilityHide");
-
-        tB.animate().translationY(-tB.getBottom()).setDuration(200L).withEndAction(new Runnable() {
-            @Override
-            public void run() {
-                aB.hide();
-            }
-        }).start();
-        uploadContainer.animate().translationY(220).setDuration(200L).start();
-    }
-
-    public void setToolbarVisibility (){
-        if (aB.isShowing()) {
-            //aB.hide();
-            tB.animate().translationY(-tB.getBottom()).setDuration(200L).withEndAction(new Runnable() {
+        if(tB != null) {
+            tB.animate().translationY(-220).setDuration(200L).withEndAction(new Runnable() {
                 @Override
                 public void run() {
                     aB.hide();
                 }
             }).start();
             uploadContainer.animate().translationY(220).setDuration(200L).start();
-        } else {
-            aB.show();
-            tB.animate().translationY(0).setDuration(200L).start();
-            uploadContainer.animate().translationY(0).setDuration(200L).start();
+        }
+        else {
+            aB.hide();
+        }
+    }
+
+    public void setToolbarVisibility (){
+        if (aB != null && aB.isShowing()) {
+            setToolbarVisibilityHide();
+        } else if (aB != null && !aB.isShowing()){
+            setToolbarVisibilityShow();
         }
     }
 
@@ -866,7 +885,6 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
     @Override
     public void onClick(View v) {
         log("onClick");
-
         setToolbarVisibility();
     }
 
@@ -985,7 +1003,6 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
             MegaApplication.setLoggingIn(false);
             if(e.getErrorCode()==MegaChatError.ERROR_OK){
                 log("Connected to chat!");
-                MegaApplication.setChatConnection(true);
             }
             else{
                 log("ERROR WHEN CONNECTING " + e.getErrorString());

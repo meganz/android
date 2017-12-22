@@ -216,8 +216,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 	public long transferCallback = 0;
 
-	boolean chatConnection = false;
-
 	String regex = "[*|\\?:\"<>\\{\\}\\[\\]\\\\\\/]";
 
 	TransfersBottomSheetDialogFragment transfersBottomSheet = null;
@@ -1041,7 +1039,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		outState.putLong("parentHandleOutgoing", parentHandleOutgoing);
 		outState.putLong("parentHandleSearch", parentHandleSearch);
 		outState.putLong("parentHandleInbox", parentHandleInbox);
-		outState.putBoolean("chatConnection", chatConnection);
 		outState.putSerializable("drawerItem", drawerItem);
 
 		outState.putBoolean("isSearchEnabled", isSearchEnabled);
@@ -1149,8 +1146,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			searchQuery = savedInstanceState.getString("searchQuery");
 			textsearchQuery = savedInstanceState.getBoolean("textsearchQuery");
 			levelsSearch = savedInstanceState.getInt("levelsSearch");
-			chatConnection = savedInstanceState.getBoolean("chatConnection");
-
 		}
 		else{
 			log("Bundle is NULL");
@@ -1164,7 +1159,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			indexContacts = -1;
 			deepBrowserTreeIncoming = 0;
 			deepBrowserTreeOutgoing = 0;
-			chatConnection = MegaApplication.isChatConnection();
 
 			this.setPathNavigationOffline("/");
 		}
@@ -1963,6 +1957,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						selectDrawerItemLollipop(drawerItem);
 						selectDrawerItemPending=false;
 					}
+					else if(getIntent().getAction().equals(Constants.ACTION_SHOW_UPGRADE_ACCOUNT)){
+						log("intent from chat - show my account");
+						drawerItem=DrawerItem.ACCOUNT;
+						accountFragment=Constants.UPGRADE_ACCOUNT_FRAGMENT;
+						selectDrawerItemLollipop(drawerItem);
+						selectDrawerItemPending=false;
+					}
 					else if(getIntent().getAction().equals(Constants.ACTION_OVERQUOTA_TRANSFER)){
 						log("intent overquota transfer alert!!");
 						if(alertDialogTransferOverquota==null){
@@ -2033,14 +2034,19 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 			log("onCreate - Check if there any unread chat");
 			if(Util.isChatEnabled()){
-				log("Connect to chat!");
+				log("Connect to chat!: "+megaChatApi.getInitState());
 
-				if(!chatConnection){
-					log("Connection goes!!!");
-					megaChatApi.connect(this);
+				if(megaChatApi!=null){
+					if((megaChatApi.getInitState()!=MegaChatApi.INIT_ERROR)&&(megaChatApi.getInitState()!=MegaChatApi.INIT_WAITING_NEW_SESSION)&&(megaChatApi.getInitState()!=MegaChatApi.INIT_NO_CACHE)){
+						log("Connection goes!!!");
+						megaChatApi.connect(this);
+					}
+					else{
+						log("Not connected: "+megaChatApi.getInitState());
+					}
 				}
 				else{
-					log("Already connected");
+					log("megaChatApi is NULL");
 				}
 
 				setChatTitleSection();
@@ -9612,6 +9618,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		Intent in = new Intent(this, AddContactActivityLollipop.class);
 		if(isMegaContact){
 			in.putExtra("contactType", Constants.CONTACT_TYPE_MEGA);
+			in.putExtra("chat", true);
 			startActivityForResult(in, Constants.REQUEST_CREATE_CHAT);
 		}
 		else{
@@ -12406,9 +12413,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			if(e.getErrorCode()==MegaChatError.ERROR_OK){
 				log("CONNECT CHAT finished ");
 
-				chatConnection = true;
-				MegaApplication.setChatConnection(chatConnection);
-
 				if(rChatFL!=null){
 					if(rChatFL.isAdded()){
 						rChatFL.onlineStatusUpdate(megaChatApi.getOnlineStatus());
@@ -13788,6 +13792,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	public void onTransferStart(MegaApiJava api, MegaTransfer transfer) {
 		log("-------------------onTransferStart: " + transfer.getNotificationNumber()+ "-" + transfer.getFileName() + " - " + transfer.getTag());
 
+		if(transfer.isStreamingTransfer()){
+			return;
+		}
+
 		if(transferCallback<transfer.getNotificationNumber()) {
 
 			transferCallback = transfer.getNotificationNumber();
@@ -13821,6 +13829,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	@Override
 	public void onTransferFinish(MegaApiJava api, MegaTransfer transfer, MegaError e) {
 		log("--------------onTransferFinish: "+transfer.getFileName() + " - " + transfer.getTag() + "- " +transfer.getNotificationNumber());
+
+		if(transfer.isStreamingTransfer()){
+			return;
+		}
 
 		if(transferCallback<transfer.getNotificationNumber()) {
 
@@ -13894,6 +13906,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	@Override
 	public void onTransferUpdate(MegaApiJava api, MegaTransfer transfer) {
 //		log("onTransferUpdate: " + transfer.getFileName() + " - " + transfer.getTag());
+
+		if(transfer.isStreamingTransfer()){
+			return;
+		}
 
 		long now = Calendar.getInstance().getTimeInMillis();
 		if((now - lastTimeOnTransferUpdate)>Util.ONTRANSFERUPDATE_REFRESH_MILLIS){

@@ -31,7 +31,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
@@ -975,146 +974,150 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	onTransferStart(MegaApiJava api, MegaTransfer transfer) {
 		log("Download start: " + transfer.getFileName() + "_" + megaApi.getTotalDownloads() + "_" + megaApiFolder.getTotalDownloads());
 
-		transfersCount++;
+		if(transfer.getType()==MegaTransfer.TYPE_DOWNLOAD){
+			transfersCount++;
 
-        updateProgressNotification();
+			updateProgressNotification();
+		}
 	}
 
 	@Override
 	public void onTransferFinish(MegaApiJava api, MegaTransfer transfer, MegaError error) {
 		log("onTransferFinish: " + transfer.getFileName());
 
-		transfersCount--;
+		if(transfer.getType()==MegaTransfer.TYPE_DOWNLOAD){
+			transfersCount--;
 
-		if(!transfer.isFolderTransfer()){
-			if(transfer.getState()==MegaTransfer.STATE_COMPLETED){
-				String size = Util.getSizeString(transfer.getTotalBytes());
-				AndroidCompletedTransfer completedTransfer = new AndroidCompletedTransfer(transfer.getFileName(), transfer.getType(), transfer.getState(), size, transfer.getNodeHandle()+"");
-				dbH.setCompletedTransfer(completedTransfer);
+			if(!transfer.isFolderTransfer()){
+				if(transfer.getState()==MegaTransfer.STATE_COMPLETED){
+					String size = Util.getSizeString(transfer.getTotalBytes());
+					AndroidCompletedTransfer completedTransfer = new AndroidCompletedTransfer(transfer.getFileName(), transfer.getType(), transfer.getState(), size, transfer.getNodeHandle()+"");
+					dbH.setCompletedTransfer(completedTransfer);
+				}
+
+				updateProgressNotification();
 			}
 
-			updateProgressNotification();
-		}
+			if (canceled) {
+				if((lock != null) && (lock.isHeld()))
+					try{ lock.release(); } catch(Exception ex) {}
+				if((wl != null) && (wl.isHeld()))
+					try{ wl.release(); } catch(Exception ex) {}
 
-        if (canceled) {
-            if((lock != null) && (lock.isHeld()))
-                try{ lock.release(); } catch(Exception ex) {}
-            if((wl != null) && (wl.isHeld()))
-                try{ wl.release(); } catch(Exception ex) {}
+				log("Download cancelled: " + transfer.getFileName());
+				File file = new File(transfer.getPath());
+				file.delete();
+				DownloadService.this.cancel();
+			}
+			else{
+				if (error.getErrorCode() == MegaError.API_OK) {
+					log("Download OK: " + transfer.getFileName());
+					log("DOWNLOADFILE: " + transfer.getPath());
 
-            log("Download cancelled: " + transfer.getFileName());
-            File file = new File(transfer.getPath());
-            file.delete();
-            DownloadService.this.cancel();
-        }
-        else{
-            if (error.getErrorCode() == MegaError.API_OK) {
-                log("Download OK: " + transfer.getFileName());
-                log("DOWNLOADFILE: " + transfer.getPath());
+					//To update thumbnails for videos
+					if(Util.isVideoFile(transfer.getPath())){
+						log("Is video!!!");
+						MegaNode videoNode = megaApi.getNodeByHandle(transfer.getNodeHandle());
+						if (videoNode != null){
+							if(!videoNode.hasThumbnail()){
+								log("The video has not thumb");
+								ThumbnailUtilsLollipop.createThumbnailVideo(this, transfer.getPath(), megaApi, transfer.getNodeHandle());
+							}
+							if(videoNode.getDuration()<1){
+								log("The video has not duration!!!");
+								MediaMetadataRetriever retriever = new MediaMetadataRetriever();
+								retriever.setDataSource(transfer.getPath());
+								String time = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
+								if(time!=null){
+									double seconds = Double.parseDouble(time)/1000;
+									log("The original duration is: "+seconds);
+									int secondsAprox = (int) Math.round(seconds);
+									log("The duration aprox is: "+secondsAprox);
 
-                //To update thumbnails for videos
-                if(Util.isVideoFile(transfer.getPath())){
-                    log("Is video!!!");
-                    MegaNode videoNode = megaApi.getNodeByHandle(transfer.getNodeHandle());
-                    if (videoNode != null){
-                        if(!videoNode.hasThumbnail()){
-                            log("The video has not thumb");
-                            ThumbnailUtilsLollipop.createThumbnailVideo(this, transfer.getPath(), megaApi, transfer.getNodeHandle());
-                        }
-                        if(videoNode.getDuration()<1){
-                            log("The video has not duration!!!");
-                            MediaMetadataRetriever retriever = new MediaMetadataRetriever();
-                            retriever.setDataSource(transfer.getPath());
-                            String time = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
-                            if(time!=null){
-                                double seconds = Double.parseDouble(time)/1000;
-                                log("The original duration is: "+seconds);
-                                int secondsAprox = (int) Math.round(seconds);
-                                log("The duration aprox is: "+secondsAprox);
-
-                                megaApi.setNodeDuration(videoNode, secondsAprox, null);
-                            }
-                        }
-                    }
-                    else{
-                        log("videoNode is NULL");
-                    }
-                }
-                else{
-                    log("NOT video!");
-                }
-
-                File resultFile = new File(transfer.getPath());
-                File treeParent = resultFile.getParentFile();
-                while(treeParent != null)
-                {
-                    treeParent.setReadable(true, false);
-                    treeParent.setExecutable(true, false);
-                    treeParent = treeParent.getParentFile();
-                }
-                resultFile.setReadable(true, false);
-                resultFile.setExecutable(true, false);
-
-                String filePath = transfer.getPath();
-
-				try {
-					Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-					File f = new File(filePath);
-					Uri contentUri;
-					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-						contentUri = FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", f);
-					} else {
-						contentUri = Uri.fromFile(f);
-					}
-					mediaScanIntent.setData(contentUri);
-					mediaScanIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-					this.sendBroadcast(mediaScanIntent);
-				}
-				catch (Exception e){}
-
-                if(storeToAdvacedDevices.containsKey(transfer.getNodeHandle())){
-                    log("Now copy the file to the SD Card");
-                    openFile=false;
-                    Uri tranfersUri = storeToAdvacedDevices.get(transfer.getNodeHandle());
-                    MegaNode node = megaApi.getNodeByHandle(transfer.getNodeHandle());
-                    alterDocument(tranfersUri, node.getName());
-                }
-
-                if(transfer.getPath().contains(Util.offlineDIR)){
-					log("YESSSS it is Offline file");
-					dbH = DatabaseHandler.getDbHandler(getApplicationContext());
-					offlineNode = megaApi.getNodeByHandle(transfer.getNodeHandle());
-
-					if(offlineNode!=null){
-						saveOffline(offlineNode, transfer.getPath());
+									megaApi.setNodeDuration(videoNode, secondsAprox, null);
+								}
+							}
+						}
+						else{
+							log("videoNode is NULL");
+						}
 					}
 					else{
-						saveOfflineChatFile(transfer);
+						log("NOT video!");
+					}
+
+					File resultFile = new File(transfer.getPath());
+					File treeParent = resultFile.getParentFile();
+					while(treeParent != null)
+					{
+						treeParent.setReadable(true, false);
+						treeParent.setExecutable(true, false);
+						treeParent = treeParent.getParentFile();
+					}
+					resultFile.setReadable(true, false);
+					resultFile.setExecutable(true, false);
+
+					String filePath = transfer.getPath();
+
+					try {
+						Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+						File f = new File(filePath);
+						Uri contentUri;
+						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+							contentUri = FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", f);
+						} else {
+							contentUri = Uri.fromFile(f);
+						}
+						mediaScanIntent.setData(contentUri);
+						mediaScanIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+						this.sendBroadcast(mediaScanIntent);
+					}
+					catch (Exception e){}
+
+					if(storeToAdvacedDevices.containsKey(transfer.getNodeHandle())){
+						log("Now copy the file to the SD Card");
+						openFile=false;
+						Uri tranfersUri = storeToAdvacedDevices.get(transfer.getNodeHandle());
+						MegaNode node = megaApi.getNodeByHandle(transfer.getNodeHandle());
+						alterDocument(tranfersUri, node.getName());
+					}
+
+					if(transfer.getPath().contains(Util.offlineDIR)){
+						log("YESSSS it is Offline file");
+						dbH = DatabaseHandler.getDbHandler(getApplicationContext());
+						offlineNode = megaApi.getNodeByHandle(transfer.getNodeHandle());
+
+						if(offlineNode!=null){
+							saveOffline(offlineNode, transfer.getPath());
+						}
+						else{
+							saveOfflineChatFile(transfer);
+						}
 					}
 				}
-            }
-            else
-            {
-                log("Download Error: " + transfer.getFileName() + "_" + error.getErrorCode() + "___" + error.getErrorString());
+				else
+				{
+					log("Download Error: " + transfer.getFileName() + "_" + error.getErrorCode() + "___" + error.getErrorString());
 
-				if(!transfer.isFolderTransfer()){
-					errorCount++;
+					if(!transfer.isFolderTransfer()){
+						errorCount++;
+					}
+
+					if(error.getErrorCode() == MegaError.API_EINCOMPLETE){
+						File file = new File(transfer.getPath());
+						file.delete();
+					}
+					else{
+						File file = new File(transfer.getPath());
+						file.delete();
+					}
 				}
+			}
 
-                if(error.getErrorCode() == MegaError.API_EINCOMPLETE){
-                    File file = new File(transfer.getPath());
-                    file.delete();
-                }
-                else{
-                    File file = new File(transfer.getPath());
-                    file.delete();
-                }
-            }
-        }
-
-        if ((megaApi.getNumPendingDownloads() == 0) && (transfersCount==0) && (megaApiFolder.getNumPendingDownloads() == 0)){
-            onQueueComplete();
-        }
+			if ((megaApi.getNumPendingDownloads() == 0) && (transfersCount==0) && (megaApiFolder.getNumPendingDownloads() == 0)){
+				onQueueComplete();
+			}
+		}
 	}
 
 	private void alterDocument(Uri uri, String fileName) {
@@ -1697,20 +1700,22 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 	@Override
 	public void onTransferUpdate(MegaApiJava api, MegaTransfer transfer) {
-		if (canceled) {
-			log("Transfer cancel: " + transfer.getFileName());
+		if(transfer.getType()==MegaTransfer.TYPE_DOWNLOAD){
+			if (canceled) {
+				log("Transfer cancel: " + transfer.getFileName());
 
-			if((lock != null) && (lock.isHeld()))
-				try{ lock.release(); } catch(Exception ex) {}
-			if((wl != null) && (wl.isHeld()))
-				try{ wl.release(); } catch(Exception ex) {}
+				if((lock != null) && (lock.isHeld()))
+					try{ lock.release(); } catch(Exception ex) {}
+				if((wl != null) && (wl.isHeld()))
+					try{ wl.release(); } catch(Exception ex) {}
 
-			megaApi.cancelTransfer(transfer);
-			DownloadService.this.cancel();
-			return;
-		}
-		if(!transfer.isFolderTransfer()){
-			updateProgressNotification();
+				megaApi.cancelTransfer(transfer);
+				DownloadService.this.cancel();
+				return;
+			}
+			if(!transfer.isFolderTransfer()){
+				updateProgressNotification();
+			}
 		}
 	}
 
@@ -1879,7 +1884,6 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 			if(e.getErrorCode()==MegaChatError.ERROR_OK){
 				log("Connected to chat!");
-                MegaApplication.setChatConnection(true);
 			}
 			else{
 				log("EEEERRRRROR WHEN CONNECTING " + e.getErrorString());
