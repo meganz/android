@@ -4,6 +4,7 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.PorterDuff;
@@ -23,6 +24,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.Surface;
 import android.view.View;
 import android.view.WindowManager;
@@ -80,7 +82,7 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaTransferListenerInterface;
 
-public class AudioVideoPlayerLollipop extends PinActivityLollipop implements VideoRendererEventListener, MegaChatRequestListenerInterface, MegaTransferListenerInterface {
+public class AudioVideoPlayerLollipop extends PinActivityLollipop implements VideoRendererEventListener, MegaChatRequestListenerInterface, MegaTransferListenerInterface{
 
     public static int REQUEST_CODE_SELECT_CHAT = 1005;
 
@@ -112,6 +114,8 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
     private boolean loading = true;
     private ProgressDialog statusDialog = null;
     private String fileName = null;
+
+    private RelativeLayout containerAudioVideoPlayer;
 
     private Notification.Builder mBuilder;
     private NotificationManager mNotificationManager;
@@ -237,16 +241,32 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
 
         //Bind the player to the view
         simpleExoPlayerView.setPlayer(player);
-        simpleExoPlayerView.setControllerVisibilityListener(new PlaybackControlView.VisibilityListener() {
+        simpleExoPlayerView.setControllerAutoShow(false);
+        simpleExoPlayerView.setControllerShowTimeoutMs(999999999);
+        simpleExoPlayerView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event){
+
+                if (event.getAction() == MotionEvent.ACTION_UP) {
+                    if (aB.isShowing()) {
+                        simpleExoPlayerView.hideController();
+                        hideActionStatusBar();
+                    }
+                    else {
+                        showActionStatusBar();
+                    }
+                }
+                return true;
+            }
+        });
+        /*simpleExoPlayerView.setControllerVisibilityListener(new PlaybackControlView.VisibilityListener() {
             @Override
             public void onVisibilityChange(int visibility) {
                 if(aB.isShowing()){
-                    hideActionStatusBar();
-                }else{
-                    showActionStatusBar();
+                    simpleExoPlayerView.showController();
                 }
             }
-        });
+        });*/
         //Measures bandwidth during playback. Can be null if not required.
         DefaultBandwidthMeter defaultBandwidthMeter = new DefaultBandwidthMeter();
         //Produces DataSource instances through which meida data is loaded
@@ -266,6 +286,19 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
 
         statusDialog = new ProgressDialog(AudioVideoPlayerLollipop.this);
         statusDialog.setMessage(getString(R.string.general_loading));
+        statusDialog.setOnShowListener(new DialogInterface.OnShowListener() {
+            @Override
+            public void onShow(DialogInterface dialog) {
+                showActionStatusBar();
+            }
+        });
+
+        statusDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialog) {
+                simpleExoPlayerView.setControllerShowTimeoutMs(3000);
+            }
+        });
 
         player.addListener(new ExoPlayer.EventListener() {
             @Override
@@ -292,7 +325,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
 
                     if (loading){
                         try {
-//                            statusDialog.setCanceledOnTouchOutside(false);
+                            statusDialog.setCanceledOnTouchOutside(false);
                             statusDialog.show();
                         }
                         catch(Exception e){
@@ -348,6 +381,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
         });
         player.setPlayWhenReady(true);
         player.setVideoDebugListener(this);
+        simpleExoPlayerView.showController();
     }
 
     public String getFileName(Uri uri) {
@@ -385,6 +419,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
             else {
                 aB.hide();
             }
+            simpleExoPlayerView.hideController();
         }
     }
     protected void showActionStatusBar(){
@@ -394,7 +429,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
                 tB.animate().translationY(0).setDuration(400L).start();
                 getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
             }
-
+            simpleExoPlayerView.showController();
         }
     }
 
@@ -723,9 +758,23 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
 
         alertDialogTransferOverquota = dialogBuilder.create();
 
+        alertDialogTransferOverquota.setOnShowListener(new DialogInterface.OnShowListener() {
+            @Override
+            public void onShow(DialogInterface dialog) {
+                if (loading) {
+                    statusDialog.hide();
+                }
+                showActionStatusBar();
+            }
+        });
+
         continueButton.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v) {
                 alertDialogTransferOverquota.dismiss();
+                if (loading) {
+                    statusDialog.setCanceledOnTouchOutside(false);
+                    statusDialog.show();
+                }
             }
 
         });
@@ -800,5 +849,4 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
 
         mNotificationManager.notify(Constants.NOTIFICATION_STREAMING_OVERQUOTA, notification);
     }
-
 }
