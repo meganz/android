@@ -56,7 +56,7 @@
                     android:id="@+id/writing_linear_layout_chat"
                     android:layout_width="match_parent"
                     android:focusableInTouchMode="true"
-                    android:background="@drawable/rounded_text_view_chat_contact_message"
+                    android:background="@drawable/rounded_text_view_chat_keyboard"
                     android:layout_height="wrap_content">
 
                     <ImageButton
