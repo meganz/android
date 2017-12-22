@@ -22,7 +22,6 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewPager;
-import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.SwitchCompat;
@@ -983,7 +982,6 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 
 			if(e.getErrorCode()==MegaChatError.ERROR_OK){
 				log("Connected to chat!");
-				MegaApplication.setChatConnection(true);
 			}
 			else{
 				log("ERROR WHEN CONNECTING " + e.getErrorString());
@@ -1484,6 +1482,10 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 	public void onTransferFinish(MegaApiJava api, MegaTransfer transfer,
 			MegaError e) {
 		log("onTransferFinish: "+transfer.getPath());
+		if(transfer.isStreamingTransfer()){
+			return;
+		}
+
 		try {
 			//Get the URI of the file
 			File fileToShare = new File(transfer.getPath());

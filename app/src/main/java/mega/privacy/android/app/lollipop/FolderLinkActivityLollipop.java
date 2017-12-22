@@ -54,8 +54,6 @@ import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
 
 import java.io.File;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -72,6 +70,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop.Mode;
 import mega.privacy.android.app.lollipop.adapters.MegaBrowserLollipopAdapter;
+import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.modalbottomsheet.FolderLinkBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
@@ -79,6 +78,8 @@ import mega.privacy.android.app.utils.PreviewUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaChatApi;
+import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
@@ -89,6 +90,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 	FolderLinkActivityLollipop folderLinkActivity = this;
 	MegaApiAndroid megaApi;
 	MegaApiAndroid megaApiFolder;
+	MegaChatApiAndroid megaChatApi;
 	
 	private AlertDialog decryptionKeyDialog;
 	
@@ -290,6 +292,40 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 		MegaApplication app = (MegaApplication)getApplication();
 		megaApiFolder = app.getMegaApiFolder();
 		megaApi = app.getMegaApi();
+
+		if(megaApi==null||megaApi.getRootNode()==null){
+			log("Refresh session - sdk");
+			Intent intent = new Intent(this, LoginActivityLollipop.class);
+			intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
+			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			startActivity(intent);
+			finish();
+			return;
+		}
+		if(megaApiFolder==null||megaApiFolder.getRootNode()==null){
+			log("Refresh session - sdk");
+			Intent intent = new Intent(this, LoginActivityLollipop.class);
+			intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
+			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			startActivity(intent);
+			finish();
+			return;
+		}
+		if(Util.isChatEnabled()){
+			if (megaChatApi == null){
+				megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
+			}
+
+			if(megaChatApi==null||megaChatApi.getInitState()== MegaChatApi.INIT_ERROR){
+				log("Refresh session - karere");
+				Intent intent = new Intent(this, LoginActivityLollipop.class);
+				intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
+				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+				startActivity(intent);
+				finish();
+				return;
+			}
+		}
 		
 		folderLinkActivity = this;
 
@@ -1542,7 +1578,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 					intent.putExtra("isFolderLink", true);
 					startActivity(intent);
 				}
-				else if (MimeTypeList.typeForName(nodes.get(position).getName()).isVideoReproducible() || MimeTypeList.typeForName(nodes.get(position).getName()).isAudio() ){
+				/*else if (MimeTypeList.typeForName(nodes.get(position).getName()).isVideo() || MimeTypeList.typeForName(nodes.get(position).getName()).isAudio() ){
 					MegaNode file = nodes.get(position);
 
 					if (megaApi.httpServerIsRunning() == 0) {
@@ -1601,6 +1637,60 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 						onFileClick(handleList);
 			  		}					
 				}
+				else if (MimeTypeList.typeForName(nodes.get(position).getName()).isPdf()){
+					MegaNode file = nodes.get(position);
+
+					if (megaApi.httpServerIsRunning() == 0) {
+						megaApi.httpServerStart();
+					}
+
+					ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
+					ActivityManager activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+					activityManager.getMemoryInfo(mi);
+
+					if(mi.totalMem>Constants.BUFFER_COMP){
+						log("Total mem: "+mi.totalMem+" allocate 32 MB");
+						megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
+					}
+					else{
+						log("Total mem: "+mi.totalMem+" allocate 16 MB");
+						megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
+					}
+
+					String url = megaApi.httpServerGetLocalLink(file);
+					String mimeType = MimeTypeList.typeForName(file.getName()).getType();
+					log("FILENAME: " + file.getName() + "TYPE: "+mimeType);
+
+					Intent pdfIntent = new Intent(FolderLinkActivityLollipop.this, PdfViewerActivityLollipop.class);
+					pdfIntent.putExtra("APP", true);
+					String localPath = Util.getLocalFile(FolderLinkActivityLollipop.this, file.getName(), file.getSize(), downloadLocationDefaultPath);
+					if (localPath != null){
+						File mediaFile = new File(localPath);
+						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+							pdfIntent.setDataAndType(FileProvider.getUriForFile(FolderLinkActivityLollipop.this, "mega.privacy.android.app.providers.fileprovider", mediaFile), MimeTypeList.typeForName(file.getName()).getType());
+						}
+						else{
+							pdfIntent.setDataAndType(Uri.fromFile(mediaFile), MimeTypeList.typeForName(file.getName()).getType());
+						}
+						pdfIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+					}
+					else {
+						pdfIntent.setDataAndType(Uri.parse(url), mimeType);
+					}
+					pdfIntent.putExtra("HANDLE", file.getHandle());
+					pdfIntent.putExtra("isFolderLink", true);
+					if (MegaApiUtils.isIntentAvailable(FolderLinkActivityLollipop.this, pdfIntent)){
+						startActivity(pdfIntent);
+					}
+					else{
+						Toast.makeText(FolderLinkActivityLollipop.this, FolderLinkActivityLollipop.this.getResources().getString(R.string.intent_not_available), Toast.LENGTH_LONG).show();
+
+						ArrayList<Long> handleList = new ArrayList<Long>();
+						handleList.add(nodes.get(position).getHandle());
+						NodeController nC = new NodeController(FolderLinkActivityLollipop.this);
+						nC.prepareForDownload(handleList);
+					}
+				}*/
 				else{
 					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 						boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);

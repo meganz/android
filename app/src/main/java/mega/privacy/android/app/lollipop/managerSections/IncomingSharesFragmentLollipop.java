@@ -55,6 +55,7 @@ import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.MyAccountInfo;
+import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaBrowserLollipopAdapter;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.utils.Constants;
@@ -475,17 +476,21 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 				contentTextLayout.setVisibility(View.VISIBLE);
 				emptyImageView.setVisibility(View.GONE);
 				emptyTextView.setVisibility(View.GONE);
-			}	
-
-			contentText.setText(MegaApiUtils.getInfoNodeOnlyFolders(nodes, context));
+			}
 
 			log("Deep browser tree: "+((ManagerActivityLollipop)context).deepBrowserTreeIncoming);
 
+			if (((ManagerActivityLollipop)context).deepBrowserTreeIncoming == 0){
+				contentText.setText(MegaApiUtils.getInfoNodeOnlyFolders(nodes, context));
+			}else{
+				MegaNode infoNode = megaApi.getNodeByHandle(((ManagerActivityLollipop)context).parentHandleIncoming);
+				contentText.setText(MegaApiUtils.getInfoFolder(infoNode, context));
+				aB.setTitle(infoNode.getName());
+			}
 			return v;
 		}
 		else{
 			log("Grid View");
-			
 			View v = inflater.inflate(R.layout.fragment_filebrowsergrid, container, false);
 			
 			recyclerView = (CustomizedGridRecyclerView) v.findViewById(R.id.file_grid_view_browser);
@@ -506,6 +511,7 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 			contentTextLayout = (RelativeLayout) v.findViewById(R.id.content_grid_text_layout);
 			contentText = (TextView) v.findViewById(R.id.content_grid_text);
 
+
 			if (adapter == null){
 				adapter = new MegaBrowserLollipopAdapter(context, this, nodes, ((ManagerActivityLollipop)context).parentHandleIncoming, recyclerView, aB, Constants.INCOMING_SHARES_ADAPTER, MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_GRID);
 //				adapterList.setNodes(nodes);
@@ -523,20 +529,18 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 			else{
 				MegaNode parentNode = megaApi.getNodeByHandle(((ManagerActivityLollipop)context).parentHandleIncoming);
 				log("ParentHandle: "+((ManagerActivityLollipop)context).parentHandleIncoming);
-
 				nodes = megaApi.getChildren(parentNode, ((ManagerActivityLollipop)context).orderOthers);
+				adapter.setNodes(nodes);
 			}
+
 			((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 
 			if (((ManagerActivityLollipop)context).deepBrowserTreeIncoming == 0){
 				contentText.setText(MegaApiUtils.getInfoNodeOnlyFolders(nodes, context));
-			}
-			else{
-
+			}else{
 				MegaNode infoNode = megaApi.getNodeByHandle(((ManagerActivityLollipop)context).parentHandleIncoming);
 				contentText.setText(MegaApiUtils.getInfoFolder(infoNode, context));
 				aB.setTitle(infoNode.getName());
-
 			}						
 			
 			adapter.setMultipleSelect(false);
@@ -544,7 +548,6 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 			recyclerView.setAdapter(adapter);
 			fastScroller.setRecyclerView(recyclerView);
 			visibilityFastScroller();
-
 			if (adapter.getItemCount() == 0){
 				recyclerView.setVisibility(View.GONE);
 				contentTextLayout.setVisibility(View.GONE);
@@ -583,7 +586,6 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 
 //	public void refresh(){
 //		log("refresh");
-//		//TODO conservar el path
 //		findNodes();
 //	}
 	
@@ -609,8 +611,7 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 
 		if(((ManagerActivityLollipop)context).deepBrowserTreeIncoming==0){
 			contentText.setText(MegaApiUtils.getInfoNodeOnlyFolders(nodes, context));
-		}
-		else{
+		}else{
 			if(parentNode!=null){
 				contentText.setText(MegaApiUtils.getInfoFolder(parentNode, context));
 			}
@@ -820,6 +821,58 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 			  		else{
 			  			Toast.makeText(context, getResources().getString(R.string.intent_not_available), Toast.LENGTH_LONG).show();
 			  			adapter.notifyDataSetChanged();
+						ArrayList<Long> handleList = new ArrayList<Long>();
+						handleList.add(nodes.get(position).getHandle());
+						NodeController nC = new NodeController(context);
+						nC.prepareForDownload(handleList);
+					}
+				}else if (MimeTypeList.typeForName(nodes.get(position).getName()).isPdf()){
+					MegaNode file = nodes.get(position);
+
+					if (megaApi.httpServerIsRunning() == 0) {
+						megaApi.httpServerStart();
+					}
+
+					ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
+					ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+					activityManager.getMemoryInfo(mi);
+
+					if(mi.totalMem>Constants.BUFFER_COMP){
+						log("Total mem: "+mi.totalMem+" allocate 32 MB");
+						megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
+					}
+					else{
+						log("Total mem: "+mi.totalMem+" allocate 16 MB");
+						megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
+					}
+
+					String url = megaApi.httpServerGetLocalLink(file);
+					String mimeType = MimeTypeList.typeForName(file.getName()).getType();
+					log("FILENAME: " + file.getName() + "TYPE: "+mimeType);
+
+					Intent pdfIntent = new Intent(context, PdfViewerActivityLollipop.class);
+					pdfIntent.putExtra("APP", true);
+					String localPath = Util.getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
+					if (localPath != null){
+						File mediaFile = new File(localPath);
+						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+							pdfIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile), MimeTypeList.typeForName(file.getName()).getType());
+						}
+						else{
+							pdfIntent.setDataAndType(Uri.fromFile(mediaFile), MimeTypeList.typeForName(file.getName()).getType());
+						}
+						pdfIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+					}
+					else {
+						pdfIntent.setDataAndType(Uri.parse(url), mimeType);
+					}
+					pdfIntent.putExtra("HANDLE", file.getHandle());
+					if (MegaApiUtils.isIntentAvailable(context, pdfIntent)){
+						startActivity(pdfIntent);
+					}
+					else{
+						Toast.makeText(context, context.getResources().getString(R.string.intent_not_available), Toast.LENGTH_LONG).show();
+
 						ArrayList<Long> handleList = new ArrayList<Long>();
 						handleList.add(nodes.get(position).getHandle());
 						NodeController nC = new NodeController(context);

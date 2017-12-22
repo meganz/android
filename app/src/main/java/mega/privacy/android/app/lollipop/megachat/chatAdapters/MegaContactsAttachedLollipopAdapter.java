@@ -174,7 +174,7 @@ public class MegaContactsAttachedLollipopAdapter extends RecyclerView.Adapter<Me
 //        ImageView imageView;
         TextView textViewContactName;
         TextView textViewContent;
-        ImageButton imageButtonThreeDots;
+		ImageView imageButtonThreeDots;
         RelativeLayout itemLayout;
         String contactMail;
     }
@@ -218,7 +218,7 @@ public class MegaContactsAttachedLollipopAdapter extends RecyclerView.Adapter<Me
 		    holderList.contactInitialLetter = (TextView) v.findViewById(R.id.contact_list_initial_letter);
 		    holderList.textViewContactName = (TextView) v.findViewById(R.id.contact_list_name);
 		    holderList.textViewContent = (TextView) v.findViewById(R.id.contact_list_content);
-		    holderList.imageButtonThreeDots = (ImageButton) v.findViewById(R.id.contact_list_three_dots);
+		    holderList.imageButtonThreeDots = (ImageView) v.findViewById(R.id.contact_list_three_dots);
 			holderList.contactStateIcon = (ImageView) v.findViewById(R.id.contact_list_drawable_state);
 
 			if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){

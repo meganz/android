@@ -31,6 +31,7 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;
@@ -55,6 +56,7 @@ import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop.DrawerItem;
 import mega.privacy.android.app.lollipop.MyAccountInfo;
+import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaBrowserLollipopAdapter;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.utils.Constants;
@@ -521,7 +523,13 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 				}			
 			}
 
-			contentText.setText(MegaApiUtils.getInfoNodeOnlyFolders(nodes, context));
+			if (((ManagerActivityLollipop) context).deepBrowserTreeOutgoing == 0){
+				contentText.setText(MegaApiUtils.getInfoNodeOnlyFolders(nodes, context));
+			}else{
+				MegaNode infoNode = megaApi.getNodeByHandle(((ManagerActivityLollipop)context).parentHandleOutgoing);
+				contentText.setText(MegaApiUtils.getInfoFolder(infoNode, context));
+				aB.setTitle(infoNode.getName());
+			}
 
 			return v;
 		}
@@ -563,15 +571,15 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 				MegaNode parentNode = megaApi.getNodeByHandle(((ManagerActivityLollipop)context).parentHandleOutgoing);
 				log("ParentHandle: "+((ManagerActivityLollipop)context).parentHandleOutgoing);
 				nodes = megaApi.getChildren(parentNode, ((ManagerActivityLollipop)context).orderOthers);
+				adapter.setNodes(nodes);
 			}
+
 			((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 			if (((ManagerActivityLollipop) context).deepBrowserTreeOutgoing == 0){
 				contentText.setText(MegaApiUtils.getInfoNodeOnlyFolders(nodes, context));
-			}
-			else{
+			}else{
 				MegaNode infoNode = megaApi.getNodeByHandle(((ManagerActivityLollipop)context).parentHandleOutgoing);
 				contentText.setText(MegaApiUtils.getInfoFolder(infoNode, context));
-
 				aB.setTitle(infoNode.getName());
 			}
 			adapter.setMultipleSelect(false);
@@ -665,7 +673,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
                     emptyLinearLayout.setVisibility(View.GONE);
                 }
                 contentText.setText(MegaApiUtils.getInfoNodeOnlyFolders(nodes, context));
-            }
+			}
         }
         else{
             MegaNode n = megaApi.getNodeByHandle(((ManagerActivityLollipop)context).parentHandleOutgoing);
@@ -678,7 +686,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 
             contentText.setText(MegaApiUtils.getInfoFolder(n, context));
 
-            nodes = megaApi.getChildren(n, ((ManagerActivityLollipop)context).orderOthers);
+			nodes = megaApi.getChildren(n, ((ManagerActivityLollipop)context).orderOthers);
             adapter.setNodes(nodes);
 			visibilityFastScroller();
 
@@ -743,6 +751,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 					emptyLinearLayout.setVisibility(View.GONE);
 				}
 				contentText.setText(MegaApiUtils.getInfoNodeOnlyFolders(nodes, context));
+
 			}
 		}
 		else{
@@ -982,6 +991,58 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 			  		else{
 						((ManagerActivityLollipop) context).showSnackbar(context.getResources().getString(R.string.intent_not_available));
 			  			adapter.notifyDataSetChanged();
+						ArrayList<Long> handleList = new ArrayList<Long>();
+						handleList.add(nodes.get(position).getHandle());
+						NodeController nC = new NodeController(context);
+						nC.prepareForDownload(handleList);
+					}
+				}else if (MimeTypeList.typeForName(nodes.get(position).getName()).isPdf()){
+					MegaNode file = nodes.get(position);
+
+					if (megaApi.httpServerIsRunning() == 0) {
+						megaApi.httpServerStart();
+					}
+
+					ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
+					ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+					activityManager.getMemoryInfo(mi);
+
+					if(mi.totalMem>Constants.BUFFER_COMP){
+						log("Total mem: "+mi.totalMem+" allocate 32 MB");
+						megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
+					}
+					else{
+						log("Total mem: "+mi.totalMem+" allocate 16 MB");
+						megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
+					}
+
+					String url = megaApi.httpServerGetLocalLink(file);
+					String mimeType = MimeTypeList.typeForName(file.getName()).getType();
+					log("FILENAME: " + file.getName() + "TYPE: "+mimeType);
+
+					Intent pdfIntent = new Intent(context, PdfViewerActivityLollipop.class);
+					pdfIntent.putExtra("APP", true);
+					String localPath = Util.getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
+					if (localPath != null){
+						File mediaFile = new File(localPath);
+						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+							pdfIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile), MimeTypeList.typeForName(file.getName()).getType());
+						}
+						else{
+							pdfIntent.setDataAndType(Uri.fromFile(mediaFile), MimeTypeList.typeForName(file.getName()).getType());
+						}
+						pdfIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+					}
+					else {
+						pdfIntent.setDataAndType(Uri.parse(url), mimeType);
+					}
+					pdfIntent.putExtra("HANDLE", file.getHandle());
+					if (MegaApiUtils.isIntentAvailable(context, pdfIntent)){
+						startActivity(pdfIntent);
+					}
+					else{
+						Toast.makeText(context, context.getResources().getString(R.string.intent_not_available), Toast.LENGTH_LONG).show();
+
 						ArrayList<Long> handleList = new ArrayList<Long>();
 						handleList.add(nodes.get(position).getHandle());
 						NodeController nC = new NodeController(context);
@@ -1235,6 +1296,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 			}
 
 			contentText.setText(MegaApiUtils.getInfoNodeOnlyFolders(nodes, context));
+
 			recyclerView.setVisibility(View.VISIBLE);
 			contentTextLayout.setVisibility(View.VISIBLE);
 			emptyImageView.setVisibility(View.GONE);
@@ -1247,6 +1309,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 
 			MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(((ManagerActivityLollipop)context).parentHandleOutgoing));
 			contentText.setText(MegaApiUtils.getInfoFolder(parentNode, context));
+
 			if (parentNode != null){
 				recyclerView.setVisibility(View.VISIBLE);
 				contentTextLayout.setVisibility(View.VISIBLE);

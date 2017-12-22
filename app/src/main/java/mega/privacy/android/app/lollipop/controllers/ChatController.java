@@ -29,6 +29,7 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
+import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatFullScreenImageViewer;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
@@ -1439,6 +1440,21 @@ public class ChatController {
                             }
                             audioIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                             context.startActivity(audioIntent);
+                        }
+                        else if (MimeTypeList.typeForName(tempNode.getName()).isPdf()){
+                            log("Pdf file");
+                            File pdfFile = new File(localPath);
+
+                            Intent pdfIntent = new Intent(context, PdfViewerActivityLollipop.class);
+                            pdfIntent.putExtra("APP", true);
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                                pdfIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", new File(localPath)), MimeTypeList.typeForName(tempNode.getName()).getType());
+                            }
+                            else{
+                                pdfIntent.setDataAndType(Uri.fromFile(new File(localPath)), MimeTypeList.typeForName(tempNode.getName()).getType());
+                            }
+                            pdfIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                            context.startActivity(pdfIntent);
                         }
                         else {
                             log("MimeTypeList other file");

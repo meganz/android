@@ -44,6 +44,7 @@ import mega.privacy.android.app.components.TwoLineCheckPreference;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.lollipop.MyAccountInfo;
 import mega.privacy.android.app.lollipop.PinLockActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatPreferencesActivity;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
@@ -59,8 +60,6 @@ import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatPresenceConfig;
 import nz.mega.sdk.MegaNode;
 
-import android.provider.Settings.Secure;
-
 
 //import android.support.v4.preference.PreferenceFragment;
 
@@ -71,6 +70,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 	private MegaApiAndroid megaApi;
 	private MegaChatApiAndroid megaChatApi;
 	Handler handler = new Handler();
+	MyAccountInfo myAccountInfo;
 	
 	private static int REQUEST_DOWNLOAD_FOLDER = 1000;
 	private static int REQUEST_CODE_TREE_LOCAL_CAMERA = 1014;
@@ -175,6 +175,8 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 	Preference localCameraUploadFolderSDCard;
 	Preference megaCameraFolder;
 	Preference helpSendFeedback;
+	Preference cancelAccount;
+
 	Preference aboutPrivacy;
 	Preference aboutTOS;
 	Preference aboutSDK;
@@ -382,6 +384,9 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 
 		helpSendFeedback = findPreference(KEY_HELP_SEND_FEEDBACK);
 		helpSendFeedback.setOnPreferenceClickListener(this);
+
+		cancelAccount = findPreference("settings_advanced_features_cancel_account");
+		cancelAccount.setOnPreferenceClickListener(this);
 		
 		aboutPrivacy = findPreference(KEY_ABOUT_PRIVACY_POLICY);
 		aboutPrivacy.setOnPreferenceClickListener(this);
@@ -1792,16 +1797,52 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 
 		}else if (preference.getKey().compareTo(KEY_HELP_SEND_FEEDBACK) == 0){
 
-			String body = getString(R.string.setting_feedback_body)+"\n\n\n\n\n\n\n\n\n\n\n"+getString(R.string.settings_feedback_body_device_model)+"  "+getDeviceName()+"\n"+getString(R.string.settings_feedback_body_android_version)+"  "+Build.VERSION.RELEASE+" "+Build.DISPLAY+"\n"+getString(R.string.user_account_feedback)+"  "+megaApi.getMyEmail();
+			StringBuilder body = new StringBuilder();
+			body.append(getString(R.string.setting_feedback_body));
+			body.append("\n\n\n\n\n\n\n\n\n\n\n");
+			body.append(getString(R.string.settings_feedback_body_device_model)+"  "+getDeviceName()+"\n");
+			body.append(getString(R.string.settings_feedback_body_android_version)+"  "+Build.VERSION.RELEASE+" "+Build.DISPLAY+"\n");
+			body.append(getString(R.string.user_account_feedback)+"  "+megaApi.getMyEmail());
+
+			myAccountInfo = ((ManagerActivityLollipop)context).getMyAccountInfo();
+			if(myAccountInfo!=null){
+				if(myAccountInfo.getAccountType()<0||myAccountInfo.getAccountType()>4){
+					body.append(" ("+getString(R.string.my_account_free)+")");
+				}
+				else{
+					switch(myAccountInfo.getAccountType()){
+						case 0:{
+							body.append(" ("+getString(R.string.my_account_free)+")");
+							break;
+						}
+						case 1:{
+							body.append(" ("+getString(R.string.my_account_pro1)+")");
+							break;
+						}
+						case 2:{
+							body.append(" ("+getString(R.string.my_account_pro2)+")");
+							break;
+						}
+						case 3:{
+							body.append(" ("+getString(R.string.my_account_pro3)+")");
+							break;
+						}
+						case 4:{
+							body.append(" (PRO "+getString(R.string.my_account_prolite)+")");
+							break;
+						}
+					}
+				}
+			}
+
 			String emailAndroid = Constants.MAIL_ANDROID;
 			String versionApp = (getString(R.string.app_version));
 			String subject = getString(R.string.setting_feedback_subject)+" v"+versionApp;
 
 			Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:" + emailAndroid));
 			emailIntent.putExtra(Intent.EXTRA_SUBJECT, subject);
-			emailIntent.putExtra(Intent.EXTRA_TEXT, body);
+			emailIntent.putExtra(Intent.EXTRA_TEXT, body.toString());
 			startActivity(Intent.createChooser(emailIntent, " "));
-
 		}
 		else if (preference.getKey().compareTo(KEY_ABOUT_PRIVACY_POLICY) == 0){
 			Intent viewIntent = new Intent(Intent.ACTION_VIEW);
@@ -1817,6 +1858,10 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			Intent viewIntent = new Intent(Intent.ACTION_VIEW);
 			viewIntent.setData(Uri.parse("https://github.com/meganz/android"));
 			startActivity(viewIntent);
+		}
+		else if (preference.getKey().compareTo("settings_advanced_features_cancel_account") == 0){
+			log("Cancel account preference");
+			((ManagerActivityLollipop)context).askConfirmationDeleteAccount();
 		}
 		
 		return true;
