@@ -590,7 +590,7 @@ public class ContactFileListFragmentLollipop extends Fragment{
 					}
 					((ContactFileListActivityLollipop)context).startActivity(intent);
 				} 
-				else if (MimeTypeList.typeForName(contactNodes.get(position).getName()).isVideo()	|| MimeTypeList.typeForName(contactNodes.get(position).getName()).isAudio()) {
+				else if (MimeTypeList.typeForName(contactNodes.get(position).getName()).isVideoReproducible()	|| MimeTypeList.typeForName(contactNodes.get(position).getName()).isAudio()) {
 					MegaNode file = contactNodes.get(position);
 					if (megaApi.httpServerIsRunning() == 0) {
 						megaApi.httpServerStart();
@@ -615,8 +615,7 @@ public class ContactFileListFragmentLollipop extends Fragment{
 
 					//Intent mediaIntent = new Intent(Intent.ACTION_VIEW);
 					Intent mediaIntent;
-					if (file.getName().contains(".avi") || file.getName().contains(".wmv") || file.getName().contains(".mpg")
-							|| file.getName().contains(".flv") || file.getName().contains(".vob") || file.getName().contains(".mts")){
+					if (MimeTypeList.typeForName(file.getName()).isVideoNotSupported()){
 						mediaIntent = new Intent(Intent.ACTION_VIEW);
 					}
 					else {
