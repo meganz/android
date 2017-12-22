@@ -218,6 +218,10 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		propertiesIcon = menu.findItem(R.id.full_image_viewer_properties);
 		downloadIcon = menu.findItem(R.id.full_image_viewer_download);
 
+		Drawable download = getResources().getDrawable(R.drawable.ic_download_white);
+		download.setColorFilter(getResources().getColor(R.color.white), PorterDuff.Mode.SRC_ATOP);
+		downloadIcon.setIcon(download);
+
 		renameIcon = menu.findItem(R.id.full_image_viewer_rename);
 		moveIcon = menu.findItem(R.id.full_image_viewer_move);
 		copyIcon = menu.findItem(R.id.full_image_viewer_copy);
