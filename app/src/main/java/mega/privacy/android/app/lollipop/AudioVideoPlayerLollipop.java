@@ -109,6 +109,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
     int countChat = 0;
     int successSent = 0;
     int errorSent = 0;
+    boolean transferOverquota = false;
 
     private boolean video = false;
     private boolean loading = true;
@@ -292,11 +293,12 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
                 showActionStatusBar();
             }
         });
-
         statusDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
             @Override
             public void onDismiss(DialogInterface dialog) {
-                simpleExoPlayerView.setControllerShowTimeoutMs(3000);
+                if (loading) {
+                    finish();
+                }
             }
         });
 
@@ -323,7 +325,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
                 if (playbackState == ExoPlayer.STATE_BUFFERING){
                     audioContainer.setVisibility(View.GONE);
 
-                    if (loading){
+                    if (loading && !transferOverquota){
                         try {
                             statusDialog.setCanceledOnTouchOutside(false);
                             statusDialog.show();
@@ -761,9 +763,8 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
         alertDialogTransferOverquota.setOnShowListener(new DialogInterface.OnShowListener() {
             @Override
             public void onShow(DialogInterface dialog) {
-                if (loading) {
-                    statusDialog.hide();
-                }
+                transferOverquota = true;
+                statusDialog.hide();
                 showActionStatusBar();
             }
         });
@@ -771,6 +772,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
         continueButton.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v) {
                 alertDialogTransferOverquota.dismiss();
+                transferOverquota = false;
                 if (loading) {
                     statusDialog.setCanceledOnTouchOutside(false);
                     statusDialog.show();
