@@ -4,29 +4,19 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.PointF;
 import android.os.AsyncTask;
 import android.os.Build;
-import android.support.design.widget.AppBarLayout;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.ActionBar;
-import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.util.SparseArray;
 import android.view.Display;
-import android.view.GestureDetector;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
-import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.view.animation.TranslateAnimation;
-import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
-import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -34,6 +24,7 @@ import java.util.ArrayList;
 import mega.privacy.android.app.MimeTypeMime;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.TouchImageView;
+import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.PreviewUtils;
@@ -512,6 +503,10 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 	@Override
 	public void onTransferStart(MegaApiJava api, MegaTransfer transfer) {
 
+		if(transfer.isStreamingTransfer()){
+			return;
+		}
+
 		log("Download started : " + transfer.getFileName() + "_" + transfer.getTransferredBytes() + "/" + transfer.getTotalBytes());
 		long handle = transfer.getNodeHandle();
 		int position = 0;
@@ -533,6 +528,11 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 	@Override
 	public void onTransferFinish(MegaApiJava api, MegaTransfer transfer,
 			MegaError e) {
+
+		if(transfer.isStreamingTransfer()){
+			return;
+		}
+
 		long handle = transfer.getNodeHandle();
 		
 		pendingFullImages.remove(handle);
@@ -555,6 +555,10 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 	@Override
 	public void onTransferUpdate(MegaApiJava api, MegaTransfer transfer) {
 //		log ("Download updated: " + transfer.getFileName() + "_" + transfer.getTransferredBytes() + "/" + transfer.getTotalBytes());
+
+		if(transfer.isStreamingTransfer()){
+			return;
+		}
 		
 		long handle = transfer.getNodeHandle();
 		

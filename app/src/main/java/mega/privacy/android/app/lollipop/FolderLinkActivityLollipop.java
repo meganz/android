@@ -54,8 +54,6 @@ import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
 
 import java.io.File;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -80,6 +78,8 @@ import mega.privacy.android.app.utils.PreviewUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaChatApi;
+import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
@@ -90,6 +90,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 	FolderLinkActivityLollipop folderLinkActivity = this;
 	MegaApiAndroid megaApi;
 	MegaApiAndroid megaApiFolder;
+	MegaChatApiAndroid megaChatApi;
 	
 	private AlertDialog decryptionKeyDialog;
 	
@@ -291,6 +292,40 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 		MegaApplication app = (MegaApplication)getApplication();
 		megaApiFolder = app.getMegaApiFolder();
 		megaApi = app.getMegaApi();
+
+		if(megaApi==null||megaApi.getRootNode()==null){
+			log("Refresh session - sdk");
+			Intent intent = new Intent(this, LoginActivityLollipop.class);
+			intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
+			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			startActivity(intent);
+			finish();
+			return;
+		}
+		if(megaApiFolder==null||megaApiFolder.getRootNode()==null){
+			log("Refresh session - sdk");
+			Intent intent = new Intent(this, LoginActivityLollipop.class);
+			intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
+			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			startActivity(intent);
+			finish();
+			return;
+		}
+		if(Util.isChatEnabled()){
+			if (megaChatApi == null){
+				megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
+			}
+
+			if(megaChatApi==null||megaChatApi.getInitState()== MegaChatApi.INIT_ERROR){
+				log("Refresh session - karere");
+				Intent intent = new Intent(this, LoginActivityLollipop.class);
+				intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
+				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+				startActivity(intent);
+				finish();
+				return;
+			}
+		}
 		
 		folderLinkActivity = this;
 

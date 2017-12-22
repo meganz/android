@@ -142,6 +142,8 @@ public class Constants {
 
 	public static String ACTION_OVERQUOTA_TRANSFER = "OVERQUOTA_TRANSFER";
 
+	public static String ACTION_SHOW_UPGRADE_ACCOUNT = "ACTION_SHOW_UPGRADE_ACCOUNT";
+
 	final public static int CHAT_ADAPTER_SHOW_ALL = 2;
 	final public static int CHAT_ADAPTER_SHOW_TIME = 1;
 	final public static int CHAT_ADAPTER_SHOW_NOTHING = 0;

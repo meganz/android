@@ -1,69 +1,45 @@
 package mega.privacy.android.app.lollipop.megachat;
 
-import android.app.AlertDialog;
-import android.app.ProgressDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.design.widget.CoordinatorLayout;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.app.ActionBar;
-import android.support.v7.view.ActionMode;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.text.format.DateUtils;
 import android.util.DisplayMetrics;
 import android.view.Display;
-import android.view.GestureDetector;
-import android.view.GestureDetector.SimpleOnGestureListener;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Stack;
 
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MegaContactAdapter;
 import mega.privacy.android.app.MegaContactDB;
-import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.ShareInfo;
-import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
-import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.PinActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
-import mega.privacy.android.app.lollipop.listeners.FileContactMultipleRequestListener;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaContactsAttachedLollipopAdapter;
-import mega.privacy.android.app.modalbottomsheet.FileContactsListBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ContactAttachmentBottomSheetDialogFragment;
-import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.NodeAttachmentBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatError;
@@ -74,11 +50,8 @@ import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
-import nz.mega.sdk.MegaGlobalListenerInterface;
-import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
-import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 
 public class ContactAttachmentActivityLollipop extends PinActivityLollipop implements MegaRequestListenerInterface, MegaChatRequestListenerInterface, OnClickListener {
@@ -121,6 +94,25 @@ public class ContactAttachmentActivityLollipop extends PinActivityLollipop imple
 
 		if (megaChatApi == null){
 			megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
+		}
+
+		if(megaApi==null||megaApi.getRootNode()==null){
+			log("Refresh session - sdk");
+			Intent intent = new Intent(this, LoginActivityLollipop.class);
+			intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
+			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			startActivity(intent);
+			finish();
+			return;
+		}
+		if(megaChatApi==null||megaChatApi.getInitState()== MegaChatApi.INIT_ERROR){
+			log("Refresh session - karere");
+			Intent intent = new Intent(this, LoginActivityLollipop.class);
+			intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
+			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			startActivity(intent);
+			finish();
+			return;
 		}
 
 		Display display = getWindowManager().getDefaultDisplay();
