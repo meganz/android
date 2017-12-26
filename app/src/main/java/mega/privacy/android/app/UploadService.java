@@ -597,8 +597,13 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 								log("Couldn't read exif info: " + transfer.getPath());
 							}
 						}
+					} else if (MimeTypeList.typeForName(transfer.getPath()).isPdf()) {
+						log("Is pdf!!!");
+
+						ThumbnailUtilsLollipop.createThumbnailPdf(this, transfer.getPath(), megaApi, transfer.getNodeHandle());
+
 					} else {
-						log("NOT video or image!");
+						log("NOT video, image or pdf!");
 					}
 				} else {
 					log("Upload Error: " + transfer.getFileName() + "_" + error.getErrorCode() + "___" + error.getErrorString());
