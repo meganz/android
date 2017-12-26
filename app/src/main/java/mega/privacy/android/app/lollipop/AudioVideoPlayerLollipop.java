@@ -784,6 +784,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
         paymentButton.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v) {
                 alertDialogTransferOverquota.dismiss();
+                transferOverquota = false;
                 showUpgradeAccount();
             }
         });
