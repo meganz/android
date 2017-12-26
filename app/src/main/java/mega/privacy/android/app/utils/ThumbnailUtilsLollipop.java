@@ -15,6 +15,7 @@ import android.graphics.RectF;
 import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.ParcelFileDescriptor;
 import android.provider.BaseColumns;
 import android.provider.MediaStore;
 import android.provider.MediaStore.MediaColumns;
@@ -28,6 +29,9 @@ import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
+import com.shockwave.pdfium.PdfDocument;
+import com.shockwave.pdfium.PdfiumCore;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -37,7 +41,6 @@ import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ThumbnailCache;
 import mega.privacy.android.app.lollipop.adapters.MegaBrowserLollipopAdapter;
-import mega.privacy.android.app.lollipop.adapters.MegaBrowserLollipopAdapter.ViewHolderBrowser;
 import mega.privacy.android.app.lollipop.adapters.MegaExplorerLollipopAdapter;
 import mega.privacy.android.app.lollipop.adapters.MegaExplorerLollipopAdapter.ViewHolderExplorerLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaFullScreenImageAdapterLollipop;
@@ -1339,7 +1342,55 @@ public class ThumbnailUtilsLollipop {
 		} //Si no, no hago nada
 		
 	}
-	
+
+	public static void createThumbnailPdf(Context context, String localPath, MegaApiAndroid megaApi, long handle){
+		log("createThumbnailPdf: "+localPath+ " : "+handle);
+
+		MegaNode pdfNode = megaApi.getNodeByHandle(handle);
+
+		if (pdfNode == null){
+			log("pdf is NULL");
+			return;
+		}
+
+		int pageNumber = 0;
+		PdfiumCore pdfiumCore = new PdfiumCore(context);
+		FileOutputStream out = null;
+
+		File thumbDir = getThumbFolder(context);
+		File thumb = new File(thumbDir, pdfNode.getBase64Handle()+".jpg");
+		File file = new File(localPath);
+		try {
+			PdfDocument pdfDocument = pdfiumCore.newDocument(ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_ONLY));
+			pdfiumCore.openPage(pdfDocument, pageNumber);
+			int width = pdfiumCore.getPageWidthPoint(pdfDocument, pageNumber);
+			int height = pdfiumCore.getPageHeightPoint(pdfDocument, pageNumber);
+			Bitmap bmp = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+			pdfiumCore.renderPageBitmap(pdfDocument, bmp, pageNumber, 0, 0, width, height);
+			Bitmap resizedBitmap = Bitmap.createScaledBitmap(bmp, 200, 200, false);
+			out = new FileOutputStream(thumb);
+			boolean result = resizedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, out); // bmp is your Bitmap instance
+			if(result){
+				log("Compress OK!");
+				megaApi.setThumbnail(pdfNode, thumb.getAbsolutePath());
+				megaApi.setPreview(pdfNode, thumb.getAbsolutePath());
+			}
+			else{
+				log("Not Compress");
+			}
+			pdfiumCore.closeDocument(pdfDocument);
+		} catch(Exception e) {
+			//todo with exception
+		} finally {
+			try {
+				if (out != null)
+					out.close();
+			} catch (Exception e) {
+				//todo with exception
+			}
+		}
+	}
+
 	public static void createThumbnailVideo(Context context, String localPath, MegaApiAndroid megaApi, long handle){
 		log("createThumbnailVideo: "+localPath+ " : "+handle);
 		

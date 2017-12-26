@@ -444,8 +444,13 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 						}
 					}
 				}
+				else if (MimeTypeList.typeForName(transfer.getPath()).isPdf()) {
+					log("Is pdf!!!");
+
+					ThumbnailUtilsLollipop.createThumbnailPdf(this, transfer.getPath(), megaApi, transfer.getNodeHandle());
+				}
                 else{
-                    log("NOT video not image!");
+                    log("NOT video, image or pdf!");
                 }
 
                 attachNodes(transfer);
