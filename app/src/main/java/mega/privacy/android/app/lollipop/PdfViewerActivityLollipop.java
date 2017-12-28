@@ -103,6 +103,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
     DatabaseHandler dbH = null;
     ChatSettings chatSettings;
     boolean isUrl;
+    DefaultScrollHandle defaultScrollHandle;
 
     Uri uri;
     String pdfFileName;
@@ -110,6 +111,8 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
     boolean inside = false;
     long handle;
     boolean isFolderLink = false;
+    public static boolean isScrolling = false;
+    public static boolean scroll = false;
 
     public RelativeLayout uploadContainer;
     RelativeLayout pdfviewerContainer;
@@ -177,7 +180,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
         }
         setContentView(R.layout.activity_pdfviewer);
 
-        appBarLayout = (AppBarLayout) findViewById(R.id.app_bar_pdfviewer);
+        //appBarLayout = (AppBarLayout) findViewById(R.id.app_bar_pdfviewer);
 
         tB = (Toolbar) findViewById(R.id.toolbar_pdf_viewer);
         if(tB==null){
@@ -198,6 +201,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
 
         pdfView.setBackgroundColor(Color.LTGRAY);
         pdfFileName = getFileName(uri);
+        defaultScrollHandle = new DefaultScrollHandle(PdfViewerActivityLollipop.this);
 
         if (uri.toString().contains("http://")){
             isUrl = true;
@@ -262,7 +266,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
                         .onPageChange(PdfViewerActivityLollipop.this)
                         .enableAnnotationRendering(true)
                         .onLoad(PdfViewerActivityLollipop.this)
-                        .scrollHandle(new DefaultScrollHandle(PdfViewerActivityLollipop.this))
+                        .scrollHandle(defaultScrollHandle)
                         .spacing(10) // in dp
                         .onPageError(PdfViewerActivityLollipop.this)
                         .load();
@@ -283,7 +287,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
                     .onPageChange(this)
                     .enableAnnotationRendering(true)
                     .onLoad(this)
-                    .scrollHandle(new DefaultScrollHandle(this))
+                    .scrollHandle(defaultScrollHandle)
                     .spacing(10) // in dp
                     .onPageError(this)
                     .load();
@@ -434,6 +438,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
         log("setToolbarVisibilityShow");
         aB.show();
         if(tB != null) {
+            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
             tB.animate().translationY(0).setDuration(200L).start();
             uploadContainer.animate().translationY(0).setDuration(200L).start();
         }
@@ -442,6 +447,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
     public void setToolbarVisibilityHide () {
         log("setToolbarVisibilityHide");
         if(tB != null) {
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
             tB.animate().translationY(-220).setDuration(200L).withEndAction(new Runnable() {
                 @Override
                 public void run() {
@@ -451,6 +457,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
             uploadContainer.animate().translationY(220).setDuration(200L).start();
         }
         else {
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
             aB.hide();
         }
     }
@@ -821,10 +828,22 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
         }
     }
 
+    public void establishScroll() {
+        if (isScrolling && !scroll) {
+            scroll = true;
+            setToolbarVisibilityHide();
+        }
+        else if (!isScrolling){
+            scroll = false;
+        }
+    }
+
     @Override
     public void onPageChanged(int page, int pageCount) {
         pageNumber = page;
         setTitle(String.format("%s %s / %s", pdfFileName, page + 1, pageCount));
+
+        establishScroll();
     }
 
     @Override
@@ -886,6 +905,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
     public void onClick(View v) {
         log("onClick");
         setToolbarVisibility();
+        defaultScrollHandle.hideDelayed();
     }
 
     @Override
