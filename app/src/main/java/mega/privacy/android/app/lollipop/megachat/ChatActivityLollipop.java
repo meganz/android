@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.ColorStateList;
 import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
@@ -180,7 +181,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     ImageButton keyboardButton;
 
     EmojiconEditText textChat;
-    ImageButton sendIcon;
+    ImageButton attachIcon;
     RelativeLayout messagesContainerLayout;
 
     FloatingActionButton fab;
@@ -444,18 +445,22 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     if (s.length() > 0) {
                         String temp = s.toString();
                         if(temp.trim().length()>0){
-                            sendIcon.setVisibility(View.VISIBLE);
+                            fab.setEnabled(true);
+                            fab.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.accentColor)));
                         }
                         else{
-                            sendIcon.setVisibility(View.GONE);
+                            fab.setEnabled(false);
+                            fab.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.invite_button_deactivated)));
                         }
                     }
                     else {
-                        sendIcon.setVisibility(View.GONE);
+                        fab.setEnabled(false);
+                        fab.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.invite_button_deactivated)));
                     }
                 }
                 else{
-                    sendIcon.setVisibility(View.GONE);
+                    fab.setEnabled(false);
+                    fab.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.invite_button_deactivated)));
                 }
 
                 if(getCurrentFocus() == textChat)
@@ -524,9 +529,14 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
         chatRelativeLayout  = (RelativeLayout) findViewById(R.id.relative_chat_layout);
 
-        sendIcon = (ImageButton) findViewById(R.id.send_message_icon_chat);
-        sendIcon.setOnClickListener(this);
-        sendIcon.setVisibility(View.GONE);
+        fab = (FloatingActionButton) findViewById(R.id.fab_chat);
+        fab.setOnClickListener(this);
+
+        attachIcon = (ImageButton) findViewById(R.id.attach_icon_chat);
+        attachIcon.setOnClickListener(this);
+
+        fab.setEnabled(false);
+        fab.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.invite_button_deactivated)));
 
         listView = (RecyclerView) findViewById(R.id.messages_chat_list_view);
         listView.setClipToPadding(false);;
@@ -580,9 +590,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         userTypingLayout = (RelativeLayout) findViewById(R.id.user_typing_layout);
         userTypingLayout.setVisibility(View.GONE);
         userTypingText = (TextView) findViewById(R.id.user_typing_text);
-
-        fab = (FloatingActionButton) findViewById(R.id.fab_chat);
-        fab.setOnClickListener(this);
 
         emojiKeyboardLayout = (FrameLayout) findViewById(R.id.chat_emoji_keyboard);
 
@@ -1640,24 +1647,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             case R.id.home:{
                 break;
             }
-			case R.id.send_message_icon_chat:{
-                log("click on Send message");
-                writingLayout.setClickable(false);
-                String text = textChat.getText().toString();
-
-                if(editingMessage){
-                    editMessage(text);
-                    log("Edited message: "+text);
-                    clearSelections();
-                    hideMultipleSelect();
-                    actionMode.invalidate();
-                }
-                else{
-                    log("Call to send message: "+text);
-                    sendMessage(text);
-                }
-
-                textChat.getText().clear();
+			case R.id.attach_icon_chat:{
+                showUploadPanel();
                 break;
 			}
             case R.id.keyboard_icon_chat:{
@@ -1698,7 +1689,23 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 break;
             }
             case R.id.fab_chat:{
-                showUploadPanel();
+                log("click on Send message");
+                writingLayout.setClickable(false);
+                String text = textChat.getText().toString();
+
+                if(editingMessage){
+                    editMessage(text);
+                    log("Edited message: "+text);
+                    clearSelections();
+                    hideMultipleSelect();
+                    actionMode.invalidate();
+                }
+                else{
+                    log("Call to send message: "+text);
+                    sendMessage(text);
+                }
+
+                textChat.getText().clear();
                 break;
             }
 		}
