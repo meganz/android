@@ -1406,7 +1406,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             log("value of resumeSession: "+resumeSesion);
 
             if((action!=null)&&(url!=null)) {
-                log("Empty completed transfers data");
+                log("(1) Empty completed transfers data");
                 dbH.emptyCompletedTransfers();
 
                 if (action.equals(Constants.ACTION_CHANGE_MAIL)) {
@@ -1524,7 +1524,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     }
 
-                    log("Empty completed transfers data");
+                    log("(2) Empty completed transfers data");
                     dbH.emptyCompletedTransfers();
 
                     startActivity(intent);
