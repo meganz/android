@@ -3010,8 +3010,12 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             if(!messages.isEmpty()){
                 AndroidMegaChatMessage lastSeen = messages.get(messages.size()-1);
                 if(lastSeen!=null){
-                    boolean markAsRead = megaChatApi.setMessageSeen(idChat, lastSeen.getMessage().getMsgId());
-                    log("Result of markAsRead: "+markAsRead);
+                    if(!lastSeen.isUploading()){
+                        if(lastSeen.getMessage()!=null){
+                            boolean markAsRead = megaChatApi.setMessageSeen(idChat, lastSeen.getMessage().getMsgId());
+                            log("Result of markAsRead: "+markAsRead);
+                        }
+                    }
                 }
             }
 
