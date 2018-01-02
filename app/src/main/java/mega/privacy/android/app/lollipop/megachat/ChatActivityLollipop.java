@@ -3052,10 +3052,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             log("CONTENT: "+msg.getContent());
         }
 
-        if(megaChatApi.getConnectionState()==MegaChatApi.CHAT_CONNECTION_LOGGING){
-            log("CHAT_CONNECTION_LOGGING: no process message - return");
-            return;
-        }
+//        if(megaChatApi.getConnectionState()==MegaChatApi.CHAT_CONNECTION_LOGGING){
+//            log("CHAT_CONNECTION_LOGGING: no process message - return");
+//            return;
+//        }
 
         if(msg.getType()==MegaChatMessage.TYPE_REVOKE_NODE_ATTACHMENT) {
             log("TYPE_REVOKE_NODE_ATTACHMENT MESSAGE!!!!");
