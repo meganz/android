@@ -234,6 +234,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	TextView rightUpgradeButton;
 	FloatingActionButton fabButton;
 
+	AlertDialog evaluateAppDialog;
+
+
 	MegaNode inboxNode = null;
 
 	boolean mkLayoutVisible = false;
@@ -14884,5 +14887,138 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 		}
 	}
+
+
+	public void showEvaluatedAppDialog(){
+		if(megaChatApi.isSignalActivityRequired()){
+			megaChatApi.signalPresenceActivity();
+		}
+
+		LayoutInflater inflater = getLayoutInflater();
+		View dialoglayout = inflater.inflate(R.layout.evaluate_the_app_dialog, null);
+
+		final CheckedTextView rateAppCheck = (CheckedTextView) dialoglayout.findViewById(R.id.rate_the_app);
+		rateAppCheck.setText(getString(R.string.rate_the_app_panel));
+		rateAppCheck.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16*scaleText));
+		rateAppCheck.setCompoundDrawablePadding(Util.scaleWidthPx(10, outMetrics));
+		ViewGroup.MarginLayoutParams rateAppMLP = (ViewGroup.MarginLayoutParams) rateAppCheck.getLayoutParams();
+		rateAppMLP.setMargins(Util.scaleWidthPx(15, outMetrics), Util.scaleHeightPx(10, outMetrics), 0, Util.scaleHeightPx(10, outMetrics));
+
+		final CheckedTextView sendFeedbackCheck = (CheckedTextView) dialoglayout.findViewById(R.id.send_feedback);
+		sendFeedbackCheck.setText(getString(R.string.send_feedback_panel));
+		sendFeedbackCheck.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16*scaleText));
+		sendFeedbackCheck.setCompoundDrawablePadding(Util.scaleWidthPx(10, outMetrics));
+		ViewGroup.MarginLayoutParams sendFeedbackMLP = (ViewGroup.MarginLayoutParams) sendFeedbackCheck.getLayoutParams();
+		sendFeedbackMLP.setMargins(Util.scaleWidthPx(15, outMetrics), Util.scaleHeightPx(10, outMetrics), 0, Util.scaleHeightPx(10, outMetrics));
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		builder.setView(dialoglayout);
+
+		builder.setTitle(getString(R.string.title_evaluate_the_app_panel));
+		evaluateAppDialog = builder.create();
+
+		evaluateAppDialog.show();
+
+
+		final AlertDialog dialog = permissionsDialog;
+		rateAppCheck.setOnClickListener(new View.OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				log("Rate the app");
+				//Rate the app option:
+				startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=mega.privacy.android.app") ) );
+
+				if (dialog != null){
+					dialog.dismiss();
+				}
+			}
+		});
+
+		sendFeedbackCheck.setOnClickListener(new View.OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				log("Send Feedback");
+
+				//Send feedback option:
+				StringBuilder body = new StringBuilder();
+				body.append(getString(R.string.setting_feedback_body));
+				body.append("\n\n\n\n\n\n\n\n\n\n\n");
+				body.append(getString(R.string.settings_feedback_body_device_model)+"  "+getDeviceName()+"\n");
+				body.append(getString(R.string.settings_feedback_body_android_version)+"  "+Build.VERSION.RELEASE+" "+Build.DISPLAY+"\n");
+				body.append(getString(R.string.user_account_feedback)+"  "+megaApi.getMyEmail());
+
+				myAccountInfo = getMyAccountInfo();
+				if(myAccountInfo!=null){
+					if(myAccountInfo.getAccountType()<0||myAccountInfo.getAccountType()>4){
+						body.append(" ("+getString(R.string.my_account_free)+")");
+					}
+					else{
+						switch(myAccountInfo.getAccountType()){
+							case 0:{
+								body.append(" ("+getString(R.string.my_account_free)+")");
+								break;
+							}
+							case 1:{
+								body.append(" ("+getString(R.string.my_account_pro1)+")");
+								break;
+							}
+							case 2:{
+								body.append(" ("+getString(R.string.my_account_pro2)+")");
+								break;
+							}
+							case 3:{
+								body.append(" ("+getString(R.string.my_account_pro3)+")");
+								break;
+							}
+							case 4:{
+								body.append(" (PRO "+getString(R.string.my_account_prolite)+")");
+								break;
+							}
+						}
+					}
+				}
+
+				String emailAndroid = Constants.MAIL_ANDROID;
+				String versionApp = (getString(R.string.app_version));
+				String subject = getString(R.string.setting_feedback_subject)+" v"+versionApp;
+
+				Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:" + emailAndroid));
+				emailIntent.putExtra(Intent.EXTRA_SUBJECT, subject);
+				emailIntent.putExtra(Intent.EXTRA_TEXT, body.toString());
+				startActivity(Intent.createChooser(emailIntent, " "));
+
+				if (dialog != null){
+					dialog.dismiss();
+				}
+			}
+		});
+
+
+	}
+
+	public String getDeviceName() {
+		String manufacturer = Build.MANUFACTURER;
+		String model = Build.MODEL;
+		if (model.startsWith(manufacturer)) {
+			return capitalize(model);
+		} else {
+			return capitalize(manufacturer) + " " + model;
+		}
+	}
+
+	private String capitalize(String s) {
+		if (s == null || s.length() == 0) {
+			return "";
+		}
+		char first = s.charAt(0);
+		if (Character.isUpperCase(first)) {
+			return s;
+		} else {
+			return Character.toUpperCase(first) + s.substring(1);
+		}
+	}
+
 
 }
