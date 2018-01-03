@@ -878,7 +878,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             }
         });
 
-        log("Cambio permisos");
+        log("Change permissions");
     }
 
     public void changePermissions(int newPermissions){
