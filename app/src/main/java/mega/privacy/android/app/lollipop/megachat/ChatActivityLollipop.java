@@ -1,20 +1,25 @@
 package mega.privacy.android.app.lollipop.megachat;
 
 import android.Manifest;
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
+import android.provider.MediaStore;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.FileProvider;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
@@ -48,6 +53,8 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -59,6 +66,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
+import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.components.NpaLinearLayoutManager;
 import mega.privacy.android.app.components.emojicon.EmojiconEditText;
 import mega.privacy.android.app.components.emojicon.EmojiconGridFragment;
@@ -72,6 +80,7 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PinActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.listeners.MultipleGroupChatRequestListener;
+import mega.privacy.android.app.lollipop.managerSections.FileBrowserFragmentLollipop;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaChatLollipopAdapter;
 import mega.privacy.android.app.lollipop.tasks.FilePrepareTask;
@@ -1571,7 +1580,25 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 hideMultipleSelect();
             }
         }
-        else{
+        else if (requestCode == Constants.TAKE_PHOTO_CODE) {
+            log("TAKE_PHOTO_CODE");
+            if (resultCode == Activity.RESULT_OK) {
+                String filePath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.temporalPicDIR + "/picture.jpg";
+                File imgFile = new File(filePath);
+
+                String name = Util.getPhotoSyncName(imgFile.lastModified(), imgFile.getAbsolutePath());
+                log("Taken picture Name: " + name);
+                String newPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.temporalPicDIR + "/" + name;
+                log("----NEW Name: " + newPath);
+                File newFile = new File(newPath);
+                imgFile.renameTo(newFile);
+
+                uploadTakePicture(newPath);
+            } else {
+                log("TAKE_PHOTO_CODE--->ERROR!");
+            }
+
+        }else{
             log("Error onActivityResult");
         }
 
@@ -1722,6 +1749,30 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 break;
             }
             case R.id.media_icon_chat:{
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
+                    if (!hasStoragePermission) {
+                        ActivityCompat.requestPermissions(this,
+                                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                                Constants.REQUEST_WRITE_STORAGE);
+                    }
+
+                    boolean hasCameraPermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED);
+                    if (!hasCameraPermission) {
+                        ActivityCompat.requestPermissions(this,
+                                new String[]{Manifest.permission.CAMERA},
+                                Constants.REQUEST_CAMERA);
+                    }
+
+                    if (hasStoragePermission && hasCameraPermission){
+                        this.takePicture();
+                    }
+                }
+                else{
+                    this.takePicture();
+                }
+
 
                 if (emojiKeyboardShown) {
                     keyboardButton.setImageResource(R.drawable.ic_emoticon_white);
@@ -4562,4 +4613,63 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     public void onChatConnectionStateUpdate(MegaChatApiJava api, long chatid, int newState) {
             supportInvalidateOptionsMenu();
     }
+
+    public void takePicture(){
+        log("takePicture");
+        String path = Environment.getExternalStorageDirectory().getAbsolutePath() +"/"+ Util.temporalPicDIR;
+        File newFolder = new File(path);
+        newFolder.mkdirs();
+
+        String file = path + "/picture.jpg";
+        File newFile = new File(file);
+        try {
+            newFile.createNewFile();
+        } catch (IOException e) {}
+
+        Uri outputFileUri;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            outputFileUri = FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", newFile);
+        }
+        else{
+            outputFileUri = Uri.fromFile(newFile);
+        }
+
+        Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, outputFileUri);
+        cameraIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        startActivityForResult(cameraIntent, Constants.TAKE_PHOTO_CODE);
+    }
+
+    public void uploadTakePicture(String imagePath){
+        log("uploadTakePicture");
+
+        Intent intent = new Intent(this, ChatUploadService.class);
+        File selfie = new File(imagePath);
+
+        long timestamp = System.currentTimeMillis()/1000;
+        long idPendingMsg = dbH.setPendingMessage(idChat+"", Long.toString(timestamp));
+        if(idPendingMsg!=-1){
+            intent.putExtra(ChatUploadService.EXTRA_ID_PEND_MSG, idPendingMsg);
+        }
+
+        log("name of the file: "+selfie.getName());
+        log("size of the file: "+selfie.length());
+        String fingerprint = megaApi.getFingerprint(selfie.getAbsolutePath());
+
+        long idNode = dbH.setNodeAttachment(selfie.getAbsolutePath(), selfie.getName(), fingerprint);
+        dbH.setMsgNode(idPendingMsg, idNode);
+
+        PendingNodeAttachment nodeAttachment = new PendingNodeAttachment(selfie.getAbsolutePath(), fingerprint, selfie.getName());
+        ArrayList<PendingNodeAttachment> nodeAttachments = new ArrayList<>();
+        nodeAttachments.add(nodeAttachment);
+        PendingMessage newPendingMsg = new PendingMessage(idPendingMsg, idChat, nodeAttachments, timestamp, PendingMessage.STATE_SENDING);
+        AndroidMegaChatMessage newNodeAttachmentMsg = new AndroidMegaChatMessage(newPendingMsg, true);
+        sendMessageUploading(newNodeAttachmentMsg);
+
+        intent.putStringArrayListExtra(ChatUploadService.EXTRA_FILEPATHS, newPendingMsg.getFilePaths());
+        intent.putExtra(ChatUploadService.EXTRA_CHAT_ID, idChat);
+
+        startService(intent);
+    }
+
 }
