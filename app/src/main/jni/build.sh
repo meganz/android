@@ -69,17 +69,17 @@ LIBUV_DOWNLOAD_URL=http://dist.libuv.org/dist/v${LIBUV_VERSION}/${LIBUV_SOURCE_F
 LIBUV_SHA1="91ea51844ec0fac1c6358a7ad3e8bba128e9d0cc"
 
 LIBWEBSOCKETS=libwebsockets
-LIBWEBSOCKETS_VERSION=2.2.2
-LIBWEBSOCKETS_SOURCE_FILE=libwebsockets-${LIBWEBSOCKETS_VERSION}.tar.gz
+LIBWEBSOCKETS_VERSION=bce3f98f1b2fd3ad5cd18b01cbb1e68dc2be29dd
+LIBWEBSOCKETS_SOURCE_FILE=libwebsockets-${LIBWEBSOCKETS_VERSION}.zip
 LIBWEBSOCKETS_SOURCE_FOLDER=libwebsockets-${LIBWEBSOCKETS_VERSION}
-LIBWEBSOCKETS_DOWNLOAD_URL=https://github.com/warmcat/libwebsockets/archive/v${LIBWEBSOCKETS_VERSION}.tar.gz
-LIBWEBSOCKETS_SHA1="09cc816c70468270fc34efb17c8fce9676b16777"
+LIBWEBSOCKETS_DOWNLOAD_URL=https://github.com/warmcat/libwebsockets/archive/${LIBWEBSOCKETS_VERSION}.zip
+LIBWEBSOCKETS_SHA1="6bc1801b397769cf5a37f888eb57ef2499309215"
 
 PDFVIEWER=pdfviewer
-PDFVIEWER_VERSION=1.8.0
-PDFVIEWER_SOURCE_FILE=master.zip
-PDFVIEWER_DOWNLOAD_URL=https://github.com/barteksc/PdfiumAndroid/archive/${PDFVIEWER_SOURCE_FILE}
-PDFVIEWER_SHA1="4dfd78dcd7c90b00cf3d1077b0746ffd977c5208"
+PDFVIEWER_VERSION=981f4ccae1d76bf1e6e0cb2eee1b54bafdfd138c
+PDFVIEWER_SOURCE_FILE=PdfiumAndroid-${PDFVIEWER_VERSION}.zip
+PDFVIEWER_DOWNLOAD_URL=https://github.com/barteksc/PdfiumAndroid/archive/${PDFVIEWER_VERSION}.zip
+PDFVIEWER_SHA1="8839e302908c18d6661d73a7f53f6591cc9ed42f"
 
 function downloadCheckAndUnpack()
 {
@@ -220,8 +220,8 @@ if [ "$1" == "clean" ]; then
 
     rm -rf ${PDFVIEWER}/${PDFVIEWER_SOURCE_FILE}
     rm -rf ${PDFVIEWER}/${PDFVIEWER_SOURCE_FILE}.ready
-	rm -rf ../obj/local/armeabi/
-	rm -rf ../obj/local/x86
+    rm -rf ../obj/local/armeabi/
+    rm -rf ../obj/local/x86
     echo "* Task finished OK"
     exit 0
 fi
@@ -339,15 +339,16 @@ echo "* Setting up PdfViewer"
 if [ ! -f ${PDFVIEWER}/${PDFVIEWER_SOURCE_FILE}.ready ]; then
     downloadCheckAndUnpack ${PDFVIEWER_DOWNLOAD_URL} ${PDFVIEWER}/${PDFVIEWER_SOURCE_FILE} ${PDFVIEWER_SHA1} ${PDFVIEWER}
     cd ${PDFVIEWER}
+    rm -rf ${PDFVIEWER}
     mkdir ${PDFVIEWER}
     cd ${PDFVIEWER}
     mkdir include
     mkdir lib
     mkdir src
-    cp -R ../PdfiumAndroid-master/src/main/jni/include/* ./include/
-    cp -R ../PdfiumAndroid-master/src/main/jni/lib/* ./lib/
-    cp -R ../PdfiumAndroid-master/src/main/jni/src/* ./src/
-    rm -rf ../PdfiumAndroid-master
+    cp -R ../PdfiumAndroid-${PDFVIEWER_VERSION}/src/main/jni/include/* ./include/
+    cp -R ../PdfiumAndroid-${PDFVIEWER_VERSION}/src/main/jni/lib/* ./lib/
+    cp -R ../PdfiumAndroid-${PDFVIEWER_VERSION}/src/main/jni/src/* ./src/
+    rm -rf ../PdfiumAndroid-${PDFVIEWER_VERSION}
     cd ../..
     touch ${PDFVIEWER}/${PDFVIEWER_SOURCE_FILE}.ready
 fi
