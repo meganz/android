@@ -7,7 +7,7 @@
     android:layout_marginLeft="16dp"
     android:layout_marginRight="36dp"
     android:layout_marginBottom="20dp"
-    android:background="@color/participants_layout">
+    android:background="@color/background_chat">
 
     <LinearLayout
         android:id="@+id/mega_info_layout"
