@@ -133,4 +133,6 @@
     <color name="own_messages">#FF00BFA6</color>
 
     <color name="keyboard_chat_separator">#1F000000</color>
+    <color name="background_chat">#FFFFFFFF</color>
+
 </resources>
