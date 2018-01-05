@@ -71,6 +71,8 @@ public class ParticipantBottomSheetDialogFragment extends BottomSheetDialogFragm
     MegaApiAndroid megaApi;
     MegaChatApiAndroid megaChatApi = null;
 
+    private int heightDisplay;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -110,6 +112,8 @@ public class ParticipantBottomSheetDialogFragment extends BottomSheetDialogFragm
         Display display = getActivity().getWindowManager().getDefaultDisplay();
         outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
+
+        heightDisplay = outMetrics.heightPixels;
 
         super.setupDialog(dialog, style);
         View contentView = View.inflate(getContext(), R.layout.bottom_sheet_group_participant, null);
@@ -286,6 +290,16 @@ public class ParticipantBottomSheetDialogFragment extends BottomSheetDialogFragm
         }
 
         dialog.setContentView(contentView);
+
+        mBehavior = BottomSheetBehavior.from((View) mainLinearLayout.getParent());
+        mBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+
+        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            mBehavior.setPeekHeight((heightDisplay / 4) * 2);
+        }
+        else if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT){
+            mBehavior.setPeekHeight(BottomSheetBehavior.PEEK_HEIGHT_AUTO);
+        }
     }
 
     public void addAvatarParticipantPanel(long handle, String email, String myName){
