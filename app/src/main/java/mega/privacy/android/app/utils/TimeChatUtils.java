@@ -109,7 +109,9 @@ public class TimeChatUtils implements Comparator<Calendar> {
             df = SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.LONG, SimpleDateFormat.SHORT, Locale.getDefault());
         }
         else{
-            df = SimpleDateFormat.getDateInstance(SimpleDateFormat.LONG, Locale.getDefault());
+            df = new SimpleDateFormat("EEE d MMM");
+
+            //df = SimpleDateFormat.getDateInstance(SimpleDateFormat.LONG, Locale.getDefault());
         }
 
         Calendar cal = Util.calculateDateFromTimestamp(timestamp);
