@@ -7,18 +7,24 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.media.ExifInterface;
 import android.media.MediaMetadataRetriever;
 import android.net.wifi.WifiManager;
 import android.net.wifi.WifiManager.WifiLock;
 import android.os.Build;
 import android.os.IBinder;
+import android.os.ParcelFileDescriptor;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 import android.support.v4.app.NotificationCompat;
 import android.widget.RemoteViews;
 
+import com.shockwave.pdfium.PdfDocument;
+import com.shockwave.pdfium.PdfiumCore;
+
 import java.io.File;
+import java.io.FileOutputStream;
 import java.util.ArrayList;
 
 import mega.privacy.android.app.DatabaseHandler;
@@ -448,6 +454,47 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 					log("Is pdf!!!");
 
 					ThumbnailUtilsLollipop.createThumbnailPdf(this, transfer.getPath(), megaApi, transfer.getNodeHandle());
+
+					int pageNumber = 0;
+					PdfiumCore pdfiumCore = new PdfiumCore(this);
+					FileOutputStream out = null;
+					MegaNode pdfNode = megaApi.getNodeByHandle(transfer.getNodeHandle());
+
+					if (pdfNode == null){
+						log("pdf is NULL");
+						return;
+					}
+
+					File file = new File(transfer.getPath());
+					try {
+						PdfDocument pdfDocument = pdfiumCore.newDocument(ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_ONLY));
+						pdfiumCore.openPage(pdfDocument, pageNumber);
+						int width = pdfiumCore.getPageWidthPoint(pdfDocument, pageNumber);
+						int height = pdfiumCore.getPageHeightPoint(pdfDocument, pageNumber);
+						Bitmap bmp = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+						pdfiumCore.renderPageBitmap(pdfDocument, bmp, pageNumber, 0, 0, width, height);
+						Bitmap resizedBitmap;
+						resizedBitmap = Bitmap.createScaledBitmap(bmp, width/3, height/3, false);
+						out = new FileOutputStream(preview);
+						boolean result = resizedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, out); // bmp is your Bitmap instance
+						if(result){
+							log("Compress OK!");
+							megaApi.setPreview(pdfNode, preview.getAbsolutePath());
+						}
+						else{
+							log("Not Compress");
+						}
+						pdfiumCore.closeDocument(pdfDocument);
+					} catch(Exception e) {
+						//todo with exception
+					} finally {
+						try {
+							if (out != null)
+								out.close();
+						} catch (Exception e) {
+							//todo with exception
+						}
+					}
 				}
                 else{
                     log("NOT video, image or pdf!");
