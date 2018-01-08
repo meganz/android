@@ -202,6 +202,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
             case android.R.id.home: {
                 log("Hang call");
                 megaChatApi.hangChatCall(chatId, null);
+                MegaApplication.activityPaused();
                 finish();
                 break;
             }
@@ -350,6 +351,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                 callChat = megaChatApi.getChatCall(chatId);
                 if (callChat == null){
                     megaChatApi.removeChatCallListener(this);
+                    MegaApplication.activityPaused();
                     finish();
                     return;
                 }
@@ -631,8 +633,11 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
         this.getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
         this.getWindow().addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
 
+        MegaApplication.activityResumed();
+
         ((MegaApplication) getApplication()).sendSignalPresenceActivity();
     }
+
 
     @Override
     public void onDestroy(){
@@ -644,6 +649,8 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
             timer.cancel();
             timer = null;
         }
+        MegaApplication.activityPaused();
+
         super.onDestroy();
     }
 
@@ -675,6 +682,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
     public void onRequestFinish(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
         log("onRequestFinish");
         if(request.getType() == MegaChatRequest.TYPE_HANG_CHAT_CALL){
+            MegaApplication.activityPaused();
             finish();
         }
         else if(request.getType() == MegaChatRequest.TYPE_ANSWER_CHAT_CALL){
@@ -695,6 +703,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
             }
             else{
                 log("Error call: "+e.getErrorString());
+                MegaApplication.activityPaused();
                 finish();
 //                showSnackbar(getString(R.string.clear_history_error));
             }
@@ -804,6 +813,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                     }
 
                     rtcAudioManager.stop();
+                    MegaApplication.activityPaused();
                     finish();
                     break;
                 }
