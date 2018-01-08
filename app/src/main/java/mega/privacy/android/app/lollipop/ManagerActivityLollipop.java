@@ -14680,6 +14680,16 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	@Override
 	public void onChatConnectionStateUpdate(MegaChatApiJava api, long chatid, int newState) {
 		log("onChatConnectionStateUpdate: "+chatid);
+
+		if(newState==MegaChatApi.CHAT_CONNECTION_ONLINE && chatid==-1){
+			log("Online Connection: "+chatid);
+			if (rChatFL != null){
+				if(rChatFL.isAdded()){
+					rChatFL.setChats();
+					rChatFL.setStatus();
+				}
+			}
+		}
 	}
 
 	public boolean isMkLayoutVisible() {
