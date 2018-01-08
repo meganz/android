@@ -427,6 +427,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
         keyboardButton = (ImageButton) findViewById(R.id.keyboard_icon_chat);
         textChat = (EmojiconEditText) findViewById(R.id.edit_text_chat);
+
         keyboardButton.setOnClickListener(this);
 
         textChat.addTextChangedListener(new TextWatcher() {
