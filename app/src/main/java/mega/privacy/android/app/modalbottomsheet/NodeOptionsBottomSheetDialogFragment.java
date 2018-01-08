@@ -97,6 +97,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
     private int height = -1;
     private boolean heightseted = false;
     private int heightReal = -1;
+    private int heightDisplay;
 
     private View contentView;
 
@@ -141,6 +142,8 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
         Display display = getActivity().getWindowManager().getDefaultDisplay();
         outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
+
+        heightDisplay = outMetrics.heightPixels;
 
         contentView = View.inflate(getContext(), R.layout.bottom_sheet_node_item, null);
 
@@ -631,6 +634,13 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
 
 
             final NodeOptionsBottomSheetDialogFragment thisclass = this;
+
+            if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                mBehavior.setPeekHeight((heightDisplay / 4) * 2);
+            }
+            else if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT){
+                mBehavior.setPeekHeight(BottomSheetBehavior.PEEK_HEIGHT_AUTO);
+            }
 
             mBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
                 @Override
