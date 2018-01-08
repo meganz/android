@@ -177,32 +177,37 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
                         performLoginProccess(gSession);
                     }
                 }
-                else if(remoteMessageType.equals("2") || remoteMessageType.equals("4")){
+                else if(remoteMessageType.equals("4")) {
+                    String gSession = credentials.getSession();
+
+                    if (megaApi.getRootNode() == null) {
+                        log("RootNode = null");
+                        performLoginProccess(gSession);
+                    }
+
+                }else if(remoteMessageType.equals("2")){
                     String gSession = credentials.getSession();
                     if (megaApi.getRootNode() == null){
                         log("RootNode = null");
                         performLoginProccess(gSession);
 
-                        String type = remoteMessage.getData().get("type");
-                        if(type.equals("2")){
-                            h = new Handler(Looper.getMainLooper());
-                            h.postDelayed(
-                                    new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            if(!shown){
-                                                log("Show simple notification - no connection finished");
-                                                shown=true;
-                                                notificationBuilder.showSimpleNotification();
-                                            }
-                                            else{
-                                                log("Notification already shown");
-                                            }
+                        h = new Handler(Looper.getMainLooper());
+                        h.postDelayed(
+                                new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        if(!shown){
+                                            log("Show simple notification - no connection finished");
+                                            shown=true;
+                                            notificationBuilder.showSimpleNotification();
                                         }
-                                    },
-                                    10000
-                            );
-                        }
+                                        else{
+                                            log("Notification already shown");
+                                        }
+                                    }
+                                },
+                                10000
+                        );
                     }
                     else{
                         log("Chat notification");
