@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -76,6 +77,8 @@ public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment imp
     MegaChatApiAndroid megaChatApi;
     DatabaseHandler dbH;
 
+    private int heightDisplay;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -113,6 +116,8 @@ public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment imp
         Display display = getActivity().getWindowManager().getDefaultDisplay();
         outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
+
+        heightDisplay = outMetrics.heightPixels;
 
         super.setupDialog(dialog, style);
         View contentView = View.inflate(getContext(), R.layout.chat_item_bottom_sheet, null);
@@ -268,6 +273,17 @@ public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment imp
 		}
 
         dialog.setContentView(contentView);
+
+        mBehavior = BottomSheetBehavior.from((View) mainLinearLayout.getParent());
+        mBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+
+        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            mBehavior.setPeekHeight((heightDisplay / 4) * 2);
+        }
+        else if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT){
+            mBehavior.setPeekHeight(BottomSheetBehavior.PEEK_HEIGHT_AUTO);
+        }
+
     }
 
     public void addAvatarChatPanel(String contactMail, MegaChatListItem chat){
