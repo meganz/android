@@ -1373,7 +1373,6 @@ public class ThumbnailUtilsLollipop {
 			if(result){
 				log("Compress OK!");
 				megaApi.setThumbnail(pdfNode, thumb.getAbsolutePath());
-				megaApi.setPreview(pdfNode, thumb.getAbsolutePath());
 			}
 			else{
 				log("Not Compress");

@@ -19,6 +19,7 @@ import android.graphics.Typeface;
 import android.media.ExifInterface;
 import android.os.AsyncTask;
 import android.os.Build;
+import android.os.ParcelFileDescriptor;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
@@ -45,11 +46,14 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.shockwave.pdfium.PdfDocument;
+import com.shockwave.pdfium.PdfiumCore;
 import com.vdurmont.emoji.Emoji;
 import com.vdurmont.emoji.EmojiManager;
 import com.vdurmont.emoji.EmojiParser;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -138,31 +142,70 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             log("doInBackground ChatUploadingPreviewAsyncTask");
             filePath = params[0];
             File currentFile = new File(filePath);
+            if (MimeTypeList.typeForName(filePath).isImage()){
+                log("Is image");
 
-            BitmapFactory.Options options = new BitmapFactory.Options();
-            options.inJustDecodeBounds = true;
-            Bitmap preview = BitmapFactory.decodeFile(currentFile.getAbsolutePath(), options);
+                BitmapFactory.Options options = new BitmapFactory.Options();
+                options.inJustDecodeBounds = true;
+                Bitmap preview = BitmapFactory.decodeFile(currentFile.getAbsolutePath(), options);
 
-            ExifInterface exif;
-            int orientation = ExifInterface.ORIENTATION_NORMAL;
-            try {
-                exif = new ExifInterface(currentFile.getAbsolutePath());
-                orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_UNDEFINED);
-            } catch (IOException e) {}
+                ExifInterface exif;
+                int orientation = ExifInterface.ORIENTATION_NORMAL;
+                try {
+                    exif = new ExifInterface(currentFile.getAbsolutePath());
+                    orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_UNDEFINED);
+                } catch (IOException e) {}
 
-            // Calculate inSampleSize
-            options.inSampleSize = Util.calculateInSampleSize(options, 1000, 1000);
+                // Calculate inSampleSize
+                options.inSampleSize = Util.calculateInSampleSize(options, 1000, 1000);
 
-            // Decode bitmap with inSampleSize set
-            options.inJustDecodeBounds = false;
+                // Decode bitmap with inSampleSize set
+                options.inJustDecodeBounds = false;
 
-            preview = BitmapFactory.decodeFile(currentFile.getAbsolutePath(), options);
-            if (preview != null){
-                preview = Util.rotateBitmap(preview, orientation);
+                preview = BitmapFactory.decodeFile(currentFile.getAbsolutePath(), options);
+                if (preview != null){
+                    preview = Util.rotateBitmap(preview, orientation);
 
-                long fingerprintCache = MegaApiAndroid.base64ToHandle(megaApi.getFingerprint(filePath));
-                PreviewUtils.setPreviewCache(fingerprintCache, preview);
-                return preview;
+                    long fingerprintCache = MegaApiAndroid.base64ToHandle(megaApi.getFingerprint(filePath));
+                    PreviewUtils.setPreviewCache(fingerprintCache, preview);
+                    return preview;
+                }
+            }
+            else if (MimeTypeList.typeForName(filePath).isPdf()){
+                log("Is pdf");
+
+                int pageNumber = 0;
+                PdfiumCore pdfiumCore = new PdfiumCore(context);
+                FileOutputStream out = null;
+                Bitmap preview = null;
+
+                try {
+                    PdfDocument pdfDocument = pdfiumCore.newDocument(ParcelFileDescriptor.open(currentFile, ParcelFileDescriptor.MODE_READ_ONLY));
+                    pdfiumCore.openPage(pdfDocument, pageNumber);
+                    int width = pdfiumCore.getPageWidthPoint(pdfDocument, pageNumber);
+                    int height = pdfiumCore.getPageHeightPoint(pdfDocument, pageNumber);
+                    Bitmap bmp = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+                    pdfiumCore.renderPageBitmap(pdfDocument, bmp, pageNumber, 0, 0, width, height);
+                    preview = Bitmap.createScaledBitmap(bmp, width/3, height/3, false);
+                    out = new FileOutputStream(filePath);
+                    preview.compress(Bitmap.CompressFormat.JPEG, 100, out); // bmp is your Bitmap instance
+                    pdfiumCore.closeDocument(pdfDocument);
+                } catch(Exception e) {
+                    //todo with exception
+                } finally {
+                    try {
+                        if (out != null)
+                            out.close();
+                    } catch (Exception e) {
+                        //todo with exception
+                    }
+                }
+                if (preview != null){
+
+                    long fingerprintCache = MegaApiAndroid.base64ToHandle(megaApi.getFingerprint(filePath));
+                    PreviewUtils.setPreviewCache(fingerprintCache, preview);
+                    return preview;
+                }
             }
 
             return null;
@@ -585,7 +628,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     log("Path of the file: "+paths.get(0));
                     long fingerprintCache = MegaApiAndroid.base64ToHandle(megaApi.getFingerprint(paths.get(0)));
 
-                    if (MimeTypeList.typeForName(paths.get(0)).isImage()){
+                    if (MimeTypeList.typeForName(paths.get(0)).isImage() || MimeTypeList.typeForName(paths.get(0)).isPdf()){
 
                         preview = PreviewUtils.getPreviewFromCache(fingerprintCache);
                         if (preview != null){
@@ -595,7 +638,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                             log("No preview!");
                             try{
-                                new MegaChatLollipopAdapter.ChatUploadingPreviewAsyncTask(((ViewHolderMessageChat)holder)).execute(paths.get(0));
+                                new ChatUploadingPreviewAsyncTask(((ViewHolderMessageChat)holder)).execute(paths.get(0));
                             }
                             catch(Exception e){
                                 //Too many AsyncTasks
