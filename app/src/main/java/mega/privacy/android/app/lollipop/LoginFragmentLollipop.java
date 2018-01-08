@@ -577,6 +577,12 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     else if(intentReceived.getAction().equals(Constants.ACTION_OPEN_HANDLE_NODE)){
                         url = intentReceived.getDataString();
                     }
+                    else if(intentReceived.getAction().equals(Constants.ACTION_OPEN_FILE_LINK_ROOTNODES_NULL)){
+                        uriData = intentReceived.getData();
+                    }
+                    else if(intentReceived.getAction().equals(Constants.ACTION_OPEN_FOLDER_LINK_ROOTNODES_NULL)){
+                        uriData = intentReceived.getData();
+                    }
 
                     MegaNode rootNode = megaApi.getRootNode();
                     if (rootNode != null){
@@ -596,6 +602,18 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                                 {
                                     intent.putExtras(extras);
                                 }
+                                intent.setData(uriData);
+                            }
+                            else if (action.equals(Constants.ACTION_OPEN_FILE_LINK_ROOTNODES_NULL)){
+                                intent = new Intent(context, FileLinkActivityLollipop.class);
+                                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                action = Constants.ACTION_OPEN_MEGA_LINK;
+                                intent.setData(uriData);
+                            }
+                            else if (action.equals(Constants.ACTION_OPEN_FOLDER_LINK_ROOTNODES_NULL)){
+                                intent = new Intent(context, FolderLinkActivityLollipop.class);
+                                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                action = Constants.ACTION_OPEN_MEGA_FOLDER_LINK;
                                 intent.setData(uriData);
                             }
                             intent.setAction(action);
@@ -635,6 +653,18 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                             {
                                 intent.putExtras(extras);
                             }
+                            intent.setData(uriData);
+                        }
+                        else if (action.equals(Constants.ACTION_OPEN_FILE_LINK_ROOTNODES_NULL)){
+                            intent = new Intent(context, FileLinkActivityLollipop.class);
+                            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                            action = Constants.ACTION_OPEN_MEGA_LINK;
+                            intent.setData(uriData);
+                        }
+                        else if (action.equals(Constants.ACTION_OPEN_FOLDER_LINK_ROOTNODES_NULL)){
+                            intent = new Intent(context, FolderLinkActivityLollipop.class);
+                            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                            action = Constants.ACTION_OPEN_MEGA_FOLDER_LINK;
                             intent.setData(uriData);
                         }
                         intent.setAction(action);
@@ -1505,6 +1535,18 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                                     {
                                         intent.setData(uriData);
                                     }
+                                }
+                                else if (action.equals(Constants.ACTION_OPEN_FILE_LINK_ROOTNODES_NULL)){
+                                    intent = new Intent(context, FileLinkActivityLollipop.class);
+                                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                    action = Constants.ACTION_OPEN_MEGA_LINK;
+                                    intent.setData(uriData);
+                                }
+                                else if (action.equals(Constants.ACTION_OPEN_FOLDER_LINK_ROOTNODES_NULL)){
+                                    intent = new Intent(context, FolderLinkActivityLollipop.class);
+                                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                    action = Constants.ACTION_OPEN_MEGA_FOLDER_LINK;
+                                    intent.setData(uriData);
                                 }
                                 intent.setAction(action);
                                 if (url != null){
