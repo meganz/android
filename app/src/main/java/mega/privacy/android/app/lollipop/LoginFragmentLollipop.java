@@ -875,10 +875,12 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 if (megaChatApi == null){
                     megaChatApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaChatApi();
                 }
-                log("INIT STATE: "+megaChatApi.getInitState());
-                int ret = -3;
-                if(megaChatApi.getInitState()!=MegaChatApi.INIT_OFFLINE_SESSION){
+                int ret = megaChatApi.getInitState();
+                log("initial: INIT STATE: "+ret);
+
+                if(ret!=MegaChatApi.INIT_OFFLINE_SESSION){
                     ret = megaChatApi.init(gSession);
+                    log("after init: INIT STATE: "+ret);
                 }
 
                 log("startFastLogin: result of init ---> "+ret);
