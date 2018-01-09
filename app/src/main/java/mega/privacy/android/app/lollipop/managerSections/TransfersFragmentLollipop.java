@@ -133,8 +133,10 @@ public class TransfersFragmentLollipop extends Fragment {
 
 		for(int i=0; i<((ManagerActivityLollipop)context).transfersInProgress.size();i++){
 			MegaTransfer transfer = megaApi.getTransferByTag(((ManagerActivityLollipop)context).transfersInProgress.get(i));
-			if(!transfer.isStreamingTransfer()){
-				tL.add(transfer);
+			if (transfer != null) {
+				if (!transfer.isStreamingTransfer()) {
+					tL.add(transfer);
+				}
 			}
 		}
 
