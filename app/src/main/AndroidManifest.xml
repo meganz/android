@@ -2,8 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="mega.privacy.android.app"
     android:installLocation="auto"
-    android:versionCode="171"
-    android:versionName="3.3 (171)" >
+    android:versionCode="173"
+    android:versionName="3.3 (173)" >
 
     <uses-sdk
         android:minSdkVersion="16"

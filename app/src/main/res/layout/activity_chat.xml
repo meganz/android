@@ -97,7 +97,7 @@
                         android:textSize="14sp"
                         android:hint="@string/type_message_hint"
                         android:layout_toLeftOf="@+id/attach_icon_chat"
-                        android:inputType="textMultiLine"
+                        android:inputType="textMultiLine|textNoSuggestions"
                         emojicon:emojiconSize="16sp"
                         android:minLines="2"
                         android:lines="6"/>
