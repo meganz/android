@@ -151,30 +151,30 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
 
         app = (MegaApplication)getApplication();
         megaApi = app.getMegaApi();
-        if(megaApi==null||megaApi.getRootNode()==null){
-            log("Refresh session - sdk");
-            Intent intentLogin = new Intent(this, LoginActivityLollipop.class);
-            intentLogin.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
-            intentLogin.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivity(intentLogin);
-            finish();
-            return;
-        }
-        if(Util.isChatEnabled()){
-            if (megaChatApi == null){
-                megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
-            }
-
-            if(megaChatApi==null||megaChatApi.getInitState()== MegaChatApi.INIT_ERROR){
-                log("Refresh session - karere");
-                Intent intentLogin = new Intent(this, LoginActivityLollipop.class);
-                intentLogin.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
-                intentLogin.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                startActivity(intentLogin);
-                finish();
-                return;
-            }
-        }
+//        if(megaApi==null||megaApi.getRootNode()==null){
+//            log("Refresh session - sdk");
+//            Intent intentLogin = new Intent(this, LoginActivityLollipop.class);
+//            intentLogin.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
+//            intentLogin.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+//            startActivity(intentLogin);
+//            finish();
+//            return;
+//        }
+//        if(Util.isChatEnabled()){
+//            if (megaChatApi == null){
+//                megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
+//            }
+//
+//            if(megaChatApi==null||megaChatApi.getInitState()== MegaChatApi.INIT_ERROR){
+//                log("Refresh session - karere");
+//                Intent intentLogin = new Intent(this, LoginActivityLollipop.class);
+//                intentLogin.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
+//                intentLogin.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+//                startActivity(intentLogin);
+//                finish();
+//                return;
+//            }
+//        }
         setContentView(R.layout.activity_pdfviewer);
 
         appBarLayout = (AppBarLayout) findViewById(R.id.app_bar_pdfviewer);

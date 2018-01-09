@@ -2037,7 +2037,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				log("Connect to chat!: "+megaChatApi.getInitState());
 
 				if(megaChatApi!=null){
-					if((megaChatApi.getInitState()!=MegaChatApi.INIT_ERROR)&&(megaChatApi.getInitState()!=MegaChatApi.INIT_WAITING_NEW_SESSION)&&(megaChatApi.getInitState()!=MegaChatApi.INIT_NO_CACHE)){
+					if((megaChatApi.getInitState()!=MegaChatApi.INIT_ERROR)){
 						log("Connection goes!!!");
 						megaChatApi.connect(this);
 					}
@@ -14680,6 +14680,16 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	@Override
 	public void onChatConnectionStateUpdate(MegaChatApiJava api, long chatid, int newState) {
 		log("onChatConnectionStateUpdate: "+chatid);
+
+		if(newState==MegaChatApi.CHAT_CONNECTION_ONLINE && chatid==-1){
+			log("Online Connection: "+chatid);
+			if (rChatFL != null){
+				if(rChatFL.isAdded()){
+					rChatFL.setChats();
+					rChatFL.setStatus();
+				}
+			}
+		}
 	}
 
 	public boolean isMkLayoutVisible() {
