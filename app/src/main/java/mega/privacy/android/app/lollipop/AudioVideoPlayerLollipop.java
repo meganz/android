@@ -621,7 +621,9 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
         if (megaApi != null) {
             megaApi.removeTransferListener(this);
         }
-        player.release();
+        if (player != null){
+            player.release();
+        }
 
         super.onDestroy();
     }
