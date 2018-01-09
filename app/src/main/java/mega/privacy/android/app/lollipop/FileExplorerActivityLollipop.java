@@ -602,7 +602,11 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 						viewPagerExplorer.setAdapter(mTabsAdapterExplorer);
 						tabLayoutExplorer.setupWithViewPager(viewPagerExplorer);
 
-						tabLayoutExplorer.removeTabAt(2);
+						if (mTabsAdapterExplorer != null) {
+							if (mTabsAdapterExplorer.getCount() > 2) {
+								tabLayoutExplorer.removeTabAt(2);
+							}
+						}
 					}
 					else{
 						log("mTabsAdapterExplorer != null");
@@ -638,7 +642,11 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 						viewPagerExplorer.setAdapter(mTabsAdapterExplorer);
 						tabLayoutExplorer.setupWithViewPager(viewPagerExplorer);
 
-						tabLayoutExplorer.removeTabAt(2);
+						if (mTabsAdapterExplorer != null) {
+							if (mTabsAdapterExplorer.getCount() > 2) {
+								tabLayoutExplorer.removeTabAt(2);
+							}
+						}
 					}
 
 					MegaNode p;
@@ -663,7 +671,11 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 						viewPagerExplorer.setAdapter(mTabsAdapterExplorer);
 						tabLayoutExplorer.setupWithViewPager(viewPagerExplorer);
 
-						tabLayoutExplorer.removeTabAt(2);
+						if (mTabsAdapterExplorer != null) {
+							if (mTabsAdapterExplorer.getCount() > 2) {
+								tabLayoutExplorer.removeTabAt(2);
+							}
+						}
 					}
 				}
 				else if (intent.getAction().equals(ACTION_PICK_IMPORT_FOLDER)){
@@ -677,7 +689,11 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 						viewPagerExplorer.setAdapter(mTabsAdapterExplorer);
 						tabLayoutExplorer.setupWithViewPager(viewPagerExplorer);
 
-						tabLayoutExplorer.removeTabAt(2);
+						if (mTabsAdapterExplorer != null) {
+							if (mTabsAdapterExplorer.getCount() > 2) {
+								tabLayoutExplorer.removeTabAt(2);
+							}
+						}
 					}
 				}
 				else if ((intent.getAction().equals(ACTION_SELECT_FOLDER))){
@@ -692,7 +708,11 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 						viewPagerExplorer.setAdapter(mTabsAdapterExplorer);
 						tabLayoutExplorer.setupWithViewPager(viewPagerExplorer);
 
-						tabLayoutExplorer.removeTabAt(2);
+						if (mTabsAdapterExplorer != null) {
+							if (mTabsAdapterExplorer.getCount() > 2) {
+								tabLayoutExplorer.removeTabAt(2);
+							}
+						}
 					}
 				}
 				else{
