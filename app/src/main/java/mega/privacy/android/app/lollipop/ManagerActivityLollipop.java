@@ -7709,22 +7709,26 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			int index = viewPagerCDrive.getCurrentItem();
 			if(index==1){
 				//Rubbish Bin
-				rubbishBinFLol = (RubbishBinFragmentLollipop) cloudPageAdapter.instantiateItem(viewPagerCDrive, 1);
-				if (rubbishBinFLol != null){
-					if (rubbishBinFLol.onBackPressed() == 0){
-						viewPagerCDrive.setCurrentItem(0);
+				if (cloudPageAdapter != null) {
+					rubbishBinFLol = (RubbishBinFragmentLollipop) cloudPageAdapter.instantiateItem(viewPagerCDrive, 1);
+					if (rubbishBinFLol != null) {
+						if (rubbishBinFLol.onBackPressed() == 0) {
+							viewPagerCDrive.setCurrentItem(0);
+						}
+						return;
 					}
-					return;
 				}
 			}
 			else if(index==0){
 				//Cloud Drive
-				fbFLol = (FileBrowserFragmentLollipop) cloudPageAdapter.instantiateItem(viewPagerCDrive, 0);
-				if (fbFLol != null){
-					if (fbFLol.onBackPressed() == 0){
-						super.onBackPressed();
+				if (cloudPageAdapter != null) {
+					fbFLol = (FileBrowserFragmentLollipop) cloudPageAdapter.instantiateItem(viewPagerCDrive, 0);
+					if (fbFLol != null) {
+						if (fbFLol.onBackPressed() == 0) {
+							super.onBackPressed();
+						}
+						return;
 					}
-					return;
 				}
 			}
 
