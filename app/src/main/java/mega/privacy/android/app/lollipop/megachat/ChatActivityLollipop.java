@@ -3181,18 +3181,14 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
             if(msg.getType()==MegaChatMessage.TYPE_TRUNCATE){
                 log("TRUNCATE MESSAGE");
-                messages.clear();
-                androidMsg.setInfoToShow(Constants.CHAT_ADAPTER_SHOW_ALL);
-                messages.add(androidMsg);
-                adapter.setMessages(messages);
-                adapter.notifyDataSetChanged();
-                invalidateOptionsMenu();
+                clearHistory(androidMsg);
             }
             else{
                 if(msg.isDeleted()){
                     log("Message deleted!!");
                 }
                 resultModify = modifyMessageReceived(androidMsg, false);
+                log("onMessageUpdate: resultModify: "+resultModify);
             }
         }
         else{
@@ -3225,6 +3221,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             if(msg.getStatus()==MegaChatMessage.STATUS_SERVER_RECEIVED){
                 log("STATUS_SERVER_RECEIVED");
                 resultModify = modifyMessageReceived(androidMsg, true);
+                log("onMessageUpdate: resultModify: "+resultModify);
             }
             else{
                 log("-----------Status : "+msg.getStatus());
@@ -3238,13 +3235,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 }
 
                 resultModify = modifyMessageReceived(androidMsg, false);
+                log("onMessageUpdate: resultModify: "+resultModify);
             }
-        }
-
-        if(resultModify == -1){
-            log("ERROR: Modify not found match");
-//            AndroidMegaChatMessage msgToAppend = new AndroidMegaChatMessage(msg);
-//            appendMessagePosition(msgToAppend);
         }
     }
 
@@ -3518,6 +3510,56 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         log("AFTER updateMessagesLoaded: "+messages.size()+" messages in list");
 
         bufferMessages.clear();
+    }
+
+    public void clearHistory(AndroidMegaChatMessage androidMsg){
+        log("clearHistory");
+
+        ListIterator<AndroidMegaChatMessage> itr = messages.listIterator(messages.size());
+
+        int indexToChange=-1;
+        // Iterate in reverse.
+        while(itr.hasPrevious()) {
+            AndroidMegaChatMessage messageToCheck = itr.previous();
+
+            if(!messageToCheck.isUploading()){
+                if(messageToCheck.getMessage().getStatus()!=MegaChatMessage.STATUS_SENDING){
+
+                    indexToChange = itr.nextIndex();
+                    log("Found index of last sent and confirmed message: "+indexToChange);
+                    break;
+                }
+            }
+        }
+
+//        indexToChange = 2;
+        if(indexToChange != messages.size()-1){
+            log("Clear history of confirmed messages: "+indexToChange);
+
+            List<AndroidMegaChatMessage> messagesCopy = new ArrayList<>(messages);
+            messages.clear();
+            messages.add(androidMsg);
+            for(int i = indexToChange+1; i<messagesCopy.size();i++){
+                messages.add(messagesCopy.get(i));
+            }
+        }
+        else{
+            log("Clear all messages");
+            messages.clear();
+            messages.add(androidMsg);
+        }
+
+        if(messages.size()==1){
+            androidMsg.setInfoToShow(Constants.CHAT_ADAPTER_SHOW_ALL);
+        }
+        else{
+            for(int i=0; i<messages.size();i++){
+                adjustInfoToShow(i);
+            }
+        }
+
+        adapter.setMessages(messages);
+        adapter.notifyDataSetChanged();
     }
 
     public void loadPendingMessages(){
