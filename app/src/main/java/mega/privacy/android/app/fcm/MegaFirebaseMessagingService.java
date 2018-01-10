@@ -427,7 +427,7 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
             i.putExtra("chatHandle", call.getChatid());
             i.putExtra("callId", call.getId());
             i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            i.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
+//            i.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
             startActivity(i);
 
             removeListeners();

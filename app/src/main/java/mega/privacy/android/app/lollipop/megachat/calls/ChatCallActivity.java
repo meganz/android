@@ -208,7 +208,12 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                 log("Hang call");
                 megaChatApi.hangChatCall(chatId, null);
                 MegaApplication.activityPaused();
-                finish();
+                if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    super.finishAndRemoveTask();
+                }
+                else {
+                    super.finish();
+                }
                 break;
             }
         }
@@ -357,7 +362,12 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                 if (callChat == null){
                     megaChatApi.removeChatCallListener(this);
                     MegaApplication.activityPaused();
-                    finish();
+                    if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                        super.finishAndRemoveTask();
+                    }
+                    else {
+                        super.finish();
+                    }
                     return;
                 }
 
@@ -624,7 +634,8 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
         }
     }
 
-    @Override public void onPause(){
+    @Override
+    public void onPause(){
         super.onPause();
        mSensorManager.unregisterListener(this);
     }
@@ -689,7 +700,12 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
         log("onRequestFinish");
         if(request.getType() == MegaChatRequest.TYPE_HANG_CHAT_CALL){
             MegaApplication.activityPaused();
-            finish();
+            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                super.finishAndRemoveTask();
+            }
+            else {
+                super.finish();
+            }
         }
         else if(request.getType() == MegaChatRequest.TYPE_ANSWER_CHAT_CALL){
             if(e.getErrorCode()==MegaChatError.ERROR_OK){
@@ -710,7 +726,12 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
             else{
                 log("Error call: "+e.getErrorString());
                 MegaApplication.activityPaused();
-                finish();
+                if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    super.finishAndRemoveTask();
+                }
+                else {
+                    super.finish();
+                }
 //                showSnackbar(getString(R.string.clear_history_error));
             }
         }
@@ -820,7 +841,12 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
 
                     rtcAudioManager.stop();
                     MegaApplication.activityPaused();
-                    finish();
+                    if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                        super.finishAndRemoveTask();
+                    }
+                    else {
+                        super.finish();
+                    }
                     break;
                 }
             }
