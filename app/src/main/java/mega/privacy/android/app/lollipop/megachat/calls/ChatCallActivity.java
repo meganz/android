@@ -440,7 +440,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
         p.setAntiAlias(true);
         p.setColor(Color.TRANSPARENT);
 
-        String color = megaApi.getUserAvatarColor(megaApi.handleToBase64(userHandle));
+        String color = megaApi.getUserAvatarColor(MegaApiAndroid.userHandleToBase64(userHandle));
         if (color != null) {
             log("The color to set the avatar is " + color);
             p.setColor(Color.parseColor(color));
@@ -513,7 +513,8 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
         p.setAntiAlias(true);
         p.setColor(Color.TRANSPARENT);
 
-        String color = megaApi.getUserAvatarColor(megaApi.handleToBase64(userHandle));
+        String color = megaApi.getUserAvatarColor(MegaApiAndroid.userHandleToBase64(userHandle));
+
         if(color!=null){
             log("The color to set the avatar is "+color);
             p.setColor(Color.parseColor(color));
