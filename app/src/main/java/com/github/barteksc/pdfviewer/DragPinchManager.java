@@ -30,6 +30,7 @@ import com.shockwave.pdfium.PdfDocument;
 import com.shockwave.pdfium.util.SizeF;
 
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
+import mega.privacy.android.app.utils.Util;
 
 import static com.github.barteksc.pdfviewer.util.Constants.Pinch.MAXIMUM_ZOOM;
 import static com.github.barteksc.pdfviewer.util.Constants.Pinch.MINIMUM_ZOOM;
@@ -46,7 +47,7 @@ class DragPinchManager implements GestureDetector.OnGestureListener, GestureDete
     private GestureDetector gestureDetector;
     private ScaleGestureDetector scaleGestureDetector;
 
-    private boolean scrolling = false;
+    public boolean scrolling = false;
     private boolean scaling = false;
     private boolean enabled = false;
 
@@ -149,6 +150,8 @@ class DragPinchManager implements GestureDetector.OnGestureListener, GestureDete
     @Override
     public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
         scrolling = true;
+        PdfViewerActivityLollipop.isScrolling = true;
+
         if (pdfView.isZooming() || pdfView.isSwipeEnabled()) {
             pdfView.moveRelativeTo(-distanceX, -distanceY);
         }
@@ -227,11 +230,22 @@ class DragPinchManager implements GestureDetector.OnGestureListener, GestureDete
         boolean retVal = scaleGestureDetector.onTouchEvent(event);
         retVal = gestureDetector.onTouchEvent(event) || retVal;
 
-        if (event.getAction() == MotionEvent.ACTION_UP) {
-            if (scrolling) {
-                scrolling = false;
-                onScrollEnd(event);
-            }
+        switch (event.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+            case MotionEvent.ACTION_POINTER_DOWN:
+            case MotionEvent.ACTION_SCROLL:
+            case MotionEvent.ACTION_MOVE:
+                if (scrolling) {
+                    PdfViewerActivityLollipop.scroll = false;
+                }
+                break;
+            case MotionEvent.ACTION_UP:
+                if (scrolling) {
+                    scrolling = false;
+                    PdfViewerActivityLollipop.isScrolling = false;
+                    onScrollEnd(event);
+                }
+                break;
         }
         return retVal;
     }
@@ -241,5 +255,9 @@ class DragPinchManager implements GestureDetector.OnGestureListener, GestureDete
         if (scrollHandle != null && scrollHandle.shown()) {
             scrollHandle.hideDelayed();
         }
+    }
+
+    public static void log(String log) {
+        Util.log("DragPinchManager", log);
     }
 }
