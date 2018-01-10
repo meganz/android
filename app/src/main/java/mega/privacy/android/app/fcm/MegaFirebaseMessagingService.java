@@ -402,8 +402,6 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
     public void onChatCallUpdate(MegaChatApiJava api, MegaChatCall call) {
         log("onChatCallUpdate: " + call.getChatid() + " " + call.getStatus());
 
-        removeListeners();
-
         if(call.hasChanged(MegaChatCall.CHANGE_TYPE_STATUS)){
             lauchCallActivity(call);
         }
@@ -431,6 +429,8 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
             i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             i.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
             startActivity(i);
+
+            removeListeners();
         }
         else{
             log("Not in RINGING status");
