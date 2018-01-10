@@ -100,6 +100,7 @@
                         android:inputType="textMultiLine|textNoSuggestions"
                         emojicon:emojiconSize="16sp"
                         android:minLines="2"
+                        android:autoLink=""
                         android:lines="6"/>
 
                     <RelativeLayout
@@ -169,19 +170,21 @@
                 android:layout_marginBottom="8dp"
                 android:layout_alignParentBottom="true"
                 android:layout_alignParentRight="true">
+
                 <android.support.design.widget.FloatingActionButton
                     android:id="@+id/fab_chat"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     app:fabSize="mini"
                     android:layout_gravity="center"
-                    app:elevation="6dp"
+                    app:elevation="@dimen/elevation_fab_chat"
                     app:borderWidth="0dp"
                     android:scaleType="center"
                     app:backgroundTint="@color/accentColor"
-                    app:pressedTranslationZ="12dp"
+                    app:pressedTranslationZ="@dimen/translationZ_fab_chat"
                     android:layout_marginLeft="8dp"
                     android:layout_marginRight="8dp"
+                    android:layout_marginTop="@dimen/marginTop_fab_chat"
                     android:src="@drawable/ic_send_white"/>
             </android.support.design.widget.CoordinatorLayout>
 
