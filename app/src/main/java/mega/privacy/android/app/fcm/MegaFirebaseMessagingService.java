@@ -205,7 +205,7 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
 
                                 MegaChatCall call = megaChatApi.getChatCall(chatId);
                                 if(call!=null){
-                                    lauchCallActivity(call);
+                                    launchCallActivity(call);
                                 }
                             }
                             else{
@@ -403,7 +403,7 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
         log("onChatCallUpdate: " + call.getChatid() + " " + call.getStatus());
 
         if(call.hasChanged(MegaChatCall.CHANGE_TYPE_STATUS)){
-            lauchCallActivity(call);
+            launchCallActivity(call);
         }
 
         if(call.hasRemoteAudio()){
@@ -420,8 +420,8 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
         }
     }
 
-    public void lauchCallActivity(MegaChatCall call){
-        log("lauchCallActivity");
+    public void launchCallActivity(MegaChatCall call){
+        log("launchCallActivity");
         if(call.getStatus()==MegaChatCall.CALL_STATUS_RING_IN){
             Intent i = new Intent(this, ChatCallActivity.class);
             i.putExtra("chatHandle", call.getChatid());
