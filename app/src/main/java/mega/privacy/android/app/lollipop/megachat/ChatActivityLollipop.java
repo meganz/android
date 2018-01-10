@@ -1725,6 +1725,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 }
 
                 textChat.getText().clear();
+                textChat.setText("", TextView.BufferType.EDITABLE);
                 break;
             }
 		}

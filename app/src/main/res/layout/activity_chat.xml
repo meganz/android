@@ -97,10 +97,9 @@
                         android:textSize="14sp"
                         android:hint="@string/type_message_hint"
                         android:layout_toLeftOf="@+id/attach_icon_chat"
-                        android:inputType="textMultiLine|textNoSuggestions"
+                        android:inputType="textMultiLine"
                         emojicon:emojiconSize="16sp"
                         android:minLines="2"
-                        android:autoLink=""
                         android:lines="6"/>
 
                     <RelativeLayout
