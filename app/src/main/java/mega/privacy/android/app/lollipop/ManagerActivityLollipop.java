@@ -14910,8 +14910,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 		evaluateAppDialog.show();
 
-
-		final AlertDialog dialog = permissionsDialog;
 		rateAppCheck.setOnClickListener(new View.OnClickListener() {
 
 			@Override
@@ -14920,8 +14918,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				//Rate the app option:
 				startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=mega.privacy.android.app") ) );
 
-				if (dialog != null){
-					dialog.dismiss();
+				if (evaluateAppDialog!= null){
+					evaluateAppDialog.dismiss();
 				}
 			}
 		});
@@ -14980,8 +14978,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				emailIntent.putExtra(Intent.EXTRA_TEXT, body.toString());
 				startActivity(Intent.createChooser(emailIntent, " "));
 
-				if (dialog != null){
-					dialog.dismiss();
+				if (evaluateAppDialog != null){
+					evaluateAppDialog.dismiss();
 				}
 			}
 		});
