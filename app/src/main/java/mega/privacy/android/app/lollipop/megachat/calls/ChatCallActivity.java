@@ -304,10 +304,8 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
         RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams)fragmentContainerLocalCamera.getLayoutParams();
         params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
         params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-        //**params.addRule(RelativeLayout.ABOVE,R.id.linear_buttons);
 
         fragmentContainerLocalCamera.setLayoutParams(params);
-        //****fragmentContainerLocalCamera.setOnTouchListener(this);
         fragmentContainerLocalCamera.setOnTouchListener(new OnDragTouchListener(fragmentContainerLocalCamera,parent));
         parent.setVisibility(View.GONE);
         fragmentContainerLocalCamera.setVisibility(View.GONE);
@@ -626,21 +624,19 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
     @Override
     protected void onResume() {
         log("onResume-ChatCallActivity");
+        this.width=0;
+        this.height=0;
         super.onResume();
         mSensorManager.registerListener(this, mSensor, SensorManager.SENSOR_DELAY_NORMAL);
-
-        this.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
-        this.getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
-        this.getWindow().addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
-
         MegaApplication.activityResumed();
-
         ((MegaApplication) getApplication()).sendSignalPresenceActivity();
     }
 
 
     @Override
     public void onDestroy(){
+        log("onDestroy-ChatCallActivity");
+
         if (megaChatApi != null) {
             megaChatApi.removeChatCallListener(this);
             megaChatApi.removeChatVideoListener(this);
@@ -657,7 +653,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
 
     @Override
     public void onBackPressed() {
-        log("onBackPress");
+        log("onBackPress-ChatCallActivity");
 //		if (overflowMenuLayout != null){
 //			if (overflowMenuLayout.getVisibility() == View.VISIBLE){
 //				overflowMenuLayout.setVisibility(View.GONE);
@@ -844,9 +840,8 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
     @Override
     public void onChatVideoData(MegaChatApiJava api, long chatid, int width, int height, byte[] byteBuffer)
     {
-//        log("onChatVideoData");
-        if (this.width != width || this.height != height)
-        {
+
+        if (this.width != width || this.height != height) {
             this.width = width;
             this.height = height;
             this.bitmap = remoteRenderer.CreateBitmap(width, height);
@@ -857,8 +852,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                 int viewHeight = remoteSurfaceView.getHeight();
                 int holderWidth = viewWidth < width ? viewWidth : width;
                 int holderHeight = holderWidth * viewHeight / viewWidth;
-                if (holderHeight > viewHeight)
-                {
+                if (holderHeight > viewHeight){
                     holderHeight = viewHeight;
                     holderWidth = holderHeight * viewWidth / viewHeight;
                 }
@@ -992,6 +986,8 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
     }
 
     public void showInitialFABConfiguration(){
+        log("showInitialFABConfiguration");
+
         if(callChat.getStatus()==MegaChatCall.CALL_STATUS_RING_IN){
             answerCallFAB.show();
             answerCallFAB.setVisibility(View.VISIBLE);
@@ -1019,6 +1015,8 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
     }
 
     public void updateLocalVideoStatus(){
+        log("updateLocalVideoStatus");
+
         if(callChat.hasLocalVideo()){
             log("Video local connected");
             if(myAvatarLayout.getVisibility()==View.VISIBLE){
@@ -1055,6 +1053,8 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
     }
 
     public void updateLocalAudioStatus(){
+        log("updateLocalAudioStatus");
+
         if(callChat.hasLocalAudio()){
             log("Audio local connected");
             microFAB.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.accentColor)));
@@ -1066,6 +1066,8 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
     }
 
     public void updateRemoteVideoStatus(){
+        log("updateRemoteVideoStatus");
+
         if(callChat.hasRemoteVideo()){
             log("Video remote connected");
             contactAvatarLayout.setVisibility(View.GONE);
