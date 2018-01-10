@@ -1036,7 +1036,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
 
                 FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
                 ft.replace(R.id.fragment_container_local_camera, localCameraFragment, "localCameraFragment");
-                ft.commitNow();
+                ft.commitNowAllowingStateLoss();
             }
             else{
                 log("No needed to refresh");
