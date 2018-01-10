@@ -44,6 +44,7 @@ public class DefaultScrollHandle extends RelativeLayout implements ScrollHandle 
 
     public DefaultScrollHandle(Context context, boolean inverted) {
         super(context);
+        log("DefaultScrollHandle");
         this.context = context;
         this.inverted = inverted;
         textViewHandle = new TextView(context);
@@ -51,7 +52,6 @@ public class DefaultScrollHandle extends RelativeLayout implements ScrollHandle 
         setVisibility(INVISIBLE);
         setTextColor(Color.WHITE);
         setTextSize(DEFAULT_TEXT_SIZE);
-        log("DefaultScrollHandle");
     }
 
     @Override
@@ -109,7 +109,6 @@ public class DefaultScrollHandle extends RelativeLayout implements ScrollHandle 
     public void setScroll(float position) {
         log("setScroll");
 
-        ((PdfViewerActivityLollipop) getContext()).setToolbarVisibilityHide();
         if (!shown()) {
             show();
         } else {
@@ -204,12 +203,12 @@ public class DefaultScrollHandle extends RelativeLayout implements ScrollHandle 
      * @param size text size in sp
      */
     public void setTextSize(int size) {
-        log("hideDelayed");
+        log("setTextSize");
         textViewBubble.setTextSize(TypedValue.COMPLEX_UNIT_SP, size);
     }
 
     private boolean isPDFViewReady() {
-        log("hideDelayed");
+        log("isPDFViewReady");
         return pdfView != null && pdfView.getPageCount() > 0 && !pdfView.documentFitsView();
     }
 
@@ -223,7 +222,6 @@ public class DefaultScrollHandle extends RelativeLayout implements ScrollHandle 
 
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
-                log("ACTION_DOWN");
             case MotionEvent.ACTION_POINTER_DOWN:
                 pdfView.stopFling();
                 handler.removeCallbacks(hidePageScrollerRunnable);
@@ -232,6 +230,10 @@ public class DefaultScrollHandle extends RelativeLayout implements ScrollHandle 
                 } else {
                     currentPos = event.getRawX() - getX();
                 }
+            case MotionEvent.ACTION_SCROLL:
+                ((PdfViewerActivityLollipop) getContext()).isScrolling = true;
+                ((PdfViewerActivityLollipop) getContext()).scroll = false;
+                ((PdfViewerActivityLollipop) getContext()).establishScroll();
             case MotionEvent.ACTION_MOVE:
                 if (pdfView.isSwipeVertical()) {
                     setPosition(event.getRawY() - currentPos + relativeHandlerMiddle);
@@ -240,6 +242,9 @@ public class DefaultScrollHandle extends RelativeLayout implements ScrollHandle 
                     setPosition(event.getRawX() - currentPos + relativeHandlerMiddle);
                     pdfView.setPositionOffset(relativeHandlerMiddle / (float) getWidth(), false);
                 }
+                ((PdfViewerActivityLollipop) getContext()).isScrolling = true;
+                ((PdfViewerActivityLollipop) getContext()).scroll = false;
+                ((PdfViewerActivityLollipop) getContext()).establishScroll();
                 return true;
             case MotionEvent.ACTION_CANCEL:
             case MotionEvent.ACTION_UP:
