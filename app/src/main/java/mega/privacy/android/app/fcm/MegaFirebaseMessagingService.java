@@ -77,6 +77,7 @@ import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaGlobalListenerInterface;
+import nz.mega.sdk.MegaHandleList;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
@@ -184,6 +185,34 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
                         log("RootNode = null");
                         performLoginProccess(gSession);
                     }
+                    else{
+                        log("RootNode is NOT null");
+//                        String gSession = credentials.getSession();
+                        int ret = megaChatApi.getInitState();
+                        log("result of init ---> " + ret);
+                        int status = megaChatApi.getOnlineStatus();
+                        log("online status ---> "+status);
+                        int connectionState = megaChatApi.getConnectionState();
+                        log("connection state ---> "+connectionState);
+
+                        MegaHandleList handleList = megaChatApi.getChatCalls();
+                        if(handleList!=null){
+                            if(handleList.size()==0){
+                                log("NO calls in progress");
+                            }
+                            else if(handleList.size()==1){
+                                long chatId = handleList.get(0);
+
+                                MegaChatCall call = megaChatApi.getChatCall(chatId);
+                                if(call!=null){
+                                    lauchCallActivity(call);
+                                }
+                            }
+                            else{
+                                log("MORE than one call in progress - not supported yet");
+                            }
+                        }
+                    }
 
                 }else if(remoteMessageType.equals("2")){
                     String gSession = credentials.getSession();
@@ -221,7 +250,6 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
 
             }
         }
-
 
 //
 //        // Check if message contains a notification payload.
@@ -372,18 +400,12 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
 
     @Override
     public void onChatCallUpdate(MegaChatApiJava api, MegaChatCall call) {
-        log("onChatCallUpdate: " + call.getChatid());
+        log("onChatCallUpdate: " + call.getChatid() + " " + call.getStatus());
 
         removeListeners();
 
         if(call.hasChanged(MegaChatCall.CHANGE_TYPE_STATUS)){
-            if(call.getStatus()==MegaChatCall.CALL_STATUS_RING_IN){
-                Intent i = new Intent(this, ChatCallActivity.class);
-                i.putExtra("chatHandle", call.getChatid());
-                i.putExtra("callId", call.getId());
-                i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(i);
-            }
+            lauchCallActivity(call);
         }
 
         if(call.hasRemoteAudio()){
@@ -397,6 +419,21 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
         }
         else{
             log("Remote video is NOT connected");
+        }
+    }
+
+    public void lauchCallActivity(MegaChatCall call){
+        log("lauchCallActivity");
+        if(call.getStatus()==MegaChatCall.CALL_STATUS_RING_IN){
+            Intent i = new Intent(this, ChatCallActivity.class);
+            i.putExtra("chatHandle", call.getChatid());
+            i.putExtra("callId", call.getId());
+            i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            i.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
+            startActivity(i);
+        }
+        else{
+            log("Not in RINGING status");
         }
     }
 
