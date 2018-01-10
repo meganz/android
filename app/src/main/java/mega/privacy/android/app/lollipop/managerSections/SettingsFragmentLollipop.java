@@ -1796,53 +1796,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			startActivityForResult(intent, REQUEST_MEGA_CAMERA_FOLDER);
 
 		}else if (preference.getKey().compareTo(KEY_HELP_SEND_FEEDBACK) == 0){
-
-			StringBuilder body = new StringBuilder();
-			body.append(getString(R.string.setting_feedback_body));
-			body.append("\n\n\n\n\n\n\n\n\n\n\n");
-			body.append(getString(R.string.settings_feedback_body_device_model)+"  "+getDeviceName()+"\n");
-			body.append(getString(R.string.settings_feedback_body_android_version)+"  "+Build.VERSION.RELEASE+" "+Build.DISPLAY+"\n");
-			body.append(getString(R.string.user_account_feedback)+"  "+megaApi.getMyEmail());
-
-			myAccountInfo = ((ManagerActivityLollipop)context).getMyAccountInfo();
-			if(myAccountInfo!=null){
-				if(myAccountInfo.getAccountType()<0||myAccountInfo.getAccountType()>4){
-					body.append(" ("+getString(R.string.my_account_free)+")");
-				}
-				else{
-					switch(myAccountInfo.getAccountType()){
-						case 0:{
-							body.append(" ("+getString(R.string.my_account_free)+")");
-							break;
-						}
-						case 1:{
-							body.append(" ("+getString(R.string.my_account_pro1)+")");
-							break;
-						}
-						case 2:{
-							body.append(" ("+getString(R.string.my_account_pro2)+")");
-							break;
-						}
-						case 3:{
-							body.append(" ("+getString(R.string.my_account_pro3)+")");
-							break;
-						}
-						case 4:{
-							body.append(" (PRO "+getString(R.string.my_account_prolite)+")");
-							break;
-						}
-					}
-				}
-			}
-
-			String emailAndroid = Constants.MAIL_ANDROID;
-			String versionApp = (getString(R.string.app_version));
-			String subject = getString(R.string.setting_feedback_subject)+" v"+versionApp;
-
-			Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:" + emailAndroid));
-			emailIntent.putExtra(Intent.EXTRA_SUBJECT, subject);
-			emailIntent.putExtra(Intent.EXTRA_TEXT, body.toString());
-			startActivity(Intent.createChooser(emailIntent, " "));
+			((ManagerActivityLollipop) context).showEvaluatedAppDialog();
 		}
 		else if (preference.getKey().compareTo(KEY_ABOUT_PRIVACY_POLICY) == 0){
 			Intent viewIntent = new Intent(Intent.ACTION_VIEW);
@@ -2249,28 +2203,6 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 		}
 	}
 
-	public String getDeviceName() {
-		String manufacturer = Build.MANUFACTURER;
-		String model = Build.MODEL;
-		if (model.startsWith(manufacturer)) {
-			return capitalize(model);
-		} else {
-			return capitalize(manufacturer) + " " + model;
-		}
-	}
-
-
-	private String capitalize(String s) {
-		if (s == null || s.length() == 0) {
-			return "";
-		}
-		char first = s.charAt(0);
-		if (Character.isUpperCase(first)) {
-			return s;
-		} else {
-			return Character.toUpperCase(first) + s.substring(1);
-		}
-	}
 
 	public void cancelSetPinLock(){
 		log("cancelSetPinkLock");
