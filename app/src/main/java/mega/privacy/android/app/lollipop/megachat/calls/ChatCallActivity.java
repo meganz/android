@@ -180,13 +180,18 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
         log("onPrepareOptionsMenu");
 
         remoteAudioIcon = menu.findItem(R.id.info_remote_audio);
-        if(callChat.hasRemoteAudio()){
-            log("Audio remote connected");
-            remoteAudioIcon.setIcon(ContextCompat.getDrawable(this, R.drawable.ic_volume_up_white));
+        if(callChat!=null){
+            if(callChat.hasRemoteAudio()){
+                log("Audio remote connected");
+                remoteAudioIcon.setIcon(ContextCompat.getDrawable(this, R.drawable.ic_volume_up_white));
+            }
+            else{
+                log("Audio remote NOT connected");
+                remoteAudioIcon.setIcon(ContextCompat.getDrawable(this, R.drawable.ic_volume_off_white));
+            }
         }
         else{
-            log("Audio remote NOT connected");
-            remoteAudioIcon.setIcon(ContextCompat.getDrawable(this, R.drawable.ic_volume_off_white));
+            log("callChat is Null");
         }
 
         return super.onPrepareOptionsMenu(menu);
