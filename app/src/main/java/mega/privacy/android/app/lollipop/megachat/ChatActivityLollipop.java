@@ -1792,7 +1792,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 log("adapter is NOT null");
                 adapter.addMessage(messages, index+1);
                 final int indexToScroll = index+1;
-
                 mLayoutManager.scrollToPositionWithOffset(indexToScroll,Util.scaleHeightPx(20, outMetrics));
 //                Handler handler = new Handler();
 //                handler.postDelayed(new Runnable() {
@@ -1861,7 +1860,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             else{
                 log("adapter is NOT null");
                 adapter.addMessage(messages, index);
-
                 if(infoToShow==Constants.CHAT_ADAPTER_SHOW_ALL){
                     mLayoutManager.scrollToPositionWithOffset(index, Util.scaleHeightPx(50, outMetrics));
                 }
@@ -1872,9 +1870,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
         else{
             log("Error sending message!");
-            //EL mensaje no se ha enviado, mostrar error al usuario pero no cambiar interfaz
-            //TODO
-
         }
     }
 
@@ -3478,7 +3473,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 if(scrollToP!=-1){
                     if(msg.getMessage().getStatus()==MegaChatMessage.STATUS_SERVER_RECEIVED){
                         log("modifyMessageReceived: need to scroll to position: "+indexToChange);
-                        mLayoutManager.scrollToPositionWithOffset(scrollToP, Util.scaleHeightPx(20, outMetrics));
+                        mLayoutManager.scrollToPosition(scrollToP+1);
+                        //mLayoutManager.scrollToPositionWithOffset(scrollToP, Util.scaleHeightPx(20, outMetrics));
                     }
                 }
                 log("modifyMessageReceived: messages size 2: "+messages.size());
