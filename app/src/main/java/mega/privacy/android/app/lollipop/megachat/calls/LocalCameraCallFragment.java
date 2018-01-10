@@ -108,9 +108,15 @@ public class LocalCameraCallFragment extends Fragment implements MegaChatVideoLi
 
     @Override
     public void onDestroy(){
-        log("onDestroy");
         megaChatApi.removeChatVideoListener(this);
         super.onDestroy();
+    }
+    @Override
+    public void onResume() {
+        log("onResume");
+        this.width=0;
+        this.height=0;
+        super.onResume();
     }
 
     public void setVideoFrame(boolean visible){

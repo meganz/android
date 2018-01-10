@@ -314,10 +314,8 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
         RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams)fragmentContainerLocalCamera.getLayoutParams();
         params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
         params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-        //**params.addRule(RelativeLayout.ABOVE,R.id.linear_buttons);
 
         fragmentContainerLocalCamera.setLayoutParams(params);
-        //****fragmentContainerLocalCamera.setOnTouchListener(this);
         fragmentContainerLocalCamera.setOnTouchListener(new OnDragTouchListener(fragmentContainerLocalCamera,parent));
         parent.setVisibility(View.GONE);
         fragmentContainerLocalCamera.setVisibility(View.GONE);
@@ -447,8 +445,6 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
     public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) {}
 
     public void createDefaultAvatar(long userHandle,  String fullName) {
-        log("createDefaultAvatar");
-
         Bitmap defaultAvatar = Bitmap.createBitmap(outMetrics.widthPixels, outMetrics.widthPixels, Bitmap.Config.ARGB_8888);
         Canvas c = new Canvas(defaultAvatar);
         Paint p = new Paint();
@@ -479,8 +475,6 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
     }
 
     public void setUserProfileAvatar(long userHandle,  String fullName){
-        log("setUserProfileAvatar");
-
         Bitmap bitmap = null;
         File avatar = null;
         if (context.getExternalCacheDir() != null) {
@@ -514,9 +508,6 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
     }
 
     public void createMyDefaultAvatar() {
-        log("createMyDefaultAvatar");
-
-
         String myFullName = megaChatApi.getMyFullname();
         String myFirstLetter=myFullName.charAt(0) + "";
         myFirstLetter = myFirstLetter.toUpperCase(Locale.getDefault());
@@ -555,8 +546,6 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
     }
 
     public void setProfileMyAvatar() {
-        log("setProfileMyAvatar");
-
         Bitmap myBitmap = null;
         File avatar = null;
         if (context != null) {
@@ -642,16 +631,11 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
 
     @Override
     protected void onResume() {
-        log("onResume-ChatCallActivity");
+        this.width=0;
+        this.height=0;
         super.onResume();
         mSensorManager.registerListener(this, mSensor, SensorManager.SENSOR_DELAY_NORMAL);
-
-        this.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
-        this.getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
-        this.getWindow().addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
-
         MegaApplication.activityResumed();
-
         ((MegaApplication) getApplication()).sendSignalPresenceActivity();
     }
 
@@ -674,7 +658,6 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
 
     @Override
     public void onBackPressed() {
-        log("onBackPress");
 //		if (overflowMenuLayout != null){
 //			if (overflowMenuLayout.getVisibility() == View.VISIBLE){
 //				overflowMenuLayout.setVisibility(View.GONE);
@@ -686,7 +669,6 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
 
     @Override
     public void onRequestStart(MegaChatApiJava api, MegaChatRequest request) {
-        log("onRequestStart");
         log("Type: "+request.getType());
     }
 
@@ -697,7 +679,6 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
 
     @Override
     public void onRequestFinish(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
-        log("onRequestFinish");
         if(request.getType() == MegaChatRequest.TYPE_HANG_CHAT_CALL){
             MegaApplication.activityPaused();
             if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -771,12 +752,10 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
 
     @Override
     public void onRequestTemporaryError(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
-        log("onRequestTemporaryError");
     }
 
     @Override
     public void onChatCallUpdate(MegaChatApiJava api, MegaChatCall call) {
-        log("onChatCallStateChange");
 
         this.callChat = call;
         if(callChat.hasChanged(MegaChatCall.CHANGE_TYPE_STATUS)){
@@ -876,9 +855,8 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
     @Override
     public void onChatVideoData(MegaChatApiJava api, long chatid, int width, int height, byte[] byteBuffer)
     {
-//        log("onChatVideoData");
-        if (this.width != width || this.height != height)
-        {
+
+        if (this.width != width || this.height != height) {
             this.width = width;
             this.height = height;
             this.bitmap = remoteRenderer.CreateBitmap(width, height);
@@ -889,8 +867,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                 int viewHeight = remoteSurfaceView.getHeight();
                 int holderWidth = viewWidth < width ? viewWidth : width;
                 int holderHeight = holderWidth * viewHeight / viewWidth;
-                if (holderHeight > viewHeight)
-                {
+                if (holderHeight > viewHeight){
                     holderHeight = viewHeight;
                     holderWidth = holderHeight * viewWidth / viewHeight;
                 }
@@ -1002,8 +979,6 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
     }
 
     public boolean checkPermissions(){
-        log("checkPermissions");
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 
             boolean hasCameraPermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED);
@@ -1120,7 +1095,6 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        log("onRequestPermissionsResult");
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         switch (requestCode) {
             case Constants.REQUEST_CAMERA: {
@@ -1250,7 +1224,6 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        log("onKeyDown");
         switch (keyCode) {
 
             case KeyEvent.KEYCODE_VOLUME_UP: {
