@@ -156,7 +156,6 @@ import mega.privacy.android.app.lollipop.managerSections.UpgradeAccountFragmentL
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.lollipop.megachat.RecentChatsFragmentLollipop;
-import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.lollipop.tasks.CheckOfflineNodesTask;
 import mega.privacy.android.app.lollipop.tasks.FilePrepareTask;
 import mega.privacy.android.app.lollipop.tasks.FillDBContactsTask;
@@ -14686,7 +14685,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 	@Override
 	public void onChatConnectionStateUpdate(MegaChatApiJava api, long chatid, int newState) {
-		log("onChatConnectionStateUpdate: "+chatid);
+		log("onChatConnectionStateUpdate: "+chatid+" newState: "+newState);
 
 		if(newState==MegaChatApi.CHAT_CONNECTION_ONLINE && chatid==-1){
 			log("Online Connection: "+chatid);
@@ -14813,28 +14812,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	@Override
 	public void onChatCallUpdate(MegaChatApiJava api, MegaChatCall call) {
 		log("onChatCallUpdate");
-
-		if(call.hasChanged(MegaChatCall.CHANGE_TYPE_STATUS)){
-			if(call.getStatus()==MegaChatCall.CALL_STATUS_RING_IN){
-				Intent i = new Intent(this, ChatCallActivity.class);
-				i.putExtra("chatHandle", call.getChatid());
-				i.putExtra("callId", call.getId());
-				startActivity(i);
-			}
-		}
-
-		if(call.hasRemoteAudio()){
-			log("Remote audio is connected");
-		}
-		else{
-			log("Remote audio is NOT connected");
-		}
-		if(call.hasRemoteVideo()){
-			log("Remote video is connected");
-		}
-		else{
-			log("Remote video is NOT connected");
-		}
 	}
 
 	public void setContactTitleSection(){
