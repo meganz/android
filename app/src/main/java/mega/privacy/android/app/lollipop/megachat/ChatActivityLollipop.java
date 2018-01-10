@@ -532,6 +532,15 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         chatRelativeLayout  = (RelativeLayout) findViewById(R.id.relative_chat_layout);
 
         fab = (FloatingActionButton) findViewById(R.id.fab_chat);
+
+        DisplayMetrics metrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(metrics);
+        if(android.os.Build.VERSION.SDK_INT == Build.VERSION_CODES.JELLY_BEAN_MR2 && metrics.densityDpi == DisplayMetrics.DENSITY_XHIGH) {
+            CoordinatorLayout.LayoutParams params = new CoordinatorLayout.LayoutParams(CoordinatorLayout.LayoutParams.WRAP_CONTENT, CoordinatorLayout.LayoutParams.WRAP_CONTENT);
+            params.setMargins(0, 22, 8, 0);
+            fab.setLayoutParams(params);
+        }
+
         fab.setOnClickListener(this);
 
         attachIcon = (ImageButton) findViewById(R.id.attach_icon_chat);
