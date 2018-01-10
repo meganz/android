@@ -6,7 +6,6 @@ import android.graphics.Bitmap;
 import android.graphics.PixelFormat;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -14,9 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import java.nio.ByteBuffer;
-import java.util.Stack;
 
-import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.utils.Util;
@@ -68,8 +65,7 @@ public class LocalCameraCallFragment extends Fragment implements MegaChatVideoLi
         return v;
     }
 
-
-        @Override
+    @Override
     public void onChatVideoData(MegaChatApiJava api, long chatid, int width, int height, byte[] byteBuffer) {
         if (this.width != width || this.height != height)
         {
