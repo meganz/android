@@ -1662,5 +1662,7 @@
     <string name="rate_the_app_panel" context="Label to show rate the app">Yes, rate the app</string>
     <string name="send_feedback_panel" context="Label to show send feedback">No, send feedback</string>
 
+    <string name="no_contacts_permissions" context="Title of the section to invite contacts if the user has denied the contacts permmissions">No contacts permission granted</string>
+
 </resources>
 
