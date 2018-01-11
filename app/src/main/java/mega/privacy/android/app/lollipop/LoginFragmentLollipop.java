@@ -1039,7 +1039,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
     }
 
     private void onKeysGenerated(String privateKey, String publicKey) {
-        log("key generation finished");
+        log("onKeysGenerated");
 
         this.gPrivateKey = privateKey;
         this.gPublicKey = publicKey;
@@ -1073,6 +1073,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
     }
 
     private void onKeysGeneratedLogin(final String privateKey, final String publicKey) {
+        log("onKeysGeneratedLogin");
 
         if(!Util.isOnline(context)){
             loginLoggingIn.setVisibility(View.GONE);
@@ -1116,11 +1117,28 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             else{
                 log("ERROR INIT CHAT: " + ret);
                 megaChatApi.logout(this);
+
+                if(chatSettings==null) {
+                    log("1 - ERROR----> Switch OFF chat");
+                    chatSettings = new ChatSettings(false+"", true + "", "",true + "");
+                    dbH.setChatSettings(chatSettings);
+                }
+                else{
+                    log("2 - ERROR----> Switch OFF chat");
+                    dbH.setEnabledChat(false + "");
+                }
+
+                if (!MegaApplication.isLoggingIn()){
+                    log("Keep process of login without chat");
+                    MegaApplication.setLoggingIn(true);
+                    megaApi.fastLogin(lastEmail, publicKey, privateKey, this);
+                }
             }
         }
         else{
             log("onKeysGeneratedLogin: Chat is NOT ENABLED");
             if (!MegaApplication.isLoggingIn()){
+                log("Keep process of login without chat");
                 MegaApplication.setLoggingIn(true);
                 megaApi.fastLogin(lastEmail, publicKey, privateKey, this);
             }
@@ -1656,6 +1674,16 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     }
                 }
 
+                if(chatSettings==null) {
+                    log("1 - Reset chat setting enable");
+                    chatSettings = new ChatSettings(true+"", true + "", "",true + "");
+                    dbH.setChatSettings(chatSettings);
+                }
+                else{
+                    log("2 - Reset chat setting enable");
+                    dbH.setEnabledChat(true + "");
+                }
+
                 loginLoggingIn.setVisibility(View.GONE);
                 loginLogin.setVisibility(View.VISIBLE);
                 scrollView.setBackgroundColor(getResources().getColor(R.color.background_create_account));
@@ -1731,6 +1759,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             }
         }
         else if (request.getType() == MegaRequest.TYPE_FETCH_NODES){
+            MegaApplication.setLoggingIn(false);
 
             if (error.getErrorCode() == MegaError.API_OK){
                 log("ok fetch nodes");
@@ -1749,7 +1778,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 dbH.saveCredentials(credentials);
 
                 log("readyToManager");
-                MegaApplication.setLoggingIn(false);
                 readyToManager();
 
             }else{
@@ -1784,6 +1812,15 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
                 ((LoginActivityLollipop)context).showSnackbar(errorMessage);
 
+                if(chatSettings==null) {
+                    log("1 - Reset chat setting enable");
+                    chatSettings = new ChatSettings(true+"", true + "", "",true + "");
+                    dbH.setChatSettings(chatSettings);
+                }
+                else{
+                    log("2 - Reset chat setting enable");
+                    dbH.setEnabledChat(true + "");
+                }
             }
         }
         else if (request.getType() == MegaRequest.TYPE_QUERY_SIGNUP_LINK){
