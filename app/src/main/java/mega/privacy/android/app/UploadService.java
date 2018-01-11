@@ -558,18 +558,44 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 							}
 
 							String location = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_LOCATION);
-							if (location != null) {
-								log("Location: " + location);
-								final int mid = location.length() / 2; //get the middle of the String
-								String[] parts = {location.substring(0, mid), location.substring(mid)};
+							if(location!=null){
+								log("Location: "+location);
 
-								Double lat = Double.parseDouble(parts[0]);
-								Double lon = Double.parseDouble(parts[1]);
-								log("Lat: " + lat); //first part
-								log("Long: " + lon); //second part
+								boolean secondTry = false;
+								try{
+									final int mid = location.length() / 2; //get the middle of the String
+									String[] parts = {location.substring(0, mid),location.substring(mid)};
 
-								megaApi.setNodeCoordinates(node, lat, lon, null);
-							} else {
+									Double lat = Double.parseDouble(parts[0]);
+									Double lon = Double.parseDouble(parts[1]);
+									log("Lat: "+lat); //first part
+									log("Long: "+lon); //second part
+
+									megaApi.setNodeCoordinates(node, lat, lon, null);
+								}
+								catch (Exception e){
+									secondTry = true;
+									log("Exception, second try to set GPS coordinates");
+								}
+
+								if(secondTry){
+									try{
+										String latString = location.substring(0,7);
+										String lonString = location.substring(8,17);
+
+										Double lat = Double.parseDouble(latString);
+										Double lon = Double.parseDouble(lonString);
+										log("Lat2: "+lat); //first part
+										log("Long2: "+lon); //second part
+
+										megaApi.setNodeCoordinates(node, lat, lon, null);
+									}
+									catch (Exception e){
+										log("Exception again, no chance to set coordinates of video");
+									}
+								}
+							}
+							else{
 								log("No location info");
 							}
 						}
