@@ -3459,6 +3459,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     if(msg.getMessage().getStatus()==MegaChatMessage.STATUS_SERVER_RECEIVED){
                         log("modifyMessageReceived: need to scroll to position: "+indexToChange);
                         mLayoutManager.scrollToPosition(scrollToP+1);
+
                         //mLayoutManager.scrollToPositionWithOffset(scrollToP, Util.scaleHeightPx(20, outMetrics));
                     }
                 }
