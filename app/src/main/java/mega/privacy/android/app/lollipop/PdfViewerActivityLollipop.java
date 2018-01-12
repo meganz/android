@@ -862,7 +862,6 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
         log("producer = " + meta.getProducer());
         log("creationDate = " + meta.getCreationDate());
         log("modDate = " + meta.getModDate());
-
         printBookmarksTree(pdfView.getTableOfContents(), "-");
     }
 

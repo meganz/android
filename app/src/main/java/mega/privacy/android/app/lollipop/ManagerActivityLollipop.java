@@ -9623,9 +9623,27 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 		Intent in = new Intent(this, AddContactActivityLollipop.class);
 		if(isMegaContact){
-			in.putExtra("contactType", Constants.CONTACT_TYPE_MEGA);
-			in.putExtra("chat", true);
-			startActivityForResult(in, Constants.REQUEST_CREATE_CHAT);
+
+			if(megaApi!=null && megaApi.getRootNode()!=null){
+				ArrayList<MegaUser> contacts = megaApi.getContacts();
+				if(contacts==null){
+					showSnackbar("You have no MEGA contacts. Please, invite friends from the Contacts section");
+				}
+				else {
+					if(contacts.isEmpty()){
+						showSnackbar("You have no MEGA contacts. Please, invite friends from the Contacts section");
+					}
+					else{
+						in.putExtra("contactType", Constants.CONTACT_TYPE_MEGA);
+						in.putExtra("chat", true);
+						startActivityForResult(in, Constants.REQUEST_CREATE_CHAT);
+					}
+				}
+			}
+			else{
+				log("Online but not megaApi");
+				showSnackbar(getString(R.string.error_server_connection_problem));
+			}
 		}
 		else{
 
@@ -9660,37 +9678,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			addContactDialog = b.create();
 			addContactDialog.show();
 		}
-
-//		Dialog addContactDialog;
-//		String[] addContactOptions = getResources().getStringArray(R.array.add_contact_array);
-//		AlertDialog.Builder b=new AlertDialog.Builder(this);
-//
-//		b.setTitle(getResources().getString(R.string.menu_add_contact));
-//		b.setItems(addContactOptions, new DialogInterface.OnClickListener() {
-//
-//			@Override
-//			public void onClick(DialogInterface dialog, int which) {
-//				switch(which){
-//					case 0:{
-//						showNewContactDialog();
-//						break;
-//					}
-//					case 1:{
-//						addContactFromPhone();
-//						break;
-//					}
-//				}
-//			}
-//		});
-//		b.setNegativeButton(getResources().getString(R.string.general_cancel), new DialogInterface.OnClickListener() {
-//
-//			@Override
-//			public void onClick(DialogInterface dialog, int which) {
-//				dialog.cancel();
-//			}
-//		});
-//		addContactDialog = b.create();
-//		addContactDialog.show();
 	}
 
 	public void addContactFromPhone(){

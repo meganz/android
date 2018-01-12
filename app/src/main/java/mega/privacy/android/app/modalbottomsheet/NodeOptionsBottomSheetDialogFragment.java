@@ -6,14 +6,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
-import android.graphics.Point;
-import android.graphics.Rect;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.BottomSheetDialogFragment;
 import android.support.design.widget.CoordinatorLayout;
-import android.support.v4.content.ContextCompat;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Display;
@@ -31,8 +28,6 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.MimeTypeInfo;
 import mega.privacy.android.app.MimeTypeList;
-import mega.privacy.android.app.MimeTypeMime;
-import mega.privacy.android.app.MimeTypeThumbnail;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.FileContactListActivityLollipop;
 import mega.privacy.android.app.lollipop.FileInfoActivityLollipop;
@@ -845,7 +840,29 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                     log("The selected node is NULL");
                     return;
                 }
-                nC.selectContactToSendNode(node);
+
+
+                if(megaApi!=null && megaApi.getRootNode()!=null){
+                    ArrayList<MegaUser> contacts = megaApi.getContacts();
+                    if(contacts==null){
+                        if(context instanceof ManagerActivityLollipop){
+                            ((ManagerActivityLollipop) context).showSnackbar("You have no MEGA contacts. Please, invite friends from the Contacts section");
+                        }
+                    }
+                    else {
+                        if(contacts.isEmpty()){
+                            ((ManagerActivityLollipop) context).showSnackbar("You have no MEGA contacts. Please, invite friends from the Contacts section");
+                        }
+                        else{
+                            nC.selectContactToSendNode(node);
+                        }
+                    }
+                }
+                else{
+                    log("Online but not megaApi");
+                    ((ManagerActivityLollipop) context).showSnackbar(getString(R.string.error_server_connection_problem));
+                }
+
                 dismissAllowingStateLoss();
                 break;
             }

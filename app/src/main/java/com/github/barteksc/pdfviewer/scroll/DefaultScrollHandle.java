@@ -18,8 +18,7 @@ import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 
 public class DefaultScrollHandle extends RelativeLayout implements ScrollHandle {
 
-    private final static int HANDLE_LONG = 70;
-    private final static int HANDLE_SHORT = 40;
+    private final static int HANDLE_SHORT = 50;
     private final static int DEFAULT_TEXT_SIZE = 12;
 
     private float relativeHandlerMiddle = 0f;
@@ -49,51 +48,49 @@ public class DefaultScrollHandle extends RelativeLayout implements ScrollHandle 
         this.inverted = inverted;
         textViewHandle = new TextView(context);
         textViewBubble = new TextView(context);
+
         setVisibility(INVISIBLE);
         setTextColor(Color.WHITE);
         setTextSize(DEFAULT_TEXT_SIZE);
     }
 
     @Override
-    public void setupLayout(PDFView pdfView) {
+    public void setupLayout(PDFView pdfView, int numPages) {
         log("setupLayout");
-        int align;
-
-        // determine handler position, default is right (when scrolling vertically) or bottom (when scrolling horizontally)
-        if (pdfView.isSwipeVertical()) {
-            if (inverted) { // left
-                align = ALIGN_PARENT_LEFT;
-            } else { // right
-                align = ALIGN_PARENT_RIGHT;
-            }
-        } else {
-            if (inverted) { // top
-                align = ALIGN_PARENT_TOP;
-            } else { // bottom
-                align = ALIGN_PARENT_BOTTOM;
-            }
-        }
-
-        LayoutParams lp = new LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        lp.setMargins(0, 0, 0, 0);
 
         LayoutParams tvHlp = new LayoutParams(Util.getDP(context, 50), Util.getDP(context, 50));
         textViewHandle.setBackgroundResource(R.drawable.fastscroll__default_handle);
         tvHlp.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, RelativeLayout.TRUE);
-        textViewHandle.setGravity(Gravity.CENTER);
         tvHlp.setMargins(Util.getDP(context, 5), 0, Util.getDP(context, -20), 0);
         textViewHandle.setPadding(Util.getDP(context, 10), Util.getDP(context, 10), Util.getDP(context, 10), Util.getDP(context, 10));
         addView(textViewHandle, tvHlp);
 
-        LayoutParams tvBlp = new LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        LayoutParams tvBlp = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
         textViewBubble.setBackgroundResource(R.drawable.fastscroll__default_bubble);
         tvBlp.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, RelativeLayout.TRUE);
         textViewBubble.setGravity(Gravity.CENTER);
         textViewBubble.setPadding(Util.getDP(context, 10), Util.getDP(context, 5), Util.getDP(context, 10), Util.getDP(context, 5));
-        tvBlp.setMargins(Util.getDP(context, 5), 0, Util.getDP(context, 30), 0);
+        tvBlp.setMargins(0, 0, Util.getDP(context, 30), 0);
         addView(textViewBubble, tvBlp);
 
-        lp.addRule(align);
+        int tam;
+        log("Number of pages: " +numPages);
+
+        if (numPages < 10){
+            tam = 55;
+        }
+        else if (numPages < 10 && numPages <100) {
+            tam = 60;
+        }
+        else if (numPages < 100 && numPages <1000) {
+            tam = 65;
+        }
+        else {
+            tam = 75;
+        }
+
+        LayoutParams lp = new LayoutParams(Util.getDP(context, tam), LayoutParams.WRAP_CONTENT);
+        lp.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, RelativeLayout.TRUE);
         pdfView.addView(this, lp);
 
         this.pdfView = pdfView;
@@ -170,6 +167,7 @@ public class DefaultScrollHandle extends RelativeLayout implements ScrollHandle 
     @Override
     public void setPageNum(int pageNum) {
         log("setPageNum");
+
         String text = String.valueOf(pageNum);
         if (!textViewBubble.getText().equals(text)) {
             textViewBubble.setText(text);
