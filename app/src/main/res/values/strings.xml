@@ -1665,5 +1665,12 @@
     <string name="no_contacts_permissions" context="Title of the section to invite contacts if the user has denied the contacts permmissions">No contacts permission granted</string>
 
     <string name="footnote_achievements" context="Footnote to clarify the storage space is subject to the achievement program">* Subject to your participation in our achievement program</string>
+
+    <string name="choose_qr_option_panel" context="Option of the sliding panel to go to QR code section">My QR code</string>
+    <string name="section_qr_code" context="Title of the screen that shows the options to the QR code">QR Code</string>
+    <string name="action_reset_qr" context="title of the screen that shows the options to the QR code">Reset QR code</string>
+    <string name="save_cloud_drive" context="Option shown in QR code bottom sheet dialog to save QR code in Cloud Drive">To Cloud Drive</string>
+    <string name="save_file_system" context="Option shown in QR code bottom sheet dialog to save QR code in File System">To File System</string>
+
 </resources>
 
