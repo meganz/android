@@ -319,7 +319,8 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
         switch (v.getId()) {
             case R.id.invite_button:{
                 if(chatEnabled){
-                    ((ManagerActivityLollipop)context).chooseAddContactDialog(false);
+                    //((ManagerActivityLollipop)context).chooseAddContactDialog(false);
+                    ((ManagerActivityLollipop)context).addContactFromPhone();
                     if(megaChatApi.isSignalActivityRequired()){
                         megaChatApi.signalPresenceActivity();
                     }

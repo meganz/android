@@ -9660,37 +9660,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			addContactDialog = b.create();
 			addContactDialog.show();
 		}
-
-//		Dialog addContactDialog;
-//		String[] addContactOptions = getResources().getStringArray(R.array.add_contact_array);
-//		AlertDialog.Builder b=new AlertDialog.Builder(this);
-//
-//		b.setTitle(getResources().getString(R.string.menu_add_contact));
-//		b.setItems(addContactOptions, new DialogInterface.OnClickListener() {
-//
-//			@Override
-//			public void onClick(DialogInterface dialog, int which) {
-//				switch(which){
-//					case 0:{
-//						showNewContactDialog();
-//						break;
-//					}
-//					case 1:{
-//						addContactFromPhone();
-//						break;
-//					}
-//				}
-//			}
-//		});
-//		b.setNegativeButton(getResources().getString(R.string.general_cancel), new DialogInterface.OnClickListener() {
-//
-//			@Override
-//			public void onClick(DialogInterface dialog, int which) {
-//				dialog.cancel();
-//			}
-//		});
-//		addContactDialog = b.create();
-//		addContactDialog.show();
 	}
 
 	public void addContactFromPhone(){
