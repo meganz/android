@@ -1322,12 +1322,27 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         if(megaChatApi.isSignalActivityRequired()){
             megaChatApi.signalPresenceActivity();
         }
-
-        Intent in = new Intent(this, AddContactActivityLollipop.class);
-        in.putExtra("contactType", Constants.CONTACT_TYPE_MEGA);
-        in.putExtra("chat", true);
-        startActivityForResult(in, Constants.REQUEST_ADD_PARTICIPANTS);
-
+        if(megaApi!=null && megaApi.getRootNode()!=null){
+            ArrayList<MegaUser> contacts = megaApi.getContacts();
+            if(contacts==null){
+                showSnackbar("You have no MEGA contacts. Please, invite friends from the Contacts section");
+            }
+            else {
+                if(contacts.isEmpty()){
+                    showSnackbar("You have no MEGA contacts. Please, invite friends from the Contacts section");
+                }
+                else{
+                    Intent in = new Intent(this, AddContactActivityLollipop.class);
+                    in.putExtra("contactType", Constants.CONTACT_TYPE_MEGA);
+                    in.putExtra("chat", true);
+                    startActivityForResult(in, Constants.REQUEST_ADD_PARTICIPANTS);
+                }
+            }
+        }
+        else{
+            log("Online but not megaApi");
+            Util.showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
+        }
     }
 
     public void chooseContactsDialog(){
@@ -1337,10 +1352,27 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             megaChatApi.signalPresenceActivity();
         }
 
-        Intent in = new Intent(this, AddContactActivityLollipop.class);
-        in.putExtra("contactType", Constants.CONTACT_TYPE_MEGA);
-        in.putExtra("chat", true);
-        startActivityForResult(in, Constants.REQUEST_SEND_CONTACTS);
+        if(megaApi!=null && megaApi.getRootNode()!=null){
+            ArrayList<MegaUser> contacts = megaApi.getContacts();
+            if(contacts==null){
+                showSnackbar("You have no MEGA contacts. Please, invite friends from the Contacts section");
+            }
+            else {
+                if(contacts.isEmpty()){
+                    showSnackbar("You have no MEGA contacts. Please, invite friends from the Contacts section");
+                }
+                else{
+                    Intent in = new Intent(this, AddContactActivityLollipop.class);
+                    in.putExtra("contactType", Constants.CONTACT_TYPE_MEGA);
+                    in.putExtra("chat", true);
+                    startActivityForResult(in, Constants.REQUEST_SEND_CONTACTS);
+                }
+            }
+        }
+        else{
+            log("Online but not megaApi");
+            Util.showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
+        }
     }
 
     @Override
