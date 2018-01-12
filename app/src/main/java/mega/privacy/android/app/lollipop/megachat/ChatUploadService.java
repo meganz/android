@@ -57,6 +57,8 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 	private boolean isForeground = false;
 	private boolean canceled;
 
+	boolean sendOriginalAttachments=false;
+
 	ArrayList<PendingMessage> pendingMessages;
 
 	MegaApplication app;
@@ -192,6 +194,9 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 						lock.acquire();
 					}
 					log("Chat file uploading: "+filePaths.get(i));
+
+
+
 					megaApi.startUpload(filePaths.get(i), parentNode);
 				}
 			}
@@ -383,13 +388,6 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
             if (error.getErrorCode() == MegaError.API_OK) {
                 log("Upload OK: " + transfer.getFileName());
 
-                File previewDir = PreviewUtils.getPreviewFolder(this);
-                File preview = new File(previewDir, MegaApiAndroid.handleToBase64(transfer.getNodeHandle())+".jpg");
-                File thumbDir = ThumbnailUtils.getThumbFolder(this);
-                File thumb = new File(thumbDir, MegaApiAndroid.handleToBase64(transfer.getNodeHandle())+".jpg");
-                megaApi.createThumbnail(transfer.getPath(), thumb.getAbsolutePath());
-                megaApi.createPreview(transfer.getPath(), preview.getAbsolutePath());
-
                 if(Util.isVideoFile(transfer.getPath())){
                     log("Is video!!!");
                     ThumbnailUtilsLollipop.createThumbnailVideo(this, transfer.getPath(), megaApi, transfer.getNodeHandle());
@@ -456,6 +454,35 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 
 					MegaNode node = megaApi.getNodeByHandle(transfer.getNodeHandle());
 					if(node!=null){
+
+						if(sendOriginalAttachments){
+							File previewDir = PreviewUtils.getPreviewFolder(this);
+							File preview = new File(previewDir, MegaApiAndroid.handleToBase64(transfer.getNodeHandle()) + ".jpg");
+							File thumbDir = ThumbnailUtils.getThumbFolder(this);
+							File thumb = new File(thumbDir, MegaApiAndroid.handleToBase64(transfer.getNodeHandle()) + ".jpg");
+							megaApi.createThumbnail(transfer.getPath(), thumb.getAbsolutePath());
+							megaApi.createPreview(transfer.getPath(), preview.getAbsolutePath());
+						}
+						else{
+							File previewDir = PreviewUtils.getPreviewFolder(this);
+
+							try{
+								File previewOldPreview = new File(transfer.getPath());
+								String newName = MegaApiAndroid.handleToBase64(transfer.getNodeHandle()) + ".jpg";
+								File preview = new File(previewDir, newName);
+
+								previewOldPreview.renameTo(preview);
+							}
+							catch (Exception e){
+								log("Cannot rename file preview");
+							}
+
+							File thumbDir = ThumbnailUtils.getThumbFolder(this);
+							File thumb = new File(thumbDir, MegaApiAndroid.handleToBase64(transfer.getNodeHandle()) + ".jpg");
+							megaApi.createThumbnail(transfer.getPath(), thumb.getAbsolutePath());
+							megaApi.setPreview(node, transfer.getPath());
+						}
+
 						try {
 							final ExifInterface exifInterface = new ExifInterface(transfer.getPath());
 							float[] latLong = new float[2];

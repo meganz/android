@@ -51,6 +51,7 @@ import java.util.regex.Pattern;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.UploadService;
@@ -63,6 +64,7 @@ import mega.privacy.android.app.lollipop.megachat.PendingMessage;
 import mega.privacy.android.app.lollipop.megachat.PendingNodeAttachment;
 import mega.privacy.android.app.lollipop.tasks.FilePrepareTask;
 import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.PreviewUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -110,6 +112,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 	public static int INCOMING_TAB = 1;
 	public static int CHAT_TAB = 2;
 
+	boolean sendOriginalAttachments = false;
 
 	DatabaseHandler dbH = null;
 
@@ -1059,17 +1062,64 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 						long idPendingMsg = dbH.setPendingMessage(idChat+"", Long.toString(timestamp));
 						if(idPendingMsg!=-1){
 							intent.putExtra(ChatUploadService.EXTRA_ID_PEND_MSG, idPendingMsg);
-
 							log("name of the file: "+info.getTitle());
 							log("size of the file: "+info.getSize());
-							String fingerprint = megaApi.getFingerprint(info.getFileAbsolutePath());
+							PendingNodeAttachment nodeAttachment = null;
 
-							//Add node to db
-							long idNode = dbH.setNodeAttachment(info.getFileAbsolutePath(), info.getTitle(), fingerprint);
+							if (MimeTypeList.typeForName(info.getFileAbsolutePath()).isImage()) {
 
-							dbH.setMsgNode(idPendingMsg, idNode);
+								if(sendOriginalAttachments){
+									String fingerprint = megaApi.getFingerprint(info.getFileAbsolutePath());
 
-							PendingNodeAttachment nodeAttachment = new PendingNodeAttachment(info.getFileAbsolutePath(), fingerprint, info.getTitle());
+									//Add node to db
+									long idNode = dbH.setNodeAttachment(info.getFileAbsolutePath(), info.getTitle(), fingerprint);
+
+									dbH.setMsgNode(idPendingMsg, idNode);
+
+									nodeAttachment = new PendingNodeAttachment(info.getFileAbsolutePath(), fingerprint, info.getTitle());
+								}
+								else{
+									File previewDir = PreviewUtils.getPreviewFolder(this);
+									String nameFilePreview = idChat+"_"+info.getTitle();
+									File preview = new File(previewDir, nameFilePreview);
+
+									boolean isPreview = megaApi.createPreview(info.getFileAbsolutePath(), preview.getAbsolutePath());
+
+									if(isPreview){
+										log("Preview: "+preview.getAbsolutePath());
+										String fingerprint = megaApi.getFingerprint(preview.getAbsolutePath());
+
+										//Add node to db
+										long idNode = dbH.setNodeAttachment(preview.getAbsolutePath(), info.getTitle(), fingerprint);
+
+										dbH.setMsgNode(idPendingMsg, idNode);
+
+										nodeAttachment = new PendingNodeAttachment(preview.getAbsolutePath(), fingerprint, info.getTitle());
+									}
+									else{
+										log("No preview");
+										String fingerprint = megaApi.getFingerprint(info.getFileAbsolutePath());
+
+										//Add node to db
+										long idNode = dbH.setNodeAttachment(info.getFileAbsolutePath(), info.getTitle(), fingerprint);
+
+										dbH.setMsgNode(idPendingMsg, idNode);
+
+										nodeAttachment = new PendingNodeAttachment(info.getFileAbsolutePath(), fingerprint, info.getTitle());
+									}
+								}
+							}
+							else{
+								String fingerprint = megaApi.getFingerprint(info.getFileAbsolutePath());
+
+								//Add node to db
+								long idNode = dbH.setNodeAttachment(info.getFileAbsolutePath(), info.getTitle(), fingerprint);
+
+								dbH.setMsgNode(idPendingMsg, idNode);
+
+								nodeAttachment = new PendingNodeAttachment(info.getFileAbsolutePath(), fingerprint, info.getTitle());
+							}
+
 							ArrayList<PendingNodeAttachment> nodeAttachments = new ArrayList<>();
 							nodeAttachments.add(nodeAttachment);
 							PendingMessage newPendingMsg = new PendingMessage(idPendingMsg, idChat, nodeAttachments, timestamp, PendingMessage.STATE_SENDING);
