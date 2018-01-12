@@ -1775,16 +1775,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 adapter.addMessage(messages, index+1);
                 final int indexToScroll = index+1;
                 mLayoutManager.scrollToPositionWithOffset(indexToScroll,Util.scaleHeightPx(20, outMetrics));
-//                Handler handler = new Handler();
-//                handler.postDelayed(new Runnable() {
-//
-//                    @Override
-//                    public void run() {
-//                        log("sendMessage: Now I update the recyclerview (send): "+indexToScroll);
-//
-//
-//                    }
-//                }, 100);
+
             }
         }
         else{
@@ -3349,7 +3340,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             if(scrollToP!=-1){
                 if(msg.getMessage().getStatus()==MegaChatMessage.STATUS_SERVER_RECEIVED){
                     log("modifyAttachmentReceived: need to scroll to position: "+indexToChange);
-                    mLayoutManager.scrollToPositionWithOffset(scrollToP, Util.scaleHeightPx(20, outMetrics));
+                    final int indexToScroll = indexToChange+1;
+                    mLayoutManager.scrollToPositionWithOffset(indexToScroll,Util.scaleHeightPx(20, outMetrics));
+
                 }
             }
         }
