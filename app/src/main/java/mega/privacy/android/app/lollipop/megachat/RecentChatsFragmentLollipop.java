@@ -303,6 +303,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
     }
 
     public void showNoConnectionScreen(){
+        log("showNoConnectionScreen");
 
         listView.setVisibility(View.GONE);
         ((ManagerActivityLollipop)context).hideFabButton();
@@ -319,9 +320,15 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
         switch (v.getId()) {
             case R.id.invite_button:{
                 if(chatEnabled){
-                    ((ManagerActivityLollipop)context).chooseAddContactDialog(false);
-                    if(megaChatApi.isSignalActivityRequired()){
-                        megaChatApi.signalPresenceActivity();
+                    //((ManagerActivityLollipop)context).chooseAddContactDialog(false);
+                    if(Util.isOnline(context)){
+                        ((ManagerActivityLollipop)context).addContactFromPhone();
+                        if(megaChatApi.isSignalActivityRequired()){
+                            megaChatApi.signalPresenceActivity();
+                        }
+                    }
+                    else{
+                        ((ManagerActivityLollipop)context).showSnackbar(getString(R.string.error_server_connection_problem));
                     }
                 }
                 else{

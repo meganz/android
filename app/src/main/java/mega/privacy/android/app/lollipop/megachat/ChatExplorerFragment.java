@@ -2,11 +2,9 @@ package mega.privacy.android.app.lollipop.megachat;
 
 import android.app.Activity;
 import android.content.Context;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -33,7 +31,6 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaChatExplorerAdapter;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaListChatLollipopAdapter;
 import mega.privacy.android.app.utils.Util;
@@ -69,6 +66,7 @@ public class ChatExplorerFragment extends Fragment{
     TextView emptyTextViewInvite;
     ImageView emptyImageView;
     int chatStatus;
+    Button inviteButton;
 
     boolean chatEnabled = true;
     float density;
@@ -140,15 +138,17 @@ public class ChatExplorerFragment extends Fragment{
         emptyTextView.setLayoutParams(emptyTextViewParams2);
 
         emptyImageView = (ImageView) v.findViewById(R.id.empty_image_view_chat);
+        emptyImageView.setImageResource(R.drawable.ic_empty_chat_list);
 
         mainRelativeLayout = (RelativeLayout) v.findViewById(R.id.main_relative_layout);
+        inviteButton = (Button) v.findViewById(R.id.invite_button);
+        inviteButton.setVisibility(View.GONE);
 
         if(megaChatApi.isSignalActivityRequired()){
             megaChatApi.signalPresenceActivity();
         }
 
         this.setChats();
-
 
         return v;
     }

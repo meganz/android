@@ -349,6 +349,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
 
             contactAvatarLayout.setVisibility(View.VISIBLE);
             videoFAB.setBackgroundTintList(ColorStateList.valueOf(Color.BLACK));
+            videoFAB.setImageDrawable(getResources().getDrawable(R.drawable.ic_video_off));
 
             //Contact's avatar
             chatId = extras.getLong("chatHandle", -1);
@@ -635,6 +636,9 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
         this.height=0;
         super.onResume();
         mSensorManager.registerListener(this, mSensor, SensorManager.SENSOR_DELAY_NORMAL);
+        this.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
+        this.getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
+        this.getWindow().addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
         MegaApplication.activityResumed();
         ((MegaApplication) getApplication()).sendSignalPresenceActivity();
     }
@@ -1009,6 +1013,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
 
             videoFAB.setVisibility(View.VISIBLE);
             videoFAB.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.accentColor)));
+            videoFAB.setImageDrawable(getResources().getDrawable(R.drawable.ic_videocam_white));
 
             microFAB.setVisibility(GONE);
         }
@@ -1031,6 +1036,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
             if(myAvatarLayout.getVisibility()==View.VISIBLE){
                 myAvatarLayout.setVisibility(GONE);
                 videoFAB.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.accentColor)));
+                videoFAB.setImageDrawable(getResources().getDrawable(R.drawable.ic_videocam_white));
 
                 localCameraFragment = new LocalCameraCallFragment();
                 parent.setVisibility(View.VISIBLE);
@@ -1058,6 +1064,8 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
 
             myAvatarLayout.setVisibility(View.VISIBLE);
             videoFAB.setBackgroundTintList(ColorStateList.valueOf(Color.BLACK));
+            videoFAB.setImageDrawable(getResources().getDrawable(R.drawable.ic_video_off));
+
         }
     }
 
@@ -1065,10 +1073,14 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
         if(callChat.hasLocalAudio()){
             log("Audio local connected");
             microFAB.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.accentColor)));
+            microFAB.setImageDrawable(getResources().getDrawable(R.drawable.ic_record_audio_w));
+
         }
         else{
             log("Audio local NOT connected");
             microFAB.setBackgroundTintList(ColorStateList.valueOf(Color.BLACK));
+            microFAB.setImageDrawable(getResources().getDrawable(R.drawable.ic_mic_off));
+
         }
     }
 
