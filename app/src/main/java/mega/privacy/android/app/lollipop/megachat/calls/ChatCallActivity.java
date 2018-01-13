@@ -1355,7 +1355,9 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                         audioManager.adjustStreamVolume(AudioManager.STREAM_VOICE_CALL, AudioManager.ADJUST_RAISE, AudioManager.FLAG_SHOW_UI);
                     }
                 }
-                catch(SecurityException e) {}
+                catch(SecurityException e) {
+                    return super.onKeyDown(keyCode, event);
+                }
 
                 return true;
             }
@@ -1368,7 +1370,9 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                     } else {
                         audioManager.adjustStreamVolume(AudioManager.STREAM_VOICE_CALL, AudioManager.ADJUST_LOWER, AudioManager.FLAG_SHOW_UI);
                     }
-                } catch(SecurityException e) {}
+                } catch(SecurityException e) {
+                    return super.onKeyDown(keyCode, event);
+                }
 
                 return true;
             }
