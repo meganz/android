@@ -370,7 +370,9 @@ public class ChatExplorerFragment extends Fragment{
     public void onSaveInstanceState(Bundle outState) {
         log("onSaveInstanceState");
         super.onSaveInstanceState(outState);
-        outState.putParcelable(BUNDLE_RECYCLER_LAYOUT, listView.getLayoutManager().onSaveInstanceState());
+        if(listView.getLayoutManager()!=null){
+            outState.putParcelable(BUNDLE_RECYCLER_LAYOUT, listView.getLayoutManager().onSaveInstanceState());
+        }
     }
 
     @Override

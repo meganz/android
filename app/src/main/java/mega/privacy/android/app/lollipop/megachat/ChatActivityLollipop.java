@@ -1370,6 +1370,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
         log("onActivityResult, resultCode: " + resultCode);
 
+        super.setShowPinScreen(true);
+
         if (requestCode == Constants.REQUEST_ADD_PARTICIPANTS && resultCode == RESULT_OK) {
             log("onActivityResult REQUEST_ADD_PARTICIPANTS OK");
 
@@ -4145,7 +4147,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 //getFlag - Returns true if it is a video-audio call or false for audio call
                 Intent i = new Intent(this, ChatCallActivity.class);
                 i.putExtra("chatHandle", chatRoom.getChatId());
-                i.putExtra("isVideo", request.getFlag());
                 startActivity(i);
             }
             else{
