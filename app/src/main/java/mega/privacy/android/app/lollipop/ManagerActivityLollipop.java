@@ -1573,14 +1573,17 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					String gSession = credentials.getSession();
 					int ret = megaChatApi.getInitState();
 					log("In Offline mode: init chat is: "+ret);
-					if(ret!=0){
-						log("Offline mode: Do not init, chat already initialized");
+					if(ret==0||ret==MegaChatApi.INIT_ERROR){
+						ret = megaChatApi.init(gSession);
+						log("After init: "+ret);
 					}
 					else{
-						ret = megaChatApi.init(gSession);
-						log("Offline mode: chat initialized: "+ret);
+						log("Offline mode: Do not init, chat already initialized");
 					}
 				}
+			}
+			else{
+				log("Offline mode: chat disabled");
 			}
 			return;
         }
@@ -2051,7 +2054,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						megaChatApi.connect(this);
 					}
 					else{
-						log("Not connected: "+megaChatApi.getInitState());
+						log("Not launch connect: "+megaChatApi.getInitState());
 					}
 				}
 				else{
@@ -3258,25 +3261,35 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						//Cloud Drive TAB
 						MegaNode parentNode = megaApi.getNodeByHandle(parentHandleBrowser);
 						if (parentNode != null){
-							if (parentNode.getHandle() == megaApi.getRootNode().getHandle() || parentHandleBrowser == -1){
-								log("setToolbarTitle: cloud DRIVE 202");
+							if(megaApi.getRootNode()!=null){
+								if (parentNode.getHandle() == megaApi.getRootNode().getHandle() || parentHandleBrowser == -1){
+									log("setToolbarTitle: cloud DRIVE 202");
+									aB.setTitle(getString(R.string.section_cloud_drive));
+									aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+									firstNavigationLevel = true;
+								}
+								else{
+									aB.setTitle(parentNode.getName());
+									log("indicator_arrow_back_887");
+									aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+									firstNavigationLevel = false;
+								}
+							}
+							else{
+								parentHandleBrowser = -1;
+							}
+						}
+						else{
+							if(megaApi.getRootNode()!=null){
+								parentHandleBrowser = megaApi.getRootNode().getHandle();
+								log("setToolbarTitle: cloud DRIVE 204");
 								aB.setTitle(getString(R.string.section_cloud_drive));
 								aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 								firstNavigationLevel = true;
 							}
 							else{
-								aB.setTitle(parentNode.getName());
-								log("indicator_arrow_back_887");
-								aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
-								firstNavigationLevel = false;
+								parentHandleBrowser = -1;
 							}
-						}
-						else{
-							parentHandleBrowser = megaApi.getRootNode().getHandle();
-							log("setToolbarTitle: cloud DRIVE 204");
-							aB.setTitle(getString(R.string.section_cloud_drive));
-							aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
-							firstNavigationLevel = true;
 						}
 						break;
 					}
@@ -3453,12 +3466,22 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					sttFLol.setOnlineOptions(true);
 				}
 			}
+
 			supportInvalidateOptionsMenu();
 		}
 		else{
 			log("showOnlineMode - Root is NULL");
 			if(getApplicationContext()!=null){
 				showConfirmationConnect();
+			}
+		}
+
+		if (rChatFL != null){
+			if(rChatFL.isAdded()){
+				log("ONLINE: Update screen RecentChats");
+				if(!Util.isChatEnabled()){
+					rChatFL.showDisableChatScreen();
+				}
 			}
 		}
 	}
@@ -3558,6 +3581,15 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 		}
 
+		if (rChatFL != null){
+			if(rChatFL.isAdded()){
+				log("OFFLINE: Update screen RecentChats");
+				if(!Util.isChatEnabled()){
+					rChatFL.showNoConnectionScreen();
+				}
+			}
+		}
+
 		log("DrawerItem on start offline: "+drawerItem);
 		if(drawerItem==null){
 			log("On start OFFLINE MODE");
@@ -3584,7 +3616,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		}
 
 		supportInvalidateOptionsMenu();
-
 	}
 
 	public void clickDrawerItemLollipop(DrawerItem item){
@@ -14600,21 +14631,21 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 	@Override
 	public void onChatInitStateUpdate(MegaChatApiJava api, int newState) {
-		log("onChatInitStateUpdate");
+		log("onChatInitStateUpdate: "+newState);
 		if (newState == MegaChatApi.INIT_ERROR) {
 			// chat cannot initialize, disable chat completely
-			log("newState == MegaChatApi.INIT_ERROR");
-			if (chatSettings == null) {
-				log("1 - onChatInitStateUpdate: ERROR----> Switch OFF chat");
-				chatSettings = new ChatSettings(false + "", true + "", "", true + "");
-				dbH.setChatSettings(chatSettings);
-			} else {
-				log("2 - onChatInitStateUpdate: ERROR----> Switch OFF chat");
-				dbH.setEnabledChat(false + "");
-			}
-			if(megaChatApi!=null){
-				megaChatApi.logout(null);
-			}
+//			log("newState == MegaChatApi.INIT_ERROR");
+//			if (chatSettings == null) {
+//				log("1 - onChatInitStateUpdate: ERROR----> Switch OFF chat");
+//				chatSettings = new ChatSettings(false + "", true + "", "", true + "");
+//				dbH.setChatSettings(chatSettings);
+//			} else {
+//				log("2 - onChatInitStateUpdate: ERROR----> Switch OFF chat");
+//				dbH.setEnabledChat(false + "");
+//			}
+//			if(megaChatApi!=null){
+//				megaChatApi.logout(null);
+//			}
 		}
 	}
 
