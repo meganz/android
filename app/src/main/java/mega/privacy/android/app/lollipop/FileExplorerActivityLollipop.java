@@ -461,6 +461,9 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 				log("SESSION: " + gSession);
 				megaApi.fastLogin(gSession, this);
 			}
+			else{
+				log("Another login is proccessing");
+			}
 		}
 		else{
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
