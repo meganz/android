@@ -352,6 +352,9 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
                     log("SESSION: " + gSession);
                     megaApi.fastLogin(gSession, this);
                 }
+                else{
+                    log("Another login is processing");
+                }
             }
             else{
                 ((MegaApplication) getApplication()).sendSignalPresenceActivity();

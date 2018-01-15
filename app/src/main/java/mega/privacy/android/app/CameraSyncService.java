@@ -374,6 +374,9 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 
 							megaApi.fastLogin(gSession, this);
 						}
+						else{
+							log("Another login is processing");
+						}
 						return START_NOT_STICKY;
 					}
 

@@ -265,6 +265,9 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 					megaApi.fastLogin(gSession, this);
 					return;
 				}
+				else{
+					log("Another login is processing");
+				}
 				pendingIntents.add(intent);
 				return;
 			}

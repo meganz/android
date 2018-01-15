@@ -809,7 +809,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 {
                     log("enableChat: condition ret == MegaChatApi.INIT_NO_CACHE");
                     megaApi.invalidateCache();
-
                 }
                 else if (ret == MegaChatApi.INIT_ERROR)
                 {
@@ -839,16 +838,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
         }
         else{
-            log("enableChat:isLogginIn true");
-            if(chatSettings==null) {
-                log("3 - enableChat: ERROR----> Switch OFF chat");
-                chatSettings = new ChatSettings(false+"", true + "", "",true + "");
-                dbH.setChatSettings(chatSettings);
-            }
-            else{
-                log("4 - enableChat: ERROR----> Switch OFF chat");
-                dbH.setEnabledChat(false + "");
-            }
+            log("Another login is processing");
         }
     }
 
@@ -944,6 +934,9 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 log("startFastLogin: Chat is NOT ENABLED");
             }
             megaApi.fastLogin(gSession, this);
+        }
+        else{
+            log("Another login is proccessing");
         }
     }
 
