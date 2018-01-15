@@ -3132,6 +3132,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             mLayoutManager.scrollToPosition(messages.size());
         }
         else{
+            if((softKeyboardShown || emojiKeyboardShown)&&(messages.size()==1)){
+                mLayoutManager.scrollToPosition(messages.size());
+            }
             log("DONT scroll to end");
         }
 
@@ -3384,7 +3387,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             if(scrollToP!=-1){
                 if(msg.getMessage().getStatus()==MegaChatMessage.STATUS_SERVER_RECEIVED){
                     log("modifyAttachmentReceived: need to scroll to position: "+indexToChange);
-                    final int indexToScroll = indexToChange+1;
+                    final int indexToScroll = scrollToP+1;
                     mLayoutManager.scrollToPositionWithOffset(indexToScroll,Util.scaleHeightPx(20, outMetrics));
 
                 }
@@ -3503,7 +3506,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     if(msg.getMessage().getStatus()==MegaChatMessage.STATUS_SERVER_RECEIVED){
                         log("modifyMessageReceived: need to scroll to position: "+indexToChange);
                         mLayoutManager.scrollToPosition(scrollToP+1);
-
                         //mLayoutManager.scrollToPositionWithOffset(scrollToP, Util.scaleHeightPx(20, outMetrics));
                     }
                 }
