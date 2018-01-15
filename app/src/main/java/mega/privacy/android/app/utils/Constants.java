@@ -200,7 +200,7 @@ public class Constants {
 	public static int TAKE_PICTURE_OPTION = 0;
 	public static int TAKE_PROFILE_PICTURE = 1;
 
-	final public static String MAIL_ANDROID = "android@mega.nz";
+	final public static String MAIL_ANDROID = "androidfeedback@mega.nz";
 
 	public static int MIN_ITEMS_SCROLLBAR = 30;
 	public static int MIN_ITEMS_SCROLLBAR_GRID = 200;
