@@ -1571,8 +1571,15 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				UserCredentials credentials = dbH.getCredentials();
 				if(credentials!=null){
 					String gSession = credentials.getSession();
-					int ret = megaChatApi.init(gSession);
+					int ret = megaChatApi.getInitState();
 					log("In Offline mode: init chat is: "+ret);
+					if(ret!=0){
+						log("Offline mode: Do not init, chat already initialized");
+					}
+					else{
+						ret = megaChatApi.init(gSession);
+						log("Offline mode: chat initialized: "+ret);
+					}
 				}
 			}
 			return;
