@@ -122,12 +122,16 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
     private Notification.Builder mBuilder;
     private NotificationManager mNotificationManager;
 
+    private boolean isUrl;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         log("onCreate");
 
         setContentView(R.layout.activity_audiovideoplayer);
+
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         Intent intent = getIntent();
         if (intent == null){
@@ -149,6 +153,14 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
             return;
         }
         log("uri: "+uri);
+
+        if (uri.toString().contains("http://")){
+            isUrl = true;
+        }
+        else {
+            isUrl = false;
+        }
+
         appBarLayout = (AppBarLayout) findViewById(R.id.app_bar);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -450,6 +462,13 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
 
         shareIcon = menu.findItem(R.id.full_video_viewer_share);
 
+        if (isUrl) {
+            shareIcon.setVisible(false);
+        }
+        else {
+            shareIcon.setVisible(true);
+        }
+
         Drawable share = getResources().getDrawable(R.drawable.ic_social_share_white);
         share.setColorFilter(getResources().getColor(R.color.white), PorterDuff.Mode.SRC_ATOP);
         shareIcon.setIcon(share);
@@ -514,20 +533,21 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
         log("intentToSendFile");
 
         if(uri!=null){
-            Intent share = new Intent(android.content.Intent.ACTION_SEND);
-            share.setType("application/pdf");
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                log("Use provider to share");
-                share.putExtra(Intent.EXTRA_STREAM, Uri.parse(uri.toString()));
-                share.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            if (!isUrl) {
+                Intent share = new Intent(android.content.Intent.ACTION_SEND);
+                share.setType("application/pdf");
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    log("Use provider to share");
+                    share.putExtra(Intent.EXTRA_STREAM, Uri.parse(uri.toString()));
+                    share.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                } else {
+                    share.putExtra(Intent.EXTRA_STREAM, uri);
+                }
+                startActivity(Intent.createChooser(share, getString(R.string.context_share)));
             }
             else{
-                share.putExtra(Intent.EXTRA_STREAM, uri);
+                Snackbar.make(this.getCurrentFocus(), getString(R.string.not_download), Snackbar.LENGTH_LONG).show();
             }
-            startActivity(Intent.createChooser(share, getString(R.string.context_share_image)));
-        }
-        else{
-            Snackbar.make(this.getCurrentFocus(), getString(R.string.full_image_viewer_not_preview), Snackbar.LENGTH_LONG).show();
         }
     }
 

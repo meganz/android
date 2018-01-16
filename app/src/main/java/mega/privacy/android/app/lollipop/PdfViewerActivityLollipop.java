@@ -322,35 +322,43 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
                         if (megaChatApi == null) {
                             megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
                         }
-                        int ret = megaChatApi.init(gSession);
-                        log("onCreate: result of init ---> " + ret);
-                        chatSettings = dbH.getChatSettings();
-                        if (ret == MegaChatApi.INIT_NO_CACHE) {
-                            log("onCreate: condition ret == MegaChatApi.INIT_NO_CACHE");
-                            megaApi.invalidateCache();
 
-                        } else if (ret == MegaChatApi.INIT_ERROR) {
+                        int ret = megaChatApi.getInitState();
 
-                            log("onCreate: condition ret == MegaChatApi.INIT_ERROR");
-                            if (chatSettings == null) {
+                        if(ret==0||ret==MegaChatApi.INIT_ERROR){
+                            ret = megaChatApi.init(gSession);
+                            log("onCreate: result of init ---> " + ret);
+                            chatSettings = dbH.getChatSettings();
+                            if (ret == MegaChatApi.INIT_NO_CACHE) {
+                                log("onCreate: condition ret == MegaChatApi.INIT_NO_CACHE");
+                                megaApi.invalidateCache();
 
-                                log("1 - onCreate: ERROR----> Switch OFF chat");
-                                chatSettings = new ChatSettings(false + "", true + "", "", true + "");
-                                dbH.setChatSettings(chatSettings);
+                            } else if (ret == MegaChatApi.INIT_ERROR) {
+
+                                log("onCreate: condition ret == MegaChatApi.INIT_ERROR");
+                                if (chatSettings == null) {
+
+                                    log("1 - onCreate: ERROR----> Switch OFF chat");
+                                    chatSettings = new ChatSettings(false + "", true + "", "", true + "");
+                                    dbH.setChatSettings(chatSettings);
+                                } else {
+
+                                    log("2 - onCreate: ERROR----> Switch OFF chat");
+                                    dbH.setEnabledChat(false + "");
+                                }
+                                megaChatApi.logout(this);
                             } else {
 
-                                log("2 - onCreate: ERROR----> Switch OFF chat");
-                                dbH.setEnabledChat(false + "");
+                                log("onCreate: Chat correctly initialized");
                             }
-                            megaChatApi.logout(this);
-                        } else {
-
-                            log("onCreate: Chat correctly initialized");
                         }
                     }
 
                     log("SESSION: " + gSession);
                     megaApi.fastLogin(gSession, this);
+                }
+                else{
+                    log("Another login is processing");
                 }
             }
             else{
@@ -487,6 +495,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
         downloadMenuItem = menu.findItem(R.id.pdfviewer_download);
         if (isUrl){
             log("isURL");
+            shareMenuItem.setVisible(false);
             downloadMenuItem.setVisible(true);
             Drawable download = getResources().getDrawable(R.drawable.ic_download_white);
             download.setColorFilter(getResources().getColor(R.color.lollipop_primary_color), PorterDuff.Mode.SRC_ATOP);
@@ -494,7 +503,6 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
             downloadMenuItem.setIcon(download);
         }
         else {
-
             log("NOT isURL");
             downloadMenuItem.setVisible(false);
         }
@@ -530,21 +538,23 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
         log("intentToSendFile");
 
         if(uri!=null){
-            Intent share = new Intent(android.content.Intent.ACTION_SEND);
-            share.setType("application/pdf");
+            if (!isUrl){
+                Intent share = new Intent(android.content.Intent.ACTION_SEND);
+                share.setType("application/pdf");
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                log("Use provider to share");
-                share.putExtra(Intent.EXTRA_STREAM, Uri.parse(uri.toString()));
-                share.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    log("Use provider to share");
+                    share.putExtra(Intent.EXTRA_STREAM, Uri.parse(uri.toString()));
+                    share.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                }
+                else{
+                    share.putExtra(Intent.EXTRA_STREAM, uri);
+                }
+                startActivity(Intent.createChooser(share, getString(R.string.context_share)));
             }
-            else{
-                share.putExtra(Intent.EXTRA_STREAM, uri);
+            else {
+                Snackbar.make(pdfviewerContainer, getString(R.string.not_download), Snackbar.LENGTH_LONG).show();
             }
-            startActivity(Intent.createChooser(share, getString(R.string.context_share_image)));
-        }
-        else{
-            Snackbar.make(pdfviewerContainer, getString(R.string.pdf_viewer_not_download), Snackbar.LENGTH_LONG).show();
         }
     }
 
@@ -979,7 +989,13 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
                     if(chatEnabled){
 
                         log("Chat enabled-->connect");
-                        megaChatApi.connect(this);
+                        if((megaChatApi.getInitState()!=MegaChatApi.INIT_ERROR)){
+                            log("Connection goes!!!");
+                            megaChatApi.connect(this);
+                        }
+                        else{
+                            log("Not launch connect: "+megaChatApi.getInitState());
+                        }
                         MegaApplication.setLoggingIn(false);
                         uploadToCloud();
                     }
