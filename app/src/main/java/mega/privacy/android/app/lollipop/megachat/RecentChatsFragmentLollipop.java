@@ -430,6 +430,8 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
                 case R.id.chat_list_leave_chat_layout:{
                     //Leave group chat
                     ((ManagerActivityLollipop)context).showConfirmationLeaveChats(chats);
+                    clearSelections();
+                    hideMultipleSelect();
                     break;
                 }
             }
@@ -654,14 +656,17 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
             log("listItemUpdate: Change status: MegaChatListItem.CHANGE_TYPE_STATUS");
         }
         else if(item.hasChanged(MegaChatListItem.CHANGE_TYPE_OWN_PRIV)){
+
             log("listItemUpdate: Change status: MegaChatListItem.CHANGE_TYPE_OWN_PRIV");
         }
         else if(item.hasChanged(MegaChatListItem.CHANGE_TYPE_PARTICIPANTS)){
+
             log("listItemUpdate: Change participants");
             MegaChatRoom chatToCheck = megaChatApi.getChatRoom(item.getChatId());
             updateCacheForNonContacts(chatToCheck);
         }
         else if(item.hasChanged(MegaChatListItem.CHANGE_TYPE_UNREAD_COUNT)){
+
             log("listItemUpdate: Change unread count: "+item.getTitle());
             if(item!=null){
 
@@ -702,6 +707,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
             }
         }
         else if(item.hasChanged(MegaChatListItem.CHANGE_TYPE_LAST_TS)){
+
             log("Change last ts: "+item.getChanges());
 
             long chatHandleToUpdate = item.getChatId();
@@ -732,6 +738,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
 
         }
         else if((item.hasChanged(MegaChatListItem.CHANGE_TYPE_TITLE))){
+
             log("listItemUpdate: Change title: "+item.getTitle());
 
             if(item!=null){
@@ -766,6 +773,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
             }
         }
         else if(item.hasChanged(MegaChatListItem.CHANGE_TYPE_LAST_MSG)){
+
             log("listItemUpdate: Change last message: "+item.getTitle());
 
             if(item!=null){
@@ -806,6 +814,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
             }
         }
         else if(item.hasChanged(MegaChatListItem.CHANGE_TYPE_CLOSED)){
+
             log("listItemUpdate: Change closed: MegaChatListItem.CHANGE_TYPE_CLOSED");
             log("listItemUpdate: Own privilege: "+item.getOwnPrivilege());
 
@@ -851,6 +860,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
         }
         else{
             log("listItemUpdate: Other change: "+item.getChanges());
+
             if(item!=null){
                 log("New chat: "+item.getTitle());
                 setChats();
