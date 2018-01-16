@@ -1103,6 +1103,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                 }
             }
         }
+        addContactEditText.setText("");
     }
 
     public void itemClick(View view, int position) {
@@ -1142,6 +1143,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                 showSnackbar(getResources().getString(R.string.max_add_contact));
             }
         }
+        addContactEditText.setText("");
 
     }
 
