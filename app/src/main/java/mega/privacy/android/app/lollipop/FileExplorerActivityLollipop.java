@@ -426,40 +426,48 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 					if (megaChatApi == null){
 						megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
 					}
-					int ret = megaChatApi.init(gSession);
-					log("onCreate: result of init ---> "+ret);
-					chatSettings = dbH.getChatSettings();
-					if (ret == MegaChatApi.INIT_NO_CACHE)
-					{
-						log("onCreate: condition ret == MegaChatApi.INIT_NO_CACHE");
-						megaApi.invalidateCache();
 
-					}
-					else if (ret == MegaChatApi.INIT_ERROR)
-					{
+					int ret = megaChatApi.getInitState();
 
-						log("onCreate: condition ret == MegaChatApi.INIT_ERROR");
-						if(chatSettings==null) {
+					if(ret==0||ret==MegaChatApi.INIT_ERROR){
+						ret = megaChatApi.init(gSession);
+						log("onCreate: result of init ---> "+ret);
+						chatSettings = dbH.getChatSettings();
+						if (ret == MegaChatApi.INIT_NO_CACHE)
+						{
+							log("onCreate: condition ret == MegaChatApi.INIT_NO_CACHE");
+							megaApi.invalidateCache();
 
-							log("1 - onCreate: ERROR----> Switch OFF chat");
-							chatSettings = new ChatSettings(false+"", true + "", "",true + "");
-							dbH.setChatSettings(chatSettings);
+						}
+						else if (ret == MegaChatApi.INIT_ERROR)
+						{
+
+							log("onCreate: condition ret == MegaChatApi.INIT_ERROR");
+							if(chatSettings==null) {
+
+								log("1 - onCreate: ERROR----> Switch OFF chat");
+								chatSettings = new ChatSettings(false+"", true + "", "",true + "");
+								dbH.setChatSettings(chatSettings);
+							}
+							else{
+
+								log("2 - onCreate: ERROR----> Switch OFF chat");
+								dbH.setEnabledChat(false + "");
+							}
+							megaChatApi.logout(this);
 						}
 						else{
 
-							log("2 - onCreate: ERROR----> Switch OFF chat");
-							dbH.setEnabledChat(false + "");
+							log("onCreate: Chat correctly initialized");
 						}
-						megaChatApi.logout(this);
-					}
-					else{
-
-						log("onCreate: Chat correctly initialized");
 					}
 				}
 
 				log("SESSION: " + gSession);
 				megaApi.fastLogin(gSession, this);
+			}
+			else{
+				log("Another login is proccessing");
 			}
 		}
 		else{
@@ -1697,7 +1705,13 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 					if(chatEnabled){
 
 						log("Chat enabled-->connect");
-						megaChatApi.connect(this);
+						if((megaChatApi.getInitState()!=MegaChatApi.INIT_ERROR)){
+							log("Connection goes!!!");
+							megaChatApi.connect(this);
+						}
+						else{
+							log("Not launch connect: "+megaChatApi.getInitState());
+						}
 						MegaApplication.setLoggingIn(false);
 						afterLoginAndFetch();
 					}
