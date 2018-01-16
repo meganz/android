@@ -363,16 +363,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             megaChatApi = app.getMegaChatApi();
         }
 
-        if(megaApi==null||megaApi.getRootNode()==null){
-            log("Refresh session - sdk");
-            Intent intent = new Intent(this, LoginActivityLollipop.class);
-            intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivity(intent);
-            finish();
-            return;
-        }
-        if(megaChatApi==null||megaChatApi.getInitState()==MegaChatApi.INIT_ERROR){
+        if(megaChatApi==null||megaChatApi.getInitState()==MegaChatApi.INIT_ERROR||megaChatApi.getInitState()==0){
             log("Refresh session - karere");
             Intent intent = new Intent(this, LoginActivityLollipop.class);
             intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
@@ -1375,6 +1366,11 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
     }
 
+    public void disablePinScreen(){
+        log("disablePinScreen");
+        super.setShowPinScreen(false);
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
         log("onActivityResult, resultCode: " + resultCode);
@@ -1780,6 +1776,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     public void attachPhotoVideo(){
         log("attachPhotoVideo");
+
+        disablePinScreen();
+
         Intent intent = new Intent();
         intent.setAction(Intent.ACTION_OPEN_DOCUMENT);
         intent.setAction(Intent.ACTION_GET_CONTENT);
@@ -4154,7 +4153,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 //getFlag - Returns true if it is a video-audio call or false for audio call
                 Intent i = new Intent(this, ChatCallActivity.class);
                 i.putExtra("chatHandle", chatRoom.getChatId());
-                i.putExtra("isVideo", request.getFlag());
                 startActivity(i);
             }
             else{
@@ -4598,9 +4596,11 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         log("onResume");
         super.onResume();
 
-       activityVisible = true;
+        super.setShowPinScreen(true);
 
-       setLastMessageSeen();
+        activityVisible = true;
+
+        setLastMessageSeen();
 
         if (emojiKeyboardShown){
             keyboardButton.setImageResource(R.drawable.ic_emoticon_white);

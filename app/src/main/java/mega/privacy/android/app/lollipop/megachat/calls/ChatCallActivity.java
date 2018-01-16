@@ -104,7 +104,6 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
 
     long chatId;
     long callId;
-    boolean isVideoOutgoing;
     MegaChatRoom chat;
     MegaChatCall callChat;
     private MegaApiAndroid megaApi = null;
@@ -296,6 +295,15 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
 
         powerManager = (PowerManager) getSystemService(POWER_SERVICE);
         wakeLock = powerManager.newWakeLock(field, getLocalClassName());
+
+// Wake screen for Xiaomi devices
+//        if (!powerManager.isInteractive()){ // if screen is not already on, turn it on (get wake_lock for 10 seconds)
+//            PowerManager.WakeLock wl = powerManager.newWakeLock(PowerManager.FULL_WAKE_LOCK |PowerManager.ACQUIRE_CAUSES_WAKEUP |PowerManager.ON_AFTER_RELEASE,"MH24_SCREENLOCK");
+//            wl.acquire(10000);
+//            PowerManager.WakeLock wl_cpu = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,"MH24_SCREENLOCK");
+//            wl_cpu.acquire(10000);
+//        }
+
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         tB = (Toolbar) findViewById(R.id.call_toolbar);
@@ -378,7 +386,6 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
 
             //Contact's avatar
             chatId = extras.getLong("chatHandle", -1);
-            isVideoOutgoing =  extras.getBoolean("isVideo", false);
             log("Chat handle to call: " + chatId);
             if (chatId != -1) {
                 chat = megaChatApi.getChatRoom(chatId);
@@ -421,6 +428,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                 }
                 else{
                     log("Outgoing call");
+
                     int volume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
                     if (volume == 0) {
                         toneGenerator = new ToneGenerator(AudioManager.STREAM_VOICE_CALL, 100);
@@ -431,6 +439,8 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                         thePlayer.setLooping(true);
                         thePlayer.start();
                     }
+                  
+                    updateLocalVideoStatus();
                 }
 
                 fullName = chat.getPeerFullname(0);
@@ -862,9 +872,6 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
 
                     showInitialFABConfiguration();
                     startClock();
-                    if(isVideoOutgoing){
-                        updateLocalVideoStatus();
-                    }
                     if(callChat.hasRemoteAudio()){
                         log("Remote audio is connected");
                     }
@@ -1122,6 +1129,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
     }
 
     public void updateLocalVideoStatus(){
+        log("updateLocalVideoStatus");
         if(callChat.hasLocalVideo()){
             log("Video local connected");
             if(myAvatarLayout.getVisibility()==View.VISIBLE){

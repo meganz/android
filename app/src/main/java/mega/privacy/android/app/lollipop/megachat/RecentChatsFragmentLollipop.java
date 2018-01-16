@@ -83,7 +83,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
     Button inviteButton;
     int chatStatus;
 
-    boolean chatEnabled = true;
+//    boolean chatEnabled = true;
     float density;
     DisplayMetrics outMetrics;
     Display display;
@@ -110,14 +110,12 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
         dbH = DatabaseHandler.getDbHandler(getActivity());
 
         if(Util.isChatEnabled()){
-            chatEnabled=true;
             if (megaChatApi == null){
                 megaChatApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaChatApi();
             }
         }
         else{
             log("Chat not enabled!");
-            chatEnabled=false;
         }
     }
 
@@ -194,7 +192,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
 
         mainRelativeLayout = (RelativeLayout) v.findViewById(R.id.main_relative_layout);
 
-        if(chatEnabled){
+        if(Util.isChatEnabled()){
             log("Chat ENABLED");
 
             setStatus();
@@ -228,7 +226,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
         log("setChats");
 
         if(isAdded()){
-            if(chatEnabled){
+            if(Util.isChatEnabled()){
                 if(chats!=null){
                     chats.clear();
                 }
@@ -267,8 +265,14 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
 
                 if (adapterList.getItemCount() == 0){
                     log("adapterList.getItemCount() == 0");
-                    listView.setVisibility(View.GONE);
-                    emptyLayout.setVisibility(View.VISIBLE);
+
+                    if(Util.isOnline(context)){
+                        listView.setVisibility(View.GONE);
+                        emptyLayout.setVisibility(View.VISIBLE);
+                    }
+                    else{
+                        showNoConnectionScreen();
+                    }
                 }
                 else{
                     log("adapterList.getItemCount() NOT = 0");
@@ -298,6 +302,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
         catch (Exception e){}
         emptyTextViewInvite.setText(emptyTextViewText);
         inviteButton.setText(getString(R.string.recent_chat_enable_chat_button));
+        inviteButton.setVisibility(View.VISIBLE);
         emptyTextView.setText(R.string.recent_chat_enable_chat);
         emptyLayout.setVisibility(View.VISIBLE);
     }
@@ -310,6 +315,13 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
         emptyTextViewInvite.setText(getString(R.string.error_server_connection_problem));
         inviteButton.setVisibility(View.GONE);
         emptyTextView.setText(R.string.recent_chat_empty_no_connection_text);
+        if(Util.isChatEnabled()){
+            emptyTextView.setVisibility(View.GONE);
+        }
+        else{
+            emptyTextView.setVisibility(View.VISIBLE);
+        }
+
         emptyLayout.setVisibility(View.VISIBLE);
     }
 
@@ -319,7 +331,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
 
         switch (v.getId()) {
             case R.id.invite_button:{
-                if(chatEnabled){
+                if(Util.isChatEnabled()){
                     //((ManagerActivityLollipop)context).chooseAddContactDialog(false);
                     if(Util.isOnline(context)){
                         ((ManagerActivityLollipop)context).addContactFromPhone();
@@ -332,12 +344,27 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
                     }
                 }
                 else{
-                    ChatController chatController = new ChatController(context);
-                    log("onCLick: enableChat");
-                    chatController.enableChat();
-                    getActivity().supportInvalidateOptionsMenu();
-                    chatEnabled=!chatEnabled;
-                    ((ManagerActivityLollipop)context).enableChat();
+                    if(Util.isOnline(context)){
+                        if(megaApi!=null){
+                            if(megaApi.isLoggedIn()==0){
+                                ((ManagerActivityLollipop)context).showSnackbar(getString(R.string.error_enable_chat_before_login));
+                            }
+                            else{
+                                ChatController chatController = new ChatController(context);
+                                log("onCLick: enableChat");
+                                chatController.enableChat();
+                                getActivity().supportInvalidateOptionsMenu();
+                                ((ManagerActivityLollipop)context).enableChat();
+                            }
+                        }
+                        else{
+                            ((ManagerActivityLollipop)context).showSnackbar(getString(R.string.error_enable_chat_before_login));
+                        }
+                    }
+                    else{
+                        ((ManagerActivityLollipop)context).showSnackbar(getString(R.string.error_server_connection_problem));
+                        showNoConnectionScreen();
+                    }
 //                    setChats();
                 }
 
@@ -838,7 +865,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
 
     public void setStatus() {
         log("setStatus");
-        if(chatEnabled) {
+        if(Util.isChatEnabled()) {
             chatStatus = megaChatApi.getOnlineStatus();
             log("chatStatus --> getOnlineStatus with megaChatApi: "+chatStatus);
 
@@ -1141,7 +1168,9 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
     public void onSaveInstanceState(Bundle outState) {
         log("onSaveInstanceState");
         super.onSaveInstanceState(outState);
-        outState.putParcelable(BUNDLE_RECYCLER_LAYOUT, listView.getLayoutManager().onSaveInstanceState());
+        if(listView.getLayoutManager()!=null){
+            outState.putParcelable(BUNDLE_RECYCLER_LAYOUT, listView.getLayoutManager().onSaveInstanceState());
+        }
     }
 
     @Override
