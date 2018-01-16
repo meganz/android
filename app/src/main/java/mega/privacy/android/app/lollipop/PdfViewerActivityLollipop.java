@@ -125,6 +125,11 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
     private List<ShareInfo> filePreparedInfos;
     ArrayList<Long> handleListM = new ArrayList<Long>();
 
+    int typeCheckLogin = -1;
+
+    static int TYPE_UPLOAD = 0;
+    static int TYPE_DOWNLOAD = 1;
+
     @Override
     public void onCreate (Bundle savedInstanceState){
         log("onCreate");
@@ -229,6 +234,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
             @Override
             public void onClick(View v) {
                 log("onClick uploadContainer");
+                typeCheckLogin = TYPE_UPLOAD;
                 checkLogin();
             }
         });
@@ -299,15 +305,20 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
     public void checkLogin(){
         log("checkLogin");
 
-        uploadContainer.setVisibility(View.GONE);
+        if (typeCheckLogin == TYPE_UPLOAD) {
+            uploadContainer.setVisibility(View.GONE);
+        }
 
         dbH = DatabaseHandler.getDbHandler(this);
         credentials = dbH.getCredentials();
         //Start login process
         if (credentials == null){
             log("No credential to login");
-            Util.showAlert(this, getString(R.string.alert_not_logged_in), null);
-            uploadContainer.setVisibility(View.VISIBLE);
+            if (typeCheckLogin == TYPE_UPLOAD) {
+                Util.showAlert(this, getString(R.string.alert_not_logged_in), null);
+                uploadContainer.setVisibility(View.VISIBLE);
+                typeCheckLogin = -1;
+            }
         }
         else{
             if (megaApi.getRootNode() == null) {
@@ -363,7 +374,16 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
             }
             else{
                 ((MegaApplication) getApplication()).sendSignalPresenceActivity();
-                uploadToCloud();
+                if (typeCheckLogin == TYPE_UPLOAD) {
+                    typeCheckLogin = -1;
+
+                    uploadToCloud();
+                }
+                else if (typeCheckLogin == TYPE_DOWNLOAD){
+                    typeCheckLogin = -1;
+
+                    downloadFromCloud();
+                }
             }
         }
     }
@@ -400,6 +420,23 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
             Util.showAlert(this, getString(R.string.alert_not_logged_in), null);
             uploadContainer.setVisibility(View.VISIBLE);
         }
+    }
+
+    public void downloadFromCloud(){
+        MegaNode node = megaApi.getNodeByHandle(handle);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
+            if (!hasStoragePermission) {
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                        Constants.REQUEST_WRITE_STORAGE);
+
+                handleListM.add(node.getHandle());
+            }
+        }
+        ArrayList<Long> handleList = new ArrayList<Long>();
+        handleList.add(node.getHandle());
+        downloadNode(handleList);
     }
 
     public void onIntentProcessed(List<ShareInfo> infos) {
@@ -527,7 +564,6 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
             }
             case R.id.pdfviewer_download: {
                 downloadFile();
-                finish();
                 break;
             }
         }
@@ -560,20 +596,8 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
 
     public void downloadFile() {
 
-        MegaNode node = megaApi.getNodeByHandle(handle);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
-            if (!hasStoragePermission) {
-                ActivityCompat.requestPermissions(this,
-                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                        Constants.REQUEST_WRITE_STORAGE);
-
-                handleListM.add(node.getHandle());
-            }
-        }
-        ArrayList<Long> handleList = new ArrayList<Long>();
-        handleList.add(node.getHandle());
-        downloadNode(handleList);
+        typeCheckLogin = TYPE_DOWNLOAD;
+        checkLogin();
     }
 
     @SuppressLint("NewApi")
@@ -689,6 +713,30 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
         }
         else{
             downloadTo(downloadLocationDefaultPath, null, size, hashes);
+            finish();
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        log("-------------------onActivityResult " + requestCode + "____" + resultCode);
+
+        if (requestCode == Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER && resultCode == RESULT_OK) {
+            log("onActivityResult: REQUEST_CODE_SELECT_LOCAL_FOLDER");
+            if (intent == null) {
+                log("Return.....");
+                return;
+            }
+
+            String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
+            log("parentPath: "+parentPath);
+            long size = intent.getLongExtra(FileStorageActivityLollipop.EXTRA_SIZE, 0);
+            log("size: "+size);
+            long[] hashes = intent.getLongArrayExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES);
+            log("hashes size: "+hashes.length);
+
+            downloadTo(parentPath, null, size, hashes);
+            finish();
         }
     }
 
@@ -942,6 +990,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
                     dbH.clearPreferences();
                     dbH.setFirstTime(false);
                 }
+                typeCheckLogin = -1;
             }
             else{
                 //LOGIN OK
@@ -997,19 +1046,40 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
                             log("Not launch connect: "+megaChatApi.getInitState());
                         }
                         MegaApplication.setLoggingIn(false);
-                        uploadToCloud();
+                        if (typeCheckLogin == TYPE_UPLOAD){
+                            typeCheckLogin = -1;
+                            uploadToCloud();
+                        }
+                        else if (typeCheckLogin == TYPE_DOWNLOAD){
+                            typeCheckLogin = -1;
+                            downloadFromCloud();
+                        }
                     }
                     else{
 
                         log("Chat NOT enabled - readyToManager");
                         MegaApplication.setLoggingIn(false);
-                        uploadToCloud();
+                        if (typeCheckLogin == TYPE_UPLOAD){
+                            typeCheckLogin = -1;
+                            uploadToCloud();
+                        }
+                        else if (typeCheckLogin == TYPE_DOWNLOAD){
+                            typeCheckLogin = -1;
+                            downloadFromCloud();
+                        }
                     }
                 }
                 else{
                     log("chatSettings NULL - readyToManager");
                     MegaApplication.setLoggingIn(false);
-                    uploadToCloud();
+                    if (typeCheckLogin == TYPE_UPLOAD){
+                        typeCheckLogin = -1;
+                        uploadToCloud();
+                    }
+                    else if (typeCheckLogin == TYPE_DOWNLOAD){
+                        typeCheckLogin = -1;
+                        downloadFromCloud();
+                    }
                 }
             }
         }
