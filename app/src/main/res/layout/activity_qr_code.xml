@@ -44,7 +44,20 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@color/mega"
-                    style="@style/MyCustomTabLayout"/>
+                    style="@style/MyCustomTabLayout">
+
+                    <android.support.design.widget.TabItem
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:text="MY CODE"/>
+
+                    <android.support.design.widget.TabItem
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:text="SCAN CODE"/>
+
+
+                </android.support.design.widget.TabLayout>
 
             </android.support.design.widget.AppBarLayout>
 
@@ -54,7 +67,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"/>
-
 
             <FrameLayout
                 android:id="@+id/fragment_container"
