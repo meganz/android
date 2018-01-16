@@ -381,7 +381,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
             setProfileMyAvatar();
 
             contactAvatarLayout.setVisibility(View.VISIBLE);
-            videoFAB.setBackgroundTintList(ColorStateList.valueOf(Color.BLACK));
+            videoFAB.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.disable_fab_chat_call)));
             videoFAB.setImageDrawable(getResources().getDrawable(R.drawable.ic_video_off));
 
             //Contact's avatar
@@ -1162,7 +1162,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
             }
 
             myAvatarLayout.setVisibility(View.VISIBLE);
-            videoFAB.setBackgroundTintList(ColorStateList.valueOf(Color.BLACK));
+            videoFAB.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.disable_fab_chat_call)));
             videoFAB.setImageDrawable(getResources().getDrawable(R.drawable.ic_video_off));
 
         }
@@ -1177,7 +1177,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
         }
         else{
             log("Audio local NOT connected");
-            microFAB.setBackgroundTintList(ColorStateList.valueOf(Color.BLACK));
+            microFAB.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.disable_fab_chat_call)));
             microFAB.setImageDrawable(getResources().getDrawable(R.drawable.ic_mic_off));
 
         }
