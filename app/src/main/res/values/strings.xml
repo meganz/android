@@ -1667,5 +1667,7 @@
 
     <string name="footnote_achievements" context="Footnote to clarify the storage space is subject to the achievement program">* Subject to your participation in our achievement program</string>
 
+    <string name="error_enable_chat_before_login" context="Message shown if the user choose enable button and he is not logged in">Please, log in before enabling the chat</string>
+
 </resources>
 
