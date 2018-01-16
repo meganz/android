@@ -1366,11 +1366,14 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
     }
 
+    public void disablePinScreen(){
+        log("disablePinScreen");
+        super.setShowPinScreen(false);
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
         log("onActivityResult, resultCode: " + resultCode);
-
-        super.setShowPinScreen(true);
 
         if (requestCode == Constants.REQUEST_ADD_PARTICIPANTS && resultCode == RESULT_OK) {
             log("onActivityResult REQUEST_ADD_PARTICIPANTS OK");
@@ -1773,6 +1776,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     public void attachPhotoVideo(){
         log("attachPhotoVideo");
+
+        disablePinScreen();
+
         Intent intent = new Intent();
         intent.setAction(Intent.ACTION_OPEN_DOCUMENT);
         intent.setAction(Intent.ACTION_GET_CONTENT);
@@ -4590,9 +4596,11 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         log("onResume");
         super.onResume();
 
-       activityVisible = true;
+        super.setShowPinScreen(true);
 
-       setLastMessageSeen();
+        activityVisible = true;
+
+        setLastMessageSeen();
 
         if (emojiKeyboardShown){
             keyboardButton.setImageResource(R.drawable.ic_emoticon_white);
