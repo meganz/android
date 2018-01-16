@@ -487,6 +487,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
         downloadMenuItem = menu.findItem(R.id.pdfviewer_download);
         if (isUrl){
             log("isURL");
+            shareMenuItem.setVisible(false);
             downloadMenuItem.setVisible(true);
             Drawable download = getResources().getDrawable(R.drawable.ic_download_white);
             download.setColorFilter(getResources().getColor(R.color.lollipop_primary_color), PorterDuff.Mode.SRC_ATOP);
@@ -494,7 +495,6 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
             downloadMenuItem.setIcon(download);
         }
         else {
-
             log("NOT isURL");
             downloadMenuItem.setVisible(false);
         }
@@ -530,21 +530,23 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
         log("intentToSendFile");
 
         if(uri!=null){
-            Intent share = new Intent(android.content.Intent.ACTION_SEND);
-            share.setType("application/pdf");
+            if (!isUrl){
+                Intent share = new Intent(android.content.Intent.ACTION_SEND);
+                share.setType("application/pdf");
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                log("Use provider to share");
-                share.putExtra(Intent.EXTRA_STREAM, Uri.parse(uri.toString()));
-                share.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    log("Use provider to share");
+                    share.putExtra(Intent.EXTRA_STREAM, Uri.parse(uri.toString()));
+                    share.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                }
+                else{
+                    share.putExtra(Intent.EXTRA_STREAM, uri);
+                }
+                startActivity(Intent.createChooser(share, getString(R.string.context_share)));
             }
-            else{
-                share.putExtra(Intent.EXTRA_STREAM, uri);
+            else {
+                Snackbar.make(pdfviewerContainer, getString(R.string.not_download), Snackbar.LENGTH_LONG).show();
             }
-            startActivity(Intent.createChooser(share, getString(R.string.context_share_image)));
-        }
-        else{
-            Snackbar.make(pdfviewerContainer, getString(R.string.pdf_viewer_not_download), Snackbar.LENGTH_LONG).show();
         }
     }
 
