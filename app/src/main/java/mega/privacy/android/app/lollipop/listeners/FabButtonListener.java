@@ -52,8 +52,7 @@ public class FabButtonListener implements FloatingActionButton.OnClickListener{
                                 }
                                 return;
                             }
-                            //((ManagerActivityLollipop)context).chooseAddContactDialog(false);
-                            ((ManagerActivityLollipop)context).addContactFromPhone();
+                            ((ManagerActivityLollipop)context).chooseAddContactDialog(false);
                             break;
                         }
                         case CHAT:{
