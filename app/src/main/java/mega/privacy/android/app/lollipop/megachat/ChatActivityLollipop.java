@@ -2441,7 +2441,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         }
                         else if(m.getMessage().getUserHandle()==megaChatApi.getMyUserHandle()) {
                             if(!(m.getMessage().isManagementMessage())){
-                                log("selected message: "+m.getMessage().getContent());
                                 log("selected message handle: "+m.getMessage().getTempId());
                                 log("selected message rowId: "+m.getMessage().getRowId());
                                 if((m.getMessage().getStatus()==MegaChatMessage.STATUS_SERVER_REJECTED)||(m.getMessage().getStatus()==MegaChatMessage.STATUS_SENDING_MANUAL)){
@@ -2916,7 +2915,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         log("Try to recover the initial msg");
                         if(msg.getMsgId()!=-1){
                             MegaChatMessage notEdited = megaChatApi.getMessage(idChat, msg.getMsgId());
-                            log("Content not edited: "+notEdited.getContent());
+                            log("Content not edited");
                             AndroidMegaChatMessage androidMsgNotEdited = new AndroidMegaChatMessage(notEdited);
                             int returnValue = modifyMessageReceived(androidMsgNotEdited, false);
                             if(returnValue!=-1){
@@ -2986,12 +2985,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
                 bufferMessages.add(androidMsg);
                 log("onMessageLoaded: Counter: "+bufferMessages.size());
-                if(msg.getContent()!=null){
-                    log("onMessageLoaded: Content: "+msg.getContent());
-                }
-                else{
-                    log("onMessageLoaded: content NULL");
-                }
                 log("onMessageLoaded: Get type of message: "+msg.getType());
 
                 log("onMessageLoaded: Size of messages: "+messages.size());
@@ -3032,7 +3025,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     if(positionToScroll>0){
                         log("onMessageLoaded: Scroll to position: "+positionToScroll);
                         if(positionToScroll<messages.size()){
-                            log("onMessageLoaded: message position to scroll: "+positionToScroll+" content: "+messages.get(positionToScroll).getMessage().getContent());
+                            log("onMessageLoaded: message position to scroll: "+positionToScroll);
                             messages.get(positionToScroll).setInfoToShow(Constants.CHAT_ADAPTER_SHOW_ALL);
                             adapter.notifyItemChanged(positionToScroll+1);
                             mLayoutManager.scrollToPositionWithOffset(positionToScroll+1,Util.scaleHeightPx(20, outMetrics));
@@ -3092,9 +3085,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         log("FINAL ID: "+msg.getMsgId());
         log("TIMESTAMP: "+msg.getTimestamp());
         log("TYPE: "+msg.getType());
-        if(msg.getContent()!=null){
-            log("CONTENT: "+msg.getContent());
-        }
 
         if(msg.getType()==MegaChatMessage.TYPE_REVOKE_NODE_ATTACHMENT) {
             log("TYPE_REVOKE_NODE_ATTACHMENT MESSAGE!!!!");
@@ -3259,7 +3249,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             else{
                 log("-----------Status : "+msg.getStatus());
                 log("-----------Timestamp: "+msg.getTimestamp());
-                log("-----------Content: "+msg.getContent());
 
                 if(msg.getStatus()==MegaChatMessage.STATUS_SERVER_REJECTED){
                     log("onMessageLoaded: STATUS_SERVER_REJECTED----- "+msg.getStatus());
@@ -3314,7 +3303,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
             if(!messageToCheck.isUploading()){
                 if (messageToCheck.getMessage().getMsgId() == msg.getMsgId()) {
-                    log("content to delete: " + messageToCheck.getMessage().getContent());
                     indexToChange = itr.nextIndex();
                     break;
                 }
@@ -3416,18 +3404,18 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             if(!messageToCheck.isUploading()){
                 log("Checking with Msg ID: "+messageToCheck.getMessage().getMsgId());
                 log("Checking with Msg TEMP ID: "+messageToCheck.getMessage().getTempId());
-                log("Content: " + messageToCheck.getMessage().getContent());
+
                 if(checkTempId){
                     log("Check temporal IDS----");
                     if (messageToCheck.getMessage().getTempId() == msg.getMessage().getTempId()) {
-                        log("modifyMessageReceived: " + messageToCheck.getMessage().getContent());
+                        log("modifyMessageReceived with idTemp");
                         indexToChange = itr.nextIndex();
                         break;
                     }
                 }
                 else{
                     if (messageToCheck.getMessage().getMsgId() == msg.getMessage().getMsgId()) {
-                        log("modifyMessageReceived: " + messageToCheck.getMessage().getContent());
+                        log("modifyMessageReceived");
                         indexToChange = itr.nextIndex();
                         break;
                     }
@@ -3617,7 +3605,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     public void loadMessage(AndroidMegaChatMessage messageToShow){
         log("loadMessage");
 
-        log("Message to show: "+messageToShow.getMessage().getContent());
         messageToShow.setInfoToShow(Constants.CHAT_ADAPTER_SHOW_ALL);
         messages.add(0,messageToShow);
 
@@ -3631,7 +3618,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     }
 
     public void appendMessageAnotherMS(AndroidMegaChatMessage msg){
-        log("appendMessageAnotherMS: "+msg.getMessage().getContent());
+        log("appendMessageAnotherMS");
         messages.add(msg);
         int lastIndex = messages.size()-1;
 
