@@ -711,7 +711,9 @@ public class OfflineFragmentLollipop extends Fragment{
 		
 		mOffList.clear();
 		mOffList.addAll(tempOffline);
-
+		if (adapter!= null) {
+			adapter.setNodes(mOffList);
+		}
 		contentText.setText(getInfoFolder(mOffList));
 	}
 
@@ -769,6 +771,9 @@ public class OfflineFragmentLollipop extends Fragment{
 		
 		mOffList.clear();
 		mOffList.addAll(tempOffline);
+		if (adapter!= null) {
+			adapter.setNodes(mOffList);
+		}
 		contentText.setText(getInfoFolder(mOffList));
 	}
 	
