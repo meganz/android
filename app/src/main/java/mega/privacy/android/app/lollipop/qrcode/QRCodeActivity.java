@@ -3,16 +3,20 @@ package mega.privacy.android.app.lollipop.qrcode;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.support.design.widget.TabLayout;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.FrameLayout;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.PinActivityLollipop;
+import mega.privacy.android.app.lollipop.managerSections.FileBrowserFragmentLollipop;
 import mega.privacy.android.app.modalbottomsheet.QRCodeSaveBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.Util;
 
@@ -26,6 +30,10 @@ public class QRCodeActivity extends PinActivityLollipop{
     private ActionBar aB;
 
     private MenuItem shareMenuItem;
+
+    private FrameLayout fragmentContainer;
+    private TabLayout tabLayoutQRCode;
+    private ViewPager viewPagerQRCode;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,8 +53,12 @@ public class QRCodeActivity extends PinActivityLollipop{
         aB = getSupportActionBar();
         aB.setHomeButtonEnabled(true);
         aB.setDisplayHomeAsUpEnabled(true);
-
         tB.setTitle(getString(R.string.section_qr_code));
+
+        fragmentContainer = (FrameLayout) findViewById(R.id.fragment_container);
+
+        tabLayoutQRCode =  (TabLayout) findViewById(R.id.sliding_tabs_qr_code);
+        viewPagerQRCode = (ViewPager) findViewById(R.id.qr_code_tabs_pager);
     }
 
     @Override
