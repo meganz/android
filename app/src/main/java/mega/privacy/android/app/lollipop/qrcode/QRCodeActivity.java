@@ -59,6 +59,8 @@ public class QRCodeActivity extends PinActivityLollipop{
 
         tabLayoutQRCode =  (TabLayout) findViewById(R.id.sliding_tabs_qr_code);
         viewPagerQRCode = (ViewPager) findViewById(R.id.qr_code_tabs_pager);
+
+
     }
 
     @Override
