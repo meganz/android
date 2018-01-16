@@ -505,12 +505,8 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 	public void onRestoreInstanceState (Bundle savedInstanceState){
 		super.onRestoreInstanceState(savedInstanceState);
 
-
 		aBshown = savedInstanceState.getBoolean("aBshown");
 		adapterMega.setaBshown(aBshown);
-
-
-
 	}
 
 	
