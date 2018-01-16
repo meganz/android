@@ -843,7 +843,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             fetchingNodesText.setVisibility(View.VISIBLE);
             log("enableChat: Call to fechtNodes");
             megaApi.fetchNodes(this);
-
         }
         else{
             log("Another login is processing");

@@ -265,8 +265,14 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
 
                 if (adapterList.getItemCount() == 0){
                     log("adapterList.getItemCount() == 0");
-                    listView.setVisibility(View.GONE);
-                    emptyLayout.setVisibility(View.VISIBLE);
+
+                    if(Util.isOnline(context)){
+                        listView.setVisibility(View.GONE);
+                        emptyLayout.setVisibility(View.VISIBLE);
+                    }
+                    else{
+                        showNoConnectionScreen();
+                    }
                 }
                 else{
                     log("adapterList.getItemCount() NOT = 0");
@@ -309,6 +315,13 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
         emptyTextViewInvite.setText(getString(R.string.error_server_connection_problem));
         inviteButton.setVisibility(View.GONE);
         emptyTextView.setText(R.string.recent_chat_empty_no_connection_text);
+        if(Util.isChatEnabled()){
+            emptyTextView.setVisibility(View.GONE);
+        }
+        else{
+            emptyTextView.setVisibility(View.VISIBLE);
+        }
+
         emptyLayout.setVisibility(View.VISIBLE);
     }
 
@@ -332,11 +345,21 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
                 }
                 else{
                     if(Util.isOnline(context)){
-                        ChatController chatController = new ChatController(context);
-                        log("onCLick: enableChat");
-                        chatController.enableChat();
-                        getActivity().supportInvalidateOptionsMenu();
-                        ((ManagerActivityLollipop)context).enableChat();
+                        if(megaApi!=null){
+                            if(megaApi.isLoggedIn()==0){
+                                ((ManagerActivityLollipop)context).showSnackbar(getString(R.string.error_enable_chat_before_login));
+                            }
+                            else{
+                                ChatController chatController = new ChatController(context);
+                                log("onCLick: enableChat");
+                                chatController.enableChat();
+                                getActivity().supportInvalidateOptionsMenu();
+                                ((ManagerActivityLollipop)context).enableChat();
+                            }
+                        }
+                        else{
+                            ((ManagerActivityLollipop)context).showSnackbar(getString(R.string.error_enable_chat_before_login));
+                        }
                     }
                     else{
                         ((ManagerActivityLollipop)context).showSnackbar(getString(R.string.error_server_connection_problem));
