@@ -1667,5 +1667,7 @@
 
     <string name="footnote_achievements" context="Footnote to clarify the storage space is subject to the achievement program">* Subject to your participation in our achievement program</string>
 
+    <string name="external_play" context="Item menu option to reproduce audio or video in external reproductors">Open with</string>
+
 </resources>
 
