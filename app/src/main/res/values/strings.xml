@@ -1669,5 +1669,6 @@
 
     <string name="context_share" context="to share a file using Facebook, Whatsapp, etc">Share using</string>
 
+    <string name="error_enable_chat_before_login" context="Message shown if the user choose enable button and he is not logged in">Please, log in before enabling the chat</string>
 </resources>
 

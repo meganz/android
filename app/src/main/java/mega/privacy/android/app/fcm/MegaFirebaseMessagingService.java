@@ -280,26 +280,31 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
                 if (megaChatApi == null) {
                     megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
                 }
-                int ret = megaChatApi.init(gSession);
-                log("result of init ---> " + ret);
-                chatSettings = dbH.getChatSettings();
-                if (ret == MegaChatApi.INIT_NO_CACHE) {
-                    log("condition ret == MegaChatApi.INIT_NO_CACHE");
-                    megaApi.invalidateCache();
 
-                } else if (ret == MegaChatApi.INIT_ERROR) {
-                    log("condition ret == MegaChatApi.INIT_ERROR");
-                    if (chatSettings == null) {
-                        log("ERROR----> Switch OFF chat");
-                        chatSettings = new ChatSettings(false + "", true + "", "", true + "");
-                        dbH.setChatSettings(chatSettings);
+                int ret = megaChatApi.getInitState();
+
+                if(ret==0||ret==MegaChatApi.INIT_ERROR){
+                    ret = megaChatApi.init(gSession);
+                    log("result of init ---> " + ret);
+                    chatSettings = dbH.getChatSettings();
+                    if (ret == MegaChatApi.INIT_NO_CACHE) {
+                        log("condition ret == MegaChatApi.INIT_NO_CACHE");
+                        megaApi.invalidateCache();
+
+                    } else if (ret == MegaChatApi.INIT_ERROR) {
+                        log("condition ret == MegaChatApi.INIT_ERROR");
+                        if (chatSettings == null) {
+                            log("ERROR----> Switch OFF chat");
+                            chatSettings = new ChatSettings(false + "", true + "", "", true + "");
+                            dbH.setChatSettings(chatSettings);
+                        } else {
+                            log("ERROR----> Switch OFF chat");
+                            dbH.setEnabledChat(false + "");
+                        }
+                        megaChatApi.logout(this);
                     } else {
-                        log("ERROR----> Switch OFF chat");
-                        dbH.setEnabledChat(false + "");
+                        log("Chat correctly initialized");
                     }
-                    megaChatApi.logout(this);
-                } else {
-                    log("Chat correctly initialized");
                 }
             }
 
