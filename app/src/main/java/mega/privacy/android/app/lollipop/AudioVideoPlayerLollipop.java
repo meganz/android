@@ -131,6 +131,8 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
 
         setContentView(R.layout.activity_audiovideoplayer);
 
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
         Intent intent = getIntent();
         if (intent == null){
             log("intent null");
