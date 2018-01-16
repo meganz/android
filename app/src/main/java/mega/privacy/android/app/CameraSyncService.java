@@ -344,35 +344,43 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 								if (megaChatApi == null){
 									megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
 								}
-								int ret = megaChatApi.init(gSession);
-								log("shouldRun: result of init ---> "+ret);
-								chatSettings = dbH.getChatSettings();
-								if (ret == MegaChatApi.INIT_NO_CACHE)
-								{
-									log("shouldRun: condition ret == MegaChatApi.INIT_NO_CACHE");
-									megaApi.invalidateCache();
 
-								}
-								else if (ret == MegaChatApi.INIT_ERROR)
-								{
-									log("shouldRun: condition ret == MegaChatApi.INIT_ERROR");
-									if(chatSettings==null) {
-										log("1 - shouldRun: ERROR----> Switch OFF chat");
-										chatSettings = new ChatSettings(false+"", true + "", "",true + "");
-										dbH.setChatSettings(chatSettings);
+								int ret = megaChatApi.getInitState();
+
+								if(ret==0||ret==MegaChatApi.INIT_ERROR){
+									ret = megaChatApi.init(gSession);
+									log("shouldRun: result of init ---> "+ret);
+									chatSettings = dbH.getChatSettings();
+									if (ret == MegaChatApi.INIT_NO_CACHE)
+									{
+										log("shouldRun: condition ret == MegaChatApi.INIT_NO_CACHE");
+										megaApi.invalidateCache();
+
+									}
+									else if (ret == MegaChatApi.INIT_ERROR)
+									{
+										log("shouldRun: condition ret == MegaChatApi.INIT_ERROR");
+										if(chatSettings==null) {
+											log("1 - shouldRun: ERROR----> Switch OFF chat");
+											chatSettings = new ChatSettings(false+"", true + "", "",true + "");
+											dbH.setChatSettings(chatSettings);
+										}
+										else{
+											log("2 - shouldRun: ERROR----> Switch OFF chat");
+											dbH.setEnabledChat(false + "");
+										}
+										megaChatApi.logout(this);
 									}
 									else{
-										log("2 - shouldRun: ERROR----> Switch OFF chat");
-										dbH.setEnabledChat(false + "");
+										log("shouldRun: Chat correctly initialized");
 									}
-									megaChatApi.logout(this);
-								}
-								else{
-									log("shouldRun: Chat correctly initialized");
 								}
 							}
 
 							megaApi.fastLogin(gSession, this);
+						}
+						else{
+							log("Another login is processing");
 						}
 						return START_NOT_STICKY;
 					}
