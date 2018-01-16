@@ -826,10 +826,8 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 	    
 	    createFolderMenuItem = menu.findItem(R.id.cab_menu_create_folder);
 	    newChatMenuItem = menu.findItem(R.id.cab_menu_new_chat);
-	    
-	    if (cDriveExplorer != null){	
-	    	createFolderMenuItem.setVisible(true);
-	    }
+		createFolderMenuItem.setVisible(false);
+
 //	    if(iSharesExplorer != null){
 //	    	if (iSharesExplorer.deepBrowserTree==0){
 //	    		createFolderMenuItem.setVisible(false);
@@ -873,7 +871,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 					log("Level deepBrowserTree: "+iSharesExplorer.getDeepBrowserTree());
 			    	if (iSharesExplorer.getDeepBrowserTree()==0){
 			    		createFolderMenuItem.setVisible(false);
-			    	}
+					}
 			    	else{		    		
 			    		//Check the folder's permissions
 			    		long parentH = iSharesExplorer.getParentHandle();
@@ -886,7 +884,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 							case MegaShare.ACCESS_READWRITE:
 							case MegaShare.ACCESS_FULL:{
 								log("The node is: "+n.getName()+" permissions: "+accessLevel);
-								createFolderMenuItem.setVisible(true);				
+								createFolderMenuItem.setVisible(true);
 								break;
 							}
 							case MegaShare.ACCESS_READ:{
