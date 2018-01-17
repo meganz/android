@@ -1270,4 +1270,33 @@
     <string name="context_permissions_changing_folder" context="Item menu option upon clicking on one or multiple files.">Cambiando permisos</string>
     <string name="context_removing_contact_folder" context="Item menu option upon clicking on one or multiple files.">Eliminando contacto de la carpeta compartida</string>
 
+    <string name="achievements_title" context="title of the section for achievements">Logros</string>
+    <string name="achievements_subtitle" context="subtitle of the section for achievements">Invita a amigos y recibe bonos</string>
+
+    <string name="button_invite_friends" context="button to invite friends for getting achievements">Invita a amigos</string>
+
+    <string name="figures_achievements_text_referrals" context="title of the introduction for the achievements screen">Consigue %1$s de almacenamiento y %2$s de cuota de transferencia por cada invitado</string>
+
+    <string name="figures_achievements_text" context="sentence to detail the figures of storage and transfer quota related to each achievement">Consigue %1$s de almacenamiento y %2$s de cuota de transferencia</string>
+
+    <string name="unlocked_rewards_title" context="title of the section for unlocked rewards">Bonos conseguidos</string>
+
+    <string name="unlocked_storage_title" context="title of the section for unlocked storage quota">Almacenamiento</string>
+
+    <string name="title_referral_bonuses" context="title of the section for referral bonuses in achivements section (maximum 24 chars)">Invita a un amigo a MEGA</string>
+    <string name="title_install_app" context="title of the section for install a mobile app in achivements section (maximum 24 chars)">Instala nuestra aplicación móvil</string>
+    <string name="title_regitration" context="title of the section for install megasync in achivements section (maximum 24 chars)">Bono por registro de cuenta</string>
+    <string name="title_install_desktop" context="title of the section for install a mobile app bonuses in achivements section (maximum 24 chars)">Instala la aplicación de MEGA de escritorio</string>
+    <string name="title_base_quota" context="title of the section for base quota in achivements section">Account Base Quota</string>
+
+    <string name="general_num_days_left" context="indicates the number of days left related to a achievement">Expira en %1$d d</string>
+    <string name="expired_achievement" context="state to indicate the achievement has expired">Expirado</string>
+
+    <string name="setting_title_use_https_only" context="title of the advanced setting to choose the use of https">No usar HTTP</string>
+    <string name="setting_subtitle_use_https_only" context="subtitle of the advanced setting to choose the use of https">Activa esta opción solo si las transferencias no arrancan. En circunstancias normales, HTTP es satisfactorio ya que todas las transferencias se encuentran ya cifradas</string>
+
+    <string name="title_achievement_invite_friends" context="title of screen to invite friends and get an achievement">¿Cómo funciona?</string>
+    <string name="first_paragraph_achievement_invite_friends" context="first paragraph of screen to invite friends and get an achievement">Invita a tus amigos a crear una cuenta gratuita de MEGA y a instalar nuestra aplicación móvil. Por cada registro correcto e instalación, tú recibirás un bono de almacenamiento y de cuota de transferencia.</string>
+    <string name="second_paragraph_achievement_invite_friends" context="second paragraph of screen to invite friends and get an achievement">No recibirás bono por invitar a alguien que ya haya usado MEGA anteriormente y no serás notificado sobre ello. Los contactos invitados deberán instalar la aplicación móvil de MEGA o la aplicación de MEGA de escritorio.</string>
+
 </resources>
