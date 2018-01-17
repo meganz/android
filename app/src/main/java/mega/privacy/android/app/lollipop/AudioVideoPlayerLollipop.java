@@ -44,6 +44,7 @@ import com.google.android.exoplayer2.LoadControl;
 import com.google.android.exoplayer2.PlaybackParameters;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.Timeline;
+import com.google.android.exoplayer2.audio.AudioRendererEventListener;
 import com.google.android.exoplayer2.decoder.DecoderCounters;
 import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
 import com.google.android.exoplayer2.extractor.ExtractorsFactory;
@@ -83,7 +84,7 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaTransferListenerInterface;
 
-public class AudioVideoPlayerLollipop extends PinActivityLollipop implements VideoRendererEventListener, MegaChatRequestListenerInterface, MegaTransferListenerInterface{
+public class AudioVideoPlayerLollipop extends PinActivityLollipop implements VideoRendererEventListener, MegaChatRequestListenerInterface, MegaTransferListenerInterface, AudioRendererEventListener {
 
     public static int REQUEST_CODE_SELECT_CHAT = 1005;
 
@@ -193,6 +194,8 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
         else {
             aB.setTitle(getFileName(uri));
         }
+
+        containerAudioVideoPlayer = (RelativeLayout) findViewById(R.id.audiovideoplayer_container);
 
         audioContainer = (RelativeLayout) findViewById(R.id.audio_container);
         audioContainer.setVisibility(View.GONE);
@@ -401,6 +404,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
         });
         player.setPlayWhenReady(true);
         player.setVideoDebugListener(this);
+        player.setAudioDebugListener(this);
         simpleExoPlayerView.showController();
     }
 
@@ -493,6 +497,10 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
         int id = item.getItemId();
         switch (id) {
             case android.R.id.home: {
+                log("onBackPRess");
+                if (player != null) {
+                    player.release();
+                }
                 onBackPressed();
                 break;
             }
@@ -878,5 +886,36 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
         }
 
         mNotificationManager.notify(Constants.NOTIFICATION_STREAMING_OVERQUOTA, notification);
+    }
+
+    @Override
+    public void onAudioEnabled(DecoderCounters counters) {
+        loading = false;
+        statusDialog.dismiss();
+    }
+
+    @Override
+    public void onAudioSessionId(int audioSessionId) {
+
+    }
+
+    @Override
+    public void onAudioDecoderInitialized(String decoderName, long initializedTimestampMs, long initializationDurationMs) {
+
+    }
+
+    @Override
+    public void onAudioInputFormatChanged(Format format) {
+
+    }
+
+    @Override
+    public void onAudioSinkUnderrun(int bufferSize, long bufferSizeMs, long elapsedSinceLastFeedMs) {
+
+    }
+
+    @Override
+    public void onAudioDisabled(DecoderCounters counters) {
+
     }
 }
