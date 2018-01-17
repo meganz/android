@@ -67,30 +67,37 @@ public class LocalCameraCallFragment extends Fragment implements MegaChatVideoLi
 
     @Override
     public void onChatVideoData(MegaChatApiJava api, long chatid, int width, int height, byte[] byteBuffer) {
+
+        if((width == 0) || (height == 0)){
+            return;
+        }
+
         if (this.width != width || this.height != height)
         {
             this.width = width;
             this.height = height;
-            this.bitmap = localRenderer.CreateBitmap(width, height);
 
             SurfaceHolder holder = localSurfaceView.getHolder();
             if (holder != null) {
                 int viewWidth = localSurfaceView.getWidth();
                 int viewHeight = localSurfaceView.getHeight();
-                int holderWidth = viewWidth < width ? viewWidth : width;
-                int holderHeight = holderWidth * viewHeight / viewWidth;
-                if (holderHeight > viewHeight)
-                {
-                    holderHeight = viewHeight;
-                    holderWidth = holderHeight * viewWidth / viewHeight;
+                if ((viewWidth != 0) && (viewHeight != 0)) {
+                    int holderWidth = viewWidth < width ? viewWidth : width;
+                    int holderHeight = holderWidth * viewHeight / viewWidth;
+                    if (holderHeight > viewHeight) {
+                        holderHeight = viewHeight;
+                        holderWidth = holderHeight * viewWidth / viewHeight;
+                    }
+                    this.bitmap = localRenderer.CreateBitmap(width, height);
+                    holder.setFixedSize(holderWidth, holderHeight);
                 }
-                holder.setFixedSize(holderWidth, holderHeight);
             }
         }
 
-        bitmap.copyPixelsFromBuffer(ByteBuffer.wrap(byteBuffer));
-
-        localRenderer.DrawBitmap(true);
+        if (bitmap != null){
+            bitmap.copyPixelsFromBuffer(ByteBuffer.wrap(byteBuffer));
+            localRenderer.DrawBitmap(true);
+        }
     }
 
     @Override

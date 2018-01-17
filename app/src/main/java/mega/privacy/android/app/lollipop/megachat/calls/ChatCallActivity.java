@@ -956,31 +956,38 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
     @Override
     public void onChatVideoData(MegaChatApiJava api, long chatid, int width, int height, byte[] byteBuffer)
     {
+        if((width == 0) || (height == 0)){
+            return;
+        }
 
         if (this.width != width || this.height != height) {
             this.width = width;
             this.height = height;
-            this.bitmap = remoteRenderer.CreateBitmap(width, height);
 
             SurfaceHolder holder = remoteSurfaceView.getHolder();
             if (holder != null) {
                 int viewWidth = remoteSurfaceView.getWidth();
                 int viewHeight = remoteSurfaceView.getHeight();
-                int holderWidth = viewWidth < width ? viewWidth : width;
-                int holderHeight = holderWidth * viewHeight / viewWidth;
-                if (holderHeight > viewHeight){
-                    holderHeight = viewHeight;
-                    holderWidth = holderHeight * viewWidth / viewHeight;
+                if ((viewWidth != 0) && (viewHeight != 0)) {
+                    int holderWidth = viewWidth < width ? viewWidth : width;
+                    int holderHeight = holderWidth * viewHeight / viewWidth;
+                    if (holderHeight > viewHeight) {
+                        holderHeight = viewHeight;
+                        holderWidth = holderHeight * viewWidth / viewHeight;
+                    }
+                    this.bitmap = remoteRenderer.CreateBitmap(width, height);
+                    holder.setFixedSize(holderWidth, holderHeight);
                 }
-                holder.setFixedSize(holderWidth, holderHeight);
             }
         }
 
-        bitmap.copyPixelsFromBuffer(ByteBuffer.wrap(byteBuffer));
+        if (bitmap != null) {
+            bitmap.copyPixelsFromBuffer(ByteBuffer.wrap(byteBuffer));
 
-        // Instead of using this WebRTC renderer, we should probably draw the image by ourselves.
-        // The renderer has been modified a bit and an update of WebRTC could break our app
-        remoteRenderer.DrawBitmap(false);
+            // Instead of using this WebRTC renderer, we should probably draw the image by ourselves.
+            // The renderer has been modified a bit and an update of WebRTC could break our app
+            remoteRenderer.DrawBitmap(false);
+        }
     }
 
     //  private Bitmap getRoundedCornerBitmap(Bitmap bitmap){
