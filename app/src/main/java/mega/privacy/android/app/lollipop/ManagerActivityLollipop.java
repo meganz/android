@@ -4,6 +4,7 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
+import android.app.NotificationManager;
 import android.app.ProgressDialog;
 import android.app.SearchManager;
 import android.content.Context;
@@ -1179,13 +1180,23 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		else{
 			thumbDir = getDir("thumbnailsMEGA", 0);
 		}
+
 		File previewDir;
 		if (getExternalCacheDir() != null){
 			previewDir = new File (getExternalCacheDir(), "previewsMEGA");
 			previewDir.mkdirs();
 		}
+
 		else{
 			previewDir = getDir("previewsMEGA", 0);
+		}
+
+		try {
+			NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+			notificationManager.cancelAll();
+		}
+		catch (Exception e){
+			log("Exception NotificationManager - remove all notifications");
 		}
 
 		dbH = DatabaseHandler.getDbHandler(getApplicationContext());
