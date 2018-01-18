@@ -15,7 +15,6 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.media.AudioAttributes;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.Ringtone;
@@ -232,6 +231,8 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
         setContentView(R.layout.activity_calls_chat);
 
         chatCallActivityActivity = this;
+
+        MegaApplication.setShowPinScreen(true);
 
         display = getWindowManager().getDefaultDisplay();
         outMetrics = new DisplayMetrics();
