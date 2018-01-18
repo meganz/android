@@ -482,6 +482,14 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 		return firstConnect;
 	}
 
+	public static boolean isShowInfoChatMessages() {
+		return showInfoChatMessages;
+	}
+
+	public static void setShowInfoChatMessages(boolean showInfoChatMessages) {
+		MegaApplication.showInfoChatMessages = showInfoChatMessages;
+	}
+
 	public static void activityResumed() {
 		log("activityResumed()");
 		activityVisible = true;
@@ -495,6 +503,8 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 	private static boolean activityVisible = false;
 	private static boolean isLoggingIn = false;
 	private static boolean firstConnect = true;
+
+	private static boolean showInfoChatMessages = false;
 
 	private static long openChatId = -1;
 
