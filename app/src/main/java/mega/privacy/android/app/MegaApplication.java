@@ -500,11 +500,21 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 		activityVisible = false;
 	}
 
+	public static boolean isShowPinScreen() {
+		return showPinScreen;
+	}
+
+	public static void setShowPinScreen(boolean showPinScreen) {
+		MegaApplication.showPinScreen = showPinScreen;
+	}
+
 	private static boolean activityVisible = false;
 	private static boolean isLoggingIn = false;
 	private static boolean firstConnect = true;
 
 	private static boolean showInfoChatMessages = false;
+
+	private static boolean showPinScreen = true;
 
 	private static long openChatId = -1;
 

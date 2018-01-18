@@ -1373,7 +1373,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     public void disablePinScreen(){
         log("disablePinScreen");
-        super.setShowPinScreen(false);
+        MegaApplication.setShowPinScreen(false);
     }
 
     @Override
@@ -4595,7 +4595,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         log("onResume");
         super.onResume();
 
-        super.setShowPinScreen(true);
+        MegaApplication.setShowPinScreen(true);
 
         activityVisible = true;
 
