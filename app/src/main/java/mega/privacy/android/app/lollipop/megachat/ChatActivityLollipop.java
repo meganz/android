@@ -288,16 +288,21 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
             if (!adapter.isMultipleSelect()){
 
-                if(!messages.get(position-1).isUploading()){
-                    adapter.setMultipleSelect(true);
+                if(position<1){
+                    log("Position not valid: "+position);
+                }
+                else{
+                    if(!messages.get(position-1).isUploading()){
+                        adapter.setMultipleSelect(true);
 
-                    actionMode = startSupportActionMode(new ActionBarCallBack());
+                        actionMode = startSupportActionMode(new ActionBarCallBack());
 
-                    if(position<1){
-                        log("Position not valid");
-                    }
-                    else{
-                        itemClick(position);
+                        if(position<1){
+                            log("Position not valid");
+                        }
+                        else{
+                            itemClick(position);
+                        }
                     }
                 }
             }
@@ -2375,17 +2380,21 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         if(position<messages.size()){
             AndroidMegaChatMessage m = messages.get(position);
 
-            if (adapter.isMultipleSelect()){
+            if (adapter.isMultipleSelect()) {
 
-                if(!m.isUploading()){
+                if (!m.isUploading()) {
+                    if (m.getMessage() != null) {
+                        log("Message id: " + m.getMessage().getMsgId());
+                        log("Timestamp: " + m.getMessage().getTimestamp());
+                    }
+
                     adapter.toggleSelection(positionInAdapter);
 
                     List<AndroidMegaChatMessage> messages = adapter.getSelectedMessages();
-                    if (messages.size() > 0){
+                    if (messages.size() > 0) {
                         updateActionModeTitle();
 //                adapter.notifyDataSetChanged();
-                    }
-                    else{
+                    } else {
                         hideMultipleSelect();
                     }
                 }
@@ -2399,6 +2408,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         }
                     }
                     else{
+
                         if(m.getMessage().getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT){
 
                             MegaNodeList nodeList = m.getMessage().getMegaNodeList();
