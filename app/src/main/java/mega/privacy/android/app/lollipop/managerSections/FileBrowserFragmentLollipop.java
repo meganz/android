@@ -9,6 +9,7 @@ import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
@@ -905,7 +906,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 					log("FILENAME: " + file.getName() + "TYPE: "+mimeType);
 
 					Intent mediaIntent;
-					if (MimeTypeList.typeForName(file.getName()).isVideoNotSupported()){
+					if (MimeTypeList.typeForName(file.getName()).isVideoNotSupported() || MimeTypeList.typeForName(file.getName()).isAudioNotSupported()){
 						mediaIntent = new Intent(Intent.ACTION_VIEW);
 					}
 					else {

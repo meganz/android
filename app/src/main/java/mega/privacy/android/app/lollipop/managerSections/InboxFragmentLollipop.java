@@ -24,18 +24,14 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.File;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
@@ -51,7 +47,6 @@ import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop.DrawerItem;
 import mega.privacy.android.app.lollipop.MyAccountInfo;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaBrowserLollipopAdapter;
@@ -62,7 +57,6 @@ import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
-import nz.mega.sdk.MegaShare;
 
 
 public class InboxFragmentLollipop extends Fragment{
@@ -566,7 +560,7 @@ public class InboxFragmentLollipop extends Fragment{
 					log("FILENAME: " + file.getName());
 
 					Intent mediaIntent;
-					if (MimeTypeList.typeForName(file.getName()).isVideoNotSupported()){
+					if (MimeTypeList.typeForName(file.getName()).isVideoNotSupported() || MimeTypeList.typeForName(file.getName()).isAudioNotSupported()){
 						mediaIntent = new Intent(Intent.ACTION_VIEW);
 					}
 					else {
@@ -575,9 +569,9 @@ public class InboxFragmentLollipop extends Fragment{
 					mediaIntent.putExtra("HANDLE", file.getHandle());
 					mediaIntent.putExtra("FILENAME", file.getName());
 					String localPath = Util.getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
+					log("localPath: "+localPath);
 					if (localPath != null){
 						File mediaFile = new File(localPath);
-						//mediaIntent.setDataAndType(Uri.parse(localPath), mimeType);
 						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
 							mediaIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile), MimeTypeList.typeForName(file.getName()).getType());
 						}
@@ -663,7 +657,7 @@ public class InboxFragmentLollipop extends Fragment{
 			}
 		}
     }
-	
+
 	private void updateActionModeTitle() {
 		if (actionMode == null || getActivity() == null) {
 			return;
