@@ -194,6 +194,10 @@ public class MimeTypeList {
 		return type.startsWith("audio/");
 	}
 
+	public boolean isAudioNotSupported() {
+		return extension.equals("flac");
+	}
+
 	/*
 	 * Get Icon for current MimeType
 	 */
