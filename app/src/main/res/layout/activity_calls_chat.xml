@@ -28,12 +28,25 @@
             android:layout_height="match_parent"
             android:fitsSystemWindows="true">
 
-
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
                 <!-- Background -->
+                <RelativeLayout
+                    android:id="@+id/parentLayoutFS"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_alignParentTop="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignParentEnd="true"
+                    android:background="@android:color/transparent">
+                    <FrameLayout
+                        android:id="@+id/fragment_container_local_cameraFS"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@android:color/transparent"/>
+                </RelativeLayout>
                 <SurfaceView
                     android:id="@+id/surface_remote_video"
                     android:layout_width="match_parent"
@@ -42,6 +55,7 @@
                     android:layout_alignParentRight="true"
                     android:layout_alignParentEnd="true">
                 </SurfaceView>
+
 
                 <RelativeLayout
                     android:id="@+id/call_chat_contact_image_layout"
@@ -53,7 +67,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:adjustViewBounds="true"
-                            android:background="@color/blue"
+                            android:background="@android:color/transparent"
                             android:visibility="gone"/>
 
                         <RelativeLayout
@@ -85,7 +99,6 @@
                 </RelativeLayout>
 
                 <!-- Toolbar -->
-
                 <android.support.v7.widget.Toolbar
                     android:id="@+id/call_toolbar"
                     android:layout_width="match_parent"
@@ -94,16 +107,6 @@
                     app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
                     app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
                     android:fitsSystemWindows="true"/>
-
-                <!--<FrameLayout-->
-                    <!--android:id="@+id/fragment_container_local_camera"-->
-                    <!--android:layout_width="wrap_content"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:layout_marginBottom="25dp"-->
-                    <!--android:layout_marginRight="20dp"-->
-                    <!--app:layout_behavior="@string/appbar_scrolling_view_behavior"-->
-                    <!--android:background="@android:color/transparent"/>-->
-
 
                 <RelativeLayout
                     android:id="@+id/parentLayout"
@@ -123,16 +126,6 @@
                         app:layout_behavior="@string/appbar_scrolling_view_behavior"
                         android:background="@android:color/transparent"/>
                 </RelativeLayout>
-
-                <!--<FrameLayout-->
-                    <!--android:id="@+id/fragment_container_local_camera"-->
-                    <!--android:layout_width="wrap_content"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:layout_marginRight="20dp"-->
-                    <!--android:layout_marginBottom="25dp"-->
-                    <!--app:layout_behavior="@string/appbar_scrolling_view_behavior"-->
-                    <!--android:background="@android:color/transparent"/>-->
-
 
                 <!-- My avatar -->
                 <RelativeLayout
@@ -247,11 +240,9 @@
                         app:pressedTranslationZ="12dp" />
                 </LinearLayout>
 
-
             </RelativeLayout>
 
         </android.support.design.widget.AppBarLayout>
-
 
     </RelativeLayout>
         <!--</android.support.design.widget.CoordinatorLayout>-->
