@@ -134,6 +134,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	private MenuItem removelinkIcon;
 	private MenuItem chatIcon;
 
+	MegaOffline currentNode;
 
 	private RelativeLayout bottomLayout;
 	private ExtendedViewPager viewPager;
@@ -143,6 +144,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	MegaChatApiAndroid megaChatApi;
 
     private ArrayList<String> paths;
+	private String offlinePathDirectory;
     
     int adapterType = 0;
 
@@ -231,6 +233,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 
 		Intent intent = getIntent();
 		adapterType = intent.getIntExtra("adapterType", 0);
+		offlinePathDirectory = intent.getStringExtra("offlinePathDirectory");
 
 		if (adapterType == Constants.OFFLINE_ADAPTER){
 			getlinkIcon.setVisible(false);
@@ -239,8 +242,8 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			removelinkIcon.setVisible(false);
 			menu.findItem(R.id.full_image_viewer_remove_link).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
 
-			shareIcon.setVisible(false);
-			menu.findItem(R.id.full_image_viewer_share).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+			shareIcon.setVisible(true);
+			menu.findItem(R.id.full_image_viewer_share).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
 			propertiesIcon.setVisible(false);
 			menu.findItem(R.id.full_image_viewer_properties).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
@@ -964,10 +967,22 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				viewPager.setCurrentItem(positionG);
 		
 				viewPager.setOnPageChangeListener(this);
-			}			
+			}
+
+			fileNameTextView = (TextView) findViewById(R.id.full_image_viewer_file_name);
+
+			if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+				fileNameTextView.setMaxWidth(Util.scaleWidthPx(300, outMetrics));
+			}
+			else{
+				fileNameTextView.setMaxWidth(Util.scaleWidthPx(300, outMetrics));
+			}
+
+			currentNode = mOffListImages.get(positionG);
+
+			fileNameTextView.setText(currentNode.getName());
 		}				
 		else if (adapterType == Constants.ZIP_ADAPTER){
-			String offlinePathDirectory = intent.getStringExtra("offlinePathDirectory");
 
 			File offlineDirectory = new File(offlinePathDirectory);
 //			if (Environment.getExternalStorageDirectory() != null){
