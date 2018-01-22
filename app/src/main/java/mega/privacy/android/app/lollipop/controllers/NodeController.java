@@ -724,7 +724,7 @@ public class NodeController {
 
                             Intent pdfIntent = new Intent(context, PdfViewerActivityLollipop.class);
                             pdfIntent.putExtra("APP", true);
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && pdfFile.getAbsolutePath().contains(Environment.getExternalStorageDirectory().getPath())) {
                                 pdfIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", pdfFile), MimeTypeList.typeForName(tempNode.getName()).getType());
                             }
                             else{
@@ -739,7 +739,7 @@ public class NodeController {
 
                             Intent videoIntent = new Intent(context, AudioVideoPlayerLollipop.class);
                             videoIntent.putExtra("HANDLE", tempNode.getHandle());
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && videoFile.getAbsolutePath().contains(Environment.getExternalStorageDirectory().getPath())) {
                                 videoIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", videoFile), MimeTypeList.typeForName(tempNode.getName()).getType());
                             }
                             else{
@@ -754,7 +754,7 @@ public class NodeController {
 
                             Intent audioIntent = new Intent(context, AudioVideoPlayerLollipop.class);
                             audioIntent.putExtra("HANDLE", tempNode.getHandle());
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && audioFile.getAbsolutePath().contains(Environment.getExternalStorageDirectory().getPath())) {
                                 audioIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", audioFile), MimeTypeList.typeForName(tempNode.getName()).getType());
                             }
                             else{
