@@ -3,7 +3,6 @@ package mega.privacy.android.app;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 
@@ -33,6 +32,8 @@ public class OpenLinkActivity extends PinActivity implements MegaRequestListener
 	MegaApiAndroid megaApi;
 	MegaChatApiAndroid megaChatApi;
 	DatabaseHandler dbH = null;
+
+	String urlConfirmationLink = null;
 
 	static OpenLinkActivity openLinkActivity = null;
 	
@@ -86,24 +87,9 @@ public class OpenLinkActivity extends PinActivity implements MegaRequestListener
 		if (url != null && (url.matches("^https://mega.co.nz/#confirm.+$") || url.matches("^https://mega.nz/#confirm.+$"))) {
 			log("confirmation url");
 //			megaApi.localLogout();
-			AccountController aC = new AccountController(this);
-			aC.logout(this, megaApi, megaChatApi, true);
+			urlConfirmationLink = url;
 
-
-			if (dbH == null){
-				dbH = DatabaseHandler.getDbHandler(getApplicationContext());
-			}
-			if (dbH != null){
-				dbH.clearEphemeral();
-			}
-
-			Intent confirmIntent = new Intent(this, LoginActivityLollipop.class);
-			confirmIntent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
-			confirmIntent.putExtra(Constants.EXTRA_CONFIRMATION, url);
-			confirmIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-			confirmIntent.setAction(Constants.ACTION_CONFIRM);
-			startActivity(confirmIntent);
-			finish();
+			megaApi.querySignupLink(url, this);
 
 			return;
 		}
@@ -509,7 +495,6 @@ public class OpenLinkActivity extends PinActivity implements MegaRequestListener
 						finish();
 					}
 				}
-
 			}
 			else if(e.getErrorCode() == MegaError.API_EEXPIRED){
 				log("Error expired link");
@@ -527,7 +512,77 @@ public class OpenLinkActivity extends PinActivity implements MegaRequestListener
 			else{
 				log("Error when asking for recovery pass link");
 				log(e.getErrorString() + "___" + e.getErrorCode());
-				Util.showAlert(this, getString(R.string.email_verification_text_error), getString(R.string.general_error_word));
+				Util.showAlert(this, getString(R.string.invalid_link), getString(R.string.general_error_word));
+			}
+		}
+		else if(request.getType() == MegaRequest.TYPE_LOGOUT){
+			if(Util.isChatEnabled()){
+				log("END logout sdk request - wait chat logout");
+
+				if(MegaApplication.getUrlConfirmationLink()!=null){
+					log("Confirmation link - show confirmation screen");
+					if (dbH == null){
+						dbH = DatabaseHandler.getDbHandler(getApplicationContext());
+					}
+					if (dbH != null){
+						dbH.clearEphemeral();
+					}
+
+					AccountController aC = new AccountController(this);
+					aC.logoutConfirmed(this);
+
+					Intent confirmIntent = new Intent(this, LoginActivityLollipop.class);
+					confirmIntent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
+					confirmIntent.putExtra(Constants.EXTRA_CONFIRMATION, urlConfirmationLink);
+					confirmIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+					confirmIntent.setAction(Constants.ACTION_CONFIRM);
+					startActivity(confirmIntent);
+					MegaApplication.setUrlConfirmationLink(null);
+					finish();
+				}
+			}
+			else{
+				log("END logout sdk request - chat disabled");
+				if (dbH == null){
+					dbH = DatabaseHandler.getDbHandler(getApplicationContext());
+				}
+				if (dbH != null){
+					dbH.clearEphemeral();
+				}
+
+				AccountController aC = new AccountController(this);
+				aC.logoutConfirmed(this);
+
+				Intent confirmIntent = new Intent(this, LoginActivityLollipop.class);
+				confirmIntent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
+				confirmIntent.putExtra(Constants.EXTRA_CONFIRMATION, urlConfirmationLink);
+				confirmIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+				confirmIntent.setAction(Constants.ACTION_CONFIRM);
+				startActivity(confirmIntent);
+				MegaApplication.setUrlConfirmationLink(null);
+				finish();
+			}
+		}
+		else if (request.getType() == MegaRequest.TYPE_QUERY_SIGNUP_LINK){
+			log("MegaRequest.TYPE_QUERY_SIGNUP_LINK");
+
+			if(e.getErrorCode() == MegaError.API_OK){
+				AccountController aC = new AccountController(this);
+				MegaApplication.setUrlConfirmationLink(request.getLink());
+
+				aC.logout(this, megaApi);
+			}
+			else{
+				AlertDialog.Builder builder;
+				builder = new AlertDialog.Builder(this);
+				builder.setMessage(R.string.invalid_link);
+				builder.setPositiveButton(getString(R.string.cam_sync_ok),
+						new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog, int whichButton) {
+								finish();
+							}
+						});
+				builder.show();
 			}
 		}
 	}
