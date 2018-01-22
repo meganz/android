@@ -870,11 +870,11 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }
             else if(state == MegaChatApi.STATUS_INVALID){
                 log("INVALID status: "+state);
-                aB.setSubtitle(getString(R.string.invalid_status));
+                aB.setSubtitle(null);
             }
             else{
                 log("This user status is: "+state);
-                aB.setSubtitle(getString(R.string.invalid_status));
+                aB.setSubtitle(null);
             }
         }
     }
