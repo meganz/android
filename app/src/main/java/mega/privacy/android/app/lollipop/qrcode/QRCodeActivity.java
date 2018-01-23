@@ -16,7 +16,6 @@ import android.widget.FrameLayout;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.PinActivityLollipop;
-import mega.privacy.android.app.lollipop.managerSections.FileBrowserFragmentLollipop;
 import mega.privacy.android.app.modalbottomsheet.QRCodeSaveBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.Util;
 
@@ -34,6 +33,9 @@ public class QRCodeActivity extends PinActivityLollipop{
     private FrameLayout fragmentContainer;
     private TabLayout tabLayoutQRCode;
     private ViewPager viewPagerQRCode;
+
+    private ScanCodeFragment scanCodeFragment;
+    private MyCodeFragment myCodeFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,6 +61,23 @@ public class QRCodeActivity extends PinActivityLollipop{
 
         tabLayoutQRCode =  (TabLayout) findViewById(R.id.sliding_tabs_qr_code);
         viewPagerQRCode = (ViewPager) findViewById(R.id.qr_code_tabs_pager);
+
+        viewPagerQRCode.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
     }
 
     @Override
