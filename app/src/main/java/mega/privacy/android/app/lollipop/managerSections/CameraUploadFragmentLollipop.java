@@ -1217,6 +1217,22 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 		dbH.setStorageDownloadLocation(defaultDownloadLocation.getAbsolutePath());
 		dbH.setPinLockEnabled(false);
 		dbH.setPinLockCode("");
+
+		ArrayList<MegaNode> nodeLinks = megaApi.getPublicLinks();
+		if(nodeLinks==null){
+			log("No public links:showCopyright set true");
+			dbH.setShowCopyright(true);
+		}
+		else{
+			if(nodeLinks.size()==0){
+				log("No public links:showCopyright set true");
+				dbH.setShowCopyright(true);
+			}
+			else{
+				log("ALready public links:showCopyright set false");
+				dbH.setShowCopyright(false);
+			}
+		}
 	}
 	
 	public String getImageDateString(int month, int year){

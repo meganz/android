@@ -14,8 +14,9 @@ public class MegaAttributes {
 	String invalidateSdkCache = "false";
 	String fileLoggerKarere = "false";
 	String useHttpsOnly = "false";
+	String showCopyright = "true";
 	
-	public MegaAttributes(String online, int attemps, String askSizeDownload, String askNoAppDownload, String fileLogger, String accountDetailsTimeStamp, String paymentMethodsTimeStamp, String pricingTimeStamp, String extendedAccountDetailsTimeStamp, String invalidateSdkCache, String fileLoggerKarere) {
+	public MegaAttributes(String online, int attemps, String askSizeDownload, String askNoAppDownload, String fileLogger, String accountDetailsTimeStamp, String paymentMethodsTimeStamp, String pricingTimeStamp, String extendedAccountDetailsTimeStamp, String invalidateSdkCache, String fileLoggerKarere, String showCopyright) {
 		this.online = online;
 		this.attemps = attemps;
 		this.askNoAppDownload = askNoAppDownload;
@@ -28,9 +29,10 @@ public class MegaAttributes {
 		this.invalidateSdkCache = invalidateSdkCache;
 		this.fileLoggerKarere = fileLoggerKarere;
 		this.useHttpsOnly = "false";
+		this.showCopyright = showCopyright;
 	}
 
-	public MegaAttributes(String online, int attemps, String askSizeDownload, String askNoAppDownload, String fileLogger, String accountDetailsTimeStamp, String paymentMethodsTimeStamp, String pricingTimeStamp, String extendedAccountDetailsTimeStamp, String invalidateSdkCache, String fileLoggerKarere, String useHttpsOnly) {
+	public MegaAttributes(String online, int attemps, String askSizeDownload, String askNoAppDownload, String fileLogger, String accountDetailsTimeStamp, String paymentMethodsTimeStamp, String pricingTimeStamp, String extendedAccountDetailsTimeStamp, String invalidateSdkCache, String fileLoggerKarere, String useHttpsOnly, String showCopyright) {
 		this.online = online;
 		this.attemps = attemps;
 		this.askNoAppDownload = askNoAppDownload;
@@ -43,6 +45,7 @@ public class MegaAttributes {
 		this.invalidateSdkCache = invalidateSdkCache;
 		this.fileLoggerKarere = fileLoggerKarere;
 		this.useHttpsOnly = useHttpsOnly;
+		this.showCopyright = showCopyright;
 	}
 	
 	public String getOnline(){
@@ -139,5 +142,13 @@ public class MegaAttributes {
 
 	public void setUseHttpsOnly(String useHttpsOnly) {
 		this.useHttpsOnly = useHttpsOnly;
+	}
+
+	public String getShowCopyright() {
+		return showCopyright;
+	}
+
+	public void setShowCopyright(String showCopyright) {
+		this.showCopyright = showCopyright;
 	}
 }
