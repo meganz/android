@@ -295,34 +295,34 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
 
         listView.setVisibility(View.GONE);
         ((ManagerActivityLollipop)context).hideFabButton();
-        String emptyTextViewText = getString(R.string.recent_chat_empty_enable_chat);
-
-
-        try{
-            emptyTextViewText = emptyTextViewText.replace("[A]", "\n");
-        }
-        catch (Exception e){}
-        emptyTextViewInvite.setText(emptyTextViewText);
-
-//        String textToShow = String.format(context.getString(R.string.recent_chat_empty_enable_chat));
+//        String emptyTextViewText = getString(R.string.recent_chat_empty_enable_chat);
+//
 //
 //        try{
-//            textToShow = textToShow.replace("[A]", "\n");
-//            textToShow = textToShow.replace("[B]", "<font color=\'#000000\'>");
-//            textToShow = textToShow.replace("[/B]", "</font>");
-//            textToShow = textToShow.replace("[C]", "<font color=\'#7a7a7a\'>");
-//            textToShow = textToShow.replace("[/C]", "</font>");
-//
+//            emptyTextViewText = emptyTextViewText.replace("[A]", "\n");
 //        }
 //        catch (Exception e){}
-//        Spanned result = null;
-//        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-//            result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
-//        } else {
-//            result = Html.fromHtml(textToShow);
-//
-//        }
-//        emptyTextViewInvite.setText(result);
+//        emptyTextViewInvite.setText(emptyTextViewText);
+
+        String textToShow = String.format(context.getString(R.string.recent_chat_empty_enable_chat));
+
+        try{
+//            textToShow = textToShow.replace("[A]", "\n");
+            textToShow = textToShow.replace("[B]", "<font color=\'#000000\'>");
+            textToShow = textToShow.replace("[/B]", "</font>");
+            textToShow = textToShow.replace("[C]", "<font color=\'#7a7a7a\'>");
+            textToShow = textToShow.replace("[/C]", "</font>");
+
+        }
+        catch (Exception e){}
+        Spanned result = null;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+            result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
+        } else {
+            result = Html.fromHtml(textToShow);
+
+        }
+        emptyTextViewInvite.setText(result);
 
         inviteButton.setText(getString(R.string.recent_chat_enable_chat_button));
         inviteButton.setVisibility(View.VISIBLE);
