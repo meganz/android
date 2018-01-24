@@ -7520,7 +7520,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	        case R.id.action_menu_logout:{
 				log("action menu logout pressed");
 				AccountController aC = new AccountController(this);
-				aC.logout(this, megaApi, megaChatApi, false);
+				aC.logout(this, megaApi);
 	        	return true;
 	        }
 	        case R.id.action_menu_cancel_subscriptions:{
@@ -12445,20 +12445,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 		}
 		else if (request.getType() == MegaChatRequest.TYPE_LOGOUT){
-//            loginLoggingIn.setVisibility(View.GONE);
-//            loginLogin.setVisibility(View.VISIBLE);
-//            scrollView.setBackgroundColor(getResources().getColor(R.color.background_create_account));
-//            loginDelimiter.setVisibility(View.VISIBLE);
-//            loginCreateAccount.setVisibility(View.VISIBLE);
-//            queryingSignupLinkText.setVisibility(View.GONE);
-//            confirmingAccountText.setVisibility(View.GONE);
-//            generatingKeysText.setVisibility(View.GONE);
-//            loggingInText.setVisibility(View.GONE);
-//            fetchingNodesText.setVisibility(View.GONE);
-//            prepareNodesText.setVisibility(View.GONE);
-//            initizalizingChatText.setVisibility(View.GONE);
-//            serversBusyText.setVisibility(View.GONE);
 
+			log("Disable chat finish logout");
 			if(sttFLol!=null){
 				if(sttFLol.isAdded()){
 					sttFLol.hidePreferencesChat();
@@ -12478,17 +12466,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			else{
 				log("EEEERRRRROR WHEN TYPE_SET_ONLINE_STATUS " + e.getErrorString());
 				showSnackbar(getString(R.string.changing_status_error));
-			}
-		}
-		else if(request.getType() == MegaChatRequest.TYPE_LOGOUT){
-			if(e.getErrorCode()==MegaChatError.ERROR_OK){
-				log("Logout from chat");
-				megaChatApi = null;
-				((MegaApplication) getApplication()).disableMegaChatApi();
-				Util.resetAndroidLogger();
-			}
-			else{
-				log("ERROR logout CHAT " + e.getErrorString());
 			}
 		}
 	}
@@ -12527,29 +12504,27 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		else if (request.getType() == MegaRequest.TYPE_LOGOUT){
 			log("logout finished");
 
-			if(megaChatApi!=null){
-				megaChatApi.logout(null);
+			if(Util.isChatEnabled()){
+				log("END logout sdk request - wait chat logout");
 			}
+			else{
+				log("END logout sdk request - chat disabled");
+				if (dbH == null){
+					dbH = DatabaseHandler.getDbHandler(getApplicationContext());
+				}
+				if (dbH != null){
+					dbH.clearEphemeral();
+				}
 
-			Intent tourIntent = new Intent(this, LoginActivityLollipop.class);
-			startActivity(tourIntent);
-			finish();
+				AccountController aC = new AccountController(this);
+				aC.logoutConfirmed(this);
 
-//			if (recentChatsFragmentLollipopListener != null){
-//				log("remove chatlistener");
-//				megaChatApi.removeChatListener(recentChatsFragmentLollipopListener);
-//			}
-//
-//			megaChatApi.logout(this);
+				Intent tourIntent = new Intent(this, LoginActivityLollipop.class);
+				tourIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+				this.startActivity(tourIntent);
 
-//			if (request.getType() == MegaRequest.TYPE_LOGOUT){
-//				log("type_logout");
-//				if (e.getErrorCode() == MegaError.API_ESID){
-//					log("calling ManagerActivityLollipop.logout");
-//					MegaApiAndroid megaApi = app.getMegaApi();
-//					ManagerActivityLollipop.logout(managerActivity, app, megaApi, false);
-//				}
-//			}
+				finish();
+			}
 		}
 		else if(request.getType() == MegaRequest.TYPE_SET_ATTR_USER) {
 			log("TYPE_SET_ATTR_USER");

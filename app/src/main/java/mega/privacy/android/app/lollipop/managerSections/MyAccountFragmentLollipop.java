@@ -542,7 +542,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 			case R.id.logout_button:{
 				log("Logout button");
 				AccountController aC = new AccountController(context);
-				aC.logout(context, megaApi, megaChatApi,false);
+				aC.logout(context, megaApi);
 				break;
 			}
 			case R.id.my_account_relative_layout_avatar:{
