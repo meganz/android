@@ -1033,7 +1033,7 @@
     -->
 
     <string name="recent_chat_empty_invite" context="Message shown when the user has no recent chats">Invite your friends to join you on Chat and enjoy our encrypted platform with privacy and security.</string>
-    <string name="recent_chat_empty_enable_chat" context="Message shown when the user has no recent chats">Enable Chat[A]and enjoy our encrypted platform with privacy and security.</string>
+    <!--<string name="recent_chat_empty_enable_chat" context="Message shown when the user has no recent chats">Enable Chat[A]and enjoy our encrypted platform with privacy and security.</string>-->
 
     <!--
     <string name="videocall_title" context="Title shown in the list of main chat screen for a videocall">Video call</string>
@@ -1661,10 +1661,9 @@
     <string name="error_enable_chat_before_login" context="Message shown if the user choose enable button and he is not logged in">Please, log in before enabling the chat</string>
 
     <string name="label_set_period" context="title of a tag to search for a specific period within the search by date option in Camera upload">Set period</string>
-    <string name="overquota_alert_title" context="Title dialog overquota error">Storage over quota</string>
 
     <string name="context_empty_chat_recent" context="Text of the empty screen when there are not chat conversations">[B]Invite friends to [/B][A]Chat[/A][B] and enjoy our encrypted platform with privacy and security.[/B]</string>
-    <!--<string name="recent_chat_empty_enable_chat" context="Message shown when the user has no recent chats">[C]Enable [/C][B]Chat[/B][A][C] and enjoy our encrypted platform with privacy and security.[/C]</string>-->
+    <string name="recent_chat_empty_enable_chat" context="Message shown when the user has no recent chats">[C]Enable [/C][B]Chat[/B]\n[C] and enjoy our encrypted platform with privacy and security.[/C]</string>
     <!--<string name="recent_chat_empty_enable_chat" context="Message shown when the user has no recent chats">Enable Chat[A] and enjoy our encrypted platform with privacy and security.</string>-->
 
     <string name="context_empty_camera_uploads" context="Text of the empty screen when there are not elements in Camera Uploads">[B]No media on [/B][A]Camera Uploads[/A][B].[/B]</string>
@@ -1679,6 +1678,8 @@
 
     <string name="tab_sent_requests" context="Title of the sent requests tab. Capital letters">Sent Requests</string>
     <string name="tab_received_requests" context="Title of the received requests tab. Capital letters">Received Requests</string>
+    <string name="overquota_alert_title" context="Title dialog overquota error">Storage quota exceeded</string>
+
 
 </resources>
 
