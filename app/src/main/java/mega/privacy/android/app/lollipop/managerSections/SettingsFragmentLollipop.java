@@ -233,6 +233,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 
 	public int numberOfClicksSDK = 0;
 	public int numberOfClicksKarere = 0;
+	public int numberOfClicksAppVersion = 0;
 	
 	@Override
     public void onCreate(Bundle savedInstanceState) {
@@ -1194,6 +1195,27 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 		}
 		else{
 			numberOfClicksKarere = 0;
+		}
+
+		if (preference.getKey().compareTo(KEY_ABOUT_APP_VERSION) == 0){
+			log("KEY_ABOUT_APP_VERSION pressed");
+			numberOfClicksAppVersion++;
+			if (numberOfClicksAppVersion == 5){
+
+				if (MegaApplication.isShowInfoChatMessages() == false) {
+					MegaApplication.setShowInfoChatMessages(true);
+					numberOfClicksAppVersion = 0;
+					((ManagerActivityLollipop)context).showSnackbar("Action to show info of chat messages is enabled");
+				}
+				else{
+					MegaApplication.setShowInfoChatMessages(false);
+					numberOfClicksAppVersion = 0;
+					((ManagerActivityLollipop)context).showSnackbar("Action to show info of chat messages is disabled");
+				}
+			}
+		}
+		else{
+			numberOfClicksAppVersion = 0;
 		}
 
 		if (preference.getKey().compareTo(KEY_STORAGE_DOWNLOAD_LOCATION) == 0){
