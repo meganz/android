@@ -1,10 +1,90 @@
 package mega.privacy.android.app.lollipop.qrcode;
 
-import android.app.Fragment;
+
+import android.app.Activity;
+import android.content.Context;
+import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.TextView;
+
+import mega.privacy.android.app.R;
+import mega.privacy.android.app.utils.Util;
 
 /**
  * Created by mega on 22/01/18.
  */
 
 public class MyCodeFragment extends Fragment{
+
+    private ActionBar aB;
+
+    private ImageView qrcode;
+    private TextView qrcode_link;
+    private Button qrcode_copy_link;
+
+    private Context context;
+
+    public static MyCodeFragment newInstance() {
+        log("newInstance");
+        MyCodeFragment fragment = new MyCodeFragment();
+        return fragment;
+    }
+
+    @Override
+    public void onCreate (Bundle savedInstanceState){
+        log("onCreate");
+
+        super.onCreate(savedInstanceState);
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        log("onCreateView");
+
+        View v = inflater.inflate(R.layout.fragment_mycode, container, false);
+
+        if (aB == null){
+            aB = ((AppCompatActivity)context).getSupportActionBar();
+        }
+
+        if(aB!=null){
+            aB.setTitle(getString(R.string.section_qr_code));
+            aB.setHomeButtonEnabled(true);
+            aB.setDisplayHomeAsUpEnabled(true);
+        }
+
+        qrcode = (ImageView) v.findViewById(R.id.qr_code_image);
+        qrcode_link = (TextView) v.findViewById(R.id.qr_code_link);
+        qrcode_copy_link = (Button) v.findViewById(R.id.qr_code_button_copy_link);
+
+        return v;
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        log("onAttach");
+        super.onAttach(activity);
+        context = activity;
+        aB = ((AppCompatActivity)activity).getSupportActionBar();
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        log("onAttach context");
+        super.onAttach(context);
+        this.context = context;
+        aB = ((AppCompatActivity)getActivity()).getSupportActionBar();
+    }
+
+    private static void log(String log) {
+        Util.log("MyCodeFragment", log);
+    }
 }

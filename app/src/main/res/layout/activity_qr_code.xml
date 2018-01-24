@@ -44,23 +44,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@color/mega"
-                    style="@style/MyCustomTabLayout">
-
-                    <android.support.design.widget.TabItem
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:text="MY CODE"/>
-
-                    <android.support.design.widget.TabItem
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:text="SCAN CODE"/>
-
-
-                </android.support.design.widget.TabLayout>
+                    style="@style/MyCustomTabLayout"/>
 
             </android.support.design.widget.AppBarLayout>
-
 
             <android.support.v4.view.ViewPager
                 android:id="@+id/qr_code_tabs_pager"
@@ -68,12 +54,12 @@
                 android:layout_height="0dp"
                 android:layout_weight="1"/>
 
-            <FrameLayout
+            <!--<FrameLayout
                 android:id="@+id/fragment_container"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_below="@id/app_bar_layout"
-                app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
+                app:layout_behavior="@string/appbar_scrolling_view_behavior"/>-->
 
         </LinearLayout>
     </android.support.design.widget.CoordinatorLayout>
