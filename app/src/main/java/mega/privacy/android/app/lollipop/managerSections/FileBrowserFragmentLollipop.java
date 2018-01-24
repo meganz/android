@@ -18,6 +18,8 @@ import android.support.v7.view.ActionMode;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
+import android.text.Spanned;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.LayoutInflater;
@@ -80,7 +82,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 	ImageView emptyImageView;
 	LinearLayout emptyTextView;
 	TextView emptyTextViewFirst;
-	TextView emptyTextViewSecond;
 
 	MegaBrowserLollipopAdapter adapter;
 	FileBrowserFragmentLollipop fileBrowserFragment = this;
@@ -577,7 +578,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			emptyImageView = (ImageView) v.findViewById(R.id.file_list_empty_image);
 			emptyTextView = (LinearLayout) v.findViewById(R.id.file_list_empty_text);
 			emptyTextViewFirst = (TextView) v.findViewById(R.id.file_list_empty_text_first);
-			emptyTextViewSecond = (TextView) v.findViewById(R.id.file_list_empty_text_second);
 
 			contentTextLayout = (RelativeLayout) v.findViewById(R.id.content_text_layout);
 			contentText = (TextView) v.findViewById(R.id.content_text);
@@ -652,7 +652,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			emptyImageView = (ImageView) v.findViewById(R.id.file_grid_empty_image);
 			emptyTextView = (LinearLayout) v.findViewById(R.id.file_grid_empty_text);
 			emptyTextViewFirst = (TextView) v.findViewById(R.id.file_grid_empty_text_first);
-			emptyTextViewSecond = (TextView) v.findViewById(R.id.file_grid_empty_text_second);
 
 			contentTextLayout = (RelativeLayout) v.findViewById(R.id.content_grid_text_layout);
 
@@ -1150,9 +1149,21 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 				}else{
 					emptyImageView.setImageResource(R.drawable.ic_empty_cloud_drive);
 				}
-				emptyTextViewFirst.setText(R.string.context_empty_inbox);
-				String text = getString(R.string.section_cloud_drive);
-				emptyTextViewSecond.setText(" "+text+".");
+				String textToShow = String.format(context.getString(R.string.context_empty_inbox), getString(R.string.section_cloud_drive));
+				try{
+					textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
+					textToShow = textToShow.replace("[/A]", "</font>");
+					textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
+					textToShow = textToShow.replace("[/B]", "</font>");
+				}
+				catch (Exception e){}
+				Spanned result = null;
+				if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+					result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
+				} else {
+					result = Html.fromHtml(textToShow);
+				}
+				emptyTextViewFirst.setText(result);
 
 			} else {
 				emptyImageView.setImageResource(R.drawable.ic_empty_folder);
@@ -1349,9 +1360,21 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 						}else{
 							emptyImageView.setImageResource(R.drawable.ic_empty_cloud_drive);
 						}
-						emptyTextViewFirst.setText(R.string.context_empty_inbox);
-						String text = getString(R.string.section_cloud_drive);
-						emptyTextViewSecond.setText(" "+text+".");
+						String textToShow = String.format(context.getString(R.string.context_empty_inbox), getString(R.string.section_cloud_drive));
+						try{
+							textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
+							textToShow = textToShow.replace("[/A]", "</font>");
+							textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
+							textToShow = textToShow.replace("[/B]", "</font>");
+						}
+						catch (Exception e){}
+						Spanned result = null;
+						if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+							result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
+						} else {
+							result = Html.fromHtml(textToShow);
+						}
+						emptyTextViewFirst.setText(result);
 
 					} else {
 						emptyImageView.setImageResource(R.drawable.ic_empty_folder);
@@ -1383,9 +1406,21 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 						}else{
 							emptyImageView.setImageResource(R.drawable.ic_empty_cloud_drive);
 						}
-						emptyTextViewFirst.setText(R.string.context_empty_inbox);
-						String text = getString(R.string.section_cloud_drive);
-						emptyTextViewSecond.setText(" "+text+".");
+						String textToShow = String.format(context.getString(R.string.context_empty_inbox), getString(R.string.section_cloud_drive));
+						try{
+							textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
+							textToShow = textToShow.replace("[/A]", "</font>");
+							textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
+							textToShow = textToShow.replace("[/B]", "</font>");
+						}
+						catch (Exception e){}
+						Spanned result = null;
+						if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+							result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
+						} else {
+							result = Html.fromHtml(textToShow);
+						}
+						emptyTextViewFirst.setText(result);
 
 					} else {
 						emptyImageView.setImageResource(R.drawable.ic_empty_folder);
