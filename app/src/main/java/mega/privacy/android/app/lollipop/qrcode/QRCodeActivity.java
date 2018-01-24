@@ -3,6 +3,8 @@ package mega.privacy.android.app.lollipop.qrcode;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
@@ -23,12 +25,15 @@ import mega.privacy.android.app.utils.Util;
  * Created by mega on 12/01/18.
  */
 
-public class QRCodeActivity extends PinActivityLollipop{
+public class QRCodeActivity extends PinActivityLollipop {
 
     private Toolbar tB;
     private ActionBar aB;
 
     private MenuItem shareMenuItem;
+    private MenuItem saveMenuItem;
+    private MenuItem settingsMenuItem;
+    private MenuItem resetQRMenuItem;
 
     private FrameLayout fragmentContainer;
     private TabLayout tabLayoutQRCode;
@@ -36,6 +41,8 @@ public class QRCodeActivity extends PinActivityLollipop{
 
     private ScanCodeFragment scanCodeFragment;
     private MyCodeFragment myCodeFragment;
+
+    private int qrCodeFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,7 +68,6 @@ public class QRCodeActivity extends PinActivityLollipop{
 
         tabLayoutQRCode =  (TabLayout) findViewById(R.id.sliding_tabs_qr_code);
         viewPagerQRCode = (ViewPager) findViewById(R.id.qr_code_tabs_pager);
-
         viewPagerQRCode.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
@@ -71,6 +77,14 @@ public class QRCodeActivity extends PinActivityLollipop{
             @Override
             public void onPageSelected(int position) {
 
+                supportInvalidateOptionsMenu();
+
+                if (position == 0) {
+                    qrCodeFragment = 0;
+                }
+                else {
+                    qrCodeFragment = 1;
+                }
             }
 
             @Override
@@ -78,6 +92,10 @@ public class QRCodeActivity extends PinActivityLollipop{
 
             }
         });
+
+        viewPagerQRCode.setAdapter(new QRCodePageAdapter(getSupportFragmentManager(),this));
+        tabLayoutQRCode.setupWithViewPager(viewPagerQRCode);
+        viewPagerQRCode.setCurrentItem(0);
     }
 
     @Override
@@ -88,10 +106,30 @@ public class QRCodeActivity extends PinActivityLollipop{
         inflater.inflate(R.menu.activity_qr_code, menu);
 
         shareMenuItem = menu.findItem(R.id.qr_code_share);
+        saveMenuItem = menu.findItem(R.id.qr_code_save);
+        settingsMenuItem = menu.findItem(R.id.qr_code_settings);
+        resetQRMenuItem = menu.findItem(R.id.qr_code_reset);
 
         Drawable share = getResources().getDrawable(R.drawable.ic_social_share_white);
         share.setColorFilter(getResources().getColor(R.color.white), PorterDuff.Mode.SRC_ATOP);
         shareMenuItem.setIcon(share);
+
+        switch (qrCodeFragment) {
+            case 0: {
+                shareMenuItem.setVisible(true);
+                saveMenuItem.setVisible(true);
+                settingsMenuItem.setVisible(true);
+                resetQRMenuItem.setVisible(true);
+                break;
+            }
+            case 1: {
+                shareMenuItem.setVisible(false);
+                saveMenuItem.setVisible(false);
+                settingsMenuItem.setVisible(false);
+                resetQRMenuItem.setVisible(false);
+                break;
+            }
+        }
 
         return super.onCreateOptionsMenu(menu);
     }

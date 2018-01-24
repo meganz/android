@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ImageView
+        android:layout_width="240dp"
+        android:layout_height="240dp"
+        android:id="@+id/qr_code_image"
+        android:layout_centerHorizontal="true"
+        android:background="@drawable/red_border_upgrade_account"
+        android:layout_marginBottom="80dp"
+        android:layout_above="@+id/qr_code_link"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/qr_code_link"
+        android:textColor="@color/black"
+        android:text="https://mega.nz/fm/4Si6od-7Yqw"
+        android:layout_centerHorizontal="true"
+        android:layout_above="@+id/qr_code_button_copy_link"
+        android:layout_marginBottom="15dp"
+        android:textSize="16sp"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/qr_code_button_copy_link"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentBottom="true"
+        android:elevation="6dp"
+        android:background="@color/white"
+        android:layout_marginBottom="40dp"
+        android:textSize="14sp"
+        android:text="copy link"/>
+
+</RelativeLayout>
