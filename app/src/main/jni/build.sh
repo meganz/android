@@ -132,7 +132,7 @@ function createMEGAchatBindings
 {
     echo "* Creating MEGAchat Java bindings"
     mkdir -p ../java/nz/mega/sdk
-    swig -c++ -Imega/sdk/include -Imegachat/sdk/src/ -java -package nz.mega.sdk -outdir ${JAVA_OUTPUT_PATH}/nz/mega/sdk/ -o bindings/megachat.cpp megachat/megachatapi.i &>> ${LOG_FILE}
+    swig -c++ -Imega/sdk/include -Imegachat/sdk/src/ -java -package nz.mega.sdk -outdir ${JAVA_OUTPUT_PATH}/nz/mega/sdk/ -o bindings/megachat.cpp megachat/sdk/bindings/megachatapi.i &>> ${LOG_FILE}
     pushd megachat/sdk/src &>> ${LOG_FILE}
     cmake -P genDbSchema.cmake
     popd &>> ${LOG_FILE}
