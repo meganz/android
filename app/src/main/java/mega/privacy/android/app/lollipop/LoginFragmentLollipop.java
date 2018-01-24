@@ -235,14 +235,14 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                         log("firstTimeChat true --> enable chat by default");
                         chatSettings = new ChatSettings(true+"", true + "", "",true + "");
                         dbH.setChatSettings(chatSettings);
-                        dbH.setFirstTimeChat(false);
+//                        dbH.setFirstTimeChat(false);
                     }
                 }
                 else{
                     log("firstTimeChat is null --> enable chat by default");
                     chatSettings = new ChatSettings(true+"", true + "", "",true + "");
                     dbH.setChatSettings(chatSettings);
-                    dbH.setFirstTimeChat(false);
+//                    dbH.setFirstTimeChat(false);
                 }
             }
         }
