@@ -3426,15 +3426,18 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						if(!searchQuery.isEmpty()){
 							log("aB.setHomeAsUpIndicator_4911");
 							aB.setTitle(getString(R.string.action_search)+": "+searchQuery);
+							aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 						}
 						else{
 							log("aB.setHomeAsUpIndicator_481");
 							aB.setTitle(getString(R.string.action_search)+": "+"");
+							aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 						}
 					}
 					else{
 						log("aB.setHomeAsUpIndicator_6611");
 						aB.setTitle(getString(R.string.action_search)+": "+"");
+						aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 					}
 				}
 				else{
@@ -10700,7 +10703,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
     		searchQuery = intent.getStringExtra(SearchManager.QUERY);
     		parentHandleSearch = -1;
     		aB.setTitle(getString(R.string.action_search)+": "+searchQuery);
-
+			aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
     		isSearching = true;
 
     		if (searchMenuItem != null) {
