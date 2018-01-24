@@ -1674,8 +1674,8 @@
     <string name="context_empty_offline" context="Text of the empty screen when there are not elements in Saved for Offline">[B]No files [/B][A]%1$s[/A][B].[/B]</string>
     <string name="context_empty_contacts" context="Text of the empty screen when there are not contacts">[B]No [/B][A]%1$s[/A][B].[/B]</string>
 
-    <string name="context_empty_incoming" context="Text of the empty screen when there are not elements in Incoming Shared folders">Incoming Shared folders</string>
-    <string name="context_empty_outgoing" context="Text of the empty screen when there are not elements in Outgoing Shared folders">Outgoing Shared folders</string>
+    <string name="context_empty_incoming" context="Text of the empty screen when there are not elements in Incoming">Incoming Shared folders</string>
+    <string name="context_empty_outgoing" context="Text of the empty screen when there are not elements in Outgoing">Outgoing Shared folders</string>
 
     <string name="tab_sent_requests" context="Title of the sent requests tab. Capital letters">Sent Requests</string>
     <string name="tab_received_requests" context="Title of the received requests tab. Capital letters">Received Requests</string>
