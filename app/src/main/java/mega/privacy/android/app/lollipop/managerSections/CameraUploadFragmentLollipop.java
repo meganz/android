@@ -29,6 +29,8 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SwitchCompat;
+import android.text.Html;
+import android.text.Spanned;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.GestureDetector;
@@ -106,7 +108,6 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	ImageView emptyImageView;
 	LinearLayout emptyTextView;
 	TextView emptyTextViewFirst;
-	TextView emptyTextViewSecond;
 
 	private RelativeLayout contentTextLayout;
 //	Button turnOnOff;
@@ -751,16 +752,28 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 				emptyImageView = (ImageView) v.findViewById(R.id.file_list_empty_image);
 				emptyTextView = (LinearLayout) v.findViewById(R.id.file_list_empty_text);
 				emptyTextViewFirst = (TextView) v.findViewById(R.id.file_list_empty_text_first);
-				emptyTextViewSecond = (TextView) v.findViewById(R.id.file_list_empty_text_second);
 
 				if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
 					emptyImageView.setImageResource(R.drawable.uploads_empty_landscape);
 				} else {
 					emptyImageView.setImageResource(R.drawable.ic_empty_camera_uploads);
 				}
-				emptyTextViewFirst.setText(R.string.context_empty_camera_uploads);
-				String text = getString(R.string.section_photo_sync);
-				emptyTextViewSecond.setText(" " + text + ".");
+				String textToShow = String.format(context.getString(R.string.context_empty_camera_uploads));
+
+				try{
+					textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
+					textToShow = textToShow.replace("[/A]", "</font>");
+					textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
+					textToShow = textToShow.replace("[/B]", "</font>");
+				}
+				catch (Exception e){}
+				Spanned result = null;
+				if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+					result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
+				} else {
+					result = Html.fromHtml(textToShow);
+				}
+				emptyTextViewFirst.setText(result);
 
 				emptyImageView.setVisibility(View.VISIBLE);
 				emptyTextView.setVisibility(View.VISIBLE);
@@ -938,16 +951,29 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 				emptyImageView = (ImageView) v.findViewById(R.id.file_grid_empty_image);
 				emptyTextView = (LinearLayout) v.findViewById(R.id.file_grid_empty_text);
 				emptyTextViewFirst = (TextView) v.findViewById(R.id.file_grid_empty_text_first);
-				emptyTextViewSecond = (TextView) v.findViewById(R.id.file_grid_empty_text_second);
 
 				if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
 					emptyImageView.setImageResource(R.drawable.uploads_empty_landscape);
 				} else {
 					emptyImageView.setImageResource(R.drawable.ic_empty_camera_uploads);
 				}
-				emptyTextViewFirst.setText(R.string.context_empty_camera_uploads);
-				String text = getString(R.string.section_photo_sync);
-				emptyTextViewSecond.setText(" " + text + ".");
+
+				String textToShow = String.format(context.getString(R.string.context_empty_camera_uploads));
+
+				try{
+					textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
+					textToShow = textToShow.replace("[/A]", "</font>");
+					textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
+					textToShow = textToShow.replace("[/B]", "</font>");
+				}
+				catch (Exception e){}
+				Spanned result = null;
+				if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+					result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
+				} else {
+					result = Html.fromHtml(textToShow);
+				}
+				emptyTextViewFirst.setText(result);
 
 				emptyImageView.setVisibility(View.VISIBLE);
 				emptyTextView.setVisibility(View.VISIBLE);

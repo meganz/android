@@ -7,6 +7,8 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
+import android.text.Spanned;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.LayoutInflater;
@@ -52,7 +54,6 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 	ImageView emptyImageView;
 	LinearLayout emptyTextView;
 	TextView emptyTextViewFirst;
-	TextView emptyTextViewSecond;
 
 	TextView contentText;
 	View separator;
@@ -133,8 +134,6 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 		emptyImageView = (ImageView) v.findViewById(R.id.file_list_empty_image);
 		emptyTextView = (LinearLayout) v.findViewById(R.id.file_list_empty_text);
 		emptyTextViewFirst = (TextView) v.findViewById(R.id.file_list_empty_text_first);
-		emptyTextViewSecond = (TextView) v.findViewById(R.id.file_list_empty_text_second);
-
 		parentHandle = ((FileExplorerActivityLollipop)context).parentHandleIncoming;
 
 		modeCloud = ((FileExplorerActivityLollipop)context).getMode();
@@ -234,16 +233,26 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 				}else{
 					emptyImageView.setImageResource(R.drawable.incoming_shares_empty);
 				}
-				emptyTextViewFirst.setText(R.string.context_empty_contacts);
-				String text = getString(R.string.context_empty_incoming);
-				emptyTextViewSecond.setText(" "+text+".");
-				emptyTextViewSecond.setVisibility(View.VISIBLE);
+				String textToShow = String.format(context.getString(R.string.context_empty_contacts), getString(R.string.context_empty_incoming));
+				try{
+					textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
+					textToShow = textToShow.replace("[/A]", "</font>");
+					textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
+					textToShow = textToShow.replace("[/B]", "</font>");
+				}
+				catch (Exception e){}
+				Spanned result = null;
+				if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+					result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
+				} else {
+					result = Html.fromHtml(textToShow);
+				}
+				emptyTextViewFirst.setText(result);
 
 			}else{
 
 				emptyImageView.setImageResource(R.drawable.ic_empty_folder);
 				emptyTextViewFirst.setText(R.string.file_browser_empty_folder);
-				emptyTextViewSecond.setVisibility(View.GONE);
 			}
 
 		}
@@ -366,7 +375,6 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 
 			emptyImageView.setVisibility(View.VISIBLE);
 			emptyTextView.setVisibility(View.VISIBLE);
-			emptyTextViewSecond.setVisibility(View.GONE);
 		}
 		else{
 			listView.setVisibility(View.VISIBLE);
@@ -426,7 +434,6 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 				listView.setVisibility(View.GONE);
 				emptyImageView.setImageResource(R.drawable.ic_empty_folder);
 				emptyTextViewFirst.setText(R.string.file_browser_empty_folder);
-				emptyTextViewSecond.setVisibility(View.GONE);
 				emptyImageView.setVisibility(View.VISIBLE);
 				emptyTextView.setVisibility(View.VISIBLE);
 				if (modeCloud == FileExplorerActivityLollipop.COPY){
@@ -524,10 +531,21 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 				}else{
 					emptyImageView.setImageResource(R.drawable.incoming_shares_empty);
 				}
-				emptyTextViewFirst.setText(R.string.context_empty_contacts);
-				String text = getString(R.string.context_empty_incoming);
-				emptyTextViewSecond.setText(" "+text+".");
-				emptyTextViewSecond.setVisibility(View.VISIBLE);
+				String textToShow = String.format(context.getString(R.string.context_empty_contacts), getString(R.string.context_empty_incoming));
+				try{
+					textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
+					textToShow = textToShow.replace("[/A]", "</font>");
+					textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
+					textToShow = textToShow.replace("[/B]", "</font>");
+				}
+				catch (Exception e){}
+				Spanned result = null;
+				if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+					result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
+				} else {
+					result = Html.fromHtml(textToShow);
+				}
+				emptyTextViewFirst.setText(result);
 
 			}
 
@@ -583,7 +601,6 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 					emptyTextViewFirst.setText(R.string.file_browser_empty_folder);
 					emptyImageView.setVisibility(View.VISIBLE);
 					emptyTextView.setVisibility(View.VISIBLE);
-					emptyTextViewSecond.setVisibility(View.GONE);
 					listView.setVisibility(View.GONE);
 				}
 				return 2;
@@ -648,14 +665,24 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 					}else{
 						emptyImageView.setImageResource(R.drawable.incoming_shares_empty);
 					}
-					emptyTextViewFirst.setText(R.string.context_empty_contacts);
-					String text = getString(R.string.context_empty_incoming);
-					emptyTextViewSecond.setText(" "+text+".");
-					emptyTextViewSecond.setVisibility(View.VISIBLE);
+					String textToShow = String.format(context.getString(R.string.context_empty_contacts), getString(R.string.context_empty_incoming));
+					try{
+						textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
+						textToShow = textToShow.replace("[/A]", "</font>");
+						textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
+						textToShow = textToShow.replace("[/B]", "</font>");
+					}
+					catch (Exception e){}
+					Spanned result = null;
+					if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+						result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
+					} else {
+						result = Html.fromHtml(textToShow);
+					}
+					emptyTextViewFirst.setText(result);
 				} else {
 					emptyImageView.setImageResource(R.drawable.ic_empty_folder);
 					emptyTextViewFirst.setText(R.string.file_browser_empty_folder);
-					emptyTextViewSecond.setVisibility(View.GONE);
 
 				}
 			}
