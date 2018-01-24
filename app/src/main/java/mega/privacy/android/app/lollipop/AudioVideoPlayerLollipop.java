@@ -144,6 +144,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
     private boolean loading = true;
     private ProgressDialog statusDialog = null;
     private String fileName = null;
+    private long currentPosition;
 
     private RelativeLayout containerAudioVideoPlayer;
 
@@ -162,6 +163,13 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
         setContentView(R.layout.activity_audiovideoplayer);
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
+        if (savedInstanceState != null) {
+            currentPosition = savedInstanceState.getLong("currentPosition");
+        }
+        else {
+            currentPosition = 0;
+        }
 
         Intent intent = getIntent();
         if (intent == null){
@@ -435,9 +443,18 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
             }
         });
         player.setPlayWhenReady(true);
+        player.seekTo(currentPosition);
         player.setVideoDebugListener(this);
         player.setAudioDebugListener(this);
         simpleExoPlayerView.showController();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        currentPosition = player.getCurrentPosition();
+        outState.putLong("currentPosition", currentPosition);
     }
 
     public String getFileName(Uri uri) {
