@@ -344,35 +344,43 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 								if (megaChatApi == null){
 									megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
 								}
-								int ret = megaChatApi.init(gSession);
-								log("shouldRun: result of init ---> "+ret);
-								chatSettings = dbH.getChatSettings();
-								if (ret == MegaChatApi.INIT_NO_CACHE)
-								{
-									log("shouldRun: condition ret == MegaChatApi.INIT_NO_CACHE");
-									megaApi.invalidateCache();
 
-								}
-								else if (ret == MegaChatApi.INIT_ERROR)
-								{
-									log("shouldRun: condition ret == MegaChatApi.INIT_ERROR");
-									if(chatSettings==null) {
-										log("1 - shouldRun: ERROR----> Switch OFF chat");
-										chatSettings = new ChatSettings(false+"", true + "", "",true + "");
-										dbH.setChatSettings(chatSettings);
+								int ret = megaChatApi.getInitState();
+
+								if(ret==0||ret==MegaChatApi.INIT_ERROR){
+									ret = megaChatApi.init(gSession);
+									log("shouldRun: result of init ---> "+ret);
+									chatSettings = dbH.getChatSettings();
+									if (ret == MegaChatApi.INIT_NO_CACHE)
+									{
+										log("shouldRun: condition ret == MegaChatApi.INIT_NO_CACHE");
+										megaApi.invalidateCache();
+
+									}
+									else if (ret == MegaChatApi.INIT_ERROR)
+									{
+										log("shouldRun: condition ret == MegaChatApi.INIT_ERROR");
+										if(chatSettings==null) {
+											log("1 - shouldRun: ERROR----> Switch OFF chat");
+											chatSettings = new ChatSettings(false+"", true + "", "",true + "");
+											dbH.setChatSettings(chatSettings);
+										}
+										else{
+											log("2 - shouldRun: ERROR----> Switch OFF chat");
+											dbH.setEnabledChat(false + "");
+										}
+										megaChatApi.logout(this);
 									}
 									else{
-										log("2 - shouldRun: ERROR----> Switch OFF chat");
-										dbH.setEnabledChat(false + "");
+										log("shouldRun: Chat correctly initialized");
 									}
-									megaChatApi.logout(this);
-								}
-								else{
-									log("shouldRun: Chat correctly initialized");
 								}
 							}
 
 							megaApi.fastLogin(gSession, this);
+						}
+						else{
+							log("Another login is processing");
 						}
 						return START_NOT_STICKY;
 					}
@@ -2336,15 +2344,40 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 						String location = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_LOCATION);
 						if(location!=null){
 							log("Location: "+location);
-							final int mid = location.length() / 2; //get the middle of the String
-							String[] parts = {location.substring(0, mid),location.substring(mid)};
 
-							Double lat = Double.parseDouble(parts[0]);
-							Double lon = Double.parseDouble(parts[1]);
-							log("Lat: "+lat); //first part
-							log("Long: "+lon); //second part
+							boolean secondTry = false;
+							try{
+								final int mid = location.length() / 2; //get the middle of the String
+								String[] parts = {location.substring(0, mid),location.substring(mid)};
 
-							megaApi.setNodeCoordinates(node, lat, lon, null);
+								Double lat = Double.parseDouble(parts[0]);
+								Double lon = Double.parseDouble(parts[1]);
+								log("Lat: "+lat); //first part
+								log("Long: "+lon); //second part
+
+								megaApi.setNodeCoordinates(node, lat, lon, null);
+							}
+							catch (Exception exc){
+								secondTry = true;
+								log("Exception, second try to set GPS coordinates");
+							}
+
+							if(secondTry){
+								try{
+									String latString = location.substring(0,7);
+									String lonString = location.substring(8,17);
+
+									Double lat = Double.parseDouble(latString);
+									Double lon = Double.parseDouble(lonString);
+									log("Lat2: "+lat); //first part
+									log("Long2: "+lon); //second part
+
+									megaApi.setNodeCoordinates(node, lat, lon, null);
+								}
+								catch (Exception ex){
+									log("Exception again, no chance to set coordinates of video");
+								}
+							}
 						}
 						else{
 							log("No location info");

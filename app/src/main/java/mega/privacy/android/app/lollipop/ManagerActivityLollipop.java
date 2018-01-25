@@ -4,6 +4,7 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
+import android.app.NotificationManager;
 import android.app.ProgressDialog;
 import android.app.SearchManager;
 import android.content.Context;
@@ -156,7 +157,6 @@ import mega.privacy.android.app.lollipop.managerSections.UpgradeAccountFragmentL
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.lollipop.megachat.RecentChatsFragmentLollipop;
-import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.lollipop.tasks.CheckOfflineNodesTask;
 import mega.privacy.android.app.lollipop.tasks.FilePrepareTask;
 import mega.privacy.android.app.lollipop.tasks.FillDBContactsTask;
@@ -216,7 +216,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 	public long transferCallback = 0;
 
-	String regex = "[*|\\?:\"<>\\{\\}\\[\\]\\\\\\/]";
+	String regex = "[*|\\?:\"<>\\{\\}\\\\\\/]";
 
 	TransfersBottomSheetDialogFragment transfersBottomSheet = null;
 
@@ -233,6 +233,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	TextView leftCancelButton;
 	TextView rightUpgradeButton;
 	FloatingActionButton fabButton;
+
+	AlertDialog evaluateAppDialog;
+
 
 	MegaNode inboxNode = null;
 
@@ -1177,13 +1180,23 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		else{
 			thumbDir = getDir("thumbnailsMEGA", 0);
 		}
+
 		File previewDir;
 		if (getExternalCacheDir() != null){
 			previewDir = new File (getExternalCacheDir(), "previewsMEGA");
 			previewDir.mkdirs();
 		}
+
 		else{
 			previewDir = getDir("previewsMEGA", 0);
+		}
+
+		try {
+			NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+			notificationManager.cancelAll();
+		}
+		catch (Exception e){
+			log("Exception NotificationManager - remove all notifications");
 		}
 
 		dbH = DatabaseHandler.getDbHandler(getApplicationContext());
@@ -1569,9 +1582,19 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				UserCredentials credentials = dbH.getCredentials();
 				if(credentials!=null){
 					String gSession = credentials.getSession();
-					int ret = megaChatApi.init(gSession);
+					int ret = megaChatApi.getInitState();
 					log("In Offline mode: init chat is: "+ret);
+					if(ret==0||ret==MegaChatApi.INIT_ERROR){
+						ret = megaChatApi.init(gSession);
+						log("After init: "+ret);
+					}
+					else{
+						log("Offline mode: Do not init, chat already initialized");
+					}
 				}
+			}
+			else{
+				log("Offline mode: chat disabled");
 			}
 			return;
         }
@@ -2037,12 +2060,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				log("Connect to chat!: "+megaChatApi.getInitState());
 
 				if(megaChatApi!=null){
-					if((megaChatApi.getInitState()!=MegaChatApi.INIT_ERROR)&&(megaChatApi.getInitState()!=MegaChatApi.INIT_WAITING_NEW_SESSION)&&(megaChatApi.getInitState()!=MegaChatApi.INIT_NO_CACHE)){
+					if((megaChatApi.getInitState()!=MegaChatApi.INIT_ERROR)){
 						log("Connection goes!!!");
 						megaChatApi.connect(this);
 					}
 					else{
-						log("Not connected: "+megaChatApi.getInitState());
+						log("Not launch connect: "+megaChatApi.getInitState());
 					}
 				}
 				else{
@@ -3249,25 +3272,35 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						//Cloud Drive TAB
 						MegaNode parentNode = megaApi.getNodeByHandle(parentHandleBrowser);
 						if (parentNode != null){
-							if (parentNode.getHandle() == megaApi.getRootNode().getHandle() || parentHandleBrowser == -1){
-								log("setToolbarTitle: cloud DRIVE 202");
+							if(megaApi.getRootNode()!=null){
+								if (parentNode.getHandle() == megaApi.getRootNode().getHandle() || parentHandleBrowser == -1){
+									log("setToolbarTitle: cloud DRIVE 202");
+									aB.setTitle(getString(R.string.section_cloud_drive));
+									aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+									firstNavigationLevel = true;
+								}
+								else{
+									aB.setTitle(parentNode.getName());
+									log("indicator_arrow_back_887");
+									aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+									firstNavigationLevel = false;
+								}
+							}
+							else{
+								parentHandleBrowser = -1;
+							}
+						}
+						else{
+							if(megaApi.getRootNode()!=null){
+								parentHandleBrowser = megaApi.getRootNode().getHandle();
+								log("setToolbarTitle: cloud DRIVE 204");
 								aB.setTitle(getString(R.string.section_cloud_drive));
 								aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 								firstNavigationLevel = true;
 							}
 							else{
-								aB.setTitle(parentNode.getName());
-								log("indicator_arrow_back_887");
-								aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
-								firstNavigationLevel = false;
+								parentHandleBrowser = -1;
 							}
-						}
-						else{
-							parentHandleBrowser = megaApi.getRootNode().getHandle();
-							log("setToolbarTitle: cloud DRIVE 204");
-							aB.setTitle(getString(R.string.section_cloud_drive));
-							aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
-							firstNavigationLevel = true;
 						}
 						break;
 					}
@@ -3393,15 +3426,18 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						if(!searchQuery.isEmpty()){
 							log("aB.setHomeAsUpIndicator_4911");
 							aB.setTitle(getString(R.string.action_search)+": "+searchQuery);
+							aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 						}
 						else{
 							log("aB.setHomeAsUpIndicator_481");
 							aB.setTitle(getString(R.string.action_search)+": "+"");
+							aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 						}
 					}
 					else{
 						log("aB.setHomeAsUpIndicator_6611");
 						aB.setTitle(getString(R.string.action_search)+": "+"");
+						aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 					}
 				}
 				else{
@@ -3444,12 +3480,22 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					sttFLol.setOnlineOptions(true);
 				}
 			}
+
 			supportInvalidateOptionsMenu();
 		}
 		else{
 			log("showOnlineMode - Root is NULL");
 			if(getApplicationContext()!=null){
 				showConfirmationConnect();
+			}
+		}
+
+		if (rChatFL != null){
+			if(rChatFL.isAdded()){
+				log("ONLINE: Update screen RecentChats");
+				if(!Util.isChatEnabled()){
+					rChatFL.showDisableChatScreen();
+				}
 			}
 		}
 	}
@@ -3549,6 +3595,15 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 		}
 
+		if (rChatFL != null){
+			if(rChatFL.isAdded()){
+				log("OFFLINE: Update screen RecentChats");
+				if(!Util.isChatEnabled()){
+					rChatFL.showNoConnectionScreen();
+				}
+			}
+		}
+
 		log("DrawerItem on start offline: "+drawerItem);
 		if(drawerItem==null){
 			log("On start OFFLINE MODE");
@@ -3575,7 +3630,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		}
 
 		supportInvalidateOptionsMenu();
-
 	}
 
 	public void clickDrawerItemLollipop(DrawerItem item){
@@ -7469,7 +7523,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	        case R.id.action_menu_logout:{
 				log("action menu logout pressed");
 				AccountController aC = new AccountController(this);
-				aC.logout(this, megaApi, megaChatApi, false);
+				aC.logout(this, megaApi);
 	        	return true;
 	        }
 	        case R.id.action_menu_cancel_subscriptions:{
@@ -7709,22 +7763,26 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			int index = viewPagerCDrive.getCurrentItem();
 			if(index==1){
 				//Rubbish Bin
-				rubbishBinFLol = (RubbishBinFragmentLollipop) cloudPageAdapter.instantiateItem(viewPagerCDrive, 1);
-				if (rubbishBinFLol != null){
-					if (rubbishBinFLol.onBackPressed() == 0){
-						viewPagerCDrive.setCurrentItem(0);
+				if (cloudPageAdapter != null) {
+					rubbishBinFLol = (RubbishBinFragmentLollipop) cloudPageAdapter.instantiateItem(viewPagerCDrive, 1);
+					if (rubbishBinFLol != null) {
+						if (rubbishBinFLol.onBackPressed() == 0) {
+							viewPagerCDrive.setCurrentItem(0);
+						}
+						return;
 					}
-					return;
 				}
 			}
 			else if(index==0){
 				//Cloud Drive
-				fbFLol = (FileBrowserFragmentLollipop) cloudPageAdapter.instantiateItem(viewPagerCDrive, 0);
-				if (fbFLol != null){
-					if (fbFLol.onBackPressed() == 0){
-						super.onBackPressed();
+				if (cloudPageAdapter != null) {
+					fbFLol = (FileBrowserFragmentLollipop) cloudPageAdapter.instantiateItem(viewPagerCDrive, 0);
+					if (fbFLol != null) {
+						if (fbFLol.onBackPressed() == 0) {
+							super.onBackPressed();
+						}
+						return;
 					}
-					return;
 				}
 			}
 
@@ -9617,74 +9675,31 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 		Intent in = new Intent(this, AddContactActivityLollipop.class);
 		if(isMegaContact){
-			in.putExtra("contactType", Constants.CONTACT_TYPE_MEGA);
-			in.putExtra("chat", true);
-			startActivityForResult(in, Constants.REQUEST_CREATE_CHAT);
-		}
-		else{
 
-			Dialog addContactDialog;
-			String[] addContactOptions = getResources().getStringArray(R.array.add_contact_array);
-			AlertDialog.Builder b=new AlertDialog.Builder(this);
-
-			b.setTitle(getResources().getString(R.string.menu_add_contact));
-			b.setItems(addContactOptions, new DialogInterface.OnClickListener() {
-
-				@Override
-				public void onClick(DialogInterface dialog, int which) {
-					switch(which){
-						case 0:{
-							showNewContactDialog();
-							break;
-						}
-						case 1:{
-							addContactFromPhone();
-							break;
-						}
+			if(megaApi!=null && megaApi.getRootNode()!=null){
+				ArrayList<MegaUser> contacts = megaApi.getContacts();
+				if(contacts==null){
+					showSnackbar("You have no MEGA contacts. Please, invite friends from the Contacts section");
+				}
+				else {
+					if(contacts.isEmpty()){
+						showSnackbar("You have no MEGA contacts. Please, invite friends from the Contacts section");
+					}
+					else{
+						in.putExtra("contactType", Constants.CONTACT_TYPE_MEGA);
+						in.putExtra("chat", true);
+						startActivityForResult(in, Constants.REQUEST_CREATE_CHAT);
 					}
 				}
-			});
-			b.setNegativeButton(getResources().getString(R.string.general_cancel), new DialogInterface.OnClickListener() {
-
-				@Override
-				public void onClick(DialogInterface dialog, int which) {
-					dialog.cancel();
-				}
-			});
-			addContactDialog = b.create();
-			addContactDialog.show();
+			}
+			else{
+				log("Online but not megaApi");
+				showSnackbar(getString(R.string.error_server_connection_problem));
+			}
 		}
-
-//		Dialog addContactDialog;
-//		String[] addContactOptions = getResources().getStringArray(R.array.add_contact_array);
-//		AlertDialog.Builder b=new AlertDialog.Builder(this);
-//
-//		b.setTitle(getResources().getString(R.string.menu_add_contact));
-//		b.setItems(addContactOptions, new DialogInterface.OnClickListener() {
-//
-//			@Override
-//			public void onClick(DialogInterface dialog, int which) {
-//				switch(which){
-//					case 0:{
-//						showNewContactDialog();
-//						break;
-//					}
-//					case 1:{
-//						addContactFromPhone();
-//						break;
-//					}
-//				}
-//			}
-//		});
-//		b.setNegativeButton(getResources().getString(R.string.general_cancel), new DialogInterface.OnClickListener() {
-//
-//			@Override
-//			public void onClick(DialogInterface dialog, int which) {
-//				dialog.cancel();
-//			}
-//		});
-//		addContactDialog = b.create();
-//		addContactDialog.show();
+		else{
+			addContactFromPhone();
+		}
 	}
 
 	public void addContactFromPhone(){
@@ -10688,7 +10703,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
     		searchQuery = intent.getStringExtra(SearchManager.QUERY);
     		parentHandleSearch = -1;
     		aB.setTitle(getString(R.string.action_search)+": "+searchQuery);
-
+			aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
     		isSearching = true;
 
     		if (searchMenuItem != null) {
@@ -12433,20 +12448,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 		}
 		else if (request.getType() == MegaChatRequest.TYPE_LOGOUT){
-//            loginLoggingIn.setVisibility(View.GONE);
-//            loginLogin.setVisibility(View.VISIBLE);
-//            scrollView.setBackgroundColor(getResources().getColor(R.color.background_create_account));
-//            loginDelimiter.setVisibility(View.VISIBLE);
-//            loginCreateAccount.setVisibility(View.VISIBLE);
-//            queryingSignupLinkText.setVisibility(View.GONE);
-//            confirmingAccountText.setVisibility(View.GONE);
-//            generatingKeysText.setVisibility(View.GONE);
-//            loggingInText.setVisibility(View.GONE);
-//            fetchingNodesText.setVisibility(View.GONE);
-//            prepareNodesText.setVisibility(View.GONE);
-//            initizalizingChatText.setVisibility(View.GONE);
-//            serversBusyText.setVisibility(View.GONE);
 
+			log("Disable chat finish logout");
 			if(sttFLol!=null){
 				if(sttFLol.isAdded()){
 					sttFLol.hidePreferencesChat();
@@ -12466,17 +12469,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			else{
 				log("EEEERRRRROR WHEN TYPE_SET_ONLINE_STATUS " + e.getErrorString());
 				showSnackbar(getString(R.string.changing_status_error));
-			}
-		}
-		else if(request.getType() == MegaChatRequest.TYPE_LOGOUT){
-			if(e.getErrorCode()==MegaChatError.ERROR_OK){
-				log("Logout from chat");
-				megaChatApi = null;
-				((MegaApplication) getApplication()).disableMegaChatApi();
-				Util.resetAndroidLogger();
-			}
-			else{
-				log("ERROR logout CHAT " + e.getErrorString());
 			}
 		}
 	}
@@ -12515,29 +12507,27 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		else if (request.getType() == MegaRequest.TYPE_LOGOUT){
 			log("logout finished");
 
-			if(megaChatApi!=null){
-				megaChatApi.logout(null);
+			if(Util.isChatEnabled()){
+				log("END logout sdk request - wait chat logout");
 			}
+			else{
+				log("END logout sdk request - chat disabled");
+				if (dbH == null){
+					dbH = DatabaseHandler.getDbHandler(getApplicationContext());
+				}
+				if (dbH != null){
+					dbH.clearEphemeral();
+				}
 
-			Intent tourIntent = new Intent(this, LoginActivityLollipop.class);
-			startActivity(tourIntent);
-			finish();
+				AccountController aC = new AccountController(this);
+				aC.logoutConfirmed(this);
 
-//			if (recentChatsFragmentLollipopListener != null){
-//				log("remove chatlistener");
-//				megaChatApi.removeChatListener(recentChatsFragmentLollipopListener);
-//			}
-//
-//			megaChatApi.logout(this);
+				Intent tourIntent = new Intent(this, LoginActivityLollipop.class);
+				tourIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+				this.startActivity(tourIntent);
 
-//			if (request.getType() == MegaRequest.TYPE_LOGOUT){
-//				log("type_logout");
-//				if (e.getErrorCode() == MegaError.API_ESID){
-//					log("calling ManagerActivityLollipop.logout");
-//					MegaApiAndroid megaApi = app.getMegaApi();
-//					ManagerActivityLollipop.logout(managerActivity, app, megaApi, false);
-//				}
-//			}
+				finish();
+			}
 		}
 		else if(request.getType() == MegaRequest.TYPE_SET_ATTR_USER) {
 			log("TYPE_SET_ATTR_USER");
@@ -14600,21 +14590,21 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 	@Override
 	public void onChatInitStateUpdate(MegaChatApiJava api, int newState) {
-		log("onChatInitStateUpdate");
+		log("onChatInitStateUpdate: "+newState);
 		if (newState == MegaChatApi.INIT_ERROR) {
 			// chat cannot initialize, disable chat completely
-			log("newState == MegaChatApi.INIT_ERROR");
-			if (chatSettings == null) {
-				log("1 - onChatInitStateUpdate: ERROR----> Switch OFF chat");
-				chatSettings = new ChatSettings(false + "", true + "", "", true + "");
-				dbH.setChatSettings(chatSettings);
-			} else {
-				log("2 - onChatInitStateUpdate: ERROR----> Switch OFF chat");
-				dbH.setEnabledChat(false + "");
-			}
-			if(megaChatApi!=null){
-				megaChatApi.logout(null);
-			}
+//			log("newState == MegaChatApi.INIT_ERROR");
+//			if (chatSettings == null) {
+//				log("1 - onChatInitStateUpdate: ERROR----> Switch OFF chat");
+//				chatSettings = new ChatSettings(false + "", true + "", "", true + "");
+//				dbH.setChatSettings(chatSettings);
+//			} else {
+//				log("2 - onChatInitStateUpdate: ERROR----> Switch OFF chat");
+//				dbH.setEnabledChat(false + "");
+//			}
+//			if(megaChatApi!=null){
+//				megaChatApi.logout(null);
+//			}
 		}
 	}
 
@@ -14679,7 +14669,17 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 	@Override
 	public void onChatConnectionStateUpdate(MegaChatApiJava api, long chatid, int newState) {
-		log("onChatConnectionStateUpdate: "+chatid);
+		log("onChatConnectionStateUpdate: "+chatid+" newState: "+newState);
+
+		if(newState==MegaChatApi.CHAT_CONNECTION_ONLINE && chatid==-1){
+			log("Online Connection: "+chatid);
+			if (rChatFL != null){
+				if(rChatFL.isAdded()){
+					rChatFL.setChats();
+					rChatFL.setStatus();
+				}
+			}
+		}
 	}
 
 	public boolean isMkLayoutVisible() {
@@ -14796,28 +14796,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	@Override
 	public void onChatCallUpdate(MegaChatApiJava api, MegaChatCall call) {
 		log("onChatCallUpdate");
-
-		if(call.hasChanged(MegaChatCall.CHANGE_TYPE_STATUS)){
-			if(call.getStatus()==MegaChatCall.CALL_STATUS_RING_IN){
-				Intent i = new Intent(this, ChatCallActivity.class);
-				i.putExtra("chatHandle", call.getChatid());
-				i.putExtra("callId", call.getId());
-				startActivity(i);
-			}
-		}
-
-		if(call.hasRemoteAudio()){
-			log("Remote audio is connected");
-		}
-		else{
-			log("Remote audio is NOT connected");
-		}
-		if(call.hasRemoteVideo()){
-			log("Remote video is connected");
-		}
-		else{
-			log("Remote video is NOT connected");
-		}
 	}
 
 	public void setContactTitleSection(){
@@ -14884,5 +14862,136 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 		}
 	}
+
+
+	public void showEvaluatedAppDialog(){
+		if(megaChatApi.isSignalActivityRequired()){
+			megaChatApi.signalPresenceActivity();
+		}
+
+		LayoutInflater inflater = getLayoutInflater();
+		View dialoglayout = inflater.inflate(R.layout.evaluate_the_app_dialog, null);
+
+		final CheckedTextView rateAppCheck = (CheckedTextView) dialoglayout.findViewById(R.id.rate_the_app);
+		rateAppCheck.setText(getString(R.string.rate_the_app_panel));
+		rateAppCheck.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16*scaleText));
+		rateAppCheck.setCompoundDrawablePadding(Util.scaleWidthPx(10, outMetrics));
+		ViewGroup.MarginLayoutParams rateAppMLP = (ViewGroup.MarginLayoutParams) rateAppCheck.getLayoutParams();
+		rateAppMLP.setMargins(Util.scaleWidthPx(15, outMetrics), Util.scaleHeightPx(10, outMetrics), 0, Util.scaleHeightPx(10, outMetrics));
+
+		final CheckedTextView sendFeedbackCheck = (CheckedTextView) dialoglayout.findViewById(R.id.send_feedback);
+		sendFeedbackCheck.setText(getString(R.string.send_feedback_panel));
+		sendFeedbackCheck.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16*scaleText));
+		sendFeedbackCheck.setCompoundDrawablePadding(Util.scaleWidthPx(10, outMetrics));
+		ViewGroup.MarginLayoutParams sendFeedbackMLP = (ViewGroup.MarginLayoutParams) sendFeedbackCheck.getLayoutParams();
+		sendFeedbackMLP.setMargins(Util.scaleWidthPx(15, outMetrics), Util.scaleHeightPx(10, outMetrics), 0, Util.scaleHeightPx(10, outMetrics));
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		builder.setView(dialoglayout);
+
+		builder.setTitle(getString(R.string.title_evaluate_the_app_panel));
+		evaluateAppDialog = builder.create();
+
+		evaluateAppDialog.show();
+
+		rateAppCheck.setOnClickListener(new View.OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				log("Rate the app");
+				//Rate the app option:
+				startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=mega.privacy.android.app") ) );
+
+				if (evaluateAppDialog!= null){
+					evaluateAppDialog.dismiss();
+				}
+			}
+		});
+
+		sendFeedbackCheck.setOnClickListener(new View.OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				log("Send Feedback");
+
+				//Send feedback option:
+				StringBuilder body = new StringBuilder();
+				body.append(getString(R.string.setting_feedback_body));
+				body.append("\n\n\n\n\n\n\n\n\n\n\n");
+				body.append(getString(R.string.settings_feedback_body_device_model)+"  "+getDeviceName()+"\n");
+				body.append(getString(R.string.settings_feedback_body_android_version)+"  "+Build.VERSION.RELEASE+" "+Build.DISPLAY+"\n");
+				body.append(getString(R.string.user_account_feedback)+"  "+megaApi.getMyEmail());
+
+				myAccountInfo = getMyAccountInfo();
+				if(myAccountInfo!=null){
+					if(myAccountInfo.getAccountType()<0||myAccountInfo.getAccountType()>4){
+						body.append(" ("+getString(R.string.my_account_free)+")");
+					}
+					else{
+						switch(myAccountInfo.getAccountType()){
+							case 0:{
+								body.append(" ("+getString(R.string.my_account_free)+")");
+								break;
+							}
+							case 1:{
+								body.append(" ("+getString(R.string.my_account_pro1)+")");
+								break;
+							}
+							case 2:{
+								body.append(" ("+getString(R.string.my_account_pro2)+")");
+								break;
+							}
+							case 3:{
+								body.append(" ("+getString(R.string.my_account_pro3)+")");
+								break;
+							}
+							case 4:{
+								body.append(" (PRO "+getString(R.string.my_account_prolite)+")");
+								break;
+							}
+						}
+					}
+				}
+
+				String emailAndroid = Constants.MAIL_ANDROID;
+				String versionApp = (getString(R.string.app_version));
+				String subject = getString(R.string.setting_feedback_subject)+" v"+versionApp;
+
+				Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:" + emailAndroid));
+				emailIntent.putExtra(Intent.EXTRA_SUBJECT, subject);
+				emailIntent.putExtra(Intent.EXTRA_TEXT, body.toString());
+				startActivity(Intent.createChooser(emailIntent, " "));
+
+				if (evaluateAppDialog != null){
+					evaluateAppDialog.dismiss();
+				}
+			}
+		});
+
+
+	}
+
+	public String getDeviceName() {
+		String manufacturer = Build.MANUFACTURER;
+		String model = Build.MODEL;
+		if (model.startsWith(manufacturer)) {
+			return capitalize(model);
+		} else {
+			return capitalize(manufacturer) + " " + model;
+		}
+	}
+
+	private String capitalize(String s) {
+		if (s == null || s.length() == 0) {
+			return "";
+		}
+		char first = s.charAt(0);
+		if (Character.isUpperCase(first)) {
+			return s;
+		} else {
+			return Character.toUpperCase(first) + s.substring(1);
+		}
+	}
+
 
 }

@@ -36,7 +36,6 @@
 					android:hint="@string/type_contact"
 					android:textSize="15sp"
 					android:inputType="textEmailAddress"
-					android:imeOptions="actionSend"
 					android:textCursorDrawable="@drawable/cursor_color"
 					android:backgroundTint="@color/grey_achievements_invite_friends_sub"
 					android:textColorHint="@color/white"/>

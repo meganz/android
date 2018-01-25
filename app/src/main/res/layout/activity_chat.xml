@@ -48,6 +48,7 @@
                 android:orientation="vertical">
                 <LinearLayout
                     android:layout_width="match_parent"
+
                     android:layout_height="wrap_content"
                     android:background="@color/white"
                     android:orientation="vertical">
@@ -57,6 +58,7 @@
                         android:layout_height="1dp"
                         android:background="@color/keyboard_chat_separator"
                         android:orientation="horizontal" />
+
                     <RelativeLayout
                         android:id="@+id/writing_linear_layout_chat"
                         android:layout_width="match_parent"
@@ -159,13 +161,7 @@
                             android:layout_marginRight="38dp"
                             android:layout_gravity="center_vertical"/>
                     </LinearLayout>
-
-
-
                 </LinearLayout>
-
-
-
             </RelativeLayout>
 
             <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
