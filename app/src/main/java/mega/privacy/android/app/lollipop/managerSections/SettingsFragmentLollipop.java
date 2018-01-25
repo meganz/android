@@ -86,6 +86,11 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 	public static String CATEGORY_STORAGE = "settings_storage";
 	public static String CATEGORY_CAMERA_UPLOAD = "settings_camera_upload";
 	public static String CATEGORY_ADVANCED_FEATURES = "advanced_features";
+	public static String CATEGORY_QR_CODE = "settings_qrcode";
+
+	public static String KEY_QR_CODE_ENABLE = "settings_qrcode_active";
+	public static String KEY_QR_CODE_AUTO_ACCEPT = "settings_qrcode_autoaccept";
+	public static String KEY_QR_CODE_RESET = "settings_qrcode_reset";
 
 	public static String KEY_PIN_LOCK_ENABLE = "settings_pin_lock_enable";
 	public static String KEY_PIN_LOCK_CODE = "settings_pin_lock_code";
@@ -139,6 +144,14 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 	
 	public final static int STORAGE_DOWNLOAD_LOCATION_INTERNAL_SD_CARD = 1001;
 	public final static int STORAGE_DOWNLOAD_LOCATION_EXTERNAL_SD_CARD = 1002;
+
+
+	PreferenceCategory qrCodeCategory;
+	SwitchPreference qrCodeEnabledSwitch;
+	TwoLineCheckPreference qrCodeEnabledCheck;
+	SwitchPreference qrCodeAutoAcceptSwitch;
+	TwoLineCheckPreference qrCodeAutoAcceptCheck;
+	Preference qrCodeResetCodePreference;
 
 	PreferenceScreen preferenceScreen;
 
@@ -265,6 +278,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 		advancedFeaturesCategory = (PreferenceCategory) findPreference(CATEGORY_ADVANCED_FEATURES);
 		autoawayChatCategory = (PreferenceCategory) findPreference(CATEGORY_AUTOAWAY_CHAT);
 		persistenceChatCategory = (PreferenceCategory) findPreference(CATEGORY_PERSISTENCE_CHAT);
+		qrCodeCategory = (PreferenceCategory) findPreference(CATEGORY_QR_CODE);
 
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 			pinLockEnableSwitch = (SwitchPreference) findPreference(KEY_PIN_LOCK_ENABLE);
@@ -275,6 +289,12 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 
 			autoAwaySwitch = (SwitchPreference) findPreference(KEY_AUTOAWAY_ENABLE);
 			autoAwaySwitch.setOnPreferenceClickListener(this);
+
+			qrCodeEnabledSwitch = (SwitchPreference) findPreference(KEY_QR_CODE_ENABLE);
+			qrCodeEnabledSwitch.setOnPreferenceClickListener(this);
+
+			qrCodeAutoAcceptSwitch = (SwitchPreference) findPreference(KEY_QR_CODE_AUTO_ACCEPT);
+			qrCodeAutoAcceptSwitch.setOnPreferenceClickListener(this);
 		}
 		else{
 			pinLockEnableCheck = (TwoLineCheckPreference) findPreference(KEY_PIN_LOCK_ENABLE);
@@ -285,7 +305,16 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 
 			autoAwayCheck = (TwoLineCheckPreference) findPreference(KEY_AUTOAWAY_ENABLE);
 			autoAwayCheck.setOnPreferenceClickListener(this);
+
+			qrCodeEnabledCheck = (TwoLineCheckPreference) findPreference(KEY_QR_CODE_ENABLE);
+			qrCodeEnabledCheck.setOnPreferenceClickListener(this);
+
+			qrCodeAutoAcceptCheck = (TwoLineCheckPreference) findPreference(KEY_QR_CODE_AUTO_ACCEPT);
+			qrCodeAutoAcceptCheck.setOnPreferenceClickListener(this);
 		}
+
+		qrCodeResetCodePreference = findPreference(KEY_QR_CODE_RESET);
+		qrCodeResetCodePreference.setOnPreferenceClickListener(this);
 
 		statusChatListPreference = (ListPreference) findPreference("settings_chat_list_status");
 		statusChatListPreference.setOnPreferenceChangeListener(this);
@@ -980,6 +1009,15 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 		log("Value of useHttpsOnly: "+useHttpsOnlyValue);
 
 		useHttpsOnly.setChecked(useHttpsOnlyValue);
+
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+			qrCodeEnabledSwitch.setChecked(true);
+			qrCodeAutoAcceptSwitch.setChecked(true);
+		}
+		else{
+			qrCodeEnabledCheck.setChecked(true);
+			qrCodeAutoAcceptCheck.setChecked(true);
+		}
 	}
 
 	@Override
@@ -1816,6 +1854,36 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 		else if (preference.getKey().compareTo("settings_advanced_features_cancel_account") == 0){
 			log("Cancel account preference");
 			((ManagerActivityLollipop)context).askConfirmationDeleteAccount();
+		}
+		else if (preference.getKey().compareTo(KEY_QR_CODE_ENABLE) == 0){
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+				if (qrCodeEnabledSwitch.isChecked()){
+					qrCodeCategory.addPreference(qrCodeAutoAcceptSwitch);
+					qrCodeAutoAcceptSwitch.setChecked(true);
+					qrCodeCategory.addPreference(qrCodeResetCodePreference);
+				}
+				else{
+					qrCodeCategory.removePreference(qrCodeAutoAcceptSwitch);
+					qrCodeCategory.removePreference(qrCodeResetCodePreference);
+				}
+			}
+			else{
+				if (qrCodeEnabledCheck.isChecked()){
+					qrCodeCategory.addPreference(qrCodeAutoAcceptCheck);
+					qrCodeAutoAcceptCheck.setChecked(true);
+					qrCodeCategory.addPreference(qrCodeResetCodePreference);
+				}
+				else{
+					qrCodeCategory.removePreference(qrCodeAutoAcceptCheck);
+					qrCodeCategory.removePreference(qrCodeResetCodePreference);
+				}
+			}
+		}
+		else if (preference.getKey().compareTo(KEY_QR_CODE_AUTO_ACCEPT) == 0){
+
+		}
+		else if (preference.getKey().compareTo(KEY_QR_CODE_RESET) == 0){
+			//Reset QR code
 		}
 		
 		return true;

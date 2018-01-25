@@ -1345,6 +1345,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 		handler = new Handler();
 
+		Bundle bundle = getIntent().getExtras();
+		if (bundle != null) {
+			drawerItem = (DrawerItem) bundle.getSerializable("drawerItem");
+		}
+
 		log("Set view");
 		setContentView(R.layout.activity_manager);
 //		long num = 11179220468180L;

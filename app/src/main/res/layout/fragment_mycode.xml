@@ -32,6 +32,7 @@
         android:elevation="6dp"
         android:background="@color/white"
         android:layout_marginBottom="40dp"
+
         android:textSize="14sp"
         android:text="copy link"/>
 

@@ -52,18 +52,26 @@ public class QRCodeSaveBottomSheetDialogFragment extends BottomSheetDialogFragme
 
             case R.id.qr_code_saveTo_cloud_layout:{
                 log("option save to Cloud Drive");
-
+                saveToCloudDrive();
                 break;
             }
             case R.id.qr_code_saveTo_fileSystem_layout:{
                 log("option save to File System");
-
+                saveToFileSystem();
                 break;
             }
         }
 
         mBehavior = BottomSheetBehavior.from((View) mainLinearLayout.getParent());
         mBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+    }
+
+    public void saveToCloudDrive (){
+
+    }
+
+    public void saveToFileSystem () {
+
     }
 
     @Override

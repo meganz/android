@@ -37,7 +37,7 @@ public class ScanCodeFragment extends Fragment implements ZXingScannerView.Resul
 
     private Context context;
 
-    private ZXingScannerView scannerView;
+    public static ZXingScannerView scannerView;
 
     private final int MY_PERMISSIONS_REQUEST_CAMERA = 1010;
 
@@ -104,11 +104,16 @@ public class ScanCodeFragment extends Fragment implements ZXingScannerView.Resul
     }
 
     @Override
+    public void onStart(){
+        super.onStart();
+    }
+
+    @Override
     public void onResume() {
         log("onResume");
         super.onResume();
         scannerView.setResultHandler(this);
-        scannerView.startCamera();
+//        scannerView.startCamera();
     }
 
     @Override
@@ -135,11 +140,11 @@ public class ScanCodeFragment extends Fragment implements ZXingScannerView.Resul
 //            }
 //        }, 2000);
 
-        Alert (rawResult);
+        Invite(rawResult);
 
     }
 
-    public void Alert(Result rawResult){
+    public void Invite (Result rawResult){
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setTitle("Qr scan result");
         builder.setMessage("Result :"+rawResult.getText()+"\nType :"+rawResult.getBarcodeFormat().toString())
