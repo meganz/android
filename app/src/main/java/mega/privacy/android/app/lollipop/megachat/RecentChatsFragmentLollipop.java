@@ -295,19 +295,10 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
 
         listView.setVisibility(View.GONE);
         ((ManagerActivityLollipop)context).hideFabButton();
-//        String emptyTextViewText = getString(R.string.recent_chat_empty_enable_chat);
-//
-//
-//        try{
-//            emptyTextViewText = emptyTextViewText.replace("[A]", "\n");
-//        }
-//        catch (Exception e){}
-//        emptyTextViewInvite.setText(emptyTextViewText);
-
         String textToShow = String.format(context.getString(R.string.recent_chat_empty_enable_chat));
 
         try{
-//            textToShow = textToShow.replace("[A]", "\n");
+            textToShow = textToShow.replace("[A]", "<br />");
             textToShow = textToShow.replace("[B]", "<font color=\'#000000\'>");
             textToShow = textToShow.replace("[/B]", "</font>");
             textToShow = textToShow.replace("[C]", "<font color=\'#7a7a7a\'>");
