@@ -865,9 +865,15 @@ public class MegaChatExplorerAdapter extends RecyclerView.Adapter<MegaChatExplor
 			log("MessageType: "+messageType);
 			String lastMessageString = chat.getLastMessage();
 
-			if(messageType==MegaChatMessage.TYPE_INVALID||messageType==255){
+			if(messageType==MegaChatMessage.TYPE_INVALID){
 				log("Message Type -> INVALID");
 				holder.textViewContent.setText(context.getString(R.string.no_conversation_history));
+				holder.textViewContent.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
+				holder.textViewDate.setVisibility(View.GONE);
+			}
+			else if(messageType==255){
+				log("Message Type -> LOADING");
+				holder.textViewContent.setText(context.getString(R.string.general_loading));
 				holder.textViewContent.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
 				holder.textViewDate.setVisibility(View.GONE);
 			}

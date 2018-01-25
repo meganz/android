@@ -176,7 +176,17 @@ public class MimeTypeList {
 	public boolean isVideo() {
 		return type.startsWith("video/") || extension.equals("mkv");
 	}
-	
+
+	public boolean isVideoReproducible() {
+		return type.startsWith("video/") || extension.equals("mkv") || extension.equals("flv")
+				|| extension.equals("vob") || extension.equals("avi") || extension.equals("wmv")
+				|| extension.equals("mpg") || extension.equals("mts");
+	}
+
+	public boolean isVideoNotSupported() {
+		return extension.equals("flv") || extension.equals("avi") || extension.equals("wmv");
+	}
+
 	/*
 	 * Check is MimeType of audio type
 	 */

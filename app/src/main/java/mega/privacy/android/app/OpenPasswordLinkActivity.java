@@ -80,30 +80,30 @@ public class OpenPasswordLinkActivity extends PinActivityLollipop implements Meg
 		MegaApplication app = (MegaApplication)getApplication();
 		megaApi = app.getMegaApi();
 
-		if(megaApi==null||megaApi.getRootNode()==null){
-			log("Refresh session - sdk");
-			Intent intent = new Intent(this, LoginActivityLollipop.class);
-			intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
-			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-			startActivity(intent);
-			finish();
-			return;
-		}
-		if(Util.isChatEnabled()){
-			if (megaChatApi == null){
-				megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
-			}
-
-			if(megaChatApi==null||megaChatApi.getInitState()== MegaChatApi.INIT_ERROR){
-				log("Refresh session - karere");
-				Intent intent = new Intent(this, LoginActivityLollipop.class);
-				intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
-				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-				startActivity(intent);
-				finish();
-				return;
-			}
-		}
+//		if(megaApi==null||megaApi.getRootNode()==null){
+//			log("Refresh session - sdk");
+//			Intent intent = new Intent(this, LoginActivityLollipop.class);
+//			intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
+//			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+//			startActivity(intent);
+//			finish();
+//			return;
+//		}
+//		if(Util.isChatEnabled()){
+//			if (megaChatApi == null){
+//				megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
+//			}
+//
+//			if(megaChatApi==null||megaChatApi.getInitState()== MegaChatApi.INIT_ERROR){
+//				log("Refresh session - karere");
+//				Intent intent = new Intent(this, LoginActivityLollipop.class);
+//				intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
+//				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+//				startActivity(intent);
+//				finish();
+//				return;
+//			}
+//		}
 		
 		setContentView(R.layout.activity_open_pass_link);
 		
