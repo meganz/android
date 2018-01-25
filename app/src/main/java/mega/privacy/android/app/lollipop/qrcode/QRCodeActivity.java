@@ -1,12 +1,15 @@
 package mega.privacy.android.app.lollipop.qrcode;
 
+import android.content.Intent;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -14,9 +17,11 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.FrameLayout;
+import android.widget.TextView;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PinActivityLollipop;
 import mega.privacy.android.app.modalbottomsheet.QRCodeSaveBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.Util;
@@ -35,12 +40,13 @@ public class QRCodeActivity extends PinActivityLollipop {
     private MenuItem settingsMenuItem;
     private MenuItem resetQRMenuItem;
 
-    private FrameLayout fragmentContainer;
     private TabLayout tabLayoutQRCode;
     private ViewPager viewPagerQRCode;
 
     private ScanCodeFragment scanCodeFragment;
     private MyCodeFragment myCodeFragment;
+
+    private DrawerLayout drawerLayout;
 
     private int qrCodeFragment;
 
@@ -64,7 +70,7 @@ public class QRCodeActivity extends PinActivityLollipop {
         aB.setDisplayHomeAsUpEnabled(true);
         tB.setTitle(getString(R.string.section_qr_code));
 
-        fragmentContainer = (FrameLayout) findViewById(R.id.fragment_container);
+        drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 
         tabLayoutQRCode =  (TabLayout) findViewById(R.id.sliding_tabs_qr_code);
         viewPagerQRCode = (ViewPager) findViewById(R.id.qr_code_tabs_pager);
@@ -84,6 +90,7 @@ public class QRCodeActivity extends PinActivityLollipop {
                 }
                 else {
                     qrCodeFragment = 1;
+                    ScanCodeFragment.scannerView.startCamera();
                 }
             }
 
@@ -146,7 +153,7 @@ public class QRCodeActivity extends PinActivityLollipop {
                 break;
             }
             case R.id.qr_code_share: {
-
+                shareQR ();
                 break;
             }
             case R.id.qr_code_save: {
@@ -156,15 +163,36 @@ public class QRCodeActivity extends PinActivityLollipop {
                 break;
             }
             case R.id.qr_code_settings: {
-
+                Intent intent = new Intent(this, ManagerActivityLollipop.class);
+                Bundle bundle = new Bundle();
+                bundle.putSerializable("drawerItem", ManagerActivityLollipop.DrawerItem.SETTINGS);
+                intent.putExtras(bundle);
+                startActivity(intent);
+                this.finish();
                 break;
             }
             case R.id.qr_code_reset: {
-
+                resetQR ();
                 break;
             }
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    public void shareQR () {
+
+    }
+
+    public void resetQR () {
+        showSnackbar(getString(R.string.qrcode_reset_successfully));
+    }
+
+    public void showSnackbar(String s){
+        log("showSnackbar");
+        Snackbar snackbar = Snackbar.make(drawerLayout, s, Snackbar.LENGTH_LONG);
+        TextView snackbarTextView = (TextView)snackbar.getView().findViewById(android.support.design.R.id.snackbar_text);
+        snackbarTextView.setMaxLines(5);
+        snackbar.show();
     }
 
     public static void log(String message) {

@@ -158,6 +158,27 @@
 	        android:key="settings_storage_download_location"
 	        android:title="@string/settings_storage_download_location" />
 	</PreferenceCategory>
+
+	<PreferenceCategory
+		android:key="settings_qrcode"
+		android:title="@string/section_qr_code"
+		android:layout="@layout/my_category_preference">
+
+		<SwitchPreference
+			android:key="settings_qrcode_active"
+			android:title="@string/section_qr_code" />
+
+		<SwitchPreference
+			android:key="settings_qrcode_autoaccept"
+			android:title="@string/settings_qrcode_autoaccept"
+			android:summary="@string/setting_subtitle_qrcode_autoccept"/>
+
+		<Preference
+			android:key="settings_qrcode_reset"
+			android:title="@string/action_reset_qr"
+			android:summary="@string/setting_subtitle_qrcode_reset"/>
+
+	</PreferenceCategory>
 	
 	<PreferenceCategory
 	    android:key="advanced_features"

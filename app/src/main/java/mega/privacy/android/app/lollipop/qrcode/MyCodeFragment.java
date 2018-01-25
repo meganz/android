@@ -4,6 +4,7 @@ package mega.privacy.android.app.lollipop.qrcode;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -22,13 +23,14 @@ import mega.privacy.android.app.utils.Util;
  * Created by mega on 22/01/18.
  */
 
-public class MyCodeFragment extends Fragment{
+public class MyCodeFragment extends Fragment implements View.OnClickListener {
 
     private ActionBar aB;
 
     private ImageView qrcode;
     private TextView qrcode_link;
     private Button qrcode_copy_link;
+    private View v;
 
     private Context context;
 
@@ -49,7 +51,7 @@ public class MyCodeFragment extends Fragment{
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         log("onCreateView");
 
-        View v = inflater.inflate(R.layout.fragment_mycode, container, false);
+        v = inflater.inflate(R.layout.fragment_mycode, container, false);
 
         if (aB == null){
             aB = ((AppCompatActivity)context).getSupportActionBar();
@@ -64,6 +66,7 @@ public class MyCodeFragment extends Fragment{
         qrcode = (ImageView) v.findViewById(R.id.qr_code_image);
         qrcode_link = (TextView) v.findViewById(R.id.qr_code_link);
         qrcode_copy_link = (Button) v.findViewById(R.id.qr_code_button_copy_link);
+        qrcode_copy_link.setOnClickListener(this);
 
         return v;
     }
@@ -86,5 +89,29 @@ public class MyCodeFragment extends Fragment{
 
     private static void log(String log) {
         Util.log("MyCodeFragment", log);
+    }
+
+    @Override
+    public void onClick(View v) {
+        log("onClick");
+        switch (v.getId()) {
+            case R.id.qr_code_button_copy_link: {
+                copyLink();
+                break;
+            }
+        }
+    }
+
+    public void copyLink () {
+        log("copyLink");
+        showSnackbar(getString(R.string.qrcode_link_copied));
+    }
+
+    public void showSnackbar(String s){
+        log("showSnackbar");
+        Snackbar snackbar = Snackbar.make(v, s, Snackbar.LENGTH_LONG);
+        TextView snackbarTextView = (TextView)snackbar.getView().findViewById(android.support.design.R.id.snackbar_text);
+        snackbarTextView.setMaxLines(5);
+        snackbar.show();
     }
 }
