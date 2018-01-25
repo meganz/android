@@ -86,8 +86,6 @@ public class InboxFragmentLollipop extends Fragment{
 	ImageView emptyImageView;
 	LinearLayout emptyTextView;
 	TextView emptyTextViewFirst;
-	TextView emptyTextViewSecond;
-
 	TextView contentText;
 	RelativeLayout contentTextLayout;
 	Stack<Integer> lastPositionStack;
@@ -393,8 +391,6 @@ public class InboxFragmentLollipop extends Fragment{
 			emptyImageView = (ImageView) v.findViewById(R.id.inbox_list_empty_image);
 			emptyTextView = (LinearLayout) v.findViewById(R.id.inbox_list_empty_text);
 			emptyTextViewFirst = (TextView) v.findViewById(R.id.inbox_list_empty_text_first);
-			emptyTextViewSecond = (TextView) v.findViewById(R.id.inbox_list_empty_text_second);
-
 			contentTextLayout = (RelativeLayout) v.findViewById(R.id.inbox_list_content_text_layout);
 			contentText = (TextView) v.findViewById(R.id.inbox_list_content_text);
 
@@ -427,8 +423,6 @@ public class InboxFragmentLollipop extends Fragment{
 			emptyImageView = (ImageView) v.findViewById(R.id.inbox_grid_empty_image);
 			emptyTextView = (LinearLayout) v.findViewById(R.id.inbox_grid_empty_text);
 			emptyTextViewFirst = (TextView) v.findViewById(R.id.inbox_grid_empty_text_first);
-			emptyTextViewSecond = (TextView) v.findViewById(R.id.inbox_grid_empty_text_second);
-
 
 //			emptyImageView.setImageResource(R.drawable.inbox_empty);
 //			emptyTextView.setText(R.string.empty_inbox);
