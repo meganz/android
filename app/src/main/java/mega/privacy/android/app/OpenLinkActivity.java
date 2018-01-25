@@ -5,6 +5,11 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
+import android.view.View;
+import android.widget.Button;
+import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -26,7 +31,7 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 
 
-public class OpenLinkActivity extends PinActivity implements MegaRequestListenerInterface {
+public class OpenLinkActivity extends PinActivity implements MegaRequestListenerInterface, View.OnClickListener {
 
 	MegaApplication app;
 	MegaApiAndroid megaApi;
@@ -36,7 +41,13 @@ public class OpenLinkActivity extends PinActivity implements MegaRequestListener
 	String urlConfirmationLink = null;
 
 	static OpenLinkActivity openLinkActivity = null;
-	
+
+	RelativeLayout relativeContainer;
+	TextView processingText;
+	TextView errorText;
+	ProgressBar progressBar;
+	Button okButton;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
@@ -50,6 +61,18 @@ public class OpenLinkActivity extends PinActivity implements MegaRequestListener
 		log("Original url: " + url);
 
 		openLinkActivity = this;
+
+
+		setContentView(R.layout.activity_open_link);
+
+		relativeContainer = (RelativeLayout) findViewById(R.id.relative_container_open_link);
+		processingText = (TextView) findViewById(R.id.open_link_text);
+		errorText = (TextView) findViewById(R.id.open_link_error);
+		errorText.setVisibility(View.GONE);
+		progressBar = (ProgressBar) findViewById(R.id.open_link_bar);
+		okButton = (Button) findViewById(R.id.open_link_accept_button);
+		okButton.setVisibility(View.GONE);
+		okButton.setOnClickListener(this);
 		
 		try {
 			url = URLDecoder.decode(url, "UTF-8");
@@ -573,7 +596,7 @@ public class OpenLinkActivity extends PinActivity implements MegaRequestListener
 				aC.logout(this, megaApi);
 			}
 			else{
-				AlertDialog.Builder builder;
+				/*AlertDialog.Builder builder;
 				builder = new AlertDialog.Builder(this);
 				builder.setMessage(R.string.invalid_link);
 				builder.setPositiveButton(getString(R.string.cam_sync_ok),
@@ -582,7 +605,8 @@ public class OpenLinkActivity extends PinActivity implements MegaRequestListener
 								finish();
 							}
 						});
-				builder.show();
+				builder.show();*/
+
 			}
 		}
 	}
@@ -590,5 +614,15 @@ public class OpenLinkActivity extends PinActivity implements MegaRequestListener
 	@Override
 	public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) {
 
+	}
+
+	@Override
+	public void onClick(View v) {
+		switch (v.getId()) {
+			case R.id.open_link_accept_button: {
+				finish();
+				break;
+			}
+		}
 	}
 }

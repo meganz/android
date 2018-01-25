@@ -1675,5 +1675,7 @@
     <string name="error_enable_chat_before_login" context="Message shown if the user choose enable button and he is not logged in">Please, log in before enabling the chat</string>
 
     <string name="invalid_link" context="error message shown when an account confirmation link or reset password link is invalid for unknown reasons">Invalid link, please ask for a new valid link</string>
+    <string name="processing_link" context="Message shown when a link is processing">Processing link...</string>
+
 </resources>
 
