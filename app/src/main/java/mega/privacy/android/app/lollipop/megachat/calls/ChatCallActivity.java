@@ -502,6 +502,8 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                         thePlayer.setLooping(true);
                         thePlayer.start();
                     }
+                    log("*********4- updateLocalVideoStatus");
+
                     updateLocalVideoStatus();
                 }
             }
@@ -848,6 +850,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                     log("Ok answer with NO video - ");
 //                    updateLocalVideoStatus();
                 }
+                log("*********3- updateLocalVideoStatus");
 
                 updateLocalVideoStatus();
             }
@@ -915,6 +918,8 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                     if(localCameraFragmentFS != null){
                         updateLocalFullVideoStatus();
                     }
+                    log("*********2- updateLocalVideoStatus");
+
                     updateLocalVideoStatus();
 
                     if(thePlayer!=null){
@@ -1016,6 +1021,8 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
         else if(call.hasChanged(MegaChatCall.CHANGE_TYPE_LOCAL_AVFLAGS)){
             log("Local flags have changed");
             updateLocalAudioStatus();
+            log("*********1- updateLocalVideoStatus");
+
             updateLocalVideoStatus();
         }
         else if(call.hasChanged(MegaChatCall.CHANGE_TYPE_RINGING_STATUS)){
@@ -1113,13 +1120,13 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                 megaChatApi.hangChatCall(chatId, this);
                 break;
             }
-            case R.id.answer_call_fab:{
-                log("Click on answer fab");
-                megaChatApi.answerChatCall(chatId, false, this);
-                answerCallFAB.clearAnimation();
-
-                break;
-            }
+//            case R.id.answer_call_fab:{
+//                log("Click on answer fab");
+//                megaChatApi.answerChatCall(chatId, false, this);
+//                answerCallFAB.clearAnimation();
+//
+//                break;
+//            }
         }
     }
 
@@ -1163,20 +1170,6 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                 public void onSwipeTop() {
                     log("onSwipeTop");
                     answerCallFAB.clearAnimation();
-//                    float posY= myAvatarLayout.getY();
-//                    float posX = myAvatarLayout.getX();
-//                    log("*************** 1..... ABOVE: ("+myAvatarLayout.getX()+","+myAvatarLayout.getY()+")");
-
-//                    RelativeLayout.LayoutParams myAvatarLayoutParams= new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
-//                    myAvatarLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, RelativeLayout.TRUE);
-//                    myAvatarLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
-//                    myAvatarLayoutParams.setMargins(0,0,Util.scaleHeightPx(20, outMetrics),0);
-//                    myAvatarLayoutParams.addRule(RelativeLayout.ABOVE, 0);
-//                    myAvatarLayout.setLayoutParams(myAvatarLayoutParams);
-////                    myAvatarLayout.setX(Util.scaleWidthPx((int)posX, outMetrics));
-////                    myAvatarLayout.setY(Util.scaleWidthPx((int)posY, outMetrics));
-//
-//                    log("*************** 2 no ABOVE: ("+myAvatarLayout.getX()+","+myAvatarLayout.getY()+")");
 
                     RelativeLayout.LayoutParams layoutExtend = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
                     layoutExtend.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
@@ -1221,125 +1214,9 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                             layoutCompress.setMargins(0, 0, Util.scaleWidthPx(72, outMetrics), 0); //substitute parameters for left, top, right, bottom
                             linearFAB.setLayoutParams(layoutCompress);
                             linearFAB.setOrientation(LinearLayout.HORIZONTAL);
-
-
-//                            RelativeLayout.LayoutParams myAvatarLayoutParams= new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
-//                            myAvatarLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, RelativeLayout.TRUE);
-//                            myAvatarLayoutParams.setMargins(0,0,Util.scaleHeightPx(20, outMetrics),Util.scaleHeightPx(20, outMetrics));
-//                            myAvatarLayoutParams.addRule(RelativeLayout.ABOVE, R.id.linear_buttons);
-//                            myAvatarLayout.setLayoutParams(myAvatarLayoutParams);
-//                            log("*************** 3  ABOVE: ("+myAvatarLayout.getX()+","+myAvatarLayout.getY()+")");
-
-
-
                             answerTheCall();
                         }
                     });
-
-
-//                    TranslateAnimation translateAnim = new TranslateAnimation( 0, 0 , 0, -300 );
-//                    translateAnim.setDuration(translationAnimationDuration);
-//                    translateAnim.setFillAfter(true);
-//                    translateAnim.setFillBefore(true);
-//                    translateAnim.setRepeatCount(0);
-//
-//                    answerCallFAB.startAnimation(translateAnim);
-//
-//                    translateAnim.setAnimationListener(new Animation.AnimationListener(){
-//                        @Override
-//                        public void onAnimationStart(Animation animation) {
-//                        }
-//
-//                        @Override
-//                        public void onAnimationRepeat(Animation animation) {
-//                        }
-//
-//                        @Override
-//                        public void onAnimationEnd(Animation animation) {
-//                            AlphaAnimation alphaAnim = new AlphaAnimation(1.0f, 0.0f);
-//                            alphaAnim.setDuration(alphaAnimationDuration);
-//                            alphaAnim.setFillAfter(true);
-//                            alphaAnim.setFillBefore(true);
-//                            alphaAnim.setRepeatCount(0);
-//                            answerCallFAB.startAnimation(alphaAnim);
-//                            RelativeLayout.LayoutParams layoutCompress = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
-//                            layoutCompress.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
-//                            layoutCompress.addRule(RelativeLayout.CENTER_HORIZONTAL);
-//                            linearFAB.setLayoutParams(layoutCompress);
-//                            linearFAB.setOrientation(LinearLayout.HORIZONTAL);
-//                            linearFAB.setPadding(72,0,0,0);
-//
-//                            RelativeLayout.LayoutParams myAvatarLayoutParams= new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
-//                            myAvatarLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, RelativeLayout.TRUE);
-//                            myAvatarLayoutParams.setMargins(0,0,20,0);
-//                            myAvatarLayoutParams.addRule(RelativeLayout.ABOVE, R.id.linear_buttons);
-//                            myAvatarLayout.setLayoutParams(myAvatarLayoutParams);
-//
-//
-//                            answerTheCall();
-//                        }
-//                    });
-
-
-//                    AnimatorSet animatorSet = new AnimatorSet();
-//
-//                    ObjectAnimator animatorY = ObjectAnimator.ofFloat(answerCallFAB, "y",-100f);
-//                    animatorY.addListener(new Animator.AnimatorListener() {
-//                        @Override
-//                        public void onAnimationStart(Animator animation) {
-//                            RelativeLayout.LayoutParams layoutExtend = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.MATCH_PARENT);
-//                            linearFAB.setLayoutParams(layoutExtend);
-//                        }
-//
-//                        @Override
-//                        public void onAnimationEnd(Animator animation) {
-//                        }
-//
-//                        @Override
-//                        public void onAnimationCancel(Animator animation) {
-//                        }
-//
-//                        @Override
-//                        public void onAnimationRepeat(Animator animation) {
-//                        }
-//                    });
-//                    animatorY.setInterpolator(new LinearInterpolator());
-//
-//
-//                    ObjectAnimator alphaAnimation = ObjectAnimator.ofFloat(answerCallFAB, View.ALPHA, 1.0f, 0.0f);
-//                    alphaAnimation.addListener(new Animator.AnimatorListener() {
-//                        @Override
-//                        public void onAnimationStart(Animator animation) {
-//                        }
-//
-//                        @Override
-//                        public void onAnimationEnd(Animator animation) {
-//                            RelativeLayout.LayoutParams layoutCompress = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
-//                            linearFAB.setLayoutParams(layoutCompress);
-//                            answerCallFAB.clearAnimation();
-//                        }
-//
-//                        @Override
-//                        public void onAnimationCancel(Animator animation) {
-//                        }
-//
-//                        @Override
-//                        public void onAnimationRepeat(Animator animation) {
-//                        }
-//                    });
-//                    alphaAnimation.setInterpolator(new LinearInterpolator());
-//
-//                    animatorY.setDuration(animationDuration);
-//                    alphaAnimation.setDuration(animationDuration);
-//
-//                    animatorY.setRepeatCount(0);
-//                    alphaAnimation.setRepeatCount(0);
-//
-//                    animatorSet.playTogether(animatorY, alphaAnimation);
-//                    animatorSet.start();
-
-
-
                 }
                 public void onSwipeRight() {}
                 public void onSwipeLeft() {}
@@ -1368,7 +1245,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
         int callStatus = callChat.getStatus();
 
         if (callChat.hasLocalVideo()) {
-
+            log("**********Video local connected");
             log("Video local connected");
             if (myAvatarLayout.getVisibility() == View.VISIBLE) {
                 videoFAB.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.accentColor)));
@@ -1397,6 +1274,8 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                 log("No needed to refresh");
             }
         } else {
+            log("**********Video local NOT connected");
+
             log("Video local NOT connected");
 
             if(callStatus==MegaChatCall.CALL_STATUS_REQUEST_SENT){
