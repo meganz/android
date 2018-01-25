@@ -132,10 +132,6 @@
                     android:id="@+id/call_chat_my_image_layout"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_above="@+id/linear_buttons"
-                    android:layout_alignParentRight="true"
-                    android:layout_marginRight="20dp"
-                    android:layout_marginBottom="25dp"
                     android:background="@android:color/transparent">
 
                     <RelativeLayout
@@ -168,21 +164,17 @@
                 <!-- Buttons -->
                 <LinearLayout
                     android:id="@+id/linear_buttons"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentBottom="true"
-                    android:layout_centerHorizontal="true"
-                    android:layout_marginBottom="32dp"
-                    android:orientation="horizontal">
+                    android:background="@android:color/transparent">
 
                     <android.support.design.widget.FloatingActionButton
                         android:id="@+id/answer_call_fab"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="bottom|end"
-                        android:layout_marginBottom="12dp"
-                        android:layout_marginLeft="16dp"
-                        android:layout_marginRight="16dp"
+                        android:layout_marginBottom="24dp"
+                        android:layout_marginRight="36dp"
                         android:scaleType="center"
                         android:src="@drawable/ic_phone_white"
                         app:backgroundTint="@color/accentColor"
@@ -196,9 +188,9 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="bottom|end"
-                        android:layout_marginBottom="12dp"
-                        android:layout_marginLeft="16dp"
-                        android:layout_marginRight="16dp"
+                        android:layout_marginBottom="24dp"
+                        android:layout_marginRight="36dp"
+                        android:layout_marginTop="12dp"
                         android:scaleType="center"
                         android:src="@drawable/ic_videocam_white"
                         app:backgroundTint="@color/accentColor"
@@ -212,9 +204,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="bottom|end"
-                        android:layout_marginBottom="12dp"
-                        android:layout_marginLeft="16dp"
-                        android:layout_marginRight="16dp"
+                        android:layout_marginBottom="24dp"
+                        android:layout_marginRight="36dp"
                         android:scaleType="center"
                         android:src="@drawable/ic_record_audio_w"
                         app:backgroundTint="@color/accentColor"
@@ -228,9 +219,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="bottom|end"
-                        android:layout_marginBottom="12dp"
-                        android:layout_marginLeft="16dp"
-                        android:layout_marginRight="16dp"
+                        android:layout_marginBottom="24dp"
                         android:scaleType="center"
                         android:src="@drawable/ic_close_white"
                         app:backgroundTint="@color/delete_account"
