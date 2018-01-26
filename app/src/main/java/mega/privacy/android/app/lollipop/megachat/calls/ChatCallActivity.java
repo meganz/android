@@ -338,10 +338,10 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
         aB.setTitle(" ");
 
         linearFAB = (LinearLayout) findViewById(R.id.linear_buttons);
-        RelativeLayout.LayoutParams layoutCompress = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+        RelativeLayout.LayoutParams layoutCompress = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
         layoutCompress.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
-        layoutCompress.addRule(RelativeLayout.CENTER_HORIZONTAL);
-        layoutCompress.setMargins(0, 0, Util.scaleWidthPx(72, outMetrics), 0); //left, top, right, bottom
+        layoutCompress.addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE);
+        //layoutCompress.setMargins(0, 0, Util.scaleWidthPx(72, outMetrics), 0); //left, top, right, bottom
         linearFAB.setLayoutParams(layoutCompress);
         linearFAB.setOrientation(LinearLayout.HORIZONTAL);
 
@@ -1165,10 +1165,16 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                     log("onSwipeTop");
                     answerCallFAB.clearAnimation();
 
-                    RelativeLayout.LayoutParams layoutExtend = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
+//                    RelativeLayout.LayoutParams layoutExtend = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
+//                    layoutExtend.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
+//                    layoutExtend.addRule(RelativeLayout.CENTER_HORIZONTAL);
+//                    layoutExtend.setMargins(0, 0, Util.scaleWidthPx(72, outMetrics), 0); //substitute parameters for left, top, right, bottom
+//                    linearFAB.setLayoutParams(layoutExtend);
+//                    linearFAB.setOrientation(LinearLayout.HORIZONTAL);
+
+                    RelativeLayout.LayoutParams layoutExtend = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.MATCH_PARENT);
                     layoutExtend.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
-                    layoutExtend.addRule(RelativeLayout.CENTER_HORIZONTAL);
-                    layoutExtend.setMargins(0, 0, Util.scaleWidthPx(72, outMetrics), 0); //substitute parameters for left, top, right, bottom
+                    layoutExtend.addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE);
                     linearFAB.setLayoutParams(layoutExtend);
                     linearFAB.setOrientation(LinearLayout.HORIZONTAL);
 
@@ -1202,12 +1208,19 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                         @Override
                         public void onAnimationEnd(Animation animation) {
 
-                            RelativeLayout.LayoutParams layoutCompress = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+//                            RelativeLayout.LayoutParams layoutCompress = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+//                            layoutCompress.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
+//                            layoutCompress.addRule(RelativeLayout.CENTER_HORIZONTAL);
+//                            layoutCompress.setMargins(0, 0, Util.scaleWidthPx(72, outMetrics), 0); //substitute parameters for left, top, right, bottom
+//                            linearFAB.setLayoutParams(layoutCompress);
+//                            linearFAB.setOrientation(LinearLayout.HORIZONTAL);
+
+                            RelativeLayout.LayoutParams layoutCompress = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.MATCH_PARENT);
                             layoutCompress.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
-                            layoutCompress.addRule(RelativeLayout.CENTER_HORIZONTAL);
-                            layoutCompress.setMargins(0, 0, Util.scaleWidthPx(72, outMetrics), 0); //substitute parameters for left, top, right, bottom
+                            layoutCompress.addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE);
                             linearFAB.setLayoutParams(layoutCompress);
                             linearFAB.setOrientation(LinearLayout.HORIZONTAL);
+
                             answerTheCall();
                         }
                     });
