@@ -55,7 +55,7 @@ public class LocalCameraCallFullScreenFragment extends Fragment implements MegaC
         View v = inflater.inflate(R.layout.fragment_local_camera_call_full_screen, container, false);
 
         localFullScreenSurfaceView = (SurfaceView)v.findViewById(R.id.surface_local_video);
-        localFullScreenSurfaceView.setZOrderOnTop(false);
+        localFullScreenSurfaceView.setZOrderMediaOverlay(true);
         SurfaceHolder localSurfaceHolder = localFullScreenSurfaceView.getHolder();
         localSurfaceHolder.setFormat(PixelFormat.TRANSPARENT);
         localRenderer = new MegaSurfaceRenderer(localFullScreenSurfaceView);
