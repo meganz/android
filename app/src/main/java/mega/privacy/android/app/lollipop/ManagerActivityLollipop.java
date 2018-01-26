@@ -9012,7 +9012,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	}
 
 	public void checkPermissions(){
-		log("checkPermissions");
+		log("checkPermissionsCall");
 
 		fromTakePicture = Constants.TAKE_PROFILE_PICTURE;
 

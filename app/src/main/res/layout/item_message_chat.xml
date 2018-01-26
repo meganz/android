@@ -508,6 +508,18 @@
                 android:layout_height="26dp"
                 android:gravity="left|bottom"
                 android:layout_marginBottom="4dp">
+
+                <TextView
+                    android:id="@+id/contact_message_chat_name_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="12sp"
+                    android:text="name of the contact"
+                    android:textColor="@color/accentColor"
+                    android:layout_marginRight="4dp"
+                    android:gravity="left"
+                    android:layout_centerVertical="true"/>
+
                 <TextView
                     android:id="@+id/contact_message_chat_time_text"
                     android:layout_width="wrap_content"
@@ -515,6 +527,8 @@
                     android:textSize="12sp"
                     android:textColor="@color/file_list_second_row"
                     android:gravity="left"
+                    android:layout_toEndOf="@+id/contact_message_chat_name_text"
+                    android:layout_toRightOf="@+id/contact_message_chat_name_text"
                     android:layout_centerVertical="true"/>
 
             </RelativeLayout>
@@ -573,22 +587,10 @@
                         android:elevation="2dp"
                         android:background="@android:color/transparent">
 
-                        <TextView
-                            android:id="@+id/content_contact_message_file_sender"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textSize="14sp"
-                            android:layout_marginRight="12dp"
-                            android:maxLines="2"
-                            android:ellipsize="end"
-                            android:background="@android:color/transparent"
-                            android:gravity="left"/>
-
                         <!-- contact portrait-->
                         <RelativeLayout
                             android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_below="@+id/content_contact_message_file_sender">
+                            android:layout_height="wrap_content">
 
                             <mega.privacy.android.app.components.RoundedImageView
                                 android:id="@+id/content_contact_message_thumb_portrait"
@@ -619,8 +621,7 @@
                         <!-- contact landscape -->
                         <RelativeLayout
                             android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_below="@+id/content_contact_message_file_sender">
+                            android:layout_height="wrap_content">
 
                             <mega.privacy.android.app.components.RoundedImageView
                                 android:id="@+id/content_contact_message_thumb_landscape"
@@ -651,7 +652,6 @@
                         <RelativeLayout
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_below="@+id/content_contact_message_file_sender"
                             android:background="@drawable/rounded_text_view_chat_contact_message">
 
                             <ImageView
@@ -710,20 +710,10 @@
                     android:layout_marginRight="108dp"
                     android:gravity="left">
 
-                    <TextView
-                        android:id="@+id/content_contact_message_contact_sender"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textSize="14sp"
-                        android:layout_marginLeft="12dp"
-                        android:layout_marginTop="11dp"
-                        android:layout_marginRight="12dp"
-                        android:gravity="left"/>
 
                     <RelativeLayout
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_below="@+id/content_contact_message_contact_sender">
+                        android:layout_height="wrap_content">
 
                         <RelativeLayout
                             android:id="@+id/content_contact_message_contact_layout_avatar"
