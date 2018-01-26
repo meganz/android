@@ -1116,34 +1116,28 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         }
 
                         leaveMenuItem.setVisible(true);
-                        callMenuItem.setVisible(true);
-                        videoMenuItem.setVisible(true);
-
                     }
                     else if(permission==MegaChatRoom.PRIV_RM) {
                         log("Group chat PRIV_RM");
                         leaveMenuItem.setVisible(false);
-                        callMenuItem.setVisible(false);
-                        videoMenuItem.setVisible(false);
                         clearHistoryMenuItem.setVisible(false);
                         inviteMenuItem.setVisible(false);
                     }
                     else if(permission==MegaChatRoom.PRIV_RO) {
                         log("Group chat PRIV_RM");
                         leaveMenuItem.setVisible(true);
-                        callMenuItem.setVisible(false);
-                        videoMenuItem.setVisible(false);
                         clearHistoryMenuItem.setVisible(false);
                         inviteMenuItem.setVisible(false);
                     }
                     else{
                         log("Permission: "+permission);
                         leaveMenuItem.setVisible(true);
-                        callMenuItem.setVisible(true);
-                        videoMenuItem.setVisible(true);
                         clearHistoryMenuItem.setVisible(false);
                         inviteMenuItem.setVisible(false);
                     }
+
+                    callMenuItem.setVisible(false);
+                    videoMenuItem.setVisible(false);
 
                     contactInfoMenuItem.setTitle(getString(R.string.group_chat_info_label));
                     contactInfoMenuItem.setVisible(true);
@@ -1160,6 +1154,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         clearHistoryMenuItem.setVisible(true);
                         contactInfoMenuItem.setTitle(getString(R.string.contact_properties_activity));
                         contactInfoMenuItem.setVisible(true);
+                        callMenuItem.setVisible(true);
+                        videoMenuItem.setVisible(true);
                     }
                     leaveMenuItem.setVisible(false);
                 }
