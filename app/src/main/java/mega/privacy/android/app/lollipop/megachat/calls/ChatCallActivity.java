@@ -36,6 +36,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.view.Display;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -105,8 +106,6 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
     private LocalCameraCallFragment localCameraFragment;
     private LocalCameraCallFullScreenFragment localCameraFragmentFS = null;
 
-    boolean flag = true;
-    float dX, dY;
     float widthScreenPX, heightScreenPX;
 
     ViewGroup parent;
@@ -185,18 +184,24 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
     Animation shake;
 
     long translationAnimationDuration = 500;
-    long alphaAnimationDuration = 1000;
+    long alphaAnimationDuration = 600;
+    long alphaAnimationDurationArrow = 1000;
 
     LinearLayout linearFAB;
-    LinearLayout linearArrow;
-    ImageView firstArrow;
-    ImageView secondArrow;
-    ImageView thirdArrow;
-    ImageView fourArrow;
+    RelativeLayout relativeCall;
+    LinearLayout linearArrowCall;
+    ImageView firstArrowCall;
+    ImageView secondArrowCall;
+    ImageView thirdArrowCall;
+    ImageView fourArrowCall;
 
-    RelativeLayout relativeFAB;
+    RelativeLayout relativeVideo;
+    LinearLayout linearArrowVideo;
+    ImageView firstArrowVideo;
+    ImageView secondArrowVideo;
+    ImageView thirdArrowVideo;
+    ImageView fourArrowVideo;
 
-    float tam;
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         log("onCreateOptionsMenu");
@@ -355,14 +360,26 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
         linearFAB.setLayoutParams(layoutCompress);
         linearFAB.setOrientation(LinearLayout.HORIZONTAL);
 
-        relativeFAB = (RelativeLayout) findViewById(R.id.relative_buttons);
-        relativeFAB.setVisibility(GONE);
+        relativeCall = (RelativeLayout) findViewById(R.id.relative_answer_call_fab);
+        relativeCall.setVisibility(GONE);
 
-        linearArrow = (LinearLayout) findViewById(R.id.linear_arrow);
-        firstArrow = (ImageView) findViewById(R.id.first_arrow);
-        secondArrow = (ImageView) findViewById(R.id.second_arrow);
-        thirdArrow = (ImageView) findViewById(R.id.third_arrow);
-        fourArrow = (ImageView) findViewById(R.id.four_arrow);
+        linearArrowCall = (LinearLayout) findViewById(R.id.linear_arrow_call);
+        firstArrowCall = (ImageView) findViewById(R.id.first_arrow_call);
+        secondArrowCall = (ImageView) findViewById(R.id.second_arrow_call);
+        thirdArrowCall = (ImageView) findViewById(R.id.third_arrow_call);
+        fourArrowCall = (ImageView) findViewById(R.id.four_arrow_call);
+
+        relativeVideo = (RelativeLayout) findViewById(R.id.relative_video_fab);
+        relativeVideo.setVisibility(GONE);
+
+        linearArrowVideo = (LinearLayout) findViewById(R.id.linear_arrow_video);
+        firstArrowVideo = (ImageView) findViewById(R.id.first_arrow_video);
+        secondArrowVideo = (ImageView) findViewById(R.id.second_arrow_video);
+        thirdArrowVideo = (ImageView) findViewById(R.id.third_arrow_video);
+        fourArrowVideo = (ImageView) findViewById(R.id.four_arrow_video);
+
+        answerCallFAB = (FloatingActionButton) findViewById(R.id.answer_call_fab);
+        answerCallFAB.setVisibility(GONE);
 
         videoFAB = (FloatingActionButton) findViewById(R.id.video_fab);
         videoFAB.setOnClickListener(this);
@@ -376,9 +393,6 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
         hangFAB.setOnClickListener(this);
         hangFAB.setVisibility(GONE);
 
-        answerCallFAB = (FloatingActionButton) findViewById(R.id.answer_call_fab);
-        answerCallFAB.setVisibility(GONE);
-
         shake = AnimationUtils.loadAnimation(this, R.anim.shake);
 
         remoteSurfaceView = (SurfaceView)findViewById(R.id.surface_remote_video);
@@ -388,8 +402,8 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
         parent = (ViewGroup) findViewById(R.id.parentLayout);
         fragmentContainerLocalCamera = (FrameLayout) findViewById(R.id.fragment_container_local_camera);
         RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams)fragmentContainerLocalCamera.getLayoutParams();
-        params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-        params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+        params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT,RelativeLayout.TRUE);
+        params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM,RelativeLayout.TRUE);
         fragmentContainerLocalCamera.setLayoutParams(params);
         fragmentContainerLocalCamera.setOnTouchListener(new OnDragTouchListener(fragmentContainerLocalCamera,parent));
         parent.setVisibility(View.GONE);
@@ -398,9 +412,10 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
         parentFS = (ViewGroup) findViewById(R.id.parentLayoutFS);
         fragmentContainerLocalCameraFS = (FrameLayout) findViewById(R.id.fragment_container_local_cameraFS);
         RelativeLayout.LayoutParams paramsFS = (RelativeLayout.LayoutParams)fragmentContainerLocalCameraFS.getLayoutParams();
-        paramsFS.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-        paramsFS.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+        paramsFS.addRule(RelativeLayout.ALIGN_PARENT_RIGHT,RelativeLayout.TRUE);
+        paramsFS.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
         fragmentContainerLocalCameraFS.setLayoutParams(paramsFS);
+
         parentFS.setVisibility(View.GONE);
         fragmentContainerLocalCameraFS.setVisibility(View.GONE);
 
@@ -479,11 +494,15 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                 aB.setTitle(fullName);
 
                 if(callStatus==MegaChatCall.CALL_STATUS_RING_IN){
+                    log("Incoming call");
+
+                    relativeVideo.getLayoutParams().width= RelativeLayout.LayoutParams.WRAP_CONTENT;
+                    relativeVideo.getLayoutParams().height= RelativeLayout.LayoutParams.MATCH_PARENT;
+
                     contactAvatarLayout.setVisibility(View.VISIBLE);
                     setProfileMyAvatar(true);
                     setProfileContactAvatar(userHandle, fullName, false);
 
-                    log("Incoming call");
                     Uri ringtoneUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE);
                     ringtone = RingtoneManager.getRingtone(this, ringtoneUri);
                     ringerTimer = new Timer();
@@ -502,6 +521,9 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                 }
                 else{
                     log("Outgoing call");
+
+                    relativeVideo.getLayoutParams().height= RelativeLayout.LayoutParams.WRAP_CONTENT;
+                    relativeVideo.getLayoutParams().width= RelativeLayout.LayoutParams.WRAP_CONTENT;
                     setProfileMyAvatar(false);
                     setProfileContactAvatar(userHandle, fullName, true);
 
@@ -747,7 +769,8 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
         }
         if(answerCallFAB.getVisibility() == View.VISIBLE){
             answerCallFAB.hide();
-            relativeFAB.setVisibility(GONE);
+            relativeCall.setVisibility(GONE);
+
         }
     }
 
@@ -851,9 +874,13 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
         else if(request.getType() == MegaChatRequest.TYPE_ANSWER_CHAT_CALL){
             if(e.getErrorCode()==MegaChatError.ERROR_OK){
                 videoFAB.setVisibility(View.VISIBLE);
+                relativeVideo.setVisibility(View.VISIBLE);
+
                 microFAB.setVisibility(View.VISIBLE);
                 answerCallFAB.setVisibility(GONE);
-                relativeFAB.setVisibility(GONE);
+                relativeCall.setVisibility(GONE);
+                linearArrowVideo.setVisibility(GONE);
+
                 if(request.getFlag()==true){
                     log("Ok answer with video");
 //                    updateLocalVideoStatus();
@@ -924,6 +951,12 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
             int callStatus = callChat.getStatus();
             switch (callStatus){
                 case MegaChatCall.CALL_STATUS_IN_PROGRESS:{
+
+                    videoFAB.setOnClickListener(null);
+                    answerCallFAB.setOnTouchListener(null);
+                    videoFAB.setOnTouchListener(null);
+                    videoFAB.setOnClickListener(this);
+
                     setProfileMyAvatar(true);
                     setProfileContactAvatar(userHandle, fullName, false);
 
@@ -1135,13 +1168,13 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                 megaChatApi.hangChatCall(chatId, this);
                 break;
             }
-//            case R.id.answer_call_fab:{
-//                log("Click on answer fab");
-//                megaChatApi.answerChatCall(chatId, false, this);
-//                answerCallFAB.clearAnimation();
-//
-//                break;
-//            }
+            case R.id.answer_call_fab:{
+                log("Click on answer fab");
+                megaChatApi.answerChatCall(chatId, false, this);
+                videoFAB.clearAnimation();
+
+                break;
+            }
         }
     }
 
@@ -1167,117 +1200,211 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
 
     public void showInitialFABConfiguration(){
         if(callChat.getStatus()==MegaChatCall.CALL_STATUS_RING_IN){
+            relativeCall.setVisibility(View.VISIBLE);
+            linearArrowCall.setVisibility(GONE);
             answerCallFAB.show();
             answerCallFAB.setVisibility(View.VISIBLE);
-            relativeFAB.setVisibility(View.VISIBLE);
-            //answerCallFAB.setOnClickListener(this);
-
             hangFAB.show();
             hangFAB.setVisibility(View.VISIBLE);
 
+            relativeVideo.setVisibility(View.VISIBLE);
+            linearArrowVideo.setVisibility(GONE);
             videoFAB.setVisibility(View.VISIBLE);
             videoFAB.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.accentColor)));
             videoFAB.setImageDrawable(getResources().getDrawable(R.drawable.ic_videocam_white));
 
             microFAB.setVisibility(GONE);
 
-            answerCallFAB.startAnimation(shake);
+            if (callChat.hasRemoteVideo()) {
 
-            RelativeLayout.LayoutParams layoutExtend = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.MATCH_PARENT);
-            layoutExtend.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
-            layoutExtend.addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE);
-            linearFAB.setLayoutParams(layoutExtend);
-            linearFAB.setOrientation(LinearLayout.HORIZONTAL);
+                answerCallFAB.setOnClickListener(this);
+                videoFAB.setOnClickListener(null);
 
-            linearArrow.setVisibility(View.VISIBLE);
-            animationAlphaArrows(fourArrow);
-            Handler handler = new Handler();
-            handler.postDelayed(new Runnable() {
-                public void run() {
-                    animationAlphaArrows(thirdArrow);
-                    Handler handler = new Handler();
-                    handler.postDelayed(new Runnable() {
-                        public void run() {
-                            animationAlphaArrows(secondArrow);
-                            Handler handler = new Handler();
-                            handler.postDelayed(new Runnable() {
-                                public void run() {
-                                    animationAlphaArrows(firstArrow);
-                                }
-                            }, 250);
-                        }
-                    }, 250);
-                }
-            }, 250);
+                linearArrowVideo.setVisibility(View.VISIBLE);
+                videoFAB.startAnimation(shake);
+
+                RelativeLayout.LayoutParams layoutExtend = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.MATCH_PARENT);
+                layoutExtend.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
+                layoutExtend.addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE);
+                linearFAB.setLayoutParams(layoutExtend);
+                linearFAB.setOrientation(LinearLayout.HORIZONTAL);
+
+                animationAlphaArrows(fourArrowVideo);
+                Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    public void run() {
+                        animationAlphaArrows(thirdArrowVideo);
+                        Handler handler = new Handler();
+                        handler.postDelayed(new Runnable() {
+                            public void run() {
+                                animationAlphaArrows(secondArrowVideo);
+                                Handler handler = new Handler();
+                                handler.postDelayed(new Runnable() {
+                                    public void run() {
+                                        animationAlphaArrows(firstArrowVideo);
+                                    }
+                                }, 250);
+                            }
+                        }, 250);
+                    }
+                }, 250);
+                videoFAB.setOnTouchListener(new OnSwipeTouchListener(this) {
+                    public void onSwipeTop() {
+                        log("onSwipeTop");
+                        videoFAB.clearAnimation();
+
+                        TranslateAnimation translateAnim = new TranslateAnimation( 0, 0 , 0, -380 );
+                        translateAnim.setDuration(translationAnimationDuration);
+                        translateAnim.setFillAfter(true);
+                        translateAnim.setFillBefore(true);
+                        translateAnim.setRepeatCount(0);
+
+                        AlphaAnimation alphaAnim = new AlphaAnimation(1.0f, 0.0f);
+                        alphaAnim.setDuration(alphaAnimationDuration);
+                        alphaAnim.setFillAfter(true);
+                        alphaAnim.setFillBefore(true);
+                        alphaAnim.setRepeatCount(0);
+
+                        AnimationSet s = new AnimationSet(false);//false means don't share interpolators
+                        s.addAnimation(translateAnim);
+                        s.addAnimation(alphaAnim);
+
+                        videoFAB.startAnimation(s);
+                        firstArrowVideo.clearAnimation();
+                        secondArrowVideo.clearAnimation();
+                        thirdArrowVideo.clearAnimation();
+                        fourArrowVideo.clearAnimation();
+                        linearArrowVideo.setVisibility(GONE);
+
+                        translateAnim.setAnimationListener(new Animation.AnimationListener(){
+                            @Override
+                            public void onAnimationStart(Animation animation) {
+                            }
+
+                            @Override
+                            public void onAnimationRepeat(Animation animation) {
+                            }
+
+                            @Override
+                            public void onAnimationEnd(Animation animation) {
+
+                                RelativeLayout.LayoutParams layoutCompress = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.MATCH_PARENT);
+                                layoutCompress.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
+                                layoutCompress.addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE);
+                                linearFAB.setLayoutParams(layoutCompress);
+                                linearFAB.setOrientation(LinearLayout.HORIZONTAL);
+
+                                answerVideoCall();
+                            }
+                        });
+                    }
+                    public void onSwipeRight() {}
+                    public void onSwipeLeft() {}
+                    public void onSwipeBottom() {}
+
+                });
 
 
-            answerCallFAB.setOnTouchListener(new OnSwipeTouchListener(this) {
-                public void onSwipeTop() {
-                    log("onSwipeTop");
-                    answerCallFAB.clearAnimation();
+            }else{
 
-                    TranslateAnimation translateAnim = new TranslateAnimation( 0, 0 , 0, -300 );
-                    translateAnim.setDuration(translationAnimationDuration);
-                    translateAnim.setFillAfter(true);
-                    translateAnim.setFillBefore(true);
-                    translateAnim.setRepeatCount(0);
+                answerCallFAB.startAnimation(shake);
 
-                    AlphaAnimation alphaAnim = new AlphaAnimation(1.0f, 0.0f);
-                    alphaAnim.setDuration(translationAnimationDuration);
-                    alphaAnim.setFillAfter(true);
-                    alphaAnim.setFillBefore(true);
-                    alphaAnim.setRepeatCount(0);
+                RelativeLayout.LayoutParams layoutExtend = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.MATCH_PARENT);
+                layoutExtend.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
+                layoutExtend.addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE);
+                linearFAB.setLayoutParams(layoutExtend);
+                linearFAB.setOrientation(LinearLayout.HORIZONTAL);
 
-                    AnimationSet s = new AnimationSet(false);//false means don't share interpolators
-                    s.addAnimation(translateAnim);
-                    s.addAnimation(alphaAnim);
-                    answerCallFAB.startAnimation(s);
-                    firstArrow.clearAnimation();
-                    secondArrow.clearAnimation();
-                    thirdArrow.clearAnimation();
-                    fourArrow.clearAnimation();
-                    linearArrow.setVisibility(GONE);
+                linearArrowCall.setVisibility(View.VISIBLE);
+                animationAlphaArrows(fourArrowCall);
+                Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    public void run() {
+                        animationAlphaArrows(thirdArrowCall);
+                        Handler handler = new Handler();
+                        handler.postDelayed(new Runnable() {
+                            public void run() {
+                                animationAlphaArrows(secondArrowCall);
+                                Handler handler = new Handler();
+                                handler.postDelayed(new Runnable() {
+                                    public void run() {
+                                        animationAlphaArrows(firstArrowCall);
+                                    }
+                                }, 250);
+                            }
+                        }, 250);
+                    }
+                }, 250);
 
-                    translateAnim.setAnimationListener(new Animation.AnimationListener(){
-                        @Override
-                        public void onAnimationStart(Animation animation) {
-                        }
+                answerCallFAB.setOnTouchListener(new OnSwipeTouchListener(this) {
+                    public void onSwipeTop() {
+                        log("onSwipeTop");
+                        answerCallFAB.clearAnimation();
 
-                        @Override
-                        public void onAnimationRepeat(Animation animation) {
-                        }
+                        TranslateAnimation translateAnim = new TranslateAnimation( 0, 0 , 0, -380 );
+                        translateAnim.setDuration(translationAnimationDuration);
+                        translateAnim.setFillAfter(true);
+                        translateAnim.setFillBefore(true);
+                        translateAnim.setRepeatCount(0);
 
-                        @Override
-                        public void onAnimationEnd(Animation animation) {
+                        AlphaAnimation alphaAnim = new AlphaAnimation(1.0f, 0.0f);
+                        alphaAnim.setDuration(alphaAnimationDuration);
+                        alphaAnim.setFillAfter(true);
+                        alphaAnim.setFillBefore(true);
+                        alphaAnim.setRepeatCount(0);
 
-                            RelativeLayout.LayoutParams layoutCompress = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.MATCH_PARENT);
-                            layoutCompress.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
-                            layoutCompress.addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE);
-                            linearFAB.setLayoutParams(layoutCompress);
-                            linearFAB.setOrientation(LinearLayout.HORIZONTAL);
+                        AnimationSet s = new AnimationSet(false);//false means don't share interpolators
+                        s.addAnimation(translateAnim);
+                        s.addAnimation(alphaAnim);
 
-                            answerTheCall();
-                        }
-                    });
-                }
-                public void onSwipeRight() {}
-                public void onSwipeLeft() {}
-                public void onSwipeBottom() {}
+                        answerCallFAB.startAnimation(s);
+                        firstArrowCall.clearAnimation();
+                        secondArrowCall.clearAnimation();
+                        thirdArrowCall.clearAnimation();
+                        fourArrowCall.clearAnimation();
+                        linearArrowCall.setVisibility(GONE);
 
-            });
+                        translateAnim.setAnimationListener(new Animation.AnimationListener(){
+                            @Override
+                            public void onAnimationStart(Animation animation) {
+                            }
 
+                            @Override
+                            public void onAnimationRepeat(Animation animation) {
+                            }
 
+                            @Override
+                            public void onAnimationEnd(Animation animation) {
 
-        }
-        else{
+                                RelativeLayout.LayoutParams layoutCompress = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.MATCH_PARENT);
+                                layoutCompress.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
+                                layoutCompress.addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE);
+                                linearFAB.setLayoutParams(layoutCompress);
+                                linearFAB.setOrientation(LinearLayout.HORIZONTAL);
+
+                                answerAudioCall();
+                            }
+                        });
+                    }
+                    public void onSwipeRight() {}
+                    public void onSwipeLeft() {}
+                    public void onSwipeBottom() {}
+
+                });
+
+            }
+
+        }else{
+            relativeVideo.setVisibility(View.VISIBLE);
             videoFAB.show();
             videoFAB.setVisibility(View.VISIBLE);
 
             microFAB.show();
             microFAB.setVisibility(View.VISIBLE);
 
+            relativeCall.setVisibility(GONE);
             answerCallFAB.setVisibility(GONE);
-            relativeFAB.setVisibility(GONE);
+
             hangFAB.show();
             hangFAB.setVisibility(View.VISIBLE);
         }
@@ -1575,17 +1702,22 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
         }
     }
 
-    public void answerTheCall(){
+    public void answerAudioCall(){
         if (megaChatApi.isSignalActivityRequired()) {
             megaChatApi.signalPresenceActivity();
         }
         megaChatApi.answerChatCall(chatId, false, this);
-
+    }
+    public void answerVideoCall(){
+        if (megaChatApi.isSignalActivityRequired()) {
+            megaChatApi.signalPresenceActivity();
+        }
+        megaChatApi.answerChatCall(chatId, true, this);
     }
 
     public void animationAlphaArrows(final ImageView arrow){
         AlphaAnimation alphaAnimArrows = new AlphaAnimation(1.0f, 0.0f);
-        alphaAnimArrows.setDuration(alphaAnimationDuration);
+        alphaAnimArrows.setDuration(alphaAnimationDurationArrow);
         alphaAnimArrows.setFillAfter(true);
         alphaAnimArrows.setFillBefore(true);
         alphaAnimArrows.setRepeatCount(Animation.INFINITE);
