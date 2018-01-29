@@ -24,7 +24,6 @@ import nz.mega.sdk.MegaRequestListenerInterface;
  */
 public class ThumbnailUtils {
 	public static File thumbDir;
-	private static int THUMBNAIL_SIZE = 120;
 	public static ThumbnailCache thumbnailCache = new ThumbnailCache();
 	public static ThumbnailCache thumbnailCachePath = new ThumbnailCache(1);
 //	public static ArrayList<Long> pendingThumbnails = new ArrayList<Long>();

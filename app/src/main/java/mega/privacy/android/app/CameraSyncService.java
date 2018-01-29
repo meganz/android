@@ -10,6 +10,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.media.ExifInterface;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.net.wifi.WifiManager;
@@ -151,7 +152,6 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 
 			if(e.getErrorCode()==MegaChatError.ERROR_OK){
 				log("Connected to chat!");
-				MegaApplication.setChatConnection(true);
 			}
 			else{
 				log("EEEERRRRROR WHEN CONNECTING " + e.getErrorString());
@@ -344,35 +344,43 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 								if (megaChatApi == null){
 									megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
 								}
-								int ret = megaChatApi.init(gSession);
-								log("shouldRun: result of init ---> "+ret);
-								chatSettings = dbH.getChatSettings();
-								if (ret == MegaChatApi.INIT_NO_CACHE)
-								{
-									log("shouldRun: condition ret == MegaChatApi.INIT_NO_CACHE");
-									megaApi.invalidateCache();
 
-								}
-								else if (ret == MegaChatApi.INIT_ERROR)
-								{
-									log("shouldRun: condition ret == MegaChatApi.INIT_ERROR");
-									if(chatSettings==null) {
-										log("1 - shouldRun: ERROR----> Switch OFF chat");
-										chatSettings = new ChatSettings(false+"", true + "", "",true + "");
-										dbH.setChatSettings(chatSettings);
+								int ret = megaChatApi.getInitState();
+
+								if(ret==0||ret==MegaChatApi.INIT_ERROR){
+									ret = megaChatApi.init(gSession);
+									log("shouldRun: result of init ---> "+ret);
+									chatSettings = dbH.getChatSettings();
+									if (ret == MegaChatApi.INIT_NO_CACHE)
+									{
+										log("shouldRun: condition ret == MegaChatApi.INIT_NO_CACHE");
+										megaApi.invalidateCache();
+
+									}
+									else if (ret == MegaChatApi.INIT_ERROR)
+									{
+										log("shouldRun: condition ret == MegaChatApi.INIT_ERROR");
+										if(chatSettings==null) {
+											log("1 - shouldRun: ERROR----> Switch OFF chat");
+											chatSettings = new ChatSettings(false+"", true + "", "",true + "");
+											dbH.setChatSettings(chatSettings);
+										}
+										else{
+											log("2 - shouldRun: ERROR----> Switch OFF chat");
+											dbH.setEnabledChat(false + "");
+										}
+										megaChatApi.logout(this);
 									}
 									else{
-										log("2 - shouldRun: ERROR----> Switch OFF chat");
-										dbH.setEnabledChat(false + "");
+										log("shouldRun: Chat correctly initialized");
 									}
-									megaChatApi.logout(this);
-								}
-								else{
-									log("shouldRun: Chat correctly initialized");
 								}
 							}
 
 							megaApi.fastLogin(gSession, this);
+						}
+						else{
+							log("Another login is processing");
 						}
 						return START_NOT_STICKY;
 					}
@@ -2315,13 +2323,6 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 					dbH.setCamSyncTimeStamp(currentTimeStamp);
 				}
 
-				File previewDir = PreviewUtils.getPreviewFolder(this);
-				File preview = new File(previewDir, MegaApiAndroid.handleToBase64(transfer.getNodeHandle())+".jpg");
-				File thumbDir = ThumbnailUtils.getThumbFolder(this);
-				File thumb = new File(thumbDir, MegaApiAndroid.handleToBase64(transfer.getNodeHandle())+".jpg");
-				megaApi.createThumbnail(transfer.getPath(), thumb.getAbsolutePath());
-				megaApi.createPreview(transfer.getPath(), preview.getAbsolutePath());
-
 				if(Util.isVideoFile(transfer.getPath())){
 					log("Is video!!!");
 					ThumbnailUtilsLollipop.createThumbnailVideo(this, transfer.getPath(), megaApi, transfer.getNodeHandle());
@@ -2339,10 +2340,77 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 
 							megaApi.setNodeDuration(node, secondsAprox, null);
 						}
+
+						String location = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_LOCATION);
+						if(location!=null){
+							log("Location: "+location);
+
+							boolean secondTry = false;
+							try{
+								final int mid = location.length() / 2; //get the middle of the String
+								String[] parts = {location.substring(0, mid),location.substring(mid)};
+
+								Double lat = Double.parseDouble(parts[0]);
+								Double lon = Double.parseDouble(parts[1]);
+								log("Lat: "+lat); //first part
+								log("Long: "+lon); //second part
+
+								megaApi.setNodeCoordinates(node, lat, lon, null);
+							}
+							catch (Exception exc){
+								secondTry = true;
+								log("Exception, second try to set GPS coordinates");
+							}
+
+							if(secondTry){
+								try{
+									String latString = location.substring(0,7);
+									String lonString = location.substring(8,17);
+
+									Double lat = Double.parseDouble(latString);
+									Double lon = Double.parseDouble(lonString);
+									log("Lat2: "+lat); //first part
+									log("Long2: "+lon); //second part
+
+									megaApi.setNodeCoordinates(node, lat, lon, null);
+								}
+								catch (Exception ex){
+									log("Exception again, no chance to set coordinates of video");
+								}
+							}
+						}
+						else{
+							log("No location info");
+						}
+					}
+				}
+				else if (MimeTypeList.typeForName(transfer.getPath()).isImage()){
+					log("Is image!!!");
+
+					File previewDir = PreviewUtils.getPreviewFolder(this);
+					File preview = new File(previewDir, MegaApiAndroid.handleToBase64(transfer.getNodeHandle())+".jpg");
+					File thumbDir = ThumbnailUtils.getThumbFolder(this);
+					File thumb = new File(thumbDir, MegaApiAndroid.handleToBase64(transfer.getNodeHandle())+".jpg");
+					megaApi.createThumbnail(transfer.getPath(), thumb.getAbsolutePath());
+					megaApi.createPreview(transfer.getPath(), preview.getAbsolutePath());
+
+					MegaNode node = megaApi.getNodeByHandle(transfer.getNodeHandle());
+					if(node!=null){
+						try {
+							final ExifInterface exifInterface = new ExifInterface(transfer.getPath());
+							float[] latLong = new float[2];
+							if (exifInterface.getLatLong(latLong)) {
+								log("Latitude: "+latLong[0]+" Longitude: " +latLong[1]);
+								megaApi.setNodeCoordinates(node, latLong[0], latLong[1], null);
+							}
+
+						} catch (Exception exception) {
+							log("Couldn't read exif info: " + transfer.getPath());
+						}
 					}
 				}
 				else{
-					log("NOT video!");
+					log("NOT video or image!");
 				}
 
 				if (isExternalSDCard){
@@ -2492,8 +2560,15 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 		}
 
 		if (!isForeground) {
-			log("starting foreground!");
-			startForeground(notificationId, notification);
+			log("starting foreground");
+			try {
+				startForeground(notificationId, notification);
+			}
+			catch(Exception e){
+				log("startforeground exception: " + e.getMessage());
+				retryLaterShortTime();
+				return;
+			}
 			isForeground = true;
 		} else {
 			mNotificationManager.notify(notificationId, notification);

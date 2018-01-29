@@ -114,13 +114,13 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		}
     	RoundedImageView imageView;
     	TextView contactInitialLetter;
-//        ImageView imageView;
         TextView textViewContactName;
         EmojiconTextView textViewContent;
 		TextView textViewDate;
         ImageButton imageButtonThreeDots;
         RelativeLayout itemLayout;
-		ImageView circlePendingMessages;
+		RelativeLayout circlePendingMessages;
+
 		TextView numberPendingMessages;
 		RelativeLayout layoutPendingMessages;
         ImageView muteIcon;
@@ -154,7 +154,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 		log("Get the ChatRoom: "+position);
 		MegaChatListItem chat = (MegaChatListItem) getItem(position);
-		log("ChatRoom handle: "+chat.getChatId());
+		log("ChatRoom handle: "+chat.getChatId() + "title"+chat.getTitle());
 
 		setTitle(position, holder);
 
@@ -372,18 +372,11 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 						return;
 					}
 
-					MegaUser contact = megaApi.getContact(holder.contactMail);
-
-					if(contact!=null){
-						if (context.getExternalCacheDir() != null){
-							megaApi.getUserAvatar(contact, context.getExternalCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);
-						}
-						else{
-							megaApi.getUserAvatar(contact, context.getCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);
-						}
+					if (context.getExternalCacheDir() != null){
+						megaApi.getUserAvatar(holder.contactMail, context.getExternalCacheDir().getAbsolutePath() + "/" + holder.contactMail + ".jpg", listener);
 					}
 					else{
-						log("Contact is NULL");
+						megaApi.getUserAvatar(holder.contactMail, context.getCacheDir().getAbsolutePath() + "/" + holder.contactMail + ".jpg", listener);
 					}
 				}
 				else{
@@ -397,17 +390,11 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 					return;
 				}
 
-				MegaUser contact = megaApi.getContact(holder.contactMail);
-				if(contact!=null){
-					if (context.getExternalCacheDir() != null){
-						megaApi.getUserAvatar(contact, context.getExternalCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);
-					}
-					else{
-						megaApi.getUserAvatar(contact, context.getCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);
-					}
+				if (context.getExternalCacheDir() != null){
+					megaApi.getUserAvatar(holder.contactMail, context.getExternalCacheDir().getAbsolutePath() + "/" + holder.contactMail + ".jpg", listener);
 				}
 				else{
-					log("Contact is NULL");
+					megaApi.getUserAvatar(holder.contactMail, context.getCacheDir().getAbsolutePath() + "/" + holder.contactMail + ".jpg", listener);
 				}
 			}
 		}
@@ -417,17 +404,11 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 				return;
 			}
 
-			MegaUser contact = megaApi.getContact(holder.contactMail);
-			if(contact!=null){
-				if (context.getExternalCacheDir() != null){
-					megaApi.getUserAvatar(contact, context.getExternalCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);
-				}
-				else{
-					megaApi.getUserAvatar(contact, context.getCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);
-				}
+			if (context.getExternalCacheDir() != null){
+				megaApi.getUserAvatar(holder.contactMail, context.getExternalCacheDir().getAbsolutePath() + "/" + holder.contactMail + ".jpg", listener);
 			}
 			else{
-				log("Contact is NULL");
+				megaApi.getUserAvatar(holder.contactMail, context.getCacheDir().getAbsolutePath() + "/" + holder.contactMail + ".jpg", listener);
 			}
 		}
 	}
@@ -477,16 +458,16 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		holder.imageView = (RoundedImageView) v.findViewById(R.id.recent_chat_list_thumbnail);
 		holder.contactInitialLetter = (TextView) v.findViewById(R.id.recent_chat_list_initial_letter);
 		holder.textViewContactName = (TextView) v.findViewById(R.id.recent_chat_list_name);
-		holder.textViewContactName.setMaxWidth(Util.scaleWidthPx(194, outMetrics));
+		holder.textViewContactName.setMaxWidth(Util.scaleWidthPx(185, outMetrics));
 
 		holder.textViewContent = (EmojiconTextView) v.findViewById(R.id.recent_chat_list_content);
-		holder.textViewContent.setMaxWidth(Util.scaleWidthPx(194, outMetrics));
+		holder.textViewContent.setMaxWidth(Util.scaleWidthPx(185, outMetrics));
 
 		holder.textViewDate = (TextView) v.findViewById(R.id.recent_chat_list_date);
 		holder.imageButtonThreeDots = (ImageButton) v.findViewById(R.id.recent_chat_list_three_dots);
 
 		holder.layoutPendingMessages = (RelativeLayout) v.findViewById(R.id.recent_chat_list_unread_layout);
-		holder.circlePendingMessages = (ImageView) v.findViewById(R.id.recent_chat_list_unread_circle);
+		holder.circlePendingMessages = (RelativeLayout) v.findViewById(R.id.recent_chat_list_unread_circle);
 		holder.numberPendingMessages = (TextView) v.findViewById(R.id.recent_chat_list_unread_number);
 
 		holder.contactStateIcon = (ImageView) v.findViewById(R.id.recent_chat_list_contact_state);
@@ -527,27 +508,30 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 			}
 			case 1:{
 				log("drawing circle for one digit");
-				holder.circlePendingMessages.setImageResource(R.drawable.ic_unread_1);
+				holder.circlePendingMessages.setBackground(context.getResources().getDrawable(R.drawable.ic_unread_1));
 				holder.layoutPendingMessages.setVisibility(View.VISIBLE);
+
 				break;
 			}
 			case 2:{
 				log("drawing oval for two digits");
-				holder.circlePendingMessages.setImageResource(R.drawable.ic_unread_2);
+				holder.circlePendingMessages.setBackground(context.getResources().getDrawable(R.drawable.ic_unread_2));
 				holder.layoutPendingMessages.setVisibility(View.VISIBLE);
 
 				break;
 			}
 			case 3:{
 				log("drawing oval for three digits");
-				holder.circlePendingMessages.setImageResource(R.drawable.ic_unread_3);
+				holder.circlePendingMessages.setBackground(context.getResources().getDrawable(R.drawable.ic_unread_3));
 				holder.layoutPendingMessages.setVisibility(View.VISIBLE);
+
 				break;
 			}
 			default:{
 				log("drawing oval for DEFAULT");
-				holder.circlePendingMessages.setImageResource(R.drawable.ic_unread_4);
+				holder.circlePendingMessages.setBackground(context.getResources().getDrawable(R.drawable.ic_unread_4));
 				holder.layoutPendingMessages.setVisibility(View.VISIBLE);
+
 				break;
 			}
 		}
@@ -1138,6 +1122,12 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 			if(messageType==MegaChatMessage.TYPE_INVALID){
 				log("Message Type -> INVALID");
 				holder.textViewContent.setText(context.getString(R.string.no_conversation_history));
+				holder.textViewContent.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
+				holder.textViewDate.setVisibility(View.GONE);
+			}
+			else if(messageType==255){
+				log("Message Type -> LOADING");
+				holder.textViewContent.setText(context.getString(R.string.general_loading));
 				holder.textViewContent.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
 				holder.textViewDate.setVisibility(View.GONE);
 			}
