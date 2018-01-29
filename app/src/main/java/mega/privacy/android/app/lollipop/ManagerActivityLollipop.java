@@ -2029,7 +2029,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 									if (nodeLink.isInShare()){
 										i.putExtra("imageId", R.drawable.ic_folder_incoming);
 									}
-									else if (nodeLink.isOutShare()){
+									else if (nodeLink.isOutShare()||megaApi.isPendingShare(nodeLink)){
 										i.putExtra("imageId", R.drawable.ic_folder_outgoing);
 									}
 									else{
