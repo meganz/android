@@ -1,6 +1,7 @@
 package mega.privacy.android.app.lollipop.adapters;
 
 import android.app.Activity;
+import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
@@ -9,6 +10,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.support.annotation.Nullable;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
@@ -30,22 +32,26 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
+import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MegaMonthPic;
-import mega.privacy.android.app.MegaStreamingService;
+import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.MimeTypeThumbnail;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.components.scrollBar.SectionTitleProvider;
+import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.MegaMonthPicLollipop;
 import mega.privacy.android.app.lollipop.MyAccountInfo;
+import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.lollipop.managerSections.CameraUploadFragmentLollipop;
 import mega.privacy.android.app.utils.Constants;
@@ -58,11 +64,7 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 
-/**
- * Created by mega on 4/08/17.
- */
-
-public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<MegaPhotoSyncGridTitleAdapterLollipop.ViewHolderPhotoTitleSyncGridTitle>{
+public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<MegaPhotoSyncGridTitleAdapterLollipop.ViewHolderPhotoTitleSyncGridTitle> implements SectionTitleProvider {
 
     private class Media {
         public String filePath;
@@ -109,8 +111,14 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
 
     private int count;
     private int countTitles;
+    private ItemInformation dateNode;
+    private String dateNodeText = null;
 
     private List<ItemInformation> itemInformationList;
+
+    DatabaseHandler dbH;
+    MegaPreferences prefs;
+    String downloadLocationDefaultPath = Util.downloadDIR;
 
     public static class ItemInformation{
         public int type = -1;
@@ -339,6 +347,22 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
         log("onBindViewHolder");
 
         log("onCreateViewHolder");
+
+        dbH = DatabaseHandler.getDbHandler(context);
+        prefs = dbH.getPreferences();
+        if (prefs != null){
+            log("prefs != null");
+            if (prefs.getStorageAskAlways() != null){
+                if (!Boolean.parseBoolean(prefs.getStorageAskAlways())){
+                    log("askMe==false");
+                    if (prefs.getStorageDownloadLocation() != null){
+                        if (prefs.getStorageDownloadLocation().compareTo("") != 0){
+                            downloadLocationDefaultPath = prefs.getStorageDownloadLocation();
+                        }
+                    }
+                }
+            }
+        }
 
         Display display = ((Activity) context).getWindowManager().getDefaultDisplay();
         DisplayMetrics outMetrics = new DisplayMetrics();
@@ -958,6 +982,21 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
         return photosyncHandle;
     }
 
+    @Override
+    public String getSectionTitle(int position) {
+        dateNode = getInformationOfPosition(position);
+        if(dateNode != null){
+            if(dateNode.megaMonthPic.monthYearString != null){
+                if(dateNodeText == null){
+                    dateNodeText = dateNode.megaMonthPic.monthYearString;
+                }else if(!dateNodeText.equals(dateNode.megaMonthPic.monthYearString)){
+                    dateNodeText = dateNode.megaMonthPic.monthYearString;
+                }
+            }
+        }
+        return dateNodeText;
+    }
+
     /*
      * Disable selection
      */
@@ -1057,27 +1096,105 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
                     }
                     else if (MimeTypeThumbnail.typeForName(n.getName()).isVideo() || MimeTypeThumbnail.typeForName(n.getName()).isAudio() ){
                         MegaNode file = n;
-                        Intent service = new Intent(context, MegaStreamingService.class);
-                        context.startService(service);
-                        String fileName = file.getName();
-                        try {
-                            fileName = URLEncoder.encode(fileName, "UTF-8").replaceAll("\\+", "%20");
-                        }
-                        catch (UnsupportedEncodingException e) {
-                            e.printStackTrace();
+
+                        if (megaApi.httpServerIsRunning() == 0) {
+                            megaApi.httpServerStart();
                         }
 
-                        String url = "http://127.0.0.1:4443/" + file.getBase64Handle() + "/" + fileName;
-                        String mimeType = MimeTypeThumbnail.typeForName(file.getName()).getType();
-                        System.out.println("FILENAME: " + fileName);
+                        ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
+                        ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+                        activityManager.getMemoryInfo(mi);
 
-                        Intent mediaIntent = new Intent(Intent.ACTION_VIEW);
-                        mediaIntent.setDataAndType(Uri.parse(url), mimeType);
+                        if(mi.totalMem>Constants.BUFFER_COMP){
+                            log("Total mem: "+mi.totalMem+" allocate 32 MB");
+                            megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
+                        }
+                        else{
+                            log("Total mem: "+mi.totalMem+" allocate 16 MB");
+                            megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
+                        }
+
+                        String url = megaApi.httpServerGetLocalLink(file);
+                        String mimeType = MimeTypeList.typeForName(file.getName()).getType();
+                        log("FILENAME: " + file.getName());
+
+                        //Intent mediaIntent = new Intent(Intent.ACTION_VIEW);
+                        Intent mediaIntent = new Intent(context, AudioVideoPlayerLollipop.class);
+                        mediaIntent.putExtra("HANDLE", file.getHandle());
+                        mediaIntent.putExtra("FILENAME", file.getName());
+                        String localPath = Util.getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
+                        if (localPath != null){
+                            File mediaFile = new File(localPath);
+                            //mediaIntent.setDataAndType(Uri.parse(localPath), mimeType);
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                                mediaIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile), MimeTypeList.typeForName(file.getName()).getType());
+                            }
+                            else{
+                                mediaIntent.setDataAndType(Uri.fromFile(mediaFile), MimeTypeList.typeForName(file.getName()).getType());
+                            }
+                            mediaIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                        }
+                        else {
+                            mediaIntent.setDataAndType(Uri.parse(url), mimeType);
+                        }
                         if (MegaApiUtils.isIntentAvailable(context, mediaIntent)){
                             context.startActivity(mediaIntent);
                         }
                         else{
                             Toast.makeText(context, context.getResources().getString(R.string.intent_not_available), Toast.LENGTH_LONG).show();
+                            ArrayList<Long> handleList = new ArrayList<Long>();
+                            handleList.add(n.getHandle());
+                            NodeController nC = new NodeController(context);
+                            nC.prepareForDownload(handleList);
+                        }
+                    }
+                    else if (MimeTypeList.typeForName(n.getName()).isPdf()){
+                        MegaNode file = n;
+
+                        if (megaApi.httpServerIsRunning() == 0) {
+                            megaApi.httpServerStart();
+                        }
+
+                        ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
+                        ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+                        activityManager.getMemoryInfo(mi);
+
+                        if(mi.totalMem>Constants.BUFFER_COMP){
+                            log("Total mem: "+mi.totalMem+" allocate 32 MB");
+                            megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
+                        }
+                        else{
+                            log("Total mem: "+mi.totalMem+" allocate 16 MB");
+                            megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
+                        }
+
+                        String url = megaApi.httpServerGetLocalLink(file);
+                        String mimeType = MimeTypeList.typeForName(file.getName()).getType();
+                        log("FILENAME: " + file.getName() + "TYPE: "+mimeType);
+
+                        Intent pdfIntent = new Intent(context, PdfViewerActivityLollipop.class);
+                        pdfIntent.putExtra("APP", true);
+                        String localPath = Util.getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
+                        if (localPath != null){
+                            File mediaFile = new File(localPath);
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                                pdfIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile), MimeTypeList.typeForName(file.getName()).getType());
+                            }
+                            else{
+                                pdfIntent.setDataAndType(Uri.fromFile(mediaFile), MimeTypeList.typeForName(file.getName()).getType());
+                            }
+                            pdfIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                        }
+                        else {
+                            pdfIntent.setDataAndType(Uri.parse(url), mimeType);
+                        }
+                        pdfIntent.putExtra("HANDLE", file.getHandle());
+                        if (MegaApiUtils.isIntentAvailable(context, pdfIntent)){
+                            context.startActivity(pdfIntent);
+                        }
+                        else{
+                            Toast.makeText(context, context.getResources().getString(R.string.intent_not_available), Toast.LENGTH_LONG).show();
+
                             ArrayList<Long> handleList = new ArrayList<Long>();
                             handleList.add(n.getHandle());
                             NodeController nC = new NodeController(context);

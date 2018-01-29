@@ -41,8 +41,8 @@ import mega.privacy.android.app.components.EmojiconTextView;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.lollipop.listeners.ChatListNonContactNameListener;
 import mega.privacy.android.app.lollipop.listeners.ChatUserAvatarListener;
-import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerFragment;
+import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
 import mega.privacy.android.app.lollipop.megachat.NonContactInfo;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.TimeChatUtils;
@@ -112,7 +112,6 @@ public class MegaChatExplorerAdapter extends RecyclerView.Adapter<MegaChatExplor
 		TextView textViewDate;
         ImageButton imageButtonThreeDots;
         RelativeLayout itemLayout;
-		ImageView circlePendingMessages;
 		TextView numberPendingMessages;
 		RelativeLayout layoutPendingMessages;
         ImageView muteIcon;
@@ -450,7 +449,6 @@ public class MegaChatExplorerAdapter extends RecyclerView.Adapter<MegaChatExplor
 		holder.imageButtonThreeDots.setVisibility(View.GONE);
 
 		holder.layoutPendingMessages = (RelativeLayout) v.findViewById(R.id.recent_chat_list_unread_layout);
-		holder.circlePendingMessages = (ImageView) v.findViewById(R.id.recent_chat_list_unread_circle);
 		holder.numberPendingMessages = (TextView) v.findViewById(R.id.recent_chat_list_unread_number);
 		holder.layoutPendingMessages.setVisibility(View.GONE);
 
@@ -870,6 +868,12 @@ public class MegaChatExplorerAdapter extends RecyclerView.Adapter<MegaChatExplor
 			if(messageType==MegaChatMessage.TYPE_INVALID){
 				log("Message Type -> INVALID");
 				holder.textViewContent.setText(context.getString(R.string.no_conversation_history));
+				holder.textViewContent.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
+				holder.textViewDate.setVisibility(View.GONE);
+			}
+			else if(messageType==255){
+				log("Message Type -> LOADING");
+				holder.textViewContent.setText(context.getString(R.string.general_loading));
 				holder.textViewContent.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
 				holder.textViewDate.setVisibility(View.GONE);
 			}

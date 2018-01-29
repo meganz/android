@@ -16,17 +16,6 @@ extern jmethodID getBytes;
 extern int sdkVersion;
 #endif
 
-#ifndef KARERE_DISABLE_WEBRTC
-    namespace webrtc
-    {
-        class JVM
-        {
-            public:
-                static void Initialize(JavaVM* jvm, jobject context);
-        };
-    };
-#endif
-
 %}
 %import "megaapi.h"
 
@@ -87,6 +76,10 @@ extern int sdkVersion;
     Swig::LocalRefGuard $1_refguard(jenv, $input);
 %}
 
+%apply (char *STRING, size_t LENGTH) {(char *buffer, size_t size)};
+%typemap(directorargout) (char *buffer, size_t size)
+%{ jenv->DeleteLocalRef($input); %}
+
 //Make the "delete" method protected
 %typemap(javadestruct, methodname="delete", methodmodifiers="protected synchronized") SWIGTYPE 
 {   
@@ -100,27 +93,6 @@ extern int sdkVersion;
 }
 
 %javamethodmodifiers copy ""
-
-%typemap(check) mega::MegaApi *megaApi
-%{
-
-#ifndef KARERE_DISABLE_WEBRTC
-    if (!MEGAjvm)
-    { 
-        jenv->GetJavaVM(&MEGAjvm);
-    }
-    
-    MEGAjvm->AttachCurrentThread(&jenv, NULL);
-    jclass appGlobalsClass = jenv->FindClass("android/app/AppGlobals");
-    jmethodID getInitialApplicationMID = jenv->GetStaticMethodID(appGlobalsClass,"getInitialApplication","()Landroid/app/Application;");
-    jobject context = jenv->CallStaticObjectMethod(appGlobalsClass, getInitialApplicationMID);
-
-    // Initialize the Java environment (currently only used by the audio manager).
-    webrtc::JVM::Initialize(MEGAjvm, context);
-    //MEGAjvm->DetachCurrentThread();
-#endif
-
-%}
 
 #endif
 

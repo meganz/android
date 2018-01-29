@@ -129,7 +129,9 @@
         android:layout_marginBottom="7dp"
         android:layout_marginLeft="12dp"
         android:textColor="@color/file_list_second_row"
-        android:textSize="12sp" />
+        android:textSize="12sp"
+        android:ellipsize="end"
+        android:maxLines="1"/>
 
 </RelativeLayout><!--
     <RelativeLayout

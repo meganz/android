@@ -85,7 +85,7 @@ public class MegaContactRequestLollipopAdapter extends RecyclerView.Adapter<Mega
 //        ImageView imageView;
         TextView textViewContactName;
         TextView textViewContent;
-        ImageButton imageButtonThreeDots;
+        RelativeLayout threeDotsLayout;
         RelativeLayout itemLayout;
 //        ImageView arrowSelection;
         String contactMail;
@@ -177,8 +177,8 @@ public class MegaContactRequestLollipopAdapter extends RecyclerView.Adapter<Mega
 			}
 		}		
 		holder.itemLayout.setOnLongClickListener(this);
-		holder.imageButtonThreeDots.setTag(holder);
-		holder.imageButtonThreeDots.setOnClickListener(this);		
+		holder.threeDotsLayout.setTag(holder);
+		holder.threeDotsLayout.setOnClickListener(this);
 	}
 
 	@Override
@@ -192,63 +192,29 @@ public class MegaContactRequestLollipopAdapter extends RecyclerView.Adapter<Mega
 	    float scaleW = Util.getScaleW(outMetrics, density);
 	    float scaleH = Util.getScaleH(outMetrics, density); 		
 	
-		if(type==Constants.OUTGOING_REQUEST_ADAPTER)
-		{
-			log("ManagerActivityLollipop.OUTGOING_REQUEST_ADAPTER");
-			View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_contact_outg_request_list, parent, false);	
-			holder = new ViewHolderContactsRequestList(v);
-			holder.itemLayout = (RelativeLayout) v.findViewById(R.id.contact_request_list_item_layout);
-			holder.imageView = (RoundedImageView) v.findViewById(R.id.contact_request_list_thumbnail);	
-			holder.contactInitialLetter = (TextView) v.findViewById(R.id.contact_request_list_initial_letter);
-			holder.textViewContactName = (TextView) v.findViewById(R.id.contact_request_list_name);
-			if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-				log("Landscape");
-				holder.textViewContactName.setMaxWidth(Util.scaleWidthPx(280, outMetrics));
-			}else{
-				log("Portrait");
-				holder.textViewContactName.setMaxWidth(Util.scaleWidthPx(250, outMetrics));
-			}
-			holder.textViewContent = (TextView) v.findViewById(R.id.contact_request_list_content);
-			holder.imageButtonThreeDots = (ImageButton) v.findViewById(R.id.contact_request_list_three_dots);
-			//Right margin
-			RelativeLayout.LayoutParams actionButtonParams = (RelativeLayout.LayoutParams)holder.imageButtonThreeDots.getLayoutParams();
-			actionButtonParams.setMargins(0, 0, Util.scaleWidthPx(10, outMetrics), 0); 
-			holder.imageButtonThreeDots.setLayoutParams(actionButtonParams);
 
-			holder.itemLayout.setOnClickListener(this);
+		log("ManagerActivityLollipop.OUTGOING_REQUEST_ADAPTER");
+		View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_contact_incom_request_list, parent, false);
+		holder = new ViewHolderContactsRequestList(v);
+		holder.itemLayout = (RelativeLayout) v.findViewById(R.id.contact_request_list_item_layout);
+		holder.imageView = (RoundedImageView) v.findViewById(R.id.contact_request_list_thumbnail);
+		holder.contactInitialLetter = (TextView) v.findViewById(R.id.contact_request_list_initial_letter);
+		holder.textViewContactName = (TextView) v.findViewById(R.id.contact_request_list_name);
+		if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+			log("Landscape");
+			holder.textViewContactName.setMaxWidth(Util.scaleWidthPx(280, outMetrics));
+		}else{
+			log("Portrait");
+			holder.textViewContactName.setMaxWidth(Util.scaleWidthPx(250, outMetrics));
+		}
+		holder.textViewContent = (TextView) v.findViewById(R.id.contact_request_list_content);
+		holder.threeDotsLayout = (RelativeLayout) v.findViewById(R.id.contact_request_three_dots_layout);
+
+		holder.itemLayout.setOnClickListener(this);
 
 //			holder.optionsLayout = (LinearLayout) v.findViewById(R.id.contact_request_list_options);
-			v.setTag(holder);	
-		}
-		else{
-			//Incoming request
-			log("ManagerActivityLollipop.INCOMING_REQUEST_ADAPTER");
-			View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_contact_incom_request_list, parent, false);
-			holder = new ViewHolderContactsRequestList(v);
-			holder.itemLayout = (RelativeLayout) v.findViewById(R.id.contact_request_list_item_layout);
-			holder.imageView = (RoundedImageView) v.findViewById(R.id.contact_request_list_thumbnail);	
-			holder.contactInitialLetter = (TextView) v.findViewById(R.id.contact_request_list_initial_letter);
-			holder.textViewContactName = (TextView) v.findViewById(R.id.contact_request_list_name);
-			if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-				log("Landscape");
-				holder.textViewContactName.setMaxWidth(Util.scaleWidthPx(280, outMetrics));
-			}else{
-				log("Portrait");
-				holder.textViewContactName.setMaxWidth(Util.scaleWidthPx(250, outMetrics));
-			}
-			holder.textViewContent = (TextView) v.findViewById(R.id.contact_request_list_content);
-			holder.imageButtonThreeDots = (ImageButton) v.findViewById(R.id.contact_request_list_three_dots);
-			//Right margin
-			RelativeLayout.LayoutParams actionButtonParams = (RelativeLayout.LayoutParams)holder.imageButtonThreeDots.getLayoutParams();
-			actionButtonParams.setMargins(0, 0, Util.scaleWidthPx(10, outMetrics), 0); 
-			holder.imageButtonThreeDots.setLayoutParams(actionButtonParams);
+		v.setTag(holder);
 
-			holder.itemLayout.setOnClickListener(this);
-
-//			holder.optionsLayout = (LinearLayout) v.findViewById(R.id.contact_request_list_options);
-			
-			v.setTag(holder);		
-		}
 		return holder;
 	}
 	
@@ -532,7 +498,7 @@ public class MegaContactRequestLollipopAdapter extends RecyclerView.Adapter<Mega
 		MegaContactRequest c = (MegaContactRequest) getItem(currentPosition);
 		
 		switch (v.getId()){	
-			case R.id.contact_request_list_three_dots:{
+			case R.id.contact_request_three_dots_layout:{
 				if(multipleSelect){
 					if(type==Constants.OUTGOING_REQUEST_ADAPTER)
 					{

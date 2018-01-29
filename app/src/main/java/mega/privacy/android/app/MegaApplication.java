@@ -5,50 +5,31 @@ package mega.privacy.android.app;
 //import com.google.android.gms.analytics.Tracker;
 
 import android.app.Application;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.Context;
-import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.Rect;
-import android.graphics.Typeface;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
-import android.media.Ringtone;
-import android.media.RingtoneManager;
-import android.net.Uri;
-import android.os.Build;
 import android.os.Handler;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.content.ContextCompat;
-import android.text.Html;
-import android.text.Spanned;
 import android.util.Log;
+
+import org.webrtc.AndroidVideoTrackSourceObserver;
+import org.webrtc.Camera1Enumerator;
+import org.webrtc.Camera2Enumerator;
+import org.webrtc.CameraEnumerator;
+import org.webrtc.ContextUtils;
+import org.webrtc.SurfaceTextureHelper;
+import org.webrtc.VideoCapturer;
 
 import java.util.ArrayList;
 import java.util.Locale;
 
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
-import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
-import mega.privacy.android.app.lollipop.megachat.ChatSettings;
-import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatError;
-import nz.mega.sdk.MegaChatListItem;
-import nz.mega.sdk.MegaChatListenerInterface;
-import nz.mega.sdk.MegaChatMessage;
-import nz.mega.sdk.MegaChatPresenceConfig;
 import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaContactRequest;
@@ -57,14 +38,13 @@ import nz.mega.sdk.MegaListenerInterface;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
-import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaUser;
 
 
 public class MegaApplication extends Application implements MegaListenerInterface, MegaChatRequestListenerInterface {
 	final String TAG = "MegaApplication";
-	static final String USER_AGENT = "MEGAAndroid/3.2.6.1_164";
+	static final String USER_AGENT = "MEGAAndroid/3.3_179";
 
 	DatabaseHandler dbH;
 	MegaApiAndroid megaApi;
@@ -181,17 +161,14 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 
 				if (activityVisible) {
 					log("SEND KEEPALIVE");
-					if (chatConnection) {
-						if (megaChatApi != null) {
-							megaChatApi.setBackgroundStatus(false);
-						}
+					if (megaChatApi != null) {
+						megaChatApi.setBackgroundStatus(false);
 					}
+
 				} else {
 					log("SEND KEEPALIVEAWAY");
-					if (chatConnection) {
-						if (megaChatApi != null) {
-							megaChatApi.setBackgroundStatus(true);
-						}
+					if (megaChatApi != null) {
+						megaChatApi.setBackgroundStatus(true);
 					}
 				}
 
@@ -301,6 +278,77 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 //		new MegaTest(getMegaApi()).start();
 	}	
 	
+
+	static private VideoCapturer createCameraCapturer(CameraEnumerator enumerator) {
+		final String[] deviceNames = enumerator.getDeviceNames();
+
+		// First, try to find front facing camera
+		for (String deviceName : deviceNames) {
+			if (enumerator.isFrontFacing(deviceName)) {
+				VideoCapturer videoCapturer = enumerator.createCapturer(deviceName, null);
+
+				if (videoCapturer != null) {
+					return videoCapturer;
+				}
+			}
+		}
+
+		// Front facing camera not found, try something else
+		for (String deviceName : deviceNames) {
+			if (!enumerator.isFrontFacing(deviceName)) {
+				VideoCapturer videoCapturer = enumerator.createCapturer(deviceName, null);
+
+				if (videoCapturer != null) {
+					return videoCapturer;
+				}
+			}
+		}
+
+		return null;
+	}
+
+	static VideoCapturer videoCapturer = null;
+
+	static public void stopVideoCapture() {
+		if (videoCapturer != null) {
+			try {
+				videoCapturer.stopCapture();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			videoCapturer = null;
+		}
+	}
+
+	static public void startVideoCapture(long nativeAndroidVideoTrackSource, SurfaceTextureHelper surfaceTextureHelper) {
+		// Settings
+		boolean useCamera2 = false;
+		boolean captureToTexture = true;
+		int videoWidth = 480;
+		int videoHeight = 320;
+		int videoFps = 15;
+
+		stopVideoCapture();
+		Context context = ContextUtils.getApplicationContext();
+		if (Camera2Enumerator.isSupported(context) && useCamera2) {
+			videoCapturer = createCameraCapturer(new Camera2Enumerator(context));
+		} else {
+			videoCapturer = createCameraCapturer(new Camera1Enumerator(captureToTexture));
+		}
+
+		if (videoCapturer == null) {
+			log("Unable to create video capturer");
+			return;
+		}
+
+		// Link the capturer with the surfaceTextureHelper and the native video source
+		VideoCapturer.CapturerObserver capturerObserver = new AndroidVideoTrackSourceObserver(nativeAndroidVideoTrackSource);
+		videoCapturer.initialize(surfaceTextureHelper, context, capturerObserver);
+
+		// Start the capture!
+		videoCapturer.startCapture(videoWidth, videoHeight, videoFps);
+	}
+
 //	private void initializeGA(){
 //		// Set the log level to verbose.
 //		GoogleAnalytics.getInstance(this).getLogger().setLogLevel(LogLevel.VERBOSE);
@@ -434,14 +482,6 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 		return firstConnect;
 	}
 
-	public static void setChatConnection(boolean chatConnection){
-		MegaApplication.chatConnection = chatConnection;
-	}
-
-	public static boolean isChatConnection(){
-		return chatConnection;
-	}
-
 	public static void activityResumed() {
 		log("activityResumed()");
 		activityVisible = true;
@@ -455,7 +495,6 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 	private static boolean activityVisible = false;
 	private static boolean isLoggingIn = false;
 	private static boolean firstConnect = true;
-	private static boolean chatConnection = false;
 
 	private static long openChatId = -1;
 
@@ -547,96 +586,7 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 
 	@Override
 	public void onNodesUpdate(MegaApiJava api, ArrayList<MegaNode> updatedNodes) {
-		if (megaApi == null){
-			megaApi = getMegaApi();
-		}
-
-		if (updatedNodes != null) {
-			log("updatedNodes: " + updatedNodes.size());
-
-			for (int i = 0; i < updatedNodes.size(); i++) {
-				MegaNode n = updatedNodes.get(i);
-				if (n.isInShare() && n.hasChanged(MegaNode.CHANGE_TYPE_INSHARE)){
-					log("updatedNodes name: " + n.getName() + " isInshared: " + n.isInShare() + " getchanges: " + n.getChanges() + " haschanged(TYPE_INSHARE): " + n.hasChanged(MegaNode.CHANGE_TYPE_INSHARE));
-
-					try {
-						ArrayList<MegaShare> sharesIncoming = megaApi.getInSharesList();
-						String name = "";
-						for(int j=0; j<sharesIncoming.size();j++) {
-							MegaShare mS = sharesIncoming.get(j);
-							if (mS.getNodeHandle() == n.getHandle()) {
-								MegaUser user = megaApi.getContact(mS.getUser());
-								if (user != null) {
-									MegaContactDB contactDB = dbH.findContactByHandle(String.valueOf(user.getHandle()));
-
-									if (contactDB != null) {
-										if (!contactDB.getName().equals("")) {
-											name = contactDB.getName() + " " + contactDB.getLastName();
-
-										} else {
-											name = user.getEmail();
-
-										}
-									} else {
-										log("The contactDB is null: ");
-										name = user.getEmail();
-
-									}
-								} else {
-									name = user.getEmail();
-								}
-							}
-						}
-
-						String source = "<b>"+n.getName()+"</b> "+getString(R.string.incoming_folder_notification)+" "+name;
-						Spanned notificationContent;
-						if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-							notificationContent = Html.fromHtml(source,Html.FROM_HTML_MODE_LEGACY);
-						} else {
-							notificationContent = Html.fromHtml(source);
-						}
-
-						int notificationId = Constants.NOTIFICATION_PUSH_CLOUD_DRIVE;
-
-						Intent intent = new Intent(this, ManagerActivityLollipop.class);
-						intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-						intent.setAction(Constants.ACTION_INCOMING_SHARED_FOLDER_NOTIFICATION);
-						PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
-								PendingIntent.FLAG_ONE_SHOT);
-
-						Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-						NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
-								.setSmallIcon(R.drawable.ic_stat_notify_download)
-								.setContentTitle(getString(R.string.title_incoming_folder_notification))
-								.setContentText(notificationContent)
-								.setStyle(new NotificationCompat.BigTextStyle()
-										.bigText(notificationContent))
-								.setAutoCancel(true)
-								.setSound(defaultSoundUri)
-								.setColor(ContextCompat.getColor(this,R.color.mega))
-								.setContentIntent(pendingIntent);
-
-						Drawable d;
-
-						if(android.os.Build.VERSION.SDK_INT >=  Build.VERSION_CODES.LOLLIPOP){
-							d = getResources().getDrawable(R.drawable.ic_folder_incoming, getTheme());
-						} else {
-							d = getResources().getDrawable(R.drawable.ic_folder_incoming);
-						}
-
-						notificationBuilder.setLargeIcon(((BitmapDrawable)d).getBitmap());
-
-						NotificationManager notificationManager =
-								(NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-
-						notificationManager.notify(notificationId, notificationBuilder.build());
-					}
-					catch(Exception e){
-						log("Exception: "+e.toString());
-					}
-				}
-			}
-		}
+		log("onNodesUpdate");
 	}
 
 	@Override
@@ -681,122 +631,6 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 	public void onContactRequestsUpdate(MegaApiJava api, ArrayList<MegaContactRequest> requests) {
 		log("onContactRequestUpdate");
 
-		try {
-			if (requests == null) {
-				log("Return REQUESTS are NULL");
-				return;
-			}
-			MegaContactRequest crToShow = null;
-			boolean showNotification = false;
-			for (int i = 0; i < requests.size(); i++) {
-				MegaContactRequest cr = requests.get(i);
-				if (cr != null) {
-					if ((cr.getStatus() == MegaContactRequest.STATUS_UNRESOLVED) && (!cr.isOutgoing())) {
-						showNotification = true;
-						crToShow = cr;
-						log("onContactRequestUpdate: " + cr.getSourceEmail() + " cr.isOutgoing: " + cr.isOutgoing() + " cr.getStatus: " + cr.getStatus());
-					}
-				}
-			}
-
-			if (showNotification) {
-
-				String notificationContent;
-				if(crToShow!=null){
-					notificationContent = crToShow.getSourceEmail();
-				}
-				else{
-					log("Return because the request is NULL");
-					return;
-				}
-
-				int notificationId = Constants.NOTIFICATION_PUSH_CONTACT;
-
-				Intent intent = new Intent(this, ManagerActivityLollipop.class);
-				intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-				intent.setAction(Constants.ACTION_IPC);
-				PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
-						PendingIntent.FLAG_ONE_SHOT);
-
-				Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-				NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
-						.setSmallIcon(R.drawable.ic_stat_notify_download)
-						.setContentTitle(getString(R.string.title_contact_request_notification))
-						.setContentText(notificationContent)
-						.setStyle(new NotificationCompat.BigTextStyle()
-								.bigText(notificationContent))
-						.setAutoCancel(true)
-						.setSound(defaultSoundUri)
-						.setColor(ContextCompat.getColor(this,R.color.mega))
-						.setContentIntent(pendingIntent);
-
-				if(crToShow!=null){
-
-					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
-						Bitmap largeIcon = createDefaultAvatar(crToShow.getSourceEmail());
-						if(largeIcon!=null){
-							notificationBuilder.setLargeIcon(largeIcon);
-						}
-					}
-				}
-
-				NotificationManager notificationManager =
-						(NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-
-				notificationManager.notify(notificationId, notificationBuilder.build());
-			}
-		}
-		catch(Exception e){
-			log("Exception when showing IPC request: "+e.getMessage());
-		}
-	}
-	public Bitmap createDefaultAvatar(String email){
-		log("createDefaultAvatar()");
-
-		Bitmap defaultAvatar = Bitmap.createBitmap(Constants.DEFAULT_AVATAR_WIDTH_HEIGHT,Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
-		Canvas c = new Canvas(defaultAvatar);
-		Paint paintText = new Paint();
-		Paint paintCircle = new Paint();
-
-		paintCircle.setColor(ContextCompat.getColor(this, R.color.lollipop_primary_color));
-		paintText.setColor(Color.WHITE);
-		paintText.setTextSize(150);
-		paintCircle.setAntiAlias(true);
-		paintText.setAntiAlias(true);
-		paintText.setTextAlign(Paint.Align.CENTER);
-		Typeface face = Typeface.SANS_SERIF;
-		paintText.setTypeface(face);
-		paintText.setAntiAlias(true);
-		paintText.setSubpixelText(true);
-		paintText.setStyle(Paint.Style.FILL);
-
-		int radius;
-		if (defaultAvatar.getWidth() < defaultAvatar.getHeight())
-			radius = defaultAvatar.getWidth()/2;
-		else
-			radius = defaultAvatar.getHeight()/2;
-
-		c.drawCircle(defaultAvatar.getWidth()/2, defaultAvatar.getHeight()/2, radius, paintCircle);
-
-		if(email!=null){
-			if(!email.isEmpty()){
-				char title = email.charAt(0);
-				String firstLetter = new String(title+"");
-
-				if(!firstLetter.equals("(")){
-
-					log("Draw letter: "+firstLetter);
-					Rect bounds = new Rect();
-
-					paintText.getTextBounds(firstLetter,0,firstLetter.length(),bounds);
-					int xPos = (c.getWidth()/2);
-					int yPos = (int)((c.getHeight()/2)-((paintText.descent()+paintText.ascent()/2))+20);
-					c.drawText(firstLetter.toUpperCase(Locale.getDefault()), xPos, yPos, paintText);
-				}
-
-			}
-		}
-		return defaultAvatar;
 	}
 
 	public void sendSignalPresenceActivity(){

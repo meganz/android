@@ -8,11 +8,12 @@ import android.support.v4.app.FragmentPagerAdapter;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.CloudDriveExplorerFragmentLollipop;
 import mega.privacy.android.app.lollipop.IncomingSharesExplorerFragmentLollipop;
+import mega.privacy.android.app.lollipop.megachat.ChatExplorerFragment;
 import mega.privacy.android.app.utils.Util;
 
 public class FileExplorerPagerAdapter extends FragmentPagerAdapter {
 
-    final int PAGE_COUNT = 2;
+    final int PAGE_COUNT = 3;
     private Context context;
 
     public FileExplorerPagerAdapter(FragmentManager fm, Context context) {
@@ -30,6 +31,9 @@ public class FileExplorerPagerAdapter extends FragmentPagerAdapter {
             case 1:{
                 return IncomingSharesExplorerFragmentLollipop.newInstance();
             }
+            case 2:{
+                return ChatExplorerFragment.newInstance();
+            }
         }
         return null;
     }
@@ -44,13 +48,21 @@ public class FileExplorerPagerAdapter extends FragmentPagerAdapter {
             case 1:{
                 return context.getString(R.string.tab_incoming_shares);
             }
+            case 2:{
+                return context.getString(R.string.section_chat);
+            }
         }
         return null;
     }
 
     @Override
     public int getCount() {
-        return PAGE_COUNT;
+        if(Util.isChatEnabled()){
+            return PAGE_COUNT;
+        }
+        else{
+            return PAGE_COUNT-1;
+        }
     }
 
     private static void log(String log) {

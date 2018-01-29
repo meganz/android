@@ -1,13 +1,16 @@
 package mega.privacy.android.app.lollipop.managerSections;
 
 import android.app.Activity;
+import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
@@ -28,7 +31,9 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -37,17 +42,21 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
 
+import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MegaStreamingService;
+import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.CustomizedGridLayoutManager;
 import mega.privacy.android.app.components.CustomizedGridRecyclerView;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
+import mega.privacy.android.app.components.scrollBar.FastScroller;
+import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop.DrawerItem;
 import mega.privacy.android.app.lollipop.MyAccountInfo;
+import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaBrowserLollipopAdapter;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.utils.Constants;
@@ -68,6 +77,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 	RecyclerView recyclerView;
 	LinearLayoutManager mLayoutManager;
 	CustomizedGridLayoutManager gridLayoutManager;
+	FastScroller fastScroller;
 
 	ImageView emptyImageView;
 	LinearLayout emptyLinearLayout;
@@ -92,6 +102,10 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 	ArrayList<MegaNode> nodes;
 
 	public ActionMode actionMode;
+
+	DatabaseHandler dbH;
+	MegaPreferences prefs;
+	String downloadLocationDefaultPath = Util.downloadDIR;
 
 	public void activateActionMode(){
 		log("activateActionMode");
@@ -134,6 +148,8 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 					if (documents.size()==1){
 						((ManagerActivityLollipop) context).showRenameDialog(documents.get(0), documents.get(0).getName());
 					}
+					clearSelections();
+					hideMultipleSelect();
 					break;
 				}
 				case R.id.cab_menu_copy:{
@@ -144,6 +160,8 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 
 					NodeController nC = new NodeController(context);
 					nC.chooseLocationToCopyNodes(handleList);
+					clearSelections();
+					hideMultipleSelect();
 					break;
 				}	
 				case R.id.cab_menu_share:{
@@ -157,6 +175,8 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 
 					NodeController nC = new NodeController(context);
 					nC.selectContactToShareFolders(handleList);
+					clearSelections();
+					hideMultipleSelect();
 					break;
 				}
 				case R.id.cab_menu_move:{
@@ -167,6 +187,8 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 
 					NodeController nC = new NodeController(context);
 					nC.chooseLocationToMoveNodes(handleList);
+					clearSelections();
+					hideMultipleSelect();
 					break;
 				}
 				case R.id.cab_menu_share_link:{
@@ -266,8 +288,6 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 				showShare = true;
 				showCopy = true;
 
-
-
 				for(int i=0; i<selected.size();i++)	{
 					if(megaApi.checkMove(selected.get(i), megaApi.getRubbishNode()).getErrorCode() != MegaError.API_OK)	{
 						showTrash = false;
@@ -283,7 +303,11 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 					showLink=false;
 					showRemoveLink=false;
 					showEditLink=false;
-					showRename=false;
+					if(selected.size()==1){
+						showRename=true;
+					}else{
+						showRename=false;
+					}
 				}
 				else if(selected.size()==1){
 					//showLink=true;
@@ -365,6 +389,22 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
 		}
 
+		dbH = DatabaseHandler.getDbHandler(context);
+		prefs = dbH.getPreferences();
+		if (prefs != null){
+			log("prefs != null");
+			if (prefs.getStorageAskAlways() != null){
+				if (!Boolean.parseBoolean(prefs.getStorageAskAlways())){
+					log("askMe==false");
+					if (prefs.getStorageDownloadLocation() != null){
+						if (prefs.getStorageDownloadLocation().compareTo("") != 0){
+							downloadLocationDefaultPath = prefs.getStorageDownloadLocation();
+						}
+					}
+				}
+			}
+		}
+
 		lastPositionStack = new Stack<>();
 		nodes = new ArrayList<MegaNode>();
 		super.onCreate(savedInstanceState);
@@ -399,6 +439,8 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 			View v = inflater.inflate(R.layout.fragment_filebrowserlist, container, false);
 			
 			recyclerView = (RecyclerView) v.findViewById(R.id.file_list_view_browser);
+			fastScroller = (FastScroller) v.findViewById(R.id.fastscroll);
+
 			recyclerView.setPadding(0, 0, 0, Util.scaleHeightPx(85, outMetrics));
 			recyclerView.setClipToPadding(false);
 			recyclerView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
@@ -443,10 +485,13 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 			((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 			adapter.setMultipleSelect(false);
 			
-			recyclerView.setAdapter(adapter);		
-			
+			recyclerView.setAdapter(adapter);
+			fastScroller.setRecyclerView(recyclerView);
+
 			if (adapter != null){
 				adapter.setNodes(nodes);
+				visibilityFastScroller();
+
 				if (adapter.getItemCount() == 0){
 					recyclerView.setVisibility(View.GONE);
 					contentTextLayout.setVisibility(View.GONE);
@@ -478,7 +523,13 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 				}			
 			}
 
-			contentText.setText(MegaApiUtils.getInfoNodeOnlyFolders(nodes, context));
+			if (((ManagerActivityLollipop) context).deepBrowserTreeOutgoing == 0){
+				contentText.setText(MegaApiUtils.getInfoNodeOnlyFolders(nodes, context));
+			}else{
+				MegaNode infoNode = megaApi.getNodeByHandle(((ManagerActivityLollipop)context).parentHandleOutgoing);
+				contentText.setText(MegaApiUtils.getInfoFolder(infoNode, context));
+				aB.setTitle(infoNode.getName());
+			}
 
 			return v;
 		}
@@ -488,6 +539,8 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 			View v = inflater.inflate(R.layout.fragment_filebrowsergrid, container, false);
 			
 			recyclerView = (CustomizedGridRecyclerView) v.findViewById(R.id.file_grid_view_browser);
+			fastScroller = (FastScroller) v.findViewById(R.id.fastscroll);
+
 			recyclerView.setPadding(0, 0, 0, Util.scaleHeightPx(80, outMetrics));
 			recyclerView.setClipToPadding(false);
 			recyclerView.setHasFixedSize(true);
@@ -518,21 +571,22 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 				MegaNode parentNode = megaApi.getNodeByHandle(((ManagerActivityLollipop)context).parentHandleOutgoing);
 				log("ParentHandle: "+((ManagerActivityLollipop)context).parentHandleOutgoing);
 				nodes = megaApi.getChildren(parentNode, ((ManagerActivityLollipop)context).orderOthers);
+				adapter.setNodes(nodes);
 			}
+
 			((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 			if (((ManagerActivityLollipop) context).deepBrowserTreeOutgoing == 0){
 				contentText.setText(MegaApiUtils.getInfoNodeOnlyFolders(nodes, context));
-			}
-			else{
+			}else{
 				MegaNode infoNode = megaApi.getNodeByHandle(((ManagerActivityLollipop)context).parentHandleOutgoing);
 				contentText.setText(MegaApiUtils.getInfoFolder(infoNode, context));
-
 				aB.setTitle(infoNode.getName());
 			}
 			adapter.setMultipleSelect(false);
 			
-			recyclerView.setAdapter(adapter);		
-
+			recyclerView.setAdapter(adapter);
+			fastScroller.setRecyclerView(recyclerView);
+			visibilityFastScroller();
 			if (adapter.getItemCount() == 0){
 				recyclerView.setVisibility(View.GONE);
 				contentTextLayout.setVisibility(View.GONE);
@@ -582,6 +636,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
             if(adapter != null){
                 log("adapter != null");
                 adapter.setNodes(nodes);
+				visibilityFastScroller();
 
                 if (adapter.getItemCount() == 0){
                     log("adapter.getItemCount() = 0");
@@ -618,7 +673,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
                     emptyLinearLayout.setVisibility(View.GONE);
                 }
                 contentText.setText(MegaApiUtils.getInfoNodeOnlyFolders(nodes, context));
-            }
+			}
         }
         else{
             MegaNode n = megaApi.getNodeByHandle(((ManagerActivityLollipop)context).parentHandleOutgoing);
@@ -631,8 +686,9 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 
             contentText.setText(MegaApiUtils.getInfoFolder(n, context));
 
-            nodes = megaApi.getChildren(n, ((ManagerActivityLollipop)context).orderOthers);
+			nodes = megaApi.getChildren(n, ((ManagerActivityLollipop)context).orderOthers);
             adapter.setNodes(nodes);
+			visibilityFastScroller();
 
             //If folder has no files
             if (adapter.getItemCount() == 0){
@@ -678,6 +734,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 			if(adapter != null){
 				log("adapter != null");
 				adapter.setNodes(nodes);
+				visibilityFastScroller();
 
 				if (adapter.getItemCount() == 0){
 					log("adapter.getItemCount() = 0");
@@ -694,6 +751,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 					emptyLinearLayout.setVisibility(View.GONE);
 				}
 				contentText.setText(MegaApiUtils.getInfoNodeOnlyFolders(nodes, context));
+
 			}
 		}
 		else{
@@ -702,6 +760,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 
 			nodes = megaApi.getChildren(n, ((ManagerActivityLollipop)context).orderOthers);
 			adapter.setNodes(nodes);
+			visibilityFastScroller();
 
 			//If folder has no files
 			if (adapter.getItemCount() == 0){
@@ -820,7 +879,8 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 				nodes = megaApi.getChildren(nodes.get(position), ((ManagerActivityLollipop)context).orderOthers);
 				adapter.setNodes(nodes);
 				recyclerView.scrollToPosition(0);
-				
+				visibilityFastScroller();
+
 				//If folder has no files
 				if (adapter.getItemCount() == 0){
 					recyclerView.setVisibility(View.GONE);
@@ -877,30 +937,112 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 					startActivity(intent);
 							
 				}
-				else if (MimeTypeList.typeForName(nodes.get(position).getName()).isVideo() || MimeTypeList.typeForName(nodes.get(position).getName()).isAudio() ){
+				else if (MimeTypeList.typeForName(nodes.get(position).getName()).isVideoReproducible() || MimeTypeList.typeForName(nodes.get(position).getName()).isAudio() ){
 					MegaNode file = nodes.get(position);
-					Intent service = new Intent(context, MegaStreamingService.class);
-			  		context.startService(service);
-			  		String fileName = file.getName();
-					try {
-						fileName = URLEncoder.encode(fileName, "UTF-8").replaceAll("\\+", "%20");
-					} 
-					catch (UnsupportedEncodingException e) {
-						e.printStackTrace();
+
+					if (megaApi.httpServerIsRunning() == 0) {
+						megaApi.httpServerStart();
 					}
-					
-			  		String url = "http://127.0.0.1:4443/" + file.getBase64Handle() + "/" + fileName;
-			  		String mimeType = MimeTypeList.typeForName(file.getName()).getType();
-			  		System.out.println("FILENAME: " + fileName);
-			  		
-			  		Intent mediaIntent = new Intent(Intent.ACTION_VIEW);
-			  		mediaIntent.setDataAndType(Uri.parse(url), mimeType);
+
+					ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
+					ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+					activityManager.getMemoryInfo(mi);
+
+					if(mi.totalMem>Constants.BUFFER_COMP){
+						log("Total mem: "+mi.totalMem+" allocate 32 MB");
+						megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
+					}
+					else{
+						log("Total mem: "+mi.totalMem+" allocate 16 MB");
+						megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
+					}
+
+					String url = megaApi.httpServerGetLocalLink(file);
+					String mimeType = MimeTypeList.typeForName(file.getName()).getType();
+					log("FILENAME: " + file.getName());
+
+					Intent mediaIntent;
+					if (MimeTypeList.typeForName(file.getName()).isVideoNotSupported()){
+						mediaIntent = new Intent(Intent.ACTION_VIEW);
+					}
+					else {
+						mediaIntent = new Intent(context, AudioVideoPlayerLollipop.class);
+					}
+					mediaIntent.putExtra("HANDLE", file.getHandle());
+					mediaIntent.putExtra("FILENAME", file.getName());
+					String localPath = Util.getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
+					if (localPath != null){
+						File mediaFile = new File(localPath);
+						//mediaIntent.setDataAndType(Uri.parse(localPath), mimeType);
+						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+							mediaIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile), MimeTypeList.typeForName(file.getName()).getType());
+						}
+						else{
+							mediaIntent.setDataAndType(Uri.fromFile(mediaFile), MimeTypeList.typeForName(file.getName()).getType());
+						}
+						mediaIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+					}
+					else {
+						mediaIntent.setDataAndType(Uri.parse(url), mimeType);
+					}
 			  		if (MegaApiUtils.isIntentAvailable(context, mediaIntent)){
 			  			context.startActivity(mediaIntent);
 			  		}
 			  		else{
 						((ManagerActivityLollipop) context).showSnackbar(context.getResources().getString(R.string.intent_not_available));
 			  			adapter.notifyDataSetChanged();
+						ArrayList<Long> handleList = new ArrayList<Long>();
+						handleList.add(nodes.get(position).getHandle());
+						NodeController nC = new NodeController(context);
+						nC.prepareForDownload(handleList);
+					}
+				}else if (MimeTypeList.typeForName(nodes.get(position).getName()).isPdf()){
+					MegaNode file = nodes.get(position);
+
+					if (megaApi.httpServerIsRunning() == 0) {
+						megaApi.httpServerStart();
+					}
+
+					ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
+					ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+					activityManager.getMemoryInfo(mi);
+
+					if(mi.totalMem>Constants.BUFFER_COMP){
+						log("Total mem: "+mi.totalMem+" allocate 32 MB");
+						megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
+					}
+					else{
+						log("Total mem: "+mi.totalMem+" allocate 16 MB");
+						megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
+					}
+
+					String url = megaApi.httpServerGetLocalLink(file);
+					String mimeType = MimeTypeList.typeForName(file.getName()).getType();
+					log("FILENAME: " + file.getName() + "TYPE: "+mimeType);
+
+					Intent pdfIntent = new Intent(context, PdfViewerActivityLollipop.class);
+					pdfIntent.putExtra("APP", true);
+					String localPath = Util.getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
+					if (localPath != null){
+						File mediaFile = new File(localPath);
+						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+							pdfIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile), MimeTypeList.typeForName(file.getName()).getType());
+						}
+						else{
+							pdfIntent.setDataAndType(Uri.fromFile(mediaFile), MimeTypeList.typeForName(file.getName()).getType());
+						}
+						pdfIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+					}
+					else {
+						pdfIntent.setDataAndType(Uri.parse(url), mimeType);
+					}
+					pdfIntent.putExtra("HANDLE", file.getHandle());
+					if (MegaApiUtils.isIntentAvailable(context, pdfIntent)){
+						startActivity(pdfIntent);
+					}
+					else{
+						Toast.makeText(context, context.getResources().getString(R.string.intent_not_available), Toast.LENGTH_LONG).show();
+
 						ArrayList<Long> handleList = new ArrayList<Long>();
 						handleList.add(nodes.get(position).getHandle());
 						NodeController nC = new NodeController(context);
@@ -1107,6 +1249,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 			actionMode.finish();
 		}
 	}
+
 	
 	public int onBackPressed(){
 
@@ -1133,6 +1276,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 			findNodes();
 
 			adapter.setNodes(nodes);
+			visibilityFastScroller();
 
 			int lastVisiblePosition = 0;
 			if(!lastPositionStack.empty()){
@@ -1152,6 +1296,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 			}
 
 			contentText.setText(MegaApiUtils.getInfoNodeOnlyFolders(nodes, context));
+
 			recyclerView.setVisibility(View.VISIBLE);
 			contentTextLayout.setVisibility(View.VISIBLE);
 			emptyImageView.setVisibility(View.GONE);
@@ -1164,6 +1309,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 
 			MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(((ManagerActivityLollipop)context).parentHandleOutgoing));
 			contentText.setText(MegaApiUtils.getInfoFolder(parentNode, context));
+
 			if (parentNode != null){
 				recyclerView.setVisibility(View.VISIBLE);
 				contentTextLayout.setVisibility(View.VISIBLE);
@@ -1179,6 +1325,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 
 				nodes = megaApi.getChildren(parentNode, ((ManagerActivityLollipop)context).orderOthers);
 				adapter.setNodes(nodes);
+				visibilityFastScroller();
 
 				int lastVisiblePosition = 0;
 				if(!lastPositionStack.empty()){
@@ -1276,4 +1423,16 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 		Util.log("OutgoingSharesFragmentLollipop", log);
 	}
 
+	public void visibilityFastScroller(){
+		if(adapter == null){
+			fastScroller.setVisibility(View.GONE);
+		}else{
+			if(adapter.getItemCount() < Constants.MIN_ITEMS_SCROLLBAR){
+				fastScroller.setVisibility(View.GONE);
+			}else{
+				fastScroller.setVisibility(View.VISIBLE);
+			}
+		}
+
+	}
 }

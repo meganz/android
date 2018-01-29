@@ -45,6 +45,7 @@ public class FabButtonListener implements FloatingActionButton.OnClickListener{
                             break;
                         }
                         case CONTACTS:{
+                            log("Add contacts");
                             if(!Util.isOnline(context)){
                                 if(context instanceof ManagerActivityLollipop){
                                     ((ManagerActivityLollipop) context).showSnackbar(context.getString(R.string.error_server_connection_problem));

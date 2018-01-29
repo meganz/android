@@ -206,6 +206,7 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 		cancelButton.setText(getString(R.string.general_cancel).toUpperCase(Locale.getDefault()));
 
 		listView = (RecyclerView) v.findViewById(R.id.file_list_view_browser);
+
 		listView.addItemDecoration(new SimpleDividerItemDecoration(context, metrics));
 		mLayoutManager = new LinearLayoutManager(context);
 		listView.setLayoutManager(mLayoutManager);
@@ -344,9 +345,6 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 		}
 		else if (modeCloud == FileExplorerActivityLollipop.SELECT || modeCloud == FileExplorerActivityLollipop.SELECT_CAMERA_FOLDER){
 			optionButton.setText(getString(R.string.general_select).toUpperCase(Locale.getDefault()));
-		}
-		else if(modeCloud == FileExplorerActivityLollipop.UPLOAD_SELFIE){
-			optionButton.setText(getString(R.string.context_upload).toUpperCase(Locale.getDefault()));
 		}
 		else {
 			optionButton.setText(getString(R.string.general_select).toUpperCase(Locale.getDefault()));
@@ -541,7 +539,6 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 		}
 		else{
 			listView.setVisibility(View.VISIBLE);
-			emptyImageView.setVisibility(View.GONE);
 			emptyTextView.setVisibility(View.GONE);
 		}
 

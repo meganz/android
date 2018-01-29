@@ -2,7 +2,7 @@ package mega.privacy.android.app.components.tokenautocomplete;
 
 import java.io.Serializable;
 
-public class ContactInfo implements Serializable{
+public class ContactInfo implements Serializable, Comparable<ContactInfo>{
     private String name;
     private String email;
 
@@ -35,5 +35,14 @@ public class ContactInfo implements Serializable{
     @Override
     public String toString(){
         return name + " ( " + email + " )";
+    }
+
+    @Override
+    public int compareTo(ContactInfo contactInfo) {
+
+        String a = new String(String.valueOf(this.getName()));
+        String b = new String (String.valueOf(contactInfo.getName()));
+
+        return a.compareTo(b);
     }
 }
