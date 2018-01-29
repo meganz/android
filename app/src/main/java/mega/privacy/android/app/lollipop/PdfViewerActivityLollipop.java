@@ -185,23 +185,6 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
 
         setContentView(R.layout.activity_pdfviewer);
 
-        appBarLayout = (AppBarLayout) findViewById(R.id.app_bar_pdfviewer);
-
-        tB = (Toolbar) findViewById(R.id.toolbar_pdf_viewer);
-        if(tB==null){
-            log("Tb is Null");
-            return;
-        }
-
-        tB.setVisibility(View.VISIBLE);
-        setSupportActionBar(tB);
-        aB = getSupportActionBar();
-        Drawable upArrow = getResources().getDrawable(R.drawable.ic_arrow_back_black);
-        upArrow.setColorFilter(getResources().getColor(R.color.lollipop_primary_color), PorterDuff.Mode.SRC_ATOP);
-        aB.setHomeAsUpIndicator(upArrow);
-        aB.setHomeButtonEnabled(true);
-        aB.setDisplayHomeAsUpEnabled(true);
-
         app = (MegaApplication)getApplication();
         megaApi = app.getMegaApi();
 
@@ -231,7 +214,20 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
 //        }
         setContentView(R.layout.activity_pdfviewer);
 
-        //appBarLayout = (AppBarLayout) findViewById(R.id.app_bar_pdfviewer);
+        tB = (Toolbar) findViewById(R.id.toolbar_pdf_viewer);
+        if(tB==null){
+            log("Tb is Null");
+            return;
+        }
+
+        tB.setVisibility(View.VISIBLE);
+        setSupportActionBar(tB);
+        aB = getSupportActionBar();
+        Drawable upArrow = getResources().getDrawable(R.drawable.ic_arrow_back_black);
+        upArrow.setColorFilter(getResources().getColor(R.color.lollipop_primary_color), PorterDuff.Mode.SRC_ATOP);
+        aB.setHomeAsUpIndicator(upArrow);
+        aB.setHomeButtonEnabled(true);
+        aB.setDisplayHomeAsUpEnabled(true);
 
         log("Overquota delay: "+megaApi.getBandwidthOverquotaDelay());
         if(megaApi.getBandwidthOverquotaDelay()>0){
