@@ -1071,6 +1071,12 @@ public class OfflineFragmentLollipop extends Fragment{
 
 						Intent videoIntent = new Intent(context, AudioVideoPlayerLollipop.class);
 						videoIntent.putExtra("HANDLE", Long.parseLong(currentNode.getHandle()));
+						videoIntent.putExtra("adapterType", Constants.OFFLINE_ADAPTER);
+						videoIntent.putExtra("position", position);
+						videoIntent.putExtra("parentNodeHandle", -1L);
+						videoIntent.putExtra("offlinePathDirectory", currentFile.getParent());
+						videoIntent.putExtra("pathNavigation", pathNavigation);
+						videoIntent.putExtra("orderGetChildren", orderGetChildren);
 						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
 							videoIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
 						}
@@ -1085,6 +1091,12 @@ public class OfflineFragmentLollipop extends Fragment{
 
 						Intent audioIntent = new Intent(context, AudioVideoPlayerLollipop.class);
 						audioIntent.putExtra("HANDLE", Long.parseLong(currentNode.getHandle()));
+						audioIntent.putExtra("adapterType", Constants.OFFLINE_ADAPTER);
+						audioIntent.putExtra("position", position);
+						audioIntent.putExtra("parentNodeHandle", -1L);
+						audioIntent.putExtra("offlinePathDirectory", currentFile.getParent());
+						audioIntent.putExtra("pathNavigation", pathNavigation);
+						audioIntent.putExtra("orderGetChildren", orderGetChildren);
 						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
 							audioIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
 						}

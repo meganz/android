@@ -2,11 +2,13 @@ package mega.privacy.android.app.lollipop;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.ActivityManager;
 import android.app.Dialog;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -16,8 +18,10 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.StatFs;
+import android.provider.MediaStore;
 import android.provider.OpenableColumns;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.Snackbar;
@@ -56,6 +60,7 @@ import com.google.android.exoplayer2.audio.AudioRendererEventListener;
 import com.google.android.exoplayer2.decoder.DecoderCounters;
 import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
 import com.google.android.exoplayer2.extractor.ExtractorsFactory;
+import com.google.android.exoplayer2.source.ConcatenatingMediaSource;
 import com.google.android.exoplayer2.source.ExtractorMediaSource;
 import com.google.android.exoplayer2.source.LoopingMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
@@ -75,12 +80,15 @@ import com.google.android.exoplayer2.video.VideoRendererEventListener;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.DownloadService;
 import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.MimeTypeMime;
@@ -106,9 +114,9 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
 
     public static int REQUEST_CODE_SELECT_CHAT = 1005;
     public static int REQUEST_CODE_SELECT_LOCAL_FOLDER = 1004;
+    private final String offLineDIR = mega.privacy.android.app.utils.Util.offlineDIR;
+    private final String oldMKFile = mega.privacy.android.app.utils.Util.oldMKFile;
     
-    int orderGetChildren = MegaApiJava.ORDER_DEFAULT_ASC;
-
     private MegaApiAndroid megaApi;
     private MegaChatApiAndroid megaChatApi;
     DatabaseHandler dbH = null;
@@ -144,7 +152,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
     private boolean loading = true;
     private ProgressDialog statusDialog = null;
     private String fileName = null;
-    private long currentPosition;
+    private long currentTime;
 
     private RelativeLayout containerAudioVideoPlayer;
 
@@ -154,6 +162,16 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
     private boolean isUrl;
 
     ArrayList<Long> handleListM = new ArrayList<Long>();
+    
+    private int currentPosition = 0;
+    private int orderGetChildren = MegaApiJava.ORDER_DEFAULT_ASC;
+    private long parentNodeHandle = -1;
+    private int adapterType = 0;
+    private ArrayList<Long> mediaHandles;
+    ArrayList<MegaOffline> offList;
+    ArrayList<MegaOffline> mediaOffList;
+
+    String downloadLocationDefaultPath;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -165,10 +183,10 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         if (savedInstanceState != null) {
-            currentPosition = savedInstanceState.getLong("currentPosition");
+            currentTime = savedInstanceState.getLong("currentTime");
         }
         else {
-            currentPosition = 0;
+            currentTime = 0;
         }
 
         Intent intent = getIntent();
@@ -177,12 +195,17 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
             finish();
             return;
         }
+
         Bundle bundle = intent.getExtras();
         if (bundle != null) {
             handle = bundle.getLong("HANDLE");
             fileName = bundle.getString("FILENAME");
         }
         isFolderLink = intent.getBooleanExtra("isFolderLink", false);
+        currentPosition = intent.getIntExtra("position", 0);
+        orderGetChildren = intent.getIntExtra("orderGetChildren", MegaApiJava.ORDER_DEFAULT_ASC);
+        parentNodeHandle = intent.getLongExtra("parentNodeHandle", -1);
+        adapterType = intent.getIntExtra("adapterType", 0);
         
         uri = intent.getData();
         //Uri uri = Uri.parse("https://youtu.be/upUpVb3cLfk");
@@ -243,7 +266,13 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
         handler = new Handler();
 
         MegaApplication app = (MegaApplication)getApplication();
-        megaApi = app.getMegaApi();
+        if (isFolderLink){
+            megaApi = app.getMegaApiFolder();
+        }
+        else{
+            megaApi = app.getMegaApi();
+        }
+
         if(megaApi==null||megaApi.getRootNode()==null){
             log("Refresh session - sdk");
             Intent intentLogin = new Intent(this, LoginActivityLollipop.class);
@@ -285,6 +314,288 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
         log("Add transfer listener");
         megaApi.addTransferListener(this);
 
+        if (dbH == null){
+            dbH = DatabaseHandler.getDbHandler(getApplicationContext());
+        }
+
+        if (megaApi.httpServerIsRunning() == 0) {
+            megaApi.httpServerStart();
+        }
+
+        ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
+        ActivityManager activityManager = (ActivityManager) this.getSystemService(Context.ACTIVITY_SERVICE);
+        activityManager.getMemoryInfo(mi);
+
+        if(mi.totalMem>Constants.BUFFER_COMP){
+            log("Total mem: "+mi.totalMem+" allocate 32 MB");
+            megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
+        }
+        else{
+            log("Total mem: "+mi.totalMem+" allocate 16 MB");
+            megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
+        }
+
+//        String url = megaApi.httpServerGetLocalLink(file);
+
+        MegaNode parentNode;
+
+        if (adapterType == Constants.OFFLINE_ADAPTER){
+            //OFFLINE
+            log("OFFLINE_ADAPTER");
+
+            offList = new ArrayList<>();
+            String pathNavigation = intent.getStringExtra("pathNavigation");
+            log("PATHNAVIGATION: " + pathNavigation);
+            offList=dbH.findByPath(pathNavigation);
+            log ("offList.size() = " + offList.size());
+
+            for(int i=0; i<offList.size();i++){
+                MegaOffline checkOffline = offList.get(i);
+                File offlineDirectory = null;
+                if(checkOffline.getOrigin()==MegaOffline.INCOMING){
+                    log("isIncomingOffline");
+
+                    if (Environment.getExternalStorageDirectory() != null){
+                        offlineDirectory = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + offLineDIR + "/" +checkOffline.getHandleIncoming() + "/" + checkOffline.getPath()+checkOffline.getName());
+                        log("offlineDirectory: "+offlineDirectory);
+                    }
+                    else{
+                        offlineDirectory = getFilesDir();
+                    }
+                }
+                else if(checkOffline.getOrigin()==MegaOffline.INBOX){
+                    if (Environment.getExternalStorageDirectory() != null){
+                        offlineDirectory = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + offLineDIR + "/in/" + checkOffline.getPath()+checkOffline.getName());
+                        log("offlineDirectory: "+offlineDirectory);
+                    }
+                    else{
+                        offlineDirectory = getFilesDir();
+                    }
+                }
+                else{
+                    log("NOT isIncomingOffline");
+                    if (Environment.getExternalStorageDirectory() != null){
+                        offlineDirectory = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + offLineDIR + checkOffline.getPath()+checkOffline.getName());
+                    }
+                    else{
+                        offlineDirectory = getFilesDir();
+                    }
+                }
+
+                if(offlineDirectory!=null){
+                    if (!offlineDirectory.exists()){
+                        log("Path to remove B: "+(offList.get(i).getPath()+offList.get(i).getName()));
+                        //dbH.removeById(offList.get(i).getId());
+                        offList.remove(i);
+                        i--;
+                    }
+                }
+            }
+
+            if (offList != null){
+                if(!offList.isEmpty()) {
+                    MegaOffline lastItem = offList.get(offList.size()-1);
+                    if(!(lastItem.getHandle().equals("0"))){
+                        String path = Environment.getExternalStorageDirectory().getAbsolutePath()+oldMKFile;
+                        log("Export in: "+path);
+                        File file= new File(path);
+                        if(file.exists()){
+                            MegaOffline masterKeyFile = new MegaOffline("0", path, "MEGARecoveryKey.txt", 0, "0", 0, "0");
+                            offList.add(masterKeyFile);
+                        }
+                    }
+                }
+                else{
+                    String path = Environment.getExternalStorageDirectory().getAbsolutePath()+oldMKFile;
+                    log("Export in: "+path);
+                    File file= new File(path);
+                    if(file.exists()){
+                        MegaOffline masterKeyFile = new MegaOffline("0", path, "MEGARecoveryKey.txt", 0, "0", 0, "0");
+                        offList.add(masterKeyFile);
+                    }
+                }
+            }
+
+            if(orderGetChildren == MegaApiJava.ORDER_DEFAULT_DESC){
+                sortByNameDescending();
+            }
+            else{
+                sortByNameAscending();
+            }
+
+            if (offList.size() > 0){
+
+                mediaOffList = new ArrayList<>();
+                int mediaPosition = -1;
+                for (int i=0;i<offList.size();i++){
+                    if (MimeTypeList.typeForName(offList.get(i).getName()).isVideoReproducible() || MimeTypeList.typeForName(offList.get(i).getName()).isAudio()){
+                        mediaOffList.add(offList.get(i));
+                        mediaPosition++;
+                        if (i == currentPosition){
+                            currentPosition = mediaPosition;
+                        }
+                    }
+                }
+
+                if (currentPosition >= mediaOffList.size()){
+                    currentPosition = 0;
+                }
+
+//                adapterOffline = new MegaOfflineFullScreenImageAdapterLollipop(this, fullScreenImageViewer, mediaOffList);
+//                viewPager.setAdapter(adapterOffline);
+//
+//                viewPager.setCurrentItem(currentPosition);
+//
+//                viewPager.setOnPageChangeListener(this);
+            }
+//
+//            fileNameTextView = (TextView) findViewById(R.id.full_image_viewer_file_name);
+//
+//            if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+//                fileNameTextView.setMaxWidth(Util.scaleWidthPx(300, outMetrics));
+//            }
+//            else{
+//                fileNameTextView.setMaxWidth(Util.scaleWidthPx(300, outMetrics));
+//            }
+
+//            currentNode = mediaOffList.get(currentPosition);
+
+//            fileNameTextView.setText(currentNode.getName());
+        }
+        else if(adapterType == Constants.SEARCH_ADAPTER){
+
+            mediaHandles = new ArrayList<>();
+
+            ArrayList<MegaNode> nodes = null;
+            if (parentNodeHandle == -1){
+                String query = intent.getStringExtra("searchQuery");
+                nodes = megaApi.search(query);
+            }
+            else{
+                parentNode =  megaApi.getNodeByHandle(parentNodeHandle);
+                nodes = megaApi.getChildren(parentNode, orderGetChildren);
+            }
+
+            int mediaNumber = 0;
+            for (int i=0;i<nodes.size();i++){
+                MegaNode n = nodes.get(i);
+                if (MimeTypeList.typeForName(n.getName()).isVideoReproducible() || MimeTypeList.typeForName(n.getName()).isAudio()){
+                    mediaHandles.add(n.getHandle());
+                    if (i == currentPosition){
+                        currentPosition = mediaNumber;
+                    }
+                    mediaNumber++;
+                }
+            }
+
+            if(mediaHandles.size() == 0){
+                finish();
+                return;
+            }
+
+            if(currentPosition >= mediaHandles.size()){
+                currentPosition = 0;
+            }
+
+//            adapterMega = new MegaFullScreenImageAdapterLollipop(this, fullScreenImageViewer,imageHandles, megaApi);
+//
+//            viewPager.setAdapter(adapterMega);
+//
+//            viewPager.setCurrentItem(currentPosition);
+//
+//            viewPager.setOnPageChangeListener(this);
+//
+//            fileNameTextView = (TextView) findViewById(R.id.full_image_viewer_file_name);
+//
+//            if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+//                fileNameTextView.setMaxWidth(Util.scaleWidthPx(300, outMetrics));
+//            }
+//            else{
+//                fileNameTextView.setMaxWidth(Util.scaleWidthPx(300, outMetrics));
+//            }
+//
+//            fileNameTextView.setText(megaApi.getNodeByHandle(imageHandles.get(currentPosition)).getName());
+
+        }else{
+
+            if (parentNodeHandle == -1){
+
+                switch(adapterType){
+                    case Constants.FILE_BROWSER_ADAPTER:{
+                        parentNode = megaApi.getRootNode();
+                        break;
+                    }
+                    case Constants.RUBBISH_BIN_ADAPTER:{
+                        parentNode = megaApi.getRubbishNode();
+                        break;
+                    }
+                    case Constants.SHARED_WITH_ME_ADAPTER:{
+                        parentNode = megaApi.getInboxNode();
+                        break;
+                    }
+                    case Constants.FOLDER_LINK_ADAPTER:{
+                        parentNode = megaApi.getRootNode();
+                        break;
+                    }
+                    default:{
+                        parentNode = megaApi.getRootNode();
+                        break;
+                    }
+                }
+
+            }
+            else{
+                parentNode = megaApi.getNodeByHandle(parentNodeHandle);
+            }
+
+            mediaHandles = new ArrayList<>();
+            ArrayList<MegaNode> nodes = megaApi.getChildren(parentNode, orderGetChildren);
+
+            int mediaNumber = 0;
+            for (int i=0;i<nodes.size();i++){
+                MegaNode n = nodes.get(i);
+                if (MimeTypeList.typeForName(n.getName()).isVideoReproducible() || MimeTypeList.typeForName(n.getName()).isAudio()){
+                    mediaHandles.add(n.getHandle());
+                    if (i == currentPosition){
+                        currentPosition = mediaNumber;
+                    }
+                    mediaNumber++;
+                }
+            }
+
+            if(mediaHandles.size() == 0)
+            {
+                finish();
+                return;
+            }
+
+            if(currentPosition >= mediaHandles.size())
+            {
+                currentPosition = 0;
+            }
+
+//            fileNameTextView = (TextView) findViewById(R.id.full_image_viewer_file_name);
+//
+//            if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+//                fileNameTextView.setMaxWidth(Util.scaleWidthPx(300, outMetrics));
+//            }
+//            else{
+//                fileNameTextView.setMaxWidth(Util.scaleWidthPx(300, outMetrics));
+//            }
+//
+//            fileNameTextView.setText(megaApi.getNodeByHandle(imageHandles.get(currentPosition)).getName());
+//
+//            adapterMega = new MegaFullScreenImageAdapterLollipop(this, fullScreenImageViewer,imageHandles, megaApi);
+//
+//            viewPager.setAdapter(adapterMega);
+//
+//            viewPager.setCurrentItem(currentPosition);
+//
+//            viewPager.setOnPageChangeListener(this);
+
+            ((MegaApplication) getApplication()).sendSignalPresenceActivity();
+        }
+
         //Create a default TrackSelector
         BandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
         TrackSelection.Factory videoTrackSelectionFactory = new AdaptiveTrackSelection.Factory(bandwidthMeter);
@@ -321,14 +632,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
                 return true;
             }
         });
-        /*simpleExoPlayerView.setControllerVisibilityListener(new PlaybackControlView.VisibilityListener() {
-            @Override
-            public void onVisibilityChange(int visibility) {
-                if(aB.isShowing()){
-                    simpleExoPlayerView.showController();
-                }
-            }
-        });*/
+
         //Measures bandwidth during playback. Can be null if not required.
         DefaultBandwidthMeter defaultBandwidthMeter = new DefaultBandwidthMeter();
         //Produces DataSource instances through which meida data is loaded
@@ -337,12 +641,56 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
         //Produces Extractor instances for parsing the media data
         ExtractorsFactory extractorsFactory = new DefaultExtractorsFactory();
 
-        MediaSource mediaSource = new ExtractorMediaSource(uri, dataSourceFactory, extractorsFactory, null, null);
+        final List<MediaSource> playlist = new ArrayList<>();
+        MediaSource mediaSource;
+        String localPath;
+        Uri mediaUri;
+        File mediaFile;
+        if (mediaOffList != null && !mediaOffList.isEmpty()){
+            log("OFFLIST");
+            for(int i=0; i<mediaOffList.size(); i++){
+                MegaOffline currentNode = mediaOffList.get(i);
+                if(currentNode.getOrigin()==MegaOffline.INCOMING){
+                    String handleString = currentNode.getHandleIncoming();
+                    mediaFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + offLineDIR + "/" + handleString + "/"+currentNode.getPath() + "/" + currentNode.getName());
+                }
+                else if(currentNode.getOrigin()==MegaOffline.INBOX){
+                    String handleString = currentNode.getHandleIncoming();
+                    mediaFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + offLineDIR + "/in/"+currentNode.getPath() + "/" + currentNode.getName());
+                }
+                else{
+                    mediaFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + offLineDIR + currentNode.getPath() + "/" + currentNode.getName());
+                }
+                mediaUri = FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", mediaFile);
+                mediaSource = new ExtractorMediaSource(mediaUri, dataSourceFactory, extractorsFactory, null, null);
+                playlist.add(mediaSource);
+            }
+        }
+        else if (mediaHandles!= null && !mediaHandles.isEmpty()) {
+            log("ONLIST");
+            MegaNode n;
+            for(int i=0; i<mediaHandles.size(); i++){
+                n = megaApi.getNodeByHandle(mediaHandles.get(i));
+                localPath = mega.privacy.android.app.utils.Util.getLocalFile(this, n.getName(), n.getSize(), downloadLocationDefaultPath);
+                if (localPath != null){
+                    mediaFile = new File(localPath);
+                    mediaUri = FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", mediaFile);
+                    mediaSource = new ExtractorMediaSource(mediaUri, dataSourceFactory, extractorsFactory, null, null);
+                }
+                else {
+                    mediaUri = Uri.parse(megaApi.httpServerGetLocalLink(n));
+                    mediaSource = new ExtractorMediaSource (mediaUri, dataSourceFactory, extractorsFactory, null, null);
+                }
+                playlist.add(mediaSource);
+            }
+        }
+        //MediaSource mediaSource = new ExtractorMediaSource(uri, dataSourceFactory, extractorsFactory, null, null);
         //MediaSource mediaSource = new HlsMediaSource(uri, dataSourceFactory, handler, null);
         //DashMediaSource mediaSource = new DashMediaSource(uri, dataSourceFactory, new DefaultDashChunkSource.Factory(dataSourceFactory), null, null);
 
+        final ConcatenatingMediaSource concatenatingMediaSource = new ConcatenatingMediaSource(playlist.toArray(new MediaSource[playlist.size()]));
 
-        final LoopingMediaSource loopingMediaSource = new LoopingMediaSource(mediaSource);
+        final LoopingMediaSource loopingMediaSource = new LoopingMediaSource(concatenatingMediaSource);
 
         player.prepare(loopingMediaSource);
 
@@ -372,6 +720,20 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
             @Override
             public void onTracksChanged(TrackGroupArray trackGroups, TrackSelectionArray trackSelections) {
                 log("onTracksChanged");
+
+                invalidateOptionsMenu();
+                if (mediaOffList != null && !mediaOffList.isEmpty()){
+                    MegaOffline n = mediaOffList.get(player.getCurrentWindowIndex());
+                    tB.setTitle(n.getName());
+//                    handle = n.getHandle();
+//                    uri = ;
+                }
+                else if (mediaHandles!= null && !mediaHandles.isEmpty()) {
+                    MegaNode n = megaApi.getNodeByHandle(mediaHandles.get(player.getCurrentWindowIndex()));
+                    tB.setTitle(n.getName());
+                    handle = n.getHandle();
+//                    uri = ;
+                }
             }
 
             @Override
@@ -423,7 +785,8 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
             public void onPlayerError(ExoPlaybackException error) {
                 log("onPlayerError");
                 player.stop();
-                player.prepare(loopingMediaSource);
+                //player.prepare(loopingMediaSource);
+                player.prepare(concatenatingMediaSource);
                 player.setPlayWhenReady(true);
             }
 
@@ -443,18 +806,112 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
             }
         });
         player.setPlayWhenReady(true);
-        player.seekTo(currentPosition);
+        player.seekTo(currentTime);
         player.setVideoDebugListener(this);
         player.setAudioDebugListener(this);
         simpleExoPlayerView.showController();
+    }
+
+    public void sortByNameDescending(){
+
+        ArrayList<String> foldersOrder = new ArrayList<String>();
+        ArrayList<String> filesOrder = new ArrayList<String>();
+        ArrayList<MegaOffline> tempOffline = new ArrayList<MegaOffline>();
+
+
+        for(int k = 0; k < offList.size() ; k++) {
+            MegaOffline node = offList.get(k);
+            if(node.getType().equals("1")){
+                foldersOrder.add(node.getName());
+            }
+            else{
+                filesOrder.add(node.getName());
+            }
+        }
+
+
+        Collections.sort(foldersOrder, String.CASE_INSENSITIVE_ORDER);
+        Collections.reverse(foldersOrder);
+        Collections.sort(filesOrder, String.CASE_INSENSITIVE_ORDER);
+        Collections.reverse(filesOrder);
+
+        for(int k = 0; k < foldersOrder.size() ; k++) {
+            for(int j = 0; j < offList.size() ; j++) {
+                String name = foldersOrder.get(k);
+                String nameOffline = offList.get(j).getName();
+                if(name.equals(nameOffline)){
+                    tempOffline.add(offList.get(j));
+                }
+            }
+
+        }
+
+        for(int k = 0; k < filesOrder.size() ; k++) {
+            for(int j = 0; j < offList.size() ; j++) {
+                String name = filesOrder.get(k);
+                String nameOffline = offList.get(j).getName();
+                if(name.equals(nameOffline)){
+                    tempOffline.add(offList.get(j));
+                }
+            }
+
+        }
+
+        offList.clear();
+        offList.addAll(tempOffline);
+    }
+
+
+    public void sortByNameAscending(){
+        log("sortByNameAscending");
+        ArrayList<String> foldersOrder = new ArrayList<String>();
+        ArrayList<String> filesOrder = new ArrayList<String>();
+        ArrayList<MegaOffline> tempOffline = new ArrayList<MegaOffline>();
+
+        for(int k = 0; k < offList.size() ; k++) {
+            MegaOffline node = offList.get(k);
+            if(node.getType().equals("1")){
+                foldersOrder.add(node.getName());
+            }
+            else{
+                filesOrder.add(node.getName());
+            }
+        }
+
+        Collections.sort(foldersOrder, String.CASE_INSENSITIVE_ORDER);
+        Collections.sort(filesOrder, String.CASE_INSENSITIVE_ORDER);
+
+        for(int k = 0; k < foldersOrder.size() ; k++) {
+            for(int j = 0; j < offList.size() ; j++) {
+                String name = foldersOrder.get(k);
+                String nameOffline = offList.get(j).getName();
+                if(name.equals(nameOffline)){
+                    tempOffline.add(offList.get(j));
+                }
+            }
+        }
+
+        for(int k = 0; k < filesOrder.size() ; k++) {
+            for(int j = 0; j < offList.size() ; j++) {
+                String name = filesOrder.get(k);
+                String nameOffline = offList.get(j).getName();
+                if(name.equals(nameOffline)){
+                    tempOffline.add(offList.get(j));
+                }
+            }
+
+        }
+
+        offList.clear();
+        offList.addAll(tempOffline);
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
 
-        currentPosition = player.getCurrentPosition();
-        outState.putLong("currentPosition", currentPosition);
+        currentTime = player.getCurrentPosition();
+        outState.putLong("currentTime", currentTime);
     }
 
     public String getFileName(Uri uri) {
@@ -529,8 +986,8 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
         share.setColorFilter(getResources().getColor(R.color.white), PorterDuff.Mode.SRC_ATOP);
         shareIcon.setIcon(share);
 
-        propertiesIcon = menu.findItem(R.id.full_image_viewer_properties);
-        chatIcon = menu.findItem(R.id.full_image_viewer_chat);
+        propertiesIcon = menu.findItem(R.id.full_video_viewer_properties);
+        chatIcon = menu.findItem(R.id.full_video_viewer_chat);
 
         return super.onCreateOptionsMenu(menu);
     }
@@ -629,7 +1086,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
         }
 
         boolean askMe = true;
-        String downloadLocationDefaultPath = "";
+        downloadLocationDefaultPath = "";
         prefs = dbH.getPreferences();
         if (prefs != null){
             if (prefs.getStorageAskAlways() != null){
