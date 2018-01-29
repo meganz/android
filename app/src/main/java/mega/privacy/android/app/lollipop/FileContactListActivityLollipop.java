@@ -618,7 +618,7 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 					listView.invalidate();
 
 				}
-				if(changeShare){
+				else if(changeShare){
 					log("OK onRequestFinish change");
 					permissionsDialog.dismiss();
 					try {
@@ -632,8 +632,10 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 					changeShare=false;
 					adapter.setShareList(listContacts);
 					listView.invalidate();
-				
-				}				
+				}
+				else{
+					showSnackbar(getString(R.string.context_correctly_shared));
+				}
 			}
 			else{
 				if(removeShare){
@@ -799,6 +801,7 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 		dialogBuilder.setSingleChoiceItems(items, selectedShare.getAccess(), new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int item) {
 				removeShare = false;
+				changeShare = true;
 				ProgressDialog temp = null;
 				try{
 					temp = new ProgressDialog(fileContactListActivityLollipop);
@@ -930,21 +933,43 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 			                    case 0:{
 			                    	for (int i=0;i<emails.size();i++){
 			                    		MegaUser u = megaApi.getContact(emails.get(i));
-			                    		megaApi.share(node, u, MegaShare.ACCESS_READ, fileContactListActivityLollipop);
+
+										if(u!=null){
+											log("Share: "+ node.getName() + " to "+ u.getEmail());
+											megaApi.share(node, u, MegaShare.ACCESS_READ, fileContactListActivityLollipop);
+										}
+										else{
+											log("USER is NULL when sharing!->SHARE WITH NON CONTACT");
+											megaApi.share(node, emails.get(i), MegaShare.ACCESS_READ, fileContactListActivityLollipop);
+										}
 			                    	}
 			                    	break;
 			                    }
 			                    case 1:{
 			                    	for (int i=0;i<emails.size();i++){
 			                    		MegaUser u = megaApi.getContact(emails.get(i));
-			                    		megaApi.share(node, u, MegaShare.ACCESS_READWRITE, fileContactListActivityLollipop);
+										if(u!=null){
+											log("Share: "+ node.getName() + " to "+ u.getEmail());
+											megaApi.share(node, u, MegaShare.ACCESS_READWRITE, fileContactListActivityLollipop);
+										}
+										else{
+											log("USER is NULL when sharing!->SHARE WITH NON CONTACT");
+											megaApi.share(node, emails.get(i), MegaShare.ACCESS_READWRITE, fileContactListActivityLollipop);
+										}
 			                    	}
 			                        break;
 			                    }
 			                    case 2:{
 			                    	for (int i=0;i<emails.size();i++){
 			                    		MegaUser u = megaApi.getContact(emails.get(i));
-			                    		megaApi.share(node, u, MegaShare.ACCESS_FULL, fileContactListActivityLollipop);
+										if(u!=null){
+											log("Share: "+ node.getName() + " to "+ u.getEmail());
+											megaApi.share(node, u, MegaShare.ACCESS_FULL, fileContactListActivityLollipop);
+										}
+										else{
+											log("USER is NULL when sharing!->SHARE WITH NON CONTACT");
+											megaApi.share(node, emails.get(i), MegaShare.ACCESS_FULL, fileContactListActivityLollipop);
+										}
 			                    	}		                    	
 			                        break;
 			                    }

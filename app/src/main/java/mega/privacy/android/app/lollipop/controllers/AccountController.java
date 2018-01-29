@@ -5,11 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.net.Uri;
-import android.os.Build;
 import android.os.Environment;
-import android.provider.MediaStore;
-import android.support.v4.content.FileProvider;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -22,13 +18,12 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.DownloadService;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
-import mega.privacy.android.app.MimeTypeList;
+import mega.privacy.android.app.OpenLinkActivity;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.UploadService;
-import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.lollipop.PinLockActivityLollipop;
 import mega.privacy.android.app.lollipop.managerSections.MyAccountFragmentLollipop;
-import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.PreviewUtils;
 import mega.privacy.android.app.utils.ThumbnailUtils;
 import mega.privacy.android.app.utils.Util;
@@ -249,48 +244,24 @@ public class AccountController {
         megaApi.killSession(-1, (ManagerActivityLollipop) context);
     }
 
-    static public void logout(Context context, MegaApiAndroid megaApi, MegaChatApiAndroid megaChatApi, boolean confirmAccount) {
+    static public void logout(Context context, MegaApiAndroid megaApi) {
         log("logout");
-        logout(context, megaApi, megaChatApi, confirmAccount, false);
-    }
-
-    static public void logout(Context context, MegaApiAndroid megaApi, boolean confirmAccount) {
-        log("logout");
-        logout(context, megaApi, null, confirmAccount, false);
-    }
-
-
-    static public void logout(Context context, MegaApiAndroid megaApi, MegaChatApiAndroid megaChatApi, boolean confirmAccount, boolean logoutBadSession) {
-        log("logout");
-
-        boolean isManagerActivityLollipop = false;
 
         if (megaApi == null){
-            if (context instanceof Activity){
-                megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
-            }
+            megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
         }
 
-        if (megaChatApi == null){
-            if (context instanceof Activity){
-                megaChatApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaChatApi();
-            }
+        if (context instanceof ManagerActivityLollipop){
+            megaApi.logout((ManagerActivityLollipop)context);
         }
-
-        if (!logoutBadSession){
-            if (context instanceof ManagerActivityLollipop){
-                isManagerActivityLollipop = true;
-                megaApi.logout((ManagerActivityLollipop)context);
-            }
-            else{
-                isManagerActivityLollipop = false;
-                boolean chatEnabled = true;
-                chatEnabled = Util.isChatEnabled();
-                megaApi.logout();
-                if(chatEnabled){
-                    megaChatApi.logout();
-                }
-            }
+        else if (context instanceof OpenLinkActivity){
+            megaApi.logout((OpenLinkActivity)context);
+        }
+        else if (context instanceof PinLockActivityLollipop){
+            megaApi.logout((PinLockActivityLollipop)context);
+        }
+        else{
+            megaApi.logout();
         }
 
         File offlineDirectory = null;
@@ -340,23 +311,6 @@ public class AccountController {
             fMK.delete();
         }
 
-        PackageManager m = context.getPackageManager();
-        String s = context.getPackageName();
-        try {
-            PackageInfo p = m.getPackageInfo(s, 0);
-            s = p.applicationInfo.dataDir;
-        } catch (PackageManager.NameNotFoundException e) {
-            log("Error Package name not found " + e);
-        }
-
-        File appDir = new File(s);
-
-        for (File c : appDir.listFiles()){
-            if (c.isFile()){
-                c.delete();
-            }
-        }
-
         Intent cancelTransfersIntent = new Intent(context, DownloadService.class);
         cancelTransfersIntent.setAction(DownloadService.ACTION_CANCEL);
         context.startService(cancelTransfersIntent);
@@ -381,18 +335,34 @@ public class AccountController {
 
         dbH.clearNonContacts();
 
-        dbH.clearChatSettings();
-
         dbH.clearChatItems();
 
         dbH.clearCompletedTransfers();
 
         dbH.clearPendingMessage();
+    }
 
-        if (!isManagerActivityLollipop){
-            Intent tourIntent = new Intent(context, LoginActivityLollipop.class);
-            tourIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            context.startActivity(tourIntent);
+    static public void logoutConfirmed(Context context){
+        log("logoutConfirmed");
+
+        DatabaseHandler dbH = DatabaseHandler.getDbHandler(context);
+        dbH.clearChatSettings();
+
+        PackageManager m = context.getPackageManager();
+        String s = context.getPackageName();
+        try {
+            PackageInfo p = m.getPackageInfo(s, 0);
+            s = p.applicationInfo.dataDir;
+        } catch (PackageManager.NameNotFoundException e) {
+            log("Error Package name not found " + e);
+        }
+
+        File appDir = new File(s);
+
+        for (File c : appDir.listFiles()){
+            if (c.isFile()){
+                c.delete();
+            }
         }
     }
 
