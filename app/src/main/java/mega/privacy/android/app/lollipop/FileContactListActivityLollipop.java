@@ -1166,7 +1166,7 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 			if(shares.get(j).getUser()!=null){
 				MegaUser u = megaApi.getContact(shares.get(j).getUser());
 				if(u!=null){
-					megaApi.share(node, u, MegaShare.ACCESS_READWRITE, fileContactListActivityLollipop);
+					megaApi.share(node, u, MegaShare.ACCESS_UNKNOWN, fileContactListActivityLollipop);
 				}
 				else{
 					megaApi.share(node, shares.get(j).getUser(), MegaShare.ACCESS_UNKNOWN, removeMultipleListener);
