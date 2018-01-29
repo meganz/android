@@ -196,14 +196,6 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 			
 		if (node.isFolder()){
 
-			if(selectFile) {
-				if (multipleSelect) {
-					if(isMultipleSelect()){
-						((CloudDriveExplorerFragmentLollipop) fragment).hideMultipleSelect();
-					}
-				}
-			}
-
 			RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
 			params.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
 			params.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
