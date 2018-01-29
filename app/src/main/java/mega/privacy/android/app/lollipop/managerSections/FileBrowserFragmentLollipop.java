@@ -911,6 +911,15 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 					else {
 						mediaIntent = new Intent(context, AudioVideoPlayerLollipop.class);
 					}
+					mediaIntent.putExtra("position", position);
+					if (megaApi.getParentNode(nodes.get(position)).getType() == MegaNode.TYPE_ROOT){
+						mediaIntent.putExtra("parentNodeHandle", -1L);
+					}
+					else{
+						mediaIntent.putExtra("parentNodeHandle", megaApi.getParentNode(nodes.get(position)).getHandle());
+					}
+					mediaIntent.putExtra("orderGetChildren", ((ManagerActivityLollipop)context).orderCloud);
+					mediaIntent.putExtra("adapterType", Constants.FILE_BROWSER_ADAPTER);
 					mediaIntent.putExtra("FILENAME", file.getName());
 					String localPath = Util.getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
 					if (localPath != null){
