@@ -107,12 +107,12 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
 
     Uri uri;
     String pdfFileName;
-    int pageNumber = 0;
     boolean inside = false;
     long handle;
     boolean isFolderLink = false;
     public static boolean isScrolling = false;
     public static boolean scroll = false;
+    private int currentPage;
 
     public RelativeLayout uploadContainer;
     RelativeLayout pdfviewerContainer;
@@ -135,6 +135,13 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
         log("onCreate");
 
         super.onCreate(savedInstanceState);
+
+        if (savedInstanceState != null) {
+            currentPage = savedInstanceState.getInt("currentPage");
+        }
+        else {
+            currentPage = 0;
+        }
 
         Intent intent = getIntent();
         if (intent == null){
@@ -242,6 +249,13 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
         pdfviewerContainer = (RelativeLayout) findViewById(R.id.pdf_viewer_container);
     }
 
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        outState.putInt("currentPage", currentPage);
+    }
+
     class LoadPDFStream extends AsyncTask<String, Void, InputStream> {
 
         @Override
@@ -268,7 +282,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
         protected void onPostExecute(InputStream inputStream) {
             try {
                 pdfView.fromStream(inputStream)
-                        .defaultPage(pageNumber)
+                        .defaultPage(currentPage)
                         .onPageChange(PdfViewerActivityLollipop.this)
                         .enableAnnotationRendering(true)
                         .onLoad(PdfViewerActivityLollipop.this)
@@ -289,7 +303,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
     private void loadLocalPDF() {
         try {
             pdfView.fromUri(uri)
-                    .defaultPage(pageNumber)
+                    .defaultPage(currentPage)
                     .onPageChange(this)
                     .enableAnnotationRendering(true)
                     .onLoad(this)
@@ -898,7 +912,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
 
     @Override
     public void onPageChanged(int page, int pageCount) {
-        pageNumber = page;
+        currentPage = page;
         setTitle(String.format("%s %s / %s", pdfFileName, page + 1, pageCount));
 
         establishScroll();

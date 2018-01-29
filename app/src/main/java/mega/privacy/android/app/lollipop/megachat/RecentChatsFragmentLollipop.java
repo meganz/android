@@ -922,7 +922,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
                         break;
                     }
                     case MegaChatApi.STATUS_INVALID:{
-                        aB.setSubtitle(getString(R.string.invalid_status));
+                        aB.setSubtitle(null);
                         break;
                     }
                     default:{

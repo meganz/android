@@ -232,6 +232,8 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
 
         chatCallActivityActivity = this;
 
+        MegaApplication.setShowPinScreen(true);
+
         display = getWindowManager().getDefaultDisplay();
         outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
