@@ -27,7 +27,6 @@ import android.os.StatFs;
 import android.provider.MediaStore;
 import android.provider.MediaStore.Images;
 import android.provider.MediaStore.Video;
-import android.support.design.widget.Snackbar;
 import android.support.v4.content.FileProvider;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
@@ -79,7 +78,6 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaAttributes;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaError;
@@ -1674,14 +1672,13 @@ public class Util {
 
 	public static void showAlert(Context context, String message, String title) {
 		log("showAlert");
-		android.support.v7.app.AlertDialog.Builder bld = new android.support.v7.app.AlertDialog.Builder(context, R.style.AppCompatAlertDialogStyle);
-		bld.setMessage(message);
+		AlertDialog.Builder builder = new AlertDialog.Builder(context);
 		if(title!=null){
-			bld.setTitle(title);
+			builder.setTitle(title);
 		}
-		bld.setPositiveButton("OK",null);
-		log("Showing alert dialog: " + message);
-		bld.create().show();
+		builder.setMessage(message);
+		builder.setPositiveButton("OK",null);
+		builder.show();
 	}
 
 	public static long calculateTimestampMinDifference(String timeStamp) {
@@ -1730,6 +1727,13 @@ public class Util {
 		log("calculateTimestamp: "+timestamp);
 		Calendar cal = Calendar.getInstance();
 		cal.setTimeInMillis(timestamp*1000);
+		log("calendar: "+cal.get(Calendar.YEAR)+ " "+cal.get(Calendar.MONTH));
+		return cal;
+	}
+
+	public static Calendar calculateDateFromTimestamp2 (long timestamp){
+		log("calculateTimestamp: "+timestamp);
+		Calendar cal = Calendar.getInstance();
 		log("calendar: "+cal.get(Calendar.YEAR)+ " "+cal.get(Calendar.MONTH));
 		return cal;
 	}

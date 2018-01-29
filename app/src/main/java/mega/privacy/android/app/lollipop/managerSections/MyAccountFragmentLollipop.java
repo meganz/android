@@ -30,17 +30,14 @@ import android.widget.TextView;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Locale;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
-import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.MyAccountInfo;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.lollipop.megaachievements.AchievementsActivity;
-import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.DBUtil;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -78,8 +75,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 	Button upgradeButton;
 	Button logoutButton;
 	Button mkButton;
-	Button deleteAccountButton;
-	
+
 	RelativeLayout typeLayout;
 	LinearLayout lastSessionLayout;
 	LinearLayout connectionsLayout;
@@ -228,12 +224,6 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		}
 		logoutButton.setOnClickListener(this);
 		logoutButton.setVisibility(View.VISIBLE);
-
-		deleteAccountButton = (Button) v.findViewById(R.id.delete_account_button);
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-			deleteAccountButton.setBackground(ContextCompat.getDrawable(context, R.drawable.red_rounded_corners_button));
-		}
-		deleteAccountButton.setOnClickListener(this);
 
 		parentLinearLayout = (LinearLayout) v.findViewById(R.id.parent_linear_layout);
 		exportMKLayout = (RelativeLayout) v.findViewById(R.id.export_mk_full_layout);
@@ -461,7 +451,6 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 			}
 		}
 
-
 //		if (getPaymentMethodsBoolean == true){
 //			if (upgradeButton != null){
 //				if ((myAccountInfo.getAccountInfo().getSubscriptionStatus() == MegaAccountDetails.SUBSCRIPTION_STATUS_NONE) || (myAccountInfo.getAccountInfo().getSubscriptionStatus() == MegaAccountDetails.SUBSCRIPTION_STATUS_INVALID)){
@@ -595,11 +584,6 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 				hideMKLayout();
 				AccountController aC = new AccountController(context);
 				aC.exportMK();
-				break;
-			}
-			case R.id.delete_account_button:{
-				log("Delete Account button");
-				((ManagerActivityLollipop)context).askConfirmationDeleteAccount();
 				break;
 			}
 			case R.id.my_account_account_type_button:{

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:MEGA="http://schemas.android.com/apk/res-auto" >
+
+    <item
+        android:id="@+id/full_video_viewer_share"
+        android:orderInCategory="110"
+        android:title="@string/general_share"
+        android:icon="@drawable/ic_social_share_white"
+        MEGA:showAsAction="always"
+        android:visible="true"/>
+
+    <item
+        android:id="@+id/full_video_viewer_chat"
+        android:orderInCategory="110"
+        android:title="@string/general_share"
+        android:icon="@drawable/ic_chat_white"
+        MEGA:showAsAction="always"
+        android:visible="true"/>
+
+    <item
+        android:id="@+id/full_video_viewer_properties"
+        android:orderInCategory="105"
+        android:title="@string/general_file_info"
+        android:icon="@drawable/info_ic_white"
+        MEGA:showAsAction="always"
+        android:visible="true"/>
+
+</menu>

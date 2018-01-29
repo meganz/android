@@ -45,9 +45,11 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.CustomizedGridLayoutManager;
 import mega.privacy.android.app.components.CustomizedGridRecyclerView;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
+import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.MyAccountInfo;
+import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaOfflineLollipopAdapter;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.utils.Constants;
@@ -137,6 +139,8 @@ public class OfflineFragmentLollipop extends Fragment{
 						}
 						((ManagerActivityLollipop) context).showRenameDialog(n, n.getName());
 					}
+					clearSelections();
+					hideMultipleSelect();
 					break;
 				}
 				case R.id.cab_menu_share_link:{
@@ -169,6 +173,8 @@ public class OfflineFragmentLollipop extends Fragment{
 
 					NodeController nC = new NodeController(context);
 					nC.selectContactToShareFolders(handleList);
+					clearSelections();
+					hideMultipleSelect();
 					break;
 				}
 				case R.id.cab_menu_move:{					
@@ -182,9 +188,10 @@ public class OfflineFragmentLollipop extends Fragment{
 						}
 						handleList.add(n.getHandle());
 					}
-
 					NodeController nC = new NodeController(context);
 					nC.chooseLocationToMoveNodes(handleList);
+					clearSelections();
+					hideMultipleSelect();
 					break;
 				}
 				case R.id.cab_menu_copy:{
@@ -201,6 +208,8 @@ public class OfflineFragmentLollipop extends Fragment{
 
 					NodeController nC = new NodeController(context);
 					nC.chooseLocationToCopyNodes(handleList);
+					clearSelections();
+					hideMultipleSelect();
 					break;
 				}
 				case R.id.cab_menu_delete:{
@@ -248,7 +257,7 @@ public class OfflineFragmentLollipop extends Fragment{
 					
 					if(selected.size()==adapter.getItemCount()){
 						menu.findItem(R.id.cab_menu_select_all).setVisible(false);
-						menu.findItem(R.id.cab_menu_unselect_all).setVisible(true);			
+						menu.findItem(R.id.cab_menu_unselect_all).setVisible(true);
 					}
 					else{
 						menu.findItem(R.id.cab_menu_select_all).setVisible(true);
@@ -702,7 +711,9 @@ public class OfflineFragmentLollipop extends Fragment{
 		
 		mOffList.clear();
 		mOffList.addAll(tempOffline);
-
+		if (adapter!= null) {
+			adapter.setNodes(mOffList);
+		}
 		contentText.setText(getInfoFolder(mOffList));
 	}
 
@@ -760,6 +771,9 @@ public class OfflineFragmentLollipop extends Fragment{
 		
 		mOffList.clear();
 		mOffList.addAll(tempOffline);
+		if (adapter!= null) {
+			adapter.setNodes(mOffList);
+		}
 		contentText.setText(getInfoFolder(mOffList));
 	}
 	
@@ -1051,6 +1065,51 @@ public class OfflineFragmentLollipop extends Fragment{
 						}
 
 						startActivity(intent);
+					}
+					else if (MimeTypeList.typeForName(currentFile.getName()).isVideo()) {
+						log("Video file");
+
+						Intent videoIntent = new Intent(context, AudioVideoPlayerLollipop.class);
+						videoIntent.putExtra("HANDLE", Long.parseLong(currentNode.getHandle()));
+						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+							videoIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
+						}
+						else{
+							videoIntent.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
+						}
+						videoIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+						startActivity(videoIntent);
+					}
+					else if (MimeTypeList.typeForName(currentFile.getName()).isAudio()) {
+						log("Audio file");
+
+						Intent audioIntent = new Intent(context, AudioVideoPlayerLollipop.class);
+						audioIntent.putExtra("HANDLE", Long.parseLong(currentNode.getHandle()));
+						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+							audioIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
+						}
+						else{
+							audioIntent.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
+						}
+						audioIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+						startActivity(audioIntent);
+          }
+					else if (MimeTypeList.typeForName(currentFile.getName()).isPdf()){
+						log("Pdf file");
+
+						//String localPath = Util.getLocalFile(context, currentFile.getName(), currentFile.get, currentFile.getParent());
+						File pdfFile = new File(currentFile.getAbsolutePath());
+
+						Intent pdfIntent = new Intent(context, PdfViewerActivityLollipop.class);
+						pdfIntent.putExtra("APP", true);
+						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+							pdfIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", pdfFile), MimeTypeList.typeForName(currentFile.getName()).getType());
+						}
+						else{
+							pdfIntent.setDataAndType(Uri.fromFile(pdfFile), MimeTypeList.typeForName(currentFile.getName()).getType());
+						}
+						pdfIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+						context.startActivity(pdfIntent);
 					}
 					else{
 						openFile(currentFile);

@@ -577,6 +577,12 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     else if(intentReceived.getAction().equals(Constants.ACTION_OPEN_HANDLE_NODE)){
                         url = intentReceived.getDataString();
                     }
+                    else if(intentReceived.getAction().equals(Constants.ACTION_OPEN_FILE_LINK_ROOTNODES_NULL)){
+                        uriData = intentReceived.getData();
+                    }
+                    else if(intentReceived.getAction().equals(Constants.ACTION_OPEN_FOLDER_LINK_ROOTNODES_NULL)){
+                        uriData = intentReceived.getData();
+                    }
 
                     MegaNode rootNode = megaApi.getRootNode();
                     if (rootNode != null){
@@ -596,6 +602,18 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                                 {
                                     intent.putExtras(extras);
                                 }
+                                intent.setData(uriData);
+                            }
+                            else if (action.equals(Constants.ACTION_OPEN_FILE_LINK_ROOTNODES_NULL)){
+                                intent = new Intent(context, FileLinkActivityLollipop.class);
+                                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                action = Constants.ACTION_OPEN_MEGA_LINK;
+                                intent.setData(uriData);
+                            }
+                            else if (action.equals(Constants.ACTION_OPEN_FOLDER_LINK_ROOTNODES_NULL)){
+                                intent = new Intent(context, FolderLinkActivityLollipop.class);
+                                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                action = Constants.ACTION_OPEN_MEGA_FOLDER_LINK;
                                 intent.setData(uriData);
                             }
                             intent.setAction(action);
@@ -635,6 +653,18 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                             {
                                 intent.putExtras(extras);
                             }
+                            intent.setData(uriData);
+                        }
+                        else if (action.equals(Constants.ACTION_OPEN_FILE_LINK_ROOTNODES_NULL)){
+                            intent = new Intent(context, FileLinkActivityLollipop.class);
+                            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                            action = Constants.ACTION_OPEN_MEGA_LINK;
+                            intent.setData(uriData);
+                        }
+                        else if (action.equals(Constants.ACTION_OPEN_FOLDER_LINK_ROOTNODES_NULL)){
+                            intent = new Intent(context, FolderLinkActivityLollipop.class);
+                            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                            action = Constants.ACTION_OPEN_MEGA_FOLDER_LINK;
                             intent.setData(uriData);
                         }
                         intent.setAction(action);
@@ -772,32 +802,39 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 log("INIT STATE: "+megaChatApi.getInitState());
                 log("addChatListener");
                 megaChatApi.addChatListener(this);
-                int ret = megaChatApi.init(gSession);
-                log("enableChat: result of init ---> "+ret);
-                chatSettings = dbH.getChatSettings();
-                if (ret == MegaChatApi.INIT_NO_CACHE)
-                {
-                    log("enableChat: condition ret == MegaChatApi.INIT_NO_CACHE");
-                    megaApi.invalidateCache();
 
-                }
-                else if (ret == MegaChatApi.INIT_ERROR)
-                {
-                    log("enableChat: condition ret == MegaChatApi.INIT_ERROR");
-                    // chat cannot initialize, disable chat completely
-                    if(chatSettings==null) {
-                        log("1 - enableChat: ERROR----> Switch OFF chat");
-                        chatSettings = new ChatSettings(false+"", true + "", "",true + "");
-                        dbH.setChatSettings(chatSettings);
+                int ret = megaChatApi.getInitState();
+
+                if(ret==0||ret==MegaChatApi.INIT_ERROR){
+                    ret = megaChatApi.init(gSession);
+                    log("enableChat: result of init ---> "+ret);
+                    chatSettings = dbH.getChatSettings();
+                    if (ret == MegaChatApi.INIT_NO_CACHE)
+                    {
+                        log("enableChat: condition ret == MegaChatApi.INIT_NO_CACHE");
+                        megaApi.invalidateCache();
+                    }
+                    else if (ret == MegaChatApi.INIT_ERROR)
+                    {
+                        log("enableChat: condition ret == MegaChatApi.INIT_ERROR");
+                        // chat cannot initialize, disable chat completely
+                        if(chatSettings==null) {
+                            log("1 - enableChat: ERROR----> Switch OFF chat");
+                            chatSettings = new ChatSettings(false+"", true + "", "",true + "");
+                            dbH.setChatSettings(chatSettings);
+                        }
+                        else{
+                            log("2 - enableChat: ERROR----> Switch OFF chat");
+                            dbH.setEnabledChat(false + "");
+                        }
+                        megaChatApi.logout(this);
                     }
                     else{
-                        log("2 - enableChat: ERROR----> Switch OFF chat");
-                        dbH.setEnabledChat(false + "");
+                        log("enableChat: condition ret == OK -- chat correctly initialized");
                     }
-                    megaChatApi.logout(this);
                 }
                 else{
-                    log("enableChat: condition ret == OK -- chat correctly initialized");
+                    log("2 - Do not init, chat already initialized");
                 }
             }
             else{
@@ -806,19 +843,9 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             fetchingNodesText.setVisibility(View.VISIBLE);
             log("enableChat: Call to fechtNodes");
             megaApi.fetchNodes(this);
-
         }
         else{
-            log("enableChat:isLogginIn true");
-            if(chatSettings==null) {
-                log("3 - enableChat: ERROR----> Switch OFF chat");
-                chatSettings = new ChatSettings(false+"", true + "", "",true + "");
-                dbH.setChatSettings(chatSettings);
-            }
-            else{
-                log("4 - enableChat: ERROR----> Switch OFF chat");
-                dbH.setEnabledChat(false + "");
-            }
+            log("Another login is processing");
         }
     }
 
@@ -875,43 +902,52 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 if (megaChatApi == null){
                     megaChatApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaChatApi();
                 }
-                log("INIT STATE: "+megaChatApi.getInitState());
-                int ret = -3;
-                if(megaChatApi.getInitState()!=MegaChatApi.INIT_OFFLINE_SESSION){
+
+                int ret = megaChatApi.getInitState();
+                if(ret==0||ret==MegaChatApi.INIT_ERROR){
+                    log("initial: INIT STATE: "+ret);
+
                     ret = megaChatApi.init(gSession);
-                }
 
-                log("startFastLogin: result of init ---> "+ret);
-                chatSettings = dbH.getChatSettings();
-                if (ret == MegaChatApi.INIT_NO_CACHE)
-                {
-                    log("startFastLogin: condition ret == MegaChatApi.INIT_NO_CACHE");
-                    megaApi.invalidateCache();
+                    log("startFastLogin: result of init ---> "+ret);
+                    chatSettings = dbH.getChatSettings();
+                    if (ret == MegaChatApi.INIT_NO_CACHE)
+                    {
+                        log("startFastLogin: condition ret == MegaChatApi.INIT_NO_CACHE");
+                        megaApi.invalidateCache();
 
-                }
-                else if (ret == MegaChatApi.INIT_ERROR)
-                {
-                    // chat cannot initialize, disable chat completely
-                    log("startFastLogin: condition ret == MegaChatApi.INIT_ERROR");
-                    if(chatSettings==null) {
-                        log("1 - startFastLogin: ERROR----> Switch OFF chat");
-                        chatSettings = new ChatSettings(false+"", true + "", "",true + "");
-                        dbH.setChatSettings(chatSettings);
+                    }
+                    else if (ret == MegaChatApi.INIT_ERROR)
+                    {
+                        // chat cannot initialize, disable chat completely
+                        log("startFastLogin: condition ret == MegaChatApi.INIT_ERROR");
+                        if(chatSettings==null) {
+                            log("1 - startFastLogin: ERROR----> Switch OFF chat");
+                            chatSettings = new ChatSettings(false+"", true + "", "",true + "");
+                            dbH.setChatSettings(chatSettings);
+                        }
+                        else{
+                            log("2 - startFastLogin: ERROR----> Switch OFF chat");
+                            dbH.setEnabledChat(false + "");
+                        }
+                        megaChatApi.logout(this);
                     }
                     else{
-                        log("2 - startFastLogin: ERROR----> Switch OFF chat");
-                        dbH.setEnabledChat(false + "");
+                        log("startFastLogin: condition ret == OK -- chat correctly initialized");
                     }
-                    megaChatApi.logout(this);
+                    log("After init: "+ret);
                 }
                 else{
-                    log("startFastLogin: condition ret == OK -- chat correctly initialized");
+                    log("Do not init, chat already initialized: "+ret);
                 }
             }
             else{
                 log("startFastLogin: Chat is NOT ENABLED");
             }
             megaApi.fastLogin(gSession, this);
+        }
+        else{
+            log("Another login is proccessing");
         }
     }
 
@@ -1007,7 +1043,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
     }
 
     private void onKeysGenerated(String privateKey, String publicKey) {
-        log("key generation finished");
+        log("onKeysGenerated");
 
         this.gPrivateKey = privateKey;
         this.gPublicKey = publicKey;
@@ -1041,6 +1077,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
     }
 
     private void onKeysGeneratedLogin(final String privateKey, final String publicKey) {
+        log("onKeysGeneratedLogin");
 
         if(!Util.isOnline(context)){
             loginLoggingIn.setVisibility(View.GONE);
@@ -1059,37 +1096,47 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             return;
         }
 
-        loggingInText.setVisibility(View.VISIBLE);
-        fetchingNodesText.setVisibility(View.GONE);
-        prepareNodesText.setVisibility(View.GONE);
-        serversBusyText.setVisibility(View.GONE);
+        if (!MegaApplication.isLoggingIn()) {
+            MegaApplication.setLoggingIn(true);
 
-        log("fastLogin con publicKey y privateKey");
-        resumeSesion = false;
+            loggingInText.setVisibility(View.VISIBLE);
+            fetchingNodesText.setVisibility(View.GONE);
+            prepareNodesText.setVisibility(View.GONE);
+            serversBusyText.setVisibility(View.GONE);
 
-        if(Util.isChatEnabled()){
-            log("onKeysGeneratedLogin: Chat is ENABLED");
-            if (megaChatApi == null){
-                megaChatApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaChatApi();
-            }
-            int ret = megaChatApi.init(null);
-            log("onKeysGeneratedLogin: result of init ---> "+ret);
-            if (ret ==MegaChatApi.INIT_WAITING_NEW_SESSION){
-                log("startFastLogin: condition ret == MegaChatApi.INIT_WAITING_NEW_SESSION");
-                if (!MegaApplication.isLoggingIn()){
-                    MegaApplication.setLoggingIn(true);
+            log("fastLogin con publicKey y privateKey");
+            resumeSesion = false;
+
+            if(Util.isChatEnabled()){
+                log("onKeysGeneratedLogin: Chat is ENABLED");
+                if (megaChatApi == null){
+                    megaChatApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaChatApi();
+                }
+                int ret = megaChatApi.init(null);
+                log("onKeysGeneratedLogin: result of init ---> "+ret);
+                if (ret ==MegaChatApi.INIT_WAITING_NEW_SESSION){
+                    log("startFastLogin: condition ret == MegaChatApi.INIT_WAITING_NEW_SESSION");
+                    megaApi.fastLogin(lastEmail, publicKey, privateKey, this);
+                }
+                else{
+                    log("ERROR INIT CHAT: " + ret);
+                    megaChatApi.logout(this);
+
+                    if(chatSettings==null) {
+                        log("1 - ERROR----> Switch OFF chat");
+                        chatSettings = new ChatSettings(false+"", true + "", "",true + "");
+                        dbH.setChatSettings(chatSettings);
+                    }
+                    else{
+                        log("2 - ERROR----> Switch OFF chat");
+                        dbH.setEnabledChat(false + "");
+                    }
+
                     megaApi.fastLogin(lastEmail, publicKey, privateKey, this);
                 }
             }
             else{
-                log("ERROR INIT CHAT: " + ret);
-                megaChatApi.logout(this);
-            }
-        }
-        else{
-            log("onKeysGeneratedLogin: Chat is NOT ENABLED");
-            if (!MegaApplication.isLoggingIn()){
-                MegaApplication.setLoggingIn(true);
+                log("onKeysGeneratedLogin: Chat is NOT ENABLED");
                 megaApi.fastLogin(lastEmail, publicKey, privateKey, this);
             }
         }
@@ -1406,7 +1453,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             log("value of resumeSession: "+resumeSesion);
 
             if((action!=null)&&(url!=null)) {
-                log("Empty completed transfers data");
+                log("(1) Empty completed transfers data");
                 dbH.emptyCompletedTransfers();
 
                 if (action.equals(Constants.ACTION_CHANGE_MAIL)) {
@@ -1504,6 +1551,18 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                                         intent.setData(uriData);
                                     }
                                 }
+                                else if (action.equals(Constants.ACTION_OPEN_FILE_LINK_ROOTNODES_NULL)){
+                                    intent = new Intent(context, FileLinkActivityLollipop.class);
+                                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                    action = Constants.ACTION_OPEN_MEGA_LINK;
+                                    intent.setData(uriData);
+                                }
+                                else if (action.equals(Constants.ACTION_OPEN_FOLDER_LINK_ROOTNODES_NULL)){
+                                    intent = new Intent(context, FolderLinkActivityLollipop.class);
+                                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                    action = Constants.ACTION_OPEN_MEGA_FOLDER_LINK;
+                                    intent.setData(uriData);
+                                }
                                 intent.setAction(action);
                                 if (url != null){
                                     intent.setData(Uri.parse(url));
@@ -1524,7 +1583,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     }
 
-                    log("Empty completed transfers data");
+                    log("(2) Empty completed transfers data");
                     dbH.emptyCompletedTransfers();
 
                     startActivity(intent);
@@ -1612,6 +1671,16 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     }
                 }
 
+                if(chatSettings==null) {
+                    log("1 - Reset chat setting enable");
+                    chatSettings = new ChatSettings(true+"", true + "", "",true + "");
+                    dbH.setChatSettings(chatSettings);
+                }
+                else{
+                    log("2 - Reset chat setting enable");
+                    dbH.setEnabledChat(true + "");
+                }
+
                 loginLoggingIn.setVisibility(View.GONE);
                 loginLogin.setVisibility(View.VISIBLE);
                 scrollView.setBackgroundColor(getResources().getColor(R.color.background_create_account));
@@ -1687,6 +1756,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             }
         }
         else if (request.getType() == MegaRequest.TYPE_FETCH_NODES){
+            MegaApplication.setLoggingIn(false);
 
             if (error.getErrorCode() == MegaError.API_OK){
                 log("ok fetch nodes");
@@ -1705,7 +1775,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 dbH.saveCredentials(credentials);
 
                 log("readyToManager");
-                MegaApplication.setLoggingIn(false);
                 readyToManager();
 
             }else{
@@ -1740,6 +1809,15 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
                 ((LoginActivityLollipop)context).showSnackbar(errorMessage);
 
+                if(chatSettings==null) {
+                    log("1 - Reset chat setting enable");
+                    chatSettings = new ChatSettings(true+"", true + "", "",true + "");
+                    dbH.setChatSettings(chatSettings);
+                }
+                else{
+                    log("2 - Reset chat setting enable");
+                    dbH.setEnabledChat(true + "");
+                }
             }
         }
         else if (request.getType() == MegaRequest.TYPE_QUERY_SIGNUP_LINK){
@@ -2299,6 +2377,11 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
     @Override
     public void onChatPresenceConfigUpdate(MegaChatApiJava api, MegaChatPresenceConfig config) {
+
+    }
+
+    @Override
+    public void onChatConnectionStateUpdate(MegaChatApiJava api, long chatid, int newState) {
 
     }
 
