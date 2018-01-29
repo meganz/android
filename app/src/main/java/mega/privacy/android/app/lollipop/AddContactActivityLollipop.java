@@ -528,7 +528,6 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                         }
                         else {
                             inviteContacts(addedContactsPhone);
-                            hideKeyboard();
                         }
                     }
                     else if (contactType == Constants.CONTACT_TYPE_MEGA){
@@ -537,7 +536,6 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                         }
                         else {
                             setResultContacts(addedContactsMEGA, true);
-                            hideKeyboard();
                         }
                     }
                     return true;
@@ -1225,6 +1223,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         }
         intent.putExtra(EXTRA_MEGA_CONTACTS, megaContacts);
         setResult(RESULT_OK, intent);
+        hideKeyboard();
         finish();
     }
 
@@ -1281,6 +1280,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
 
         intent.putExtra(EXTRA_MEGA_CONTACTS, false);
         setResult(RESULT_OK, intent);
+        hideKeyboard();
         finish();
     }
 
