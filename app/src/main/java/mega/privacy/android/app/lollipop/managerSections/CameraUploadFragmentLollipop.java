@@ -12,7 +12,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.content.res.Resources;
-import java.text.SimpleDateFormat;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -30,6 +29,8 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SwitchCompat;
+import android.text.Html;
+import android.text.Spanned;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.GestureDetector;
@@ -51,6 +52,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -71,8 +73,6 @@ import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.MegaMonthPicLollipop;
 import mega.privacy.android.app.lollipop.MyAccountInfo;
-import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
-import mega.privacy.android.app.lollipop.adapters.MegaPhotoSyncGridAdapterLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaPhotoSyncGridTitleAdapterLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaPhotoSyncListAdapterLollipop;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
@@ -90,9 +90,7 @@ import nz.mega.sdk.MegaShare;
 
 public class CameraUploadFragmentLollipop extends Fragment implements OnClickListener, RecyclerView.OnItemTouchListener, GestureDetector.OnGestureListener, MegaRequestListenerInterface{
 
-	
 	public static int GRID_WIDTH = 154;
-	private static final String BUNDLE_RECYCLER_LAYOUT = "classname.recycler.layout";
 
 	public static int GRID_LARGE = 3;
 	public static int GRID_SMALL = 7;
@@ -110,7 +108,6 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	ImageView emptyImageView;
 	LinearLayout emptyTextView;
 	TextView emptyTextViewFirst;
-	TextView emptyTextViewSecond;
 
 	private RelativeLayout contentTextLayout;
 //	Button turnOnOff;
@@ -755,16 +752,28 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 				emptyImageView = (ImageView) v.findViewById(R.id.file_list_empty_image);
 				emptyTextView = (LinearLayout) v.findViewById(R.id.file_list_empty_text);
 				emptyTextViewFirst = (TextView) v.findViewById(R.id.file_list_empty_text_first);
-				emptyTextViewSecond = (TextView) v.findViewById(R.id.file_list_empty_text_second);
 
 				if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
 					emptyImageView.setImageResource(R.drawable.uploads_empty_landscape);
 				} else {
 					emptyImageView.setImageResource(R.drawable.ic_empty_camera_uploads);
 				}
-				emptyTextViewFirst.setText(R.string.context_empty_camera_uploads);
-				String text = getString(R.string.section_photo_sync);
-				emptyTextViewSecond.setText(" " + text + ".");
+				String textToShow = String.format(context.getString(R.string.context_empty_camera_uploads));
+
+				try{
+					textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
+					textToShow = textToShow.replace("[/A]", "</font>");
+					textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
+					textToShow = textToShow.replace("[/B]", "</font>");
+				}
+				catch (Exception e){}
+				Spanned result = null;
+				if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+					result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
+				} else {
+					result = Html.fromHtml(textToShow);
+				}
+				emptyTextViewFirst.setText(result);
 
 				emptyImageView.setVisibility(View.VISIBLE);
 				emptyTextView.setVisibility(View.VISIBLE);
@@ -942,16 +951,29 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 				emptyImageView = (ImageView) v.findViewById(R.id.file_grid_empty_image);
 				emptyTextView = (LinearLayout) v.findViewById(R.id.file_grid_empty_text);
 				emptyTextViewFirst = (TextView) v.findViewById(R.id.file_grid_empty_text_first);
-				emptyTextViewSecond = (TextView) v.findViewById(R.id.file_grid_empty_text_second);
 
 				if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
 					emptyImageView.setImageResource(R.drawable.uploads_empty_landscape);
 				} else {
 					emptyImageView.setImageResource(R.drawable.ic_empty_camera_uploads);
 				}
-				emptyTextViewFirst.setText(R.string.context_empty_camera_uploads);
-				String text = getString(R.string.section_photo_sync);
-				emptyTextViewSecond.setText(" " + text + ".");
+
+				String textToShow = String.format(context.getString(R.string.context_empty_camera_uploads));
+
+				try{
+					textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
+					textToShow = textToShow.replace("[/A]", "</font>");
+					textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
+					textToShow = textToShow.replace("[/B]", "</font>");
+				}
+				catch (Exception e){}
+				Spanned result = null;
+				if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+					result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
+				} else {
+					result = Html.fromHtml(textToShow);
+				}
+				emptyTextViewFirst.setText(result);
 
 				emptyImageView.setVisibility(View.VISIBLE);
 				emptyTextView.setVisibility(View.VISIBLE);
@@ -1221,6 +1243,22 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 		dbH.setStorageDownloadLocation(defaultDownloadLocation.getAbsolutePath());
 		dbH.setPinLockEnabled(false);
 		dbH.setPinLockCode("");
+
+		ArrayList<MegaNode> nodeLinks = megaApi.getPublicLinks();
+		if(nodeLinks==null){
+			log("No public links:showCopyright set true");
+			dbH.setShowCopyright(true);
+		}
+		else{
+			if(nodeLinks.size()==0){
+				log("No public links:showCopyright set true");
+				dbH.setShowCopyright(true);
+			}
+			else{
+				log("ALready public links:showCopyright set false");
+				dbH.setShowCopyright(false);
+			}
+		}
 	}
 	
 	public String getImageDateString(int month, int year){

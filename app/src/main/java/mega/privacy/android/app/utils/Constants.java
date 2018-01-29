@@ -133,6 +133,8 @@ public class Constants {
 	public static String ACTION_CHAT_SUMMARY = "ACTION_CHAT_SUMMARY";
 	public static String ACTION_INCOMING_SHARED_FOLDER_NOTIFICATION = "ACTION_INCOMING_SHARED_FOLDER_NOTIFICATION";
 	public static String ACTION_OPEN_HANDLE_NODE = "ACTION_OPEN_HANDLE_NODE";
+	public static String ACTION_OPEN_FILE_LINK_ROOTNODES_NULL = "ACTION_OPEN_FILE_LINK_ROOTNODES_NULL";
+	public static String ACTION_OPEN_FOLDER_LINK_ROOTNODES_NULL = "ACTION_OPEN_FOLDER_LINK_ROOTNODES_NULL";
 
 	public static String ACTION_CHAT_SHOW_MESSAGES = "CHAT_SHOW_MESSAGES";
 	public static String ACTION_NEW_CHAT = "NEW_CHAT";
@@ -198,7 +200,7 @@ public class Constants {
 	public static int TAKE_PICTURE_OPTION = 0;
 	public static int TAKE_PROFILE_PICTURE = 1;
 
-	final public static String MAIL_ANDROID = "android@mega.nz";
+	final public static String MAIL_ANDROID = "androidfeedback@mega.nz";
 
 	public static int MIN_ITEMS_SCROLLBAR = 30;
 	public static int MIN_ITEMS_SCROLLBAR_GRID = 200;

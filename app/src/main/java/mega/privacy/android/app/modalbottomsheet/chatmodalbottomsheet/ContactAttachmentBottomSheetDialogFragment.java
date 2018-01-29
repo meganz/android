@@ -93,6 +93,8 @@ public class ContactAttachmentBottomSheetDialogFragment extends BottomSheetDialo
     MegaChatApiAndroid megaChatApi;
     DatabaseHandler dbH;
 
+    private int heightDisplay;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -152,6 +154,8 @@ public class ContactAttachmentBottomSheetDialogFragment extends BottomSheetDialo
         Display display = getActivity().getWindowManager().getDefaultDisplay();
         outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
+
+        heightDisplay = outMetrics.heightPixels;
 
         View contentView = View.inflate(getContext(), R.layout.bottom_sheet_contact_attachment_item, null);
 
@@ -417,6 +421,13 @@ public class ContactAttachmentBottomSheetDialogFragment extends BottomSheetDialo
             mBehavior = BottomSheetBehavior.from((View) contentView.getParent());
             mBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
 
+
+            if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                mBehavior.setPeekHeight((heightDisplay / 4) * 2);
+            }
+            else if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT){
+                mBehavior.setPeekHeight(BottomSheetBehavior.PEEK_HEIGHT_AUTO);
+            }
         }
     }
 

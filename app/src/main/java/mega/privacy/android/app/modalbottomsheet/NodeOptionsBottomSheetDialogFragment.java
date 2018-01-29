@@ -1,19 +1,20 @@
 package mega.privacy.android.app.modalbottomsheet;
 
 import android.app.Activity;
+import android.app.ActivityManager;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
-import android.graphics.Point;
-import android.graphics.Rect;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.BottomSheetDialogFragment;
 import android.support.design.widget.CoordinatorLayout;
-import android.support.v4.content.ContextCompat;
+import android.support.v4.content.FileProvider;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Display;
@@ -23,7 +24,9 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import java.io.File;
 import java.util.ArrayList;
 
 import mega.privacy.android.app.DatabaseHandler;
@@ -31,14 +34,13 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.MimeTypeInfo;
 import mega.privacy.android.app.MimeTypeList;
-import mega.privacy.android.app.MimeTypeMime;
-import mega.privacy.android.app.MimeTypeThumbnail;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.FileContactListActivityLollipop;
 import mega.privacy.android.app.lollipop.FileInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.MyAccountInfo;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
+import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.ThumbnailUtils;
 import mega.privacy.android.app.utils.Util;
@@ -82,6 +84,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
     private LinearLayout optionRubbishBin;
     private LinearLayout optionRemove;
     private LinearLayout optionOpenFolder;
+    private LinearLayout optionOpenWith;
 
     private LinearLayout items_layout;
     private RelativeLayout node_head;
@@ -97,6 +100,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
     private int height = -1;
     private boolean heightseted = false;
     private int heightReal = -1;
+    private int heightDisplay;
 
     private View contentView;
 
@@ -142,6 +146,8 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
         outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
 
+        heightDisplay = outMetrics.heightPixels;
+
         contentView = View.inflate(getContext(), R.layout.bottom_sheet_node_item, null);
 
         contentView.post(new Runnable() {
@@ -180,6 +186,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
         optionRubbishBin = (LinearLayout) contentView.findViewById(R.id.option_rubbish_bin_layout);
         optionRemove = (LinearLayout) contentView.findViewById(R.id.option_remove_layout);
         optionOpenFolder = (LinearLayout) contentView.findViewById(R.id.option_open_folder_layout);
+        optionOpenWith = (LinearLayout) contentView.findViewById(R.id.option_open_with_layout);
 
         optionDownload.setOnClickListener(this);
         optionInfo.setOnClickListener(this);
@@ -195,6 +202,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
         optionRubbishBin.setOnClickListener(this);
         optionRemove.setOnClickListener(this);
         optionOpenFolder.setOnClickListener(this);
+        optionOpenWith.setOnClickListener(this);
 
         nodeIconLayout.setVisibility(View.GONE);
 
@@ -210,6 +218,14 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
 
         if(node!=null) {
             log("node is NOT null");
+
+            if (MimeTypeList.typeForName(node.getName()).isVideoReproducible() || MimeTypeList.typeForName(node.getName()).isVideo() || MimeTypeList.typeForName(node.getName()).isAudio()) {
+                optionOpenWith.setVisibility(View.VISIBLE);
+            }
+            else {
+                optionOpenWith.setVisibility(View.GONE);
+            }
+
             if (Util.isOnline(context)) {
                 nodeName.setText(node.getName());
 
@@ -632,6 +648,13 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
 
             final NodeOptionsBottomSheetDialogFragment thisclass = this;
 
+            if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                mBehavior.setPeekHeight((heightDisplay / 4) * 2);
+            }
+            else if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT){
+                mBehavior.setPeekHeight(BottomSheetBehavior.PEEK_HEIGHT_AUTO);
+            }
+
             mBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
                 @Override
                 public void onStateChanged(@NonNull View bottomSheet, int newState) {
@@ -835,7 +858,29 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                     log("The selected node is NULL");
                     return;
                 }
-                nC.selectContactToSendNode(node);
+
+
+                if(megaApi!=null && megaApi.getRootNode()!=null){
+                    ArrayList<MegaUser> contacts = megaApi.getContacts();
+                    if(contacts==null){
+                        if(context instanceof ManagerActivityLollipop){
+                            ((ManagerActivityLollipop) context).showSnackbar("You have no MEGA contacts. Please, invite friends from the Contacts section");
+                        }
+                    }
+                    else {
+                        if(contacts.isEmpty()){
+                            ((ManagerActivityLollipop) context).showSnackbar("You have no MEGA contacts. Please, invite friends from the Contacts section");
+                        }
+                        else{
+                            nC.selectContactToSendNode(node);
+                        }
+                    }
+                }
+                else{
+                    log("Online but not megaApi");
+                    ((ManagerActivityLollipop) context).showSnackbar(getString(R.string.error_server_connection_problem));
+                }
+
                 dismissAllowingStateLoss();
                 break;
             }
@@ -905,11 +950,70 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                 dismissAllowingStateLoss();
                 break;
             }
+
+            case R.id.option_open_with_layout:{
+                log("Open with");
+                if(node==null){
+                    log("The selected node is NULL");
+                    return;
+                }
+                openWith ();
+                break;
+            }
         }
 
 //        dismiss();
         mBehavior = BottomSheetBehavior.from((View) mainLinearLayout.getParent());
         mBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+    }
+
+    public void openWith () {
+        log("openWith");
+
+        if (megaApi.httpServerIsRunning() == 0) {
+            megaApi.httpServerStart();
+        }
+
+        ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
+        ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+        activityManager.getMemoryInfo(mi);
+
+        if(mi.totalMem> Constants.BUFFER_COMP){
+            log("Total mem: "+mi.totalMem+" allocate 32 MB");
+            megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
+        }
+        else{
+            log("Total mem: "+mi.totalMem+" allocate 16 MB");
+            megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
+        }
+
+        String url = megaApi.httpServerGetLocalLink(node);
+        String mimeType = MimeTypeList.typeForName(node.getName()).getType();
+        log("FILENAME: " + node.getName());
+
+        Intent mediaIntent = new Intent(Intent.ACTION_VIEW);
+        mediaIntent.putExtra("HANDLE", node.getHandle());
+        mediaIntent.putExtra("FILENAME", node.getName());
+        String localPath = Util.getLocalFile(context, node.getName(), node.getSize(), Util.downloadDIR);
+        if (localPath != null){
+            File mediaFile = new File(localPath);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                mediaIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile), MimeTypeList.typeForName(node.getName()).getType());
+            }
+            else{
+                mediaIntent.setDataAndType(Uri.fromFile(mediaFile), MimeTypeList.typeForName(node.getName()).getType());
+            }
+            mediaIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        }
+        else {
+            mediaIntent.setDataAndType(Uri.parse(url), mimeType);
+        }
+        if (MegaApiUtils.isIntentAvailable(context, mediaIntent)){
+            startActivity(mediaIntent);
+        }
+        else{
+            Toast.makeText(context, getResources().getString(R.string.intent_not_available), Toast.LENGTH_LONG).show();
+        }
     }
 
 

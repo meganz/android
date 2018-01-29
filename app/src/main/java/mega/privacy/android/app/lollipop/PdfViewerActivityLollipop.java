@@ -122,13 +122,16 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
     DatabaseHandler dbH = null;
     ChatSettings chatSettings;
     boolean isUrl;
+    DefaultScrollHandle defaultScrollHandle;
 
     Uri uri;
     String pdfFileName;
-    int pageNumber = 0;
     boolean inside = false;
     long handle;
     boolean isFolderLink = false;
+    public static boolean isScrolling = false;
+    public static boolean scroll = false;
+    private int currentPage;
 
     public RelativeLayout uploadContainer;
     RelativeLayout pdfviewerContainer;
@@ -141,11 +144,23 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
     private List<ShareInfo> filePreparedInfos;
     ArrayList<Long> handleListM = new ArrayList<Long>();
 
+    int typeCheckLogin = -1;
+
+    static int TYPE_UPLOAD = 0;
+    static int TYPE_DOWNLOAD = 1;
+
     @Override
     public void onCreate (Bundle savedInstanceState){
         log("onCreate");
 
         super.onCreate(savedInstanceState);
+
+        if (savedInstanceState != null) {
+            currentPage = savedInstanceState.getInt("currentPage");
+        }
+        else {
+            currentPage = 0;
+        }
 
         Intent intent = getIntent();
         if (intent == null){
@@ -189,30 +204,34 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
 
         app = (MegaApplication)getApplication();
         megaApi = app.getMegaApi();
-        if(megaApi==null||megaApi.getRootNode()==null){
-            log("Refresh session - sdk");
-            Intent intentLogin = new Intent(this, LoginActivityLollipop.class);
-            intentLogin.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
-            intentLogin.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivity(intentLogin);
-            finish();
-            return;
-        }
-        if(Util.isChatEnabled()){
-            if (megaChatApi == null){
-                megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
-            }
 
-            if(megaChatApi==null||megaChatApi.getInitState()== MegaChatApi.INIT_ERROR){
-                log("Refresh session - karere");
-                Intent intentLogin = new Intent(this, LoginActivityLollipop.class);
-                intentLogin.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
-                intentLogin.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                startActivity(intentLogin);
-                finish();
-                return;
-            }
-        }
+//        if(megaApi==null||megaApi.getRootNode()==null){
+//            log("Refresh session - sdk");
+//            Intent intentLogin = new Intent(this, LoginActivityLollipop.class);
+//            intentLogin.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
+//            intentLogin.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+//            startActivity(intentLogin);
+//            finish();
+//            return;
+//        }
+//        if(Util.isChatEnabled()){
+//            if (megaChatApi == null){
+//                megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
+//            }
+//
+//            if(megaChatApi==null||megaChatApi.getInitState()== MegaChatApi.INIT_ERROR){
+//                log("Refresh session - karere");
+//                Intent intentLogin = new Intent(this, LoginActivityLollipop.class);
+//                intentLogin.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
+//                intentLogin.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+//                startActivity(intentLogin);
+//                finish();
+//                return;
+//            }
+//        }
+        setContentView(R.layout.activity_pdfviewer);
+
+        //appBarLayout = (AppBarLayout) findViewById(R.id.app_bar_pdfviewer);
 
         log("Overquota delay: "+megaApi.getBandwidthOverquotaDelay());
         if(megaApi.getBandwidthOverquotaDelay()>0){
@@ -233,6 +252,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
 
         pdfView.setBackgroundColor(Color.LTGRAY);
         pdfFileName = getFileName(uri);
+        defaultScrollHandle = new DefaultScrollHandle(PdfViewerActivityLollipop.this);
 
         loading = true;
         if (uri.toString().contains("http://")){
@@ -272,11 +292,19 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
             @Override
             public void onClick(View v) {
                 log("onClick uploadContainer");
+                typeCheckLogin = TYPE_UPLOAD;
                 checkLogin();
             }
         });
 
         pdfviewerContainer = (RelativeLayout) findViewById(R.id.pdf_viewer_container);
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        outState.putInt("currentPage", currentPage);
     }
 
     class LoadPDFStream extends AsyncTask<String, Void, InputStream> {
@@ -306,11 +334,11 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
             log("onPostExecute");
             try {
                 pdfView.fromStream(inputStream)
-                        .defaultPage(pageNumber)
+                        .defaultPage(currentPage)
                         .onPageChange(PdfViewerActivityLollipop.this)
                         .enableAnnotationRendering(true)
                         .onLoad(PdfViewerActivityLollipop.this)
-                        .scrollHandle(new DefaultScrollHandle(PdfViewerActivityLollipop.this))
+                        .scrollHandle(defaultScrollHandle)
                         .spacing(10) // in dp
                         .onPageError(PdfViewerActivityLollipop.this)
                         .load();
@@ -332,11 +360,11 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
         log("loadLocalPDF loading: "+loading);
         try {
             pdfView.fromUri(uri)
-                    .defaultPage(pageNumber)
+                    .defaultPage(currentPage)
                     .onPageChange(this)
                     .enableAnnotationRendering(true)
                     .onLoad(this)
-                    .scrollHandle(new DefaultScrollHandle(this))
+                    .scrollHandle(defaultScrollHandle)
                     .spacing(10) // in dp
                     .onPageError(this)
                     .load();
@@ -351,15 +379,20 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
     public void checkLogin(){
         log("checkLogin");
 
-        uploadContainer.setVisibility(View.GONE);
+        if (typeCheckLogin == TYPE_UPLOAD) {
+            uploadContainer.setVisibility(View.GONE);
+        }
 
         dbH = DatabaseHandler.getDbHandler(this);
         credentials = dbH.getCredentials();
         //Start login process
         if (credentials == null){
             log("No credential to login");
-            Util.showAlert(this, getString(R.string.alert_not_logged_in), null);
-            uploadContainer.setVisibility(View.VISIBLE);
+            if (typeCheckLogin == TYPE_UPLOAD) {
+                Util.showAlert(this, getString(R.string.alert_not_logged_in), null);
+                uploadContainer.setVisibility(View.VISIBLE);
+                typeCheckLogin = -1;
+            }
         }
         else{
             if (megaApi.getRootNode() == null) {
@@ -374,40 +407,57 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
                         if (megaChatApi == null) {
                             megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
                         }
-                        int ret = megaChatApi.init(gSession);
-                        log("onCreate: result of init ---> " + ret);
-                        chatSettings = dbH.getChatSettings();
-                        if (ret == MegaChatApi.INIT_NO_CACHE) {
-                            log("onCreate: condition ret == MegaChatApi.INIT_NO_CACHE");
-                            megaApi.invalidateCache();
 
-                        } else if (ret == MegaChatApi.INIT_ERROR) {
+                        int ret = megaChatApi.getInitState();
 
-                            log("onCreate: condition ret == MegaChatApi.INIT_ERROR");
-                            if (chatSettings == null) {
+                        if(ret==0||ret==MegaChatApi.INIT_ERROR){
+                            ret = megaChatApi.init(gSession);
+                            log("onCreate: result of init ---> " + ret);
+                            chatSettings = dbH.getChatSettings();
+                            if (ret == MegaChatApi.INIT_NO_CACHE) {
+                                log("onCreate: condition ret == MegaChatApi.INIT_NO_CACHE");
+                                megaApi.invalidateCache();
 
-                                log("1 - onCreate: ERROR----> Switch OFF chat");
-                                chatSettings = new ChatSettings(false + "", true + "", "", true + "");
-                                dbH.setChatSettings(chatSettings);
+                            } else if (ret == MegaChatApi.INIT_ERROR) {
+
+                                log("onCreate: condition ret == MegaChatApi.INIT_ERROR");
+                                if (chatSettings == null) {
+
+                                    log("1 - onCreate: ERROR----> Switch OFF chat");
+                                    chatSettings = new ChatSettings(false + "", true + "", "", true + "");
+                                    dbH.setChatSettings(chatSettings);
+                                } else {
+
+                                    log("2 - onCreate: ERROR----> Switch OFF chat");
+                                    dbH.setEnabledChat(false + "");
+                                }
+                                megaChatApi.logout(this);
                             } else {
 
-                                log("2 - onCreate: ERROR----> Switch OFF chat");
-                                dbH.setEnabledChat(false + "");
+                                log("onCreate: Chat correctly initialized");
                             }
-                            megaChatApi.logout(this);
-                        } else {
-
-                            log("onCreate: Chat correctly initialized");
                         }
                     }
 
                     log("SESSION: " + gSession);
                     megaApi.fastLogin(gSession, this);
                 }
+                else{
+                    log("Another login is processing");
+                }
             }
             else{
                 ((MegaApplication) getApplication()).sendSignalPresenceActivity();
-                uploadToCloud();
+                if (typeCheckLogin == TYPE_UPLOAD) {
+                    typeCheckLogin = -1;
+
+                    uploadToCloud();
+                }
+                else if (typeCheckLogin == TYPE_DOWNLOAD){
+                    typeCheckLogin = -1;
+
+                    downloadFromCloud();
+                }
             }
         }
     }
@@ -444,6 +494,23 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
             Util.showAlert(this, getString(R.string.alert_not_logged_in), null);
             uploadContainer.setVisibility(View.VISIBLE);
         }
+    }
+
+    public void downloadFromCloud(){
+        MegaNode node = megaApi.getNodeByHandle(handle);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
+            if (!hasStoragePermission) {
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                        Constants.REQUEST_WRITE_STORAGE);
+
+                handleListM.add(node.getHandle());
+            }
+        }
+        ArrayList<Long> handleList = new ArrayList<Long>();
+        handleList.add(node.getHandle());
+        downloadNode(handleList);
     }
 
     public void onIntentProcessed(List<ShareInfo> infos) {
@@ -490,6 +557,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
         log("setToolbarVisibilityShow");
         aB.show();
         if(tB != null) {
+            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
             tB.animate().translationY(0).setDuration(200L).start();
             uploadContainer.animate().translationY(0).setDuration(200L).start();
         }
@@ -498,6 +566,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
     public void setToolbarVisibilityHide () {
         log("setToolbarVisibilityHide");
         if(tB != null) {
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
             tB.animate().translationY(-220).setDuration(200L).withEndAction(new Runnable() {
                 @Override
                 public void run() {
@@ -507,6 +576,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
             uploadContainer.animate().translationY(220).setDuration(200L).start();
         }
         else {
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
             aB.hide();
         }
     }
@@ -536,6 +606,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
         downloadMenuItem = menu.findItem(R.id.pdfviewer_download);
         if (isUrl){
             log("isURL");
+            shareMenuItem.setVisible(false);
             downloadMenuItem.setVisible(true);
             Drawable download = getResources().getDrawable(R.drawable.ic_download_white);
             download.setColorFilter(getResources().getColor(R.color.lollipop_primary_color), PorterDuff.Mode.SRC_ATOP);
@@ -543,7 +614,6 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
             downloadMenuItem.setIcon(download);
         }
         else {
-
             log("NOT isURL");
             downloadMenuItem.setVisible(false);
         }
@@ -568,7 +638,6 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
             }
             case R.id.pdfviewer_download: {
                 downloadFile();
-                finish();
                 break;
             }
         }
@@ -579,40 +648,30 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
         log("intentToSendFile");
 
         if(uri!=null){
-            Intent share = new Intent(android.content.Intent.ACTION_SEND);
-            share.setType("application/pdf");
+            if (!isUrl){
+                Intent share = new Intent(android.content.Intent.ACTION_SEND);
+                share.setType("application/pdf");
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                log("Use provider to share");
-                share.putExtra(Intent.EXTRA_STREAM, Uri.parse(uri.toString()));
-                share.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    log("Use provider to share");
+                    share.putExtra(Intent.EXTRA_STREAM, Uri.parse(uri.toString()));
+                    share.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                }
+                else{
+                    share.putExtra(Intent.EXTRA_STREAM, uri);
+                }
+                startActivity(Intent.createChooser(share, getString(R.string.context_share)));
             }
-            else{
-                share.putExtra(Intent.EXTRA_STREAM, uri);
+            else {
+                Snackbar.make(pdfviewerContainer, getString(R.string.not_download), Snackbar.LENGTH_LONG).show();
             }
-            startActivity(Intent.createChooser(share, getString(R.string.context_share_image)));
-        }
-        else{
-            Snackbar.make(pdfviewerContainer, getString(R.string.pdf_viewer_not_download), Snackbar.LENGTH_LONG).show();
         }
     }
 
     public void downloadFile() {
 
-        MegaNode node = megaApi.getNodeByHandle(handle);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
-            if (!hasStoragePermission) {
-                ActivityCompat.requestPermissions(this,
-                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                        Constants.REQUEST_WRITE_STORAGE);
-
-                handleListM.add(node.getHandle());
-            }
-        }
-        ArrayList<Long> handleList = new ArrayList<Long>();
-        handleList.add(node.getHandle());
-        downloadNode(handleList);
+        typeCheckLogin = TYPE_DOWNLOAD;
+        checkLogin();
     }
 
     @SuppressLint("NewApi")
@@ -728,6 +787,30 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
         }
         else{
             downloadTo(downloadLocationDefaultPath, null, size, hashes);
+            finish();
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        log("-------------------onActivityResult " + requestCode + "____" + resultCode);
+
+        if (requestCode == Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER && resultCode == RESULT_OK) {
+            log("onActivityResult: REQUEST_CODE_SELECT_LOCAL_FOLDER");
+            if (intent == null) {
+                log("Return.....");
+                return;
+            }
+
+            String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
+            log("parentPath: "+parentPath);
+            long size = intent.getLongExtra(FileStorageActivityLollipop.EXTRA_SIZE, 0);
+            log("size: "+size);
+            long[] hashes = intent.getLongArrayExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES);
+            log("hashes size: "+hashes.length);
+
+            downloadTo(parentPath, null, size, hashes);
+            finish();
         }
     }
 
@@ -877,10 +960,22 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
         }
     }
 
+    public void establishScroll() {
+        if (isScrolling && !scroll) {
+            scroll = true;
+            setToolbarVisibilityHide();
+        }
+        else if (!isScrolling){
+            scroll = false;
+        }
+    }
+
     @Override
     public void onPageChanged(int page, int pageCount) {
-        pageNumber = page;
+        currentPage = page;
         setTitle(String.format("%s %s / %s", pdfFileName, page + 1, pageCount));
+
+        establishScroll();
     }
 
     @Override
@@ -899,7 +994,6 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
         log("producer = " + meta.getProducer());
         log("creationDate = " + meta.getCreationDate());
         log("modDate = " + meta.getModDate());
-
         printBookmarksTree(pdfView.getTableOfContents(), "-");
     }
 
@@ -942,6 +1036,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
     public void onClick(View v) {
         log("onClick");
         setToolbarVisibility();
+        defaultScrollHandle.hideDelayed();
     }
 
     @Override
@@ -969,6 +1064,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
                     dbH.clearPreferences();
                     dbH.setFirstTime(false);
                 }
+                typeCheckLogin = -1;
             }
             else{
                 //LOGIN OK
@@ -1016,21 +1112,48 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
                     if(chatEnabled){
 
                         log("Chat enabled-->connect");
-                        megaChatApi.connect(this);
+                        if((megaChatApi.getInitState()!=MegaChatApi.INIT_ERROR)){
+                            log("Connection goes!!!");
+                            megaChatApi.connect(this);
+                        }
+                        else{
+                            log("Not launch connect: "+megaChatApi.getInitState());
+                        }
                         MegaApplication.setLoggingIn(false);
-                        uploadToCloud();
+                        if (typeCheckLogin == TYPE_UPLOAD){
+                            typeCheckLogin = -1;
+                            uploadToCloud();
+                        }
+                        else if (typeCheckLogin == TYPE_DOWNLOAD){
+                            typeCheckLogin = -1;
+                            downloadFromCloud();
+                        }
                     }
                     else{
 
                         log("Chat NOT enabled - readyToManager");
                         MegaApplication.setLoggingIn(false);
-                        uploadToCloud();
+                        if (typeCheckLogin == TYPE_UPLOAD){
+                            typeCheckLogin = -1;
+                            uploadToCloud();
+                        }
+                        else if (typeCheckLogin == TYPE_DOWNLOAD){
+                            typeCheckLogin = -1;
+                            downloadFromCloud();
+                        }
                     }
                 }
                 else{
                     log("chatSettings NULL - readyToManager");
                     MegaApplication.setLoggingIn(false);
-                    uploadToCloud();
+                    if (typeCheckLogin == TYPE_UPLOAD){
+                        typeCheckLogin = -1;
+                        uploadToCloud();
+                    }
+                    else if (typeCheckLogin == TYPE_DOWNLOAD){
+                        typeCheckLogin = -1;
+                        downloadFromCloud();
+                    }
                 }
             }
         }
