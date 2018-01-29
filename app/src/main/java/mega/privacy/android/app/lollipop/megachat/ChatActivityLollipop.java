@@ -1985,6 +1985,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     editingMessage = true;
                     messageToEdit = messagesSelected.get(0).getMessage();
                     textChat.setText(messageToEdit.getContent());
+                    textChat.setSelection(textChat.getText().length());
                     //Show keyboard
 
                     break;
