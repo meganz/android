@@ -16,6 +16,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.util.SparseBooleanArray;
+import android.util.TypedValue;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -65,6 +66,8 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 	public static final int ITEM_VIEW_TYPE_LIST = 0;
 	public static final int ITEM_VIEW_TYPE_GRID = 1;
 	public static final int ITEM_VIEW_TYPE_LIST_ADD_CONTACT = 2;
+	public static int MAX_WIDTH_CONTACT_NAME_LAND=450;
+	public static int MAX_WIDTH_CONTACT_NAME_PORT=200;
 
 	private Context context;
 	private int positionClicked;
@@ -146,7 +149,6 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 
 		@Override
 		public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
-			// TODO Auto-generated method stub			
 		}
 		
 	}
@@ -181,7 +183,6 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 //        ImageView imageView;
         TextView textViewContactName;
         TextView textViewContent;
-        ImageButton imageButtonThreeDots;
         RelativeLayout itemLayout;
         String contactMail;
     }
@@ -192,6 +193,7 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 		}
     	RoundedImageView imageView;
 		ImageView contactStateIcon;
+		RelativeLayout threeDotsLayout;
     }
     
     public class ViewHolderContactsGrid extends ViewHolderContacts{
@@ -200,6 +202,7 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 		}
     	ImageView imageView;
 		ImageView contactStateIcon;
+		ImageButton imageButtonThreeDots;
     }
     
 	ViewHolderContactsList holderList = null;
@@ -225,15 +228,19 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 		    holderList.contactInitialLetter = (TextView) v.findViewById(R.id.contact_list_initial_letter);
 		    holderList.textViewContactName = (TextView) v.findViewById(R.id.contact_list_name);
 		    holderList.textViewContent = (TextView) v.findViewById(R.id.contact_list_content);
-		    holderList.imageButtonThreeDots = (ImageButton) v.findViewById(R.id.contact_list_three_dots);
+		    holderList.threeDotsLayout = (RelativeLayout) v.findViewById(R.id.contact_list_three_dots_layout);
 			holderList.contactStateIcon = (ImageView) v.findViewById(R.id.contact_list_drawable_state);
 
 			if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
 				log("onCreate: Landscape configuration");
-				holderList.textViewContactName.setMaxWidth(Util.scaleWidthPx(280, outMetrics));
+				//holderList.textViewContactName.setMaxWidth(Util.scaleWidthPx(290, outMetrics));
+				float width = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MAX_WIDTH_CONTACT_NAME_LAND, context.getResources().getDisplayMetrics());
+				holderList.textViewContactName.setMaxWidth((int) width);
 			}
 			else{
-				holderList.textViewContactName.setMaxWidth(Util.scaleWidthPx(230, outMetrics));
+				//holderList.textViewContactName.setMaxWidth(Util.scaleWidthPx(240, outMetrics));
+				float width = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MAX_WIDTH_CONTACT_NAME_PORT, context.getResources().getDisplayMetrics());
+				holderList.textViewContactName.setMaxWidth((int) width);
 			}
 
 		    holderList.itemLayout.setTag(holderList);
@@ -281,17 +288,17 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 			holderList.contactInitialLetter = (TextView) v.findViewById(R.id.contact_list_initial_letter);
 			holderList.textViewContactName = (TextView) v.findViewById(R.id.contact_list_name);
 			holderList.textViewContent = (TextView) v.findViewById(R.id.contact_list_content);
-			holderList.imageButtonThreeDots = (ImageButton) v.findViewById(R.id.contact_list_three_dots);
+			holderList.threeDotsLayout = (RelativeLayout) v.findViewById(R.id.contact_list_three_dots_layout);
 
 			//Right margin
-			RelativeLayout.LayoutParams actionButtonParams = (RelativeLayout.LayoutParams)holderList.imageButtonThreeDots.getLayoutParams();
+			RelativeLayout.LayoutParams actionButtonParams = (RelativeLayout.LayoutParams)holderList.threeDotsLayout.getLayoutParams();
 			actionButtonParams.setMargins(0, 0, Util.scaleWidthPx(10, outMetrics), 0);
-			holderList.imageButtonThreeDots.setLayoutParams(actionButtonParams);
+			holderList.threeDotsLayout.setLayoutParams(actionButtonParams);
 
 			holderList.itemLayout.setTag(holderList);
 			holderList.itemLayout.setOnClickListener(this);
 
-			holderList.imageButtonThreeDots.setVisibility(View.GONE);
+			holderList.threeDotsLayout.setVisibility(View.GONE);
 
 			v.setTag(holderList);
 
@@ -448,7 +455,7 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 
 		holder.imageView.setImageBitmap(null);
 		holder.contactInitialLetter.setText("");
-		holder.imageButtonThreeDots.setVisibility(View.GONE);
+		holder.threeDotsLayout.setVisibility(View.GONE);
 
 		MegaContactAdapter contact = (MegaContactAdapter) getItem(position);
 		holder.contactMail = contact.getMegaUser().getEmail();
@@ -694,8 +701,8 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 
 		holder.textViewContent.setText(sharedNodesDescription);
 		
-		holder.imageButtonThreeDots.setTag(holder);
-		holder.imageButtonThreeDots.setOnClickListener(this);	
+		holder.threeDotsLayout.setTag(holder);
+		holder.threeDotsLayout.setOnClickListener(this);
 	}
 	
 	public void createDefaultAvatar(ViewHolderContacts holder, MegaContactAdapter contact){
@@ -1066,7 +1073,7 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 			MegaContactAdapter c = (MegaContactAdapter) getItem(currentPosition);
 			
 			switch (v.getId()){			
-				case R.id.contact_list_three_dots:
+				case R.id.contact_list_three_dots_layout:
 				case R.id.contact_grid_three_dots:{
 					log("click contact three dots!");
 					if(multipleSelect){

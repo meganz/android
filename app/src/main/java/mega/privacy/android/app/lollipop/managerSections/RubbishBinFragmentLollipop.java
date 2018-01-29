@@ -114,6 +114,8 @@ public class RubbishBinFragmentLollipop extends Fragment {
 
 					NodeController nC = new NodeController(context);
 					nC.chooseLocationToMoveNodes(handleList);
+					clearSelections();
+					hideMultipleSelect();
 					break;
 				}
 				case R.id.cab_menu_rename:{
@@ -121,8 +123,8 @@ public class RubbishBinFragmentLollipop extends Fragment {
 					if (documents.size()==1){
 						((ManagerActivityLollipop) context).showRenameDialog(documents.get(0), documents.get(0).getName());
 					}
+					clearSelections();
 					hideMultipleSelect();
-
 					break;
 				}
 				case R.id.cab_menu_copy:{
@@ -343,6 +345,7 @@ public class RubbishBinFragmentLollipop extends Fragment {
 			View v = inflater.inflate(R.layout.fragment_rubbishbinlist, container, false);
 			
 			recyclerView = (RecyclerView) v.findViewById(R.id.rubbishbin_list_view);
+
 			recyclerView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
 			mLayoutManager = new LinearLayoutManager(context);
 			recyclerView.setLayoutManager(mLayoutManager);

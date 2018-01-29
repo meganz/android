@@ -43,7 +43,7 @@ public class ZipListAdapterLollipop  extends RecyclerView.Adapter<ZipListAdapter
 		ImageView imageView;
 		TextView textViewFileName;
 		TextView textViewFileSize;
-		ImageButton imageButtonThreeDots;
+		RelativeLayout threeDotsLayout;
 
 		RelativeLayout itemLayout;
 
@@ -99,7 +99,7 @@ public class ZipListAdapterLollipop  extends RecyclerView.Adapter<ZipListAdapter
 		holder.textViewFileSize = (TextView) convertView.findViewById(R.id.file_list_filesize);
 		holder.publicLinkImage = (ImageView) convertView.findViewById(R.id.file_list_public_link);
 		holder.savedOffline = (ImageView) convertView.findViewById(R.id.file_list_saved_offline);
-		holder.imageButtonThreeDots = (ImageButton) convertView.findViewById(R.id.file_list_three_dots);
+		holder.threeDotsLayout = (RelativeLayout) convertView.findViewById(R.id.file_list_three_dots_layout);
 
 		convertView.setTag(holder);
 		return holder;
@@ -109,7 +109,7 @@ public class ZipListAdapterLollipop  extends RecyclerView.Adapter<ZipListAdapter
 
 		holder.savedOffline.setVisibility(View.INVISIBLE);
 		holder.publicLinkImage.setVisibility(View.INVISIBLE);
-		holder.imageButtonThreeDots.setVisibility(View.INVISIBLE);
+		holder.threeDotsLayout.setVisibility(View.INVISIBLE);
 
 		ZipEntry zipNode = (ZipEntry) getItem(position);
 

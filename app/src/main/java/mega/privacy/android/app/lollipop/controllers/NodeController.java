@@ -32,6 +32,7 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
+import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.FileInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.FileLinkActivityLollipop;
@@ -40,6 +41,7 @@ import mega.privacy.android.app.lollipop.FolderLinkActivityLollipop;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.GetLinkActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.ZipBrowserActivityLollipop;
 import mega.privacy.android.app.lollipop.listeners.MultipleRequestListener;
 import mega.privacy.android.app.utils.Constants;
@@ -716,6 +718,51 @@ public class NodeController {
                             context.startActivity(intentZip);
 
                         }
+                        else if (MimeTypeList.typeForName(tempNode.getName()).isPdf()){
+                            log("Pdf file");
+                            File pdfFile = new File(localPath);
+
+                            Intent pdfIntent = new Intent(context, PdfViewerActivityLollipop.class);
+                            pdfIntent.putExtra("APP", true);
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                                pdfIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", pdfFile), MimeTypeList.typeForName(tempNode.getName()).getType());
+                            }
+                            else{
+                                pdfIntent.setDataAndType(Uri.fromFile(pdfFile), MimeTypeList.typeForName(tempNode.getName()).getType());
+                            }
+                            pdfIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                            context.startActivity(pdfIntent);
+                        }
+                        else if (MimeTypeList.typeForName(tempNode.getName()).isVideo()) {
+                            log("Video file");
+                            File videoFile = new File(localPath);
+
+                            Intent videoIntent = new Intent(context, AudioVideoPlayerLollipop.class);
+                            videoIntent.putExtra("HANDLE", tempNode.getHandle());
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                                videoIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", videoFile), MimeTypeList.typeForName(tempNode.getName()).getType());
+                            }
+                            else{
+                                videoIntent.setDataAndType(Uri.fromFile(videoFile), MimeTypeList.typeForName(tempNode.getName()).getType());
+                            }
+                            videoIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                            context.startActivity(videoIntent);
+                        }
+                        else if (MimeTypeList.typeForName(tempNode.getName()).isAudio()) {
+                            log("Audio file");
+                            File audioFile = new File(localPath);
+
+                            Intent audioIntent = new Intent(context, AudioVideoPlayerLollipop.class);
+                            audioIntent.putExtra("HANDLE", tempNode.getHandle());
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                                audioIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", audioFile), MimeTypeList.typeForName(tempNode.getName()).getType());
+                            }
+                            else{
+                                audioIntent.setDataAndType(Uri.fromFile(audioFile), MimeTypeList.typeForName(tempNode.getName()).getType());
+                            }
+                            audioIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                            context.startActivity(audioIntent);
+                        }
                         else {
                             log("MimeTypeList other file");
                             try {
@@ -1164,6 +1211,8 @@ public class NodeController {
 
     public void openFolderFromSearch(long folderHandle){
         log("openFolderFromSearch: "+folderHandle);
+        ((ManagerActivityLollipop)context).textSubmitted = true;
+        ((ManagerActivityLollipop)context).openFolderFromSearch = true;
         boolean firstNavigationLevel=true;
         int access = -1;
         ManagerActivityLollipop.DrawerItem drawerItem = ManagerActivityLollipop.DrawerItem.CLOUD_DRIVE;

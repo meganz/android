@@ -13,13 +13,9 @@ import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -137,7 +133,11 @@ public class TransfersFragmentLollipop extends Fragment {
 
 		for(int i=0; i<((ManagerActivityLollipop)context).transfersInProgress.size();i++){
 			MegaTransfer transfer = megaApi.getTransferByTag(((ManagerActivityLollipop)context).transfersInProgress.get(i));
-			tL.add(transfer);
+			if (transfer != null) {
+				if (!transfer.isStreamingTransfer()) {
+					tL.add(transfer);
+				}
+			}
 		}
 
 		if (tL.size() == 0){
@@ -158,7 +158,9 @@ public class TransfersFragmentLollipop extends Fragment {
 
 		for(int i=0; i<((ManagerActivityLollipop)context).transfersInProgress.size();i++){
 			MegaTransfer transfer = megaApi.getTransferByTag(((ManagerActivityLollipop)context).transfersInProgress.get(i));
-			tL.add(transfer);
+			if(!transfer.isStreamingTransfer()){
+				tL.add(transfer);
+			}
 		}
 
 		if (tL.size() == 0){
@@ -238,7 +240,10 @@ public class TransfersFragmentLollipop extends Fragment {
 
 	public void transferStart(MegaTransfer transfer){
 		log("transferStart");
-		tL.add(transfer);
+		if(!transfer.isStreamingTransfer()){
+			tL.add(transfer);
+		}
+
 		adapter.notifyItemInserted(tL.size()-1);
 
 		if (tL.size() == 0){

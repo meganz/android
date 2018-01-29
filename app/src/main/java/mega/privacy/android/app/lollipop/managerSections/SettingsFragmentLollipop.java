@@ -44,6 +44,7 @@ import mega.privacy.android.app.components.TwoLineCheckPreference;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.lollipop.MyAccountInfo;
 import mega.privacy.android.app.lollipop.PinLockActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatPreferencesActivity;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
@@ -59,8 +60,6 @@ import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatPresenceConfig;
 import nz.mega.sdk.MegaNode;
 
-import android.provider.Settings.Secure;
-
 
 //import android.support.v4.preference.PreferenceFragment;
 
@@ -71,6 +70,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 	private MegaApiAndroid megaApi;
 	private MegaChatApiAndroid megaChatApi;
 	Handler handler = new Handler();
+	MyAccountInfo myAccountInfo;
 	
 	private static int REQUEST_DOWNLOAD_FOLDER = 1000;
 	private static int REQUEST_CODE_TREE_LOCAL_CAMERA = 1014;
@@ -175,6 +175,8 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 	Preference localCameraUploadFolderSDCard;
 	Preference megaCameraFolder;
 	Preference helpSendFeedback;
+	Preference cancelAccount;
+
 	Preference aboutPrivacy;
 	Preference aboutTOS;
 	Preference aboutSDK;
@@ -382,6 +384,9 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 
 		helpSendFeedback = findPreference(KEY_HELP_SEND_FEEDBACK);
 		helpSendFeedback.setOnPreferenceClickListener(this);
+
+		cancelAccount = findPreference("settings_advanced_features_cancel_account");
+		cancelAccount.setOnPreferenceClickListener(this);
 		
 		aboutPrivacy = findPreference(KEY_ABOUT_PRIVACY_POLICY);
 		aboutPrivacy.setOnPreferenceClickListener(this);
@@ -1791,17 +1796,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			startActivityForResult(intent, REQUEST_MEGA_CAMERA_FOLDER);
 
 		}else if (preference.getKey().compareTo(KEY_HELP_SEND_FEEDBACK) == 0){
-
-			String body = getString(R.string.setting_feedback_body)+"\n\n\n\n\n\n\n\n\n\n\n"+getString(R.string.settings_feedback_body_device_model)+"  "+getDeviceName()+"\n"+getString(R.string.settings_feedback_body_android_version)+"  "+Build.VERSION.RELEASE+" "+Build.DISPLAY;
-			String emailAndroid = Constants.MAIL_ANDROID;
-			String versionApp = (getString(R.string.app_version));
-			String subject = getString(R.string.setting_feedback_subject)+" v"+versionApp;
-
-			Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:" + emailAndroid));
-			emailIntent.putExtra(Intent.EXTRA_SUBJECT, subject);
-			emailIntent.putExtra(Intent.EXTRA_TEXT, body);
-			startActivity(Intent.createChooser(emailIntent, " "));
-
+			((ManagerActivityLollipop) context).showEvaluatedAppDialog();
 		}
 		else if (preference.getKey().compareTo(KEY_ABOUT_PRIVACY_POLICY) == 0){
 			Intent viewIntent = new Intent(Intent.ACTION_VIEW);
@@ -1817,6 +1812,10 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			Intent viewIntent = new Intent(Intent.ACTION_VIEW);
 			viewIntent.setData(Uri.parse("https://github.com/meganz/android"));
 			startActivity(viewIntent);
+		}
+		else if (preference.getKey().compareTo("settings_advanced_features_cancel_account") == 0){
+			log("Cancel account preference");
+			((ManagerActivityLollipop)context).askConfirmationDeleteAccount();
 		}
 		
 		return true;
@@ -2204,28 +2203,6 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 		}
 	}
 
-	public String getDeviceName() {
-		String manufacturer = Build.MANUFACTURER;
-		String model = Build.MODEL;
-		if (model.startsWith(manufacturer)) {
-			return capitalize(model);
-		} else {
-			return capitalize(manufacturer) + " " + model;
-		}
-	}
-
-
-	private String capitalize(String s) {
-		if (s == null || s.length() == 0) {
-			return "";
-		}
-		char first = s.charAt(0);
-		if (Character.isUpperCase(first)) {
-			return s;
-		} else {
-			return Character.toUpperCase(first) + s.substring(1);
-		}
-	}
 
 	public void cancelSetPinLock(){
 		log("cancelSetPinkLock");
