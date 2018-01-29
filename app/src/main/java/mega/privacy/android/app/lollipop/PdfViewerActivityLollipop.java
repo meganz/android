@@ -2,8 +2,10 @@ package mega.privacy.android.app.lollipop;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -24,14 +26,20 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.RemoteViews;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.github.barteksc.pdfviewer.PDFView;
@@ -79,14 +87,25 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
+import nz.mega.sdk.MegaTransfer;
+import nz.mega.sdk.MegaTransferListenerInterface;
 import nz.mega.sdk.MegaUser;
 
-public class PdfViewerActivityLollipop extends PinActivityLollipop implements OnPageChangeListener, OnLoadCompleteListener, OnPageErrorListener, View.OnClickListener, MegaRequestListenerInterface, MegaChatRequestListenerInterface {
+public class PdfViewerActivityLollipop extends PinActivityLollipop implements OnPageChangeListener, OnLoadCompleteListener, OnPageErrorListener, View.OnClickListener, MegaRequestListenerInterface, MegaChatRequestListenerInterface, MegaTransferListenerInterface {
 
     MegaApplication app = null;
     MegaApiAndroid megaApi;
     MegaChatApiAndroid megaChatApi;
     MegaPreferences prefs = null;
+
+    private AlertDialog alertDialogTransferOverquota;
+    public static ProgressDialog progressDialog = null;
+
+    private Notification.Builder mBuilder;
+    private NotificationManager mNotificationManager;
+
+    public static boolean loading = true;
+    boolean transferOverquota = false;
 
     PDFView pdfView;
 
@@ -164,8 +183,28 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
             return;
         }
 
+        setContentView(R.layout.activity_pdfviewer);
+
+        appBarLayout = (AppBarLayout) findViewById(R.id.app_bar_pdfviewer);
+
+        tB = (Toolbar) findViewById(R.id.toolbar_pdf_viewer);
+        if(tB==null){
+            log("Tb is Null");
+            return;
+        }
+
+        tB.setVisibility(View.VISIBLE);
+        setSupportActionBar(tB);
+        aB = getSupportActionBar();
+        Drawable upArrow = getResources().getDrawable(R.drawable.ic_arrow_back_black);
+        upArrow.setColorFilter(getResources().getColor(R.color.lollipop_primary_color), PorterDuff.Mode.SRC_ATOP);
+        aB.setHomeAsUpIndicator(upArrow);
+        aB.setHomeButtonEnabled(true);
+        aB.setDisplayHomeAsUpEnabled(true);
+
         app = (MegaApplication)getApplication();
         megaApi = app.getMegaApi();
+
 //        if(megaApi==null||megaApi.getRootNode()==null){
 //            log("Refresh session - sdk");
 //            Intent intentLogin = new Intent(this, LoginActivityLollipop.class);
@@ -194,20 +233,20 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
 
         //appBarLayout = (AppBarLayout) findViewById(R.id.app_bar_pdfviewer);
 
-        tB = (Toolbar) findViewById(R.id.toolbar_pdf_viewer);
-        if(tB==null){
-            log("Tb is Null");
-            return;
+        log("Overquota delay: "+megaApi.getBandwidthOverquotaDelay());
+        if(megaApi.getBandwidthOverquotaDelay()>0){
+            if(alertDialogTransferOverquota==null){
+                showTransferOverquotaDialog();
+            }
+            else {
+                if (!(alertDialogTransferOverquota.isShowing())) {
+                    showTransferOverquotaDialog();
+                }
+            }
         }
 
-        tB.setVisibility(View.VISIBLE);
-        setSupportActionBar(tB);
-        aB = getSupportActionBar();
-        Drawable upArrow = getResources().getDrawable(R.drawable.ic_arrow_back_black);
-        upArrow.setColorFilter(getResources().getColor(R.color.lollipop_primary_color), PorterDuff.Mode.SRC_ATOP);
-        aB.setHomeAsUpIndicator(upArrow);
-        aB.setHomeButtonEnabled(true);
-        aB.setDisplayHomeAsUpEnabled(true);
+        log("Add transfer listener");
+        megaApi.addTransferListener(this);
 
         pdfView = (PDFView) findViewById(R.id.pdfView);
 
@@ -215,6 +254,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
         pdfFileName = getFileName(uri);
         defaultScrollHandle = new DefaultScrollHandle(PdfViewerActivityLollipop.this);
 
+        loading = true;
         if (uri.toString().contains("http://")){
             isUrl = true;
             loadStreamPDF();
@@ -223,6 +263,17 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
             isUrl = false;
             loadLocalPDF();
         }
+        progressDialog = new ProgressDialog(PdfViewerActivityLollipop.this);
+        progressDialog.setMessage(getString(R.string.general_loading));
+        progressDialog.setCanceledOnTouchOutside(false);
+        progressDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialog) {
+                if (loading) {
+                    finish();
+                }
+            }
+        });
 
         pdfView.setOnClickListener(this);
 
@@ -280,6 +331,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
 
         @Override
         protected void onPostExecute(InputStream inputStream) {
+            log("onPostExecute");
             try {
                 pdfView.fromStream(inputStream)
                         .defaultPage(currentPage)
@@ -293,14 +345,19 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
             } catch (Exception e) {
 
             }
+            if (loading && progressDialog!=null && !transferOverquota) {
+                progressDialog.show();
+            }
         }
     }
 
     private void loadStreamPDF() {
+        log("loadStreamPDF loading: "+loading);
         new LoadPDFStream().execute(uri.toString());
     }
 
     private void loadLocalPDF() {
+        log("loadLocalPDF loading: "+loading);
         try {
             pdfView.fromUri(uri)
                     .defaultPage(currentPage)
@@ -313,6 +370,9 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
                     .load();
         } catch (Exception e) {
 
+        }
+        if (loading && progressDialog!=null && !transferOverquota) {
+            progressDialog.show();
         }
     }
 
@@ -1132,5 +1192,197 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
     @Override
     public void onRequestTemporaryError(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
 
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        log("onStop");
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        log("onStart");
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        log("onResume");
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        log("onPause");
+    }
+
+    @Override
+    protected void onDestroy() {
+        log("onDestroy()");
+
+        if (megaApi != null) {
+            megaApi.removeTransferListener(this);
+        }
+        finish();
+
+        super.onDestroy();
+    }
+
+    public void showTransferOverquotaDialog(){
+        log("showTransferOverquotaDialog");
+
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(PdfViewerActivityLollipop.this);
+
+        LayoutInflater inflater = this.getLayoutInflater();
+        View dialogView = inflater.inflate(R.layout.transfer_overquota_layout, null);
+        dialogBuilder.setView(dialogView);
+
+        TextView title = (TextView) dialogView.findViewById(R.id.transfer_overquota_title);
+        title.setText(getString(R.string.title_depleted_transfer_overquota));
+
+        ImageView icon = (ImageView) dialogView.findViewById(R.id.image_transfer_overquota);
+        icon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.transfer_quota_empty));
+
+        TextView text = (TextView) dialogView.findViewById(R.id.text_transfer_overquota);
+        text.setText(getString(R.string.text_depleted_transfer_overquota));
+
+        Button continueButton = (Button) dialogView.findViewById(R.id.transfer_overquota_button_dissmiss);
+
+        Button paymentButton = (Button) dialogView.findViewById(R.id.transfer_overquota_button_payment);
+        paymentButton.setText(getString(R.string.action_upgrade_account));
+
+        alertDialogTransferOverquota = dialogBuilder.create();
+
+        alertDialogTransferOverquota.setOnShowListener(new DialogInterface.OnShowListener() {
+            @Override
+            public void onShow(DialogInterface dialog) {
+                transferOverquota = true;
+                if (progressDialog != null) {
+                    progressDialog.hide();
+                }
+            }
+        });
+
+        continueButton.setOnClickListener(new View.OnClickListener(){
+            public void onClick(View v) {
+                alertDialogTransferOverquota.dismiss();
+                transferOverquota = false;
+                if (loading && progressDialog != null && !transferOverquota) {
+                    progressDialog.show();
+                }
+            }
+
+        });
+
+        paymentButton.setOnClickListener(new View.OnClickListener(){
+            public void onClick(View v) {
+                alertDialogTransferOverquota.dismiss();
+                transferOverquota = false;
+                showUpgradeAccount();
+            }
+        });
+
+        alertDialogTransferOverquota.setCancelable(false);
+        alertDialogTransferOverquota.setCanceledOnTouchOutside(false);
+        alertDialogTransferOverquota.show();
+    }
+
+    public void showUpgradeAccount(){
+        log("showUpgradeAccount");
+        Intent upgradeIntent = new Intent(this, ManagerActivityLollipop.class);
+        upgradeIntent.setAction(Constants.ACTION_SHOW_UPGRADE_ACCOUNT);
+        startActivity(upgradeIntent);
+    }
+
+    private void showOverquotaNotification(){
+        log("showOverquotaNotification");
+
+        PendingIntent pendingIntent = null;
+
+        String info = "Streaming";
+        Notification notification = null;
+
+        String contentText = getString(R.string.download_show_info);
+        String message = getString(R.string.title_depleted_transfer_overquota);
+
+        int currentapiVersion = android.os.Build.VERSION.SDK_INT;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            mBuilder
+                    .setSmallIcon(R.drawable.ic_stat_notify_download)
+                    .setOngoing(false).setContentTitle(message).setSubText(info)
+                    .setContentText(contentText)
+                    .setOnlyAlertOnce(true);
+
+            if(pendingIntent!=null){
+                mBuilder.setContentIntent(pendingIntent);
+            }
+            notification = mBuilder.build();
+        }
+        else if (currentapiVersion >= android.os.Build.VERSION_CODES.ICE_CREAM_SANDWICH)
+        {
+            mBuilder
+                    .setSmallIcon(R.drawable.ic_stat_notify_download)
+                    .setOngoing(false).setContentTitle(message).setContentInfo(info)
+                    .setContentText(contentText)
+                    .setOnlyAlertOnce(true);
+
+            if(pendingIntent!=null){
+                mBuilder.setContentIntent(pendingIntent);
+            }
+            notification = mBuilder.getNotification();
+        }
+        else
+        {
+            notification = new Notification(R.drawable.ic_stat_notify_download, null, 1);
+            notification.contentView = new RemoteViews(getApplicationContext().getPackageName(), R.layout.download_progress);
+            if(pendingIntent!=null){
+                notification.contentIntent = pendingIntent;
+            }
+            notification.contentView.setImageViewResource(R.id.status_icon, R.drawable.ic_stat_notify_download);
+            notification.contentView.setTextViewText(R.id.status_text, message);
+            notification.contentView.setTextViewText(R.id.progress_text, info);
+        }
+
+        mNotificationManager.notify(Constants.NOTIFICATION_STREAMING_OVERQUOTA, notification);
+    }
+
+
+    @Override
+    public void onTransferStart(MegaApiJava api, MegaTransfer transfer) {
+
+    }
+
+    @Override
+    public void onTransferFinish(MegaApiJava api, MegaTransfer transfer, MegaError e) {
+
+    }
+
+    @Override
+    public void onTransferUpdate(MegaApiJava api, MegaTransfer transfer) {
+
+    }
+
+    @Override
+    public void onTransferTemporaryError(MegaApiJava api, MegaTransfer transfer, MegaError e) {
+
+        if(e.getErrorCode() == MegaError.API_EOVERQUOTA){
+            log("API_EOVERQUOTA error!!");
+
+            if(alertDialogTransferOverquota==null){
+                showTransferOverquotaDialog();
+            }
+            else {
+                if (!(alertDialogTransferOverquota.isShowing())) {
+                    showTransferOverquotaDialog();
+                }
+            }
+        }
+    }
+
+    @Override
+    public boolean onTransferData(MegaApiJava api, MegaTransfer transfer, byte[] buffer) {
+        return false;
     }
 }
