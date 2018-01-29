@@ -13,6 +13,8 @@ import android.support.v7.view.ActionMode;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
+import android.text.Spanned;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.LayoutInflater;
@@ -71,7 +73,6 @@ public class RubbishBinFragmentLollipop extends Fragment {
 	ImageView emptyImageView;
 	LinearLayout emptyTextView;
 	TextView emptyTextViewFirst;
-	TextView emptyTextViewSecond;
 
 	TextView contentText;
 	RelativeLayout contentTextLayout;
@@ -354,7 +355,6 @@ public class RubbishBinFragmentLollipop extends Fragment {
 			emptyImageView = (ImageView) v.findViewById(R.id.rubbishbin_list_empty_image);
 			emptyTextView = (LinearLayout) v.findViewById(R.id.rubbishbin_list_empty_text);
 			emptyTextViewFirst = (TextView) v.findViewById(R.id.rubbishbin_list_empty_text_first);
-			emptyTextViewSecond = (TextView) v.findViewById(R.id.rubbishbin_list_empty_text_second);
 
 			contentTextLayout = (RelativeLayout) v.findViewById(R.id.rubbishbin_content_text_layout);
 			contentText = (TextView) v.findViewById(R.id.rubbishbin_list_content_text);
@@ -397,9 +397,22 @@ public class RubbishBinFragmentLollipop extends Fragment {
 					}else{
 						emptyImageView.setImageResource(R.drawable.rubbish_bin_empty);
 					}
-					emptyTextViewFirst.setText(R.string.context_empty);
-					String text = getString(R.string.section_rubbish_bin);
-					emptyTextViewSecond.setText(" "+text+".");
+					String textToShow = String.format(context.getString(R.string.context_empty_rubbish_bin));
+
+					try{
+						textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
+						textToShow = textToShow.replace("[/A]", "</font>");
+						textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
+						textToShow = textToShow.replace("[/B]", "</font>");
+					}
+					catch (Exception e){}
+					Spanned result = null;
+					if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+						result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
+					} else {
+						result = Html.fromHtml(textToShow);
+					}
+					emptyTextViewFirst.setText(result);
 				} else {
 					emptyImageView.setImageResource(R.drawable.ic_empty_folder);
 					emptyTextViewFirst.setText(R.string.file_browser_empty_folder);
@@ -433,7 +446,6 @@ public class RubbishBinFragmentLollipop extends Fragment {
 			emptyImageView = (ImageView) v.findViewById(R.id.rubbishbin_grid_empty_image);
 			emptyTextView = (LinearLayout) v.findViewById(R.id.rubbishbin_grid_empty_text);
 			emptyTextViewFirst = (TextView) v.findViewById(R.id.rubbishbin_grid_empty_text_first);
-			emptyTextViewSecond = (TextView) v.findViewById(R.id.rubbishbin_grid_empty_text_second);
 
 			contentTextLayout = (RelativeLayout) v.findViewById(R.id.rubbishbin_grid_content_text_layout);
 			contentText = (TextView) v.findViewById(R.id.rubbishbin_grid_content_text);			
@@ -476,9 +488,22 @@ public class RubbishBinFragmentLollipop extends Fragment {
 					}else{
 						emptyImageView.setImageResource(R.drawable.rubbish_bin_empty);
 					}
-					emptyTextViewFirst.setText(R.string.context_empty);
-					String text = getString(R.string.section_rubbish_bin);
-					emptyTextViewSecond.setText(" "+text+".");
+					String textToShow = String.format(context.getString(R.string.context_empty_rubbish_bin));
+
+					try{
+						textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
+						textToShow = textToShow.replace("[/A]", "</font>");
+						textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
+						textToShow = textToShow.replace("[/B]", "</font>");
+					}
+					catch (Exception e){}
+					Spanned result = null;
+					if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+						result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
+					} else {
+						result = Html.fromHtml(textToShow);
+					}
+					emptyTextViewFirst.setText(result);
 				} else {
 					emptyImageView.setImageResource(R.drawable.ic_empty_folder);
 					emptyTextViewFirst.setText(R.string.file_browser_empty_folder);
@@ -562,9 +587,25 @@ public class RubbishBinFragmentLollipop extends Fragment {
 							emptyImageView.setImageResource(R.drawable.rubbish_bin_empty_landscape);
 						}else{
 							emptyImageView.setImageResource(R.drawable.rubbish_bin_empty);
-						}						emptyTextViewFirst.setText(R.string.context_empty);
-						String text = getString(R.string.section_rubbish_bin);
-						emptyTextViewSecond.setText(" "+text+".");
+						}
+
+						String textToShow = String.format(context.getString(R.string.context_empty_rubbish_bin));
+
+						try{
+							textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
+							textToShow = textToShow.replace("[/A]", "</font>");
+							textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
+							textToShow = textToShow.replace("[/B]", "</font>");
+						}
+						catch (Exception e){}
+						Spanned result = null;
+						if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+							result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
+						} else {
+							result = Html.fromHtml(textToShow);
+						}
+						emptyTextViewFirst.setText(result);
+
 					} else {
 						emptyImageView.setImageResource(R.drawable.ic_empty_folder);
 						emptyTextViewFirst.setText(R.string.file_browser_empty_folder);
@@ -798,9 +839,22 @@ public class RubbishBinFragmentLollipop extends Fragment {
 					}else{
 						emptyImageView.setImageResource(R.drawable.rubbish_bin_empty);
 					}
-					emptyTextViewFirst.setText(R.string.context_empty);
-					String text = getString(R.string.section_rubbish_bin);
-					emptyTextViewSecond.setText(" "+text+".");
+					String textToShow = String.format(context.getString(R.string.context_empty_rubbish_bin));
+
+					try{
+						textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
+						textToShow = textToShow.replace("[/A]", "</font>");
+						textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
+						textToShow = textToShow.replace("[/B]", "</font>");
+					}
+					catch (Exception e){}
+					Spanned result = null;
+					if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+						result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
+					} else {
+						result = Html.fromHtml(textToShow);
+					}
+					emptyTextViewFirst.setText(result);
 				} else {
 					emptyImageView.setImageResource(R.drawable.ic_empty_folder);
 					emptyTextViewFirst.setText(R.string.file_browser_empty_folder);

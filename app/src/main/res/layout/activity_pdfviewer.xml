@@ -3,24 +3,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:id="@+id/pdf_viewer_container"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <android.support.design.widget.AppBarLayout
-        android:id="@+id/app_bar_pdfviewer"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:fitsSystemWindows="true"
-        android:background="@color/white">
-
-        <RelativeLayout
-            android:id="@+id/pdf_viewer_container"
+        <com.github.barteksc.pdfviewer.PDFView
+            android:id="@+id/pdfView"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
-
-            <com.github.barteksc.pdfviewer.PDFView
-                android:id="@+id/pdfView"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"/>
 
             <android.support.v7.widget.Toolbar
                 android:id="@+id/toolbar_pdf_viewer"
@@ -69,8 +58,6 @@
 
             </RelativeLayout>
 
-        </RelativeLayout>
-
-    </android.support.design.widget.AppBarLayout>
+        </com.github.barteksc.pdfviewer.PDFView>
 
 </RelativeLayout>

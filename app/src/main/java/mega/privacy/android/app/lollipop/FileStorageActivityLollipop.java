@@ -149,7 +149,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	
 	private AlertDialog newFolderDialog;
 
-	String regex = "[*|\\?:\"<>\\{\\}\\[\\]\\\\\\/]";
+	String regex = "[*|\\?:\"<>\\{\\}\\\\\\/]";
 
 	public class RecyclerViewOnGestureListener extends SimpleOnGestureListener{
 

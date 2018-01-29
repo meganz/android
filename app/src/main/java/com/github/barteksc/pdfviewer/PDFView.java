@@ -685,7 +685,7 @@ public class PDFView extends RelativeLayout {
         renderingHandler.start();
 
         if (scrollHandle != null) {
-            scrollHandle.setupLayout(this);
+            scrollHandle.setupLayout(this, pdfFile.getPagesCount());
             isScrollHandleInit = true;
         }
 

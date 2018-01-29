@@ -28,6 +28,7 @@ import android.widget.CheckedTextView;
 import android.widget.CompoundButton;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -71,6 +72,11 @@ public class GetLinkFragmentLollipop extends Fragment implements View.OnClickLis
     Button copyButton;
     SwitchCompat switchButtonExpiry;
     Button expiryDateButton;
+    RelativeLayout expiryDateLayout;
+    RelativeLayout passwordProtectionLayout;
+
+    ImageView advancedOptionsImage;
+    RelativeLayout advancedOptionsLayout;
 
     DatePickerDialog datePickerDialog;
 
@@ -88,12 +94,19 @@ public class GetLinkFragmentLollipop extends Fragment implements View.OnClickLis
     TextView subtitleProOnlyExpiry;
     TextView linkText;
 
+    RelativeLayout linkWithoutKeyLayout;
+    RelativeLayout linkDecryptionKeyLayout;
+    RelativeLayout linkWithKeyLayout;
+
     TextView subtitleProOnlyProtection;
     SwitchCompat switchButtonProtection;
     TextView passwordProtectionEditText;
 
     RelativeLayout transparentKeyLayoutExpiry;
     RelativeLayout transparentKeyLayoutProtection;
+
+    LinearLayout separatorExpiry;
+    LinearLayout separatorPass;
 
     @Override
     public void onCreate (Bundle savedInstanceState){
@@ -120,10 +133,20 @@ public class GetLinkFragmentLollipop extends Fragment implements View.OnClickLis
 
         scrollView = (ScrollView) v.findViewById(R.id.scroll_view_get_link);
         mainLinearLayout = (LinearLayout) v.findViewById(R.id.get_link_main_linear_layout);
+        expiryDateLayout = (RelativeLayout) v.findViewById(R.id.expiry_date_layout);
+        expiryDateLayout.setVisibility(View.GONE);
+
         switchButtonExpiry = (SwitchCompat) v.findViewById(R.id.switch_set_expiry_date);
         expiryDateButton = (Button) v.findViewById(R.id.expiry_date_button);
 
+        advancedOptionsLayout = (RelativeLayout) v.findViewById(R.id.advanced_options_layout);
+        advancedOptionsImage = (ImageView) v.findViewById(R.id.advanced_options_image);
+
         //Set by default, link with key
+        linkWithoutKeyLayout = (RelativeLayout) v.findViewById(R.id.link_without_key_layout);
+        linkDecryptionKeyLayout= (RelativeLayout) v.findViewById(R.id.link_decryption_key_layout);
+        linkWithKeyLayout = (RelativeLayout) v.findViewById(R.id.link_with_key_layout);
+
         linkWithoutKeyCheck = (CheckedTextView) v.findViewById(R.id.link_without_key);
         linkDecryptionKeyCheck = (CheckedTextView) v.findViewById(R.id.link_decryption_key);
         linkWithKeyCheck = (CheckedTextView) v.findViewById(R.id.link_with_key);
@@ -131,9 +154,15 @@ public class GetLinkFragmentLollipop extends Fragment implements View.OnClickLis
         linkText = (TextView)v.findViewById(R.id.link);
         subtitleProOnlyExpiry = (TextView)v.findViewById(R.id.subtitle_set_expiry_date);
 
-        linkWithoutKeyCheck.setOnClickListener(this);
-        linkDecryptionKeyCheck.setOnClickListener(this);
-        linkWithKeyCheck.setOnClickListener(this);
+        advancedOptionsLayout.setOnClickListener(this);
+
+        linkWithoutKeyLayout.setOnClickListener(this);
+        linkDecryptionKeyLayout.setOnClickListener(this);
+        linkWithKeyLayout.setOnClickListener(this);
+
+        linkWithoutKeyLayout.setVisibility(View.GONE);
+        linkDecryptionKeyLayout.setVisibility(View.GONE);
+        linkWithKeyLayout.setVisibility(View.GONE);
 
         sendButton = (Button) v.findViewById(R.id.send_button);
         copyButton = (Button) v.findViewById(R.id.copy_button);
@@ -143,12 +172,19 @@ public class GetLinkFragmentLollipop extends Fragment implements View.OnClickLis
 
         transparentKeyLayoutExpiry = (RelativeLayout) v.findViewById(R.id.transparent_key_layout_expiry_date);
 
+        passwordProtectionLayout = (RelativeLayout) v.findViewById(R.id.password_protection_layout);
+        passwordProtectionLayout.setVisibility(View.GONE);
         subtitleProOnlyProtection = (TextView)v.findViewById(R.id.subtitle_set_password_protection);
         switchButtonProtection = (SwitchCompat) v.findViewById(R.id.switch_set_password_protection);
         passwordProtectionEditText = (TextView) v.findViewById(R.id.password_protection_edit);
         passwordProtectionEditText.setOnClickListener(this);
 
         transparentKeyLayoutProtection = (RelativeLayout) v.findViewById(R.id.transparent_key_layout_password_protection);
+
+        separatorExpiry = (LinearLayout) v.findViewById(R.id.separator_expiry);
+        separatorPass= (LinearLayout) v.findViewById(R.id.separator_password);
+        separatorExpiry.setVisibility(View.GONE);
+        separatorPass.setVisibility(View.GONE);
 
         if(((GetLinkActivityLollipop)context).selectedNode.isExported()){
             log("node is already exported: "+((GetLinkActivityLollipop)context).selectedNode.getName());
@@ -262,7 +298,30 @@ public class GetLinkFragmentLollipop extends Fragment implements View.OnClickLis
                 log("Agree button");
                 break;
             }
-            case R.id.link_without_key:{
+            case R.id.advanced_options_layout:{
+                if(linkWithKeyLayout.isShown()){
+                    advancedOptionsImage.setImageDrawable(getResources().getDrawable(R.drawable.ic_collapse_acc));
+                    linkWithoutKeyLayout.setVisibility(View.GONE);
+                    linkDecryptionKeyLayout.setVisibility(View.GONE);
+                    linkWithKeyLayout.setVisibility(View.GONE);
+                    expiryDateLayout.setVisibility(View.GONE);
+                    passwordProtectionLayout.setVisibility(View.GONE);
+                    separatorExpiry.setVisibility(View.GONE);
+                    separatorPass.setVisibility(View.GONE);
+
+                }else{
+                    advancedOptionsImage.setImageDrawable(getResources().getDrawable(R.drawable.ic_expand));
+                    linkWithoutKeyLayout.setVisibility(View.VISIBLE);
+                    linkDecryptionKeyLayout.setVisibility(View.VISIBLE);
+                    linkWithKeyLayout.setVisibility(View.VISIBLE);
+                    expiryDateLayout.setVisibility(View.VISIBLE);
+                    passwordProtectionLayout.setVisibility(View.VISIBLE);
+                    separatorExpiry.setVisibility(View.VISIBLE);
+                    separatorPass.setVisibility(View.VISIBLE);
+                }
+                break;
+            }
+            case R.id.link_without_key_layout:{
                 linkWithoutKeyCheck.setChecked(true);
 				linkDecryptionKeyCheck.setChecked(false);
 				linkWithKeyCheck.setChecked(false);
@@ -276,7 +335,7 @@ public class GetLinkFragmentLollipop extends Fragment implements View.OnClickLis
                 }
                 break;
             }
-            case R.id.link_decryption_key:{
+            case R.id.link_decryption_key_layout:{
                 linkWithoutKeyCheck.setChecked(false);
 				linkDecryptionKeyCheck.setChecked(true);
 				linkWithKeyCheck.setChecked(false);
@@ -290,7 +349,7 @@ public class GetLinkFragmentLollipop extends Fragment implements View.OnClickLis
                 }
                 break;
             }
-            case R.id.link_with_key:{
+            case R.id.link_with_key_layout:{
                 linkWithoutKeyCheck.setChecked(false);
 				linkDecryptionKeyCheck.setChecked(false);
 				linkWithKeyCheck.setChecked(true);

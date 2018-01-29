@@ -48,7 +48,7 @@
                 android:layout_marginTop="8dp"
                 android:layout_marginLeft="16dp"
                 android:layout_marginBottom="8dp"
-                android:layout_marginRight="72dp"
+                android:layout_marginRight="60dp"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
@@ -72,7 +72,7 @@
                         />
 
                     <ImageButton
-                        android:id="@+id/send_message_icon_chat"
+                        android:id="@+id/attach_icon_chat"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentRight="true"
@@ -80,7 +80,7 @@
                         android:background="@null"
                         android:layout_alignBottom="@id/edit_text_chat"
                         android:tint="@color/accentColor"
-                        android:src="@drawable/ic_send_black"
+                        android:src="@drawable/ic_add_white"
                         android:layout_marginBottom="3dp"/>
 
                     <mega.privacy.android.app.components.emojicon.EmojiconEditText
@@ -96,8 +96,8 @@
                         android:layout_centerVertical="true"
                         android:textSize="14sp"
                         android:hint="@string/type_message_hint"
-                        android:layout_toLeftOf="@+id/send_message_icon_chat"
-                        android:inputType="textMultiLine"
+                        android:layout_toLeftOf="@+id/attach_icon_chat"
+                        android:inputType="textMultiLine|textCapSentences"
                         emojicon:emojiconSize="16sp"
                         android:minLines="2"
                         android:lines="6"/>
@@ -165,26 +165,26 @@
 
             <android.support.design.widget.CoordinatorLayout
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="53dp"
+                android:layout_marginBottom="8dp"
                 android:layout_alignParentBottom="true"
                 android:layout_alignParentRight="true">
+
                 <android.support.design.widget.FloatingActionButton
                     android:id="@+id/fab_chat"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     app:fabSize="mini"
-                    android:layout_gravity="bottom|end"
-                    app:elevation="6dp"
+                    android:layout_gravity="center"
+                    app:elevation="@dimen/elevation_fab_chat"
                     app:borderWidth="0dp"
                     android:scaleType="center"
                     app:backgroundTint="@color/accentColor"
-                    app:pressedTranslationZ="12dp"
-                    android:layout_marginLeft="16dp"
-                    android:layout_marginRight="16dp"
-                    android:layout_marginBottom="12dp"
-                    android:src="@drawable/ic_add_white"
-                    android:layout_alignParentRight="true"
-                    android:layout_alignParentBottom="true"/>
+                    app:pressedTranslationZ="@dimen/translationZ_fab_chat"
+                    android:layout_marginLeft="8dp"
+                    android:layout_marginRight="8dp"
+                    android:layout_marginTop="@dimen/marginTop_fab_chat"
+                    android:src="@drawable/ic_send_white"/>
             </android.support.design.widget.CoordinatorLayout>
 
         </RelativeLayout>
