@@ -1681,5 +1681,7 @@
 
     <string name="invalid_link" context="error message shown when an account confirmation link or reset password link is invalid for unknown reasons">Invalid link, please ask for a new valid link</string>
 
+    <string name="processing_link" context="Message shown when a link is being processing">Processing link...</string>
+
 </resources>
 
