@@ -14,6 +14,8 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
+import android.text.Spanned;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.LayoutInflater;
@@ -71,7 +73,6 @@ public class ContactsFragmentLollipop extends Fragment{
 	ImageView emptyImageView;
 	LinearLayout emptyTextView;
 	TextView emptyTextViewFirst;
-	TextView emptyTextViewSecond;
 
 	TextView contentText;
 	RelativeLayout contentTextLayout;
@@ -388,8 +389,6 @@ public class ContactsFragmentLollipop extends Fragment{
 			emptyImageView = (ImageView) v.findViewById(R.id.contact_list_empty_image);
 			emptyTextView = (LinearLayout) v.findViewById(R.id.contact_list_empty_text);
 			emptyTextViewFirst = (TextView) v.findViewById(R.id.contact_list_empty_text_first);
-			emptyTextViewSecond = (TextView) v.findViewById(R.id.contact_list_empty_text_second);
-
 			contentTextLayout = (RelativeLayout) v.findViewById(R.id.contact_list_content_text_layout);
 			contentText = (TextView) v.findViewById(R.id.contact_list_content_text);
 
@@ -419,9 +418,22 @@ public class ContactsFragmentLollipop extends Fragment{
 				}else{
 					emptyImageView.setImageResource(R.drawable.ic_empty_contacts);
 				}
-				emptyTextViewFirst.setText(R.string.context_empty_contacts);
-				String text = getString(R.string.section_contacts);
-				emptyTextViewSecond.setText(" "+text+".");
+
+				String textToShow = String.format(getString(R.string.context_empty_contacts), getString(R.string.section_contacts));
+				try{
+					textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
+					textToShow = textToShow.replace("[/A]", "</font>");
+					textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
+					textToShow = textToShow.replace("[/B]", "</font>");
+				}
+				catch (Exception e){}
+				Spanned result = null;
+				if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+					result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
+				} else {
+					result = Html.fromHtml(textToShow);
+				}
+				emptyTextViewFirst.setText(result);
 
 			}else{
 				recyclerView.setVisibility(View.VISIBLE);
@@ -468,8 +480,6 @@ public class ContactsFragmentLollipop extends Fragment{
 			emptyImageView = (ImageView) v.findViewById(R.id.contact_grid_empty_image);
 			emptyTextView = (LinearLayout) v.findViewById(R.id.contact_grid_empty_text);
 			emptyTextViewFirst = (TextView) v.findViewById(R.id.contact_grid_empty_text_first);
-			emptyTextViewSecond = (TextView) v.findViewById(R.id.contact_grid_empty_text_second);
-
 			contentTextLayout = (RelativeLayout) v.findViewById(R.id.contact_content_grid_text_layout);
 
 			contentText = (TextView) v.findViewById(R.id.contact_content_text_grid);
@@ -502,9 +512,21 @@ public class ContactsFragmentLollipop extends Fragment{
 				}else{
 					emptyImageView.setImageResource(R.drawable.ic_empty_contacts);
 				}
-				emptyTextViewFirst.setText(R.string.context_empty_contacts);
-				String text = getString(R.string.section_contacts);
-				emptyTextViewSecond.setText(" "+text+".");
+				String textToShow = String.format(getString(R.string.context_empty_contacts), getString(R.string.section_contacts));
+				try{
+					textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
+					textToShow = textToShow.replace("[/A]", "</font>");
+					textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
+					textToShow = textToShow.replace("[/B]", "</font>");
+				}
+				catch (Exception e){}
+				Spanned result = null;
+				if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+					result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
+				} else {
+					result = Html.fromHtml(textToShow);
+				}
+				emptyTextViewFirst.setText(result);
 
 			}else{
 				recyclerView.setVisibility(View.VISIBLE);
@@ -663,9 +685,21 @@ public class ContactsFragmentLollipop extends Fragment{
 			}else{
 				emptyImageView.setImageResource(R.drawable.ic_empty_contacts);
 			}
-			emptyTextViewFirst.setText(R.string.context_empty_contacts);
-			String text = getString(R.string.section_contacts);
-			emptyTextViewSecond.setText(" "+text+".");
+			String textToShow = String.format(getString(R.string.context_empty_contacts), getString(R.string.section_contacts));
+			try{
+				textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
+				textToShow = textToShow.replace("[/A]", "</font>");
+				textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
+				textToShow = textToShow.replace("[/B]", "</font>");
+			}
+			catch (Exception e){}
+			Spanned result = null;
+			if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+				result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
+			} else {
+				result = Html.fromHtml(textToShow);
+			}
+			emptyTextViewFirst.setText(result);
 
 		}
 		else{
