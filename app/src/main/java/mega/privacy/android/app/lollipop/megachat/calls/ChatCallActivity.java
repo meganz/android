@@ -1416,21 +1416,22 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
         int callStatus = callChat.getStatus();
 
         if (callChat.hasLocalVideo()) {
+
             log("Video local connected");
             if (myAvatarLayout.getVisibility() == View.VISIBLE) {
                 videoFAB.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.accentColor)));
                 videoFAB.setImageDrawable(getResources().getDrawable(R.drawable.ic_videocam_white));
 
                 if(callStatus==MegaChatCall.CALL_STATUS_REQUEST_SENT){
-                    localCameraFragmentFS = new LocalCameraCallFullScreenFragment();
-                    FragmentTransaction ftFS = getSupportFragmentManager().beginTransaction();
-                    ftFS.replace(R.id.fragment_container_local_cameraFS, localCameraFragmentFS, "localCameraFragmentFS");
-                    ftFS.commitNowAllowingStateLoss();
-
+                    if(localCameraFragmentFS == null){
+                        localCameraFragmentFS = new LocalCameraCallFullScreenFragment();
+                        FragmentTransaction ftFS = getSupportFragmentManager().beginTransaction();
+                        ftFS.replace(R.id.fragment_container_local_cameraFS, localCameraFragmentFS, "localCameraFragmentFS");
+                        ftFS.commitNowAllowingStateLoss();
+                    }
                     contactAvatarLayout.setVisibility(GONE);
                     parentFS.setVisibility(View.VISIBLE);
                     fragmentContainerLocalCameraFS.setVisibility(View.VISIBLE);
-
 
                 }else{
                     localCameraFragment = new LocalCameraCallFragment();
@@ -1454,7 +1455,6 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                 fragmentContainerLocalCameraFS.setVisibility(View.GONE);
                 if (localCameraFragmentFS != null) {
                     localCameraFragmentFS.setVideoFrame(false);
-
                     FragmentTransaction ftFS = getSupportFragmentManager().beginTransaction();
                     ftFS.remove(localCameraFragmentFS);
                     localCameraFragmentFS = null;
@@ -1466,9 +1466,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                 parent.setVisibility(View.GONE);
                 fragmentContainerLocalCamera.setVisibility(View.GONE);
                 if (localCameraFragment != null) {
-
                     localCameraFragment.setVideoFrame(false);
-
                     FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
                     ft.remove(localCameraFragment);
                     localCameraFragment = null;
@@ -1486,12 +1484,12 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
     public void updateLocalAudioStatus(){
         log("updateLocalAudioStatus");
         if(callChat.hasLocalAudio()){
+
             log("Audio local connected");
             microFAB.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.accentColor)));
             microFAB.setImageDrawable(getResources().getDrawable(R.drawable.ic_record_audio_w));
 
-        }
-        else{
+        }else{
             log("Audio local NOT connected");
             microFAB.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.disable_fab_chat_call)));
             microFAB.setImageDrawable(getResources().getDrawable(R.drawable.ic_mic_off));
