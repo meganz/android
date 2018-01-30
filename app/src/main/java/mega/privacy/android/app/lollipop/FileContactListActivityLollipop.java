@@ -449,10 +449,8 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 			else{
 				emptyImage.setVisibility(View.VISIBLE);
 				emptyText.setVisibility(View.VISIBLE);
-				
 				listView.setVisibility(View.GONE);
-				emptyImage.setImageResource(R.drawable.ic_empty_folder);
-				emptyText.setText(R.string.file_browser_empty_folder);
+
 			}
 			
 			if (node.getCreationTime() != 0){
