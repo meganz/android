@@ -47,7 +47,6 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.MyAccountInfo;
 import mega.privacy.android.app.lollipop.adapters.MegaContactsLollipopAdapter;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
-import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -672,7 +671,21 @@ public class ContactsFragmentLollipop extends Fragment{
 	public void updateView () {
 		log("updateView");
 		ArrayList<MegaUser> contacts = megaApi.getContacts();
-		this.setContacts(contacts);
+
+		if(adapter == null){
+			isList = ((ManagerActivityLollipop)context).isList();
+
+			if (isList) {
+				log("isList");
+				adapter = new MegaContactsLollipopAdapter(context, this, visibleContacts, recyclerView, MegaContactsLollipopAdapter.ITEM_VIEW_TYPE_LIST);
+			}
+			else{
+				adapter = new MegaContactsLollipopAdapter(context, this, visibleContacts, recyclerView, MegaContactsLollipopAdapter.ITEM_VIEW_TYPE_GRID);
+			}
+		}
+		else{
+			this.setContacts(contacts);
+		}
 		
 		if (visibleContacts.size() == 0){
 			log("CONTACTS SIZE == 0");
@@ -738,7 +751,7 @@ public class ContactsFragmentLollipop extends Fragment{
 	}
 
 	public void sortBy(int orderContacts){
-		log("sortByName");
+		log("sortBy");
 
 		if(orderContacts == MegaApiJava.ORDER_DEFAULT_DESC){
 			Collections.sort(visibleContacts,  Collections.reverseOrder(new Comparator<MegaContactAdapter>(){
