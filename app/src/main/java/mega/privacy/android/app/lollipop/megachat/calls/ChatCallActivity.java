@@ -36,7 +36,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.view.Display;
-import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -1554,6 +1553,9 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                        showInitialFABConfiguration();
                     }
                 }
+                else{
+                    hangFAB.setVisibility(View.VISIBLE);
+                }
                 break;
             }
             case Constants.RECORD_AUDIO: {
@@ -1562,6 +1564,9 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                     if(checkPermissions()){
                         showInitialFABConfiguration();
                     }
+                }
+                else{
+                    hangFAB.setVisibility(View.VISIBLE);
                 }
                 break;
             }
@@ -1711,6 +1716,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
         megaChatApi.answerChatCall(chatId, false, this);
     }
     public void answerVideoCall(){
+        log("answerVideoCall");
         if (megaChatApi.isSignalActivityRequired()) {
             megaChatApi.signalPresenceActivity();
         }

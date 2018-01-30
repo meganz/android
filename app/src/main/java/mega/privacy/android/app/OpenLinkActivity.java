@@ -1,12 +1,9 @@
 package mega.privacy.android.app;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v7.app.AlertDialog;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -421,6 +418,17 @@ public class OpenLinkActivity extends PinActivity implements MegaRequestListener
 
 		if (url != null && (url.matches("^https://mega.co.nz/#help") || url.matches("^https://mega.nz/#help") || url.matches("^https://mega.nz/help"))) {
 			log("help link url");
+
+			Intent openHelpIntent = new Intent(this, WebViewActivityLollipop.class);
+			openHelpIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			openHelpIntent.setData(Uri.parse(url));
+			startActivity(openHelpIntent);
+			finish();
+			return;
+		}
+
+		if (url != null && (url.matches("^https://mega.co.nz/#sync") || url.matches("^https://mega.nz/#sync") || url.matches("^https://mega.nz/sync"))) {
+			log("sync link url");
 
 			Intent openHelpIntent = new Intent(this, WebViewActivityLollipop.class);
 			openHelpIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
