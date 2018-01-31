@@ -465,48 +465,16 @@
         android:layout_marginBottom="6dp">
 
         <RelativeLayout
-            android:id="@+id/layout_avatar"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:layout_marginLeft="16dp"
-            android:layout_alignParentBottom="true"
-            android:layout_marginBottom="10dp"
-            android:background="@android:color/transparent">
-
-            <mega.privacy.android.app.components.RoundedImageView
-                android:id="@+id/contact_thumbnail"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_centerInParent="true"
-                android:background="@android:color/transparent"
-                android:scaleType="fitCenter"
-                rounded:border_color="@color/border_file_properties"
-                rounded:border_width="0dp"
-                rounded:corner_radius="40dp" />
-
-            <TextView
-                android:id="@+id/contact_initial_letter"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_centerInParent="true"
-                android:textSize="15sp"
-                android:gravity="center_horizontal|center_vertical"/>
-
-        </RelativeLayout>
-
-        <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_toRightOf="@+id/layout_avatar"
-            android:background="@android:color/transparent"
-            android:layout_marginStart="8dp"
-            android:layout_marginLeft="8dp">
+            android:background="@android:color/transparent">
 
             <RelativeLayout
                 android:id="@+id/title_contact_message_layout"
                 android:layout_width="match_parent"
                 android:layout_height="26dp"
                 android:gravity="left|bottom"
+                android:layout_marginLeft="48dp"
                 android:layout_marginBottom="4dp">
 
                 <TextView
@@ -560,17 +528,48 @@
                 android:background="@android:color/transparent"
                 android:layout_below="@+id/title_contact_message_layout">
 
+
+                <RelativeLayout
+                    android:id="@+id/layout_avatar"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginRight="8dp"
+                    android:layout_alignParentBottom="true"
+                    android:layout_marginBottom="10dp"
+                    android:background="@android:color/transparent">
+
+                    <mega.privacy.android.app.components.RoundedImageView
+                        android:id="@+id/contact_thumbnail"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_centerInParent="true"
+                        android:background="@android:color/transparent"
+                        android:scaleType="fitCenter"
+                        rounded:border_color="@color/border_file_properties"
+                        rounded:border_width="0dp"
+                        rounded:corner_radius="40dp" />
+
+                    <TextView
+                        android:id="@+id/contact_initial_letter"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_centerInParent="true"
+                        android:textSize="15sp"
+                        android:gravity="center_horizontal|center_vertical"/>
+
+                </RelativeLayout>
+
                 <mega.privacy.android.app.components.WrapEmojiconTextView
                     android:id="@+id/content_contact_message_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor="@color/name_my_account"
+                    android:layout_toRightOf="@+id/layout_avatar"
                     android:textSize="14sp"
                     android:inputType="textMultiLine|textNoSuggestions"
                     android:background="@drawable/rounded_text_view_chat_contact_message"
-                    android:padding="12dp"
-                    android:layout_marginEnd="80dp"
-                    android:layout_marginRight="80dp" />
+                    android:padding="12dp" />
 
                 <RelativeLayout
                     android:layout_width="wrap_content"
