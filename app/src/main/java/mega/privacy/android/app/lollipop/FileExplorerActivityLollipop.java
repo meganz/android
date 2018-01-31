@@ -345,7 +345,6 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			}*/	
 			startActivity(loginIntent);
 			return;
-//			finish();
 		}
 		else{
 			log("User has credentials");
@@ -747,56 +746,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 					public void onPageSelected(int position) {
 						log("onTabChanged TabId :"+ position);
 						supportInvalidateOptionsMenu();
-						if(position == 0){
-							tabShown=CLOUD_TAB;
-							String cFTag = getFragmentTag(R.id.explorer_tabs_pager, 0);
-							cDriveExplorer = (CloudDriveExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
-
-							if(cDriveExplorer!=null){
-								if(cDriveExplorer.parentHandle==-1|| cDriveExplorer.parentHandle==megaApi.getRootNode().getHandle()){
-									changeTitle(getString(R.string.section_cloud_drive));
-								}
-								else{
-									changeTitle(megaApi.getNodeByHandle(cDriveExplorer.parentHandle).getName());
-								}
-							}
-							fabButton.setVisibility(View.GONE);
-						}
-						else if(position == 1){
-							tabShown=INCOMING_TAB;
-
-							String cFTag = getFragmentTag(R.id.explorer_tabs_pager, 1);
-							iSharesExplorer = (IncomingSharesExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
-
-							if(iSharesExplorer!=null){
-								if(iSharesExplorer.getDeepBrowserTree()==0){
-									changeTitle(getString(R.string.title_incoming_shares_explorer));
-								}
-								else{
-									changeTitle(megaApi.getNodeByHandle(iSharesExplorer.parentHandle).getName());
-								}
-							}
-							fabButton.setVisibility(View.GONE);
-
-						}
-						else if(position == 2){
-							tabShown=CHAT_TAB;
-
-							String cFTag = getFragmentTag(R.id.explorer_tabs_pager, 2);
-							chatExplorer = (ChatExplorerFragment) getSupportFragmentManager().findFragmentByTag(cFTag);
-
-							if(chatExplorer!=null){
-								changeTitle(getString(R.string.section_chat));
-							}
-
-							if(chatExplorer.getSelectedChats().size() > 0){
-								fabButton.setVisibility(View.VISIBLE);
-							}
-							else{
-								fabButton.setVisibility(View.GONE);
-							}
-
-						}
+						changeTitle();
 					}
 				});
 			}
@@ -938,19 +888,81 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 //		}
 //	}
 	
-	public void changeTitle (String title){
-		aB.setTitle(title);	
+
+	public void changeTitle (){
+
+		int position = viewPagerExplorer.getCurrentItem();
+		if(position == 0){
+			tabShown=CLOUD_TAB;
+			String cFTag = getFragmentTag(R.id.explorer_tabs_pager, 0);
+			cDriveExplorer = (CloudDriveExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
+
+			if(cDriveExplorer!=null){
+				if(cDriveExplorer.parentHandle==-1|| cDriveExplorer.parentHandle==megaApi.getRootNode().getHandle()){
+					log("3**Change title");
+					aB.setTitle(getString(R.string.section_cloud_drive));
+				}
+				else{
+					log("4**Change title");
+					aB.setTitle(megaApi.getNodeByHandle(cDriveExplorer.parentHandle).getName());
+				}
+			}
+			fabButton.setVisibility(View.GONE);
+		}
+		else if(position == 1){
+			tabShown=INCOMING_TAB;
+
+			String cFTag = getFragmentTag(R.id.explorer_tabs_pager, 1);
+			iSharesExplorer = (IncomingSharesExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
+
+			if(iSharesExplorer!=null){
+				if(iSharesExplorer.getDeepBrowserTree()==0){
+					log("5**Change title");
+					aB.setTitle(getString(R.string.title_incoming_shares_explorer));
+				}
+				else{
+					log("6**Change title");
+					aB.setTitle(megaApi.getNodeByHandle(iSharesExplorer.parentHandle).getName());
+				}
+			}
+			fabButton.setVisibility(View.GONE);
+
+		}
+		else if(position == 2){
+			tabShown=CHAT_TAB;
+
+			String cFTag = getFragmentTag(R.id.explorer_tabs_pager, 2);
+			chatExplorer = (ChatExplorerFragment) getSupportFragmentManager().findFragmentByTag(cFTag);
+
+			if(chatExplorer!=null){
+				log("7**Change title");
+				aB.setTitle(getString(R.string.section_chat));
+			}
+
+			if(chatExplorer.getSelectedChats().size() > 0){
+				fabButton.setVisibility(View.VISIBLE);
+			}
+			else{
+				fabButton.setVisibility(View.GONE);
+			}
+
+		}
 	}
 	
 	private String getFragmentTag(int viewPagerId, int fragmentPosition)
 	{
 	     return "android:switcher:" + viewPagerId + ":" + fragmentPosition;
 	}
-	
+
 	public void finishActivity(){
-		finish();
+		if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+			super.finishAndRemoveTask();
+		}
+		else {
+			super.finish();
+		}
 	}
-	
+
 	@Override
 	protected void onSaveInstanceState(Bundle bundle) {
 		log("onSaveInstanceState");
@@ -1014,8 +1026,8 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 	
 			if(cDriveExplorer!=null){
 				if (cDriveExplorer.onBackPressed() == 0){
-					super.onBackPressed();
-					return;
+//					super.onBackPressed();
+					finishActivity();
 				}
 			}
 		}
@@ -1024,8 +1036,8 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			iSharesExplorer = (IncomingSharesExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
 			if(iSharesExplorer!=null){
 				if (iSharesExplorer.onBackPressed() == 0){
-					super.onBackPressed();
-					return;
+//					super.onBackPressed();
+					finishActivity();
 				}
 			}
 		}
@@ -1034,8 +1046,8 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 
 			if(cDriveExplorer!=null){
 				if (cDriveExplorer.onBackPressed() == 0){
-					super.onBackPressed();
-					return;
+//					super.onBackPressed();
+					finishActivity();
 				}
 			}
 		}
@@ -1145,7 +1157,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 				else{
 					filePreparedInfos = null;
 					log("ERROR null files to upload");
-					finish();
+					finishActivity();
 				}
 
 			}
@@ -1176,7 +1188,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 
 			filePreparedInfos = null;
 			log("finish!!!");
-			finish();
+			finishActivity();
 		}
 	}
 	
@@ -1219,7 +1231,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 				}
 				filePreparedInfos = null;
 				log("finish!!!");
-				finish();
+				finishActivity();
 			}	
 		}
 	}
@@ -1231,7 +1243,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
         intent.putExtra("NODE_HANDLES", handles);
         intent.putStringArrayListExtra("SELECTED_CONTACTS", selectedContacts);
         setResult(RESULT_OK, intent);
-        finish();
+		finishActivity();
     }
 	
 	public void buttonClick(long handle){
@@ -1242,7 +1254,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			if (iSharesExplorer.getDeepBrowserTree()==0){
 				Intent intent = new Intent();
 				setResult(RESULT_FIRST_USER, intent);
-				finish();
+				finishActivity();
 				return;
 			}
 		}
@@ -1262,7 +1274,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			intent.putExtra("MOVE_HANDLES", moveFromHandles);
 			setResult(RESULT_OK, intent);
 			log("finish!");
-			finish();
+			finishActivity();
 		}
 		else if (mode == COPY){
 			
@@ -1277,7 +1289,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			intent.putExtra("COPY_HANDLES", copyFromHandles);
 			setResult(RESULT_OK, intent);
 			log("finish!");
-			finish();
+			finishActivity();
 		}
 		else if (mode == UPLOAD){
 
@@ -1359,7 +1371,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			intent.putExtra("IMPORT_TO", parentNode.getHandle());
 			setResult(RESULT_OK, intent);
 			log("finish!");
-			finish();
+			finishActivity();
 		}
 		else if (mode == SELECT){
 
@@ -1369,7 +1381,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 				intent.putExtra("SELECT", handle);
 				intent.putStringArrayListExtra("SELECTED_CONTACTS", selectedContacts);
 				setResult(RESULT_OK, intent);
-				finish();
+				finishActivity();
 			}
 			else{
 				long parentHandle = handle;
@@ -1382,7 +1394,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 				intent.putExtra("SELECT", parentNode.getHandle());
 				intent.putStringArrayListExtra("SELECTED_CONTACTS", selectedContacts);
 				setResult(RESULT_OK, intent);
-				finish();
+				finishActivity();
 			}
 		}
 		else if (mode == SELECT_CAMERA_FOLDER){
@@ -1396,7 +1408,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			Intent intent = new Intent();
 			intent.putExtra("SELECT_MEGA_FOLDER", parentNode.getHandle());			
 			setResult(RESULT_OK, intent);
-			finish();
+			finishActivity();
 		}
 	}
 
@@ -1433,7 +1445,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 
 			log("After UPLOAD click - back to Cloud");
 			this.backToCloud(parentNode.getHandle());
-			finish();
+			finishActivity();
 		}
 		else{
 			Snackbar.make(fragmentContainer,getString(R.string.email_verification_text_error),Snackbar.LENGTH_LONG).show();
