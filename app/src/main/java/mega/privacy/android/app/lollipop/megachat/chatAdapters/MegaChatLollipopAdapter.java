@@ -373,10 +373,10 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.contentOwnMessageText = (WrapEmojiconTextView) v.findViewById(R.id.content_own_message_text);
 
             if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                holder.contentOwnMessageText.setMaxWidth(Util.scaleWidthPx(300, outMetrics));
+                holder.contentOwnMessageText.setMaxWidth(Util.scaleWidthPx(310, outMetrics));
 
             }else{
-                holder.contentOwnMessageText.setMaxWidth(Util.scaleWidthPx(260, outMetrics));
+                holder.contentOwnMessageText.setMaxWidth(Util.scaleWidthPx(275, outMetrics));
             }
 
             holder.contentOwnMessageThumbLand = (RoundedImageView)  v.findViewById(R.id.content_own_message_thumb_landscape);
@@ -454,6 +454,13 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.contentContactMessageLayout = (RelativeLayout) v.findViewById(R.id.content_contact_message_layout);
             holder.contentContactMessageText = (WrapEmojiconTextView) v.findViewById(R.id.content_contact_message_text);
 
+            if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                holder.contentContactMessageText.setMaxWidth(Util.scaleWidthPx(315, outMetrics));
+
+            }else{
+                holder.contentContactMessageText.setMaxWidth(Util.scaleWidthPx(280, outMetrics));
+            }
+
             holder.contentContactMessageThumbLand = (RoundedImageView)  v.findViewById(R.id.content_contact_message_thumb_landscape);
             holder.contentContactMessageThumbLand.setCornerRadius(radius);
             holder.contentContactMessageThumbLand.setBorderWidth(0);
@@ -506,7 +513,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-
         if(holder instanceof ViewHolderHeaderChat){
             log("onBindViewHolder ViewHolderHeaderChat: " + position);
         }
@@ -1729,6 +1735,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                             if (preview != null) {
 
                                                 PreviewUtils.previewCache.put(node.getHandle(), preview);
+
                                                 if (preview.getWidth() < preview.getHeight()) {
                                                     log("Portrait");
 
@@ -2431,6 +2438,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                                         log("Success -> getPreviewFromCache");
                                         PreviewUtils.previewCache.put(node.getHandle(), preview);
+
                                         if (preview.getWidth() < preview.getHeight()) {
                                             log("Portrait");
 
@@ -3056,6 +3064,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
     }
 
     public void createDefaultAvatarContact(ViewHolderMessageChat holder, String userHandle, String name){
+        log("createDefaultAvatarContact");
         Bitmap defaultAvatar = Bitmap.createBitmap(Constants.DEFAULT_AVATAR_WIDTH_HEIGHT,Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
         Canvas c = new Canvas(defaultAvatar);
         Paint p = new Paint();
@@ -3377,6 +3386,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                             String name = holder.contentOwnMessageFileName.toString();
                             log("Update my preview: "+name);
+
                             if (bitmap.getWidth() < bitmap.getHeight()) {
                                 log("Portrait");
 
@@ -3580,7 +3590,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                         //Error
                         holder.uploadingProgressBarPort.setVisibility(View.GONE);
                         holder.uploadingProgressBarLand.setVisibility(View.GONE);
-
                         if (bitmap.getWidth() < bitmap.getHeight()) {
                             log("Portrait");
 
@@ -3629,6 +3638,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                             holder.transparentCoatingPortrait.setVisibility(View.VISIBLE);
                             holder.uploadingProgressBarPort.setVisibility(View.VISIBLE);
                             holder.uploadingProgressBarLand.setVisibility(View.GONE);
+
+
 
                         }else{
                             log("Landscape");
