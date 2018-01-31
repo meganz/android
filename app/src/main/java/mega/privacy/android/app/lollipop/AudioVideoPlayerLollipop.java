@@ -172,6 +172,8 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
     private ArrayList<MegaOffline> mediaOffList;
     private ArrayList<Uri> mediaUris;
     private boolean isOffLine = false;
+    private boolean isPlayList;
+    private int size = 0;
 
     private String downloadLocationDefaultPath;
 
@@ -205,6 +207,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
         }
         isFolderLink = intent.getBooleanExtra("isFolderLink", false);
         currentPosition = intent.getIntExtra("position", 0);
+        isPlayList = intent.getBooleanExtra("isPlayList", true);
         orderGetChildren = intent.getIntExtra("orderGetChildren", MegaApiJava.ORDER_DEFAULT_ASC);
         parentNodeHandle = intent.getLongExtra("parentNodeHandle", -1);
         adapterType = intent.getIntExtra("adapterType", 0);
@@ -339,63 +342,74 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
 
         MegaNode parentNode;
 
-        if (adapterType == Constants.OFFLINE_ADAPTER){
-            //OFFLINE
-            log("OFFLINE_ADAPTER");
-            isOffLine = true;
-            offList = new ArrayList<>();
-            String pathNavigation = intent.getStringExtra("pathNavigation");
-            log("PATHNAVIGATION: " + pathNavigation);
-            offList=dbH.findByPath(pathNavigation);
-            log ("offList.size() = " + offList.size());
+        if (isPlayList){
+            if (adapterType == Constants.OFFLINE_ADAPTER){
+                //OFFLINE
+                log("OFFLINE_ADAPTER");
+                isOffLine = true;
+                offList = new ArrayList<>();
+                String pathNavigation = intent.getStringExtra("pathNavigation");
+                log("PATHNAVIGATION: " + pathNavigation);
+                offList=dbH.findByPath(pathNavigation);
+                log ("offList.size() = " + offList.size());
 
-            for(int i=0; i<offList.size();i++){
-                MegaOffline checkOffline = offList.get(i);
-                File offlineDirectory = null;
-                if(checkOffline.getOrigin()==MegaOffline.INCOMING){
-                    log("isIncomingOffline");
+                for(int i=0; i<offList.size();i++){
+                    MegaOffline checkOffline = offList.get(i);
+                    File offlineDirectory = null;
+                    if(checkOffline.getOrigin()==MegaOffline.INCOMING){
+                        log("isIncomingOffline");
 
-                    if (Environment.getExternalStorageDirectory() != null){
-                        offlineDirectory = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + offLineDIR + "/" +checkOffline.getHandleIncoming() + "/" + checkOffline.getPath()+checkOffline.getName());
-                        log("offlineDirectory: "+offlineDirectory);
+                        if (Environment.getExternalStorageDirectory() != null){
+                            offlineDirectory = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + offLineDIR + "/" +checkOffline.getHandleIncoming() + "/" + checkOffline.getPath()+checkOffline.getName());
+                            log("offlineDirectory: "+offlineDirectory);
+                        }
+                        else{
+                            offlineDirectory = getFilesDir();
+                        }
+                    }
+                    else if(checkOffline.getOrigin()==MegaOffline.INBOX){
+                        if (Environment.getExternalStorageDirectory() != null){
+                            offlineDirectory = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + offLineDIR + "/in/" + checkOffline.getPath()+checkOffline.getName());
+                            log("offlineDirectory: "+offlineDirectory);
+                        }
+                        else{
+                            offlineDirectory = getFilesDir();
+                        }
                     }
                     else{
-                        offlineDirectory = getFilesDir();
+                        log("NOT isIncomingOffline");
+                        if (Environment.getExternalStorageDirectory() != null){
+                            offlineDirectory = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + offLineDIR + checkOffline.getPath()+checkOffline.getName());
+                        }
+                        else{
+                            offlineDirectory = getFilesDir();
+                        }
                     }
-                }
-                else if(checkOffline.getOrigin()==MegaOffline.INBOX){
-                    if (Environment.getExternalStorageDirectory() != null){
-                        offlineDirectory = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + offLineDIR + "/in/" + checkOffline.getPath()+checkOffline.getName());
-                        log("offlineDirectory: "+offlineDirectory);
-                    }
-                    else{
-                        offlineDirectory = getFilesDir();
-                    }
-                }
-                else{
-                    log("NOT isIncomingOffline");
-                    if (Environment.getExternalStorageDirectory() != null){
-                        offlineDirectory = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + offLineDIR + checkOffline.getPath()+checkOffline.getName());
-                    }
-                    else{
-                        offlineDirectory = getFilesDir();
+
+                    if(offlineDirectory!=null){
+                        if (!offlineDirectory.exists()){
+                            log("Path to remove B: "+(offList.get(i).getPath()+offList.get(i).getName()));
+                            //dbH.removeById(offList.get(i).getId());
+                            offList.remove(i);
+                            i--;
+                        }
                     }
                 }
 
-                if(offlineDirectory!=null){
-                    if (!offlineDirectory.exists()){
-                        log("Path to remove B: "+(offList.get(i).getPath()+offList.get(i).getName()));
-                        //dbH.removeById(offList.get(i).getId());
-                        offList.remove(i);
-                        i--;
+                if (offList != null){
+                    if(!offList.isEmpty()) {
+                        MegaOffline lastItem = offList.get(offList.size()-1);
+                        if(!(lastItem.getHandle().equals("0"))){
+                            String path = Environment.getExternalStorageDirectory().getAbsolutePath()+oldMKFile;
+                            log("Export in: "+path);
+                            File file= new File(path);
+                            if(file.exists()){
+                                MegaOffline masterKeyFile = new MegaOffline("0", path, "MEGARecoveryKey.txt", 0, "0", 0, "0");
+                                offList.add(masterKeyFile);
+                            }
+                        }
                     }
-                }
-            }
-
-            if (offList != null){
-                if(!offList.isEmpty()) {
-                    MegaOffline lastItem = offList.get(offList.size()-1);
-                    if(!(lastItem.getHandle().equals("0"))){
+                    else{
                         String path = Environment.getExternalStorageDirectory().getAbsolutePath()+oldMKFile;
                         log("Export in: "+path);
                         File file= new File(path);
@@ -405,140 +419,138 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
                         }
                     }
                 }
-                else{
-                    String path = Environment.getExternalStorageDirectory().getAbsolutePath()+oldMKFile;
-                    log("Export in: "+path);
-                    File file= new File(path);
-                    if(file.exists()){
-                        MegaOffline masterKeyFile = new MegaOffline("0", path, "MEGARecoveryKey.txt", 0, "0", 0, "0");
-                        offList.add(masterKeyFile);
-                    }
+
+                if(orderGetChildren == MegaApiJava.ORDER_DEFAULT_DESC){
+                    sortByNameDescending();
                 }
-            }
+                else{
+                    sortByNameAscending();
+                }
 
-            if(orderGetChildren == MegaApiJava.ORDER_DEFAULT_DESC){
-                sortByNameDescending();
-            }
-            else{
-                sortByNameAscending();
-            }
+                if (offList.size() > 0){
 
-            if (offList.size() > 0){
-
-                mediaOffList = new ArrayList<>();
-                int mediaPosition = -1;
-                for (int i=0;i<offList.size();i++){
-                    if ((MimeTypeList.typeForName(offList.get(i).getName()).isVideoReproducible() && !MimeTypeList.typeForName(offList.get(i).getName()).isVideoNotSupported())|| MimeTypeList.typeForName(offList.get(i).getName()).isAudio()){
-                        mediaOffList.add(offList.get(i));
-                        mediaPosition++;
-                        if (i == currentPosition){
-                            currentPosition = mediaPosition;
+                    mediaOffList = new ArrayList<>();
+                    int mediaPosition = -1;
+                    for (int i=0;i<offList.size();i++){
+                        if ((MimeTypeList.typeForName(offList.get(i).getName()).isVideoReproducible() && !MimeTypeList.typeForName(offList.get(i).getName()).isVideoNotSupported())|| MimeTypeList.typeForName(offList.get(i).getName()).isAudio()){
+                            mediaOffList.add(offList.get(i));
+                            mediaPosition++;
+                            if (i == currentPosition){
+                                currentPosition = mediaPosition;
+                            }
                         }
                     }
+
+                    if (currentPosition >= mediaOffList.size()){
+                        currentPosition = 0;
+                    }
+                }
+                size = mediaOffList.size();
+            }
+            else if(adapterType == Constants.SEARCH_ADAPTER){
+                isOffLine = false;
+                mediaHandles = new ArrayList<>();
+
+                ArrayList<MegaNode> nodes = null;
+                if (parentNodeHandle == -1){
+                    String query = intent.getStringExtra("searchQuery");
+                    nodes = megaApi.search(query);
+                }
+                else{
+                    parentNode =  megaApi.getNodeByHandle(parentNodeHandle);
+                    nodes = megaApi.getChildren(parentNode, orderGetChildren);
                 }
 
-                if (currentPosition >= mediaOffList.size()){
+                int mediaNumber = 0;
+                for (int i=0;i<nodes.size();i++){
+                    MegaNode n = nodes.get(i);
+                    if ((MimeTypeList.typeForName(n.getName()).isVideoReproducible() && !MimeTypeList.typeForName(n.getName()).isVideoNotSupported()) || MimeTypeList.typeForName(n.getName()).isAudio()){
+                        mediaHandles.add(n.getHandle());
+                        if (i == currentPosition){
+                            currentPosition = mediaNumber;
+                        }
+                        mediaNumber++;
+                    }
+                }
+
+                if(mediaHandles.size() == 0){
+                    finish();
+                    return;
+                }
+
+                if(currentPosition >= mediaHandles.size()){
                     currentPosition = 0;
                 }
-            }
-        }
-        else if(adapterType == Constants.SEARCH_ADAPTER){
-            isOffLine = false;
-            mediaHandles = new ArrayList<>();
 
-            ArrayList<MegaNode> nodes = null;
-            if (parentNodeHandle == -1){
-                String query = intent.getStringExtra("searchQuery");
-                nodes = megaApi.search(query);
+                size = mediaHandles.size();
             }
             else{
-                parentNode =  megaApi.getNodeByHandle(parentNodeHandle);
-                nodes = megaApi.getChildren(parentNode, orderGetChildren);
-            }
+                isOffLine = false;
+                if (parentNodeHandle == -1){
 
-            int mediaNumber = 0;
-            for (int i=0;i<nodes.size();i++){
-                MegaNode n = nodes.get(i);
-                if ((MimeTypeList.typeForName(n.getName()).isVideoReproducible() && !MimeTypeList.typeForName(n.getName()).isVideoNotSupported()) || MimeTypeList.typeForName(n.getName()).isAudio()){
-                    mediaHandles.add(n.getHandle());
-                    if (i == currentPosition){
-                        currentPosition = mediaNumber;
+                    switch(adapterType){
+                        case Constants.FILE_BROWSER_ADAPTER:{
+                            parentNode = megaApi.getRootNode();
+                            break;
+                        }
+                        case Constants.RUBBISH_BIN_ADAPTER:{
+                            parentNode = megaApi.getRubbishNode();
+                            break;
+                        }
+                        case Constants.SHARED_WITH_ME_ADAPTER:{
+                            parentNode = megaApi.getInboxNode();
+                            break;
+                        }
+                        case Constants.FOLDER_LINK_ADAPTER:{
+                            parentNode = megaApi.getRootNode();
+                            break;
+                        }
+                        default:{
+                            parentNode = megaApi.getRootNode();
+                            break;
+                        }
                     }
-                    mediaNumber++;
+
                 }
-            }
+                else{
+                    parentNode = megaApi.getNodeByHandle(parentNodeHandle);
+                }
 
-            if(mediaHandles.size() == 0){
-                finish();
-                return;
-            }
+                mediaHandles = new ArrayList<>();
+                ArrayList<MegaNode> nodes = megaApi.getChildren(parentNode, orderGetChildren);
 
-            if(currentPosition >= mediaHandles.size()){
-                currentPosition = 0;
-            }
-
-        }else{
-            isOffLine = false;
-            if (parentNodeHandle == -1){
-
-                switch(adapterType){
-                    case Constants.FILE_BROWSER_ADAPTER:{
-                        parentNode = megaApi.getRootNode();
-                        break;
-                    }
-                    case Constants.RUBBISH_BIN_ADAPTER:{
-                        parentNode = megaApi.getRubbishNode();
-                        break;
-                    }
-                    case Constants.SHARED_WITH_ME_ADAPTER:{
-                        parentNode = megaApi.getInboxNode();
-                        break;
-                    }
-                    case Constants.FOLDER_LINK_ADAPTER:{
-                        parentNode = megaApi.getRootNode();
-                        break;
-                    }
-                    default:{
-                        parentNode = megaApi.getRootNode();
-                        break;
+                int mediaNumber = 0;
+                for (int i=0;i<nodes.size();i++){
+                    MegaNode n = nodes.get(i);
+                    if ((MimeTypeList.typeForName(n.getName()).isVideoReproducible() && !MimeTypeList.typeForName(n.getName()).isVideoNotSupported()) || MimeTypeList.typeForName(n.getName()).isAudio()){
+                        mediaHandles.add(n.getHandle());
+                        if (i == currentPosition){
+                            currentPosition = mediaNumber;
+                        }
+                        mediaNumber++;
                     }
                 }
 
-            }
-            else{
-                parentNode = megaApi.getNodeByHandle(parentNodeHandle);
-            }
-
-            mediaHandles = new ArrayList<>();
-            ArrayList<MegaNode> nodes = megaApi.getChildren(parentNode, orderGetChildren);
-
-            int mediaNumber = 0;
-            for (int i=0;i<nodes.size();i++){
-                MegaNode n = nodes.get(i);
-                if ((MimeTypeList.typeForName(n.getName()).isVideoReproducible() && !MimeTypeList.typeForName(n.getName()).isVideoNotSupported()) || MimeTypeList.typeForName(n.getName()).isAudio()){
-                    mediaHandles.add(n.getHandle());
-                    if (i == currentPosition){
-                        currentPosition = mediaNumber;
-                    }
-                    mediaNumber++;
+                if(mediaHandles.size() == 0)
+                {
+                    finish();
+                    return;
                 }
+
+                if(currentPosition >= mediaHandles.size())
+                {
+                    currentPosition = 0;
+                }
+
+                ((MegaApplication) getApplication()).sendSignalPresenceActivity();
+                size = mediaHandles.size();
             }
 
-            if(mediaHandles.size() == 0)
-            {
-                finish();
-                return;
+            if (size > 1) {
+                sortBySelected();
             }
-
-            if(currentPosition >= mediaHandles.size())
-            {
-                currentPosition = 0;
-            }
-
-            ((MegaApplication) getApplication()).sendSignalPresenceActivity();
         }
 
-        sortBySelected();
 
         //Create a default TrackSelector
         BandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
@@ -585,60 +597,70 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
         //Produces Extractor instances for parsing the media data
         ExtractorsFactory extractorsFactory = new DefaultExtractorsFactory();
 
-        final List<MediaSource> playlist = new ArrayList<>();
-        MediaSource mediaSource;
-        String localPath;
-        Uri mediaUri;
-        File mediaFile;
-        mediaUris = new ArrayList<>();
-        if (isOffLine){
-            for(int i=0; i<mediaOffList.size(); i++){
-                MegaOffline currentNode = mediaOffList.get(i);
-                if(currentNode.getOrigin()==MegaOffline.INCOMING){
-                    String handleString = currentNode.getHandleIncoming();
-                    mediaFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + offLineDIR + "/" + handleString + "/"+currentNode.getPath() + "/" + currentNode.getName());
-                }
-                else if(currentNode.getOrigin()==MegaOffline.INBOX){
-                    String handleString = currentNode.getHandleIncoming();
-                    mediaFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + offLineDIR + "/in/"+currentNode.getPath() + "/" + currentNode.getName());
-                }
-                else{
-                    mediaFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + offLineDIR + currentNode.getPath() + "/" + currentNode.getName());
-                }
-                mediaUri = FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", mediaFile);
-                mediaUris.add(mediaUri);
-                mediaSource = new ExtractorMediaSource(mediaUri, dataSourceFactory, extractorsFactory, null, null);
-                playlist.add(mediaSource);
-            }
-        }
-        else {
-            MegaNode n;
-            for(int i=0; i<mediaHandles.size(); i++){
-                n = megaApi.getNodeByHandle(mediaHandles.get(i));
-                localPath = mega.privacy.android.app.utils.Util.getLocalFile(this, n.getName(), n.getSize(), downloadLocationDefaultPath);
-                if (localPath != null){
-                    mediaFile = new File(localPath);
+        MediaSource mediaSource = null;
+        LoopingMediaSource loopingMediaSource = null;
+
+        if (isPlayList && size > 1) {
+            final List<MediaSource> playlist = new ArrayList<>();
+            MediaSource mSource;
+            String localPath;
+            Uri mediaUri;
+            File mediaFile;
+            mediaUris = new ArrayList<>();
+            if (isOffLine){
+                for(int i=0; i<mediaOffList.size(); i++){
+                    MegaOffline currentNode = mediaOffList.get(i);
+                    if(currentNode.getOrigin()==MegaOffline.INCOMING){
+                        String handleString = currentNode.getHandleIncoming();
+                        mediaFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + offLineDIR + "/" + handleString + "/"+currentNode.getPath() + "/" + currentNode.getName());
+                    }
+                    else if(currentNode.getOrigin()==MegaOffline.INBOX){
+                        String handleString = currentNode.getHandleIncoming();
+                        mediaFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + offLineDIR + "/in/"+currentNode.getPath() + "/" + currentNode.getName());
+                    }
+                    else{
+                        mediaFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + offLineDIR + currentNode.getPath() + "/" + currentNode.getName());
+                    }
                     mediaUri = FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", mediaFile);
                     mediaUris.add(mediaUri);
-                    mediaSource = new ExtractorMediaSource(mediaUri, dataSourceFactory, extractorsFactory, null, null);
+                    mSource = new ExtractorMediaSource(mediaUri, dataSourceFactory, extractorsFactory, null, null);
+                    playlist.add(mSource);
                 }
-                else {
-                    mediaUri = Uri.parse(megaApi.httpServerGetLocalLink(n));
-                    mediaUris.add(mediaUri);
-                    mediaSource = new ExtractorMediaSource (mediaUri, dataSourceFactory, extractorsFactory, null, null);
-                }
-                playlist.add(mediaSource);
             }
+            else {
+                MegaNode n;
+                for(int i=0; i<mediaHandles.size(); i++){
+                    n = megaApi.getNodeByHandle(mediaHandles.get(i));
+                    localPath = mega.privacy.android.app.utils.Util.getLocalFile(this, n.getName(), n.getSize(), downloadLocationDefaultPath);
+                    if (localPath != null){
+                        mediaFile = new File(localPath);
+                        mediaUri = FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", mediaFile);
+                        mediaUris.add(mediaUri);
+                        mSource = new ExtractorMediaSource(mediaUri, dataSourceFactory, extractorsFactory, null, null);
+                    }
+                    else {
+                        mediaUri = Uri.parse(megaApi.httpServerGetLocalLink(n));
+                        mediaUris.add(mediaUri);
+                        mSource = new ExtractorMediaSource (mediaUri, dataSourceFactory, extractorsFactory, null, null);
+                    }
+                    playlist.add(mSource);
+                }
+            }
+
+            final ConcatenatingMediaSource concatenatingMediaSource = new ConcatenatingMediaSource(playlist.toArray(new MediaSource[playlist.size()]));
+            loopingMediaSource = new LoopingMediaSource(concatenatingMediaSource);
+            player.prepare(loopingMediaSource);
+
         }
-        //MediaSource mediaSource = new ExtractorMediaSource(uri, dataSourceFactory, extractorsFactory, null, null);
+        else {
+            mediaSource = new ExtractorMediaSource(uri, dataSourceFactory, extractorsFactory, null, null);
+            player.prepare(mediaSource);
+        }
+
+        final LoopingMediaSource finalLoopingMediaSource = loopingMediaSource;
+        final MediaSource finalMediaSource = mediaSource;
         //MediaSource mediaSource = new HlsMediaSource(uri, dataSourceFactory, handler, null);
         //DashMediaSource mediaSource = new DashMediaSource(uri, dataSourceFactory, new DefaultDashChunkSource.Factory(dataSourceFactory), null, null);
-
-        final ConcatenatingMediaSource concatenatingMediaSource = new ConcatenatingMediaSource(playlist.toArray(new MediaSource[playlist.size()]));
-
-        final LoopingMediaSource loopingMediaSource = new LoopingMediaSource(concatenatingMediaSource);
-
-        player.prepare(loopingMediaSource);
 
         statusDialog = new ProgressDialog(AudioVideoPlayerLollipop.this);
         statusDialog.setMessage(getString(R.string.general_loading));
@@ -666,21 +688,23 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
             @Override
             public void onTracksChanged(TrackGroupArray trackGroups, TrackSelectionArray trackSelections) {
                 log("onTracksChanged");
-                loading = true;
-                video = false;
-                audioContainer.setVisibility(View.VISIBLE);
-                invalidateOptionsMenu();
-                if (isOffLine){
-                    MegaOffline n = mediaOffList.get(player.getCurrentWindowIndex());
-                    tB.setTitle(n.getName());
-                    handle = Long.parseLong(n.getHandle());
+                if (size > 1) {
+                    statusDialog.show();
+                    video = false;
+                    audioContainer.setVisibility(View.VISIBLE);
+                    invalidateOptionsMenu();
+                    if (isOffLine){
+                        MegaOffline n = mediaOffList.get(player.getCurrentWindowIndex());
+                        tB.setTitle(n.getName());
+                        handle = Long.parseLong(n.getHandle());
+                    }
+                    else {
+                        MegaNode n = megaApi.getNodeByHandle(mediaHandles.get(player.getCurrentWindowIndex()));
+                        tB.setTitle(n.getName());
+                        handle = n.getHandle();
+                    }
+                    uri = mediaUris.get(player.getCurrentWindowIndex());
                 }
-                else {
-                    MegaNode n = megaApi.getNodeByHandle(mediaHandles.get(player.getCurrentWindowIndex()));
-                    tB.setTitle(n.getName());
-                    handle = n.getHandle();
-                }
-                uri = mediaUris.get(player.getCurrentWindowIndex());
             }
 
             @Override
@@ -731,8 +755,12 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
             public void onPlayerError(ExoPlaybackException error) {
                 log("onPlayerError");
                 player.stop();
-                //player.prepare(loopingMediaSource);
-                player.prepare(concatenatingMediaSource);
+                if (isPlayList && size > 1){
+                    player.prepare(finalLoopingMediaSource);
+                }
+                else {
+                    player.prepare(finalMediaSource);
+                }
                 player.setPlayWhenReady(true);
             }
 

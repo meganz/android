@@ -621,6 +621,13 @@ public class ContactFileListFragmentLollipop extends Fragment{
 					else {
 						mediaIntent = new Intent(context, AudioVideoPlayerLollipop.class);
 					}
+					mediaIntent.putExtra("position", position);
+					mediaIntent.putExtra("adapterType", Constants.CONTACT_FILE_ADAPTER);
+					if (megaApi.getParentNode(contactNodes.get(position)).getType() == MegaNode.TYPE_ROOT) {
+						mediaIntent.putExtra("parentNodeHandle", -1L);
+					} else {
+						mediaIntent.putExtra("parentNodeHandle", megaApi.getParentNode(contactNodes.get(position)).getHandle());
+					}
 					mediaIntent.putExtra("HANDLE", file.getHandle());
 					mediaIntent.putExtra("FILENAME", file.getName());
 					String localPath = Util.getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);

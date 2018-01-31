@@ -118,7 +118,8 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
 
     DatabaseHandler dbH;
     MegaPreferences prefs;
-    String downloadLocationDefaultPath = Util.downloadDIR;
+    String downloadLocationDefaultPath;
+    String defaultPath;
 
     public static class ItemInformation{
         public int type = -1;
@@ -911,7 +912,7 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
 
     }
 
-    public MegaPhotoSyncGridTitleAdapterLollipop(Context _context, ArrayList<MegaMonthPicLollipop> _monthPics, long _photosyncHandle, RecyclerView listView, ImageView emptyImageView, LinearLayout emptyTextView, ActionBar aB, ArrayList<MegaNode> _nodes, int numberOfCells, int gridWidth, Object fragment, int type, int count, int countTitles, List<ItemInformation> itemInformationList) {
+    public MegaPhotoSyncGridTitleAdapterLollipop(Context _context, ArrayList<MegaMonthPicLollipop> _monthPics, long _photosyncHandle, RecyclerView listView, ImageView emptyImageView, LinearLayout emptyTextView, ActionBar aB, ArrayList<MegaNode> _nodes, int numberOfCells, int gridWidth, Object fragment, int type, int count, int countTitles, List<ItemInformation> itemInformationList, String defaultPath) {
         this.context = _context;
         this.monthPics = _monthPics;
         this.photosyncHandle = _photosyncHandle;
@@ -935,6 +936,8 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
         this.countTitles = countTitles;
 
         this.itemInformationList = itemInformationList;
+
+        this.defaultPath = defaultPath;
     }
 
     public void setNumberOfCells(int numberOfCells, int gridWidth){
@@ -1094,7 +1097,7 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
                         }
                         context.startActivity(intent);
                     }
-                    else if (MimeTypeThumbnail.typeForName(n.getName()).isVideo() || MimeTypeThumbnail.typeForName(n.getName()).isAudio() ){
+                    else if (MimeTypeThumbnail.typeForName(n.getName()).isVideoReproducible()){
                         MegaNode file = n;
 
                         if (megaApi.httpServerIsRunning() == 0) {
@@ -1119,10 +1122,26 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
                         log("FILENAME: " + file.getName());
 
                         //Intent mediaIntent = new Intent(Intent.ACTION_VIEW);
-                        Intent mediaIntent = new Intent(context, AudioVideoPlayerLollipop.class);
+                        Intent mediaIntent;
+                        if (MimeTypeList.typeForName(n.getName()).isVideoNotSupported()){
+                            mediaIntent = new Intent(Intent.ACTION_VIEW);
+                        }
+                        else {
+                            mediaIntent = new Intent(context, AudioVideoPlayerLollipop.class);
+                        }
+                        mediaIntent.putExtra("position", positionInNodes);
+                        if (megaApi.getParentNode(nodes.get(positionInNodes)).getType() == MegaNode.TYPE_ROOT){
+                            mediaIntent.putExtra("parentNodeHandle", -1L);
+                        }
+                        else{
+                            mediaIntent.putExtra("parentNodeHandle", megaApi.getParentNode(nodes.get(positionInNodes)).getHandle());
+                        }
+                        mediaIntent.putExtra("orderGetChildren", orderGetChildren);
+                        mediaIntent.putExtra("adapterType", Constants.PHOTO_SYNC_ADAPTER);
                         mediaIntent.putExtra("HANDLE", file.getHandle());
                         mediaIntent.putExtra("FILENAME", file.getName());
-                        String localPath = Util.getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
+                        String localPath = findLocalPath(file.getName(), file.getSize());
+                        log("localpath cameraupload: "+localPath+" name: "+file.getName());
                         if (localPath != null){
                             File mediaFile = new File(localPath);
                             //mediaIntent.setDataAndType(Uri.parse(localPath), mimeType);
@@ -1142,59 +1161,6 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
                         }
                         else{
                             Toast.makeText(context, context.getResources().getString(R.string.intent_not_available), Toast.LENGTH_LONG).show();
-                            ArrayList<Long> handleList = new ArrayList<Long>();
-                            handleList.add(n.getHandle());
-                            NodeController nC = new NodeController(context);
-                            nC.prepareForDownload(handleList);
-                        }
-                    }
-                    else if (MimeTypeList.typeForName(n.getName()).isPdf()){
-                        MegaNode file = n;
-
-                        if (megaApi.httpServerIsRunning() == 0) {
-                            megaApi.httpServerStart();
-                        }
-
-                        ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
-                        ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
-                        activityManager.getMemoryInfo(mi);
-
-                        if(mi.totalMem>Constants.BUFFER_COMP){
-                            log("Total mem: "+mi.totalMem+" allocate 32 MB");
-                            megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
-                        }
-                        else{
-                            log("Total mem: "+mi.totalMem+" allocate 16 MB");
-                            megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
-                        }
-
-                        String url = megaApi.httpServerGetLocalLink(file);
-                        String mimeType = MimeTypeList.typeForName(file.getName()).getType();
-                        log("FILENAME: " + file.getName() + "TYPE: "+mimeType);
-
-                        Intent pdfIntent = new Intent(context, PdfViewerActivityLollipop.class);
-                        pdfIntent.putExtra("APP", true);
-                        String localPath = Util.getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
-                        if (localPath != null){
-                            File mediaFile = new File(localPath);
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                                pdfIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile), MimeTypeList.typeForName(file.getName()).getType());
-                            }
-                            else{
-                                pdfIntent.setDataAndType(Uri.fromFile(mediaFile), MimeTypeList.typeForName(file.getName()).getType());
-                            }
-                            pdfIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                        }
-                        else {
-                            pdfIntent.setDataAndType(Uri.parse(url), mimeType);
-                        }
-                        pdfIntent.putExtra("HANDLE", file.getHandle());
-                        if (MegaApiUtils.isIntentAvailable(context, pdfIntent)){
-                            context.startActivity(pdfIntent);
-                        }
-                        else{
-                            Toast.makeText(context, context.getResources().getString(R.string.intent_not_available), Toast.LENGTH_LONG).show();
-
                             ArrayList<Long> handleList = new ArrayList<Long>();
                             handleList.add(n.getHandle());
                             NodeController nC = new NodeController(context);
@@ -1228,6 +1194,54 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
                 clearSelections();
             }
         }
+    }
+
+    public String findLocalPath (String fileName, long fileSize) {
+        log("findLocalPath");
+        String localPath = null;
+
+        localPath = getPath(fileName, fileSize, defaultPath);
+        if (localPath != null) {
+            return localPath;
+        }
+
+        if (localPath == null){
+            localPath = Util.getLocalFile(context, fileName, fileSize, downloadLocationDefaultPath);
+            if (localPath != null) {
+                return localPath;
+            }
+        }
+
+        return null;
+    }
+
+    public String getPath (String fileName, long fileSize, String destDir) {
+        log("getPath");
+        String path = null;
+        File dir = new File(destDir);
+        File [] listFiles = dir.listFiles();
+
+        if (listFiles != null){
+            for (int i=0; i<listFiles.length; i++){
+                log("listFiles[]: "+listFiles[i].getAbsolutePath());
+                if (listFiles[i].isDirectory()){
+                    path = getPath(fileName, fileSize, listFiles[i].getAbsolutePath());
+                    if (path != null) {
+                        log("path number X: "+path);
+                        return path;
+                    }
+                }
+                else {
+                    path = Util.getLocalFile(context, fileName, fileSize, listFiles[i].getAbsolutePath());
+                    if (path != null) {
+                        log("path number X: "+path);
+                        return path;
+                    }
+                }
+            }
+        }
+
+        return null;
     }
 
     public void onNodeLongClick(MegaPhotoSyncGridTitleAdapterLollipop.ViewHolderPhotoTitleSyncGridTitle holder, int positionInNodes){
