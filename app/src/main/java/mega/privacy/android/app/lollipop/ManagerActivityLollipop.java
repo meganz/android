@@ -14819,7 +14819,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						log("Formatted string: " + textToShow);
 					}
 
-					log("TEXTTOSHOW: " + textToShow);
 					Spanned result = null;
 					if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
 						result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);

@@ -1023,8 +1023,6 @@
     <!--
     <string name="archive_chat_empty" context="Message shown when the user has no archived chats">No archived conversations</string>
     -->
-    <string name="recent_chat_empty" context="Message shown when the user has no archived chats">No conversations</string>
-
     <string name="recent_chat_enable_chat" context="Message shown when the user has no archived chats">Chat is disabled</string>
     <string name="recent_chat_enable_chat_button" context="Message shown when the user has no archived chats">Enable chat</string>
 
@@ -1671,6 +1669,9 @@
     <string name="context_empty_inbox" context="Text of the empty screen when there are not elements in Cloud Drive or Inbox">[B]No files on your [/B][A]%1$s[/A][B].[/B]</string>
     <string name="context_empty_offline" context="Text of the empty screen when there are not elements in Saved for Offline">[B]No files [/B][A]%1$s[/A][B].[/B]</string>
     <string name="context_empty_contacts" context="Text of the empty screen when there are not contacts">[B]No [/B][A]%1$s[/A][B].[/B]</string>
+
+    <string name="recent_chat_empty" context="Message shown when the user has no archived chats">[A]No[/A] [B]Conversations[/B]</string>
+    <string name="recent_chat_loading_conversations" context="Message shown when the chat is section is loading the conversations">[A]Loading[/A] [B]Conversations...[/B]</string>
 
     <string name="context_empty_incoming" context="Text of the empty screen when there are not elements in Incoming">Incoming Shared folders</string>
     <string name="context_empty_outgoing" context="Text of the empty screen when there are not elements in Outgoing">Outgoing Shared folders</string>
