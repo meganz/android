@@ -447,9 +447,9 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 		passFirstLetter.requestFocus();
 		imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
 		imm.showSoftInput(passFirstLetter, InputMethodManager.SHOW_FORCED);
-//		imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);	
+//		imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
 
-		//Add TextWatcher to first letter		
+		//Add TextWatcher to first letter
 		passFirstLetter.addTextChangedListener(new TextWatcher() {
             public void onTextChanged(CharSequence s, int start, int before, int count) {}
 
@@ -737,7 +737,6 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
                 }
             }
         });
-
 
 		passSecondLetter.addTextChangedListener(new TextWatcher() {
             public void onTextChanged(CharSequence s, int start, int before, int count) {}

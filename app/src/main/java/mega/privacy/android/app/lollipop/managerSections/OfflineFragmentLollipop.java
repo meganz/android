@@ -1148,6 +1148,8 @@ public class OfflineFragmentLollipop extends Fragment{
 
 						Intent pdfIntent = new Intent(context, PdfViewerActivityLollipop.class);
 						pdfIntent.putExtra("APP", true);
+						pdfIntent.putExtra("HANDLE", Long.parseLong(currentNode.getHandle()));
+						pdfIntent.putExtra("adapterType", Constants.OFFLINE_ADAPTER);
 						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
 							pdfIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", pdfFile), MimeTypeList.typeForName(currentFile.getName()).getType());
 						}
