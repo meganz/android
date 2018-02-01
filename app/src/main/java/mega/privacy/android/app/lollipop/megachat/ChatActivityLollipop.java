@@ -466,19 +466,26 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     if (s.length() > 0) {
                         String temp = s.toString();
                         if(temp.trim().length()>0){
+                            sendIcon.setEnabled(true);
 
                             sendIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_send_black));
 
                         }
                         else{
+                            sendIcon.setEnabled(false);
+
                             sendIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_send_trans));
                         }
                     }
                     else {
+                        sendIcon.setEnabled(false);
+
                         sendIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_send_trans));
                     }
                 }
                 else{
+                    sendIcon.setEnabled(false);
+
                     sendIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_send_trans));
                 }
 
@@ -551,6 +558,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         sendIcon = (ImageButton) findViewById(R.id.send_message_icon_chat);
         sendIcon.setOnClickListener(this);
         sendIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_send_trans));
+        sendIcon.setEnabled(false);
 
         listView = (RecyclerView) findViewById(R.id.messages_chat_list_view);
         listView.setClipToPadding(false);;
