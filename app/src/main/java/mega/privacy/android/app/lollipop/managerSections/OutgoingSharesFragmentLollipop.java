@@ -9,6 +9,7 @@ import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.ActionBar;
@@ -17,6 +18,8 @@ import android.support.v7.view.ActionMode;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
+import android.text.Spanned;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.LayoutInflater;
@@ -82,7 +85,6 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 	ImageView emptyImageView;
 	LinearLayout emptyLinearLayout;
 	TextView emptyTextViewFirst;
-	TextView emptyTextViewSecond;
 
 	MegaBrowserLollipopAdapter adapter;
 	OutgoingSharesFragmentLollipop outgoingSharesFragment = this;
@@ -451,7 +453,6 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 			emptyImageView = (ImageView) v.findViewById(R.id.file_list_empty_image);
 			emptyLinearLayout = (LinearLayout) v.findViewById(R.id.file_list_empty_text);
 			emptyTextViewFirst = (TextView) v.findViewById(R.id.file_list_empty_text_first);
-			emptyTextViewSecond = (TextView) v.findViewById(R.id.file_list_empty_text_second);
 
 			contentTextLayout = (RelativeLayout) v.findViewById(R.id.content_text_layout);
 			contentText = (TextView) v.findViewById(R.id.content_text);
@@ -504,15 +505,24 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 						}else{
 							emptyImageView.setImageResource(R.drawable.outgoing_shares_empty);
 						}
-						emptyTextViewFirst.setText(R.string.context_empty_contacts);
-						String text = getString(R.string.context_empty_outgoing);
-						emptyTextViewSecond.setText(" "+text+".");
-						emptyTextViewSecond.setVisibility(View.VISIBLE);
-
+						String textToShow = String.format(context.getString(R.string.context_empty_contacts), getString(R.string.context_empty_outgoing));
+						try{
+							textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
+							textToShow = textToShow.replace("[/A]", "</font>");
+							textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
+							textToShow = textToShow.replace("[/B]", "</font>");
+						}
+						catch (Exception e){}
+						Spanned result = null;
+						if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+							result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
+						} else {
+							result = Html.fromHtml(textToShow);
+						}
+						emptyTextViewFirst.setText(result);
 					}else {
 						emptyImageView.setImageResource(R.drawable.ic_empty_folder);
 						emptyTextViewFirst.setText(R.string.file_browser_empty_folder);
-						emptyTextViewSecond.setVisibility(View.GONE);
 					}
 				}
 				else{
@@ -551,8 +561,6 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 			emptyImageView = (ImageView) v.findViewById(R.id.file_grid_empty_image);
 			emptyLinearLayout = (LinearLayout) v.findViewById(R.id.file_grid_empty_text);
 			emptyTextViewFirst = (TextView) v.findViewById(R.id.file_grid_empty_text_first);
-			emptyTextViewSecond = (TextView) v.findViewById(R.id.file_grid_empty_text_second);
-
 			contentTextLayout = (RelativeLayout) v.findViewById(R.id.content_grid_text_layout);
 			contentText = (TextView) v.findViewById(R.id.content_grid_text);
 
@@ -600,16 +608,26 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 					}else{
 						emptyImageView.setImageResource(R.drawable.outgoing_shares_empty);
 					}
-					emptyTextViewFirst.setText(R.string.context_empty_contacts);
-					String text = getString(R.string.context_empty_outgoing);
-					emptyTextViewSecond.setText(" "+text+".");
-					emptyTextViewSecond.setVisibility(View.VISIBLE);
+					String textToShow = String.format(context.getString(R.string.context_empty_contacts), getString(R.string.context_empty_outgoing));
+					try{
+						textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
+						textToShow = textToShow.replace("[/A]", "</font>");
+						textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
+						textToShow = textToShow.replace("[/B]", "</font>");
+					}
+					catch (Exception e){}
+					Spanned result = null;
+					if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+						result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
+					} else {
+						result = Html.fromHtml(textToShow);
+					}
+					emptyTextViewFirst.setText(result);
 
 				}else {
 
 					emptyImageView.setImageResource(R.drawable.ic_empty_folder);
 					emptyTextViewFirst.setText(R.string.file_browser_empty_folder);
-					emptyTextViewSecond.setVisibility(View.GONE);
 				}
 			}
 			else{
@@ -652,16 +670,26 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 						}else{
 							emptyImageView.setImageResource(R.drawable.outgoing_shares_empty);
 						}
-						emptyTextViewFirst.setText(R.string.context_empty_contacts);
-						String text = getString(R.string.context_empty_outgoing);
-						emptyTextViewSecond.setText(" "+text+".");
-						emptyTextViewSecond.setVisibility(View.VISIBLE);
+						String textToShow = String.format(context.getString(R.string.context_empty_contacts), getString(R.string.context_empty_outgoing));
+						try{
+							textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
+							textToShow = textToShow.replace("[/A]", "</font>");
+							textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
+							textToShow = textToShow.replace("[/B]", "</font>");
+						}
+						catch (Exception e){}
+						Spanned result = null;
+						if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+							result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
+						} else {
+							result = Html.fromHtml(textToShow);
+						}
+						emptyTextViewFirst.setText(result);
 
 					}else {
 
 						emptyImageView.setImageResource(R.drawable.ic_empty_folder);
 						emptyTextViewFirst.setText(R.string.file_browser_empty_folder);
-						emptyTextViewSecond.setVisibility(View.GONE);
 					}
                 }
                 else{
@@ -704,16 +732,25 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 					}else{
 						emptyImageView.setImageResource(R.drawable.outgoing_shares_empty);
 					}
-					emptyTextViewFirst.setText(R.string.context_empty_contacts);
-					String text = getString(R.string.context_empty_outgoing);
-					emptyTextViewSecond.setText(" "+text+".");
-					emptyTextViewSecond.setVisibility(View.VISIBLE);
-
+					String textToShow = String.format(context.getString(R.string.context_empty_contacts), getString(R.string.context_empty_outgoing));
+					try{
+						textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
+						textToShow = textToShow.replace("[/A]", "</font>");
+						textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
+						textToShow = textToShow.replace("[/B]", "</font>");
+					}
+					catch (Exception e){}
+					Spanned result = null;
+					if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+						result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
+					} else {
+						result = Html.fromHtml(textToShow);
+					}
+					emptyTextViewFirst.setText(result);
 				} else {
 
 					emptyImageView.setImageResource(R.drawable.ic_empty_folder);
                     emptyTextViewFirst.setText(R.string.file_browser_empty_folder);
-					emptyTextViewSecond.setVisibility(View.GONE);
 				}
             }
             else{
@@ -776,15 +813,25 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 					}else{
 						emptyImageView.setImageResource(R.drawable.outgoing_shares_empty);
 					}
-					emptyTextViewFirst.setText(R.string.context_empty_contacts);
-					String text = getString(R.string.context_empty_outgoing);
-					emptyTextViewSecond.setText(" "+text+".");
-					emptyTextViewSecond.setVisibility(View.VISIBLE);
+					String textToShow = String.format(context.getString(R.string.context_empty_contacts), getString(R.string.context_empty_outgoing));
+					try{
+						textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
+						textToShow = textToShow.replace("[/A]", "</font>");
+						textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
+						textToShow = textToShow.replace("[/B]", "</font>");
+					}
+					catch (Exception e){}
+					Spanned result = null;
+					if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+						result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
+					} else {
+						result = Html.fromHtml(textToShow);
+					}
+					emptyTextViewFirst.setText(result);
 
 				} else {
 					emptyImageView.setImageResource(R.drawable.ic_empty_folder);
 					emptyTextViewFirst.setText(R.string.file_browser_empty_folder);
-					emptyTextViewSecond.setVisibility(View.GONE);
 				}
 			}
 			else{
@@ -895,15 +942,26 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 						}else{
 							emptyImageView.setImageResource(R.drawable.outgoing_shares_empty);
 						}
-						emptyTextViewFirst.setText(R.string.context_empty_contacts);
-						String text = getString(R.string.context_empty_outgoing);
-						emptyTextViewSecond.setText(" "+text+".");
-						emptyTextViewSecond.setVisibility(View.VISIBLE);
+
+						String textToShow = String.format(context.getString(R.string.context_empty_contacts), getString(R.string.context_empty_outgoing));
+						try{
+							textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
+							textToShow = textToShow.replace("[/A]", "</font>");
+							textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
+							textToShow = textToShow.replace("[/B]", "</font>");
+						}
+						catch (Exception e){}
+						Spanned result = null;
+						if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+							result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
+						} else {
+							result = Html.fromHtml(textToShow);
+						}
+						emptyTextViewFirst.setText(result);
 
 					}else {
 						emptyImageView.setImageResource(R.drawable.ic_empty_folder);
 						emptyTextViewFirst.setText(R.string.file_browser_empty_folder);
-						emptyTextViewSecond.setVisibility(View.GONE);
 
 					}
 				}
@@ -974,7 +1032,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 					if (localPath != null){
 						File mediaFile = new File(localPath);
 						//mediaIntent.setDataAndType(Uri.parse(localPath), mimeType);
-						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && prefs.getStorageDownloadLocation().contains(Environment.getExternalStorageDirectory().getPath())) {
 							mediaIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile), MimeTypeList.typeForName(file.getName()).getType());
 						}
 						else{
@@ -1025,7 +1083,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 					String localPath = Util.getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
 					if (localPath != null){
 						File mediaFile = new File(localPath);
-						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && prefs.getStorageDownloadLocation().contains(Environment.getExternalStorageDirectory().getPath())) {
 							pdfIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile), MimeTypeList.typeForName(file.getName()).getType());
 						}
 						else{

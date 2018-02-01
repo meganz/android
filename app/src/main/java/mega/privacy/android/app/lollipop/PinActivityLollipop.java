@@ -12,8 +12,6 @@ import nz.mega.sdk.MegaApiAndroid;
 public class PinActivityLollipop extends AppCompatActivity{
 	
 	private MegaApiAndroid megaApi;
-
-	public boolean showPinScreen = true;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -52,20 +50,11 @@ public class PinActivityLollipop extends AppCompatActivity{
 		log("retryPendingConnections()");
 		megaApi.retryPendingConnections();
 
-		if(showPinScreen){
+		if(MegaApplication.isShowPinScreen()){
 			PinUtil.resume(this);
 		}
 
 		((MegaApplication) getApplication()).sendSignalPresenceActivity();
-	}
-
-
-	public boolean isShowPinScreen() {
-		return showPinScreen;
-	}
-
-	public void setShowPinScreen(boolean showPinScreen) {
-		this.showPinScreen = showPinScreen;
 	}
 
 	public static void log(String message) {

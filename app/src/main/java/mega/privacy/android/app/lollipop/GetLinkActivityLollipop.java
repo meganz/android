@@ -30,6 +30,8 @@ import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
@@ -162,7 +164,32 @@ public class GetLinkActivityLollipop extends PinActivityLollipop implements Mega
 		}
 		else{
 
-			visibleFragment = Constants.COPYRIGHT_FRAGMENT;
+			ArrayList<MegaNode> nodeLinks = megaApi.getPublicLinks();
+			if(nodeLinks==null){
+				boolean showCopyright = Boolean.parseBoolean(dbH.getShowCopyright());
+				log("No public links: showCopyright = "+showCopyright);
+				if(showCopyright){
+					visibleFragment = Constants.COPYRIGHT_FRAGMENT;
+				}
+				else{
+					visibleFragment = Constants.GET_LINK_FRAGMENT;
+				}
+			}
+			else{
+				if(nodeLinks.size()==0){
+					boolean showCopyright = Boolean.parseBoolean(dbH.getShowCopyright());
+					log("No public links: showCopyright = "+showCopyright);
+					if(showCopyright){
+						visibleFragment = Constants.COPYRIGHT_FRAGMENT;
+					}
+					else{
+						visibleFragment = Constants.GET_LINK_FRAGMENT;
+					}
+				}
+				else{
+					visibleFragment = Constants.GET_LINK_FRAGMENT;
+				}
+			}
 		}
 		showFragment(visibleFragment);
 	}
