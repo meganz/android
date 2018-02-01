@@ -808,10 +808,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 				//CLOUD TAB				
 				String cFTag2 = getFragmentTag(R.id.explorer_tabs_pager, 0);		
 				log("Tag: "+ cFTag2);
-				cDriveExplorer = (CloudDriveExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag2);
-				if (cDriveExplorer != null){
-					createFolderMenuItem.setVisible(true);
-				}
+				createFolderMenuItem.setVisible(true);
 				newChatMenuItem.setVisible(false);
 			}
 			else if(index==1){
