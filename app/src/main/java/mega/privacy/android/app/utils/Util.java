@@ -47,6 +47,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
@@ -99,7 +100,7 @@ public class Util {
 	public static String mainDIR = "/MEGA";
 	public static String offlineDIR = "MEGA/MEGA Offline";
 	public static String downloadDIR ="MEGA/MEGA Downloads";
-	public static String temporalPicDIR ="MEGA/MEGA Selfies";
+	public static String temporalPicDIR ="MEGA/MEGA AppTemp";
 	public static String profilePicDIR ="MEGA/MEGA Profile Images";
 	public static String logDIR = "MEGA/MEGA Logs";
 	public static String advancesDevicesDIR = "MEGA/MEGA Temp";
@@ -146,7 +147,39 @@ public class Util {
 	public static void showErrorAlertDialogFinish(MegaError error, Activity activity) {
 		showErrorAlertDialog(error.getErrorString(), true, activity);
 	}
-	
+
+	public static File createTemporalTextFile(String name, String data){
+
+		String path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.temporalPicDIR + "/";
+		File tempDownDirectory = new File(path);
+		if(!tempDownDirectory.exists()){
+			tempDownDirectory.mkdirs();
+		}
+
+		String fileName = name+".txt";
+		final File file = new File(path, fileName);
+
+		try
+		{
+			file.createNewFile();
+			FileOutputStream fOut = new FileOutputStream(file);
+			OutputStreamWriter myOutWriter = new OutputStreamWriter(fOut);
+			myOutWriter.append(data);
+
+			myOutWriter.close();
+
+			fOut.flush();
+			fOut.close();
+
+			return file;
+		}
+		catch (IOException e)
+		{
+			log("File write failed: " + e.toString());
+			return null;
+		}
+	}
+
 	/*
 	 * Build error dialog
 	 * @param message Message to display
@@ -1639,14 +1672,13 @@ public class Util {
 
 	public static void showAlert(Context context, String message, String title) {
 		log("showAlert");
-		android.support.v7.app.AlertDialog.Builder bld = new android.support.v7.app.AlertDialog.Builder(context, R.style.AppCompatAlertDialogStyle);
-		bld.setMessage(message);
+		AlertDialog.Builder builder = new AlertDialog.Builder(context);
 		if(title!=null){
-			bld.setTitle(title);
+			builder.setTitle(title);
 		}
-		bld.setPositiveButton("OK",null);
-		log("Showing alert dialog: " + message);
-		bld.create().show();
+		builder.setMessage(message);
+		builder.setPositiveButton("OK",null);
+		builder.show();
 	}
 
 	public static long calculateTimestampMinDifference(String timeStamp) {
@@ -1695,6 +1727,13 @@ public class Util {
 		log("calculateTimestamp: "+timestamp);
 		Calendar cal = Calendar.getInstance();
 		cal.setTimeInMillis(timestamp*1000);
+		log("calendar: "+cal.get(Calendar.YEAR)+ " "+cal.get(Calendar.MONTH));
+		return cal;
+	}
+
+	public static Calendar calculateDateFromTimestamp2 (long timestamp){
+		log("calculateTimestamp: "+timestamp);
+		Calendar cal = Calendar.getInstance();
 		log("calendar: "+cal.get(Calendar.YEAR)+ " "+cal.get(Calendar.MONTH));
 		return cal;
 	}

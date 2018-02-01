@@ -29,32 +29,24 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
-import android.text.InputFilter;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Display;
-import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
-import android.widget.CompoundButton;
-import android.widget.CompoundButton.OnCheckedChangeListener;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-
-import org.w3c.dom.Text;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -72,8 +64,6 @@ import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
-import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
-import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaChatLollipopAdapter;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -101,8 +91,11 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 
 	ContactController cC;
 
-	public static int MAX_WIDTH_FILENAME_LAND=470;
-	public static int MAX_WIDTH_FILENAME_PORT=190;
+	public static int MAX_WIDTH_FILENAME_LAND=450;
+	public static int MAX_WIDTH_FILENAME_PORT=170;
+	public static int MAX_WIDTH_APPBAR_LAND=250;
+	public static int MAX_WIDTH_APPBAR_PORT=350;
+
 
 	RelativeLayout imageLayout;
 	android.app.AlertDialog permissionsDialog;
@@ -202,10 +195,29 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			megaApi = app.getMegaApi();
 		}
 
+		if(megaApi==null||megaApi.getRootNode()==null){
+			log("Refresh session - sdk");
+			Intent intent = new Intent(this, LoginActivityLollipop.class);
+			intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
+			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			startActivity(intent);
+			finish();
+			return;
+		}
+
 		if(Util.isChatEnabled()){
-			if (megaChatApi == null) {
-				MegaApplication app = (MegaApplication) getApplication();
-				megaChatApi = app.getMegaChatApi();
+			if (megaChatApi == null){
+				megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
+			}
+
+			if(megaChatApi==null||megaChatApi.getInitState()== MegaChatApi.INIT_ERROR){
+				log("Refresh session - karere");
+				Intent intent = new Intent(this, LoginActivityLollipop.class);
+				intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
+				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+				startActivity(intent);
+				finish();
+				return;
 			}
 		}
 
@@ -229,6 +241,8 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			appBarLayout = (AppBarLayout) findViewById(R.id.app_bar);
 			setSupportActionBar(toolbar);
 			aB = getSupportActionBar();
+
+
 			imageLayout = (RelativeLayout) findViewById(R.id.chat_contact_properties_image_layout);
 
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -251,6 +265,11 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 
 			if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
 				log("Landscape configuration");
+
+				CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) appBarLayout.getLayoutParams();
+				params.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MAX_WIDTH_APPBAR_LAND, context.getResources().getDisplayMetrics());
+				appBarLayout.setLayoutParams(params);
+
 				float width = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MAX_WIDTH_FILENAME_LAND, getResources().getDisplayMetrics());
 				nameContact.setMaxWidth((int) width);
 				nameLength.setMaxWidth((int) width);
@@ -263,6 +282,11 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			}
 			else{
 				log("Portrait configuration");
+
+				CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) appBarLayout.getLayoutParams();
+				params.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MAX_WIDTH_APPBAR_PORT, context.getResources().getDisplayMetrics());
+				appBarLayout.setLayoutParams(params);
+
 				float width = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MAX_WIDTH_FILENAME_PORT, getResources().getDisplayMetrics());
 				nameContact.setMaxWidth((int) width);
 				nameLength.setMaxWidth((int) width);
@@ -867,7 +891,6 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 				break;
 			}*/
 			case R.id.cab_menu_start_conversation:{
-				showSnackbar("Start conversation");
 
 				if(!Util.isOnline(this)){
 
@@ -885,10 +908,19 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 					}
 					else{
 						log("There is already a chat, open it!");
-						Intent intentOpenChat = new Intent(this, ChatActivityLollipop.class);
-						intentOpenChat.setAction(Constants.ACTION_CHAT_SHOW_MESSAGES);
-						intentOpenChat.putExtra("CHAT_ID", chat.getChatId());
-						this.startActivity(intentOpenChat);
+						if(fromContacts){
+							Intent intentOpenChat = new Intent(this, ChatActivityLollipop.class);
+							intentOpenChat.setAction(Constants.ACTION_CHAT_SHOW_MESSAGES);
+							intentOpenChat.putExtra("CHAT_ID", chat.getChatId());
+							this.startActivity(intentOpenChat);
+						}
+						else{
+							Intent intentOpenChat = new Intent(this, ChatActivityLollipop.class);
+							intentOpenChat.setAction(Constants.ACTION_CHAT_SHOW_MESSAGES);
+							intentOpenChat.putExtra("CHAT_ID", chat.getChatId());
+							intentOpenChat.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+							this.startActivity(intentOpenChat);
+						}
 					}
 				}
 				break;
@@ -1447,7 +1479,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			}
 		};
 
-		AlertDialog.Builder builder = new AlertDialog.Builder(contactInfoActivityLollipop, R.style.AppCompatAlertDialogStyle);
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		String title = getResources().getQuantityString(R.plurals.title_confirmation_remove_contact, 1);
 		builder.setTitle(title);
 		String message= getResources().getQuantityString(R.plurals.confirmation_remove_contact, 1);
@@ -1634,11 +1666,22 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			log("Create chat request finish!!!");
 			if(e.getErrorCode()==MegaChatError.ERROR_OK){
 				log("Chat CREATEDD!!!---> open it!");
-				Intent intent = new Intent(this, ChatActivityLollipop.class);
-				intent.setAction(Constants.ACTION_CHAT_NEW);
-				intent.putExtra("CHAT_ID", request.getChatHandle());
-				this.startActivity(intent);
-				finish();
+
+				if(fromContacts){
+					Intent intent = new Intent(this, ChatActivityLollipop.class);
+					intent.setAction(Constants.ACTION_NEW_CHAT);
+					intent.putExtra("CHAT_ID", request.getChatHandle());
+					this.startActivity(intent);
+					finish();
+				}
+				else{
+					Intent intent = new Intent(this, ChatActivityLollipop.class);
+					intent.setAction(Constants.ACTION_NEW_CHAT);
+					intent.putExtra("CHAT_ID", request.getChatHandle());
+					intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+					this.startActivity(intent);
+					finish();
+				}
 			}
 			else{
 				log("EEEERRRRROR WHEN CREATING CHAT " + e.getErrorString());

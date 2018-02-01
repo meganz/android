@@ -44,6 +44,7 @@ import mega.privacy.android.app.components.TwoLineCheckPreference;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.lollipop.MyAccountInfo;
 import mega.privacy.android.app.lollipop.PinLockActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatPreferencesActivity;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
@@ -59,6 +60,7 @@ import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatPresenceConfig;
 import nz.mega.sdk.MegaNode;
 
+
 //import android.support.v4.preference.PreferenceFragment;
 
 @SuppressLint("NewApi")
@@ -68,6 +70,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 	private MegaApiAndroid megaApi;
 	private MegaChatApiAndroid megaChatApi;
 	Handler handler = new Handler();
+	MyAccountInfo myAccountInfo;
 	
 	private static int REQUEST_DOWNLOAD_FOLDER = 1000;
 	private static int REQUEST_CODE_TREE_LOCAL_CAMERA = 1014;
@@ -124,6 +127,8 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 	public static String KEY_ABOUT_KARERE_VERSION = "settings_about_karere_version";
 	public static String KEY_ABOUT_APP_VERSION = "settings_about_app_version";
 	public static String KEY_ABOUT_CODE_LINK = "settings_about_code_link";
+
+	public static String KEY_HELP_SEND_FEEDBACK= "settings_help_send_feedfack";
 	
 	public final static int CAMERA_UPLOAD_WIFI_OR_DATA_PLAN = 1001;
 	public final static int CAMERA_UPLOAD_WIFI = 1002;
@@ -169,6 +174,9 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 	Preference localCameraUploadFolder;
 	Preference localCameraUploadFolderSDCard;
 	Preference megaCameraFolder;
+	Preference helpSendFeedback;
+	Preference cancelAccount;
+
 	Preference aboutPrivacy;
 	Preference aboutTOS;
 	Preference aboutSDK;
@@ -373,6 +381,12 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 		advancedFeaturesCache.setOnPreferenceClickListener(this);
 		advancedFeaturesOffline = findPreference(KEY_OFFLINE);
 		advancedFeaturesOffline.setOnPreferenceClickListener(this);
+
+		helpSendFeedback = findPreference(KEY_HELP_SEND_FEEDBACK);
+		helpSendFeedback.setOnPreferenceClickListener(this);
+
+		cancelAccount = findPreference("settings_advanced_features_cancel_account");
+		cancelAccount.setOnPreferenceClickListener(this);
 		
 		aboutPrivacy = findPreference(KEY_ABOUT_PRIVACY_POLICY);
 		aboutPrivacy.setOnPreferenceClickListener(this);
@@ -1780,6 +1794,9 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			Intent intent = new Intent(context, FileExplorerActivityLollipop.class);
 			intent.setAction(FileExplorerActivityLollipop.ACTION_CHOOSE_MEGA_FOLDER_SYNC);
 			startActivityForResult(intent, REQUEST_MEGA_CAMERA_FOLDER);
+
+		}else if (preference.getKey().compareTo(KEY_HELP_SEND_FEEDBACK) == 0){
+			((ManagerActivityLollipop) context).showEvaluatedAppDialog();
 		}
 		else if (preference.getKey().compareTo(KEY_ABOUT_PRIVACY_POLICY) == 0){
 			Intent viewIntent = new Intent(Intent.ACTION_VIEW);
@@ -1795,6 +1812,10 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			Intent viewIntent = new Intent(Intent.ACTION_VIEW);
 			viewIntent.setData(Uri.parse("https://github.com/meganz/android"));
 			startActivity(viewIntent);
+		}
+		else if (preference.getKey().compareTo("settings_advanced_features_cancel_account") == 0){
+			log("Cancel account preference");
+			((ManagerActivityLollipop)context).askConfirmationDeleteAccount();
 		}
 		
 		return true;
@@ -2181,6 +2202,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			hidePreferencesChat();
 		}
 	}
+
 
 	public void cancelSetPinLock(){
 		log("cancelSetPinkLock");

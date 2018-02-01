@@ -3,7 +3,6 @@ package mega.privacy.android.app.lollipop;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
-import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -12,6 +11,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -26,11 +26,7 @@ import android.support.v4.content.FileProvider;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.support.v7.app.ActionBar;
-import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
-import android.text.Editable;
-import android.text.TextWatcher;
-import android.text.format.DateUtils;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Display;
@@ -39,41 +35,25 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.View.OnClickListener;
-import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
-import android.view.animation.TranslateAnimation;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.CheckedTextView;
-import android.widget.CompoundButton;
-import android.widget.DatePicker;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
 
 import java.io.File;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Locale;
 import java.util.Map;
-import java.util.TimeZone;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.DownloadService;
@@ -89,7 +69,7 @@ import mega.privacy.android.app.components.TouchImageView;
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop.Mode;
 import mega.privacy.android.app.lollipop.adapters.MegaFullScreenImageAdapterLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaOfflineFullScreenImageAdapterLollipop;
-import mega.privacy.android.app.lollipop.controllers.NodeController;
+import mega.privacy.android.app.lollipop.megachat.ChatExplorerActivity;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.PreviewUtils;
@@ -97,6 +77,13 @@ import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaChatApi;
+import nz.mega.sdk.MegaChatApiAndroid;
+import nz.mega.sdk.MegaChatApiJava;
+import nz.mega.sdk.MegaChatError;
+import nz.mega.sdk.MegaChatListItem;
+import nz.mega.sdk.MegaChatRequest;
+import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaGlobalListenerInterface;
@@ -108,7 +95,7 @@ import nz.mega.sdk.MegaUser;
 
 import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.TYPE_EXPORT_REMOVE;
 
-public class FullScreenImageViewerLollipop extends PinActivityLollipop implements OnPageChangeListener, MegaRequestListenerInterface, OnItemClickListener, MegaGlobalListenerInterface {
+public class FullScreenImageViewerLollipop extends PinActivityLollipop implements OnPageChangeListener, MegaRequestListenerInterface, OnItemClickListener, MegaGlobalListenerInterface, MegaChatRequestListenerInterface {
 	
 	private DisplayMetrics outMetrics;
 
@@ -145,6 +132,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	private MenuItem moveToTrashIcon;
 	private MenuItem removeIcon;
 	private MenuItem removelinkIcon;
+	private MenuItem chatIcon;
 
 
 	private RelativeLayout bottomLayout;
@@ -152,14 +140,20 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	
 	static FullScreenImageViewerLollipop fullScreenImageViewer;
     private MegaApiAndroid megaApi;
+	MegaChatApiAndroid megaChatApi;
 
     private ArrayList<String> paths;
     
     int adapterType = 0;
+
+	int countChat = 0;
+	int errorSent = 0;
+	int successSent = 0;
     
     public static int REQUEST_CODE_SELECT_MOVE_FOLDER = 1001;
 	public static int REQUEST_CODE_SELECT_COPY_FOLDER = 1002;
 	public static int REQUEST_CODE_SELECT_LOCAL_FOLDER = 1004;
+	public static int REQUEST_CODE_SELECT_CHAT = 1005;
 	
 	MegaNode node;
 
@@ -218,20 +212,27 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		removelinkIcon = menu.findItem(R.id.full_image_viewer_remove_link);
 		removelinkIcon.setVisible(false);
 		shareIcon = menu.findItem(R.id.full_image_viewer_share);
+		Drawable share = getResources().getDrawable(R.drawable.ic_social_share_white);
+		share.setColorFilter(getResources().getColor(R.color.white), PorterDuff.Mode.SRC_ATOP);
+		shareIcon.setIcon(share);
 		propertiesIcon = menu.findItem(R.id.full_image_viewer_properties);
 		downloadIcon = menu.findItem(R.id.full_image_viewer_download);
+
+		Drawable download = getResources().getDrawable(R.drawable.ic_download_white);
+		download.setColorFilter(getResources().getColor(R.color.white), PorterDuff.Mode.SRC_ATOP);
+		downloadIcon.setIcon(download);
 
 		renameIcon = menu.findItem(R.id.full_image_viewer_rename);
 		moveIcon = menu.findItem(R.id.full_image_viewer_move);
 		copyIcon = menu.findItem(R.id.full_image_viewer_copy);
 		moveToTrashIcon = menu.findItem(R.id.full_image_viewer_move_to_trash);
 		removeIcon = menu.findItem(R.id.full_image_viewer_remove);
+		chatIcon = menu.findItem(R.id.full_image_viewer_chat);
 
 		Intent intent = getIntent();
 		adapterType = intent.getIntExtra("adapterType", 0);
 
 		if (adapterType == Constants.OFFLINE_ADAPTER){
-
 			getlinkIcon.setVisible(false);
 			menu.findItem(R.id.full_image_viewer_get_link).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
 
@@ -252,6 +253,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			copyIcon .setVisible(false);
 			moveToTrashIcon.setVisible(false);
 			removeIcon.setVisible(false);
+			chatIcon.setVisible(false);
 
 		}else if (adapterType == Constants.ZIP_ADAPTER){
 
@@ -275,10 +277,9 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			copyIcon .setVisible(false);
 			moveToTrashIcon.setVisible(false);
 			removeIcon.setVisible(false);
-
+			chatIcon.setVisible(false);
 
 		}else if(adapterType == Constants.SEARCH_ADAPTER){
-
 			node = megaApi.getNodeByHandle(imageHandles.get(positionG));
 
 			if(node.isExported()){
@@ -309,6 +310,13 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			moveIcon.setVisible(true);
 			copyIcon .setVisible(true);
 
+			if(Util.isChatEnabled()){
+				chatIcon.setVisible(true);
+			}
+			else{
+				chatIcon.setVisible(false);
+			}
+
 			node = megaApi.getNodeByHandle(imageHandles.get(positionG));
 			final long handle = node.getHandle();
 			MegaNode parent = megaApi.getNodeByHandle(handle);
@@ -326,7 +334,6 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			}
 
 		}else {
-
 			node = megaApi.getNodeByHandle(imageHandles.get(positionG));
 
 			if(adapterType==Constants.CONTACT_FILE_ADAPTER){
@@ -387,6 +394,8 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 
 			if(fromShared){
 				removeIcon.setVisible(false);
+				chatIcon.setVisible(false);
+
 				node = megaApi.getNodeByHandle(imageHandles.get(positionG));
 				int accessLevel = megaApi.getAccess(node);
 
@@ -408,7 +417,6 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 					}
 				}
 			}else{
-
 				if(isFolderLink){
 					propertiesIcon.setVisible(false);
 					menu.findItem(R.id.full_image_viewer_properties).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
@@ -418,8 +426,10 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 					renameIcon.setVisible(false);
 					moveIcon.setVisible(false);
 					copyIcon.setVisible(false);
+					chatIcon.setVisible(false);
 
 				}else{
+
 					propertiesIcon.setVisible(true);
 					menu.findItem(R.id.full_image_viewer_properties).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
@@ -434,6 +444,12 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 								renameIcon.setVisible(true);
 								moveIcon.setVisible(true);
 								moveToTrashIcon.setVisible(true);
+								if(Util.isChatEnabled()){
+									chatIcon.setVisible(true);
+								}
+								else{
+									chatIcon.setVisible(false);
+								}
 								break;
 							}
 							case MegaShare.ACCESS_READWRITE:
@@ -441,25 +457,37 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 								renameIcon.setVisible(false);
 								moveIcon.setVisible(false);
 								moveToTrashIcon.setVisible(false);
+								chatIcon.setVisible(false);
 								break;
 							}
 						}
 
 					}else{
+						if(Util.isChatEnabled()){
+							chatIcon.setVisible(true);
+						}
+						else{
+							chatIcon.setVisible(false);
+						}
 						renameIcon.setVisible(true);
 						moveIcon.setVisible(true);
+
 						node = megaApi.getNodeByHandle(imageHandles.get(positionG));
+
 						final long handle = node.getHandle();
 						MegaNode parent = megaApi.getNodeByHandle(handle);
+
 						while (megaApi.getParentNode(parent) != null){
 							parent = megaApi.getParentNode(parent);
 						}
 
 						if (parent.getHandle() != megaApi.getRubbishNode().getHandle()){
+
 							moveToTrashIcon.setVisible(true);
 							removeIcon.setVisible(false);
 
 						}else{
+
 							moveToTrashIcon.setVisible(false);
 							removeIcon.setVisible(true);
 							getlinkIcon.setVisible(false);
@@ -503,6 +531,27 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 					break;
 				}
 
+			}
+
+			case R.id.full_image_viewer_chat:{
+
+//				node = megaApi.getNodeByHandle(imageHandles.get(positionG));
+
+//				ArrayList<Long> handleList = new ArrayList<Long>();
+//				handleList.add(node.getHandle());
+//
+//				long[] longArray = new long[handleList.size()];
+//				for (int i=0; i<handleList.size(); i++){
+//					longArray[i] = handleList.get(i);
+//				}
+
+				long[] longArray = new long[1];
+				longArray[0] = imageHandles.get(positionG);
+
+				Intent i = new Intent(this, ChatExplorerActivity.class);
+				i.putExtra("NODE_HANDLES", longArray);
+				startActivityForResult(i, REQUEST_CODE_SELECT_CHAT);
+				break;
 			}
 
 			case R.id.full_image_viewer_remove_link: {
@@ -565,7 +614,8 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				break;
 			}
 			case R.id.full_image_viewer_share: {
-
+				log("Share option");
+				File previewFile = null;
 				if (adapterType == Constants.OFFLINE_ADAPTER){
 					String offlineDirectory;
 					if (Environment.getExternalStorageDirectory() != null){
@@ -576,53 +626,19 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 					}
 
 					String fileName = offlineDirectory + mOffListImages.get(positionG).getPath() + mOffListImages.get(positionG).getName();
-					File previewFile = new File(fileName);
-
-					if (previewFile.exists()){
-						Intent share = new Intent(android.content.Intent.ACTION_SEND);
-						share.setType("image/*");
-						share.putExtra(Intent.EXTRA_STREAM, Uri.parse("file://" + previewFile));
-						startActivity(Intent.createChooser(share, getString(R.string.context_share_image)));
-					}
-					else{
-						Snackbar.make(fragmentContainer, fileName + ": "  + getString(R.string.full_image_viewer_not_preview), Snackbar.LENGTH_LONG).show();
-					}
-
-					break;
+					previewFile = new File(fileName);
 				}else if (adapterType == Constants.ZIP_ADAPTER){
 
 					String fileName = paths.get(positionG);
-					File previewFile = new File(fileName);
-
-					if (previewFile.exists()){
-						Intent share = new Intent(android.content.Intent.ACTION_SEND);
-						share.setType("image/*");
-						share.putExtra(Intent.EXTRA_STREAM, Uri.parse("file://" + previewFile));
-						startActivity(Intent.createChooser(share, getString(R.string.context_share_image)));
-					}
-					else{
-						Snackbar.make(fragmentContainer, getString(R.string.full_image_viewer_not_preview), Snackbar.LENGTH_LONG).show();
-					}
-					break;
+					previewFile = new File(fileName);
 				}else{
 					node = megaApi.getNodeByHandle(imageHandles.get(positionG));
 					File previewFolder = PreviewUtils.getPreviewFolder(this);
-					File previewFile = new File(previewFolder, node.getBase64Handle() + ".jpg");
-
-					if (previewFile.exists()){
-						Intent share = new Intent(android.content.Intent.ACTION_SEND);
-						share.setType("image/*");
-						share.putExtra(Intent.EXTRA_STREAM, Uri.parse("file://" + previewFile));
-						startActivity(Intent.createChooser(share, getString(R.string.context_share_image)));
-					}
-					else{
-						Snackbar.make(fragmentContainer, getString(R.string.full_image_viewer_not_preview), Snackbar.LENGTH_LONG).show();
-					}
-
-					break;
-
+					previewFile = new File(previewFolder, node.getBase64Handle() + ".jpg");
 
 				}
+				intentToSendFile(previewFile);
+				break;
 			}
 			case R.id.full_image_viewer_properties: {
 
@@ -683,6 +699,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				break;
 			}
 			case R.id.full_image_viewer_move_to_trash: {
+				positionToRemove = positionG;
 				moveToTrash();
 				break;
 			}
@@ -692,6 +709,35 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			}
 		}
 		return super.onOptionsItemSelected(item);
+	}
+
+	public void intentToSendFile(File previewFile){
+		log("intentToSendFile");
+
+		if(previewFile!=null){
+			if (previewFile.exists()){
+				Intent share = new Intent(android.content.Intent.ACTION_SEND);
+				share.setType("image/*");
+
+				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+					log("Use provider to share");
+					Uri uri = FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider",previewFile);
+					share.putExtra(Intent.EXTRA_STREAM, Uri.parse(uri.toString()));
+					share.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+				}
+				else{
+					share.putExtra(Intent.EXTRA_STREAM, Uri.parse("file://" + previewFile));
+				}
+
+				startActivity(Intent.createChooser(share, getString(R.string.context_share_image)));
+			}
+			else{
+				Snackbar.make(fragmentContainer, getString(R.string.full_image_viewer_not_preview), Snackbar.LENGTH_LONG).show();
+			}
+		}
+		else{
+			Snackbar.make(fragmentContainer, getString(R.string.full_image_viewer_not_preview), Snackbar.LENGTH_LONG).show();
+		}
 	}
 
 	@Override
@@ -739,6 +785,36 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		else{
 			megaApi = app.getMegaApi();
 		}
+
+		if(megaApi==null||megaApi.getRootNode()==null){
+			log("Refresh session - sdk");
+			Intent intentLogin = new Intent(this, LoginActivityLollipop.class);
+			intentLogin.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
+			intentLogin.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			startActivity(intentLogin);
+			finish();
+			return;
+		}
+
+		if(Util.isChatEnabled()){
+			if (megaChatApi == null){
+				megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
+			}
+
+			if(megaChatApi==null||megaChatApi.getInitState()== MegaChatApi.INIT_ERROR){
+				log("Refresh session - karere");
+				Intent intentLogin = new Intent(this, LoginActivityLollipop.class);
+				intentLogin.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
+				intentLogin.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+				startActivity(intentLogin);
+				finish();
+				return;
+			}
+		}
+		else{
+			megaChatApi=null;
+		}
+
 		dbH = DatabaseHandler.getDbHandler(this);
 		handler = new Handler();
 
@@ -1599,9 +1675,6 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		});
 	}
 
-
-
-
 	private void rename(String newName){
 		if (newName.equals(node.getName())) {
 			return;
@@ -1703,8 +1776,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		    public void onClick(DialogInterface dialog, int which) {
 		        switch (which){
 		        case DialogInterface.BUTTON_POSITIVE:
-		        	//TODO remove the outgoing shares
-		    		//Check if the node is not yet in the rubbish bin (if so, remove it)			
+		    		//Check if the node is not yet in the rubbish bin (if so, remove it)
 		    		
 		    		if (moveToRubbish){
 		    			megaApi.moveNode(megaApi.getNodeByHandle(handle), rubbishNode, fullScreenImageViewer);
@@ -1732,6 +1804,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		    			}
 		    			statusDialog = temp;
 		    		}
+
 		        	
 		            break;
 
@@ -1831,6 +1904,8 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 							}
 							viewPager.setCurrentItem(positionG);
 							positionToRemove=-1;
+							supportInvalidateOptionsMenu();
+
 						}
 					}
 				}
@@ -1985,8 +2060,27 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				}
 			}
 		}
+		else if (requestCode == REQUEST_CODE_SELECT_CHAT && resultCode == RESULT_OK){
+			long[] chatHandles = intent.getLongArrayExtra("SELECTED_CHATS");
+			log("Send to "+chatHandles.length+" chats");
+
+			long[] nodeHandles = intent.getLongArrayExtra("NODE_HANDLES");
+			log("Send "+nodeHandles.length+" nodes");
+
+			countChat = chatHandles.length;
+			if(countChat==1){
+				megaChatApi.attachNode(chatHandles[0], nodeHandles[0], this);
+			}
+			else if(countChat>1){
+
+				for(int i=0; i<chatHandles.length; i++){
+					megaChatApi.attachNode(chatHandles[i], nodeHandles[0], this);
+				}
+			}
+//			megaChatApi.attachNode();
+
+		}
 	}
-	
 
 	// Get list of all child files
 
@@ -2159,14 +2253,15 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	protected void hideActionBar(){
 		if (aB != null && aB.isShowing()) {
 			if(tB != null) {
-				tB.animate().translationY(-220).setDuration(800L)
+				tB.animate().translationY(-220).setDuration(400L)
 						.withEndAction(new Runnable() {
 							@Override
 							public void run() {
 								aB.hide();
 							}
 						}).start();
-				bottomLayout.animate().translationY(220).setDuration(800L).start();
+				bottomLayout.animate().translationY(220).setDuration(400L).start();
+				getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 			} else {
 				aB.hide();
 			}
@@ -2176,10 +2271,10 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		if (aB != null && !aB.isShowing()) {
 			aB.show();
 			if(tB != null) {
-				tB.animate().translationY(0).setDuration(800L).start();
-				bottomLayout.animate().translationY(0).setDuration(800L).start();
+				tB.animate().translationY(0).setDuration(400L).start();
+				bottomLayout.animate().translationY(0).setDuration(400L).start();
+				getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 			}
-
 		}
 	}
 
@@ -2242,4 +2337,62 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	@Override
 	public void onContactRequestsUpdate(MegaApiJava api, ArrayList<MegaContactRequest> requests) {}
 
+
+	@Override
+	public void onRequestStart(MegaChatApiJava api, MegaChatRequest request) {
+
+	}
+
+	@Override
+	public void onRequestUpdate(MegaChatApiJava api, MegaChatRequest request) {
+
+	}
+
+	@Override
+	public void onRequestFinish(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
+		log("onRequestFinish");
+		if(request.getType() == MegaChatRequest.TYPE_ATTACH_NODE_MESSAGE){
+
+			if(e.getErrorCode()==MegaChatError.ERROR_OK){
+				log("File sent correctly");
+				successSent++;
+
+			}
+			else{
+				log("File NOT sent: "+e.getErrorCode()+"___"+e.getErrorString());
+				errorSent++;
+			}
+
+			if(countChat==errorSent+successSent){
+				if(successSent==countChat){
+					if(countChat==1){
+						long handle = request.getChatHandle();
+						MegaChatListItem chatItem = megaChatApi.getChatListItem(handle);
+						if(chatItem!=null){
+							Intent intent = new Intent(this, ManagerActivityLollipop.class);
+							intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+							intent.setAction(Constants.ACTION_CHAT_NOTIFICATION_MESSAGE);
+							intent.putExtra("CHAT_ID", handle);
+							startActivity(intent);
+							finish();
+						}
+					}
+					else{
+						showSnackbar(getString(R.string.success_attaching_node_from_cloud_chats, countChat));
+					}
+				}
+				else if(errorSent==countChat){
+					showSnackbar(getString(R.string.error_attaching_node_from_cloud));
+				}
+				else{
+					showSnackbar(getString(R.string.error_attaching_node_from_cloud_chats));
+				}
+			}
+		}
+	}
+
+	@Override
+	public void onRequestTemporaryError(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
+
+	}
 }

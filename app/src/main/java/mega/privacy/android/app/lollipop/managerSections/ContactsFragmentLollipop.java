@@ -3,6 +3,7 @@ package mega.privacy.android.app.lollipop.managerSections;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -22,6 +23,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -38,11 +40,12 @@ import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.CustomizedGridRecyclerView;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
-import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.lollipop.MyAccountInfo;
 import mega.privacy.android.app.lollipop.adapters.MegaContactsLollipopAdapter;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
+import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -56,13 +59,20 @@ public class ContactsFragmentLollipop extends Fragment{
 	public static final String ARG_OBJECT = "object";
 	
 	MegaApiAndroid megaApi;
+	MyAccountInfo myAccountInfo;
+	TextView initialLetter;
+
 
 	Context context;
 	ActionBar aB;
 	RecyclerView recyclerView;
 	MegaContactsLollipopAdapter adapter;
+
 	ImageView emptyImageView;
-	TextView emptyTextView;
+	LinearLayout emptyTextView;
+	TextView emptyTextViewFirst;
+	TextView emptyTextViewSecond;
+
 	TextView contentText;
 	RelativeLayout contentTextLayout;
 	private ActionMode actionMode;
@@ -127,24 +137,24 @@ public class ContactsFragmentLollipop extends Fragment{
 					break;
 				}
 				case R.id.cab_menu_start_conversation:{
+					ArrayList<Long> contactHandles = new ArrayList<>();
 
 					if(users.get(0)==null){
 						log("Selected contact NULL");
 						break;
 					}
-					((ManagerActivityLollipop) context).startOneToOneChat(users.get(0));
+					if(users.size()  == 1){
+						((ManagerActivityLollipop) context).startOneToOneChat(users.get(0));
+					}else{
+						for(int i=0;i<users.size();i++){
+							contactHandles.add(users.get(i).getHandle());
+						}
 
-					break;
-				}
-				case R.id.cab_menu_start_conversation_more:{
-
-					ArrayList<Long> contactHandles = new ArrayList<>();
-
-					for(int i=0;i<users.size();i++){
-						contactHandles.add(users.get(i).getHandle());
+						((ManagerActivityLollipop)context).startGroupConversation(contactHandles);
 					}
 
-					((ManagerActivityLollipop)context).startGroupConversation(contactHandles);
+					clearSelections();
+					hideMultipleSelect();
 
 					break;
 				}
@@ -196,17 +206,8 @@ public class ContactsFragmentLollipop extends Fragment{
 				menu.findItem(R.id.cab_menu_send_file).setVisible(true);
 				menu.findItem(R.id.cab_menu_send_file).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
-				if(selected.size() ==1){
-					menu.findItem(R.id.cab_menu_start_conversation_more).setVisible(false);
-					menu.findItem(R.id.cab_menu_start_conversation_more).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
-					menu.findItem(R.id.cab_menu_start_conversation).setVisible(true);
-					menu.findItem(R.id.cab_menu_start_conversation).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-				}else{
-					menu.findItem(R.id.cab_menu_start_conversation).setVisible(false);
-					menu.findItem(R.id.cab_menu_start_conversation).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
-					menu.findItem(R.id.cab_menu_start_conversation_more).setVisible(true);
-					menu.findItem(R.id.cab_menu_start_conversation_more).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-				}
+				menu.findItem(R.id.cab_menu_start_conversation).setVisible(true);
+				menu.findItem(R.id.cab_menu_start_conversation).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
 				if(selected.size()==adapter.getItemCount()){
 					menu.findItem(R.id.cab_menu_select_all).setVisible(false);
@@ -333,6 +334,11 @@ public class ContactsFragmentLollipop extends Fragment{
 //			}
 //		}
 
+		if(myAccountInfo == null){
+			myAccountInfo = ((ManagerActivityLollipop)context).getMyAccountInfo();
+
+		}
+
 		for (int i=0;i<contacts.size();i++){
 
 //			MegaContact contactDB = dbH.findContactByHandle(String.valueOf(contacts.get(i).getHandle()));
@@ -377,13 +383,14 @@ public class ContactsFragmentLollipop extends Fragment{
 			recyclerView.setHasFixedSize(true);
 			LinearLayoutManager linearLayoutManager = new LinearLayoutManager(context);
 		    recyclerView.setLayoutManager(linearLayoutManager);
-		    recyclerView.setItemAnimator(new DefaultItemAnimator()); 			
-		
+		    recyclerView.setItemAnimator(new DefaultItemAnimator());
+
 			emptyImageView = (ImageView) v.findViewById(R.id.contact_list_empty_image);
-			emptyTextView = (TextView) v.findViewById(R.id.contact_list_empty_text);
+			emptyTextView = (LinearLayout) v.findViewById(R.id.contact_list_empty_text);
+			emptyTextViewFirst = (TextView) v.findViewById(R.id.contact_list_empty_text_first);
+			emptyTextViewSecond = (TextView) v.findViewById(R.id.contact_list_empty_text_second);
 
 			contentTextLayout = (RelativeLayout) v.findViewById(R.id.contact_list_content_text_layout);
-
 			contentText = (TextView) v.findViewById(R.id.contact_list_content_text);
 
 			if (adapter == null){
@@ -401,16 +408,22 @@ public class ContactsFragmentLollipop extends Fragment{
 			adapter.setPositionClicked(-1);
 			recyclerView.setAdapter(adapter);
 						
-			if (adapter.getItemCount() == 0){				
-		
-				emptyImageView.setImageResource(R.drawable.ic_empty_contacts);
-				emptyTextView.setText(R.string.contacts_list_empty_text);
-				recyclerView.setVisibility(View.GONE);
-				contentTextLayout.setVisibility(View.GONE);
-				emptyImageView.setVisibility(View.VISIBLE);
-				emptyTextView.setVisibility(View.VISIBLE);
-			}
-			else{
+			if (adapter.getItemCount() == 0){
+                recyclerView.setVisibility(View.GONE);
+                contentTextLayout.setVisibility(View.GONE);
+                emptyImageView.setVisibility(View.VISIBLE);
+                emptyTextView.setVisibility(View.VISIBLE);
+
+				if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+					emptyImageView.setImageResource(R.drawable.contacts_empty_landscape);
+				}else{
+					emptyImageView.setImageResource(R.drawable.ic_empty_contacts);
+				}
+				emptyTextViewFirst.setText(R.string.context_empty_contacts);
+				String text = getString(R.string.section_contacts);
+				emptyTextViewSecond.setText(" "+text+".");
+
+			}else{
 				recyclerView.setVisibility(View.VISIBLE);
 				contentTextLayout.setVisibility(View.VISIBLE);
 				emptyImageView.setVisibility(View.GONE);
@@ -434,6 +447,7 @@ public class ContactsFragmentLollipop extends Fragment{
 			return v;
 		}
 		else{
+			log("isGrid View");
 			View v = inflater.inflate(R.layout.fragment_contactsgrid, container, false);
 			
 			recyclerView = (RecyclerView) v.findViewById(R.id.contacts_grid_view);
@@ -449,10 +463,12 @@ public class ContactsFragmentLollipop extends Fragment{
 				}
 			});
 
-			recyclerView.setItemAnimator(new DefaultItemAnimator());			
-				
+			recyclerView.setItemAnimator(new DefaultItemAnimator());
+
 			emptyImageView = (ImageView) v.findViewById(R.id.contact_grid_empty_image);
-			emptyTextView = (TextView) v.findViewById(R.id.contact_grid_empty_text);
+			emptyTextView = (LinearLayout) v.findViewById(R.id.contact_grid_empty_text);
+			emptyTextViewFirst = (TextView) v.findViewById(R.id.contact_grid_empty_text_first);
+			emptyTextViewSecond = (TextView) v.findViewById(R.id.contact_grid_empty_text_second);
 
 			contentTextLayout = (RelativeLayout) v.findViewById(R.id.contact_content_grid_text_layout);
 
@@ -474,16 +490,23 @@ public class ContactsFragmentLollipop extends Fragment{
 			adapter.setMultipleSelect(false);
 			recyclerView.setAdapter(adapter);
 						
-			if (adapter.getItemCount() == 0){				
-		
-				emptyImageView.setImageResource(R.drawable.ic_empty_contacts);
-				emptyTextView.setText(R.string.contacts_list_empty_text);
-				recyclerView.setVisibility(View.GONE);
-				contentTextLayout.setVisibility(View.GONE);
-				emptyImageView.setVisibility(View.VISIBLE);
-				emptyTextView.setVisibility(View.VISIBLE);
-			}
-			else{
+			if (adapter.getItemCount() == 0){
+
+                recyclerView.setVisibility(View.GONE);
+                contentTextLayout.setVisibility(View.GONE);
+                emptyImageView.setVisibility(View.VISIBLE);
+                emptyTextView.setVisibility(View.VISIBLE);
+
+				if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+					emptyImageView.setImageResource(R.drawable.contacts_empty_landscape);
+				}else{
+					emptyImageView.setImageResource(R.drawable.ic_empty_contacts);
+				}
+				emptyTextViewFirst.setText(R.string.context_empty_contacts);
+				String text = getString(R.string.section_contacts);
+				emptyTextViewSecond.setText(" "+text+".");
+
+			}else{
 				recyclerView.setVisibility(View.VISIBLE);
 				contentTextLayout.setVisibility(View.VISIBLE);
 				emptyImageView.setVisibility(View.GONE);
@@ -571,7 +594,6 @@ public class ContactsFragmentLollipop extends Fragment{
 			}
 		}
 		else{
-	
 			Intent i = new Intent(context, ContactInfoActivityLollipop.class);
 			i.putExtra("name", visibleContacts.get(position).getMegaUser().getEmail());
 			startActivity(i);
@@ -635,8 +657,16 @@ public class ContactsFragmentLollipop extends Fragment{
 			recyclerView.setVisibility(View.GONE);
 			emptyImageView.setVisibility(View.VISIBLE);
 			emptyTextView.setVisibility(View.VISIBLE);
-			emptyImageView.setImageResource(R.drawable.ic_empty_contacts);
-			emptyTextView.setText(R.string.contacts_list_empty_text);
+
+			if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+				emptyImageView.setImageResource(R.drawable.contacts_empty_landscape);
+			}else{
+				emptyImageView.setImageResource(R.drawable.ic_empty_contacts);
+			}
+			emptyTextViewFirst.setText(R.string.context_empty_contacts);
+			String text = getString(R.string.section_contacts);
+			emptyTextViewSecond.setText(" "+text+".");
+
 		}
 		else{
 			log("CONTACTS SIZE != 0 ---> "+visibleContacts.size());
@@ -671,7 +701,6 @@ public class ContactsFragmentLollipop extends Fragment{
 			log("Index to replace: " + indexToReplace);
 			adapter.updateContactStatus(indexToReplace, userHandle, status);
 		}
-
 	}
 
 	public void sortBy(int orderContacts){
