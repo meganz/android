@@ -2592,7 +2592,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 			if (node.isInShare()){
 				imageId = R.drawable.ic_folder_incoming;
 			}
-			else if (node.isOutShare()){
+			else if (node.isOutShare()||megaApi.isPendingShare(node)){
 				imageId = R.drawable.ic_folder_outgoing;
 			}
 			else{

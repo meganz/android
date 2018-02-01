@@ -234,7 +234,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                     if (node.isInShare()){
                         nodeThumb.setImageResource(R.drawable.ic_folder_incoming);
                     }
-                    else if (node.isOutShare()){
+                    else if (node.isOutShare()||megaApi.isPendingShare(node)){
                         nodeThumb.setImageResource(R.drawable.ic_folder_outgoing);
                     }
                     else{
@@ -279,7 +279,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                         if (node.isFolder()) {
                             optionInfoText.setText(R.string.general_folder_info);
                             optionShare.setVisibility(View.VISIBLE);
-                            if(node.isOutShare()){
+                            if(node.isOutShare()||megaApi.isPendingShare(node)){
                                 optionShareText.setText(R.string.context_sharing_folder);
                             }
                             else{
@@ -777,7 +777,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                     if (node.isInShare()){
                         i.putExtra("imageId", R.drawable.ic_folder_incoming);
                     }
-                    else if (node.isOutShare()){
+                    else if (node.isOutShare()||megaApi.isPendingShare(node)){
                         i.putExtra("imageId", R.drawable.ic_folder_outgoing);
                     }
                     else{
@@ -820,7 +820,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                     log("The selected node is NULL");
                     return;
                 }
-                if(node.isOutShare()){
+                if(node.isOutShare()||megaApi.isPendingShare(node)){
                     Intent i = new Intent(context, FileContactListActivityLollipop.class);
                     i.putExtra("name", node.getHandle());
                     context.startActivity(i);

@@ -1,11 +1,15 @@
 package mega.privacy.android.app.lollipop;
 
+import android.Manifest;
+import android.annotation.SuppressLint;
+import android.app.Dialog;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
@@ -13,10 +17,13 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.StatFs;
 import android.provider.OpenableColumns;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
@@ -34,6 +41,7 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.RemoteViews;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.ExoPlaybackException;
@@ -65,11 +73,21 @@ import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
 import com.google.android.exoplayer2.video.VideoRendererEventListener;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
+import mega.privacy.android.app.DatabaseHandler;
+import mega.privacy.android.app.DownloadService;
 import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.MegaPreferences;
+import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.MimeTypeMime;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerActivity;
 import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.MegaApiUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -87,13 +105,19 @@ import nz.mega.sdk.MegaTransferListenerInterface;
 public class AudioVideoPlayerLollipop extends PinActivityLollipop implements VideoRendererEventListener, MegaChatRequestListenerInterface, MegaTransferListenerInterface, AudioRendererEventListener {
 
     public static int REQUEST_CODE_SELECT_CHAT = 1005;
+    public static int REQUEST_CODE_SELECT_LOCAL_FOLDER = 1004;
+    
+    int orderGetChildren = MegaApiJava.ORDER_DEFAULT_ASC;
 
     private MegaApiAndroid megaApi;
     private MegaChatApiAndroid megaChatApi;
+    DatabaseHandler dbH = null;
+    MegaPreferences prefs = null;
 
     private AlertDialog alertDialogTransferOverquota;
 
     Handler handler;
+    boolean isFolderLink = false;
     private SimpleExoPlayerView simpleExoPlayerView;
     private SimpleExoPlayer player;
     private Uri uri;
@@ -105,7 +129,10 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
     private MenuItem shareIcon;
     private MenuItem propertiesIcon;
     private MenuItem chatIcon;
+    private MenuItem downloadIcon;
 
+    private RelativeLayout audioVideoPlayerContainer;
+    
     private RelativeLayout audioContainer;
     private long handle;
     int countChat = 0;
@@ -117,6 +144,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
     private boolean loading = true;
     private ProgressDialog statusDialog = null;
     private String fileName = null;
+    private long currentPosition;
 
     private RelativeLayout containerAudioVideoPlayer;
 
@@ -124,6 +152,8 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
     private NotificationManager mNotificationManager;
 
     private boolean isUrl;
+
+    ArrayList<Long> handleListM = new ArrayList<Long>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -133,6 +163,13 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
         setContentView(R.layout.activity_audiovideoplayer);
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
+        if (savedInstanceState != null) {
+            currentPosition = savedInstanceState.getLong("currentPosition");
+        }
+        else {
+            currentPosition = 0;
+        }
 
         Intent intent = getIntent();
         if (intent == null){
@@ -145,7 +182,8 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
             handle = bundle.getLong("HANDLE");
             fileName = bundle.getString("FILENAME");
         }
-
+        isFolderLink = intent.getBooleanExtra("isFolderLink", false);
+        
         uri = intent.getData();
         //Uri uri = Uri.parse("https://youtu.be/upUpVb3cLfk");
         if (uri == null){
@@ -199,6 +237,8 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
 
         audioContainer = (RelativeLayout) findViewById(R.id.audio_container);
         audioContainer.setVisibility(View.GONE);
+        
+        audioVideoPlayerContainer = (RelativeLayout) findViewById(R.id.audiovideoplayer_container); 
 
         handler = new Handler();
 
@@ -403,9 +443,18 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
             }
         });
         player.setPlayWhenReady(true);
+        player.seekTo(currentPosition);
         player.setVideoDebugListener(this);
         player.setAudioDebugListener(this);
         simpleExoPlayerView.showController();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        currentPosition = player.getCurrentPosition();
+        outState.putLong("currentPosition", currentPosition);
     }
 
     public String getFileName(Uri uri) {
@@ -465,17 +514,24 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
         inflater.inflate(R.menu.activity_audiovideoplayer, menu);
 
         shareIcon = menu.findItem(R.id.full_video_viewer_share);
+        downloadIcon = menu.findItem(R.id.full_video_viewer_download);
 
         if (isUrl) {
             shareIcon.setVisible(false);
+            downloadIcon.setVisible(true);
         }
         else {
             shareIcon.setVisible(true);
+            downloadIcon.setVisible(false);
         }
 
         Drawable share = getResources().getDrawable(R.drawable.ic_social_share_white);
         share.setColorFilter(getResources().getColor(R.color.white), PorterDuff.Mode.SRC_ATOP);
         shareIcon.setIcon(share);
+
+        Drawable download = getResources().getDrawable(R.drawable.ic_download_white);
+        download.setColorFilter(getResources().getColor(R.color.white), PorterDuff.Mode.SRC_ATOP);
+        downloadIcon.setIcon(download);
 
         propertiesIcon = menu.findItem(R.id.full_image_viewer_properties);
         chatIcon = menu.findItem(R.id.full_image_viewer_chat);
@@ -533,8 +589,295 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
                 startActivity(i);
                 break;
             }
+            case R.id.full_video_viewer_download: {
+                log("Download option");
+
+                downloadFile();
+                finish();
+                break;
+            }
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    public void downloadFile() {
+
+        MegaNode node = megaApi.getNodeByHandle(handle);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
+            if (!hasStoragePermission) {
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                        Constants.REQUEST_WRITE_STORAGE);
+
+                handleListM.add(node.getHandle());
+            }
+        }
+        ArrayList<Long> handleList = new ArrayList<Long>();
+        handleList.add(node.getHandle());
+        downloadNode(handleList);
+    }
+
+    @SuppressLint("NewApi")
+    public void downloadNode(ArrayList<Long> handleList){
+
+        long size = 0;
+        long[] hashes = new long[handleList.size()];
+        for (int i=0;i<handleList.size();i++){
+            hashes[i] = handleList.get(i);
+            size += megaApi.getNodeByHandle(hashes[i]).getSize();
+        }
+
+        if (dbH == null){
+            dbH = DatabaseHandler.getDbHandler(getApplicationContext());
+        }
+
+        boolean askMe = true;
+        String downloadLocationDefaultPath = "";
+        prefs = dbH.getPreferences();
+        if (prefs != null){
+            if (prefs.getStorageAskAlways() != null){
+                if (!Boolean.parseBoolean(prefs.getStorageAskAlways())){
+                    if (prefs.getStorageDownloadLocation() != null){
+                        if (prefs.getStorageDownloadLocation().compareTo("") != 0){
+                            askMe = false;
+                            downloadLocationDefaultPath = prefs.getStorageDownloadLocation();
+                        }
+                    }
+                }
+            }
+        }
+
+        if (askMe){
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                File[] fs = getExternalFilesDirs(null);
+                if (fs.length > 1){
+                    if (fs[1] == null){
+                        Intent intent = new Intent(FileStorageActivityLollipop.Mode.PICK_FOLDER.getAction());
+                        intent.putExtra(FileStorageActivityLollipop.EXTRA_BUTTON_PREFIX, getString(R.string.context_download_to));
+                        intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, size);
+                        intent.setClass(this, FileStorageActivityLollipop.class);
+                        intent.putExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES, hashes);
+                        startActivityForResult(intent, REQUEST_CODE_SELECT_LOCAL_FOLDER);
+                    }
+                    else{
+                        Dialog downloadLocationDialog;
+                        String[] sdCardOptions = getResources().getStringArray(R.array.settings_storage_download_location_array);
+                        android.app.AlertDialog.Builder b=new android.app.AlertDialog.Builder(this);
+
+                        b.setTitle(getResources().getString(R.string.settings_storage_download_location));
+                        final long sizeFinal = size;
+                        final long[] hashesFinal = new long[hashes.length];
+                        for (int i=0; i< hashes.length; i++){
+                            hashesFinal[i] = hashes[i];
+                        }
+
+                        b.setItems(sdCardOptions, new DialogInterface.OnClickListener() {
+
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                switch(which){
+                                    case 0:{
+                                        Intent intent = new Intent(FileStorageActivityLollipop.Mode.PICK_FOLDER.getAction());
+                                        intent.putExtra(FileStorageActivityLollipop.EXTRA_BUTTON_PREFIX, getString(R.string.context_download_to));
+                                        intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, sizeFinal);
+                                        intent.setClass(getApplicationContext(), FileStorageActivityLollipop.class);
+                                        intent.putExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES, hashesFinal);
+                                        startActivityForResult(intent, REQUEST_CODE_SELECT_LOCAL_FOLDER);
+                                        break;
+                                    }
+                                    case 1:{
+                                        File[] fs = getExternalFilesDirs(null);
+                                        if (fs.length > 1){
+                                            String path = fs[1].getAbsolutePath();
+                                            File defaultPathF = new File(path);
+                                            defaultPathF.mkdirs();
+                                            Toast.makeText(getApplicationContext(), getString(R.string.general_download) + ": "  + defaultPathF.getAbsolutePath() , Toast.LENGTH_LONG).show();
+                                            downloadTo(path, null, sizeFinal, hashesFinal);
+                                        }
+                                        break;
+                                    }
+                                }
+                            }
+                        });
+                        b.setNegativeButton(getResources().getString(R.string.general_cancel), new DialogInterface.OnClickListener() {
+
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.cancel();
+                            }
+                        });
+                        downloadLocationDialog = b.create();
+                        downloadLocationDialog.show();
+                    }
+                }
+                else{
+                    Intent intent = new Intent(FileStorageActivityLollipop.Mode.PICK_FOLDER.getAction());
+                    intent.putExtra(FileStorageActivityLollipop.EXTRA_BUTTON_PREFIX, getString(R.string.context_download_to));
+                    intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, size);
+                    intent.setClass(this, FileStorageActivityLollipop.class);
+                    intent.putExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES, hashes);
+                    startActivityForResult(intent, REQUEST_CODE_SELECT_LOCAL_FOLDER);
+                }
+            }
+            else{
+                Intent intent = new Intent(FileStorageActivityLollipop.Mode.PICK_FOLDER.getAction());
+                intent.putExtra(FileStorageActivityLollipop.EXTRA_BUTTON_PREFIX, getString(R.string.context_download_to));
+                intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, size);
+                intent.setClass(this, FileStorageActivityLollipop.class);
+                intent.putExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES, hashes);
+                startActivityForResult(intent, REQUEST_CODE_SELECT_LOCAL_FOLDER);
+            }
+        }
+        else{
+            downloadTo(downloadLocationDefaultPath, null, size, hashes);
+        }
+    }
+
+    public void downloadTo(String parentPath, String url, long size, long [] hashes){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
+            if (!hasStoragePermission) {
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                        Constants.REQUEST_WRITE_STORAGE);
+            }
+        }
+
+        double availableFreeSpace = Double.MAX_VALUE;
+        try{
+            StatFs stat = new StatFs(parentPath);
+            availableFreeSpace = (double)stat.getAvailableBlocks() * (double)stat.getBlockSize();
+        }
+        catch(Exception ex){}
+
+
+        if (hashes == null){
+            if(url != null) {
+                if(availableFreeSpace < size) {
+                    Snackbar.make(audioVideoPlayerContainer, getString(R.string.error_not_enough_free_space), Snackbar.LENGTH_LONG).show();
+                    return;
+                }
+                Intent service = new Intent(this, DownloadService.class);
+                service.putExtra(DownloadService.EXTRA_URL, url);
+                service.putExtra(DownloadService.EXTRA_SIZE, size);
+                service.putExtra(DownloadService.EXTRA_PATH, parentPath);
+                service.putExtra(DownloadService.EXTRA_FOLDER_LINK, isFolderLink);
+                startService(service);
+            }
+        }
+        else{
+            if(hashes.length == 1){
+                MegaNode tempNode = megaApi.getNodeByHandle(hashes[0]);
+                if((tempNode != null) && tempNode.getType() == MegaNode.TYPE_FILE){
+                    log("ISFILE");
+                    String localPath = mega.privacy.android.app.utils.Util.getLocalFile(this, tempNode.getName(), tempNode.getSize(), parentPath);
+                    if(localPath != null){
+                        try {
+                            mega.privacy.android.app.utils.Util.copyFile(new File(localPath), new File(parentPath, tempNode.getName()));
+                        }
+                        catch(Exception e) {}
+
+                        try {
+
+                            Intent viewIntent = new Intent(Intent.ACTION_VIEW);
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                                viewIntent.setDataAndType(FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", new File(localPath)), MimeTypeList.typeForName(tempNode.getName()).getType());
+                            } else {
+                                viewIntent.setDataAndType(Uri.fromFile(new File(localPath)), MimeTypeList.typeForName(tempNode.getName()).getType());
+                            }
+                            viewIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                            if (MegaApiUtils.isIntentAvailable(this, viewIntent))
+                                startActivity(viewIntent);
+                            else {
+                                Intent intentShare = new Intent(Intent.ACTION_SEND);
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                                    intentShare.setDataAndType(FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", new File(localPath)), MimeTypeList.typeForName(tempNode.getName()).getType());
+                                } else {
+                                    intentShare.setDataAndType(Uri.fromFile(new File(localPath)), MimeTypeList.typeForName(tempNode.getName()).getType());
+                                }
+                                intentShare.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                                if (MegaApiUtils.isIntentAvailable(this, intentShare))
+                                    startActivity(intentShare);
+                                String message = getString(R.string.general_already_downloaded) + ": " + localPath;
+                                Snackbar.make(audioVideoPlayerContainer, message, Snackbar.LENGTH_LONG).show();
+                            }
+                        }
+                        catch (Exception e){
+                            String message = getString(R.string.general_already_downloaded) + ": " + localPath;
+                            Snackbar.make(audioVideoPlayerContainer, message, Snackbar.LENGTH_LONG).show();
+                        }
+                        return;
+                    }
+                }
+            }
+
+            for (long hash : hashes) {
+                MegaNode node = megaApi.getNodeByHandle(hash);
+                if(node != null){
+                    Map<MegaNode, String> dlFiles = new HashMap<MegaNode, String>();
+                    if (node.getType() == MegaNode.TYPE_FOLDER) {
+                        getDlList(dlFiles, node, new File(parentPath, new String(node.getName())));
+                    } else {
+                        dlFiles.put(node, parentPath);
+                    }
+
+                    for (MegaNode document : dlFiles.keySet()) {
+
+                        String path = dlFiles.get(document);
+
+                        if(availableFreeSpace < document.getSize()){
+                            Snackbar.make(audioVideoPlayerContainer, getString(R.string.error_not_enough_free_space), Snackbar.LENGTH_LONG).show();
+                            continue;
+                        }
+
+                        Intent service = new Intent(this, DownloadService.class);
+                        service.putExtra(DownloadService.EXTRA_HASH, document.getHandle());
+                        service.putExtra(DownloadService.EXTRA_URL, url);
+                        service.putExtra(DownloadService.EXTRA_SIZE, document.getSize());
+                        service.putExtra(DownloadService.EXTRA_PATH, path);
+                        service.putExtra(DownloadService.EXTRA_FOLDER_LINK, isFolderLink);
+                        startService(service);
+                    }
+                }
+                else if(url != null) {
+                    if(availableFreeSpace < size) {
+                        Snackbar.make(audioVideoPlayerContainer, getString(R.string.error_not_enough_free_space), Snackbar.LENGTH_LONG).show();
+                        continue;
+                    }
+
+                    Intent service = new Intent(this, DownloadService.class);
+                    service.putExtra(DownloadService.EXTRA_HASH, hash);
+                    service.putExtra(DownloadService.EXTRA_URL, url);
+                    service.putExtra(DownloadService.EXTRA_SIZE, size);
+                    service.putExtra(DownloadService.EXTRA_PATH, parentPath);
+                    service.putExtra(DownloadService.EXTRA_FOLDER_LINK, isFolderLink);
+                    startService(service);
+                }
+                else {
+                    log("node not found");
+                }
+            }
+        }
+    }
+
+    private void getDlList(Map<MegaNode, String> dlFiles, MegaNode parent, File folder) {
+
+        if (megaApi.getRootNode() == null)
+            return;
+
+        folder.mkdir();
+        ArrayList<MegaNode> nodeList = megaApi.getChildren(parent, orderGetChildren);
+        for(int i=0; i<nodeList.size(); i++){
+            MegaNode document = nodeList.get(i);
+            if (document.getType() == MegaNode.TYPE_FOLDER) {
+                File subfolder = new File(folder, new String(document.getName()));
+                getDlList(dlFiles, document, subfolder);
+            }
+            else {
+                dlFiles.put(document, folder.getAbsolutePath());
+            }
+        }
     }
 
     public void intentToSendFile(Uri uri){
@@ -820,6 +1163,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
         paymentButton.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v) {
                 alertDialogTransferOverquota.dismiss();
+                transferOverquota = false;
                 showUpgradeAccount();
             }
         });

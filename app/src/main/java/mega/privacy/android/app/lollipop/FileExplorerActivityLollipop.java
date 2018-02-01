@@ -186,7 +186,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 
 	ArrayList<MegaNode> nodes;
 
-	String regex = "[*|\\?:\"<>\\{\\}\\[\\]\\\\\\/]";
+	String regex = "[*|\\?:\"<>\\{\\}\\\\\\/]";
 
 	//	long gParentHandle;
 	long parentHandleIncoming;

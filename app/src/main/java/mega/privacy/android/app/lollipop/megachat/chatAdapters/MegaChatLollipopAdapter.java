@@ -653,6 +653,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         MegaChatMessage message = messages.get(position-1).getMessage();
         ((ViewHolderMessageChat)holder).userHandle = message.getUserHandle();
 
+        log("Message type: "+message.getType());
+
         if(message.getType()==MegaChatMessage.TYPE_ALTER_PARTICIPANTS){
             log("ALTER PARTICIPANT MESSAGE!!");
 
@@ -2004,13 +2006,28 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 else{
                     log("Type message ERROR: "+message.getType());
                     ((ViewHolderMessageChat)holder).contentOwnMessageText.setTextColor(ContextCompat.getColor(context, R.color.tour_bar_red));
-
                     ((ViewHolderMessageChat)holder).contentOwnMessageText.setText(context.getString(R.string.error_message_unrecognizable));
 
                     ((ViewHolderMessageChat)holder).contentOwnMessageLayout.setVisibility(View.VISIBLE);
                     ((ViewHolderMessageChat)holder).ownManagementMessageLayout.setVisibility(View.GONE);
 
                     ((ViewHolderMessageChat)holder).contentOwnMessageLayout.setBackgroundColor(ContextCompat.getColor(context, android.R.color.transparent));
+
+                    ((ViewHolderMessageChat)holder).previewFrameLand.setVisibility(View.GONE);
+                    ((ViewHolderMessageChat)holder).contentOwnMessageThumbLand.setVisibility(View.GONE);
+                    ((ViewHolderMessageChat)holder).previewFramePort.setVisibility(View.GONE);
+                    ((ViewHolderMessageChat)holder).contentOwnMessageThumbPort.setVisibility(View.GONE);
+
+                    ((ViewHolderMessageChat)holder).contentOwnMessageFileLayout.setVisibility(View.GONE);
+
+                    ((ViewHolderMessageChat)holder).contentOwnMessageFileThumb.setVisibility(View.GONE);
+                    ((ViewHolderMessageChat)holder).contentOwnMessageFileName.setVisibility(View.GONE);
+                    ((ViewHolderMessageChat)holder).contentOwnMessageFileSize.setVisibility(View.GONE);
+
+                    ((ViewHolderMessageChat)holder).contentOwnMessageContactLayout.setVisibility(View.GONE);
+                    ((ViewHolderMessageChat)holder).contentOwnMessageContactThumb.setVisibility(View.GONE);
+                    ((ViewHolderMessageChat)holder).contentOwnMessageContactName.setVisibility(View.GONE);
+                    ((ViewHolderMessageChat)holder).contentOwnMessageContactEmail.setVisibility(View.GONE);
 
 //                log("Content: "+message.getContent());
                 }
@@ -3106,6 +3123,23 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     ((ViewHolderMessageChat)holder).contentContactMessageText.setText(context.getString(R.string.error_message_unrecognizable));
 
                     ((ViewHolderMessageChat)holder).contentContactMessageLayout.setBackgroundColor(ContextCompat.getColor(context, android.R.color.transparent));
+
+                    ((ViewHolderMessageChat)holder).contentContactMessageText.setVisibility(View.VISIBLE);
+                    ((ViewHolderMessageChat)holder).contentContactMessageThumbLand.setVisibility(View.GONE);
+                    ((ViewHolderMessageChat)holder).contentContactMessageThumbLandFramework.setVisibility(View.GONE);
+
+                    ((ViewHolderMessageChat)holder).contentContactMessageThumbPort.setVisibility(View.GONE);
+                    ((ViewHolderMessageChat)holder).contentContactMessageThumbPortFramework.setVisibility(View.GONE);
+
+                    ((ViewHolderMessageChat)holder).contentContactMessageFileLayout.setVisibility(View.GONE);
+                    ((ViewHolderMessageChat)holder).contentContactMessageFileThumb.setVisibility(View.GONE);
+                    ((ViewHolderMessageChat)holder).contentContactMessageFileName.setVisibility(View.GONE);
+                    ((ViewHolderMessageChat)holder).contentContactMessageFileSize.setVisibility(View.GONE);
+
+                    ((ViewHolderMessageChat)holder).contentContactMessageContactLayout.setVisibility(View.GONE);
+                    ((ViewHolderMessageChat)holder).contentContactMessageContactThumb.setVisibility(View.GONE);
+                    ((ViewHolderMessageChat)holder).contentContactMessageContactName.setVisibility(View.GONE);
+                    ((ViewHolderMessageChat)holder).contentContactMessageContactEmail.setVisibility(View.GONE);
                 }
             }
         }

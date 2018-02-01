@@ -148,15 +148,6 @@
                 android:gravity="center_horizontal"
                 android:textColor="@color/text_secondary"
                 android:textSize="18sp" />
-
-            <TextView
-                android:id="@+id/contact_list_empty_text_second"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="sans-serif"
-                android:textColor="@color/black"
-                android:textSize="18sp"/>
-
         </LinearLayout>
 
 		<ProgressBar
