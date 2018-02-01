@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -36,6 +37,7 @@ import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatListItem;
@@ -75,6 +77,8 @@ public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment imp
     MegaChatApiAndroid megaChatApi;
     DatabaseHandler dbH;
 
+    private int heightDisplay;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -112,6 +116,8 @@ public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment imp
         Display display = getActivity().getWindowManager().getDefaultDisplay();
         outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
+
+        heightDisplay = outMetrics.heightPixels;
 
         super.setupDialog(dialog, style);
         View contentView = View.inflate(getContext(), R.layout.chat_item_bottom_sheet, null);
@@ -213,18 +219,32 @@ public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment imp
                     optionClearHistory.setVisibility(View.VISIBLE);
                 }
             }
-
 		}
 		else{
-			infoChatText.setText(getString(R.string.contact_properties_activity));
-			optionLeaveChat.setVisibility(View.GONE);
+            long userHandle = chat.getPeerHandle();
+            MegaUser contact = megaApi.getContact(MegaApiJava.handleToBase64(userHandle));
+            if(contact!=null){
+                if(contact.getVisibility()==MegaUser.VISIBILITY_VISIBLE){
+                    optionInfoChat.setVisibility(View.VISIBLE);
+                    infoChatText.setText(getString(R.string.contact_properties_activity));
 
-            if(chat.getLastMessageType()== MegaChatMessage.TYPE_INVALID){
-                optionClearHistory.setVisibility(View.GONE);
+                    if(chat.getLastMessageType()== MegaChatMessage.TYPE_INVALID){
+                        optionClearHistory.setVisibility(View.GONE);
+                    }
+                    else{
+                        optionClearHistory.setVisibility(View.VISIBLE);
+                    }
+                }
+                else{
+                    optionInfoChat.setVisibility(View.GONE);
+                    optionClearHistory.setVisibility(View.GONE);
+                }
             }
             else{
-                optionClearHistory.setVisibility(View.VISIBLE);
+                optionInfoChat.setVisibility(View.GONE);
+                optionClearHistory.setVisibility(View.GONE);
             }
+			optionLeaveChat.setVisibility(View.GONE);
 		}
 
 		chatPrefs = dbH.findChatPreferencesByHandle(String.valueOf(chat.getChatId()));
@@ -253,6 +273,17 @@ public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment imp
 		}
 
         dialog.setContentView(contentView);
+
+        mBehavior = BottomSheetBehavior.from((View) mainLinearLayout.getParent());
+        mBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+
+        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            mBehavior.setPeekHeight((heightDisplay / 4) * 2);
+        }
+        else if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT){
+            mBehavior.setPeekHeight(BottomSheetBehavior.PEEK_HEIGHT_AUTO);
+        }
+
     }
 
     public void addAvatarChatPanel(String contactMail, MegaChatListItem chat){

@@ -33,21 +33,43 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/separator"
-        android:choiceMode="multipleChoice" />
+        android:choiceMode="multipleChoice"/>
 
-    <ImageView
-        android:id="@+id/offline_empty_image"
+
+    <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true" />
+        android:layout_centerInParent="true"
+        android:gravity="center_horizontal">
 
-    <TextView
-        android:id="@+id/offline_empty_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/offline_empty_image"
-        android:layout_centerHorizontal="true"
-        android:textColor="@color/text_secondary"
-        android:textSize="16sp" />
+        <ImageView
+            android:id="@+id/offline_empty_image"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"/>
+
+        <LinearLayout
+            android:id="@+id/offline_empty_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_below="@id/offline_empty_image"
+            android:layout_centerHorizontal="true">
+            <TextView
+                android:id="@+id/offline_empty_text_first"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/text_secondary"
+                android:fontFamily="sans-serif"
+                android:textSize="18sp"/>
+            <TextView
+                android:id="@+id/offline_empty_text_second"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif"
+                android:textColor="@color/black"
+                android:textSize="18sp"/>
+        </LinearLayout>
+    </RelativeLayout>
 
 </RelativeLayout>

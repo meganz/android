@@ -3,6 +3,13 @@
     xmlns:MEGA="http://schemas.android.com/apk/res-auto" >
 
     <item
+        android:id="@+id/chat_cab_menu_forward"
+        android:orderInCategory="105"
+        android:title="@string/forward_menu_item"
+        MEGA:showAsAction="always"
+        android:icon="@drawable/ic_forward_white"/>
+
+    <item
         android:id="@+id/chat_cab_menu_edit"
         android:orderInCategory="105"
         android:title="@string/title_edit_profile_info"

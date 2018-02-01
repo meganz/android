@@ -3,6 +3,7 @@ package mega.privacy.android.app.lollipop.managerSections;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Build;
@@ -25,6 +26,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -43,9 +45,11 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.CustomizedGridLayoutManager;
 import mega.privacy.android.app.components.CustomizedGridRecyclerView;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
+import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.MyAccountInfo;
+import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaOfflineLollipopAdapter;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.utils.Constants;
@@ -68,7 +72,10 @@ public class OfflineFragmentLollipop extends Fragment{
 	Stack<Integer> lastPositionStack;
 	
 	ImageView emptyImageView;
-	TextView emptyTextView;
+	LinearLayout emptyTextView;
+	TextView emptyTextViewFirst;
+	TextView emptyTextViewSecond;
+
 	MegaOfflineLollipopAdapter adapter;
 	OfflineFragmentLollipop offlineFragment = this;
 	DatabaseHandler dbH = null;
@@ -132,6 +139,8 @@ public class OfflineFragmentLollipop extends Fragment{
 						}
 						((ManagerActivityLollipop) context).showRenameDialog(n, n.getName());
 					}
+					clearSelections();
+					hideMultipleSelect();
 					break;
 				}
 				case R.id.cab_menu_share_link:{
@@ -164,6 +173,8 @@ public class OfflineFragmentLollipop extends Fragment{
 
 					NodeController nC = new NodeController(context);
 					nC.selectContactToShareFolders(handleList);
+					clearSelections();
+					hideMultipleSelect();
 					break;
 				}
 				case R.id.cab_menu_move:{					
@@ -177,9 +188,10 @@ public class OfflineFragmentLollipop extends Fragment{
 						}
 						handleList.add(n.getHandle());
 					}
-
 					NodeController nC = new NodeController(context);
 					nC.chooseLocationToMoveNodes(handleList);
+					clearSelections();
+					hideMultipleSelect();
 					break;
 				}
 				case R.id.cab_menu_copy:{
@@ -196,6 +208,8 @@ public class OfflineFragmentLollipop extends Fragment{
 
 					NodeController nC = new NodeController(context);
 					nC.chooseLocationToCopyNodes(handleList);
+					clearSelections();
+					hideMultipleSelect();
 					break;
 				}
 				case R.id.cab_menu_delete:{
@@ -243,7 +257,7 @@ public class OfflineFragmentLollipop extends Fragment{
 					
 					if(selected.size()==adapter.getItemCount()){
 						menu.findItem(R.id.cab_menu_select_all).setVisible(false);
-						menu.findItem(R.id.cab_menu_unselect_all).setVisible(true);			
+						menu.findItem(R.id.cab_menu_unselect_all).setVisible(true);
 					}
 					else{
 						menu.findItem(R.id.cab_menu_select_all).setVisible(true);
@@ -420,13 +434,14 @@ public class OfflineFragmentLollipop extends Fragment{
 			recyclerView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
 			mLayoutManager = new LinearLayoutManager(context);
 			recyclerView.setLayoutManager(mLayoutManager);
-			recyclerView.setItemAnimator(new DefaultItemAnimator()); 
-			
+			recyclerView.setItemAnimator(new DefaultItemAnimator());
+
 			emptyImageView = (ImageView) v.findViewById(R.id.offline_empty_image);
-			emptyTextView = (TextView) v.findViewById(R.id.offline_empty_text);		
+			emptyTextView = (LinearLayout) v.findViewById(R.id.offline_empty_text);
+			emptyTextViewFirst = (TextView) v.findViewById(R.id.offline_empty_text_first);
+			emptyTextViewSecond = (TextView) v.findViewById(R.id.offline_empty_text_second);
 					
 			contentTextLayout = (RelativeLayout) v.findViewById(R.id.offline_content_text_layout);
-
 			contentText = (TextView) v.findViewById(R.id.offline_content_text);			
 
 			findNodes();
@@ -446,8 +461,16 @@ public class OfflineFragmentLollipop extends Fragment{
 					emptyImageView.setVisibility(View.VISIBLE);
 					emptyTextView.setVisibility(View.VISIBLE);
 					contentTextLayout.setVisibility(View.GONE);
-					emptyImageView.setImageResource(R.drawable.ic_empty_offline);
-					emptyTextView.setText(R.string.offline_empty_folder);
+
+					if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+						emptyImageView.setImageResource(R.drawable.offline_empty_landscape);
+					}else{
+						emptyImageView.setImageResource(R.drawable.ic_empty_offline);
+					}
+					emptyTextViewFirst.setText(R.string.context_empty_offline);
+					String text = getString(R.string.section_saved_for_offline);
+					emptyTextViewSecond.setText(" "+text+".");
+
 				}
 				else{
 					recyclerView.setVisibility(View.VISIBLE);
@@ -474,7 +497,9 @@ public class OfflineFragmentLollipop extends Fragment{
 			recyclerView.setItemAnimator(new DefaultItemAnimator());
 			
 			emptyImageView = (ImageView) v.findViewById(R.id.offline_empty_image_grid);
-			emptyTextView = (TextView) v.findViewById(R.id.offline_empty_text_grid);		
+			emptyTextView = (LinearLayout) v.findViewById(R.id.offline_empty_text_grid);
+			emptyTextViewFirst = (TextView) v.findViewById(R.id.offline_empty_text_grid_first);
+			emptyTextViewSecond = (TextView) v.findViewById(R.id.offline_empty_text_grid_second);
 
 			contentTextLayout = (RelativeLayout) v.findViewById(R.id.offline_content_grid_text_layout);
 
@@ -497,8 +522,15 @@ public class OfflineFragmentLollipop extends Fragment{
 					emptyImageView.setVisibility(View.VISIBLE);
 					emptyTextView.setVisibility(View.VISIBLE);
 					contentTextLayout.setVisibility(View.GONE);
-					emptyImageView.setImageResource(R.drawable.ic_empty_offline);
-					emptyTextView.setText(R.string.offline_empty_folder);
+
+					if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+						emptyImageView.setImageResource(R.drawable.offline_empty_landscape);
+					}else{
+						emptyImageView.setImageResource(R.drawable.ic_empty_offline);
+					}
+					emptyTextViewFirst.setText(R.string.context_empty_offline);
+					String text = getString(R.string.section_saved_for_offline);
+					emptyTextViewSecond.setText(" "+text+".");
 				}
 				else{
 					recyclerView.setVisibility(View.VISIBLE);
@@ -606,8 +638,14 @@ public class OfflineFragmentLollipop extends Fragment{
 				emptyImageView.setVisibility(View.VISIBLE);
 				emptyTextView.setVisibility(View.VISIBLE);
 				contentTextLayout.setVisibility(View.GONE);
-				emptyImageView.setImageResource(R.drawable.ic_empty_offline);
-				emptyTextView.setText(R.string.offline_empty_folder);
+				if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+					emptyImageView.setImageResource(R.drawable.offline_empty_landscape);
+				}else{
+					emptyImageView.setImageResource(R.drawable.ic_empty_offline);
+				}
+				emptyTextViewFirst.setText(R.string.context_empty_offline);
+				String text = getString(R.string.section_saved_for_offline);
+				emptyTextViewSecond.setText(" "+text+".");
 			}
 			else{
 				recyclerView.setVisibility(View.VISIBLE);
@@ -673,7 +711,9 @@ public class OfflineFragmentLollipop extends Fragment{
 		
 		mOffList.clear();
 		mOffList.addAll(tempOffline);
-
+		if (adapter!= null) {
+			adapter.setNodes(mOffList);
+		}
 		contentText.setText(getInfoFolder(mOffList));
 	}
 
@@ -731,6 +771,9 @@ public class OfflineFragmentLollipop extends Fragment{
 		
 		mOffList.clear();
 		mOffList.addAll(tempOffline);
+		if (adapter!= null) {
+			adapter.setNodes(mOffList);
+		}
 		contentText.setText(getInfoFolder(mOffList));
 	}
 	
@@ -979,8 +1022,15 @@ public class OfflineFragmentLollipop extends Fragment{
 					emptyImageView.setVisibility(View.VISIBLE);
 					emptyTextView.setVisibility(View.VISIBLE);
 					contentTextLayout.setVisibility(View.GONE);
-					emptyImageView.setImageResource(R.drawable.ic_empty_offline);
-					emptyTextView.setText(R.string.offline_empty_folder);
+
+					if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+						emptyImageView.setImageResource(R.drawable.offline_empty_landscape);
+					}else{
+						emptyImageView.setImageResource(R.drawable.ic_empty_offline);
+					}
+					emptyTextViewFirst.setText(R.string.context_empty_offline);
+					String text = getString(R.string.section_saved_for_offline);
+					emptyTextViewSecond.setText(" "+text+".");
 				}
 				else{
 					recyclerView.setVisibility(View.VISIBLE);
@@ -1015,6 +1065,51 @@ public class OfflineFragmentLollipop extends Fragment{
 						}
 
 						startActivity(intent);
+					}
+					else if (MimeTypeList.typeForName(currentFile.getName()).isVideo()) {
+						log("Video file");
+
+						Intent videoIntent = new Intent(context, AudioVideoPlayerLollipop.class);
+						videoIntent.putExtra("HANDLE", Long.parseLong(currentNode.getHandle()));
+						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+							videoIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
+						}
+						else{
+							videoIntent.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
+						}
+						videoIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+						startActivity(videoIntent);
+					}
+					else if (MimeTypeList.typeForName(currentFile.getName()).isAudio()) {
+						log("Audio file");
+
+						Intent audioIntent = new Intent(context, AudioVideoPlayerLollipop.class);
+						audioIntent.putExtra("HANDLE", Long.parseLong(currentNode.getHandle()));
+						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+							audioIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
+						}
+						else{
+							audioIntent.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
+						}
+						audioIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+						startActivity(audioIntent);
+          }
+					else if (MimeTypeList.typeForName(currentFile.getName()).isPdf()){
+						log("Pdf file");
+
+						//String localPath = Util.getLocalFile(context, currentFile.getName(), currentFile.get, currentFile.getParent());
+						File pdfFile = new File(currentFile.getAbsolutePath());
+
+						Intent pdfIntent = new Intent(context, PdfViewerActivityLollipop.class);
+						pdfIntent.putExtra("APP", true);
+						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+							pdfIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", pdfFile), MimeTypeList.typeForName(currentFile.getName()).getType());
+						}
+						else{
+							pdfIntent.setDataAndType(Uri.fromFile(pdfFile), MimeTypeList.typeForName(currentFile.getName()).getType());
+						}
+						pdfIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+						context.startActivity(pdfIntent);
 					}
 					else{
 						openFile(currentFile);
@@ -1297,8 +1392,14 @@ public class OfflineFragmentLollipop extends Fragment{
 				recyclerView.setVisibility(View.GONE);
 				emptyImageView.setVisibility(View.VISIBLE);
 				emptyTextView.setVisibility(View.VISIBLE);
-				emptyImageView.setImageResource(R.drawable.ic_empty_offline);
-				emptyTextView.setText(R.string.offline_empty_folder);
+				if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+					emptyImageView.setImageResource(R.drawable.offline_empty_landscape);
+				}else{
+					emptyImageView.setImageResource(R.drawable.ic_empty_offline);
+				}
+				emptyTextViewFirst.setText(R.string.context_empty_offline);
+				String text = getString(R.string.section_saved_for_offline);
+				emptyTextViewSecond.setText(" "+text+".");
 			}
 			else{
 				recyclerView.setVisibility(View.VISIBLE);
@@ -1350,8 +1451,14 @@ public class OfflineFragmentLollipop extends Fragment{
 			emptyImageView.setVisibility(View.VISIBLE);
 			emptyTextView.setVisibility(View.VISIBLE);
 			contentTextLayout.setVisibility(View.GONE);
-			emptyImageView.setImageResource(R.drawable.ic_empty_offline);
-			emptyTextView.setText(R.string.offline_empty_folder);
+			if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+				emptyImageView.setImageResource(R.drawable.offline_empty_landscape);
+			}else{
+				emptyImageView.setImageResource(R.drawable.ic_empty_offline);
+			}
+			emptyTextViewFirst.setText(R.string.context_empty_offline);
+			String text = getString(R.string.section_saved_for_offline);
+			emptyTextViewSecond.setText(" "+text+".");
 		}
 		else{
 			recyclerView.setVisibility(View.VISIBLE);

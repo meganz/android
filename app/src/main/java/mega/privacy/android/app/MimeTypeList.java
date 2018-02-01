@@ -96,10 +96,15 @@ public class MimeTypeList {
 		String detectedType = MimeTypeMap.getSingleton()
 				.getMimeTypeFromExtension(extension);
 		if (detectedType == null) {
-			if(extension.equals("mkv"))
+			if(extension.equals("mkv")) {
 				detectedType = "video/x-matroska";
-			else
+			}
+			else if (extension.equals("heic")) {
+				detectedType = "image/heic";
+			}
+			else {
 				detectedType = "application/octet-stream";
+			}
 		}
 		if (extension == null) {
 			extension = "";
@@ -130,6 +135,7 @@ public class MimeTypeList {
 	 * Check is MimeType of image type
 	 */
 	public boolean isImage() {
+		log("type is: " + type);
 		return type.startsWith("image/");
 	}
 	
@@ -170,7 +176,17 @@ public class MimeTypeList {
 	public boolean isVideo() {
 		return type.startsWith("video/") || extension.equals("mkv");
 	}
-	
+
+	public boolean isVideoReproducible() {
+		return type.startsWith("video/") || extension.equals("mkv") || extension.equals("flv")
+				|| extension.equals("vob") || extension.equals("avi") || extension.equals("wmv")
+				|| extension.equals("mpg") || extension.equals("mts");
+	}
+
+	public boolean isVideoNotSupported() {
+		return extension.equals("flv") || extension.equals("avi") || extension.equals("wmv");
+	}
+
 	/*
 	 * Check is MimeType of audio type
 	 */

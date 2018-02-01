@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -23,6 +24,8 @@ import java.util.List;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.components.scrollBar.SectionTitleProvider;
+import mega.privacy.android.app.lollipop.MegaMonthPicLollipop;
 import mega.privacy.android.app.lollipop.managerSections.CameraUploadFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.CameraUploadFragmentLollipop.PhotoSyncHolder;
 import mega.privacy.android.app.utils.Constants;
@@ -30,16 +33,19 @@ import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaNode;
 
 
-public class MegaPhotoSyncListAdapterLollipop extends RecyclerView.Adapter<MegaPhotoSyncListAdapterLollipop.ViewHolderPhotoSyncList> implements OnClickListener {
+public class MegaPhotoSyncListAdapterLollipop extends RecyclerView.Adapter<MegaPhotoSyncListAdapterLollipop.ViewHolderPhotoSyncList> implements OnClickListener, SectionTitleProvider {
 	
 	private class Media {
 		public String filePath;
 		public long timestamp;
 	}
-	
+	public static final int ITEM_VIEW_TYPE_NODE= 0;
+	public static final int ITEM_VIEW_TYPE_MONTH = 1;
+
 	private SparseBooleanArray selectedItems = new SparseBooleanArray();;
 	
 	ViewHolderPhotoSyncList holder = null;
@@ -55,7 +61,7 @@ public class MegaPhotoSyncListAdapterLollipop extends RecyclerView.Adapter<MegaP
 	
 	RecyclerView listFragment;
 	ImageView emptyImageViewFragment;
-	TextView emptyTextViewFragment;
+	LinearLayout emptyTextViewFragment;
 	ActionBar aB;
 	
 	boolean multipleSelect;
@@ -67,7 +73,7 @@ public class MegaPhotoSyncListAdapterLollipop extends RecyclerView.Adapter<MegaP
 	int type = Constants.CAMERA_UPLOAD_ADAPTER;
 	
 	/*public static view holder class*/
-    public class ViewHolderPhotoSyncList extends RecyclerView.ViewHolder {
+    public static class ViewHolderPhotoSyncList extends RecyclerView.ViewHolder {
     	
     	public ViewHolderPhotoSyncList(View v){
     		super(v);
@@ -83,7 +89,7 @@ public class MegaPhotoSyncListAdapterLollipop extends RecyclerView.Adapter<MegaP
     	public long document;
     }
 	
-	public MegaPhotoSyncListAdapterLollipop(Context _context, ArrayList<PhotoSyncHolder> _nodesArray, long _photosyncHandle, RecyclerView listView, ImageView emptyImageView, TextView emptyTextView, ActionBar aB, ArrayList<MegaNode> _nodes, Object fragment, int type) {
+	public MegaPhotoSyncListAdapterLollipop(Context _context, ArrayList<PhotoSyncHolder> _nodesArray, long _photosyncHandle, RecyclerView listView, ImageView emptyImageView, LinearLayout emptyTextView, ActionBar aB, ArrayList<MegaNode> _nodes, Object fragment, int type) {
 		this.context = _context;
 		this.nodesArray = _nodesArray;
 		this.photosyncHandle = _photosyncHandle;
@@ -280,7 +286,7 @@ public class MegaPhotoSyncListAdapterLollipop extends RecyclerView.Adapter<MegaP
 		}
 		else{
 			if(this.isItemChecked(position)){
-				holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.new_file_list_selected_row));
+				holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.new_multiselect_color));
 			}
 			else{
 				holder.itemLayout.setBackgroundColor(Color.WHITE);
@@ -352,6 +358,29 @@ public class MegaPhotoSyncListAdapterLollipop extends RecyclerView.Adapter<MegaP
 			holder.itemLayout.setVisibility(View.GONE);
 			holder.monthLayout.setVisibility(View.VISIBLE);
 			
+		}
+	}
+	@Override
+	public int getItemViewType(int position) {
+		log("getItemViewType: position"+position);
+		PhotoSyncHolder psh = (PhotoSyncHolder) getItem(position);
+		if (psh.isNode){
+				return ITEM_VIEW_TYPE_NODE;
+		} else{
+			return ITEM_VIEW_TYPE_MONTH;
+		}
+	}
+//	private MegaNode getItemNode(int position) {
+//		return nodes.get(position);
+//	}
+
+	@Override
+	public String getSectionTitle(int position) {
+		PhotoSyncHolder psh = (PhotoSyncHolder) getItem(position);
+		if (psh.isNode){
+			return psh.nodeDate;
+		} else{
+			return null;
 		}
 	}
 

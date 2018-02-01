@@ -1,12 +1,16 @@
 package mega.privacy.android.app.lollipop.managerSections;
 
 import android.app.Activity;
+import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
@@ -23,11 +27,13 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -37,16 +43,17 @@ import java.util.Stack;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
-import mega.privacy.android.app.MegaStreamingService;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.CustomizedGridLayoutManager;
 import mega.privacy.android.app.components.CustomizedGridRecyclerView;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
+import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop.DrawerItem;
 import mega.privacy.android.app.lollipop.MyAccountInfo;
+import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaBrowserLollipopAdapter;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.utils.Constants;
@@ -70,19 +77,22 @@ public class InboxFragmentLollipop extends Fragment{
 	MegaBrowserLollipopAdapter adapter;
 	public InboxFragmentLollipop inboxFragment = this;
 	MegaNode inboxNode;
-	boolean isList = true;
-	long parentHandle = -1;
 
 	ArrayList<MegaNode> nodes;
 	MegaNode selectedNode;
 	
 	ImageView emptyImageView;
-	TextView emptyTextView;
+	LinearLayout emptyTextView;
+	TextView emptyTextViewFirst;
+	TextView emptyTextViewSecond;
+
 	TextView contentText;
 	RelativeLayout contentTextLayout;
 	Stack<Integer> lastPositionStack;
 	
 	MegaApiAndroid megaApi;
+
+	String downloadLocationDefaultPath = Util.downloadDIR;
 	
 	private ActionMode actionMode;
 	
@@ -312,6 +322,19 @@ public class InboxFragmentLollipop extends Fragment{
 
 		dbH = DatabaseHandler.getDbHandler(context);
 		prefs = dbH.getPreferences();
+		if (prefs != null){
+			log("prefs != null");
+			if (prefs.getStorageAskAlways() != null){
+				if (!Boolean.parseBoolean(prefs.getStorageAskAlways())){
+					log("askMe==false");
+					if (prefs.getStorageDownloadLocation() != null){
+						if (prefs.getStorageDownloadLocation().compareTo("") != 0){
+							downloadLocationDefaultPath = prefs.getStorageDownloadLocation();
+						}
+					}
+				}
+			}
+		}
 
 		lastPositionStack = new Stack<>();
 		
@@ -333,67 +356,51 @@ public class InboxFragmentLollipop extends Fragment{
 	    display.getMetrics(outMetrics);
 	    density  = getResources().getDisplayMetrics().density;
 
-		if (parentHandle == -1){
-
-			long parentHandleInbox = ((ManagerActivityLollipop)context).getParentHandleInbox();
-			if(parentHandleInbox!=-1){
-				log("After consulting... the parent is: "+parentHandleInbox);
-				parentHandle = parentHandleInbox;
-			}
-		}
-
-		if (parentHandle == -1||parentHandle==megaApi.getInboxNode().getHandle()) {
+		if (((ManagerActivityLollipop) context).parentHandleInbox == -1||((ManagerActivityLollipop) context).parentHandleInbox==megaApi.getInboxNode().getHandle()) {
 			log("parentHandle -1");
 
 			if (megaApi.getInboxNode() != null){
+				log("InboxNode != null");
 				inboxNode = megaApi.getInboxNode();
-				parentHandle = inboxNode.getHandle();
-				//		((ManagerActivityLollipop)context).setParentHandleRubbish(parentHandle);
 				nodes = megaApi.getChildren(inboxNode, ((ManagerActivityLollipop)context).orderCloud);
 			}
-			aB.setTitle(getString(R.string.section_inbox));
-			aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
-			((ManagerActivityLollipop)context).setFirstNavigationLevel(true);
-
 		}
 		else{
-			log("parentHandle: " + parentHandle);
-			MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
+			log("parentHandle: " + ((ManagerActivityLollipop) context).parentHandleInbox);
+			MegaNode parentNode = megaApi.getNodeByHandle(((ManagerActivityLollipop) context).parentHandleInbox);
 
 			if(parentNode!=null){
 				log("parentNode: "+parentNode.getName());
 				nodes = megaApi.getChildren(parentNode, ((ManagerActivityLollipop)context).orderCloud);
-				aB.setTitle(parentNode.getName());
-				aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
-				((ManagerActivityLollipop)context).setFirstNavigationLevel(false);
 			}
 
 		}
 		((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
-	    isList = ((ManagerActivityLollipop)context).isList();
 
 		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 	    
-		if (isList){
+		if (((ManagerActivityLollipop) context).isList){
 			View v = inflater.inflate(R.layout.fragment_inboxlist, container, false);
 
 			recyclerView = (RecyclerView) v.findViewById(R.id.inbox_list_view);
 			recyclerView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
 			mLayoutManager = new LinearLayoutManager(context);
 			recyclerView.setLayoutManager(mLayoutManager);
-			recyclerView.setItemAnimator(new DefaultItemAnimator());      
-	
+			recyclerView.setItemAnimator(new DefaultItemAnimator());
+
 			emptyImageView = (ImageView) v.findViewById(R.id.inbox_list_empty_image);
-			emptyTextView = (TextView) v.findViewById(R.id.inbox_list_empty_text);
+			emptyTextView = (LinearLayout) v.findViewById(R.id.inbox_list_empty_text);
+			emptyTextViewFirst = (TextView) v.findViewById(R.id.inbox_list_empty_text_first);
+			emptyTextViewSecond = (TextView) v.findViewById(R.id.inbox_list_empty_text_second);
 
 			contentTextLayout = (RelativeLayout) v.findViewById(R.id.inbox_list_content_text_layout);
-			contentText = (TextView) v.findViewById(R.id.inbox_list_content_text);			
+			contentText = (TextView) v.findViewById(R.id.inbox_list_content_text);
 
 			if (adapter == null){
-				adapter = new MegaBrowserLollipopAdapter(context, this, nodes, parentHandle, recyclerView, aB, Constants.INBOX_ADAPTER, MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST);
+				adapter = new MegaBrowserLollipopAdapter(context, this, nodes, ((ManagerActivityLollipop) context).parentHandleInbox, recyclerView, aB, Constants.INBOX_ADAPTER, MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST);
 			}
 			else{
-				adapter.setParentHandle(parentHandle);
+				adapter.setParentHandle(((ManagerActivityLollipop) context).parentHandleInbox);
 				adapter.setNodes(nodes);
 				adapter.setAdapterType(MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST);
 			}	
@@ -401,34 +408,12 @@ public class InboxFragmentLollipop extends Fragment{
 			adapter.setMultipleSelect(false);
 
 			recyclerView.setAdapter(adapter);
-			contentText.setText(MegaApiUtils.getInfoFolder(inboxNode, context));
 
-			log("call to setNodes");
 			setNodes(nodes);
-
-			if (adapter.getItemCount() == 0){
-
-				recyclerView.setVisibility(View.GONE);
-				emptyImageView.setVisibility(View.VISIBLE);
-				emptyTextView.setVisibility(View.VISIBLE);
-
-				if (megaApi.getInboxNode().getHandle()==parentHandle||parentHandle==-1) {
-					emptyImageView.setImageResource(R.drawable.inbox_empty);
-					emptyTextView.setText(R.string.empty_inbox);
-				} else {
-					emptyImageView.setImageResource(R.drawable.ic_empty_folder);
-					emptyTextView.setText(R.string.file_browser_empty_folder);
-				}
-			}
-			else{
-				recyclerView.setVisibility(View.VISIBLE);
-				emptyImageView.setVisibility(View.GONE);
-				emptyTextView.setVisibility(View.GONE);
-			}
-
 			return v;
 		}
 		else{
+			log("isGrid View");
 			View v = inflater.inflate(R.layout.fragment_inboxgrid, container, false);
 			
 			recyclerView = (CustomizedGridRecyclerView) v.findViewById(R.id.inbox_grid_view);
@@ -437,35 +422,32 @@ public class InboxFragmentLollipop extends Fragment{
 
 			recyclerView.setItemAnimator(new DefaultItemAnimator());
 
-	        emptyImageView = (ImageView) v.findViewById(R.id.inbox_grid_empty_image);
-			emptyTextView = (TextView) v.findViewById(R.id.inbox_grid_empty_text);
-			emptyImageView.setImageResource(R.drawable.inbox_empty);
-			emptyTextView.setText(R.string.empty_inbox);
+			emptyImageView = (ImageView) v.findViewById(R.id.inbox_grid_empty_image);
+			emptyTextView = (LinearLayout) v.findViewById(R.id.inbox_grid_empty_text);
+			emptyTextViewFirst = (TextView) v.findViewById(R.id.inbox_grid_empty_text_first);
+			emptyTextViewSecond = (TextView) v.findViewById(R.id.inbox_grid_empty_text_second);
+
+
+//			emptyImageView.setImageResource(R.drawable.inbox_empty);
+//			emptyTextView.setText(R.string.empty_inbox);
 
 			contentTextLayout = (RelativeLayout) v.findViewById(R.id.inbox_grid_content_text_layout);
 			contentText = (TextView) v.findViewById(R.id.inbox_content_grid_text);			
 
 			if (adapter == null){
-				adapter = new MegaBrowserLollipopAdapter(context, this, nodes, parentHandle, recyclerView, aB, Constants.INBOX_ADAPTER, MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_GRID);
+				adapter = new MegaBrowserLollipopAdapter(context, this, nodes, ((ManagerActivityLollipop) context).parentHandleInbox, recyclerView, aB, Constants.INBOX_ADAPTER, MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_GRID);
 			}
 			else{
-				adapter.setParentHandle(parentHandle);
+				adapter.setParentHandle(((ManagerActivityLollipop) context).parentHandleInbox);
 				adapter.setNodes(nodes);
 				adapter.setAdapterType(MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_GRID);
 			}
 
 			recyclerView.setAdapter(adapter);
 
-			contentText.setText(MegaApiUtils.getInfoFolder(inboxNode, context));
 			setNodes(nodes);
 
-			if (megaApi.getInboxNode().getHandle()==parentHandle||parentHandle==-1) {
-				emptyImageView.setImageResource(R.drawable.inbox_empty);
-				emptyTextView.setText(R.string.empty_inbox);
-			} else {
-				emptyImageView.setImageResource(R.drawable.ic_empty_folder);
-				emptyTextView.setText(R.string.file_browser_empty_folder);
-			}
+			setContentText();
 
 			return v;	
 		}
@@ -473,11 +455,11 @@ public class InboxFragmentLollipop extends Fragment{
 	
 	public void refresh(){
 		log("refresh");
-		if(parentHandle==-1||parentHandle==inboxNode.getHandle()){
+		if(((ManagerActivityLollipop) context).parentHandleInbox==-1||((ManagerActivityLollipop) context).parentHandleInbox==inboxNode.getHandle()){
 			nodes = megaApi.getChildren(inboxNode, ((ManagerActivityLollipop)context).orderCloud);
 		}
 		else{
-			MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
+			MegaNode parentNode = megaApi.getNodeByHandle(((ManagerActivityLollipop) context).parentHandleInbox);
 			if(parentNode!=null){
 				log("parentNode: "+parentNode.getName());
 				nodes = megaApi.getChildren(parentNode, ((ManagerActivityLollipop)context).orderCloud);
@@ -485,10 +467,6 @@ public class InboxFragmentLollipop extends Fragment{
 		}
 
 		setNodes(nodes);
-		contentText.setText(MegaApiUtils.getInfoFolder(inboxNode, context));
-		if(adapter != null){				
-			adapter.notifyDataSetChanged();
-		}		
 	}
 
 	@Override
@@ -518,7 +496,7 @@ public class InboxFragmentLollipop extends Fragment{
 				MegaNode n = nodes.get(position);
 
 				int lastFirstVisiblePosition = 0;
-				if(isList){
+				if(((ManagerActivityLollipop) context).isList){
 					lastFirstVisiblePosition = mLayoutManager.findFirstCompletelyVisibleItemPosition();
 				}
 				else{
@@ -537,34 +515,13 @@ public class InboxFragmentLollipop extends Fragment{
 				((ManagerActivityLollipop)context).setFirstNavigationLevel(false);
 				((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 
-				parentHandle = nodes.get(position).getHandle();
-				MegaNode infoNode = megaApi.getNodeByHandle(parentHandle);
-				contentText.setText(MegaApiUtils.getInfoFolder(infoNode, context));
-				adapter.setParentHandle(parentHandle);
+				((ManagerActivityLollipop) context).setParentHandleInbox(nodes.get(position).getHandle());
 				nodes = megaApi.getChildren(nodes.get(position), ((ManagerActivityLollipop)context).orderCloud);
 				adapter.setNodes(nodes);
+
+				setContentText();
+
 				recyclerView.scrollToPosition(0);
-
-				//If folder has no files
-				if (adapter.getItemCount() == 0){
-
-					if (megaApi.getInboxNode().getHandle()==n.getHandle()||parentHandle==-1) {
-						emptyImageView.setImageResource(R.drawable.inbox_empty);
-						emptyTextView.setText(R.string.empty_inbox);
-					} else {
-						emptyImageView.setImageResource(R.drawable.ic_empty_folder);
-						emptyTextView.setText(R.string.file_browser_empty_folder);
-					}
-					recyclerView.setVisibility(View.GONE);
-					emptyImageView.setVisibility(View.VISIBLE);
-					emptyTextView.setVisibility(View.VISIBLE);
-				}
-				else{
-					recyclerView.setVisibility(View.VISIBLE);
-					emptyImageView.setVisibility(View.GONE);
-					emptyTextView.setVisibility(View.GONE);
-				}
-
 			}
 			else{
 				if (MimeTypeList.typeForName(nodes.get(position).getName()).isImage()){
@@ -584,30 +541,112 @@ public class InboxFragmentLollipop extends Fragment{
 					intent.putExtra("orderGetChildren", ((ManagerActivityLollipop)context).orderCloud);
 					startActivity(intent);
 				}
-				else if (MimeTypeList.typeForName(nodes.get(position).getName()).isVideo() || MimeTypeList.typeForName(nodes.get(position).getName()).isAudio() ){
+				else if (MimeTypeList.typeForName(nodes.get(position).getName()).isVideoReproducible() || MimeTypeList.typeForName(nodes.get(position).getName()).isAudio() ){
 					MegaNode file = nodes.get(position);
-					Intent service = new Intent(context, MegaStreamingService.class);
-					context.startService(service);
-					String fileName = file.getName();
-					try {
-						fileName = URLEncoder.encode(fileName, "UTF-8").replaceAll("\\+", "%20");
-					}
-					catch (UnsupportedEncodingException e) {
-						e.printStackTrace();
+
+					if (megaApi.httpServerIsRunning() == 0) {
+						megaApi.httpServerStart();
 					}
 
-					String url = "http://127.0.0.1:4443/" + file.getBase64Handle() + "/" + fileName;
+					ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
+					ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+					activityManager.getMemoryInfo(mi);
+
+					if(mi.totalMem>Constants.BUFFER_COMP){
+						log("Total mem: "+mi.totalMem+" allocate 32 MB");
+						megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
+					}
+					else{
+						log("Total mem: "+mi.totalMem+" allocate 16 MB");
+						megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
+					}
+
+					String url = megaApi.httpServerGetLocalLink(file);
 					String mimeType = MimeTypeList.typeForName(file.getName()).getType();
-					System.out.println("FILENAME: " + fileName);
+					log("FILENAME: " + file.getName());
 
-					Intent mediaIntent = new Intent(Intent.ACTION_VIEW);
-					mediaIntent.setDataAndType(Uri.parse(url), mimeType);
+					Intent mediaIntent;
+					if (MimeTypeList.typeForName(file.getName()).isVideoNotSupported()){
+						mediaIntent = new Intent(Intent.ACTION_VIEW);
+					}
+					else {
+						mediaIntent = new Intent(context, AudioVideoPlayerLollipop.class);
+					}
+					mediaIntent.putExtra("HANDLE", file.getHandle());
+					mediaIntent.putExtra("FILENAME", file.getName());
+					String localPath = Util.getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
+					if (localPath != null){
+						File mediaFile = new File(localPath);
+						//mediaIntent.setDataAndType(Uri.parse(localPath), mimeType);
+						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+							mediaIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile), MimeTypeList.typeForName(file.getName()).getType());
+						}
+						else{
+							mediaIntent.setDataAndType(Uri.fromFile(mediaFile), MimeTypeList.typeForName(file.getName()).getType());
+						}
+						mediaIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+					}
+					else {
+						mediaIntent.setDataAndType(Uri.parse(url), mimeType);
+					}
 					if (MegaApiUtils.isIntentAvailable(context, mediaIntent)){
 						startActivity(mediaIntent);
 					}
 					else{
 						Toast.makeText(context, context.getResources().getString(R.string.intent_not_available), Toast.LENGTH_LONG).show();
 						adapter.notifyDataSetChanged();
+						ArrayList<Long> handleList = new ArrayList<Long>();
+						handleList.add(nodes.get(position).getHandle());
+						NodeController nC = new NodeController(context);
+						nC.prepareForDownload(handleList);
+					}
+				}else if (MimeTypeList.typeForName(nodes.get(position).getName()).isPdf()){
+					MegaNode file = nodes.get(position);
+
+					if (megaApi.httpServerIsRunning() == 0) {
+						megaApi.httpServerStart();
+					}
+
+					ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
+					ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+					activityManager.getMemoryInfo(mi);
+
+					if(mi.totalMem>Constants.BUFFER_COMP){
+						log("Total mem: "+mi.totalMem+" allocate 32 MB");
+						megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
+					}
+					else{
+						log("Total mem: "+mi.totalMem+" allocate 16 MB");
+						megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
+					}
+
+					String url = megaApi.httpServerGetLocalLink(file);
+					String mimeType = MimeTypeList.typeForName(file.getName()).getType();
+					log("FILENAME: " + file.getName() + "TYPE: "+mimeType);
+
+					Intent pdfIntent = new Intent(context, PdfViewerActivityLollipop.class);
+					pdfIntent.putExtra("APP", true);
+					String localPath = Util.getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
+					if (localPath != null){
+						File mediaFile = new File(localPath);
+						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+							pdfIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile), MimeTypeList.typeForName(file.getName()).getType());
+						}
+						else{
+							pdfIntent.setDataAndType(Uri.fromFile(mediaFile), MimeTypeList.typeForName(file.getName()).getType());
+						}
+						pdfIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+					}
+					else {
+						pdfIntent.setDataAndType(Uri.parse(url), mimeType);
+					}
+					pdfIntent.putExtra("HANDLE", file.getHandle());
+					if (MegaApiUtils.isIntentAvailable(context, pdfIntent)){
+						startActivity(pdfIntent);
+					}
+					else{
+						Toast.makeText(context, context.getResources().getString(R.string.intent_not_available), Toast.LENGTH_LONG).show();
+
 						ArrayList<Long> handleList = new ArrayList<Long>();
 						handleList.add(nodes.get(position).getHandle());
 						NodeController nC = new NodeController(context);
@@ -720,12 +759,9 @@ public class InboxFragmentLollipop extends Fragment{
 			return 0;
 		}
 
-		MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(parentHandle));
+		MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(((ManagerActivityLollipop) context).parentHandleInbox));
 		if (parentNode != null) {
 			log("ParentNode: "+parentNode.getName());
-			recyclerView.setVisibility(View.VISIBLE);
-			emptyImageView.setVisibility(View.GONE);
-			emptyTextView.setVisibility(View.GONE);
 
 			if (parentNode.getHandle() == megaApi.getInboxNode().getHandle()){
 				aB.setTitle(getString(R.string.section_inbox));
@@ -740,10 +776,9 @@ public class InboxFragmentLollipop extends Fragment{
 
 			((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 
-			parentHandle = parentNode.getHandle();
-			((ManagerActivityLollipop)context).setParentHandleInbox(parentHandle);
+			((ManagerActivityLollipop) context).setParentHandleInbox(parentNode.getHandle());
 			nodes = megaApi.getChildren(parentNode, ((ManagerActivityLollipop)context).orderCloud);
-			adapter.setNodes(nodes);
+			setNodes(nodes);
 
 			int lastVisiblePosition = 0;
 			if(!lastPositionStack.empty()){
@@ -754,17 +789,13 @@ public class InboxFragmentLollipop extends Fragment{
 
 			if(lastVisiblePosition>=0){
 
-				if(isList){
+				if(((ManagerActivityLollipop) context).isList){
 					mLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
 				}
 				else{
 					gridLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
 				}
 			}
-
-			adapter.setParentHandle(parentHandle);
-
-			contentText.setText(MegaApiUtils.getInfoFolder(parentNode, context));
 			return 2;
 		}
 		else{
@@ -772,25 +803,14 @@ public class InboxFragmentLollipop extends Fragment{
 		}
 	}
 
-	public void setIsList(boolean isList){
-		this.isList = isList;
-	}
-	
 	public boolean getIsList(){
-		return isList;
+		return ((ManagerActivityLollipop) context).isList;
 	}
 	
 	public long getParentHandle(){
-		return adapter.getParentHandle();
+		return ((ManagerActivityLollipop) context).parentHandleInbox;
 	}
-	
-	public void setParentHandle(long parentHandle){
-		this.parentHandle = parentHandle;
-		if (adapter != null){
-			adapter.setParentHandle(parentHandle);
-		}
-	}
-	
+
 	public RecyclerView getRecyclerView(){
 		return recyclerView;
 	}
@@ -800,25 +820,52 @@ public class InboxFragmentLollipop extends Fragment{
 		this.nodes = nodes;
 		if (adapter != null){
 			adapter.setNodes(nodes);
-			if (adapter.getItemCount() == 0){
-				recyclerView.setVisibility(View.GONE);
-				emptyImageView.setVisibility(View.VISIBLE);
-				emptyTextView.setVisibility(View.VISIBLE);
+			setContentText();
+		}	
+	}
 
-				if (megaApi.getInboxNode().getHandle()==parentHandle||parentHandle==-1) {
+	public void setContentText(){
+		log("setContentText");
+
+		if (adapter.getItemCount() == 0){
+
+			recyclerView.setVisibility(View.GONE);
+			emptyImageView.setVisibility(View.VISIBLE);
+			emptyTextView.setVisibility(View.VISIBLE);
+			contentTextLayout.setVisibility(View.GONE);
+
+			if (megaApi.getInboxNode().getHandle()==((ManagerActivityLollipop)context).parentHandleInbox||((ManagerActivityLollipop)context).parentHandleInbox==-1) {
+				if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+					emptyImageView.setImageResource(R.drawable.inbox_empty_landscape);
+				}else{
 					emptyImageView.setImageResource(R.drawable.inbox_empty);
-					emptyTextView.setText(R.string.empty_inbox);
-				} else {
-					emptyImageView.setImageResource(R.drawable.ic_empty_folder);
-					emptyTextView.setText(R.string.file_browser_empty_folder);
+				}
+				emptyTextViewFirst.setText(R.string.context_empty_inbox);
+				String text = getString(R.string.section_inbox);
+				emptyTextViewSecond.setText(" "+text+".");
+
+			} else {
+				emptyImageView.setImageResource(R.drawable.ic_empty_folder);
+				emptyTextViewFirst.setText(R.string.file_browser_empty_folder);
+			}
+		}
+		else{
+			recyclerView.setVisibility(View.VISIBLE);
+			emptyImageView.setVisibility(View.GONE);
+			emptyTextView.setVisibility(View.GONE);
+			contentTextLayout.setVisibility(View.VISIBLE);
+
+			if (megaApi.getInboxNode().getHandle()==((ManagerActivityLollipop) context).parentHandleInbox||((ManagerActivityLollipop) context).parentHandleInbox==-1) {
+
+				contentText.setText(MegaApiUtils.getInfoFolder(inboxNode, context));
+			} else {
+				MegaNode parentNode = megaApi.getNodeByHandle(((ManagerActivityLollipop) context).parentHandleInbox);
+
+				if(parentNode!=null){
+					contentText.setText(MegaApiUtils.getInfoFolder(parentNode, context));
 				}
 			}
-			else{
-				recyclerView.setVisibility(View.VISIBLE);
-				emptyImageView.setVisibility(View.GONE);
-				emptyTextView.setVisibility(View.GONE);
-			}			
-		}	
+		}
 	}
 
 	public void notifyDataSetChanged(){

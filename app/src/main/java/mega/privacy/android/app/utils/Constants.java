@@ -33,12 +33,15 @@ public class Constants {
 
 	public static int REQUEST_CODE_IMPORT_CHAT_NODE = 1022;
 	public static int REQUEST_CODE_IMPORT_CHAT_NODE_LIST = 1023;
+	public static int ACTION_SEARCH_BY_DATE = 1024;
 
 	public static String ACTION_REFRESH = "ACTION_REFRESH";
 	public static String ACTION_ENABLE_CHAT = "ACTION_ENABLE_CHAT";
 	public static String ACTION_CREATE_ACCOUNT_EXISTS = "ACTION_CREATE_ACCOUNT_EXISTS";
 	public static String ACTION_CONFIRM = "MEGA_ACTION_CONFIRM";
 	public static String EXTRA_CONFIRMATION = "MEGA_EXTRA_CONFIRMATION";
+
+	public static String ACTION_FORWARD_MESSAGES = "ACTION_FORWARD_MESSAGES";
 
 	public static String SHOW_REPEATED_UPLOAD = "SHOW_REPEATED_UPLOAD";
 
@@ -87,6 +90,8 @@ public class Constants {
 	public static final int REQUEST_WRITE_STORAGE = 1;
 	public static final int REQUEST_CAMERA = 2;
 	public static final int REQUEST_READ_CONTACTS = 3;
+	public static final int RECORD_AUDIO = 4;
+	public static final int REQUEST_UPLOAD_CONTACT = 5;
 
 	public static final int PRO_LITE = 4;
 	public static final int FREE = 0;
@@ -109,7 +114,7 @@ public class Constants {
 	public static String EXTRA_PATH_ZIP = "PATH_ZIP";
 	public static String EXTRA_OPEN_FOLDER = "EXTRA_OPEN_FOLER";
 	public static String ACTION_REFRESH_PARENTHANDLE_BROWSER = "REFRESH_PARENTHANDLE_BROWSER";
-	public static String ACTION_OVERQUOTA_ALERT = "OVERQUOTA_ALERT";
+	public static String ACTION_OVERQUOTA_STORAGE = "OVERQUOTA_STORAGE";
 	public static String ACTION_TAKE_SELFIE = "TAKE_SELFIE";
 	public static String ACTION_SHOW_TRANSFERS = "SHOW_TRANSFERS";
 	public static String ACTION_EXPORT_MASTER_KEY = "EXPORT_MASTER_KEY";
@@ -128,8 +133,9 @@ public class Constants {
 	public static String ACTION_CHAT_SUMMARY = "ACTION_CHAT_SUMMARY";
 	public static String ACTION_INCOMING_SHARED_FOLDER_NOTIFICATION = "ACTION_INCOMING_SHARED_FOLDER_NOTIFICATION";
 	public static String ACTION_OPEN_HANDLE_NODE = "ACTION_OPEN_HANDLE_NODE";
+	public static String ACTION_OPEN_FILE_LINK_ROOTNODES_NULL = "ACTION_OPEN_FILE_LINK_ROOTNODES_NULL";
+	public static String ACTION_OPEN_FOLDER_LINK_ROOTNODES_NULL = "ACTION_OPEN_FOLDER_LINK_ROOTNODES_NULL";
 
-	public static String ACTION_CHAT_NEW = "CHAT_NEW";
 	public static String ACTION_CHAT_SHOW_MESSAGES = "CHAT_SHOW_MESSAGES";
 	public static String ACTION_NEW_CHAT = "NEW_CHAT";
 	public static String ACTION_CLEAR_CHAT = "CLEAR_CHAT";
@@ -137,6 +143,8 @@ public class Constants {
 	public static String ACTION_UPDATE_ATTACHMENT = "UPDATE_ATTACHMENT";
 
 	public static String ACTION_OVERQUOTA_TRANSFER = "OVERQUOTA_TRANSFER";
+
+	public static String ACTION_SHOW_UPGRADE_ACCOUNT = "ACTION_SHOW_UPGRADE_ACCOUNT";
 
 	final public static int CHAT_ADAPTER_SHOW_ALL = 2;
 	final public static int CHAT_ADAPTER_SHOW_TIME = 1;
@@ -159,6 +167,8 @@ public class Constants {
 	final public static int OUTGOING_REQUEST_ADAPTER = 2013;
 	final public static int CAMERA_UPLOAD_ADAPTER = 2014;
 	final public static int NODE_ATTACHMENT_ADAPTER = 2015;
+	final public static int INCOMING_SHARES_PROVIDER_ADAPTER = 2016;
+	final public static int CLOUD_DRIVE_PROVIDER_ADAPTER = 2017;
 
 	final public static int ACCOUNT_DETAILS_MIN_DIFFERENCE = 5;
 	final public static int PAYMENT_METHODS_MIN_DIFFERENCE = 720;
@@ -189,4 +199,13 @@ public class Constants {
 
 	public static int TAKE_PICTURE_OPTION = 0;
 	public static int TAKE_PROFILE_PICTURE = 1;
+
+	final public static String MAIL_ANDROID = "androidfeedback@mega.nz";
+
+	public static int MIN_ITEMS_SCROLLBAR = 30;
+	public static int MIN_ITEMS_SCROLLBAR_GRID = 200;
+
+	public static long BUFFER_COMP = 1073741824;      // 1 GB
+	public static int MAX_BUFFER_16MB = 16777216; // 16 MB
+	public static int MAX_BUFFER_32MB = 33554432; // 32 MB
 }

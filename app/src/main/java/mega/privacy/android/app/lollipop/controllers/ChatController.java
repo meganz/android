@@ -2,9 +2,7 @@ package mega.privacy.android.app.lollipop.controllers;
 
 import android.Manifest;
 import android.app.Activity;
-import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.media.RingtoneManager;
@@ -15,17 +13,12 @@ import android.os.StatFs;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
-import android.support.v7.app.AlertDialog;
 import android.text.Html;
 import android.text.Spanned;
-import android.widget.Toast;
-
-import org.w3c.dom.NodeList;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import mega.privacy.android.app.DatabaseHandler;
@@ -35,10 +28,11 @@ import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.lollipop.ChatFullScreenImageViewer;
+import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
+import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
+import mega.privacy.android.app.lollipop.megachat.ChatFullScreenImageViewer;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
-import mega.privacy.android.app.lollipop.FileStorageActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.ZipBrowserActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.AndroidMegaChatMessage;
@@ -257,10 +251,9 @@ public class ChatController {
         return text;
     }
 
-    public String createManagementString(AndroidMegaChatMessage androidMessage, MegaChatRoom chatRoom) {
+    public String createManagementString(MegaChatMessage message, MegaChatRoom chatRoom) {
         log("createManagementString");
 
-        MegaChatMessage message = androidMessage.getMessage();
         long userHandle = message.getUserHandle();
 
         if (message.getType() == MegaChatMessage.TYPE_ALTER_PARTICIPANTS) {
@@ -676,6 +669,13 @@ public class ChatController {
                 }
             }
         }
+    }
+
+    public String createManagementString(AndroidMegaChatMessage androidMessage, MegaChatRoom chatRoom) {
+        log("createManagementString with AndroidMessage");
+
+        MegaChatMessage message = androidMessage.getMessage();
+        return createManagementString(message, chatRoom);
     }
 
     public String getFirstName(long userHandle, MegaChatRoom chatRoom){
@@ -1360,9 +1360,16 @@ public class ChatController {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             boolean hasStoragePermission = (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
             if (!hasStoragePermission) {
-                ActivityCompat.requestPermissions(((ManagerActivityLollipop) context),
-                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                        Constants.REQUEST_WRITE_STORAGE);
+                if (context instanceof ManagerActivityLollipop) {
+                    ActivityCompat.requestPermissions(((ManagerActivityLollipop) context),
+                            new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                            Constants.REQUEST_WRITE_STORAGE);
+                }
+                else if (context instanceof ChatFullScreenImageViewer){
+                    ActivityCompat.requestPermissions(((ChatFullScreenImageViewer) context),
+                            new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                            Constants.REQUEST_WRITE_STORAGE);
+                }
             }
         }
 
@@ -1410,6 +1417,51 @@ public class ChatController {
 
                             context.startActivity(intentZip);
 
+                        }
+                        else if (MimeTypeList.typeForName(tempNode.getName()).isVideo()) {
+                            log("Video file");
+                            File videoFile = new File(localPath);
+
+                            Intent videoIntent = new Intent(context, AudioVideoPlayerLollipop.class);
+                            videoIntent.putExtra("HANDLE", tempNode.getHandle());
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                                videoIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", videoFile), MimeTypeList.typeForName(tempNode.getName()).getType());
+                            }
+                            else{
+                                videoIntent.setDataAndType(Uri.fromFile(videoFile), MimeTypeList.typeForName(tempNode.getName()).getType());
+                            }
+                            videoIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                            context.startActivity(videoIntent);
+                        }
+                        else if (MimeTypeList.typeForName(tempNode.getName()).isAudio()) {
+                            log("Audio file");
+                            File audioFile = new File(localPath);
+
+                            Intent audioIntent = new Intent(context, AudioVideoPlayerLollipop.class);
+                            audioIntent.putExtra("HANDLE", tempNode.getHandle());
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                                audioIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", audioFile), MimeTypeList.typeForName(tempNode.getName()).getType());
+                            }
+                            else{
+                                audioIntent.setDataAndType(Uri.fromFile(audioFile), MimeTypeList.typeForName(tempNode.getName()).getType());
+                            }
+                            audioIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                            context.startActivity(audioIntent);
+                        }
+                        else if (MimeTypeList.typeForName(tempNode.getName()).isPdf()){
+                            log("Pdf file");
+                            File pdfFile = new File(localPath);
+
+                            Intent pdfIntent = new Intent(context, PdfViewerActivityLollipop.class);
+                            pdfIntent.putExtra("APP", true);
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                                pdfIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", new File(localPath)), MimeTypeList.typeForName(tempNode.getName()).getType());
+                            }
+                            else{
+                                pdfIntent.setDataAndType(Uri.fromFile(new File(localPath)), MimeTypeList.typeForName(tempNode.getName()).getType());
+                            }
+                            pdfIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                            context.startActivity(pdfIntent);
                         }
                         else {
                             log("MimeTypeList other file");
