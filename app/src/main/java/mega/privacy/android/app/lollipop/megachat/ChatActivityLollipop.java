@@ -48,6 +48,9 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.google.firebase.iid.FirebaseInstanceId;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -293,15 +296,21 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 }
                 else{
                     if(!messages.get(position-1).isUploading()){
-                        adapter.setMultipleSelect(true);
 
-                        actionMode = startSupportActionMode(new ActionBarCallBack());
-
-                        if(position<1){
-                            log("Position not valid");
+                        if(MegaApplication.isShowInfoChatMessages()){
+                            showMessageInfo(position);
                         }
                         else{
-                            itemClick(position);
+                            adapter.setMultipleSelect(true);
+
+                            actionMode = startSupportActionMode(new ActionBarCallBack());
+
+                            if(position<1){
+                                log("Position not valid");
+                            }
+                            else{
+                                itemClick(position);
+                            }
                         }
                     }
                 }
@@ -330,12 +339,33 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
     }
 
-    public void showLoadingDialog(){
-        dialog = new ProgressDialog(this);
-        dialog.setTitle("Calculating...");
-        dialog.setMessage("Please wait...");
-        dialog.setIndeterminate(true);
-        dialog.show();
+    public void showMessageInfo(int positionInAdapter){
+
+        int position = positionInAdapter-1;
+
+        if(position<messages.size()) {
+            AndroidMegaChatMessage androidM = messages.get(position);
+            StringBuilder messageToShow = new StringBuilder("");
+            String token = FirebaseInstanceId.getInstance().getToken();
+            if(token!=null){
+                messageToShow.append("FCM TOKEN: " +token);
+            }
+            messageToShow.append("\nCHAT ID: " + MegaApiJava.handleToBase64(idChat));
+            messageToShow.append("\nMY USER HANDLE: " +MegaApiJava.userHandleToBase64(megaChatApi.getMyUserHandle()));
+            if(androidM!=null){
+                MegaChatMessage m = androidM.getMessage();
+                if(m!=null){
+                    messageToShow.append("\nMESSAGE TYPE: " +m.getType());
+                    messageToShow.append("\nMESSAGE TIMESTAMP: " +m.getTimestamp());
+                    messageToShow.append("\nMESSAGE USERHANDLE: " +MegaApiJava.userHandleToBase64(m.getUserHandle()));
+                    messageToShow.append("\nMESSAGE ID: " +MegaApiJava.handleToBase64(m.getMsgId()));
+                    messageToShow.append("\nMESSAGE TEMP ID: " +MegaApiJava.handleToBase64(m.getTempId()));
+                }
+            }
+
+            Toast.makeText(this, messageToShow, Toast.LENGTH_SHORT).show();
+            log("showMessageInfo: "+messageToShow);
+        }
     }
 
     public void showGroupInfoActivity(){
