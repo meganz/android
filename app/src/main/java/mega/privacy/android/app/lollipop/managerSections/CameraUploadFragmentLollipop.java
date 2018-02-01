@@ -1678,8 +1678,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 							mediaIntent.putExtra("HANDLE", psHMegaNode.getHandle());
 							mediaIntent.putExtra("FILENAME", psHMegaNode.getName());
 							String localPath = findLocalPath(psHMegaNode.getName(), psHMegaNode.getSize());
-							log("localpath camerauploads: "+localPath);
-							if (localPath != null){
+							if (localPath != null  && (megaApi.getFingerprint(psHMegaNode).equals(megaApi.getFingerprint(localPath)))){
 								File mediaFile = new File(localPath);
 								if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
 									mediaIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile), MimeTypeList.typeForName(psHMegaNode.getName()).getType());
@@ -1747,15 +1746,18 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 
 		if (listFiles != null){
 			for (int i=0; i<listFiles.length; i++){
+				log("listFiles[]: "+listFiles[i].getAbsolutePath());
 				if (listFiles[i].isDirectory()){
 					path = getPath(fileName, fileSize, listFiles[i].getAbsolutePath());
 					if (path != null) {
+						log("path number X: "+path);
 						return path;
 					}
 				}
 				else {
 					path = Util.getLocalFile(context, fileName, fileSize, listFiles[i].getAbsolutePath());
 					if (path != null) {
+						log("path number X: "+path);
 						return path;
 					}
 				}

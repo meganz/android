@@ -1141,10 +1141,8 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
                         mediaIntent.putExtra("HANDLE", file.getHandle());
                         mediaIntent.putExtra("FILENAME", file.getName());
                         String localPath = findLocalPath(file.getName(), file.getSize());
-                        log("localpath cameraupload: "+localPath+" name: "+file.getName());
-                        if (localPath != null){
+                        if (localPath != null && (megaApi.getFingerprint(file).equals(megaApi.getFingerprint(localPath)))){
                             File mediaFile = new File(localPath);
-                            //mediaIntent.setDataAndType(Uri.parse(localPath), mimeType);
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                                 mediaIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile), MimeTypeList.typeForName(file.getName()).getType());
                             }
@@ -1242,6 +1240,64 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
         }
 
         return null;
+    }
+
+    public String getRealName (String photoSyncName) {
+        String realName = null;
+        String date = "";
+        String time = "";
+        String extension = "";
+        boolean index = false;
+
+        String[] s = photoSyncName.split(" ");
+        if (s != null){
+            if (s.length > 0){
+                date = s[0];
+                time = s[1];
+
+                if (time != null) {
+                    s = time.split("_");
+                    if (s != null){
+                        if (s.length > 0) {
+                            time = s[0];
+                            s = s[s.length-1].split("\\.");
+                            extension = s[s.length-1];
+                            index = true;
+                        }
+                    }
+                    s = time.split("\\.");
+                    if (s != null) {
+                        if (s.length > 0) {
+                            if (!index){
+                                extension = s[s.length-1];
+                            }
+                            time = "";
+                            for (int i= 0; i<s.length-1; i++){
+                                time += s[i];
+                            }
+                        }
+                    }
+                }
+
+                if (date != null) {
+                    s = date.split("-");
+                    if (s != null) {
+                        if (s.length > 0) {
+                            date = "";
+                            for (int i=0; i<s.length; i++) {
+                                date += s[i];
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+
+
+        realName = date + "_" + time + "." + extension;
+
+        return realName;
     }
 
     public void onNodeLongClick(MegaPhotoSyncGridTitleAdapterLollipop.ViewHolderPhotoTitleSyncGridTitle holder, int positionInNodes){

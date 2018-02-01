@@ -632,7 +632,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
                 for(int i=0; i<mediaHandles.size(); i++){
                     n = megaApi.getNodeByHandle(mediaHandles.get(i));
                     localPath = mega.privacy.android.app.utils.Util.getLocalFile(this, n.getName(), n.getSize(), downloadLocationDefaultPath);
-                    if (localPath != null){
+                    if (localPath != null && megaApi.getFingerprint(n).equals(megaApi.getFingerprint(localPath))){
                         mediaFile = new File(localPath);
                         mediaUri = FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", mediaFile);
                         mediaUris.add(mediaUri);
@@ -683,15 +683,37 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
             @Override
             public void onTimelineChanged(Timeline timeline, Object manifest) {
                 log("onTimelineChanged");
+                if (player.getCurrentPosition() > 0){
+                    statusDialog.dismiss();
+                }
             }
 
             @Override
             public void onTracksChanged(TrackGroupArray trackGroups, TrackSelectionArray trackSelections) {
                 log("onTracksChanged");
+
+                loading = true;
+                video = false;
+
+                if (loading && !transferOverquota){
+                    try {
+                        statusDialog.setCanceledOnTouchOutside(false);
+                        statusDialog.show();
+                    }
+                    catch(Exception e){
+                        return;
+                    }
+                }
+                else {
+                    statusDialog.hide();
+                    if (!video) {
+                        audioContainer.setVisibility(View.VISIBLE);
+                    }
+                    else {
+                        audioContainer.setVisibility(View.GONE);
+                    }
+                }
                 if (size > 1) {
-                    statusDialog.show();
-                    video = false;
-                    audioContainer.setVisibility(View.VISIBLE);
                     invalidateOptionsMenu();
                     if (isOffLine){
                         MegaOffline n = mediaOffList.get(player.getCurrentWindowIndex());
@@ -1418,6 +1440,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
         log("onVideoEnabled");
         video = true;
         loading = false;
+        statusDialog.dismiss();
         audioContainer.setVisibility(View.GONE);
     }
 
@@ -1449,6 +1472,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
     @Override
     public void onVideoDisabled(DecoderCounters counters) {
         log("onVideoDisabled");
+        video = false;
     }
 
     @Override
