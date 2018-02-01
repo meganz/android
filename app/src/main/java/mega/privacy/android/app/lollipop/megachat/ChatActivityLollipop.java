@@ -4889,7 +4889,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         lastMessage = messages.get(index);
                     }
                     if(lastMessage!=null){
-                        megaChatApi.setMessageSeen(idChat, lastMessage.getMessage().getMsgId());
+                        if(lastMessage.getMessage()!=null){
+                            megaChatApi.setMessageSeen(idChat, lastMessage.getMessage().getMsgId());
+                        }
                     }
                 }
             }
