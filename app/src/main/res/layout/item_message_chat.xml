@@ -494,7 +494,7 @@
                     android:layout_height="wrap_content"
                     android:textSize="12sp"
                     android:text="name of the contact"
-                    android:textColor="@color/accentColor"
+                    android:textColor="@color/name_my_account"
                     android:layout_marginRight="4dp"
                     android:gravity="left"
                     android:maxLines="1"

@@ -3672,10 +3672,12 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 //Update infoToShow also
                 if (indexToChange == 0) {
                     messages.get(indexToChange).setInfoToShow(AndroidMegaChatMessage.CHAT_ADAPTER_SHOW_ALL);
+                    messages.get(indexToChange).setShowAvatar(true);
                 }
                 else{
                     //Not first element
                     adjustInfoToShow(indexToChange);
+                    setShowAvatar(indexToChange);
 
                     //Create adapter
                     if (adapter == null) {
@@ -3686,7 +3688,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         adapter.modifyMessage(messages, indexToChange+1);
                     }
                 }
-
             }
             else{
                 log("modifyMessageReceived: INDEX change, need to reorder");
