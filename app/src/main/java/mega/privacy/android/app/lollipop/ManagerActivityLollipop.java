@@ -216,7 +216,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 	public long transferCallback = 0;
 
-	String regex = "[*|\\?:\"<>\\{\\}\\\\\\/]";
+	String regex = "[*|\\?:\"<>\\\\\\\\/]";
 
 	TransfersBottomSheetDialogFragment transfersBottomSheet = null;
 

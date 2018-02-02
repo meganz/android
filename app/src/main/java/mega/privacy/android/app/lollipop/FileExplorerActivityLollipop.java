@@ -186,7 +186,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 
 	ArrayList<MegaNode> nodes;
 
-	String regex = "[*|\\?:\"<>\\{\\}\\\\\\/]";
+	String regex = "[*|\\?:\"<>\\\\\\\\/]";
 
 	//	long gParentHandle;
 	long parentHandleIncoming;
@@ -1903,7 +1903,6 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 
 	public void showNewFolderDialog(){
 		log("showNewFolderDialog");
-
 		LinearLayout layout = new LinearLayout(this);
 		layout.setOrientation(LinearLayout.VERTICAL);
 		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -2041,7 +2040,6 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 					textError.setText(getString(R.string.invalid_string));
 					error_layout.setVisibility(View.VISIBLE);
 					input.requestFocus();
-
 				}else{
 					boolean result=matches(regex, value);
 					if(result){
@@ -2049,14 +2047,11 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 						textError.setText(getString(R.string.invalid_characters));
 						error_layout.setVisibility(View.VISIBLE);
 						input.requestFocus();
-
 					}else{
 						createFolder(value);
 						newFolderDialog.dismiss();
 					}
 				}
-
-
 			}
 		});
 	}
@@ -2085,11 +2080,6 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		this.chatListItems = chatListItems;
 
 		if (filePreparedInfos == null){
-//				Intent prueba = getIntent();
-//				Bundle bundle = prueba.getExtras();
-//				Uri uri = (Uri)bundle.get(Intent.EXTRA_STREAM);
-//				log("URI mode UPLOAD in bundle: "+uri);
-
 			FilePrepareTask filePrepareTask = new FilePrepareTask(this);
 			filePrepareTask.execute(getIntent());
 			ProgressDialog temp = null;
@@ -2108,9 +2098,9 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		}
 	}
 
+
 	public void showNewFileDialog(final MegaNode parentNode, final String data){
 		log("showNewFileDialog");
-
 		LinearLayout layout = new LinearLayout(this);
 		layout.setOrientation(LinearLayout.VERTICAL);
 		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -2119,27 +2109,93 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		final EditText input = new EditText(this);
 		layout.addView(input, params);
 
-//		input.setId(EDIT_TEXT_ID);
+		LinearLayout.LayoutParams params1 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+		params1.setMargins(Util.scaleWidthPx(20, outMetrics), 0, Util.scaleWidthPx(17, outMetrics), 0);
+
+		final RelativeLayout error_layout = new RelativeLayout(FileExplorerActivityLollipop.this);
+		layout.addView(error_layout, params1);
+
+		final ImageView error_icon = new ImageView(FileExplorerActivityLollipop.this);
+		error_icon.setImageDrawable(FileExplorerActivityLollipop.this.getResources().getDrawable(R.drawable.ic_input_warning));
+		error_layout.addView(error_icon);
+		RelativeLayout.LayoutParams params_icon = (RelativeLayout.LayoutParams) error_icon.getLayoutParams();
+
+		params_icon.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+		error_icon.setLayoutParams(params_icon);
+
+		error_icon.setColorFilter(ContextCompat.getColor(FileExplorerActivityLollipop.this, R.color.login_warning));
+
+		final TextView textError = new TextView(FileExplorerActivityLollipop.this);
+		error_layout.addView(textError);
+		RelativeLayout.LayoutParams params_text_error = (RelativeLayout.LayoutParams) textError.getLayoutParams();
+		params_text_error.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+		params_text_error.width = ViewGroup.LayoutParams.WRAP_CONTENT;
+		params_text_error.addRule(RelativeLayout.CENTER_VERTICAL);
+		params_text_error.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+		params_text_error.setMargins(Util.scaleWidthPx(3, outMetrics), 0,0,0);
+		textError.setLayoutParams(params_text_error);
+
+		textError.setTextColor(ContextCompat.getColor(FileExplorerActivityLollipop.this, R.color.login_warning));
+		error_layout.setVisibility(View.GONE);
+
+		input.getBackground().mutate().clearColorFilter();
+		input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
+		input.addTextChangedListener(new TextWatcher() {
+			@Override
+			public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+			}
+
+			@Override
+			public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+			}
+
+			@Override
+			public void afterTextChanged(Editable editable) {
+				if(error_layout.getVisibility() == View.VISIBLE){
+					error_layout.setVisibility(View.GONE);
+					input.getBackground().mutate().clearColorFilter();
+					input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
+				}
+			}
+		});
+
 		input.setSingleLine();
 		input.setTextColor(getResources().getColor(R.color.text_secondary));
 		input.setHint(getString(R.string.context_new_file_name));
-//		input.setSelectAllOnFocus(true);
 		input.setImeOptions(EditorInfo.IME_ACTION_DONE);
+
+
 		input.setOnEditorActionListener(new OnEditorActionListener() {
 			@Override
 			public boolean onEditorAction(TextView v, int actionId,KeyEvent event) {
 				if (actionId == EditorInfo.IME_ACTION_DONE) {
 					String value = v.getText().toString().trim();
 					if (value.length() == 0) {
-						return true;
+						input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+						textError.setText(getString(R.string.invalid_string));
+						error_layout.setVisibility(View.VISIBLE);
+						input.requestFocus();
+					}else{
+						boolean result=matches(regex, value);
+						if(result){
+							input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+							textError.setText(getString(R.string.invalid_characters));
+							error_layout.setVisibility(View.VISIBLE);
+							input.requestFocus();
+
+						}else{
+							createFile(value, data, parentNode);
+							newFolderDialog.dismiss();
+						}
 					}
-					createFile(value, data, parentNode);
-					newFolderDialog.dismiss();
 					return true;
 				}
 				return false;
 			}
 		});
+
 		input.setImeActionLabel(getString(R.string.general_create),EditorInfo.IME_ACTION_DONE);
 		input.setOnFocusChangeListener(new View.OnFocusChangeListener() {
 			@Override
@@ -2162,10 +2218,41 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 						createFile(value, data, parentNode);
 					}
 				});
-		builder.setNegativeButton(getString(android.R.string.cancel), null);
+
+		builder.setNegativeButton(getString(android.R.string.cancel), new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialogInterface, int i) {
+				input.getBackground().clearColorFilter();
+			}
+		});
 		builder.setView(layout);
 		newFolderDialog = builder.create();
 		newFolderDialog.show();
+
+		newFolderDialog.getButton(android.support.v7.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener(new   View.OnClickListener() {
+			@Override
+			public void onClick(View v)
+			{
+				String value = input.getText().toString().trim();
+				if (value.length() == 0) {
+					input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+					textError.setText(getString(R.string.invalid_string));
+					error_layout.setVisibility(View.VISIBLE);
+					input.requestFocus();
+				}else{
+					boolean result=matches(regex, value);
+					if(result){
+						input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+						textError.setText(getString(R.string.invalid_characters));
+						error_layout.setVisibility(View.VISIBLE);
+						input.requestFocus();
+					}else{
+						createFile(value, data, parentNode);
+						newFolderDialog.dismiss();
+					}
+				}
+			}
+		});
 	}
 
 	public static boolean matches(String regex, CharSequence input) {
