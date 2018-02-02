@@ -28,12 +28,25 @@
             android:layout_height="match_parent"
             android:fitsSystemWindows="true">
 
-
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
                 <!-- Background -->
+                <RelativeLayout
+                    android:id="@+id/parentLayoutFS"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_alignParentTop="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignParentEnd="true"
+                    android:background="@android:color/transparent">
+                    <FrameLayout
+                        android:id="@+id/fragment_container_local_cameraFS"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@android:color/transparent"/>
+                </RelativeLayout>
                 <SurfaceView
                     android:id="@+id/surface_remote_video"
                     android:layout_width="match_parent"
@@ -42,6 +55,7 @@
                     android:layout_alignParentRight="true"
                     android:layout_alignParentEnd="true">
                 </SurfaceView>
+
 
                 <RelativeLayout
                     android:id="@+id/call_chat_contact_image_layout"
@@ -53,7 +67,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:adjustViewBounds="true"
-                            android:background="@color/blue"
+                            android:background="@android:color/transparent"
                             android:visibility="gone"/>
 
                         <RelativeLayout
@@ -85,7 +99,6 @@
                 </RelativeLayout>
 
                 <!-- Toolbar -->
-
                 <android.support.v7.widget.Toolbar
                     android:id="@+id/call_toolbar"
                     android:layout_width="match_parent"
@@ -95,23 +108,13 @@
                     app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
                     android:fitsSystemWindows="true"/>
 
-                <!--<FrameLayout-->
-                    <!--android:id="@+id/fragment_container_local_camera"-->
-                    <!--android:layout_width="wrap_content"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:layout_marginBottom="25dp"-->
-                    <!--android:layout_marginRight="20dp"-->
-                    <!--app:layout_behavior="@string/appbar_scrolling_view_behavior"-->
-                    <!--android:background="@android:color/transparent"/>-->
-
-
                 <RelativeLayout
                     android:id="@+id/parentLayout"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_marginLeft="5dp"
                     android:layout_marginRight="5dp"
-                    android:layout_marginBottom="100dp"
+                    android:layout_marginBottom="110dp"
                     android:layout_marginTop="60dp"
                     android:background="@android:color/transparent">
                     <FrameLayout
@@ -124,25 +127,15 @@
                         android:background="@android:color/transparent"/>
                 </RelativeLayout>
 
-                <!--<FrameLayout-->
-                    <!--android:id="@+id/fragment_container_local_camera"-->
-                    <!--android:layout_width="wrap_content"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:layout_marginRight="20dp"-->
-                    <!--android:layout_marginBottom="25dp"-->
-                    <!--app:layout_behavior="@string/appbar_scrolling_view_behavior"-->
-                    <!--android:background="@android:color/transparent"/>-->
-
-
                 <!-- My avatar -->
                 <RelativeLayout
                     android:id="@+id/call_chat_my_image_layout"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_above="@+id/linear_buttons"
+                    android:layout_alignParentBottom="true"
                     android:layout_alignParentRight="true"
                     android:layout_marginRight="20dp"
-                    android:layout_marginBottom="25dp"
+                    android:layout_marginBottom="110dp"
                     android:background="@android:color/transparent">
 
                     <RelativeLayout
@@ -177,51 +170,177 @@
                     android:id="@+id/linear_buttons"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentBottom="true"
-                    android:layout_centerHorizontal="true"
-                    android:layout_marginBottom="32dp"
-                    android:orientation="horizontal">
+                    android:background="@android:color/transparent">
 
-                    <android.support.design.widget.FloatingActionButton
-                        android:id="@+id/answer_call_fab"
+                    <RelativeLayout
+                        android:id="@+id/relative_answer_call_fab"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="bottom|end"
-                        android:layout_marginBottom="12dp"
-                        android:layout_marginLeft="16dp"
-                        android:layout_marginRight="16dp"
-                        android:scaleType="center"
-                        android:src="@drawable/ic_phone_white"
-                        app:backgroundTint="@color/accentColor"
-                        app:borderWidth="0dp"
-                        app:elevation="6dp"
-                        app:fabSize="normal"
-                        app:pressedTranslationZ="12dp" />
+                        android:layout_height="match_parent"
+                        android:layout_gravity="bottom"
+                        android:layout_marginRight="36dp"
+                        android:gravity="bottom"
+                        android:background="@android:color/transparent">
 
-                    <android.support.design.widget.FloatingActionButton
-                        android:id="@+id/video_fab"
+                        <android.support.design.widget.FloatingActionButton
+                            android:id="@+id/answer_call_fab"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="24dp"
+                            android:layout_marginTop="12dp"
+                            android:layout_below="@+id/linear_arrow_call"
+                            android:scaleType="center"
+                            android:src="@drawable/ic_phone_white"
+                            app:backgroundTint="@color/accentColor"
+                            app:borderWidth="0dp"
+                            app:elevation="6dp"
+                            app:fabSize="normal"
+                            app:pressedTranslationZ="12dp" />
+
+                        <LinearLayout
+                            android:id="@+id/linear_arrow_call"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerHorizontal="true"
+                            android:orientation="vertical"
+                            android:gravity="bottom"
+                            android:visibility="visible"
+                            android:background="@android:color/transparent">
+                            <ImageView
+                                android:id="@+id/first_arrow_call"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:src="@drawable/ic_expand"
+                                android:layout_centerInParent="true"
+                                android:layout_marginTop="10dp"/>
+                            <ImageView
+                                android:id="@+id/second_arrow_call"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:src="@drawable/ic_expand"
+                                android:layout_centerInParent="true"
+                                android:layout_marginTop="10dp"/>
+                            <ImageView
+                                android:id="@+id/third_arrow_call"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:src="@drawable/ic_expand"
+                                android:layout_centerInParent="true"
+                                android:layout_marginTop="10dp"/>
+                            <ImageView
+                                android:id="@+id/four_arrow_call"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:src="@drawable/ic_expand"
+                                android:layout_centerInParent="true"
+                                android:layout_marginTop="10dp"/>
+                        </LinearLayout>
+
+                    </RelativeLayout>
+
+                    <RelativeLayout
+                        android:id="@+id/relative_video_fab"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="bottom|end"
-                        android:layout_marginBottom="12dp"
-                        android:layout_marginLeft="16dp"
-                        android:layout_marginRight="16dp"
-                        android:scaleType="center"
-                        android:src="@drawable/ic_videocam_white"
-                        app:backgroundTint="@color/accentColor"
-                        app:borderWidth="0dp"
-                        app:elevation="6dp"
-                        app:fabSize="normal"
-                        app:pressedTranslationZ="12dp" />
+                        android:layout_height="match_parent"
+                        android:layout_gravity="bottom"
+                        android:layout_marginRight="36dp"
+                        android:gravity="bottom"
+                        android:background="@android:color/transparent">
+
+                        <android.support.design.widget.FloatingActionButton
+                            android:id="@+id/video_fab"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="24dp"
+                            android:layout_marginTop="12dp"
+                            android:layout_below="@+id/linear_arrow_video"
+                            android:scaleType="center"
+                            android:src="@drawable/ic_videocam_white"
+                            app:backgroundTint="@color/accentColor"
+                            app:borderWidth="0dp"
+                            app:elevation="6dp"
+                            app:fabSize="normal"
+                            app:pressedTranslationZ="12dp"/>
+
+                        <LinearLayout
+                            android:id="@+id/linear_arrow_video"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerHorizontal="true"
+                            android:orientation="vertical"
+                            android:gravity="bottom"
+                            android:visibility="gone"
+                            android:background="@android:color/transparent">
+                            <ImageView
+                                android:id="@+id/first_arrow_video"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:src="@drawable/ic_expand"
+                                android:layout_centerInParent="true"
+                                android:layout_marginTop="10dp"/>
+                            <ImageView
+                                android:id="@+id/second_arrow_video"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:src="@drawable/ic_expand"
+                                android:layout_centerInParent="true"
+                                android:layout_marginTop="10dp"/>
+                            <ImageView
+                                android:id="@+id/third_arrow_video"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:src="@drawable/ic_expand"
+                                android:layout_centerInParent="true"
+                                android:layout_marginTop="10dp"/>
+                            <ImageView
+                                android:id="@+id/four_arrow_video"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:src="@drawable/ic_expand"
+                                android:layout_centerInParent="true"
+                                android:layout_marginTop="10dp"/>
+                        </LinearLayout>
+
+
+                    </RelativeLayout>
+
+                    <!--<android.support.design.widget.FloatingActionButton-->
+                    <!--android:id="@+id/answer_call_fab"-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:layout_gravity="bottom|end"-->
+                    <!--android:layout_marginBottom="24dp"-->
+                    <!--android:layout_marginRight="36dp"-->
+                    <!--android:scaleType="center"-->
+                    <!--android:src="@drawable/ic_phone_white"-->
+                    <!--app:backgroundTint="@color/accentColor"-->
+                    <!--app:borderWidth="0dp"-->
+                    <!--app:elevation="6dp"-->
+                    <!--app:fabSize="normal"-->
+                    <!--app:pressedTranslationZ="12dp" />-->
+
+                    <!--<android.support.design.widget.FloatingActionButton-->
+                    <!--android:id="@+id/video_fab"-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:layout_gravity="bottom"-->
+                    <!--android:layout_marginBottom="24dp"-->
+                    <!--android:layout_marginRight="36dp"-->
+                    <!--android:layout_marginTop="12dp"-->
+                    <!--android:scaleType="center"-->
+                    <!--android:src="@drawable/ic_videocam_white"-->
+                    <!--app:backgroundTint="@color/accentColor"-->
+                    <!--app:borderWidth="0dp"-->
+                    <!--app:elevation="6dp"-->
+                    <!--app:fabSize="normal"-->
+                    <!--app:pressedTranslationZ="12dp" />-->
 
                     <android.support.design.widget.FloatingActionButton
                         android:id="@+id/micro_fab"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="bottom|end"
-                        android:layout_marginBottom="12dp"
-                        android:layout_marginLeft="16dp"
-                        android:layout_marginRight="16dp"
+                        android:layout_gravity="bottom"
+                        android:layout_marginBottom="24dp"
+                        android:layout_marginRight="36dp"
                         android:scaleType="center"
                         android:src="@drawable/ic_record_audio_w"
                         app:backgroundTint="@color/accentColor"
@@ -234,10 +353,8 @@
                         android:id="@+id/hang_fab"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="bottom|end"
-                        android:layout_marginBottom="12dp"
-                        android:layout_marginLeft="16dp"
-                        android:layout_marginRight="16dp"
+                        android:layout_gravity="bottom"
+                        android:layout_marginBottom="24dp"
                         android:scaleType="center"
                         android:src="@drawable/ic_close_white"
                         app:backgroundTint="@color/delete_account"
@@ -247,11 +364,9 @@
                         app:pressedTranslationZ="12dp" />
                 </LinearLayout>
 
-
             </RelativeLayout>
 
         </android.support.design.widget.AppBarLayout>
-
 
     </RelativeLayout>
         <!--</android.support.design.widget.CoordinatorLayout>-->

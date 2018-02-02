@@ -529,6 +529,10 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
         share.setColorFilter(getResources().getColor(R.color.white), PorterDuff.Mode.SRC_ATOP);
         shareIcon.setIcon(share);
 
+        Drawable download = getResources().getDrawable(R.drawable.ic_download_white);
+        download.setColorFilter(getResources().getColor(R.color.white), PorterDuff.Mode.SRC_ATOP);
+        downloadIcon.setIcon(download);
+
         propertiesIcon = menu.findItem(R.id.full_image_viewer_properties);
         chatIcon = menu.findItem(R.id.full_image_viewer_chat);
 
@@ -1159,6 +1163,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
         paymentButton.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v) {
                 alertDialogTransferOverquota.dismiss();
+                transferOverquota = false;
                 showUpgradeAccount();
             }
         });

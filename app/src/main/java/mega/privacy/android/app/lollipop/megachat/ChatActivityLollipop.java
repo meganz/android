@@ -51,6 +51,9 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.google.firebase.iid.FirebaseInstanceId;
 
 import java.io.File;
 import java.io.IOException;
@@ -303,15 +306,21 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 }
                 else{
                     if(!messages.get(position-1).isUploading()){
-                        adapter.setMultipleSelect(true);
 
-                        actionMode = startSupportActionMode(new ActionBarCallBack());
-
-                        if(position<1){
-                            log("Position not valid");
+                        if(MegaApplication.isShowInfoChatMessages()){
+                            showMessageInfo(position);
                         }
                         else{
-                            itemClick(position);
+                            adapter.setMultipleSelect(true);
+
+                            actionMode = startSupportActionMode(new ActionBarCallBack());
+
+                            if(position<1){
+                                log("Position not valid");
+                            }
+                            else{
+                                itemClick(position);
+                            }
                         }
                     }
                 }
@@ -340,12 +349,33 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
     }
 
-    public void showLoadingDialog(){
-        dialog = new ProgressDialog(this);
-        dialog.setTitle("Calculating...");
-        dialog.setMessage("Please wait...");
-        dialog.setIndeterminate(true);
-        dialog.show();
+    public void showMessageInfo(int positionInAdapter){
+
+        int position = positionInAdapter-1;
+
+        if(position<messages.size()) {
+            AndroidMegaChatMessage androidM = messages.get(position);
+            StringBuilder messageToShow = new StringBuilder("");
+            String token = FirebaseInstanceId.getInstance().getToken();
+            if(token!=null){
+                messageToShow.append("FCM TOKEN: " +token);
+            }
+            messageToShow.append("\nCHAT ID: " + MegaApiJava.handleToBase64(idChat));
+            messageToShow.append("\nMY USER HANDLE: " +MegaApiJava.userHandleToBase64(megaChatApi.getMyUserHandle()));
+            if(androidM!=null){
+                MegaChatMessage m = androidM.getMessage();
+                if(m!=null){
+                    messageToShow.append("\nMESSAGE TYPE: " +m.getType());
+                    messageToShow.append("\nMESSAGE TIMESTAMP: " +m.getTimestamp());
+                    messageToShow.append("\nMESSAGE USERHANDLE: " +MegaApiJava.userHandleToBase64(m.getUserHandle()));
+                    messageToShow.append("\nMESSAGE ID: " +MegaApiJava.handleToBase64(m.getMsgId()));
+                    messageToShow.append("\nMESSAGE TEMP ID: " +MegaApiJava.handleToBase64(m.getTempId()));
+                }
+            }
+
+            Toast.makeText(this, messageToShow, Toast.LENGTH_SHORT).show();
+            log("showMessageInfo: "+messageToShow);
+        }
     }
 
     public void showGroupInfoActivity(){
@@ -1145,34 +1175,28 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         }
 
                         leaveMenuItem.setVisible(true);
-                        callMenuItem.setVisible(true);
-                        videoMenuItem.setVisible(true);
-
                     }
                     else if(permission==MegaChatRoom.PRIV_RM) {
                         log("Group chat PRIV_RM");
                         leaveMenuItem.setVisible(false);
-                        callMenuItem.setVisible(false);
-                        videoMenuItem.setVisible(false);
                         clearHistoryMenuItem.setVisible(false);
                         inviteMenuItem.setVisible(false);
                     }
                     else if(permission==MegaChatRoom.PRIV_RO) {
                         log("Group chat PRIV_RM");
                         leaveMenuItem.setVisible(true);
-                        callMenuItem.setVisible(false);
-                        videoMenuItem.setVisible(false);
                         clearHistoryMenuItem.setVisible(false);
                         inviteMenuItem.setVisible(false);
                     }
                     else{
                         log("Permission: "+permission);
                         leaveMenuItem.setVisible(true);
-                        callMenuItem.setVisible(true);
-                        videoMenuItem.setVisible(true);
                         clearHistoryMenuItem.setVisible(false);
                         inviteMenuItem.setVisible(false);
                     }
+
+                    callMenuItem.setVisible(false);
+                    videoMenuItem.setVisible(false);
 
                     contactInfoMenuItem.setTitle(getString(R.string.group_chat_info_label));
                     contactInfoMenuItem.setVisible(true);
@@ -1189,6 +1213,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         clearHistoryMenuItem.setVisible(true);
                         contactInfoMenuItem.setTitle(getString(R.string.contact_properties_activity));
                         contactInfoMenuItem.setVisible(true);
+                        callMenuItem.setVisible(true);
+                        videoMenuItem.setVisible(true);
                     }
                     leaveMenuItem.setVisible(false);
                 }
@@ -2163,6 +2189,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     editingMessage = true;
                     messageToEdit = messagesSelected.get(0).getMessage();
                     textChat.setText(messageToEdit.getContent());
+                    textChat.setSelection(textChat.getText().length());
                     //Show keyboard
 
                     break;
