@@ -120,6 +120,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.UserCredentials;
+import mega.privacy.android.app.VideoDownsampling;
 import mega.privacy.android.app.components.EditTextCursorWatcher;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.lollipop.adapters.CloudDrivePagerAdapter;
@@ -12240,7 +12241,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					intent.putExtra(UploadService.EXTRA_NAME, info.getTitle());
 					intent.putExtra(UploadService.EXTRA_PARENT_HASH, parentNode.getHandle());
 					intent.putExtra(UploadService.EXTRA_SIZE, info.getSize());
-					startService(intent);
+//					startService(intent);
+					File videoFile = new File(info.getFileAbsolutePath());
+					try {
+						new File(new VideoDownsampling().changeResolution(videoFile.getAbsoluteFile()));
+					} catch (Throwable throwable) {
+						throwable.printStackTrace();
+					}
+
 				}
 			}
 		}
