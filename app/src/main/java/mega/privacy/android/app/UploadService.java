@@ -333,10 +333,10 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 		//Delete recursively all files and folder
 		if (f.exists()) {
 			if (f.isDirectory()) {
-			    for (File c : f.listFiles())
-			      c.delete();
+				if(f.list().length<=0){
+					f.delete();
+				}
 			}
-			f.delete();
 		}
 	}
 
@@ -530,10 +530,10 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 				File f = new File(pathSelfie);
 				//Delete recursively all files and folder
 				if (f.isDirectory()) {
-					for (File c : f.listFiles())
-						c.delete();
+					if(f.list().length<=0){
+						f.delete();
+					}
 				}
-				f.delete();
 
 			} else {
 				if (error.getErrorCode() == MegaError.API_OK) {
@@ -617,10 +617,6 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 					megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD, this);
 				}
 
-				if (megaApi.getNumPendingUploads() == 0 && transfersCount == 0) {
-					onQueueComplete();
-				}
-
 				log("IN Finish: " + transfer.getFileName() + "path? " + transfer.getPath());
 				String pathSelfie = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.temporalPicDIR;
 				if (transfer.getPath() != null) {
@@ -630,6 +626,10 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 					}
 				} else {
 					log("transfer.getPath() is NULL");
+				}
+
+				if (megaApi.getNumPendingUploads() == 0 && transfersCount == 0) {
+					onQueueComplete();
 				}
 			}
 		}
