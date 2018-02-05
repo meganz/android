@@ -12,6 +12,7 @@ import android.media.MediaMetadataRetriever;
 import android.net.wifi.WifiManager;
 import android.net.wifi.WifiManager.WifiLock;
 import android.os.Build;
+import android.os.Environment;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
@@ -256,6 +257,17 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 		mNotificationManager.cancel(notificationId);
 		stopSelf();
 		log("after stopSelf");
+		String pathSelfie = Environment.getExternalStorageDirectory().getAbsolutePath() +"/"+ Util.temporalPicDIR;
+		File f = new File(pathSelfie);
+		//Delete recursively all files and folder
+		if (f.exists()) {
+			if (f.isDirectory()) {
+				if(f.list().length<=0){
+					f.delete();
+				}
+			}
+
+		}
 	}
 
 	@SuppressLint("NewApi")
@@ -383,6 +395,17 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 
             ChatUploadService.this.cancel();
             log("after cancel");
+			String pathSelfie = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.temporalPicDIR;
+			File f = new File(pathSelfie);
+			//Delete recursively all files and folder
+			if (f.isDirectory()) {
+				if (f.isDirectory()) {
+					if(f.list().length<=0){
+						f.delete();
+					}
+				}
+			}
+			f.delete();
         }
         else{
             if (error.getErrorCode() == MegaError.API_OK) {
@@ -564,6 +587,15 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 			}
 
             log("IN Finish: "+transfer.getFileName()+" path: "+transfer.getPath());
+			String pathSelfie = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.temporalPicDIR;
+			if (transfer.getPath() != null) {
+				if (transfer.getPath().startsWith(pathSelfie)) {
+					File f = new File(transfer.getPath());
+					f.delete();
+				}
+			} else {
+				log("transfer.getPath() is NULL");
+			}
         }
 
 		if (megaApi.getNumPendingUploads() == 0 && transfersCount==0){

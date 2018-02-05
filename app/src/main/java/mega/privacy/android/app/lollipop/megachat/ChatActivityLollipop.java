@@ -5016,12 +5016,51 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
         log("name of the file: "+selfie.getName());
         log("size of the file: "+selfie.length());
-        String fingerprint = megaApi.getFingerprint(selfie.getAbsolutePath());
 
-        long idNode = dbH.setNodeAttachment(selfie.getAbsolutePath(), selfie.getName(), fingerprint);
-        dbH.setMsgNode(idPendingMsg, idNode);
+        PendingNodeAttachment nodeAttachment = null;
 
-        PendingNodeAttachment nodeAttachment = new PendingNodeAttachment(selfie.getAbsolutePath(), fingerprint, selfie.getName());
+        if(sendOriginalAttachments){
+            String fingerprint = megaApi.getFingerprint(selfie.getAbsolutePath());
+
+            //Add node to db
+            long idNode = dbH.setNodeAttachment(selfie.getAbsolutePath(), selfie.getName(), fingerprint);
+
+            dbH.setMsgNode(idPendingMsg, idNode);
+
+            nodeAttachment = new PendingNodeAttachment(selfie.getAbsolutePath(), fingerprint, selfie.getName());
+
+        }
+        else{
+            File previewDir = PreviewUtils.getPreviewFolder(this);
+            String nameFilePreview = idChat+"_"+selfie.getName();
+            File preview = new File(previewDir, nameFilePreview);
+
+            boolean isPreview = megaApi.createPreview(selfie.getAbsolutePath(), preview.getAbsolutePath());
+
+            if(isPreview){
+                log("Preview: "+preview.getAbsolutePath());
+                String fingerprint = megaApi.getFingerprint(preview.getAbsolutePath());
+
+                //Add node to db
+                long idNode = dbH.setNodeAttachment(preview.getAbsolutePath(), selfie.getName(), fingerprint);
+
+                dbH.setMsgNode(idPendingMsg, idNode);
+
+                nodeAttachment = new PendingNodeAttachment(preview.getAbsolutePath(), fingerprint, selfie.getName());
+            }
+            else{
+                log("No preview");
+                String fingerprint = megaApi.getFingerprint(selfie.getAbsolutePath());
+
+                //Add node to db
+                long idNode = dbH.setNodeAttachment(selfie.getAbsolutePath(), selfie.getName(), fingerprint);
+
+                dbH.setMsgNode(idPendingMsg, idNode);
+
+                nodeAttachment = new PendingNodeAttachment(selfie.getAbsolutePath(), fingerprint, selfie.getName());
+            }
+        }
+
         ArrayList<PendingNodeAttachment> nodeAttachments = new ArrayList<>();
         nodeAttachments.add(nodeAttachment);
         PendingMessage newPendingMsg = new PendingMessage(idPendingMsg, idChat, nodeAttachments, timestamp, PendingMessage.STATE_SENDING);
@@ -5033,5 +5072,4 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
         startService(intent);
     }
-
 }
