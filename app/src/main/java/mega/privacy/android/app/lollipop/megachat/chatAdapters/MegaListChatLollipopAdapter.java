@@ -110,7 +110,6 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
     public static class ViewHolderChatList extends ViewHolder{
     	public ViewHolderChatList(View arg0) {
 			super(arg0);
-			// TODO Auto-generated constructor stub
 		}
     	RoundedImageView imageView;
     	TextView contactInitialLetter;

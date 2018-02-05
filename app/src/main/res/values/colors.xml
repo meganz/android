@@ -130,6 +130,10 @@
     <color name="scroll_handle">#90d90007</color>
     <color name="camera_uploads_list_view">#FFF5F5F5</color>
     <color name="transparent_black2">#99000000</color>
-    <color name="disable_fab_chat_call">#CC444444</color>
 
+    <color name="own_messages">#FF00BFA6</color>
+
+    <color name="keyboard_chat_separator">#1F000000</color>
+    <color name="background_chat">#FFFFFFFF</color>
+    <color name="disable_fab_chat_call">#CC444444</color>
 </resources>

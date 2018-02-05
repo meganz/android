@@ -1,14 +1,18 @@
 package mega.privacy.android.app.lollipop.megachat;
 
 
-import java.util.ArrayList;
-
 import nz.mega.sdk.MegaChatMessage;
 
 public class AndroidMegaChatMessage {
+
+    final public static int CHAT_ADAPTER_SHOW_TIME = 1;
+    final public static int CHAT_ADAPTER_SHOW_NOTHING = 0;
+    final public static int CHAT_ADAPTER_SHOW_ALL = 2;
+
     MegaChatMessage message;
     PendingMessage pendingMessage;
     int infoToShow=-1;
+    boolean showAvatar = true;
     boolean uploading = false;
 
     public AndroidMegaChatMessage(MegaChatMessage message) {
@@ -50,5 +54,13 @@ public class AndroidMegaChatMessage {
 
     public void setPendingMessage(PendingMessage pendingMessage) {
         this.pendingMessage = pendingMessage;
+    }
+
+    public boolean isShowAvatar() {
+        return showAvatar;
+    }
+
+    public void setShowAvatar(boolean showAvatar) {
+        this.showAvatar = showAvatar;
     }
 }
