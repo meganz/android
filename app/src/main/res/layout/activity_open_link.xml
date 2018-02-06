@@ -42,17 +42,28 @@
         android:layout_below="@id/open_link_text"
         android:layout_marginTop="10dp" />
 
-    <TextView
-        android:id="@+id/open_link_accept_button"
+    <RelativeLayout
+        android:id="@+id/container_accept_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
-        android:fontFamily="sans-serif-medium"
-        android:layout_marginTop="40dp"
-        android:layout_marginRight="30dp"
-        android:textColor="@color/accentColor"
-        android:text="@string/cam_sync_ok"
-        android:layout_below="@+id/open_link_error"
-        android:textSize="14sp"/>
+        android:layout_below="@+id/open_link_error">
+
+        <TextView
+            android:id="@+id/open_link_accept_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:fontFamily="sans-serif-medium"
+            android:layout_marginLeft="20dp"
+            android:layout_marginBottom="20dp"
+            android:layout_marginTop="40dp"
+            android:layout_marginRight="40dp"
+            android:textColor="@color/accentColor"
+            android:text="@string/cam_sync_ok"
+            android:textSize="14sp"/>
+
+    </RelativeLayout>
 
 </RelativeLayout>
