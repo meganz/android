@@ -35,25 +35,26 @@ public class VideoDownsampling {
     private static final String OUTPUT_AUDIO_MIME_TYPE = "audio/mp4a-latm";
     private static final int OUTPUT_AUDIO_CHANNEL_COUNT = 2;
     private static final int OUTPUT_AUDIO_BIT_RATE = 128 * 1024;
-    private static final int OUTPUT_AUDIO_AAC_PROFILE =
-            MediaCodecInfo.CodecProfileLevel.AACObjectHE;
+    private static final int OUTPUT_AUDIO_AAC_PROFILE = MediaCodecInfo.CodecProfileLevel.AACObjectHE;
     private static final int OUTPUT_AUDIO_SAMPLE_RATE_HZ = 44100;
 
     private int mWidth = 1280;
     private int mHeight = 720;
     private String mOutputFile, mInputFile;
+    private long sizeInputFile, sizeRead;
+    private int percentage;
 
     public String changeResolution(File f) throws Throwable {
         log("changeResolution");
-        mInputFile=f.getAbsolutePath();
-
-        String filePath = mInputFile.substring(0, mInputFile.lastIndexOf(File.separator));
+        mInputFile = f.getAbsolutePath();
+        sizeInputFile = f.length(); log("Size: "+sizeInputFile);
+        sizeRead = percentage = 0;
+//        String filePath = mInputFile.substring(0, mInputFile.lastIndexOf(File.separator));
         String[] splitByDot = mInputFile.split("\\.");
         String ext="";
         if(splitByDot!=null && splitByDot.length>1)
             ext = splitByDot[splitByDot.length-1];
-        String fileName = mInputFile.substring(mInputFile.lastIndexOf(File.separator)+1,
-                mInputFile.length());
+        String fileName = mInputFile.substring(mInputFile.lastIndexOf(File.separator)+1, mInputFile.length());
         if(ext.length()>0)
             fileName=fileName.replace("."+ext, "_out.mp4");
         else
@@ -127,8 +128,7 @@ public class VideoDownsampling {
             MediaMetadataRetriever m = new MediaMetadataRetriever();
             m.setDataSource(mInputFile);
             Bitmap thumbnail = m.getFrameAtTime();
-            int inputWidth = thumbnail.getWidth(),
-                    inputHeight = thumbnail.getHeight();
+            int inputWidth = thumbnail.getWidth(), inputHeight = thumbnail.getHeight();
 
             if(inputWidth>inputHeight){
                 if(mWidth<mHeight){
@@ -376,6 +376,7 @@ public class VideoDownsampling {
                 ByteBuffer decoderInputBuffer = videoDecoderInputBuffers[decoderInputBufferIndex];
                 int size = videoExtractor.readSampleData(decoderInputBuffer, 0);
                 long presentationTime = videoExtractor.getSampleTime();
+                sizeRead += size;
 
                 if (size >= 0) {
                     videoDecoder.queueInputBuffer(decoderInputBufferIndex,0, size, presentationTime, videoExtractor.getSampleFlags());
@@ -394,6 +395,7 @@ public class VideoDownsampling {
                 ByteBuffer decoderInputBuffer = audioDecoderInputBuffers[decoderInputBufferIndex];
                 int size = audioExtractor.readSampleData(decoderInputBuffer, 0);
                 long presentationTime = audioExtractor.getSampleTime();
+                sizeRead += size;
 
                 if (size >= 0)
                     audioDecoder.queueInputBuffer(decoderInputBufferIndex, 0, size, presentationTime, audioExtractor.getSampleFlags());
@@ -405,8 +407,7 @@ public class VideoDownsampling {
                 break;
             }
 
-            while (!videoDecoderDone
-                    && (encoderOutputVideoFormat == null || muxing)) {
+            while (!videoDecoderDone && (encoderOutputVideoFormat == null || muxing)) {
                 int decoderOutputBufferIndex = videoDecoder.dequeueOutputBuffer(videoDecoderOutputBufferInfo, TIMEOUT_USEC);
                 if (decoderOutputBufferIndex == MediaCodec.INFO_TRY_AGAIN_LATER)
                     break;
@@ -538,7 +539,6 @@ public class VideoDownsampling {
                     audioEncoderDone = true;
 
                 audioEncoder.releaseOutputBuffer(encoderOutputBufferIndex, false);
-
                 break;
             }
             if (!muxing && (encoderOutputAudioFormat != null) && (encoderOutputVideoFormat != null)) {
@@ -547,7 +547,16 @@ public class VideoDownsampling {
                 muxer.start();
                 muxing = true;
             }
+
+            calculatePercentage();
+            log("The percentage complete is: " + percentage + " (" + sizeRead + "/" + sizeInputFile +")");
         }
+        percentage = 100;
+        log("The percentage complete is: " + percentage + " (" + sizeInputFile + "/" + sizeInputFile +")");
+    }
+
+    public void calculatePercentage () {
+        percentage = (int)((100 * sizeRead) / sizeInputFile);
     }
 
     private static boolean isVideoFormat(MediaFormat format) {
