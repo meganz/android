@@ -1454,6 +1454,7 @@ public class ChatController {
 
                             Intent pdfIntent = new Intent(context, PdfViewerActivityLollipop.class);
                             pdfIntent.putExtra("APP", true);
+                            pdfIntent.putExtra("HANDLE", tempNode.getHandle());
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                                 pdfIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", new File(localPath)), MimeTypeList.typeForName(tempNode.getName()).getType());
                             }
