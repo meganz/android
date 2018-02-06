@@ -43,7 +43,7 @@ public class OpenLinkActivity extends PinActivity implements MegaRequestListener
 	TextView processingText;
 	TextView errorText;
 	ProgressBar progressBar;
-	TextView okButton;
+	RelativeLayout containerOkButton;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState){
@@ -67,9 +67,10 @@ public class OpenLinkActivity extends PinActivity implements MegaRequestListener
 		errorText = (TextView) findViewById(R.id.open_link_error);
 		errorText.setVisibility(View.GONE);
 		progressBar = (ProgressBar) findViewById(R.id.open_link_bar);
-		okButton = (TextView) findViewById(R.id.open_link_accept_button);
-		okButton.setVisibility(View.GONE);
-		okButton.setOnClickListener(this);
+		containerOkButton = (RelativeLayout) findViewById(R.id.container_accept_button);
+		containerOkButton.setVisibility(View.GONE);
+		containerOkButton.setOnClickListener(this);
+
 		
 		try {
 			url = URLDecoder.decode(url, "UTF-8");
@@ -637,7 +638,7 @@ public class OpenLinkActivity extends PinActivity implements MegaRequestListener
 		progressBar.setVisibility(View.GONE);
 		errorText.setText(string);
 		errorText.setVisibility(View.VISIBLE);
-		okButton.setVisibility(View.VISIBLE);
+		containerOkButton.setVisibility(View.VISIBLE);
 	}
 
 	@Override
@@ -648,7 +649,7 @@ public class OpenLinkActivity extends PinActivity implements MegaRequestListener
 	@Override
 	public void onClick(View v) {
 		switch (v.getId()) {
-			case R.id.open_link_accept_button: {
+			case R.id.container_accept_button: {
 				this.finish();
 				break;
 			}
