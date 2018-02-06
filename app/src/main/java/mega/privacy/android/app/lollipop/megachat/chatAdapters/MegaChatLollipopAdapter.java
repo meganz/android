@@ -11,7 +11,6 @@ import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.media.ExifInterface;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
@@ -71,6 +70,7 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaNodeList;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
+import nz.mega.sdk.MegaUtilsAndroid;
 
 public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
 
@@ -103,6 +103,168 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
     MegaChatRoom chatRoom;
 
     private ArrayList<Long> pendingPreviews = new ArrayList<Long>();
+
+    private class ChatPreviewAsyncTask extends AsyncTask<MegaNode, Void, Integer>{
+
+        MegaChatLollipopAdapter.ViewHolderMessageChat holder;
+        MegaNode node;
+        Bitmap preview;
+
+        public ChatPreviewAsyncTask(MegaChatLollipopAdapter.ViewHolderMessageChat holder) {
+            this.holder = holder;
+        }
+
+        @Override
+        protected Integer doInBackground(MegaNode... params){
+            node = params[0];
+            preview = PreviewUtils.getPreviewFromFolder(node, context);
+
+            if (preview != null){
+                PreviewUtils.previewCache.put(node.getHandle(), preview);
+                return 0;
+            }
+            else{
+                if (pendingPreviews.contains(node.getHandle())){
+                    log("the preview is already downloaded or added to the list");
+                    return 1;
+                }
+                else{
+                    return 2;
+                }
+            }
+        }
+
+        @Override
+        protected void onPostExecute(Integer param){
+            if (param == 0){
+                int position = holder.getCurrentPosition();
+
+                AndroidMegaChatMessage message = messages.get(position-1);
+
+                if(message.getMessage()!=null){
+                    if(message.getMessage().getMegaNodeList()!=null){
+                        if(message.getMessage().getMegaNodeList().get(0)!=null){
+                            long nodeMessageHandle = message.getMessage().getMegaNodeList().get(0).getHandle();
+
+                            if (nodeMessageHandle == node.getHandle()){
+                                if(message.getMessage().getUserHandle()==megaChatApi.getMyUserHandle()){
+                                    setOwnPreview(holder, preview, node);
+                                }
+                                else{
+                                    setContactPreview(holder, preview, node);
+                                }
+
+                            }
+                            else{
+                                log("The nodeHandles are not equal!");
+                            }
+                        }
+                    }
+                }
+            }
+            else if(param == 2){
+                File previewFile = new File(PreviewUtils.getPreviewFolder(context), node.getBase64Handle()+".jpg");
+                log("GET PREVIEW OF HANDLE: " + node.getHandle()+" to download here: " + previewFile.getAbsolutePath());
+                pendingPreviews.add(node.getHandle());
+                PreviewDownloadListener listener = new PreviewDownloadListener(context, (ViewHolderMessageChat) holder, megaChatAdapter);
+                megaApi.getPreview(node, previewFile.getAbsolutePath(), listener);
+            }
+        }
+    }
+
+    private class ChatLocalPreviewAsyncTask extends AsyncTask<MegaNode, Void, Integer>{
+
+        MegaNode node;
+        Bitmap preview;
+        File cacheDir;
+        File destination;
+        MegaChatLollipopAdapter.ViewHolderMessageChat holder;
+
+        public ChatLocalPreviewAsyncTask(MegaChatLollipopAdapter.ViewHolderMessageChat holder) {
+            this.holder = holder;
+        }
+
+        @Override
+        protected Integer doInBackground(MegaNode... params){
+            node = params[0];
+
+            if (node == null){
+                return 3;
+            }
+            preview = PreviewUtils.getPreviewFromFolder(node, context);
+
+            if (preview != null){
+                return 0;
+            }
+            else{
+                if (context.getExternalCacheDir() != null){
+                    cacheDir = context.getExternalCacheDir();
+                }
+                else{
+                    cacheDir = context.getCacheDir();
+                }
+                destination = new File(cacheDir, node.getName());
+
+                if (destination.exists()){
+                    if (destination.length() == node.getSize()){
+                        File previewDir = PreviewUtils.getPreviewFolder(context);
+                        File previewFile = new File(previewDir, node.getBase64Handle()+".jpg");
+                        log("BASE64: " + node.getBase64Handle() + "name: " + node.getName());
+                        boolean previewCreated = MegaUtilsAndroid.createPreview(destination, previewFile);
+
+                        if (previewCreated){
+                            preview = PreviewUtils.getBitmapForCache(previewFile, context);
+                            destination.delete();
+                            return 0;
+                        }
+                        else{
+                            return 1;
+                        }
+                    }
+                    else{
+                        destination.delete();
+                        return 1;
+                    }
+                }
+
+                if (pendingPreviews.contains(node.getHandle())){
+                    log("the image is already downloaded or added to the list");
+                    return 1;
+                }
+                else{
+                    return 2;
+                }
+            }
+        }
+
+        @Override
+        protected void onPostExecute(Integer param){
+            if (param == 0){
+                int position = holder.getCurrentPosition();
+
+                AndroidMegaChatMessage message = messages.get(position-1);
+
+                long nodeMessageHandle = message.getMessage().getMegaNodeList().get(0).getHandle();
+
+                if (nodeMessageHandle == node.getHandle()){
+                    if(message.getMessage().getUserHandle()==megaChatApi.getMyUserHandle()){
+                        setOwnPreview(holder, preview, node);
+                    }
+                    else{
+
+                    }
+
+                }
+                else{
+                    log("The nodeHandles are not equal!");
+                }
+            }
+            else if(param == 2){
+                log("No preview and no generated correctly");
+            }
+        }
+    }
+
 
     private class ChatUploadingPreviewAsyncTask extends AsyncTask<String, Void, Bitmap> {
 
@@ -1688,11 +1850,31 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                                     ((ViewHolderMessageChat) holder).contentOwnMessageFileThumb.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
 
+                                    Bitmap preview = null;
                                     if (node.hasPreview()){
-                                        log("Get preview of node");
-                                        Bitmap preview = null;
+
                                         preview = PreviewUtils.getPreviewFromCache(node);
                                         if (preview != null) {
+                                            PreviewUtils.previewCache.put(node.getHandle(), preview);
+                                            setOwnPreview((ViewHolderMessageChat) holder, preview, node);
+
+                                        } else {
+
+                                            try{
+                                                new MegaChatLollipopAdapter.ChatPreviewAsyncTask(((ViewHolderMessageChat)holder)).execute(node);
+
+                                            }
+                                            catch(Exception ex){
+                                                //Too many AsyncTasks
+                                                log("Too many AsyncTasks");
+                                            }
+                                        }
+                                    }
+                                    else{
+                                        log("Node has no preview on servers");
+
+                                        preview = PreviewUtils.getPreviewFromCache(node);
+                                        if (preview != null){
                                             PreviewUtils.previewCache.put(node.getHandle(), preview);
                                             if (preview.getWidth() < preview.getHeight()) {
                                                 log("Portrait");
@@ -1734,77 +1916,17 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                                 ((ViewHolderMessageChat) holder).previewFramePort.setVisibility(View.GONE);
                                                 ((ViewHolderMessageChat) holder).contentOwnMessageThumbPort.setVisibility(View.GONE);
                                             }
-
-                                        } else {
-
-                                            preview = PreviewUtils.getPreviewFromFolder(node, context);
-                                            if (preview != null) {
-
-                                                PreviewUtils.previewCache.put(node.getHandle(), preview);
-
-                                                if (preview.getWidth() < preview.getHeight()) {
-                                                    log("Portrait");
-
-                                                    ((ViewHolderMessageChat) holder).contentOwnMessageThumbPort.setImageBitmap(preview);
-                                                    ((ViewHolderMessageChat) holder).contentOwnMessageThumbPort.setScaleType(ImageView.ScaleType.CENTER_CROP);
-
-                                                    if (MimeTypeList.typeForName(node.getName()).isPdf()){
-                                                        log("Is pfd preview");
-                                                        ((ViewHolderMessageChat) holder).iconOwnTypeDocPortraitPreview.setVisibility(View.VISIBLE);
-                                                    }
-                                                    else{
-                                                        ((ViewHolderMessageChat) holder).iconOwnTypeDocPortraitPreview.setVisibility(View.GONE);
-                                                    }
-
-                                                    ((ViewHolderMessageChat) holder).previewFramePort.setVisibility(View.VISIBLE);
-                                                    ((ViewHolderMessageChat) holder).contentOwnMessageThumbPort.setVisibility(View.VISIBLE);
-                                                    ((ViewHolderMessageChat) holder).contentOwnMessageFileLayout.setVisibility(View.GONE);
-                                                    ((ViewHolderMessageChat)holder).previewFrameLand.setVisibility(View.GONE);
-                                                    ((ViewHolderMessageChat) holder).contentOwnMessageThumbLand.setVisibility(View.GONE);
-
-                                                } else {
-                                                    log("Landcape");
-
-                                                    ((ViewHolderMessageChat) holder).contentOwnMessageThumbLand.setImageBitmap(preview);
-                                                    ((ViewHolderMessageChat) holder).contentOwnMessageThumbLand.setScaleType(ImageView.ScaleType.CENTER_CROP);
-
-                                                    if (MimeTypeList.typeForName(node.getName()).isPdf()){
-                                                        log("Is pfd preview");
-                                                        ((ViewHolderMessageChat) holder).iconOwnTypeDocLandPreview.setVisibility(View.VISIBLE);
-                                                    }
-                                                    else{
-                                                        ((ViewHolderMessageChat) holder).iconOwnTypeDocLandPreview.setVisibility(View.GONE);
-                                                    }
-
-                                                    ((ViewHolderMessageChat)holder).previewFrameLand.setVisibility(View.VISIBLE);
-                                                    ((ViewHolderMessageChat) holder).contentOwnMessageThumbLand.setVisibility(View.VISIBLE);
-                                                    ((ViewHolderMessageChat) holder).contentOwnMessageFileLayout.setVisibility(View.GONE);
-                                                    ((ViewHolderMessageChat) holder).previewFramePort.setVisibility(View.GONE);
-                                                    ((ViewHolderMessageChat) holder).contentOwnMessageThumbPort.setVisibility(View.GONE);
-                                                }
-
-                                            } else {
-
-                                                if (pendingPreviews.contains(node.getHandle())) {
-                                                    log("the preview is already downloaded or added to the list");
-
-                                                } else {
-
-                                                    File previewFile = new File(PreviewUtils.getPreviewFolder(context), node.getBase64Handle() + ".jpg");
-
-                                                    PreviewDownloadListener listener = new PreviewDownloadListener(context, (ViewHolderMessageChat) holder, this);
-                                                    //                                                listenersGrid.put(node.getHandle(), listener);
-                                                    log("To download here: " + previewFile.getAbsolutePath());
-
-                                                    pendingPreviews.add(node.getHandle());
-                                                    megaApi.getPreview(node, previewFile.getAbsolutePath(), listener);
-                                                }
+                                        }
+                                        else{
+                                            try{
+                                                new MegaChatLollipopAdapter.ChatLocalPreviewAsyncTask(((ViewHolderMessageChat)holder)).execute(node);
 
                                             }
+                                            catch(Exception ex){
+                                                //Too many AsyncTasks
+                                                log("Too many AsyncTasks");
+                                            }
                                         }
-                                    }
-                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                                        ((ViewHolderMessageChat)holder).contentContactMessageFileLayout.setElevation(0);
                                     }
                                 }
                                 else{
@@ -2403,10 +2525,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                             ((ViewHolderMessageChat)holder).contentContactMessageFileLayout.setVisibility(View.VISIBLE);
 
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                                ((ViewHolderMessageChat)holder).contentContactMessageFileLayout.setElevation(0);
-                            }
-
                             ((ViewHolderMessageChat)holder).contentContactMessageFileThumb.setVisibility(View.VISIBLE);
                             ((ViewHolderMessageChat)holder).contentContactMessageFileName.setVisibility(View.VISIBLE);
                             ((ViewHolderMessageChat)holder).contentContactMessageFileSize.setVisibility(View.VISIBLE);
@@ -2444,112 +2562,15 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                     log("Get preview of node");
 
                                     Bitmap preview = null;
-                                    preview = PreviewUtils.getPreviewFromCache(node);
-                                    if (preview != null){
-                                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                                            ((ViewHolderMessageChat)holder).contentContactMessageFileLayout.setElevation(2);
-                                        }
-
-                                        log("Success -> getPreviewFromCache");
-                                        PreviewUtils.previewCache.put(node.getHandle(), preview);
-
-                                        if (preview.getWidth() < preview.getHeight()) {
-                                            log("Portrait");
-
-                                            ((ViewHolderMessageChat) holder).contentContactMessageThumbPort.setImageBitmap(preview);
-                                            ((ViewHolderMessageChat) holder).contentContactMessageThumbPort.setScaleType(ImageView.ScaleType.CENTER_CROP);
-
-                                            if (MimeTypeList.typeForName(node.getName()).isPdf()){
-                                                log("Contact message - Is pfd preview");
-                                                ((ViewHolderMessageChat) holder).iconContactTypeDocPortraitPreview.setVisibility(View.VISIBLE);
-                                            }
-                                            else{
-                                                ((ViewHolderMessageChat) holder).iconContactTypeDocPortraitPreview.setVisibility(View.GONE);
-                                            }
-
-                                            ((ViewHolderMessageChat) holder).contentContactMessageThumbPort.setVisibility(View.VISIBLE);
-//                                            ((ViewHolderMessageChat) holder).contentContactMessageThumbPortFramework.setVisibility(View.VISIBLE);
-
-                                            ((ViewHolderMessageChat) holder).contentContactMessageThumbLand.setVisibility(View.GONE);
-//                                            ((ViewHolderMessageChat) holder).contentContactMessageThumbLandFramework.setVisibility(View.GONE);
-
-                                            ((ViewHolderMessageChat)holder).contentContactMessageFileThumb.setVisibility(View.GONE);
-                                            ((ViewHolderMessageChat)holder).contentContactMessageFileName.setVisibility(View.GONE);
-                                            ((ViewHolderMessageChat)holder).contentContactMessageFileSize.setVisibility(View.GONE);
-
-//                                            if(chatRoom.isGroup()){
-//                                                RelativeLayout.LayoutParams contactThumbParams = (RelativeLayout.LayoutParams)((ViewHolderMessageChat)holder).contentContactMessageThumbPort.getLayoutParams();
-//                                                contactThumbParams.setMargins(0, Util.scaleHeightPx(10, outMetrics) ,0, 0);
-//                                                ((ViewHolderMessageChat)holder).contentContactMessageThumbPort.setLayoutParams(contactThumbParams);
-////                                                ((ViewHolderMessageChat)holder).contentContactMessageThumbPortFramework.setLayoutParams(contactThumbParams);
-//                                            }
-//                                            else{
-//                                                RelativeLayout.LayoutParams contactThumbParams = (RelativeLayout.LayoutParams)((ViewHolderMessageChat)holder).contentContactMessageThumbPort.getLayoutParams();
-//                                                contactThumbParams.setMargins(0, 0 ,0, 0);
-//                                                ((ViewHolderMessageChat)holder).contentContactMessageThumbPort.setLayoutParams(contactThumbParams);
-////                                                ((ViewHolderMessageChat)holder).contentContactMessageThumbPortFramework.setLayoutParams(contactThumbParams);
-//                                            }
-                                            RelativeLayout.LayoutParams contactThumbParams = (RelativeLayout.LayoutParams)((ViewHolderMessageChat)holder).contentContactMessageThumbPort.getLayoutParams();
-                                            contactThumbParams.setMargins(0, 0 ,0, 0);
-                                            ((ViewHolderMessageChat)holder).contentContactMessageThumbPort.setLayoutParams(contactThumbParams);
-
-                                        } else {
-                                            log("Landcape");
-
-                                            ((ViewHolderMessageChat) holder).contentContactMessageThumbLand.setImageBitmap(preview);
-                                            ((ViewHolderMessageChat) holder).contentContactMessageThumbLand.setScaleType(ImageView.ScaleType.CENTER_CROP);
-
-                                            if (MimeTypeList.typeForName(node.getName()).isPdf()){
-                                                log("Contact message - Is pfd preview");
-                                                ((ViewHolderMessageChat) holder).iconContactTypeDocLandPreview.setVisibility(View.VISIBLE);
-                                            }
-                                            else{
-                                                ((ViewHolderMessageChat) holder).iconContactTypeDocLandPreview.setVisibility(View.GONE);
-                                            }
-
-                                            ((ViewHolderMessageChat) holder).contentContactMessageThumbLand.setVisibility(View.VISIBLE);
-//                                            ((ViewHolderMessageChat) holder).contentContactMessageThumbLandFramework.setVisibility(View.VISIBLE);
-
-                                            ((ViewHolderMessageChat) holder).contentContactMessageThumbPort.setVisibility(View.GONE);
-//                                            ((ViewHolderMessageChat) holder).contentContactMessageThumbPortFramework.setVisibility(View.GONE);
-
-                                            ((ViewHolderMessageChat)holder).contentContactMessageFileThumb.setVisibility(View.GONE);
-                                            ((ViewHolderMessageChat)holder).contentContactMessageFileName.setVisibility(View.GONE);
-                                            ((ViewHolderMessageChat)holder).contentContactMessageFileSize.setVisibility(View.GONE);
-
-                                            RelativeLayout.LayoutParams contactThumbParams = (RelativeLayout.LayoutParams)((ViewHolderMessageChat)holder).contentContactMessageThumbLand.getLayoutParams();
-                                            contactThumbParams.setMargins(0, 0 ,0, 0);
-                                            ((ViewHolderMessageChat)holder).contentContactMessageThumbLand.setLayoutParams(contactThumbParams);
-
-//                                            if(chatRoom.isGroup()){
-//                                                RelativeLayout.LayoutParams contactThumbParams = (RelativeLayout.LayoutParams)((ViewHolderMessageChat)holder).contentContactMessageThumbLand.getLayoutParams();
-//                                                contactThumbParams.setMargins(0, Util.scaleHeightPx(10, outMetrics) ,0, 0);
-//                                                ((ViewHolderMessageChat)holder).contentContactMessageThumbLand.setLayoutParams(contactThumbParams);
-////                                                ((ViewHolderMessageChat)holder).contentContactMessageThumbLandFramework.setLayoutParams(contactThumbParams);
-//                                            }
-//                                            else{
-//                                                RelativeLayout.LayoutParams contactThumbParams = (RelativeLayout.LayoutParams)((ViewHolderMessageChat)holder).contentContactMessageThumbLand.getLayoutParams();
-//                                                contactThumbParams.setMargins(0, 0 ,0, 0);
-//                                                ((ViewHolderMessageChat)holder).contentContactMessageThumbLand.setLayoutParams(contactThumbParams);
-////                                                ((ViewHolderMessageChat)holder).contentContactMessageThumbLandFramework.setLayoutParams(contactThumbParams);
-//                                            }
-                                        }
-                                    }
-                                    else {
-
-
-                                        log("Fail -> getPreviewFromCache");
-                                        preview = PreviewUtils.getPreviewFromFolder(node, context);
-                                        if (preview != null) {
-
-                                            log("SUCCESS -> getPreviewFromFolder");
+                                    if (node.hasPreview()) {
+                                        log("Get preview of node");
+                                        preview = PreviewUtils.getPreviewFromCache(node);
+                                        if (preview != null){
                                             PreviewUtils.previewCache.put(node.getHandle(), preview);
-                                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                                                ((ViewHolderMessageChat)holder).contentContactMessageFileLayout.setElevation(2);
-                                            }
 
                                             if (preview.getWidth() < preview.getHeight()) {
                                                 log("Portrait");
+
                                                 ((ViewHolderMessageChat) holder).contentContactMessageThumbPort.setImageBitmap(preview);
                                                 ((ViewHolderMessageChat) holder).contentContactMessageThumbPort.setScaleType(ImageView.ScaleType.CENTER_CROP);
 
@@ -2562,34 +2583,33 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                                 }
 
                                                 ((ViewHolderMessageChat) holder).contentContactMessageThumbPort.setVisibility(View.VISIBLE);
-//                                                ((ViewHolderMessageChat) holder).contentContactMessageThumbPortFramework.setVisibility(View.VISIBLE);
+//                                            ((ViewHolderMessageChat) holder).contentContactMessageThumbPortFramework.setVisibility(View.VISIBLE);
 
                                                 ((ViewHolderMessageChat) holder).contentContactMessageThumbLand.setVisibility(View.GONE);
-//                                                ((ViewHolderMessageChat) holder).contentContactMessageThumbLandFramework.setVisibility(View.GONE);
-
+//                                            ((ViewHolderMessageChat) holder).contentContactMessageThumbLandFramework.setVisibility(View.GONE);
 
                                                 ((ViewHolderMessageChat)holder).contentContactMessageFileThumb.setVisibility(View.GONE);
                                                 ((ViewHolderMessageChat)holder).contentContactMessageFileName.setVisibility(View.GONE);
                                                 ((ViewHolderMessageChat)holder).contentContactMessageFileSize.setVisibility(View.GONE);
 
+//                                            if(chatRoom.isGroup()){
+//                                                RelativeLayout.LayoutParams contactThumbParams = (RelativeLayout.LayoutParams)((ViewHolderMessageChat)holder).contentContactMessageThumbPort.getLayoutParams();
+//                                                contactThumbParams.setMargins(0, Util.scaleHeightPx(10, outMetrics) ,0, 0);
+//                                                ((ViewHolderMessageChat)holder).contentContactMessageThumbPort.setLayoutParams(contactThumbParams);
+////                                                ((ViewHolderMessageChat)holder).contentContactMessageThumbPortFramework.setLayoutParams(contactThumbParams);
+//                                            }
+//                                            else{
+//                                                RelativeLayout.LayoutParams contactThumbParams = (RelativeLayout.LayoutParams)((ViewHolderMessageChat)holder).contentContactMessageThumbPort.getLayoutParams();
+//                                                contactThumbParams.setMargins(0, 0 ,0, 0);
+//                                                ((ViewHolderMessageChat)holder).contentContactMessageThumbPort.setLayoutParams(contactThumbParams);
+////                                                ((ViewHolderMessageChat)holder).contentContactMessageThumbPortFramework.setLayoutParams(contactThumbParams);
+//                                            }
                                                 RelativeLayout.LayoutParams contactThumbParams = (RelativeLayout.LayoutParams)((ViewHolderMessageChat)holder).contentContactMessageThumbPort.getLayoutParams();
                                                 contactThumbParams.setMargins(0, 0 ,0, 0);
                                                 ((ViewHolderMessageChat)holder).contentContactMessageThumbPort.setLayoutParams(contactThumbParams);
 
-//                                                if(chatRoom.isGroup()){
-//                                                    RelativeLayout.LayoutParams contactThumbParams = (RelativeLayout.LayoutParams)((ViewHolderMessageChat)holder).contentContactMessageThumbPort.getLayoutParams();
-//                                                    contactThumbParams.setMargins(0, Util.scaleHeightPx(10, outMetrics) ,0, 0);
-//                                                    ((ViewHolderMessageChat)holder).contentContactMessageThumbPort.setLayoutParams(contactThumbParams);
-////                                                    ((ViewHolderMessageChat)holder).contentContactMessageThumbPortFramework.setLayoutParams(contactThumbParams);
-//                                                }
-//                                                else{
-//                                                    RelativeLayout.LayoutParams contactThumbParams = (RelativeLayout.LayoutParams)((ViewHolderMessageChat)holder).contentContactMessageThumbPort.getLayoutParams();
-//                                                    contactThumbParams.setMargins(0, 0 ,0, 0);
-//                                                    ((ViewHolderMessageChat)holder).contentContactMessageThumbPort.setLayoutParams(contactThumbParams);
-////                                                    ((ViewHolderMessageChat)holder).contentContactMessageThumbPortFramework.setLayoutParams(contactThumbParams);
-//                                                }
-
-                                            } else {
+                                            }
+                                            else {
                                                 log("Landcape");
 
                                                 ((ViewHolderMessageChat) holder).contentContactMessageThumbLand.setImageBitmap(preview);
@@ -2604,10 +2624,11 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                                 }
 
                                                 ((ViewHolderMessageChat) holder).contentContactMessageThumbLand.setVisibility(View.VISIBLE);
-//                                                ((ViewHolderMessageChat) holder).contentContactMessageThumbLandFramework.setVisibility(View.VISIBLE);
+//                                            ((ViewHolderMessageChat) holder).contentContactMessageThumbLandFramework.setVisibility(View.VISIBLE);
 
                                                 ((ViewHolderMessageChat) holder).contentContactMessageThumbPort.setVisibility(View.GONE);
-//                                                ((ViewHolderMessageChat) holder).contentContactMessageThumbPortFramework.setVisibility(View.GONE);
+//                                            ((ViewHolderMessageChat) holder).contentContactMessageThumbPortFramework.setVisibility(View.GONE);
+
                                                 ((ViewHolderMessageChat)holder).contentContactMessageFileThumb.setVisibility(View.GONE);
                                                 ((ViewHolderMessageChat)holder).contentContactMessageFileName.setVisibility(View.GONE);
                                                 ((ViewHolderMessageChat)holder).contentContactMessageFileSize.setVisibility(View.GONE);
@@ -2616,45 +2637,51 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                                 contactThumbParams.setMargins(0, 0 ,0, 0);
                                                 ((ViewHolderMessageChat)holder).contentContactMessageThumbLand.setLayoutParams(contactThumbParams);
 
-//                                                if(chatRoom.isGroup()){
-//                                                    RelativeLayout.LayoutParams contactThumbParams = (RelativeLayout.LayoutParams)((ViewHolderMessageChat)holder).contentContactMessageThumbLand.getLayoutParams();
-//                                                    contactThumbParams.setMargins(0, Util.scaleHeightPx(10, outMetrics),0, 0);
-//                                                    ((ViewHolderMessageChat)holder).contentContactMessageThumbLand.setLayoutParams(contactThumbParams);
-////                                                    ((ViewHolderMessageChat)holder).contentContactMessageThumbLandFramework.setLayoutParams(contactThumbParams);
-//                                                }
-//                                                else{
-//                                                    RelativeLayout.LayoutParams contactThumbParams = (RelativeLayout.LayoutParams)((ViewHolderMessageChat)holder).contentContactMessageThumbLand.getLayoutParams();
-//                                                    contactThumbParams.setMargins(0, 0 ,0, 0);
-//                                                    ((ViewHolderMessageChat)holder).contentContactMessageThumbLand.setLayoutParams(contactThumbParams);
-////                                                    ((ViewHolderMessageChat)holder).contentContactMessageThumbLandFramework.setLayoutParams(contactThumbParams);
-//                                                }
+//                                            if(chatRoom.isGroup()){
+//                                                RelativeLayout.LayoutParams contactThumbParams = (RelativeLayout.LayoutParams)((ViewHolderMessageChat)holder).contentContactMessageThumbLand.getLayoutParams();
+//                                                contactThumbParams.setMargins(0, Util.scaleHeightPx(10, outMetrics) ,0, 0);
+//                                                ((ViewHolderMessageChat)holder).contentContactMessageThumbLand.setLayoutParams(contactThumbParams);
+////                                                ((ViewHolderMessageChat)holder).contentContactMessageThumbLandFramework.setLayoutParams(contactThumbParams);
+//                                            }
+//                                            else{
+//                                                RelativeLayout.LayoutParams contactThumbParams = (RelativeLayout.LayoutParams)((ViewHolderMessageChat)holder).contentContactMessageThumbLand.getLayoutParams();
+//                                                contactThumbParams.setMargins(0, 0 ,0, 0);
+//                                                ((ViewHolderMessageChat)holder).contentContactMessageThumbLand.setLayoutParams(contactThumbParams);
+////                                                ((ViewHolderMessageChat)holder).contentContactMessageThumbLandFramework.setLayoutParams(contactThumbParams);
+//                                            }
                                             }
+
+                                        }
+                                        else{
+                                            try{
+                                                new MegaChatLollipopAdapter.ChatPreviewAsyncTask(((ViewHolderMessageChat)holder)).execute(node);
+
+                                            }
+                                            catch(Exception ex){
+                                                //Too many AsyncTasks
+                                                log("Too many AsyncTasks");
+                                            }
+                                        }
+
+                                    }
+                                    else {
+                                        log("Node has no preview on servers");
+
+                                        preview = PreviewUtils.getPreviewFromCache(node);
+                                        if (preview != null){
+                                            PreviewUtils.previewCache.put(node.getHandle(), preview);
+
+                                            setContactPreview(((ViewHolderMessageChat) holder), preview, node);
 
                                         } else {
 
-                                            log("Fail -> getPreviewFromFolder");
-                                            if (node.hasPreview()){
-                                                log("Node has preview");
+                                            try{
+                                                new MegaChatLollipopAdapter.ChatLocalPreviewAsyncTask(((ViewHolderMessageChat)holder)).execute(node);
 
-                                                if (pendingPreviews.contains(node.getHandle())){
-                                                    log("the preview is already downloaded or added to the list");
-                                                }
-                                                else{
-                                                    File previewFile = new File(PreviewUtils.getPreviewFolder(context), node.getBase64Handle()+".jpg");
-
-                                                    PreviewDownloadListener listener = new PreviewDownloadListener(context, (ViewHolderMessageChat)holder, this);
-//                                                listenersGrid.put(node.getHandle(), listener);
-                                                    log("To download here: " + previewFile.getAbsolutePath());
-
-                                                    pendingPreviews.add(node.getHandle());
-                                                    megaApi.getPreview(node, previewFile.getAbsolutePath(), listener);
-                                                }
                                             }
-                                            else{
-                                                log("Node has NO preview!!!");
-                                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                                                    ((ViewHolderMessageChat)holder).contentContactMessageFileLayout.setElevation(0);
-                                                }
+                                            catch(Exception ex){
+                                                //Too many AsyncTasks
+                                                log("Too many AsyncTasks");
                                             }
                                         }
                                     }
@@ -3405,11 +3432,140 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         notifyItemRangeInserted(0, counter);
     }
 
+    private void setOwnPreview(MegaChatLollipopAdapter.ViewHolderMessageChat holder, Bitmap bitmap, MegaNode node){
+        log("setOwnPreview");
+
+        if(holder!=null) {
+            if (bitmap.getWidth() < bitmap.getHeight()) {
+                log("Portrait");
+
+                ((ViewHolderMessageChat) holder).contentOwnMessageThumbPort.setImageBitmap(bitmap);
+                ((ViewHolderMessageChat) holder).contentOwnMessageThumbPort.setScaleType(ImageView.ScaleType.CENTER_CROP);
+
+                if (MimeTypeList.typeForName(node.getName()).isPdf()){
+                    log("Is pfd preview");
+                    ((ViewHolderMessageChat) holder).iconOwnTypeDocPortraitPreview.setVisibility(View.VISIBLE);
+                }
+                else{
+                    ((ViewHolderMessageChat) holder).iconOwnTypeDocPortraitPreview.setVisibility(View.GONE);
+                }
+
+                ((ViewHolderMessageChat) holder).previewFramePort.setVisibility(View.VISIBLE);
+                ((ViewHolderMessageChat) holder).contentOwnMessageThumbPort.setVisibility(View.VISIBLE);
+                ((ViewHolderMessageChat) holder).contentOwnMessageFileLayout.setVisibility(View.GONE);
+                ((ViewHolderMessageChat)holder).previewFrameLand.setVisibility(View.GONE);
+                ((ViewHolderMessageChat) holder).contentOwnMessageThumbLand.setVisibility(View.GONE);
+
+            } else {
+                log("Landcape");
+
+                ((ViewHolderMessageChat) holder).contentOwnMessageThumbLand.setImageBitmap(bitmap);
+                ((ViewHolderMessageChat) holder).contentOwnMessageThumbLand.setScaleType(ImageView.ScaleType.CENTER_CROP);
+
+                if (MimeTypeList.typeForName(node.getName()).isPdf()){
+                    log("Is pfd preview");
+                    ((ViewHolderMessageChat) holder).iconOwnTypeDocLandPreview.setVisibility(View.VISIBLE);
+                }
+                else{
+                    ((ViewHolderMessageChat) holder).iconOwnTypeDocLandPreview.setVisibility(View.GONE);
+                }
+
+                ((ViewHolderMessageChat)holder).previewFrameLand.setVisibility(View.VISIBLE);
+                ((ViewHolderMessageChat) holder).contentOwnMessageThumbLand.setVisibility(View.VISIBLE);
+                ((ViewHolderMessageChat) holder).contentOwnMessageFileLayout.setVisibility(View.GONE);
+                ((ViewHolderMessageChat) holder).previewFramePort.setVisibility(View.GONE);
+                ((ViewHolderMessageChat) holder).contentOwnMessageThumbPort.setVisibility(View.GONE);
+            }
+        }
+    }
+
+    private void setContactPreview(MegaChatLollipopAdapter.ViewHolderMessageChat holder, Bitmap bitmap, MegaNode node) {
+        log("setContactPreview");
+        if (bitmap.getWidth() < bitmap.getHeight()) {
+            log("Portrait");
+            ((ViewHolderMessageChat) holder).contentContactMessageThumbPort.setImageBitmap(bitmap);
+            ((ViewHolderMessageChat) holder).contentContactMessageThumbPort.setScaleType(ImageView.ScaleType.CENTER_CROP);
+
+            if (MimeTypeList.typeForName(node.getName()).isPdf()){
+                log("Contact message - Is pfd preview");
+                ((ViewHolderMessageChat) holder).iconContactTypeDocPortraitPreview.setVisibility(View.VISIBLE);
+            }
+            else{
+                ((ViewHolderMessageChat) holder).iconContactTypeDocPortraitPreview.setVisibility(View.GONE);
+            }
+
+            ((ViewHolderMessageChat) holder).contentContactMessageThumbPort.setVisibility(View.VISIBLE);
+//                                                ((ViewHolderMessageChat) holder).contentContactMessageThumbPortFramework.setVisibility(View.VISIBLE);
+
+            ((ViewHolderMessageChat) holder).contentContactMessageThumbLand.setVisibility(View.GONE);
+//                                                ((ViewHolderMessageChat) holder).contentContactMessageThumbLandFramework.setVisibility(View.GONE);
+
+
+            ((ViewHolderMessageChat)holder).contentContactMessageFileThumb.setVisibility(View.GONE);
+            ((ViewHolderMessageChat)holder).contentContactMessageFileName.setVisibility(View.GONE);
+            ((ViewHolderMessageChat)holder).contentContactMessageFileSize.setVisibility(View.GONE);
+
+            RelativeLayout.LayoutParams contactThumbParams = (RelativeLayout.LayoutParams)((ViewHolderMessageChat)holder).contentContactMessageThumbPort.getLayoutParams();
+            contactThumbParams.setMargins(0, 0 ,0, 0);
+            ((ViewHolderMessageChat)holder).contentContactMessageThumbPort.setLayoutParams(contactThumbParams);
+
+//                                                if(chatRoom.isGroup()){
+//                                                    RelativeLayout.LayoutParams contactThumbParams = (RelativeLayout.LayoutParams)((ViewHolderMessageChat)holder).contentContactMessageThumbPort.getLayoutParams();
+//                                                    contactThumbParams.setMargins(0, Util.scaleHeightPx(10, outMetrics) ,0, 0);
+//                                                    ((ViewHolderMessageChat)holder).contentContactMessageThumbPort.setLayoutParams(contactThumbParams);
+////                                                    ((ViewHolderMessageChat)holder).contentContactMessageThumbPortFramework.setLayoutParams(contactThumbParams);
+//                                                }
+//                                                else{
+//                                                    RelativeLayout.LayoutParams contactThumbParams = (RelativeLayout.LayoutParams)((ViewHolderMessageChat)holder).contentContactMessageThumbPort.getLayoutParams();
+//                                                    contactThumbParams.setMargins(0, 0 ,0, 0);
+//                                                    ((ViewHolderMessageChat)holder).contentContactMessageThumbPort.setLayoutParams(contactThumbParams);
+////                                                    ((ViewHolderMessageChat)holder).contentContactMessageThumbPortFramework.setLayoutParams(contactThumbParams);
+//                                                }
+
+        } else {
+            log("Landcape");
+
+            ((ViewHolderMessageChat) holder).contentContactMessageThumbLand.setImageBitmap(bitmap);
+            ((ViewHolderMessageChat) holder).contentContactMessageThumbLand.setScaleType(ImageView.ScaleType.CENTER_CROP);
+
+            if (MimeTypeList.typeForName(node.getName()).isPdf()){
+                log("Contact message - Is pfd preview");
+                ((ViewHolderMessageChat) holder).iconContactTypeDocLandPreview.setVisibility(View.VISIBLE);
+            }
+            else{
+                ((ViewHolderMessageChat) holder).iconContactTypeDocLandPreview.setVisibility(View.GONE);
+            }
+
+            ((ViewHolderMessageChat) holder).contentContactMessageThumbLand.setVisibility(View.VISIBLE);
+//                                                ((ViewHolderMessageChat) holder).contentContactMessageThumbLandFramework.setVisibility(View.VISIBLE);
+
+            ((ViewHolderMessageChat) holder).contentContactMessageThumbPort.setVisibility(View.GONE);
+//                                                ((ViewHolderMessageChat) holder).contentContactMessageThumbPortFramework.setVisibility(View.GONE);
+            ((ViewHolderMessageChat)holder).contentContactMessageFileThumb.setVisibility(View.GONE);
+            ((ViewHolderMessageChat)holder).contentContactMessageFileName.setVisibility(View.GONE);
+            ((ViewHolderMessageChat)holder).contentContactMessageFileSize.setVisibility(View.GONE);
+
+            RelativeLayout.LayoutParams contactThumbParams = (RelativeLayout.LayoutParams)((ViewHolderMessageChat)holder).contentContactMessageThumbLand.getLayoutParams();
+            contactThumbParams.setMargins(0, 0 ,0, 0);
+            ((ViewHolderMessageChat)holder).contentContactMessageThumbLand.setLayoutParams(contactThumbParams);
+
+//                                                if(chatRoom.isGroup()){
+//                                                    RelativeLayout.LayoutParams contactThumbParams = (RelativeLayout.LayoutParams)((ViewHolderMessageChat)holder).contentContactMessageThumbLand.getLayoutParams();
+//                                                    contactThumbParams.setMargins(0, Util.scaleHeightPx(10, outMetrics),0, 0);
+//                                                    ((ViewHolderMessageChat)holder).contentContactMessageThumbLand.setLayoutParams(contactThumbParams);
+////                                                    ((ViewHolderMessageChat)holder).contentContactMessageThumbLandFramework.setLayoutParams(contactThumbParams);
+//                                                }
+//                                                else{
+//                                                    RelativeLayout.LayoutParams contactThumbParams = (RelativeLayout.LayoutParams)((ViewHolderMessageChat)holder).contentContactMessageThumbLand.getLayoutParams();
+//                                                    contactThumbParams.setMargins(0, 0 ,0, 0);
+//                                                    ((ViewHolderMessageChat)holder).contentContactMessageThumbLand.setLayoutParams(contactThumbParams);
+////                                                    ((ViewHolderMessageChat)holder).contentContactMessageThumbLandFramework.setLayoutParams(contactThumbParams);
+//                                                }
+        }
+    }
+
     private void setPreview(long handle, MegaChatLollipopAdapter.ViewHolderMessageChat holder){
         log("setPreview: "+handle);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            ((ViewHolderMessageChat)holder).contentContactMessageFileLayout.setElevation(2);
-        }
 
         if(holder!=null){
             File previewDir = PreviewUtils.getPreviewFolder(context);
@@ -3563,9 +3719,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             }
             else{
                 log("Preview not exists");
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    ((ViewHolderMessageChat)holder).contentContactMessageFileLayout.setElevation(0);
-                }
             }
         }
     }
