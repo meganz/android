@@ -226,6 +226,9 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		share.setColorFilter(getResources().getColor(R.color.white), PorterDuff.Mode.SRC_ATOP);
 		shareIcon.setIcon(share);
 		propertiesIcon = menu.findItem(R.id.full_image_viewer_properties);
+		Drawable properties = getResources().getDrawable(R.drawable.info_ic_white);
+		properties.setColorFilter(getResources().getColor(R.color.white), PorterDuff.Mode.SRC_ATOP);
+		propertiesIcon.setIcon(properties);
 		downloadIcon = menu.findItem(R.id.full_image_viewer_download);
 
 		Drawable download = getResources().getDrawable(R.drawable.ic_download_white);
@@ -238,6 +241,9 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		moveToTrashIcon = menu.findItem(R.id.full_image_viewer_move_to_trash);
 		removeIcon = menu.findItem(R.id.full_image_viewer_remove);
 		chatIcon = menu.findItem(R.id.full_image_viewer_chat);
+		Drawable chat = getResources().getDrawable(R.drawable.ic_chat_white);
+		chat.setColorFilter(getResources().getColor(R.color.white), PorterDuff.Mode.SRC_ATOP);
+		chatIcon.setIcon(chat);
 
 		Intent intent = getIntent();
 		adapterType = intent.getIntExtra("adapterType", 0);
