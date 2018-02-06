@@ -160,7 +160,6 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
         emptyTextViewParams2.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleHeightPx(20, outMetrics), Util.scaleWidthPx(20, outMetrics), Util.scaleHeightPx(20, outMetrics));
         emptyTextView.setLayoutParams(emptyTextViewParams2);
 
-
         emptyImageView = (ImageView) v.findViewById(R.id.empty_image_view_chat);
         emptyImageView.setOnClickListener(this);
         if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
@@ -481,11 +480,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
         }
 
         emptyTextView.setText(resultB);
-        if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-            emptyTextView.setVisibility(View.GONE);
-        }else{
-            emptyTextView.setVisibility(View.VISIBLE);
-        }
+        emptyTextView.setVisibility(View.VISIBLE);
     }
 
     public void showNoConnectionScreen(){
@@ -501,11 +496,8 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
             emptyTextView.setVisibility(View.GONE);
         }
         else{
-            if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-                emptyTextView.setVisibility(View.GONE);
-            }else{
-                emptyTextView.setVisibility(View.VISIBLE);
-            }        }
+            emptyTextView.setVisibility(View.VISIBLE);
+        }
 
         emptyLayout.setVisibility(View.VISIBLE);
     }
