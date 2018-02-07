@@ -499,6 +499,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 		}
 
 		dbH = DatabaseHandler.getDbHandler(context);
+
 		prefs = dbH.getPreferences();
 		if (prefs != null){
 			log("prefs != null");
@@ -781,6 +782,13 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
         context = activity;
         aB = ((AppCompatActivity)activity).getSupportActionBar();
     }
+
+	@Override
+	public void onAttach(Context context) {
+		super.onAttach(context);
+		this.context = context;
+		aB = ((AppCompatActivity)context).getSupportActionBar();
+	}
 		
 	@Override
 	public void onClick(View v) {
