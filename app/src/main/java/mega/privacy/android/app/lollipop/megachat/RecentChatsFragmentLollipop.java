@@ -4,9 +4,11 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
@@ -29,6 +31,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -57,6 +60,14 @@ import nz.mega.sdk.MegaChatRoom;
 public class RecentChatsFragmentLollipop extends Fragment implements View.OnClickListener {
 
     private static final String BUNDLE_RECYCLER_LAYOUT = "classname.recycler.layout";
+
+    //define source of MediaStore.Images.Media, internal or external storage
+    final Uri sourceUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+    final Uri thumbUri = MediaStore.Images.Thumbnails.EXTERNAL_CONTENT_URI;
+    final String thumb_DATA = MediaStore.Images.Thumbnails.DATA;
+    final String thumb_IMAGE_ID = MediaStore.Images.Thumbnails.IMAGE_ID;
+
+    SimpleCursorAdapter mySimpleCursorAdapter;
 
     MegaApiAndroid megaApi;
     MegaChatApiAndroid megaChatApi;
