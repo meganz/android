@@ -4,12 +4,14 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Environment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.ViewHolder;
+import android.util.Base64;
 import android.util.DisplayMetrics;
 import android.util.SparseBooleanArray;
 import android.util.TypedValue;
@@ -204,15 +206,6 @@ public class MegaChatFileStorageAdapter extends RecyclerView.Adapter<MegaChatFil
         Util.log("MegaChatFileStorageAdapter", log);
     }
 
-//    public Bitmap StringToBitMap(String encodedString){
-//        try{
-//            byte [] encodeByte=Base64.decode(encodedString,Base64.DEFAULT);
-//            Bitmap bitmap=BitmapFactory.decodeByteArray(encodeByte, 0, encodeByte.length);
-//            return bitmap;
-//        }catch(Exception e){
-//            e.getMessage();
-//            return null;
-//        }
-//    }
+
 
 }
