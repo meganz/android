@@ -8,6 +8,7 @@ import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
+import android.media.Image;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -168,6 +169,9 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
     private Drawable login_background;
     private Drawable password_background;
 
+    private ImageView toggleButton;
+    private boolean passwdVisibility;
+
     @Override
     public void onSaveInstanceState(Bundle outState) {
         log("onSaveInstanceState");
@@ -294,6 +298,10 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
         loginEmailErrorText = (TextView) v.findViewById(R.id.login_email_text_error_text);
 
+        toggleButton = (ImageView) v.findViewById(R.id.toggle_button);
+        toggleButton.setOnClickListener(this);
+        passwdVisibility = false;
+
         et_password = (EditText) v.findViewById(R.id.login_password_text);
 
         et_password.setCursorVisible(true);
@@ -326,6 +334,21 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             }
         });
 
+        et_password.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (hasFocus) {
+                    toggleButton.setVisibility(View.VISIBLE);
+                    toggleButton.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_b_shared_read));
+                }
+                else {
+                    toggleButton.setVisibility(View.GONE);
+                    passwdVisibility = false;
+                    showHidePassword();
+                }
+            }
+        });
+
         password_background = et_password.getBackground().mutate().getConstantState().newDrawable();
 
         loginPasswordErrorLayout = (RelativeLayout) v.findViewById(R.id.login_password_text_error);
@@ -333,33 +356,33 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
         loginPasswordErrorText = (TextView) v.findViewById(R.id.login_password_text_error_text);
 
-        loginThreeDots = (ImageView) v.findViewById(R.id.login_three_dots);
-        LinearLayout.LayoutParams textThreeDots = (LinearLayout.LayoutParams)loginThreeDots.getLayoutParams();
-        textThreeDots.setMargins(Util.scaleWidthPx(0, outMetrics), 0, Util.scaleWidthPx(10, outMetrics), 0);
-        loginThreeDots.setLayoutParams(textThreeDots);
-
-        loginABC = (TextView) v.findViewById(R.id.ABC);
-
-        loginSwitch = (SwitchCompat) v.findViewById(R.id.switch_login);
-        LinearLayout.LayoutParams switchParams = (LinearLayout.LayoutParams)loginSwitch.getLayoutParams();
-        switchParams.setMargins(0, 0, Util.scaleWidthPx(10, outMetrics), 0);
-        loginSwitch.setLayoutParams(switchParams);
-        loginSwitch.setChecked(false);
-
-        loginSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if(!isChecked){
-                    et_password.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-                    et_password.setTypeface(Typeface.SANS_SERIF,Typeface.NORMAL);
-                    et_password.setSelection(et_password.getText().length());
-                }else{
-                    et_password.setInputType(InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
-                    et_password.setSelection(et_password.getText().length());
-                }
-            }
-        });
+//        loginThreeDots = (ImageView) v.findViewById(R.id.login_three_dots);
+//        LinearLayout.LayoutParams textThreeDots = (LinearLayout.LayoutParams)loginThreeDots.getLayoutParams();
+//        textThreeDots.setMargins(Util.scaleWidthPx(0, outMetrics), 0, Util.scaleWidthPx(10, outMetrics), 0);
+//        loginThreeDots.setLayoutParams(textThreeDots);
+//
+//        loginABC = (TextView) v.findViewById(R.id.ABC);
+//
+//        loginSwitch = (SwitchCompat) v.findViewById(R.id.switch_login);
+//        LinearLayout.LayoutParams switchParams = (LinearLayout.LayoutParams)loginSwitch.getLayoutParams();
+//        switchParams.setMargins(0, 0, Util.scaleWidthPx(10, outMetrics), 0);
+//        loginSwitch.setLayoutParams(switchParams);
+//        loginSwitch.setChecked(false);
+//
+//        loginSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+//
+//            @Override
+//            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+//                if(!isChecked){
+//                    et_password.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+//                    et_password.setTypeface(Typeface.SANS_SERIF,Typeface.NORMAL);
+//                    et_password.setSelection(et_password.getText().length());
+//                }else{
+//                    et_password.setInputType(InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
+//                    et_password.setSelection(et_password.getText().length());
+//                }
+//            }
+//        });
 
         bLogin = (TextView) v.findViewById(R.id.button_login_login);
         bLogin.setText(getString(R.string.login_text).toUpperCase(Locale.getDefault()));
@@ -740,6 +763,17 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
         log("END onCreateView");
         return v;
+    }
+
+    public void showHidePassword () {
+        if(!passwdVisibility){
+            et_password.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+            et_password.setTypeface(Typeface.SANS_SERIF,Typeface.NORMAL);
+            et_password.setSelection(et_password.getText().length());
+        }else{
+            et_password.setInputType(InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
+            et_password.setSelection(et_password.getText().length());
+        }
     }
 
     public void startLoginInProcess(){
@@ -1295,6 +1329,19 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                         log("attrs is NULL");
                         ((LoginActivityLollipop)context).showConfirmationEnableLogsSDK();
                     }
+                }
+                break;
+            }
+            case R.id.toggle_button: {
+                if (passwdVisibility) {
+                    toggleButton.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_b_shared_read));
+                    passwdVisibility = false;
+                    showHidePassword();
+                }
+                else {
+                    toggleButton.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_b_see));
+                    passwdVisibility = true;
+                    showHidePassword();
                 }
                 break;
             }

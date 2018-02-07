@@ -206,7 +206,7 @@
     <string name="tour_access_text">Get fully encrypted access anywhere, anytime</string>
 
     <string name="create_account_text" context="button that allows the user to create an account">Create account</string>
-    <string name="name_text" context="Name of the user">Name</string>
+    <string name="name_text" context="Name of the user">First Name</string>
     <string name="lastname_text" context="Last name of the user">Last Name</string>
     <string name="tos" context="text placed on the checkbox of acceptation of the Terms of Service">I agree with MEGA\'s [A]Terms of Service[/A]</string>
     <string name="already_account" context="Does the user already have a MEGA account">Already have an account?</string>
@@ -1683,6 +1683,18 @@
     <string name="invalid_link" context="error message shown when an account confirmation link or reset password link is invalid for unknown reasons">Invalid link, please ask for a new valid link</string>
 
     <string name="processing_link" context="Message shown when a link is being processing">Processing link...</string>
+
+    <string name="passwd_weak" context="Message shown when it is creating an acount and it is been introduced a very weak or weak password">Your password is easily guessed. Try making your password longer. Combine uppercase &amp; lowercase letters. Add special characters. Do not use names or dictionary words.</string>
+    <string name="passwd_medium" context="Message shown when it is creating an acount and it is been introduced a medium password">Your password is good enough to proceed, but it is recommended to strengthen your password further.</string>
+    <string name="passwd_good" context="Message shown when it is creating an acount and it is been introduced a good password">This password will withstand most typical brute-force attacks. Please ensure that you will remember it.</string>
+    <string name="passwd_strong" context="Message shown when it is creating an acount and it is been introduced a strong password">This password will withstand most sophisticated brute-force attacks. Please ensure that you will remember it.</string>
+    <string name="pass_very_weak" context="Password very weak">Very Weak</string>
+    <string name="pass_weak" context="Password weak">Weak</string>
+    <string name="pass_medium" context="Password medium">Medium</string>
+    <string name="pass_good" context="Password good">Good</string>
+    <string name="pass_strong" context="Password strong">Strong</string>
+    <string name="wrong_passwd" context="Error shown when it is changing the password and the old password is incorrect">Wrong password</string>
+
 
 </resources>
 

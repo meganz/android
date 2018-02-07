@@ -82,6 +82,20 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 	private Drawable oldPassword_background;
 	private Drawable newPassword_background;
 	private Drawable newPassword2_background;
+
+	private ImageView toggleButtonOldPasswd;
+	private ImageView toggleButtonNewPasswd;
+	private ImageView toggleButtonNewPasswd2;
+	private boolean passwdVisibility;
+	private LinearLayout containerPasswdElements;
+	private ImageView firstShape;
+	private ImageView secondShape;
+	private ImageView tirdShape;
+	private ImageView fourthShape;
+	private ImageView fifthShape;
+	private TextView passwdType;
+	private TextView passwdAdvice;
+	private boolean passwdValid;
 	
 	@SuppressLint("NewApi")
 	@Override
@@ -101,6 +115,15 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 	    scaleH = Util.getScaleH(outMetrics, density);
 
 		title = (TextView) findViewById(R.id.title_change_pass);
+
+		toggleButtonOldPasswd  = (ImageView) findViewById(R.id.toggle_button_old_passwd);
+		toggleButtonOldPasswd.setOnClickListener(this);
+		toggleButtonNewPasswd = (ImageView) findViewById(R.id.toggle_button_new_passwd);
+		toggleButtonNewPasswd.setOnClickListener(this);
+		toggleButtonNewPasswd2 = (ImageView) findViewById(R.id.toggle_button_new_passwd2);
+		toggleButtonNewPasswd2.setOnClickListener(this);
+		passwdVisibility = false;
+		passwdValid = false;
 		
 		oldPasswordView = (EditText) findViewById(R.id.change_password_oldPassword);
 		oldPasswordView.getBackground().mutate().clearColorFilter();
@@ -126,7 +149,32 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 				quitError(oldPasswordView);
 			}
 		});
-		
+
+		oldPasswordView.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+			@Override
+			public void onFocusChange(View v, boolean hasFocus) {
+				if (hasFocus) {
+					toggleButtonOldPasswd.setVisibility(View.VISIBLE);
+					toggleButtonOldPasswd.setImageDrawable(getResources().getDrawable(R.drawable.ic_b_shared_read));
+				}
+				else {
+					toggleButtonOldPasswd.setVisibility(View.GONE);
+					passwdVisibility = false;
+					showHidePassword(R.id.toggle_button_old_passwd);
+				}
+			}
+		});
+
+		containerPasswdElements = (LinearLayout) findViewById(R.id.container_passwd_elements);
+		containerPasswdElements.setVisibility(View.GONE);
+		firstShape = (ImageView) findViewById(R.id.shape_passwd_first);
+		secondShape = (ImageView) findViewById(R.id.shape_passwd_second);
+		tirdShape = (ImageView) findViewById(R.id.shape_passwd_third);
+		fourthShape = (ImageView) findViewById(R.id.shape_passwd_fourth);
+		fifthShape = (ImageView) findViewById(R.id.shape_passwd_fifth);
+		passwdType = (TextView) findViewById(R.id.password_type);
+		passwdAdvice = (TextView) findViewById(R.id.password_advice_text);
+
 		newPassword1View = (EditText) findViewById(R.id.change_password_newPassword1);
 		newPassword1View.getBackground().clearColorFilter();
 		newPassword_background = newPassword1View.getBackground().mutate().getConstantState().newDrawable();
@@ -140,13 +188,40 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 			}
 
 			@Override
-			public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+			public void onTextChanged(CharSequence s, int start, int before, int count) {
+				log("onTextChanged: " + s.toString() + "_ " + start + "__" + before + "__" + count);
+				if (s != null){
+					if (s.length() > 0) {
+						String temp = s.toString();
+						containerPasswdElements.setVisibility(View.VISIBLE);
 
+						checkPasswordStrenght(temp.trim());
+					}
+					else{
+						passwdValid = false;
+						containerPasswdElements.setVisibility(View.GONE);
+					}
+				}
 			}
 
 			@Override
 			public void afterTextChanged(Editable editable) {
 				quitError(newPassword1View);
+			}
+		});
+
+		newPassword1View.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+			@Override
+			public void onFocusChange(View v, boolean hasFocus) {
+				if (hasFocus) {
+					toggleButtonNewPasswd.setVisibility(View.VISIBLE);
+					toggleButtonNewPasswd.setImageDrawable(getResources().getDrawable(R.drawable.ic_b_shared_read));
+				}
+				else {
+					toggleButtonNewPasswd.setVisibility(View.GONE);
+					passwdVisibility = false;
+					showHidePassword(R.id.toggle_button_new_passwd);
+				}
 			}
 		});
 		
@@ -173,55 +248,69 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 				quitError(newPassword2View);
 			}
 		});
-		
-		loginThreeDots = (ImageView) findViewById(R.id.change_pass_three_dots);
-		LinearLayout.LayoutParams textThreeDots = (LinearLayout.LayoutParams)loginThreeDots.getLayoutParams();
-		textThreeDots.setMargins(Util.scaleWidthPx(0, outMetrics), 0, Util.scaleWidthPx(10, outMetrics), 0); 
-		loginThreeDots.setLayoutParams(textThreeDots);
-		
-		loginABC = (TextView) findViewById(R.id.ABC_change_pass);
-		
-		loginSwitch = (SwitchCompat) findViewById(R.id.switch_change_pass);
-		LinearLayout.LayoutParams switchParams = (LinearLayout.LayoutParams)loginSwitch.getLayoutParams();
-		switchParams.setMargins(0, 0, Util.scaleWidthPx(10, outMetrics), 0); 
-		loginSwitch.setLayoutParams(switchParams);
-		loginSwitch.setChecked(false);
 
-		
-		loginSwitch.setOnCheckedChangeListener(new OnCheckedChangeListener() {
-			
+		newPassword2View.setOnFocusChangeListener(new View.OnFocusChangeListener() {
 			@Override
-			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-				if(!isChecked){
-					oldPasswordView.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-					oldPasswordView.setTypeface(Typeface.SANS_SERIF,Typeface.NORMAL);
-					oldPasswordView.setSelection(oldPasswordView.getText().length());
-					
-					newPassword1View.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-					newPassword1View.setTypeface(Typeface.SANS_SERIF,Typeface.NORMAL);
-					newPassword1View.setSelection(newPassword1View.getText().length());
-					
-					newPassword2View.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-					newPassword2View.setTypeface(Typeface.SANS_SERIF,Typeface.NORMAL);
-					newPassword2View.setSelection(newPassword2View.getText().length());
-				}else{
-					oldPasswordView.setInputType(InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
-					oldPasswordView.setSelection(oldPasswordView.getText().length());
-					
-					newPassword1View.setInputType(InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
-					newPassword1View.setSelection(newPassword1View.getText().length());
-					
-					newPassword2View.setInputType(InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
-					newPassword2View.setSelection(newPassword2View.getText().length());
-			    }				
+			public void onFocusChange(View v, boolean hasFocus) {
+				if (hasFocus) {
+					toggleButtonNewPasswd2.setVisibility(View.VISIBLE);
+					toggleButtonNewPasswd2.setImageDrawable(getResources().getDrawable(R.drawable.ic_b_shared_read));
+				}
+				else {
+					toggleButtonNewPasswd2.setVisibility(View.GONE);
+					passwdVisibility = false;
+					showHidePassword(R.id.toggle_button_new_passwd2);
+				}
 			}
-		});		
+		});
+//		loginThreeDots = (ImageView) findViewById(R.id.change_pass_three_dots);
+//		LinearLayout.LayoutParams textThreeDots = (LinearLayout.LayoutParams)loginThreeDots.getLayoutParams();
+//		textThreeDots.setMargins(Util.scaleWidthPx(0, outMetrics), 0, Util.scaleWidthPx(10, outMetrics), 0);
+//		loginThreeDots.setLayoutParams(textThreeDots);
+//
+//		loginABC = (TextView) findViewById(R.id.ABC_change_pass);
+//
+//		loginSwitch = (SwitchCompat) findViewById(R.id.switch_change_pass);
+//		LinearLayout.LayoutParams switchParams = (LinearLayout.LayoutParams)loginSwitch.getLayoutParams();
+//		switchParams.setMargins(0, 0, Util.scaleWidthPx(10, outMetrics), 0);
+//		loginSwitch.setLayoutParams(switchParams);
+//		loginSwitch.setChecked(false);
+//
+//
+//		loginSwitch.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+//
+//			@Override
+//			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+//				if(!isChecked){
+//					oldPasswordView.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+//					oldPasswordView.setTypeface(Typeface.SANS_SERIF,Typeface.NORMAL);
+//					oldPasswordView.setSelection(oldPasswordView.getText().length());
+//
+//					newPassword1View.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+//					newPassword1View.setTypeface(Typeface.SANS_SERIF,Typeface.NORMAL);
+//					newPassword1View.setSelection(newPassword1View.getText().length());
+//
+//					newPassword2View.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+//					newPassword2View.setTypeface(Typeface.SANS_SERIF,Typeface.NORMAL);
+//					newPassword2View.setSelection(newPassword2View.getText().length());
+//				}else{
+//					oldPasswordView.setInputType(InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
+//					oldPasswordView.setSelection(oldPasswordView.getText().length());
+//
+//					newPassword1View.setInputType(InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
+//					newPassword1View.setSelection(newPassword1View.getText().length());
+//
+//					newPassword2View.setInputType(InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
+//					newPassword2View.setSelection(newPassword2View.getText().length());
+//			    }
+//			}
+//		});
 				
 		changePasswordButton = (Button) findViewById(R.id.action_change_password);
 		changePasswordButton.setOnClickListener(this);
 
-		cancelChangePasswordButton = (Button) findViewById(R.id.cancel_change_password);
-		cancelChangePasswordButton.setOnClickListener(this);
+//		cancelChangePasswordButton = (Button) findViewById(R.id.cancel_change_password);
+//		cancelChangePasswordButton.setOnClickListener(this);
 		
 		progress = new ProgressDialog(this);
 		progress.setMessage(getString(R.string.my_account_changing_password));
@@ -304,9 +393,205 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 				}
 				break;
 			}
-			case R.id.cancel_change_password:{
-				changePasswordActivity.finish();
+			case R.id.toggle_button_old_passwd: {
+				if (passwdVisibility) {
+					toggleButtonOldPasswd.setImageDrawable(getResources().getDrawable(R.drawable.ic_b_shared_read));
+					passwdVisibility = false;
+					showHidePassword(R.id.toggle_button_old_passwd);
+				}
+				else {
+					toggleButtonOldPasswd.setImageDrawable(getResources().getDrawable(R.drawable.ic_b_see));
+					passwdVisibility = true;
+					showHidePassword(R.id.toggle_button_old_passwd);
+				}
 				break;
+			}
+			case R.id.toggle_button_new_passwd: {
+				if (passwdVisibility) {
+					toggleButtonNewPasswd.setImageDrawable(getResources().getDrawable(R.drawable.ic_b_shared_read));
+					passwdVisibility = false;
+					showHidePassword(R.id.toggle_button_new_passwd);
+				}
+				else {
+					toggleButtonNewPasswd.setImageDrawable(getResources().getDrawable(R.drawable.ic_b_see));
+					passwdVisibility = true;
+					showHidePassword(R.id.toggle_button_new_passwd);
+				}
+				break;
+			}
+			case R.id.toggle_button_new_passwd2: {
+				if (passwdVisibility) {
+					toggleButtonNewPasswd2.setImageDrawable(getResources().getDrawable(R.drawable.ic_b_shared_read));
+					passwdVisibility = false;
+					showHidePassword(R.id.toggle_button_new_passwd2);
+				}
+				else {
+					toggleButtonNewPasswd2.setImageDrawable(getResources().getDrawable(R.drawable.ic_b_see));
+					passwdVisibility = true;
+					showHidePassword(R.id.toggle_button_new_passwd2);
+				}
+				break;
+			}
+//			case R.id.cancel_change_password:{
+//				changePasswordActivity.finish();
+//				break;
+//			}
+		}
+	}
+
+	public void checkPasswordStrenght(String s) {
+
+		if (megaApi.getPasswordStrength(s) == MegaApiJava.PASSWORD_STRENGTH_VERYWEAK){
+			if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.JELLY_BEAN) {
+				firstShape.setBackgroundDrawable(getResources().getDrawable(R.drawable.passwd_very_weak));
+				secondShape.setBackgroundDrawable(getResources().getDrawable(R.drawable.shape_password));
+				tirdShape.setBackgroundDrawable(getResources().getDrawable(R.drawable.shape_password));
+				fourthShape.setBackgroundDrawable(getResources().getDrawable(R.drawable.shape_password));
+				fifthShape.setBackgroundDrawable(getResources().getDrawable(R.drawable.shape_password));
+			} else{
+				firstShape.setBackground(getResources().getDrawable(R.drawable.passwd_very_weak));
+				secondShape.setBackground(getResources().getDrawable(R.drawable.shape_password));
+				tirdShape.setBackground(getResources().getDrawable(R.drawable.shape_password));
+				fourthShape.setBackground(getResources().getDrawable(R.drawable.shape_password));
+				fifthShape.setBackground(getResources().getDrawable(R.drawable.shape_password));
+			}
+
+			passwdType.setText(getString(R.string.pass_very_weak));
+			passwdType.setTextColor(getResources().getColor(R.color.login_warning));
+
+			passwdAdvice.setText(getString(R.string.passwd_weak));
+
+			passwdValid = false;
+		}
+		else if (megaApi.getPasswordStrength(s) == MegaApiJava.PASSWORD_STRENGTH_WEAK){
+			if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.JELLY_BEAN) {
+				firstShape.setBackgroundDrawable(getResources().getDrawable(R.drawable.passwd_weak));
+				secondShape.setBackgroundDrawable(getResources().getDrawable(R.drawable.passwd_weak));
+				tirdShape.setBackgroundDrawable(getResources().getDrawable(R.drawable.shape_password));
+				fourthShape.setBackgroundDrawable(getResources().getDrawable(R.drawable.shape_password));
+				fifthShape.setBackgroundDrawable(getResources().getDrawable(R.drawable.shape_password));
+			} else{
+				firstShape.setBackground(getResources().getDrawable(R.drawable.passwd_weak));
+				secondShape.setBackground(getResources().getDrawable(R.drawable.passwd_weak));
+				tirdShape.setBackground(getResources().getDrawable(R.drawable.shape_password));
+				fourthShape.setBackground(getResources().getDrawable(R.drawable.shape_password));
+				fifthShape.setBackground(getResources().getDrawable(R.drawable.shape_password));
+			}
+
+			passwdType.setText(getString(R.string.pass_weak));
+			passwdType.setTextColor(getResources().getColor(R.color.pass_weak));
+
+			passwdAdvice.setText(getString(R.string.passwd_weak));
+
+			passwdValid = false;
+		}
+		else if (megaApi.getPasswordStrength(s) == MegaApiJava.PASSWORD_STRENGTH_MEDIUM){
+			if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.JELLY_BEAN) {
+				firstShape.setBackgroundDrawable(getResources().getDrawable(R.drawable.passwd_medium));
+				secondShape.setBackgroundDrawable(getResources().getDrawable(R.drawable.passwd_medium));
+				tirdShape.setBackgroundDrawable(getResources().getDrawable(R.drawable.passwd_medium));
+				fourthShape.setBackgroundDrawable(getResources().getDrawable(R.drawable.shape_password));
+				fifthShape.setBackgroundDrawable(getResources().getDrawable(R.drawable.shape_password));
+			} else{
+				firstShape.setBackground(getResources().getDrawable(R.drawable.passwd_medium));
+				secondShape.setBackground(getResources().getDrawable(R.drawable.passwd_medium));
+				tirdShape.setBackground(getResources().getDrawable(R.drawable.passwd_medium));
+				fourthShape.setBackground(getResources().getDrawable(R.drawable.shape_password));
+				fifthShape.setBackground(getResources().getDrawable(R.drawable.shape_password));
+			}
+
+			passwdType.setText(getString(R.string.pass_medium));
+			passwdType.setTextColor(getResources().getColor(R.color.green_unlocked_rewards));
+
+			passwdAdvice.setText(getString(R.string.passwd_medium));
+
+			passwdValid = true;
+		}
+		else if (megaApi.getPasswordStrength(s) == MegaApiJava.PASSWORD_STRENGTH_GOOD){
+			if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.JELLY_BEAN) {
+				firstShape.setBackgroundDrawable(getResources().getDrawable(R.drawable.passwd_good));
+				secondShape.setBackgroundDrawable(getResources().getDrawable(R.drawable.passwd_good));
+				tirdShape.setBackgroundDrawable(getResources().getDrawable(R.drawable.passwd_good));
+				fourthShape.setBackgroundDrawable(getResources().getDrawable(R.drawable.passwd_good));
+				fifthShape.setBackgroundDrawable(getResources().getDrawable(R.drawable.shape_password));
+			} else{
+				firstShape.setBackground(getResources().getDrawable(R.drawable.passwd_good));
+				secondShape.setBackground(getResources().getDrawable(R.drawable.passwd_good));
+				tirdShape.setBackground(getResources().getDrawable(R.drawable.passwd_good));
+				fourthShape.setBackground(getResources().getDrawable(R.drawable.passwd_good));
+				fifthShape.setBackground(getResources().getDrawable(R.drawable.shape_password));
+			}
+
+			passwdType.setText(getString(R.string.pass_good));
+			passwdType.setTextColor(getResources().getColor(R.color.pass_good));
+
+			passwdAdvice.setText(getString(R.string.passwd_good));
+
+			passwdValid = true;
+		}
+		else {
+			if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.JELLY_BEAN) {
+				firstShape.setBackgroundDrawable(getResources().getDrawable(R.drawable.passwd_strong));
+				secondShape.setBackgroundDrawable(getResources().getDrawable(R.drawable.passwd_strong));
+				tirdShape.setBackgroundDrawable(getResources().getDrawable(R.drawable.passwd_strong));
+				fourthShape.setBackgroundDrawable(getResources().getDrawable(R.drawable.passwd_strong));
+				fifthShape.setBackgroundDrawable(getResources().getDrawable(R.drawable.passwd_strong));
+			} else{
+				firstShape.setBackground(getResources().getDrawable(R.drawable.passwd_strong));
+				secondShape.setBackground(getResources().getDrawable(R.drawable.passwd_strong));
+				tirdShape.setBackground(getResources().getDrawable(R.drawable.passwd_strong));
+				fourthShape.setBackground(getResources().getDrawable(R.drawable.passwd_strong));
+				fifthShape.setBackground(getResources().getDrawable(R.drawable.passwd_strong));
+			}
+
+			passwdType.setText(getString(R.string.pass_strong));
+			passwdType.setTextColor(getResources().getColor(R.color.blue_unlocked_rewards));
+
+			passwdAdvice.setText(getString(R.string.passwd_strong));
+
+			passwdValid = true;
+		}
+	}
+
+	public void showHidePassword (int type) {
+		if(!passwdVisibility){
+			switch (type) {
+				case R.id.toggle_button_old_passwd: {
+					oldPasswordView.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+					oldPasswordView.setTypeface(Typeface.SANS_SERIF, Typeface.NORMAL);
+					oldPasswordView.setSelection(oldPasswordView.getText().length());
+					break;
+				}
+				case R.id.toggle_button_new_passwd: {
+					newPassword1View.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+					newPassword1View.setTypeface(Typeface.SANS_SERIF, Typeface.NORMAL);
+					newPassword1View.setSelection(newPassword1View.getText().length());
+					break;
+				}
+				case R.id.toggle_button_new_passwd2: {
+					newPassword2View.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+					newPassword2View.setTypeface(Typeface.SANS_SERIF, Typeface.NORMAL);
+					newPassword2View.setSelection(newPassword2View.getText().length());
+					break;
+				}
+			}
+		}else{
+			switch (type) {
+				case R.id.toggle_button_old_passwd: {
+					oldPasswordView.setInputType(InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
+					oldPasswordView.setSelection(oldPasswordView.getText().length());
+					break;
+				}
+				case R.id.toggle_button_new_passwd: {
+					newPassword1View.setInputType(InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
+					newPassword1View.setSelection(newPassword1View.getText().length());
+					break;
+				}
+				case R.id.toggle_button_new_passwd2: {
+					newPassword2View.setInputType(InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
+					newPassword2View.setSelection(newPassword2View.getText().length());
+					break;
+				}
 			}
 		}
 	}
@@ -322,7 +607,7 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 
 		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 
-		if (!validateForm(false)) {
+		if (!validateForm(false) || !passwdValid) {
 			return;
 		}
 
@@ -370,7 +655,7 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 			return;
 		}
 		
-		if (!validateForm(true)) {
+		if (!validateForm(true) || !passwdValid) {
 			return;
 		}
 		
@@ -411,7 +696,6 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 		final UserCredentials oldCredentials = dbH.getCredentials();
 		
 		String currentEmail = oldCredentials.getEmail();
-		
 //		new HashTask().execute(currentEmail, newPassword, oldPassword);
 		changePassword(currentEmail, newPassword, oldPassword);
 	}
@@ -546,18 +830,17 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 
 				//Intent to MyAccount
 				Intent resetPassIntent = new Intent(this, ManagerActivityLollipop.class);
-				resetPassIntent.setAction(Constants.ACTION_PASS_CHANGED);
 				if(e.getErrorCode()==MegaError.API_EARGS){
 					log("Error, the old pass is not correct");
-					resetPassIntent.putExtra("RESULT", MegaError.API_EARGS);
+					setError(oldPasswordView, getString(R.string.wrong_passwd));
 				}
 				else{
+					resetPassIntent.setAction(Constants.ACTION_PASS_CHANGED);
 					log("General Error");
 					resetPassIntent.putExtra("RESULT", -1);
+					startActivity(resetPassIntent);
+					finish();
 				}
-
-				startActivity(resetPassIntent);
-				finish();
 			}
 			else{
 				log("pass changed OK");
