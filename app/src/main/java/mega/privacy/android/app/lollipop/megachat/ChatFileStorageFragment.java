@@ -9,6 +9,8 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -40,7 +42,9 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
@@ -66,6 +70,7 @@ import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.lollipop.managerSections.FileBrowserFragmentLollipop;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
+import mega.privacy.android.app.utils.ThumbnailUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
@@ -105,7 +110,7 @@ public class ChatFileStorageFragment extends Fragment {
     MegaNode selectedNode = null;
 
     ArrayList<String> imagesPath = new ArrayList<>();
-    ArrayList<String> thumbPath = new ArrayList<>();
+    ArrayList<Bitmap> thumBitmap = new ArrayList<>();
     String downloadLocationDefaultPath = Util.downloadDIR;
 
     int count = 0;
@@ -197,9 +202,37 @@ public class ChatFileStorageFragment extends Fragment {
         }
         cur.close();
         count = imagesPath.size();
-        log("imagesPath.size(): "+imagesPath.size());
-        String re = getThumbnailPath(context, imagesPath.get(1));
-        log("re "+re);
+        log("******imagesPath.size(): "+imagesPath.size());
+        log("******imagesPath(3): "+imagesPath.get(3));
+
+        final int THUMBNAIL_SIZE = 64;
+
+        try
+        {
+            for(String one : imagesPath){
+                FileInputStream fis = new FileInputStream(one);
+                Bitmap imageBitmap = BitmapFactory.decodeStream(fis);
+
+                Float width = new Float(imageBitmap.getWidth());
+                Float height = new Float(imageBitmap.getHeight());
+                Float ratio = width/height;
+                imageBitmap = Bitmap.createScaledBitmap(imageBitmap, (int)(THUMBNAIL_SIZE * ratio), THUMBNAIL_SIZE, false);
+
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                imageBitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+                thumBitmap.add(imageBitmap);
+            }
+
+        }
+        catch(Exception ex) {
+
+        }
+
+        log("******thumBitmap.size(): "+thumBitmap.size());
+        log("******thumBitmap(0): "+thumBitmap.get(0));
+
+//        String re = getThumbnailPath(context, imagesPath.get(1));
+//        log("re "+re);
 
 
 
@@ -248,10 +281,10 @@ public class ChatFileStorageFragment extends Fragment {
         recyclerView.setItemAnimator(new DefaultItemAnimator());
 
         if (adapter == null){
-            adapter = new MegaChatFileStorageAdapter(context, this, imagesPath, recyclerView, aB);
+            adapter = new MegaChatFileStorageAdapter(context, this, recyclerView, aB, thumBitmap);
 
         }else{
-            adapter.setNodes(imagesPath);
+            adapter.setNodes(thumBitmap);
         }
 
 //        adapter.setMultipleSelect(false);
@@ -259,7 +292,7 @@ public class ChatFileStorageFragment extends Fragment {
         recyclerView.setAdapter(adapter);
         fastScroller.setRecyclerView(recyclerView);
 
-        setNodes(imagesPath);
+        setNodes(thumBitmap);
 
         if (adapter.getItemCount() == 0){
             recyclerView.setVisibility(View.VISIBLE);
@@ -324,17 +357,16 @@ public class ChatFileStorageFragment extends Fragment {
         return recyclerView;
     }
 
-    public void setNodes(ArrayList<String> imagesPath){
-        log("setNodes: "+imagesPath.size());
+    public void setNodes(ArrayList<Bitmap> thumImages){
+        log("setNodes: "+thumImages.size());
 
         visibilityFastScroller();
 
-        this.imagesPath = imagesPath;
+        this.thumBitmap = thumImages;
             if (adapter != null){
-                adapter.setNodes(imagesPath);
+                adapter.setNodes(thumImages);
 
                 if (adapter.getItemCount() == 0){
-                    log("********* adapter = 0");
                     recyclerView.setVisibility(View.VISIBLE);
                 }else{
                     recyclerView.setVisibility(View.VISIBLE);

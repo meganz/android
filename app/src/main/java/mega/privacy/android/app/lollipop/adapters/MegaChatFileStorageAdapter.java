@@ -64,7 +64,7 @@ public class MegaChatFileStorageAdapter extends RecyclerView.Adapter<MegaChatFil
     MegaApiAndroid megaApi;
     ActionBar aB;
 
-    ArrayList<String> imagesPath;
+    ArrayList<Bitmap> thumbimages;
 
     Object fragment;
 
@@ -94,12 +94,12 @@ public class MegaChatFileStorageAdapter extends RecyclerView.Adapter<MegaChatFil
         public View separator;
     }
 
-    public MegaChatFileStorageAdapter(Context _context, Object fragment, ArrayList<String> _imagesPath, RecyclerView recyclerView, ActionBar aB) {
+    public MegaChatFileStorageAdapter(Context _context, Object fragment, RecyclerView recyclerView, ActionBar aB, ArrayList<Bitmap> _thumbimages) {
 
-        log("MegaChatFileStorageAdapter");
+        log("******++MegaChatFileStorageAdapter");
         this.context = _context;
-        this.imagesPath = _imagesPath;
         this.fragment = fragment;
+        this.thumbimages = _thumbimages;
 
         dbH = DatabaseHandler.getDbHandler(context);
 
@@ -111,9 +111,9 @@ public class MegaChatFileStorageAdapter extends RecyclerView.Adapter<MegaChatFil
         }
     }
 
-    public void setNodes(ArrayList<String> imagesPath) {
+    public void setNodes(ArrayList<Bitmap> thumbImages) {
         log("setNodes");
-        this.imagesPath = imagesPath;
+        this.thumbimages = thumbImages;
         notifyDataSetChanged();
     }
 
@@ -121,7 +121,7 @@ public class MegaChatFileStorageAdapter extends RecyclerView.Adapter<MegaChatFil
 
     @Override
     public ViewHolderBrowser onCreateViewHolder(ViewGroup parent, int viewType) {
-        log("onCreateViewHolder");
+        log("*******onCreateViewHolder");
         Display display = ((Activity) context).getWindowManager().getDefaultDisplay();
         outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
@@ -145,53 +145,55 @@ public class MegaChatFileStorageAdapter extends RecyclerView.Adapter<MegaChatFil
 
     @Override
     public void onBindViewHolder(ViewHolderBrowser holder, int position) {
-        log("onBindViewHolder");
+        log("*********onBindViewHolder");
         ViewHolderBrowserGrid holderGrid = (ViewHolderBrowserGrid) holder;
         onBindViewHolderGrid(holderGrid, position);
     }
 
     public void onBindViewHolderGrid(ViewHolderBrowserGrid holder, int position){
-        log("onBindViewHolderGrid");
+        log("******onBindViewHolderGrid");
 
         Display display = ((Activity) context).getWindowManager().getDefaultDisplay();
-
-        String image = (String) getItem(position);
-        if (image == null){
+        Bitmap image = (Bitmap) getItem(position);
+        if(image == null){
             return;
         }
 
-        Bitmap thumb = null;
         holder.itemLayout.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.background_item_grid));
         holder.separator.setBackgroundColor(context.getResources().getColor(R.color.new_background_fragment));
 
         holder.imageViewThumb.setVisibility(View.VISIBLE);
+
+
+        holder.imageViewThumb.setImageBitmap(image);
+
     }
 
-    private String getItemNode(int position) {
-        return imagesPath.get(position);
+    private Bitmap getItemNode(int position) {
+        return thumbimages.get(position);
     }
 
 
     @Override
     public int getItemCount() {
-        if (imagesPath != null){
-            return imagesPath.size();
+        if (thumbimages != null){
+            return thumbimages.size();
         }else{
             return 0;
         }
     }
 
     public Object getItem(int position) {
-        if (imagesPath != null){
-            return imagesPath.get(position);
+        if (thumbimages != null){
+            return thumbimages.get(position);
         }
         return null;
     }
 
-    public String getNodeAt(int position) {
+    public Bitmap getNodeAt(int position) {
         try {
-            if (imagesPath != null) {
-                return imagesPath.get(position);
+            if (thumbimages != null) {
+                return thumbimages.get(position);
             }
         } catch (IndexOutOfBoundsException e) {
         }
