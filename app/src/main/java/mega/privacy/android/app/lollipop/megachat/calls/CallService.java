@@ -102,7 +102,10 @@ public class CallService extends Service implements MegaChatCallListenerInterfac
                 .setContentTitle("Call in progress").setContentText("Click to back to call")
                 .setOngoing(false);
 
-        mNotificationManager.notify(Constants.NOTIFICATION_CALL_IN_PROGRESS, mBuilderCompat.build());
+        Notification notif = mBuilderCompat.build();
+//        mNotificationManager.notify(Constants.NOTIFICATION_CALL_IN_PROGRESS, notif);
+
+        startForeground(Constants.NOTIFICATION_CALL_IN_PROGRESS, notif);
     }
 
     @Override
