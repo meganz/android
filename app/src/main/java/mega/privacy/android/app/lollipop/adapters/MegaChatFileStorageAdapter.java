@@ -93,7 +93,7 @@ public class MegaChatFileStorageAdapter extends RecyclerView.Adapter<MegaChatFil
         }
         public ImageView imageViewThumb;
         public RelativeLayout thumbLayout;
-        public View separator;
+//        public View separator;
     }
 
     public MegaChatFileStorageAdapter(Context _context, Object fragment, RecyclerView recyclerView, ActionBar aB, ArrayList<Bitmap> _thumbimages) {
@@ -134,7 +134,7 @@ public class MegaChatFileStorageAdapter extends RecyclerView.Adapter<MegaChatFil
         holderGrid.itemLayout = (RelativeLayout) v.findViewById(R.id.file_storage_grid_item_layout);
         holderGrid.thumbLayout = (RelativeLayout) v.findViewById(R.id.file_storage_grid_thumbnail_layout);
         holderGrid.imageViewThumb = (ImageView) v.findViewById(R.id.file_storage_grid_thumbnail);
-        holderGrid.separator = (View) v.findViewById(R.id.file_grid_separator);
+//        holderGrid.separator = (View) v.findViewById(R.id.file_grid_separator);
 
         holderGrid.itemLayout.setTag(holderGrid);
         //holderGrid.itemLayout.setOnClickListener(this);
@@ -162,7 +162,7 @@ public class MegaChatFileStorageAdapter extends RecyclerView.Adapter<MegaChatFil
         }
 
         holder.itemLayout.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.background_item_grid));
-        holder.separator.setBackgroundColor(context.getResources().getColor(R.color.new_background_fragment));
+//        holder.separator.setBackgroundColor(context.getResources().getColor(R.color.new_background_fragment));
 
         holder.imageViewThumb.setVisibility(View.VISIBLE);
 
