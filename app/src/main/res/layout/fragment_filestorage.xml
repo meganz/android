@@ -16,13 +16,13 @@
             android:choiceMode="multipleChoice"
             android:columnWidth="172dp"/>
 
-        <mega.privacy.android.app.components.scrollBar.FastScroller
-            android:id="@+id/fastscroll"
-            android:orientation="vertical"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_alignParentRight="true"
-            android:gravity="right"/>
+        <!--<mega.privacy.android.app.components.scrollBar.FastScroller-->
+            <!--android:id="@+id/fastscroll"-->
+            <!--android:orientation="vertical"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="match_parent"-->
+            <!--android:layout_alignParentRight="true"-->
+            <!--android:gravity="right"/>-->
     </RelativeLayout>
 
 </RelativeLayout>

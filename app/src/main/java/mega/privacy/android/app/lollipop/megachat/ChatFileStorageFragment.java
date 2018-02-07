@@ -86,7 +86,7 @@ public class ChatFileStorageFragment extends Fragment {
     private static final String BUNDLE_RECYCLER_LAYOUT = "classname.recycler.layout";
 
     RecyclerView recyclerView;
-    FastScroller fastScroller;
+//    FastScroller fastScroller;
 
     MegaChatFileStorageAdapter adapter;
     ChatFileStorageFragment fileStorageFragment = this;
@@ -215,7 +215,7 @@ public class ChatFileStorageFragment extends Fragment {
         View v = inflater.inflate(R.layout.fragment_filestorage, container, false);
 
         recyclerView = (CustomizedGridRecyclerView) v.findViewById(R.id.file_storage_grid_view_browser);
-        fastScroller = (FastScroller) v.findViewById(R.id.fastscroll);
+//        fastScroller = (FastScroller) v.findViewById(R.id.fastscroll);
 
         recyclerView.setPadding(0, 0, 0, Util.scaleHeightPx(80, outMetrics));
         recyclerView.setClipToPadding(false);
@@ -235,7 +235,7 @@ public class ChatFileStorageFragment extends Fragment {
 //        adapter.setMultipleSelect(false);
 
         recyclerView.setAdapter(adapter);
-        fastScroller.setRecyclerView(recyclerView);
+//        fastScroller.setRecyclerView(recyclerView);
 
         setNodes(thumBitmap);
 
@@ -305,7 +305,7 @@ public class ChatFileStorageFragment extends Fragment {
     public void setNodes(ArrayList<Bitmap> thumImages){
         log("setNodes: "+thumImages.size());
 
-        visibilityFastScroller();
+//        visibilityFastScroller();
 
         this.thumBitmap = thumImages;
             if (adapter != null){
@@ -329,18 +329,18 @@ public class ChatFileStorageFragment extends Fragment {
         return 0;
     }
 
-    public void visibilityFastScroller(){
-        if(adapter == null){
-            fastScroller.setVisibility(View.GONE);
-        }else{
-            if(adapter.getItemCount() < Constants.MIN_ITEMS_SCROLLBAR){
-                fastScroller.setVisibility(View.GONE);
-            }else{
-                fastScroller.setVisibility(View.VISIBLE);
-            }
-        }
-
-    }
+//    public void visibilityFastScroller(){
+//        if(adapter == null){
+//            fastScroller.setVisibility(View.GONE);
+//        }else{
+//            if(adapter.getItemCount() < Constants.MIN_ITEMS_SCROLLBAR){
+//                fastScroller.setVisibility(View.GONE);
+//            }else{
+//                fastScroller.setVisibility(View.VISIBLE);
+//            }
+//        }
+//
+//    }
 
     public static String getThumbnailPath(Context context, String path)
     {

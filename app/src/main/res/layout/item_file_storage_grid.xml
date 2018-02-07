@@ -24,11 +24,11 @@
             android:background="@color/green_free_account"/>
     </RelativeLayout>
 
-    <View
-        android:id="@+id/file_grid_separator"
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_below="@id/file_grid_thumbnail_layout"
-        android:background="@color/new_background_fragment"/>
+    <!--<View-->
+        <!--android:id="@+id/file_grid_separator"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="1dp"-->
+        <!--android:layout_below="@id/file_grid_thumbnail_layout"-->
+        <!--android:background="@color/new_background_fragment"/>-->
 
 </RelativeLayout>
