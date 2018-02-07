@@ -27,6 +27,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.text.Spanned;
+import android.util.Base64;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.LayoutInflater;
@@ -109,7 +110,6 @@ public class ChatFileStorageFragment extends Fragment {
     CustomizedGridLayoutManager gridLayoutManager;
     MegaNode selectedNode = null;
 
-    ArrayList<String> imagesPath = new ArrayList<>();
     ArrayList<Bitmap> thumBitmap = new ArrayList<>();
     String downloadLocationDefaultPath = Util.downloadDIR;
 
@@ -185,7 +185,7 @@ public class ChatFileStorageFragment extends Fragment {
         display.getMetrics(outMetrics);
         density  = getResources().getDisplayMetrics().density;
 
-        //GET IMAGES PATH:
+                //GET IMAGES PATH:
         String[] projection = new String[]{
             MediaStore.Images.Media.DATA,
         };
@@ -197,72 +197,17 @@ public class ChatFileStorageFragment extends Fragment {
 
             int dataColumn = cur.getColumnIndex(MediaStore.Images.Media.DATA);
             do {
-                imagesPath.add(cur.getString(dataColumn));
+                Cursor ca = getActivity().getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, new String[] { MediaStore.MediaColumns._ID }, MediaStore.MediaColumns.DATA + "=?", new String[] {cur.getString(dataColumn)}, null);
+
+                if (ca != null && ca.moveToFirst()) {
+                    int id = ca.getInt(ca.getColumnIndex(MediaStore.MediaColumns._ID));
+                    thumBitmap.add(MediaStore.Images.Thumbnails.getThumbnail(getActivity().getContentResolver(), id, MediaStore.Images.Thumbnails.MINI_KIND, null ));
+                }
             } while (cur.moveToNext());
         }
         cur.close();
-        count = imagesPath.size();
-        log("******imagesPath.size(): "+imagesPath.size());
-        log("******imagesPath(3): "+imagesPath.get(3));
-
-        final int THUMBNAIL_SIZE = 64;
-
-        try
-        {
-            for(String one : imagesPath){
-                FileInputStream fis = new FileInputStream(one);
-                Bitmap imageBitmap = BitmapFactory.decodeStream(fis);
-
-                Float width = new Float(imageBitmap.getWidth());
-                Float height = new Float(imageBitmap.getHeight());
-                Float ratio = width/height;
-                imageBitmap = Bitmap.createScaledBitmap(imageBitmap, (int)(THUMBNAIL_SIZE * ratio), THUMBNAIL_SIZE, false);
-
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                imageBitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
-                thumBitmap.add(imageBitmap);
-            }
-
-        }
-        catch(Exception ex) {
-
-        }
 
         log("******thumBitmap.size(): "+thumBitmap.size());
-        log("******thumBitmap(0): "+thumBitmap.get(0));
-
-//        String re = getThumbnailPath(context, imagesPath.get(1));
-//        log("re "+re);
-
-
-
-
-//        //GET IMAGES PATH:
-//       String[] projection = new String[]{
-//                MediaStore.Images.Media.DATA,
-//        };
-//
-//        Uri images = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
-//        Cursor cur = getActivity().managedQuery(images, projection, "", null, "");
-//
-//        if (cur.moveToFirst()) {
-//
-//            int dataColumn = cur.getColumnIndex(MediaStore.Images.Media.DATA);
-//            do {
-//                imagesPath.add(cur.getString(dataColumn));
-//            } while (cur.moveToNext());
-//        }
-//        cur.close();
-//        count = imagesPath.size();
-//        log("imagesPath.size(): "+imagesPath.size());
-
-
-        //GET THUMBNAILS PATH
-//        Cursor cursor = MediaStore.Images.Thumbnails.queryMiniThumbnails(getActivity().getContentResolver(), getActivity().selectedImageUri, MediaStore.Images.Thumbnails.MINI_KIND, null );
-//        if( cursor != null && cursor.getCount() > 0 ) {
-//            cursor.moveToFirst();
-//            String uri = cursor.getString( cursor.getColumnIndex( MediaStore.Images.Thumbnails.DATA ) );
-//        }
 
         ((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
@@ -421,6 +366,17 @@ public class ChatFileStorageFragment extends Fragment {
         }
 
         return result;
+    }
+
+    public Bitmap StringToBitMap(String image){
+        try{
+            byte [] encodeByte= Base64.decode(image,Base64.DEFAULT);
+            Bitmap bitmap= BitmapFactory.decodeByteArray(encodeByte, 0, encodeByte.length);
+            return bitmap;
+        }catch(Exception e){
+            e.getMessage();
+            return null;
+        }
     }
 
 }
