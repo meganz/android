@@ -430,6 +430,7 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
         MegaApplication.setShowPinScreen(false);
 
         if(call.getStatus()==MegaChatCall.CALL_STATUS_RING_IN){
+
             Intent i = new Intent(this, ChatCallActivity.class);
             i.putExtra("chatHandle", call.getChatid());
             i.putExtra("callId", call.getId());

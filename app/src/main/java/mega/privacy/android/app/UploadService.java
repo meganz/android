@@ -273,7 +273,6 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 			else{
 				return CHECK_FILE_TO_UPLOAD_OVERWRITE;
 			}
-
 		}
 	}
 

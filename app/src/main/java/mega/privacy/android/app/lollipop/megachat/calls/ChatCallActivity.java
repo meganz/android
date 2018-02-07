@@ -102,6 +102,11 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
     ChatItemPreferences chatPrefs = null;
     MegaUser myUser;
 
+    public static int REMOTE_VIDEO_NOT_INIT = -1;
+    public static int REMOTE_VIDEO_ENABLED = 1;
+    public static int REMOTE_VIDEO_DISABLED = 0;
+
+
     private LocalCameraCallFragment localCameraFragment;
     private LocalCameraCallFullScreenFragment localCameraFragmentFS = null;
 
@@ -129,6 +134,8 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
     Timer timer = null;
     Timer ringerTimer = null;
     long milliseconds = 0;
+
+    int isRemoteVideo = REMOTE_VIDEO_NOT_INIT;
 
     Ringtone ringtone = null;
     Vibrator vibrator = null;
@@ -420,6 +427,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
         parentFS.setVisibility(View.GONE);
         fragmentContainerLocalCameraFS.setVisibility(View.GONE);
 
+
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
 
@@ -472,6 +480,10 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                     return;
                 }
 
+                Intent intentService = new Intent(this, CallService.class);
+                intentService.putExtra("chatHandle", callChat.getChatid());
+                this.startService(intentService);
+
                 audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
 
                 int callStatus = callChat.getStatus();
@@ -519,6 +531,17 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                             vibrator.vibrate(pattern, 0);
                         }
                     }
+                }
+                else if(callStatus==MegaChatCall.CALL_STATUS_IN_PROGRESS){
+                    relativeVideo.getLayoutParams().height= RelativeLayout.LayoutParams.WRAP_CONTENT;
+                    relativeVideo.getLayoutParams().width= RelativeLayout.LayoutParams.WRAP_CONTENT;
+                    setProfileMyAvatar(false);
+                    setProfileContactAvatar(userHandle, fullName, true);
+
+                    updateLocalVideoStatus();
+                    updateLocalAudioStatus();
+                    updateRemoteAudioStatus();
+                    updateRemoteVideoStatus();
                 }
                 else{
                     log("Outgoing call");
@@ -842,6 +865,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
 
     @Override
     public void onBackPressed() {
+        log("onBackPressed");
 //		if (overflowMenuLayout != null){
 //			if (overflowMenuLayout.getVisibility() == View.VISIBLE){
 //				overflowMenuLayout.setVisibility(View.GONE);
@@ -849,6 +873,19 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
 //			}
 //		}
 //        super.onBackPressed();
+        super.onBackPressed();
+
+        if (megaChatApi != null) {
+            megaChatApi.removeChatCallListener(this);
+            megaChatApi.removeChatVideoListener(this);
+        }
+
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            super.finishAndRemoveTask();
+        }
+        else {
+            super.finish();
+        }
     }
 
     @Override
@@ -1500,21 +1537,44 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
     public void updateRemoteVideoStatus(){
         log("updateRemoteVideoStatus");
 
-        if(callChat.hasRemoteVideo()){
-            log("Video remote connected");
-            contactAvatarLayout.setVisibility(View.GONE);
-            contactAvatarLayout.setOnTouchListener(null);
-            remoteSurfaceView.setOnTouchListener(this);
-            megaChatApi.addChatRemoteVideoListener(this);
+        if(isRemoteVideo== REMOTE_VIDEO_NOT_INIT){
+            if(callChat.hasRemoteVideo()){
+                log("Video remote connected");
+                isRemoteVideo = REMOTE_VIDEO_ENABLED;
+                contactAvatarLayout.setVisibility(View.GONE);
+                contactAvatarLayout.setOnTouchListener(null);
+                remoteSurfaceView.setOnTouchListener(this);
+                log("Register remote video listener");
+                megaChatApi.addChatRemoteVideoListener(this);
+            }
+            else{
+                log("Video remote NOT connected");
+                isRemoteVideo = REMOTE_VIDEO_DISABLED;
+                contactAvatarLayout.setVisibility(View.VISIBLE);
+                remoteSurfaceView.setOnTouchListener(null);
+                contactAvatarLayout.setOnTouchListener(this);
+                megaChatApi.removeChatVideoListener(this);
+            }
         }
         else{
-            log("Video remote NOT connected");
-            contactAvatarLayout.setVisibility(View.VISIBLE);
-            remoteSurfaceView.setOnTouchListener(null);
-            contactAvatarLayout.setOnTouchListener(this);
-            megaChatApi.removeChatVideoListener(this);
+            log("Change on remote video");
+            if((isRemoteVideo==REMOTE_VIDEO_ENABLED)&&(!callChat.hasRemoteVideo())){
+                isRemoteVideo = REMOTE_VIDEO_DISABLED;
+                contactAvatarLayout.setVisibility(View.VISIBLE);
+                remoteSurfaceView.setOnTouchListener(null);
+                contactAvatarLayout.setOnTouchListener(this);
+                megaChatApi.removeChatVideoListener(this);
+            }
+            else if((isRemoteVideo==REMOTE_VIDEO_DISABLED)&&(callChat.hasRemoteVideo())){
+                isRemoteVideo = REMOTE_VIDEO_ENABLED;
+                contactAvatarLayout.setVisibility(View.GONE);
+                contactAvatarLayout.setOnTouchListener(null);
+                remoteSurfaceView.setOnTouchListener(this);
+                megaChatApi.addChatRemoteVideoListener(this);
+            }
         }
     }
+
     public void updateLocalFullVideoStatus(){
         log("updateLocalFullVideoStatus: ");
 
