@@ -1,5 +1,6 @@
 package mega.privacy.android.app.lollipop.megachat.calls;
 
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.RelativeLayout;
@@ -128,10 +129,6 @@ public class OnDragTouchListener implements View.OnTouchListener{
                     onDragFinish();
                     break;
                 case MotionEvent.ACTION_MOVE:
-//                    RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams)v.getLayoutParams();
-//                    params.leftMargin = (int )v.getX();
-//                    params.topMargin = (int )v.getY();
-//                    v.setLayoutParams(params);
                     mView.animate().x(bounds[0]).y(bounds[1]).setDuration(0).start();
 
                     break;

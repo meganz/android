@@ -29,7 +29,6 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.Product;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -126,6 +125,7 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
 
     private TextView freePriceInteger;
     private TextView freePriceDecimal;
+    private TextView freeStorageTitle;
     private TextView freeStorageInteger;
     private TextView freeStorageGb;
     private TextView freeBandwidthInteger;
@@ -288,6 +288,10 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
         RelativeLayout.LayoutParams perMonthParams = (RelativeLayout.LayoutParams) perMonth.getLayoutParams();
         perMonthParams.setMargins(0,0,0,Util.scaleHeightPx(4, outMetrics));
         perMonth.setLayoutParams(perMonthParams);
+
+        freeStorageTitle = (TextView) v.findViewById(R.id.choose_account_free_storage_label);
+        String storageTitle = getString(R.string.general_storage)+" *";
+        freeStorageTitle.setText(storageTitle.toUpperCase(Locale.getDefault()));
 
         freePriceInteger = (TextView) v.findViewById(R.id.choose_account_free_integer_text);
         freePriceDecimal = (TextView) v.findViewById(R.id.choose_account_free_decimal_text);

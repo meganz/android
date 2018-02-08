@@ -280,7 +280,6 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 			else{
 				return CHECK_FILE_TO_UPLOAD_OVERWRITE;
 			}
-
 		}
 	}
 
@@ -340,10 +339,10 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 		//Delete recursively all files and folder
 		if (f.exists()) {
 			if (f.isDirectory()) {
-			    for (File c : f.listFiles())
-			      c.delete();
+				if(f.list().length<=0){
+					f.delete();
+				}
 			}
-			f.delete();
 		}
 	}
 
@@ -537,10 +536,10 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 				File f = new File(pathSelfie);
 				//Delete recursively all files and folder
 				if (f.isDirectory()) {
-					for (File c : f.listFiles())
-						c.delete();
+					if(f.list().length<=0){
+						f.delete();
+					}
 				}
-				f.delete();
 
 			} else {
 				if (error.getErrorCode() == MegaError.API_OK) {
@@ -554,15 +553,6 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 						if (node != null) {
 							MediaMetadataRetriever retriever = new MediaMetadataRetriever();
 							retriever.setDataSource(transfer.getPath());
-							String time = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
-							if (time != null) {
-								double seconds = Double.parseDouble(time) / 1000;
-								log("The original duration is: " + seconds);
-								int secondsAprox = (int) Math.round(seconds);
-								log("The duration aprox is: " + secondsAprox);
-
-								megaApi.setNodeDuration(node, secondsAprox, null);
-							}
 
 							String location = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_LOCATION);
 							if (location != null) {
@@ -680,10 +670,6 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 					megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD, this);
 				}
 
-				if (megaApi.getNumPendingUploads() == 0 && transfersCount == 0) {
-					onQueueComplete();
-				}
-
 				log("IN Finish: " + transfer.getFileName() + "path? " + transfer.getPath());
 				String pathSelfie = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.temporalPicDIR;
 				if (transfer.getPath() != null) {
@@ -693,6 +679,10 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 					}
 				} else {
 					log("transfer.getPath() is NULL");
+				}
+
+				if (megaApi.getNumPendingUploads() == 0 && transfersCount == 0) {
+					onQueueComplete();
 				}
 			}
 		}

@@ -7,7 +7,6 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.net.wifi.WifiManager;
 import android.net.wifi.WifiManager.WifiLock;
@@ -237,26 +236,31 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 						if (megaChatApi == null) {
 							megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
 						}
-						int ret = megaChatApi.init(gSession);
-						log("result of init ---> " + ret);
-						chatSettings = dbH.getChatSettings();
-						if (ret == MegaChatApi.INIT_NO_CACHE) {
-							log("condition ret == MegaChatApi.INIT_NO_CACHE");
-							megaApi.invalidateCache();
 
-						} else if (ret == MegaChatApi.INIT_ERROR) {
-							log("condition ret == MegaChatApi.INIT_ERROR");
-							if (chatSettings == null) {
-								log("ERROR----> Switch OFF chat");
-								chatSettings = new ChatSettings(false + "", true + "", "", true + "");
-								dbH.setChatSettings(chatSettings);
+						int ret = megaChatApi.getInitState();
+
+						if(ret==0||ret==MegaChatApi.INIT_ERROR){
+							ret = megaChatApi.init(gSession);
+							log("result of init ---> " + ret);
+							chatSettings = dbH.getChatSettings();
+							if (ret == MegaChatApi.INIT_NO_CACHE) {
+								log("condition ret == MegaChatApi.INIT_NO_CACHE");
+								megaApi.invalidateCache();
+
+							} else if (ret == MegaChatApi.INIT_ERROR) {
+								log("condition ret == MegaChatApi.INIT_ERROR");
+								if (chatSettings == null) {
+									log("ERROR----> Switch OFF chat");
+									chatSettings = new ChatSettings(false + "", true + "", "", true + "");
+									dbH.setChatSettings(chatSettings);
+								} else {
+									log("ERROR----> Switch OFF chat");
+									dbH.setEnabledChat(false + "");
+								}
+								megaChatApi.logout(this);
 							} else {
-								log("ERROR----> Switch OFF chat");
-								dbH.setEnabledChat(false + "");
+								log("Chat correctly initialized");
 							}
-							megaChatApi.logout(this);
-						} else {
-							log("Chat correctly initialized");
 						}
 					}
 
@@ -264,6 +268,9 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 					updateProgressNotification();
 					megaApi.fastLogin(gSession, this);
 					return;
+				}
+				else{
+					log("Another login is processing");
 				}
 				pendingIntents.add(intent);
 				return;
@@ -586,11 +593,20 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 					//
 					//					log("Lanzo intent al manager.....");
 					//				}
+					Boolean externalFile;
+					if (!currentFile.getAbsolutePath().contains(Environment.getExternalStorageDirectory().getPath())){
+						externalFile = true;
+					}
+					else {
+						externalFile = false;
+					}
+
 					if (MimeTypeList.typeForName(currentFile.getName()).isPdf()){
 						log("Pdf file");
 						Intent pdfIntent = new Intent(this, PdfViewerActivityLollipop.class);
 						pdfIntent.putExtra("APP", true);
-						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+						pdfIntent.putExtra("HANDLE", currentDocument.getHandle());
+						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && !externalFile) {
 							pdfIntent.setDataAndType(FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
 						}
 						else{
@@ -605,7 +621,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 						Intent videoIntent = new Intent(this, AudioVideoPlayerLollipop.class);
 						videoIntent.putExtra("HANDLE", currentDocument.getHandle());
-						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && !externalFile) {
 							videoIntent.setDataAndType(FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
 						}
 						else{
@@ -619,7 +635,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 						Intent audioIntent = new Intent(this, AudioVideoPlayerLollipop.class);
 						audioIntent.putExtra("HANDLE", currentDocument.getHandle());
-						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && !externalFile) {
 							audioIntent.setDataAndType(FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
 						}
 						else{
@@ -1022,20 +1038,6 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 							if(!videoNode.hasThumbnail()){
 								log("The video has not thumb");
 								ThumbnailUtilsLollipop.createThumbnailVideo(this, transfer.getPath(), megaApi, transfer.getNodeHandle());
-							}
-							if(videoNode.getDuration()<1){
-								log("The video has not duration!!!");
-								MediaMetadataRetriever retriever = new MediaMetadataRetriever();
-								retriever.setDataSource(transfer.getPath());
-								String time = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
-								if(time!=null){
-									double seconds = Double.parseDouble(time)/1000;
-									log("The original duration is: "+seconds);
-									int secondsAprox = (int) Math.round(seconds);
-									log("The duration aprox is: "+secondsAprox);
-
-									megaApi.setNodeDuration(videoNode, secondsAprox, null);
-								}
 							}
 						}
 						else{

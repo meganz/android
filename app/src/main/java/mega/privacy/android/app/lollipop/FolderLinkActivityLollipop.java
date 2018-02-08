@@ -293,37 +293,42 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 		megaApiFolder = app.getMegaApiFolder();
 		megaApi = app.getMegaApi();
 
-		if(megaApi==null||megaApi.getRootNode()==null){
-			log("Refresh session - sdk");
-			Intent intent = new Intent(this, LoginActivityLollipop.class);
-			intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
-			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-			startActivity(intent);
-			finish();
-			return;
-		}
-		if(megaApiFolder==null||megaApiFolder.getRootNode()==null){
-			log("Refresh session - sdk");
-			Intent intent = new Intent(this, LoginActivityLollipop.class);
-			intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
-			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-			startActivity(intent);
-			finish();
-			return;
-		}
-		if(Util.isChatEnabled()){
-			if (megaChatApi == null){
-				megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
-			}
+		dbH = DatabaseHandler.getDbHandler(FolderLinkActivityLollipop.this);
 
-			if(megaChatApi==null||megaChatApi.getInitState()== MegaChatApi.INIT_ERROR){
-				log("Refresh session - karere");
+		Intent intentReceived = getIntent();
+
+		if (intentReceived != null) {
+			url = intentReceived.getDataString();
+		}
+
+		if (dbH.getCredentials() != null) {
+			if (megaApi == null || megaApi.getRootNode() == null) {
+				log("Refresh session - sdk");
 				Intent intent = new Intent(this, LoginActivityLollipop.class);
-				intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
+				intent.putExtra("visibleFragment", Constants.LOGIN_FRAGMENT);
+				intent.setData(Uri.parse(url));
+				intent.setAction(Constants.ACTION_OPEN_FOLDER_LINK_ROOTNODES_NULL);
 				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 				startActivity(intent);
 				finish();
 				return;
+			}
+			if (Util.isChatEnabled()) {
+				if (megaChatApi == null) {
+					megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
+				}
+
+				if (megaChatApi == null || megaChatApi.getInitState() == MegaChatApi.INIT_ERROR) {
+					log("Refresh session - karere");
+					Intent intent = new Intent(this, LoginActivityLollipop.class);
+					intent.putExtra("visibleFragment", Constants.LOGIN_FRAGMENT);
+					intent.setData(Uri.parse(url));
+					intent.setAction(Constants.ACTION_OPEN_FOLDER_LINK_ROOTNODES_NULL);
+					intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+					startActivity(intent);
+					finish();
+					return;
+				}
 			}
 		}
 		
@@ -336,7 +341,6 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 			window.setStatusBarColor(ContextCompat.getColor(this, R.color.lollipop_dark_primary_color));
 		}
 
-		dbH = DatabaseHandler.getDbHandler(FolderLinkActivityLollipop.this);
 		prefs = dbH.getPreferences();
 		if (prefs != null){
 			log("prefs != null");

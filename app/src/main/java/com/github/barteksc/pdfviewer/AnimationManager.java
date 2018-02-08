@@ -41,11 +41,13 @@ class AnimationManager {
     private boolean flinging = false;
 
     public AnimationManager(PDFView pdfView) {
+        log("AnimationManager");
         this.pdfView = pdfView;
         scroller = new OverScroller(pdfView.getContext());
     }
 
     public void startXAnimation(float xFrom, float xTo) {
+        log("startXAnimation");
         stopAll();
         animation = ValueAnimator.ofFloat(xFrom, xTo);
         animation.setInterpolator(new DecelerateInterpolator());
@@ -55,6 +57,7 @@ class AnimationManager {
     }
 
     public void startYAnimation(float yFrom, float yTo) {
+        log("startYAnimation");
         stopAll();
         animation = ValueAnimator.ofFloat(yFrom, yTo);
         animation.setInterpolator(new DecelerateInterpolator());
@@ -64,6 +67,7 @@ class AnimationManager {
     }
 
     public void startZoomAnimation(float centerX, float centerY, float zoomFrom, float zoomTo) {
+        log("startZoomAnimation");
         stopAll();
         animation = ValueAnimator.ofFloat(zoomFrom, zoomTo);
         animation.setInterpolator(new DecelerateInterpolator());
@@ -75,12 +79,14 @@ class AnimationManager {
     }
 
     public void startFlingAnimation(int startX, int startY, int velocityX, int velocityY, int minX, int maxX, int minY, int maxY) {
+        log("startFlingAnimation");
         stopAll();
         flinging = true;
         scroller.fling(startX, startY, velocityX, velocityY, minX, maxX, minY, maxY);
     }
 
     void computeFling() {
+        log("computeFling");
         if (scroller.computeScrollOffset()) {
             pdfView.moveTo(scroller.getCurrX(), scroller.getCurrY());
             pdfView.loadPageByOffset();
@@ -92,6 +98,7 @@ class AnimationManager {
     }
 
     public void stopAll() {
+        log("stopAll");
         if (animation != null) {
             animation.cancel();
             animation = null;
@@ -100,6 +107,7 @@ class AnimationManager {
     }
 
     public void stopFling() {
+        log("stopFling");
         flinging = false;
         scroller.forceFinished(true);
     }
@@ -108,6 +116,7 @@ class AnimationManager {
 
         @Override
         public void onAnimationUpdate(ValueAnimator animation) {
+            log("onAnimationUpdate");
             float offset = (Float) animation.getAnimatedValue();
             pdfView.moveTo(offset, pdfView.getCurrentYOffset());
         }
@@ -118,6 +127,7 @@ class AnimationManager {
 
         @Override
         public void onAnimationUpdate(ValueAnimator animation) {
+            log("onAnimationUpdate");
             float offset = (Float) animation.getAnimatedValue();
             pdfView.moveTo(pdfView.getCurrentXOffset(), offset);
         }
@@ -130,40 +140,50 @@ class AnimationManager {
         private final float centerY;
 
         public ZoomAnimation(float centerX, float centerY) {
+            log("ZoomAnimation");
             this.centerX = centerX;
             this.centerY = centerY;
         }
 
         @Override
         public void onAnimationUpdate(ValueAnimator animation) {
+            log("onAnimationUpdate");
             float zoom = (Float) animation.getAnimatedValue();
             pdfView.zoomCenteredTo(zoom, new PointF(centerX, centerY));
         }
 
         @Override
         public void onAnimationCancel(Animator animation) {
+            log("onAnimationCancel");
         }
 
         @Override
         public void onAnimationEnd(Animator animation) {
+            log("onAnimationEnd");
             pdfView.loadPages();
             hideHandle();
         }
 
         @Override
         public void onAnimationRepeat(Animator animation) {
+            log("onAnimationRepeat");
         }
 
         @Override
         public void onAnimationStart(Animator animation) {
+            log("onAnimationStart");
         }
 
     }
 
     private void hideHandle() {
+        log("hideHandle");
         if (pdfView.getScrollHandle() != null) {
             pdfView.getScrollHandle().hideDelayed();
         }
+    }
+    public static void log(String log) {
+        mega.privacy.android.app.utils.Util.log("AnimationManager: ", log);
     }
 
 }
