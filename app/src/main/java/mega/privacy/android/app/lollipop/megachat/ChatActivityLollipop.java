@@ -1419,6 +1419,22 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         return true;
     }
 
+    public boolean checkPermissionsReadStorage(){
+        log("checkPermissionsReadStorage");
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+
+            boolean hasReadStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
+            if (!hasReadStoragePermission) {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, Constants.REQUEST_READ_STORAGE);
+                return false;
+            }
+
+            return true;
+        }
+        return true;
+    }
+
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         log("onRequestPermissionsResult");
@@ -1453,6 +1469,14 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     if(checkPermissionsTakePicture()){
                         takePicture();
+                    }
+                }
+                break;
+            }
+            case Constants.REQUEST_READ_STORAGE:{
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    if(checkPermissionsReadStorage()){
+                        attachFromFileStorage();
                     }
                 }
                 break;
@@ -1776,35 +1800,25 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 log("TAKE_PHOTO_CODE--->ERROR!");
             }
 
-        }
-//        else if(requestCode == Constants.SELECT_PHOTO && resultCode == RESULT_OK){
-//
-//
-//
-//            if(intent != null) {
-//                Uri selectedImage = intent.getData();
-//
-//                Bitmap datifoto = null;
-//                imageView.setImageBitmap(null);
-//                Uri picUri = null;
-//                picUri = intent.getData();//<- get Uri here from data intent
-//                if(picUri !=null) {
-//                    try {
-//                        datifoto = android.provider.MediaStore.Images.Media.getBitmap(this.getContentResolver(), picUri);
-//                        imageView.setImageBitmap(datifoto);
-//                    } catch (FileNotFoundException e) {
-//                        throw new RuntimeException(e);
-//                    } catch (IOException e) {
-//                        throw new RuntimeException(e);
-//                    } catch (OutOfMemoryError e) {
-//                        Toast.makeText(getBaseContext(), "Image is too large. choose other", Toast.LENGTH_LONG).show();
-//                    }
-//                }
-//
-//            }
-//        }
+        }else if (requestCode == Constants.TAKE_PHOTO_CODE && resultCode == RESULT_OK) {
+            log("==========TAKE_PHOTO_CODE");
+            if (resultCode == Activity.RESULT_OK) {
+                String filePath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.temporalPicDIR + "/picture.jpg";
+                File imgFile = new File(filePath);
 
-        else{
+                String name = Util.getPhotoSyncName(imgFile.lastModified(), imgFile.getAbsolutePath());
+                log("Taken picture Name: " + name);
+                String newPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.temporalPicDIR + "/" + name;
+                log("----NEW Name: " + newPath);
+                File newFile = new File(newPath);
+                imgFile.renameTo(newFile);
+
+                uploadTakePicture(newPath);
+            } else {
+                log("TAKE_PHOTO_CODE--->ERROR!");
+            }
+
+        }else{
             log("Error onActivityResult");
         }
 
@@ -2042,8 +2056,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         imm.hideSoftInputFromWindow(textChat.getWindowToken(), 0);
                     }
                 }
-                attachPhotoVideo();
 
+                attachPhotoVideo();
                 break;
             }
             case R.id.pick_cloud_drive_icon_chat:{
@@ -2080,7 +2094,22 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         imm.hideSoftInputFromWindow(textChat.getWindowToken(), 0);
                     }
                 }
-                attachFromFileStorage();
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
+                    if (!hasStoragePermission) {
+                        ActivityCompat.requestPermissions(this,
+                                new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                                Constants.REQUEST_READ_STORAGE);
+                    }
+
+                    if (hasStoragePermission){
+                        this.attachFromFileStorage();
+                    }
+                }
+                else{
+                    this.attachFromFileStorage();
+                }
 
                 break;
             }
@@ -2099,10 +2128,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             ft.replace(R.id.fragment_container_file_storage, FileStorageF, "fileStorageF");
             ft.commitNow();
-
         }
-
-
     }
 
     public void attachFromCloud(){
@@ -5141,7 +5167,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     }
 
     public void uploadTakePicture(String imagePath){
-        log("uploadTakePicture");
+        log("==========uploadTakePicture");
 
         Intent intent = new Intent(this, ChatUploadService.class);
         File selfie = new File(imagePath);
@@ -5158,6 +5184,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         PendingNodeAttachment nodeAttachment = null;
 
         if(sendOriginalAttachments){
+            log("==========sendOriginalAttachments");
+
             String fingerprint = megaApi.getFingerprint(selfie.getAbsolutePath());
 
             //Add node to db
@@ -5169,6 +5197,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
         }
         else{
+            log("========== NOT sendOriginalAttachments");
+
             File previewDir = PreviewUtils.getPreviewFolder(this);
             String nameFilePreview = idChat+"_"+selfie.getName();
             File preview = new File(previewDir, nameFilePreview);
@@ -5176,6 +5206,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             boolean isPreview = megaApi.createPreview(selfie.getAbsolutePath(), preview.getAbsolutePath());
 
             if(isPreview){
+                log("========== YES Preview");
+
                 log("Preview: "+preview.getAbsolutePath());
                 String fingerprint = megaApi.getFingerprint(preview.getAbsolutePath());
 
@@ -5187,6 +5219,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 nodeAttachment = new PendingNodeAttachment(preview.getAbsolutePath(), fingerprint, selfie.getName());
             }
             else{
+                log("==========  NO Preview");
+
                 log("No preview");
                 String fingerprint = megaApi.getFingerprint(selfie.getAbsolutePath());
 

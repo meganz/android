@@ -86,8 +86,6 @@ public class ChatFileStorageFragment extends Fragment {
     private static final String BUNDLE_RECYCLER_LAYOUT = "classname.recycler.layout";
 
     RecyclerView recyclerView;
-//    FastScroller fastScroller;
-
     MegaChatFileStorageAdapter adapter;
     ChatFileStorageFragment fileStorageFragment = this;
 
@@ -111,13 +109,14 @@ public class ChatFileStorageFragment extends Fragment {
     MegaNode selectedNode = null;
 
     ArrayList<Bitmap> thumBitmap = new ArrayList<>();
+    ArrayList<String> imagesPath = new ArrayList<>();
     String downloadLocationDefaultPath = Util.downloadDIR;
 
     int count = 0;
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        log("onSaveInstanceState");
+        log("*******FRAGMENT: onSaveInstanceState");
         super.onSaveInstanceState(outState);
         if(recyclerView.getLayoutManager()!=null){
             outState.putParcelable(BUNDLE_RECYCLER_LAYOUT, recyclerView.getLayoutManager().onSaveInstanceState());
@@ -125,14 +124,14 @@ public class ChatFileStorageFragment extends Fragment {
     }
 
     public static ChatFileStorageFragment newInstance() {
-        log("newInstance");
+        log("*******FRAGMENT: newInstance");
         ChatFileStorageFragment fragment = new ChatFileStorageFragment();
         return fragment;
     }
 
     @Override
     public void onCreate (Bundle savedInstanceState){
-        log("onCreate");
+        log("*******FRAGMENT: onCreate");
         if (megaApi == null){
             megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
         }
@@ -160,7 +159,7 @@ public class ChatFileStorageFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        log("onCreateView");
+        log("*******FRAGMENT: onCreateView");
 
         if(!isAdded()){
             return null;
@@ -185,7 +184,7 @@ public class ChatFileStorageFragment extends Fragment {
         display.getMetrics(outMetrics);
         density  = getResources().getDisplayMetrics().density;
 
-                //GET IMAGES PATH:
+        //GET THUMBNAIL PATH:
         String[] projection = new String[]{
             MediaStore.Images.Media.DATA,
         };
@@ -207,7 +206,26 @@ public class ChatFileStorageFragment extends Fragment {
         }
         cur.close();
 
-        log("******thumBitmap.size(): "+thumBitmap.size());
+        log("********thumBitmap.size(): "+thumBitmap.size());
+
+
+        //GET IMAGES PATH:
+        String[] projection1 = new String[]{
+            MediaStore.Images.Media.DATA,
+        };
+
+        Uri images1 = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+        Cursor cur1 = getActivity().managedQuery(images1, projection1, "", null, "");
+
+        if (cur1.moveToFirst()) {
+            int dataColumn = cur1.getColumnIndex(MediaStore.Images.Media.DATA);
+            do {
+                imagesPath.add(cur1.getString(dataColumn));
+            } while (cur1.moveToNext());
+        }
+        cur1.close();
+        count = imagesPath.size();
+        log("imagesPath.size(): "+imagesPath.size());
 
         ((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
@@ -215,8 +233,6 @@ public class ChatFileStorageFragment extends Fragment {
         View v = inflater.inflate(R.layout.fragment_filestorage, container, false);
 
         recyclerView = (CustomizedGridRecyclerView) v.findViewById(R.id.file_storage_grid_view_browser);
-//        fastScroller = (FastScroller) v.findViewById(R.id.fastscroll);
-
         recyclerView.setPadding(0, 0, 0, Util.scaleHeightPx(80, outMetrics));
         recyclerView.setClipToPadding(false);
 
@@ -232,10 +248,9 @@ public class ChatFileStorageFragment extends Fragment {
             adapter.setNodes(thumBitmap);
         }
 
-//        adapter.setMultipleSelect(false);
+        adapter.setMultipleSelect(false);
 
         recyclerView.setAdapter(adapter);
-//        fastScroller.setRecyclerView(recyclerView);
 
         setNodes(thumBitmap);
 
@@ -250,7 +265,7 @@ public class ChatFileStorageFragment extends Fragment {
 
     @Override
     public void onAttach(Activity activity) {
-        log("onAttach");
+        log("*******FRAGMENT: onAttach");
         super.onAttach(activity);
         context = activity;
         aB = ((AppCompatActivity)activity).getSupportActionBar();
@@ -258,10 +273,41 @@ public class ChatFileStorageFragment extends Fragment {
 
     @Override
     public void onAttach(Context context) {
+        log("*******FRAGMENT: onAttach");
+
         super.onAttach(context);
         this.context = context;
         aB = ((AppCompatActivity)context).getSupportActionBar();
     }
+
+    public void itemClick(int position) {
+        log("*******FRAGMENT: itemClick-> "+position);
+
+        ((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
+        if (adapter.isMultipleSelect()){
+            log("*****multiselect ON");
+            adapter.toggleSelection(position);
+
+//            List<Bitmap> selectedNodes = adapter.getSelectedNodes();
+//            if (selectedNodes.size() > 0){
+//
+////                ((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_RED);
+//            }
+////			else{
+////				hideMultipleSelect();
+////			}
+        }
+        else{
+            log("********************* SEND IMAGEEEEEE");
+
+            String filePath = imagesPath.get(position);
+            log("****** Position: "+position+", filePath"+filePath);
+
+            ((ChatActivityLollipop) getActivity()).uploadTakePicture(filePath);
+
+        }
+    }
+
 
     private static void log(String log) {
         Util.log("ChatFileStorageFragment", log);
@@ -269,7 +315,7 @@ public class ChatFileStorageFragment extends Fragment {
 
 
     public int onBackPressed(){
-        log("onBackPressed");
+        log("*******FRAGMENT: onBackPressed");
         ((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
         if (adapter != null){
@@ -303,9 +349,7 @@ public class ChatFileStorageFragment extends Fragment {
     }
 
     public void setNodes(ArrayList<Bitmap> thumImages){
-        log("setNodes: "+thumImages.size());
-
-//        visibilityFastScroller();
+        log("*******FRAGMENT: setNodes");
 
         this.thumBitmap = thumImages;
             if (adapter != null){
@@ -323,60 +367,62 @@ public class ChatFileStorageFragment extends Fragment {
     }
 
     public int getItemCount(){
+        log("*******FRAGMENT: getItemCount");
+
         if(adapter!=null){
             return adapter.getItemCount();
         }
         return 0;
     }
 
-//    public void visibilityFastScroller(){
-//        if(adapter == null){
-//            fastScroller.setVisibility(View.GONE);
-//        }else{
-//            if(adapter.getItemCount() < Constants.MIN_ITEMS_SCROLLBAR){
-//                fastScroller.setVisibility(View.GONE);
-//            }else{
-//                fastScroller.setVisibility(View.VISIBLE);
-//            }
-//        }
-//
-//    }
 
-    public static String getThumbnailPath(Context context, String path)
-    {
-        long imageId = -1;
-
-        String[] projection = new String[] { MediaStore.MediaColumns._ID };
-        String selection = MediaStore.MediaColumns.DATA + "=?";
-        String[] selectionArgs = new String[] { path };
-        Cursor cursor = context.getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, projection, selection, selectionArgs, null);
-        if (cursor != null && cursor.moveToFirst())
-        {
-            imageId = cursor.getInt(cursor.getColumnIndex(MediaStore.MediaColumns._ID));
-            cursor.close();
+    public boolean showSelectMenuItem(){
+        log("*******FRAGMENT: showSelectMenuItem");
+        if (adapter != null){
+            return adapter.isMultipleSelect();
         }
 
-        String result = null;
-        cursor = MediaStore.Images.Thumbnails.queryMiniThumbnail(context.getContentResolver(), imageId, MediaStore.Images.Thumbnails.MINI_KIND, null);
-        if (cursor != null && cursor.getCount() > 0)
-        {
-            cursor.moveToFirst();
-            result = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Images.Thumbnails.DATA));
-            cursor.close();
-        }
-
-        return result;
+        return false;
     }
 
-    public Bitmap StringToBitMap(String image){
-        try{
-            byte [] encodeByte= Base64.decode(image,Base64.DEFAULT);
-            Bitmap bitmap= BitmapFactory.decodeByteArray(encodeByte, 0, encodeByte.length);
-            return bitmap;
-        }catch(Exception e){
-            e.getMessage();
-            return null;
+    public void selectAll(){
+        log("*******FRAGMENT: selectAll");
+        if (adapter != null){
+            if(adapter.isMultipleSelect()){
+                adapter.selectAll();
+            }
+            else{
+                adapter.setMultipleSelect(true);
+                adapter.selectAll();
+
+            }
+
         }
     }
+
+    private void clearSelections() {
+        log("*******FRAGMENT: clearSelections");
+
+        if(adapter.isMultipleSelect()){
+            adapter.clearSelections();
+        }
+    }
+
+    public void hideMultipleSelect() {
+        log("*******FRAGMENT: hideMultipleSelect");
+
+        log("hideMultipleSelect");
+        adapter.setMultipleSelect(false);
+    }
+
+    public boolean isMultipleselect(){
+        log("*******FRAGMENT: isMultipleselect");
+
+        if(adapter!=null){
+            return adapter.isMultipleSelect();
+        }
+        return false;
+    }
+
 
 }

@@ -92,6 +92,7 @@ public class Constants {
 	public static final int REQUEST_READ_CONTACTS = 3;
 	public static final int RECORD_AUDIO = 4;
 	public static final int REQUEST_UPLOAD_CONTACT = 5;
+	public static final int REQUEST_READ_STORAGE = 6;
 
 	public static final int PRO_LITE = 4;
 	public static final int FREE = 0;
