@@ -31,8 +31,6 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import java.util.Locale;
-
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaAttributes;
@@ -44,11 +42,15 @@ import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApiAndroid;
+import nz.mega.sdk.MegaError;
+import nz.mega.sdk.MegaRequest;
+import nz.mega.sdk.MegaRequestListenerInterface;
 
 
 @SuppressLint("NewApi")
-public class PinLockActivityLollipop extends AppCompatActivity implements OnClickListener{
+public class PinLockActivityLollipop extends AppCompatActivity implements OnClickListener, MegaRequestListenerInterface {
 
 	public static String ACTION_SET_PIN_LOCK = "ACTION_SET";
 	public static String ACTION_RESET_PIN_LOCK = "ACTION_RESET";
@@ -106,6 +108,8 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 
 	int attemps = 0;
 
+	static PinLockActivityLollipop pinLockActivity = null;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -121,6 +125,8 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 		}
 
 		setContentView(R.layout.activity_pin_lock);
+
+		pinLockActivity = this;
 
 		if(megaApi==null) {
 			megaApi = ((MegaApplication)getApplication()).getMegaApi();
@@ -235,8 +241,7 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 //						dbH.setAttributes(att);
 						dbH.setAttrAttemps(attemps);
 						AccountController accountController = new AccountController(getApplicationContext());
-						accountController.logout(getApplication(), megaApi, false);
-						finish();
+						accountController.logout(pinLockActivity, megaApi);
 					}
 				}.start();
 			}
@@ -442,9 +447,9 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 		passFirstLetter.requestFocus();
 		imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
 		imm.showSoftInput(passFirstLetter, InputMethodManager.SHOW_FORCED);
-//		imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);	
+//		imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
 
-		//Add TextWatcher to first letter		
+		//Add TextWatcher to first letter
 		passFirstLetter.addTextChangedListener(new TextWatcher() {
             public void onTextChanged(CharSequence s, int start, int before, int count) {}
 
@@ -733,7 +738,6 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
             }
         });
 
-
 		passSecondLetter.addTextChangedListener(new TextWatcher() {
             public void onTextChanged(CharSequence s, int start, int before, int count) {}
 
@@ -947,8 +951,7 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 //						dbH.setAttributes(att);
 								 dbH.setAttrAttemps(attemps);
 								 AccountController aC = new AccountController(getApplicationContext());
-								 aC.logout(getApplicationContext(), megaApi, megaChatApi, false);
-								 finish();
+								 aC.logout(pinLockActivity, megaApi);
 						     }
 						  }.start();
 					}
@@ -1055,8 +1058,7 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 //						dbH.setAttributes(att);
 								 dbH.setAttrAttemps(attemps);
 								 AccountController accountController = new AccountController(getApplicationContext());
-								 accountController.logout(getApplication(), megaApi, megaChatApi, false);
-								 finish();
+								 accountController.logout(pinLockActivity, megaApi);
 						     }
 						  }.start();
 					}
@@ -1160,8 +1162,7 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 //						dbH.setAttributes(att);
 								 dbH.setAttrAttemps(attemps);
 								 AccountController accountController = new AccountController(getApplicationContext());
-								 accountController.logout(getApplication(), megaApi, false);
-								 finish();
+								 accountController.logout(pinLockActivity, megaApi);
 						     }
 						  }.start();
 					}
@@ -1254,8 +1255,7 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 //						dbH.setAttributes(att);
 								 dbH.setAttrAttemps(attemps);
 								 AccountController accountController = new AccountController(getApplicationContext());
-								 accountController.logout(getApplication(), megaApi, false);
-								 finish();
+								 accountController.logout(pinLockActivity, megaApi);
 						     }
 						  }.start();
 					}
@@ -1485,8 +1485,7 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 //						dbH.setAttributes(att);
 				dbH.setAttrAttemps(attemps);
 				AccountController aC = new AccountController(this);
-				aC.logout(getApplication(), megaApi, megaChatApi, false);
-				finish();
+				aC.logout(this, megaApi);
 				break;
 			}
 			case R.id.button_enter:{
@@ -1589,5 +1588,61 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 		if(view!=null){
 			imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
 		}
+	}
+
+	@Override
+	protected void onPause() {
+		log("onPause");
+
+		MegaApplication.activityPaused();
+
+		super.onPause();
+	}
+
+	@Override
+	protected void onResume() {
+		log("onResume");
+
+		super.onResume();
+
+		MegaApplication.activityResumed();
+
+		((MegaApplication) getApplication()).sendSignalPresenceActivity();
+	}
+
+	@Override
+	public void onRequestStart(MegaApiJava api, MegaRequest request) {
+
+	}
+
+	@Override
+	public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
+
+	}
+
+	@Override
+	public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
+		log("onRequestFinish");
+		if(request.getType() == MegaRequest.TYPE_LOGOUT){
+			if(Util.isChatEnabled()){
+				log("END logout sdk request - wait chat logout");
+			}
+			else{
+				log("END logout sdk request - chat disabled");
+
+				AccountController aC = new AccountController(this);
+				aC.logoutConfirmed(this);
+
+				Intent tourIntent = new Intent(this, LoginActivityLollipop.class);
+				tourIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+				this.startActivity(tourIntent);
+				finish();
+			}
+		}
+	}
+
+	@Override
+	public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) {
+
 	}
 }

@@ -49,12 +49,14 @@ public class PinActivityLollipop extends AppCompatActivity{
 		
 		log("retryPendingConnections()");
 		megaApi.retryPendingConnections();
-		
-		PinUtil.resume(this);
+
+		if(MegaApplication.isShowPinScreen()){
+			PinUtil.resume(this);
+		}
 
 		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 	}
-	
+
 	public static void log(String message) {
 		Util.log("PinActivityLollipop", message);
 	}

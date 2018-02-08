@@ -868,5 +868,22 @@
 
 			</RelativeLayout>
 		</RelativeLayout>
+
+		<RelativeLayout
+			android:id="@+id/achievements_layout"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content">
+
+			<TextView
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:textColor="@color/file_properties_text_available"
+				android:textSize="11sp"
+				android:layout_marginBottom="8dp"
+				android:layout_marginTop="8dp"
+				android:layout_marginLeft="12dp"
+				android:layout_marginRight="8dp"
+				android:text="@string/footnote_achievements"/>
+		</RelativeLayout>
     </LinearLayout>
 </ScrollView>

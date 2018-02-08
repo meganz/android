@@ -3,6 +3,7 @@ package mega.privacy.android.app.modalbottomsheet;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.design.widget.BottomSheetBehavior;
@@ -42,6 +43,7 @@ public class FolderLinkBottomSheetDialogFragment extends BottomSheetDialogFragme
     LinearLayout optionImport;
 
     DisplayMetrics outMetrics;
+    private int heightDisplay;
 
     Bitmap thumb = null;
 
@@ -80,6 +82,8 @@ public class FolderLinkBottomSheetDialogFragment extends BottomSheetDialogFragme
         Display display = getActivity().getWindowManager().getDefaultDisplay();
         outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
+
+        heightDisplay = outMetrics.heightPixels;
 
         View contentView = View.inflate(getContext(), R.layout.bottom_sheet_folder_link, null);
 
@@ -147,6 +151,13 @@ public class FolderLinkBottomSheetDialogFragment extends BottomSheetDialogFragme
         dialog.setContentView(contentView);
         mBehavior = BottomSheetBehavior.from((View) mainLinearLayout.getParent());
         mBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+
+        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            mBehavior.setPeekHeight((heightDisplay / 4) * 2);
+        }
+        else if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT){
+            mBehavior.setPeekHeight(BottomSheetBehavior.PEEK_HEIGHT_AUTO);
+        }
     }
 
 

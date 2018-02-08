@@ -908,10 +908,19 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 					}
 					else{
 						log("There is already a chat, open it!");
-						Intent intentOpenChat = new Intent(this, ChatActivityLollipop.class);
-						intentOpenChat.setAction(Constants.ACTION_CHAT_SHOW_MESSAGES);
-						intentOpenChat.putExtra("CHAT_ID", chat.getChatId());
-						this.startActivity(intentOpenChat);
+						if(fromContacts){
+							Intent intentOpenChat = new Intent(this, ChatActivityLollipop.class);
+							intentOpenChat.setAction(Constants.ACTION_CHAT_SHOW_MESSAGES);
+							intentOpenChat.putExtra("CHAT_ID", chat.getChatId());
+							this.startActivity(intentOpenChat);
+						}
+						else{
+							Intent intentOpenChat = new Intent(this, ChatActivityLollipop.class);
+							intentOpenChat.setAction(Constants.ACTION_CHAT_SHOW_MESSAGES);
+							intentOpenChat.putExtra("CHAT_ID", chat.getChatId());
+							intentOpenChat.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+							this.startActivity(intentOpenChat);
+						}
 					}
 				}
 				break;
@@ -1657,11 +1666,22 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			log("Create chat request finish!!!");
 			if(e.getErrorCode()==MegaChatError.ERROR_OK){
 				log("Chat CREATEDD!!!---> open it!");
-				Intent intent = new Intent(this, ChatActivityLollipop.class);
-				intent.setAction(Constants.ACTION_NEW_CHAT);
-				intent.putExtra("CHAT_ID", request.getChatHandle());
-				this.startActivity(intent);
-				finish();
+
+				if(fromContacts){
+					Intent intent = new Intent(this, ChatActivityLollipop.class);
+					intent.setAction(Constants.ACTION_NEW_CHAT);
+					intent.putExtra("CHAT_ID", request.getChatHandle());
+					this.startActivity(intent);
+					finish();
+				}
+				else{
+					Intent intent = new Intent(this, ChatActivityLollipop.class);
+					intent.setAction(Constants.ACTION_NEW_CHAT);
+					intent.putExtra("CHAT_ID", request.getChatHandle());
+					intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+					this.startActivity(intent);
+					finish();
+				}
 			}
 			else{
 				log("EEEERRRRROR WHEN CREATING CHAT " + e.getErrorString());

@@ -6,7 +6,6 @@ import android.graphics.Bitmap;
 import android.graphics.PixelFormat;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -14,9 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import java.nio.ByteBuffer;
-import java.util.Stack;
 
-import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.utils.Util;
@@ -68,33 +65,43 @@ public class LocalCameraCallFragment extends Fragment implements MegaChatVideoLi
         return v;
     }
 
-
-        @Override
+    @Override
     public void onChatVideoData(MegaChatApiJava api, long chatid, int width, int height, byte[] byteBuffer) {
+
+        if((width == 0) || (height == 0)){
+            return;
+        }
+
         if (this.width != width || this.height != height)
         {
             this.width = width;
             this.height = height;
-            this.bitmap = localRenderer.CreateBitmap(width, height);
 
             SurfaceHolder holder = localSurfaceView.getHolder();
             if (holder != null) {
                 int viewWidth = localSurfaceView.getWidth();
                 int viewHeight = localSurfaceView.getHeight();
-                int holderWidth = viewWidth < width ? viewWidth : width;
-                int holderHeight = holderWidth * viewHeight / viewWidth;
-                if (holderHeight > viewHeight)
-                {
-                    holderHeight = viewHeight;
-                    holderWidth = holderHeight * viewWidth / viewHeight;
+                if ((viewWidth != 0) && (viewHeight != 0)) {
+                    int holderWidth = viewWidth < width ? viewWidth : width;
+                    int holderHeight = holderWidth * viewHeight / viewWidth;
+                    if (holderHeight > viewHeight) {
+                        holderHeight = viewHeight;
+                        holderWidth = holderHeight * viewWidth / viewHeight;
+                    }
+                    this.bitmap = localRenderer.CreateBitmap(width, height);
+                    holder.setFixedSize(holderWidth, holderHeight);
                 }
-                holder.setFixedSize(holderWidth, holderHeight);
+                else{
+                    this.width = -1;
+                    this.height = -1;
+                }
             }
         }
 
-        bitmap.copyPixelsFromBuffer(ByteBuffer.wrap(byteBuffer));
-
-        localRenderer.DrawBitmap(true);
+        if (bitmap != null){
+            bitmap.copyPixelsFromBuffer(ByteBuffer.wrap(byteBuffer));
+            localRenderer.DrawBitmap(true);
+        }
     }
 
     @Override
@@ -112,9 +119,15 @@ public class LocalCameraCallFragment extends Fragment implements MegaChatVideoLi
 
     @Override
     public void onDestroy(){
-        log("onDestroy");
         megaChatApi.removeChatVideoListener(this);
         super.onDestroy();
+    }
+    @Override
+    public void onResume() {
+        log("onResume");
+        this.width=0;
+        this.height=0;
+        super.onResume();
     }
 
     public void setVideoFrame(boolean visible){

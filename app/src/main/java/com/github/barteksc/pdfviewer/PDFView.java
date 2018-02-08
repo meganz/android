@@ -685,7 +685,7 @@ public class PDFView extends RelativeLayout {
         renderingHandler.start();
 
         if (scrollHandle != null) {
-            scrollHandle.setupLayout(this);
+            scrollHandle.setupLayout(this, pdfFile.getPagesCount());
             isScrollHandleInit = true;
         }
 
@@ -694,6 +694,9 @@ public class PDFView extends RelativeLayout {
         callbacks.callOnLoadComplete(pdfFile.getPagesCount());
 
         jumpTo(defaultPage, false);
+
+        ((PdfViewerActivityLollipop) getContext()).loading = false;
+        ((PdfViewerActivityLollipop) getContext()).progressDialog.hide();
     }
 
     void loadError(Throwable t) {

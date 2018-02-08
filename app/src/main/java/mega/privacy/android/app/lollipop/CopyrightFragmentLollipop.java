@@ -2,7 +2,6 @@ package mega.privacy.android.app.lollipop;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -14,31 +13,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
-import android.widget.ScrollView;
-import android.widget.TableLayout;
-import android.widget.TableRow;
-import android.widget.TextView;
-
-import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.BitSet;
-import java.util.Locale;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.Product;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaApiJava;
-import nz.mega.sdk.MegaChatApiAndroid;
-import nz.mega.sdk.MegaError;
-import nz.mega.sdk.MegaPricing;
-import nz.mega.sdk.MegaRequest;
-import nz.mega.sdk.MegaRequestListenerInterface;
 
 public class CopyrightFragmentLollipop extends Fragment implements View.OnClickListener {
 
@@ -53,6 +34,8 @@ public class CopyrightFragmentLollipop extends Fragment implements View.OnClickL
     Button agreeButton;
     Button disagreeButton;
 
+    DatabaseHandler dbH;
+
     @Override
     public void onCreate (Bundle savedInstanceState){
         log("onCreate");
@@ -62,6 +45,8 @@ public class CopyrightFragmentLollipop extends Fragment implements View.OnClickL
             log("context is null");
             return;
         }
+
+        dbH = DatabaseHandler.getDbHandler(context);
     }
 
     @Override
@@ -93,10 +78,12 @@ public class CopyrightFragmentLollipop extends Fragment implements View.OnClickL
     public void onClick(View v) {
         switch (v.getId()){
             case R.id.disagree_button:{
+                dbH.setShowCopyright(true);
                 ((GetLinkActivityLollipop)context).finish();
                 break;
             }
             case R.id.agree_button:{
+                dbH.setShowCopyright(false);
                 ((GetLinkActivityLollipop)context).showFragment(Constants.GET_LINK_FRAGMENT);
                 break;
             }

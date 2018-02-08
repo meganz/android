@@ -75,6 +75,8 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
 
     int lastFirstVisiblePosition;
 
+    int numberOfClicks = 0;
+
     //Empty screen
     TextView emptyTextView;
     LinearLayout emptyLayout;
@@ -83,7 +85,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
     Button inviteButton;
     int chatStatus;
 
-    boolean chatEnabled = true;
+//    boolean chatEnabled = true;
     float density;
     DisplayMetrics outMetrics;
     Display display;
@@ -110,14 +112,12 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
         dbH = DatabaseHandler.getDbHandler(getActivity());
 
         if(Util.isChatEnabled()){
-            chatEnabled=true;
             if (megaChatApi == null){
                 megaChatApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaChatApi();
             }
         }
         else{
             log("Chat not enabled!");
-            chatEnabled=false;
         }
     }
 
@@ -152,26 +152,6 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
         emptyTextViewInvite.setWidth(Util.scaleWidthPx(236, outMetrics));
         emptyTextView = (TextView) v.findViewById(R.id.empty_text_chat_recent);
 
-        StringBuilder builder = new StringBuilder();
-        String textToShow = String.format(context.getString(R.string.context_empty_chat_recent));
-
-        try{
-            textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
-            textToShow = textToShow.replace("[/A]", "</font>");
-            textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
-            textToShow = textToShow.replace("[/B]", "</font>");
-        }
-        catch (Exception e){}
-        Spanned result = null;
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-            result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
-        } else {
-            result = Html.fromHtml(textToShow);
-
-        }
-
-        emptyTextViewInvite.setText(result);
-
         LinearLayout.LayoutParams emptyTextViewParams1 = (LinearLayout.LayoutParams)emptyTextViewInvite.getLayoutParams();
         emptyTextViewParams1.setMargins(0, Util.scaleHeightPx(50, outMetrics), 0, Util.scaleHeightPx(24, outMetrics));
         emptyTextViewInvite.setLayoutParams(emptyTextViewParams1);
@@ -181,10 +161,13 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
         emptyTextView.setLayoutParams(emptyTextViewParams2);
 
         emptyImageView = (ImageView) v.findViewById(R.id.empty_image_view_chat);
+        emptyImageView.setOnClickListener(this);
         if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
             emptyImageView.setImageResource(R.drawable.chat_empty_landscape);
+            emptyTextView.setVisibility(View.GONE);
         }else{
             emptyImageView.setImageResource(R.drawable.ic_empty_chat_list);
+            emptyTextView.setVisibility(View.VISIBLE);
         }
         inviteButton = (Button) v.findViewById(R.id.invite_button);
         inviteButton.setOnClickListener(this);
@@ -194,7 +177,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
 
         mainRelativeLayout = (RelativeLayout) v.findViewById(R.id.main_relative_layout);
 
-        if(chatEnabled){
+        if(Util.isChatEnabled()){
             log("Chat ENABLED");
 
             setStatus();
@@ -228,52 +211,123 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
         log("setChats");
 
         if(isAdded()){
-            if(chatEnabled){
-                if(chats!=null){
-                    chats.clear();
-                }
-                else{
-                    chats = new ArrayList<MegaChatListItem>();
-                }
+            if(Util.isChatEnabled()){
 
                 int initState = megaChatApi.getInitState();
                 log("Init state is: "+initState);
-                chats = megaChatApi.getActiveChatListItems();
 
-                log("chats no: "+chats.size());
+                if((initState==MegaChatApi.INIT_ONLINE_SESSION)){
+                    log("Connected state is: "+megaChatApi.getConnectionState());
+                    if(megaChatApi.getConnectionState()==MegaChatApi.CONNECTED){
+                        if(chats!=null){
+                            chats.clear();
+                        }
+                        else{
+                            chats = new ArrayList<MegaChatListItem>();
+                        }
 
-                //Order by last interaction
-                Collections.sort(chats, new Comparator<MegaChatListItem> (){
+                        chats = megaChatApi.getActiveChatListItems();
 
-                    public int compare(MegaChatListItem c1, MegaChatListItem c2) {
-                        long timestamp1 = c1.getLastTimestamp();
-                        long timestamp2 = c2.getLastTimestamp();
+                        if(chats==null || chats.isEmpty()){
+                            showEmptyChatScreen();
+                        }
+                        else{
+                            log("chats no: "+chats.size());
 
-                        long result = timestamp2 - timestamp1;
-                        return (int)result;
+                            //Order by last interaction
+                            Collections.sort(chats, new Comparator<MegaChatListItem> (){
+
+                                public int compare(MegaChatListItem c1, MegaChatListItem c2) {
+                                    long timestamp1 = c1.getLastTimestamp();
+                                    long timestamp2 = c2.getLastTimestamp();
+
+                                    long result = timestamp2 - timestamp1;
+                                    return (int)result;
+                                }
+                            });
+
+                            if (adapterList == null){
+                                log("adapterList is NULL");
+                                adapterList = new MegaListChatLollipopAdapter(context, this, chats, listView, MegaListChatLollipopAdapter.ADAPTER_RECENT_CHATS);
+                            }
+                            else{
+                                adapterList.setChats(chats);
+                            }
+
+                            listView.setAdapter(adapterList);
+                            adapterList.setPositionClicked(-1);
+
+                            if (adapterList.getItemCount() == 0){
+                                log("adapterList.getItemCount() == 0");
+
+                                if(Util.isOnline(context)){
+                                    listView.setVisibility(View.GONE);
+                                    emptyLayout.setVisibility(View.VISIBLE);
+                                }
+                                else{
+                                    showNoConnectionScreen();
+                                }
+                            }
+                            else{
+                                log("adapterList.getItemCount() NOT = 0");
+                                listView.setVisibility(View.VISIBLE);
+                                emptyLayout.setVisibility(View.GONE);
+                            }
+                        }
                     }
-                });
+                    else{
+                        log("Show chat screen connecting...");
+                        showConnectingChatScreen();
+                    }
 
-                if (adapterList == null){
-                    log("adapterList is NULL");
-                    adapterList = new MegaListChatLollipopAdapter(context, this, chats, listView, MegaListChatLollipopAdapter.ADAPTER_RECENT_CHATS);
+                }
+                else if(initState == MegaChatApi.INIT_OFFLINE_SESSION){
+                    log("Init with OFFLINE session");
+                    if(chats!=null){
+                        chats.clear();
+                    }
+                    else{
+                        chats = new ArrayList<MegaChatListItem>();
+                    }
+
+                    chats = megaChatApi.getActiveChatListItems();
+
+                    if(chats==null || chats.isEmpty()){
+                        showNoConnectionScreen();
+                    }
+                    else{
+                        log("chats no: "+chats.size());
+
+                        //Order by last interaction
+                        Collections.sort(chats, new Comparator<MegaChatListItem> (){
+
+                            public int compare(MegaChatListItem c1, MegaChatListItem c2) {
+                                long timestamp1 = c1.getLastTimestamp();
+                                long timestamp2 = c2.getLastTimestamp();
+
+                                long result = timestamp2 - timestamp1;
+                                return (int)result;
+                            }
+                        });
+
+                        if (adapterList == null){
+                            log("adapterList is NULL");
+                            adapterList = new MegaListChatLollipopAdapter(context, this, chats, listView, MegaListChatLollipopAdapter.ADAPTER_RECENT_CHATS);
+                        }
+                        else{
+                            adapterList.setChats(chats);
+                        }
+
+                        listView.setAdapter(adapterList);
+                        adapterList.setPositionClicked(-1);
+
+                        listView.setVisibility(View.VISIBLE);
+                        emptyLayout.setVisibility(View.GONE);
+                    }
                 }
                 else{
-                    adapterList.setChats(chats);
-                }
-
-                listView.setAdapter(adapterList);
-                adapterList.setPositionClicked(-1);
-
-                if (adapterList.getItemCount() == 0){
-                    log("adapterList.getItemCount() == 0");
-                    listView.setVisibility(View.GONE);
-                    emptyLayout.setVisibility(View.VISIBLE);
-                }
-                else{
-                    log("adapterList.getItemCount() NOT = 0");
-                    listView.setVisibility(View.VISIBLE);
-                    emptyLayout.setVisibility(View.GONE);
+                    log("Show chat screen connecting...");
+                    showConnectingChatScreen();
                 }
             }
             else{
@@ -287,28 +341,164 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
         }
     }
 
-    public void showDisableChatScreen(){
+    public void showEmptyChatScreen(){
+        log("showEmptyChatScreen");
 
         listView.setVisibility(View.GONE);
         ((ManagerActivityLollipop)context).hideFabButton();
-        String emptyTextViewText = getString(R.string.recent_chat_empty_enable_chat);
+
+        String textToShow = String.format(context.getString(R.string.context_empty_chat_recent));
+
         try{
-            emptyTextViewText = emptyTextViewText.replace("[A]", "\n");
+            textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
+            textToShow = textToShow.replace("[/A]", "</font>");
+            textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
+            textToShow = textToShow.replace("[/B]", "</font>");
         }
         catch (Exception e){}
-        emptyTextViewInvite.setText(emptyTextViewText);
-        inviteButton.setText(getString(R.string.recent_chat_enable_chat_button));
-        emptyTextView.setText(R.string.recent_chat_enable_chat);
+        Spanned result = null;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+            result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
+        } else {
+            result = Html.fromHtml(textToShow);
+
+        }
+
+        emptyTextViewInvite.setText(result);
+        emptyTextViewInvite.setVisibility(View.VISIBLE);
+
+        emptyTextViewInvite.setText(result);
+        emptyTextViewInvite.setVisibility(View.VISIBLE);
+
+        inviteButton.setText(getString(R.string.contact_invite));
+        inviteButton.setVisibility(View.VISIBLE);
+
+        String textToShowB = String.format(context.getString(R.string.recent_chat_empty));
+
+        try{
+            textToShowB = textToShowB.replace("[A]", "<font color=\'#7a7a7a\'>");
+            textToShowB = textToShowB.replace("[/A]", "</font>");
+            textToShowB = textToShowB.replace("[B]", "<font color=\'#000000\'>");
+            textToShowB = textToShowB.replace("[/B]", "</font>");
+        }
+        catch (Exception e){}
+        Spanned resultB = null;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+            resultB = Html.fromHtml(textToShowB,Html.FROM_HTML_MODE_LEGACY);
+        } else {
+            resultB = Html.fromHtml(textToShowB);
+        }
+
+        emptyTextView.setText(resultB);
+        if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+            emptyTextView.setVisibility(View.GONE);
+        }else{
+            emptyTextView.setVisibility(View.VISIBLE);
+        }
         emptyLayout.setVisibility(View.VISIBLE);
     }
 
+    public void showDisableChatScreen(){
+        log("showDisableChatScreen");
+
+        listView.setVisibility(View.GONE);
+        ((ManagerActivityLollipop)context).hideFabButton();
+        String textToShow = String.format(context.getString(R.string.recent_chat_empty_enable_chat));
+
+        try{
+            textToShow = textToShow.replace("[A]", "<br />");
+            textToShow = textToShow.replace("[B]", "<font color=\'#000000\'>");
+            textToShow = textToShow.replace("[/B]", "</font>");
+            textToShow = textToShow.replace("[C]", "<font color=\'#7a7a7a\'>");
+            textToShow = textToShow.replace("[/C]", "</font>");
+
+        }
+        catch (Exception e){}
+        Spanned result = null;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+            result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
+        } else {
+            result = Html.fromHtml(textToShow);
+
+        }
+        emptyTextViewInvite.setText(result);
+        emptyTextViewInvite.setVisibility(View.VISIBLE);
+
+        inviteButton.setText(getString(R.string.recent_chat_enable_chat_button));
+        inviteButton.setVisibility(View.VISIBLE);
+        emptyTextView.setText(R.string.recent_chat_enable_chat);
+        if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+            emptyTextView.setVisibility(View.GONE);
+        }else{
+            emptyTextView.setVisibility(View.VISIBLE);
+        }
+        emptyLayout.setVisibility(View.VISIBLE);
+    }
+
+    public void showConnectingChatScreen(){
+        log("showConnectingChatScreen");
+
+        listView.setVisibility(View.GONE);
+        ((ManagerActivityLollipop)context).hideFabButton();
+
+        String textToShow = String.format(context.getString(R.string.context_empty_chat_recent));
+
+        try{
+            textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
+            textToShow = textToShow.replace("[/A]", "</font>");
+            textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
+            textToShow = textToShow.replace("[/B]", "</font>");
+        }
+        catch (Exception e){}
+        Spanned result = null;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+            result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
+        } else {
+            result = Html.fromHtml(textToShow);
+
+        }
+
+        emptyTextViewInvite.setText(result);
+        emptyTextViewInvite.setVisibility(View.INVISIBLE);
+
+        inviteButton.setVisibility(View.GONE);
+
+        String textToShowB = String.format(context.getString(R.string.recent_chat_loading_conversations));
+
+        try{
+            textToShowB = textToShowB.replace("[A]", "<font color=\'#7a7a7a\'>");
+            textToShowB = textToShowB.replace("[/A]", "</font>");
+            textToShowB = textToShowB.replace("[B]", "<font color=\'#000000\'>");
+            textToShowB = textToShowB.replace("[/B]", "</font>");
+        }
+        catch (Exception e){}
+        Spanned resultB = null;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+            resultB = Html.fromHtml(textToShowB,Html.FROM_HTML_MODE_LEGACY);
+        } else {
+            resultB = Html.fromHtml(textToShowB);
+        }
+
+        emptyTextView.setText(resultB);
+        emptyTextView.setVisibility(View.VISIBLE);
+    }
+
     public void showNoConnectionScreen(){
+        log("showNoConnectionScreen");
 
         listView.setVisibility(View.GONE);
         ((ManagerActivityLollipop)context).hideFabButton();
         emptyTextViewInvite.setText(getString(R.string.error_server_connection_problem));
+        emptyTextViewInvite.setVisibility(View.VISIBLE);
         inviteButton.setVisibility(View.GONE);
         emptyTextView.setText(R.string.recent_chat_empty_no_connection_text);
+        if(Util.isChatEnabled()){
+            emptyTextView.setVisibility(View.GONE);
+        }
+        else{
+            emptyTextView.setVisibility(View.VISIBLE);
+        }
+
         emptyLayout.setVisibility(View.VISIBLE);
     }
 
@@ -318,25 +508,93 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
 
         switch (v.getId()) {
             case R.id.invite_button:{
-                if(chatEnabled){
-                    ((ManagerActivityLollipop)context).chooseAddContactDialog(false);
-                    if(megaChatApi.isSignalActivityRequired()){
-                        megaChatApi.signalPresenceActivity();
+                if(Util.isChatEnabled()){
+                    //((ManagerActivityLollipop)context).chooseAddContactDialog(false);
+                    if(Util.isOnline(context)){
+                        ((ManagerActivityLollipop)context).addContactFromPhone();
+                        if(megaChatApi.isSignalActivityRequired()){
+                            megaChatApi.signalPresenceActivity();
+                        }
+                    }
+                    else{
+                        ((ManagerActivityLollipop)context).showSnackbar(getString(R.string.error_server_connection_problem));
                     }
                 }
                 else{
-                    ChatController chatController = new ChatController(context);
-                    log("onCLick: enableChat");
-                    chatController.enableChat();
-                    getActivity().supportInvalidateOptionsMenu();
-                    chatEnabled=!chatEnabled;
-                    ((ManagerActivityLollipop)context).enableChat();
+                    if(Util.isOnline(context)){
+                        if(megaApi!=null){
+                            if(megaApi.isLoggedIn()==0){
+                                ((ManagerActivityLollipop)context).showSnackbar(getString(R.string.error_enable_chat_before_login));
+                            }
+                            else{
+                                ChatController chatController = new ChatController(context);
+                                log("onCLick: enableChat");
+                                chatController.enableChat();
+                                getActivity().supportInvalidateOptionsMenu();
+                                ((ManagerActivityLollipop)context).enableChat();
+                            }
+                        }
+                        else{
+                            ((ManagerActivityLollipop)context).showSnackbar(getString(R.string.error_enable_chat_before_login));
+                        }
+                    }
+                    else{
+                        ((ManagerActivityLollipop)context).showSnackbar(getString(R.string.error_server_connection_problem));
+                        showNoConnectionScreen();
+                    }
 //                    setChats();
                 }
 
                 break;
             }
+            case R.id.empty_image_view_chat:{
+                numberOfClicks++;
+                log("Number of clicks: "+numberOfClicks);
+                if (numberOfClicks >= 5){
+                    numberOfClicks = 0;
+                    showStateInfo();
+                }
+
+                break;
+            }
         }
+    }
+
+    public void showStateInfo(){
+
+        StringBuilder builder = new StringBuilder();
+
+        if(Util.isChatEnabled()){
+            if(megaChatApi!=null){
+                builder.append("INIT STATE: " +megaChatApi.getInitState());
+                builder.append("\nCONNECT STATE: " +megaChatApi.getConnectionState());
+                if(Util.isOnline(context)){
+                    builder.append("\nNetwork OK");
+                }
+                else{
+                    builder.append("\nNo network connection");
+                }
+            }
+            else{
+                builder.append("MegaChatApi: false");
+            }
+        }
+        else{
+            builder.append("Chat is disabled");
+            if(megaChatApi!=null){
+                builder.append("\nINIT STATE: " +megaChatApi.getInitState());
+                builder.append("\nCONNECT STATE: " +megaChatApi.getConnectionState());
+                if(Util.isOnline(context)){
+                    builder.append("\nNetwork OK");
+                }
+                else{
+                    builder.append("\nNo network connection");
+                }
+            }
+        }
+
+        Toast.makeText(context, builder, Toast.LENGTH_LONG).show();
+        log("showStateInfo: "+builder);
     }
 
     /////Multiselect/////
@@ -396,6 +654,8 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
                 case R.id.chat_list_leave_chat_layout:{
                     //Leave group chat
                     ((ManagerActivityLollipop)context).showConfirmationLeaveChats(chats);
+                    clearSelections();
+                    hideMultipleSelect();
                     break;
                 }
             }
@@ -620,14 +880,17 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
             log("listItemUpdate: Change status: MegaChatListItem.CHANGE_TYPE_STATUS");
         }
         else if(item.hasChanged(MegaChatListItem.CHANGE_TYPE_OWN_PRIV)){
+
             log("listItemUpdate: Change status: MegaChatListItem.CHANGE_TYPE_OWN_PRIV");
         }
         else if(item.hasChanged(MegaChatListItem.CHANGE_TYPE_PARTICIPANTS)){
+
             log("listItemUpdate: Change participants");
             MegaChatRoom chatToCheck = megaChatApi.getChatRoom(item.getChatId());
             updateCacheForNonContacts(chatToCheck);
         }
         else if(item.hasChanged(MegaChatListItem.CHANGE_TYPE_UNREAD_COUNT)){
+
             log("listItemUpdate: Change unread count: "+item.getTitle());
             if(item!=null){
 
@@ -668,6 +931,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
             }
         }
         else if(item.hasChanged(MegaChatListItem.CHANGE_TYPE_LAST_TS)){
+
             log("Change last ts: "+item.getChanges());
 
             long chatHandleToUpdate = item.getChatId();
@@ -698,6 +962,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
 
         }
         else if((item.hasChanged(MegaChatListItem.CHANGE_TYPE_TITLE))){
+
             log("listItemUpdate: Change title: "+item.getTitle());
 
             if(item!=null){
@@ -732,6 +997,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
             }
         }
         else if(item.hasChanged(MegaChatListItem.CHANGE_TYPE_LAST_MSG)){
+
             log("listItemUpdate: Change last message: "+item.getTitle());
 
             if(item!=null){
@@ -772,6 +1038,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
             }
         }
         else if(item.hasChanged(MegaChatListItem.CHANGE_TYPE_CLOSED)){
+
             log("listItemUpdate: Change closed: MegaChatListItem.CHANGE_TYPE_CLOSED");
             log("listItemUpdate: Own privilege: "+item.getOwnPrivilege());
 
@@ -817,6 +1084,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
         }
         else{
             log("listItemUpdate: Other change: "+item.getChanges());
+
             if(item!=null){
                 log("New chat: "+item.getTitle());
                 setChats();
@@ -831,7 +1099,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
 
     public void setStatus() {
         log("setStatus");
-        if(chatEnabled) {
+        if(Util.isChatEnabled()) {
             chatStatus = megaChatApi.getOnlineStatus();
             log("chatStatus --> getOnlineStatus with megaChatApi: "+chatStatus);
 
@@ -864,7 +1132,12 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
                         break;
                     }
                     case MegaChatApi.STATUS_INVALID:{
-                        aB.setSubtitle(getString(R.string.invalid_status));
+                        if(!Util.isOnline(context)){
+                            aB.setSubtitle(getString(R.string.error_server_connection_problem));
+                        }
+                        else{
+                            aB.setSubtitle(null);
+                        }
                         break;
                     }
                     default:{
@@ -878,7 +1151,8 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
                                 aB.setSubtitle(getString(R.string.chat_connecting));
                             }
                             else{
-                                aB.setSubtitle(getString(R.string.loading_status));
+//                                aB.setSubtitle(getString(R.string.loading_status));
+                                aB.setSubtitle(null);
                             }
                         }
                         break;
@@ -1134,7 +1408,9 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
     public void onSaveInstanceState(Bundle outState) {
         log("onSaveInstanceState");
         super.onSaveInstanceState(outState);
-        outState.putParcelable(BUNDLE_RECYCLER_LAYOUT, listView.getLayoutManager().onSaveInstanceState());
+        if(listView.getLayoutManager()!=null){
+            outState.putParcelable(BUNDLE_RECYCLER_LAYOUT, listView.getLayoutManager().onSaveInstanceState());
+        }
     }
 
     @Override

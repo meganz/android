@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -43,6 +44,7 @@ public class FileContactsListBottomSheetDialogFragment extends BottomSheetDialog
     MegaNode node = null;
     MegaShare share = null;
     ContactController cC;
+    String nonContactEmail;
 
     private BottomSheetBehavior mBehavior;
 
@@ -58,6 +60,7 @@ public class FileContactsListBottomSheetDialogFragment extends BottomSheetDialog
     String fullName="";
 
     DisplayMetrics outMetrics;
+    private int heightDisplay;
 
     MegaApiAndroid megaApi;
     DatabaseHandler dbH;
@@ -76,17 +79,25 @@ public class FileContactsListBottomSheetDialogFragment extends BottomSheetDialog
             log("Email of the contact: "+email);
             if(email!=null){
                 contact = megaApi.getContact(email);
+                if(contact==null){
+                    nonContactEmail = email;
+                }
             }
         }
         else{
             log("Bundle NULL");
-            if(context instanceof FileContactListActivityLollipop){
-                contact = ((FileContactListActivityLollipop) context).getSelectedContact();
-            }
 
             if(context instanceof FileContactListActivityLollipop){
                 share = ((FileContactListActivityLollipop) context).getSelectedShare();
             }
+
+            if(context instanceof FileContactListActivityLollipop){
+                contact = ((FileContactListActivityLollipop) context).getSelectedContact();
+                if(contact==null){
+                    nonContactEmail = share.getUser();
+                }
+            }
+
         }
         dbH = DatabaseHandler.getDbHandler(getActivity());
     }
@@ -96,6 +107,8 @@ public class FileContactsListBottomSheetDialogFragment extends BottomSheetDialog
         Display display = getActivity().getWindowManager().getDefaultDisplay();
         outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
+
+        heightDisplay = outMetrics.heightPixels;
 
         super.setupDialog(dialog, style);
         View contentView = View.inflate(getContext(), R.layout.bottom_sheet_file_contact_list, null);
@@ -121,37 +134,54 @@ public class FileContactsListBottomSheetDialogFragment extends BottomSheetDialog
 
         if(contact!=null){
             fullName = getFullName(contact);
-            titleNameContactPanel.setText(fullName);
-            if(share!=null){
-                int accessLevel = share.getAccess();
-                switch(accessLevel){
-                    case MegaShare.ACCESS_OWNER:
-                    case MegaShare.ACCESS_FULL:{
-                        titleMailContactPanel.setText(context.getString(R.string.file_properties_shared_folder_full_access));
-                        break;
-                    }
-                    case MegaShare.ACCESS_READ:{
-                        titleMailContactPanel.setText(context.getString(R.string.file_properties_shared_folder_read_only));
-                        break;
-                    }
-                    case MegaShare.ACCESS_READWRITE:{
-                        titleMailContactPanel.setText(context.getString(R.string.file_properties_shared_folder_read_write));
-                        break;
-                    }
-                }
-            }
-            else{
-                titleMailContactPanel.setText(contact.getEmail());
-            }
-
-            addAvatarContactPanel(contact);
-
-            dialog.setContentView(contentView);
-            mBehavior = BottomSheetBehavior.from((View) mainLinearLayout.getParent());
-            mBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
         }
         else{
             log("Contact NULL");
+//            nonContactEmail
+            fullName = nonContactEmail;
+        }
+
+        if(contact!=null && contact.getVisibility()==MegaUser.VISIBILITY_VISIBLE){
+            optionInfo.setVisibility(View.VISIBLE);
+        }
+        else{
+            optionInfo.setVisibility(View.GONE);
+        }
+
+        titleNameContactPanel.setText(fullName);
+        addAvatarContactPanel(contact);
+
+        if(share!=null){
+            int accessLevel = share.getAccess();
+            switch(accessLevel){
+                case MegaShare.ACCESS_OWNER:
+                case MegaShare.ACCESS_FULL:{
+                    titleMailContactPanel.setText(context.getString(R.string.file_properties_shared_folder_full_access));
+                    break;
+                }
+                case MegaShare.ACCESS_READ:{
+                    titleMailContactPanel.setText(context.getString(R.string.file_properties_shared_folder_read_only));
+                    break;
+                }
+                case MegaShare.ACCESS_READWRITE:{
+                    titleMailContactPanel.setText(context.getString(R.string.file_properties_shared_folder_read_write));
+                    break;
+                }
+            }
+        }
+        else{
+            titleMailContactPanel.setText(contact.getEmail());
+        }
+
+        dialog.setContentView(contentView);
+        mBehavior = BottomSheetBehavior.from((View) mainLinearLayout.getParent());
+        mBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+
+        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            mBehavior.setPeekHeight((heightDisplay / 4) * 2);
+        }
+        else if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT){
+            mBehavior.setPeekHeight(BottomSheetBehavior.PEEK_HEIGHT_AUTO);
         }
     }
 
@@ -191,28 +221,30 @@ public class FileContactsListBottomSheetDialogFragment extends BottomSheetDialog
 
     public void addAvatarContactPanel(MegaUser contact){
 
-        String contactMail = contact.getEmail();
-        File avatar = null;
-        if (getActivity().getExternalCacheDir() != null){
-            avatar = new File(getActivity().getExternalCacheDir().getAbsolutePath(), contactMail + ".jpg");
-        }
-        else{
-            avatar = new File(getActivity().getCacheDir().getAbsolutePath(), contactMail + ".jpg");
-        }
-        Bitmap bitmap = null;
-        if (avatar.exists()){
-            if (avatar.length() > 0){
-                BitmapFactory.Options bOpts = new BitmapFactory.Options();
-                bOpts.inPurgeable = true;
-                bOpts.inInputShareable = true;
-                bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
-                if (bitmap == null) {
-                    avatar.delete();
-                }
-                else{
-                    avatarInitialLetter.setVisibility(View.GONE);
-                    contactImageView.setImageBitmap(bitmap);
-                    return;
+        if(contact!=null){
+            String contactMail = contact.getEmail();
+            File avatar = null;
+            if (getActivity().getExternalCacheDir() != null){
+                avatar = new File(getActivity().getExternalCacheDir().getAbsolutePath(), contactMail + ".jpg");
+            }
+            else{
+                avatar = new File(getActivity().getCacheDir().getAbsolutePath(), contactMail + ".jpg");
+            }
+            Bitmap bitmap = null;
+            if (avatar.exists()){
+                if (avatar.length() > 0){
+                    BitmapFactory.Options bOpts = new BitmapFactory.Options();
+                    bOpts.inPurgeable = true;
+                    bOpts.inInputShareable = true;
+                    bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
+                    if (bitmap == null) {
+                        avatar.delete();
+                    }
+                    else{
+                        avatarInitialLetter.setVisibility(View.GONE);
+                        contactImageView.setImageBitmap(bitmap);
+                        return;
+                    }
                 }
             }
         }
@@ -281,19 +313,11 @@ public class FileContactsListBottomSheetDialogFragment extends BottomSheetDialog
 
             case R.id.file_contact_list_option_permissions_layout:{
                 log("permissions layout");
-                if(contact==null){
-                    log("Selected contact NULL");
-                    return;
-                }
                 ((FileContactListActivityLollipop)context).changePermissions();
                 break;
             }
             case R.id.file_contact_list_option_delete_layout:{
                 log("optionSendFile");
-                if(contact==null){
-                    log("Selected contact NULL");
-                    return;
-                }
                 ((FileContactListActivityLollipop)context).removeFileContactShare();
                 break;
             }
