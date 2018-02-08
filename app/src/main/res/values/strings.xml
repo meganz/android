@@ -1684,5 +1684,8 @@
 
     <string name="processing_link" context="Message shown when a link is being processing">Processing link...</string>
 
+    <string name="title_notification_call_in_progress" context="Title of the notification shown on the action bar when there is a call in progress">Call in progress</string>
+    <string name="action_notification_call_in_progress" context="Subtitle of the notification shown on the action bar when there is a call in progress">Click to back to the call</string>
+    <string name="button_notification_call_in_progress" context="Button in the notification shown on the action bar when there is a call in progress">Return to the call</string>
 </resources>
 
