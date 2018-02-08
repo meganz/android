@@ -355,7 +355,7 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
 
     public void checkPasswordStrenght(String s) {
 
-        if (megaApi.getPasswordStrength(s) == MegaApiJava.PASSWORD_STRENGTH_VERYWEAK){
+        if (megaApi.getPasswordStrength(s) == MegaApiJava.PASSWORD_STRENGTH_VERYWEAK || s.length() < 4){
             if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.JELLY_BEAN) {
                 firstShape.setBackgroundDrawable(getResources().getDrawable(R.drawable.passwd_very_weak));
                 secondShape.setBackgroundDrawable(getResources().getDrawable(R.drawable.shape_password));
@@ -397,7 +397,7 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
 
             passwdAdvice.setText(getString(R.string.passwd_weak));
 
-            passwdValid = false;
+            passwdValid = true;
         }
         else if (megaApi.getPasswordStrength(s) == MegaApiJava.PASSWORD_STRENGTH_MEDIUM){
             if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.JELLY_BEAN) {
