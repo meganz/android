@@ -531,6 +531,8 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 						return;
 					}
 
+					File previewDir = PreviewUtils.getPreviewFolder(this);
+					File preview = new File(previewDir, MegaApiAndroid.handleToBase64(transfer.getNodeHandle()) + ".jpg");
 					File file = new File(transfer.getPath());
 					try {
 						PdfDocument pdfDocument = pdfiumCore.newDocument(ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_ONLY));
