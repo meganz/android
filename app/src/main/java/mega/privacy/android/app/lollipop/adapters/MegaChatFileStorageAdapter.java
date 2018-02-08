@@ -48,6 +48,7 @@ import mega.privacy.android.app.lollipop.managerSections.IncomingSharesFragmentL
 import mega.privacy.android.app.lollipop.managerSections.OutgoingSharesFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.RubbishBinFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.SearchFragmentLollipop;
+import mega.privacy.android.app.lollipop.megachat.ChatFileStorageFragment;
 import mega.privacy.android.app.lollipop.megachat.NodeAttachmentActivityLollipop;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
@@ -60,22 +61,17 @@ import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 
 
-public class MegaChatFileStorageAdapter extends RecyclerView.Adapter<MegaChatFileStorageAdapter.ViewHolderBrowser>{
+public class MegaChatFileStorageAdapter extends RecyclerView.Adapter<MegaChatFileStorageAdapter.ViewHolderBrowser> implements OnClickListener, View.OnLongClickListener{
 
     Context context;
     MegaApiAndroid megaApi;
     ActionBar aB;
-
     ArrayList<Bitmap> thumbimages;
-
     Object fragment;
-
     DisplayMetrics outMetrics;
-
     private SparseBooleanArray selectedItems;
-
-    DatabaseHandler dbH = null;
     boolean multipleSelect;
+    DatabaseHandler dbH = null;
 
     /* public static view holder class */
     public static class ViewHolderBrowser extends ViewHolder {
@@ -93,12 +89,107 @@ public class MegaChatFileStorageAdapter extends RecyclerView.Adapter<MegaChatFil
         }
         public ImageView imageViewThumb;
         public RelativeLayout thumbLayout;
-//        public View separator;
+        public ImageView imageSelected;
+        public RelativeLayout imageUnselected;
     }
+
+    public void toggleSelection(int pos) {
+        log("*********ADAPTER: toggleSelection-> "+pos);
+
+        if (selectedItems.get(pos, false)) {
+            log("delete pos: "+pos);
+            selectedItems.delete(pos);
+        }else {
+            log("PUT pos: "+pos);
+            selectedItems.put(pos, true);
+        }
+        notifyItemChanged(pos);
+
+        if (selectedItems.size() <= 0){
+            ((ChatFileStorageFragment) fragment).hideMultipleSelect();
+        }
+    }
+
+    public void toggleAllSelection(int pos) {
+        log("*********ADAPTER: toggleAllSelection-> "+pos);
+        final int positionToflip = pos;
+
+        if (selectedItems.get(pos, false)) {
+            log("delete pos: "+pos);
+            selectedItems.delete(pos);
+        }
+        else {
+            log("PUT pos: "+pos);
+            selectedItems.put(pos, true);
+        }
+        log("adapter type is GRID");
+        if (selectedItems.size() <= 0){
+            ((ChatFileStorageFragment) fragment).hideMultipleSelect();
+        }
+        notifyItemChanged(positionToflip);
+    }
+
+    public void selectAll(){
+        log("*********ADAPTER: selectAll");
+
+        for (int i= 0; i<this.getItemCount();i++){
+            if(!isItemChecked(i)){
+                toggleAllSelection(i);
+            }
+        }
+    }
+
+    public void clearSelections() {
+        log("*********ADAPTER: clearSelections");
+        for (int i= 0; i<this.getItemCount();i++){
+            if(isItemChecked(i)){
+                toggleAllSelection(i);
+            }
+        }
+    }
+
+    private boolean isItemChecked(int position) {
+        log("*********ADAPTER: isItemChecked-> "+position);
+
+        return selectedItems.get(position);
+    }
+
+    public int getSelectedItemCount() {
+        log("*********ADAPTER: getSelectedItemCount");
+
+        return selectedItems.size();
+    }
+
+    public List<Integer> getSelectedItems() {
+        log("*********ADAPTER: getSelectedItems");
+
+        List<Integer> items = new ArrayList<Integer>(selectedItems.size());
+        for (int i = 0; i < selectedItems.size(); i++) {
+            items.add(selectedItems.keyAt(i));
+        }
+        return items;
+    }
+
+    public List<Bitmap> getSelectedNodes() {
+        log("*********ADAPTER: getSelectedNodes");
+
+        ArrayList<Bitmap> nodes = new ArrayList<Bitmap>();
+
+        for (int i = 0; i < selectedItems.size(); i++) {
+            if (selectedItems.valueAt(i) == true) {
+                Bitmap document = getNodeAt(selectedItems.keyAt(i));
+                if (document != null){
+                    nodes.add(document);
+                }
+            }
+        }
+        return nodes;
+    }
+
 
     public MegaChatFileStorageAdapter(Context _context, Object fragment, RecyclerView recyclerView, ActionBar aB, ArrayList<Bitmap> _thumbimages) {
 
-        log("******++MegaChatFileStorageAdapter");
+        log("*********ADAPTER: MegaChatFileStorageAdapter");
         this.context = _context;
         this.fragment = fragment;
         this.thumbimages = _thumbimages;
@@ -114,7 +205,7 @@ public class MegaChatFileStorageAdapter extends RecyclerView.Adapter<MegaChatFil
     }
 
     public void setNodes(ArrayList<Bitmap> thumbImages) {
-        log("setNodes");
+        log("*********ADAPTER: setNodes");
         this.thumbimages = thumbImages;
         notifyDataSetChanged();
     }
@@ -123,7 +214,7 @@ public class MegaChatFileStorageAdapter extends RecyclerView.Adapter<MegaChatFil
 
     @Override
     public ViewHolderBrowser onCreateViewHolder(ViewGroup parent, int viewType) {
-        log("*******onCreateViewHolder");
+        log("*********ADAPTER: onCreateViewHolder");
         Display display = ((Activity) context).getWindowManager().getDefaultDisplay();
         outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
@@ -134,11 +225,12 @@ public class MegaChatFileStorageAdapter extends RecyclerView.Adapter<MegaChatFil
         holderGrid.itemLayout = (RelativeLayout) v.findViewById(R.id.file_storage_grid_item_layout);
         holderGrid.thumbLayout = (RelativeLayout) v.findViewById(R.id.file_storage_grid_thumbnail_layout);
         holderGrid.imageViewThumb = (ImageView) v.findViewById(R.id.file_storage_grid_thumbnail);
-//        holderGrid.separator = (View) v.findViewById(R.id.file_grid_separator);
+        holderGrid.imageSelected = (ImageView) v.findViewById(R.id.thumbnail_selected);
+        holderGrid.imageUnselected = (RelativeLayout) v.findViewById(R.id.long_click_unselected);
 
         holderGrid.itemLayout.setTag(holderGrid);
-        //holderGrid.itemLayout.setOnClickListener(this);
-        // holderGrid.itemLayout.setOnLongClickListener(this);
+        holderGrid.itemLayout.setOnClickListener(this);
+        holderGrid.itemLayout.setOnLongClickListener(this);
 
         v.setTag(holderGrid);
 
@@ -147,13 +239,13 @@ public class MegaChatFileStorageAdapter extends RecyclerView.Adapter<MegaChatFil
 
     @Override
     public void onBindViewHolder(ViewHolderBrowser holder, int position) {
-        log("*********onBindViewHolder");
+        log("*********ADAPTER: onBindViewHolder");
         ViewHolderBrowserGrid holderGrid = (ViewHolderBrowserGrid) holder;
         onBindViewHolderGrid(holderGrid, position);
     }
 
     public void onBindViewHolderGrid(ViewHolderBrowserGrid holder, int position){
-        log("******onBindViewHolderGrid");
+        log("*********ADAPTER: onBindViewHolderGrid");
 
         Display display = ((Activity) context).getWindowManager().getDefaultDisplay();
         Bitmap image = (Bitmap) getItem(position);
@@ -161,23 +253,37 @@ public class MegaChatFileStorageAdapter extends RecyclerView.Adapter<MegaChatFil
             return;
         }
 
-        holder.itemLayout.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.background_item_grid));
-//        holder.separator.setBackgroundColor(context.getResources().getColor(R.color.new_background_fragment));
-
         holder.imageViewThumb.setVisibility(View.VISIBLE);
 
-
         holder.imageViewThumb.setImageBitmap(image);
+        if (!multipleSelect) {
+            holder.imageSelected.setVisibility(View.GONE);
+            holder.imageUnselected.setVisibility(View.GONE);
+
+        }else {
+
+            if(this.isItemChecked(position)){
+                holder.imageSelected.setVisibility(View.VISIBLE);
+                holder.imageUnselected.setVisibility(View.GONE);
+
+            }else{
+                holder.imageSelected.setVisibility(View.GONE);
+                holder.imageUnselected.setVisibility(View.VISIBLE);
+            }
+        }
 
     }
 
     private Bitmap getItemNode(int position) {
+        log("*********ADAPTER: getItemNode");
         return thumbimages.get(position);
     }
 
 
     @Override
     public int getItemCount() {
+        log("*********ADAPTER: getItemCount");
+
         if (thumbimages != null){
             return thumbimages.size();
         }else{
@@ -186,13 +292,25 @@ public class MegaChatFileStorageAdapter extends RecyclerView.Adapter<MegaChatFil
     }
 
     public Object getItem(int position) {
+        log("*********ADAPTER: getItem-> "+position);
+
         if (thumbimages != null){
             return thumbimages.get(position);
         }
         return null;
     }
 
+    @Override
+    public long getItemId(int position) {
+        log("*********ADAPTER: getItemCount-> "+position);
+
+        return position;
+    }
+
+
     public Bitmap getNodeAt(int position) {
+        log("*********ADAPTER: getNodeAt-> "+position);
+
         try {
             if (thumbimages != null) {
                 return thumbimages.get(position);
@@ -206,6 +324,55 @@ public class MegaChatFileStorageAdapter extends RecyclerView.Adapter<MegaChatFil
         Util.log("MegaChatFileStorageAdapter", log);
     }
 
+    @Override
+    public void onClick(View v) {
+        log("*********ADAPTER: onClick");
+        ((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
+        ViewHolderBrowser holder = (ViewHolderBrowser) v.getTag();
+        int currentPosition = holder.getAdapterPosition();
+        log("onClick -> Current position: "+currentPosition);
+
+        if(currentPosition<0){
+            log("Current position error - not valid value");
+            return;
+        }
+        ((ChatFileStorageFragment) fragment).itemClick(currentPosition);
+
+    }
+
+    @Override
+    public boolean onLongClick(View view) {
+        log("*******ADAPTER: OnLongCLick");
+        ((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
+
+        ViewHolderBrowser holder = (ViewHolderBrowser) view.getTag();
+        int currentPosition = holder.getAdapterPosition();
+        if (!isMultipleSelect()){
+            setMultipleSelect(true);
+        }
+//        getSelectedNodes();
+        ((ChatFileStorageFragment) fragment).itemClick(currentPosition);
+
+
+        return true;
+    }
+
+    public boolean isMultipleSelect() {
+        log("*********ADAPTER: isMultipleSelect");
+
+        return multipleSelect;
+    }
+
+    public void setMultipleSelect(boolean multipleSelect) {
+        log("*********ADAPTER: setMultipleSelect-> "+multipleSelect);
+
+        if (this.multipleSelect != multipleSelect) {
+            this.multipleSelect = multipleSelect;
+        }
+        if(this.multipleSelect){
+            selectedItems = new SparseBooleanArray();
+        }
+    }
 
 }
