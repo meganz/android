@@ -194,35 +194,35 @@
 
                         <ImageView
                             android:id="@+id/shape_passwd_first"
-                            android:layout_width="wrap_content"
+                            android:layout_width="@dimen/width_passwd_shape"
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="5dp"
                             android:layout_marginRight="5dp"
                             android:background="@drawable/passwd_very_weak"/>
                         <ImageView
                             android:id="@+id/shape_passwd_second"
-                            android:layout_width="wrap_content"
+                            android:layout_width="@dimen/width_passwd_shape"
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="5dp"
                             android:layout_marginRight="5dp"
                             android:background="@drawable/shape_password"/>
                         <ImageView
                             android:id="@+id/shape_passwd_third"
-                            android:layout_width="wrap_content"
+                            android:layout_width="@dimen/width_passwd_shape"
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="5dp"
                             android:layout_marginRight="5dp"
                             android:background="@drawable/shape_password"/>
                         <ImageView
                             android:id="@+id/shape_passwd_fourth"
-                            android:layout_width="wrap_content"
+                            android:layout_width="@dimen/width_passwd_shape"
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="5dp"
                             android:layout_marginRight="5dp"
                             android:background="@drawable/shape_password"/>
                         <ImageView
                             android:id="@+id/shape_passwd_fifth"
-                            android:layout_width="wrap_content"
+                            android:layout_width="@dimen/width_passwd_shape"
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="5dp"
                             android:layout_marginRight="5dp"
