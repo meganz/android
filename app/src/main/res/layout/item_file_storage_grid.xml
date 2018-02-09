@@ -1,49 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/file_storage_grid_item_layout"
-    android:layout_width="172dp"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_alignParentLeft="true"
-    android:layout_alignParentTop="true"
-    android:layout_margin="3dp"
-    android:background="@drawable/background_item_grid"
-    android:descendantFocusability="blocksDescendants" >
+    android:id="@+id/file_storage_grid_item_layout">
 
     <RelativeLayout
         android:id="@+id/file_storage_grid_thumbnail_layout"
-        android:layout_width="match_parent"
-        android:background="@color/new_background_fragment"
-        android:layout_height="172dp">
+        android:layout_width="110dp"
+        android:layout_height="110dp"
+        android:layout_margin="3dp">
 
         <ImageView
             android:id="@+id/file_storage_grid_thumbnail"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_centerHorizontal="true"
-            android:layout_centerVertical="true"
             android:scaleType="centerCrop"
-            android:background="@android:color/transparent"/>
+            android:background="@color/white"
+            android:adjustViewBounds="true" />
+
+        <!--<RelativeLayout-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="55dp"-->
+            <!--android:background="@drawable/gradient_cam_uploads"-->
+            <!--android:id="@+id/cell_photosync_title_gradient_effect"-->
+            <!--android:layout_alignParentBottom="true"/>-->
+
         <ImageView
             android:id="@+id/thumbnail_selected"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/media_select_ic"
-            android:visibility="gone"/>
+            android:layout_centerInParent="true"
+            android:src="@drawable/media_select_ic"/>
+
         <RelativeLayout
             android:id="@+id/long_click_unselected"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_centerHorizontal="true"
-            android:layout_centerVertical="true"
-            android:background="@color/less_transparent_white"
-            android:visibility="gone">
-        </RelativeLayout>
-    </RelativeLayout>
+            android:background="@drawable/background_item_photosync_grid_long_click"/>
 
-    <!--<View-->
-        <!--android:id="@+id/file_grid_separator"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="1dp"-->
-        <!--android:layout_below="@id/file_grid_thumbnail_layout"-->
-        <!--android:background="@color/new_background_fragment"/>-->
+    </RelativeLayout>
 
 </RelativeLayout>
