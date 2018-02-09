@@ -143,6 +143,7 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
 
         @Override
         public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+            log("###### ADAPTER onActionItemClicked");
             log("onActionItemClicked");
             List<MegaNode> documents = getSelectedDocuments();
 
@@ -231,6 +232,8 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
         @Override
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
             log("onCreateActionMode");
+            log("###### ADAPTER onCreateActionMode");
+
             MenuInflater inflater = mode.getMenuInflater();
             inflater.inflate(R.menu.file_browser_action, menu);
             return true;
@@ -239,6 +242,8 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
         @Override
         public void onDestroyActionMode(ActionMode mode) {
             log("onDestroyActionMode");
+            log("###### ADAPTER onDestroyActionMode");
+
             clearSelections();
             multipleSelect = false;
             actionMode = null;
@@ -247,6 +252,8 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
         @Override
         public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
             log("onPrepareActionMode");
+            log("###### ADAPTER onPrepareActionMode");
+
             List<MegaNode> selected = getSelectedDocuments();
 
             log("the num of items selected is "+selected.size());
@@ -344,7 +351,7 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
 
     @Override
     public ViewHolderPhotoTitleSyncGridTitle onCreateViewHolder(ViewGroup parent, int viewType) {
-        log("onBindViewHolder");
+        log("###### ADAPTER onCreateViewHolder");
 
         log("onCreateViewHolder");
 
@@ -409,6 +416,8 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
 
     @Override
     public void onBindViewHolder(ViewHolderPhotoTitleSyncGridTitle holder, int position) {
+        log("###### ADAPTER onBindViewHolder");
+
 //        Display display = ((Activity) context).getWindowManager().getDefaultDisplay();
 //        DisplayMetrics outMetrics = new DisplayMetrics();
 //        display.getMetrics(outMetrics);
@@ -448,11 +457,12 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
 
     @Override
     public int getItemCount() {
+        log("###### ADAPTER getItemCount");
+
         return count;
     }
 
     public class ViewHolderPhotoTitleSyncGridTitle extends RecyclerView.ViewHolder implements ThumbnailUtilsLollipop.ThumbnailInterface{
-
         private RelativeLayout layout_title;
         private TextView title;
         private ImageView photo;
@@ -474,6 +484,8 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
 
         public ViewHolderPhotoTitleSyncGridTitle(View itemView, int gridWidth, int margins, RecyclerView.Adapter adapter) {
             super(itemView);
+            log("###### ADAPTER ViewHolderPhotoTitleSyncGridTitle");
+
             layout_title = (RelativeLayout) itemView.findViewById(R.id.cell_photosync_grid_title_layout);
             layout_title.setVisibility(View.GONE);
             title = (TextView) itemView.findViewById(R.id.cell_photosync_grid_title_title);
@@ -515,6 +527,8 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
 
                 @Override
                 public void onClick(View v) {
+                    log("###### ADAPTER ViewHolderPhotoTitleSyncGridTitle-setOnClickListener");
+
                     if(type == MegaPhotoSyncGridTitleAdapterLollipop.TYPE_NO_TYPE || type == MegaPhotoSyncGridTitleAdapterLollipop.TYPE_ITEM_TITLE){
                         return;
                     }
@@ -531,6 +545,8 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
 
                 @Override
                 public boolean onLongClick(View v) {
+                    log("###### ADAPTER ViewHolderPhotoTitleSyncGridTitle-setOnLongClickListener");
+
                     if(type == MegaPhotoSyncGridTitleAdapterLollipop.TYPE_NO_TYPE || type == MegaPhotoSyncGridTitleAdapterLollipop.TYPE_ITEM_TITLE){
                         return true;
                     }
@@ -556,6 +572,8 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
         }
 
         public void setDataImage(MegaNode n, boolean checked, boolean multipleSelect, int positionAdapter, int positionNodes){
+            log("###### ADAPTER setDataImage");
+
             layout_title.setVisibility(View.GONE);
             content_layout.setVisibility(View.VISIBLE);
             layout_videoInfo.setVisibility(View.GONE);
@@ -739,11 +757,15 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
 
         @Override
         public ImageView getImageView() {
+            log("###### ADAPTER getImageView");
+
             return photo;
         }
 
         @Override
         public int getPositionOnAdapter() {
+            log("###### ADAPTER getPositionOnAdapter");
+
             return positionAdapter;
         }
 
@@ -758,6 +780,8 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
 
         @Override
         public void setBitmap(Bitmap bitmap) {
+            log("###### ADAPTER setBitmap");
+
             photo.setImageBitmap(bitmap);
         }
 
@@ -766,22 +790,32 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
         }
 
         public void setMegaMonthPicLollipop(MegaMonthPicLollipop megaMonthPicLollipop) {
+            log("###### ADAPTER setMegaMonthPicLollipop");
+
             this.megaMonthPicLollipop = megaMonthPicLollipop;
         }
 
         public int getPositionNodes() {
+            log("###### ADAPTER getPositionNodes");
+
             return positionNodes;
         }
 
         public void setPositionNodes(int positionNodes) {
+            log("###### ADAPTER setPositionNodes: "+positionNodes);
+
             this.positionNodes = positionNodes;
         }
 
         public int getGridWidth() {
+            log("###### ADAPTER getGridWidth");
+
             return gridWidth;
         }
 
         public void setGridWidth(int gridWidth, int numberOfCells) {
+            log("###### ADAPTER setGridWidth");
+
             if(this.gridWidth != gridWidth){
                 this.gridWidth = gridWidth;
                 ViewGroup.LayoutParams params = (ViewGroup.LayoutParams) content_layout.getLayoutParams();
@@ -807,10 +841,14 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
         }
 
         public int getMargins() {
+            log("###### ADAPTER getMargins");
+
             return margins;
         }
 
         public void setMargins(int margins) {
+            log("###### ADAPTER setMargins");
+
             if(this.margins != margins){
                 this.margins = margins;
                 ViewGroup.MarginLayoutParams marginParams = (ViewGroup.MarginLayoutParams) content_layout.getLayoutParams();
@@ -912,6 +950,8 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
     }
 
     public MegaPhotoSyncGridTitleAdapterLollipop(Context _context, ArrayList<MegaMonthPicLollipop> _monthPics, long _photosyncHandle, RecyclerView listView, ImageView emptyImageView, LinearLayout emptyTextView, ActionBar aB, ArrayList<MegaNode> _nodes, int numberOfCells, int gridWidth, Object fragment, int type, int count, int countTitles, List<ItemInformation> itemInformationList) {
+        log("###### ADAPTER MegaPhotoSyncGridTitleAdapterLollipop");
+
         this.context = _context;
         this.monthPics = _monthPics;
         this.photosyncHandle = _photosyncHandle;
@@ -938,12 +978,16 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
     }
 
     public void setNumberOfCells(int numberOfCells, int gridWidth){
+        log("###### ADAPTER setNumberOfCells");
+
         this.numberOfCells = numberOfCells;
         this.gridWidth = gridWidth;
         notifyDataSetChanged();
     }
 
     public void setNodes(ArrayList<MegaMonthPicLollipop> monthPics, ArrayList<MegaNode> nodes, int count, int countTitles, List<ItemInformation> itemInformationList){
+        log("###### ADAPTER setNodes");
+
         this.monthPics = monthPics;
         this.nodes = nodes;
         this.count = count;
@@ -958,23 +1002,33 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
     }
 
     public Object getItem(int position) {
+        log("###### ADAPTER getItem: "+position);
+
         return monthPics.get(position);
     }
 
     @Override
     public long getItemId(int position) {
+        log("###### ADAPTER getItemId: "+position);
+
         return position;
     }
 
     public boolean isMultipleSelect() {
+        log("###### ADAPTER isMultipleSelect -> "+multipleSelect);
+
         return multipleSelect;
     }
 
     public void setMultipleSelect(boolean multipleSelect){
+        log("###### ADAPTER setMultipleSelect: "+multipleSelect);
+
         this.multipleSelect = multipleSelect;
     }
 
     public void setOrder(int orderGetChildren){
+        log("###### ADAPTER setOrder");
+
         this.orderGetChildren = orderGetChildren;
     }
 
@@ -1002,6 +1056,7 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
      */
     public void hideMultipleSelect() {
         log("hideMultipleSelect");
+        log("###### ADAPTER hideMultipleSelect");
 
         this.multipleSelect = false;
         ((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_TRANSPARENT_BLACK);
@@ -1013,6 +1068,7 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
     }
 
     public void selectAll(){
+        log("###### ADAPTER selectAll");
 
         this.multipleSelect = true;
         if(nodes != null){
@@ -1038,6 +1094,7 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
 
     public void clearSelections() {
         log("clearSelections");
+        log("###### ADAPTER clearSelections");
 
         hideMultipleSelect();
         for (int i = 0; i < checkedItems.size(); i++) {
@@ -1052,6 +1109,7 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
     }
 
     public boolean isChecked(int totalPosition){
+        log("###### ADAPTER isChecked: "+totalPosition);
 
         if (!multipleSelect){
             return false;
@@ -1069,6 +1127,7 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
 
     public void onNodeClick(MegaPhotoSyncGridTitleAdapterLollipop.ViewHolderPhotoTitleSyncGridTitle holder, int positionInNodes){
         log("onNodeClick");
+        log("###### ADAPTER onNodeClick: "+positionInNodes);
 
         if (!multipleSelect){
             MegaNode n = megaApi.getNodeByHandle(holder.getDocument());
@@ -1231,6 +1290,8 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
     }
 
     public void onNodeLongClick(MegaPhotoSyncGridTitleAdapterLollipop.ViewHolderPhotoTitleSyncGridTitle holder, int positionInNodes){
+        log("###### ADAPTER onNodeLongClick: "+positionInNodes);
+
         log("onNodeLongClick");
         if (!multipleSelect){
             clearSelections();
@@ -1251,6 +1312,7 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
     }
 
     private void updateActionModeTitle() {
+
         log("updateActionModeTitle");
         if (actionMode == null){
             log("actionMode null");
@@ -1324,6 +1386,8 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
     }
 
     private int getTypeOfPosition(int position){
+        log("###### ADAPTER getTypeOfPosition: "+position);
+
         for(MegaMonthPicLollipop temp : monthPics){
             log("size of temp: "+temp.nodeHandles);
             if(position == 0){
@@ -1345,6 +1409,8 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
 
     @Nullable
     private Object getItemOfPosition(int position){
+        log("###### ADAPTER getItemOfPosition: "+position);
+
         for(MegaMonthPicLollipop temp : monthPics){
             if(position == 0){
                 log("Title is "+temp.monthYearString);
@@ -1365,6 +1431,8 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
     }
 
     private long getNodesPositionOfPosition(int position){
+        log("###### ADAPTER getNodesPositionOfPosition: "+position);
+
         for(MegaMonthPicLollipop temp : monthPics){
             if(position == 0){
                 return -1;
@@ -1378,6 +1446,8 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
     }
 
     private MegaMonthPicLollipop getMegaMonthPicOfPosition(int position){
+        log("###### ADAPTER getMegaMonthPicOfPosition: "+position);
+
         for(MegaMonthPicLollipop temp : monthPics){
             if(position < temp.nodeHandles.size() + 1){
                 return temp;
@@ -1388,6 +1458,8 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
     }
 
     public int getSpanSizeOfPosition(int position){
+        log("###### ADAPTER getSpanSizeOfPosition: "+position);
+
         int type = TYPE_NO_TYPE;
         try{
             type = itemInformationList.get(position).type;

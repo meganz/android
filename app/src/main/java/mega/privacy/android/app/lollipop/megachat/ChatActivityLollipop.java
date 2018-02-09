@@ -602,6 +602,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     keyboardButton.setImageResource(R.drawable.ic_emoticon_white);
                     removeEmojiconFragment();
                 }
+                if(fileStorageLayout.isShown()){
+                    fileStorageLayout.setVisibility(View.GONE);
+                }
                 return false;
             }
         });
@@ -615,6 +618,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 if (emojiKeyboardShown){
                     keyboardButton.setImageResource(R.drawable.ic_emoticon_white);
                     removeEmojiconFragment();
+                }
+                if(fileStorageLayout.isShown()){
+                    fileStorageLayout.setVisibility(View.GONE);
                 }
                 textChat.requestFocus();
                 InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -1891,6 +1897,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         if (emojiKeyboardShown) {
             keyboardButton.setImageResource(R.drawable.ic_emoticon_white);
             removeEmojiconFragment();
+        }else if(fileStorageLayout.isShown()){
+            fileStorageLayout.setVisibility(View.GONE);
         }
         else{
             finish();
@@ -1941,8 +1949,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }
             case R.id.keyboard_icon_chat:{
                 log("open emoji keyboard:  " + emojiKeyboardShown);
-                fileStorageLayout.setVisibility(View.GONE);
-
+                if(fileStorageLayout.isShown()){
+                    fileStorageLayout.setVisibility(View.GONE);
+                }
                 if (emojiKeyboardShown){
                     removeEmojiconFragment();
                     textChat.requestFocus();
@@ -1980,8 +1989,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
             case R.id.media_icon_chat:{
 
-                fileStorageLayout.setVisibility(View.GONE);
-
+                if(fileStorageLayout.isShown()){
+                    fileStorageLayout.setVisibility(View.GONE);
+                }
                 if (emojiKeyboardShown) {
                     keyboardButton.setImageResource(R.drawable.ic_emoticon_white);
                     removeEmojiconFragment();
@@ -2023,8 +2033,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 break;
             }
             case R.id.send_contact_icon_chat:{
-                fileStorageLayout.setVisibility(View.GONE);
-
+                if(fileStorageLayout.isShown()){
+                    fileStorageLayout.setVisibility(View.GONE);
+                }
                 if (emojiKeyboardShown) {
                     keyboardButton.setImageResource(R.drawable.ic_emoticon_white);
                     removeEmojiconFragment();
@@ -2042,8 +2053,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 break;
             }
             case R.id.pick_file_system_icon_chat:{
-                fileStorageLayout.setVisibility(View.GONE);
-
+                if(fileStorageLayout.isShown()){
+                    fileStorageLayout.setVisibility(View.GONE);
+                }
                 if (emojiKeyboardShown) {
                     keyboardButton.setImageResource(R.drawable.ic_emoticon_white);
                     removeEmojiconFragment();
@@ -2061,7 +2073,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 break;
             }
             case R.id.pick_cloud_drive_icon_chat:{
-                fileStorageLayout.setVisibility(View.GONE);
+                if(fileStorageLayout.isShown()){
+                    fileStorageLayout.setVisibility(View.GONE);
+                }
 
                 if (emojiKeyboardShown) {
                     keyboardButton.setImageResource(R.drawable.ic_emoticon_white);
@@ -2095,20 +2109,26 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     }
                 }
 
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
-                    if (!hasStoragePermission) {
-                        ActivityCompat.requestPermissions(this,
-                                new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
-                                Constants.REQUEST_READ_STORAGE);
-                    }
+                if(fileStorageLayout.isShown()){
+                    fileStorageLayout.setVisibility(View.GONE);
 
-                    if (hasStoragePermission){
+                }else{
+                    fileStorageLayout.setVisibility(View.VISIBLE);
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                        boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
+                        if (!hasStoragePermission) {
+                            ActivityCompat.requestPermissions(this,
+                                    new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                                    Constants.REQUEST_READ_STORAGE);
+                        }
+
+                        if (hasStoragePermission){
+                            this.attachFromFileStorage();
+                        }
+                    }
+                    else{
                         this.attachFromFileStorage();
                     }
-                }
-                else{
-                    this.attachFromFileStorage();
                 }
 
                 break;
@@ -2118,17 +2138,11 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     public void attachFromFileStorage(){
         log("attachaFromFileStorage");
-        if(fileStorageLayout.isShown()){
-            fileStorageLayout.setVisibility(View.GONE);
+        FileStorageF = new ChatFileStorageFragment();
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        ft.replace(R.id.fragment_container_file_storage, FileStorageF, "fileStorageF");
+        ft.commitNow();
 
-        }else{
-            fileStorageLayout.setVisibility(View.VISIBLE);
-
-            FileStorageF = new ChatFileStorageFragment();
-            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            ft.replace(R.id.fragment_container_file_storage, FileStorageF, "fileStorageF");
-            ft.commitNow();
-        }
     }
 
     public void attachFromCloud(){
