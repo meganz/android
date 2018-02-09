@@ -354,7 +354,6 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 									if (ret == MegaChatApi.INIT_NO_CACHE)
 									{
 										log("shouldRun: condition ret == MegaChatApi.INIT_NO_CACHE");
-										megaApi.invalidateCache();
 
 									}
 									else if (ret == MegaChatApi.INIT_ERROR)
