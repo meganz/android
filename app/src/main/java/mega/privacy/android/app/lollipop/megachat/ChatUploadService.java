@@ -542,7 +542,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 						Bitmap bmp = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
 						pdfiumCore.renderPageBitmap(pdfDocument, bmp, pageNumber, 0, 0, width, height);
 						Bitmap resizedBitmap;
-						resizedBitmap = Bitmap.createScaledBitmap(bmp, width/3, height/3, false);
+						resizedBitmap = Bitmap.createScaledBitmap(bmp, width, height, false);
 						out = new FileOutputStream(preview);
 						boolean result = resizedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, out); // bmp is your Bitmap instance
 						if(result){

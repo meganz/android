@@ -333,7 +333,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     int height = pdfiumCore.getPageHeightPoint(pdfDocument, pageNumber);
                     Bitmap bmp = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
                     pdfiumCore.renderPageBitmap(pdfDocument, bmp, pageNumber, 0, 0, width, height);
-                    preview = Bitmap.createScaledBitmap(bmp, width/3, height/3, false);
+                    preview = Bitmap.createScaledBitmap(bmp, width, height, false);
                     out = new FileOutputStream(previewFile);
                     result = preview.compress(Bitmap.CompressFormat.JPEG, 100, out); // bmp is your Bitmap instance
                     pdfiumCore.closeDocument(pdfDocument);
@@ -349,7 +349,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 }
                 if (preview != null && result){
                     log("Compress OK");
-                    long fingerprintCache = MegaApiAndroid.base64ToHandle(megaApi.getFingerprint(filePath));
+                    long fingerprintCache = MegaApiAndroid.base64ToHandle(megaApi.getFingerprint(previewFile.getPath()));
                     PreviewUtils.setPreviewCache(fingerprintCache, preview);
                     return preview;
                 }
