@@ -290,7 +290,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                 BitmapFactory.Options options = new BitmapFactory.Options();
                 options.inJustDecodeBounds = true;
-                Bitmap preview = BitmapFactory.decodeFile(currentFile.getAbsolutePath(), options);
+                Bitmap preview;
 
                 ExifInterface exif;
                 int orientation = ExifInterface.ORIENTATION_NORMAL;
@@ -321,6 +321,10 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 PdfiumCore pdfiumCore = new PdfiumCore(context);
                 FileOutputStream out = null;
                 Bitmap preview = null;
+                boolean result = false;
+                File previewDir = PreviewUtils.getPreviewFolder(context);
+                String[] previewName = currentFile.getName().split(".pdf");
+                File previewFile = new File(previewDir, previewName[0] + ".jpg");
 
                 try {
                     PdfDocument pdfDocument = pdfiumCore.newDocument(ParcelFileDescriptor.open(currentFile, ParcelFileDescriptor.MODE_READ_ONLY));
@@ -330,8 +334,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     Bitmap bmp = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
                     pdfiumCore.renderPageBitmap(pdfDocument, bmp, pageNumber, 0, 0, width, height);
                     preview = Bitmap.createScaledBitmap(bmp, width/3, height/3, false);
-                    out = new FileOutputStream(filePath);
-                    preview.compress(Bitmap.CompressFormat.JPEG, 100, out); // bmp is your Bitmap instance
+                    out = new FileOutputStream(previewFile);
+                    result = preview.compress(Bitmap.CompressFormat.JPEG, 100, out); // bmp is your Bitmap instance
                     pdfiumCore.closeDocument(pdfDocument);
                 } catch(Exception e) {
                     //todo with exception
@@ -343,11 +347,14 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                         //todo with exception
                     }
                 }
-                if (preview != null){
-
+                if (preview != null && result){
+                    log("Compress OK");
                     long fingerprintCache = MegaApiAndroid.base64ToHandle(megaApi.getFingerprint(filePath));
                     PreviewUtils.setPreviewCache(fingerprintCache, preview);
                     return preview;
+                }
+                else if (!result) {
+                    log("Not Compress");
                 }
             }
 
