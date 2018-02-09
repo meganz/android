@@ -64,7 +64,6 @@ import java.util.Map;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.DownloadService;
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.MimeTypeMime;
@@ -428,8 +427,6 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
                             chatSettings = dbH.getChatSettings();
                             if (ret == MegaChatApi.INIT_NO_CACHE) {
                                 log("onCreate: condition ret == MegaChatApi.INIT_NO_CACHE");
-                                megaApi.invalidateCache();
-
                             } else if (ret == MegaChatApi.INIT_ERROR) {
 
                                 log("onCreate: condition ret == MegaChatApi.INIT_ERROR");
