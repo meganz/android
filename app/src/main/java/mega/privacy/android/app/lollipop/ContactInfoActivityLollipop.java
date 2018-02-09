@@ -408,9 +408,9 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 				}
 				else {
 					if (userEmailExtra != null) {
-						String[] splitEmail = userEmailExtra.split("[@._]");
-						nameContact.setText(splitEmail[0]);
-						nameLength.setText(splitEmail[0]);
+
+						nameContact.setText(userEmailExtra);
+						nameLength.setText(userEmailExtra);
 					}
 				}
 				String fullname = (String)nameContact.getText();
@@ -443,11 +443,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 
 						if (fullName.trim().length() <= 0){
 							log("Put email as fullname");
-							String email = user.getEmail();
-							if (email != null && !email.isEmpty() && !email.equals("")) {
-								String[] splitEmail = email.split("[@._]");
-								fullName = splitEmail[0];
-							}
+							fullName= user.getEmail();
 						}
 
 						nameContact.setText(fullName);
