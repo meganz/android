@@ -35,9 +35,9 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="left"
                     android:layout_marginTop="40dp"
+                    android:layout_marginLeft="3dp"
                     android:layout_marginBottom="24dp"
                     android:text="@string/create_account_text"
-                    android:layout_marginLeft="3dp"
                     android:textColor="@color/login_title"
                     android:textSize="20sp" />
 
@@ -61,6 +61,7 @@
                         android:layout_height="wrap_content"
                         android:id="@+id/create_account_name_error_icon"
                         android:layout_alignParentRight="true"
+                        android:layout_marginRight="3dp"
                         android:src="@drawable/ic_input_warning"
                         android:tint="@color/login_warning"
                         />
@@ -73,6 +74,7 @@
                         android:layout_toLeftOf="@id/create_account_name_error_icon"
                         android:layout_alignParentLeft="true"
                         android:layout_centerVertical="true"
+                        android:layout_marginLeft="3dp"
                         android:paddingLeft="3dp"
                         />
 
@@ -109,6 +111,7 @@
                         android:id="@+id/create_account_email_error_icon"
                         android:layout_alignParentRight="true"
                         android:src="@drawable/ic_input_warning"
+                        android:layout_marginRight="3dp"
                         android:tint="@color/login_warning"
                         />
 
@@ -119,6 +122,7 @@
                         android:textColor="@color/login_warning"
                         android:layout_toLeftOf="@id/create_account_email_error_icon"
                         android:layout_alignParentLeft="true"
+                        android:layout_marginLeft="3dp"
                         android:layout_centerVertical="true"
                         android:paddingLeft="3dp"
                         />
@@ -164,6 +168,7 @@
                         android:id="@+id/create_account_password_error_icon"
                         android:layout_alignParentRight="true"
                         android:src="@drawable/ic_input_warning"
+                        android:layout_marginRight="3dp"
                         android:tint="@color/login_warning"
                         />
 
@@ -174,6 +179,7 @@
                         android:textColor="@color/login_warning"
                         android:layout_toLeftOf="@id/create_account_password_error_icon"
                         android:layout_alignParentLeft="true"
+                        android:layout_marginLeft="3dp"
                         android:layout_centerVertical="true"
                         android:paddingLeft="3dp"
                         />
@@ -291,6 +297,7 @@
                         android:id="@+id/create_account_password_confirm_error_icon"
                         android:layout_alignParentRight="true"
                         android:src="@drawable/ic_input_warning"
+                        android:layout_marginRight="3dp"
                         android:tint="@color/login_warning"/>
 
                     <TextView
@@ -300,6 +307,7 @@
                         android:textColor="@color/login_warning"
                         android:layout_toLeftOf="@id/create_account_password_confirm_error_icon"
                         android:layout_alignParentLeft="true"
+                        android:layout_marginLeft="3dp"
                         android:layout_centerVertical="true"
                         android:paddingLeft="3dp"/>
 
@@ -311,7 +319,7 @@
                     android:layout_gravity="left"
                     android:layout_marginBottom="31dp"
                     android:layout_marginTop="36dp"
-                    android:layout_marginLeft="-2dp"
+                    android:layout_marginLeft="-4dp"
                     android:orientation="horizontal" >
 
                     <CheckBox
@@ -343,11 +351,11 @@
                     android:paddingRight="16dp"
                     android:paddingLeft="16dp"
                     android:layout_marginBottom="30dp"
+                    android:layout_marginLeft="3dp"
                     android:layout_gravity="left"
                     android:minHeight="0dp"
                     android:minWidth="0dp"
                     android:elevation="6dp"
-                    android:layout_marginLeft="4dp"
                     android:stateListAnimator="@null"/>
 
             </LinearLayout>
@@ -367,8 +375,6 @@
                     android:layout_gravity="center"
                     android:layout_marginTop="24dp"
                     android:layout_marginBottom="23dp"
-                    android:layout_marginLeft="47dp"
-                    android:layout_marginRight="47dp"
                     android:textSize="20sp" />
 
                 <Button
@@ -380,8 +386,6 @@
                     android:layout_gravity="center"
                     android:minHeight="0dp"
                     android:minWidth="0dp"
-                    android:layout_marginLeft="47dp"
-                    android:layout_marginRight="47dp"
                     android:layout_marginBottom="30dp"
                     android:stateListAnimator="@null" />
             </LinearLayout>
