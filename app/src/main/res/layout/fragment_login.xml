@@ -62,9 +62,9 @@
                         android:layout_height="wrap_content"
                         android:id="@+id/login_email_text_error_icon"
                         android:layout_alignParentRight="true"
+                        android:layout_marginRight="3dp"
                         android:src="@drawable/ic_input_warning"
-                        android:tint="@color/login_warning"
-                        android:layout_marginRight="4dp"/>
+                        android:tint="@color/login_warning"/>
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -73,7 +73,7 @@
                         android:textColor="@color/login_warning"
                         android:layout_toLeftOf="@id/login_email_text_error_icon"
                         android:layout_alignParentLeft="true"
-                        android:layout_marginLeft="4dp"
+                        android:layout_marginLeft="3dp"
                         android:layout_centerInParent="true"/>
 
                 </RelativeLayout>
@@ -118,8 +118,8 @@
                         android:id="@+id/login_password_text_error_icon"
                         android:layout_alignParentRight="true"
                         android:src="@drawable/ic_input_warning"
-                        android:tint="@color/login_warning"
-                        android:layout_marginRight="4dp"/>
+                        android:layout_marginRight="3dp"
+                        android:tint="@color/login_warning"/>
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -129,7 +129,7 @@
                         android:layout_toLeftOf="@id/login_password_text_error_icon"
                         android:layout_alignParentLeft="true"
                         android:layout_centerInParent="true"
-                        android:layout_marginLeft="4dp"/>
+                        android:layout_marginLeft="3dp"/>
 
                 </RelativeLayout>
 
@@ -201,8 +201,6 @@
                     android:id="@+id/text_newToMega"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="48dp"
-                    android:layout_marginRight="45dp"
                     android:text="@string/new_to_mega"
                     android:layout_marginTop="24dp"
                     android:textColor="@color/text_login"
@@ -212,8 +210,6 @@
                     android:id="@+id/button_create_account_login"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="48dp"
-                    android:layout_marginRight="45dp"
                     android:layout_marginTop="22dp"
                     android:layout_marginBottom="24dp"
                     android:fontFamily="sans-serif-medium"
