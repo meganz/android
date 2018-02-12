@@ -11,6 +11,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.PixelFormat;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -408,6 +409,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
         remoteSurfaceView = (SurfaceView)findViewById(R.id.surface_remote_video);
         remoteRenderer = new MegaSurfaceRenderer(remoteSurfaceView);
         rtcAudioManager = AppRTCAudioManager.create(getApplicationContext());
+        remoteSurfaceView.getHolder().setFormat(PixelFormat.TRANSPARENT);
 
         parent = (ViewGroup) findViewById(R.id.parentLayout);
         fragmentContainerLocalCamera = (FrameLayout) findViewById(R.id.fragment_container_local_camera);
@@ -489,7 +491,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
 
                 int callStatus = callChat.getStatus();
                 log("The status of the callChat is: " + callStatus);
-                fullName = chat.getPeerFullname(0);
+                fullName = chat.getTitle();
                 email = chat.getPeerEmail(0);
                 userHandle = chat.getPeerHandle(0);
 
@@ -551,7 +553,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                     relativeVideo.getLayoutParams().width= RelativeLayout.LayoutParams.WRAP_CONTENT;
                     setProfileMyAvatar(false);
                     setProfileContactAvatar(userHandle, fullName, true);
-                    remoteSurfaceView.setVisibility(GONE);
+//                    remoteSurfaceView.setVisibility(GONE);
 
                     int volume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
                     if (volume == 0) {
@@ -1553,7 +1555,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                 isRemoteVideo = REMOTE_VIDEO_ENABLED;
                 contactAvatarLayout.setVisibility(View.GONE);
                 contactAvatarLayout.setOnTouchListener(null);
-                remoteSurfaceView.setVisibility(View.VISIBLE);
+                //remoteSurfaceView.setVisibility(View.VISIBLE);
                 remoteSurfaceView.setOnTouchListener(this);
                 log("Register remote video listener");
                 megaChatApi.addChatRemoteVideoListener(this);
@@ -1564,7 +1566,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                 contactAvatarLayout.setVisibility(View.VISIBLE);
                 contactAvatarLayout.setOnTouchListener(this);
                 remoteSurfaceView.setOnTouchListener(null);
-                remoteSurfaceView.setVisibility(View.GONE);
+                //remoteSurfaceView.setVisibility(View.GONE);
                 megaChatApi.removeChatVideoListener(this);
             }
         }
@@ -1574,7 +1576,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                 isRemoteVideo = REMOTE_VIDEO_DISABLED;
                 contactAvatarLayout.setVisibility(View.VISIBLE);
                 contactAvatarLayout.setOnTouchListener(this);
-                remoteSurfaceView.setVisibility(View.GONE);
+                //remoteSurfaceView.setVisibility(View.GONE);
                 remoteSurfaceView.setOnTouchListener(null);
                 megaChatApi.removeChatVideoListener(this);
             }
@@ -1582,30 +1584,10 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                 isRemoteVideo = REMOTE_VIDEO_ENABLED;
                 contactAvatarLayout.setVisibility(View.GONE);
                 contactAvatarLayout.setOnTouchListener(null);
-                remoteSurfaceView.setVisibility(View.VISIBLE);
+                //remoteSurfaceView.setVisibility(View.VISIBLE);
                 remoteSurfaceView.setOnTouchListener(this);
                 megaChatApi.addChatRemoteVideoListener(this);
             }
-        }
-    }
-
-    public void updateLocalFullVideoStatus(){
-        log("updateLocalFullVideoStatus: ");
-
-        if (localCameraFragmentFS == null) {
-            localCameraFragmentFS = new LocalCameraCallFullScreenFragment();
-            FragmentTransaction ftFS = getSupportFragmentManager().beginTransaction();
-            ftFS.replace(R.id.fragment_container_local_cameraFS, localCameraFragmentFS, "localCameraFragment");
-            ftFS.commitNowAllowingStateLoss();
-        }else {
-            contactAvatarLayout.setVisibility(View.VISIBLE);
-            parentFS.setVisibility(View.GONE);
-            fragmentContainerLocalCameraFS.setVisibility(View.GONE);
-
-            localCameraFragmentFS.setVideoFrame(false);
-            FragmentTransaction ftFS = getSupportFragmentManager().beginTransaction();
-            ftFS.remove(localCameraFragmentFS);
-            localCameraFragmentFS = null;
         }
     }
 
