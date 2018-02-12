@@ -76,6 +76,7 @@ import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
+import nz.mega.sdk.MegaEvent;
 import nz.mega.sdk.MegaGlobalListenerInterface;
 import nz.mega.sdk.MegaHandleList;
 import nz.mega.sdk.MegaNode;
@@ -871,6 +872,12 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
 
     @Override
     public void onAccountUpdate(MegaApiJava api) {
+
+    }
+
+
+    @Override
+    public void onEvent(MegaApiJava api, MegaEvent event) {
 
     }
 
