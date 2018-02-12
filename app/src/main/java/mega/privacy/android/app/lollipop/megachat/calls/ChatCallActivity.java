@@ -553,8 +553,6 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                     relativeVideo.getLayoutParams().width= RelativeLayout.LayoutParams.WRAP_CONTENT;
                     setProfileMyAvatar(false);
                     setProfileContactAvatar(userHandle, fullName, true);
-//                    remoteSurfaceView.setVisibility(GONE);
-
                     int volume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
                     if (volume == 0) {
                         toneGenerator = new ToneGenerator(AudioManager.STREAM_VOICE_CALL, 100);
