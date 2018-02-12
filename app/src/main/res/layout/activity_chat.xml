@@ -90,10 +90,12 @@
                             android:textSize="14sp"
                             android:hint="@string/type_message_hint"
                             android:layout_toLeftOf="@+id/send_message_icon_chat"
-                            android:inputType="textMultiLine"
                             emojicon:emojiconSize="16sp"
                             android:minLines="2"
-                            android:lines="6"/>
+                            android:lines="6"
+                            android:inputType="textCapSentences" />
+                        <!--android:inputType="textMultiLine"-->
+
 
                         <RelativeLayout
                             android:id="@+id/writing_disabled_linear_layout_chat"
