@@ -18,13 +18,6 @@
             android:background="@color/white"
             android:adjustViewBounds="true" />
 
-        <!--<RelativeLayout-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="55dp"-->
-            <!--android:background="@drawable/gradient_cam_uploads"-->
-            <!--android:id="@+id/cell_photosync_title_gradient_effect"-->
-            <!--android:layout_alignParentBottom="true"/>-->
-
         <ImageView
             android:id="@+id/thumbnail_selected"
             android:layout_width="wrap_content"
@@ -33,10 +26,11 @@
             android:src="@drawable/media_select_ic"/>
 
         <RelativeLayout
-            android:id="@+id/long_click_unselected"
+            android:id="@+id/thumbnail_unselected"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@drawable/background_item_photosync_grid_long_click"/>
+            android:background="@color/transparency_white">
+        </RelativeLayout>
 
     </RelativeLayout>
 
