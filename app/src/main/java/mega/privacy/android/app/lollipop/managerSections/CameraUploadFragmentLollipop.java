@@ -170,8 +170,6 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	
 	public class RecyclerViewOnGestureListener extends SimpleOnGestureListener{
 		public void onLongPress(MotionEvent e) {
-			log("###### FRAGMENT RecyclerViewOnGestureListener-onLongPress");
-
 			log("onLongPress");
 			if (((ManagerActivityLollipop)context).isListCameraUploads()){
 				log("onLongPress:isList");
@@ -198,8 +196,6 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 
 		@Override
 		public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-			log("###### FRAGMENT ActionBarCallBack-onActionItemClicked");
-
 			((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
 			List<PhotoSyncHolder> documentsList = null;
@@ -377,8 +373,6 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 
 		@Override
 		public void onDestroyActionMode(ActionMode mode) {
-			log("###### FRAGMENT onDestroyActionMode");
-
 			log("onDestroyActionMode");
 			clearSelections();
       
@@ -396,8 +390,6 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 
 		@Override
 		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-			log("###### FRAGMENT onPrepareActionMode");
-
 			log("onPrepareActionMode");
 			boolean showDownload = false;
 			boolean showRename = false;
@@ -597,7 +589,6 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	
 	@Override
 	public void onCreate (Bundle savedInstanceState){
-		log("###### FRAGMENT onCreate");
 
 		log("onCreate");
 		if (megaApi == null){
@@ -633,8 +624,6 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		log("###### FRAGMENT onCreateView");
-
 		log("onCreateView");		
 		
 		if (megaApi == null){
@@ -1206,8 +1195,6 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	}
 	
 	public void selectAll(){
-		log("###### FRAGMENT selectAll");
-
 		if (((ManagerActivityLollipop)context).isListCameraUploads()){
 			if (adapterList != null){
 				if(adapterList.isMultipleSelect()){
@@ -1238,8 +1225,6 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	}
 	
 	public void setInitialPreferences(){
-		log("###### FRAGMENT setInitialPreferences");
-
 		log("setInitialPreferences");
 //		DatabaseHandler dbH = new DatabaseHandler(getApplicationContext());
 		DatabaseHandler dbH = DatabaseHandler.getDbHandler(context);
@@ -1278,8 +1263,6 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	}
 	
 	public String getImageDateString(int month, int year){
-		log("###### FRAGMENT getImageDateString");
-
 		String ret = "";
 		year = year + 1900;
 	
@@ -1535,8 +1518,6 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	@SuppressLint("NewApi")
 	@Override
 	public void onClick(View v) {
-		log("###### FRAGMENT onClick");
-
 		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
 		switch(v.getId()){
@@ -1606,8 +1587,6 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	}
 	
 	public void itemClick(int position) {
-		log("###### FRAGMENT itemClick");
-
 		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 		
 		PhotoSyncHolder psHPosition = nodesArray.get(position);
@@ -1726,8 +1705,6 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	}
 
 	private void clearSelections() {
-		log("###### FRAGMENT clearSelections");
-
 		log("clearSelections");
 		if (((ManagerActivityLollipop)context).isListCameraUploads()){
 			if (adapterList != null){
@@ -1817,8 +1794,6 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	 * Disable selection
 	 */
 	void hideMultipleSelect() {
-		log("###### FRAGMENT hideMultipleSelect");
-
 		log("hideMultipleSelect");
 		if (((ManagerActivityLollipop)context).isListCameraUploads()){
 			if (adapterList != null){
@@ -1841,8 +1816,6 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	}
 
 	public int onBackPressed(){
-		log("###### FRAGMENT onBackPressed");
-
 		log("onBackPressed");
 		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
@@ -1950,8 +1923,6 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	}
 
 	public void setNodes(ArrayList<MegaNode> nodes){
-		log("###### FRAGMENT setNodes");
-
 		this.nodes = nodes;
 		if (((ManagerActivityLollipop)context).isListCameraUploads()){
 			this.nodesArray.clear();
@@ -2193,8 +2164,6 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	}
 
 	public boolean showSelectMenuItem(){
-		log("###### FRAGMENT showSelectMenuItem");
-
 		if (((ManagerActivityLollipop)context).isListCameraUploads()){
 			if (adapterList != null){
 				return adapterList.isMultipleSelect();
@@ -2214,8 +2183,6 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	}
 
 	public int getItemCountList(){
-		log("###### FRAGMENT getItemCountList");
-
 		if(adapterList != null){
 			return adapterList.getItemCount();
 		}
@@ -2223,8 +2190,6 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	}
 
 	public int getItemCountGrid(){
-		log("###### FRAGMENT getItemCountGrid");
-
 		if(adapterGrid != null){
 			return adapterGrid.getItemCount();
 		}

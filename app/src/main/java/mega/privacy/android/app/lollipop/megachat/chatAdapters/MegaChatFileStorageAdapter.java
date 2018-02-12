@@ -1,64 +1,31 @@
-package mega.privacy.android.app.lollipop.adapters;
+package mega.privacy.android.app.lollipop.megachat.chatAdapters;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.res.Configuration;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Color;
-import android.os.Environment;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.ViewHolder;
-import android.util.Base64;
 import android.util.DisplayMetrics;
 import android.util.SparseBooleanArray;
-import android.util.TypedValue;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MegaContactDB;
-import mega.privacy.android.app.MegaOffline;
-import mega.privacy.android.app.MimeTypeList;
+import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.components.scrollBar.SectionTitleProvider;
-import mega.privacy.android.app.lollipop.ContactFileListActivityLollipop;
-import mega.privacy.android.app.lollipop.ContactFileListFragmentLollipop;
-import mega.privacy.android.app.lollipop.FolderLinkActivityLollipop;
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
-import mega.privacy.android.app.lollipop.managerSections.FileBrowserFragmentLollipop;
-import mega.privacy.android.app.lollipop.managerSections.InboxFragmentLollipop;
-import mega.privacy.android.app.lollipop.managerSections.IncomingSharesFragmentLollipop;
-import mega.privacy.android.app.lollipop.managerSections.OutgoingSharesFragmentLollipop;
-import mega.privacy.android.app.lollipop.managerSections.RubbishBinFragmentLollipop;
-import mega.privacy.android.app.lollipop.managerSections.SearchFragmentLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatFileStorageFragment;
-import mega.privacy.android.app.lollipop.megachat.NodeAttachmentActivityLollipop;
-import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.MegaApiUtils;
-import mega.privacy.android.app.utils.ThumbnailUtils;
-import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaNode;
-import nz.mega.sdk.MegaShare;
-import nz.mega.sdk.MegaUser;
 
 
 public class MegaChatFileStorageAdapter extends RecyclerView.Adapter<MegaChatFileStorageAdapter.ViewHolderBrowser> implements OnClickListener, View.OnLongClickListener{
@@ -71,7 +38,16 @@ public class MegaChatFileStorageAdapter extends RecyclerView.Adapter<MegaChatFil
     DisplayMetrics outMetrics;
     private SparseBooleanArray selectedItems;
     boolean multipleSelect;
-    DatabaseHandler dbH = null;
+
+    public static int PADDING_GRID_LARGE = 6;
+    int padding = 6;
+    private int numberOfCells;
+    private int gridWidth;
+
+    DatabaseHandler dbH;
+    private int count;
+    MegaPreferences prefs;
+    private SparseBooleanArray checkedItems = new SparseBooleanArray();
 
     /* public static view holder class */
     public static class ViewHolderBrowser extends ViewHolder {
@@ -87,10 +63,10 @@ public class MegaChatFileStorageAdapter extends RecyclerView.Adapter<MegaChatFil
         public ViewHolderBrowserGrid(View v){
             super(v);
         }
-        public ImageView imageViewThumb;
+        public ImageView photo;
         public RelativeLayout thumbLayout;
-        public ImageView imageSelected;
-        public RelativeLayout imageUnselected;
+        public ImageView photoSelected;
+        public RelativeLayout photoUnselected;
     }
 
     public void toggleSelection(int pos) {
@@ -108,6 +84,8 @@ public class MegaChatFileStorageAdapter extends RecyclerView.Adapter<MegaChatFil
         if (selectedItems.size() <= 0){
             ((ChatFileStorageFragment) fragment).hideMultipleSelect();
         }
+        notifyDataSetChanged();
+
     }
 
     public void toggleAllSelection(int pos) {
@@ -129,16 +107,6 @@ public class MegaChatFileStorageAdapter extends RecyclerView.Adapter<MegaChatFil
         notifyItemChanged(positionToflip);
     }
 
-    public void selectAll(){
-        log("*********ADAPTER: selectAll");
-
-        for (int i= 0; i<this.getItemCount();i++){
-            if(!isItemChecked(i)){
-                toggleAllSelection(i);
-            }
-        }
-    }
-
     public void clearSelections() {
         log("*********ADAPTER: clearSelections");
         for (int i= 0; i<this.getItemCount();i++){
@@ -146,6 +114,8 @@ public class MegaChatFileStorageAdapter extends RecyclerView.Adapter<MegaChatFil
                 toggleAllSelection(i);
             }
         }
+        notifyDataSetChanged();
+
     }
 
     private boolean isItemChecked(int position) {
@@ -187,13 +157,14 @@ public class MegaChatFileStorageAdapter extends RecyclerView.Adapter<MegaChatFil
     }
 
 
-    public MegaChatFileStorageAdapter(Context _context, Object fragment, RecyclerView recyclerView, ActionBar aB, ArrayList<Bitmap> _thumbimages) {
+    public MegaChatFileStorageAdapter(Context _context, Object fragment, RecyclerView recyclerView, ActionBar aB, ArrayList<Bitmap> _thumbimages, int numberOfCells, int gridWidth) {
 
         log("*********ADAPTER: MegaChatFileStorageAdapter");
         this.context = _context;
         this.fragment = fragment;
         this.thumbimages = _thumbimages;
-
+        this.numberOfCells = numberOfCells;
+        this.gridWidth = gridWidth;
         dbH = DatabaseHandler.getDbHandler(context);
 
         this.aB = aB;
@@ -210,23 +181,62 @@ public class MegaChatFileStorageAdapter extends RecyclerView.Adapter<MegaChatFil
         notifyDataSetChanged();
     }
 
+    public void setNumberOfCells(int numberOfCells, int gridWidth){
+        log("###### ADAPTER setNumberOfCells");
 
+        this.numberOfCells = numberOfCells;
+        this.gridWidth = gridWidth;
+        notifyDataSetChanged();
+    }
+
+    public int getSpanSizeOfPosition(int position){
+        log("###### ADAPTER getSpanSizeOfPosition: "+position);
+        return 1;
+    }
 
     @Override
     public ViewHolderBrowser onCreateViewHolder(ViewGroup parent, int viewType) {
         log("*********ADAPTER: onCreateViewHolder");
+
         Display display = ((Activity) context).getWindowManager().getDefaultDisplay();
-        outMetrics = new DisplayMetrics();
+        DisplayMetrics outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
+        float density = ((Activity) context).getResources().getDisplayMetrics().density;
+
+        float scaleW = Util.getScaleW(outMetrics, density);
+        float scaleH = Util.getScaleH(outMetrics, density);
+
+        float dpHeight = outMetrics.heightPixels / density;
+        float dpWidth  = outMetrics.widthPixels / density;
 
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_file_storage_grid, parent, false);
         ViewHolderBrowserGrid holderGrid = new ViewHolderBrowserGrid(v);
 
+
         holderGrid.itemLayout = (RelativeLayout) v.findViewById(R.id.file_storage_grid_item_layout);
         holderGrid.thumbLayout = (RelativeLayout) v.findViewById(R.id.file_storage_grid_thumbnail_layout);
-        holderGrid.imageViewThumb = (ImageView) v.findViewById(R.id.file_storage_grid_thumbnail);
-        holderGrid.imageSelected = (ImageView) v.findViewById(R.id.thumbnail_selected);
-        holderGrid.imageUnselected = (RelativeLayout) v.findViewById(R.id.long_click_unselected);
+
+
+        holderGrid.photo = (ImageView) v.findViewById(R.id.file_storage_grid_thumbnail);
+        holderGrid.photoSelected = (ImageView) v.findViewById(R.id.thumbnail_selected);
+        holderGrid.photoSelected.setVisibility(View.GONE);
+        holderGrid.photoUnselected = (RelativeLayout) v.findViewById(R.id.thumbnail_unselected);
+        holderGrid.photoUnselected.setVisibility(View.GONE);
+
+        ViewGroup.MarginLayoutParams marginParams = (ViewGroup.MarginLayoutParams) holderGrid.thumbLayout.getLayoutParams();
+        marginParams.setMargins(padding, padding, padding, padding);
+        holderGrid.thumbLayout.setLayoutParams(marginParams);
+
+        this.gridWidth = gridWidth;
+        ViewGroup.LayoutParams params = (ViewGroup.LayoutParams) holderGrid.thumbLayout.getLayoutParams();
+        params.height = gridWidth;
+        params.width = gridWidth;
+        holderGrid.thumbLayout.setLayoutParams(params);
+
+        holderGrid.photoSelected.setMaxHeight(gridWidth);
+        holderGrid.photoSelected.setMaxWidth(gridWidth);
+
+        holderGrid.thumbLayout.setVisibility(View.GONE);
 
         holderGrid.itemLayout.setTag(holderGrid);
         holderGrid.itemLayout.setOnClickListener(this);
@@ -252,23 +262,24 @@ public class MegaChatFileStorageAdapter extends RecyclerView.Adapter<MegaChatFil
         if(image == null){
             return;
         }
+        holder.thumbLayout.setVisibility(View.VISIBLE);
 
-        holder.imageViewThumb.setVisibility(View.VISIBLE);
+        holder.photo.setVisibility(View.VISIBLE);
 
-        holder.imageViewThumb.setImageBitmap(image);
+        holder.photo.setImageBitmap(image);
         if (!multipleSelect) {
-            holder.imageSelected.setVisibility(View.GONE);
-            holder.imageUnselected.setVisibility(View.GONE);
+            holder.photoSelected.setVisibility(View.GONE);
+            holder.photoUnselected.setVisibility(View.GONE);
 
         }else {
 
             if(this.isItemChecked(position)){
-                holder.imageSelected.setVisibility(View.VISIBLE);
-                holder.imageUnselected.setVisibility(View.GONE);
+                holder.photoSelected.setVisibility(View.VISIBLE);
+                holder.photoUnselected.setVisibility(View.GONE);
 
             }else{
-                holder.imageSelected.setVisibility(View.GONE);
-                holder.imageUnselected.setVisibility(View.VISIBLE);
+                holder.photoSelected.setVisibility(View.GONE);
+               holder.photoUnselected.setVisibility(View.VISIBLE);
             }
         }
 

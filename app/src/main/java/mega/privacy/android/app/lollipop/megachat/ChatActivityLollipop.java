@@ -1892,15 +1892,14 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         if(megaChatApi.isSignalActivityRequired()){
             megaChatApi.signalPresenceActivity();
         }
-        fileStorageLayout.setVisibility(View.GONE);
-
         if (emojiKeyboardShown) {
             keyboardButton.setImageResource(R.drawable.ic_emoticon_white);
             removeEmojiconFragment();
         }else if(fileStorageLayout.isShown()){
             fileStorageLayout.setVisibility(View.GONE);
-        }
-        else{
+        }else  if(fileStorageLayout.isShown()){
+            fileStorageLayout.setVisibility(View.GONE);
+        }else{
             finish();
         }
     }
@@ -5258,6 +5257,5 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
         startService(intent);
     }
-
 
 }

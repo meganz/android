@@ -9,7 +9,14 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent">
 
-        <mega.privacy.android.app.components.CustomizedGridRecyclerView
+        <!--<mega.privacy.android.app.components.CustomizedGridRecyclerView-->
+            <!--android:id="@+id/file_storage_grid_view_browser"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="match_parent"-->
+            <!--android:choiceMode="multipleChoice"-->
+            <!--android:columnWidth="172dp"/>-->
+
+        <android.support.v7.widget.RecyclerView
             android:id="@+id/file_storage_grid_view_browser"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
