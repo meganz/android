@@ -489,7 +489,8 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
 
                 int callStatus = callChat.getStatus();
                 log("The status of the callChat is: " + callStatus);
-                fullName = chat.getPeerFullname(0);
+//                fullName = chat.getPeerFullname(0);
+                fullName = chat.getTitle();
                 email = chat.getPeerEmail(0);
                 userHandle = chat.getPeerHandle(0);
 
@@ -673,7 +674,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
     public void createMyDefaultAvatar(boolean flag) {
         String myFullName = megaChatApi.getMyFullname();
         String myFirstLetter=myFullName.charAt(0) + "";
-        myFirstLetter = myFirstLetter.toUpperCase(Locale.getDefault());
+        //myFirstLetter = myFirstLetter.toUpperCase(Locale.getDefault());
         long userHandle = megaChatApi.getMyUserHandle();
 
         Bitmap defaultAvatar = Bitmap.createBitmap(outMetrics.widthPixels,outMetrics.widthPixels, Bitmap.Config.ARGB_8888);
