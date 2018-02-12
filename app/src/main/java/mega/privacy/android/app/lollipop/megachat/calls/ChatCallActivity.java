@@ -154,8 +154,6 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
     TextView contactInitialLetter;
     RelativeLayout contactImageBorder;
 
-//    LocalVideoDataListener localVideoListener;
-
     static ChatCallActivity chatCallActivityActivity = null;
 
     private MenuItem remoteAudioIcon;
@@ -447,11 +445,6 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
 
             myAvatarLayout = (RelativeLayout) findViewById(R.id.call_chat_my_image_layout);
             myAvatarLayout.setVisibility(View.VISIBLE);
-
-            //RelativeLayout.LayoutParams myAvatarLayoutParams= new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
-            //myAvatarLayoutParams.setMargins(0,0,Util.scaleHeightPx(20, outMetrics),Util.scaleHeightPx(110, outMetrics));
-//            myAvatarLayoutParams.addRule(RelativeLayout.ABOVE, R.id.linear_buttons);
-           // myAvatarLayout.setLayoutParams(myAvatarLayoutParams);
 
             myImage = (RoundedImageView) findViewById(R.id.call_chat_my_image);
             myImageBorder = (RelativeLayout) findViewById(R.id.call_chat_my_image_rl);
@@ -1553,7 +1546,6 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                 isRemoteVideo = REMOTE_VIDEO_ENABLED;
                 contactAvatarLayout.setVisibility(View.GONE);
                 contactAvatarLayout.setOnTouchListener(null);
-                //remoteSurfaceView.setVisibility(View.VISIBLE);
                 remoteSurfaceView.setOnTouchListener(this);
                 log("Register remote video listener");
                 megaChatApi.addChatRemoteVideoListener(this);
@@ -1564,7 +1556,6 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                 contactAvatarLayout.setVisibility(View.VISIBLE);
                 contactAvatarLayout.setOnTouchListener(this);
                 remoteSurfaceView.setOnTouchListener(null);
-                //remoteSurfaceView.setVisibility(View.GONE);
                 megaChatApi.removeChatVideoListener(this);
             }
         }
@@ -1574,7 +1565,6 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                 isRemoteVideo = REMOTE_VIDEO_DISABLED;
                 contactAvatarLayout.setVisibility(View.VISIBLE);
                 contactAvatarLayout.setOnTouchListener(this);
-                //remoteSurfaceView.setVisibility(View.GONE);
                 remoteSurfaceView.setOnTouchListener(null);
                 megaChatApi.removeChatVideoListener(this);
             }
@@ -1582,7 +1572,6 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                 isRemoteVideo = REMOTE_VIDEO_ENABLED;
                 contactAvatarLayout.setVisibility(View.GONE);
                 contactAvatarLayout.setOnTouchListener(null);
-                //remoteSurfaceView.setVisibility(View.VISIBLE);
                 remoteSurfaceView.setOnTouchListener(this);
                 megaChatApi.addChatRemoteVideoListener(this);
             }
