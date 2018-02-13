@@ -1854,6 +1854,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                             }
 
                             ((ViewHolderMessageChat)holder).contentOwnMessageText.setLinksClickable(true);
+                            ((ViewHolderMessageChat)holder).contentOwnMessageText.setLinkTextColor(ContextCompat.getColor(context, R.color.white));
                             Linkify.addLinks(((ViewHolderMessageChat)holder).contentOwnMessageText, Linkify.WEB_URLS);
                         }
                         else if(message.getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT){
