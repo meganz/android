@@ -6039,7 +6039,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		}
 
 		chatSrc = getResources().getDrawable(R.drawable.ic_chat_white);
-		chatSrc.setColorFilter(getResources().getColor(R.color.white), PorterDuff.Mode.SRC_ATOP);
 
 		log("Call to super onCreateOptionsMenu");
 	    return super.onCreateOptionsMenu(menu);
