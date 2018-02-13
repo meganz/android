@@ -23,6 +23,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
@@ -77,13 +78,13 @@ public class ChatFileStorageFragment extends Fragment {
 
     ArrayList<Bitmap> thumBitmap = new ArrayList<>();
     ArrayList<String> imagesPath = new ArrayList<>();
+    ArrayList<String> imagesSelected = new ArrayList<>();
     String downloadLocationDefaultPath = Util.downloadDIR;
 
     int count = 0;
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        log("*******FRAGMENT: onSaveInstanceState");
         super.onSaveInstanceState(outState);
         if(recyclerView.getLayoutManager()!=null){
             outState.putParcelable(BUNDLE_RECYCLER_LAYOUT, recyclerView.getLayoutManager().onSaveInstanceState());
@@ -91,14 +92,12 @@ public class ChatFileStorageFragment extends Fragment {
     }
 
     public static ChatFileStorageFragment newInstance() {
-        log("*******FRAGMENT: newInstance");
         ChatFileStorageFragment fragment = new ChatFileStorageFragment();
         return fragment;
     }
 
     @Override
     public void onCreate (Bundle savedInstanceState){
-        log("*******FRAGMENT: onCreate");
         if (megaApi == null){
             megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
         }
@@ -126,7 +125,6 @@ public class ChatFileStorageFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        log("*******FRAGMENT: onCreateView");
 
         if(!isAdded()){
             return null;
@@ -199,6 +197,8 @@ public class ChatFileStorageFragment extends Fragment {
 
         adapter.setMultipleSelect(false);
 
+
+
         mLayoutManager = new GridLayoutManager(context, numberOfCells);
         ((GridLayoutManager) mLayoutManager).setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
             @Override
@@ -225,7 +225,6 @@ public class ChatFileStorageFragment extends Fragment {
 
     @Override
     public void onAttach(Activity activity) {
-        log("*******FRAGMENT: onAttach");
         super.onAttach(activity);
         context = activity;
         aB = ((AppCompatActivity)activity).getSupportActionBar();
@@ -233,7 +232,6 @@ public class ChatFileStorageFragment extends Fragment {
 
     @Override
     public void onAttach(Context context) {
-        log("*******FRAGMENT: onAttach");
 
         super.onAttach(context);
         this.context = context;
@@ -241,15 +239,13 @@ public class ChatFileStorageFragment extends Fragment {
     }
 
     public void itemClick(int position) {
-        log("*******FRAGMENT: itemClick-> "+position);
 
         ((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
         if (adapter.isMultipleSelect()){
-            log("*****multiselect ON");
             adapter.toggleSelection(position);
         }
         else{
-            log("********************* SEND IMAGEEEEEE");
+            log("********************* SEND IMAGE");
 
             String filePath = imagesPath.get(position);
             log("****** Position: "+position+", filePath"+filePath);
@@ -268,7 +264,6 @@ public class ChatFileStorageFragment extends Fragment {
     }
 
     public void setNodes(ArrayList<Bitmap> thumImages){
-        log("*******FRAGMENT: setNodes");
 
         this.thumBitmap = thumImages;
             if (adapter != null){
@@ -286,7 +281,6 @@ public class ChatFileStorageFragment extends Fragment {
     }
 
     public int getItemCount(){
-        log("*******FRAGMENT: getItemCount");
 
         if(adapter!=null){
             return adapter.getItemCount();
@@ -296,7 +290,6 @@ public class ChatFileStorageFragment extends Fragment {
 
 
     public boolean showSelectMenuItem(){
-        log("*******FRAGMENT: showSelectMenuItem");
         if (adapter != null){
             return adapter.isMultipleSelect();
         }
@@ -305,23 +298,18 @@ public class ChatFileStorageFragment extends Fragment {
     }
 
     private void clearSelections() {
-        log("*******FRAGMENT: clearSelections");
-
         if(adapter.isMultipleSelect()){
             adapter.clearSelections();
         }
     }
 
     public void hideMultipleSelect() {
-        log("*******FRAGMENT: hideMultipleSelect");
-
         log("hideMultipleSelect");
         adapter.setMultipleSelect(false);
+
     }
 
     public boolean isMultipleselect(){
-        log("*******FRAGMENT: isMultipleselect");
-
         if(adapter!=null){
             return adapter.isMultipleSelect();
         }
@@ -350,8 +338,6 @@ public class ChatFileStorageFragment extends Fragment {
         }
         cur.close();
 
-        log("********thumBitmap.size(): "+thumBitmap.size());
-
     }
 
     public void getImagesPath(){
@@ -371,8 +357,55 @@ public class ChatFileStorageFragment extends Fragment {
         }
         cur1.close();
         count = imagesPath.size();
-        log("imagesPath.size(): "+imagesPath.size());
     }
+
+    public void sendButton(boolean flag){
+        ((ChatActivityLollipop) getActivity()).activateSendButton(flag);
+        if(flag){
+            List<Integer> items = adapter.getSelectedItems();
+            log("*************** items: "+items.size());
+        }
+
+
+    }
+
+
+//    public void removeItemsSelected(int pos){
+//        imagesSelected.remove(pos);
+//    }
+//
+//    public void addItemSelected(){
+//
+//    }
+
+//    public  void setItemsSelected(String path, boolean flag){
+//        if(flag){
+//            imagesSelected.delete(pos);
+//        }else{
+//
+//        }
+//
+//        if (imagesSelected.get(pos, false)) {
+//            log("delete pos: "+pos);
+//            selectedItems.delete(pos);
+//        }else {
+//            log("PUT pos: "+pos);
+//            selectedItems.put(pos, true);
+//        }
+//        notifyItemChanged(pos);
+//
+//        if (selectedItems.size() <= 0){
+//            ((ChatFileStorageFragment) fragment).hideMultipleSelect();
+//        }
+//
+//
+//
+////        String filePath = imagesPath.get(position);
+////        log("****** Position: "+position+", filePath"+filePath);
+////
+////        ((ChatActivityLollipop) getActivity()).uploadTakePicture(filePath);
+//
+//    }
 
 
 

@@ -23,6 +23,7 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatFileStorageFragment;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -73,11 +74,12 @@ public class MegaChatFileStorageAdapter extends RecyclerView.Adapter<MegaChatFil
         log("*********ADAPTER: toggleSelection-> "+pos);
 
         if (selectedItems.get(pos, false)) {
-            log("delete pos: "+pos);
             selectedItems.delete(pos);
+            log("******selectedItems: "+selectedItems.size());
         }else {
-            log("PUT pos: "+pos);
             selectedItems.put(pos, true);
+            log("******selectedItems: "+selectedItems.size());
+
         }
         notifyItemChanged(pos);
 
@@ -93,12 +95,13 @@ public class MegaChatFileStorageAdapter extends RecyclerView.Adapter<MegaChatFil
         final int positionToflip = pos;
 
         if (selectedItems.get(pos, false)) {
-            log("delete pos: "+pos);
             selectedItems.delete(pos);
-        }
-        else {
-            log("PUT pos: "+pos);
+            log("******selectedItems: "+selectedItems.size());
+
+        }else {
             selectedItems.put(pos, true);
+            log("******selectedItems: "+selectedItems.size());
+
         }
         log("adapter type is GRID");
         if (selectedItems.size() <= 0){
@@ -108,7 +111,6 @@ public class MegaChatFileStorageAdapter extends RecyclerView.Adapter<MegaChatFil
     }
 
     public void clearSelections() {
-        log("*********ADAPTER: clearSelections");
         for (int i= 0; i<this.getItemCount();i++){
             if(isItemChecked(i)){
                 toggleAllSelection(i);
@@ -119,14 +121,10 @@ public class MegaChatFileStorageAdapter extends RecyclerView.Adapter<MegaChatFil
     }
 
     private boolean isItemChecked(int position) {
-        log("*********ADAPTER: isItemChecked-> "+position);
-
         return selectedItems.get(position);
     }
 
     public int getSelectedItemCount() {
-        log("*********ADAPTER: getSelectedItemCount");
-
         return selectedItems.size();
     }
 
@@ -140,26 +138,7 @@ public class MegaChatFileStorageAdapter extends RecyclerView.Adapter<MegaChatFil
         return items;
     }
 
-    public List<Bitmap> getSelectedNodes() {
-        log("*********ADAPTER: getSelectedNodes");
-
-        ArrayList<Bitmap> nodes = new ArrayList<Bitmap>();
-
-        for (int i = 0; i < selectedItems.size(); i++) {
-            if (selectedItems.valueAt(i) == true) {
-                Bitmap document = getNodeAt(selectedItems.keyAt(i));
-                if (document != null){
-                    nodes.add(document);
-                }
-            }
-        }
-        return nodes;
-    }
-
-
     public MegaChatFileStorageAdapter(Context _context, Object fragment, RecyclerView recyclerView, ActionBar aB, ArrayList<Bitmap> _thumbimages, int numberOfCells, int gridWidth) {
-
-        log("*********ADAPTER: MegaChatFileStorageAdapter");
         this.context = _context;
         this.fragment = fragment;
         this.thumbimages = _thumbimages;
@@ -176,13 +155,11 @@ public class MegaChatFileStorageAdapter extends RecyclerView.Adapter<MegaChatFil
     }
 
     public void setNodes(ArrayList<Bitmap> thumbImages) {
-        log("*********ADAPTER: setNodes");
         this.thumbimages = thumbImages;
         notifyDataSetChanged();
     }
 
     public void setNumberOfCells(int numberOfCells, int gridWidth){
-        log("###### ADAPTER setNumberOfCells");
 
         this.numberOfCells = numberOfCells;
         this.gridWidth = gridWidth;
@@ -190,13 +167,11 @@ public class MegaChatFileStorageAdapter extends RecyclerView.Adapter<MegaChatFil
     }
 
     public int getSpanSizeOfPosition(int position){
-        log("###### ADAPTER getSpanSizeOfPosition: "+position);
         return 1;
     }
 
     @Override
     public ViewHolderBrowser onCreateViewHolder(ViewGroup parent, int viewType) {
-        log("*********ADAPTER: onCreateViewHolder");
 
         Display display = ((Activity) context).getWindowManager().getDefaultDisplay();
         DisplayMetrics outMetrics = new DisplayMetrics();
@@ -215,7 +190,6 @@ public class MegaChatFileStorageAdapter extends RecyclerView.Adapter<MegaChatFil
 
         holderGrid.itemLayout = (RelativeLayout) v.findViewById(R.id.file_storage_grid_item_layout);
         holderGrid.thumbLayout = (RelativeLayout) v.findViewById(R.id.file_storage_grid_thumbnail_layout);
-
 
         holderGrid.photo = (ImageView) v.findViewById(R.id.file_storage_grid_thumbnail);
         holderGrid.photoSelected = (ImageView) v.findViewById(R.id.thumbnail_selected);
@@ -249,14 +223,11 @@ public class MegaChatFileStorageAdapter extends RecyclerView.Adapter<MegaChatFil
 
     @Override
     public void onBindViewHolder(ViewHolderBrowser holder, int position) {
-        log("*********ADAPTER: onBindViewHolder");
         ViewHolderBrowserGrid holderGrid = (ViewHolderBrowserGrid) holder;
         onBindViewHolderGrid(holderGrid, position);
     }
 
     public void onBindViewHolderGrid(ViewHolderBrowserGrid holder, int position){
-        log("*********ADAPTER: onBindViewHolderGrid");
-
         Display display = ((Activity) context).getWindowManager().getDefaultDisplay();
         Bitmap image = (Bitmap) getItem(position);
         if(image == null){
@@ -285,16 +256,8 @@ public class MegaChatFileStorageAdapter extends RecyclerView.Adapter<MegaChatFil
 
     }
 
-    private Bitmap getItemNode(int position) {
-        log("*********ADAPTER: getItemNode");
-        return thumbimages.get(position);
-    }
-
-
     @Override
     public int getItemCount() {
-        log("*********ADAPTER: getItemCount");
-
         if (thumbimages != null){
             return thumbimages.size();
         }else{
@@ -303,8 +266,6 @@ public class MegaChatFileStorageAdapter extends RecyclerView.Adapter<MegaChatFil
     }
 
     public Object getItem(int position) {
-        log("*********ADAPTER: getItem-> "+position);
-
         if (thumbimages != null){
             return thumbimages.get(position);
         }
@@ -313,14 +274,10 @@ public class MegaChatFileStorageAdapter extends RecyclerView.Adapter<MegaChatFil
 
     @Override
     public long getItemId(int position) {
-        log("*********ADAPTER: getItemCount-> "+position);
-
         return position;
     }
 
-
-    public Bitmap getNodeAt(int position) {
-        log("*********ADAPTER: getNodeAt-> "+position);
+    public Bitmap getItemAt(int position) {
 
         try {
             if (thumbimages != null) {
@@ -337,7 +294,6 @@ public class MegaChatFileStorageAdapter extends RecyclerView.Adapter<MegaChatFil
 
     @Override
     public void onClick(View v) {
-        log("*********ADAPTER: onClick");
         ((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
         ViewHolderBrowser holder = (ViewHolderBrowser) v.getTag();
@@ -361,17 +317,14 @@ public class MegaChatFileStorageAdapter extends RecyclerView.Adapter<MegaChatFil
         int currentPosition = holder.getAdapterPosition();
         if (!isMultipleSelect()){
             setMultipleSelect(true);
-        }
-//        getSelectedNodes();
-        ((ChatFileStorageFragment) fragment).itemClick(currentPosition);
+            ((ChatFileStorageFragment) fragment).itemClick(currentPosition);
 
+        }
 
         return true;
     }
 
     public boolean isMultipleSelect() {
-        log("*********ADAPTER: isMultipleSelect");
-
         return multipleSelect;
     }
 
@@ -384,6 +337,7 @@ public class MegaChatFileStorageAdapter extends RecyclerView.Adapter<MegaChatFil
         if(this.multipleSelect){
             selectedItems = new SparseBooleanArray();
         }
+        ((ChatFileStorageFragment) fragment).sendButton(this.multipleSelect);
     }
 
 }
