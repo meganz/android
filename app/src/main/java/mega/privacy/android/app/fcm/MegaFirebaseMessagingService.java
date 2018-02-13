@@ -235,7 +235,7 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
                                         }
                                     }
                                 },
-                                10000
+                                12000
                         );
                     }
                     else{

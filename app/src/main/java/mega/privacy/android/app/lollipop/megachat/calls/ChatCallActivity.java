@@ -484,6 +484,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
 
                 int callStatus = callChat.getStatus();
                 log("The status of the callChat is: " + callStatus);
+
                 fullName = chat.getTitle();
                 email = chat.getPeerEmail(0);
                 userHandle = chat.getPeerHandle(0);
@@ -611,13 +612,17 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
         c.drawCircle(defaultAvatar.getWidth()/2, defaultAvatar.getHeight()/2, radius, p);
         if(flag){
             myImage.setImageBitmap(defaultAvatar);
-            myInitialLetter.setText(fullName.charAt(0) + "");
+            String contactFirstLetter = fullName.charAt(0) + "";
+            contactFirstLetter = contactFirstLetter.toUpperCase(Locale.getDefault());
+            myInitialLetter.setText(contactFirstLetter);
             myInitialLetter.setTextSize(40);
             myInitialLetter.setTextColor(Color.WHITE);
             myInitialLetter.setVisibility(View.VISIBLE);
         }else {
             contactImage.setImageBitmap(defaultAvatar);
-            contactInitialLetter.setText(fullName.charAt(0) + "");
+            String contactFirstLetter = fullName.charAt(0) + "";
+            contactFirstLetter = contactFirstLetter.toUpperCase(Locale.getDefault());
+            contactInitialLetter.setText(contactFirstLetter);
             contactInitialLetter.setTextSize(60);
             contactInitialLetter.setTextColor(Color.WHITE);
             contactInitialLetter.setVisibility(View.VISIBLE);
