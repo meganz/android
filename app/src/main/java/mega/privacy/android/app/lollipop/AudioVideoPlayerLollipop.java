@@ -526,23 +526,9 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
             downloadIcon.setVisible(false);
         }
 
-        Drawable share = getResources().getDrawable(R.drawable.ic_social_share_white);
-        share.setColorFilter(getResources().getColor(R.color.white), PorterDuff.Mode.SRC_ATOP);
-        shareIcon.setIcon(share);
-
-        Drawable download = getResources().getDrawable(R.drawable.ic_download_white);
-        download.setColorFilter(getResources().getColor(R.color.white), PorterDuff.Mode.SRC_ATOP);
-        downloadIcon.setIcon(download);
-
         propertiesIcon = menu.findItem(R.id.full_video_viewer_properties);
-        Drawable properties = getResources().getDrawable(R.drawable.info_ic_white);
-        properties.setColorFilter(getResources().getColor(R.color.white), PorterDuff.Mode.SRC_ATOP);
-        propertiesIcon.setIcon(properties);
 
         chatIcon = menu.findItem(R.id.full_video_viewer_chat);
-        Drawable chat = getResources().getDrawable(R.drawable.ic_chat_white);
-        chat.setColorFilter(getResources().getColor(R.color.white), PorterDuff.Mode.SRC_ATOP);
-        chatIcon.setIcon(chat);
 
         return super.onCreateOptionsMenu(menu);
     }
