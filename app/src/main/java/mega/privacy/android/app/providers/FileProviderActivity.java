@@ -538,32 +538,32 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 				return false;
 			}
 		});			
-		loginThreeDots = (ImageView) findViewById(R.id.login_three_dots);
-		LinearLayout.LayoutParams textThreeDots = (LinearLayout.LayoutParams)loginThreeDots.getLayoutParams();
-		textThreeDots.setMargins(Util.scaleWidthPx(30, outMetrics), 0, Util.scaleWidthPx(10, outMetrics), 0); 
-		loginThreeDots.setLayoutParams(textThreeDots);
-		
-		loginABC = (TextView) findViewById(R.id.ABC);
-
-		loginSwitchLol = (SwitchCompat) findViewById(R.id.switch_login);
-		LinearLayout.LayoutParams switchParams = (LinearLayout.LayoutParams)loginSwitchLol.getLayoutParams();
-		switchParams.setMargins(0, 0, Util.scaleWidthPx(10, outMetrics), 0); 
-		loginSwitchLol.setLayoutParams(switchParams);
-		loginSwitchLol.setChecked(false);
-		
-		loginSwitchLol.setOnCheckedChangeListener(new OnCheckedChangeListener() {
-			
-			@Override
-			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-				if(!isChecked){
-						et_password.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-						et_password.setSelection(et_password.getText().length());
-				}else{
-						et_password.setInputType(InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
-						et_password.setSelection(et_password.getText().length());
-			    }				
-			}
-		});
+//		loginThreeDots = (ImageView) findViewById(R.id.login_three_dots);
+//		LinearLayout.LayoutParams textThreeDots = (LinearLayout.LayoutParams)loginThreeDots.getLayoutParams();
+//		textThreeDots.setMargins(Util.scaleWidthPx(30, outMetrics), 0, Util.scaleWidthPx(10, outMetrics), 0);
+//		loginThreeDots.setLayoutParams(textThreeDots);
+//
+//		loginABC = (TextView) findViewById(R.id.ABC);
+//
+//		loginSwitchLol = (SwitchCompat) findViewById(R.id.switch_login);
+//		LinearLayout.LayoutParams switchParams = (LinearLayout.LayoutParams)loginSwitchLol.getLayoutParams();
+//		switchParams.setMargins(0, 0, Util.scaleWidthPx(10, outMetrics), 0);
+//		loginSwitchLol.setLayoutParams(switchParams);
+//		loginSwitchLol.setChecked(false);
+//
+//		loginSwitchLol.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+//
+//			@Override
+//			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+//				if(!isChecked){
+//						et_password.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+//						et_password.setSelection(et_password.getText().length());
+//				}else{
+//						et_password.setInputType(InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
+//						et_password.setSelection(et_password.getText().length());
+//			    }
+//			}
+//		});
 		
 		bLoginLol = (TextView) findViewById(R.id.button_login_login);
 		bLoginLol.setText(getString(R.string.login_text).toUpperCase(Locale.getDefault()));
