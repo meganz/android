@@ -435,8 +435,6 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 						if (ret == MegaChatApi.INIT_NO_CACHE)
 						{
 							log("onCreate: condition ret == MegaChatApi.INIT_NO_CACHE");
-							megaApi.invalidateCache();
-
 						}
 						else if (ret == MegaChatApi.INIT_ERROR)
 						{

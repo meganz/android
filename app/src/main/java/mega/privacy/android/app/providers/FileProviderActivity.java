@@ -337,8 +337,6 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 							if (ret == MegaChatApi.INIT_NO_CACHE)
 							{
 								log("onCreate: condition ret == MegaChatApi.INIT_NO_CACHE");
-								megaApi.invalidateCache();
-
 							}
 							else if (ret == MegaChatApi.INIT_ERROR)
 							{

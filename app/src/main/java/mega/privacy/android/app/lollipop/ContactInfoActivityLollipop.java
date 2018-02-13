@@ -385,6 +385,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			removeContactChatLayout.setOnClickListener(this);
 
 			chatHandle = extras.getLong("handle",-1);
+			userEmailExtra = extras.getString("name");
 			if (chatHandle != -1) {
 
 				log("From chat!!");
@@ -401,8 +402,17 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 
 				chatPrefs = dbH.findChatPreferencesByHandle(String.valueOf(chatHandle));
 
-				nameContact.setText(chat.getTitle());
-				nameLength.setText(chat.getTitle());
+				if (chat.getTitle() != null && !chat.getTitle().isEmpty() && !chat.getTitle().equals("")){
+					nameContact.setText(chat.getTitle());
+					nameLength.setText(chat.getTitle());
+				}
+				else {
+					if (userEmailExtra != null) {
+
+						nameContact.setText(userEmailExtra);
+						nameLength.setText(userEmailExtra);
+					}
+				}
 				String fullname = (String)nameContact.getText();
 				setDefaultAvatar(fullname);
 			}
@@ -410,7 +420,6 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 				log("From contacts!!");
 
 				fromContacts = true;
-				userEmailExtra = extras.getString("name");
 				user = megaApi.getContact(userEmailExtra);
 
 				String fullName = "";
@@ -434,9 +443,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 
 						if (fullName.trim().length() <= 0){
 							log("Put email as fullname");
-							String email = user.getEmail();
-							String[] splitEmail = email.split("[@._]");
-							fullName = splitEmail[0];
+							fullName= user.getEmail();
 						}
 
 						nameContact.setText(fullName);
