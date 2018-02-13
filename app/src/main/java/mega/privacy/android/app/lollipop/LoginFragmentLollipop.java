@@ -1816,7 +1816,19 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 queryingSignupLinkText.setVisibility(View.GONE);
                 confirmingAccountText.setVisibility(View.GONE);
 
-                ((LoginActivityLollipop)context).showSnackbar(errorMessage);
+                if (error.getErrorCode() == MegaError.API_EACCESS){
+                    log("Error API_EACCESS");
+                    if(((LoginActivityLollipop)context).accountBlocked!=null){
+                        log("Account blocked");
+                    }
+                    else{
+                        errorMessage = error.getErrorString();
+                        ((LoginActivityLollipop)context).showSnackbar(errorMessage);
+                    }
+                }
+                else{
+                    ((LoginActivityLollipop)context).showSnackbar(errorMessage);
+                }
 
                 if(chatSettings==null) {
                     log("1 - Reset chat setting enable");

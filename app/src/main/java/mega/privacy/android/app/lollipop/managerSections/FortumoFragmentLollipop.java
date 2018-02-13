@@ -30,6 +30,7 @@ import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
+import nz.mega.sdk.MegaEvent;
 import nz.mega.sdk.MegaGlobalListenerInterface;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
@@ -208,6 +209,11 @@ public class FortumoFragmentLollipop extends Fragment implements MegaRequestList
 			ArrayList<MegaContactRequest> requests) {
 		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	public void onEvent(MegaApiJava api, MegaEvent event) {
+
 	}
 
 	public void setMyAccountInfo(MyAccountInfo myAccountInfo) {

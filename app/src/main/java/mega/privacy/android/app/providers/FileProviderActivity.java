@@ -83,6 +83,7 @@ import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
+import nz.mega.sdk.MegaEvent;
 import nz.mega.sdk.MegaGlobalListenerInterface;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
@@ -1582,6 +1583,11 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 			ArrayList<MegaContactRequest> requests) {
 		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	public void onEvent(MegaApiJava api, MegaEvent event) {
+
 	}
 
 	public void activateButton (Boolean show){
