@@ -811,7 +811,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     if (ret == MegaChatApi.INIT_NO_CACHE)
                     {
                         log("enableChat: condition ret == MegaChatApi.INIT_NO_CACHE");
-                        megaApi.invalidateCache();
                     }
                     else if (ret == MegaChatApi.INIT_ERROR)
                     {
@@ -913,8 +912,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     if (ret == MegaChatApi.INIT_NO_CACHE)
                     {
                         log("startFastLogin: condition ret == MegaChatApi.INIT_NO_CACHE");
-                        megaApi.invalidateCache();
-
                     }
                     else if (ret == MegaChatApi.INIT_ERROR)
                     {
