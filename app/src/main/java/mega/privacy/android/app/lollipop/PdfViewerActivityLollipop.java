@@ -158,6 +158,11 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
     static int TYPE_UPLOAD = 0;
     static int TYPE_DOWNLOAD = 1;
 
+    Drawable share;
+    Drawable chat;
+    Drawable properties;
+    Drawable download;
+
     @Override
     public void onCreate (Bundle savedInstanceState){
         log("onCreate");
@@ -606,7 +611,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
         inflater.inflate(R.menu.activity_pdfviewer, menu);
 
         shareMenuItem = menu.findItem(R.id.pdfviewer_share);
-        Drawable share = getResources().getDrawable(R.drawable.ic_social_share_white);
+        share = getResources().getDrawable(R.drawable.ic_social_share_white);
         share.setColorFilter(getResources().getColor(R.color.lollipop_primary_color), PorterDuff.Mode.SRC_ATOP);
         shareMenuItem.setIcon(share);
 
@@ -615,7 +620,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
             log("isURL");
             shareMenuItem.setVisible(false);
             downloadMenuItem.setVisible(true);
-            Drawable download = getResources().getDrawable(R.drawable.ic_download_white);
+            download = getResources().getDrawable(R.drawable.ic_download_white);
             download.setColorFilter(getResources().getColor(R.color.lollipop_primary_color), PorterDuff.Mode.SRC_ATOP);
 
             downloadMenuItem.setIcon(download);
@@ -626,12 +631,12 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
         }
 
         chatMenuItem = menu.findItem(R.id.pdfviewer_chat);
-        Drawable chat = getResources().getDrawable(R.drawable.ic_chat_white);
+        chat = getResources().getDrawable(R.drawable.ic_chat_white);
         chat.setColorFilter(getResources().getColor(R.color.lollipop_primary_color), PorterDuff.Mode.SRC_ATOP);
         chatMenuItem.setIcon(chat);
 
         propertiesMenuItem = menu.findItem(R.id.pdfviewer_properties);
-        Drawable properties = getResources().getDrawable(R.drawable.info_ic_white);
+        properties = getResources().getDrawable(R.drawable.info_ic_white);
         properties.setColorFilter(getResources().getColor(R.color.lollipop_primary_color), PorterDuff.Mode.SRC_ATOP);
         propertiesMenuItem.setIcon(properties);
 
@@ -1291,6 +1296,18 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
 
         if (megaApi != null) {
             megaApi.removeTransferListener(this);
+        }
+        if (chat != null) {
+            chat.setColorFilter(null);
+        }
+        if (download != null){
+            download.setColorFilter(null);
+        }
+        if (properties != null){
+            properties.setColorFilter(null);
+        }
+        if (share != null) {
+            share.setColorFilter(null);
         }
 
         super.onDestroy();
