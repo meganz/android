@@ -519,22 +519,30 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 				else if (MimeTypeList.typeForName(transfer.getPath()).isPdf()) {
 					log("Is pdf!!!");
 
-					ThumbnailUtilsLollipop.createThumbnailPdf(this, transfer.getPath(), megaApi, transfer.getNodeHandle());
-
-					int pageNumber = 0;
-					PdfiumCore pdfiumCore = new PdfiumCore(this);
-					FileOutputStream out = null;
-					MegaNode pdfNode = megaApi.getNodeByHandle(transfer.getNodeHandle());
-
-					if (pdfNode == null){
-						log("pdf is NULL");
-						return;
+					try{
+						ThumbnailUtilsLollipop.createThumbnailPdf(this, transfer.getPath(), megaApi, transfer.getNodeHandle());
+					}
+					catch(Exception e){
+						log("Pdf thumbnail could not be created");
 					}
 
-					File previewDir = PreviewUtils.getPreviewFolder(this);
-					File preview = new File(previewDir, MegaApiAndroid.handleToBase64(transfer.getNodeHandle()) + ".jpg");
-					File file = new File(transfer.getPath());
+					int pageNumber = 0;
+					FileOutputStream out = null;
+
 					try {
+
+						PdfiumCore pdfiumCore = new PdfiumCore(this);
+						MegaNode pdfNode = megaApi.getNodeByHandle(transfer.getNodeHandle());
+
+						if (pdfNode == null){
+							log("pdf is NULL");
+							return;
+						}
+
+						File previewDir = PreviewUtils.getPreviewFolder(this);
+						File preview = new File(previewDir, MegaApiAndroid.handleToBase64(transfer.getNodeHandle()) + ".jpg");
+						File file = new File(transfer.getPath());
+
 						PdfDocument pdfDocument = pdfiumCore.newDocument(ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_ONLY));
 						pdfiumCore.openPage(pdfDocument, pageNumber);
 						int width = pdfiumCore.getPageWidthPoint(pdfDocument, pageNumber);
@@ -554,7 +562,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 						}
 						pdfiumCore.closeDocument(pdfDocument);
 					} catch(Exception e) {
-						//todo with exception
+						log("Pdf preview could not be created");
 					} finally {
 						try {
 							if (out != null)
