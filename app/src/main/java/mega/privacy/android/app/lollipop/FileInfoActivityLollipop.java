@@ -528,12 +528,13 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 		deleteMenuItem = menu.findItem(R.id.cab_menu_file_info_delete);
 		leaveMenuItem = menu.findItem(R.id.cab_menu_file_info_leave);
 
+
 		MegaNode parent = megaApi.getNodeByHandle(handle);
 		while (megaApi.getParentNode(parent) != null){
 			parent = megaApi.getParentNode(parent);
 		}
 
-		if (parent.getHandle() == megaApi.getRubbishNode().getHandle()){
+	 	if (parent.getHandle() == megaApi.getRubbishNode().getHandle()){
 
 			downloadMenuItem.setVisible(false);
 			shareMenuItem.setVisible(false);
@@ -1901,43 +1902,43 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 		    @Override
 		    public void onClick(DialogInterface dialog, int which) {
 		        switch (which){
-		        case DialogInterface.BUTTON_POSITIVE:
-		        	//TODO remove the outgoing shares
-		    		//Check if the node is not yet in the rubbish bin (if so, remove it)
+					case DialogInterface.BUTTON_POSITIVE:
+						//TODO remove the outgoing shares
+						//Check if the node is not yet in the rubbish bin (if so, remove it)
 
-		    		if (moveToRubbish){
-		    			megaApi.moveNode(megaApi.getNodeByHandle(handle), rubbishNode, fileInfoActivity);
-		    			ProgressDialog temp = null;
-		    			try{
-		    				temp = new ProgressDialog(fileInfoActivity);
-		    				temp.setMessage(getString(R.string.context_move_to_trash));
-		    				temp.show();
-		    			}
-		    			catch(Exception e){
-		    				return;
-		    			}
-		    			statusDialog = temp;
-		    		}
-		    		else{
-		    			megaApi.remove(megaApi.getNodeByHandle(handle), fileInfoActivity);
-		    			ProgressDialog temp = null;
-		    			try{
-		    				temp = new ProgressDialog(fileInfoActivity);
-		    				temp.setMessage(getString(R.string.context_delete_from_mega));
-		    				temp.show();
-		    			}
-		    			catch(Exception e){
-		    				return;
-		    			}
-		    			statusDialog = temp;
-		    		}
+						if (moveToRubbish){
+							megaApi.moveNode(megaApi.getNodeByHandle(handle), rubbishNode, fileInfoActivity);
+							ProgressDialog temp = null;
+							try{
+								temp = new ProgressDialog(fileInfoActivity);
+								temp.setMessage(getString(R.string.context_move_to_trash));
+								temp.show();
+							}
+							catch(Exception e){
+								return;
+							}
+							statusDialog = temp;
+						}
+						else{
+							megaApi.remove(megaApi.getNodeByHandle(handle), fileInfoActivity);
+							ProgressDialog temp = null;
+							try{
+								temp = new ProgressDialog(fileInfoActivity);
+								temp.setMessage(getString(R.string.context_delete_from_mega));
+								temp.show();
+							}
+							catch(Exception e){
+								return;
+							}
+							statusDialog = temp;
+						}
 
-		            break;
+						break;
 
-		        case DialogInterface.BUTTON_NEGATIVE:
-		            //No button clicked
-		            break;
-		        }
+					case DialogInterface.BUTTON_NEGATIVE:
+						//No button clicked
+						break;
+					}
 		    }
 		};
 
@@ -2565,7 +2566,10 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 			log("node updated");
 			node = megaApi.getNodeByHandle(handle);
 		}
-		supportInvalidateOptionsMenu();
+
+		if (moveToRubbish){
+			supportInvalidateOptionsMenu();
+		}
 
 		if (node == null){
 			return;
