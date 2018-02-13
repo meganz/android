@@ -93,9 +93,8 @@
                             emojicon:emojiconSize="16sp"
                             android:minLines="2"
                             android:lines="6"
-                            android:inputType="textCapSentences" />
-                        <!--android:inputType="textMultiLine"-->
-
+                            android:inputType="textMultiLine" />
+                        <!--android:inputType="textCapSentences"-->
 
                         <RelativeLayout
                             android:id="@+id/writing_disabled_linear_layout_chat"
@@ -172,61 +171,6 @@
                             android:src="@drawable/ic_collections_white"
                             android:layout_gravity="center_vertical"/>
 
-
-                        <!--<ImageButton-->
-                            <!--android:id="@+id/keyboard_icon_chat"-->
-                            <!--android:layout_width="wrap_content"-->
-                            <!--android:layout_height="wrap_content"-->
-                            <!--android:background="@null"-->
-                            <!--android:tint="@color/transparent_black"-->
-                            <!--android:src="@drawable/ic_emoticon_white"-->
-                            <!--android:layout_marginLeft="18dp"-->
-                            <!--android:layout_marginRight="38dp"-->
-                            <!--android:layout_gravity="center_vertical"/>-->
-
-                        <!--<ImageButton-->
-                            <!--android:id="@+id/media_icon_chat"-->
-                            <!--android:layout_width="wrap_content"-->
-                            <!--android:layout_height="wrap_content"-->
-                            <!--android:background="@null"-->
-                            <!--android:tint="@color/transparent_black"-->
-                            <!--android:src="@drawable/ic_media"-->
-                            <!--android:layout_marginRight="38dp"-->
-                            <!--android:layout_gravity="center_vertical"/>-->
-
-                        <!--<ImageButton-->
-                            <!--android:id="@+id/send_contact_icon_chat"-->
-                            <!--android:layout_width="wrap_content"-->
-                            <!--android:layout_height="wrap_content"-->
-                            <!--android:background="@null"-->
-                            <!--android:tint="@color/transparent_black"-->
-                            <!--android:src="@drawable/ic_send_contact"-->
-                            <!--android:layout_marginRight="38dp"-->
-                            <!--android:layout_gravity="center_vertical"/>-->
-
-                        <!--<ImageButton-->
-                            <!--android:id="@+id/pick_file_system_icon_chat"-->
-                            <!--android:layout_width="wrap_content"-->
-                            <!--android:layout_height="wrap_content"-->
-                            <!--android:background="@null"-->
-                            <!--android:tint="@color/transparent_black"-->
-                            <!--android:src="@drawable/ic_pick_file_system"-->
-                            <!--android:layout_marginRight="38dp"-->
-                            <!--android:layout_gravity="center_vertical"/>-->
-
-                        <!--<ImageButton-->
-                            <!--android:id="@+id/pick_cloud_drive_icon_chat"-->
-                            <!--android:layout_width="wrap_content"-->
-                            <!--android:layout_height="wrap_content"-->
-                            <!--android:background="@null"-->
-                            <!--android:tint="@color/transparent_black"-->
-                            <!--android:src="@drawable/ic_pick_cloud_drive"-->
-                            <!--android:layout_marginRight="38dp"-->
-                            <!--android:layout_gravity="center_vertical"/>-->
-
-
-
-
                     </LinearLayout>
 
                 <!--File storage fragment-->
@@ -237,27 +181,12 @@
                         android:layout_height="240dp"
                         android:layout_alignParentBottom="true"
                         android:background="@android:color/transparent">
-                        <!--<GridView-->
-                            <!--android:id="@+id/galleryGridView"-->
-                            <!--android:layout_width="match_parent"-->
-                            <!--android:layout_height="wrap_content"-->
-                            <!--android:columnWidth="280dp"-->
-                            <!--android:gravity="center"-->
-                            <!--android:horizontalSpacing="2dp"-->
-                            <!--android:numColumns="2"-->
-                            <!--android:padding="2dp"-->
-                            <!--android:stretchMode="columnWidth"-->
-                            <!--android:verticalSpacing="2dp" >-->
-                        <!--</GridView>-->
                         <FrameLayout
                             android:id="@+id/fragment_container_file_storage"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:background="@android:color/transparent"/>
-                        <!--<ImageView-->
-                            <!--android:id="@+id/imageView"-->
-                            <!--android:layout_width="wrap_content"-->
-                            <!--android:layout_height="wrap_content" />-->
+
                     </RelativeLayout>
                 </LinearLayout>
             </RelativeLayout>

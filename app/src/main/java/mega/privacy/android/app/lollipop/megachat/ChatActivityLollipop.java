@@ -1557,9 +1557,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
         log("onActivityResult, resultCode: " + resultCode);
-
+log("*********onActivityResult");
         if (requestCode == Constants.REQUEST_ADD_PARTICIPANTS && resultCode == RESULT_OK) {
-            log("onActivityResult REQUEST_ADD_PARTICIPANTS OK");
+            log("**********onActivityResult REQUEST_ADD_PARTICIPANTS OK");
+
 
             if (intent == null) {
                 log("Return.....");
@@ -1589,7 +1590,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }
         }
         else if (requestCode == Constants.REQUEST_CODE_SELECT_IMPORT_FOLDER && resultCode == RESULT_OK) {
-            log("onActivityResult REQUEST_CODE_SELECT_IMPORT_FOLDER OK");
+            log("**********onActivityResult REQUEST_CODE_SELECT_IMPORT_FOLDER OK");
 
             if(!Util.isOnline(this)) {
                 try{
@@ -1641,7 +1642,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }
         }
         else if (requestCode == Constants.REQUEST_SEND_CONTACTS && resultCode == RESULT_OK) {
-            log("onActivityResult REQUEST_SEND_CONTACTS OK");
+            log("***********onActivityResult REQUEST_SEND_CONTACTS OK");
 
             final ArrayList<String> contactsData = intent.getStringArrayListExtra(AddContactActivityLollipop.EXTRA_CONTACTS);
             if (contactsData != null) {
@@ -1660,7 +1661,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }
         }
         else if (requestCode == Constants.REQUEST_CODE_SELECT_FILE && resultCode == RESULT_OK) {
-            log("requestCode == REQUEST_CODE_SELECT_FILE");
+            log("**********+requestCode == REQUEST_CODE_SELECT_FILE");
             if (intent == null) {
                 log("Return.....");
                 return;
@@ -1687,6 +1688,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             log("---- no more files to send");
         }
         else if (requestCode == Constants.REQUEST_CODE_GET && resultCode == RESULT_OK) {
+            log("**********+requestCode == REQUEST_CODE_GET");
+
             if (intent == null) {
                 log("Return.....");
                 return;
@@ -1707,7 +1710,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             statusDialog = temp;
         }
         else if (requestCode == REQUEST_CODE_SELECT_CHAT && resultCode == RESULT_OK) {
-            log("onActivityResult REQUEST_CODE_SELECT_CHAT OK");
+            log("**************onActivityResult REQUEST_CODE_SELECT_CHAT OK");
 
             if(!Util.isOnline(this)) {
                 try{
@@ -1789,25 +1792,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }
         }
         else if (requestCode == Constants.TAKE_PHOTO_CODE && resultCode == RESULT_OK) {
-            log("TAKE_PHOTO_CODE");
-            if (resultCode == Activity.RESULT_OK) {
-                String filePath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.temporalPicDIR + "/picture.jpg";
-                File imgFile = new File(filePath);
-
-                String name = Util.getPhotoSyncName(imgFile.lastModified(), imgFile.getAbsolutePath());
-                log("Taken picture Name: " + name);
-                String newPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.temporalPicDIR + "/" + name;
-                log("----NEW Name: " + newPath);
-                File newFile = new File(newPath);
-                imgFile.renameTo(newFile);
-
-                uploadTakePicture(newPath);
-            } else {
-                log("TAKE_PHOTO_CODE--->ERROR!");
-            }
-
-        }else if (requestCode == Constants.TAKE_PHOTO_CODE && resultCode == RESULT_OK) {
-            log("==========TAKE_PHOTO_CODE");
+            log("***************+TAKE_PHOTO_CODE");
             if (resultCode == Activity.RESULT_OK) {
                 String filePath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.temporalPicDIR + "/picture.jpg";
                 File imgFile = new File(filePath);
@@ -1930,20 +1915,30 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 writingLayout.setClickable(false);
                 String text = textChat.getText().toString();
 
-                if(editingMessage){
-                    editMessage(text);
-                    log("Edited message: "+text);
-                    clearSelections();
-                    hideMultipleSelect();
-                    actionMode.invalidate();
-                }
-                else{
-                    log("Call to send message: "+text);
-                    sendMessage(text);
-                }
+                if(!text.isEmpty()){
+                    if(editingMessage){
+                        editMessage(text);
+                        log("Edited message: "+text);
+                        clearSelections();
+                        hideMultipleSelect();
+                        actionMode.invalidate();
+                    }
+                    else{
+                        log("Call to send message: "+text);
+                        sendMessage(text);
+                    }
 
-                textChat.getText().clear();
-                textChat.setText("", TextView.BufferType.EDITABLE);
+                    textChat.getText().clear();
+                    textChat.setText("", TextView.BufferType.EDITABLE);
+                }
+                        if(FileStorageF == null){
+
+                    //*********************+
+                            int elemntsSelected = FileStorageF.getItemCount();
+
+                        }
+
+
                 break;
             }
             case R.id.keyboard_icon_chat:{
@@ -2141,7 +2136,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         ft.replace(R.id.fragment_container_file_storage, FileStorageF, "fileStorageF");
         ft.commitNow();
-
     }
 
     public void attachFromCloud(){
@@ -5256,6 +5250,16 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         intent.putExtra(ChatUploadService.EXTRA_CHAT_ID, idChat);
 
         startService(intent);
+    }
+
+    public void activateSendButton(){
+        sendIcon.setEnabled(true);
+        sendIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_send_black));
+    }
+
+    public void desactivateSendButton(){
+        sendIcon.setEnabled(false);
+        sendIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_send_trans));
     }
 
 }
