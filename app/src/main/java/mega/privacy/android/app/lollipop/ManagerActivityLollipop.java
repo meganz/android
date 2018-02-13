@@ -236,8 +236,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	TextView rightUpgradeButton;
 	FloatingActionButton fabButton;
 
-	Drawable chatSrc;
-
 	AlertDialog evaluateAppDialog;
 
 
@@ -1398,8 +1396,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		mainFabButtonChat = (FloatingActionButton) findViewById(R.id.main_fab_chat);
 		mainFabButtonChat.setOnClickListener(new FabButtonListener(this));
 		firstFabButtonChat = (FloatingActionButton) findViewById(R.id.first_fab_chat);
-		firstFabButtonChat.setImageDrawable(chatSrc);
-
 		firstFabButtonChat.setOnClickListener(new FabButtonListener(this));
 		secondFabButtonChat = (FloatingActionButton) findViewById(R.id.second_fab_chat);
 		secondFabButtonChat.setOnClickListener(new FabButtonListener(this));
@@ -6037,8 +6033,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				pauseTransfersMenuIcon.setVisible(false);
 			}
 		}
-
-		chatSrc = getResources().getDrawable(R.drawable.ic_chat_white);
 
 		log("Call to super onCreateOptionsMenu");
 	    return super.onCreateOptionsMenu(menu);
@@ -14299,10 +14293,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				break;
 			}
 			case CHAT:{
-				fabButton.setImageDrawable(chatSrc);
+				fabButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_chat_white));
 				if(megaChatApi!=null){
 					if(megaChatApi.getChatRooms().size()==0){
-						fabButton.setImageDrawable(chatSrc);
+						fabButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_chat_white));
 					}
 					fabButton.setVisibility(View.VISIBLE);
 				}
