@@ -775,6 +775,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 	    
 	    createFolderMenuItem = menu.findItem(R.id.cab_menu_create_folder);
 	    newChatMenuItem = menu.findItem(R.id.cab_menu_new_chat);
+
 		createFolderMenuItem.setVisible(false);
 
 //	    if(iSharesExplorer != null){
@@ -807,7 +808,12 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 				//CLOUD TAB				
 				String cFTag2 = getFragmentTag(R.id.explorer_tabs_pager, 0);		
 				log("Tag: "+ cFTag2);
-				createFolderMenuItem.setVisible(true);
+				if(intent.getAction().equals(ACTION_MULTISELECT_FILE)){
+					createFolderMenuItem.setVisible(false);
+				}
+				else{
+					createFolderMenuItem.setVisible(true);
+				}
 				newChatMenuItem.setVisible(false);
 			}
 			else if(index==1){
@@ -887,11 +893,8 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 
 	public void changeTitle (){
 
-		int position = viewPagerExplorer.getCurrentItem();
-		if(position == 0){
-			tabShown=CLOUD_TAB;
-			String cFTag = getFragmentTag(R.id.explorer_tabs_pager, 0);
-			cDriveExplorer = (CloudDriveExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
+		if(tabShown==NO_TABS){
+			cDriveExplorer = (CloudDriveExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag("cDriveExplorer");
 
 			if(cDriveExplorer!=null){
 				if(cDriveExplorer.parentHandle==-1|| cDriveExplorer.parentHandle==megaApi.getRootNode().getHandle()){
@@ -905,43 +908,70 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			}
 			fabButton.setVisibility(View.GONE);
 		}
-		else if(position == 1){
-			tabShown=INCOMING_TAB;
-
-			String cFTag = getFragmentTag(R.id.explorer_tabs_pager, 1);
-			iSharesExplorer = (IncomingSharesExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
-
-			if(iSharesExplorer!=null){
-				if(iSharesExplorer.getDeepBrowserTree()==0){
-					log("5**Change title");
-					aB.setTitle(getString(R.string.title_incoming_shares_explorer));
+		else{
+			int position = viewPagerExplorer.getCurrentItem();
+			if(position == 0){
+				if(tabShown!=NO_TABS){
+					tabShown=CLOUD_TAB;
 				}
-				else{
-					log("6**Change title");
-					aB.setTitle(megaApi.getNodeByHandle(iSharesExplorer.parentHandle).getName());
+
+				String cFTag = getFragmentTag(R.id.explorer_tabs_pager, 0);
+				cDriveExplorer = (CloudDriveExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
+
+				if(cDriveExplorer!=null){
+					if(cDriveExplorer.parentHandle==-1|| cDriveExplorer.parentHandle==megaApi.getRootNode().getHandle()){
+						log("3**Change title");
+						aB.setTitle(getString(R.string.section_cloud_drive));
+					}
+					else{
+						log("4**Change title");
+						aB.setTitle(megaApi.getNodeByHandle(cDriveExplorer.parentHandle).getName());
+					}
 				}
-			}
-			fabButton.setVisibility(View.GONE);
-
-		}
-		else if(position == 2){
-			tabShown=CHAT_TAB;
-
-			String cFTag = getFragmentTag(R.id.explorer_tabs_pager, 2);
-			chatExplorer = (ChatExplorerFragment) getSupportFragmentManager().findFragmentByTag(cFTag);
-
-			if(chatExplorer!=null){
-				log("7**Change title");
-				aB.setTitle(getString(R.string.section_chat));
-			}
-
-			if(chatExplorer.getSelectedChats().size() > 0){
-				fabButton.setVisibility(View.VISIBLE);
-			}
-			else{
 				fabButton.setVisibility(View.GONE);
 			}
+			else if(position == 1){
+				if(tabShown!=NO_TABS){
+					tabShown=INCOMING_TAB;
+				}
 
+				String cFTag = getFragmentTag(R.id.explorer_tabs_pager, 1);
+				iSharesExplorer = (IncomingSharesExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
+
+				if(iSharesExplorer!=null){
+					if(iSharesExplorer.getDeepBrowserTree()==0){
+						log("5**Change title");
+						aB.setTitle(getString(R.string.title_incoming_shares_explorer));
+					}
+					else{
+						log("6**Change title");
+						aB.setTitle(megaApi.getNodeByHandle(iSharesExplorer.parentHandle).getName());
+					}
+				}
+				fabButton.setVisibility(View.GONE);
+
+			}
+			else if(position == 2){
+				if(tabShown!=NO_TABS){
+					tabShown=CHAT_TAB;
+				}
+
+				String cFTag = getFragmentTag(R.id.explorer_tabs_pager, 2);
+				chatExplorer = (ChatExplorerFragment) getSupportFragmentManager().findFragmentByTag(cFTag);
+
+				if(chatExplorer!=null){
+					log("7**Change title");
+					aB.setTitle(getString(R.string.section_chat));
+				}
+
+				if(chatExplorer.getSelectedChats().size() > 0){
+					fabButton.setVisibility(View.VISIBLE);
+				}
+				else{
+					fabButton.setVisibility(View.GONE);
+				}
+
+			}
 		}
 	}
 	

@@ -5426,7 +5426,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 						//Hide
 						searchByDate.setVisible(false);
-						upgradeAccountMenuItem.setVisible(true);
+						upgradeAccountMenuItem.setVisible(false);
 						pauseTransfersMenuIcon.setVisible(false);
 						playTransfersMenuIcon.setVisible(false);
 						addContactMenuItem.setVisible(false);

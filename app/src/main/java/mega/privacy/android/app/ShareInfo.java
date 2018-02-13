@@ -305,6 +305,11 @@ public class ShareInfo {
 
 			if (context.getExternalCacheDir() != null){
 				if (title != null){
+					if (title.contains("../")){
+						log("External path traversal: " + title);
+						return;
+					}
+					log("External No path traversal: " + title);
 					file = new File(context.getExternalCacheDir(), title);
 				}
 				else{
@@ -313,6 +318,11 @@ public class ShareInfo {
 			}
 			else{
 				if (title != null){
+					if (title.contains("../")){
+						log("Internal path traversal: " + title);
+						return;
+					}
+					log("Internal No path traversal: " + title);
 					file = new File(context.getCacheDir(), title);
 				}
 				else{

@@ -208,6 +208,9 @@ public class ParticipantBottomSheetDialogFragment extends BottomSheetDialogFragm
             ChatController chatC = new ChatController(context);
             String myFullName = chatC.getMyFullName();
 
+            if (myFullName == null || myFullName.isEmpty() || myFullName.equals("")) {
+                myFullName = megaChatApi.getMyEmail();
+            }
             titleNameContactChatPanel.setText(myFullName);
 
             titleMailContactChatPanel.setText(megaChatApi.getMyEmail());
@@ -238,17 +241,12 @@ public class ParticipantBottomSheetDialogFragment extends BottomSheetDialogFragm
         else{
 
             String fullName = selectedChat.getPeerFullnameByHandle(participantHandle);
-            String email = selectedChat.getPeerEmailByHandle(participantHandle);
-            if(fullName==null||fullName.isEmpty()){
-                String[] splitEmail = email.split("[@._]");
-                titleNameContactChatPanel.setText(splitEmail[0]);
-                fullName = splitEmail[0];
-            }
-            else{
-                titleNameContactChatPanel.setText(fullName);
+            if (fullName == null || fullName.isEmpty() || fullName.equals("")) {
+                fullName = selectedChat.getPeerEmailByHandle(participantHandle);
             }
 
-            titleMailContactChatPanel.setText(email);
+            titleNameContactChatPanel.setText(fullName);
+            titleMailContactChatPanel.setText(selectedChat.getPeerEmailByHandle(participantHandle));
 
             int permission = selectedChat.getPeerPrivilegeByHandle(participantHandle);
 

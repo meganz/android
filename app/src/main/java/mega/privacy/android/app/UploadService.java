@@ -7,6 +7,7 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.media.ExifInterface;
 import android.media.MediaMetadataRetriever;
 import android.net.wifi.WifiManager;
@@ -14,13 +15,18 @@ import android.net.wifi.WifiManager.WifiLock;
 import android.os.Build;
 import android.os.Environment;
 import android.os.IBinder;
+import android.os.ParcelFileDescriptor;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 import android.support.v4.app.NotificationCompat;
 import android.text.format.Formatter;
 import android.widget.RemoteViews;
 
+import com.shockwave.pdfium.PdfDocument;
+import com.shockwave.pdfium.PdfiumCore;
+
 import java.io.File;
+import java.io.FileOutputStream;
 import java.util.HashMap;
 
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
@@ -613,8 +619,61 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 								log("Couldn't read exif info: " + transfer.getPath());
 							}
 						}
+					} else if (MimeTypeList.typeForName(transfer.getPath()).isPdf()) {
+						log("Is pdf!!!");
+
+						try {
+							ThumbnailUtilsLollipop.createThumbnailPdf(this, transfer.getPath(), megaApi, transfer.getNodeHandle());
+						} catch(Exception e) {
+							log("Pdf thumbnail could not be created");
+						}
+
+						int pageNumber = 0;
+						FileOutputStream out = null;
+
+						try {
+						PdfiumCore pdfiumCore = new PdfiumCore(this);
+						MegaNode pdfNode = megaApi.getNodeByHandle(transfer.getNodeHandle());
+
+						if (pdfNode == null){
+							log("pdf is NULL");
+							return;
+						}
+
+						File previewDir = PreviewUtils.getPreviewFolder(this);
+						File preview = new File(previewDir, MegaApiAndroid.handleToBase64(transfer.getNodeHandle()) + ".jpg");
+						File file = new File(transfer.getPath());
+
+							PdfDocument pdfDocument = pdfiumCore.newDocument(ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_ONLY));
+							pdfiumCore.openPage(pdfDocument, pageNumber);
+							int width = pdfiumCore.getPageWidthPoint(pdfDocument, pageNumber);
+							int height = pdfiumCore.getPageHeightPoint(pdfDocument, pageNumber);
+							Bitmap bmp = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+							pdfiumCore.renderPageBitmap(pdfDocument, bmp, pageNumber, 0, 0, width, height);
+							Bitmap resizedBitmap = Bitmap.createScaledBitmap(bmp, width, height, false);
+							out = new FileOutputStream(preview);
+							boolean result = resizedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, out); // bmp is your Bitmap instance
+							if(result){
+								log("Compress OK!");
+								megaApi.setPreview(pdfNode, preview.getAbsolutePath());
+							}
+							else{
+								log("Not Compress");
+							}
+							pdfiumCore.closeDocument(pdfDocument);
+						} catch(Exception e) {
+							log("Pdf preview could not be created");
+						} finally {
+							try {
+								if (out != null)
+									out.close();
+							} catch (Exception e) {
+
+							}
+						}
+
 					} else {
-						log("NOT video or image!");
+						log("NOT video, image or pdf!");
 					}
 				} else {
 					log("Upload Error: " + transfer.getFileName() + "_" + error.getErrorCode() + "___" + error.getErrorString());
