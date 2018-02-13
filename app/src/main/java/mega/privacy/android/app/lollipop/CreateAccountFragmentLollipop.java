@@ -3,7 +3,6 @@ package mega.privacy.android.app.lollipop;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Configuration;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.graphics.Typeface;
@@ -337,6 +336,7 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
 
         createAccountLayout.setVisibility(View.VISIBLE);
         creatingAccountLayout.setVisibility(View.GONE);
+        scrollView.setBackgroundColor(getResources().getColor(R.color.background_create_account));
         creatingAccountTextView.setVisibility(View.GONE);
         createAccountProgressBar.setVisibility(View.GONE);
 
@@ -574,6 +574,7 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
 
         createAccountLayout.setVisibility(View.GONE);
         creatingAccountLayout.setVisibility(View.VISIBLE);
+        scrollView.setBackgroundColor(getResources().getColor(R.color.white));
         creatingAccountTextView.setVisibility(View.GONE);
         createAccountProgressBar.setVisibility(View.VISIBLE);
 
@@ -584,6 +585,7 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
 
         createAccountLayout.setVisibility(View.GONE);
         creatingAccountLayout.setVisibility(View.VISIBLE);
+        scrollView.setBackgroundColor(getResources().getColor(R.color.white));
         creatingAccountTextView.setVisibility(View.VISIBLE);
         createAccountProgressBar.setVisibility(View.VISIBLE);
         log("[CREDENTIALS]userEmail: _" + userEmail.getText().toString().trim().toLowerCase(Locale.ENGLISH) + "_");
@@ -669,6 +671,7 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
 
         createAccountLayout.setVisibility(View.GONE);
         creatingAccountLayout.setVisibility(View.VISIBLE);
+        scrollView.setBackgroundColor(getResources().getColor(R.color.white));
         creatingAccountTextView.setVisibility(View.VISIBLE);
         createAccountProgressBar.setVisibility(View.VISIBLE);
         log("[CREDENTIALS]userEmail: _" + userEmail.getText().toString().trim().toLowerCase(Locale.ENGLISH) + "_");
@@ -693,6 +696,7 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
                 ((LoginActivityLollipop)context).showSnackbar(getString(R.string.error_email_registered));
                 createAccountLayout.setVisibility(View.VISIBLE);
                 creatingAccountLayout.setVisibility(View.GONE);
+                scrollView.setBackgroundColor(getResources().getColor(R.color.background_create_account));
                 creatingAccountTextView.setVisibility(View.GONE);
                 createAccountProgressBar.setVisibility(View.GONE);
                 return;
@@ -703,6 +707,7 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
                 ((LoginActivityLollipop)context).showFragment(Constants.LOGIN_FRAGMENT);
                 createAccountLayout.setVisibility(View.VISIBLE);
                 creatingAccountLayout.setVisibility(View.GONE);
+                scrollView.setBackgroundColor(getResources().getColor(R.color.background_create_account));
                 creatingAccountTextView.setVisibility(View.GONE);
                 createAccountProgressBar.setVisibility(View.GONE);
                 return;
