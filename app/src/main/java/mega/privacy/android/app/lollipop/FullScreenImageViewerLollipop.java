@@ -2428,6 +2428,21 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	}
 
 	@Override
+	protected void onResume(){
+		log("onResume");
+		super.onResume();
+
+		if (imageHandles.get(positionG) != -1){
+			log("node updated");
+			node = megaApi.getNodeByHandle(imageHandles.get(positionG));
+		}
+
+		if (node == null){
+			finish();
+		}
+	}
+
+	@Override
 	public void onBackPressed() {
 		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 		super.onBackPressed();
