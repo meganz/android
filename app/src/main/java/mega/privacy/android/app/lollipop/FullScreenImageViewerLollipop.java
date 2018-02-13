@@ -93,6 +93,7 @@ import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
+import nz.mega.sdk.MegaEvent;
 import nz.mega.sdk.MegaGlobalListenerInterface;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
@@ -2449,6 +2450,11 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 
 	@Override
 	public void onUsersUpdate(MegaApiJava api, ArrayList<MegaUser> users) {
+
+	}
+
+	@Override
+	public void onEvent(MegaApiJava api, MegaEvent event) {
 
 	}
 
