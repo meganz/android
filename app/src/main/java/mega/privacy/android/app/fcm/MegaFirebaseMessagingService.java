@@ -235,7 +235,7 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
                                         }
                                     }
                                 },
-                                10000
+                                12000
                         );
                     }
                     else{
@@ -289,8 +289,6 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
                     chatSettings = dbH.getChatSettings();
                     if (ret == MegaChatApi.INIT_NO_CACHE) {
                         log("condition ret == MegaChatApi.INIT_NO_CACHE");
-                        megaApi.invalidateCache();
-
                     } else if (ret == MegaChatApi.INIT_ERROR) {
                         log("condition ret == MegaChatApi.INIT_ERROR");
                         if (chatSettings == null) {
