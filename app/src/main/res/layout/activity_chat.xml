@@ -158,7 +158,6 @@
                             android:background="@null"
                             android:tint="@color/transparent_black"
                             android:src="@drawable/ic_pick_cloud_drive"
-                            android:layout_marginRight="38dp"
                             android:layout_gravity="center_vertical"/>
                     </LinearLayout>
                 </LinearLayout>
