@@ -67,10 +67,6 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 	private RelativeLayout oldPasswordErrorView, newPassword1ErrorView, newPassword2ErrorView;
 	private TextView oldPasswordErrorText, newPassword1ErrorText, newPassword2ErrorText;
 	private Button changePasswordButton;
-	private Button cancelChangePasswordButton;
-	private ImageView loginThreeDots;
-	private SwitchCompat loginSwitch;
-	private TextView loginABC;
     private RelativeLayout fragmentContainer;
 	private TextView title;
 	private String linkToReset;
@@ -263,54 +259,10 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 				}
 			}
 		});
-//		loginThreeDots = (ImageView) findViewById(R.id.change_pass_three_dots);
-//		LinearLayout.LayoutParams textThreeDots = (LinearLayout.LayoutParams)loginThreeDots.getLayoutParams();
-//		textThreeDots.setMargins(Util.scaleWidthPx(0, outMetrics), 0, Util.scaleWidthPx(10, outMetrics), 0);
-//		loginThreeDots.setLayoutParams(textThreeDots);
-//
-//		loginABC = (TextView) findViewById(R.id.ABC_change_pass);
-//
-//		loginSwitch = (SwitchCompat) findViewById(R.id.switch_change_pass);
-//		LinearLayout.LayoutParams switchParams = (LinearLayout.LayoutParams)loginSwitch.getLayoutParams();
-//		switchParams.setMargins(0, 0, Util.scaleWidthPx(10, outMetrics), 0);
-//		loginSwitch.setLayoutParams(switchParams);
-//		loginSwitch.setChecked(false);
-//
-//
-//		loginSwitch.setOnCheckedChangeListener(new OnCheckedChangeListener() {
-//
-//			@Override
-//			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-//				if(!isChecked){
-//					oldPasswordView.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-//					oldPasswordView.setTypeface(Typeface.SANS_SERIF,Typeface.NORMAL);
-//					oldPasswordView.setSelection(oldPasswordView.getText().length());
-//
-//					newPassword1View.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-//					newPassword1View.setTypeface(Typeface.SANS_SERIF,Typeface.NORMAL);
-//					newPassword1View.setSelection(newPassword1View.getText().length());
-//
-//					newPassword2View.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-//					newPassword2View.setTypeface(Typeface.SANS_SERIF,Typeface.NORMAL);
-//					newPassword2View.setSelection(newPassword2View.getText().length());
-//				}else{
-//					oldPasswordView.setInputType(InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
-//					oldPasswordView.setSelection(oldPasswordView.getText().length());
-//
-//					newPassword1View.setInputType(InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
-//					newPassword1View.setSelection(newPassword1View.getText().length());
-//
-//					newPassword2View.setInputType(InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
-//					newPassword2View.setSelection(newPassword2View.getText().length());
-//			    }
-//			}
-//		});
+
 				
 		changePasswordButton = (Button) findViewById(R.id.action_change_password);
 		changePasswordButton.setOnClickListener(this);
-
-//		cancelChangePasswordButton = (Button) findViewById(R.id.cancel_change_password);
-//		cancelChangePasswordButton.setOnClickListener(this);
 		
 		progress = new ProgressDialog(this);
 		progress.setMessage(getString(R.string.my_account_changing_password));
