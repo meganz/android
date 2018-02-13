@@ -18,7 +18,6 @@ import android.os.IBinder;
 import android.os.ParcelFileDescriptor;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
-import android.provider.MediaStore;
 import android.support.v4.app.NotificationCompat;
 import android.text.format.Formatter;
 import android.widget.RemoteViews;
@@ -623,11 +622,17 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 					} else if (MimeTypeList.typeForName(transfer.getPath()).isPdf()) {
 						log("Is pdf!!!");
 
-						ThumbnailUtilsLollipop.createThumbnailPdf(this, transfer.getPath(), megaApi, transfer.getNodeHandle());
+						try {
+							ThumbnailUtilsLollipop.createThumbnailPdf(this, transfer.getPath(), megaApi, transfer.getNodeHandle());
+						} catch(Exception e) {
+							log("Pdf thumbnail could not be created");
+						}
 
 						int pageNumber = 0;
-						PdfiumCore pdfiumCore = new PdfiumCore(this);
 						FileOutputStream out = null;
+
+						try {
+						PdfiumCore pdfiumCore = new PdfiumCore(this);
 						MegaNode pdfNode = megaApi.getNodeByHandle(transfer.getNodeHandle());
 
 						if (pdfNode == null){
@@ -638,7 +643,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 						File previewDir = PreviewUtils.getPreviewFolder(this);
 						File preview = new File(previewDir, MegaApiAndroid.handleToBase64(transfer.getNodeHandle()) + ".jpg");
 						File file = new File(transfer.getPath());
-						try {
+
 							PdfDocument pdfDocument = pdfiumCore.newDocument(ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_ONLY));
 							pdfiumCore.openPage(pdfDocument, pageNumber);
 							int width = pdfiumCore.getPageWidthPoint(pdfDocument, pageNumber);
@@ -657,13 +662,13 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 							}
 							pdfiumCore.closeDocument(pdfDocument);
 						} catch(Exception e) {
-							//todo with exception
+							log("Pdf preview could not be created");
 						} finally {
 							try {
 								if (out != null)
 									out.close();
 							} catch (Exception e) {
-								//todo with exception
+
 							}
 						}
 

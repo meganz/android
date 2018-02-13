@@ -36,7 +36,6 @@ import android.widget.TextView;
 
 import com.shockwave.pdfium.PdfDocument;
 import com.shockwave.pdfium.PdfiumCore;
-
 import com.vdurmont.emoji.EmojiManager;
 import com.vdurmont.emoji.EmojiParser;
 
@@ -317,16 +316,18 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             else if (MimeTypeList.typeForName(filePath).isPdf()){
                 log("Is pdf");
 
-                int pageNumber = 0;
-                PdfiumCore pdfiumCore = new PdfiumCore(context);
                 FileOutputStream out = null;
-                Bitmap preview = null;
-                boolean result = false;
-                File previewDir = PreviewUtils.getPreviewFolder(context);
-                String[] previewName = currentFile.getName().split(".pdf");
-                File previewFile = new File(previewDir, previewName[0] + ".jpg");
-
+                int pageNumber = 0;
                 try {
+
+                    PdfiumCore pdfiumCore = new PdfiumCore(context);
+
+                    Bitmap preview = null;
+                    boolean result = false;
+                    File previewDir = PreviewUtils.getPreviewFolder(context);
+                    String[] previewName = currentFile.getName().split(".pdf");
+                    File previewFile = new File(previewDir, previewName[0] + ".jpg");
+
                     PdfDocument pdfDocument = pdfiumCore.newDocument(ParcelFileDescriptor.open(currentFile, ParcelFileDescriptor.MODE_READ_ONLY));
                     pdfiumCore.openPage(pdfDocument, pageNumber);
                     int width = pdfiumCore.getPageWidthPoint(pdfDocument, pageNumber);
@@ -337,24 +338,24 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     out = new FileOutputStream(previewFile);
                     result = preview.compress(Bitmap.CompressFormat.JPEG, 100, out); // bmp is your Bitmap instance
                     pdfiumCore.closeDocument(pdfDocument);
+
+                    if (preview != null && result){
+                        log("Compress OK");
+                        long fingerprintCache = MegaApiAndroid.base64ToHandle(megaApi.getFingerprint(previewFile.getPath()));
+                        PreviewUtils.setPreviewCache(fingerprintCache, preview);
+                        return preview;
+                    }
+                    else if (!result) {
+                        log("Not Compress");
+                    }
                 } catch(Exception e) {
-                    //todo with exception
+                    log("Pdf thumbnail could not be created");
                 } finally {
                     try {
                         if (out != null)
                             out.close();
                     } catch (Exception e) {
-                        //todo with exception
                     }
-                }
-                if (preview != null && result){
-                    log("Compress OK");
-                    long fingerprintCache = MegaApiAndroid.base64ToHandle(megaApi.getFingerprint(previewFile.getPath()));
-                    PreviewUtils.setPreviewCache(fingerprintCache, preview);
-                    return preview;
-                }
-                else if (!result) {
-                    log("Not Compress");
                 }
             }
 
