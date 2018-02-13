@@ -1557,11 +1557,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
         log("onActivityResult, resultCode: " + resultCode);
-log("*********onActivityResult");
         if (requestCode == Constants.REQUEST_ADD_PARTICIPANTS && resultCode == RESULT_OK) {
-            log("**********onActivityResult REQUEST_ADD_PARTICIPANTS OK");
-
-
             if (intent == null) {
                 log("Return.....");
                 return;
@@ -1590,8 +1586,6 @@ log("*********onActivityResult");
             }
         }
         else if (requestCode == Constants.REQUEST_CODE_SELECT_IMPORT_FOLDER && resultCode == RESULT_OK) {
-            log("**********onActivityResult REQUEST_CODE_SELECT_IMPORT_FOLDER OK");
-
             if(!Util.isOnline(this)) {
                 try{
                     statusDialog.dismiss();
@@ -1642,8 +1636,6 @@ log("*********onActivityResult");
             }
         }
         else if (requestCode == Constants.REQUEST_SEND_CONTACTS && resultCode == RESULT_OK) {
-            log("***********onActivityResult REQUEST_SEND_CONTACTS OK");
-
             final ArrayList<String> contactsData = intent.getStringArrayListExtra(AddContactActivityLollipop.EXTRA_CONTACTS);
             if (contactsData != null) {
                 MegaHandleList handleList = MegaHandleList.createInstance();
@@ -1661,7 +1653,6 @@ log("*********onActivityResult");
             }
         }
         else if (requestCode == Constants.REQUEST_CODE_SELECT_FILE && resultCode == RESULT_OK) {
-            log("**********+requestCode == REQUEST_CODE_SELECT_FILE");
             if (intent == null) {
                 log("Return.....");
                 return;
@@ -1688,7 +1679,6 @@ log("*********onActivityResult");
             log("---- no more files to send");
         }
         else if (requestCode == Constants.REQUEST_CODE_GET && resultCode == RESULT_OK) {
-            log("**********+requestCode == REQUEST_CODE_GET");
 
             if (intent == null) {
                 log("Return.....");
@@ -1710,7 +1700,6 @@ log("*********onActivityResult");
             statusDialog = temp;
         }
         else if (requestCode == REQUEST_CODE_SELECT_CHAT && resultCode == RESULT_OK) {
-            log("**************onActivityResult REQUEST_CODE_SELECT_CHAT OK");
 
             if(!Util.isOnline(this)) {
                 try{
@@ -1792,7 +1781,6 @@ log("*********onActivityResult");
             }
         }
         else if (requestCode == Constants.TAKE_PHOTO_CODE && resultCode == RESULT_OK) {
-            log("***************+TAKE_PHOTO_CODE");
             if (resultCode == Activity.RESULT_OK) {
                 String filePath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.temporalPicDIR + "/picture.jpg";
                 File imgFile = new File(filePath);
@@ -1931,12 +1919,12 @@ log("*********onActivityResult");
                     textChat.getText().clear();
                     textChat.setText("", TextView.BufferType.EDITABLE);
                 }
-                        if(FileStorageF == null){
-
-                    //*********************+
-                            int elemntsSelected = FileStorageF.getItemCount();
-
-                        }
+//                        if(FileStorageF == null){
+//
+//                    //*********************+
+//                            int elemntsSelected = FileStorageF.getItemCount();
+//
+//                        }
 
 
                 break;
@@ -5252,14 +5240,20 @@ log("*********onActivityResult");
         startService(intent);
     }
 
-    public void activateSendButton(){
-        sendIcon.setEnabled(true);
-        sendIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_send_black));
+    public void activateSendButton(boolean flag){
+        if(flag){
+            if(!sendIcon.isEnabled()){
+                sendIcon.setEnabled(true);
+                sendIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_send_black));
+            }
+
+        }else if(!flag){
+            if(sendIcon.isEnabled()) {
+                sendIcon.setEnabled(false);
+                sendIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_send_trans));
+            }
+        }
     }
 
-    public void desactivateSendButton(){
-        sendIcon.setEnabled(false);
-        sendIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_send_trans));
-    }
 
 }
