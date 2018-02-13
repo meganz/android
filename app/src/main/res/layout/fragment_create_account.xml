@@ -61,7 +61,7 @@
                         android:layout_height="wrap_content"
                         android:id="@+id/create_account_name_error_icon"
                         android:layout_alignParentRight="true"
-                        android:layout_marginRight="3dp"
+                        android:layout_marginRight="2dp"
                         android:src="@drawable/ic_input_warning"
                         android:tint="@color/login_warning"
                         />
@@ -74,9 +74,7 @@
                         android:layout_toLeftOf="@id/create_account_name_error_icon"
                         android:layout_alignParentLeft="true"
                         android:layout_centerVertical="true"
-                        android:layout_marginLeft="3dp"
-                        android:paddingLeft="3dp"
-                        />
+                        android:layout_marginLeft="3dp"/>
 
                 </RelativeLayout>
 
@@ -111,7 +109,7 @@
                         android:id="@+id/create_account_email_error_icon"
                         android:layout_alignParentRight="true"
                         android:src="@drawable/ic_input_warning"
-                        android:layout_marginRight="3dp"
+                        android:layout_marginRight="2dp"
                         android:tint="@color/login_warning"
                         />
 
@@ -123,9 +121,7 @@
                         android:layout_toLeftOf="@id/create_account_email_error_icon"
                         android:layout_alignParentLeft="true"
                         android:layout_marginLeft="3dp"
-                        android:layout_centerVertical="true"
-                        android:paddingLeft="3dp"
-                        />
+                        android:layout_centerVertical="true"/>
 
                 </RelativeLayout>
 
@@ -168,7 +164,7 @@
                         android:id="@+id/create_account_password_error_icon"
                         android:layout_alignParentRight="true"
                         android:src="@drawable/ic_input_warning"
-                        android:layout_marginRight="3dp"
+                        android:layout_marginRight="2dp"
                         android:tint="@color/login_warning"
                         />
 
@@ -180,9 +176,7 @@
                         android:layout_toLeftOf="@id/create_account_password_error_icon"
                         android:layout_alignParentLeft="true"
                         android:layout_marginLeft="3dp"
-                        android:layout_centerVertical="true"
-                        android:paddingLeft="3dp"
-                        />
+                        android:layout_centerVertical="true"/>
 
                 </RelativeLayout>
 
@@ -297,7 +291,7 @@
                         android:id="@+id/create_account_password_confirm_error_icon"
                         android:layout_alignParentRight="true"
                         android:src="@drawable/ic_input_warning"
-                        android:layout_marginRight="3dp"
+                        android:layout_marginRight="2dp"
                         android:tint="@color/login_warning"/>
 
                     <TextView
@@ -308,8 +302,7 @@
                         android:layout_toLeftOf="@id/create_account_password_confirm_error_icon"
                         android:layout_alignParentLeft="true"
                         android:layout_marginLeft="3dp"
-                        android:layout_centerVertical="true"
-                        android:paddingLeft="3dp"/>
+                        android:layout_centerVertical="true"/>
 
                 </RelativeLayout>
 
