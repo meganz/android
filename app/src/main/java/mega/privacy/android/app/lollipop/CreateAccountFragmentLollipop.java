@@ -7,16 +7,15 @@ import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
-import android.media.Image;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
-import android.text.InputType;
-import android.text.TextWatcher;
 import android.text.Html;
+import android.text.InputType;
 import android.text.Spanned;
+import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.LayoutInflater;
@@ -142,7 +141,7 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
 
         megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
 
-//        scrollView = (ScrollView) v.findViewById(R.id.scroll_view_account);
+        scrollView = (ScrollView) v.findViewById(R.id.scroll_view_account);
         createAccountLayout = (LinearLayout) v.findViewById(R.id.create_account_create_layout);
         createAccountTitle = (TextView) v.findViewById(R.id.create_account_text_view);
 
