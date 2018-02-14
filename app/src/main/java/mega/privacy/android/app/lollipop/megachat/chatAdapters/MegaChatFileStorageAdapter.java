@@ -71,15 +71,12 @@ public class MegaChatFileStorageAdapter extends RecyclerView.Adapter<MegaChatFil
     }
 
     public void toggleSelection(int pos) {
-        log("*********ADAPTER: toggleSelection-> "+pos);
-
         if (selectedItems.get(pos, false)) {
             selectedItems.delete(pos);
-            log("******selectedItems: "+selectedItems.size());
+            ((ChatFileStorageFragment) fragment).removePosition(pos);
         }else {
             selectedItems.put(pos, true);
-            log("******selectedItems: "+selectedItems.size());
-
+            ((ChatFileStorageFragment) fragment).addPosition(pos);
         }
         notifyItemChanged(pos);
 
@@ -91,16 +88,15 @@ public class MegaChatFileStorageAdapter extends RecyclerView.Adapter<MegaChatFil
     }
 
     public void toggleAllSelection(int pos) {
-        log("*********ADAPTER: toggleAllSelection-> "+pos);
         final int positionToflip = pos;
 
         if (selectedItems.get(pos, false)) {
             selectedItems.delete(pos);
-            log("******selectedItems: "+selectedItems.size());
+            ((ChatFileStorageFragment) fragment).removePosition(pos);
 
         }else {
             selectedItems.put(pos, true);
-            log("******selectedItems: "+selectedItems.size());
+            ((ChatFileStorageFragment) fragment).addPosition(pos);
 
         }
         log("adapter type is GRID");
@@ -129,8 +125,6 @@ public class MegaChatFileStorageAdapter extends RecyclerView.Adapter<MegaChatFil
     }
 
     public List<Integer> getSelectedItems() {
-        log("*********ADAPTER: getSelectedItems");
-
         List<Integer> items = new ArrayList<Integer>(selectedItems.size());
         for (int i = 0; i < selectedItems.size(); i++) {
             items.add(selectedItems.keyAt(i));
@@ -310,7 +304,6 @@ public class MegaChatFileStorageAdapter extends RecyclerView.Adapter<MegaChatFil
 
     @Override
     public boolean onLongClick(View view) {
-        log("*******ADAPTER: OnLongCLick");
         ((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
         ViewHolderBrowser holder = (ViewHolderBrowser) view.getTag();
@@ -329,8 +322,6 @@ public class MegaChatFileStorageAdapter extends RecyclerView.Adapter<MegaChatFil
     }
 
     public void setMultipleSelect(boolean multipleSelect) {
-        log("*********ADAPTER: setMultipleSelect-> "+multipleSelect);
-
         if (this.multipleSelect != multipleSelect) {
             this.multipleSelect = multipleSelect;
         }

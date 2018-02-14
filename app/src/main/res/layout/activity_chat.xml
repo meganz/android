@@ -157,6 +157,7 @@
                             android:layout_height="wrap_content"
                             android:background="@null"
                             android:tint="@color/transparent_black"
+                            android:layout_marginRight="30dp"
                             android:src="@drawable/ic_pick_cloud_drive"
                             android:layout_gravity="center_vertical"/>
 
