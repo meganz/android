@@ -6,6 +6,7 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -62,6 +63,7 @@ import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
+import nz.mega.sdk.MegaEvent;
 import nz.mega.sdk.MegaGlobalListenerInterface;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaNodeList;
@@ -401,6 +403,12 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 
 		bottomLayout = (RelativeLayout) findViewById(R.id.chat_image_viewer_layout_bottom);
 		fileNameTextView = (TextView) findViewById(R.id.chat_full_image_viewer_file_name);
+		if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+			fileNameTextView.setMaxWidth(Util.scaleWidthPx(300, outMetrics));
+		}
+		else{
+			fileNameTextView.setMaxWidth(Util.scaleWidthPx(300, outMetrics));
+		}
 		fileNameTextView.setText(messages.get(positionG).getMegaNodeList().get(0).getName());
 
 		((MegaApplication) getApplication()).sendSignalPresenceActivity();
@@ -833,6 +841,11 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 
 	@Override
 	public void onAccountUpdate(MegaApiJava api) {}
+
+	@Override
+	public void onEvent(MegaApiJava api, MegaEvent event) {
+
+	}
 
 	@Override
 	public void onContactRequestsUpdate(MegaApiJava api, ArrayList<MegaContactRequest> requests) {}

@@ -245,8 +245,6 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 							chatSettings = dbH.getChatSettings();
 							if (ret == MegaChatApi.INIT_NO_CACHE) {
 								log("condition ret == MegaChatApi.INIT_NO_CACHE");
-								megaApi.invalidateCache();
-
 							} else if (ret == MegaChatApi.INIT_ERROR) {
 								log("condition ret == MegaChatApi.INIT_ERROR");
 								if (chatSettings == null) {
@@ -605,6 +603,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 						log("Pdf file");
 						Intent pdfIntent = new Intent(this, PdfViewerActivityLollipop.class);
 						pdfIntent.putExtra("APP", true);
+						pdfIntent.putExtra("HANDLE", currentDocument.getHandle());
 						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && !externalFile) {
 							pdfIntent.setDataAndType(FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
 						}

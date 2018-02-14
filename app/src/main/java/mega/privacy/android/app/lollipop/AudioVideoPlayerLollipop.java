@@ -86,6 +86,7 @@ import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.MimeTypeMime;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerActivity;
+import mega.privacy.android.app.receivers.NetworkStateReceiver;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
 import nz.mega.sdk.MegaApiAndroid;
@@ -102,7 +103,7 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaTransferListenerInterface;
 
-public class AudioVideoPlayerLollipop extends PinActivityLollipop implements VideoRendererEventListener, MegaChatRequestListenerInterface, MegaTransferListenerInterface, AudioRendererEventListener {
+public class AudioVideoPlayerLollipop extends PinActivityLollipop implements VideoRendererEventListener, MegaChatRequestListenerInterface, MegaTransferListenerInterface, AudioRendererEventListener{
 
     public static int REQUEST_CODE_SELECT_CHAT = 1005;
     public static int REQUEST_CODE_SELECT_LOCAL_FOLDER = 1004;
@@ -525,16 +526,9 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
             downloadIcon.setVisible(false);
         }
 
-        Drawable share = getResources().getDrawable(R.drawable.ic_social_share_white);
-        share.setColorFilter(getResources().getColor(R.color.white), PorterDuff.Mode.SRC_ATOP);
-        shareIcon.setIcon(share);
+        propertiesIcon = menu.findItem(R.id.full_video_viewer_properties);
 
-        Drawable download = getResources().getDrawable(R.drawable.ic_download_white);
-        download.setColorFilter(getResources().getColor(R.color.white), PorterDuff.Mode.SRC_ATOP);
-        downloadIcon.setIcon(download);
-
-        propertiesIcon = menu.findItem(R.id.full_image_viewer_properties);
-        chatIcon = menu.findItem(R.id.full_image_viewer_chat);
+        chatIcon = menu.findItem(R.id.full_video_viewer_chat);
 
         return super.onCreateOptionsMenu(menu);
     }
