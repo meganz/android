@@ -23,6 +23,7 @@ import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.graphics.Shader.TileMode;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -195,6 +196,7 @@ import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
+import nz.mega.sdk.MegaEvent;
 import nz.mega.sdk.MegaGlobalListenerInterface;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
@@ -216,7 +218,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 	public long transferCallback = 0;
 
-	String regex = "[*|\\?:\"<>\\{\\}\\\\\\/]";
+	String regex = "[*|\\?:\"<>\\\\\\\\/]";
 
 	TransfersBottomSheetDialogFragment transfersBottomSheet = null;
 
@@ -5420,7 +5422,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 						//Hide
 						searchByDate.setVisible(false);
-						upgradeAccountMenuItem.setVisible(true);
+						upgradeAccountMenuItem.setVisible(false);
 						pauseTransfersMenuIcon.setVisible(false);
 						playTransfersMenuIcon.setVisible(false);
 						addContactMenuItem.setVisible(false);
@@ -13374,6 +13376,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 
 		}
+	}
+
+	@Override
+	public void onEvent(MegaApiJava api, MegaEvent event) {
+
 	}
 
 	public void updateMyEmail(String email){

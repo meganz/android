@@ -4347,7 +4347,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                                             msg.setInfoToShow(AndroidMegaChatMessage.CHAT_ADAPTER_SHOW_TIME);
                                         }
                                         else{
-                                            msg.setInfoToShow(AndroidMegaChatMessage.CHAT_ADAPTER_SHOW_NOTHING);
+                                            msg.setInfoToShow(AndroidMegaChatMessage.CHAT_ADAPTER_SHOW_TIME);
                                         }
                                     }
 

@@ -5,6 +5,7 @@ import android.app.ActivityManager;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Build;
@@ -20,6 +21,8 @@ import android.support.v7.view.ActionMode;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
+import android.text.Spanned;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Display;
@@ -363,8 +366,29 @@ public class ContactFileListFragmentLollipop extends Fragment{
 				emptyImageView.setVisibility(View.VISIBLE);
 				emptyTextView.setVisibility(View.VISIBLE);
 				listView.setVisibility(View.GONE);
-				emptyImageView.setImageResource(R.drawable.ic_empty_folder);
-				emptyTextView.setText(R.string.file_browser_empty_folder);
+//				emptyImageView.setImageResource(R.drawable.ic_empty_folder);
+//				emptyTextView.setText(R.string.file_browser_empty_folder);
+
+				if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+					emptyImageView.setImageResource(R.drawable.incoming_empty_landscape);
+				}else{
+					emptyImageView.setImageResource(R.drawable.incoming_shares_empty);
+				}
+				String textToShow = String.format(context.getString(R.string.context_empty_contacts), getString(R.string.context_empty_incoming));
+				try{
+					textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
+					textToShow = textToShow.replace("[/A]", "</font>");
+					textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
+					textToShow = textToShow.replace("[/B]", "</font>");
+				}
+				catch (Exception e){}
+				Spanned result = null;
+				if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+					result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
+				} else {
+					result = Html.fromHtml(textToShow);
+				}
+				emptyTextView.setText(result);
 			}
 
 			if (adapter == null) {
@@ -427,8 +451,29 @@ public class ContactFileListFragmentLollipop extends Fragment{
 					emptyImageView.setImageResource(R.drawable.ic_empty_cloud_drive);
 					emptyTextView.setText(R.string.file_browser_empty_cloud_drive);
 				} else {
-					emptyImageView.setImageResource(R.drawable.ic_empty_folder);
-					emptyTextView.setText(R.string.file_browser_empty_folder);
+//					emptyImageView.setImageResource(R.drawable.ic_empty_folder);
+//					emptyTextView.setText(R.string.file_browser_empty_folder);
+
+					if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+						emptyImageView.setImageResource(R.drawable.incoming_empty_landscape);
+					}else{
+						emptyImageView.setImageResource(R.drawable.incoming_shares_empty);
+					}
+					String textToShow = String.format(context.getString(R.string.context_empty_contacts), getString(R.string.context_empty_incoming));
+					try{
+						textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
+						textToShow = textToShow.replace("[/A]", "</font>");
+						textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
+						textToShow = textToShow.replace("[/B]", "</font>");
+					}
+					catch (Exception e){}
+					Spanned result = null;
+					if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+						result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
+					} else {
+						result = Html.fromHtml(textToShow);
+					}
+					emptyTextView.setText(result);
 				}
 			}
 			else{
@@ -570,8 +615,32 @@ public class ContactFileListFragmentLollipop extends Fragment{
 					listView.setVisibility(View.GONE);
 					emptyImageView.setVisibility(View.VISIBLE);
 					emptyTextView.setVisibility(View.VISIBLE);
-					emptyImageView.setImageResource(R.drawable.ic_empty_folder);
-					emptyTextView.setText(R.string.file_browser_empty_folder);
+					//******
+//					emptyImageView.setImageResource(R.drawable.ic_empty_folder);
+//					emptyTextView.setText(R.string.file_browser_empty_folder);
+
+					if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+						emptyImageView.setImageResource(R.drawable.incoming_empty_landscape);
+					}else{
+						emptyImageView.setImageResource(R.drawable.incoming_shares_empty);
+					}
+					String textToShow = String.format(context.getString(R.string.context_empty_contacts), getString(R.string.context_empty_incoming));
+					try{
+						textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
+						textToShow = textToShow.replace("[/A]", "</font>");
+						textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
+						textToShow = textToShow.replace("[/B]", "</font>");
+					}
+					catch (Exception e){}
+					Spanned result = null;
+					if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+						result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
+					} else {
+						result = Html.fromHtml(textToShow);
+					}
+					emptyTextView.setText(result);
+
+
 				} else {
 					listView.setVisibility(View.VISIBLE);
 					emptyImageView.setVisibility(View.GONE);
