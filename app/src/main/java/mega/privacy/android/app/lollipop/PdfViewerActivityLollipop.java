@@ -865,14 +865,19 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
             log("Send "+nodeHandles.length+" nodes");
 
             countChat = chatHandles.length;
-            if(countChat==1){
-                megaChatApi.attachNode(chatHandles[0], nodeHandles[0], this);
-            }
-            else if(countChat>1){
-
-                for(int i=0; i<chatHandles.length; i++){
-                    megaChatApi.attachNode(chatHandles[i], nodeHandles[0], this);
+            if (megaChatApi != null) {
+                if(countChat==1){
+                    megaChatApi.attachNode(chatHandles[0], nodeHandles[0], this);
                 }
+                else if(countChat>1){
+
+                    for(int i=0; i<chatHandles.length; i++){
+                        megaChatApi.attachNode(chatHandles[i], nodeHandles[0], this);
+                    }
+                }
+            }
+            else{
+                log("megaChatApi is Null - cannot attach nodes");
             }
         }
 
