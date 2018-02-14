@@ -507,6 +507,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         fileStorageLayout = (RelativeLayout) findViewById(R.id.relative_layout_file_storage);
 
         fileStorageLayout.setVisibility(View.GONE);
+
 //        imageView = (ImageView) findViewById(R.id.imageView);
        fragmentContainerFileStorage = (FrameLayout) findViewById(R.id.fragment_container_file_storage);
        // GridView gallery = (GridView) findViewById(R.id.galleryGridView);
@@ -596,7 +597,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         textChat.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                fileStorageLayout.setVisibility(View.GONE);
 
                 if (emojiKeyboardShown){
                     keyboardButton.setImageResource(R.drawable.ic_emoticon_white);
@@ -604,6 +604,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 }
                 if(fileStorageLayout.isShown()){
                     fileStorageLayout.setVisibility(View.GONE);
+
                 }
                 return false;
             }
@@ -613,7 +614,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
             @Override
             public boolean onLongClick(View v) {
-                fileStorageLayout.setVisibility(View.GONE);
 
                 if (emojiKeyboardShown){
                     keyboardButton.setImageResource(R.drawable.ic_emoticon_white);
@@ -1558,6 +1558,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
         log("onActivityResult, resultCode: " + resultCode);
         if (requestCode == Constants.REQUEST_ADD_PARTICIPANTS && resultCode == RESULT_OK) {
+            log("***** 1");
             if (intent == null) {
                 log("Return.....");
                 return;
@@ -1586,6 +1587,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }
         }
         else if (requestCode == Constants.REQUEST_CODE_SELECT_IMPORT_FOLDER && resultCode == RESULT_OK) {
+            log("***** 2");
+
             if(!Util.isOnline(this)) {
                 try{
                     statusDialog.dismiss();
@@ -1636,6 +1639,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }
         }
         else if (requestCode == Constants.REQUEST_SEND_CONTACTS && resultCode == RESULT_OK) {
+            log("***** 3");
+
             final ArrayList<String> contactsData = intent.getStringArrayListExtra(AddContactActivityLollipop.EXTRA_CONTACTS);
             if (contactsData != null) {
                 MegaHandleList handleList = MegaHandleList.createInstance();
@@ -1653,6 +1658,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }
         }
         else if (requestCode == Constants.REQUEST_CODE_SELECT_FILE && resultCode == RESULT_OK) {
+            log("***** 4");
+
             if (intent == null) {
                 log("Return.....");
                 return;
@@ -1679,6 +1686,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             log("---- no more files to send");
         }
         else if (requestCode == Constants.REQUEST_CODE_GET && resultCode == RESULT_OK) {
+            log("*****5");
 
             if (intent == null) {
                 log("Return.....");
@@ -1700,6 +1708,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             statusDialog = temp;
         }
         else if (requestCode == REQUEST_CODE_SELECT_CHAT && resultCode == RESULT_OK) {
+            log("***** 6");
 
             if(!Util.isOnline(this)) {
                 try{
@@ -1781,6 +1790,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }
         }
         else if (requestCode == Constants.TAKE_PHOTO_CODE && resultCode == RESULT_OK) {
+            log("***** 7");
+
             if (resultCode == Activity.RESULT_OK) {
                 String filePath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.temporalPicDIR + "/picture.jpg";
                 File imgFile = new File(filePath);
@@ -1792,12 +1803,14 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 File newFile = new File(newPath);
                 imgFile.renameTo(newFile);
 
-                uploadTakePicture(newPath);
+                uploadPicture(newPath);
             } else {
                 log("TAKE_PHOTO_CODE--->ERROR!");
             }
 
         }else{
+            log("***** 8");
+
             log("Error onActivityResult");
         }
 
@@ -1870,8 +1883,11 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             removeEmojiconFragment();
         }else if(fileStorageLayout.isShown()){
             fileStorageLayout.setVisibility(View.GONE);
-        }else  if(fileStorageLayout.isShown()){
-            fileStorageLayout.setVisibility(View.GONE);
+            if(adapter != null){
+                log("####Fragment != null");
+
+                adapter.clearSelections();
+            }
         }else{
             finish();
         }
@@ -1898,12 +1914,16 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 //			}
             case R.id.send_message_icon_chat:{
                 log("click on Send message");
+                log("####click Button send");
+
 //                fileStorageLayout.setVisibility(View.GONE);
 
                 writingLayout.setClickable(false);
                 String text = textChat.getText().toString();
 
                 if(!text.isEmpty()){
+                    log("####text non Empty");
+
                     if(editingMessage){
                         editMessage(text);
                         log("Edited message: "+text);
@@ -1919,14 +1939,11 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     textChat.getText().clear();
                     textChat.setText("", TextView.BufferType.EDITABLE);
                 }
-//                        if(FileStorageF == null){
-//
-//                    //*********************+
-//                            int elemntsSelected = FileStorageF.getItemCount();
-//
-//                        }
+                if(FileStorageF != null){
+                    log("####Fragment != null");
 
-
+                    FileStorageF.sendImages();
+                }
                 break;
             }
             case R.id.keyboard_icon_chat:{
@@ -1973,6 +1990,11 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
                 if(fileStorageLayout.isShown()){
                     fileStorageLayout.setVisibility(View.GONE);
+                    if(adapter != null){
+                        log("####Fragment != null");
+
+                        adapter.clearSelections();
+                    }
                 }
                 if (emojiKeyboardShown) {
                     keyboardButton.setImageResource(R.drawable.ic_emoticon_white);
@@ -2017,6 +2039,11 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             case R.id.send_contact_icon_chat:{
                 if(fileStorageLayout.isShown()){
                     fileStorageLayout.setVisibility(View.GONE);
+                    if(adapter != null){
+                        log("####Fragment != null");
+
+                        adapter.clearSelections();
+                    }
                 }
                 if (emojiKeyboardShown) {
                     keyboardButton.setImageResource(R.drawable.ic_emoticon_white);
@@ -2037,6 +2064,11 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             case R.id.pick_file_system_icon_chat:{
                 if(fileStorageLayout.isShown()){
                     fileStorageLayout.setVisibility(View.GONE);
+                    if(adapter != null){
+                        log("####Fragment != null");
+
+                        adapter.clearSelections();
+                    }
                 }
                 if (emojiKeyboardShown) {
                     keyboardButton.setImageResource(R.drawable.ic_emoticon_white);
@@ -2057,6 +2089,11 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             case R.id.pick_cloud_drive_icon_chat:{
                 if(fileStorageLayout.isShown()){
                     fileStorageLayout.setVisibility(View.GONE);
+                    if(adapter != null){
+                        log("####Fragment != null");
+
+                        adapter.clearSelections();
+                    }
                 }
 
                 if (emojiKeyboardShown) {
@@ -2093,6 +2130,11 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
                 if(fileStorageLayout.isShown()){
                     fileStorageLayout.setVisibility(View.GONE);
+                    if(adapter != null){
+                        log("####Fragment != null");
+
+                        adapter.clearSelections();
+                    }
 
                 }else{
                     fileStorageLayout.setVisibility(View.VISIBLE);
@@ -5050,6 +5092,11 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
         setLastMessageSeen();
        fileStorageLayout.setVisibility(View.GONE);
+       if(adapter != null){
+           log("####Fragment != null");
+
+           adapter.clearSelections();
+       }
 
         if (emojiKeyboardShown){
             keyboardButton.setImageResource(R.drawable.ic_emoticon_white);
@@ -5161,8 +5208,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         startActivityForResult(cameraIntent, Constants.TAKE_PHOTO_CODE);
     }
 
-    public void uploadTakePicture(String imagePath){
-        log("==========uploadTakePicture");
+    public void uploadPicture(String imagePath){
+        log("==========uploadPicture");
 
         Intent intent = new Intent(this, ChatUploadService.class);
         File selfie = new File(imagePath);
