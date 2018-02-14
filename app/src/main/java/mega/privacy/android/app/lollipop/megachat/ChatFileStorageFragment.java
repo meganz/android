@@ -53,9 +53,6 @@ public class ChatFileStorageFragment extends Fragment {
     public static int GRID_LARGE = 3;
     public static int PADDING_GRID_LARGE = 6;
 
-    public static int GRID_SMALL = 7;
-
-
     MegaApiAndroid megaApi;
     MegaChatApiAndroid megaChatApi;
 
@@ -72,13 +69,12 @@ public class ChatFileStorageFragment extends Fragment {
 
     public ActionMode actionMode;
 
-   // LinearLayoutManager mLayoutManager;
     CustomizedGridLayoutManager gridLayoutManager;
     MegaNode selectedNode = null;
 
     ArrayList<Bitmap> thumBitmap = new ArrayList<>();
     ArrayList<String> imagesPath = new ArrayList<>();
-    ArrayList<String> imagesSelected = new ArrayList<>();
+    ArrayList<Integer> posSelected = new ArrayList<>();
     String downloadLocationDefaultPath = Util.downloadDIR;
 
     int count = 0;
@@ -239,19 +235,13 @@ public class ChatFileStorageFragment extends Fragment {
     }
 
     public void itemClick(int position) {
-
         ((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
         if (adapter.isMultipleSelect()){
             adapter.toggleSelection(position);
         }
         else{
-            log("********************* SEND IMAGE");
-
             String filePath = imagesPath.get(position);
-            log("****** Position: "+position+", filePath"+filePath);
-
             ((ChatActivityLollipop) getActivity()).uploadTakePicture(filePath);
-
         }
     }
 
@@ -322,21 +312,22 @@ public class ChatFileStorageFragment extends Fragment {
         };
 
         Uri images = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
-        Cursor cur = getActivity().managedQuery(images, projection, "", null, "");
+        Cursor cur1 = getActivity().managedQuery(images, projection, "", null, "");
 
-        if (cur.moveToFirst()) {
+        if (cur1.moveToFirst()) {
 
-            int dataColumn = cur.getColumnIndex(MediaStore.Images.Media.DATA);
+            int dataColumn = cur1.getColumnIndex(MediaStore.Images.Media.DATA);
             do {
-                Cursor ca = getActivity().getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, new String[] { MediaStore.MediaColumns._ID }, MediaStore.MediaColumns.DATA + "=?", new String[] {cur.getString(dataColumn)}, null);
+                Cursor cur2 = getActivity().getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, new String[] { MediaStore.MediaColumns._ID }, MediaStore.MediaColumns.DATA + "=?", new String[] {cur1.getString(dataColumn)}, null);
 
-                if (ca != null && ca.moveToFirst()) {
-                    int id = ca.getInt(ca.getColumnIndex(MediaStore.MediaColumns._ID));
+                if (cur2 != null && cur2.moveToFirst()) {
+                    int id = cur2.getInt(cur2.getColumnIndex(MediaStore.MediaColumns._ID));
                     thumBitmap.add(MediaStore.Images.Thumbnails.getThumbnail(getActivity().getContentResolver(), id, MediaStore.Images.Thumbnails.MINI_KIND, null ));
                 }
-            } while (cur.moveToNext());
+                cur2.close();
+            } while (cur1.moveToNext());
         }
-        cur.close();
+        cur1.close();
 
     }
 
@@ -347,15 +338,15 @@ public class ChatFileStorageFragment extends Fragment {
         };
 
         Uri images1 = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
-        Cursor cur1 = getActivity().managedQuery(images1, projection1, "", null, "");
+        Cursor cur3 = getActivity().managedQuery(images1, projection1, "", null, "");
 
-        if (cur1.moveToFirst()) {
-            int dataColumn = cur1.getColumnIndex(MediaStore.Images.Media.DATA);
+        if (cur3.moveToFirst()) {
+            int dataColumn = cur3.getColumnIndex(MediaStore.Images.Media.DATA);
             do {
-                imagesPath.add(cur1.getString(dataColumn));
-            } while (cur1.moveToNext());
+                imagesPath.add(cur3.getString(dataColumn));
+            } while (cur3.moveToNext());
         }
-        cur1.close();
+        cur3.close();
         count = imagesPath.size();
     }
 
@@ -370,43 +361,23 @@ public class ChatFileStorageFragment extends Fragment {
     }
 
 
-//    public void removeItemsSelected(int pos){
-//        imagesSelected.remove(pos);
-//    }
-//
-//    public void addItemSelected(){
-//
+//    public void removeItemSelected(Integer pos){
+//        posSelected.remove(pos);
+//        log("*******REMOVE->imagesSELECTED: "+posSelected.size());
 //    }
 
-//    public  void setItemsSelected(String path, boolean flag){
-//        if(flag){
-//            imagesSelected.delete(pos);
-//        }else{
-//
-//        }
-//
-//        if (imagesSelected.get(pos, false)) {
-//            log("delete pos: "+pos);
-//            selectedItems.delete(pos);
-//        }else {
-//            log("PUT pos: "+pos);
-//            selectedItems.put(pos, true);
-//        }
-//        notifyItemChanged(pos);
-//
-//        if (selectedItems.size() <= 0){
-//            ((ChatFileStorageFragment) fragment).hideMultipleSelect();
-//        }
-//
-//
-//
-////        String filePath = imagesPath.get(position);
-////        log("****** Position: "+position+", filePath"+filePath);
-////
-////        ((ChatActivityLollipop) getActivity()).uploadTakePicture(filePath);
-//
-//    }
+    public void removePosition(Integer pos){
+        posSelected.remove(pos);
+        for(Integer element:posSelected){
+            log("**** poSelected: "+element);
+        }
+    }
 
-
+    public void addPosition(Integer pos){
+        posSelected.add(pos);
+        for(Integer element:posSelected){
+            log("**** poSelected: "+element);
+        }
+    }
 
 }
