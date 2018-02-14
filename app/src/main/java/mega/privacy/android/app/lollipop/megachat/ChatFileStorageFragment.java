@@ -48,8 +48,6 @@ public class ChatFileStorageFragment extends Fragment {
     MegaChatFileStorageAdapter adapter;
     ChatFileStorageFragment fileStorageFragment = this;
 
-    public static int GRID_WIDTH = 154;
-
     public static int GRID_LARGE = 3;
     public static int PADDING_GRID_LARGE = 6;
 
@@ -70,14 +68,13 @@ public class ChatFileStorageFragment extends Fragment {
     public ActionMode actionMode;
 
     CustomizedGridLayoutManager gridLayoutManager;
-    MegaNode selectedNode = null;
 
     ArrayList<Bitmap> thumBitmap = new ArrayList<>();
     ArrayList<String> imagesPath = new ArrayList<>();
     ArrayList<Integer> posSelected = new ArrayList<>();
     String downloadLocationDefaultPath = Util.downloadDIR;
 
-    int count = 0;
+    private static int firstVisibleInListview;
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
@@ -151,8 +148,6 @@ public class ChatFileStorageFragment extends Fragment {
 
         ((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
-
-
         View v = inflater.inflate(R.layout.fragment_filestorage, container, false);
 
         recyclerView = (RecyclerView) v.findViewById(R.id.file_storage_grid_view_browser);
@@ -176,24 +171,19 @@ public class ChatFileStorageFragment extends Fragment {
         gridWidth = realGridWidth - (padding * 2);
         numberOfCells = GRID_LARGE;
 
-        getThumbnailPath();
-        getImagesPath();
+//        getThumbnailPath();
+//        getImagesPath();
+            getPaths();
 
         if (adapter == null){
             adapter = new MegaChatFileStorageAdapter(context, this, recyclerView, aB, thumBitmap, numberOfCells, gridWidth);
-
             adapter.setHasStableIds(true);
-
 
         }else{
             adapter.setNumberOfCells(numberOfCells, gridWidth);
-
             adapter.setNodes(thumBitmap);
         }
-
         adapter.setMultipleSelect(false);
-
-
 
         mLayoutManager = new GridLayoutManager(context, numberOfCells);
         ((GridLayoutManager) mLayoutManager).setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
@@ -202,7 +192,6 @@ public class ChatFileStorageFragment extends Fragment {
                 return adapter.getSpanSizeOfPosition(position);
             }
         });
-
 
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setAdapter(adapter);
@@ -215,6 +204,30 @@ public class ChatFileStorageFragment extends Fragment {
             recyclerView.setVisibility(View.VISIBLE);
         }
 
+//        firstVisibleInListview = ((GridLayoutManager) mLayoutManager).findFirstVisibleItemPosition();
+//
+//        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+//            int ydy = 0;
+//            @Override
+//            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+//                super.onScrollStateChanged(recyclerView, newState);
+//
+//            }
+//
+//            @Override
+//            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+//                super.onScrolled(recyclerView, dx, dy);
+//
+//                int currentFirstVisible = ((GridLayoutManager) mLayoutManager).findFirstVisibleItemPosition();
+//
+//                if(currentFirstVisible > firstVisibleInListview)
+//                    log("****************UP");
+//                else
+//                    log("****************DOWN");
+//
+//                firstVisibleInListview = currentFirstVisible;
+//            }
+//        });
             return v;
     }
 
@@ -241,7 +254,7 @@ public class ChatFileStorageFragment extends Fragment {
         }
         else{
             String filePath = imagesPath.get(position);
-            ((ChatActivityLollipop) getActivity()).uploadTakePicture(filePath);
+            ((ChatActivityLollipop) getActivity()).uploadPicture(filePath);
         }
     }
 
@@ -306,7 +319,7 @@ public class ChatFileStorageFragment extends Fragment {
         return false;
     }
 
-    public void getThumbnailPath(){
+    public void getPaths(){
         String[] projection = new String[]{
                 MediaStore.Images.Media.DATA,
         };
@@ -318,6 +331,8 @@ public class ChatFileStorageFragment extends Fragment {
 
             int dataColumn = cur1.getColumnIndex(MediaStore.Images.Media.DATA);
             do {
+                imagesPath.add(cur1.getString(dataColumn));
+
                 Cursor cur2 = getActivity().getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, new String[] { MediaStore.MediaColumns._ID }, MediaStore.MediaColumns.DATA + "=?", new String[] {cur1.getString(dataColumn)}, null);
 
                 if (cur2 != null && cur2.moveToFirst()) {
@@ -328,28 +343,51 @@ public class ChatFileStorageFragment extends Fragment {
             } while (cur1.moveToNext());
         }
         cur1.close();
-
     }
 
-    public void getImagesPath(){
-
-        String[] projection1 = new String[]{
-                MediaStore.Images.Media.DATA,
-        };
-
-        Uri images1 = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
-        Cursor cur3 = getActivity().managedQuery(images1, projection1, "", null, "");
-
-        if (cur3.moveToFirst()) {
-            int dataColumn = cur3.getColumnIndex(MediaStore.Images.Media.DATA);
-            do {
-                imagesPath.add(cur3.getString(dataColumn));
-            } while (cur3.moveToNext());
-        }
-        cur3.close();
-        count = imagesPath.size();
-    }
-
+//    public void getThumbnailPath(){
+//        String[] projection = new String[]{
+//                MediaStore.Images.Media.DATA,
+//        };
+//
+//        Uri images = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+//        Cursor cur1 = getActivity().managedQuery(images, projection, "", null, "");
+//
+//        if (cur1.moveToFirst()) {
+//
+//            int dataColumn = cur1.getColumnIndex(MediaStore.Images.Media.DATA);
+//            do {
+//                Cursor cur2 = getActivity().getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, new String[] { MediaStore.MediaColumns._ID }, MediaStore.MediaColumns.DATA + "=?", new String[] {cur1.getString(dataColumn)}, null);
+//
+//                if (cur2 != null && cur2.moveToFirst()) {
+//                    int id = cur2.getInt(cur2.getColumnIndex(MediaStore.MediaColumns._ID));
+//                    thumBitmap.add(MediaStore.Images.Thumbnails.getThumbnail(getActivity().getContentResolver(), id, MediaStore.Images.Thumbnails.MINI_KIND, null ));
+//                }
+//                cur2.close();
+//            } while (cur1.moveToNext());
+//        }
+//        cur1.close();
+//
+//    }
+//
+//    public void getImagesPath(){
+//
+//        String[] projection1 = new String[]{
+//                MediaStore.Images.Media.DATA,
+//        };
+//
+//        Uri images1 = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+//        Cursor cur3 = getActivity().managedQuery(images1, projection1, "", null, "");
+//
+//        if (cur3.moveToFirst()) {
+//            int dataColumn = cur3.getColumnIndex(MediaStore.Images.Media.DATA);
+//            do {
+//                imagesPath.add(cur3.getString(dataColumn));
+//            } while (cur3.moveToNext());
+//        }
+//        cur3.close();
+//    }
+//
     public void sendButton(boolean flag){
         ((ChatActivityLollipop) getActivity()).activateSendButton(flag);
         if(flag){
@@ -359,12 +397,6 @@ public class ChatFileStorageFragment extends Fragment {
 
 
     }
-
-
-//    public void removeItemSelected(Integer pos){
-//        posSelected.remove(pos);
-//        log("*******REMOVE->imagesSELECTED: "+posSelected.size());
-//    }
 
     public void removePosition(Integer pos){
         posSelected.remove(pos);
@@ -377,6 +409,23 @@ public class ChatFileStorageFragment extends Fragment {
         posSelected.add(pos);
         for(Integer element:posSelected){
             log("**** poSelected: "+element);
+        }
+    }
+
+    public void sendImages(){
+        log("####sendImages");
+        String filePath;
+        if(isMultipleselect()){
+            log("####sendImages-isMultipleselect");
+
+            for(Integer element:posSelected){
+                log("####sendImages-element: "+element);
+
+                filePath = imagesPath.get(element);
+               ((ChatActivityLollipop) getActivity()).uploadPicture(filePath);
+            }
+            adapter.clearSelections();
+
         }
     }
 
