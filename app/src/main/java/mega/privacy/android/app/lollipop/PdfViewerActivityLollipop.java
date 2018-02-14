@@ -206,7 +206,10 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
 
         app = (MegaApplication)getApplication();
         megaApi = app.getMegaApi();
-        megaChatApi = app.getMegaChatApi();
+
+        if(Util.isChatEnabled()){
+            megaChatApi = app.getMegaChatApi();
+        }
 
 //        if(megaApi==null||megaApi.getRootNode()==null){
 //            log("Refresh session - sdk");
