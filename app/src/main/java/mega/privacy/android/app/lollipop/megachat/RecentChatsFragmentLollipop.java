@@ -1180,21 +1180,26 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
                 log("The user has a one to one chat: "+chatHandleToUpdate);
 
                 int indexToReplace = -1;
-                ListIterator<MegaChatListItem> itrReplace = chats.listIterator();
-                while (itrReplace.hasNext()) {
-                    MegaChatListItem chat = itrReplace.next();
-                    if (chat != null) {
-                        if (chat.getChatId() == chatHandleToUpdate) {
-                            indexToReplace = itrReplace.nextIndex() - 1;
+                if(chats!=null){
+                    ListIterator<MegaChatListItem> itrReplace = chats.listIterator();
+                    while (itrReplace.hasNext()) {
+                        MegaChatListItem chat = itrReplace.next();
+                        if (chat != null) {
+                            if (chat.getChatId() == chatHandleToUpdate) {
+                                indexToReplace = itrReplace.nextIndex() - 1;
+                                break;
+                            }
+                        } else {
                             break;
                         }
-                    } else {
-                        break;
+                    }
+                    if (indexToReplace != -1) {
+                        log("Index to replace: " + indexToReplace);
+                        onStatusChange(indexToReplace, userHandle, status);
                     }
                 }
-                if (indexToReplace != -1) {
-                    log("Index to replace: " + indexToReplace);
-                    onStatusChange(indexToReplace, userHandle, status);
+                else{
+                    log("No chat list loaded");
                 }
             }
         }
