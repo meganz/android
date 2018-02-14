@@ -643,7 +643,12 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
 
         if (inside){
             propertiesMenuItem.setVisible(true);
-            chatMenuItem.setVisible(true);
+            if(Util.isChatEnabled()){
+                chatMenuItem.setVisible(true);
+            }
+            else{
+                chatMenuItem.setVisible(false);
+            }
         }
         else {
             propertiesMenuItem.setVisible(false);
