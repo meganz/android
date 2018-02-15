@@ -165,6 +165,10 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 	ImageView publicLinkIcon;
 	Button publicLinkButton;
 
+	RelativeLayout versionsLayout;
+	Button versionsButton;
+	View separatorVersions;
+
 //	ImageView publicLinkImage;
 	SwitchCompat offlineSwitch;
 
@@ -487,6 +491,22 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 		    //Modified Layout
 		    modifiedLayout = (RelativeLayout) findViewById(R.id.file_properties_modified_layout);
 			modifiedTextView = (TextView) findViewById(R.id.file_properties_info_data_modified);
+
+			//Versions Layout
+			versionsLayout = (RelativeLayout) findViewById(R.id.file_properties_versions_layout);
+			versionsButton = (Button) findViewById(R.id.file_properties_text_number_versions);
+			separatorVersions = (View) findViewById(R.id.separator_versions);
+
+			if(megaApi.hasVersions(node)){
+				versionsLayout.setVisibility(View.VISIBLE);
+				versionsButton.setText(String.format(getString(R.string.number_of_versions), megaApi.getNumVersions(node)));
+				versionsButton.setOnClickListener(this);
+				separatorVersions.setVisibility(View.VISIBLE);
+			}
+			else{
+				versionsLayout.setVisibility(View.GONE);
+				separatorVersions.setVisibility(View.GONE);
+			}
 
 		}
 		else{
@@ -1353,6 +1373,12 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 
 		switch (v.getId()) {
+			case R.id.file_properties_text_number_versions:{
+                Intent i = new Intent(this, VersionsFileActivity.class);
+                i.putExtra("handle", node.getHandle());
+                startActivity(i);
+				break;
+			}
 			case R.id.file_properties_link_button:{
 				log("copy link button");
 				if(Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
