@@ -175,7 +175,7 @@
                             android:layout_alignBottom="@+id/content_own_message_thumb_portrait"
                             android:layout_alignRight="@+id/content_own_message_thumb_portrait"
                             android:layout_marginBottom="5dp"
-                            android:layout_marginRight="5dp"
+                            android:layout_marginRight="10dp"
                             android:text="00:00"/>
 
                         <!--Image without preview-->
@@ -298,7 +298,7 @@
                                 android:layout_alignBottom="@+id/content_own_message_thumb_landscape"
                                 android:layout_alignRight="@+id/content_own_message_thumb_landscape"
                                 android:layout_marginBottom="5dp"
-                                android:layout_marginRight="5dp"
+                                android:layout_marginRight="10dp"
                                 android:text="00:00"/>
 
                             <!--Image without preview-->
@@ -702,7 +702,7 @@
                                 android:layout_alignBottom="@+id/content_contact_message_thumb_portrait"
                                 android:layout_alignRight="@+id/content_contact_message_thumb_portrait"
                                 android:layout_marginBottom="5dp"
-                                android:layout_marginRight="5dp"
+                                android:layout_marginRight="10dp"
                                 android:text="00:00"/>
 
                             <!--Image without preview-->
@@ -765,7 +765,7 @@
                                 android:layout_alignBottom="@+id/content_contact_message_thumb_landscape"
                                 android:layout_alignRight="@+id/content_contact_message_thumb_landscape"
                                 android:layout_marginBottom="5dp"
-                                android:layout_marginRight="5dp"
+                                android:layout_marginRight="10dp"
                                 android:text="00:00"/>
 
 

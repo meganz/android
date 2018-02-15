@@ -444,18 +444,19 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         WrapEmojiconTextView contentOwnMessageText;
 
         RoundedImageView contentOwnMessageThumbLand;
+        RelativeLayout gradientOwnMessageThumbLand;
+        ImageView videoIconOwnMessageThumbLand;
+        TextView videoTimecontentOwnMessageThumbLand;
+
         RoundedImageView contentOwnMessageThumbPort;
+        RelativeLayout gradientOwnMessageThumbPort;
+        ImageView videoIconOwnMessageThumbPort;
+        TextView videoTimecontentOwnMessageThumbPort;
+
         RelativeLayout contentOwnMessageFileLayout;
         ImageView contentOwnMessageFileThumb;
         TextView contentOwnMessageFileName;
         TextView contentOwnMessageFileSize;
-
-        RelativeLayout gradientOwnMessageThumbPort;
-        ImageView videoIconOwnMessageThumbPort;
-        TextView videoTimecontentOwnMessageThumbPort;
-        RelativeLayout gradientOwnMessageThumbLand;
-        ImageView videoIconOwnMessageThumbLand;
-        TextView videoTimecontentOwnMessageThumbLand;
 
         RelativeLayout contentOwnMessageContactLayout;
         RelativeLayout contentOwnMessageContactLayoutAvatar;
@@ -493,12 +494,11 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         WrapEmojiconTextView contentContactMessageText;
 
         RoundedImageView contentContactMessageThumbLand;
-        RoundedImageView contentContactMessageThumbPort;
-
         RelativeLayout gradientContactMessageThumbLand;
         ImageView videoIconContactMessageThumbLand;
         TextView videoTimecontentContactMessageThumbLand;
 
+        RoundedImageView contentContactMessageThumbPort;
         RelativeLayout gradientContactMessageThumbPort;
         ImageView videoIconContactMessageThumbPort;
         TextView videoTimecontentContactMessageThumbPort;
@@ -3910,6 +3910,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                         if(holder.userHandle == megaChatApi.getMyUserHandle()){
 
                             String name = holder.contentOwnMessageFileName.getText().toString();
+                            MegaNode node = megaApi.getNodeByHandle(handle);
+
                             log("Update my preview: "+name);
                             if (bitmap.getWidth() < bitmap.getHeight()) {
                                 log("Portrait");
@@ -3924,15 +3926,11 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                    holder.gradientOwnMessageThumbPort.setVisibility(View.VISIBLE);
                                    holder.videoIconOwnMessageThumbPort.setVisibility(View.VISIBLE);
 
-                                   MegaNode node = megaApi.getNodeByHandle(handle);
                                    if(node!=null){
                                        holder.videoTimecontentOwnMessageThumbPort.setText(timeVideo(node));
-//                                       node.getDuration();
                                        holder.videoTimecontentOwnMessageThumbPort.setVisibility(View.VISIBLE);
-
                                    }else{
                                        holder.videoTimecontentOwnMessageThumbPort.setVisibility(View.GONE);
-
                                    }
                                 }
                                 else{
@@ -3962,11 +3960,10 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                                     holder.gradientOwnMessageThumbLand.setVisibility(View.VISIBLE);
                                     holder.videoIconOwnMessageThumbLand.setVisibility(View.VISIBLE);
-                                    MegaNode node = megaApi.getNodeByHandle(handle);
+
                                     if(node!=null){
                                         holder.videoTimecontentOwnMessageThumbLand.setText(timeVideo(node));
                                         holder.videoTimecontentOwnMessageThumbLand.setVisibility(View.VISIBLE);
-//                                       node.getDuration();
                                     }else{
                                         holder.videoTimecontentOwnMessageThumbLand.setVisibility(View.GONE);
                                     }
@@ -3989,6 +3986,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                         else{
                             log("Update my contacts preview");
                             String name = holder.contentContactMessageFileName.getText().toString();
+                            MegaNode node = megaApi.getNodeByHandle(handle);
 
                             if (bitmap.getWidth() < bitmap.getHeight()) {
 
@@ -4002,7 +4000,14 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                 }else if(MimeTypeList.typeForName(name).isVideo()){
                                     holder.gradientContactMessageThumbPort.setVisibility(View.VISIBLE);
                                     holder.videoIconContactMessageThumbPort.setVisibility(View.VISIBLE);
-                                    holder.videoTimecontentContactMessageThumbPort.setVisibility(View.VISIBLE);
+
+                                    if(node!=null){
+                                        holder.videoTimecontentContactMessageThumbPort.setText(timeVideo(node));
+                                        holder.videoTimecontentContactMessageThumbPort.setVisibility(View.VISIBLE);
+                                    }else{
+                                        holder.videoTimecontentContactMessageThumbPort.setVisibility(View.GONE);
+                                    }
+
                                 }else{
                                     holder.iconContactTypeDocPortraitPreview.setVisibility(View.GONE);
                                 }
@@ -4050,7 +4055,13 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                 }else if(MimeTypeList.typeForName(name).isVideo()){
                                     holder.gradientContactMessageThumbLand.setVisibility(View.VISIBLE);
                                     holder.videoIconContactMessageThumbLand.setVisibility(View.VISIBLE);
-                                    holder.videoTimecontentContactMessageThumbLand.setVisibility(View.VISIBLE);
+
+                                    if(node!=null){
+                                        holder.videoTimecontentContactMessageThumbLand.setText(timeVideo(node));
+                                        holder.videoTimecontentContactMessageThumbLand.setVisibility(View.VISIBLE);
+                                    }else{
+                                        holder.videoTimecontentContactMessageThumbLand.setVisibility(View.GONE);
+                                    }
                                 }else{
                                     holder.iconContactTypeDocLandPreview.setVisibility(View.GONE);
                                 }
