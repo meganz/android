@@ -3871,7 +3871,17 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                 }else if (MimeTypeList.typeForName(name).isVideo()){
                                    holder.gradientOwnMessageThumbPort.setVisibility(View.VISIBLE);
                                    holder.videoIconOwnMessageThumbPort.setVisibility(View.VISIBLE);
-                                   holder.videoTimecontentOwnMessageThumbPort.setVisibility(View.VISIBLE);
+
+                                   MegaNode node = megaApi.getNodeByHandle(handle);
+                                   if(node!=null){
+                                       holder.videoTimecontentOwnMessageThumbPort.setText(timeVideo(node));
+//                                       node.getDuration();
+                                       holder.videoTimecontentOwnMessageThumbPort.setVisibility(View.VISIBLE);
+
+                                   }else{
+                                       holder.videoTimecontentOwnMessageThumbPort.setVisibility(View.GONE);
+
+                                   }
                                 }
                                 else{
                                     holder.iconOwnTypeDocPortraitPreview.setVisibility(View.GONE);
@@ -3900,7 +3910,14 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                                     holder.gradientOwnMessageThumbLand.setVisibility(View.VISIBLE);
                                     holder.videoIconOwnMessageThumbLand.setVisibility(View.VISIBLE);
-                                    holder.videoTimecontentOwnMessageThumbLand.setVisibility(View.VISIBLE);
+                                    MegaNode node = megaApi.getNodeByHandle(handle);
+                                    if(node!=null){
+                                        holder.videoTimecontentOwnMessageThumbLand.setText(timeVideo(node));
+                                        holder.videoTimecontentOwnMessageThumbLand.setVisibility(View.VISIBLE);
+//                                       node.getDuration();
+                                    }else{
+                                        holder.videoTimecontentOwnMessageThumbLand.setVisibility(View.GONE);
+                                    }
                                 }
                                 else{
                                     holder.iconOwnTypeDocLandPreview.setVisibility(View.GONE);
