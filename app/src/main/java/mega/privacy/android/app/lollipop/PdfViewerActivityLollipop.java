@@ -207,6 +207,10 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
         app = (MegaApplication)getApplication();
         megaApi = app.getMegaApi();
 
+        if(Util.isChatEnabled()){
+            megaChatApi = app.getMegaChatApi();
+        }
+
 //        if(megaApi==null||megaApi.getRootNode()==null){
 //            log("Refresh session - sdk");
 //            Intent intentLogin = new Intent(this, LoginActivityLollipop.class);
@@ -374,6 +378,10 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
 
     private void loadLocalPDF() {
         log("loadLocalPDF loading: "+loading);
+
+//        if (loading && progressDialog!=null && !transferOverquota) {
+//            progressDialog.show();
+//        }
         try {
             pdfView.fromUri(uri)
                     .defaultPage(currentPage)
@@ -386,9 +394,6 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
                     .load();
         } catch (Exception e) {
 
-        }
-        if (loading && progressDialog!=null && !transferOverquota) {
-            progressDialog.show();
         }
     }
 
@@ -642,7 +647,12 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
 
         if (inside){
             propertiesMenuItem.setVisible(true);
-            chatMenuItem.setVisible(true);
+            if(Util.isChatEnabled()){
+                chatMenuItem.setVisible(true);
+            }
+            else{
+                chatMenuItem.setVisible(false);
+            }
         }
         else {
             propertiesMenuItem.setVisible(false);
@@ -661,6 +671,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
         switch(id) {
             case android.R.id.home: {
                 onBackPressed();
+                finish();
                 break;
             }
             case R.id.pdfviewer_share: {
@@ -669,6 +680,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
             }
             case R.id.pdfviewer_download: {
                 downloadFile();
+                finish();
                 break;
             }
             case R.id.pdfviewer_chat: {
@@ -856,14 +868,19 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
             log("Send "+nodeHandles.length+" nodes");
 
             countChat = chatHandles.length;
-            if(countChat==1){
-                megaChatApi.attachNode(chatHandles[0], nodeHandles[0], this);
-            }
-            else if(countChat>1){
-
-                for(int i=0; i<chatHandles.length; i++){
-                    megaChatApi.attachNode(chatHandles[i], nodeHandles[0], this);
+            if (megaChatApi != null) {
+                if(countChat==1){
+                    megaChatApi.attachNode(chatHandles[0], nodeHandles[0], this);
                 }
+                else if(countChat>1){
+
+                    for(int i=0; i<chatHandles.length; i++){
+                        megaChatApi.attachNode(chatHandles[i], nodeHandles[0], this);
+                    }
+                }
+            }
+            else{
+                log("megaChatApi is Null - cannot attach nodes");
             }
         }
 

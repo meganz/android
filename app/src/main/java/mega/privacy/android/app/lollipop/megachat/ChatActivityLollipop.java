@@ -3132,6 +3132,29 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 }
                 else{
                     log("NOOOT MESSAGE EDITED");
+                    int resultModify = -1;
+                    if(msg.getUserHandle()==megaChatApi.getMyUserHandle()){
+                        if(msg.getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT){
+                            log("Modify my message and node attachment");
+
+                            long idMsg =  dbH.findPendingMessageByIdTempKarere(msg.getTempId());
+                            log("----The id of my pending message is: "+idMsg);
+                            if(idMsg!=-1){
+                                resultModify = modifyAttachmentReceived(androidMsg, idMsg);
+                                dbH.removePendingMessageById(idMsg);
+                                if(resultModify==-1){
+                                    log("Node attachment message not in list -> resultModify -1");
+//                            AndroidMegaChatMessage msgToAppend = new AndroidMegaChatMessage(msg);
+//                            appendMessagePosition(msgToAppend);
+                                }
+                                else{
+                                    log("onMessageLoaded: Modify attachment");
+                                    return;
+                                }
+                            }
+                        }
+                    }
+
                     int returnValue = modifyMessageReceived(androidMsg, true);
                     if(returnValue!=-1){
                         log("onMessageLoaded: Message " + returnValue + " modified!");
@@ -3419,7 +3442,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }
         }
         else{
-            log("Status change");
+            int statusMsg = msg.getStatus();
+            log("Status change: "+statusMsg);
             log("Temporal id: "+msg.getTempId());
             log("Final id: "+msg.getMsgId());
 
@@ -3455,7 +3479,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 log("-----------Timestamp: "+msg.getTimestamp());
 
                 if(msg.getStatus()==MegaChatMessage.STATUS_SERVER_REJECTED){
-                    log("onMessageLoaded: STATUS_SERVER_REJECTED----- "+msg.getStatus());
+                    log("onMessageUpdate: STATUS_SERVER_REJECTED----- "+msg.getStatus());
                     //Buscar en la de sending por temporal id.
 
                 }
@@ -3628,6 +3652,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 }
             }
             else{
+
                 log("This message is uploading");
             }
         }
@@ -3931,18 +3956,20 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }
             else{
                 log("status of message: "+msg.getMessage().getStatus());
-                while(messages.get(lastIndex).isUploading()){
-                    log("one less index is uploading");
-                    lastIndex--;
-                }
-                while(messages.get(lastIndex).getMessage().getStatus()==MegaChatMessage.STATUS_SENDING_MANUAL){
-                    log("one less index is MANUAL SENDING");
-                    lastIndex--;
-                }
-                if(msg.getMessage().getStatus()==MegaChatMessage.STATUS_SERVER_RECEIVED||msg.getMessage().getStatus()==MegaChatMessage.STATUS_NOT_SEEN){
-                    while(messages.get(lastIndex).getMessage().getStatus()==MegaChatMessage.STATUS_SENDING){
-                        log("one less index");
+                if(lastIndex>=0){
+                    while(messages.get(lastIndex).isUploading()){
+                        log("one less index is uploading");
                         lastIndex--;
+                    }
+                    while(messages.get(lastIndex).getMessage().getStatus()==MegaChatMessage.STATUS_SENDING_MANUAL){
+                        log("one less index is MANUAL SENDING");
+                        lastIndex--;
+                    }
+                    if(msg.getMessage().getStatus()==MegaChatMessage.STATUS_SERVER_RECEIVED||msg.getMessage().getStatus()==MegaChatMessage.STATUS_NOT_SEEN){
+                        while(messages.get(lastIndex).getMessage().getStatus()==MegaChatMessage.STATUS_SENDING){
+                            log("one less index");
+                            lastIndex--;
+                        }
                     }
                 }
                 lastIndex++;
