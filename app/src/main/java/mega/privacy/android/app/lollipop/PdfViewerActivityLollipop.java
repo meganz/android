@@ -19,6 +19,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.StatFs;
+import android.os.StrictMode;
 import android.provider.OpenableColumns;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.Snackbar;
@@ -203,6 +204,11 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
         }
 
         setContentView(R.layout.activity_pdfviewer);
+
+        if (Build.VERSION.SDK_INT >= 26) {
+            StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
+            StrictMode.setVmPolicy(builder.build());
+        }
 
         app = (MegaApplication)getApplication();
         megaApi = app.getMegaApi();
