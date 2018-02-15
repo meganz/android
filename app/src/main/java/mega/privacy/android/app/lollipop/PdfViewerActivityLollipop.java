@@ -378,6 +378,10 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
 
     private void loadLocalPDF() {
         log("loadLocalPDF loading: "+loading);
+
+//        if (loading && progressDialog!=null && !transferOverquota) {
+//            progressDialog.show();
+//        }
         try {
             pdfView.fromUri(uri)
                     .defaultPage(currentPage)
@@ -390,9 +394,6 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
                     .load();
         } catch (Exception e) {
 
-        }
-        if (loading && progressDialog!=null && !transferOverquota) {
-            progressDialog.show();
         }
     }
 
@@ -670,6 +671,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
         switch(id) {
             case android.R.id.home: {
                 onBackPressed();
+                finish();
                 break;
             }
             case R.id.pdfviewer_share: {
@@ -678,6 +680,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
             }
             case R.id.pdfviewer_download: {
                 downloadFile();
+                finish();
                 break;
             }
             case R.id.pdfviewer_chat: {
