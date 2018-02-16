@@ -177,7 +177,7 @@
             android:id="@+id/separator_versions"
             android:layout_width="fill_parent"
             android:layout_height="1dp"
-            android:layout_marginLeft="31dp"
+            android:layout_marginLeft="70dp"
             android:background="@color/separator_grey" />
 
         <!-- SHARED LAYOUT -->

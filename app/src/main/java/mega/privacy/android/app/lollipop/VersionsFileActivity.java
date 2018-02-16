@@ -3,6 +3,7 @@ package mega.privacy.android.app.lollipop;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
@@ -36,9 +37,9 @@ import java.util.List;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.components.SimpleDividerItemDecoration;
+import mega.privacy.android.app.components.PositionDividerItemDecoration;
 import mega.privacy.android.app.lollipop.adapters.VersionsFileAdapter;
-import mega.privacy.android.app.modalbottomsheet.FileContactsListBottomSheetDialogFragment;
+import mega.privacy.android.app.modalbottomsheet.VersionBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -52,7 +53,6 @@ import nz.mega.sdk.MegaGlobalListenerInterface;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
-import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 
 public class VersionsFileActivity extends PinActivityLollipop implements MegaRequestListenerInterface, RecyclerView.OnItemTouchListener, GestureDetector.OnGestureListener, OnClickListener, MegaGlobalListenerInterface {
@@ -63,7 +63,7 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 	Toolbar tB;
 	VersionsFileActivity versionsFileActivity = this;
 
-	MegaShare selectedShare;
+	MegaNode selectedNode;
 
 	RelativeLayout container;
 	RecyclerView listView;
@@ -78,6 +78,7 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 	MegaNode node;
 	
 	VersionsFileAdapter adapter;
+	public String versionsSize = null;
 	
 	long parentHandle = -1;
 
@@ -87,20 +88,57 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 
 	MegaPreferences prefs = null;
 	
-	MenuItem addSharingContact;
 	MenuItem selectMenuItem;
 	MenuItem unSelectMenuItem;
+
+	private class GetVersionsSizeTask extends AsyncTask<String, Void, String> {
+
+		@Override
+		protected String doInBackground(String... params) {
+			long sizeNumber = 0;
+			for(int i=0; i<nodeVersions.size();i++){
+				MegaNode node = nodeVersions.get(i);
+				sizeNumber = sizeNumber + node.getSize();
+			}
+			String size = Util.getSizeString(sizeNumber);
+			log("doInBackground-AsyncTask GetVersionsSizeTask: "+size);
+			return size;
+		}
+
+		@Override
+		protected void onPostExecute(String size) {
+			log("GetVersionsSizeTask::onPostExecute");
+			updateSize(size);
+		}
+	}
 
 	public class RecyclerViewOnGestureListener extends SimpleOnGestureListener{
 
 	    public void onLongPress(MotionEvent e) {
 			log("onLongPress -- RecyclerViewOnGestureListener");
-			// handle long press
-			if (!adapter.isMultipleSelect()){
-				adapter.setMultipleSelect(true);
 
-				actionMode = startSupportActionMode(new ActionBarCallBack());
+			View view = listView.findChildViewUnder(e.getX(), e.getY());
+			int position = listView.getChildLayoutPosition(view);
+
+			if (!adapter.isMultipleSelect()){
+
+				if(position<1){
+					log("Position not valid: "+position);
+				}
+				else{
+					adapter.setMultipleSelect(true);
+
+					actionMode = startSupportActionMode(new ActionBarCallBack());
+
+					if(position<1){
+						log("Position not valid");
+					}
+					else{
+						itemClick(position);
+					}
+				}
 			}
+
 			super.onLongPress(e);
 	    }
 	}
@@ -132,7 +170,9 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 			log("onCreateActionMode");
 			MenuInflater inflater = mode.getMenuInflater();
 			inflater.inflate(R.menu.file_contact_shared_browser_action, menu);
-
+			menu.findItem(R.id.cab_menu_select_all).setVisible(true);
+			menu.findItem(R.id.action_file_contact_list_permissions).setVisible(false);
+			menu.findItem(R.id.action_file_contact_list_delete).setVisible(false);
 			return true;
 		}
 		
@@ -141,7 +181,6 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 			log("onDestroyActionMode");
 			adapter.clearSelections();
 			adapter.setMultipleSelect(false);
-
 		}
 
 		@Override
@@ -170,7 +209,6 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 			
 			return false;
 		}
-		
 	}
 
 	@Override
@@ -229,7 +267,7 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 //			aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 		aB.setDisplayHomeAsUpEnabled(true);
 		aB.setDisplayShowHomeEnabled(true);
-		aB.setTitle(getString(R.string.file_properties_shared_folder_select_contact));
+		aB.setTitle(getString(R.string.title_section_versions));
 
 		container = (RelativeLayout) findViewById(R.id.versions_main_layout);
 
@@ -238,7 +276,7 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 		listView = (RecyclerView) findViewById(R.id.recycler_view_versions_file);
 		listView.setPadding(0, 0, 0, Util.scaleHeightPx(85, outMetrics));
 		listView.setClipToPadding(false);
-		listView.addItemDecoration(new SimpleDividerItemDecoration(this, outMetrics));
+		listView.addItemDecoration(new PositionDividerItemDecoration(this, outMetrics));
 		mLayoutManager = new LinearLayoutManager(this);
 		listView.setLayoutManager(mLayoutManager);
 		listView.addOnItemTouchListener(this);
@@ -258,6 +296,9 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 				nodeVersions = megaApi.getVersions(node);
 			}
 
+			GetVersionsSizeTask getVersionsSizeTask = new GetVersionsSizeTask();
+			getVersionsSizeTask.execute();
+
 			if (nodeVersions.size() != 0){
 				emptyImage.setVisibility(View.GONE);
 				emptyText.setVisibility(View.GONE);
@@ -267,7 +308,6 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 				emptyImage.setVisibility(View.VISIBLE);
 				emptyText.setVisibility(View.VISIBLE);
 				listView.setVisibility(View.GONE);
-
 			}
 			
 			if (adapter == null){
@@ -288,12 +328,11 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 		}
 	}
 	
-	
-	public void showOptionsPanel(MegaShare sShare){
-		log("showNodeOptionsPanel");
+	public void showOptionsPanel(MegaNode sNode){
+		log("showOptionsPanel");
 		if(node!=null){
-			this.selectedShare = sShare;
-			FileContactsListBottomSheetDialogFragment bottomSheetDialogFragment = new FileContactsListBottomSheetDialogFragment();
+			this.selectedNode = sNode;
+			VersionBottomSheetDialogFragment bottomSheetDialogFragment = new VersionBottomSheetDialogFragment();
 			bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
 		}
 	}
@@ -316,16 +355,8 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 	    MenuInflater inflater = getMenuInflater();
 	    inflater.inflate(R.menu.activity_folder_contact_list, menu);
 	    
-//	    permissionButton = menu.findItem(R.id.action_file_contact_list_permissions);
-//	    deleteShareButton = menu.findItem(R.id.action_file_contact_list_delete);
-	    addSharingContact = menu.findItem(R.id.action_folder_contacts_list_share_folder);
-	    	    
-//	    permissionButton.setVisible(false);
-//	    deleteShareButton.setVisible(false);
-	    addSharingContact.setVisible(true);
-		menu.findItem(R.id.action_folder_contacts_list_share_folder).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+	    menu.findItem(R.id.action_folder_contacts_list_share_folder).setVisible(false);
 
-	    
 	    selectMenuItem = menu.findItem(R.id.action_select);
 		unSelectMenuItem = menu.findItem(R.id.action_unselect);
 		
@@ -344,16 +375,16 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 		    	onBackPressed();
 		    	return true;
 		    }
-		    case R.id.action_folder_contacts_list_share_folder:{
-
-
-	        	return true;
-	        }
 		    case R.id.action_select:{
 		    	
 		    	selectAll();
 		    	return true;
 		    }
+			case R.id.action_unselect:{
+
+
+				return true;
+			}
 		    default:{
 	            return super.onOptionsItemSelected(item);
 	        }
@@ -423,7 +454,7 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 	}
 	
 	public static void log(String log) {
-		Util.log("FileContactListActivityLollipop", log);
+		Util.log("VersionsFileActivity", log);
 	}
 
 	public void itemClick(int position) {
@@ -434,8 +465,8 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 			updateActionModeTitle();
 		}
 		else{
-
-
+			MegaNode n = nodeVersions.get(position);
+			showOptionsPanel(n);
 		}
 	}
 
@@ -459,7 +490,7 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 		Resources res = getResources();
 		String format = "%d %s";
 	
-		actionMode.setTitle(String.format(format, nodes.size(),res.getQuantityString(R.plurals.general_num_contacts, nodes.size())));
+		actionMode.setTitle(String.format(format, nodes.size(),res.getQuantityString(R.plurals.general_num_files, nodes.size())));
 		try {
 			actionMode.invalidate();
 		} catch (NullPointerException e) {
@@ -598,12 +629,22 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 		
 	}
 
+	public MegaNode getSelectedNode() {
+		return selectedNode;
+	}
+
 	public void showSnackbar(String s){
 		log("showSnackbar");
 		Snackbar snackbar = Snackbar.make(container, s, Snackbar.LENGTH_LONG);
 		TextView snackbarTextView = (TextView)snackbar.getView().findViewById(android.support.design.R.id.snackbar_text);
 		snackbarTextView.setMaxLines(5);
 		snackbar.show();
+	}
+
+	public void updateSize(String size){
+		log("updateSize");
+		this.versionsSize = size;
+		adapter.notifyItemChanged(1);
 	}
 }
 

@@ -1704,5 +1704,11 @@
 
     <string name="number_of_versions" formatted="false" context="Number of versions of a file shown on the screen info of the file">%1$d versions</string>
     <string name="title_section_versions" context="Title of the section Versions for files">Versions</string>
+
+    <string name="header_current_section_item" context="Header of the item to show the current version of a file in a list">Current version</string>
+    <plurals name="header_previous_section_item" context="Header of the item to show the previous versions of a file in a list">
+        <item context="file item" quantity="one">Previous version</item>
+        <item context="file items" quantity="other">Previous versions</item>
+    </plurals>
 </resources>
 
