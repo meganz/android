@@ -400,8 +400,13 @@ public class ContactsFragmentLollipop extends Fragment{
 			}
 
 			if (visibleContacts.size() > 0) {
+				contentTextLayout.setVisibility(View.VISIBLE);
+
 				contentText.setText(visibleContacts.size()+ " " +context.getResources().getQuantityString(R.plurals.general_num_contacts, visibleContacts.size()));
+			}else if(visibleContacts.size() == 0){
+				contentTextLayout.setVisibility(View.GONE);
 			}
+
 		
 			adapter.setPositionClicked(-1);
 			recyclerView.setAdapter(adapter);
@@ -492,7 +497,11 @@ public class ContactsFragmentLollipop extends Fragment{
 			}
 
 			if (visibleContacts.size() > 0) {
+				contentTextLayout.setVisibility(View.VISIBLE);
+
 				contentText.setText(visibleContacts.size()+ " " +context.getResources().getQuantityString(R.plurals.general_num_contacts, visibleContacts.size()));
+			}else if(visibleContacts.size() == 0){
+				contentTextLayout.setVisibility(View.GONE);
 			}
 
 			adapter.setPositionClicked(-1);
@@ -583,7 +592,11 @@ public class ContactsFragmentLollipop extends Fragment{
 		adapter.setContacts(visibleContacts);
 
 		if (visibleContacts.size() > 0) {
+			contentTextLayout.setVisibility(View.VISIBLE);
+
 			contentText.setText(visibleContacts.size()+ " " +context.getResources().getQuantityString(R.plurals.general_num_contacts, visibleContacts.size()));
+		}else if(visibleContacts.size() == 0){
+			contentTextLayout.setVisibility(View.GONE);
 		}
 	}
 

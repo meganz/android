@@ -37,13 +37,9 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.adapters.MegaExplorerLollipopAdapter;
-import mega.privacy.android.app.lollipop.controllers.NodeController;
-import mega.privacy.android.app.lollipop.managerSections.FileBrowserFragmentLollipop;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
-import nz.mega.sdk.MegaShare;
 
 
 public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnClickListener{
@@ -259,13 +255,11 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 				parentHandle = megaApi.getRootNode().getHandle();
 				nodes = megaApi.getChildren(megaApi.getRootNode());
 			}
-			
-			changeActionBarTitle(context.getString(R.string.section_cloud_drive));
+
 		}else if(chosenNode.getType() == MegaNode.TYPE_ROOT) {
 			log("chosenNode is ROOT");
 			parentHandle = megaApi.getRootNode().getHandle();
 			nodes = megaApi.getChildren(chosenNode);
-			changeActionBarTitle(context.getString(R.string.section_cloud_drive));
 
 		}else {
 			log("ChosenNode not null and not ROOT");
@@ -280,14 +274,12 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 				}
 				if(parentNode.getType() == MegaNode.TYPE_ROOT){
 					nodes = megaApi.getChildren(chosenNode);
-					changeActionBarTitle(chosenNode.getName());
 					log("chosenNode is: "+chosenNode.getName());
 				}
 				else{
 					log("Parent node exists but is not Cloud!");
 					parentHandle = megaApi.getRootNode().getHandle();
 					nodes = megaApi.getChildren(megaApi.getRootNode());
-					changeActionBarTitle(context.getString(R.string.section_cloud_drive));
 				}
 				
 			}
@@ -295,7 +287,6 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 				log("parentNode is NULL");
 				parentHandle = megaApi.getRootNode().getHandle();
 				nodes = megaApi.getChildren(megaApi.getRootNode());
-				changeActionBarTitle(context.getString(R.string.section_cloud_drive));
 			}		
 			
 		}
@@ -315,7 +306,6 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 				}
 			}else{
 				activateButton(true);
-
 			}
 
 			nodeHandleMoveCopy = ((FileExplorerActivityLollipop)context).getNodeHandleMoveCopy();
@@ -476,12 +466,8 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 //		modeCloud=mode;
 //		log("setMode: "+modeCloud);
 //	}	
-	
-	
-	public void changeActionBarTitle(String folder){
-		((FileExplorerActivityLollipop) context).changeTitle(folder);
-	}
-	
+
+
 //	public void setBackVisibility(boolean backVisibility){
 //		((LauncherFileExplorerActivity) context).setBackVisibility(backVisibility);
 //	}
@@ -516,7 +502,7 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 				break;
 			}
 			case R.id.cancel_text:{
-				((FileExplorerActivityLollipop) context).finish();
+				((FileExplorerActivityLollipop) context).finishActivity();
 			}
 			break;
 		}
@@ -533,13 +519,12 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 
 		parentHandle = handle;
 
-		MegaNode parentNode = megaApi.getNodeByHandle(handle);
-		changeActionBarTitle(parentNode.getName());
-
 		adapter.setParentHandle(parentHandle);
 		nodes.clear();
 		adapter.setNodes(nodes);
 		listView.scrollToPosition(0);
+
+		((FileExplorerActivityLollipop) context).changeTitle();
 
 		//If folder has no files
 		if (adapter.getItemCount() == 0){
@@ -587,7 +572,6 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 
 			if(n.getType() != MegaNode.TYPE_ROOT)
 			{
-				changeActionBarTitle(n.getName());
 				if(modeCloud==FileExplorerActivityLollipop.SELECT){
 					if(!selectFile)
 					{
@@ -612,7 +596,6 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 			}
 			else
 			{
-				changeActionBarTitle(context.getString(R.string.section_cloud_drive));
 				if(modeCloud==FileExplorerActivityLollipop.SELECT){
 					separator.setVisibility(View.GONE);
 					optionsBar.setVisibility(View.GONE);
@@ -627,6 +610,8 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 			nodes = megaApi.getChildren(nodes.get(position));
 			adapter.setNodes(nodes);
 			listView.scrollToPosition(0);
+
+			((FileExplorerActivityLollipop) context).changeTitle();
 			
 			//If folder has no files
 			if (adapter.getItemCount() == 0){
@@ -748,7 +733,7 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 
 			if(parentNode.getType()==MegaNode.TYPE_ROOT){
 				parentHandle=-1;
-				changeActionBarTitle(context.getString(R.string.section_cloud_drive));
+
 				if(modeCloud==FileExplorerActivityLollipop.SELECT){
 					if(!selectFile)
 					{
@@ -769,6 +754,7 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 					}
 				}
 
+				((FileExplorerActivityLollipop) context).changeTitle();
 			}
 			else{
 //				String path=parentNode.getName();
@@ -776,7 +762,6 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 //				temp = path.split("/");
 //				name = temp[temp.length-1];
 
-				changeActionBarTitle(parentNode.getName());
 				if(modeCloud==FileExplorerActivityLollipop.SELECT){
 					if(!selectFile)
 					{
@@ -798,6 +783,7 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 					}
 				}
 				parentHandle = parentNode.getHandle();
+				((FileExplorerActivityLollipop) context).changeTitle();
 			}
 
 			if((modeCloud == FileExplorerActivityLollipop.MOVE) || (modeCloud == FileExplorerActivityLollipop.COPY)){

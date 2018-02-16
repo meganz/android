@@ -304,12 +304,7 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 
 		this.setDisableNodes(disabledNodes);
 	}
-	
-	public void changeActionBarTitle(String folder){
-		((FileExplorerActivityLollipop) context).changeTitle(folder);
-		((FileExplorerActivityLollipop)context).supportInvalidateOptionsMenu();
-	}
-	
+
 	@Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
@@ -326,7 +321,7 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 				break;
 			}
 			case R.id.cancel_text:{
-				((FileExplorerActivityLollipop) context).finish();
+				((FileExplorerActivityLollipop) context).finishActivity();
 				break;
 			}
 		}
@@ -358,14 +353,13 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 		log("Push to stack "+lastFirstVisiblePosition+" position");
 		lastPositionStack.push(lastFirstVisiblePosition);
 
-		MegaNode parentNode = megaApi.getNodeByHandle(handle);
-		changeActionBarTitle(parentNode.getName());
-
 		parentHandle = handle;
 		adapter.setParentHandle(parentHandle);
 		nodes.clear();
 		adapter.setNodes(nodes);
 		listView.scrollToPosition(0);
+
+		((FileExplorerActivityLollipop) context).changeTitle();
 
 		//If folder has no files
 		if (adapter.getItemCount() == 0){
@@ -385,9 +379,6 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 		if (modeCloud == FileExplorerActivityLollipop.COPY){
 			activateButton(true);
 		}
-
-
-
 	}
 
     public void itemClick(View view, int position) {
@@ -412,8 +403,6 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 					optionsBar.setVisibility(View.VISIBLE);
 				}
 			}
-			
-			MegaNode n = nodes.get(position);
 
 			int lastFirstVisiblePosition = 0;
 			lastFirstVisiblePosition = mLayoutManager.findFirstCompletelyVisibleItemPosition();
@@ -421,13 +410,13 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 			log("Push to stack "+lastFirstVisiblePosition+" position");
 			lastPositionStack.push(lastFirstVisiblePosition);
 
-			changeActionBarTitle(n.getName());
-			
 			parentHandle = nodes.get(position).getHandle();
 			adapter.setParentHandle(parentHandle);
 			nodes = megaApi.getChildren(nodes.get(position));
 			adapter.setNodes(nodes);
 			listView.scrollToPosition(0);
+
+			((FileExplorerActivityLollipop) context).changeTitle();
 			
 			//If folder has no files
 			if (adapter.getItemCount() == 0){
@@ -495,12 +484,13 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 
 		if(((FileExplorerActivityLollipop)context).deepBrowserTree==0){
 			parentHandle=-1;
-			changeActionBarTitle(getString(R.string.title_incoming_shares_explorer));
 //			uploadButton.setText(getString(R.string.choose_folder_explorer));
 			findNodes();
 			findDisabledNodes();
 			
 			adapter.setNodes(nodes);
+			((FileExplorerActivityLollipop) context).changeTitle();
+
 			int lastVisiblePosition = 0;
 			if(!lastPositionStack.empty()){
 				lastVisiblePosition = lastPositionStack.pop();
@@ -557,7 +547,6 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 			MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(parentHandle));				
 
 			if (parentNode != null){
-				changeActionBarTitle(parentNode.getName());
 				
 				parentHandle = parentNode.getHandle();
 				nodes = megaApi.getChildren(parentNode);
@@ -590,6 +579,8 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 					mLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
 				}
 				adapter.setParentHandle(parentHandle);
+
+				((FileExplorerActivityLollipop) context).changeTitle();
 
 				if (adapter.getItemCount() != 0){
 					emptyImageView.setVisibility(View.GONE);

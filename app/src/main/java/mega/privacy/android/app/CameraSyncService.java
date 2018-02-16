@@ -58,6 +58,7 @@ import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
+import nz.mega.sdk.MegaEvent;
 import nz.mega.sdk.MegaGlobalListenerInterface;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
@@ -354,7 +355,6 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 									if (ret == MegaChatApi.INIT_NO_CACHE)
 									{
 										log("shouldRun: condition ret == MegaChatApi.INIT_NO_CACHE");
-										megaApi.invalidateCache();
 
 									}
 									else if (ret == MegaChatApi.INIT_ERROR)
@@ -2642,6 +2642,12 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 	public void onContactRequestsUpdate(MegaApiJava api,
 										ArrayList<MegaContactRequest> requests) {
 		// TODO Auto-generated method stub
+
+	}
+
+
+	@Override
+	public void onEvent(MegaApiJava api, MegaEvent event) {
 
 	}
 
