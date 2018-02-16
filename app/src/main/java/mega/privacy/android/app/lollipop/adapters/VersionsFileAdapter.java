@@ -563,7 +563,7 @@ public class VersionsFileAdapter extends RecyclerView.Adapter<VersionsFileAdapte
 					((VersionsFileActivity) context).itemClick(currentPosition);
 				}
 				else{
-					((VersionsFileActivity) context).showOptionsPanel(n);
+					((VersionsFileActivity) context).showOptionsPanel(n, currentPosition);
 
 				}
 

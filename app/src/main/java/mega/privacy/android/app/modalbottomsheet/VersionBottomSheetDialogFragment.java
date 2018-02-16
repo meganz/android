@@ -3,7 +3,6 @@ package mega.privacy.android.app.modalbottomsheet;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.design.widget.BottomSheetBehavior;
@@ -19,13 +18,9 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
-import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MimeTypeInfo;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.lollipop.ContactFileListActivityLollipop;
-import mega.privacy.android.app.lollipop.FileInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.VersionsFileActivity;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.utils.ThumbnailUtils;
@@ -56,7 +51,6 @@ public class VersionBottomSheetDialogFragment extends BottomSheetDialogFragment 
     private Bitmap thumb = null;
 
     private MegaApiAndroid megaApi;
-    private DatabaseHandler dbH;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -81,8 +75,6 @@ public class VersionBottomSheetDialogFragment extends BottomSheetDialogFragment 
         }
 
         nC = new NodeController(context);
-
-        dbH = DatabaseHandler.getDbHandler(getActivity());
     }
 
     @Override
@@ -104,8 +96,8 @@ public class VersionBottomSheetDialogFragment extends BottomSheetDialogFragment 
         nodeIconLayout = (RelativeLayout) contentView.findViewById(R.id.versions_file_relative_layout_icon);
         nodeIcon = (ImageView) contentView.findViewById(R.id.versions_file_icon);
         optionDownload = (LinearLayout) contentView.findViewById(R.id.option_download_layout);
-        optionRevert = (LinearLayout) contentView.findViewById(R.id.option_leave_layout);
-        optionDelete = (LinearLayout) contentView.findViewById(R.id.option_rubbish_bin_layout);
+        optionRevert = (LinearLayout) contentView.findViewById(R.id.option_revert_layout);
+        optionDelete = (LinearLayout) contentView.findViewById(R.id.option_delete_layout);
 
         optionDownload.setOnClickListener(this);
         optionRevert.setOnClickListener(this);
@@ -147,7 +139,13 @@ public class VersionBottomSheetDialogFragment extends BottomSheetDialogFragment 
             }
             optionDownload.setVisibility(View.VISIBLE);
             optionDelete.setVisibility(View.VISIBLE);
-            optionRevert.setVisibility(View.VISIBLE);
+
+            if(((VersionsFileActivity) context).getSelectedPosition()==0){
+                optionRevert.setVisibility(View.GONE);
+            }
+            else{
+                optionRevert.setVisibility(View.VISIBLE);
+            }
 
             dialog.setContentView(contentView);
             mBehavior = BottomSheetBehavior.from((View) mainLinearLayout.getParent());
@@ -171,93 +169,26 @@ public class VersionBottomSheetDialogFragment extends BottomSheetDialogFragment 
                 }
                 ArrayList<Long> handleList = new ArrayList<Long>();
                 handleList.add(node.getHandle());
-                ((ContactFileListActivityLollipop) context).onFileClick(handleList);
+                nC.prepareForDownload(handleList);
                 break;
             }
-            case R.id.option_properties_layout:{
-                log("Properties option");
+            case R.id.option_revert_layout:{
+                log("Revert option");
                 if(node==null){
                     log("The selected node is NULL");
                     return;
                 }
-                Intent i = new Intent(context, FileInfoActivityLollipop.class);
-                i.putExtra("handle", node.getHandle());
-                i.putExtra("from", FileInfoActivityLollipop.FROM_INCOMING_SHARES);
-                boolean firstLevel = ((ContactFileListActivityLollipop) context).isEmptyParentHandleStack();
-                log("onClick File Info: First LEVEL is: "+firstLevel);
-                i.putExtra("firstLevel", firstLevel);
-
-                if (node.isFolder()) {
-                    if(node.isInShare()){
-                        i.putExtra("imageId", R.drawable.ic_folder_incoming);
-                    }
-                    else if (node.isOutShare()||megaApi.isPendingShare(node)){
-                        i.putExtra("imageId", R.drawable.ic_folder_outgoing);
-                    }
-                    else{
-                        i.putExtra("imageId", R.drawable.ic_folder);
-                    }
-                }
-                else {
-                    i.putExtra("imageId", MimeTypeInfo.typeForName(node.getName()).getIconResourceId());
-                }
-                i.putExtra("name", node.getName());
-                context.startActivity(i);
+                ((VersionsFileActivity) context).revertVersion();
                 dismissAllowingStateLoss();
                 break;
             }
-            case R.id.option_leave_layout:{
-                log("Share with");
+            case R.id.option_delete_layout:{
+                log("Delete option");
                 if(node==null){
                     log("The selected node is NULL");
                     return;
                 }
-                ((ContactFileListActivityLollipop) context).showConfirmationLeaveIncomingShare(node);
-                dismissAllowingStateLoss();
-                break;
-            }
-            case R.id.option_rename_layout:{
-                log("Rename option");
-                if(node==null){
-                    log("The selected node is NULL");
-                    return;
-                }
-                ((ContactFileListActivityLollipop) context).showRenameDialog(node, node.getName());
-                break;
-            }
-            case R.id.option_move_layout:{
-                log("Move option");
-                if(node==null){
-                    log("The selected node is NULL");
-                    return;
-                }
-                ArrayList<Long> handleList = new ArrayList<Long>();
-                handleList.add(node.getHandle());
-                ((ContactFileListActivityLollipop) context).showMoveLollipop(handleList);
-                dismissAllowingStateLoss();
-                break;
-            }
-            case R.id.option_copy_layout:{
-                log("Copy option");
-                if(node==null){
-                    log("The selected node is NULL");
-                    return;
-                }
-                ArrayList<Long> handleList = new ArrayList<Long>();
-                handleList.add(node.getHandle());
-                ((ContactFileListActivityLollipop) context).showCopyLollipop(handleList);
-                dismissAllowingStateLoss();
-                break;
-            }
-            case R.id.option_rubbish_bin_layout:{
-                log("Delete/Move to rubbish option");
-                if(node==null){
-                    log("The selected node is NULL");
-                    return;
-                }
-                ArrayList<Long> handleList = new ArrayList<Long>();
-                handleList.add(node.getHandle());
-                ((ContactFileListActivityLollipop) context).askConfirmationMoveToRubbish(handleList);
+                ((VersionsFileActivity) context).removeVersion();
                 break;
             }
         }
@@ -289,10 +220,6 @@ public class VersionBottomSheetDialogFragment extends BottomSheetDialogFragment 
         long handle = node.getHandle();
         log("Handle of the node: "+handle);
         outState.putLong("handle", handle);
-    }
-
-    public interface CustomHeight{
-        int getHeightToPanel(BottomSheetDialogFragment dialog);
     }
 
     private static void log(String log) {

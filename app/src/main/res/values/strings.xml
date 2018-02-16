@@ -1710,5 +1710,7 @@
         <item context="file item" quantity="one">Previous version</item>
         <item context="file items" quantity="other">Previous versions</item>
     </plurals>
+
+    <string name="general_revert" context="option menu to revert a file version">Revert</string>
 </resources>
 

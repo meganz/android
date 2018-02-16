@@ -65,6 +65,8 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 
 	MegaNode selectedNode;
 
+	int selectedPosition;
+
 	RelativeLayout container;
 	RecyclerView listView;
 	LinearLayoutManager mLayoutManager;
@@ -328,10 +330,11 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 		}
 	}
 	
-	public void showOptionsPanel(MegaNode sNode){
+	public void showOptionsPanel(MegaNode sNode, int sPosition){
 		log("showOptionsPanel");
 		if(node!=null){
 			this.selectedNode = sNode;
+			this.selectedPosition = sPosition;
 			VersionBottomSheetDialogFragment bottomSheetDialogFragment = new VersionBottomSheetDialogFragment();
 			bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
 		}
@@ -440,10 +443,14 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 			}
 		}
 
-		if (request.getType() == MegaRequest.TYPE_SHARE) {
-			log(" MegaRequest.TYPE_SHARE");
-
-		}
+//		if (request.getType() == MegaRequest.TYPE_REMOVE) {
+//			log(" MegaRequest.TYPE_REMOVE");
+//			adapter.notifyDataSetChanged();
+//		}
+//		else if(request.getType() == MegaRequest.TYPE_RESTORE){
+//			log(" MegaRequest.TYPE_RESTORE");
+//			adapter.notifyDataSetChanged();
+//		}
 	}
 
 
@@ -466,7 +473,7 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 		}
 		else{
 			MegaNode n = nodeVersions.get(position);
-			showOptionsPanel(n);
+			showOptionsPanel(n, position);
 		}
 	}
 
@@ -524,7 +531,6 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 		}
 	}
 
-
 	public void notifyDataSetChanged(){		
 		if (adapter != null){
 			adapter.notifyDataSetChanged();
@@ -545,6 +551,19 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 	@Override
 	public void onNodesUpdate(MegaApiJava api, ArrayList<MegaNode> nodes) {
 		log("onNodesUpdate");
+		nodeVersions = megaApi.getVersions(node);
+		if(adapter!=null){
+			adapter.notifyDataSetChanged();
+		}
+
+
+
+//		for(int i=0; i<nodes.size();i++){
+//			MegaNode node = nodes.get(i);
+//			if(node.hasChanged(MegaNode.CHANGE_TYPE_REMOVED)){
+//				for(int j=0; i<node)
+//			}
+//		}
 
 	}
 
@@ -629,6 +648,20 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 		
 	}
 
+	public void revertVersion(){
+		node = selectedNode;
+		megaApi.restoreVersion(selectedNode, this);
+	}
+
+	public void removeVersion(){
+		if(selectedPosition==0){
+			node = nodeVersions.get(1);
+		}
+		else{
+			megaApi.removeVersion(selectedNode, this);
+		}
+	}
+
 	public MegaNode getSelectedNode() {
 		return selectedNode;
 	}
@@ -645,6 +678,14 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 		log("updateSize");
 		this.versionsSize = size;
 		adapter.notifyItemChanged(1);
+	}
+
+	public int getSelectedPosition() {
+		return selectedPosition;
+	}
+
+	public void setSelectedPosition(int selectedPosition) {
+		this.selectedPosition = selectedPosition;
 	}
 }
 
