@@ -79,6 +79,7 @@ import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
+import nz.mega.sdk.MegaEvent;
 import nz.mega.sdk.MegaGlobalListenerInterface;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
@@ -186,7 +187,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 
 	ArrayList<MegaNode> nodes;
 
-	String regex = "[*|\\?:\"<>\\{\\}\\\\\\/]";
+	String regex = "[*|\\?:\"<>\\\\\\\\/]";
 
 	//	long gParentHandle;
 	long parentHandleIncoming;
@@ -345,7 +346,6 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			}*/	
 			startActivity(loginIntent);
 			return;
-//			finish();
 		}
 		else{
 			log("User has credentials");
@@ -436,8 +436,6 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 						if (ret == MegaChatApi.INIT_NO_CACHE)
 						{
 							log("onCreate: condition ret == MegaChatApi.INIT_NO_CACHE");
-							megaApi.invalidateCache();
-
 						}
 						else if (ret == MegaChatApi.INIT_ERROR)
 						{
@@ -747,56 +745,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 					public void onPageSelected(int position) {
 						log("onTabChanged TabId :"+ position);
 						supportInvalidateOptionsMenu();
-						if(position == 0){
-							tabShown=CLOUD_TAB;
-							String cFTag = getFragmentTag(R.id.explorer_tabs_pager, 0);
-							cDriveExplorer = (CloudDriveExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
-
-							if(cDriveExplorer!=null){
-								if(cDriveExplorer.parentHandle==-1|| cDriveExplorer.parentHandle==megaApi.getRootNode().getHandle()){
-									changeTitle(getString(R.string.section_cloud_drive));
-								}
-								else{
-									changeTitle(megaApi.getNodeByHandle(cDriveExplorer.parentHandle).getName());
-								}
-							}
-							fabButton.setVisibility(View.GONE);
-						}
-						else if(position == 1){
-							tabShown=INCOMING_TAB;
-
-							String cFTag = getFragmentTag(R.id.explorer_tabs_pager, 1);
-							iSharesExplorer = (IncomingSharesExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
-
-							if(iSharesExplorer!=null){
-								if(iSharesExplorer.getDeepBrowserTree()==0){
-									changeTitle(getString(R.string.title_incoming_shares_explorer));
-								}
-								else{
-									changeTitle(megaApi.getNodeByHandle(iSharesExplorer.parentHandle).getName());
-								}
-							}
-							fabButton.setVisibility(View.GONE);
-
-						}
-						else if(position == 2){
-							tabShown=CHAT_TAB;
-
-							String cFTag = getFragmentTag(R.id.explorer_tabs_pager, 2);
-							chatExplorer = (ChatExplorerFragment) getSupportFragmentManager().findFragmentByTag(cFTag);
-
-							if(chatExplorer!=null){
-								changeTitle(getString(R.string.section_chat));
-							}
-
-							if(chatExplorer.getSelectedChats().size() > 0){
-								fabButton.setVisibility(View.VISIBLE);
-							}
-							else{
-								fabButton.setVisibility(View.GONE);
-							}
-
-						}
+						changeTitle();
 					}
 				});
 			}
@@ -826,6 +775,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 	    
 	    createFolderMenuItem = menu.findItem(R.id.cab_menu_create_folder);
 	    newChatMenuItem = menu.findItem(R.id.cab_menu_new_chat);
+
 		createFolderMenuItem.setVisible(false);
 
 //	    if(iSharesExplorer != null){
@@ -858,8 +808,10 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 				//CLOUD TAB				
 				String cFTag2 = getFragmentTag(R.id.explorer_tabs_pager, 0);		
 				log("Tag: "+ cFTag2);
-				cDriveExplorer = (CloudDriveExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag2);
-				if (cDriveExplorer != null){
+				if(intent.getAction().equals(ACTION_MULTISELECT_FILE)){
+					createFolderMenuItem.setVisible(false);
+				}
+				else{
 					createFolderMenuItem.setVisible(true);
 				}
 				newChatMenuItem.setVisible(false);
@@ -938,19 +890,105 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 //		}
 //	}
 	
-	public void changeTitle (String title){
-		aB.setTitle(title);	
+
+	public void changeTitle (){
+
+		if(tabShown==NO_TABS){
+			cDriveExplorer = (CloudDriveExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag("cDriveExplorer");
+
+			if(cDriveExplorer!=null){
+				if(cDriveExplorer.parentHandle==-1|| cDriveExplorer.parentHandle==megaApi.getRootNode().getHandle()){
+					log("3**Change title");
+					aB.setTitle(getString(R.string.section_cloud_drive));
+				}
+				else{
+					log("4**Change title");
+					aB.setTitle(megaApi.getNodeByHandle(cDriveExplorer.parentHandle).getName());
+				}
+			}
+			fabButton.setVisibility(View.GONE);
+		}
+		else{
+			int position = viewPagerExplorer.getCurrentItem();
+			if(position == 0){
+				if(tabShown!=NO_TABS){
+					tabShown=CLOUD_TAB;
+				}
+
+				String cFTag = getFragmentTag(R.id.explorer_tabs_pager, 0);
+				cDriveExplorer = (CloudDriveExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
+
+				if(cDriveExplorer!=null){
+					if(cDriveExplorer.parentHandle==-1|| cDriveExplorer.parentHandle==megaApi.getRootNode().getHandle()){
+						log("3**Change title");
+						aB.setTitle(getString(R.string.section_cloud_drive));
+					}
+					else{
+						log("4**Change title");
+						aB.setTitle(megaApi.getNodeByHandle(cDriveExplorer.parentHandle).getName());
+					}
+				}
+				fabButton.setVisibility(View.GONE);
+			}
+			else if(position == 1){
+				if(tabShown!=NO_TABS){
+					tabShown=INCOMING_TAB;
+				}
+
+				String cFTag = getFragmentTag(R.id.explorer_tabs_pager, 1);
+				iSharesExplorer = (IncomingSharesExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
+
+				if(iSharesExplorer!=null){
+					if(iSharesExplorer.getDeepBrowserTree()==0){
+						log("5**Change title");
+						aB.setTitle(getString(R.string.title_incoming_shares_explorer));
+					}
+					else{
+						log("6**Change title");
+						aB.setTitle(megaApi.getNodeByHandle(iSharesExplorer.parentHandle).getName());
+					}
+				}
+				fabButton.setVisibility(View.GONE);
+
+			}
+			else if(position == 2){
+				if(tabShown!=NO_TABS){
+					tabShown=CHAT_TAB;
+				}
+
+				String cFTag = getFragmentTag(R.id.explorer_tabs_pager, 2);
+				chatExplorer = (ChatExplorerFragment) getSupportFragmentManager().findFragmentByTag(cFTag);
+
+				if(chatExplorer!=null){
+					log("7**Change title");
+					aB.setTitle(getString(R.string.section_chat));
+				}
+
+				if(chatExplorer.getSelectedChats().size() > 0){
+					fabButton.setVisibility(View.VISIBLE);
+				}
+				else{
+					fabButton.setVisibility(View.GONE);
+				}
+
+			}
+		}
 	}
 	
 	private String getFragmentTag(int viewPagerId, int fragmentPosition)
 	{
 	     return "android:switcher:" + viewPagerId + ":" + fragmentPosition;
 	}
-	
+
 	public void finishActivity(){
-		finish();
+		if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+			super.finishAndRemoveTask();
+		}
+		else {
+			super.finish();
+		}
 	}
-	
+
 	@Override
 	protected void onSaveInstanceState(Bundle bundle) {
 		log("onSaveInstanceState");
@@ -1014,8 +1052,8 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 	
 			if(cDriveExplorer!=null){
 				if (cDriveExplorer.onBackPressed() == 0){
-					super.onBackPressed();
-					return;
+//					super.onBackPressed();
+					finishActivity();
 				}
 			}
 		}
@@ -1024,8 +1062,8 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			iSharesExplorer = (IncomingSharesExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
 			if(iSharesExplorer!=null){
 				if (iSharesExplorer.onBackPressed() == 0){
-					super.onBackPressed();
-					return;
+//					super.onBackPressed();
+					finishActivity();
 				}
 			}
 		}
@@ -1034,8 +1072,8 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 
 			if(cDriveExplorer!=null){
 				if (cDriveExplorer.onBackPressed() == 0){
-					super.onBackPressed();
-					return;
+//					super.onBackPressed();
+					finishActivity();
 				}
 			}
 		}
@@ -1145,7 +1183,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 				else{
 					filePreparedInfos = null;
 					log("ERROR null files to upload");
-					finish();
+					finishActivity();
 				}
 
 			}
@@ -1176,7 +1214,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 
 			filePreparedInfos = null;
 			log("finish!!!");
-			finish();
+			finishActivity();
 		}
 	}
 	
@@ -1219,7 +1257,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 				}
 				filePreparedInfos = null;
 				log("finish!!!");
-				finish();
+				finishActivity();
 			}	
 		}
 	}
@@ -1231,7 +1269,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
         intent.putExtra("NODE_HANDLES", handles);
         intent.putStringArrayListExtra("SELECTED_CONTACTS", selectedContacts);
         setResult(RESULT_OK, intent);
-        finish();
+		finishActivity();
     }
 	
 	public void buttonClick(long handle){
@@ -1242,7 +1280,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			if (iSharesExplorer.getDeepBrowserTree()==0){
 				Intent intent = new Intent();
 				setResult(RESULT_FIRST_USER, intent);
-				finish();
+				finishActivity();
 				return;
 			}
 		}
@@ -1262,7 +1300,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			intent.putExtra("MOVE_HANDLES", moveFromHandles);
 			setResult(RESULT_OK, intent);
 			log("finish!");
-			finish();
+			finishActivity();
 		}
 		else if (mode == COPY){
 			
@@ -1277,7 +1315,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			intent.putExtra("COPY_HANDLES", copyFromHandles);
 			setResult(RESULT_OK, intent);
 			log("finish!");
-			finish();
+			finishActivity();
 		}
 		else if (mode == UPLOAD){
 
@@ -1359,7 +1397,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			intent.putExtra("IMPORT_TO", parentNode.getHandle());
 			setResult(RESULT_OK, intent);
 			log("finish!");
-			finish();
+			finishActivity();
 		}
 		else if (mode == SELECT){
 
@@ -1369,7 +1407,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 				intent.putExtra("SELECT", handle);
 				intent.putStringArrayListExtra("SELECTED_CONTACTS", selectedContacts);
 				setResult(RESULT_OK, intent);
-				finish();
+				finishActivity();
 			}
 			else{
 				long parentHandle = handle;
@@ -1382,7 +1420,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 				intent.putExtra("SELECT", parentNode.getHandle());
 				intent.putStringArrayListExtra("SELECTED_CONTACTS", selectedContacts);
 				setResult(RESULT_OK, intent);
-				finish();
+				finishActivity();
 			}
 		}
 		else if (mode == SELECT_CAMERA_FOLDER){
@@ -1396,7 +1434,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			Intent intent = new Intent();
 			intent.putExtra("SELECT_MEGA_FOLDER", parentNode.getHandle());			
 			setResult(RESULT_OK, intent);
-			finish();
+			finishActivity();
 		}
 	}
 
@@ -1433,7 +1471,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 
 			log("After UPLOAD click - back to Cloud");
 			this.backToCloud(parentNode.getHandle());
-			finish();
+			finishActivity();
 		}
 		else{
 			Snackbar.make(fragmentContainer,getString(R.string.email_verification_text_error),Snackbar.LENGTH_LONG).show();
@@ -1750,6 +1788,12 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		
 	}
 
+
+	@Override
+	public void onEvent(MegaApiJava api, MegaEvent event) {
+
+	}
+
 	@Override
 	public void onNodesUpdate(MegaApiJava api, ArrayList<MegaNode> updatedNodes) {
 		log("onNodesUpdate");
@@ -1894,7 +1938,6 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 
 	public void showNewFolderDialog(){
 		log("showNewFolderDialog");
-
 		LinearLayout layout = new LinearLayout(this);
 		layout.setOrientation(LinearLayout.VERTICAL);
 		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -2032,7 +2075,6 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 					textError.setText(getString(R.string.invalid_string));
 					error_layout.setVisibility(View.VISIBLE);
 					input.requestFocus();
-
 				}else{
 					boolean result=matches(regex, value);
 					if(result){
@@ -2040,14 +2082,11 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 						textError.setText(getString(R.string.invalid_characters));
 						error_layout.setVisibility(View.VISIBLE);
 						input.requestFocus();
-
 					}else{
 						createFolder(value);
 						newFolderDialog.dismiss();
 					}
 				}
-
-
 			}
 		});
 	}
@@ -2076,11 +2115,6 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		this.chatListItems = chatListItems;
 
 		if (filePreparedInfos == null){
-//				Intent prueba = getIntent();
-//				Bundle bundle = prueba.getExtras();
-//				Uri uri = (Uri)bundle.get(Intent.EXTRA_STREAM);
-//				log("URI mode UPLOAD in bundle: "+uri);
-
 			FilePrepareTask filePrepareTask = new FilePrepareTask(this);
 			filePrepareTask.execute(getIntent());
 			ProgressDialog temp = null;
@@ -2099,9 +2133,9 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		}
 	}
 
+
 	public void showNewFileDialog(final MegaNode parentNode, final String data){
 		log("showNewFileDialog");
-
 		LinearLayout layout = new LinearLayout(this);
 		layout.setOrientation(LinearLayout.VERTICAL);
 		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -2110,27 +2144,93 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		final EditText input = new EditText(this);
 		layout.addView(input, params);
 
-//		input.setId(EDIT_TEXT_ID);
+		LinearLayout.LayoutParams params1 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+		params1.setMargins(Util.scaleWidthPx(20, outMetrics), 0, Util.scaleWidthPx(17, outMetrics), 0);
+
+		final RelativeLayout error_layout = new RelativeLayout(FileExplorerActivityLollipop.this);
+		layout.addView(error_layout, params1);
+
+		final ImageView error_icon = new ImageView(FileExplorerActivityLollipop.this);
+		error_icon.setImageDrawable(FileExplorerActivityLollipop.this.getResources().getDrawable(R.drawable.ic_input_warning));
+		error_layout.addView(error_icon);
+		RelativeLayout.LayoutParams params_icon = (RelativeLayout.LayoutParams) error_icon.getLayoutParams();
+
+		params_icon.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+		error_icon.setLayoutParams(params_icon);
+
+		error_icon.setColorFilter(ContextCompat.getColor(FileExplorerActivityLollipop.this, R.color.login_warning));
+
+		final TextView textError = new TextView(FileExplorerActivityLollipop.this);
+		error_layout.addView(textError);
+		RelativeLayout.LayoutParams params_text_error = (RelativeLayout.LayoutParams) textError.getLayoutParams();
+		params_text_error.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+		params_text_error.width = ViewGroup.LayoutParams.WRAP_CONTENT;
+		params_text_error.addRule(RelativeLayout.CENTER_VERTICAL);
+		params_text_error.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+		params_text_error.setMargins(Util.scaleWidthPx(3, outMetrics), 0,0,0);
+		textError.setLayoutParams(params_text_error);
+
+		textError.setTextColor(ContextCompat.getColor(FileExplorerActivityLollipop.this, R.color.login_warning));
+		error_layout.setVisibility(View.GONE);
+
+		input.getBackground().mutate().clearColorFilter();
+		input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
+		input.addTextChangedListener(new TextWatcher() {
+			@Override
+			public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+			}
+
+			@Override
+			public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+			}
+
+			@Override
+			public void afterTextChanged(Editable editable) {
+				if(error_layout.getVisibility() == View.VISIBLE){
+					error_layout.setVisibility(View.GONE);
+					input.getBackground().mutate().clearColorFilter();
+					input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
+				}
+			}
+		});
+
 		input.setSingleLine();
 		input.setTextColor(getResources().getColor(R.color.text_secondary));
 		input.setHint(getString(R.string.context_new_file_name));
-//		input.setSelectAllOnFocus(true);
 		input.setImeOptions(EditorInfo.IME_ACTION_DONE);
+
+
 		input.setOnEditorActionListener(new OnEditorActionListener() {
 			@Override
 			public boolean onEditorAction(TextView v, int actionId,KeyEvent event) {
 				if (actionId == EditorInfo.IME_ACTION_DONE) {
 					String value = v.getText().toString().trim();
 					if (value.length() == 0) {
-						return true;
+						input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+						textError.setText(getString(R.string.invalid_string));
+						error_layout.setVisibility(View.VISIBLE);
+						input.requestFocus();
+					}else{
+						boolean result=matches(regex, value);
+						if(result){
+							input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+							textError.setText(getString(R.string.invalid_characters));
+							error_layout.setVisibility(View.VISIBLE);
+							input.requestFocus();
+
+						}else{
+							createFile(value, data, parentNode);
+							newFolderDialog.dismiss();
+						}
 					}
-					createFile(value, data, parentNode);
-					newFolderDialog.dismiss();
 					return true;
 				}
 				return false;
 			}
 		});
+
 		input.setImeActionLabel(getString(R.string.general_create),EditorInfo.IME_ACTION_DONE);
 		input.setOnFocusChangeListener(new View.OnFocusChangeListener() {
 			@Override
@@ -2153,10 +2253,41 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 						createFile(value, data, parentNode);
 					}
 				});
-		builder.setNegativeButton(getString(android.R.string.cancel), null);
+
+		builder.setNegativeButton(getString(android.R.string.cancel), new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialogInterface, int i) {
+				input.getBackground().clearColorFilter();
+			}
+		});
 		builder.setView(layout);
 		newFolderDialog = builder.create();
 		newFolderDialog.show();
+
+		newFolderDialog.getButton(android.support.v7.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener(new   View.OnClickListener() {
+			@Override
+			public void onClick(View v)
+			{
+				String value = input.getText().toString().trim();
+				if (value.length() == 0) {
+					input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+					textError.setText(getString(R.string.invalid_string));
+					error_layout.setVisibility(View.VISIBLE);
+					input.requestFocus();
+				}else{
+					boolean result=matches(regex, value);
+					if(result){
+						input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+						textError.setText(getString(R.string.invalid_characters));
+						error_layout.setVisibility(View.VISIBLE);
+						input.requestFocus();
+					}else{
+						createFile(value, data, parentNode);
+						newFolderDialog.dismiss();
+					}
+				}
+			}
+		});
 	}
 
 	public static boolean matches(String regex, CharSequence input) {

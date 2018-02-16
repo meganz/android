@@ -37,6 +37,7 @@ import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
+import nz.mega.sdk.MegaEvent;
 import nz.mega.sdk.MegaListenerInterface;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
@@ -47,7 +48,7 @@ import nz.mega.sdk.MegaUser;
 
 public class MegaApplication extends Application implements MegaListenerInterface, MegaChatRequestListenerInterface {
 	final String TAG = "MegaApplication";
-	static final String USER_AGENT = "MEGAAndroid/3.3.1_181";
+	static final String USER_AGENT = "MEGAAndroid/3.3.2_182";
 
 	DatabaseHandler dbH;
 	MegaApiAndroid megaApi;
@@ -59,6 +60,7 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 
 
 	MegaChatApiAndroid megaChatApi = null;
+
 
 //	static final String GA_PROPERTY_ID = "UA-59254318-1";
 //	
@@ -764,5 +766,10 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 	@Override
 	public void onRequestTemporaryError(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
 		log("onRequestTemporaryError: Chat");
+	}
+
+	@Override
+	public void onEvent(MegaApiJava api, MegaEvent event) {
+
 	}
 }
