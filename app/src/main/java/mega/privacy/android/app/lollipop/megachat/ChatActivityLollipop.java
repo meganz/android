@@ -95,6 +95,7 @@ import mega.privacy.android.app.lollipop.managerSections.FileBrowserFragmentLoll
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaChatLollipopAdapter;
 import mega.privacy.android.app.lollipop.tasks.FilePrepareTask;
+import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.AttachmentUploadBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ContactAttachmentBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.MessageNotSentBottomSheetDialogFragment;
@@ -1949,6 +1950,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             case R.id.keyboard_icon_chat:{
                 log("open emoji keyboard:  " + emojiKeyboardShown);
                 if(fileStorageLayout.isShown()){
+                    if(FileStorageF != null){
+                        FileStorageF.clearSelections();
+                    }
                     fileStorageLayout.setVisibility(View.GONE);
                 }
                 if (emojiKeyboardShown){
@@ -1990,11 +1994,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
                 if(fileStorageLayout.isShown()){
                     fileStorageLayout.setVisibility(View.GONE);
-                    if(adapter != null){
-                        log("####Fragment != null");
-
-                        adapter.clearSelections();
-                    }
                 }
                 if (emojiKeyboardShown) {
                     keyboardButton.setImageResource(R.drawable.ic_emoticon_white);
@@ -2007,6 +2006,13 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     }else{
                         imm.hideSoftInputFromWindow(textChat.getWindowToken(), 0);
                     }
+                }
+
+                if(fileStorageLayout.isShown()){
+                    if(FileStorageF != null){
+                        FileStorageF.clearSelections();
+                    }
+                    fileStorageLayout.setVisibility(View.GONE);
                 }
 
                 isTakePicture = true;
@@ -2038,12 +2044,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }
             case R.id.send_contact_icon_chat:{
                 if(fileStorageLayout.isShown()){
-                    fileStorageLayout.setVisibility(View.GONE);
-                    if(adapter != null){
-                        log("####Fragment != null");
-
-                        adapter.clearSelections();
+                    if(FileStorageF != null){
+                        FileStorageF.clearSelections();
                     }
+                    fileStorageLayout.setVisibility(View.GONE);
                 }
                 if (emojiKeyboardShown) {
                     keyboardButton.setImageResource(R.drawable.ic_emoticon_white);
@@ -2063,12 +2067,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }
             case R.id.pick_file_system_icon_chat:{
                 if(fileStorageLayout.isShown()){
-                    fileStorageLayout.setVisibility(View.GONE);
-                    if(adapter != null){
-                        log("####Fragment != null");
-
-                        adapter.clearSelections();
+                    if(FileStorageF != null){
+                        FileStorageF.clearSelections();
                     }
+                    fileStorageLayout.setVisibility(View.GONE);
                 }
                 if (emojiKeyboardShown) {
                     keyboardButton.setImageResource(R.drawable.ic_emoticon_white);
@@ -2088,12 +2090,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }
             case R.id.pick_cloud_drive_icon_chat:{
                 if(fileStorageLayout.isShown()){
-                    fileStorageLayout.setVisibility(View.GONE);
-                    if(adapter != null){
-                        log("####Fragment != null");
-
-                        adapter.clearSelections();
+                    if(FileStorageF != null){
+                        FileStorageF.clearSelections();
                     }
+                    fileStorageLayout.setVisibility(View.GONE);
                 }
 
                 if (emojiKeyboardShown) {
@@ -2129,13 +2129,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 }
 
                 if(fileStorageLayout.isShown()){
-                    fileStorageLayout.setVisibility(View.GONE);
-                    if(adapter != null){
-                        log("####Fragment != null");
-
-                        adapter.clearSelections();
+                    if(FileStorageF != null){
+                        FileStorageF.clearSelections();
                     }
-
+                    fileStorageLayout.setVisibility(View.GONE);
                 }else{
                     fileStorageLayout.setVisibility(View.VISIBLE);
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {

@@ -2,12 +2,16 @@ package mega.privacy.android.app.lollipop.megachat;
 
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Context;
+import android.content.res.Configuration;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.design.widget.BottomSheetBehavior;
+import android.support.design.widget.BottomSheetDialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -21,6 +25,8 @@ import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,12 +44,15 @@ import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaNode;
 
-public class ChatFileStorageFragment extends Fragment {
+public class ChatFileStorageFragment extends BottomSheetDialogFragment {
 
     private static final String BUNDLE_RECYCLER_LAYOUT = "classname.recycler.layout";
 
     RecyclerView recyclerView;
     private RecyclerView.LayoutManager mLayoutManager;
+
+    private BottomSheetBehavior mBehavior;
+
 
     MegaChatFileStorageAdapter adapter;
     ChatFileStorageFragment fileStorageFragment = this;
@@ -62,6 +71,11 @@ public class ChatFileStorageFragment extends Fragment {
     DisplayMetrics outMetrics;
     Display display;
 
+    private int height = -1;
+    private boolean heightseted = false;
+    private int heightReal = -1;
+    private int heightDisplay;
+
     DatabaseHandler dbH;
     MegaPreferences prefs;
 
@@ -73,8 +87,6 @@ public class ChatFileStorageFragment extends Fragment {
     ArrayList<String> imagesPath = new ArrayList<>();
     ArrayList<Integer> posSelected = new ArrayList<>();
     String downloadLocationDefaultPath = Util.downloadDIR;
-
-    private static int firstVisibleInListview;
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
@@ -146,6 +158,8 @@ public class ChatFileStorageFragment extends Fragment {
         scaleW = Util.getScaleW(outMetrics, density);
         scaleH = Util.getScaleH(outMetrics, density);
 
+        heightDisplay = outMetrics.heightPixels;
+
         ((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
         View v = inflater.inflate(R.layout.fragment_filestorage, container, false);
@@ -171,8 +185,6 @@ public class ChatFileStorageFragment extends Fragment {
         gridWidth = realGridWidth - (padding * 2);
         numberOfCells = GRID_LARGE;
 
-//        getThumbnailPath();
-//        getImagesPath();
             getPaths();
 
         if (adapter == null){
@@ -203,6 +215,93 @@ public class ChatFileStorageFragment extends Fragment {
         }else{
             recyclerView.setVisibility(View.VISIBLE);
         }
+
+
+        mBehavior = BottomSheetBehavior.from((View) v.getParent());
+        mBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+
+        final ChatFileStorageFragment thisclass = this;
+
+        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            mBehavior.setPeekHeight((heightDisplay / 4) * 2);
+        }
+        else if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT){
+            mBehavior.setPeekHeight(BottomSheetBehavior.PEEK_HEIGHT_AUTO);
+        }
+
+
+
+
+
+
+
+
+//        //SCROLL RecyclerView
+//        recyclerView.setOnScrollListener(new RecyclerView.OnScrollListener() {
+//
+//            // Keeps track of the overall vertical offset in the list
+//            int verticalOffset;
+//
+//            // Determines the scroll UP/DOWN direction
+//            boolean scrollingUp;
+//
+//            @Override
+//            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+//                if (newState == RecyclerView.SCROLL_STATE_IDLE) {
+//                    if (scrollingUp) {
+////                        if (verticalOffset > tToolbar.getHeight()) {
+////                            toolbarAnimateHide();
+////                        } else {
+////                            toolbarAnimateShow(verticalOffset);
+////                        }
+//                        log("************ 1 up ");
+//                    } else {
+////                        if (tToolbar.getTranslationY() < tToolbar.getHeight() * -0.6 && verticalOffset > tToolbar.getHeight()) {
+////                            toolbarAnimateHide();
+////                        } else {
+////                            toolbarAnimateShow(verticalOffset);
+////                        }
+//                        log("************ 1 down ");
+//
+//                    }
+//                }
+//            }
+//
+//            @Override
+//            public final void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+//                verticalOffset += dy;
+//                scrollingUp = dy > 0;
+////                int toolbarYOffset = (int) (dy - tToolbar.getTranslationY());
+////                tToolbar.animate().cancel();
+//                if (scrollingUp) {
+//                    log("************ 2 up ");
+//
+////                    if (toolbarYOffset < tToolbar.getHeight()) {
+////                        if (verticalOffset > tToolbar.getHeight()) {
+////                            toolbarSetElevation(TOOLBAR_ELEVATION);
+////                        }
+////                        tToolbar.setTranslationY(-toolbarYOffset);
+////                    } else {
+////                        toolbarSetElevation(0);
+////                        tToolbar.setTranslationY(-tToolbar.getHeight());
+////                    }
+//                } else {
+//                    log("************ 2 down ");
+//
+////                    if (toolbarYOffset < 0) {
+////                        if (verticalOffset <= 0) {
+////                            toolbarSetElevation(0);
+////                        }
+////                        tToolbar.setTranslationY(0);
+////                    } else {
+////                        if (verticalOffset > tToolbar.getHeight()) {
+////                            toolbarSetElevation(TOOLBAR_ELEVATION);
+////                        }
+////                        tToolbar.setTranslationY(-toolbarYOffset);
+////                    }
+//                }
+//            }
+//        });
 
 //        firstVisibleInListview = ((GridLayoutManager) mLayoutManager).findFirstVisibleItemPosition();
 //
@@ -252,10 +351,6 @@ public class ChatFileStorageFragment extends Fragment {
         if (adapter.isMultipleSelect()){
             adapter.toggleSelection(position);
         }
-        else{
-            String filePath = imagesPath.get(position);
-            ((ChatActivityLollipop) getActivity()).uploadPicture(filePath);
-        }
     }
 
     private static void log(String log) {
@@ -300,7 +395,7 @@ public class ChatFileStorageFragment extends Fragment {
         return false;
     }
 
-    private void clearSelections() {
+    public void clearSelections() {
         if(adapter.isMultipleSelect()){
             adapter.clearSelections();
         }
@@ -345,87 +440,29 @@ public class ChatFileStorageFragment extends Fragment {
         cur1.close();
     }
 
-//    public void getThumbnailPath(){
-//        String[] projection = new String[]{
-//                MediaStore.Images.Media.DATA,
-//        };
-//
-//        Uri images = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
-//        Cursor cur1 = getActivity().managedQuery(images, projection, "", null, "");
-//
-//        if (cur1.moveToFirst()) {
-//
-//            int dataColumn = cur1.getColumnIndex(MediaStore.Images.Media.DATA);
-//            do {
-//                Cursor cur2 = getActivity().getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, new String[] { MediaStore.MediaColumns._ID }, MediaStore.MediaColumns.DATA + "=?", new String[] {cur1.getString(dataColumn)}, null);
-//
-//                if (cur2 != null && cur2.moveToFirst()) {
-//                    int id = cur2.getInt(cur2.getColumnIndex(MediaStore.MediaColumns._ID));
-//                    thumBitmap.add(MediaStore.Images.Thumbnails.getThumbnail(getActivity().getContentResolver(), id, MediaStore.Images.Thumbnails.MINI_KIND, null ));
-//                }
-//                cur2.close();
-//            } while (cur1.moveToNext());
-//        }
-//        cur1.close();
-//
-//    }
-//
-//    public void getImagesPath(){
-//
-//        String[] projection1 = new String[]{
-//                MediaStore.Images.Media.DATA,
-//        };
-//
-//        Uri images1 = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
-//        Cursor cur3 = getActivity().managedQuery(images1, projection1, "", null, "");
-//
-//        if (cur3.moveToFirst()) {
-//            int dataColumn = cur3.getColumnIndex(MediaStore.Images.Media.DATA);
-//            do {
-//                imagesPath.add(cur3.getString(dataColumn));
-//            } while (cur3.moveToNext());
-//        }
-//        cur3.close();
-//    }
-//
     public void sendButton(boolean flag){
         ((ChatActivityLollipop) getActivity()).activateSendButton(flag);
         if(flag){
             List<Integer> items = adapter.getSelectedItems();
-            log("*************** items: "+items.size());
         }
-
-
     }
 
     public void removePosition(Integer pos){
         posSelected.remove(pos);
-        for(Integer element:posSelected){
-            log("**** poSelected: "+element);
-        }
     }
 
     public void addPosition(Integer pos){
         posSelected.add(pos);
-        for(Integer element:posSelected){
-            log("**** poSelected: "+element);
-        }
     }
 
     public void sendImages(){
-        log("####sendImages");
         String filePath;
         if(isMultipleselect()){
-            log("####sendImages-isMultipleselect");
-
             for(Integer element:posSelected){
-                log("####sendImages-element: "+element);
-
                 filePath = imagesPath.get(element);
                ((ChatActivityLollipop) getActivity()).uploadPicture(filePath);
             }
             adapter.clearSelections();
-
         }
     }
 
