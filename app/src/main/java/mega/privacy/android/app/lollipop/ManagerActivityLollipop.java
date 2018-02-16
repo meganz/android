@@ -251,6 +251,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	AccountController aC;
 	MyAccountInfo myAccountInfo;
 
+	long[] searchDate = null;
+
 	MegaNode selectedNode;
 	MegaOffline selectedOfflineNode;
 	MegaContactAdapter selectedUser;
@@ -11138,7 +11140,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				log("Return.....");
 				return;
 			}
-			final long[] searchDate = intent.getLongArrayExtra("SELECTED_DATE");
+			searchDate = intent.getLongArrayExtra("SELECTED_DATE");
 			typeOfSearch = searchDate;
 			if (cuFL != null){
 				if(cuFL.isAdded()){
@@ -11146,9 +11148,27 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					MegaNode nps = megaApi.getNodeByHandle(cameraUploadHandle);
 					if (nps != null){
 						ArrayList<MegaNode> nodes = megaApi.getChildren(nps, MegaApiJava.ORDER_MODIFICATION_DESC);
-						ArrayList<MegaNode> nodesSearch = cuFL.searchDate(searchDate, nodes);
-						cuFL.setNodes(nodesSearch);
-						isSearchEnabled = true;
+						if(searchByDate != null){
+							ArrayList<MegaNode> nodesSearch = cuFL.searchDate(searchDate, nodes);
+							cuFL.setNodes(nodesSearch);
+							isSearchEnabled = true;
+						}
+
+					}
+				}
+			}
+
+			if (muFLol != null){
+				if(muFLol.isAdded()){
+					long cameraUploadHandle = muFLol.getPhotoSyncHandle();
+					MegaNode nps = megaApi.getNodeByHandle(cameraUploadHandle);
+					if (nps != null){
+						ArrayList<MegaNode> nodes = megaApi.getChildren(nps, MegaApiJava.ORDER_MODIFICATION_DESC);
+						if(searchByDate != null){
+							ArrayList<MegaNode> nodesSearch = muFLol.searchDate(searchDate, nodes);
+							muFLol.setNodes(nodesSearch);
+							isSearchEnabled = true;
+						}
 					}
 				}
 			}
@@ -13553,9 +13573,17 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				if (nps != null){
 					log("nps != null");
 					ArrayList<MegaNode> nodes = megaApi.getChildren(nps, MegaApiJava.ORDER_MODIFICATION_DESC);
-//						cuFL.setNodes(megaApi.getFileFolderChildren(nps, MegaApiJava.ORDER_MODIFICATION_DESC));
 
-					cuFL.setNodes(nodes);
+					if(firstNavigationLevel){
+						cuFL.setNodes(nodes);
+					}else{
+						if(searchByDate != null){
+							ArrayList<MegaNode> nodesSearch = cuFL.searchDate(searchDate, nodes);
+							cuFL.setNodes(nodesSearch);
+							isSearchEnabled = true;
+						}
+
+					}
 				}
 			}
 		}
@@ -13568,8 +13596,16 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				if (nps != null){
 					log("nps != null");
 					ArrayList<MegaNode> nodes = megaApi.getChildren(nps, MegaApiJava.ORDER_MODIFICATION_DESC);
-//						muFLol.setNodes(megaApi.getFileFolderChildren(nps, MegaApiJava.ORDER_MODIFICATION_DESC));
-					muFLol.setNodes(nodes);
+					if(firstNavigationLevel){
+						muFLol.setNodes(nodes);
+					}else{
+						if(searchByDate != null){
+							ArrayList<MegaNode> nodesSearch = muFLol.searchDate(searchDate, nodes);
+							muFLol.setNodes(nodesSearch);
+							isSearchEnabled = true;
+						}
+
+					}
 				}
 			}
 		}
