@@ -27,10 +27,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.scrollBar.SectionTitleProvider;
-import mega.privacy.android.app.lollipop.ContactFileListActivityLollipop;
-import mega.privacy.android.app.lollipop.FolderLinkActivityLollipop;
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
-import mega.privacy.android.app.lollipop.managerSections.FileBrowserFragmentLollipop;
+import mega.privacy.android.app.lollipop.VersionsFileActivity;
 import mega.privacy.android.app.utils.ThumbnailUtils;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.Util;
@@ -48,7 +45,6 @@ public class VersionsFileAdapter extends RecyclerView.Adapter<VersionsFileAdapte
 //	int positionClicked;
 	ArrayList<MegaNode> nodes;
 
-	Object fragment;
 	long parentHandle = -1;
 	DisplayMetrics outMetrics;
 
@@ -71,6 +67,9 @@ public class VersionsFileAdapter extends RecyclerView.Adapter<VersionsFileAdapte
 		public ImageView imageView;
 		public RelativeLayout itemLayout;
 		public RelativeLayout threeDotsLayout;
+		public RelativeLayout headerLayout;
+		public TextView titleHeader;
+		public TextView sizeHeader;
 	}
 
 	public void toggleAllSelection(int pos) {
@@ -101,7 +100,7 @@ public class VersionsFileAdapter extends RecyclerView.Adapter<VersionsFileAdapte
 					log("onAnimationEnd");
 					if (selectedItems.size() <= 0){
 						log("toggleAllSelection: hideMultipleSelect");
-						((FileBrowserFragmentLollipop) fragment).hideMultipleSelect();
+						((VersionsFileActivity) context).hideMultipleSelect();
 					}
 					log("toggleAllSelection: notified item changed");
 					notifyItemChanged(positionToflip);
@@ -147,7 +146,7 @@ public class VersionsFileAdapter extends RecyclerView.Adapter<VersionsFileAdapte
 				@Override
 				public void onAnimationEnd(Animation animation) {
 					if (selectedItems.size() <= 0){
-						((FileBrowserFragmentLollipop) fragment).hideMultipleSelect();
+						((VersionsFileActivity) context).hideMultipleSelect();
 					}
 				}
 
@@ -253,19 +252,21 @@ public class VersionsFileAdapter extends RecyclerView.Adapter<VersionsFileAdapte
 		outMetrics = new DisplayMetrics();
 		display.getMetrics(outMetrics);
 		
-		View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_file_list, parent, false);
+		View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_version_file, parent, false);
 
 		ViewHolderVersion holderList = new ViewHolderVersion(v);
-		holderList.itemLayout = (RelativeLayout) v.findViewById(R.id.file_list_item_layout);
-		holderList.imageView = (ImageView) v.findViewById(R.id.file_list_thumbnail);
+		holderList.itemLayout = (RelativeLayout) v.findViewById(R.id.version_file_item_layout);
+		holderList.imageView = (ImageView) v.findViewById(R.id.version_file_thumbnail);
 
-		holderList.textViewFileName = (TextView) v.findViewById(R.id.file_list_filename);
+		holderList.textViewFileName = (TextView) v.findViewById(R.id.version_file_filename);
 
-		holderList.textViewFileSize = (TextView) v.findViewById(R.id.file_list_filesize);
+		holderList.textViewFileSize = (TextView) v.findViewById(R.id.version_file_filesize);
 
-		holderList.threeDotsLayout = (RelativeLayout) v.findViewById(R.id.file_list_three_dots_layout);
+		holderList.threeDotsLayout = (RelativeLayout) v.findViewById(R.id.version_file_three_dots_layout);
 
-		holderList.textViewFileSize.setVisibility(View.VISIBLE);
+		holderList.headerLayout = (RelativeLayout) v.findViewById(R.id.version_file_header_layout);
+		holderList.titleHeader = (TextView) v.findViewById(R.id.version_file_header_title);
+		holderList.sizeHeader = (TextView) v.findViewById(R.id.version_file_header_size);
 
 		holderList.itemLayout.setTag(holderList);
 		holderList.itemLayout.setOnClickListener(this);
@@ -286,6 +287,28 @@ public class VersionsFileAdapter extends RecyclerView.Adapter<VersionsFileAdapte
 		MegaNode node = (MegaNode) getItem(position);
 		holder.document = node.getHandle();
 		Bitmap thumb = null;
+
+		if(position==0){
+			holder.titleHeader.setText(context.getString(R.string.header_current_section_item));
+			holder.sizeHeader.setVisibility(View.GONE);
+			holder.headerLayout.setVisibility(View.VISIBLE);
+		}
+		else if(position==1){
+			holder.titleHeader.setText(context.getResources().getQuantityString(R.plurals.header_previous_section_item, megaApi.getNumVersions(node)));
+
+			if(((VersionsFileActivity)context).versionsSize!=null){
+				holder.sizeHeader.setText(((VersionsFileActivity)context).versionsSize);
+				holder.sizeHeader.setVisibility(View.VISIBLE);
+			}
+			else{
+				holder.sizeHeader.setVisibility(View.GONE);
+			}
+
+			holder.headerLayout.setVisibility(View.VISIBLE);
+		}
+		else{
+			holder.headerLayout.setVisibility(View.GONE);
+		}
 		
 		holder.textViewFileName.setText(node.getName());
 		holder.textViewFileSize.setText("");
@@ -365,7 +388,16 @@ public class VersionsFileAdapter extends RecyclerView.Adapter<VersionsFileAdapte
 						holder.imageView.setImageBitmap(thumb);
 
 					} else {
+						holder.imageView.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
+						RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
+						params.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
+						params.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
+						int left = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 12, context.getResources().getDisplayMetrics());
+						params.setMargins(left,0, 0, 0);
+						holder.imageView.setLayoutParams(params);
+
 						try {
+
 							ThumbnailUtilsLollipop.createThumbnailList(context, node,holder, megaApi, this);
 						} catch (Exception e) {
 						} // Too many AsyncTasks
@@ -380,7 +412,8 @@ public class VersionsFileAdapter extends RecyclerView.Adapter<VersionsFileAdapte
 				RelativeLayout.LayoutParams paramsMultiselect = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
 				paramsMultiselect.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
 				paramsMultiselect.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
-				paramsMultiselect.setMargins(0, 0, 0, 0);
+				int left = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 12, context.getResources().getDisplayMetrics());
+				paramsMultiselect.setMargins(left, 0, 0, 0);
 				holder.imageView.setLayoutParams(paramsMultiselect);
 				holder.imageView.setImageResource(R.drawable.ic_select_folder);
 			}
@@ -451,10 +484,18 @@ public class VersionsFileAdapter extends RecyclerView.Adapter<VersionsFileAdapte
 						} else {
 							log("NOT thumbnail");
 							holder.imageView.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
-							try {
-								ThumbnailUtilsLollipop.createThumbnailList(context, node, holder, megaApi, this);
-							} catch (Exception e) {
-							} // Too many AsyncTasks
+							RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
+							params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
+							params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
+							int left = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 12, context.getResources().getDisplayMetrics());
+							params1.setMargins(left, 0, 0, 0);
+
+							if (MimeTypeList.typeForName(node.getName()).isImage()) {
+								try {
+									ThumbnailUtilsLollipop.createThumbnailList(context, node, holder, megaApi, this);
+								} catch (Exception e) {
+								}
+							}
 						}
 					}
 				}
@@ -510,40 +551,27 @@ public class VersionsFileAdapter extends RecyclerView.Adapter<VersionsFileAdapte
 		final MegaNode n = (MegaNode) getItem(currentPosition);
 
 		switch (v.getId()) {
-			case R.id.file_list_three_dots_layout:
-			case R.id.file_grid_three_dots:{
+			case R.id.version_file_three_dots_layout:{
 
-				log("onClick: file_list_three_dots: "+currentPosition);
+				log("onClick: version_file_three_dots: "+currentPosition);
 				if(!Util.isOnline(context)){
-					if(context instanceof ManagerActivityLollipop){
-						((ManagerActivityLollipop) context).showSnackbar(context.getString(R.string.error_server_connection_problem));
-					}
-					else if(context instanceof FolderLinkActivityLollipop){
-						((FolderLinkActivityLollipop) context).showSnackbar(context.getString(R.string.error_server_connection_problem));
-					}
-					else if(context instanceof ContactFileListActivityLollipop){
-						((ContactFileListActivityLollipop) context).showSnackbar(context.getString(R.string.error_server_connection_problem));
-					}
+					((VersionsFileActivity) context).showSnackbar(context.getString(R.string.error_server_connection_problem));
 					return;
 				}
 
 				if(multipleSelect){
-
-					((FileBrowserFragmentLollipop) fragment).itemClick(currentPosition);
-
+					((VersionsFileActivity) context).itemClick(currentPosition);
 				}
 				else{
-
-					((ManagerActivityLollipop) context).showNodeOptionsPanel(n);
+					((VersionsFileActivity) context).showOptionsPanel(n);
 
 				}
 
 				break;
 			}
-			case R.id.file_list_item_layout:
-			case R.id.file_grid_item_layout:{
+			case R.id.version_file_item_layout:{
 
-				((FileBrowserFragmentLollipop) fragment).itemClick(currentPosition);
+				((VersionsFileActivity) context).itemClick(currentPosition);
 
 				break;
 			}
@@ -558,8 +586,7 @@ public class VersionsFileAdapter extends RecyclerView.Adapter<VersionsFileAdapte
 		ViewHolderVersion holder = (ViewHolderVersion) view.getTag();
 		int currentPosition = holder.getAdapterPosition();
 
-		((FileBrowserFragmentLollipop) fragment).activateActionMode();
-		((FileBrowserFragmentLollipop) fragment).itemClick(currentPosition);
+		((VersionsFileActivity) context).itemClick(currentPosition);
 
 		return true;
 	}
@@ -601,6 +628,6 @@ public class VersionsFileAdapter extends RecyclerView.Adapter<VersionsFileAdapte
 	}
 
 	private static void log(String log) {
-		Util.log("MegaBrowserLollipopAdapter", log);
+		Util.log("VersionsFileAdapter", log);
 	}
 }

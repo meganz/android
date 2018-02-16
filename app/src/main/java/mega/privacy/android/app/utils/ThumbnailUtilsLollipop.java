@@ -1329,7 +1329,6 @@ public class ThumbnailUtilsLollipop {
 		String localPath = Util.getLocalFile(context, document.getName(), document.getSize(), null); //if file already exists returns != null
 		if(localPath != null) //Si la tengo en el sistema de ficheros
 		{
-			log("localPath no es nulo: " + localPath);
 			ResizerParams params = new ResizerParams();
 			params.document = document;
 			params.file = new File(localPath);
