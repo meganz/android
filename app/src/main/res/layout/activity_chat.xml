@@ -177,13 +177,13 @@
                     <RelativeLayout
                         android:id="@+id/relative_layout_file_storage"
                         android:layout_width="match_parent"
-                        android:layout_height="240dp"
+                        android:layout_height="wrap_content"
                         android:layout_alignParentBottom="true"
                         android:background="@android:color/transparent">
                         <FrameLayout
                             android:id="@+id/fragment_container_file_storage"
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent"
+                            android:layout_height="wrap_content"
                             android:background="@android:color/transparent"/>
 
                     </RelativeLayout>

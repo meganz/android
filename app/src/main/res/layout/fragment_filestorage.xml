@@ -2,26 +2,50 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="240dp"
     android:background="@android:color/transparent">
 
-    <RelativeLayout
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent">
+        <android.support.v4.widget.NestedScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
-        <!--<mega.privacy.android.app.components.CustomizedGridRecyclerView-->
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/file_storage_grid_view_browser"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:choiceMode="multipleChoice"
+                    android:columnWidth="172dp"
+                    android:background="@color/grid_item_separator"
+                    android:clipToPadding="false"
+                    android:scrollbars="vertical"/>
+
+
+        </android.support.v4.widget.NestedScrollView>
+
+
+</RelativeLayout>
+
+
+    <!--<?xml version="1.0" encoding="utf-8"?>-->
+<!--<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"-->
+<!--xmlns:tools="http://schemas.android.com/tools"-->
+<!--android:layout_width="match_parent"-->
+<!--android:layout_height="match_parent"-->
+<!--android:background="@android:color/transparent">-->
+
+<!--<RelativeLayout-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="match_parent">-->
+
+        <!--<android.support.v7.widget.RecyclerView-->
             <!--android:id="@+id/file_storage_grid_view_browser"-->
             <!--android:layout_width="match_parent"-->
             <!--android:layout_height="match_parent"-->
             <!--android:choiceMode="multipleChoice"-->
-            <!--android:columnWidth="172dp"/>-->
+            <!--android:columnWidth="172dp"-->
+            <!--android:background="@color/grid_item_separator"-->
+            <!--android:clipToPadding="false"-->
+            <!--android:scrollbars="vertical"/>-->
+<!--</RelativeLayout>-->
 
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/file_storage_grid_view_browser"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:choiceMode="multipleChoice"
-            android:columnWidth="172dp"/>
-    </RelativeLayout>
-
-</RelativeLayout>
+<!--</RelativeLayout>-->

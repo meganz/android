@@ -170,17 +170,9 @@ public class MegaChatFileStorageAdapter extends RecyclerView.Adapter<MegaChatFil
         Display display = ((Activity) context).getWindowManager().getDefaultDisplay();
         DisplayMetrics outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
-        float density = ((Activity) context).getResources().getDisplayMetrics().density;
-
-        float scaleW = Util.getScaleW(outMetrics, density);
-        float scaleH = Util.getScaleH(outMetrics, density);
-
-        float dpHeight = outMetrics.heightPixels / density;
-        float dpWidth  = outMetrics.widthPixels / density;
 
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_file_storage_grid, parent, false);
         ViewHolderBrowserGrid holderGrid = new ViewHolderBrowserGrid(v);
-
 
         holderGrid.itemLayout = (RelativeLayout) v.findViewById(R.id.file_storage_grid_item_layout);
         holderGrid.thumbLayout = (RelativeLayout) v.findViewById(R.id.file_storage_grid_thumbnail_layout);
@@ -293,23 +285,35 @@ public class MegaChatFileStorageAdapter extends RecyclerView.Adapter<MegaChatFil
         ViewHolderBrowser holder = (ViewHolderBrowser) v.getTag();
         int currentPosition = holder.getAdapterPosition();
         log("onClick -> Current position: "+currentPosition);
-
         if(currentPosition<0){
             log("Current position error - not valid value");
             return;
         }
-        ((ChatFileStorageFragment) fragment).itemClick(currentPosition);
+        if (!isMultipleSelect()){
+            setMultipleSelect(true);
+            ((ChatFileStorageFragment) fragment).itemClick(currentPosition);
+
+        }else{
+            ((ChatFileStorageFragment) fragment).itemClick(currentPosition);
+
+        }
+        //((ChatFileStorageFragment) fragment).itemClick(currentPosition);
 
     }
 
     @Override
     public boolean onLongClick(View view) {
+
         ((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
         ViewHolderBrowser holder = (ViewHolderBrowser) view.getTag();
         int currentPosition = holder.getAdapterPosition();
+
         if (!isMultipleSelect()){
             setMultipleSelect(true);
+            ((ChatFileStorageFragment) fragment).itemClick(currentPosition);
+
+        }else{
             ((ChatFileStorageFragment) fragment).itemClick(currentPosition);
 
         }
