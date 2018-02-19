@@ -566,22 +566,6 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 				if (nodeToCheck.getHandle() == node.getHandle()){
 					thisNode = true;
 					n = nodeToCheck;
-
-					//Check if the parent handle has changed
-					if(n.hasChanged(MegaNode.CHANGE_TYPE_PARENT)){
-						MegaNode oldParent = megaApi.getParentNode(node);
-						MegaNode newParent = megaApi.getParentNode(n);
-						if(oldParent.getHandle()==newParent.getHandle()){
-							log("New version added");
-							node = newParent;
-						}
-						else{
-							node = n;
-						}
-					}
-					else{
-						node = n;
-					}
 				}
 				else{
 					for(int j=0; j<nodeVersions.size();j++){
@@ -598,6 +582,25 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 		if ((!thisNode)&&(!anyChild)){
 			log("exit onNodesUpdate - Not related to this node");
 			return;
+		}
+
+		//Check if the parent handle has changed
+		if(n.hasChanged(MegaNode.CHANGE_TYPE_PARENT)){
+			MegaNode oldParent = megaApi.getParentNode(node);
+			MegaNode newParent = megaApi.getParentNode(n);
+			if(oldParent.getHandle()==newParent.getHandle()){
+				log("New version added");
+				node = newParent;
+			}
+			else{
+				node = n;
+			}
+		}
+		else if(n.hasChanged(MegaNode.CHANGE_TYPE_REMOVED)){
+			node = nodeVersions.get(1);
+		}
+		else{
+			node = n;
 		}
 
 		log("nodeVersions size: "+nodeVersions.size());

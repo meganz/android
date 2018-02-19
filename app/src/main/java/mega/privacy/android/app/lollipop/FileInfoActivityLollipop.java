@@ -117,6 +117,8 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
 	boolean firstIncomingLevel=true;
 
+	ArrayList<MegaNode> nodeVersions;
+
 	RelativeLayout iconToolbarLayout;
 	ImageView iconToolbarView;
 	ImageView iconToolbarViewLink;
@@ -500,6 +502,8 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 				versionsButton.setText(String.format(getString(R.string.number_of_versions), megaApi.getNumVersions(node)));
 				versionsButton.setOnClickListener(this);
 				separatorVersions.setVisibility(View.VISIBLE);
+
+				nodeVersions = megaApi.getVersions(node);
 			}
 			else{
 				versionsLayout.setVisibility(View.GONE);
@@ -2565,6 +2569,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 		log("onNodesUpdate");
 
 		boolean thisNode = false;
+		boolean anyChild = false;
 		if(nodes==null){
 			return;
 		}
@@ -2576,30 +2581,64 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 				if (nodeToCheck.getHandle() == node.getHandle()){
 					thisNode = true;
 					n = nodeToCheck;
+					break;
+				}
+				else{
+					for(int j=0; j<nodeVersions.size();j++){
+						if(nodeToCheck.getHandle()==nodeVersions.get(j).getHandle()){
+							if(anyChild==false){
+								anyChild = true;
+								break;
+							}
+						}
+					}
 				}
 			}
 		}
 
-		if (!thisNode){
+		if ((!thisNode)&&(!anyChild)){
 			log("exit onNodesUpdate - Not related to this node");
 			return;
 		}
 
 		//Check if the parent handle has changed
-		if(n.hasChanged(MegaNode.CHANGE_TYPE_PARENT)){
-			MegaNode oldParent = megaApi.getParentNode(node);
-			MegaNode newParent = megaApi.getParentNode(n);
-			if(oldParent.getHandle()==newParent.getHandle()){
-				log("New version added");
-				node = newParent;
+		if(n!=null){
+			if(n.hasChanged(MegaNode.CHANGE_TYPE_PARENT)){
+				MegaNode oldParent = megaApi.getParentNode(node);
+				MegaNode newParent = megaApi.getParentNode(n);
+				if(oldParent.getHandle()==newParent.getHandle()){
+					log("New version added");
+					node = newParent;
+				}
+				else{
+					node = n;
+				}
+			}
+			else if(n.hasChanged(MegaNode.CHANGE_TYPE_REMOVED)){
+				if(thisNode){
+					if(nodeVersions!=null){
+						node = nodeVersions.get(1);
+						nodeVersions = megaApi.getVersions(node);
+					}
+					else{
+						finish();
+					}
+				}
+				else if(anyChild){
+					nodeVersions = megaApi.getVersions(n);
+				}
+
 			}
 			else{
 				node = n;
 			}
 		}
 		else{
-			node = n;
+			if(anyChild){
+				nodeVersions = megaApi.getVersions(node);
+			}
 		}
+
 
 //		if (node.getHandle() != -1){
 //			log("node updated");
@@ -2628,7 +2667,6 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 			publicLinkLayout.setVisibility(View.GONE);
 			publicLinkCopyLayout.setVisibility(View.GONE);
 			iconToolbarViewLink.setVisibility(View.GONE);
-
 		}
 
 		if (node.isFolder()){
