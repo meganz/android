@@ -2610,53 +2610,57 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     }
                     else{
 
-                        if(m.getMessage().getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT){
+                        if((m.getMessage().getStatus()==MegaChatMessage.STATUS_SERVER_REJECTED)||(m.getMessage().getStatus()==MegaChatMessage.STATUS_SENDING_MANUAL)){
+                            if(m.getMessage().getUserHandle()==megaChatApi.getMyUserHandle()) {
+                                if (!(m.getMessage().isManagementMessage())) {
+                                    log("selected message handle: " + m.getMessage().getTempId());
+                                    log("selected message rowId: " + m.getMessage().getRowId());
+                                    if ((m.getMessage().getStatus() == MegaChatMessage.STATUS_SERVER_REJECTED) || (m.getMessage().getStatus() == MegaChatMessage.STATUS_SENDING_MANUAL)) {
+                                        log("show not sent message panel");
+                                        showMsgNotSentPanel(m, position);
+                                    }
+                                }
+                            }
+                        }
+                        else{
+                            if(m.getMessage().getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT){
 
-                            MegaNodeList nodeList = m.getMessage().getMegaNodeList();
-                            if(nodeList.size()==1){
-                                MegaNode node = nodeList.get(0);
+                                MegaNodeList nodeList = m.getMessage().getMegaNodeList();
+                                if(nodeList.size()==1){
+                                    MegaNode node = nodeList.get(0);
 
-                                if (MimeTypeList.typeForName(node.getName()).isImage()){
-                                    if(node.hasPreview()){
-                                        log("Show full screen viewer");
-                                        showFullScreenViewer(m.getMessage().getMsgId());
+                                    if (MimeTypeList.typeForName(node.getName()).isImage()){
+                                        if(node.hasPreview()){
+                                            log("Show full screen viewer");
+                                            showFullScreenViewer(m.getMessage().getMsgId());
+                                        }
+                                        else{
+                                            log("Image without preview - show node attachment panel for one node");
+                                            showNodeAttachmentBottomSheet(m, position);
+                                        }
                                     }
                                     else{
-                                        log("Image without preview - show node attachment panel for one node");
+                                        log("NOT Image - show node attachment panel for one node");
                                         showNodeAttachmentBottomSheet(m, position);
                                     }
                                 }
                                 else{
-                                    log("NOT Image - show node attachment panel for one node");
+                                    log("show node attachment panel");
                                     showNodeAttachmentBottomSheet(m, position);
                                 }
                             }
-                            else{
-                                log("show node attachment panel");
-                                showNodeAttachmentBottomSheet(m, position);
-                            }
-                        }
-                        if(m.getMessage().getType()==MegaChatMessage.TYPE_CONTACT_ATTACHMENT){
-                            log("show contact attachment panel");
-                            if (m != null) {
-                                if (m.getMessage().getUsersCount() == 1) {
-                                    long userHandle = m.getMessage().getUserHandle(0);
-                                    if(userHandle != megaApi.getMyUser().getHandle()){
+                            else if(m.getMessage().getType()==MegaChatMessage.TYPE_CONTACT_ATTACHMENT){
+                                log("show contact attachment panel");
+                                if (m != null) {
+                                    if (m.getMessage().getUsersCount() == 1) {
+                                        long userHandle = m.getMessage().getUserHandle(0);
+                                        if(userHandle != megaApi.getMyUser().getHandle()){
+                                            showContactAttachmentBottomSheet(m, position);
+                                        }
+                                    }
+                                    else{
                                         showContactAttachmentBottomSheet(m, position);
                                     }
-                                }
-                                else{
-                                    showContactAttachmentBottomSheet(m, position);
-                                }
-                            }
-                        }
-                        else if(m.getMessage().getUserHandle()==megaChatApi.getMyUserHandle()) {
-                            if(!(m.getMessage().isManagementMessage())){
-                                log("selected message handle: "+m.getMessage().getTempId());
-                                log("selected message rowId: "+m.getMessage().getRowId());
-                                if((m.getMessage().getStatus()==MegaChatMessage.STATUS_SERVER_REJECTED)||(m.getMessage().getStatus()==MegaChatMessage.STATUS_SENDING_MANUAL)){
-                                    log("show not sent message panel");
-                                    showMsgNotSentPanel(m, position);
                                 }
                             }
                         }
@@ -3680,13 +3684,18 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     if(indexToChange<lastI){
                         //Check if there is already any MANUAL_SENDING in the queue
                         AndroidMegaChatMessage previousMessage = messages.get(lastI);
-                        if(previousMessage.getMessage().getStatus()==MegaChatMessage.STATUS_SENDING_MANUAL){
-                            log("More MANUAL SENDING in queue");
-                            log("Removed index: "+indexToChange);
-                            messages.remove(indexToChange);
-                            appendMessageAnotherMS(msg);
-                            adapter.notifyDataSetChanged();
-                            return indexToChange;
+                        if(previousMessage.isUploading()){
+                            log("Previous message is uploading");
+                        }
+                        else{
+                            if(previousMessage.getMessage().getStatus()==MegaChatMessage.STATUS_SENDING_MANUAL){
+                                log("More MANUAL SENDING in queue");
+                                log("Removed index: "+indexToChange);
+                                messages.remove(indexToChange);
+                                appendMessageAnotherMS(msg);
+                                adapter.notifyDataSetChanged();
+                                return indexToChange;
+                            }
                         }
                     }
                 }
