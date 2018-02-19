@@ -1,7 +1,7 @@
 package mega.privacy.android.app.utils;
 
 public class Constants {
-	
+
 	public static String PIN_4 = "4";
 	public static String PIN_6 = "6";
 	public static String PIN_ALPHANUMERIC = "alphanumeric";
@@ -172,6 +172,7 @@ public class Constants {
 
 	final public static int CONTACT_TYPE_MEGA = 0;
 	final public static int CONTACT_TYPE_DEVICE = 1;
+	final public static int CONTACT_TYPE_BOTH = 2;
 
 	public static int SELECT_RINGTONE = 2000;
 	public static int SELECT_NOTIFICATION_SOUND = SELECT_RINGTONE+1;
