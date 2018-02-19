@@ -32,6 +32,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import mega.privacy.android.app.MegaApplication;
@@ -551,9 +552,64 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 	@Override
 	public void onNodesUpdate(MegaApiJava api, ArrayList<MegaNode> nodes) {
 		log("onNodesUpdate");
+
+		boolean thisNode = false;
+		boolean anyChild = false;
+		if(nodes==null){
+			return;
+		}
+		MegaNode n = null;
+		Iterator<MegaNode> it = nodes.iterator();
+		while (it.hasNext()){
+			MegaNode nodeToCheck = it.next();
+			if (nodeToCheck != null){
+				if (nodeToCheck.getHandle() == node.getHandle()){
+					thisNode = true;
+					n = nodeToCheck;
+
+					//Check if the parent handle has changed
+					if(n.hasChanged(MegaNode.CHANGE_TYPE_PARENT)){
+						MegaNode oldParent = megaApi.getParentNode(node);
+						MegaNode newParent = megaApi.getParentNode(n);
+						if(oldParent.getHandle()==newParent.getHandle()){
+							log("New version added");
+							node = newParent;
+						}
+						else{
+							node = n;
+						}
+					}
+					else{
+						node = n;
+					}
+				}
+				else{
+					for(int j=0; j<nodeVersions.size();j++){
+						if(nodeToCheck.getHandle()==nodeVersions.get(j).getHandle()){
+							if(anyChild==false){
+								anyChild = true;
+							}
+						}
+					}
+				}
+			}
+		}
+
+		if ((!thisNode)&&(!anyChild)){
+			log("exit onNodesUpdate - Not related to this node");
+			return;
+		}
+
+		log("nodeVersions size: "+nodeVersions.size());
 		nodeVersions = megaApi.getVersions(node);
+		log("After update - nodeVersions size: "+nodeVersions.size());
 		if(adapter!=null){
+			adapter.setNodes(nodeVersions);
 			adapter.notifyDataSetChanged();
+		}
+		else{
+			adapter = new VersionsFileAdapter(this, nodeVersions, listView);
+			listView.setAdapter(adapter);
 		}
 
 
