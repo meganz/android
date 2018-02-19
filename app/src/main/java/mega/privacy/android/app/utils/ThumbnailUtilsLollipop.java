@@ -1456,6 +1456,27 @@ public class ThumbnailUtilsLollipop {
 			log("Create video thumb NULL");
 		}
 	}
+
+
+
+	public static Bitmap resizeBitmapUpload(Bitmap bitmap, int width, int height) {
+		Bitmap resizeBitmap = null;
+		int resizeWidth, resizeHeight;
+		float resize;
+
+		if (width > height) {
+			resize = (float) 1000 / width;
+		}
+		else {
+			resize = (float) 1000 / height;
+		}
+		resizeWidth = (int) (width * resize);
+		resizeHeight = (int) (height * resize);
+
+		resizeBitmap = Bitmap.createScaledBitmap(bitmap, resizeWidth, resizeHeight, false);
+
+		return resizeBitmap;
+	}
 	
 	private static final String SELECTION = MediaColumns.DATA + "=?";
 	private static final String[] PROJECTION = { BaseColumns._ID };

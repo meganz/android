@@ -18,6 +18,7 @@ import android.os.IBinder;
 import android.os.ParcelFileDescriptor;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
+import android.provider.MediaStore;
 import android.support.v4.app.NotificationCompat;
 import android.widget.RemoteViews;
 
@@ -26,12 +27,14 @@ import com.shockwave.pdfium.PdfiumCore;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.PreviewUtils;
@@ -422,7 +425,56 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
                     ThumbnailUtilsLollipop.createThumbnailVideo(this, transfer.getPath(), megaApi, transfer.getNodeHandle());
 
                     MegaNode node = megaApi.getNodeByHandle(transfer.getNodeHandle());
+
+					File previewDir = PreviewUtils.getPreviewFolder(this);
+					File preview = new File(previewDir, MegaApiAndroid.handleToBase64(transfer.getNodeHandle()) + ".jpg");
+
+					Bitmap bmPreview = android.media.ThumbnailUtils.createVideoThumbnail(transfer.getPath(), MediaStore.Video.Thumbnails.FULL_SCREEN_KIND);
+					if(bmPreview==null){
+						log("Create video preview NULL, get with Cursor");
+						bmPreview= ThumbnailUtilsLollipop.loadVideoThumbnail(transfer.getPath(), this);
+					}
+					else{
+						log("Create Video preview worked!");
+					}
+
                     if(node!=null){
+						if(bmPreview!=null){
+							try {
+								preview.createNewFile();
+
+								FileOutputStream out = null;
+								try {
+									out = new FileOutputStream(preview);
+									Bitmap resizedBitmap = ThumbnailUtilsLollipop.resizeBitmapUpload(bmPreview, bmPreview.getWidth(), bmPreview.getHeight());
+									boolean result = resizedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, out); // bmp is your Bitmap instance
+									if(result){
+										log("Compress OK!");
+										megaApi.setPreview(node, preview.getAbsolutePath(), new VideoPreviewGeneratorListener());
+									}
+									else{
+										log("Not Compress");
+									}
+								} catch (Exception e) {
+									log("Error with FileOutputStream: "+e.getMessage());
+								} finally {
+									try {
+										if (out != null) {
+											out.close();
+										}
+									} catch (IOException e) {
+										log("Error: "+e.getMessage());
+									}
+								}
+
+							} catch (IOException e1) {
+								log("Error creating new preview file: "+e1.getMessage());
+							}
+						}
+						else{
+							log("Create video preview NULL");
+						}
+
                         MediaMetadataRetriever retriever = new MediaMetadataRetriever();
                         retriever.setDataSource(transfer.getPath());
 
@@ -549,8 +601,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 						int height = pdfiumCore.getPageHeightPoint(pdfDocument, pageNumber);
 						Bitmap bmp = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
 						pdfiumCore.renderPageBitmap(pdfDocument, bmp, pageNumber, 0, 0, width, height);
-						Bitmap resizedBitmap;
-						resizedBitmap = Bitmap.createScaledBitmap(bmp, width, height, false);
+						Bitmap resizedBitmap = ThumbnailUtilsLollipop.resizeBitmapUpload(bmp, width, height);
 						out = new FileOutputStream(preview);
 						boolean result = resizedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, out); // bmp is your Bitmap instance
 						if(result){
@@ -663,6 +714,39 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 		if (megaApi.getNumPendingUploads() == 0 && transfersCount==0){
 			onQueueComplete();
 		}
+	}
+
+	static class VideoPreviewGeneratorListener implements MegaRequestListenerInterface{
+
+		@Override
+		public void onRequestStart(MegaApiJava api, MegaRequest request) {
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
+			if (e.getErrorCode() == MegaError.API_OK){
+				log("OK preview de video");
+			}
+			else{
+				log("ERROR preview de video: "+e.getErrorString());
+			}
+
+		}
+
+		@Override
+		public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) {
+			// TODO Auto-generated method stub
+
+		}
+
 	}
 
 	public void attachNodes(MegaTransfer transfer){
