@@ -806,6 +806,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 			case R.id.cab_menu_file_info_share_folder: {
 				Intent intent = new Intent(AddContactActivityLollipop.ACTION_PICK_CONTACT_SHARE_FOLDER);
 				intent.setClass(this, AddContactActivityLollipop.class);
+				intent.putExtra("contactType", Constants.CONTACT_TYPE_BOTH);
 				intent.putExtra(AddContactActivityLollipop.EXTRA_NODE_HANDLE, node.getHandle());
 				startActivityForResult(intent, REQUEST_CODE_SELECT_CONTACT);
 				break;
