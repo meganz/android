@@ -202,8 +202,6 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 					}
 					log("Chat file uploading: "+filePaths.get(i));
 
-
-
 					megaApi.startUpload(filePaths.get(i), parentNode);
 				}
 			}
