@@ -20,8 +20,11 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
@@ -314,40 +317,50 @@ public class VersionsFileAdapter extends RecyclerView.Adapter<VersionsFileAdapte
 		holder.textViewFileSize.setText("");
 
 		long nodeSize = node.getSize();
-		holder.textViewFileSize.setText(Util.getSizeString(nodeSize));
+		String fileInfo = Util.getSizeString(nodeSize) + " . " + getNodeDate(node);
+		holder.textViewFileSize.setText(fileInfo);
+
+		RelativeLayout.LayoutParams paramsLarge = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
+		paramsLarge.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
+		paramsLarge.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
+		int leftLarge = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 12, context.getResources().getDisplayMetrics());
+		paramsLarge.setMargins(leftLarge, 0, 0, 0);
 
 		if (!multipleSelect) {
 			log("Not multiselect");
 			holder.itemLayout.setBackgroundColor(Color.WHITE);
 			holder.imageView.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
-
-			RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
-			params.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
-			params.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
-			params.setMargins(0, 0, 0, 0);
-			holder.imageView.setLayoutParams(params);
+			holder.imageView.setLayoutParams(paramsLarge);
 
 			log("Check the thumb");
 
 			if (node.hasThumbnail()) {
 				log("Node has thumbnail");
-				RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
-				params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-				params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-				int left = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 6, context.getResources().getDisplayMetrics());
-				params1.setMargins(left, 0, 0, 0);
-
-				holder.imageView.setLayoutParams(params1);
 
 				thumb = ThumbnailUtils.getThumbnailFromCache(node);
 				if (thumb != null) {
+					RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
+					params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
+					params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
+					int left = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 18, context.getResources().getDisplayMetrics());
+					int right = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 6, context.getResources().getDisplayMetrics());
+					params1.setMargins(left, 0, right, 0);
 
+					holder.imageView.setLayoutParams(params1);
 					holder.imageView.setImageBitmap(thumb);
 
 				} else {
 					thumb = ThumbnailUtils
 							.getThumbnailFromFolder(node, context);
 					if (thumb != null) {
+						RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
+						params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
+						params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
+						int left = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 18, context.getResources().getDisplayMetrics());
+						int right = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 6, context.getResources().getDisplayMetrics());
+						params1.setMargins(left, 0, right, 0);
+
+						holder.imageView.setLayoutParams(params1);
 						holder.imageView.setImageBitmap(thumb);
 
 					} else {
@@ -357,6 +370,14 @@ public class VersionsFileAdapter extends RecyclerView.Adapter<VersionsFileAdapte
 						} // Too many AsyncTasks
 
 						if (thumb != null) {
+							RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
+							params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
+							params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
+							int left = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 18, context.getResources().getDisplayMetrics());
+							int right = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 6, context.getResources().getDisplayMetrics());
+							params1.setMargins(left, 0, right, 0);
+
+							holder.imageView.setLayoutParams(params1);
 							holder.imageView.setImageBitmap(thumb);
 						}
 					}
@@ -368,8 +389,9 @@ public class VersionsFileAdapter extends RecyclerView.Adapter<VersionsFileAdapte
 					RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
 					params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
 					params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-					int left = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 6, context.getResources().getDisplayMetrics());
-					params1.setMargins(left, 0, 0, 0);
+					int left = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 18, context.getResources().getDisplayMetrics());
+					int right = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 6, context.getResources().getDisplayMetrics());
+					params1.setMargins(left, 0, right, 0);
 
 					holder.imageView.setLayoutParams(params1);
 					holder.imageView.setImageBitmap(thumb);
@@ -381,23 +403,18 @@ public class VersionsFileAdapter extends RecyclerView.Adapter<VersionsFileAdapte
 						RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
 						params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
 						params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-						int left = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 6, context.getResources().getDisplayMetrics());
-						params1.setMargins(left, 0, 0, 0);
+						int left = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 18, context.getResources().getDisplayMetrics());
+						int right = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 6, context.getResources().getDisplayMetrics());
+						params1.setMargins(left, 0, right, 0);
 
 						holder.imageView.setLayoutParams(params1);
 						holder.imageView.setImageBitmap(thumb);
 
 					} else {
 						holder.imageView.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
-						RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
-						params.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
-						params.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
-						int left = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 12, context.getResources().getDisplayMetrics());
-						params.setMargins(left,0, 0, 0);
-						holder.imageView.setLayoutParams(params);
+						holder.imageView.setLayoutParams(paramsLarge);
 
 						try {
-
 							ThumbnailUtilsLollipop.createThumbnailList(context, node,holder, megaApi, this);
 						} catch (Exception e) {
 						} // Too many AsyncTasks
@@ -409,38 +426,42 @@ public class VersionsFileAdapter extends RecyclerView.Adapter<VersionsFileAdapte
 			log("Multiselection ON");
 			if(this.isItemChecked(position)){
 				holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.new_multiselect_color));
-				RelativeLayout.LayoutParams paramsMultiselect = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
-				paramsMultiselect.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
-				paramsMultiselect.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
-				int left = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 12, context.getResources().getDisplayMetrics());
-				paramsMultiselect.setMargins(left, 0, 0, 0);
-				holder.imageView.setLayoutParams(paramsMultiselect);
+
+				holder.imageView.setLayoutParams(paramsLarge);
 				holder.imageView.setImageResource(R.drawable.ic_select_folder);
 			}
 			else{
 				holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.white));
 
 				log("Check the thumb");
+				holder.imageView.setLayoutParams(paramsLarge);
 
 				if (node.hasThumbnail()) {
 					log("Node has thumbnail");
-					RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
-					params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-					params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-					int left = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 6, context.getResources().getDisplayMetrics());
-					params1.setMargins(left, 0, 0, 0);
-
-					holder.imageView.setLayoutParams(params1);
 
 					thumb = ThumbnailUtils.getThumbnailFromCache(node);
 					if (thumb != null) {
+						RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
+						params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
+						params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
+						int left = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 18, context.getResources().getDisplayMetrics());
+						int right = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 6, context.getResources().getDisplayMetrics());
+						params1.setMargins(left, 0, right, 0);
 
+						holder.imageView.setLayoutParams(params1);
 						holder.imageView.setImageBitmap(thumb);
 
 					} else {
-						thumb = ThumbnailUtils
-								.getThumbnailFromFolder(node, context);
+						thumb = ThumbnailUtils.getThumbnailFromFolder(node, context);
 						if (thumb != null) {
+							RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
+							params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
+							params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
+							int left = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 18, context.getResources().getDisplayMetrics());
+							int right = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 6, context.getResources().getDisplayMetrics());
+							params1.setMargins(left, 0, right, 0);
+
+							holder.imageView.setLayoutParams(params1);
 							holder.imageView.setImageBitmap(thumb);
 
 						} else {
@@ -450,6 +471,14 @@ public class VersionsFileAdapter extends RecyclerView.Adapter<VersionsFileAdapte
 							} // Too many AsyncTasks
 
 							if (thumb != null) {
+								RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
+								params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
+								params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
+								int left = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 18, context.getResources().getDisplayMetrics());
+								int right = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 6, context.getResources().getDisplayMetrics());
+								params1.setMargins(left, 0, right, 0);
+
+								holder.imageView.setLayoutParams(params1);
 								holder.imageView.setImageBitmap(thumb);
 							}
 						}
@@ -462,12 +491,12 @@ public class VersionsFileAdapter extends RecyclerView.Adapter<VersionsFileAdapte
 						RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
 						params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
 						params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-						int left = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 6, context.getResources().getDisplayMetrics());
-						params1.setMargins(left, 0, 0, 0);
+						int left = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 18, context.getResources().getDisplayMetrics());
+						int right = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 6, context.getResources().getDisplayMetrics());
+						params1.setMargins(left, 0, right, 0);
 
 						holder.imageView.setLayoutParams(params1);
 						holder.imageView.setImageBitmap(thumb);
-
 
 					} else {
 						thumb = ThumbnailUtils.getThumbnailFromFolder(node, context);
@@ -475,20 +504,17 @@ public class VersionsFileAdapter extends RecyclerView.Adapter<VersionsFileAdapte
 							RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
 							params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
 							params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-							int left = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 6, context.getResources().getDisplayMetrics());
-							params1.setMargins(left, 0, 0, 0);
+							int left = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 18, context.getResources().getDisplayMetrics());
+							int right = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 6, context.getResources().getDisplayMetrics());
+							params1.setMargins(left, 0, right, 0);
 
 							holder.imageView.setLayoutParams(params1);
 							holder.imageView.setImageBitmap(thumb);
 
 						} else {
 							log("NOT thumbnail");
+							holder.imageView.setLayoutParams(paramsLarge);
 							holder.imageView.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
-							RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
-							params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
-							params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
-							int left = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 12, context.getResources().getDisplayMetrics());
-							params1.setMargins(left, 0, 0, 0);
 
 							if (MimeTypeList.typeForName(node.getName()).isImage()) {
 								try {
@@ -604,6 +630,12 @@ public class VersionsFileAdapter extends RecyclerView.Adapter<VersionsFileAdapte
 		return null;
 	}
 
+	public String getNodeDate(MegaNode node){
+
+		Calendar calendar = Util.calculateDateFromTimestamp(node.getModificationTime());
+		String format3 = new SimpleDateFormat("d MMM yyyy HH:mm", Locale.getDefault()).format(calendar.getTime());
+		return format3;
+	}
 
 	public long getParentHandle() {
 		return parentHandle;
