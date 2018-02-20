@@ -1559,7 +1559,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
         log("onActivityResult, resultCode: " + resultCode);
         if (requestCode == Constants.REQUEST_ADD_PARTICIPANTS && resultCode == RESULT_OK) {
-            log("***** 1");
             if (intent == null) {
                 log("Return.....");
                 return;
@@ -1588,8 +1587,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }
         }
         else if (requestCode == Constants.REQUEST_CODE_SELECT_IMPORT_FOLDER && resultCode == RESULT_OK) {
-            log("***** 2");
-
             if(!Util.isOnline(this)) {
                 try{
                     statusDialog.dismiss();
@@ -1640,7 +1637,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }
         }
         else if (requestCode == Constants.REQUEST_SEND_CONTACTS && resultCode == RESULT_OK) {
-            log("***** 3");
 
             final ArrayList<String> contactsData = intent.getStringArrayListExtra(AddContactActivityLollipop.EXTRA_CONTACTS);
             if (contactsData != null) {
@@ -1659,7 +1655,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }
         }
         else if (requestCode == Constants.REQUEST_CODE_SELECT_FILE && resultCode == RESULT_OK) {
-            log("***** 4");
 
             if (intent == null) {
                 log("Return.....");
@@ -1687,8 +1682,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             log("---- no more files to send");
         }
         else if (requestCode == Constants.REQUEST_CODE_GET && resultCode == RESULT_OK) {
-            log("*****5");
-
             if (intent == null) {
                 log("Return.....");
                 return;
@@ -1709,8 +1702,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             statusDialog = temp;
         }
         else if (requestCode == REQUEST_CODE_SELECT_CHAT && resultCode == RESULT_OK) {
-            log("***** 6");
-
             if(!Util.isOnline(this)) {
                 try{
                     statusDialog.dismiss();
@@ -1791,8 +1782,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }
         }
         else if (requestCode == Constants.TAKE_PHOTO_CODE && resultCode == RESULT_OK) {
-            log("***** 7");
-
             if (resultCode == Activity.RESULT_OK) {
                 String filePath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.temporalPicDIR + "/picture.jpg";
                 File imgFile = new File(filePath);
@@ -1810,8 +1799,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }
 
         }else{
-            log("***** 8");
-
             log("Error onActivityResult");
         }
 
@@ -2109,12 +2096,11 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     }
                 }
 
-                attachFromCloud();
+                //attachFromCloud();
                 break;
             }
 
             case R.id.pick_file_storage_icon_chat:{
-
                 if (emojiKeyboardShown) {
                     keyboardButton.setImageResource(R.drawable.ic_emoticon_white);
                     removeEmojiconFragment();
