@@ -630,17 +630,13 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         if(fullName!=null){
             if(fullName.isEmpty()){
                 log("1-Put email as fullname");
-                String participantEmail = chat.getPeerEmail(i);
-                String[] splitEmail = participantEmail.split("[@._]");
-                fullName = splitEmail[0];
+                fullName = chat.getPeerEmail(i);
                 return fullName;
             }
             else{
                 if (fullName.trim().length() <= 0){
                     log("2-Put email as fullname");
-                    String participantEmail = chat.getPeerEmail(i);
-                    String[] splitEmail = participantEmail.split("[@._]");
-                    fullName = splitEmail[0];
+                    fullName = chat.getPeerEmail(i);
                     return fullName;
                 }
                 else{
@@ -650,9 +646,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         }
         else{
             log("3-Put email as fullname");
-            String participantEmail = chat.getPeerEmail(i);
-            String[] splitEmail = participantEmail.split("[@._]");
-            fullName = splitEmail[0];
+            fullName = chat.getPeerEmail(i);
             return fullName;
         }
     }
@@ -716,11 +710,27 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             megaChatApi.signalPresenceActivity();
         }
 
-        Intent in = new Intent(this, AddContactActivityLollipop.class);
-        in.putExtra("contactType", Constants.CONTACT_TYPE_MEGA);
-        in.putExtra("chat", true);
-        startActivityForResult(in, Constants.REQUEST_ADD_PARTICIPANTS);
-
+        if(megaApi!=null && megaApi.getRootNode()!=null){
+            ArrayList<MegaUser> contacts = megaApi.getContacts();
+            if(contacts==null){
+                showSnackbar("You have no MEGA contacts. Please, invite friends from the Contacts section");
+            }
+            else {
+                if(contacts.isEmpty()){
+                    showSnackbar("You have no MEGA contacts. Please, invite friends from the Contacts section");
+                }
+                else{
+                    Intent in = new Intent(this, AddContactActivityLollipop.class);
+                    in.putExtra("contactType", Constants.CONTACT_TYPE_MEGA);
+                    in.putExtra("chat", true);
+                    startActivityForResult(in, Constants.REQUEST_ADD_PARTICIPANTS);
+                }
+            }
+        }
+        else{
+            log("Online but not megaApi");
+            Util.showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
+        }
     }
 
     public void showRemoveParticipantConfirmation (long handle, MegaChatRoom chatToChange){

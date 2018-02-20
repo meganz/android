@@ -14,6 +14,8 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
+import android.text.Spanned;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.LayoutInflater;
@@ -45,7 +47,6 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.MyAccountInfo;
 import mega.privacy.android.app.lollipop.adapters.MegaContactsLollipopAdapter;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
-import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -71,7 +72,6 @@ public class ContactsFragmentLollipop extends Fragment{
 	ImageView emptyImageView;
 	LinearLayout emptyTextView;
 	TextView emptyTextViewFirst;
-	TextView emptyTextViewSecond;
 
 	TextView contentText;
 	RelativeLayout contentTextLayout;
@@ -388,8 +388,6 @@ public class ContactsFragmentLollipop extends Fragment{
 			emptyImageView = (ImageView) v.findViewById(R.id.contact_list_empty_image);
 			emptyTextView = (LinearLayout) v.findViewById(R.id.contact_list_empty_text);
 			emptyTextViewFirst = (TextView) v.findViewById(R.id.contact_list_empty_text_first);
-			emptyTextViewSecond = (TextView) v.findViewById(R.id.contact_list_empty_text_second);
-
 			contentTextLayout = (RelativeLayout) v.findViewById(R.id.contact_list_content_text_layout);
 			contentText = (TextView) v.findViewById(R.id.contact_list_content_text);
 
@@ -402,8 +400,13 @@ public class ContactsFragmentLollipop extends Fragment{
 			}
 
 			if (visibleContacts.size() > 0) {
+				contentTextLayout.setVisibility(View.VISIBLE);
+
 				contentText.setText(visibleContacts.size()+ " " +context.getResources().getQuantityString(R.plurals.general_num_contacts, visibleContacts.size()));
+			}else if(visibleContacts.size() == 0){
+				contentTextLayout.setVisibility(View.GONE);
 			}
+
 		
 			adapter.setPositionClicked(-1);
 			recyclerView.setAdapter(adapter);
@@ -419,9 +422,22 @@ public class ContactsFragmentLollipop extends Fragment{
 				}else{
 					emptyImageView.setImageResource(R.drawable.ic_empty_contacts);
 				}
-				emptyTextViewFirst.setText(R.string.context_empty_contacts);
-				String text = getString(R.string.section_contacts);
-				emptyTextViewSecond.setText(" "+text+".");
+
+				String textToShow = String.format(getString(R.string.context_empty_contacts), getString(R.string.section_contacts));
+				try{
+					textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
+					textToShow = textToShow.replace("[/A]", "</font>");
+					textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
+					textToShow = textToShow.replace("[/B]", "</font>");
+				}
+				catch (Exception e){}
+				Spanned result = null;
+				if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+					result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
+				} else {
+					result = Html.fromHtml(textToShow);
+				}
+				emptyTextViewFirst.setText(result);
 
 			}else{
 				recyclerView.setVisibility(View.VISIBLE);
@@ -468,8 +484,6 @@ public class ContactsFragmentLollipop extends Fragment{
 			emptyImageView = (ImageView) v.findViewById(R.id.contact_grid_empty_image);
 			emptyTextView = (LinearLayout) v.findViewById(R.id.contact_grid_empty_text);
 			emptyTextViewFirst = (TextView) v.findViewById(R.id.contact_grid_empty_text_first);
-			emptyTextViewSecond = (TextView) v.findViewById(R.id.contact_grid_empty_text_second);
-
 			contentTextLayout = (RelativeLayout) v.findViewById(R.id.contact_content_grid_text_layout);
 
 			contentText = (TextView) v.findViewById(R.id.contact_content_text_grid);
@@ -483,7 +497,11 @@ public class ContactsFragmentLollipop extends Fragment{
 			}
 
 			if (visibleContacts.size() > 0) {
+				contentTextLayout.setVisibility(View.VISIBLE);
+
 				contentText.setText(visibleContacts.size()+ " " +context.getResources().getQuantityString(R.plurals.general_num_contacts, visibleContacts.size()));
+			}else if(visibleContacts.size() == 0){
+				contentTextLayout.setVisibility(View.GONE);
 			}
 
 			adapter.setPositionClicked(-1);
@@ -502,9 +520,21 @@ public class ContactsFragmentLollipop extends Fragment{
 				}else{
 					emptyImageView.setImageResource(R.drawable.ic_empty_contacts);
 				}
-				emptyTextViewFirst.setText(R.string.context_empty_contacts);
-				String text = getString(R.string.section_contacts);
-				emptyTextViewSecond.setText(" "+text+".");
+				String textToShow = String.format(getString(R.string.context_empty_contacts), getString(R.string.section_contacts));
+				try{
+					textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
+					textToShow = textToShow.replace("[/A]", "</font>");
+					textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
+					textToShow = textToShow.replace("[/B]", "</font>");
+				}
+				catch (Exception e){}
+				Spanned result = null;
+				if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+					result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
+				} else {
+					result = Html.fromHtml(textToShow);
+				}
+				emptyTextViewFirst.setText(result);
 
 			}else{
 				recyclerView.setVisibility(View.VISIBLE);
@@ -562,7 +592,11 @@ public class ContactsFragmentLollipop extends Fragment{
 		adapter.setContacts(visibleContacts);
 
 		if (visibleContacts.size() > 0) {
+			contentTextLayout.setVisibility(View.VISIBLE);
+
 			contentText.setText(visibleContacts.size()+ " " +context.getResources().getQuantityString(R.plurals.general_num_contacts, visibleContacts.size()));
+		}else if(visibleContacts.size() == 0){
+			contentTextLayout.setVisibility(View.GONE);
 		}
 	}
 
@@ -650,7 +684,21 @@ public class ContactsFragmentLollipop extends Fragment{
 	public void updateView () {
 		log("updateView");
 		ArrayList<MegaUser> contacts = megaApi.getContacts();
-		this.setContacts(contacts);
+
+		if(adapter == null){
+			isList = ((ManagerActivityLollipop)context).isList();
+
+			if (isList) {
+				log("isList");
+				adapter = new MegaContactsLollipopAdapter(context, this, visibleContacts, recyclerView, MegaContactsLollipopAdapter.ITEM_VIEW_TYPE_LIST);
+			}
+			else{
+				adapter = new MegaContactsLollipopAdapter(context, this, visibleContacts, recyclerView, MegaContactsLollipopAdapter.ITEM_VIEW_TYPE_GRID);
+			}
+		}
+		else{
+			this.setContacts(contacts);
+		}
 		
 		if (visibleContacts.size() == 0){
 			log("CONTACTS SIZE == 0");
@@ -663,9 +711,21 @@ public class ContactsFragmentLollipop extends Fragment{
 			}else{
 				emptyImageView.setImageResource(R.drawable.ic_empty_contacts);
 			}
-			emptyTextViewFirst.setText(R.string.context_empty_contacts);
-			String text = getString(R.string.section_contacts);
-			emptyTextViewSecond.setText(" "+text+".");
+			String textToShow = String.format(getString(R.string.context_empty_contacts), getString(R.string.section_contacts));
+			try{
+				textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
+				textToShow = textToShow.replace("[/A]", "</font>");
+				textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
+				textToShow = textToShow.replace("[/B]", "</font>");
+			}
+			catch (Exception e){}
+			Spanned result = null;
+			if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+				result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
+			} else {
+				result = Html.fromHtml(textToShow);
+			}
+			emptyTextViewFirst.setText(result);
 
 		}
 		else{
@@ -704,7 +764,7 @@ public class ContactsFragmentLollipop extends Fragment{
 	}
 
 	public void sortBy(int orderContacts){
-		log("sortByName");
+		log("sortBy");
 
 		if(orderContacts == MegaApiJava.ORDER_DEFAULT_DESC){
 			Collections.sort(visibleContacts,  Collections.reverseOrder(new Comparator<MegaContactAdapter>(){

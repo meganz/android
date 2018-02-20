@@ -58,6 +58,7 @@ import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
+import nz.mega.sdk.MegaEvent;
 import nz.mega.sdk.MegaGlobalListenerInterface;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
@@ -344,35 +345,42 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 								if (megaChatApi == null){
 									megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
 								}
-								int ret = megaChatApi.init(gSession);
-								log("shouldRun: result of init ---> "+ret);
-								chatSettings = dbH.getChatSettings();
-								if (ret == MegaChatApi.INIT_NO_CACHE)
-								{
-									log("shouldRun: condition ret == MegaChatApi.INIT_NO_CACHE");
-									megaApi.invalidateCache();
 
-								}
-								else if (ret == MegaChatApi.INIT_ERROR)
-								{
-									log("shouldRun: condition ret == MegaChatApi.INIT_ERROR");
-									if(chatSettings==null) {
-										log("1 - shouldRun: ERROR----> Switch OFF chat");
-										chatSettings = new ChatSettings(false+"", true + "", "",true + "");
-										dbH.setChatSettings(chatSettings);
+								int ret = megaChatApi.getInitState();
+
+								if(ret==0||ret==MegaChatApi.INIT_ERROR){
+									ret = megaChatApi.init(gSession);
+									log("shouldRun: result of init ---> "+ret);
+									chatSettings = dbH.getChatSettings();
+									if (ret == MegaChatApi.INIT_NO_CACHE)
+									{
+										log("shouldRun: condition ret == MegaChatApi.INIT_NO_CACHE");
+
+									}
+									else if (ret == MegaChatApi.INIT_ERROR)
+									{
+										log("shouldRun: condition ret == MegaChatApi.INIT_ERROR");
+										if(chatSettings==null) {
+											log("1 - shouldRun: ERROR----> Switch OFF chat");
+											chatSettings = new ChatSettings(false+"", true + "", "",true + "");
+											dbH.setChatSettings(chatSettings);
+										}
+										else{
+											log("2 - shouldRun: ERROR----> Switch OFF chat");
+											dbH.setEnabledChat(false + "");
+										}
+										megaChatApi.logout(this);
 									}
 									else{
-										log("2 - shouldRun: ERROR----> Switch OFF chat");
-										dbH.setEnabledChat(false + "");
+										log("shouldRun: Chat correctly initialized");
 									}
-									megaChatApi.logout(this);
-								}
-								else{
-									log("shouldRun: Chat correctly initialized");
 								}
 							}
 
 							megaApi.fastLogin(gSession, this);
+						}
+						else{
+							log("Another login is processing");
 						}
 						return START_NOT_STICKY;
 					}
@@ -2323,15 +2331,6 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 					if(node!=null){
 						MediaMetadataRetriever retriever = new MediaMetadataRetriever();
 						retriever.setDataSource(transfer.getPath());
-						String time = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
-						if(time!=null){
-							double seconds = Double.parseDouble(time)/1000;
-							log("The original duration is: "+seconds);
-							int secondsAprox = (int) Math.round(seconds);
-							log("The duration aprox is: "+secondsAprox);
-
-							megaApi.setNodeDuration(node, secondsAprox, null);
-						}
 
 						String location = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_LOCATION);
 						if(location!=null){
@@ -2643,6 +2642,12 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 	public void onContactRequestsUpdate(MegaApiJava api,
 										ArrayList<MegaContactRequest> requests) {
 		// TODO Auto-generated method stub
+
+	}
+
+
+	@Override
+	public void onEvent(MegaApiJava api, MegaEvent event) {
 
 	}
 

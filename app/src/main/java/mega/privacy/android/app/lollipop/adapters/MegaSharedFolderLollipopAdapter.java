@@ -19,7 +19,6 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -216,10 +215,7 @@ public class MegaSharedFolderLollipopAdapter extends RecyclerView.Adapter<MegaSh
 		DisplayMetrics outMetrics = new DisplayMetrics ();
 	    display.getMetrics(outMetrics);
 	    float density  = ((Activity)context).getResources().getDisplayMetrics().density;
-		
-	    float scaleW = Util.getScaleW(outMetrics, density);
-	    float scaleH = Util.getScaleH(outMetrics, density);
-	    
+
 		View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_shared_folder, parent, false);
 		ViewHolderShareList holder = new ViewHolderShareList(v);
 		holder.itemLayout = (RelativeLayout) v.findViewById(R.id.shared_folder_item_layout);
@@ -245,100 +241,42 @@ public class MegaSharedFolderLollipopAdapter extends RecyclerView.Adapter<MegaSh
 		
 		//Check if the share
 		MegaShare share = (MegaShare) getItem(position);
-		if (share.getUser() == null){
-			holder.contactMail = context.getString(R.string.file_properties_shared_folder_public_link);
-		}
-		else{
+
+		if (share.getUser() != null){
 			holder.contactMail = share.getUser();
-			MegaUser contact = megaApi.getContact(holder.contactMail);	
-		
-			MegaContactDB contactDB = dbH.findContactByHandle(String.valueOf(contact.getHandle()));
-			if(contactDB!=null){
-				if(!contactDB.getName().equals("")){
-					holder.textViewContactName.setText(contactDB.getName()+" "+contactDB.getLastName());
+			MegaUser contact = megaApi.getContact(holder.contactMail);
+
+			if(contact!=null){
+				MegaContactDB contactDB = dbH.findContactByHandle(String.valueOf(contact.getHandle()));
+				if(contactDB!=null){
+					if(!contactDB.getName().equals("")){
+						holder.textViewContactName.setText(contactDB.getName()+" "+contactDB.getLastName());
+					}
+					else{
+						holder.textViewContactName.setText(holder.contactMail);
+					}
 				}
 				else{
+					log("The contactDB is null: ");
 					holder.textViewContactName.setText(holder.contactMail);
 				}
 			}
 			else{
-				log("The contactDB is null: ");
 				holder.textViewContactName.setText(holder.contactMail);
-			}			
-
-			MegaUser user = megaApi.getContact(holder.contactMail);
-
+			}
 
 			if (!multipleSelect) {
 				holder.itemLayout.setBackgroundColor(Color.WHITE);
 
-				createDefaultAvatar(holder, user);
+				createDefaultAvatar(holder, contact);
 
-				UserAvatarListenerList listener = new UserAvatarListenerList(context, holder, this);
-
-				holder.name=false;
-				holder.firstName=false;
-				megaApi.getUserAttribute(contact, 1, listener);
-				megaApi.getUserAttribute(contact, 2, listener);
-
-				File avatar = null;
-				if (context.getExternalCacheDir() != null){
-					avatar = new File(context.getExternalCacheDir().getAbsolutePath(), holder.contactMail + ".jpg");
-				}
-				else{
-					avatar = new File(context.getCacheDir().getAbsolutePath(), holder.contactMail + ".jpg");
-				}
-				Bitmap bitmap = null;
-				if (avatar.exists()){
-					if (avatar.length() > 0){
-						BitmapFactory.Options bOpts = new BitmapFactory.Options();
-						bOpts.inPurgeable = true;
-						bOpts.inInputShareable = true;
-						bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
-						if (bitmap == null) {
-							avatar.delete();
-							if (context.getExternalCacheDir() != null){
-								megaApi.getUserAvatar(contact, context.getExternalCacheDir().getAbsolutePath() + "/" + holder.contactMail + ".jpg", listener);
-							}
-							else{
-								megaApi.getUserAvatar(contact, context.getCacheDir().getAbsolutePath() + "/" + holder.contactMail + ".jpg", listener);
-							}
-						}
-						else{
-							holder.imageView.setImageBitmap(bitmap);
-							holder.initialLetter.setVisibility(View.GONE);
-						}
-					}
-					else{
-						if (context.getExternalCacheDir() != null){
-							megaApi.getUserAvatar(contact, context.getExternalCacheDir().getAbsolutePath() + "/" + holder.contactMail + ".jpg", listener);
-						}
-						else{
-							megaApi.getUserAvatar(contact, context.getCacheDir().getAbsolutePath() + "/" + holder.contactMail + ".jpg", listener);
-						}
-					}
-				}
-				else{
-					if (context.getExternalCacheDir() != null){
-						megaApi.getUserAvatar(contact, context.getExternalCacheDir().getAbsolutePath() + "/" + holder.contactMail + ".jpg", listener);
-					}
-					else{
-						megaApi.getUserAvatar(contact, context.getCacheDir().getAbsolutePath() + "/" + holder.contactMail + ".jpg", listener);
-					}
-				}
-			} else {
-
-				if(this.isItemChecked(position)){
-					holder.imageView.setImageResource(R.drawable.ic_select_avatar);
-					holder.initialLetter.setVisibility(View.GONE);
-					holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.new_multiselect_color));
-				}
-				else{
-					holder.itemLayout.setBackgroundColor(Color.WHITE);
-
-					createDefaultAvatar(holder, user);
-
+				if(contact!=null){
 					UserAvatarListenerList listener = new UserAvatarListenerList(context, holder, this);
+
+					holder.name=false;
+					holder.firstName=false;
+					megaApi.getUserAttribute(contact, 1, listener);
+					megaApi.getUserAttribute(contact, 2, listener);
 
 					File avatar = null;
 					if (context.getExternalCacheDir() != null){
@@ -386,6 +324,69 @@ public class MegaSharedFolderLollipopAdapter extends RecyclerView.Adapter<MegaSh
 						}
 					}
 				}
+
+			} else {
+
+				if(this.isItemChecked(position)){
+					holder.imageView.setImageResource(R.drawable.ic_select_avatar);
+					holder.initialLetter.setVisibility(View.GONE);
+					holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.new_multiselect_color));
+				}
+				else{
+					holder.itemLayout.setBackgroundColor(Color.WHITE);
+
+					createDefaultAvatar(holder, contact);
+
+					if(contact!=null){
+						UserAvatarListenerList listener = new UserAvatarListenerList(context, holder, this);
+
+						File avatar = null;
+						if (context.getExternalCacheDir() != null){
+							avatar = new File(context.getExternalCacheDir().getAbsolutePath(), holder.contactMail + ".jpg");
+						}
+						else{
+							avatar = new File(context.getCacheDir().getAbsolutePath(), holder.contactMail + ".jpg");
+						}
+						Bitmap bitmap = null;
+						if (avatar.exists()){
+							if (avatar.length() > 0){
+								BitmapFactory.Options bOpts = new BitmapFactory.Options();
+								bOpts.inPurgeable = true;
+								bOpts.inInputShareable = true;
+								bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
+								if (bitmap == null) {
+									avatar.delete();
+									if (context.getExternalCacheDir() != null){
+										megaApi.getUserAvatar(contact, context.getExternalCacheDir().getAbsolutePath() + "/" + holder.contactMail + ".jpg", listener);
+									}
+									else{
+										megaApi.getUserAvatar(contact, context.getCacheDir().getAbsolutePath() + "/" + holder.contactMail + ".jpg", listener);
+									}
+								}
+								else{
+									holder.imageView.setImageBitmap(bitmap);
+									holder.initialLetter.setVisibility(View.GONE);
+								}
+							}
+							else{
+								if (context.getExternalCacheDir() != null){
+									megaApi.getUserAvatar(contact, context.getExternalCacheDir().getAbsolutePath() + "/" + holder.contactMail + ".jpg", listener);
+								}
+								else{
+									megaApi.getUserAvatar(contact, context.getCacheDir().getAbsolutePath() + "/" + holder.contactMail + ".jpg", listener);
+								}
+							}
+						}
+						else{
+							if (context.getExternalCacheDir() != null){
+								megaApi.getUserAvatar(contact, context.getExternalCacheDir().getAbsolutePath() + "/" + holder.contactMail + ".jpg", listener);
+							}
+							else{
+								megaApi.getUserAvatar(contact, context.getCacheDir().getAbsolutePath() + "/" + holder.contactMail + ".jpg", listener);
+							}
+						}
+					}
+				}
 			}
 			
 			int accessLevel = share.getAccess();
@@ -427,6 +428,9 @@ public class MegaSharedFolderLollipopAdapter extends RecyclerView.Adapter<MegaSh
 				log("Default color to the avatar");
 				p.setColor(context.getResources().getColor(R.color.lollipop_primary_color));
 			}
+		}
+		else{
+			p.setColor(context.getResources().getColor(R.color.lollipop_primary_color));
 		}
 		
 		int radius; 

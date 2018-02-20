@@ -27,6 +27,8 @@ import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Display;
@@ -36,6 +38,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
@@ -43,6 +46,8 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
@@ -54,6 +59,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.DownloadService;
@@ -86,6 +93,7 @@ import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
+import nz.mega.sdk.MegaEvent;
 import nz.mega.sdk.MegaGlobalListenerInterface;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
@@ -114,6 +122,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	Context context;
 
 	int positionToRemove = -1;
+	String regex = "[*|\\?:\"<>\\\\\\\\/]";
 
 	private MegaFullScreenImageAdapterLollipop adapterMega;
 	private MegaOfflineFullScreenImageAdapterLollipop adapterOffline;
@@ -134,6 +143,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	private MenuItem removelinkIcon;
 	private MenuItem chatIcon;
 
+	MegaOffline currentNode;
 
 	private RelativeLayout bottomLayout;
 	private ExtendedViewPager viewPager;
@@ -143,6 +153,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	MegaChatApiAndroid megaChatApi;
 
     private ArrayList<String> paths;
+	private String offlinePathDirectory;
     
     int adapterType = 0;
 
@@ -165,7 +176,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	private static int EDIT_TEXT_ID = 1;
 	private Handler handler;
 	
-	private AlertDialog renameDialog;
+	private android.support.v7.app.AlertDialog renameDialog;
 	
 	int orderGetChildren = MegaApiJava.ORDER_DEFAULT_ASC;
 	
@@ -212,16 +223,8 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		removelinkIcon = menu.findItem(R.id.full_image_viewer_remove_link);
 		removelinkIcon.setVisible(false);
 		shareIcon = menu.findItem(R.id.full_image_viewer_share);
-		Drawable share = getResources().getDrawable(R.drawable.ic_social_share_white);
-		share.setColorFilter(getResources().getColor(R.color.white), PorterDuff.Mode.SRC_ATOP);
-		shareIcon.setIcon(share);
 		propertiesIcon = menu.findItem(R.id.full_image_viewer_properties);
 		downloadIcon = menu.findItem(R.id.full_image_viewer_download);
-
-		Drawable download = getResources().getDrawable(R.drawable.ic_download_white);
-		download.setColorFilter(getResources().getColor(R.color.white), PorterDuff.Mode.SRC_ATOP);
-		downloadIcon.setIcon(download);
-
 		renameIcon = menu.findItem(R.id.full_image_viewer_rename);
 		moveIcon = menu.findItem(R.id.full_image_viewer_move);
 		copyIcon = menu.findItem(R.id.full_image_viewer_copy);
@@ -231,6 +234,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 
 		Intent intent = getIntent();
 		adapterType = intent.getIntExtra("adapterType", 0);
+		offlinePathDirectory = intent.getStringExtra("offlinePathDirectory");
 
 		if (adapterType == Constants.OFFLINE_ADAPTER){
 			getlinkIcon.setVisible(false);
@@ -239,8 +243,8 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			removelinkIcon.setVisible(false);
 			menu.findItem(R.id.full_image_viewer_remove_link).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
 
-			shareIcon.setVisible(false);
-			menu.findItem(R.id.full_image_viewer_share).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+			shareIcon.setVisible(true);
+			menu.findItem(R.id.full_image_viewer_share).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
 			propertiesIcon.setVisible(false);
 			menu.findItem(R.id.full_image_viewer_properties).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
@@ -964,10 +968,22 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				viewPager.setCurrentItem(positionG);
 		
 				viewPager.setOnPageChangeListener(this);
-			}			
+			}
+
+			fileNameTextView = (TextView) findViewById(R.id.full_image_viewer_file_name);
+
+			if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+				fileNameTextView.setMaxWidth(Util.scaleWidthPx(300, outMetrics));
+			}
+			else{
+				fileNameTextView.setMaxWidth(Util.scaleWidthPx(300, outMetrics));
+			}
+
+			currentNode = mOffListImages.get(positionG);
+
+			fileNameTextView.setText(currentNode.getName());
 		}				
 		else if (adapterType == Constants.ZIP_ADAPTER){
-			String offlinePathDirectory = intent.getStringExtra("offlinePathDirectory");
 
 			File offlineDirectory = new File(offlinePathDirectory);
 //			if (Environment.getExternalStorageDirectory() != null){
@@ -1600,79 +1616,198 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 
 	public void showRenameDialog(){
 		log("showRenameDialog");
-
 		node = megaApi.getNodeByHandle(imageHandles.get(positionG));
+
+		LinearLayout layout = new LinearLayout(this);
+		layout.setOrientation(LinearLayout.VERTICAL);
+		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+		params.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleHeightPx(20, outMetrics), Util.scaleWidthPx(17, outMetrics), 0);
+	//	    layout.setLayoutParams(params);
+
 		final EditTextCursorWatcher input = new EditTextCursorWatcher(this, node.isFolder());
 		input.setSingleLine();
-		input.setText(node.getName());
-
+		input.setTextColor(getResources().getColor(R.color.text_secondary));
 		input.setImeOptions(EditorInfo.IME_ACTION_DONE);
 
-		input.setImeActionLabel(getString(R.string.context_rename),
-				EditorInfo.IME_ACTION_DONE);
-		
+		input.setImeActionLabel(getString(R.string.context_rename),EditorInfo.IME_ACTION_DONE);
+		input.setText(node.getName());
+
+
 		input.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-			@Override
-			public void onFocusChange(final View v, boolean hasFocus) {
-				if (hasFocus) {
-					if (node.isFolder()){
-						input.setSelection(0, input.getText().length());
-					}
-					else{
-						String [] s = node.getName().split("\\.");
-						if (s != null){
-							int numParts = s.length;
-							int lastSelectedPos = 0;
-							if (numParts == 1){
-								input.setSelection(0, input.getText().length());
-							}
-							else if (numParts > 1){
-								for (int i=0; i<(numParts-1);i++){
-									lastSelectedPos += s[i].length(); 
-									lastSelectedPos++;
-								}
-								lastSelectedPos--; //The last point should not be selected)
-								input.setSelection(0, lastSelectedPos);
-							}
+				@Override
+				public void onFocusChange(final View v, boolean hasFocus) {
+					if (hasFocus) {
+						if (node.isFolder()){
+							input.setSelection(0, input.getText().length());
 						}
-						showKeyboardDelayed(v);
+						else{
+							String [] s = node.getName().split("\\.");
+							if (s != null){
+								int numParts = s.length;
+								int lastSelectedPos = 0;
+								if (numParts == 1){
+									input.setSelection(0, input.getText().length());
+								}
+								else if (numParts > 1){
+									for (int i=0; i<(numParts-1);i++){
+										lastSelectedPos += s[i].length();
+										lastSelectedPos++;
+									}
+									lastSelectedPos--; //The last point should not be selected)
+									input.setSelection(0, lastSelectedPos);
+								}
+							}
+							showKeyboardDelayed(v);
+						}
 					}
+				}
+			});
+
+
+		layout.addView(input, params);
+
+		LinearLayout.LayoutParams params1 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+		params1.setMargins(Util.scaleWidthPx(20, outMetrics), 0, Util.scaleWidthPx(17, outMetrics), 0);
+
+		final RelativeLayout error_layout = new RelativeLayout(FullScreenImageViewerLollipop.this);
+		layout.addView(error_layout, params1);
+
+		final ImageView error_icon = new ImageView(FullScreenImageViewerLollipop.this);
+		error_icon.setImageDrawable(FullScreenImageViewerLollipop.this.getResources().getDrawable(R.drawable.ic_input_warning));
+		error_layout.addView(error_icon);
+		RelativeLayout.LayoutParams params_icon = (RelativeLayout.LayoutParams) error_icon.getLayoutParams();
+
+		params_icon.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+		error_icon.setLayoutParams(params_icon);
+
+		error_icon.setColorFilter(ContextCompat.getColor(FullScreenImageViewerLollipop.this, R.color.login_warning));
+
+		final TextView textError = new TextView(FullScreenImageViewerLollipop.this);
+		error_layout.addView(textError);
+		RelativeLayout.LayoutParams params_text_error = (RelativeLayout.LayoutParams) textError.getLayoutParams();
+		params_text_error.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+		params_text_error.width = ViewGroup.LayoutParams.WRAP_CONTENT;
+		params_text_error.addRule(RelativeLayout.CENTER_VERTICAL);
+		params_text_error.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+		params_text_error.setMargins(Util.scaleWidthPx(3, outMetrics), 0,0,0);
+		textError.setLayoutParams(params_text_error);
+
+		textError.setTextColor(ContextCompat.getColor(FullScreenImageViewerLollipop.this, R.color.login_warning));
+
+		error_layout.setVisibility(View.GONE);
+
+		input.getBackground().mutate().clearColorFilter();
+		input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
+		input.addTextChangedListener(new TextWatcher() {
+			@Override
+			public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+			}
+
+			@Override
+			public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+			}
+
+			@Override
+			public void afterTextChanged(Editable editable) {
+				if(error_layout.getVisibility() == View.VISIBLE){
+					error_layout.setVisibility(View.GONE);
+					input.getBackground().mutate().clearColorFilter();
+					input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
 				}
 			}
 		});
-
-
-		AlertDialog.Builder builder = Util.getCustomAlertBuilder(this, getString(R.string.context_rename) + " "	+ new String(node.getName()), null, input);
-		builder.setPositiveButton(getString(R.string.context_rename),
-				new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int whichButton) {
-						String value = input.getText().toString().trim();
-						if (value.length() == 0) {
-							return;
-						}
-						rename(value);
-					}
-				});
-		builder.setNegativeButton(getString(android.R.string.cancel), null);
-		renameDialog = builder.create();
-		renameDialog.show();
 
 		input.setOnEditorActionListener(new OnEditorActionListener() {
 			@Override
 			public boolean onEditorAction(TextView v, int actionId,
 										  KeyEvent event) {
 				if (actionId == EditorInfo.IME_ACTION_DONE) {
-					renameDialog.dismiss();
+
 					String value = v.getText().toString().trim();
 					if (value.length() == 0) {
-						return true;
+						input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+						textError.setText(getString(R.string.invalid_string));
+						error_layout.setVisibility(View.VISIBLE);
+						input.requestFocus();
+
+					}else{
+						boolean result=matches(regex, value);
+						if(result){
+							input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+							textError.setText(getString(R.string.invalid_characters));
+							error_layout.setVisibility(View.VISIBLE);
+							input.requestFocus();
+
+						}else{
+	//						nC.renameNode(node, value);
+							renameDialog.dismiss();
+							rename(value);
+						}
 					}
-					rename(value);
 					return true;
 				}
 				return false;
 			}
 		});
+
+		android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this);
+		builder.setTitle(getString(R.string.context_rename) + " "	+ new String(node.getName()));
+		builder.setPositiveButton(getString(R.string.context_rename),
+				new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int whichButton) {
+						String value = input.getText().toString().trim();
+							if (value.length() == 0) {
+								return;
+							}
+							rename(value);
+					}
+				});
+		builder.setNegativeButton(getString(android.R.string.cancel), new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialogInterface, int i) {
+				input.getBackground().clearColorFilter();
+			}
+		});
+		builder.setView(layout);
+		renameDialog = builder.create();
+		renameDialog.show();
+		renameDialog.getButton(android.support.v7.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener(new   View.OnClickListener()
+		{
+			@Override
+			public void onClick(View v)
+			{
+				String value = input.getText().toString().trim();
+
+				if (value.length() == 0) {
+					input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+					textError.setText(getString(R.string.invalid_string));
+					error_layout.setVisibility(View.VISIBLE);
+					input.requestFocus();
+				}
+				else{
+					boolean result=matches(regex, value);
+					if(result){
+						input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+						textError.setText(getString(R.string.invalid_characters));
+						error_layout.setVisibility(View.VISIBLE);
+						input.requestFocus();
+
+					}else{
+						//nC.renameNode(node, value);
+						renameDialog.dismiss();
+						rename(value);
+					}
+				}
+			}
+		});
+	}
+
+	public static boolean matches(String regex, CharSequence input) {
+		Pattern p = Pattern.compile(regex);
+		Matcher m = p.matcher(input);
+		return m.find();
 	}
 
 	private void rename(String newName){
@@ -2279,6 +2414,21 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	}
 
 	@Override
+	protected void onResume(){
+		log("onResume");
+		super.onResume();
+
+		if (imageHandles.get(positionG) != -1){
+			log("node updated");
+			node = megaApi.getNodeByHandle(imageHandles.get(positionG));
+		}
+
+		if (node == null){
+			finish();
+		}
+	}
+
+	@Override
 	public void onBackPressed() {
 		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 		super.onBackPressed();
@@ -2286,6 +2436,11 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 
 	@Override
 	public void onUsersUpdate(MegaApiJava api, ArrayList<MegaUser> users) {
+
+	}
+
+	@Override
+	public void onEvent(MegaApiJava api, MegaEvent event) {
 
 	}
 

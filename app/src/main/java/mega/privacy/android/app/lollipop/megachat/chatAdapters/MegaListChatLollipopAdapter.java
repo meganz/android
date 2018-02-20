@@ -16,7 +16,6 @@ import android.text.TextUtils;
 import android.text.style.ForegroundColorSpan;
 import android.util.DisplayMetrics;
 import android.util.SparseBooleanArray;
-import android.util.TypedValue;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -111,7 +110,6 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
     public static class ViewHolderChatList extends ViewHolder{
     	public ViewHolderChatList(View arg0) {
 			super(arg0);
-			// TODO Auto-generated constructor stub
 		}
     	RoundedImageView imageView;
     	TextView contactInitialLetter;
@@ -155,7 +153,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 		log("Get the ChatRoom: "+position);
 		MegaChatListItem chat = (MegaChatListItem) getItem(position);
-		log("ChatRoom handle: "+chat.getChatId());
+		log("ChatRoom handle: "+chat.getChatId() + "title"+chat.getTitle());
 
 		setTitle(position, holder);
 
@@ -1123,6 +1121,12 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 			if(messageType==MegaChatMessage.TYPE_INVALID){
 				log("Message Type -> INVALID");
 				holder.textViewContent.setText(context.getString(R.string.no_conversation_history));
+				holder.textViewContent.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
+				holder.textViewDate.setVisibility(View.GONE);
+			}
+			else if(messageType==255){
+				log("Message Type -> LOADING");
+				holder.textViewContent.setText(context.getString(R.string.general_loading));
 				holder.textViewContent.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
 				holder.textViewDate.setVisibility(View.GONE);
 			}
