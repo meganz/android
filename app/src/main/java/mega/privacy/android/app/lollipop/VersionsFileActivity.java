@@ -1,6 +1,7 @@
 package mega.privacy.android.app.lollipop;
 
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.os.AsyncTask;
@@ -10,6 +11,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -93,6 +95,7 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 	
 	MenuItem selectMenuItem;
 	MenuItem unSelectMenuItem;
+	MenuItem clearVersions;
 
 	private class GetVersionsSizeTask extends AsyncTask<String, Void, String> {
 
@@ -358,18 +361,20 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 		// Inflate the menu items for use in the action bar
 	    MenuInflater inflater = getMenuInflater();
 	    inflater.inflate(R.menu.activity_folder_contact_list, menu);
-	    
-	    menu.findItem(R.id.action_folder_contacts_list_share_folder).setVisible(false);
 
 	    selectMenuItem = menu.findItem(R.id.action_select);
 		unSelectMenuItem = menu.findItem(R.id.action_unselect);
-		
-		selectMenuItem.setVisible(true);
-		unSelectMenuItem.setVisible(false);
-	    
+
 	    return super.onCreateOptionsMenu(menu);
 	}
-	
+
+	@Override
+	public boolean onPrepareOptionsMenu(Menu menu) {
+		selectMenuItem.setVisible(true);
+		unSelectMenuItem.setVisible(false);
+		return super.onPrepareOptionsMenu(menu);
+	}
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		((MegaApplication) getApplication()).sendSignalPresenceActivity();
@@ -384,11 +389,6 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 		    	selectAll();
 		    	return true;
 		    }
-			case R.id.action_unselect:{
-
-
-				return true;
-			}
 		    default:{
 	            return super.onOptionsItemSelected(item);
 	        }
@@ -585,27 +585,76 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 		}
 
 		//Check if the parent handle has changed
-		if(n.hasChanged(MegaNode.CHANGE_TYPE_PARENT)){
-			MegaNode oldParent = megaApi.getParentNode(node);
-			MegaNode newParent = megaApi.getParentNode(n);
-			if(oldParent.getHandle()==newParent.getHandle()){
-				log("New version added");
-				node = newParent;
+		if(n!=null){
+			if(n.hasChanged(MegaNode.CHANGE_TYPE_PARENT)){
+				MegaNode oldParent = megaApi.getParentNode(node);
+				MegaNode newParent = megaApi.getParentNode(n);
+				if(oldParent.getHandle()==newParent.getHandle()){
+					log("New version added");
+					node = newParent;
+				}
+				else{
+					node = n;
+				}
+				if(megaApi.hasVersions(node)){
+					nodeVersions = megaApi.getVersions(node);
+				}
+				else{
+					nodeVersions = null;
+				}
+			}
+			else if(n.hasChanged(MegaNode.CHANGE_TYPE_REMOVED)){
+				if(thisNode){
+					if(nodeVersions!=null){
+						node = nodeVersions.get(1);
+						if(megaApi.hasVersions(node)){
+							nodeVersions = megaApi.getVersions(node);
+						}
+						else{
+							nodeVersions = null;
+						}
+					}
+					else{
+						finish();
+					}
+				}
+				else if(anyChild){
+					if(megaApi.hasVersions(n)){
+						nodeVersions = megaApi.getVersions(n);
+					}
+					else{
+						nodeVersions = null;
+					}
+				}
+
 			}
 			else{
 				node = n;
+				if(megaApi.hasVersions(node)){
+					nodeVersions = megaApi.getVersions(node);
+				}
+				else{
+					nodeVersions = null;
+				}
 			}
 		}
-		else if(n.hasChanged(MegaNode.CHANGE_TYPE_REMOVED)){
-			node = nodeVersions.get(1);
-		}
 		else{
-			node = n;
+			if(anyChild){
+				if(megaApi.hasVersions(node)){
+					nodeVersions = megaApi.getVersions(node);
+				}
+				else{
+					nodeVersions = null;
+				}
+
+			}
 		}
 
-		log("nodeVersions size: "+nodeVersions.size());
-		nodeVersions = megaApi.getVersions(node);
 		log("After update - nodeVersions size: "+nodeVersions.size());
+		if(nodeVersions.size()==1){
+			finish();
+		}
+
 		if(adapter!=null){
 			adapter.setNodes(nodeVersions);
 			adapter.notifyDataSetChanged();
@@ -614,8 +663,6 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 			adapter = new VersionsFileAdapter(this, nodeVersions, listView);
 			listView.setAdapter(adapter);
 		}
-
-
 
 //		for(int i=0; i<nodes.size();i++){
 //			MegaNode node = nodes.get(i);
@@ -708,17 +755,13 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 	}
 
 	public void revertVersion(){
-		node = selectedNode;
+		log("revertVersion");
 		megaApi.restoreVersion(selectedNode, this);
 	}
 
 	public void removeVersion(){
-		if(selectedPosition==0){
-			node = nodeVersions.get(1);
-		}
-		else{
-			megaApi.removeVersion(selectedNode, this);
-		}
+		log("removeVersion");
+		megaApi.removeVersion(selectedNode, this);
 	}
 
 	public MegaNode getSelectedNode() {
@@ -745,6 +788,30 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 
 	public void setSelectedPosition(int selectedPosition) {
 		this.selectedPosition = selectedPosition;
+	}
+
+	public void showConfirmationRemoveVersion(){
+		log("showConfirmationRemoveContact");
+		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				switch (which){
+					case DialogInterface.BUTTON_POSITIVE:
+						removeVersion();
+						break;
+
+					case DialogInterface.BUTTON_NEGATIVE:
+						//No button clicked
+						break;
+				}
+			}
+		};
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setTitle(getString(R.string.title_dialog_delete_version));
+		builder.setMessage(getString(R.string.content_dialog_delete_version)).setPositiveButton(R.string.context_delete, dialogClickListener)
+				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
+
 	}
 }
 

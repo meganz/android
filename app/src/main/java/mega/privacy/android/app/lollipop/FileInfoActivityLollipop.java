@@ -2613,37 +2613,59 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 				else{
 					node = n;
 				}
+				if(megaApi.hasVersions(node)){
+					nodeVersions = megaApi.getVersions(node);
+				}
+				else{
+					nodeVersions = null;
+				}
 			}
 			else if(n.hasChanged(MegaNode.CHANGE_TYPE_REMOVED)){
 				if(thisNode){
 					if(nodeVersions!=null){
 						node = nodeVersions.get(1);
-						nodeVersions = megaApi.getVersions(node);
+						if(megaApi.hasVersions(node)){
+							nodeVersions = megaApi.getVersions(node);
+						}
+						else{
+							nodeVersions = null;
+						}
 					}
 					else{
 						finish();
 					}
 				}
 				else if(anyChild){
-					nodeVersions = megaApi.getVersions(n);
+					if(megaApi.hasVersions(n)){
+						nodeVersions = megaApi.getVersions(n);
+					}
+					else{
+						nodeVersions = null;
+					}
 				}
 
 			}
 			else{
 				node = n;
+				if(megaApi.hasVersions(node)){
+					nodeVersions = megaApi.getVersions(node);
+				}
+				else{
+					nodeVersions = null;
+				}
 			}
 		}
 		else{
 			if(anyChild){
-				nodeVersions = megaApi.getVersions(node);
+				if(megaApi.hasVersions(node)){
+					nodeVersions = megaApi.getVersions(node);
+				}
+				else{
+					nodeVersions = null;
+				}
+
 			}
 		}
-
-
-//		if (node.getHandle() != -1){
-//			log("node updated");
-//			node = megaApi.getNodeByHandle(node.getHandle());
-//		}
 
 		if (moveToRubbish){
 			supportInvalidateOptionsMenu();
