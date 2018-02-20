@@ -26,6 +26,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.PowerManager;
+import android.os.SystemClock;
 import android.os.Vibrator;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.FloatingActionButton;
@@ -64,6 +65,7 @@ import java.nio.ByteBuffer;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+import java.util.TimeZone;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -206,6 +208,9 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
     ImageView secondArrowVideo;
     ImageView thirdArrowVideo;
     ImageView fourArrowVideo;
+
+    long startTime, timeInMilliseconds = 0;
+    Handler customHandler = new Handler();
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -1673,30 +1678,53 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {}
 
+    public static String getDateFromMillis(long d) {
+        SimpleDateFormat df = new SimpleDateFormat("HH:mm:ss");
+        df.setTimeZone(TimeZone.getTimeZone("GMT"));
+        return df.format(d);
+    }
+
+
     private void startClock(){
-
-        timer = new Timer();
-        MyTimerTask myTimerTask = new MyTimerTask();
-
-        timer.schedule(myTimerTask, 0, 1000);
+        startTime = SystemClock.uptimeMillis();
+        customHandler.postDelayed(updateTimerThread, 0);
     }
 
-    private class MyTimerTask extends TimerTask {
-
-        @Override
+    private Runnable updateTimerThread = new Runnable() {
         public void run() {
-            milliseconds = milliseconds +1000;
-            SimpleDateFormat formatter = new SimpleDateFormat("mm:ss", Locale.getDefault());
-            final String strDate = formatter.format(new Date(milliseconds));
-
-            runOnUiThread(new Runnable(){
-
-                @Override
-                public void run() {
-                    aB.setSubtitle(strDate);
-                }});
+            timeInMilliseconds = SystemClock.uptimeMillis() - startTime;
+            aB.setSubtitle(getDateFromMillis(timeInMilliseconds));
+            customHandler.postDelayed(this, 1000);
         }
-    }
+    };
+
+
+
+//    private void startClock(){
+//
+//        timer = new Timer();
+//        MyTimerTask myTimerTask = new MyTimerTask();
+//
+//        timer.schedule(myTimerTask, 0, 1000);
+//    }
+//
+//    private class MyTimerTask extends TimerTask {
+//
+//        @Override
+//        public void run() {
+//            milliseconds = milliseconds +1000;
+//            log("***********milliseconds: "+milliseconds);
+//            SimpleDateFormat formatter = new SimpleDateFormat("hh:mm:ss", Locale.getDefault());
+//            final String strDate = formatter.format(new Date(milliseconds));
+//
+//            runOnUiThread(new Runnable(){
+//
+//                @Override
+//                public void run() {
+//                    aB.setSubtitle(strDate);
+//                }});
+//        }
+//    }
 
     private class MyRingerTask extends TimerTask {
 
