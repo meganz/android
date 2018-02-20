@@ -140,13 +140,17 @@ public class ScanCodeFragment extends Fragment implements ZXingScannerView.Resul
 //            }
 //        }, 2000);
 
-        Invite(rawResult);
+        invite(rawResult);
 
     }
 
-    public void Invite (Result rawResult){
+    public void invite (Result rawResult){
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setTitle("Qr scan result");
+        LayoutInflater inflater = getActivity().getLayoutInflater();
+
+        builder.setView(inflater.inflate(R.layout.dialog_accept_contact, null));
+
+
         builder.setMessage("Result :"+rawResult.getText()+"\nType :"+rawResult.getBarcodeFormat().toString())
                 .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {

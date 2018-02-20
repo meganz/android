@@ -1,23 +1,54 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
-    <ImageView
-        android:layout_width="240dp"
-        android:layout_height="240dp"
-        android:id="@+id/qr_code_image"
+    android:layout_height="match_parent"
+    xmlns:rounded="http://schemas.android.com/apk/res-auto">
+    
+    <RelativeLayout
+        android:layout_width="280dp"
+        android:layout_height="280dp"
         android:layout_centerHorizontal="true"
-        android:background="@drawable/red_border_upgrade_account"
-        android:layout_marginBottom="80dp"
-        android:layout_above="@+id/qr_code_link"/>
+        android:layout_marginBottom="56dp"
+        android:layout_above="@+id/qr_code_link">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_centerInParent="true"
+            android:id="@+id/qr_code_image"/>
+
+        <RelativeLayout
+            android:id="@+id/qr_code_relative_layout_avatar"
+            android:layout_width="108dp"
+            android:layout_height="108dp"
+            android:layout_centerInParent="true">
+
+            <mega.privacy.android.app.components.RoundedImageView
+                android:id="@+id/qr_code_avatar"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="fitCenter"
+                android:layout_centerInParent="true"
+                rounded:border_color="@color/border_file_properties"
+                rounded:border_width="0dp"
+                rounded:corner_radius="60dp" />
+
+            <TextView
+                android:id="@+id/qr_code_initial_letter"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_centerInParent="true"
+                android:gravity="center_horizontal|center_vertical"
+                android:paddingBottom="3dp" />
+        </RelativeLayout>
+
+    </RelativeLayout>
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/qr_code_link"
         android:textColor="@color/black"
-        android:text="https://mega.nz/fm/4Si6od-7Yqw"
         android:layout_centerHorizontal="true"
         android:layout_above="@+id/qr_code_button_copy_link"
         android:layout_marginBottom="15dp"
@@ -32,7 +63,10 @@
         android:elevation="6dp"
         android:background="@color/white"
         android:layout_marginBottom="40dp"
-
+        android:paddingBottom="8dp"
+        android:paddingTop="8dp"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
         android:textSize="14sp"
         android:text="copy link"/>
 
