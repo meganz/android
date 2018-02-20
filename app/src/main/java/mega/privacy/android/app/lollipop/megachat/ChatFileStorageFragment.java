@@ -51,9 +51,6 @@ public class ChatFileStorageFragment extends BottomSheetDialogFragment {
     RecyclerView recyclerView;
     private RecyclerView.LayoutManager mLayoutManager;
 
-    private BottomSheetBehavior mBehavior;
-
-
     MegaChatFileStorageAdapter adapter;
     ChatFileStorageFragment fileStorageFragment = this;
 
@@ -215,24 +212,6 @@ public class ChatFileStorageFragment extends BottomSheetDialogFragment {
         }else{
             recyclerView.setVisibility(View.VISIBLE);
         }
-
-
-        mBehavior = BottomSheetBehavior.from((View) v.getParent());
-        mBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
-
-        final ChatFileStorageFragment thisclass = this;
-
-        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            mBehavior.setPeekHeight((heightDisplay / 4) * 2);
-        }
-        else if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT){
-            mBehavior.setPeekHeight(BottomSheetBehavior.PEEK_HEIGHT_AUTO);
-        }
-
-
-
-
-
 
 
 
@@ -442,9 +421,9 @@ public class ChatFileStorageFragment extends BottomSheetDialogFragment {
 
     public void sendButton(boolean flag){
         ((ChatActivityLollipop) getActivity()).activateSendButton(flag);
-        if(flag){
-            List<Integer> items = adapter.getSelectedItems();
-        }
+//        if(flag){
+//            List<Integer> items = adapter.getSelectedItems();
+//        }
     }
 
     public void removePosition(Integer pos){
