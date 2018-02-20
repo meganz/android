@@ -146,11 +146,6 @@ public class Constants {
 
 	public static String ACTION_SHOW_UPGRADE_ACCOUNT = "ACTION_SHOW_UPGRADE_ACCOUNT";
 
-	final public static int CHAT_ADAPTER_SHOW_ALL = 2;
-	final public static int CHAT_ADAPTER_SHOW_TIME = 1;
-	final public static int CHAT_ADAPTER_SHOW_NOTHING = 0;
-	final public static int CHAT_ADAPTER_SHOW_NOTHING_NO_NAME = 3;
-
 	final public static int FILE_BROWSER_ADAPTER = 2000;
 	final public static int CONTACT_FILE_ADAPTER = 2001;
 	final public static int RUBBISH_BIN_ADAPTER = 2002;
@@ -194,13 +189,14 @@ public class Constants {
 	public static int NOTIFICATION_PUSH_CHAT = 8;
 	public static int NOTIFICATION_PUSH_CONTACT = 9;
 	public static int NOTIFICATION_STREAMING_OVERQUOTA= 10;
+	public static int NOTIFICATION_CALL_IN_PROGRESS = 8;
 
 	public static String CHAT_FOLDER = "My chat files";
 
 	public static int TAKE_PICTURE_OPTION = 0;
 	public static int TAKE_PROFILE_PICTURE = 1;
 
-	final public static String MAIL_ANDROID = "android@mega.nz";
+	final public static String MAIL_ANDROID = "androidfeedback@mega.nz";
 
 	public static int MIN_ITEMS_SCROLLBAR = 30;
 	public static int MIN_ITEMS_SCROLLBAR_GRID = 200;

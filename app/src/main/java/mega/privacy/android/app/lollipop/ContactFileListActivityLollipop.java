@@ -77,6 +77,7 @@ import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
+import nz.mega.sdk.MegaEvent;
 import nz.mega.sdk.MegaGlobalListenerInterface;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
@@ -123,6 +124,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 	MegaPreferences prefs = null;
 
 	MenuItem createFolderMenuItem;
+	MenuItem startConversation;
 	private AlertDialog newFolderDialog;
 	DisplayMetrics outMetrics;
 
@@ -149,6 +151,8 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 		inflater.inflate(R.menu.file_explorer_action, menu);
 
 		createFolderMenuItem = menu.findItem(R.id.cab_menu_create_folder);
+		startConversation = menu.findItem(R.id.cab_menu_new_chat);
+		startConversation.setVisible(false);
 
 		if (cflF != null && cflF.isVisible()){
 			if(cflF.getFabVisibility()==View.VISIBLE){
@@ -2112,6 +2116,11 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 			ArrayList<MegaContactRequest> requests) {
 		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	public void onEvent(MegaApiJava api, MegaEvent event) {
+
 	}
 
 	public void showOptionsPanel(MegaNode node){

@@ -76,6 +76,7 @@ import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
+import nz.mega.sdk.MegaEvent;
 import nz.mega.sdk.MegaGlobalListenerInterface;
 import nz.mega.sdk.MegaHandleList;
 import nz.mega.sdk.MegaNode;
@@ -235,7 +236,7 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
                                         }
                                     }
                                 },
-                                10000
+                                12000
                         );
                     }
                     else{
@@ -280,26 +281,29 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
                 if (megaChatApi == null) {
                     megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
                 }
-                int ret = megaChatApi.init(gSession);
-                log("result of init ---> " + ret);
-                chatSettings = dbH.getChatSettings();
-                if (ret == MegaChatApi.INIT_NO_CACHE) {
-                    log("condition ret == MegaChatApi.INIT_NO_CACHE");
-                    megaApi.invalidateCache();
 
-                } else if (ret == MegaChatApi.INIT_ERROR) {
-                    log("condition ret == MegaChatApi.INIT_ERROR");
-                    if (chatSettings == null) {
-                        log("ERROR----> Switch OFF chat");
-                        chatSettings = new ChatSettings(false + "", true + "", "", true + "");
-                        dbH.setChatSettings(chatSettings);
+                int ret = megaChatApi.getInitState();
+
+                if(ret==0||ret==MegaChatApi.INIT_ERROR){
+                    ret = megaChatApi.init(gSession);
+                    log("result of init ---> " + ret);
+                    chatSettings = dbH.getChatSettings();
+                    if (ret == MegaChatApi.INIT_NO_CACHE) {
+                        log("condition ret == MegaChatApi.INIT_NO_CACHE");
+                    } else if (ret == MegaChatApi.INIT_ERROR) {
+                        log("condition ret == MegaChatApi.INIT_ERROR");
+                        if (chatSettings == null) {
+                            log("ERROR----> Switch OFF chat");
+                            chatSettings = new ChatSettings(false + "", true + "", "", true + "");
+                            dbH.setChatSettings(chatSettings);
+                        } else {
+                            log("ERROR----> Switch OFF chat");
+                            dbH.setEnabledChat(false + "");
+                        }
+                        megaChatApi.logout(this);
                     } else {
-                        log("ERROR----> Switch OFF chat");
-                        dbH.setEnabledChat(false + "");
+                        log("Chat correctly initialized");
                     }
-                    megaChatApi.logout(this);
-                } else {
-                    log("Chat correctly initialized");
                 }
             }
 
@@ -422,7 +426,10 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
 
     public void launchCallActivity(MegaChatCall call){
         log("launchCallActivity");
+        MegaApplication.setShowPinScreen(false);
+
         if(call.getStatus()==MegaChatCall.CALL_STATUS_RING_IN){
+
             Intent i = new Intent(this, ChatCallActivity.class);
             i.putExtra("chatHandle", call.getChatid());
             i.putExtra("callId", call.getId());
@@ -865,6 +872,12 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
 
     @Override
     public void onAccountUpdate(MegaApiJava api) {
+
+    }
+
+
+    @Override
+    public void onEvent(MegaApiJava api, MegaEvent event) {
 
     }
 

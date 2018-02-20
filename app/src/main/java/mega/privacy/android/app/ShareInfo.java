@@ -116,16 +116,23 @@ public class ShareInfo {
 				}
 				return processIntentMultiple(intent, context);
 			}
+		}
+		else if (intent.getClipData() != null) {
+			if(Intent.ACTION_GET_CONTENT.equals(intent.getAction())) {
+				log("Multiple ACTION_GET_CONTENT");
+				return processGetContentMultiple(intent, context);
+			}
+		}
 		// Get File info from Data URI
-		} else {
+		else {
 			Uri dataUri = intent.getData();
 			if (dataUri == null) {
 				log("data uri is null");
-
-				if(Intent.ACTION_GET_CONTENT.equals(intent.getAction())) {
-					log("Multiple ACTION_GET_CONTENT");
-					return processGetContentMultiple(intent, context);
-				}
+//
+//				if(Intent.ACTION_GET_CONTENT.equals(intent.getAction())) {
+//					log("Multiple ACTION_GET_CONTENT");
+//					return processGetContentMultiple(intent, context);
+//				}
 				return null;
 			}
 			shareInfo.processUri(dataUri, context);
@@ -298,6 +305,11 @@ public class ShareInfo {
 
 			if (context.getExternalCacheDir() != null){
 				if (title != null){
+					if (title.contains("../") || title.contains(("..%2F"))){
+						log("External path traversal: " + title);
+						return;
+					}
+					log("External No path traversal: " + title);
 					file = new File(context.getExternalCacheDir(), title);
 				}
 				else{
@@ -306,6 +318,11 @@ public class ShareInfo {
 			}
 			else{
 				if (title != null){
+					if (title.contains("../") || title.contains(("..%2F"))){
+						log("Internal path traversal: " + title);
+						return;
+					}
+					log("Internal No path traversal: " + title);
 					file = new File(context.getCacheDir(), title);
 				}
 				else{

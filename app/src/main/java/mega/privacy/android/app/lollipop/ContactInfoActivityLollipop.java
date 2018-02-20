@@ -385,6 +385,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			removeContactChatLayout.setOnClickListener(this);
 
 			chatHandle = extras.getLong("handle",-1);
+			userEmailExtra = extras.getString("name");
 			if (chatHandle != -1) {
 
 				log("From chat!!");
@@ -401,8 +402,17 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 
 				chatPrefs = dbH.findChatPreferencesByHandle(String.valueOf(chatHandle));
 
-				nameContact.setText(chat.getTitle());
-				nameLength.setText(chat.getTitle());
+				if (chat.getTitle() != null && !chat.getTitle().isEmpty() && !chat.getTitle().equals("")){
+					nameContact.setText(chat.getTitle());
+					nameLength.setText(chat.getTitle());
+				}
+				else {
+					if (userEmailExtra != null) {
+
+						nameContact.setText(userEmailExtra);
+						nameLength.setText(userEmailExtra);
+					}
+				}
 				String fullname = (String)nameContact.getText();
 				setDefaultAvatar(fullname);
 			}
@@ -410,7 +420,6 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 				log("From contacts!!");
 
 				fromContacts = true;
-				userEmailExtra = extras.getString("name");
 				user = megaApi.getContact(userEmailExtra);
 
 				String fullName = "";
@@ -434,9 +443,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 
 						if (fullName.trim().length() <= 0){
 							log("Put email as fullname");
-							String email = user.getEmail();
-							String[] splitEmail = email.split("[@._]");
-							fullName = splitEmail[0];
+							fullName= user.getEmail();
 						}
 
 						nameContact.setText(fullName);
@@ -908,10 +915,19 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 					}
 					else{
 						log("There is already a chat, open it!");
-						Intent intentOpenChat = new Intent(this, ChatActivityLollipop.class);
-						intentOpenChat.setAction(Constants.ACTION_CHAT_SHOW_MESSAGES);
-						intentOpenChat.putExtra("CHAT_ID", chat.getChatId());
-						this.startActivity(intentOpenChat);
+						if(fromContacts){
+							Intent intentOpenChat = new Intent(this, ChatActivityLollipop.class);
+							intentOpenChat.setAction(Constants.ACTION_CHAT_SHOW_MESSAGES);
+							intentOpenChat.putExtra("CHAT_ID", chat.getChatId());
+							this.startActivity(intentOpenChat);
+						}
+						else{
+							Intent intentOpenChat = new Intent(this, ChatActivityLollipop.class);
+							intentOpenChat.setAction(Constants.ACTION_CHAT_SHOW_MESSAGES);
+							intentOpenChat.putExtra("CHAT_ID", chat.getChatId());
+							intentOpenChat.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+							this.startActivity(intentOpenChat);
+						}
 					}
 				}
 				break;
@@ -1657,11 +1673,22 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			log("Create chat request finish!!!");
 			if(e.getErrorCode()==MegaChatError.ERROR_OK){
 				log("Chat CREATEDD!!!---> open it!");
-				Intent intent = new Intent(this, ChatActivityLollipop.class);
-				intent.setAction(Constants.ACTION_NEW_CHAT);
-				intent.putExtra("CHAT_ID", request.getChatHandle());
-				this.startActivity(intent);
-				finish();
+
+				if(fromContacts){
+					Intent intent = new Intent(this, ChatActivityLollipop.class);
+					intent.setAction(Constants.ACTION_NEW_CHAT);
+					intent.putExtra("CHAT_ID", request.getChatHandle());
+					this.startActivity(intent);
+					finish();
+				}
+				else{
+					Intent intent = new Intent(this, ChatActivityLollipop.class);
+					intent.setAction(Constants.ACTION_NEW_CHAT);
+					intent.putExtra("CHAT_ID", request.getChatHandle());
+					intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+					this.startActivity(intent);
+					finish();
+				}
 			}
 			else{
 				log("EEEERRRRROR WHEN CREATING CHAT " + e.getErrorString());

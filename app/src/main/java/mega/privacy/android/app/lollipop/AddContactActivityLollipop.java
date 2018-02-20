@@ -25,6 +25,8 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
+import android.text.Html;
+import android.text.Spanned;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.view.Display;
@@ -98,7 +100,6 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
     RecyclerView recyclerView;
     ImageView emptyImageView;
     TextView emptyTextView;
-    TextView emptyTextViewSecond;
     ProgressBar progressBar;
     EditText addContactEditText;
     private RelativeLayout contactErrorLayout;
@@ -168,14 +169,25 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
             progressBar.setVisibility(View.GONE);
             if(phoneContacts!=null){
                 if (phoneContacts.size() == 0){
-                    emptyTextViewSecond.setVisibility(View.VISIBLE);
-                    emptyTextView.setText(R.string.context_empty_contacts);
-                    String text = getString(R.string.section_contacts);
-                    emptyTextViewSecond.setText(" "+text+".");
+
+                    String textToShow = String.format(getString(R.string.context_empty_contacts), getString(R.string.section_contacts));
+                    try{
+                        textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
+                        textToShow = textToShow.replace("[/A]", "</font>");
+                        textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
+                        textToShow = textToShow.replace("[/B]", "</font>");
+                    }
+                    catch (Exception e){}
+                    Spanned result = null;
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                        result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
+                    } else {
+                        result = Html.fromHtml(textToShow);
+                    }
+                    emptyTextView.setText(result);
                 }
                 else {
                     emptyTextView.setText(R.string.contacts_list_empty_text_loading);
-                    emptyTextViewSecond.setVisibility(View.GONE);
                 }
                 filteredContactsPhone.clear();
                 if (phoneContacts != null) {
@@ -206,13 +218,23 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                     }
 
                     if (filteredContactsPhone.size() == 0) {
-                        emptyTextViewSecond.setVisibility(View.VISIBLE);
-                        emptyTextView.setText(R.string.context_empty_contacts);
-                        String text = getString(R.string.section_contacts);
-                        emptyTextViewSecond.setText(" "+text+".");
+                        String textToShow = String.format(getString(R.string.context_empty_contacts), getString(R.string.section_contacts));
+                        try{
+                            textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
+                            textToShow = textToShow.replace("[/A]", "</font>");
+                            textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
+                            textToShow = textToShow.replace("[/B]", "</font>");
+                        }
+                        catch (Exception e){}
+                        Spanned result = null;
+                        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                            result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
+                        } else {
+                            result = Html.fromHtml(textToShow);
+                        }
+                        emptyTextView.setText(result);
                     }
                     else {
-                        emptyTextViewSecond.setVisibility(View.GONE);
                     }
                 }
 
@@ -303,6 +325,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                 else if (contactType == Constants.CONTACT_TYPE_MEGA){
                     setResultContacts(addedContactsMEGA, true);
                 }
+                hideKeyboard();
                 break;
             }
         }
@@ -650,8 +673,6 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
 
         emptyImageView = (ImageView) findViewById(R.id.add_contact_list_empty_image);
         emptyTextView = (TextView) findViewById(R.id.add_contact_list_empty_text);
-        emptyTextViewSecond = (TextView) findViewById(R.id.contact_list_empty_text_second);
-
         emptyImageView.setImageResource(R.drawable.ic_empty_contacts);
         emptyTextView.setText(R.string.contacts_list_empty_text_loading);
 
@@ -885,10 +906,22 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                 recyclerView.setVisibility(View.GONE);
                 emptyImageView.setVisibility(View.VISIBLE);
                 emptyTextView.setVisibility(View.VISIBLE);
-                emptyTextViewSecond.setVisibility(View.VISIBLE);
-                emptyTextView.setText(R.string.context_empty_contacts);
-                String text = getString(R.string.section_contacts);
-                emptyTextViewSecond.setText(" "+text+".");
+
+                String textToShow = String.format(getString(R.string.context_empty_contacts), getString(R.string.section_contacts));
+                try{
+                    textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
+                    textToShow = textToShow.replace("[/A]", "</font>");
+                    textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
+                    textToShow = textToShow.replace("[/B]", "</font>");
+                }
+                catch (Exception e){}
+                Spanned result = null;
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                    result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
+                } else {
+                    result = Html.fromHtml(textToShow);
+                }
+                emptyTextView.setText(result);
             }
         }
 
@@ -1103,6 +1136,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                 }
             }
         }
+        addContactEditText.setText("");
     }
 
     public void itemClick(View view, int position) {
@@ -1142,6 +1176,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                 showSnackbar(getResources().getString(R.string.max_add_contact));
             }
         }
+        addContactEditText.setText("");
 
     }
 
@@ -1188,6 +1223,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         }
         intent.putExtra(EXTRA_MEGA_CONTACTS, megaContacts);
         setResult(RESULT_OK, intent);
+        hideKeyboard();
         finish();
     }
 
@@ -1244,6 +1280,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
 
         intent.putExtra(EXTRA_MEGA_CONTACTS, false);
         setResult(RESULT_OK, intent);
+        hideKeyboard();
         finish();
     }
 

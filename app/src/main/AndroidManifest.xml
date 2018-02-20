@@ -2,8 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="mega.privacy.android.app"
     android:installLocation="internalOnly"
-    android:versionCode="175"
-    android:versionName="3.3 (175)" >
+    android:versionCode="182"
+    android:versionName="3.3.2 (182)" >
 
     <uses-sdk
         android:minSdkVersion="16"
@@ -37,6 +37,7 @@
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.CAPTURE_VIDEO_OUTPUT" />
+    <uses-permission android:name="android.permission.FLAG_SHOW_WHEN_LOCKED" />
 
     <application
         android:name="MegaApplication"
@@ -389,6 +390,11 @@
 
         <service
             android:name="mega.privacy.android.app.lollipop.megachat.ChatUploadService"
+            android:exported="false" >
+        </service>
+
+        <service
+            android:name="mega.privacy.android.app.lollipop.megachat.calls.CallService"
             android:exported="false" >
         </service>
 

@@ -6,6 +6,7 @@ package mega.privacy.android.app;
 
 import android.app.Application;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
@@ -23,7 +24,9 @@ import org.webrtc.VideoCapturer;
 import java.util.ArrayList;
 import java.util.Locale;
 
+import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
+import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -34,6 +37,7 @@ import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
+import nz.mega.sdk.MegaEvent;
 import nz.mega.sdk.MegaListenerInterface;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
@@ -44,7 +48,7 @@ import nz.mega.sdk.MegaUser;
 
 public class MegaApplication extends Application implements MegaListenerInterface, MegaChatRequestListenerInterface {
 	final String TAG = "MegaApplication";
-	static final String USER_AGENT = "MEGAAndroid/3.3_175";
+	static final String USER_AGENT = "MEGAAndroid/3.3.2_182";
 
 	DatabaseHandler dbH;
 	MegaApiAndroid megaApi;
@@ -56,6 +60,7 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 
 
 	MegaChatApiAndroid megaChatApi = null;
+
 
 //	static final String GA_PROPERTY_ID = "UA-59254318-1";
 //	
@@ -95,7 +100,7 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 			if (e.getErrorCode() == MegaError.API_ESID){
 				if (request.getType() == MegaRequest.TYPE_LOGOUT){
 					log("type_logout");
-					AccountController.logout(getApplicationContext(), getMegaApi(), getMegaChatApi(), false);
+					AccountController.logout(getApplicationContext(), getMegaApi());
 				}
 			}
 			else if (request.getType() == MegaRequest.TYPE_FETCH_NODES){
@@ -482,6 +487,14 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 		return firstConnect;
 	}
 
+	public static boolean isShowInfoChatMessages() {
+		return showInfoChatMessages;
+	}
+
+	public static void setShowInfoChatMessages(boolean showInfoChatMessages) {
+		MegaApplication.showInfoChatMessages = showInfoChatMessages;
+	}
+
 	public static void activityResumed() {
 		log("activityResumed()");
 		activityVisible = true;
@@ -492,11 +505,33 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 		activityVisible = false;
 	}
 
+	public static boolean isShowPinScreen() {
+		return showPinScreen;
+	}
+
+	public static void setShowPinScreen(boolean showPinScreen) {
+		MegaApplication.showPinScreen = showPinScreen;
+	}
+
+	public static String getUrlConfirmationLink() {
+		return urlConfirmationLink;
+	}
+
+	public static void setUrlConfirmationLink(String urlConfirmationLink) {
+		MegaApplication.urlConfirmationLink = urlConfirmationLink;
+	}
+
 	private static boolean activityVisible = false;
 	private static boolean isLoggingIn = false;
 	private static boolean firstConnect = true;
 
+	private static boolean showInfoChatMessages = false;
+
+	private static boolean showPinScreen = true;
+
 	private static long openChatId = -1;
+
+	private static String urlConfirmationLink = null;
 
 	public static boolean isLoggingIn() {
 		return isLoggingIn;
@@ -529,7 +564,6 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 //		return mTrackers.get(trackerId);
 //	}
 
-
 	public static long getOpenChatId() {
 		return openChatId;
 	}
@@ -561,14 +595,13 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 	}
 
 	@Override
-	public void onRequestFinish(MegaApiJava api, MegaRequest request,
-			MegaError e) {
+	public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
 		log("onRequestFinish: " + request.getRequestString());
 		if (request.getType() == MegaRequest.TYPE_LOGOUT){
 			log("type_logout: " + e.getErrorCode() + "__" + request.getParamType());
 			if (e.getErrorCode() == MegaError.API_ESID){
 				log("calling ManagerActivity.logout");
-				AccountController.logout(getApplicationContext(), getMegaApi(), getMegaChatApi(), false);
+				AccountController.logout(getApplicationContext(), getMegaApi());
 			}
 		}
 	}
@@ -662,12 +695,69 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 		}
 		if (request.getType() == MegaChatRequest.TYPE_LOGOUT) {
 			log("CHAT_TYPE_LOGOUT: " + e.getErrorCode() + "__" + e.getErrorString());
+
 			try{
 				if (megaChatApi != null){
 					megaChatApi.removeChatRequestListener(this);
 				}
 			}
 			catch (Exception exc){}
+
+			if(megaApi!=null){
+				int loggedState = megaApi.isLoggedIn();
+				log("Login status on "+loggedState);
+				if(loggedState==0){
+					AccountController aC = new AccountController(this);
+					aC.logoutConfirmed(this);
+
+					if(activityVisible){
+						if(getUrlConfirmationLink()!=null){
+							log("Launch intent to confirmation account screen");
+							Intent confirmIntent = new Intent(this, LoginActivityLollipop.class);
+							confirmIntent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
+							confirmIntent.putExtra(Constants.EXTRA_CONFIRMATION, getUrlConfirmationLink());
+							confirmIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+							confirmIntent.setAction(Constants.ACTION_CONFIRM);
+							setUrlConfirmationLink(null);
+							startActivity(confirmIntent);
+						}
+						else{
+							log("Launch intent to tour screen");
+							Intent tourIntent = new Intent(this, LoginActivityLollipop.class);
+							tourIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+							this.startActivity(tourIntent);
+						}
+					}
+					else{
+						log("No activity visible on logging out chat");
+						if(getUrlConfirmationLink()!=null){
+							log("Show confirmation account screen");
+							Intent confirmIntent = new Intent(this, LoginActivityLollipop.class);
+							confirmIntent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
+							confirmIntent.putExtra(Constants.EXTRA_CONFIRMATION, getUrlConfirmationLink());
+							confirmIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+							confirmIntent.setAction(Constants.ACTION_CONFIRM);
+							setUrlConfirmationLink(null);
+							startActivity(confirmIntent);
+						}
+					}
+				}
+				else{
+					log("Disable chat finish logout");
+				}
+			}
+			else{
+
+				AccountController aC = new AccountController(this);
+				aC.logoutConfirmed(this);
+
+				if(activityVisible){
+					log("Launch intent to login screen");
+					Intent tourIntent = new Intent(this, LoginActivityLollipop.class);
+					tourIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+					this.startActivity(tourIntent);
+				}
+			}
 
 			megaChatApi = null;
 		}
@@ -676,5 +766,10 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 	@Override
 	public void onRequestTemporaryError(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
 		log("onRequestTemporaryError: Chat");
+	}
+
+	@Override
+	public void onEvent(MegaApiJava api, MegaEvent event) {
+
 	}
 }

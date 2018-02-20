@@ -196,14 +196,6 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 			
 		if (node.isFolder()){
 
-			if(selectFile) {
-				if (multipleSelect) {
-					if(isMultipleSelect()){
-						((CloudDriveExplorerFragmentLollipop) fragment).hideMultipleSelect();
-					}
-				}
-			}
-
 			RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
 			params.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
 			params.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
@@ -278,7 +270,7 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 					holder.permissionsIcon.setImageResource(R.drawable.ic_shared_read_write);
 				}
 			}
-			else if(node.isOutShare()) {
+			else if(node.isOutShare()||megaApi.isPendingShare(node)) {
 				holder.permissionsIcon.setVisibility(View.GONE);
 				holder.imageView.setImageResource(R.drawable.ic_folder_outgoing_list);
 				holder.textViewFileSize.setText(MegaApiUtils.getInfoFolder(node, context));

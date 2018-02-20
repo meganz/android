@@ -17,7 +17,6 @@ import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.SwitchCompat;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
@@ -31,7 +30,6 @@ import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
-import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -85,12 +83,8 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
     private EditText et_user;
     private EditText et_password;
     private TextView bRegister;
-    private TextView registerText;
     private TextView bLogin;
     private TextView bForgotPass;
-    private ImageView loginThreeDots;
-    private SwitchCompat loginSwitch;
-    private TextView loginABC;
     private LinearLayout loginLogin;
     private LinearLayout loginLoggingIn;
     private LinearLayout loginCreateAccount;
@@ -168,6 +162,9 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
     private Drawable login_background;
     private Drawable password_background;
 
+    private ImageView toggleButton;
+    private boolean passwdVisibility;
+
     @Override
     public void onSaveInstanceState(Bundle outState) {
         log("onSaveInstanceState");
@@ -227,25 +224,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             chatSettings = new ChatSettings(true+"", true + "", "",true + "");
             dbH.setChatSettings(chatSettings);
         }
-        else{
-            MegaPreferences prefs = dbH.getPreferences();
-            if(prefs!=null) {
-                if (prefs.getFirstTimeChat() != null){
-                    if (Boolean.parseBoolean(prefs.getFirstTimeChat()) == true){
-                        log("firstTimeChat true --> enable chat by default");
-                        chatSettings = new ChatSettings(true+"", true + "", "",true + "");
-                        dbH.setChatSettings(chatSettings);
-                        dbH.setFirstTimeChat(false);
-                    }
-                }
-                else{
-                    log("firstTimeChat is null --> enable chat by default");
-                    chatSettings = new ChatSettings(true+"", true + "", "",true + "");
-                    dbH.setChatSettings(chatSettings);
-                    dbH.setFirstTimeChat(false);
-                }
-            }
-        }
 
         display = ((Activity)context).getWindowManager().getDefaultDisplay();
         outMetrics = new DisplayMetrics ();
@@ -294,6 +272,10 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
         loginEmailErrorText = (TextView) v.findViewById(R.id.login_email_text_error_text);
 
+        toggleButton = (ImageView) v.findViewById(R.id.toggle_button);
+        toggleButton.setOnClickListener(this);
+        passwdVisibility = false;
+
         et_password = (EditText) v.findViewById(R.id.login_password_text);
 
         et_password.setCursorVisible(true);
@@ -326,40 +308,27 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             }
         });
 
+        et_password.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (hasFocus) {
+                    toggleButton.setVisibility(View.VISIBLE);
+                    toggleButton.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_b_shared_read));
+                }
+                else {
+                    toggleButton.setVisibility(View.GONE);
+                    passwdVisibility = false;
+                    showHidePassword();
+                }
+            }
+        });
+
         password_background = et_password.getBackground().mutate().getConstantState().newDrawable();
 
         loginPasswordErrorLayout = (RelativeLayout) v.findViewById(R.id.login_password_text_error);
         loginPasswordErrorLayout.setVisibility(View.GONE);
 
         loginPasswordErrorText = (TextView) v.findViewById(R.id.login_password_text_error_text);
-
-        loginThreeDots = (ImageView) v.findViewById(R.id.login_three_dots);
-        LinearLayout.LayoutParams textThreeDots = (LinearLayout.LayoutParams)loginThreeDots.getLayoutParams();
-        textThreeDots.setMargins(Util.scaleWidthPx(0, outMetrics), 0, Util.scaleWidthPx(10, outMetrics), 0);
-        loginThreeDots.setLayoutParams(textThreeDots);
-
-        loginABC = (TextView) v.findViewById(R.id.ABC);
-
-        loginSwitch = (SwitchCompat) v.findViewById(R.id.switch_login);
-        LinearLayout.LayoutParams switchParams = (LinearLayout.LayoutParams)loginSwitch.getLayoutParams();
-        switchParams.setMargins(0, 0, Util.scaleWidthPx(10, outMetrics), 0);
-        loginSwitch.setLayoutParams(switchParams);
-        loginSwitch.setChecked(false);
-
-        loginSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if(!isChecked){
-                    et_password.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-                    et_password.setTypeface(Typeface.SANS_SERIF,Typeface.NORMAL);
-                    et_password.setSelection(et_password.getText().length());
-                }else{
-                    et_password.setInputType(InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
-                    et_password.setSelection(et_password.getText().length());
-                }
-            }
-        });
 
         bLogin = (TextView) v.findViewById(R.id.button_login_login);
         bLogin.setText(getString(R.string.login_text).toUpperCase(Locale.getDefault()));
@@ -742,6 +711,17 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         return v;
     }
 
+    public void showHidePassword () {
+        if(!passwdVisibility){
+            et_password.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+            et_password.setTypeface(Typeface.SANS_SERIF,Typeface.NORMAL);
+            et_password.setSelection(et_password.getText().length());
+        }else{
+            et_password.setInputType(InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
+            et_password.setSelection(et_password.getText().length());
+        }
+    }
+
     public void startLoginInProcess(){
         log("startLoginInProcess");
 
@@ -802,32 +782,38 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 log("INIT STATE: "+megaChatApi.getInitState());
                 log("addChatListener");
                 megaChatApi.addChatListener(this);
-                int ret = megaChatApi.init(gSession);
-                log("enableChat: result of init ---> "+ret);
-                chatSettings = dbH.getChatSettings();
-                if (ret == MegaChatApi.INIT_NO_CACHE)
-                {
-                    log("enableChat: condition ret == MegaChatApi.INIT_NO_CACHE");
-                    megaApi.invalidateCache();
 
-                }
-                else if (ret == MegaChatApi.INIT_ERROR)
-                {
-                    log("enableChat: condition ret == MegaChatApi.INIT_ERROR");
-                    // chat cannot initialize, disable chat completely
-                    if(chatSettings==null) {
-                        log("1 - enableChat: ERROR----> Switch OFF chat");
-                        chatSettings = new ChatSettings(false+"", true + "", "",true + "");
-                        dbH.setChatSettings(chatSettings);
+                int ret = megaChatApi.getInitState();
+
+                if(ret==0||ret==MegaChatApi.INIT_ERROR){
+                    ret = megaChatApi.init(gSession);
+                    log("enableChat: result of init ---> "+ret);
+                    chatSettings = dbH.getChatSettings();
+                    if (ret == MegaChatApi.INIT_NO_CACHE)
+                    {
+                        log("enableChat: condition ret == MegaChatApi.INIT_NO_CACHE");
+                    }
+                    else if (ret == MegaChatApi.INIT_ERROR)
+                    {
+                        log("enableChat: condition ret == MegaChatApi.INIT_ERROR");
+                        // chat cannot initialize, disable chat completely
+                        if(chatSettings==null) {
+                            log("1 - enableChat: ERROR----> Switch OFF chat");
+                            chatSettings = new ChatSettings(false+"", true + "", "",true + "");
+                            dbH.setChatSettings(chatSettings);
+                        }
+                        else{
+                            log("2 - enableChat: ERROR----> Switch OFF chat");
+                            dbH.setEnabledChat(false + "");
+                        }
+                        megaChatApi.logout(this);
                     }
                     else{
-                        log("2 - enableChat: ERROR----> Switch OFF chat");
-                        dbH.setEnabledChat(false + "");
+                        log("enableChat: condition ret == OK -- chat correctly initialized");
                     }
-                    megaChatApi.logout(this);
                 }
                 else{
-                    log("enableChat: condition ret == OK -- chat correctly initialized");
+                    log("2 - Do not init, chat already initialized");
                 }
             }
             else{
@@ -836,19 +822,9 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             fetchingNodesText.setVisibility(View.VISIBLE);
             log("enableChat: Call to fechtNodes");
             megaApi.fetchNodes(this);
-
         }
         else{
-            log("enableChat:isLogginIn true");
-            if(chatSettings==null) {
-                log("3 - enableChat: ERROR----> Switch OFF chat");
-                chatSettings = new ChatSettings(false+"", true + "", "",true + "");
-                dbH.setChatSettings(chatSettings);
-            }
-            else{
-                log("4 - enableChat: ERROR----> Switch OFF chat");
-                dbH.setEnabledChat(false + "");
-            }
+            log("Another login is processing");
         }
     }
 
@@ -905,45 +881,50 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 if (megaChatApi == null){
                     megaChatApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaChatApi();
                 }
+
                 int ret = megaChatApi.getInitState();
-                log("initial: INIT STATE: "+ret);
+                if(ret==0||ret==MegaChatApi.INIT_ERROR){
+                    log("initial: INIT STATE: "+ret);
 
-                if(ret!=MegaChatApi.INIT_OFFLINE_SESSION){
                     ret = megaChatApi.init(gSession);
-                    log("after init: INIT STATE: "+ret);
-                }
 
-                log("startFastLogin: result of init ---> "+ret);
-                chatSettings = dbH.getChatSettings();
-                if (ret == MegaChatApi.INIT_NO_CACHE)
-                {
-                    log("startFastLogin: condition ret == MegaChatApi.INIT_NO_CACHE");
-                    megaApi.invalidateCache();
-
-                }
-                else if (ret == MegaChatApi.INIT_ERROR)
-                {
-                    // chat cannot initialize, disable chat completely
-                    log("startFastLogin: condition ret == MegaChatApi.INIT_ERROR");
-                    if(chatSettings==null) {
-                        log("1 - startFastLogin: ERROR----> Switch OFF chat");
-                        chatSettings = new ChatSettings(false+"", true + "", "",true + "");
-                        dbH.setChatSettings(chatSettings);
+                    log("startFastLogin: result of init ---> "+ret);
+                    chatSettings = dbH.getChatSettings();
+                    if (ret == MegaChatApi.INIT_NO_CACHE)
+                    {
+                        log("startFastLogin: condition ret == MegaChatApi.INIT_NO_CACHE");
+                    }
+                    else if (ret == MegaChatApi.INIT_ERROR)
+                    {
+                        // chat cannot initialize, disable chat completely
+                        log("startFastLogin: condition ret == MegaChatApi.INIT_ERROR");
+                        if(chatSettings==null) {
+                            log("1 - startFastLogin: ERROR----> Switch OFF chat");
+                            chatSettings = new ChatSettings(false+"", true + "", "",true + "");
+                            dbH.setChatSettings(chatSettings);
+                        }
+                        else{
+                            log("2 - startFastLogin: ERROR----> Switch OFF chat");
+                            dbH.setEnabledChat(false + "");
+                        }
+                        megaChatApi.logout(this);
                     }
                     else{
-                        log("2 - startFastLogin: ERROR----> Switch OFF chat");
-                        dbH.setEnabledChat(false + "");
+                        log("startFastLogin: condition ret == OK -- chat correctly initialized");
                     }
-                    megaChatApi.logout(this);
+                    log("After init: "+ret);
                 }
                 else{
-                    log("startFastLogin: condition ret == OK -- chat correctly initialized");
+                    log("Do not init, chat already initialized: "+ret);
                 }
             }
             else{
                 log("startFastLogin: Chat is NOT ENABLED");
             }
             megaApi.fastLogin(gSession, this);
+        }
+        else{
+            log("Another login is proccessing");
         }
     }
 
@@ -1092,54 +1073,47 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             return;
         }
 
-        loggingInText.setVisibility(View.VISIBLE);
-        fetchingNodesText.setVisibility(View.GONE);
-        prepareNodesText.setVisibility(View.GONE);
-        serversBusyText.setVisibility(View.GONE);
+        if (!MegaApplication.isLoggingIn()) {
+            MegaApplication.setLoggingIn(true);
 
-        log("fastLogin con publicKey y privateKey");
-        resumeSesion = false;
+            loggingInText.setVisibility(View.VISIBLE);
+            fetchingNodesText.setVisibility(View.GONE);
+            prepareNodesText.setVisibility(View.GONE);
+            serversBusyText.setVisibility(View.GONE);
 
-        if(Util.isChatEnabled()){
-            log("onKeysGeneratedLogin: Chat is ENABLED");
-            if (megaChatApi == null){
-                megaChatApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaChatApi();
-            }
-            int ret = megaChatApi.init(null);
-            log("onKeysGeneratedLogin: result of init ---> "+ret);
-            if (ret ==MegaChatApi.INIT_WAITING_NEW_SESSION){
-                log("startFastLogin: condition ret == MegaChatApi.INIT_WAITING_NEW_SESSION");
-                if (!MegaApplication.isLoggingIn()){
-                    MegaApplication.setLoggingIn(true);
+            log("fastLogin con publicKey y privateKey");
+            resumeSesion = false;
+
+            if(Util.isChatEnabled()){
+                log("onKeysGeneratedLogin: Chat is ENABLED");
+                if (megaChatApi == null){
+                    megaChatApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaChatApi();
+                }
+                int ret = megaChatApi.init(null);
+                log("onKeysGeneratedLogin: result of init ---> "+ret);
+                if (ret ==MegaChatApi.INIT_WAITING_NEW_SESSION){
+                    log("startFastLogin: condition ret == MegaChatApi.INIT_WAITING_NEW_SESSION");
+                    megaApi.fastLogin(lastEmail, publicKey, privateKey, this);
+                }
+                else{
+                    log("ERROR INIT CHAT: " + ret);
+                    megaChatApi.logout(this);
+
+                    if(chatSettings==null) {
+                        log("1 - ERROR----> Switch OFF chat");
+                        chatSettings = new ChatSettings(false+"", true + "", "",true + "");
+                        dbH.setChatSettings(chatSettings);
+                    }
+                    else{
+                        log("2 - ERROR----> Switch OFF chat");
+                        dbH.setEnabledChat(false + "");
+                    }
+
                     megaApi.fastLogin(lastEmail, publicKey, privateKey, this);
                 }
             }
             else{
-                log("ERROR INIT CHAT: " + ret);
-                megaChatApi.logout(this);
-
-                if(chatSettings==null) {
-                    log("1 - ERROR----> Switch OFF chat");
-                    chatSettings = new ChatSettings(false+"", true + "", "",true + "");
-                    dbH.setChatSettings(chatSettings);
-                }
-                else{
-                    log("2 - ERROR----> Switch OFF chat");
-                    dbH.setEnabledChat(false + "");
-                }
-
-                if (!MegaApplication.isLoggingIn()){
-                    log("Keep process of login without chat");
-                    MegaApplication.setLoggingIn(true);
-                    megaApi.fastLogin(lastEmail, publicKey, privateKey, this);
-                }
-            }
-        }
-        else{
-            log("onKeysGeneratedLogin: Chat is NOT ENABLED");
-            if (!MegaApplication.isLoggingIn()){
-                log("Keep process of login without chat");
-                MegaApplication.setLoggingIn(true);
+                log("onKeysGeneratedLogin: Chat is NOT ENABLED");
                 megaApi.fastLogin(lastEmail, publicKey, privateKey, this);
             }
         }
@@ -1298,6 +1272,19 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                         log("attrs is NULL");
                         ((LoginActivityLollipop)context).showConfirmationEnableLogsSDK();
                     }
+                }
+                break;
+            }
+            case R.id.toggle_button: {
+                if (passwdVisibility) {
+                    toggleButton.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_b_shared_read));
+                    passwdVisibility = false;
+                    showHidePassword();
+                }
+                else {
+                    toggleButton.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_b_see));
+                    passwdVisibility = true;
+                    showHidePassword();
                 }
                 break;
             }
@@ -1810,7 +1797,19 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 queryingSignupLinkText.setVisibility(View.GONE);
                 confirmingAccountText.setVisibility(View.GONE);
 
-                ((LoginActivityLollipop)context).showSnackbar(errorMessage);
+                if (error.getErrorCode() == MegaError.API_EACCESS){
+                    log("Error API_EACCESS");
+                    if(((LoginActivityLollipop)context).accountBlocked!=null){
+                        log("Account blocked");
+                    }
+                    else{
+                        errorMessage = error.getErrorString();
+                        ((LoginActivityLollipop)context).showSnackbar(errorMessage);
+                    }
+                }
+                else{
+                    ((LoginActivityLollipop)context).showSnackbar(errorMessage);
+                }
 
                 if(chatSettings==null) {
                     log("1 - Reset chat setting enable");
@@ -1919,19 +1918,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         log("onRequestFinish(CHAT)");
 
         if (request.getType() == MegaChatRequest.TYPE_LOGOUT){
-//            loginLoggingIn.setVisibility(View.GONE);
-//            loginLogin.setVisibility(View.VISIBLE);
-//            scrollView.setBackgroundColor(getResources().getColor(R.color.background_create_account));
-//            loginDelimiter.setVisibility(View.VISIBLE);
-//            loginCreateAccount.setVisibility(View.VISIBLE);
-//            queryingSignupLinkText.setVisibility(View.GONE);
-//            confirmingAccountText.setVisibility(View.GONE);
-//            generatingKeysText.setVisibility(View.GONE);
-//            loggingInText.setVisibility(View.GONE);
-//            fetchingNodesText.setVisibility(View.GONE);
-//            prepareNodesText.setVisibility(View.GONE);
-//            initizalizingChatText.setVisibility(View.GONE);
-//            serversBusyText.setVisibility(View.GONE);
 
             megaChatApi = null;
             ((MegaApplication) ((Activity)context).getApplication()).disableMegaChatApi();

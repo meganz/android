@@ -149,7 +149,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	
 	private AlertDialog newFolderDialog;
 
-	String regex = "[*|\\?:\"<>\\{\\}\\[\\]\\\\\\/]";
+	String regex = "[*|\\?:\"<>\\\\\\\\/]";
 
 	public class RecyclerViewOnGestureListener extends SimpleOnGestureListener{
 
@@ -925,7 +925,6 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	
 	public void showNewFolderDialog(){
 		log("showNewFolderDialog");
-
 		LinearLayout layout = new LinearLayout(this);
 		layout.setOrientation(LinearLayout.VERTICAL);
 		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);

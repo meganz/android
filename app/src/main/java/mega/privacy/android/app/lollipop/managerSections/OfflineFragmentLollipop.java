@@ -17,6 +17,8 @@ import android.support.v7.view.ActionMode;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
+import android.text.Spanned;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.LayoutInflater;
@@ -74,7 +76,6 @@ public class OfflineFragmentLollipop extends Fragment{
 	ImageView emptyImageView;
 	LinearLayout emptyTextView;
 	TextView emptyTextViewFirst;
-	TextView emptyTextViewSecond;
 
 	MegaOfflineLollipopAdapter adapter;
 	OfflineFragmentLollipop offlineFragment = this;
@@ -439,8 +440,6 @@ public class OfflineFragmentLollipop extends Fragment{
 			emptyImageView = (ImageView) v.findViewById(R.id.offline_empty_image);
 			emptyTextView = (LinearLayout) v.findViewById(R.id.offline_empty_text);
 			emptyTextViewFirst = (TextView) v.findViewById(R.id.offline_empty_text_first);
-			emptyTextViewSecond = (TextView) v.findViewById(R.id.offline_empty_text_second);
-					
 			contentTextLayout = (RelativeLayout) v.findViewById(R.id.offline_content_text_layout);
 			contentText = (TextView) v.findViewById(R.id.offline_content_text);			
 
@@ -467,9 +466,21 @@ public class OfflineFragmentLollipop extends Fragment{
 					}else{
 						emptyImageView.setImageResource(R.drawable.ic_empty_offline);
 					}
-					emptyTextViewFirst.setText(R.string.context_empty_offline);
-					String text = getString(R.string.section_saved_for_offline);
-					emptyTextViewSecond.setText(" "+text+".");
+					String textToShow = String.format(getString(R.string.context_empty_offline), getString(R.string.section_saved_for_offline));
+					try{
+						textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
+						textToShow = textToShow.replace("[/A]", "</font>");
+						textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
+						textToShow = textToShow.replace("[/B]", "</font>");
+					}
+					catch (Exception e){}
+					Spanned result = null;
+					if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+						result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
+					} else {
+						result = Html.fromHtml(textToShow);
+					}
+					emptyTextViewFirst.setText(result);
 
 				}
 				else{
@@ -499,8 +510,6 @@ public class OfflineFragmentLollipop extends Fragment{
 			emptyImageView = (ImageView) v.findViewById(R.id.offline_empty_image_grid);
 			emptyTextView = (LinearLayout) v.findViewById(R.id.offline_empty_text_grid);
 			emptyTextViewFirst = (TextView) v.findViewById(R.id.offline_empty_text_grid_first);
-			emptyTextViewSecond = (TextView) v.findViewById(R.id.offline_empty_text_grid_second);
-
 			contentTextLayout = (RelativeLayout) v.findViewById(R.id.offline_content_grid_text_layout);
 
 			contentText = (TextView) v.findViewById(R.id.offline_content_text_grid);			
@@ -528,9 +537,21 @@ public class OfflineFragmentLollipop extends Fragment{
 					}else{
 						emptyImageView.setImageResource(R.drawable.ic_empty_offline);
 					}
-					emptyTextViewFirst.setText(R.string.context_empty_offline);
-					String text = getString(R.string.section_saved_for_offline);
-					emptyTextViewSecond.setText(" "+text+".");
+					String textToShow = String.format(getString(R.string.context_empty_offline), getString(R.string.section_saved_for_offline));
+					try{
+						textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
+						textToShow = textToShow.replace("[/A]", "</font>");
+						textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
+						textToShow = textToShow.replace("[/B]", "</font>");
+					}
+					catch (Exception e){}
+					Spanned result = null;
+					if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+						result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
+					} else {
+						result = Html.fromHtml(textToShow);
+					}
+					emptyTextViewFirst.setText(result);
 				}
 				else{
 					recyclerView.setVisibility(View.VISIBLE);
@@ -643,9 +664,22 @@ public class OfflineFragmentLollipop extends Fragment{
 				}else{
 					emptyImageView.setImageResource(R.drawable.ic_empty_offline);
 				}
-				emptyTextViewFirst.setText(R.string.context_empty_offline);
-				String text = getString(R.string.section_saved_for_offline);
-				emptyTextViewSecond.setText(" "+text+".");
+
+				String textToShow = String.format(getString(R.string.context_empty_offline), getString(R.string.section_saved_for_offline));
+				try{
+					textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
+					textToShow = textToShow.replace("[/A]", "</font>");
+					textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
+					textToShow = textToShow.replace("[/B]", "</font>");
+				}
+				catch (Exception e){}
+				Spanned result = null;
+				if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+					result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
+				} else {
+					result = Html.fromHtml(textToShow);
+				}
+				emptyTextViewFirst.setText(result);
 			}
 			else{
 				recyclerView.setVisibility(View.VISIBLE);
@@ -711,7 +745,9 @@ public class OfflineFragmentLollipop extends Fragment{
 		
 		mOffList.clear();
 		mOffList.addAll(tempOffline);
-
+		if (adapter!= null) {
+			adapter.setNodes(mOffList);
+		}
 		contentText.setText(getInfoFolder(mOffList));
 	}
 
@@ -769,6 +805,9 @@ public class OfflineFragmentLollipop extends Fragment{
 		
 		mOffList.clear();
 		mOffList.addAll(tempOffline);
+		if (adapter!= null) {
+			adapter.setNodes(mOffList);
+		}
 		contentText.setText(getInfoFolder(mOffList));
 	}
 	
@@ -1023,9 +1062,21 @@ public class OfflineFragmentLollipop extends Fragment{
 					}else{
 						emptyImageView.setImageResource(R.drawable.ic_empty_offline);
 					}
-					emptyTextViewFirst.setText(R.string.context_empty_offline);
-					String text = getString(R.string.section_saved_for_offline);
-					emptyTextViewSecond.setText(" "+text+".");
+					String textToShow = String.format(getString(R.string.context_empty_offline), getString(R.string.section_saved_for_offline));
+					try{
+						textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
+						textToShow = textToShow.replace("[/A]", "</font>");
+						textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
+						textToShow = textToShow.replace("[/B]", "</font>");
+					}
+					catch (Exception e){}
+					Spanned result = null;
+					if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+						result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
+					} else {
+						result = Html.fromHtml(textToShow);
+					}
+					emptyTextViewFirst.setText(result);
 				}
 				else{
 					recyclerView.setVisibility(View.VISIBLE);
@@ -1097,6 +1148,8 @@ public class OfflineFragmentLollipop extends Fragment{
 
 						Intent pdfIntent = new Intent(context, PdfViewerActivityLollipop.class);
 						pdfIntent.putExtra("APP", true);
+						pdfIntent.putExtra("HANDLE", Long.parseLong(currentNode.getHandle()));
+						pdfIntent.putExtra("adapterType", Constants.OFFLINE_ADAPTER);
 						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
 							pdfIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", pdfFile), MimeTypeList.typeForName(currentFile.getName()).getType());
 						}
@@ -1392,9 +1445,21 @@ public class OfflineFragmentLollipop extends Fragment{
 				}else{
 					emptyImageView.setImageResource(R.drawable.ic_empty_offline);
 				}
-				emptyTextViewFirst.setText(R.string.context_empty_offline);
-				String text = getString(R.string.section_saved_for_offline);
-				emptyTextViewSecond.setText(" "+text+".");
+				String textToShow = String.format(getString(R.string.context_empty_offline), getString(R.string.section_saved_for_offline));
+				try{
+					textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
+					textToShow = textToShow.replace("[/A]", "</font>");
+					textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
+					textToShow = textToShow.replace("[/B]", "</font>");
+				}
+				catch (Exception e){}
+				Spanned result = null;
+				if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+					result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
+				} else {
+					result = Html.fromHtml(textToShow);
+				}
+				emptyTextViewFirst.setText(result);
 			}
 			else{
 				recyclerView.setVisibility(View.VISIBLE);
@@ -1451,9 +1516,21 @@ public class OfflineFragmentLollipop extends Fragment{
 			}else{
 				emptyImageView.setImageResource(R.drawable.ic_empty_offline);
 			}
-			emptyTextViewFirst.setText(R.string.context_empty_offline);
-			String text = getString(R.string.section_saved_for_offline);
-			emptyTextViewSecond.setText(" "+text+".");
+			String textToShow = String.format(getString(R.string.context_empty_offline), getString(R.string.section_saved_for_offline));
+			try{
+				textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
+				textToShow = textToShow.replace("[/A]", "</font>");
+				textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
+				textToShow = textToShow.replace("[/B]", "</font>");
+			}
+			catch (Exception e){}
+			Spanned result = null;
+			if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+				result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
+			} else {
+				result = Html.fromHtml(textToShow);
+			}
+			emptyTextViewFirst.setText(result);
 		}
 		else{
 			recyclerView.setVisibility(View.VISIBLE);

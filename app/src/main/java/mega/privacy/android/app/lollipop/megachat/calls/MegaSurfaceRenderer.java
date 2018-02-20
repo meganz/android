@@ -209,6 +209,10 @@ public class MegaSurfaceRenderer implements Callback {
         if(bitmap == null)
             return;
 
+        if (surfaceHolder == null){
+            return;
+        }
+
         Canvas canvas = surfaceHolder.lockCanvas();
         if (canvas != null) {
             canvas.scale(-1, 1);

@@ -4,17 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
-import android.graphics.BitmapShader;
-import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffXfermode;
-import android.graphics.Rect;
-import android.graphics.RectF;
-import android.graphics.Shader;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.shapes.RoundRectShape;
 import android.os.Environment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
@@ -32,14 +22,11 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import mega.privacy.android.app.DatabaseHandler;
@@ -68,7 +55,6 @@ import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
-import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaUser;
 
 public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowserLollipopAdapter.ViewHolderBrowser> implements OnClickListener, View.OnLongClickListener, SectionTitleProvider {
@@ -690,7 +676,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 				}
 			}
 			else{
-				if (node.isOutShare()){
+				if (node.isOutShare()||megaApi.isPendingShare(node)){
 					holder.imageViewIcon.setImageResource(R.drawable.ic_folder_outgoing_list);
 				}
 				else if(node.isInShare()){
@@ -1092,7 +1078,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 
 				if (!multipleSelect) {
 					holder.itemLayout.setBackgroundColor(Color.WHITE);
-					if (node.isOutShare()){
+					if (node.isOutShare()||megaApi.isPendingShare(node)){
 						holder.imageView.setImageResource(R.drawable.ic_folder_outgoing_list);
 					}
 					else if(node.isInShare()){
@@ -1115,7 +1101,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 					}
 					else{
 						holder.itemLayout.setBackgroundColor(Color.WHITE);
-						if (node.isOutShare()){
+						if (node.isOutShare()||megaApi.isPendingShare(node)){
 							holder.imageView.setImageResource(R.drawable.ic_folder_outgoing_list);
 						}
 						else if(node.isInShare()){
