@@ -29,7 +29,6 @@ import java.util.Locale;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.components.scrollBar.SectionTitleProvider;
 import mega.privacy.android.app.lollipop.VersionsFileActivity;
 import mega.privacy.android.app.utils.ThumbnailUtils;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
@@ -37,7 +36,7 @@ import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 
-public class VersionsFileAdapter extends RecyclerView.Adapter<VersionsFileAdapter.ViewHolderVersion> implements OnClickListener, View.OnLongClickListener, SectionTitleProvider {
+public class VersionsFileAdapter extends RecyclerView.Adapter<VersionsFileAdapter.ViewHolderVersion> implements OnClickListener, View.OnLongClickListener {
 
 	public static final int ITEM_VIEW_TYPE_LIST = 0;
 	public static final int ITEM_VIEW_TYPE_GRID = 1;
@@ -350,8 +349,7 @@ public class VersionsFileAdapter extends RecyclerView.Adapter<VersionsFileAdapte
 					holder.imageView.setImageBitmap(thumb);
 
 				} else {
-					thumb = ThumbnailUtils
-							.getThumbnailFromFolder(node, context);
+					thumb = ThumbnailUtils.getThumbnailFromFolder(node, context);
 					if (thumb != null) {
 						RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
 						params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
@@ -551,11 +549,6 @@ public class VersionsFileAdapter extends RecyclerView.Adapter<VersionsFileAdapte
 	}
 
 	@Override
-	public String getSectionTitle(int position) {
-		return getItemNode(position).substring(0, 1);
-	}
-
-	@Override
 	public long getItemId(int position) {
 		return position;
 	}
@@ -606,14 +599,6 @@ public class VersionsFileAdapter extends RecyclerView.Adapter<VersionsFileAdapte
 
 	@Override
 	public boolean onLongClick(View view) {
-		log("OnLongCLick");
-//		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
-//
-//		ViewHolderVersion holder = (ViewHolderVersion) view.getTag();
-//		int currentPosition = holder.getAdapterPosition();
-//
-//		((VersionsFileActivity) context).itemClick(currentPosition);
-
 		return true;
 	}
 
