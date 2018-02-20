@@ -1727,6 +1727,17 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         super.onActivityResult(requestCode, resultCode, intent);
     }
 
+    public void retryNodeAttachment(long nodeHandle){
+        megaChatApi.attachNode(idChat, nodeHandle, this);
+    }
+
+    public void retryContactAttachment(MegaHandleList handleList){
+        MegaChatMessage contactMessage = megaChatApi.attachContacts(idChat, handleList);
+        if(contactMessage!=null){
+            sendMessageToUI(contactMessage);
+        }
+    }
+
     public void showConfirmationClearChat(final MegaChatRoom c){
         log("showConfirmationClearChat");
 
