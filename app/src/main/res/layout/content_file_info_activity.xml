@@ -134,6 +134,52 @@
             android:layout_height="1dp"
             android:background="@color/separator_grey" />
 
+        <!-- VERSIONS LAYOUT -->
+
+        <RelativeLayout
+            android:id="@+id/file_properties_versions_layout"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:gravity="left" >
+            <ImageView
+                android:id="@+id/file_properties_versions_image"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:layout_centerInParent="true"
+                android:alpha="0.30"
+                android:src="@drawable/info_ic" />
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_gravity="left|center_vertical"
+                android:layout_marginLeft="26dp"
+                android:layout_toRightOf="@id/file_properties_versions_image" >
+
+                <Button
+                    android:id="@+id/file_properties_text_number_versions"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/number_of_versions"
+                    android:textAllCaps="true"
+                    android:textSize="14sp"
+                    android:stateListAnimator="@null"
+                    android:elevation="0dp"
+                    android:textColor="@color/accentColor"
+                    android:background="@color/white"/>
+
+            </RelativeLayout>
+        </RelativeLayout>
+
+        <View
+            android:id="@+id/separator_versions"
+            android:layout_width="fill_parent"
+            android:layout_height="1dp"
+            android:layout_marginLeft="70dp"
+            android:background="@color/separator_grey" />
+
         <!-- SHARED LAYOUT -->
 
         <RelativeLayout

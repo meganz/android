@@ -104,7 +104,7 @@
                     android:layout_alignParentRight="true"
                     android:textSize="14sp"
                     android:inputType="textMultiLine|textNoSuggestions"
-                    android:background="@drawable/rounded_text_view_chat_own_message"
+                    android:background="@drawable/dark_rounded_chat_own_message"
                     android:paddingTop="10dp"
                     android:paddingBottom="10dp"
                     android:paddingLeft="12dp"
@@ -232,19 +232,6 @@
                             android:layout_gravity="center"
                             android:background="@drawable/ic_input_warning"/>
                     </RelativeLayout>
-                    <TextView
-                        android:id="@+id/not_sent_text_portrait"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_below="@+id/preview_frame_portrait_rl"
-                        android:textColor="@color/name_my_account"
-                        android:layout_alignParentRight="true"
-                        android:text="@string/manual_retry_alert"
-                        android:textSize="11sp"
-                        android:layout_marginEnd="16dp"
-                        android:layout_marginRight="16dp"
-                        android:inputType="textMultiLine|textNoSuggestions"
-                        android:gravity="right"/>
                 </RelativeLayout>
 
                 <!-- own elements landscape -->
@@ -354,19 +341,6 @@
                             android:layout_gravity="center"
                             android:background="@drawable/ic_input_warning"/>
                     </RelativeLayout>
-                    <TextView
-                        android:id="@+id/not_sent_text_landscape"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_below="@+id/preview_frame_landscape_rl"
-                        android:textColor="@color/name_my_account"
-                        android:layout_alignParentRight="true"
-                        android:text="@string/manual_retry_alert"
-                        android:textSize="11sp"
-                        android:layout_marginEnd="16dp"
-                        android:layout_marginRight="16dp"
-                        android:inputType="textMultiLine|textNoSuggestions"
-                        android:gravity="right"/>
 
                 </RelativeLayout>
 
@@ -375,7 +349,7 @@
                     android:id="@+id/content_own_message_file_layout"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/rounded_text_view_chat_own_message"
+                    android:background="@drawable/dark_rounded_chat_own_message"
                     android:layout_alignParentLeft="true"
                     android:layout_marginEnd="16dp"
                     android:layout_marginRight="16dp"
@@ -433,7 +407,7 @@
                     android:id="@+id/content_own_message_contact_layout"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/rounded_text_view_chat_own_message"
+                    android:background="@drawable/dark_rounded_chat_own_message"
                     android:layout_alignParentLeft="true"
                     android:layout_marginEnd="16dp"
                     android:layout_marginRight="16dp"
@@ -513,7 +487,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/own_text_and_triangle_layout"
-                android:textColor="@color/white"
+                android:textColor="@color/text_login"
                 android:layout_alignParentRight="true"
                 android:text="@string/manual_retry_alert"
                 android:textSize="11sp"
