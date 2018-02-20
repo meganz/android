@@ -23,7 +23,6 @@ import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.graphics.Shader.TileMode;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -10055,7 +10054,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
 
 		refreshAfterMovingToRubbish();
-
 	}
 
 	public void showConfirmationLeaveIncomingShare (final MegaNode n){

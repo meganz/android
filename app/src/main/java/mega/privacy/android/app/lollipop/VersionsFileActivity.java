@@ -95,7 +95,6 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 	
 	MenuItem selectMenuItem;
 	MenuItem unSelectMenuItem;
-	MenuItem clearVersions;
 
 	private class GetVersionsSizeTask extends AsyncTask<String, Void, String> {
 
@@ -154,7 +153,7 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 		@Override
 		public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
 			log("onActionItemClicked");
-			final List<MegaNode> shares = adapter.getSelectedNodes();
+			final List<MegaNode> nodes = adapter.getSelectedNodes();
 						
 			switch(item.getItemId()){
 				case R.id.cab_menu_select_all:{
@@ -167,6 +166,14 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 					actionMode.invalidate();
 					break;
 				}
+				case R.id.action_download_versions:{
+
+					break;
+				}
+				case R.id.action_delete_versions:{
+					showConfirmationRemoveVersions(nodes);
+					break;
+				}
 			}
 			return false;
 		}
@@ -175,10 +182,10 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 		public boolean onCreateActionMode(ActionMode mode, Menu menu) {
 			log("onCreateActionMode");
 			MenuInflater inflater = mode.getMenuInflater();
-			inflater.inflate(R.menu.file_contact_shared_browser_action, menu);
+			inflater.inflate(R.menu.versions_files_action, menu);
 			menu.findItem(R.id.cab_menu_select_all).setVisible(true);
-			menu.findItem(R.id.action_file_contact_list_permissions).setVisible(false);
-			menu.findItem(R.id.action_file_contact_list_delete).setVisible(false);
+			menu.findItem(R.id.action_download_versions).setVisible(false);
+			menu.findItem(R.id.action_delete_versions).setVisible(false);
 			return true;
 		}
 		
@@ -206,11 +213,15 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 					menu.findItem(R.id.cab_menu_select_all).setVisible(true);
 					unselect.setTitle(getString(R.string.action_unselect_all));
 					unselect.setVisible(true);
-				}	
+				}
+				menu.findItem(R.id.action_download_versions).setVisible(false);
+				menu.findItem(R.id.action_delete_versions).setVisible(true);
 			}
 			else{
 				menu.findItem(R.id.cab_menu_select_all).setVisible(true);
-				menu.findItem(R.id.cab_menu_unselect_all).setVisible(false);	
+				menu.findItem(R.id.cab_menu_unselect_all).setVisible(false);
+				menu.findItem(R.id.action_download_versions).setVisible(false);
+				menu.findItem(R.id.action_delete_versions).setVisible(false);
 			}
 			
 			return false;
@@ -364,6 +375,8 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 
 	    selectMenuItem = menu.findItem(R.id.action_select);
 		unSelectMenuItem = menu.findItem(R.id.action_unselect);
+
+		menu.findItem(R.id.action_folder_contacts_list_share_folder).setVisible(false);
 
 	    return super.onCreateOptionsMenu(menu);
 	}
@@ -764,6 +777,13 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 		megaApi.removeVersion(selectedNode, this);
 	}
 
+	public void removeVersions(List<MegaNode> removeNodes){
+		log("removeVersion");
+		for(int i=0; i<removeNodes.size();i++){
+			megaApi.removeVersion(removeNodes.get(i), this);
+		}
+	}
+
 	public MegaNode getSelectedNode() {
 		return selectedNode;
 	}
@@ -808,8 +828,43 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 		};
 
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setTitle(getString(R.string.title_dialog_delete_version));
+		builder.setTitle(getResources().getQuantityString(R.plurals.title_dialog_delete_version, 1));
 		builder.setMessage(getString(R.string.content_dialog_delete_version)).setPositiveButton(R.string.context_delete, dialogClickListener)
+				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
+
+	}
+
+	public void showConfirmationRemoveVersions(final List<MegaNode> removeNodes){
+		log("showConfirmationRemoveContactRequests");
+		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				switch (which){
+					case DialogInterface.BUTTON_POSITIVE:
+						removeVersions(removeNodes);
+						break;
+
+					case DialogInterface.BUTTON_NEGATIVE:
+						//No button clicked
+						break;
+				}
+			}
+		};
+
+		String message="";
+		String title="";
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		if(removeNodes.size()==1){
+
+			title = getResources().getQuantityString(R.plurals.title_dialog_delete_version, 1);
+
+			message= getResources().getString(R.string.content_dialog_delete_version);
+		}else{
+			title = getResources().getQuantityString(R.plurals.title_dialog_delete_version, removeNodes.size());
+			message= getResources().getString(R.string.content_dialog_delete_multiple_version,removeNodes.size());
+		}
+		builder.setTitle(title);
+		builder.setMessage(message).setPositiveButton(R.string.context_delete, dialogClickListener)
 				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
 
 	}
