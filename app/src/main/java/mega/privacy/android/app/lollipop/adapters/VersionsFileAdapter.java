@@ -581,12 +581,12 @@ public class VersionsFileAdapter extends RecyclerView.Adapter<VersionsFileAdapte
 	@Override
 	public boolean onLongClick(View view) {
 		log("OnLongCLick");
-		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
-
-		ViewHolderVersion holder = (ViewHolderVersion) view.getTag();
-		int currentPosition = holder.getAdapterPosition();
-
-		((VersionsFileActivity) context).itemClick(currentPosition);
+//		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
+//
+//		ViewHolderVersion holder = (ViewHolderVersion) view.getTag();
+//		int currentPosition = holder.getAdapterPosition();
+//
+//		((VersionsFileActivity) context).itemClick(currentPosition);
 
 		return true;
 	}

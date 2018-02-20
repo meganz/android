@@ -14,9 +14,8 @@
 	    MEGA:showAsAction="never" />
 	
 	<item
-	    android:id="@+id/action_folder_contacts_list_share_folder"
+	    android:id="@+id/action_versions_file_clear_previous"
 	    android:orderInCategory="115"
-		android:title="@string/context_share_folder"
-	    android:icon="@drawable/ic_share_white"
+		android:title="@string/menu_item_clear_versions"
 	    MEGA:showAsAction="never" />
 </menu>

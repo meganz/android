@@ -1712,5 +1712,8 @@
     </plurals>
 
     <string name="general_revert" context="option menu to revert a file version">Revert</string>
+    <string name="menu_item_clear_versions" context="option menu to clear all the previous versions">Clear previous versions</string>
+    <string name="title_dialog_delete_version" context="Title of the dialog to confirm that a version os going to be deleted">Delete version?</string>
+    <string name="content_dialog_delete_version" context="Content of the dialog to confirm that a version os going to be deleted">This version will be permanently removed.</string>
 </resources>
 

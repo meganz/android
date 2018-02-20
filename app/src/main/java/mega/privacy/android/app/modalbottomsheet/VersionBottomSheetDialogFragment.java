@@ -188,7 +188,7 @@ public class VersionBottomSheetDialogFragment extends BottomSheetDialogFragment 
                     log("The selected node is NULL");
                     return;
                 }
-                ((VersionsFileActivity) context).removeVersion();
+                ((VersionsFileActivity) context).showConfirmationRemoveVersion();
                 break;
             }
         }
