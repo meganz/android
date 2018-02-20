@@ -574,7 +574,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 										boolean result = resizedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, out); // bmp is your Bitmap instance
 										if(result){
 											log("Compress OK!");
-											megaApi.setPreview(node, preview.getAbsolutePath(), new VideoPreviewGeneratorListener());
+											megaApi.setPreview(node, preview.getAbsolutePath(), this);
 										}
 										else{
 											log("Not Compress");
@@ -765,39 +765,6 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 				}
 			}
 		}
-	}
-
-	static class VideoPreviewGeneratorListener implements MegaRequestListenerInterface{
-
-		@Override
-		public void onRequestStart(MegaApiJava api, MegaRequest request) {
-			// TODO Auto-generated method stub
-
-		}
-
-		@Override
-		public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
-			// TODO Auto-generated method stub
-
-		}
-
-		@Override
-		public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
-			if (e.getErrorCode() == MegaError.API_OK){
-				log("OK preview de video");
-			}
-			else{
-				log("ERROR preview de video: "+e.getErrorString());
-			}
-
-		}
-
-		@Override
-		public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) {
-			// TODO Auto-generated method stub
-
-		}
-
 	}
 
 	@Override

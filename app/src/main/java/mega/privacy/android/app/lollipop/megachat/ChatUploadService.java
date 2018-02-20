@@ -34,7 +34,6 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.PreviewUtils;
@@ -450,7 +449,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 									boolean result = resizedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, out); // bmp is your Bitmap instance
 									if(result){
 										log("Compress OK!");
-										megaApi.setPreview(node, preview.getAbsolutePath(), new VideoPreviewGeneratorListener());
+										megaApi.setPreview(node, preview.getAbsolutePath(), this);
 									}
 									else{
 										log("Not Compress");
@@ -714,39 +713,6 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 		if (megaApi.getNumPendingUploads() == 0 && transfersCount==0){
 			onQueueComplete();
 		}
-	}
-
-	static class VideoPreviewGeneratorListener implements MegaRequestListenerInterface{
-
-		@Override
-		public void onRequestStart(MegaApiJava api, MegaRequest request) {
-			// TODO Auto-generated method stub
-
-		}
-
-		@Override
-		public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
-			// TODO Auto-generated method stub
-
-		}
-
-		@Override
-		public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
-			if (e.getErrorCode() == MegaError.API_OK){
-				log("OK preview de video");
-			}
-			else{
-				log("ERROR preview de video: "+e.getErrorString());
-			}
-
-		}
-
-		@Override
-		public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) {
-			// TODO Auto-generated method stub
-
-		}
-
 	}
 
 	public void attachNodes(MegaTransfer transfer){
