@@ -127,7 +127,7 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 
 			if (!adapter.isMultipleSelect()){
 
-				if(position<1){
+				if(position<0){
 					log("Position not valid: "+position);
 				}
 				else{
@@ -135,12 +135,7 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 
 					actionMode = startSupportActionMode(new ActionBarCallBack());
 
-					if(position<1){
-						log("Position not valid");
-					}
-					else{
-						itemClick(position);
-					}
+					itemClick(position);
 				}
 			}
 
@@ -504,9 +499,6 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 			return;
 		}
 		List<MegaNode> nodes = adapter.getSelectedNodes();
-		if(nodes!=null){
-			log("Contacts selected: "+nodes.size());
-		}
 
 		Resources res = getResources();
 		String format = "%d %s";
