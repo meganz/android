@@ -1,22 +1,22 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:MEGA="http://schemas.android.com/apk/res-auto" >
+	xmlns:MEGA="http://schemas.android.com/apk/res-auto" >
 
-    <item
-	    android:id="@+id/action_select"
-	    android:orderInCategory="110"
-	    android:title="@string/action_select_all"
-	    MEGA:showAsAction="never" />
-	
 	<item
-	    android:id="@+id/action_unselect"
-	    android:orderInCategory="110"
-	    android:title="@string/action_unselect_all"
-	    MEGA:showAsAction="never" />
-	
+		android:id="@+id/action_select"
+		android:orderInCategory="110"
+		android:title="@string/action_select_all"
+		MEGA:showAsAction="never" />
+
 	<item
-	    android:id="@+id/action_folder_contacts_list_share_folder"
-	    android:orderInCategory="115"
+		android:id="@+id/action_unselect"
+		android:orderInCategory="110"
+		android:title="@string/action_unselect_all"
+		MEGA:showAsAction="never" />
+
+	<item
+		android:id="@+id/action_folder_contacts_list_share_folder"
+		android:orderInCategory="115"
 		android:title="@string/context_share_folder"
-	    android:icon="@drawable/ic_share_white"
-	    MEGA:showAsAction="never" />
+		android:icon="@drawable/ic_share_white"
+		MEGA:showAsAction="never" />
 </menu>

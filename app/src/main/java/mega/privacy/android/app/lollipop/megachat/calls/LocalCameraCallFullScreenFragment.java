@@ -89,6 +89,10 @@ public class LocalCameraCallFullScreenFragment extends Fragment implements MegaC
                     this.bitmap = localRenderer.CreateBitmap(width, height);
                     holder.setFixedSize(holderWidth, holderHeight);
                 }
+                else{
+                    this.width = -1;
+                    this.height = -1;
+                }
             }
         }
 

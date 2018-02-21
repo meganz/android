@@ -17,7 +17,6 @@ import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.SwitchCompat;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
@@ -31,7 +30,6 @@ import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
-import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -85,12 +83,8 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
     private EditText et_user;
     private EditText et_password;
     private TextView bRegister;
-    private TextView registerText;
     private TextView bLogin;
     private TextView bForgotPass;
-    private ImageView loginThreeDots;
-    private SwitchCompat loginSwitch;
-    private TextView loginABC;
     private LinearLayout loginLogin;
     private LinearLayout loginLoggingIn;
     private LinearLayout loginCreateAccount;
@@ -168,6 +162,9 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
     private Drawable login_background;
     private Drawable password_background;
 
+    private ImageView toggleButton;
+    private boolean passwdVisibility;
+
     @Override
     public void onSaveInstanceState(Bundle outState) {
         log("onSaveInstanceState");
@@ -227,25 +224,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             chatSettings = new ChatSettings(true+"", true + "", "",true + "");
             dbH.setChatSettings(chatSettings);
         }
-        else{
-            MegaPreferences prefs = dbH.getPreferences();
-            if(prefs!=null) {
-                if (prefs.getFirstTimeChat() != null){
-                    if (Boolean.parseBoolean(prefs.getFirstTimeChat()) == true){
-                        log("firstTimeChat true --> enable chat by default");
-                        chatSettings = new ChatSettings(true+"", true + "", "",true + "");
-                        dbH.setChatSettings(chatSettings);
-//                        dbH.setFirstTimeChat(false);
-                    }
-                }
-                else{
-                    log("firstTimeChat is null --> enable chat by default");
-                    chatSettings = new ChatSettings(true+"", true + "", "",true + "");
-                    dbH.setChatSettings(chatSettings);
-//                    dbH.setFirstTimeChat(false);
-                }
-            }
-        }
 
         display = ((Activity)context).getWindowManager().getDefaultDisplay();
         outMetrics = new DisplayMetrics ();
@@ -294,6 +272,10 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
         loginEmailErrorText = (TextView) v.findViewById(R.id.login_email_text_error_text);
 
+        toggleButton = (ImageView) v.findViewById(R.id.toggle_button);
+        toggleButton.setOnClickListener(this);
+        passwdVisibility = false;
+
         et_password = (EditText) v.findViewById(R.id.login_password_text);
 
         et_password.setCursorVisible(true);
@@ -326,40 +308,27 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             }
         });
 
+        et_password.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (hasFocus) {
+                    toggleButton.setVisibility(View.VISIBLE);
+                    toggleButton.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_b_shared_read));
+                }
+                else {
+                    toggleButton.setVisibility(View.GONE);
+                    passwdVisibility = false;
+                    showHidePassword();
+                }
+            }
+        });
+
         password_background = et_password.getBackground().mutate().getConstantState().newDrawable();
 
         loginPasswordErrorLayout = (RelativeLayout) v.findViewById(R.id.login_password_text_error);
         loginPasswordErrorLayout.setVisibility(View.GONE);
 
         loginPasswordErrorText = (TextView) v.findViewById(R.id.login_password_text_error_text);
-
-        loginThreeDots = (ImageView) v.findViewById(R.id.login_three_dots);
-        LinearLayout.LayoutParams textThreeDots = (LinearLayout.LayoutParams)loginThreeDots.getLayoutParams();
-        textThreeDots.setMargins(Util.scaleWidthPx(0, outMetrics), 0, Util.scaleWidthPx(10, outMetrics), 0);
-        loginThreeDots.setLayoutParams(textThreeDots);
-
-        loginABC = (TextView) v.findViewById(R.id.ABC);
-
-        loginSwitch = (SwitchCompat) v.findViewById(R.id.switch_login);
-        LinearLayout.LayoutParams switchParams = (LinearLayout.LayoutParams)loginSwitch.getLayoutParams();
-        switchParams.setMargins(0, 0, Util.scaleWidthPx(10, outMetrics), 0);
-        loginSwitch.setLayoutParams(switchParams);
-        loginSwitch.setChecked(false);
-
-        loginSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if(!isChecked){
-                    et_password.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-                    et_password.setTypeface(Typeface.SANS_SERIF,Typeface.NORMAL);
-                    et_password.setSelection(et_password.getText().length());
-                }else{
-                    et_password.setInputType(InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
-                    et_password.setSelection(et_password.getText().length());
-                }
-            }
-        });
 
         bLogin = (TextView) v.findViewById(R.id.button_login_login);
         bLogin.setText(getString(R.string.login_text).toUpperCase(Locale.getDefault()));
@@ -742,6 +711,17 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         return v;
     }
 
+    public void showHidePassword () {
+        if(!passwdVisibility){
+            et_password.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+            et_password.setTypeface(Typeface.SANS_SERIF,Typeface.NORMAL);
+            et_password.setSelection(et_password.getText().length());
+        }else{
+            et_password.setInputType(InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
+            et_password.setSelection(et_password.getText().length());
+        }
+    }
+
     public void startLoginInProcess(){
         log("startLoginInProcess");
 
@@ -812,7 +792,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     if (ret == MegaChatApi.INIT_NO_CACHE)
                     {
                         log("enableChat: condition ret == MegaChatApi.INIT_NO_CACHE");
-                        megaApi.invalidateCache();
                     }
                     else if (ret == MegaChatApi.INIT_ERROR)
                     {
@@ -914,8 +893,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     if (ret == MegaChatApi.INIT_NO_CACHE)
                     {
                         log("startFastLogin: condition ret == MegaChatApi.INIT_NO_CACHE");
-                        megaApi.invalidateCache();
-
                     }
                     else if (ret == MegaChatApi.INIT_ERROR)
                     {
@@ -1295,6 +1272,19 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                         log("attrs is NULL");
                         ((LoginActivityLollipop)context).showConfirmationEnableLogsSDK();
                     }
+                }
+                break;
+            }
+            case R.id.toggle_button: {
+                if (passwdVisibility) {
+                    toggleButton.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_b_shared_read));
+                    passwdVisibility = false;
+                    showHidePassword();
+                }
+                else {
+                    toggleButton.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_b_see));
+                    passwdVisibility = true;
+                    showHidePassword();
                 }
                 break;
             }
@@ -1807,7 +1797,19 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 queryingSignupLinkText.setVisibility(View.GONE);
                 confirmingAccountText.setVisibility(View.GONE);
 
-                ((LoginActivityLollipop)context).showSnackbar(errorMessage);
+                if (error.getErrorCode() == MegaError.API_EACCESS){
+                    log("Error API_EACCESS");
+                    if(((LoginActivityLollipop)context).accountBlocked!=null){
+                        log("Account blocked");
+                    }
+                    else{
+                        errorMessage = error.getErrorString();
+                        ((LoginActivityLollipop)context).showSnackbar(errorMessage);
+                    }
+                }
+                else{
+                    ((LoginActivityLollipop)context).showSnackbar(errorMessage);
+                }
 
                 if(chatSettings==null) {
                     log("1 - Reset chat setting enable");
