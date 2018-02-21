@@ -66,10 +66,12 @@ import mega.privacy.android.app.DownloadService;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
+import mega.privacy.android.app.MimeTypeMime;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.UserCredentials;
+import mega.privacy.android.app.lollipop.megachat.ChatExplorerActivity;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.lollipop.tasks.FilePrepareTask;
 import mega.privacy.android.app.utils.Constants;
@@ -92,6 +94,8 @@ import nz.mega.sdk.MegaTransferListenerInterface;
 import nz.mega.sdk.MegaUser;
 
 public class PdfViewerActivityLollipop extends PinActivityLollipop implements OnPageChangeListener, OnLoadCompleteListener, OnPageErrorListener, View.OnClickListener, MegaRequestListenerInterface, MegaChatRequestListenerInterface, MegaTransferListenerInterface {
+
+    public static int REQUEST_CODE_SELECT_CHAT = 1005;
 
     MegaApplication app = null;
     MegaApiAndroid megaApi;
@@ -132,6 +136,9 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
     public static boolean isScrolling = false;
     public static boolean scroll = false;
     private int currentPage;
+    private int type;
+    private boolean isOffLine = false;
+    int countChat = 0;
 
     public RelativeLayout uploadContainer;
     RelativeLayout pdfviewerContainer;
@@ -140,6 +147,8 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
 
     private MenuItem shareMenuItem;
     private MenuItem downloadMenuItem;
+    private MenuItem propertiesMenuItem;
+    private MenuItem chatMenuItem;
 
     private List<ShareInfo> filePreparedInfos;
     ArrayList<Long> handleListM = new ArrayList<Long>();
@@ -148,6 +157,11 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
 
     static int TYPE_UPLOAD = 0;
     static int TYPE_DOWNLOAD = 1;
+
+    Drawable share;
+    Drawable chat;
+    Drawable properties;
+    Drawable download;
 
     @Override
     public void onCreate (Bundle savedInstanceState){
@@ -172,9 +186,10 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
         Bundle bundle = getIntent().getExtras();
         if (bundle != null){
             inside = bundle.getBoolean("APP");
-            handle  = bundle.getLong("HANDLE");
+            handle = bundle.getLong("HANDLE");
         }
         isFolderLink = intent.getBooleanExtra("isFolderLink", false);
+        type = intent.getIntExtra("adapterType", 0);
 
         uri = intent.getData();
         if (uri == null){
@@ -183,10 +198,18 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
             return;
         }
 
+        if (type == Constants.OFFLINE_ADAPTER){
+            isOffLine = true;
+        }
+
         setContentView(R.layout.activity_pdfviewer);
 
         app = (MegaApplication)getApplication();
         megaApi = app.getMegaApi();
+
+        if(Util.isChatEnabled()){
+            megaChatApi = app.getMegaChatApi();
+        }
 
 //        if(megaApi==null||megaApi.getRootNode()==null){
 //            log("Refresh session - sdk");
@@ -197,6 +220,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
 //            finish();
 //            return;
 //        }
+//
 //        if(Util.isChatEnabled()){
 //            if (megaChatApi == null){
 //                megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
@@ -354,6 +378,10 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
 
     private void loadLocalPDF() {
         log("loadLocalPDF loading: "+loading);
+
+//        if (loading && progressDialog!=null && !transferOverquota) {
+//            progressDialog.show();
+//        }
         try {
             pdfView.fromUri(uri)
                     .defaultPage(currentPage)
@@ -366,9 +394,6 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
                     .load();
         } catch (Exception e) {
 
-        }
-        if (loading && progressDialog!=null && !transferOverquota) {
-            progressDialog.show();
         }
     }
 
@@ -412,8 +437,6 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
                             chatSettings = dbH.getChatSettings();
                             if (ret == MegaChatApi.INIT_NO_CACHE) {
                                 log("onCreate: condition ret == MegaChatApi.INIT_NO_CACHE");
-                                megaApi.invalidateCache();
-
                             } else if (ret == MegaChatApi.INIT_ERROR) {
 
                                 log("onCreate: condition ret == MegaChatApi.INIT_ERROR");
@@ -593,10 +616,8 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
         inflater.inflate(R.menu.activity_pdfviewer, menu);
 
         shareMenuItem = menu.findItem(R.id.pdfviewer_share);
-
-        Drawable share = getResources().getDrawable(R.drawable.ic_social_share_white);
+        share = getResources().getDrawable(R.drawable.ic_social_share_white);
         share.setColorFilter(getResources().getColor(R.color.lollipop_primary_color), PorterDuff.Mode.SRC_ATOP);
-
         shareMenuItem.setIcon(share);
 
         downloadMenuItem = menu.findItem(R.id.pdfviewer_download);
@@ -604,7 +625,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
             log("isURL");
             shareMenuItem.setVisible(false);
             downloadMenuItem.setVisible(true);
-            Drawable download = getResources().getDrawable(R.drawable.ic_download_white);
+            download = getResources().getDrawable(R.drawable.ic_download_white);
             download.setColorFilter(getResources().getColor(R.color.lollipop_primary_color), PorterDuff.Mode.SRC_ATOP);
 
             downloadMenuItem.setIcon(download);
@@ -612,6 +633,30 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
         else {
             log("NOT isURL");
             downloadMenuItem.setVisible(false);
+        }
+
+        chatMenuItem = menu.findItem(R.id.pdfviewer_chat);
+        chat = getResources().getDrawable(R.drawable.ic_chat_white);
+        chat.setColorFilter(getResources().getColor(R.color.lollipop_primary_color), PorterDuff.Mode.SRC_ATOP);
+        chatMenuItem.setIcon(chat);
+
+        propertiesMenuItem = menu.findItem(R.id.pdfviewer_properties);
+        properties = getResources().getDrawable(R.drawable.info_ic_white);
+        properties.setColorFilter(getResources().getColor(R.color.lollipop_primary_color), PorterDuff.Mode.SRC_ATOP);
+        propertiesMenuItem.setIcon(properties);
+
+        if (inside){
+            propertiesMenuItem.setVisible(true);
+            if(Util.isChatEnabled()){
+                chatMenuItem.setVisible(true);
+            }
+            else{
+                chatMenuItem.setVisible(false);
+            }
+        }
+        else {
+            propertiesMenuItem.setVisible(false);
+            chatMenuItem.setVisible(false);
         }
 
         return super.onCreateOptionsMenu(menu);
@@ -626,6 +671,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
         switch(id) {
             case android.R.id.home: {
                 onBackPressed();
+                finish();
                 break;
             }
             case R.id.pdfviewer_share: {
@@ -634,6 +680,26 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
             }
             case R.id.pdfviewer_download: {
                 downloadFile();
+                finish();
+                break;
+            }
+            case R.id.pdfviewer_chat: {
+                long[] longArray = new long[1];
+
+                longArray[0] = handle;
+
+                Intent i = new Intent(this, ChatExplorerActivity.class);
+                i.putExtra("NODE_HANDLES", longArray);
+                startActivityForResult(i, REQUEST_CODE_SELECT_CHAT);
+                break;
+            }
+            case R.id.pdfviewer_properties: {
+                MegaNode node = megaApi.getNodeByHandle(handle);
+                Intent i = new Intent(this, FileInfoActivityLollipop.class);
+                i.putExtra("handle", node.getHandle());
+                i.putExtra("imageId", MimeTypeMime.typeForName(node.getName()).getIconResourceId());
+                i.putExtra("name", node.getName());
+                startActivity(i);
                 break;
             }
         }
@@ -790,6 +856,33 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
         log("-------------------onActivityResult " + requestCode + "____" + resultCode);
+        if (intent == null) {
+            return;
+        }
+
+        if (requestCode == REQUEST_CODE_SELECT_CHAT && resultCode == RESULT_OK){
+            long[] chatHandles = intent.getLongArrayExtra("SELECTED_CHATS");
+            log("Send to "+chatHandles.length+" chats");
+
+            long[] nodeHandles = intent.getLongArrayExtra("NODE_HANDLES");
+            log("Send "+nodeHandles.length+" nodes");
+
+            countChat = chatHandles.length;
+            if (megaChatApi != null) {
+                if(countChat==1){
+                    megaChatApi.attachNode(chatHandles[0], nodeHandles[0], this);
+                }
+                else if(countChat>1){
+
+                    for(int i=0; i<chatHandles.length; i++){
+                        megaChatApi.attachNode(chatHandles[i], nodeHandles[0], this);
+                    }
+                }
+            }
+            else{
+                log("megaChatApi is Null - cannot attach nodes");
+            }
+        }
 
         if (requestCode == Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER && resultCode == RESULT_OK) {
             log("onActivityResult: REQUEST_CODE_SELECT_LOCAL_FOLDER");
@@ -1220,6 +1313,18 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
 
         if (megaApi != null) {
             megaApi.removeTransferListener(this);
+        }
+        if (chat != null) {
+            chat.setColorFilter(null);
+        }
+        if (download != null){
+            download.setColorFilter(null);
+        }
+        if (properties != null){
+            properties.setColorFilter(null);
+        }
+        if (share != null) {
+            share.setColorFilter(null);
         }
 
         super.onDestroy();

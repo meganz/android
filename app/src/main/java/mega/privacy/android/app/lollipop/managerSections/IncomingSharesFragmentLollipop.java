@@ -452,6 +452,7 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 			if (adapter.getItemCount() == 0){
 				recyclerView.setVisibility(View.GONE);
 				contentTextLayout.setVisibility(View.GONE);
+				contentText.setVisibility(View.GONE);
 				emptyImageView.setVisibility(View.VISIBLE);
 				emptyTextView.setVisibility(View.VISIBLE);
 
@@ -485,6 +486,7 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 			}else{
 				recyclerView.setVisibility(View.VISIBLE);
 				contentTextLayout.setVisibility(View.VISIBLE);
+				contentText.setVisibility(View.VISIBLE);
 				emptyImageView.setVisibility(View.GONE);
 				emptyTextView.setVisibility(View.GONE);
 			}
@@ -561,6 +563,7 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 			if (adapter.getItemCount() == 0){
 				recyclerView.setVisibility(View.GONE);
 				contentTextLayout.setVisibility(View.GONE);
+				contentText.setVisibility(View.GONE);
 				emptyImageView.setVisibility(View.VISIBLE);
 				emptyTextView.setVisibility(View.VISIBLE);
 
@@ -595,6 +598,7 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 			else{
 				recyclerView.setVisibility(View.VISIBLE);
 				contentTextLayout.setVisibility(View.VISIBLE);
+				contentText.setVisibility(View.VISIBLE);
 				emptyImageView.setVisibility(View.GONE);
 				emptyTextView.setVisibility(View.GONE);
 			}	
@@ -642,6 +646,7 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 		if (adapter.getItemCount() == 0){
 			recyclerView.setVisibility(View.GONE);
 			contentTextLayout.setVisibility(View.GONE);
+			contentText.setVisibility(View.GONE);
 			emptyImageView.setVisibility(View.VISIBLE);
 			emptyTextView.setVisibility(View.VISIBLE);
 
@@ -676,6 +681,7 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 		}else{
 			recyclerView.setVisibility(View.VISIBLE);
 			contentTextLayout.setVisibility(View.VISIBLE);
+			contentText.setVisibility(View.VISIBLE);
 			emptyImageView.setVisibility(View.GONE);
 			emptyTextView.setVisibility(View.GONE);
 		}
@@ -743,6 +749,7 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 				if (adapter.getItemCount() == 0){
 					recyclerView.setVisibility(View.GONE);
 					contentTextLayout.setVisibility(View.GONE);
+					contentText.setVisibility(View.GONE);
 					emptyImageView.setVisibility(View.VISIBLE);
 					emptyTextView.setVisibility(View.VISIBLE);
 
@@ -777,6 +784,7 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 				else{
 					recyclerView.setVisibility(View.VISIBLE);
 					contentTextLayout.setVisibility(View.VISIBLE);
+					contentText.setVisibility(View.VISIBLE);
 					emptyImageView.setVisibility(View.GONE);
 					emptyTextView.setVisibility(View.GONE);
 				}
@@ -945,6 +953,7 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 			log("adapter.getItemCount() = 0");
 			recyclerView.setVisibility(View.GONE);
 			contentTextLayout.setVisibility(View.GONE);
+			contentText.setVisibility(View.GONE);
 			emptyImageView.setVisibility(View.VISIBLE);
 			emptyTextView.setVisibility(View.VISIBLE);
 
@@ -982,6 +991,7 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 			log("adapter.getItemCount() != 0");
 			recyclerView.setVisibility(View.VISIBLE);
 			contentTextLayout.setVisibility(View.VISIBLE);
+			contentText.setVisibility(View.VISIBLE);
 			emptyImageView.setVisibility(View.GONE);
 			emptyTextView.setVisibility(View.GONE);
 		}

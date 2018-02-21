@@ -1,10 +1,7 @@
 package mega.privacy.android.app.lollipop.adapters;
 
-import android.animation.Animator;
-import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -40,11 +37,8 @@ import mega.privacy.android.app.MegaContactAdapter;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
-import mega.privacy.android.app.lollipop.ContactFileListActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.managerSections.ContactsFragmentLollipop;
-import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
-import mega.privacy.android.app.lollipop.megachat.ContactAttachmentActivityLollipop;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.Util;
@@ -52,8 +46,6 @@ import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
-import nz.mega.sdk.MegaChatPeerList;
-import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
@@ -1057,13 +1049,6 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 	@Override
 	public void onClick(View v) {
 		log("onClick _ adapterType: " + adapterType);
-
-		if(!Util.isOnline(context)){
-			if(context instanceof ManagerActivityLollipop){
-				((ManagerActivityLollipop) context).showSnackbar(context.getString(R.string.error_server_connection_problem));
-			}
-			return;
-		}
 
 		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 

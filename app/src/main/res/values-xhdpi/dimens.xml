@@ -2,4 +2,6 @@
 <resources>
     <dimen name="thumb_size">120px</dimen>
     <dimen name="marginTop_fab_chat">-2dp</dimen>
+
+    <dimen name="width_passwd_shape">52dp</dimen>
 </resources>

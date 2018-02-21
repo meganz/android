@@ -76,6 +76,7 @@ import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
+import nz.mega.sdk.MegaEvent;
 import nz.mega.sdk.MegaGlobalListenerInterface;
 import nz.mega.sdk.MegaHandleList;
 import nz.mega.sdk.MegaNode;
@@ -235,7 +236,7 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
                                         }
                                     }
                                 },
-                                10000
+                                12000
                         );
                     }
                     else{
@@ -289,8 +290,6 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
                     chatSettings = dbH.getChatSettings();
                     if (ret == MegaChatApi.INIT_NO_CACHE) {
                         log("condition ret == MegaChatApi.INIT_NO_CACHE");
-                        megaApi.invalidateCache();
-
                     } else if (ret == MegaChatApi.INIT_ERROR) {
                         log("condition ret == MegaChatApi.INIT_ERROR");
                         if (chatSettings == null) {
@@ -430,6 +429,7 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
         MegaApplication.setShowPinScreen(false);
 
         if(call.getStatus()==MegaChatCall.CALL_STATUS_RING_IN){
+
             Intent i = new Intent(this, ChatCallActivity.class);
             i.putExtra("chatHandle", call.getChatid());
             i.putExtra("callId", call.getId());
@@ -872,6 +872,12 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
 
     @Override
     public void onAccountUpdate(MegaApiJava api) {
+
+    }
+
+
+    @Override
+    public void onEvent(MegaApiJava api, MegaEvent event) {
 
     }
 

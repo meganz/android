@@ -196,6 +196,7 @@ import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
+import nz.mega.sdk.MegaEvent;
 import nz.mega.sdk.MegaGlobalListenerInterface;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
@@ -217,7 +218,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 	public long transferCallback = 0;
 
-	String regex = "[*|\\?:\"<>\\{\\}\\\\\\/]";
+	String regex = "[*|\\?:\"<>\\\\\\\\/]";
 
 	TransfersBottomSheetDialogFragment transfersBottomSheet = null;
 
@@ -5421,7 +5422,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 						//Hide
 						searchByDate.setVisible(false);
-						upgradeAccountMenuItem.setVisible(true);
+						upgradeAccountMenuItem.setVisible(false);
 						pauseTransfersMenuIcon.setVisible(false);
 						playTransfersMenuIcon.setVisible(false);
 						addContactMenuItem.setVisible(false);
@@ -9013,7 +9014,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	}
 
 	public void checkPermissions(){
-		log("checkPermissions");
+		log("checkPermissionsCall");
 
 		fromTakePicture = Constants.TAKE_PROFILE_PICTURE;
 
@@ -10054,7 +10055,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
 
 		refreshAfterMovingToRubbish();
-
 	}
 
 	public void showConfirmationLeaveIncomingShare (final MegaNode n){
@@ -10343,6 +10343,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 	public void showContactOptionsPanel(MegaContactAdapter user){
 		log("showContactOptionsPanel");
+
+		if(!Util.isOnline(this)){
+			showSnackbar(getString(R.string.error_server_connection_problem));
+			return;
+		}
+
 		if(user!=null){
 			this.selectedUser = user;
 			ContactsBottomSheetDialogFragment bottomSheetDialogFragment = new ContactsBottomSheetDialogFragment();
@@ -13382,6 +13388,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 
 		}
+	}
+
+	@Override
+	public void onEvent(MegaApiJava api, MegaEvent event) {
+
 	}
 
 	public void updateMyEmail(String email){
