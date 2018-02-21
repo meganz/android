@@ -1,5 +1,6 @@
 package mega.privacy.android.app;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.media.MediaCodec;
 import android.media.MediaCodecInfo;
@@ -16,11 +17,8 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.concurrent.atomic.AtomicReference;
 
+import mega.privacy.android.app.lollipop.megachat.ChatUploadService;
 import mega.privacy.android.app.utils.Util;
-
-/**
- * Created by mega on 2/02/18.
- */
 
 public class VideoDownsampling {
 
@@ -43,30 +41,45 @@ public class VideoDownsampling {
     private String mOutputFile, mInputFile;
     private long sizeInputFile, sizeRead;
     private int percentage;
+    Context context;
+
+    public VideoDownsampling(Context context) {
+        this.context = context;
+    }
 
     public String changeResolution(File f) throws Throwable {
         log("changeResolution");
         mInputFile = f.getAbsolutePath();
-        sizeInputFile = f.length(); log("Size: "+sizeInputFile);
+        sizeInputFile = f.length();
+        log("Size: "+sizeInputFile);
         sizeRead = percentage = 0;
-//        String filePath = mInputFile.substring(0, mInputFile.lastIndexOf(File.separator));
-        String[] splitByDot = mInputFile.split("\\.");
-        String ext="";
-        if(splitByDot!=null && splitByDot.length>1)
-            ext = splitByDot[splitByDot.length-1];
-        String fileName = mInputFile.substring(mInputFile.lastIndexOf(File.separator)+1, mInputFile.length());
-        if(ext.length()>0)
-            fileName=fileName.replace("."+ext, "_out.mp4");
-        else
-            fileName=fileName.concat("_out.mp4");
 
-        final File outFile = new File(Environment.getExternalStorageDirectory(), fileName);
+        File defaultDownloadLocation = null;
+        if (Environment.getExternalStorageDirectory() != null){
+            defaultDownloadLocation = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.chatTempDIR + "/");
+        }
+        else{
+            defaultDownloadLocation = context.getFilesDir();
+        }
+
+        defaultDownloadLocation.mkdirs();
+
+        final File outFile = new File(defaultDownloadLocation.getAbsolutePath(), f.getName());
         if(!outFile.exists())
             outFile.createNewFile();
 
-        mOutputFile=outFile.getAbsolutePath();
+        if(outFile==null){
+            log("Error creating the file");
+            return null;
+        }
+        else{
+            mOutputFile=outFile.getAbsolutePath();
+        }
 
         ChangerWrapper.changeResolutionInSeparatedThread(this);
+
+//        prepareAndChangeResolution();
+
 
         return mOutputFile;
     }
@@ -84,6 +97,7 @@ public class VideoDownsampling {
         public void run() {
             try {
                 mChanger.prepareAndChangeResolution();
+                log("Finish here!!!");
             } catch (Throwable th) {
                 mThrowable = th;
             }
@@ -249,10 +263,15 @@ public class VideoDownsampling {
                 if (exception == null)
                     exception = e;
             }
-            log("Change resolution finish");
+            log("Change resolution finish correctly");
+            ((ChatUploadService)context).finishDownsampling(mOutputFile, true);
         }
-        if (exception != null)
+        if (exception != null){
+            ((ChatUploadService)context).finishDownsampling(mOutputFile, false);
+            log("Exception: "+exception.toString());
             throw exception;
+        }
+
     }
 
     private MediaExtractor createExtractor() throws IOException {
@@ -550,6 +569,9 @@ public class VideoDownsampling {
 
             calculatePercentage();
             log("The percentage complete is: " + percentage + " (" + sizeRead + "/" + sizeInputFile +")");
+            if(percentage%5==0){
+                ((ChatUploadService)context).updateProgressDownsampling(percentage);
+            }
         }
         percentage = 100;
         log("The percentage complete is: " + percentage + " (" + sizeInputFile + "/" + sizeInputFile +")");
