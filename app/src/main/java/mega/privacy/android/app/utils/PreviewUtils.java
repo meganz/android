@@ -10,6 +10,8 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.ExifInterface;
+import android.media.MediaMetadataRetriever;
+import android.provider.MediaStore;
 
 
 public class PreviewUtils {
@@ -65,6 +67,41 @@ public class PreviewUtils {
 			}
 		}
 		return previewCache.get(node.getHandle());
+	}
+
+	public static Bitmap createVideoPreview(String filePath, int kind) {
+		Bitmap bitmap = null;
+		MediaMetadataRetriever retriever = new MediaMetadataRetriever();
+		try {
+			retriever.setDataSource(filePath);
+			bitmap = retriever.getFrameAtTime(-1);
+		} catch (IllegalArgumentException ex) {
+			// Assume this is a corrupt video file
+		} catch (RuntimeException ex) {
+			// Assume this is a corrupt video file.
+		} finally {
+			try {
+				retriever.release();
+			} catch (RuntimeException ex) {
+				// Ignore failures while cleaning up.
+			}
+		}
+
+		if (bitmap == null) return null;
+
+		if (kind == MediaStore.Images.Thumbnails.FULL_SCREEN_KIND) {
+			// Scale down the bitmap if it's too large.
+			int width = bitmap.getWidth();
+			int height = bitmap.getHeight();
+			int max = Math.max(width, height);
+			if (max > 1000) {
+				float scale = 1000f / max;
+				int w = Math.round(scale * width);
+				int h = Math.round(scale * height);
+				bitmap = Bitmap.createScaledBitmap(bitmap, w, h, true);
+			}
+		}
+		return bitmap;
 	}
 
 	/*

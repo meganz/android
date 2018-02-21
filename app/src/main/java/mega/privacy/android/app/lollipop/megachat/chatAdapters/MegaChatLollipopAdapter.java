@@ -371,10 +371,10 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 String[] previewName = currentFile.getName().split(".pdf");
                 File previewFile = new File(previewDir, previewName[0] + ".jpg");
 
-                Bitmap bmPreview = android.media.ThumbnailUtils.createVideoThumbnail(filePath, MediaStore.Video.Thumbnails.FULL_SCREEN_KIND);
+                Bitmap bmPreview = PreviewUtils.createVideoPreview(filePath, MediaStore.Video.Thumbnails.FULL_SCREEN_KIND);
                 if(bmPreview==null){
-                    log("Create video preview NULL, get with Cursor");
-                    bmPreview= ThumbnailUtilsLollipop.loadVideoThumbnail(filePath, context);
+                    log("Create video preview NULL");
+//                    bmPreview= ThumbnailUtilsLollipop.loadVideoThumbnail(filePath, context);
                 }
                 else{
                     log("Create Video preview worked!");
@@ -386,13 +386,13 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                         FileOutputStream out = null;
                         try {
                             out = new FileOutputStream(previewFile);
-                            Bitmap resizedBitmap = ThumbnailUtilsLollipop.resizeBitmapUpload(bmPreview, bmPreview.getWidth(), bmPreview.getHeight());
-                            boolean result = resizedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, out); // bmp is your Bitmap instance
-                            if (resizedBitmap != null && result){
+//                            Bitmap resizedBitmap = ThumbnailUtilsLollipop.resizeBitmapUpload(bmPreview, bmPreview.getWidth(), bmPreview.getHeight());
+                            boolean result = bmPreview.compress(Bitmap.CompressFormat.JPEG, 100, out); // bmp is your Bitmap instance
+                            if (result){
                                 log("Compress OK");
                                 long fingerprintCache = MegaApiAndroid.base64ToHandle(megaApi.getFingerprint(previewFile.getPath()));
-                                PreviewUtils.setPreviewCache(fingerprintCache, resizedBitmap);
-                                return resizedBitmap;
+                                PreviewUtils.setPreviewCache(fingerprintCache, bmPreview);
+                                return bmPreview;
                             }
                         } catch (Exception e) {
                             log("Error with FileOutputStream: "+e.getMessage());
@@ -871,7 +871,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     log("Path of the file: "+paths.get(0));
                     long fingerprintCache = MegaApiAndroid.base64ToHandle(megaApi.getFingerprint(paths.get(0)));
 
-                    if (MimeTypeList.typeForName(paths.get(0)).isImage() || MimeTypeList.typeForName(paths.get(0)).isPdf()){
+                    if (MimeTypeList.typeForName(paths.get(0)).isImage() || MimeTypeList.typeForName(paths.get(0)).isPdf() || MimeTypeList.typeForName(paths.get(0)).isVideo()){
 
                         preview = PreviewUtils.getPreviewFromCache(fingerprintCache);
                         if (preview != null){

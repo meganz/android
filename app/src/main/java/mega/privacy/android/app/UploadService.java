@@ -555,10 +555,10 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 						File previewDir = PreviewUtils.getPreviewFolder(this);
 						File preview = new File(previewDir, MegaApiAndroid.handleToBase64(transfer.getNodeHandle()) + ".jpg");
 
-						Bitmap bmPreview = android.media.ThumbnailUtils.createVideoThumbnail(transfer.getPath(), MediaStore.Video.Thumbnails.FULL_SCREEN_KIND);
+						Bitmap bmPreview = PreviewUtils.createVideoPreview(transfer.getPath(), MediaStore.Video.Thumbnails.FULL_SCREEN_KIND);
 						if(bmPreview==null){
-							log("Create video preview NULL, get with Cursor");
-							bmPreview= ThumbnailUtilsLollipop.loadVideoThumbnail(transfer.getPath(), this);
+							log("Create video preview NULL");
+//							bmPreview= ThumbnailUtilsLollipop.loadVideoThumbnail(transfer.getPath(), this);
 						}
 						else{
 							log("Create Video preview worked!");
@@ -570,8 +570,8 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 									FileOutputStream out = null;
 									try {
 										out = new FileOutputStream(preview);
-										Bitmap resizedBitmap = ThumbnailUtilsLollipop.resizeBitmapUpload(bmPreview, bmPreview.getWidth(), bmPreview.getHeight());
-										boolean result = resizedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, out); // bmp is your Bitmap instance
+//										Bitmap resizedBitmap = ThumbnailUtilsLollipop.resizeBitmapUpload(bmPreview, bmPreview.getWidth(), bmPreview.getHeight());
+										boolean result = bmPreview.compress(Bitmap.CompressFormat.JPEG, 100, out); // bmp is your Bitmap instance
 										if(result){
 											log("Compress OK!");
 											megaApi.setPreview(node, preview.getAbsolutePath(), this);
