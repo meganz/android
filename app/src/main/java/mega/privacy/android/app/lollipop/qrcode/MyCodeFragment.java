@@ -11,6 +11,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
@@ -41,6 +42,7 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.utils.Util;
@@ -66,6 +68,7 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener, Me
     String myEmail;
     MegaApiAndroid megaApi;
     DatabaseHandler dbH = null;
+    Handler handler;
 
     long handle;
     String contactLink = null;
@@ -94,6 +97,10 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener, Me
 
         super.onCreate(savedInstanceState);
 
+        if (savedInstanceState != null){
+            handle = savedInstanceState.getLong("handle");
+        }
+
         if (megaApi == null){
             megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
         }
@@ -101,8 +108,16 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener, Me
         myEmail = megaApi.getMyUser().getEmail();
         myUser = megaApi.getMyUser();
         dbH = DatabaseHandler.getDbHandler(context);
+        handler = new Handler();
 
         megaApi.contactLinkCreate(this);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        outState.putLong("handle", handle);
     }
 
     @Override
@@ -129,7 +144,7 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener, Me
         qrcode_copy_link = (Button) v.findViewById(R.id.qr_code_button_copy_link);
         qrcode_copy_link.setOnClickListener(this);
 
-        updateAvatar(true);
+        updateAvatar(false);
 
         return v;
     }
@@ -288,11 +303,22 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener, Me
         int avatarTextSize = getAvatarTextSize(density);
         log("DENSITY: " + density + ":::: " + avatarTextSize);
 
-        MegaContactDB contactDB = dbH.findContactByHandle(String.valueOf(myUser.getHandle()+""));
+        if (dbH == null) {
+            dbH = DatabaseHandler.getDbHandler(context);
+        }
+//        MegaContactDB contactDB = dbH.findContactByHandle(String.valueOf(myUser.getHandle()+""));
+        UserCredentials credentials = dbH.getCredentials();
         String fullName = "";
-        if(contactDB!=null){
-            ContactController cC = new ContactController(context);
-            fullName = cC.getFullName(contactDB.getName(), contactDB.getLastName(),myEmail);
+        if(credentials!=null){
+//            ContactController cC = new ContactController(context);
+//            fullName = cC.getFullName(contactDB.getName(), contactDB.getLastName(), myEmail);
+            fullName = credentials.getFirstName();
+            if (fullName == null) {
+                fullName = credentials.getLastName();
+                if (fullName == null) {
+                    fullName = myEmail;
+                }
+            }
         }
         else{
             //No name, ask for it and later refresh!!
@@ -302,7 +328,7 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener, Me
         firstLetter = firstLetter.toUpperCase(Locale.getDefault());
 
         initialLetter.setText(firstLetter);
-        initialLetter.setTextSize(30);
+        initialLetter.setTextSize(80);
         initialLetter.setTextColor(WHITE);
         initialLetter.setVisibility(View.VISIBLE);
     }
@@ -393,16 +419,15 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener, Me
     @Override
     public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
 
-        handle = request.getNodeHandle();
-        contactLink = "https://mega.nz/C!" + MegaApiAndroid.handleToBase64(request.getNodeHandle());
-        qrcode_link.setText(contactLink);
-
-        qrcode.setImageBitmap(queryQR ());
-
         if (request.getType() == MegaRequest.TYPE_CONTACT_LINK_CREATE) {
             if (e.getErrorCode() == MegaError.API_OK) {
                 log("Contact link create LONG: " + request.getNodeHandle());
                 log("Contact link create BASE64: " + "https://mega.nz/C!" + MegaApiAndroid.handleToBase64(request.getNodeHandle()));
+
+                handle = request.getNodeHandle();
+                contactLink = "https://mega.nz/C!" + MegaApiAndroid.handleToBase64(request.getNodeHandle());
+                qrcode_link.setText(contactLink);
+                qrcode.setImageBitmap(queryQR());
             }
         }
 
@@ -415,12 +440,26 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener, Me
 
 //        megaApi.contactLinkDelete(request.getNodeHandle(), this);
         if (request.getType() == MegaRequest.TYPE_CONTACT_LINK_DELETE){
-            log("Contact link delete:" + e.getErrorCode() + "_" + request.getNodeHandle() + "_"  + MegaApiAndroid.handleToBase64(request.getNodeHandle()));
+            if (e.getErrorCode() == MegaError.API_OK){
+                log("Contact link delete:" + e.getErrorCode() + "_" + request.getNodeHandle() + "_"  + MegaApiAndroid.handleToBase64(request.getNodeHandle()));
+                ((QRCodeActivity) context).resetSuccessfully(true);
+            }
+            else {
+                ((QRCodeActivity) context).resetSuccessfully(false);
+            }
         }
     }
 
     @Override
     public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) {
 
+    }
+
+    public void resetQRCode () {
+        if (megaApi == null){
+            megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
+        }
+        megaApi.contactLinkDelete(handle, this);
+        megaApi.contactLinkCreate(this);
     }
 }
