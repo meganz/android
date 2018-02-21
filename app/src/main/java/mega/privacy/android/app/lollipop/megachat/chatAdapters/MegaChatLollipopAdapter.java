@@ -1672,12 +1672,10 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                         }
 
                         SimpleSpanBuilder ssb = null;
+
                         try{
-                            if(message.getContent()!=null){
-                                messageContent = message.getContent();
-                                RTFFormatter formatter = new RTFFormatter(messageContent, context);
-                                ssb = formatter.setRTFFormat();
-                            }
+                            RTFFormatter formatter = new RTFFormatter(messageContent, context);
+                            ssb = formatter.setRTFFormat();
                         }
                         catch (Exception e){
                             log("FORMATTER EXCEPTION!!!");
@@ -2594,11 +2592,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                             SimpleSpanBuilder ssb = null;
 
                             try{
-                                if(message.getContent()!=null){
-                                    messageContent = message.getContent();
-                                    RTFFormatter formatter = new RTFFormatter(messageContent, context);
-                                    ssb = formatter.setRTFFormat();
-                                }
+                                RTFFormatter formatter = new RTFFormatter(messageContent, context);
+                                ssb = formatter.setRTFFormat();
                             }
                             catch (Exception e){
                                 log("FORMATTER EXCEPTION!!!");

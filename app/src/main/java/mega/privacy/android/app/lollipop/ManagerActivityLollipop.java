@@ -10342,6 +10342,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 	public void showContactOptionsPanel(MegaContactAdapter user){
 		log("showContactOptionsPanel");
+
+		if(!Util.isOnline(this)){
+			showSnackbar(getString(R.string.error_server_connection_problem));
+			return;
+		}
+
 		if(user!=null){
 			this.selectedUser = user;
 			ContactsBottomSheetDialogFragment bottomSheetDialogFragment = new ContactsBottomSheetDialogFragment();

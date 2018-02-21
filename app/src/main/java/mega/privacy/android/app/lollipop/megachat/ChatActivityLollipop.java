@@ -1732,6 +1732,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     }
 
     public void retryContactAttachment(MegaHandleList handleList){
+        log("retryContactAttachment");
         MegaChatMessage contactMessage = megaChatApi.attachContacts(idChat, handleList);
         if(contactMessage!=null){
             sendMessageToUI(contactMessage);

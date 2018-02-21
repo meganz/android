@@ -189,7 +189,7 @@ public class MessageNotSentBottomSheetDialogFragment extends BottomSheetDialogFr
 
                         MegaHandleList handleList = MegaHandleList.createInstance();
 
-                        for(int i=1; i<userCount;i++){
+                        for(int i=0; i<userCount;i++){
                             long handle = selectedMessage.getMessage().getUserHandle(i);
                             handleList.addMegaHandle(handle);
                         }
