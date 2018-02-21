@@ -32,6 +32,7 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.VideoDownsampling;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.PreviewUtils;
@@ -77,6 +78,11 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 	DatabaseHandler dbH = null;
 
 	int transfersCount = 0;
+	int numberVideosPending = 0;
+	int totalVideos = 0;
+	int currentPercentageDownsampling = 0;
+
+	MegaNode parentNode;
 
 	private Notification.Builder mBuilder;
 	private NotificationCompat.Builder mBuilderCompat;
@@ -189,7 +195,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 			PendingMessage newMessage = new PendingMessage(idPendMsg, chatId, filePaths, PendingMessage.STATE_SENDING);
 			pendingMessages.add(newMessage);
 
-			MegaNode parentNode = megaApi.getNodeByPath("/"+Constants.CHAT_FOLDER);
+			parentNode = megaApi.getNodeByPath("/"+Constants.CHAT_FOLDER);
 			if(parentNode != null){
 				log("The destination "+Constants.CHAT_FOLDER+ " already exists");
 				for(int i=0; i<filePaths.size();i++){
@@ -202,7 +208,27 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 					}
 					log("Chat file uploading: "+filePaths.get(i));
 
-					megaApi.startUpload(filePaths.get(i), parentNode);
+					File file = new File(filePaths.get(i));
+					if(Util.isVideoFile(file.getName())){
+						numberVideosPending++;
+						totalVideos++;
+						try {
+							String returnedFile = new VideoDownsampling(this).changeResolution(file.getAbsoluteFile());
+							if(returnedFile==null){
+								numberVideosPending--;
+								megaApi.startUpload(filePaths.get(i), parentNode);
+							}
+
+						} catch (Throwable throwable) {
+							numberVideosPending--;
+							megaApi.startUpload(filePaths.get(i), parentNode);
+							log("Video cannot be downsampled");
+//							throwable.printStackTrace();
+						}
+					}
+					else{
+						megaApi.startUpload(filePaths.get(i), parentNode);
+					}
 				}
 			}
 			else{
@@ -217,7 +243,6 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 		else{
 			log("Error the chatId is not correct: "+chatId);
 		}
-
 	}
 
 	/*
@@ -253,6 +278,8 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 			log("onQueueComplete: reset total uploads/downloads");
 			megaApi.resetTotalUploads();
 			megaApi.resetTotalDownloads();
+			numberVideosPending=0;
+			totalVideos=0;
 		}
 
 		log("stopping service!!!!!!!!!!:::::::::::::::!!!!!!!!!!!!");
@@ -274,6 +301,19 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 		}
 	}
 
+	public void updateProgressDownsampling(int percentage){
+		currentPercentageDownsampling = percentage;
+		updateProgressNotification();
+	}
+
+	public void finishDownsampling(String returnedFile, boolean success){
+		numberVideosPending--;
+		if(success){
+			File downFile = new File(returnedFile);
+			megaApi.startUpload(downFile.getPath(), parentNode);
+		}
+	}
+
 	@SuppressLint("NewApi")
 	private void updateProgressNotification() {
 
@@ -283,7 +323,22 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 		long totalSizePendingTransfer = megaApi.getTotalUploadBytes();
 		long totalSizeTransferred = megaApi.getTotalUploadedBytes();
 
-		int progressPercent = (int) Math.round((double) totalSizeTransferred / totalSizePendingTransfer * 100);
+		int progressPercent = 0;
+
+		if(totalVideos>0){
+
+			progressPercent = (int) Math.round((double) totalSizeTransferred / totalSizePendingTransfer * 50);
+			int simplePercentage = 50/totalVideos;
+
+			int videosDownsampled = totalVideos - numberVideosPending;
+			int downsamplingPercent  = videosDownsampled * simplePercentage + currentPercentageDownsampling*simplePercentage/100;
+
+			progressPercent = progressPercent/2 + downsamplingPercent;
+		}
+		else{
+			progressPercent =  (int) Math.round((double) totalSizeTransferred / totalSizePendingTransfer * 100);
+		}
+
 		log("updateProgressNotification: "+progressPercent);
 
 		String message = "";
