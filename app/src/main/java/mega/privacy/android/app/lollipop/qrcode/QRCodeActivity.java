@@ -1,28 +1,53 @@
 package mega.privacy.android.app.lollipop.qrcode;
 
+import android.Manifest;
+import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.PersistableBundle;
+import android.os.StatFs;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.content.FileProvider;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
+import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.channels.FileChannel;
+
+import mega.privacy.android.app.DatabaseHandler;
+import mega.privacy.android.app.DownloadService;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.lollipop.FileStorageActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PinActivityLollipop;
 import mega.privacy.android.app.modalbottomsheet.QRCodeSaveBottomSheetDialogFragment;
+import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
+import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
@@ -33,7 +58,9 @@ import nz.mega.sdk.MegaRequestListenerInterface;
  * Created by mega on 12/01/18.
  */
 
-public class QRCodeActivity extends PinActivityLollipop implements View.OnClickListener, MegaRequestListenerInterface{
+public class QRCodeActivity extends PinActivityLollipop implements MegaRequestListenerInterface{
+
+    private static int REQUEST_DOWNLOAD_FOLDER = 1000;
 
     private Toolbar tB;
     private ActionBar aB;
@@ -55,10 +82,19 @@ public class QRCodeActivity extends PinActivityLollipop implements View.OnClickL
 
     private int qrCodeFragment;
 
+    private boolean reset;
+
+    MegaApiAndroid megaApi;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         log("onCreate");
+
+        reset = getIntent().getBooleanExtra("reset", false);
+        if (savedInstanceState != null) {
+            reset = savedInstanceState.getBoolean("reset");
+        }
 
         setContentView(R.layout.activity_qr_code);
 
@@ -66,6 +102,10 @@ public class QRCodeActivity extends PinActivityLollipop implements View.OnClickL
         if(tB==null){
             log("Tb is Null");
             return;
+        }
+
+        if (megaApi == null) {
+            megaApi = ((MegaApplication) getApplication()).getMegaApi();
         }
 
         tB.setVisibility(View.VISIBLE);
@@ -115,6 +155,13 @@ public class QRCodeActivity extends PinActivityLollipop implements View.OnClickL
     }
 
     @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        outState.putBoolean("reset", reset);
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         log("onCreateOptionsMenu");
 
@@ -145,6 +192,10 @@ public class QRCodeActivity extends PinActivityLollipop implements View.OnClickL
                 resetQRMenuItem.setVisible(false);
                 break;
             }
+        }
+
+        if (reset){
+            resetQR(true);
         }
 
         return super.onCreateOptionsMenu(menu);
@@ -181,32 +232,121 @@ public class QRCodeActivity extends PinActivityLollipop implements View.OnClickL
                 break;
             }
             case R.id.qr_code_reset: {
-                resetQR ();
+                resetQR(false);
                 break;
             }
         }
         return super.onOptionsItemSelected(item);
     }
 
-    public void shareQR () {
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        super.onActivityResult(requestCode, resultCode, intent);
+        if (requestCode == REQUEST_DOWNLOAD_FOLDER && resultCode == Activity.RESULT_OK && intent != null) {
+            String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
+            if (parentPath != null){
+                File qrFile = null;
+                if (megaApi == null) {
+                    megaApi = ((MegaApplication) getApplication()).getMegaApi();
+                }
+                String myEmail = megaApi.getMyEmail();
+                if (this.getExternalCacheDir() != null){
+                    qrFile = new File(this.getExternalCacheDir().getAbsolutePath(), myEmail + "QRcode.jpg");
+                }
+                else{
+                    qrFile = new File(this.getCacheDir().getAbsolutePath(), myEmail + "QRcode.jpg");
+                }
+                if (qrFile != null && qrFile.exists()){
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                        boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
+                        if (!hasStoragePermission) {
+                            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, Constants.REQUEST_WRITE_STORAGE);
+                        }
+                    }
 
+                    double availableFreeSpace = Double.MAX_VALUE;
+                    try{
+                        StatFs stat = new StatFs(parentPath);
+                        availableFreeSpace = (double)stat.getAvailableBlocks() * (double)stat.getBlockSize();
+                    }
+                    catch(Exception ex){}
+
+                    if(availableFreeSpace < qrFile.length()) {
+                        showSnackbar(getString(R.string.error_not_enough_free_space));
+                        return;
+                    }
+                    File newQrFile = new File(parentPath, myEmail + "QRcode.jpg");
+                    if (newQrFile != null && !newQrFile.exists()){
+                        try {
+                            newQrFile.createNewFile();
+                            FileChannel src = new FileInputStream(qrFile).getChannel();
+                            FileChannel dst = new FileOutputStream(newQrFile).getChannel();
+                            dst.transferFrom(src, 0, src.size());       // copy the first file to second.....
+                            src.close();
+                            dst.close();
+                            showSnackbar(getString(R.string.success_download_qr, parentPath));
+                        }catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    else {
+                        showSnackbar(getString(R.string.error_download_qr));
+                    }
+                }
+                else {
+                    showSnackbar(getString(R.string.error_download_qr));
+                }
+           }
+        }
     }
 
-    public void resetQR () {
+    public void shareQR () {
+        log("shareQR");
+
         if (myCodeFragment == null) {
             log("MyCodeFragment is NULL");
             myCodeFragment = (MyCodeFragment) qrCodePageAdapter.instantiateItem(viewPagerQRCode, 0);
         }
-        myCodeFragment.resetQRCode();
+        File qrCodeFile = myCodeFragment.queryIfQRExists();
+        if (qrCodeFile != null && qrCodeFile.exists()){
+            Intent share = new Intent(android.content.Intent.ACTION_SEND);
+            share.setType("image/*");
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                log("Use provider to share");
+                Uri uri = FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider",qrCodeFile);
+                share.putExtra(Intent.EXTRA_STREAM, Uri.parse(uri.toString()));
+                share.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            }
+            else{
+                share.putExtra(Intent.EXTRA_STREAM, Uri.parse("file://" + qrCodeFile));
+            }
+            startActivity(Intent.createChooser(share, getString(R.string.context_share)));
+        }
+        else {
+            showSnackbar(getString(R.string.error_share_qr));
+        }
+    }
+
+    public void resetQR (boolean resetQR) {
+        log("resetQR");
+
+        if (myCodeFragment == null) {
+            log("MyCodeFragment is NULL");
+            myCodeFragment = (MyCodeFragment) qrCodePageAdapter.instantiateItem(viewPagerQRCode, 0);
+        }
+        myCodeFragment.resetQRCode(resetQR);
     }
 
     public void resetSuccessfully (boolean success) {
+        log("resetSuccessfully");
         if (success){
             showSnackbar(getString(R.string.qrcode_reset_successfully));
         }
         else {
             showSnackbar(getString(R.string.qrcode_reset_not_successfully));
         }
+        reset = false;
     }
 
     public void showSnackbar(String s){
@@ -222,15 +362,6 @@ public class QRCodeActivity extends PinActivityLollipop implements View.OnClickL
     }
 
     @Override
-    public void onClick(View v) {
-        switch (v.getId()){
-            case R.id.accept_contact_invite: {
-//                showSnackbar("Pulsado botón invite");
-            }
-        }
-    }
-
-    @Override
     public void onRequestStart(MegaApiJava api, MegaRequest request) {
 
     }
@@ -242,6 +373,7 @@ public class QRCodeActivity extends PinActivityLollipop implements View.OnClickL
 
     @Override
     public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
+
         if (e.getErrorCode() == MegaError.API_OK){
             log("OK INVITE CONTACT: "+request.getEmail());
             if(request.getNumber()==MegaContactRequest.INVITE_ACTION_ADD){

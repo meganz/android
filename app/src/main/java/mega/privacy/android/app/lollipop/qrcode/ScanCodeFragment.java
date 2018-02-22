@@ -175,7 +175,6 @@ public class ScanCodeFragment extends Fragment implements ZXingScannerView.Resul
         log("onResume");
         super.onResume();
         scannerView.setResultHandler(this);
-//        scannerView.startCamera();
     }
 
     @Override
@@ -193,6 +192,7 @@ public class ScanCodeFragment extends Fragment implements ZXingScannerView.Resul
     }
 
     public void showAlertDialog (boolean accept) {
+        scannerView.stopCamera();
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         LayoutInflater inflater = getActivity().getLayoutInflater();
         View v = inflater.inflate(R.layout.dialog_invite, null);
@@ -213,6 +213,13 @@ public class ScanCodeFragment extends Fragment implements ZXingScannerView.Resul
         }
 
         requestedAlertDialog = builder.create();
+        requestedAlertDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialog) {
+                scannerView.stopCamera();
+                getActivity().finish();
+            }
+        });
         requestedAlertDialog.show();
     }
 
@@ -240,7 +247,15 @@ public class ScanCodeFragment extends Fragment implements ZXingScannerView.Resul
         contactMail = (TextView) v.findViewById(R.id.accept_contact_mail);
 
         inviteAlertDialog = builder.create();
+        inviteAlertDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialog) {
+                scannerView.startCamera();
+                onResume();
+            }
+        });
         inviteAlertDialog.show();
+        scannerView.stopCamera();
     }
 
     @Override
@@ -479,7 +494,7 @@ public class ScanCodeFragment extends Fragment implements ZXingScannerView.Resul
                 this.request = request;
                 myEmail = request.getEmail();
                 myUser = megaApi.getContact(myEmail);
-                contactName.setText(request.getName());
+                contactName.setText(request.getName() + " " + request.getText());
                 contactMail.setText(request.getEmail());
 
                 updateAvatar(false);
