@@ -252,7 +252,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 //    private ArrayList<String> images;
     ImageView imageView;
 
+//##    private ChatFileStorageFragment FileStorageF;
     private ChatFileStorageFragment FileStorageF;
+
     private FileBrowserFragmentLollipop fs;
 
     ArrayList<AndroidMegaChatMessage> messages;
@@ -497,7 +499,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         pickCloudDriveButton = (ImageButton) findViewById(R.id.pick_cloud_drive_icon_chat);
 
         textChat = (EmojiconEditText) findViewById(R.id.edit_text_chat);
-
         keyboardButton.setOnClickListener(this);
         mediaButton.setOnClickListener(this);
         sendContactButton.setOnClickListener(this);
@@ -1902,36 +1903,36 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 //			}
             case R.id.send_message_icon_chat:{
                 log("click on Send message");
-                log("####click Button send");
 
 //                fileStorageLayout.setVisibility(View.GONE);
 
                 writingLayout.setClickable(false);
                 String text = textChat.getText().toString();
 
-                if(!text.isEmpty()){
-                    log("####text non Empty");
+                if((FileStorageF != null)&&(FileStorageF.isMultipleselect())){
+                        FileStorageF.sendImages();
+                }else{
 
-                    if(editingMessage){
-                        editMessage(text);
-                        log("Edited message: "+text);
-                        clearSelections();
-                        hideMultipleSelect();
-                        actionMode.invalidate();
+                    if(!text.isEmpty()) {
+
+                        if (editingMessage) {
+                            editMessage(text);
+                            log("Edited message: " + text);
+                            clearSelections();
+                            hideMultipleSelect();
+                            actionMode.invalidate();
+                        } else {
+                            log("Call to send message: " + text);
+                            sendMessage(text);
+                        }
+
+                        textChat.getText().clear();
+                        textChat.setText("", TextView.BufferType.EDITABLE);
                     }
-                    else{
-                        log("Call to send message: "+text);
-                        sendMessage(text);
-                    }
-
-                    textChat.getText().clear();
-                    textChat.setText("", TextView.BufferType.EDITABLE);
                 }
-                if(FileStorageF != null){
-                    log("####Fragment != null");
 
-                    FileStorageF.sendImages();
-                }
+
+
                 break;
             }
             case R.id.keyboard_icon_chat:{
@@ -2096,7 +2097,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     }
                 }
 
-                //attachFromCloud();
+                attachFromCloud();
                 break;
             }
 
@@ -2145,7 +2146,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     public void attachFromFileStorage(){
         log("attachaFromFileStorage");
+//##        FileStorageF = new ChatFileStorageFragment();
         FileStorageF = new ChatFileStorageFragment();
+
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         ft.replace(R.id.fragment_container_file_storage, FileStorageF, "fileStorageF");
         ft.commitNow();
@@ -5270,18 +5273,34 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         startService(intent);
     }
 
-    public void activateSendButton(boolean flag){
+    public void multiselectActivated(boolean flag){
+        String text = textChat.getText().toString();
+
         if(flag){
+            //multiselect on
+            if(!text.isEmpty()) {
+                textChat.setTextColor(getResources().getColor(R.color.transfer_progress));
+            }
             if(!sendIcon.isEnabled()){
                 sendIcon.setEnabled(true);
                 sendIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_send_black));
             }
-
         }else if(!flag){
+
+            //multiselect off
             if(sendIcon.isEnabled()) {
-                sendIcon.setEnabled(false);
-                sendIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_send_trans));
+
+                textChat.setTextColor(getResources().getColor(R.color.black));
+                if(!text.isEmpty()) {
+                    sendIcon.setEnabled(true);
+                    sendIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_send_black));
+                }else{
+                    sendIcon.setEnabled(false);
+                    sendIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_send_trans));
+                }
+
             }
+
         }
     }
 

@@ -332,7 +332,7 @@ public class MegaChatFileStorageAdapter extends RecyclerView.Adapter<MegaChatFil
         if(this.multipleSelect){
             selectedItems = new SparseBooleanArray();
         }
-        ((ChatFileStorageFragment) fragment).sendButton(this.multipleSelect);
+        ((ChatFileStorageFragment) fragment).activatedMultiselect(this.multipleSelect);
     }
 
 }

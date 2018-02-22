@@ -93,7 +93,8 @@
                             android:inputType="textMultiLine|textCapSentences"
                             emojicon:emojiconSize="16sp"
                             android:minLines="2"
-                            android:lines="6" />
+                            android:lines="6"
+                            android:textColor="@color/black"/>
 
                         <RelativeLayout
                             android:id="@+id/writing_disabled_linear_layout_chat"
@@ -182,7 +183,7 @@
                         android:background="@android:color/transparent">
                         <FrameLayout
                             android:id="@+id/fragment_container_file_storage"
-                            android:layout_width="match_parent"
+                            android:layout_width="wrap_content"
                             android:layout_height="match_parent"
                             android:background="@android:color/transparent"/>
 

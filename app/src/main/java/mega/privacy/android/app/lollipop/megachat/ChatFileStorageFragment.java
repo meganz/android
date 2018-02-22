@@ -419,8 +419,8 @@ public class ChatFileStorageFragment extends BottomSheetDialogFragment {
         cur1.close();
     }
 
-    public void sendButton(boolean flag){
-        ((ChatActivityLollipop) getActivity()).activateSendButton(flag);
+    public void activatedMultiselect(boolean flag){
+        ((ChatActivityLollipop) getActivity()).multiselectActivated(flag);
 //        if(flag){
 //            List<Integer> items = adapter.getSelectedItems();
 //        }
