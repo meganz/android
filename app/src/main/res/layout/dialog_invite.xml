@@ -24,18 +24,17 @@
         android:textColor="@color/grey_info_menu"
         android:layout_marginBottom="28dp"/>
 
-    <TextView
+    <Button
         android:id="@+id/dialog_invite_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:paddingTop="10dp"
-        android:paddingLeft="22dp"
-        android:paddingRight="22dp"
-        android:paddingBottom="11dp"
+        android:layout_width="64dp"
+        android:layout_height="36dp"
+        android:layout_marginLeft="-16dp"
         android:textAlignment="center"
-        android:background="@color/white"
+        android:background="@android:color/transparent"
+        android:elevation="0dp"
         android:textColor="@color/accentColor"
         android:text="@string/cam_sync_ok"
         android:textSize="14sp"/>
+
 
 </LinearLayout>

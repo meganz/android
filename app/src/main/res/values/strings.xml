@@ -1669,6 +1669,10 @@
     <string name="invite_sent_text" context="Text of dialog shown when a contact request has been sent with QR code">The user %s has been invited and will appear in your contact list once accepted.</string>
     <string name="invite_accepted" context="Title of dialog shown when a contact request has been sent and accepted with QR code">Invite accepted</string>
     <string name="invite_accepted_text" context="Text of dialog shown when a contact request has been sent and accepted with QR code">The invite was automatically accepted by %s and is now in your contact list.</string>
+    <string name="error_share_qr" context="Text shown when it tries to share the QR and occurs an error to process the action">An error ocur trying to share the QR file. Maybe the file does not exists. Try ir later.</string>
+    <string name="error_upload_qr" context="Text shown when it tries to upload to Cloud Drive the QR and occurs an error to process the action">An error occur trying to upload the QR file. Maybe the file does not exists. Try ir later.</string>
+    <string name="error_download_qr" context="Text shown when it tries to download to File System the QR and occurs an error to process the action">An error occur trying to download the QR file. Maybe the file does not exists. Try ir later.</string>
+    <string name="success_download_qr" context="Text shown when it tries to download to File System the QR and the action has success">The QR Code has been downloaded successfully to %s</string>
 
     <string name="external_play" context="Item menu option to reproduce audio or video in external reproductors">Open with</string>
 

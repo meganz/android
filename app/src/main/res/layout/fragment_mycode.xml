@@ -1,72 +1,69 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:rounded="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    xmlns:rounded="http://schemas.android.com/apk/res-auto">
-    
-    <RelativeLayout
-        android:layout_width="280dp"
-        android:layout_height="280dp"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="56dp"
-        android:layout_above="@+id/qr_code_link">
+    android:layout_height="match_parent" >
 
-        <ImageView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_centerInParent="true"
-            android:id="@+id/qr_code_image"/>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
         <RelativeLayout
-            android:id="@+id/qr_code_relative_layout_avatar"
-            android:layout_width="108dp"
-            android:layout_height="108dp"
-            android:layout_centerInParent="true">
+            android:id="@+id/qr_code_relative_container"
+            android:layout_width="280dp"
+            android:layout_height="280dp"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:layout_marginTop="60dp"
+            android:layout_marginBottom="58dp"
+            android:layout_above="@+id/qr_code_link">
 
-            <mega.privacy.android.app.components.RoundedImageView
-                android:id="@+id/qr_code_avatar"
+            <ImageView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:scaleType="fitCenter"
                 android:layout_centerInParent="true"
-                rounded:border_color="@color/border_file_properties"
-                rounded:border_width="0dp"
-                rounded:corner_radius="60dp" />
+                android:id="@+id/qr_code_image"/>
 
-            <TextView
-                android:id="@+id/qr_code_initial_letter"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
-                android:paddingBottom="7dp"/>
+            <RelativeLayout
+                android:id="@+id/qr_code_relative_layout_avatar"
+                android:layout_width="108dp"
+                android:layout_height="108dp"
+                android:layout_centerInParent="true">
+
+                <ImageView
+                    android:id="@+id/qr_code_avatar"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+            </RelativeLayout>
+
         </RelativeLayout>
 
-    </RelativeLayout>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/qr_code_link"
+            android:textColor="@color/black"
+            android:layout_gravity="center"
+            android:layout_above="@+id/qr_code_button_copy_link"
+            android:layout_marginBottom="15dp"
+            android:textSize="16sp"/>
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/qr_code_link"
-        android:textColor="@color/black"
-        android:layout_centerHorizontal="true"
-        android:layout_above="@+id/qr_code_button_copy_link"
-        android:layout_marginBottom="15dp"
-        android:textSize="16sp"/>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/qr_code_button_copy_link"
+            android:layout_gravity="center"
+            android:elevation="6dp"
+            android:background="@color/white"
+            android:layout_marginBottom="40dp"
+            android:paddingBottom="8dp"
+            android:paddingTop="8dp"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:textSize="14sp"
+            android:text="copy link"/>
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/qr_code_button_copy_link"
-        android:layout_centerHorizontal="true"
-        android:layout_alignParentBottom="true"
-        android:elevation="6dp"
-        android:background="@color/white"
-        android:layout_marginBottom="40dp"
-        android:paddingBottom="8dp"
-        android:paddingTop="8dp"
-        android:paddingLeft="16dp"
-        android:paddingRight="16dp"
-        android:textSize="14sp"
-        android:text="copy link"/>
+    </LinearLayout>
 
-</RelativeLayout>
+</ScrollView>

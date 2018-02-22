@@ -48,6 +48,7 @@ import mega.privacy.android.app.lollipop.MyAccountInfo;
 import mega.privacy.android.app.lollipop.PinLockActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatPreferencesActivity;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
+import mega.privacy.android.app.lollipop.qrcode.QRCodeActivity;
 import mega.privacy.android.app.lollipop.tasks.ClearCacheTask;
 import mega.privacy.android.app.lollipop.tasks.ClearOfflineTask;
 import mega.privacy.android.app.lollipop.tasks.GetCacheSizeTask;
@@ -1013,11 +1014,11 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 			qrCodeEnabledSwitch.setChecked(true);
-			qrCodeAutoAcceptSwitch.setChecked(true);
+			qrCodeAutoAcceptSwitch.setChecked(false);
 		}
 		else{
 			qrCodeEnabledCheck.setChecked(true);
-			qrCodeAutoAcceptCheck.setChecked(true);
+			qrCodeAutoAcceptCheck.setChecked(false);
 		}
 	}
 
@@ -1881,7 +1882,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 				if (qrCodeEnabledSwitch.isChecked()){
 					qrCodeCategory.addPreference(qrCodeAutoAcceptSwitch);
-					qrCodeAutoAcceptSwitch.setChecked(true);
+					qrCodeAutoAcceptSwitch.setChecked(false);
 					qrCodeCategory.addPreference(qrCodeResetCodePreference);
 				}
 				else{
@@ -1892,7 +1893,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			else{
 				if (qrCodeEnabledCheck.isChecked()){
 					qrCodeCategory.addPreference(qrCodeAutoAcceptCheck);
-					qrCodeAutoAcceptCheck.setChecked(true);
+					qrCodeAutoAcceptCheck.setChecked(false);
 					qrCodeCategory.addPreference(qrCodeResetCodePreference);
 				}
 				else{
@@ -1906,6 +1907,9 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 		}
 		else if (preference.getKey().compareTo(KEY_QR_CODE_RESET) == 0){
 			//Reset QR code
+			Intent intent = new Intent(context, QRCodeActivity.class);
+			intent.putExtra("reset", true);
+			startActivity(intent);
 		}
 		
 		return true;

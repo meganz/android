@@ -5,23 +5,33 @@ import android.app.Activity;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
+import android.graphics.Rect;
+import android.graphics.RectF;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
+import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -34,6 +44,9 @@ import com.google.zxing.qrcode.QRCodeWriter;
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -45,6 +58,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
+import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -75,15 +89,21 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener, Me
 
     private ActionBar aB;
 
+    private RelativeLayout relativeContainerQRCode;
     private RelativeLayout relativeQRCode;
-    private RoundedImageView avatarImage;
-    private TextView initialLetter;
+//    private RoundedImageView avatarImage;
+//    private TextView initialLetter;
+    private ImageView avatarImage;
     private ImageView qrcode;
     private TextView qrcode_link;
     private Button qrcode_copy_link;
     private View v;
 
     private Context context;
+
+    private boolean reset = false;
+    private Bitmap qrCodeBitmap;
+    private File qrFile = null;
 
     public static MyCodeFragment newInstance() {
         log("newInstance");
@@ -97,10 +117,6 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener, Me
 
         super.onCreate(savedInstanceState);
 
-        if (savedInstanceState != null){
-            handle = savedInstanceState.getLong("handle");
-        }
-
         if (megaApi == null){
             megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
         }
@@ -110,7 +126,42 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener, Me
         dbH = DatabaseHandler.getDbHandler(context);
         handler = new Handler();
 
-        megaApi.contactLinkCreate(this);
+        if (savedInstanceState != null){
+            handle = savedInstanceState.getLong("handle");
+            reset = savedInstanceState.getBoolean("reset");
+        }
+
+    }
+
+    public File queryIfQRExists (){
+        log("queryIfQRExists");
+
+        if (context.getExternalCacheDir() != null){
+            qrFile = new File(context.getExternalCacheDir().getAbsolutePath(), myEmail + "QRcode.jpg");
+        }
+        else{
+            qrFile = new File(context.getCacheDir().getAbsolutePath(), myEmail + "QRcode.jpg");
+        }
+
+        if (qrFile.exists()){
+            return qrFile;
+        }
+
+        return null;
+    }
+
+    public void setImageQR (){
+        log("setImageQR");
+
+        if (qrFile.exists()) {
+            if (qrFile.length() > 0) {
+                BitmapFactory.Options bOpts = new BitmapFactory.Options();
+                bOpts.inPurgeable = true;
+                bOpts.inInputShareable = true;
+                qrCodeBitmap = BitmapFactory.decodeFile(qrFile.getAbsolutePath(), bOpts);
+                qrcode.setImageBitmap(qrCodeBitmap);
+            }
+        }
     }
 
     @Override
@@ -118,6 +169,7 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener, Me
         super.onSaveInstanceState(outState);
 
         outState.putLong("handle", handle);
+        outState.putBoolean("reset", reset);
     }
 
     @Override
@@ -136,20 +188,64 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener, Me
             aB.setDisplayHomeAsUpEnabled(true);
         }
 
+        relativeContainerQRCode = (RelativeLayout) v.findViewById(R.id.qr_code_relative_container);
         relativeQRCode = (RelativeLayout) v.findViewById(R.id.qr_code_relative_layout_avatar);
-        initialLetter = (TextView) v.findViewById(R.id.qr_code_initial_letter);
-        avatarImage = (RoundedImageView) v.findViewById(R.id.qr_code_avatar);
+        avatarImage = (ImageView) v.findViewById(R.id.qr_code_avatar);
         qrcode = (ImageView) v.findViewById(R.id.qr_code_image);
         qrcode_link = (TextView) v.findViewById(R.id.qr_code_link);
         qrcode_copy_link = (Button) v.findViewById(R.id.qr_code_button_copy_link);
         qrcode_copy_link.setOnClickListener(this);
 
-        updateAvatar(false);
+        Configuration configuration = getResources().getConfiguration();
+        int width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 280, getResources().getDisplayMetrics());
+        int top, bottom;
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(width, width);
+        params.gravity = Gravity.CENTER;
+        if(configuration.orientation==Configuration.ORIENTATION_LANDSCAPE){
+            top = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 0, getResources().getDisplayMetrics());
+            bottom = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 20, getResources().getDisplayMetrics());
+            params.setMargins(0, top, 0, bottom);
+            relativeContainerQRCode.setLayoutParams(params);
+            relativeContainerQRCode.setPadding(0,-80,0,0);
+
+        }else{
+            top = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 55, getResources().getDisplayMetrics());
+            bottom = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 58, getResources().getDisplayMetrics());
+            params.setMargins(0, top, 0, bottom);
+            relativeContainerQRCode.setLayoutParams(params);
+        }
+        if (megaApi == null) {
+            megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
+        }
+
+        if (qrFile != null && qrFile.exists()){
+            setImageQR();
+        }
+        else {
+            megaApi.contactLinkCreate(this);
+        }
 
         return v;
     }
 
+    public Bitmap createQRCode (Bitmap qr, Bitmap avatar){
+        log("createQRCode");
+
+        Bitmap qrCode = Bitmap.createBitmap(WIDTH,WIDTH, Bitmap.Config.ARGB_8888);
+        int width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 100, getResources().getDisplayMetrics());
+        Canvas c = new Canvas(qrCode);
+        int pos = (c.getWidth()/2) - (width/2);
+
+        avatar = Bitmap.createScaledBitmap(avatar, width, width, false);
+        c.drawBitmap(qr, 0f, 0f, null);
+        c.drawBitmap(avatar, pos, pos, null);
+
+        return qrCode;
+    }
+
     public Bitmap queryQR () {
+        log("queryQR");
+
         Map<EncodeHintType, ErrorCorrectionLevel> hints = new HashMap<>();
         hints.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.H);
 
@@ -180,115 +276,94 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener, Me
         return bitmap;
     }
 
-    public void updateAvatar(boolean retry){
-        log("updateAvatar");
+    public Bitmap setUserAvatar(){
+        log("setUserAvatar");
+
         File avatar = null;
-        String contactEmail = myUser.getEmail();
-        if(context!=null){
-            log("context is not null");
-
-            if (context.getExternalCacheDir() != null){
-                avatar = new File(context.getExternalCacheDir().getAbsolutePath(), contactEmail + ".jpg");
-            }
-            else{
-                avatar = new File(context.getCacheDir().getAbsolutePath(), contactEmail + ".jpg");
-            }
+        if (context.getExternalCacheDir() != null){
+            avatar = new File(context.getExternalCacheDir().getAbsolutePath(), myEmail + ".jpg");
         }
         else{
-            log("context is null!!!");
-            if(getActivity()!=null){
-                log("getActivity is not null");
-                if (getActivity().getExternalCacheDir() != null){
-                    avatar = new File(getActivity().getExternalCacheDir().getAbsolutePath(), contactEmail + ".jpg");
-                }
-                else{
-                    avatar = new File(getActivity().getCacheDir().getAbsolutePath(), contactEmail + ".jpg");
-                }
-            }
-            else{
-                log("getActivity is ALSOOO null");
-                return;
-            }
+            avatar = new File(context.getCacheDir().getAbsolutePath(), myEmail + ".jpg");
         }
-
-        if(avatar!=null){
-            setProfileAvatar(avatar, retry);
-        }
-        else{
-            setDefaultAvatar();
-        }
-    }
-
-    public void setProfileAvatar(File avatar, boolean retry){
-        log("setProfileAvatar");
-
-        Bitmap imBitmap = null;
+        Bitmap bitmap = null;
         if (avatar.exists()){
-            log("avatar path: "+avatar.getAbsolutePath());
             if (avatar.length() > 0){
-                log("my avatar exists!");
                 BitmapFactory.Options bOpts = new BitmapFactory.Options();
                 bOpts.inPurgeable = true;
                 bOpts.inInputShareable = true;
-                imBitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
-                if (imBitmap == null) {
-                    avatar.delete();
-                    log("Call to getUserAvatar");
-                    if(retry){
-                        log("Retry!");
-                        if (context.getExternalCacheDir() != null){
-                            megaApi.getUserAvatar(myUser, context.getExternalCacheDir().getAbsolutePath() + "/" + myEmail);
-                        }
-                        else{
-                            megaApi.getUserAvatar(myUser, context.getCacheDir().getAbsolutePath() + "/" + myEmail);
-                        }
-                    }
-                    else{
-                        log("DO NOT Retry!");
-                        setDefaultAvatar();
-                    }
+                bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
+                if (bitmap == null) {
+                    return createDefaultAvatar();
                 }
                 else{
-                    log("Show my avatar");
-                    avatarImage.setImageBitmap(imBitmap);
-                    initialLetter.setVisibility(View.GONE);
-                }
-            }
-        }else{
-            log("my avatar NOT exists!");
-            log("Call to getUserAvatar");
-            if(retry){
-                log("Retry!");
-                if (context.getExternalCacheDir() != null){
-                    megaApi.getUserAvatar(myUser, context.getExternalCacheDir().getAbsolutePath() + "/" + myEmail);
-                }
-                else{
-                    megaApi.getUserAvatar(myUser, context.getCacheDir().getAbsolutePath() + "/" + myEmail);
+                    return getCircleBitmap(bitmap);
                 }
             }
             else{
-                log("DO NOT Retry!");
-                setDefaultAvatar();
+                return createDefaultAvatar();
             }
+        }
+        else{
+            return createDefaultAvatar();
         }
     }
 
-    public void setDefaultAvatar(){
-        log("setDefaultAvatar");
-        Bitmap defaultAvatar = Bitmap.createBitmap(DEFAULT_AVATAR_WIDTH_HEIGHT,DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
+    private Bitmap getCircleBitmap(Bitmap bitmap) {
+        log("getCircleBitmap");
+
+        final Bitmap output = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), Bitmap.Config.ARGB_8888);
+        final Canvas canvas = new Canvas(output);
+
+        final int color = Color.RED;
+        final Paint paint = new Paint();
+        final Rect rect = new Rect(0, 0, bitmap.getWidth(), bitmap.getHeight());
+        final RectF rectF = new RectF(rect);
+
+        paint.setAntiAlias(true);
+        canvas.drawARGB(0, 0, 0, 0);
+        paint.setColor(color);
+        canvas.drawOval(rectF, paint);
+
+        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
+        canvas.drawBitmap(bitmap, rect, rect, paint);
+
+        bitmap.recycle();
+
+        return output;
+    }
+
+    public Bitmap createDefaultAvatar(){
+        log("createDefaultAvatar()");
+
+        Bitmap defaultAvatar = Bitmap.createBitmap(Constants.DEFAULT_AVATAR_WIDTH_HEIGHT,Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
         Canvas c = new Canvas(defaultAvatar);
-        Paint p = new Paint();
-        p.setAntiAlias(true);
+        Paint paintText = new Paint();
+        Paint paintCircle = new Paint();
+
+        paintText.setColor(Color.WHITE);
+        paintText.setTextSize(150);
+        paintText.setAntiAlias(true);
+        paintText.setTextAlign(Paint.Align.CENTER);
+        Typeface face = Typeface.SANS_SERIF;
+        paintText.setTypeface(face);
+        paintText.setAntiAlias(true);
+        paintText.setSubpixelText(true);
+        paintText.setStyle(Paint.Style.FILL);
+
 
         String color = megaApi.getUserAvatarColor(myUser);
         if(color!=null){
             log("The color to set the avatar is "+color);
-            p.setColor(Color.parseColor(color));
+            paintCircle.setColor(Color.parseColor(color));
+            paintCircle.setAntiAlias(true);
         }
         else{
             log("Default color to the avatar");
-            p.setColor(context.getResources().getColor(R.color.lollipop_primary_color));
+            paintCircle.setColor(ContextCompat.getColor(context, R.color.lollipop_primary_color));
+            paintCircle.setAntiAlias(true);
         }
+
 
         int radius;
         if (defaultAvatar.getWidth() < defaultAvatar.getHeight())
@@ -296,22 +371,11 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener, Me
         else
             radius = defaultAvatar.getHeight()/2;
 
-        c.drawCircle(defaultAvatar.getWidth()/2, defaultAvatar.getHeight()/2, radius, p);
-        avatarImage.setImageBitmap(defaultAvatar);
+        c.drawCircle(defaultAvatar.getWidth()/2, defaultAvatar.getHeight()/2, radius,paintCircle);
 
-        float density = ((Activity) context).getResources().getDisplayMetrics().density;
-        int avatarTextSize = getAvatarTextSize(density);
-        log("DENSITY: " + density + ":::: " + avatarTextSize);
-
-        if (dbH == null) {
-            dbH = DatabaseHandler.getDbHandler(context);
-        }
-//        MegaContactDB contactDB = dbH.findContactByHandle(String.valueOf(myUser.getHandle()+""));
         UserCredentials credentials = dbH.getCredentials();
-        String fullName = "";
+        String fullName = null;
         if(credentials!=null){
-//            ContactController cC = new ContactController(context);
-//            fullName = cC.getFullName(contactDB.getName(), contactDB.getLastName(), myEmail);
             fullName = credentials.getFirstName();
             if (fullName == null) {
                 fullName = credentials.getLastName();
@@ -325,37 +389,30 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener, Me
             fullName = myEmail;
         }
         String firstLetter = fullName.charAt(0) + "";
-        firstLetter = firstLetter.toUpperCase(Locale.getDefault());
 
-        initialLetter.setText(firstLetter);
-        initialLetter.setTextSize(80);
-        initialLetter.setTextColor(WHITE);
-        initialLetter.setVisibility(View.VISIBLE);
+        log("Draw letter: "+firstLetter);
+        Rect bounds = new Rect();
+
+        paintText.getTextBounds(firstLetter,0,firstLetter.length(),bounds);
+        int xPos = (c.getWidth()/2);
+        int yPos = (int)((c.getHeight()/2)-((paintText.descent()+paintText.ascent()/2))+20);
+        c.drawText(firstLetter.toUpperCase(Locale.getDefault()), xPos, yPos, paintText);
+
+        return defaultAvatar;
     }
 
-    private int getAvatarTextSize (float density){
-        float textSize = 0.0f;
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
 
-        if (density > 3.0){
-            textSize = density * (DisplayMetrics.DENSITY_XXXHIGH / 72.0f);
-        }
-        else if (density > 2.0){
-            textSize = density * (DisplayMetrics.DENSITY_XXHIGH / 72.0f);
-        }
-        else if (density > 1.5){
-            textSize = density * (DisplayMetrics.DENSITY_XHIGH / 72.0f);
-        }
-        else if (density > 1.0){
-            textSize = density * (72.0f / DisplayMetrics.DENSITY_HIGH / 72.0f);
-        }
-        else if (density > 0.75){
-            textSize = density * (72.0f / DisplayMetrics.DENSITY_MEDIUM / 72.0f);
-        }
-        else{
-            textSize = density * (72.0f / DisplayMetrics.DENSITY_LOW / 72.0f);
-        }
+        log("onConfigurationChanged");
+        if(newConfig.orientation==Configuration.ORIENTATION_LANDSCAPE){
+            log("onConfigurationChanged: changed to LANDSCAPE");
 
-        return (int)textSize;
+        }else{
+            log("onConfigurationChanged: changed to PORTRAIT");
+
+        }
     }
 
     @Override
@@ -427,7 +484,27 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener, Me
                 handle = request.getNodeHandle();
                 contactLink = "https://mega.nz/C!" + MegaApiAndroid.handleToBase64(request.getNodeHandle());
                 qrcode_link.setText(contactLink);
-                qrcode.setImageBitmap(queryQR());
+                qrCodeBitmap = createQRCode(queryQR(), setUserAvatar());
+                File qrCodeFile = null;
+                if (context.getExternalCacheDir() != null){
+                    qrCodeFile = new File(context.getExternalCacheDir().getAbsolutePath(), myEmail + "QRcode.jpg");
+                }
+                else{
+                    qrCodeFile = new File(context.getCacheDir().getAbsolutePath(), myEmail + "QRcode.jpg");
+                }
+                if (qrCodeFile != null) {
+                    try {
+                        FileOutputStream out = new FileOutputStream(qrCodeFile);
+                        qrCodeBitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
+                    } catch (FileNotFoundException e1) {
+                        e1.printStackTrace();
+                    }
+                }
+                qrcode.setImageBitmap(qrCodeBitmap);
+                if (reset){
+                    reset = false;
+                    resetQRCode(reset);
+                }
             }
         }
 
@@ -443,10 +520,21 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener, Me
             if (e.getErrorCode() == MegaError.API_OK){
                 log("Contact link delete:" + e.getErrorCode() + "_" + request.getNodeHandle() + "_"  + MegaApiAndroid.handleToBase64(request.getNodeHandle()));
                 ((QRCodeActivity) context).resetSuccessfully(true);
+                File qrCodeFile = null;
+                if (context.getExternalCacheDir() != null){
+                    qrCodeFile = new File(context.getExternalCacheDir().getAbsolutePath(), myEmail + "QRcode.jpg");
+                }
+                else{
+                    qrCodeFile = new File(context.getCacheDir().getAbsolutePath(), myEmail + "QRcode.jpg");
+                }
+                if (qrCodeFile != null && qrCodeFile.exists()){
+                    qrCodeFile.delete();
+                }
             }
             else {
                 ((QRCodeActivity) context).resetSuccessfully(false);
             }
+            reset = false;
         }
     }
 
@@ -455,11 +543,19 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener, Me
 
     }
 
-    public void resetQRCode () {
+    public void resetQRCode (boolean reset) {
+        log("resetQRCode");
+
         if (megaApi == null){
             megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
         }
-        megaApi.contactLinkDelete(handle, this);
-        megaApi.contactLinkCreate(this);
+        if (reset){
+            this.reset = reset;
+            megaApi.contactLinkCreate(this);
+        }
+        else{
+            megaApi.contactLinkDelete(handle, this);
+            megaApi.contactLinkCreate(this);
+        }
     }
 }
