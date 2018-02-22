@@ -9,7 +9,6 @@ import android.media.MediaExtractor;
 import android.media.MediaFormat;
 import android.media.MediaMetadataRetriever;
 import android.media.MediaMuxer;
-import android.os.Environment;
 import android.view.Surface;
 
 import java.io.File;
@@ -38,50 +37,31 @@ public class VideoDownsampling {
 
     private int mWidth = 1280;
     private int mHeight = 720;
-    private String mOutputFile, mInputFile;
+    private String mInputFile;
+
+    private static String mOutputFile;
     private long sizeInputFile, sizeRead;
     private int percentage;
-    Context context;
+    static Context context;
 
-    public VideoDownsampling(Context context) {
+    public VideoDownsampling(Context context, String inputFile) {
         this.context = context;
+        mOutputFile = inputFile;
     }
 
-    public String changeResolution(File f) throws Throwable {
+    public void changeResolution(File f) throws Throwable {
         log("changeResolution");
         mInputFile = f.getAbsolutePath();
         sizeInputFile = f.length();
         log("Size: "+sizeInputFile);
         sizeRead = percentage = 0;
 
-        File defaultDownloadLocation = null;
-        if (Environment.getExternalStorageDirectory() != null){
-            defaultDownloadLocation = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.chatTempDIR + "/");
-        }
-        else{
-            defaultDownloadLocation = context.getFilesDir();
-        }
-
-        defaultDownloadLocation.mkdirs();
-
-        final File outFile = new File(defaultDownloadLocation.getAbsolutePath(), f.getName());
-        if(!outFile.exists())
-            outFile.createNewFile();
-
-        if(outFile==null){
-            log("Error creating the file");
-            return null;
-        }
-        else{
-            mOutputFile=outFile.getAbsolutePath();
-        }
-
         ChangerWrapper.changeResolutionInSeparatedThread(this);
 
 //        prepareAndChangeResolution();
 
 
-        return mOutputFile;
+//        return mOutputFile;
     }
 
     private static class ChangerWrapper implements Runnable {
@@ -97,7 +77,7 @@ public class VideoDownsampling {
         public void run() {
             try {
                 mChanger.prepareAndChangeResolution();
-                log("Finish here!!!");
+                ((ChatUploadService)context).finishDownsampling(mOutputFile);
             } catch (Throwable th) {
                 mThrowable = th;
             }
@@ -263,11 +243,8 @@ public class VideoDownsampling {
                 if (exception == null)
                     exception = e;
             }
-            log("Change resolution finish correctly");
-            ((ChatUploadService)context).finishDownsampling(mOutputFile, true);
         }
         if (exception != null){
-            ((ChatUploadService)context).finishDownsampling(mOutputFile, false);
             log("Exception: "+exception.toString());
             throw exception;
         }
