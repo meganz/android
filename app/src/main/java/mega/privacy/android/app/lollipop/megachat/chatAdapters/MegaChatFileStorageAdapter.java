@@ -40,15 +40,14 @@ public class MegaChatFileStorageAdapter extends RecyclerView.Adapter<MegaChatFil
     private SparseBooleanArray selectedItems;
     boolean multipleSelect;
 
-    public static int PADDING_GRID_LARGE = 6;
     int padding = 6;
-    private int numberOfCells;
-    private int gridWidth;
+    private int dimPhotos;
 
     DatabaseHandler dbH;
     private int count;
     MegaPreferences prefs;
     private SparseBooleanArray checkedItems = new SparseBooleanArray();
+
 
     /* public static view holder class */
     public static class ViewHolderBrowser extends ViewHolder {
@@ -132,12 +131,11 @@ public class MegaChatFileStorageAdapter extends RecyclerView.Adapter<MegaChatFil
         return items;
     }
 
-    public MegaChatFileStorageAdapter(Context _context, Object fragment, RecyclerView recyclerView, ActionBar aB, ArrayList<Bitmap> _thumbimages, int numberOfCells, int gridWidth) {
+    public MegaChatFileStorageAdapter(Context _context, Object fragment, RecyclerView recyclerView, ActionBar aB, ArrayList<Bitmap> _thumbimages, int dimPhotos) {
         this.context = _context;
         this.fragment = fragment;
         this.thumbimages = _thumbimages;
-        this.numberOfCells = numberOfCells;
-        this.gridWidth = gridWidth;
+        this.dimPhotos = dimPhotos;
         dbH = DatabaseHandler.getDbHandler(context);
 
         this.aB = aB;
@@ -153,12 +151,11 @@ public class MegaChatFileStorageAdapter extends RecyclerView.Adapter<MegaChatFil
         notifyDataSetChanged();
     }
 
-    public void setNumberOfCells(int numberOfCells, int gridWidth){
-
-        this.numberOfCells = numberOfCells;
-        this.gridWidth = gridWidth;
+    public void setDimensionPhotos(int dimPhotos){
+        this.dimPhotos = dimPhotos;
         notifyDataSetChanged();
     }
+
 
     public int getSpanSizeOfPosition(int position){
         return 1;
@@ -175,7 +172,20 @@ public class MegaChatFileStorageAdapter extends RecyclerView.Adapter<MegaChatFil
         ViewHolderBrowserGrid holderGrid = new ViewHolderBrowserGrid(v);
 
         holderGrid.itemLayout = (RelativeLayout) v.findViewById(R.id.file_storage_grid_item_layout);
+
         holderGrid.thumbLayout = (RelativeLayout) v.findViewById(R.id.file_storage_grid_thumbnail_layout);
+//        ViewGroup.MarginLayoutParams marginParams = (ViewGroup.MarginLayoutParams) holderGrid.thumbLayout.getLayoutParams();
+//        marginParams.setMargins(padding, padding, 0, 0);
+//        holderGrid.thumbLayout.setLayoutParams(marginParams);
+
+        holderGrid.thumbLayout.setPadding(padding,padding,padding,padding);
+
+        ViewGroup.LayoutParams params = holderGrid.thumbLayout.getLayoutParams();
+        params.height = dimPhotos;
+        params.width = dimPhotos;
+        holderGrid.thumbLayout.setLayoutParams(params);
+
+        holderGrid.thumbLayout.setVisibility(View.GONE);
 
         holderGrid.photo = (ImageView) v.findViewById(R.id.file_storage_grid_thumbnail);
         holderGrid.photoSelected = (ImageView) v.findViewById(R.id.thumbnail_selected);
@@ -183,20 +193,8 @@ public class MegaChatFileStorageAdapter extends RecyclerView.Adapter<MegaChatFil
         holderGrid.photoUnselected = (RelativeLayout) v.findViewById(R.id.thumbnail_unselected);
         holderGrid.photoUnselected.setVisibility(View.GONE);
 
-        ViewGroup.MarginLayoutParams marginParams = (ViewGroup.MarginLayoutParams) holderGrid.thumbLayout.getLayoutParams();
-        marginParams.setMargins(padding, padding, padding, padding);
-        holderGrid.thumbLayout.setLayoutParams(marginParams);
-
-        this.gridWidth = gridWidth;
-        ViewGroup.LayoutParams params = (ViewGroup.LayoutParams) holderGrid.thumbLayout.getLayoutParams();
-        params.height = gridWidth;
-        params.width = gridWidth;
-        holderGrid.thumbLayout.setLayoutParams(params);
-
-        holderGrid.photoSelected.setMaxHeight(gridWidth);
-        holderGrid.photoSelected.setMaxWidth(gridWidth);
-
-        holderGrid.thumbLayout.setVisibility(View.GONE);
+        holderGrid.photoSelected.setMaxHeight(dimPhotos);
+        holderGrid.photoSelected.setMaxWidth(dimPhotos);
 
         holderGrid.itemLayout.setTag(holderGrid);
         holderGrid.itemLayout.setOnClickListener(this);

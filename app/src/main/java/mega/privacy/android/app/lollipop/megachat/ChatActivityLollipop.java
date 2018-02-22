@@ -252,7 +252,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 //    private ArrayList<String> images;
     ImageView imageView;
 
-//##    private ChatFileStorageFragment FileStorageF;
     private ChatFileStorageFragment FileStorageF;
 
     private FileBrowserFragmentLollipop fs;
@@ -2146,7 +2145,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     public void attachFromFileStorage(){
         log("attachaFromFileStorage");
-//##        FileStorageF = new ChatFileStorageFragment();
         FileStorageF = new ChatFileStorageFragment();
 
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();

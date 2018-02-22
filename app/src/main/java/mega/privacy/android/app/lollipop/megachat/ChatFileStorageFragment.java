@@ -3,7 +3,10 @@ package mega.privacy.android.app.lollipop.megachat;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.app.LoaderManager;
 import android.content.Context;
+import android.content.CursorLoader;
+import android.content.Loader;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -44,7 +47,7 @@ import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaNode;
 
-public class ChatFileStorageFragment extends BottomSheetDialogFragment {
+public class ChatFileStorageFragment extends BottomSheetDialogFragment{
 
     private static final String BUNDLE_RECYCLER_LAYOUT = "classname.recycler.layout";
 
@@ -54,8 +57,7 @@ public class ChatFileStorageFragment extends BottomSheetDialogFragment {
     MegaChatFileStorageAdapter adapter;
     ChatFileStorageFragment fileStorageFragment = this;
 
-    public static int GRID_LARGE = 3;
-    public static int PADDING_GRID_LARGE = 6;
+    public static int GRID_LARGE = 2;
 
     MegaApiAndroid megaApi;
     MegaChatApiAndroid megaChatApi;
@@ -78,7 +80,9 @@ public class ChatFileStorageFragment extends BottomSheetDialogFragment {
 
     public ActionMode actionMode;
 
-    CustomizedGridLayoutManager gridLayoutManager;
+//    CustomizedGridLayoutManager gridLayoutManager;
+
+    RelativeLayout rlfragment;
 
     ArrayList<Bitmap> thumBitmap = new ArrayList<>();
     ArrayList<String> imagesPath = new ArrayList<>();
@@ -156,45 +160,53 @@ public class ChatFileStorageFragment extends BottomSheetDialogFragment {
         scaleH = Util.getScaleH(outMetrics, density);
 
         heightDisplay = outMetrics.heightPixels;
+        int heightFrag = Util.scaleWidthPx(240, outMetrics);
 
         ((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
         View v = inflater.inflate(R.layout.fragment_filestorage, container, false);
 
+        rlfragment = (RelativeLayout) v.findViewById(R.id.relative_layout_frag);
+        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, heightFrag);
+        rlfragment.setLayoutParams(params);
+
         recyclerView = (RecyclerView) v.findViewById(R.id.file_storage_grid_view_browser);
-        recyclerView.setPadding(0, 0, 0, Util.scaleHeightPx(80, outMetrics));
+//        recyclerView.setPadding(0, 0, 0, Util.scaleHeightPx(80, outMetrics));
         recyclerView.setClipToPadding(false);
-
         recyclerView.setHasFixedSize(true);
-        gridLayoutManager = (CustomizedGridLayoutManager) recyclerView.getLayoutManager();
-
         recyclerView.setItemAnimator(new DefaultItemAnimator());
 
-        int totalWidth = outMetrics.widthPixels;
+//        gridLayoutManager = (CustomizedGridLayoutManager) recyclerView.getLayoutManager();
 
-        int gridWidth = 0;
-        int realGridWidth = 0;
-        int numberOfCells = 0;
-        int padding = 0;
 
-        realGridWidth = totalWidth / GRID_LARGE;
-        padding = PADDING_GRID_LARGE;
-        gridWidth = realGridWidth - (padding * 2);
-        numberOfCells = GRID_LARGE;
+//        int totalWidth = outMetrics.widthPixels;
+//
+//        int gridWidth = 0;
+//        int realGridWidth = 0;
+//        int numberOfCells = 0;
+//        int padding = 0;
+//
+//        realGridWidth = totalWidth / GRID_LARGE;
+//        padding = PADDING_GRID_LARGE;
+//        gridWidth = realGridWidth - (padding * 2);
+//        numberOfCells = GRID_LARGE;
 
-            getPaths();
+        int numberOfCells = GRID_LARGE;
+        int dimImages = heightFrag / numberOfCells;
+
+        getPaths();
 
         if (adapter == null){
-            adapter = new MegaChatFileStorageAdapter(context, this, recyclerView, aB, thumBitmap, numberOfCells, gridWidth);
+            adapter = new MegaChatFileStorageAdapter(context, this, recyclerView, aB, thumBitmap, dimImages);
             adapter.setHasStableIds(true);
 
         }else{
-            adapter.setNumberOfCells(numberOfCells, gridWidth);
+            adapter.setDimensionPhotos(dimImages);
             adapter.setNodes(thumBitmap);
         }
         adapter.setMultipleSelect(false);
 
-        mLayoutManager = new GridLayoutManager(context, numberOfCells);
+        mLayoutManager = new GridLayoutManager(context, numberOfCells, GridLayoutManager.HORIZONTAL,false);
         ((GridLayoutManager) mLayoutManager).setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
             @Override
             public int getSpanSize(int position) {
@@ -213,99 +225,6 @@ public class ChatFileStorageFragment extends BottomSheetDialogFragment {
             recyclerView.setVisibility(View.VISIBLE);
         }
 
-
-
-//        //SCROLL RecyclerView
-//        recyclerView.setOnScrollListener(new RecyclerView.OnScrollListener() {
-//
-//            // Keeps track of the overall vertical offset in the list
-//            int verticalOffset;
-//
-//            // Determines the scroll UP/DOWN direction
-//            boolean scrollingUp;
-//
-//            @Override
-//            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-//                if (newState == RecyclerView.SCROLL_STATE_IDLE) {
-//                    if (scrollingUp) {
-////                        if (verticalOffset > tToolbar.getHeight()) {
-////                            toolbarAnimateHide();
-////                        } else {
-////                            toolbarAnimateShow(verticalOffset);
-////                        }
-//                        log("************ 1 up ");
-//                    } else {
-////                        if (tToolbar.getTranslationY() < tToolbar.getHeight() * -0.6 && verticalOffset > tToolbar.getHeight()) {
-////                            toolbarAnimateHide();
-////                        } else {
-////                            toolbarAnimateShow(verticalOffset);
-////                        }
-//                        log("************ 1 down ");
-//
-//                    }
-//                }
-//            }
-//
-//            @Override
-//            public final void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-//                verticalOffset += dy;
-//                scrollingUp = dy > 0;
-////                int toolbarYOffset = (int) (dy - tToolbar.getTranslationY());
-////                tToolbar.animate().cancel();
-//                if (scrollingUp) {
-//                    log("************ 2 up ");
-//
-////                    if (toolbarYOffset < tToolbar.getHeight()) {
-////                        if (verticalOffset > tToolbar.getHeight()) {
-////                            toolbarSetElevation(TOOLBAR_ELEVATION);
-////                        }
-////                        tToolbar.setTranslationY(-toolbarYOffset);
-////                    } else {
-////                        toolbarSetElevation(0);
-////                        tToolbar.setTranslationY(-tToolbar.getHeight());
-////                    }
-//                } else {
-//                    log("************ 2 down ");
-//
-////                    if (toolbarYOffset < 0) {
-////                        if (verticalOffset <= 0) {
-////                            toolbarSetElevation(0);
-////                        }
-////                        tToolbar.setTranslationY(0);
-////                    } else {
-////                        if (verticalOffset > tToolbar.getHeight()) {
-////                            toolbarSetElevation(TOOLBAR_ELEVATION);
-////                        }
-////                        tToolbar.setTranslationY(-toolbarYOffset);
-////                    }
-//                }
-//            }
-//        });
-
-//        firstVisibleInListview = ((GridLayoutManager) mLayoutManager).findFirstVisibleItemPosition();
-//
-//        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-//            int ydy = 0;
-//            @Override
-//            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-//                super.onScrollStateChanged(recyclerView, newState);
-//
-//            }
-//
-//            @Override
-//            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-//                super.onScrolled(recyclerView, dx, dy);
-//
-//                int currentFirstVisible = ((GridLayoutManager) mLayoutManager).findFirstVisibleItemPosition();
-//
-//                if(currentFirstVisible > firstVisibleInListview)
-//                    log("****************UP");
-//                else
-//                    log("****************DOWN");
-//
-//                firstVisibleInListview = currentFirstVisible;
-//            }
-//        });
             return v;
     }
 
@@ -396,28 +315,40 @@ public class ChatFileStorageFragment extends BottomSheetDialogFragment {
     public void getPaths(){
         String[] projection = new String[]{
                 MediaStore.Images.Media.DATA,
+                MediaStore.Images.Media._ID
         };
-
         Uri images = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
-        Cursor cur1 = getActivity().managedQuery(images, projection, "", null, "");
+        Cursor cursor = null;
 
-        if (cur1.moveToFirst()) {
+        try {
 
-            int dataColumn = cur1.getColumnIndex(MediaStore.Images.Media.DATA);
-            do {
-                imagesPath.add(cur1.getString(dataColumn));
+            cursor = getActivity().managedQuery(images, projection, "", null, "");
+            if (cursor.moveToFirst()) {
 
-                Cursor cur2 = getActivity().getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, new String[] { MediaStore.MediaColumns._ID }, MediaStore.MediaColumns.DATA + "=?", new String[] {cur1.getString(dataColumn)}, null);
+                int dataColumn = cursor.getColumnIndex(MediaStore.Images.Media.DATA);
 
-                if (cur2 != null && cur2.moveToFirst()) {
-                    int id = cur2.getInt(cur2.getColumnIndex(MediaStore.MediaColumns._ID));
+                do {
+
+                    imagesPath.add(cursor.getString(dataColumn));
+                    int id = cursor.getInt(cursor.getColumnIndex(MediaStore.MediaColumns._ID));
                     thumBitmap.add(MediaStore.Images.Thumbnails.getThumbnail(getActivity().getContentResolver(), id, MediaStore.Images.Thumbnails.MINI_KIND, null ));
-                }
-                cur2.close();
-            } while (cur1.moveToNext());
+
+                } while (cursor.moveToNext());
+                cursor.close();
+            }
+
+        }catch (Exception e){
+
+        }finally {
+            if(cursor !=null){
+                cursor.close();
+            }
         }
-        cur1.close();
+
+
+
     }
+
 
     public void activatedMultiselect(boolean flag){
         ((ChatActivityLollipop) getActivity()).multiselectActivated(flag);
