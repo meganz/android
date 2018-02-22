@@ -14,6 +14,7 @@ import android.view.Surface;
 import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicReference;
 
 import mega.privacy.android.app.lollipop.megachat.ChatUploadService;
@@ -24,7 +25,7 @@ public class VideoDownsampling {
     private static final int TIMEOUT_USEC = 10000;
 
     private static final String OUTPUT_VIDEO_MIME_TYPE = "video/avc";
-    private static final int OUTPUT_VIDEO_BIT_RATE = 2048 * 1024;
+    private static final int OUTPUT_VIDEO_BIT_RATE = 2048 * 720;
     private static final int OUTPUT_VIDEO_FRAME_RATE = 30;
     private static final int OUTPUT_VIDEO_IFRAME_INTERVAL = 10;
     private static final int OUTPUT_VIDEO_COLOR_FORMAT = MediaCodecInfo.CodecCapabilities.COLOR_FormatSurface;
@@ -37,31 +38,45 @@ public class VideoDownsampling {
 
     private int mWidth = 1280;
     private int mHeight = 720;
-    private String mInputFile;
+//    private String mInputFile;
 
-    private static String mOutputFile;
-    private long sizeInputFile, sizeRead;
-    private int percentage;
+//    private static String mOutputFile;
+
+
     static Context context;
 
-    public VideoDownsampling(Context context, String inputFile) {
-        this.context = context;
-        mOutputFile = inputFile;
+    static ConcurrentLinkedQueue<VideoUpload> queue;
+
+    private class VideoUpload{
+        String original;
+        String outFile;
+        int percentage;
+        long sizeInputFile, sizeRead;
+        public VideoUpload(String original, String outFile, long sizeInputFile) {
+            this.original = original;
+            this.outFile = outFile;
+            this.percentage = 0;
+            this.sizeRead = 0;
+            this.sizeInputFile = sizeInputFile;
+        }
     }
 
-    public void changeResolution(File f) throws Throwable {
+    public VideoDownsampling(Context context) {
+        this.context = context;
+        queue = new ConcurrentLinkedQueue<VideoUpload>();
+    }
+
+    public void changeResolution(File f, String inputFile) throws Throwable {
         log("changeResolution");
-        mInputFile = f.getAbsolutePath();
-        sizeInputFile = f.length();
-        log("Size: "+sizeInputFile);
-        sizeRead = percentage = 0;
+//        mInputFile = f.getAbsolutePath();
+//        sizeInputFile = f.length();
+//        mOutputFile = inputFile;
+//        log("Size: "+sizeInputFile);
+//        sizeRead = percentage = 0;
+
+        queue.add(new VideoUpload(f.getAbsolutePath(), inputFile, f.length()));
 
         ChangerWrapper.changeResolutionInSeparatedThread(this);
-
-//        prepareAndChangeResolution();
-
-
-//        return mOutputFile;
     }
 
     private static class ChangerWrapper implements Runnable {
@@ -76,8 +91,9 @@ public class VideoDownsampling {
         @Override
         public void run() {
             try {
-                mChanger.prepareAndChangeResolution();
-                ((ChatUploadService)context).finishDownsampling(mOutputFile);
+                while(!queue.isEmpty()){
+                    mChanger.prepareAndChangeResolution();
+                }
             } catch (Throwable th) {
                 mThrowable = th;
             }
@@ -98,6 +114,12 @@ public class VideoDownsampling {
         log("prepareAndChangeResolution");
         Exception exception = null;
 
+        VideoUpload video = queue.poll();
+
+        String mInputFile = video.original;
+
+        String mOutputFile = video.outFile;
+
         MediaCodecInfo videoCodecInfo = selectCodec(OUTPUT_VIDEO_MIME_TYPE);
         if (videoCodecInfo == null)
             return;
@@ -115,7 +137,7 @@ public class VideoDownsampling {
         MediaMuxer muxer = null;
         InputSurface inputSurface = null;
         try {
-            videoExtractor = createExtractor();
+            videoExtractor = createExtractor(mInputFile);
             int videoInputTrack = getAndSelectVideoTrackIndex(videoExtractor);
             MediaFormat inputFormat = videoExtractor.getTrackFormat(videoInputTrack);
 
@@ -153,7 +175,7 @@ public class VideoDownsampling {
             outputSurface = new OutputSurface();
             videoDecoder = createVideoDecoder(inputFormat, outputSurface.getSurface());
 
-            audioExtractor = createExtractor();
+            audioExtractor = createExtractor(mInputFile);
             int audioInputTrack = getAndSelectAudioTrackIndex(audioExtractor);
             MediaFormat inputAudioFormat = audioExtractor.getTrackFormat(audioInputTrack);
             MediaFormat outputAudioFormat = MediaFormat.createAudioFormat(inputAudioFormat.getString(MediaFormat.KEY_MIME),
@@ -167,7 +189,7 @@ public class VideoDownsampling {
 
             muxer = new MediaMuxer(mOutputFile, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4);
 
-            changeResolution(videoExtractor, audioExtractor, videoDecoder, videoEncoder, audioDecoder, audioEncoder, muxer, inputSurface, outputSurface);
+            changeResolution(videoExtractor, audioExtractor, videoDecoder, videoEncoder, audioDecoder, audioEncoder, muxer, inputSurface, outputSurface, video);
         } finally {
             try {
                 if (videoExtractor != null)
@@ -243,6 +265,7 @@ public class VideoDownsampling {
                 if (exception == null)
                     exception = e;
             }
+            ((ChatUploadService)context).finishDownsampling(mOutputFile);
         }
         if (exception != null){
             log("Exception: "+exception.toString());
@@ -251,7 +274,7 @@ public class VideoDownsampling {
 
     }
 
-    private MediaExtractor createExtractor() throws IOException {
+    private MediaExtractor createExtractor(String mInputFile) throws IOException {
         log("createExtractor");
         MediaExtractor extractor;
         extractor = new MediaExtractor();
@@ -317,8 +340,9 @@ public class VideoDownsampling {
                                   MediaCodec videoDecoder, MediaCodec videoEncoder,
                                   MediaCodec audioDecoder, MediaCodec audioEncoder,
                                   MediaMuxer muxer,
-                                  InputSurface inputSurface, OutputSurface outputSurface) {
+                                  InputSurface inputSurface, OutputSurface outputSurface, VideoUpload video) {
         log("changeResolution");
+        String mOutputFile = video.outFile;
 
         ByteBuffer[] videoDecoderInputBuffers = null;
         ByteBuffer[] videoDecoderOutputBuffers = null;
@@ -372,7 +396,7 @@ public class VideoDownsampling {
                 ByteBuffer decoderInputBuffer = videoDecoderInputBuffers[decoderInputBufferIndex];
                 int size = videoExtractor.readSampleData(decoderInputBuffer, 0);
                 long presentationTime = videoExtractor.getSampleTime();
-                sizeRead += size;
+                video.sizeRead += size;
 
                 if (size >= 0) {
                     videoDecoder.queueInputBuffer(decoderInputBufferIndex,0, size, presentationTime, videoExtractor.getSampleFlags());
@@ -391,7 +415,7 @@ public class VideoDownsampling {
                 ByteBuffer decoderInputBuffer = audioDecoderInputBuffers[decoderInputBufferIndex];
                 int size = audioExtractor.readSampleData(decoderInputBuffer, 0);
                 long presentationTime = audioExtractor.getSampleTime();
-                sizeRead += size;
+                video.sizeRead += size;
 
                 if (size >= 0)
                     audioDecoder.queueInputBuffer(decoderInputBufferIndex, 0, size, presentationTime, audioExtractor.getSampleFlags());
@@ -544,18 +568,14 @@ public class VideoDownsampling {
                 muxing = true;
             }
 
-            calculatePercentage();
-            log("The percentage complete is: " + percentage + " (" + sizeRead + "/" + sizeInputFile +")");
-            if(percentage%5==0){
-                ((ChatUploadService)context).updateProgressDownsampling(percentage);
+            video.percentage = (int)((100 * video.sizeRead) / video.sizeInputFile);
+            log("The percentage complete is: " + video.percentage + " (" + video.sizeRead + "/" + video.sizeInputFile +")");
+            if(video.percentage%5==0){
+                log("Percentage: "+mOutputFile + "  " + video.percentage + " (" + video.sizeInputFile + "/" + video.sizeInputFile +")");
+                ((ChatUploadService)context).updateProgressDownsampling(video.percentage, mOutputFile);
             }
         }
-        percentage = 100;
-        log("The percentage complete is: " + percentage + " (" + sizeInputFile + "/" + sizeInputFile +")");
-    }
-
-    public void calculatePercentage () {
-        percentage = (int)((100 * sizeRead) / sizeInputFile);
+        video.percentage = 100;
     }
 
     private static boolean isVideoFormat(MediaFormat format) {
