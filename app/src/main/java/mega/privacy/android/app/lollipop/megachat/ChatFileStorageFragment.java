@@ -322,7 +322,7 @@ public class ChatFileStorageFragment extends BottomSheetDialogFragment{
 
         try {
 
-            cursor = getActivity().managedQuery(images, projection, "", null, "");
+            cursor = getActivity().getContentResolver().query(images, projection, "", null, "");
             if (cursor.moveToFirst()) {
 
                 int dataColumn = cursor.getColumnIndex(MediaStore.Images.Media.DATA);
