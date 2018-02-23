@@ -1721,5 +1721,13 @@
     <string name="content_dialog_delete_version" context="Content of the dialog to confirm that a version is going to be deleted">This version will be permanently removed.</string>
     <string name="content_dialog_delete_multiple_version" context="Content of the dialog to confirm that several versions are going to be deleted">These %d versions will be permanently removed.</string>
 
+    <string name="chat_upload_title_notification" context="Title of the notification shown when a file is uploading to a chat">Chat uploading</string>
+
+    <string name="settings_chat_upload_quality" context="Label for the option on setting to set up the quality of multimedia files uploaded to the chat">Chat media quality</string>
+
+    <string-array name="settings_chat_upload_quality_entries" context="the options for the option on setting to set up the quality of multimedia files uploaded to the chat">
+        <item context="the options of what to upload.">Original</item>
+        <item context="the options of what to upload.">Medium</item>
+    </string-array>
 </resources>
 
