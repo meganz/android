@@ -89,9 +89,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 	public static String CATEGORY_ADVANCED_FEATURES = "advanced_features";
 	public static String CATEGORY_QR_CODE = "settings_qrcode";
 
-	public static String KEY_QR_CODE_ENABLE = "settings_qrcode_active";
 	public static String KEY_QR_CODE_AUTO_ACCEPT = "settings_qrcode_autoaccept";
-	public static String KEY_QR_CODE_RESET = "settings_qrcode_reset";
 
 	public static String KEY_PIN_LOCK_ENABLE = "settings_pin_lock_enable";
 	public static String KEY_PIN_LOCK_CODE = "settings_pin_lock_code";
@@ -148,11 +146,8 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 
 
 	PreferenceCategory qrCodeCategory;
-	SwitchPreference qrCodeEnabledSwitch;
-	TwoLineCheckPreference qrCodeEnabledCheck;
 	SwitchPreference qrCodeAutoAcceptSwitch;
 	TwoLineCheckPreference qrCodeAutoAcceptCheck;
-	Preference qrCodeResetCodePreference;
 
 	PreferenceScreen preferenceScreen;
 
@@ -292,9 +287,6 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			autoAwaySwitch = (SwitchPreference) findPreference(KEY_AUTOAWAY_ENABLE);
 			autoAwaySwitch.setOnPreferenceClickListener(this);
 
-			qrCodeEnabledSwitch = (SwitchPreference) findPreference(KEY_QR_CODE_ENABLE);
-			qrCodeEnabledSwitch.setOnPreferenceClickListener(this);
-
 			qrCodeAutoAcceptSwitch = (SwitchPreference) findPreference(KEY_QR_CODE_AUTO_ACCEPT);
 			qrCodeAutoAcceptSwitch.setOnPreferenceClickListener(this);
 		}
@@ -308,15 +300,9 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			autoAwayCheck = (TwoLineCheckPreference) findPreference(KEY_AUTOAWAY_ENABLE);
 			autoAwayCheck.setOnPreferenceClickListener(this);
 
-			qrCodeEnabledCheck = (TwoLineCheckPreference) findPreference(KEY_QR_CODE_ENABLE);
-			qrCodeEnabledCheck.setOnPreferenceClickListener(this);
-
 			qrCodeAutoAcceptCheck = (TwoLineCheckPreference) findPreference(KEY_QR_CODE_AUTO_ACCEPT);
 			qrCodeAutoAcceptCheck.setOnPreferenceClickListener(this);
 		}
-
-		qrCodeResetCodePreference = findPreference(KEY_QR_CODE_RESET);
-		qrCodeResetCodePreference.setOnPreferenceClickListener(this);
 
 		statusChatListPreference = (ListPreference) findPreference("settings_chat_list_status");
 		statusChatListPreference.setOnPreferenceChangeListener(this);
@@ -1013,11 +999,9 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 		useHttpsOnly.setChecked(useHttpsOnlyValue);
 
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-			qrCodeEnabledSwitch.setChecked(true);
 			qrCodeAutoAcceptSwitch.setChecked(false);
 		}
 		else{
-			qrCodeEnabledCheck.setChecked(true);
 			qrCodeAutoAcceptCheck.setChecked(false);
 		}
 	}
@@ -1878,38 +1862,8 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			log("Cancel account preference");
 			((ManagerActivityLollipop)context).askConfirmationDeleteAccount();
 		}
-		else if (preference.getKey().compareTo(KEY_QR_CODE_ENABLE) == 0){
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-				if (qrCodeEnabledSwitch.isChecked()){
-					qrCodeCategory.addPreference(qrCodeAutoAcceptSwitch);
-					qrCodeAutoAcceptSwitch.setChecked(false);
-					qrCodeCategory.addPreference(qrCodeResetCodePreference);
-				}
-				else{
-					qrCodeCategory.removePreference(qrCodeAutoAcceptSwitch);
-					qrCodeCategory.removePreference(qrCodeResetCodePreference);
-				}
-			}
-			else{
-				if (qrCodeEnabledCheck.isChecked()){
-					qrCodeCategory.addPreference(qrCodeAutoAcceptCheck);
-					qrCodeAutoAcceptCheck.setChecked(false);
-					qrCodeCategory.addPreference(qrCodeResetCodePreference);
-				}
-				else{
-					qrCodeCategory.removePreference(qrCodeAutoAcceptCheck);
-					qrCodeCategory.removePreference(qrCodeResetCodePreference);
-				}
-			}
-		}
 		else if (preference.getKey().compareTo(KEY_QR_CODE_AUTO_ACCEPT) == 0){
 
-		}
-		else if (preference.getKey().compareTo(KEY_QR_CODE_RESET) == 0){
-			//Reset QR code
-			Intent intent = new Intent(context, QRCodeActivity.class);
-			intent.putExtra("reset", true);
-			startActivity(intent);
 		}
 		
 		return true;

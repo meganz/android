@@ -146,6 +146,8 @@ public class Constants {
 
 	public static String ACTION_SHOW_UPGRADE_ACCOUNT = "ACTION_SHOW_UPGRADE_ACCOUNT";
 
+	public static String ACTION_INVITE_CONTACT = "ACTION_INVITE_CONTACT";
+
 	final public static int FILE_BROWSER_ADAPTER = 2000;
 	final public static int CONTACT_FILE_ADAPTER = 2001;
 	final public static int RUBBISH_BIN_ADAPTER = 2002;
