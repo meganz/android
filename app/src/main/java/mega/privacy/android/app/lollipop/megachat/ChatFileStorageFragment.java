@@ -13,6 +13,7 @@ import android.graphics.Bitmap;
 import android.graphics.Matrix;
 import android.media.ExifInterface;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.design.widget.BottomSheetBehavior;
@@ -91,6 +92,18 @@ public class ChatFileStorageFragment extends BottomSheetDialogFragment{
     ArrayList<String> imagesPath = new ArrayList<>();
     ArrayList<Integer> posSelected = new ArrayList<>();
     String downloadLocationDefaultPath = Util.downloadDIR;
+
+//    private class ImageLoader extends AsyncTask<String, Void, String[]> {
+//
+//        @Override
+//        protected String[] doInBackground(String... args) {
+//            return null;
+//        }
+//
+//        @Override
+//        protected void onPostExecute(String[] key) {
+//        }
+//    }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
@@ -418,5 +431,10 @@ public class ChatFileStorageFragment extends BottomSheetDialogFragment{
             adapter.clearSelections();
         }
     }
+
+//    private void loadImagesThumb() {
+//        new ImageLoader().execute();
+//    }
+
 
 }
