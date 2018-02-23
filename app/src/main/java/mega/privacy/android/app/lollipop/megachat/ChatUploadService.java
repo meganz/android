@@ -38,6 +38,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.VideoDownsampling;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.DBUtil;
 import mega.privacy.android.app.utils.PreviewUtils;
 import mega.privacy.android.app.utils.ThumbnailUtils;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
@@ -195,6 +196,9 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 		long chatId = intent.getLongExtra(EXTRA_CHAT_ID, -1);
 
 		long idPendMsg = intent.getLongExtra(EXTRA_ID_PEND_MSG, -1);
+
+        sendOriginalAttachments = DBUtil.isSendOriginalAttachments(this);
+        log("sendOriginalAttachments is "+sendOriginalAttachments);
 
 		if(chatId!=-1){
 
