@@ -148,7 +148,7 @@
                 android:layout_marginLeft="16dp"
                 android:layout_centerInParent="true"
                 android:alpha="0.30"
-                android:src="@drawable/info_ic" />
+                android:src="@drawable/ic_versions_black" />
 
             <RelativeLayout
                 android:layout_width="match_parent"
