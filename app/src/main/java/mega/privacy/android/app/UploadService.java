@@ -177,13 +177,6 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 	protected void onHandleIntent(final Intent intent) {
 		log("onHandleIntent");
 
-//		final File videoFile = new File(intent.getStringExtra(EXTRA_FILEPATH));
-//		File file = null;
-//		try {
-//			file = new File(new VideoDownsampling().changeResolution(videoFile.getAbsoluteFile()));
-//		} catch (Throwable throwable) {
-//			throwable.printStackTrace();
-//		}
 		final File file = new File(intent.getStringExtra(EXTRA_FILEPATH));
 		if(file!=null){
 			log("File to manage: "+file.getAbsolutePath());

@@ -1,20 +1,15 @@
 package mega.privacy.android.app;
 
-/**
- * Created by mega on 2/02/18.
- */
-
 import android.graphics.SurfaceTexture;
 import android.opengl.EGL14;
 import android.util.Log;
 import android.view.Surface;
+
 import javax.microedition.khronos.egl.EGL10;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.egl.EGLContext;
 import javax.microedition.khronos.egl.EGLDisplay;
 import javax.microedition.khronos.egl.EGLSurface;
-
-import mega.privacy.android.app.utils.Util;
 
 /**
  * Holds state associated with a Surface used for MediaCodec decoder output.
@@ -50,7 +45,6 @@ class OutputSurface implements SurfaceTexture.OnFrameAvailableListener {
      * to MediaCodec.configure().
      */
     public OutputSurface(int width, int height) {
-        log("OutputSurface");
         if (width <= 0 || height <= 0) {
             throw new IllegalArgumentException();
         }
@@ -70,7 +64,6 @@ class OutputSurface implements SurfaceTexture.OnFrameAvailableListener {
      * with the SurfaceTexture.
      */
     private void setup() {
-        log("setup");
         mTextureRender = new TextureRender();
         mTextureRender.surfaceCreated();
         // Even if we don't access the SurfaceTexture after the constructor returns, we
@@ -97,7 +90,6 @@ class OutputSurface implements SurfaceTexture.OnFrameAvailableListener {
      * Prepares EGL.  We want a GLES 2.0 context and a surface that supports pbuffer.
      */
     private void eglSetup(int width, int height) {
-        log("eglSetup");
         mEGL = (EGL10)EGLContext.getEGL();
         mEGLDisplay = mEGL.eglGetDisplay(EGL10.EGL_DEFAULT_DISPLAY);
         if (!mEGL.eglInitialize(mEGLDisplay, null)) {
@@ -145,7 +137,6 @@ class OutputSurface implements SurfaceTexture.OnFrameAvailableListener {
      * Discard all resources held by this class, notably the EGL context.
      */
     public void release() {
-        log("release");
         if (mEGL != null) {
             if (mEGL.eglGetCurrentContext().equals(mEGLContext)) {
                 // Clear the current context and surface to ensure they are discarded immediately.
@@ -172,7 +163,6 @@ class OutputSurface implements SurfaceTexture.OnFrameAvailableListener {
      * Makes our EGL context and surface current.
      */
     public void makeCurrent() {
-        log("makeCurrent");
         if (mEGL == null) {
             throw new RuntimeException("not configured for makeCurrent");
         }
@@ -185,14 +175,12 @@ class OutputSurface implements SurfaceTexture.OnFrameAvailableListener {
      * Returns the Surface that we draw onto.
      */
     public Surface getSurface() {
-        log("getSurface");
         return mSurface;
     }
     /**
      * Replaces the fragment shader.
      */
     public void changeFragmentShader(String fragmentShader) {
-        log("changeFragmentShader");
         mTextureRender.changeFragmentShader(fragmentShader);
     }
     /**
@@ -201,7 +189,6 @@ class OutputSurface implements SurfaceTexture.OnFrameAvailableListener {
      * data is available.
      */
     public void awaitNewImage() {
-        log("awaitNewImage");
         final int TIMEOUT_MS = 500;
         synchronized (mFrameSyncObject) {
             while (!mFrameAvailable) {
@@ -228,12 +215,10 @@ class OutputSurface implements SurfaceTexture.OnFrameAvailableListener {
      * Draws the data from SurfaceTexture onto the current EGL surface.
      */
     public void drawImage() {
-        log("drawImage");
         mTextureRender.drawFrame(mSurfaceTexture);
     }
     @Override
     public void onFrameAvailable(SurfaceTexture st) {
-        log("onFrameAvailable");
         if (VERBOSE) Log.d(TAG, "new frame available");
         synchronized (mFrameSyncObject) {
             if (mFrameAvailable) {
@@ -247,7 +232,6 @@ class OutputSurface implements SurfaceTexture.OnFrameAvailableListener {
      * Checks for EGL errors.
      */
     private void checkEglError(String msg) {
-        log("checkEglError");
         boolean failed = false;
         int error;
         while ((error = mEGL.eglGetError()) != EGL10.EGL_SUCCESS) {
@@ -257,9 +241,5 @@ class OutputSurface implements SurfaceTexture.OnFrameAvailableListener {
         if (failed) {
             throw new RuntimeException("EGL error encountered (see log)");
         }
-    }
-
-    private static void log(String log) {
-        Util.log("OutputSurface", log);
     }
 }

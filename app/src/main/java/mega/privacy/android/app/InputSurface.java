@@ -1,19 +1,13 @@
 package mega.privacy.android.app;
 
-/**
- * Created by mega on 2/02/18.
- */
-
 import android.opengl.EGL14;
-import android.opengl.EGLExt;
 import android.opengl.EGLConfig;
 import android.opengl.EGLContext;
 import android.opengl.EGLDisplay;
+import android.opengl.EGLExt;
 import android.opengl.EGLSurface;
 import android.util.Log;
 import android.view.Surface;
-
-import mega.privacy.android.app.utils.Util;
 
 /**
  * Holds state associated with a Surface used for MediaCodec encoder input.
@@ -36,7 +30,6 @@ class InputSurface {
      * Creates an InputSurface from a Surface.
      */
     public InputSurface(Surface surface) {
-        log("InputSurface");
         if (surface == null) {
             throw new NullPointerException();
         }
@@ -48,7 +41,6 @@ class InputSurface {
      * Prepares EGL.  We want a GLES 2.0 context and a surface that supports recording.
      */
     private void eglSetup() {
-        log("eglSetup");
         mEGLDisplay = EGL14.eglGetDisplay(EGL14.EGL_DEFAULT_DISPLAY);
         if (mEGLDisplay == EGL14.EGL_NO_DISPLAY) {
             throw new RuntimeException("unable to get EGL14 display");
@@ -99,7 +91,6 @@ class InputSurface {
      * Surface that was passed to our constructor.
      */
     public void release() {
-        log("release");
         if (EGL14.eglGetCurrentContext().equals(mEGLContext)) {
             // Clear the current context and surface to ensure they are discarded immediately.
             EGL14.eglMakeCurrent(mEGLDisplay, EGL14.EGL_NO_SURFACE, EGL14.EGL_NO_SURFACE, EGL14.EGL_NO_CONTEXT);
@@ -119,7 +110,6 @@ class InputSurface {
      * Makes our EGL context and surface current.
      */
     public void makeCurrent() {
-        log("makeCurrent");
         if (!EGL14.eglMakeCurrent(mEGLDisplay, mEGLSurface, mEGLSurface, mEGLContext)) {
             throw new RuntimeException("eglMakeCurrent failed");
         }
@@ -129,7 +119,6 @@ class InputSurface {
      * Calls eglSwapBuffers.  Use this to "publish" the current frame.
      */
     public boolean swapBuffers() {
-        log("swapBuffers");
         return EGL14.eglSwapBuffers(mEGLDisplay, mEGLSurface);
     }
 
@@ -137,7 +126,6 @@ class InputSurface {
      * Returns the Surface that the MediaCodec receives buffers from.
      */
     public Surface getSurface() {
-        log("getSurface");
         return mSurface;
     }
 
@@ -145,7 +133,6 @@ class InputSurface {
      * Sends the presentation time stamp to EGL.  Time is expressed in nanoseconds.
      */
     public void setPresentationTime(long nsecs) {
-        log("setPresentationTime");
         EGLExt.eglPresentationTimeANDROID(mEGLDisplay, mEGLSurface, nsecs);
     }
 
@@ -153,7 +140,6 @@ class InputSurface {
      * Checks for EGL errors.
      */
     private void checkEglError(String msg) {
-        log("checkEglError");
         boolean failed = false;
         int error;
         while ((error = EGL14.eglGetError()) != EGL14.EGL_SUCCESS) {
@@ -163,9 +149,5 @@ class InputSurface {
         if (failed) {
             throw new RuntimeException("EGL error encountered (see log)");
         }
-    }
-
-    private static void log(String log) {
-        Util.log("InputSurface", log);
     }
 }
