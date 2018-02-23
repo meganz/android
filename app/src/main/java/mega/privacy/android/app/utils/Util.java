@@ -518,16 +518,16 @@ public class Util {
 		String sizeString = "";
 		DecimalFormat decf = new DecimalFormat("###.##");
 
-		float KB = 1024;
-		float MB = KB * 1024;
-		float GB = MB * 1024;
-		float TB = GB * 1024;
+		float kB = 1000;
+		float MB = kB * 1000;
+		float GB = MB * 1000;
+		float TB = GB * 1000;
 		
-		if (size < KB){
+		if (size < kB){
 			sizeString = size + " B";
 		}
 		else if (size < MB){
-			sizeString = decf.format(size/KB) + " KB";
+			sizeString = decf.format(size/kB) + " kB";
 		}
 		else if (size < GB){
 			sizeString = decf.format(size/MB) + " MB";
