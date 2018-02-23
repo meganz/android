@@ -1,19 +1,14 @@
 package mega.privacy.android.app;
 
-/**
- * Created by mega on 2/02/18.
- */
-
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.nio.FloatBuffer;
 import android.graphics.SurfaceTexture;
 import android.opengl.GLES11Ext;
 import android.opengl.GLES20;
 import android.opengl.Matrix;
 import android.util.Log;
 
-import mega.privacy.android.app.utils.Util;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.FloatBuffer;
 
 /**
  * Code for rendering a texture onto a surface using OpenGL ES 2.0.
@@ -62,19 +57,16 @@ class TextureRender {
     private int maTextureHandle;
 
     public TextureRender() {
-        log("TextureRender");
         mTriangleVertices = ByteBuffer.allocateDirect(mTriangleVerticesData.length * FLOAT_SIZE_BYTES).order(ByteOrder.nativeOrder()).asFloatBuffer();
         mTriangleVertices.put(mTriangleVerticesData).position(0);
         Matrix.setIdentityM(mSTMatrix, 0);
     }
 
     public int getTextureId() {
-        log("getTextureId");
         return mTextureID;
     }
 
     public void drawFrame(SurfaceTexture st) {
-        log("drawFrame");
         checkGlError("onDrawFrame start");
         st.getTransformMatrix(mSTMatrix);
         GLES20.glClearColor(0.0f, 1.0f, 0.0f, 1.0f);
@@ -104,7 +96,6 @@ class TextureRender {
      * Initializes GL state.  Call this after the EGL surface has been created and made current.
      */
     public void surfaceCreated() {
-        log("surfaceCreated");
         mProgram = createProgram(VERTEX_SHADER, FRAGMENT_SHADER);
         if (mProgram == 0) {
             throw new RuntimeException("failed creating program");
@@ -144,7 +135,6 @@ class TextureRender {
      * Replaces the fragment shader.
      */
     public void changeFragmentShader(String fragmentShader) {
-        log("changeFragmentShader");
         GLES20.glDeleteProgram(mProgram);
         mProgram = createProgram(VERTEX_SHADER, fragmentShader);
         if (mProgram == 0) {
@@ -152,7 +142,6 @@ class TextureRender {
         }
     }
     private int loadShader(int shaderType, String source) {
-        log("loadShader");
         int shader = GLES20.glCreateShader(shaderType);
         checkGlError("glCreateShader type=" + shaderType);
         GLES20.glShaderSource(shader, source);
@@ -168,7 +157,6 @@ class TextureRender {
         return shader;
     }
     private int createProgram(String vertexSource, String fragmentSource) {
-        log("createProgram");
         int vertexShader = loadShader(GLES20.GL_VERTEX_SHADER, vertexSource);
         if (vertexShader == 0) {
             return 0;
@@ -198,15 +186,10 @@ class TextureRender {
         return program;
     }
     public void checkGlError(String op) {
-        log("checkGlError");
         int error;
         while ((error = GLES20.glGetError()) != GLES20.GL_NO_ERROR) {
             Log.e(TAG, op + ": glError " + error);
             throw new RuntimeException(op + ": glError " + error);
         }
-    }
-
-    private static void log(String log) {
-        Util.log("TextureRender", log);
     }
 }
