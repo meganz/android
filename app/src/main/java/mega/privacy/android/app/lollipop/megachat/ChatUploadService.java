@@ -76,6 +76,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 	MegaApplication app;
 	MegaApiAndroid megaApi;
 	MegaChatApiAndroid megaChatApi;
+	int requestSent = 0;
 
 	WifiLock lock;
 	WakeLock wl;
@@ -215,9 +216,10 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 					log("Chat file uploading: "+filePaths.get(i));
 
 					File file = new File(filePaths.get(i));
-					if(Util.isVideoFile(file.getName())){
-						totalVideos++;
+
+					if(MimeTypeList.typeForName(file.getName()).isMp4Video()&&(!sendOriginalAttachments)){
 						try {
+							totalVideos++;
 							numberVideosPending++;
 							File defaultDownloadLocation = null;
 							if (Environment.getExternalStorageDirectory() != null){
@@ -229,30 +231,35 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 
 							defaultDownloadLocation.mkdirs();
 
-
 							File outFile = new File(defaultDownloadLocation.getAbsolutePath(), file.getName());
 							int index = 0;
-							while(outFile.exists()){
+							if(outFile!=null){
+								while(outFile.exists()){
+									if(index>0){
+										outFile = new File(defaultDownloadLocation.getAbsolutePath(), file.getName());
+									}
 
-								index++;
-								String outFilePath = outFile.getAbsolutePath();
-								String[] splitByDot = outFilePath.split("\\.");
-								String ext="";
-								if(splitByDot!=null && splitByDot.length>1)
-									ext = splitByDot[splitByDot.length-1];
-								String fileName = outFilePath.substring(outFilePath.lastIndexOf(File.separator)+1, outFilePath.length());
-								if(ext.length()>0)
-									fileName=fileName.replace("."+ext, "_"+index+".mp4");
-								else
-									fileName=fileName.concat("_"+index+".mp4");
+									index++;
+									String outFilePath = outFile.getAbsolutePath();
+									String[] splitByDot = outFilePath.split("\\.");
+									String ext="";
+									if(splitByDot!=null && splitByDot.length>1)
+										ext = splitByDot[splitByDot.length-1];
+									String fileName = outFilePath.substring(outFilePath.lastIndexOf(File.separator)+1, outFilePath.length());
+									if(ext.length()>0)
+										fileName=fileName.replace("."+ext, "_"+index+".mp4");
+									else
+										fileName=fileName.concat("_"+index+".mp4");
 
-								outFile = new File(defaultDownloadLocation.getAbsolutePath(), fileName);
+									outFile = new File(defaultDownloadLocation.getAbsolutePath(), fileName);
+								}
 							}
 
 							outFile.createNewFile();
 
 							if(outFile==null){
 								numberVideosPending--;
+								totalVideos--;
 								pendingMessages.add(newMessage);
 								megaApi.startUpload(filePaths.get(i), parentNode);
 							}
@@ -267,7 +274,6 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 							}
 
 						} catch (Throwable throwable) {
-							numberVideosPending--;
 							pendingMessages.add(newMessage);
 							megaApi.startUpload(filePaths.get(i), parentNode);
 							log("EXCEPTION: Video cannot be downsampled");
@@ -315,6 +321,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 	 */
 	private void onQueueComplete() {
 		log("onQueueComplete");
+		//Review when is called
 
 		if((lock != null) && (lock.isHeld()))
 			try{ lock.release(); } catch(Exception ex) {}
@@ -336,25 +343,44 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 		mNotificationManager.cancel(notificationId);
 		stopSelf();
 		log("after stopSelf");
-		String pathSelfie = Environment.getExternalStorageDirectory().getAbsolutePath() +"/"+ Util.temporalPicDIR;
-		File f = new File(pathSelfie);
-		//Delete recursively all files and folder
-		if (f.exists()) {
-			if (f.isDirectory()) {
-				if(f.list().length<=0){
-					f.delete();
+
+		try{
+			String pathSelfie = Environment.getExternalStorageDirectory().getAbsolutePath() +"/"+ Util.temporalPicDIR;
+			File f = new File(pathSelfie);
+			//Delete recursively all files and folder
+			if (f.exists()) {
+				if (f.isDirectory()) {
+					if(f.list().length<=0){
+						f.delete();
+					}
 				}
 			}
+		}
+		catch (Exception e){
+			log("EXCEPTION: pathSelfie not deleted");
+		}
 
+		try{
+			String pathVideoDownsampling = Environment.getExternalStorageDirectory().getAbsolutePath() +"/"+ Util.chatTempDIR;
+			File fVideo = new File(pathVideoDownsampling);
+			//Delete recursively all files and folder
+			if (fVideo.exists()) {
+				if (fVideo.isDirectory()) {
+					if(fVideo.list().length<=0){
+						fVideo.delete();
+					}
+				}
+
+			}
+		}
+		catch (Exception e){
+			log("EXCEPTION: pathVideoDownsampling not deleted");
 		}
 	}
 
 	public void updateProgressDownsampling(int percentage, String key){
-//		currentPercentageDownsampling = percentage;
 
-		int simplePercentage = 50/totalVideos;
-
-		mapVideoDownsampling.put(key, percentage*simplePercentage/100);
+		mapVideoDownsampling.put(key, percentage);
 		updateProgressNotification();
 	}
 
@@ -362,8 +388,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 		log("finishDownsampling");
 
 		numberVideosPending--;
-//		currentPercentageDownsampling = 0;
-		mapVideoDownsampling.put(returnedFile, 50/totalVideos);
+		mapVideoDownsampling.put(returnedFile, 100);
 		File downFile = new File(returnedFile);
 		megaApi.startUpload(downFile.getPath(), parentNode);
 	}
@@ -371,7 +396,6 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 	@SuppressLint("NewApi")
 	private void updateProgressNotification() {
 
-		int pendingTransfers = megaApi.getNumPendingUploads();
 		int totalTransfers = megaApi.getTotalUploads()+numberVideosPending;
 
 		long totalSizePendingTransfer = megaApi.getTotalUploadBytes();
@@ -383,23 +407,15 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 
 			progressPercent = (int) Math.round((double) totalSizeTransferred / totalSizePendingTransfer * 50);
 
-
-//			int videosDownsampled = totalVideos - numberVideosPending;
 			int downsamplingPercent  = 0;
 
 			Collection<Integer> values= mapVideoDownsampling.values();
-
+			int simplePercentage = 50/totalVideos;
 			for (Iterator iterator = values.iterator(); iterator.hasNext();) {
 				Integer value = (Integer) iterator.next();
-				downsamplingPercent = downsamplingPercent + value;
+				int simpleValue = simplePercentage*value/100;
+				downsamplingPercent = downsamplingPercent +simpleValue;
 			}
-
-//			if(numberVideosPending>0){
-//				downsamplingPercent  = videosDownsampled * simplePercentage +
-//			}
-//			else{
-//				downsamplingPercent  = videosDownsampled * simplePercentage;
-//			}
 
 			progressPercent = progressPercent + downsamplingPercent;
 		}
@@ -411,17 +427,12 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 
 		String message = "";
 
-		int inProgress = 0;
-		if(pendingTransfers==0){
-			inProgress = totalTransfers - pendingTransfers;
+		int inProgress = progressPercent*totalTransfers/100;
+		if(inProgress==0){
+			inProgress=1;
 		}
-		else{
-			inProgress = totalTransfers - pendingTransfers + 1;
-		}
+
 		message = getResources().getQuantityString(R.plurals.upload_service_notification, totalTransfers, inProgress, totalTransfers);
-
-
-//		String info = Util.getProgressSize(ChatUploadService.this, totalSizeTransferred, totalSizePendingTransfer);
 
 		Intent intent;
 		intent = new Intent(ChatUploadService.this, ManagerActivityLollipop.class);
@@ -732,7 +743,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 									dbH.updatePendingMessage(pendMsg.getId(), -1+"", PendingMessage.STATE_ERROR);
 									launchErrorToChat(pendMsg);
 
-									if (megaApi.getNumPendingUploads() == 0 && transfersCount==0 && numberVideosPending<=0){
+									if (megaApi.getNumPendingUploads() == 0 && transfersCount==0 && numberVideosPending<=0 && requestSent<=0){
 										onQueueComplete();
 									}
 									return;
@@ -777,7 +788,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 			}
         }
 
-		if (megaApi.getNumPendingUploads() == 0 && transfersCount==0 && numberVideosPending<=0){
+		if (megaApi.getNumPendingUploads() == 0 && transfersCount==0 && numberVideosPending<=0 && requestSent<=0){
 			onQueueComplete();
 		}
 	}
@@ -804,10 +815,10 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 								videofound = true;
 								if(megaChatApi!=null){
 									log("Send node: "+transfer.getNodeHandle()+ " to chat: "+pendMsg.getChatId());
+                                    requestSent++;
 									megaChatApi.attachNode(pendMsg.getChatId(), transfer.getNodeHandle(), this);
-
 									try{
-										//Delete the local temp file
+										//Delete the local temp video file
 										File f = new File(transfer.getPath());
 
 										if (f.exists()) {
@@ -821,10 +832,6 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 										log("Local file not deleted!");
 									}
 
-									if (megaApi.getNumPendingUploads() == 0 && transfersCount==0 && numberVideosPending<=0){
-										onQueueComplete();
-									}
-//							return;
 								}
 							}
 							else{
@@ -842,12 +849,8 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 							nodeAttachment.setNodeHandle(transfer.getNodeHandle());
 							if(megaChatApi!=null){
 								log("Send node: "+transfer.getNodeHandle()+ " to chat: "+pendMsg.getChatId());
+                                requestSent++;
 								megaChatApi.attachNode(pendMsg.getChatId(), transfer.getNodeHandle(), this);
-
-								if (megaApi.getNumPendingUploads() == 0 && transfersCount==0 && numberVideosPending<=0){
-									onQueueComplete();
-								}
-//							return;
 							}
 						}
 						else{
@@ -992,6 +995,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 	@Override
 	public void onRequestFinish(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
 		if(request.getType() == MegaChatRequest.TYPE_ATTACH_NODE_MESSAGE){
+            requestSent--;
 			if(e.getErrorCode()==MegaChatError.ERROR_OK){
 				log("Attachment sent correctly");
 				MegaNodeList nodeList = request.getMegaNodeList();
@@ -1102,7 +1106,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 			}
 		}
 
-		if (megaApi.getNumPendingUploads() == 0 && transfersCount==0 && numberVideosPending<=0){
+		if (megaApi.getNumPendingUploads() == 0 && transfersCount==0 && numberVideosPending<=0 && requestSent<=0){
 			onQueueComplete();
 		}
 	}

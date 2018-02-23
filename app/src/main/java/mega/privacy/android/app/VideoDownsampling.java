@@ -25,7 +25,7 @@ public class VideoDownsampling {
     private static final int TIMEOUT_USEC = 10000;
 
     private static final String OUTPUT_VIDEO_MIME_TYPE = "video/avc";
-    private static final int OUTPUT_VIDEO_BIT_RATE = 2048 * 720;
+    private static final int OUTPUT_VIDEO_BIT_RATE = 1280 * 720;
     private static final int OUTPUT_VIDEO_FRAME_RATE = 30;
     private static final int OUTPUT_VIDEO_IFRAME_INTERVAL = 10;
     private static final int OUTPUT_VIDEO_COLOR_FORMAT = MediaCodecInfo.CodecCapabilities.COLOR_FormatSurface;
@@ -38,10 +38,6 @@ public class VideoDownsampling {
 
     private int mWidth = 1280;
     private int mHeight = 720;
-//    private String mInputFile;
-
-//    private static String mOutputFile;
-
 
     static Context context;
 
@@ -68,11 +64,6 @@ public class VideoDownsampling {
 
     public void changeResolution(File f, String inputFile) throws Throwable {
         log("changeResolution");
-//        mInputFile = f.getAbsolutePath();
-//        sizeInputFile = f.length();
-//        mOutputFile = inputFile;
-//        log("Size: "+sizeInputFile);
-//        sizeRead = percentage = 0;
 
         queue.add(new VideoUpload(f.getAbsolutePath(), inputFile, f.length()));
 
@@ -268,14 +259,12 @@ public class VideoDownsampling {
             ((ChatUploadService)context).finishDownsampling(mOutputFile);
         }
         if (exception != null){
-            log("Exception: "+exception.toString());
+            log("VideoDownsampling Exception: "+exception.toString());
             throw exception;
         }
-
     }
 
     private MediaExtractor createExtractor(String mInputFile) throws IOException {
-        log("createExtractor");
         MediaExtractor extractor;
         extractor = new MediaExtractor();
         extractor.setDataSource(mInputFile);
@@ -283,7 +272,6 @@ public class VideoDownsampling {
     }
 
     private MediaCodec createVideoDecoder(MediaFormat inputFormat, Surface surface) throws IOException {
-        log("createVideoDecoder");
         MediaCodec decoder = MediaCodec.createDecoderByType(getMimeTypeFor(inputFormat));
         decoder.configure(inputFormat, surface, null, 0);
         decoder.start();
@@ -291,7 +279,6 @@ public class VideoDownsampling {
     }
 
     private MediaCodec createVideoEncoder(MediaCodecInfo codecInfo, MediaFormat format, AtomicReference<Surface> surfaceReference) throws IOException {
-        log("createVideoEncoder");
         MediaCodec encoder = MediaCodec.createByCodecName(codecInfo.getName());
         encoder.configure(format, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE);
         surfaceReference.set(encoder.createInputSurface());
@@ -300,7 +287,6 @@ public class VideoDownsampling {
     }
 
     private MediaCodec createAudioDecoder(MediaFormat inputFormat) throws IOException {
-        log("createAudioDecoder");
         MediaCodec decoder = MediaCodec.createDecoderByType(getMimeTypeFor(inputFormat));
         decoder.configure(inputFormat, null, null, 0);
         decoder.start();
@@ -308,7 +294,6 @@ public class VideoDownsampling {
     }
 
     private MediaCodec createAudioEncoder(MediaCodecInfo codecInfo, MediaFormat format) throws IOException {
-        log("createAudioEncoder");
         MediaCodec encoder = MediaCodec.createByCodecName(codecInfo.getName());
         encoder.configure(format, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE);
         encoder.start();
@@ -316,7 +301,6 @@ public class VideoDownsampling {
     }
 
     private int getAndSelectVideoTrackIndex(MediaExtractor extractor) {
-        log("getAndSelectVideoTrackIndex");
         for (int index = 0; index < extractor.getTrackCount(); ++index) {
             if (isVideoFormat(extractor.getTrackFormat(index))) {
                 extractor.selectTrack(index);
@@ -326,7 +310,6 @@ public class VideoDownsampling {
         return -1;
     }
     private int getAndSelectAudioTrackIndex(MediaExtractor extractor) {
-        log("getAndSelectAudioTrackIndex");
         for (int index = 0; index < extractor.getTrackCount(); ++index) {
             if (isAudioFormat(extractor.getTrackFormat(index))) {
                 extractor.selectTrack(index);
@@ -569,9 +552,9 @@ public class VideoDownsampling {
             }
 
             video.percentage = (int)((100 * video.sizeRead) / video.sizeInputFile);
-            log("The percentage complete is: " + video.percentage + " (" + video.sizeRead + "/" + video.sizeInputFile +")");
+//            log("The percentage complete is: " + video.percentage + " (" + video.sizeRead + "/" + video.sizeInputFile +")");
             if(video.percentage%5==0){
-                log("Percentage: "+mOutputFile + "  " + video.percentage + " (" + video.sizeInputFile + "/" + video.sizeInputFile +")");
+//                log("Percentage: "+mOutputFile + "  " + video.percentage + " (" + video.sizeInputFile + "/" + video.sizeInputFile +")");
                 ((ChatUploadService)context).updateProgressDownsampling(video.percentage, mOutputFile);
             }
         }
@@ -589,7 +572,6 @@ public class VideoDownsampling {
     }
 
     private static MediaCodecInfo selectCodec(String mimeType) {
-        log("selectCodec");
         int numCodecs = MediaCodecList.getCodecCount();
         for (int i = 0; i < numCodecs; i++) {
             MediaCodecInfo codecInfo = MediaCodecList.getCodecInfoAt(i);
