@@ -33,6 +33,7 @@ public class MegaPreferences{
 	String preferredSortContacts = "";
 	String preferredSortOthers = "";
 	String firstTimeChat = "";
+	String autoAcceptCR = "";
 		
 	public final static int ONLY_PHOTOS = 1001;
 	public final static int ONLY_VIDEOS = 1002;
@@ -41,7 +42,7 @@ public class MegaPreferences{
 	MegaPreferences(String firstTime, String camSyncWifi, String camSyncEnabled, String camSyncHandle, String camSyncLocalPath, String camSyncFileUpload, String camSyncTimeStamp, String pinLockEnabled, String pinLockCode, String storageAskAlways, 
 			String storageDownloadLocation, String camSyncCharging, String lastFolderUpload, String lastFolderCloud, String secondaryMediaFolderEnabled, String localPathSecondaryFolder, String megaHandleSecondaryFolder, String secSyncTimeStamp, 
 			String keepFileNames, String storageAdvancedDevices, String preferredViewList, String preferredViewListCameraUploads, String uriExternalSDCard, String cameraFolderExternalSDCard, String pinLockType, String preferredSortCloud, String preferredSortContacts,
-			String preferredSortOthers, String firstTimeChat){
+			String preferredSortOthers, String firstTimeChat, String autoAcceptCR){
 		this.firstTime = firstTime;
 		this.camSyncWifi = camSyncWifi;
 		this.camSyncEnabled = camSyncEnabled;
@@ -71,6 +72,15 @@ public class MegaPreferences{
 		this.preferredSortContacts = preferredSortContacts;
 		this.preferredSortOthers = preferredSortOthers;
 		this.firstTimeChat = firstTimeChat;
+		this.autoAcceptCR = autoAcceptCR;
+	}
+
+	public String getAutoAcceptCR() {
+		return autoAcceptCR;
+	}
+
+	public void setAutoAcceptCR(String autoAcceptCR) {
+		this.autoAcceptCR = autoAcceptCR;
 	}
 	
 	public String getFirstTime (){
