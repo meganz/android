@@ -1085,6 +1085,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		values.put(KEY_PREFERRED_SORT_CONTACTS, encrypt(prefs.getPreferredSortContacts()));
 		values.put(KEY_PREFERRED_SORT_OTHERS, encrypt(prefs.getPreferredSortOthers()));
 		values.put(KEY_FIRST_LOGIN_CHAT, encrypt(prefs.getFirstTimeChat()));
+		values.put(KEY_AUTOACCEPT_CR, encrypt(prefs.getAutoAcceptCR()));
         db.insert(TABLE_PREFERENCES, null, values);
 	}
 	
@@ -1125,11 +1126,12 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			String preferredSortContacts = decrypt(cursor.getString(27));
 			String preferredSortOthers = decrypt(cursor.getString(28));
 			String firstTimeChat = decrypt(cursor.getString(29));
+			String autoAcceptCR = decrypt(cursor.getString(30));
 			
 			prefs = new MegaPreferences(firstTime, wifi, camSyncEnabled, camSyncHandle, camSyncLocalPath, fileUpload, camSyncTimeStamp, pinLockEnabled, 
 					pinLockCode, askAlways, downloadLocation, camSyncCharging, lastFolderUpload, lastFolderCloud, secondaryFolderEnabled, secondaryPath, secondaryHandle, 
 					secSyncTimeStamp, keepFileNames, storageAdvancedDevices, preferredViewList, preferredViewListCamera, uriExternalSDCard, cameraFolderExternalSDCard,
-					pinLockType, preferredSortCloud, preferredSortContacts, preferredSortOthers, firstTimeChat);
+					pinLockType, preferredSortCloud, preferredSortContacts, preferredSortOthers, firstTimeChat, autoAcceptCR);
 		}
 		cursor.close();
 		
@@ -1191,19 +1193,36 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		cursor.close();
 	}
 
-	public void setSendOriginalAttachments(String enabled){
+	public void setSendOriginalAttachments(String originalAttachments){
 		log("setEnabledChat");
 
 		String selectQuery = "SELECT * FROM " + TABLE_CHAT_SETTINGS;
 		ContentValues values = new ContentValues();
 		Cursor cursor = db.rawQuery(selectQuery, null);
 		if (cursor.moveToFirst()){
-			String UPDATE_CHAT_TABLE = "UPDATE " + TABLE_CHAT_SETTINGS + " SET " + KEY_CHAT_SEND_ORIGINALS + "= '" + encrypt(enabled) + "' WHERE " + KEY_ID + " = '1'";
+			String UPDATE_CHAT_TABLE = "UPDATE " + TABLE_CHAT_SETTINGS + " SET " + KEY_CHAT_SEND_ORIGINALS + "= '" + encrypt(originalAttachments) + "' WHERE " + KEY_ID + " = '1'";
 			db.execSQL(UPDATE_CHAT_TABLE);
 		}
 		else{
-			values.put(KEY_CHAT_SEND_ORIGINALS, encrypt(enabled));
+			values.put(KEY_CHAT_SEND_ORIGINALS, encrypt(originalAttachments));
 			db.insert(TABLE_CHAT_SETTINGS, null, values);
+		}
+		cursor.close();
+	}
+
+	public void setAutoAcceptCR(String autoAccept){
+		log("setAutoAcceptCR");
+
+		String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
+		ContentValues values = new ContentValues();
+		Cursor cursor = db.rawQuery(selectQuery, null);
+		if (cursor.moveToFirst()){
+			String UPDATE_CHAT_TABLE = "UPDATE " + TABLE_PREFERENCES + " SET " + KEY_AUTOACCEPT_CR + "= '" + encrypt(autoAccept) + "' WHERE " + KEY_ID + " = '1'";
+			db.execSQL(UPDATE_CHAT_TABLE);
+		}
+		else{
+			values.put(KEY_AUTOACCEPT_CR, encrypt(autoAccept));
+			db.insert(TABLE_PREFERENCES, null, values);
 		}
 		cursor.close();
 	}

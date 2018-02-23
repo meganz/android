@@ -5,6 +5,7 @@ import android.content.Context;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaAttributes;
+import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 
 public class DBUtil {
@@ -193,6 +194,43 @@ public class DBUtil {
         }
         else{
             return false;
+        }
+    }
+
+    public static boolean isAutoAcceptCR (Context context){
+        log("isAutoAcceptCR");
+        dbH = DatabaseHandler.getDbHandler(context);
+
+        if(dbH!=null){
+            MegaPreferences prefs = dbH.getPreferences();
+            boolean autoAcceptCR;
+
+            if(prefs!=null){
+                if(prefs.getAutoAcceptCR()!=null){
+                    autoAcceptCR = Boolean.parseBoolean(prefs.getAutoAcceptCR());
+                    return autoAcceptCR;
+                }
+                else{
+                    autoAcceptCR=false;
+                    return autoAcceptCR;
+                }
+            }
+            else{
+                autoAcceptCR=false;
+                return autoAcceptCR;
+            }
+        }
+        else{
+            return false;
+        }
+    }
+
+    public static void setAutoAcceptCR (Context context, boolean autoAccept){
+        log("setAutoAcceptCR");
+        dbH = DatabaseHandler.getDbHandler(context);
+
+        if(dbH!=null){
+            dbH.setAutoAcceptCR(autoAccept+"");
         }
     }
 
