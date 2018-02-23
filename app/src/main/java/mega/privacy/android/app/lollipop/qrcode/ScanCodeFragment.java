@@ -95,6 +95,7 @@ public class ScanCodeFragment extends Fragment implements ZXingScannerView.Resul
     DatabaseHandler dbH = null;
     Handler handler;
     long handle;
+    private boolean success = true;
 
     public static ScanCodeFragment newInstance() {
         log("newInstance");
@@ -167,7 +168,9 @@ public class ScanCodeFragment extends Fragment implements ZXingScannerView.Resul
 
     @Override
     public void onStart(){
+        log("onStart");
         super.onStart();
+        scannerView.startCamera();
     }
 
     @Override
@@ -191,7 +194,7 @@ public class ScanCodeFragment extends Fragment implements ZXingScannerView.Resul
         invite(rawResult);
     }
 
-    public void showAlertDialog (boolean accept) {
+    public void showAlertDialog (int title, int text, final boolean success) {
         scannerView.stopCamera();
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         LayoutInflater inflater = getActivity().getLayoutInflater();
@@ -202,22 +205,27 @@ public class ScanCodeFragment extends Fragment implements ZXingScannerView.Resul
         dialogText = (TextView) v.findViewById(R.id.dialog_invite_text);
         dialogButton = (Button) v.findViewById(R.id.dialog_invite_button);
         dialogButton.setOnClickListener(this);
+        this.success = success;
+//            dialogTitle.setText(getResources().getString(R.string.invite_accepted));
+//            dialogText.setText(getResources().getString(R.string.invite_accepted_text, myEmail));
 
-        if (accept){
-            dialogTitle.setText(getResources().getString(R.string.invite_accepted));
-            dialogText.setText(getResources().getString(R.string.invite_accepted_text, myEmail));
+        if (success){
+            dialogTitle.setText(getResources().getString(title));
+            dialogText.setText(getResources().getString(text, myEmail));
         }
         else {
-            dialogTitle.setText(getResources().getString(R.string.invite_sent));
-            dialogText.setText(getResources().getString(R.string.invite_sent_text, myEmail));
+            dialogTitle.setText(getResources().getString(title));
+            dialogText.setText(getResources().getString(text));
         }
 
         requestedAlertDialog = builder.create();
         requestedAlertDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
             @Override
             public void onDismiss(DialogInterface dialog) {
-                scannerView.stopCamera();
-                getActivity().finish();
+                if (success){
+                    scannerView.stopCamera();
+                    getActivity().finish();
+                }
             }
         });
         requestedAlertDialog.show();
@@ -254,7 +262,6 @@ public class ScanCodeFragment extends Fragment implements ZXingScannerView.Resul
                 onResume();
             }
         });
-        inviteAlertDialog.show();
         scannerView.stopCamera();
     }
 
@@ -293,7 +300,13 @@ public class ScanCodeFragment extends Fragment implements ZXingScannerView.Resul
                 if (requestedAlertDialog != null){
                     requestedAlertDialog.dismiss();
                 }
-                getActivity().finish();
+                if (success){
+                    getActivity().finish();
+                }
+                else {
+                    scannerView.startCamera();
+                    onResume();
+                }
                 break;
             }
         }
@@ -303,7 +316,7 @@ public class ScanCodeFragment extends Fragment implements ZXingScannerView.Resul
         megaApi.inviteContact(myEmail, null, MegaContactRequest.INVITE_ACTION_ADD, (QRCodeActivity) context);
     }
 
-    public void updateAvatar(boolean retry){
+    public void setAvatar(){
         log("updateAvatar");
         File avatar = null;
         if(context!=null){
@@ -334,14 +347,14 @@ public class ScanCodeFragment extends Fragment implements ZXingScannerView.Resul
         }
 
         if(avatar!=null){
-            setProfileAvatar(avatar, retry);
+            setProfileAvatar(avatar);
         }
         else{
             setDefaultAvatar();
         }
     }
 
-    public void setProfileAvatar(File avatar, boolean retry){
+    public void setProfileAvatar(File avatar){
         log("setProfileAvatar");
 
         Bitmap imBitmap = null;
@@ -356,19 +369,7 @@ public class ScanCodeFragment extends Fragment implements ZXingScannerView.Resul
                 if (imBitmap == null) {
                     avatar.delete();
                     log("Call to getUserAvatar");
-                    if(retry){
-                        log("Retry!");
-                        if (context.getExternalCacheDir() != null){
-                            megaApi.getUserAvatar(myUser, context.getExternalCacheDir().getAbsolutePath() + "/" + myEmail);
-                        }
-                        else{
-                            megaApi.getUserAvatar(myUser, context.getCacheDir().getAbsolutePath() + "/" + myEmail);
-                        }
-                    }
-                    else{
-                        log("DO NOT Retry!");
-                        setDefaultAvatar();
-                    }
+                    setDefaultAvatar();
                 }
                 else{
                     log("Show my avatar");
@@ -379,19 +380,8 @@ public class ScanCodeFragment extends Fragment implements ZXingScannerView.Resul
         }else{
             log("my avatar NOT exists!");
             log("Call to getUserAvatar");
-            if(retry){
-                log("Retry!");
-                if (context.getExternalCacheDir() != null){
-                    megaApi.getUserAvatar(myUser, context.getExternalCacheDir().getAbsolutePath() + "/" + myEmail);
-                }
-                else{
-                    megaApi.getUserAvatar(myUser, context.getCacheDir().getAbsolutePath() + "/" + myEmail);
-                }
-            }
-            else{
-                log("DO NOT Retry!");
-                setDefaultAvatar();
-            }
+            log("DO NOT Retry!");
+            setDefaultAvatar();
         }
     }
 
@@ -496,8 +486,12 @@ public class ScanCodeFragment extends Fragment implements ZXingScannerView.Resul
                 myUser = megaApi.getContact(myEmail);
                 contactName.setText(request.getName() + " " + request.getText());
                 contactMail.setText(request.getEmail());
+                setAvatar();
 
-                updateAvatar(false);
+                inviteAlertDialog.show();
+            }
+            else {
+                showAlertDialog( R.string.invite_not_sent, R.string.invite_not_sent_text, false);
             }
         }
     }

@@ -82,19 +82,16 @@ public class QRCodeActivity extends PinActivityLollipop implements MegaRequestLi
 
     private int qrCodeFragment;
 
-    private boolean reset;
-
     MegaApiAndroid megaApi;
+
+    private boolean contacts = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         log("onCreate");
 
-        reset = getIntent().getBooleanExtra("reset", false);
-        if (savedInstanceState != null) {
-            reset = savedInstanceState.getBoolean("reset");
-        }
+        contacts = getIntent().getBooleanExtra("contacts", false);
 
         setContentView(R.layout.activity_qr_code);
 
@@ -151,14 +148,17 @@ public class QRCodeActivity extends PinActivityLollipop implements MegaRequestLi
 
         viewPagerQRCode.setAdapter(qrCodePageAdapter);
         tabLayoutQRCode.setupWithViewPager(viewPagerQRCode);
-        viewPagerQRCode.setCurrentItem(0);
+        if (contacts){
+            viewPagerQRCode.setCurrentItem(1);
+        }
+        else {
+            viewPagerQRCode.setCurrentItem(0);
+        }
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-
-        outState.putBoolean("reset", reset);
     }
 
     @Override
@@ -192,10 +192,6 @@ public class QRCodeActivity extends PinActivityLollipop implements MegaRequestLi
                 resetQRMenuItem.setVisible(false);
                 break;
             }
-        }
-
-        if (reset){
-            resetQR(true);
         }
 
         return super.onCreateOptionsMenu(menu);
@@ -232,7 +228,7 @@ public class QRCodeActivity extends PinActivityLollipop implements MegaRequestLi
                 break;
             }
             case R.id.qr_code_reset: {
-                resetQR(false);
+                resetQR();
                 break;
             }
         }
@@ -328,14 +324,14 @@ public class QRCodeActivity extends PinActivityLollipop implements MegaRequestLi
         }
     }
 
-    public void resetQR (boolean resetQR) {
+    public void resetQR () {
         log("resetQR");
 
         if (myCodeFragment == null) {
             log("MyCodeFragment is NULL");
             myCodeFragment = (MyCodeFragment) qrCodePageAdapter.instantiateItem(viewPagerQRCode, 0);
         }
-        myCodeFragment.resetQRCode(resetQR);
+        myCodeFragment.resetQRCode();
     }
 
     public void resetSuccessfully (boolean success) {
@@ -346,7 +342,6 @@ public class QRCodeActivity extends PinActivityLollipop implements MegaRequestLi
         else {
             showSnackbar(getString(R.string.qrcode_reset_not_successfully));
         }
-        reset = false;
     }
 
     public void showSnackbar(String s){
@@ -382,8 +377,15 @@ public class QRCodeActivity extends PinActivityLollipop implements MegaRequestLi
                     log("MyCodeFragment is NULL");
                     scanCodeFragment = (ScanCodeFragment) qrCodePageAdapter.instantiateItem(viewPagerQRCode, 1);
                 }
-                scanCodeFragment.showAlertDialog(false);
+                scanCodeFragment.showAlertDialog(R.string.invite_sent, R.string.invite_sent_text, true);
             }
+        }
+        else if (e.getErrorCode() == MegaError.API_EEXIST){
+            if (scanCodeFragment == null) {
+                log("MyCodeFragment is NULL");
+                scanCodeFragment = (ScanCodeFragment) qrCodePageAdapter.instantiateItem(viewPagerQRCode, 1);
+            }
+            scanCodeFragment.showAlertDialog(R.string.invite_not_sent, R.string.invite_not_sent_text_already_contact, true);
         }
     }
 

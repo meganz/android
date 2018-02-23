@@ -2,6 +2,7 @@ package mega.privacy.android.app.lollipop.qrcode;
 
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
@@ -101,9 +102,10 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener, Me
 
     private Context context;
 
-    private boolean reset = false;
     private Bitmap qrCodeBitmap;
     private File qrFile = null;
+
+    private ProgressDialog processingDialog;
 
     public static MyCodeFragment newInstance() {
         log("newInstance");
@@ -128,7 +130,6 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener, Me
 
         if (savedInstanceState != null){
             handle = savedInstanceState.getLong("handle");
-            reset = savedInstanceState.getBoolean("reset");
         }
 
     }
@@ -169,7 +170,6 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener, Me
         super.onSaveInstanceState(outState);
 
         outState.putLong("handle", handle);
-        outState.putBoolean("reset", reset);
     }
 
     @Override
@@ -194,6 +194,7 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener, Me
         qrcode = (ImageView) v.findViewById(R.id.qr_code_image);
         qrcode_link = (TextView) v.findViewById(R.id.qr_code_link);
         qrcode_copy_link = (Button) v.findViewById(R.id.qr_code_button_copy_link);
+        qrcode_copy_link.setEnabled(false);
         qrcode_copy_link.setOnClickListener(this);
 
         Configuration configuration = getResources().getConfiguration();
@@ -217,12 +218,22 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener, Me
         if (megaApi == null) {
             megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
         }
-
-        if (qrFile != null && qrFile.exists()){
+        qrFile = queryIfQRExists();
+        if (qrFile != null && qrFile.exists()) {
             setImageQR();
+            megaApi.contactLinkCreate(this);
         }
         else {
             megaApi.contactLinkCreate(this);
+            ProgressDialog temp = null;
+            try{
+                temp = new ProgressDialog(context);
+                temp.setMessage(getString(R.string.generatin_qr));
+                temp.show();
+            }
+            catch(Exception e){
+            }
+            processingDialog = temp;
         }
 
         return v;
@@ -492,7 +503,7 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener, Me
                 else{
                     qrCodeFile = new File(context.getCacheDir().getAbsolutePath(), myEmail + "QRcode.jpg");
                 }
-                if (qrCodeFile != null) {
+                if (qrCodeFile != null && !qrCodeFile.exists()) {
                     try {
                         FileOutputStream out = new FileOutputStream(qrCodeFile);
                         qrCodeBitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
@@ -501,9 +512,9 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener, Me
                     }
                 }
                 qrcode.setImageBitmap(qrCodeBitmap);
-                if (reset){
-                    reset = false;
-                    resetQRCode(reset);
+                qrcode_copy_link.setEnabled(true);
+                if (processingDialog != null) {
+                    processingDialog.dismiss();
                 }
             }
         }
@@ -534,7 +545,6 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener, Me
             else {
                 ((QRCodeActivity) context).resetSuccessfully(false);
             }
-            reset = false;
         }
     }
 
@@ -543,19 +553,13 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener, Me
 
     }
 
-    public void resetQRCode (boolean reset) {
+    public void resetQRCode () {
         log("resetQRCode");
 
         if (megaApi == null){
             megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
         }
-        if (reset){
-            this.reset = reset;
-            megaApi.contactLinkCreate(this);
-        }
-        else{
-            megaApi.contactLinkDelete(handle, this);
-            megaApi.contactLinkCreate(this);
-        }
+        megaApi.contactLinkDelete(handle, this);
+        megaApi.contactLinkCreate(this);
     }
 }
