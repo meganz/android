@@ -16,6 +16,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
+import com.squareup.picasso.Picasso;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,7 +36,7 @@ public class MegaChatFileStorageAdapter extends RecyclerView.Adapter<MegaChatFil
     Context context;
     MegaApiAndroid megaApi;
     ActionBar aB;
-    ArrayList<Bitmap> thumbimages;
+    ArrayList<String> uriImages;
     Object fragment;
     DisplayMetrics outMetrics;
     private SparseBooleanArray selectedItems;
@@ -47,7 +49,6 @@ public class MegaChatFileStorageAdapter extends RecyclerView.Adapter<MegaChatFil
     private int count;
     MegaPreferences prefs;
     private SparseBooleanArray checkedItems = new SparseBooleanArray();
-
 
     /* public static view holder class */
     public static class ViewHolderBrowser extends ViewHolder {
@@ -131,10 +132,10 @@ public class MegaChatFileStorageAdapter extends RecyclerView.Adapter<MegaChatFil
         return items;
     }
 
-    public MegaChatFileStorageAdapter(Context _context, Object fragment, RecyclerView recyclerView, ActionBar aB, ArrayList<Bitmap> _thumbimages, int dimPhotos) {
+    public MegaChatFileStorageAdapter(Context _context, Object fragment, RecyclerView recyclerView, ActionBar aB, ArrayList<String> _uriImages, int dimPhotos) {
         this.context = _context;
         this.fragment = fragment;
-        this.thumbimages = _thumbimages;
+        this.uriImages = _uriImages;
         this.dimPhotos = dimPhotos;
         dbH = DatabaseHandler.getDbHandler(context);
 
@@ -146,8 +147,8 @@ public class MegaChatFileStorageAdapter extends RecyclerView.Adapter<MegaChatFil
         }
     }
 
-    public void setNodes(ArrayList<Bitmap> thumbImages) {
-        this.thumbimages = thumbImages;
+    public void setNodes(ArrayList<String> uriImages) {
+        this.uriImages = uriImages;
         notifyDataSetChanged();
     }
 
@@ -213,15 +214,21 @@ public class MegaChatFileStorageAdapter extends RecyclerView.Adapter<MegaChatFil
 
     public void onBindViewHolderGrid(ViewHolderBrowserGrid holder, int position){
         Display display = ((Activity) context).getWindowManager().getDefaultDisplay();
-        Bitmap image = (Bitmap) getItem(position);
-        if(image == null){
-            return;
-        }
+//        Bitmap image = (Bitmap) getItem(position);
+//        if(image == null){
+//            return;
+//        }
         holder.thumbLayout.setVisibility(View.VISIBLE);
 
         holder.photo.setVisibility(View.VISIBLE);
 
-        holder.photo.setImageBitmap(image);
+        //holder.photo.setImageBitmap(image);
+        Picasso.with(holder.photo.getContext())
+                .load(uriImages.get(position))
+                .fit()
+                .centerCrop()
+                .into(holder.photo);
+
         if (!multipleSelect) {
             holder.photoSelected.setVisibility(View.GONE);
             holder.photoUnselected.setVisibility(View.GONE);
@@ -234,7 +241,7 @@ public class MegaChatFileStorageAdapter extends RecyclerView.Adapter<MegaChatFil
 
             }else{
                 holder.photoSelected.setVisibility(View.GONE);
-               holder.photoUnselected.setVisibility(View.VISIBLE);
+                holder.photoUnselected.setVisibility(View.VISIBLE);
             }
         }
 
@@ -242,16 +249,16 @@ public class MegaChatFileStorageAdapter extends RecyclerView.Adapter<MegaChatFil
 
     @Override
     public int getItemCount() {
-        if (thumbimages != null){
-            return thumbimages.size();
+        if (uriImages != null){
+            return uriImages.size();
         }else{
             return 0;
         }
     }
 
     public Object getItem(int position) {
-        if (thumbimages != null){
-            return thumbimages.get(position);
+        if (uriImages != null){
+            return uriImages.get(position);
         }
         return null;
     }
@@ -261,11 +268,11 @@ public class MegaChatFileStorageAdapter extends RecyclerView.Adapter<MegaChatFil
         return position;
     }
 
-    public Bitmap getItemAt(int position) {
+    public String getItemAt(int position) {
 
         try {
-            if (thumbimages != null) {
-                return thumbimages.get(position);
+            if (uriImages != null) {
+                return uriImages.get(position);
             }
         } catch (IndexOutOfBoundsException e) {
         }
