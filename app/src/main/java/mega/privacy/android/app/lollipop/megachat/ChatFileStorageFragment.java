@@ -4,6 +4,7 @@ package mega.privacy.android.app.lollipop.megachat;
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.LoaderManager;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Loader;
@@ -27,6 +28,7 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -35,6 +37,7 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -57,6 +60,9 @@ public class ChatFileStorageFragment extends BottomSheetDialogFragment{
 
     RecyclerView recyclerView;
     private RecyclerView.LayoutManager mLayoutManager;
+
+//    public ProgressDialog mProgressDialog;
+    public ArrayList<String> mPhotoUris;
 
     MegaChatFileStorageAdapter adapter;
     ChatFileStorageFragment fileStorageFragment = this;
@@ -83,27 +89,13 @@ public class ChatFileStorageFragment extends BottomSheetDialogFragment{
     MegaPreferences prefs;
 
     public ActionMode actionMode;
-
-//    CustomizedGridLayoutManager gridLayoutManager;
-
     RelativeLayout rlfragment;
 
-    ArrayList<Bitmap> thumBitmap = new ArrayList<>();
-    ArrayList<String> imagesPath = new ArrayList<>();
+//    ArrayList<Bitmap> thumBitmap = new ArrayList<>();
+//    ArrayList<String> imagesPath = new ArrayList<>();
     ArrayList<Integer> posSelected = new ArrayList<>();
     String downloadLocationDefaultPath = Util.downloadDIR;
 
-//    private class ImageLoader extends AsyncTask<String, Void, String[]> {
-//
-//        @Override
-//        protected String[] doInBackground(String... args) {
-//            return null;
-//        }
-//
-//        @Override
-//        protected void onPostExecute(String[] key) {
-//        }
-//    }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
@@ -180,8 +172,12 @@ public class ChatFileStorageFragment extends BottomSheetDialogFragment{
 
         ((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
-        View v = inflater.inflate(R.layout.fragment_filestorage, container, false);
+        //setup progress dialog
+//        mProgressDialog = new ProgressDialog(context);
+//        mProgressDialog.setMessage("Fetching Photos...");
+//        mProgressDialog.setCancelable(false);
 
+        View v = inflater.inflate(R.layout.fragment_filestorage, container, false);
         rlfragment = (RelativeLayout) v.findViewById(R.id.relative_layout_frag);
         RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, heightFrag);
         rlfragment.setLayoutParams(params);
@@ -192,55 +188,46 @@ public class ChatFileStorageFragment extends BottomSheetDialogFragment{
         recyclerView.setHasFixedSize(true);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
 
-//        gridLayoutManager = (CustomizedGridLayoutManager) recyclerView.getLayoutManager();
+        if (recyclerView != null) {
+
+            mPhotoUris = new ArrayList<>();
+
+            int numberOfCells = GRID_LARGE;
+            int dimImages = heightFrag / numberOfCells;
+
+            mLayoutManager = new GridLayoutManager(context, numberOfCells, GridLayoutManager.HORIZONTAL,false);
+            ((GridLayoutManager) mLayoutManager).setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+                @Override
+                public int getSpanSize(int position) {
+                    return adapter.getSpanSizeOfPosition(position);
+                }
+            });
 
 
-//        int totalWidth = outMetrics.widthPixels;
-//
-//        int gridWidth = 0;
-//        int realGridWidth = 0;
-//        int numberOfCells = 0;
-//        int padding = 0;
-//
-//        realGridWidth = totalWidth / GRID_LARGE;
-//        padding = PADDING_GRID_LARGE;
-//        gridWidth = realGridWidth - (padding * 2);
-//        numberOfCells = GRID_LARGE;
+            if (adapter == null){
+                adapter = new MegaChatFileStorageAdapter(context, this, recyclerView, aB, mPhotoUris, dimImages);
+                adapter.setHasStableIds(true);
 
-        int numberOfCells = GRID_LARGE;
-        int dimImages = heightFrag / numberOfCells;
-
-        getPaths();
-
-        if (adapter == null){
-            adapter = new MegaChatFileStorageAdapter(context, this, recyclerView, aB, thumBitmap, dimImages);
-            adapter.setHasStableIds(true);
-
-        }else{
-            adapter.setDimensionPhotos(dimImages);
-            adapter.setNodes(thumBitmap);
-        }
-        adapter.setMultipleSelect(false);
-
-        mLayoutManager = new GridLayoutManager(context, numberOfCells, GridLayoutManager.HORIZONTAL,false);
-        ((GridLayoutManager) mLayoutManager).setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
-            @Override
-            public int getSpanSize(int position) {
-                return adapter.getSpanSizeOfPosition(position);
+            }else{
+                adapter.setDimensionPhotos(dimImages);
+                adapter.setNodes(mPhotoUris);
             }
-        });
 
-        recyclerView.setLayoutManager(mLayoutManager);
-        recyclerView.setAdapter(adapter);
+            adapter.setMultipleSelect(false);
 
-        setNodes(thumBitmap);
+            recyclerView.setLayoutManager(mLayoutManager);
+            recyclerView.setAdapter(adapter);
 
-        if (adapter.getItemCount() == 0){
-            recyclerView.setVisibility(View.VISIBLE);
-        }else{
-            recyclerView.setVisibility(View.VISIBLE);
+
+            //fetch photos from gallery
+            new FetchPhotosTask(fileStorageFragment).execute();
         }
 
+//        if (adapter.getItemCount() == 0){
+//            recyclerView.setVisibility(View.VISIBLE);
+//        }else{
+//            recyclerView.setVisibility(View.VISIBLE);
+//        }
             return v;
     }
 
@@ -275,11 +262,11 @@ public class ChatFileStorageFragment extends BottomSheetDialogFragment{
         return recyclerView;
     }
 
-    public void setNodes(ArrayList<Bitmap> thumImages){
+    public void setNodes(ArrayList<String> mPhotoUris){
 
-        this.thumBitmap = thumImages;
+        this.mPhotoUris = mPhotoUris;
             if (adapter != null){
-                adapter.setNodes(thumImages);
+                adapter.setNodes(mPhotoUris);
 
                 if (adapter.getItemCount() == 0){
                     recyclerView.setVisibility(View.VISIBLE);
@@ -328,89 +315,86 @@ public class ChatFileStorageFragment extends BottomSheetDialogFragment{
         return false;
     }
 
-    public void getPaths(){
-        String[] projection = new String[]{
-                MediaStore.Images.Media.DATA,
-                MediaStore.Images.Media._ID
-        };
-        Uri images = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
-        Cursor cursor = null;
+//    public void getPaths(){
+//        String[] projection = new String[]{
+//                MediaStore.Images.Media.DATA,
+//                MediaStore.Images.Media._ID
+//        };
+//        Uri images = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+//        Cursor cursor = null;
+//
+//        try {
+//
+//            cursor = getActivity().getContentResolver().query(images, projection, "", null, "");
+//            if (cursor.moveToFirst()) {
+//
+//                int dataColumn = cursor.getColumnIndex(MediaStore.Images.Media.DATA);
+//                String path= null;
+//                long id= 0;
+//                Bitmap temp= null;
+//                do {
+//                    path = cursor.getString(dataColumn);
+//                    imagesPath.add(path);
+//                    id = cursor.getInt(cursor.getColumnIndex(MediaStore.MediaColumns._ID));
+//                    temp = MediaStore.Images.Thumbnails.getThumbnail(getActivity().getContentResolver(), id, MediaStore.Images.Thumbnails.MINI_KIND, null );
+//                    temp = modifyOrientation(temp, path);
+//                    thumBitmap.add(temp);
+//
+//                } while (cursor.moveToNext());
+//                cursor.close();
+//            }
+//
+//        }catch (Exception e){
+//
+//        }finally {
+//            if(cursor !=null){
+//                cursor.close();
+//            }
+//        }
+//
+//
+//    }
 
-        try {
-
-            cursor = getActivity().getContentResolver().query(images, projection, "", null, "");
-            if (cursor.moveToFirst()) {
-
-                int dataColumn = cursor.getColumnIndex(MediaStore.Images.Media.DATA);
-                String path= null;
-                long id= 0;
-                Bitmap temp= null;
-                do {
-                    path = cursor.getString(dataColumn);
-                    imagesPath.add(path);
-                    id = cursor.getInt(cursor.getColumnIndex(MediaStore.MediaColumns._ID));
-                    temp = MediaStore.Images.Thumbnails.getThumbnail(getActivity().getContentResolver(), id, MediaStore.Images.Thumbnails.MINI_KIND, null );
-                    temp = modifyOrientation(temp, path);
-                    thumBitmap.add(temp);
-
-                } while (cursor.moveToNext());
-                cursor.close();
-            }
-
-        }catch (Exception e){
-
-        }finally {
-            if(cursor !=null){
-                cursor.close();
-            }
-        }
-
-
-    }
-
-    public static Bitmap modifyOrientation(Bitmap bitmap, String image_absolute_path) throws IOException {
-        ExifInterface ei = new ExifInterface(image_absolute_path);
-        int orientation = ei.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
-
-        switch (orientation) {
-            case ExifInterface.ORIENTATION_ROTATE_90:
-                return rotate(bitmap, 90);
-
-            case ExifInterface.ORIENTATION_ROTATE_180:
-                return rotate(bitmap, 180);
-
-            case ExifInterface.ORIENTATION_ROTATE_270:
-                return rotate(bitmap, 270);
-
-            case ExifInterface.ORIENTATION_FLIP_HORIZONTAL:
-                return flip(bitmap, true, false);
-
-            case ExifInterface.ORIENTATION_FLIP_VERTICAL:
-                return flip(bitmap, false, true);
-
-            default:
-                return bitmap;
-        }
-    }
-
-    public static Bitmap rotate(Bitmap bitmap, float degrees) {
-        Matrix matrix = new Matrix();
-        matrix.postRotate(degrees);
-        return Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
-    }
-
-    public static Bitmap flip(Bitmap bitmap, boolean horizontal, boolean vertical) {
-        Matrix matrix = new Matrix();
-        matrix.preScale(horizontal ? -1 : 1, vertical ? -1 : 1);
-        return Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
-    }
+//    public static Bitmap modifyOrientation(Bitmap bitmap, String image_absolute_path) throws IOException {
+//        ExifInterface ei = new ExifInterface(image_absolute_path);
+//        int orientation = ei.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
+//
+//        switch (orientation) {
+//            case ExifInterface.ORIENTATION_ROTATE_90:
+//                return rotate(bitmap, 90);
+//
+//            case ExifInterface.ORIENTATION_ROTATE_180:
+//                return rotate(bitmap, 180);
+//
+//            case ExifInterface.ORIENTATION_ROTATE_270:
+//                return rotate(bitmap, 270);
+//
+//            case ExifInterface.ORIENTATION_FLIP_HORIZONTAL:
+//                return flip(bitmap, true, false);
+//
+//            case ExifInterface.ORIENTATION_FLIP_VERTICAL:
+//                return flip(bitmap, false, true);
+//
+//            default:
+//                return bitmap;
+//        }
+//    }
+//
+//    public static Bitmap rotate(Bitmap bitmap, float degrees) {
+//        Matrix matrix = new Matrix();
+//        matrix.postRotate(degrees);
+//        return Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+//    }
+//
+//    public static Bitmap flip(Bitmap bitmap, boolean horizontal, boolean vertical) {
+//        Matrix matrix = new Matrix();
+//        matrix.preScale(horizontal ? -1 : 1, vertical ? -1 : 1);
+//        return Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+//    }
 
 
     public void activatedMultiselect(boolean flag){
         ((ChatActivityLollipop) getActivity()).multiselectActivated(flag);
-//        if(flag){
-//            List<Integer> items = adapter.getSelectedItems();
-//        }
     }
 
     public void removePosition(Integer pos){
@@ -425,16 +409,77 @@ public class ChatFileStorageFragment extends BottomSheetDialogFragment{
         String filePath;
         if(isMultipleselect()){
             for(Integer element:posSelected){
-                filePath = imagesPath.get(element);
+                filePath = mPhotoUris.get(element);
                ((ChatActivityLollipop) getActivity()).uploadPicture(filePath);
             }
             adapter.clearSelections();
         }
     }
 
-//    private void loadImagesThumb() {
-//        new ImageLoader().execute();
-//    }
+    public static class FetchPhotosTask extends AsyncTask<Void, Void, List<String>> {
+        private WeakReference<ChatFileStorageFragment> mContextWeakReference;
+
+        public FetchPhotosTask(ChatFileStorageFragment context) {
+            mContextWeakReference = new WeakReference<>(context);
+        }
+
+        @Override
+        protected void onPreExecute() {
+            Log.d("************","************ onPreExecute");
+
+            ChatFileStorageFragment context = mContextWeakReference.get();
+            if (context != null) {
+                //context.mProgressDialog.show();
+
+            }
+        }
+
+        @Override
+        protected List<String> doInBackground(Void... params) {
+            ChatFileStorageFragment context = mContextWeakReference.get();
+
+            if (context != null) {
+                //get photos from gallery
+                String[] projection = new String[]{
+                        MediaStore.Images.Media.DATA,
+                };
+
+                Uri uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+
+                Cursor cursor = context.getActivity().getContentResolver().query(uri, projection, "", null, "");
+
+                if (cursor != null) {
+                    int dataColumn = cursor.getColumnIndex(MediaStore.Images.Media.DATA);
+
+                    List<String> photoUris = new ArrayList<>(cursor.getCount());
+                    while (cursor.moveToNext()) {
+                        photoUris.add("file://" + cursor.getString(dataColumn));
+                    }
+                    cursor.close();
+
+                    return photoUris;
+                }
+            }
+
+            return null;
+
+        }
+
+        @Override
+        protected void onPostExecute(List<String> photoUris) {
+
+            ChatFileStorageFragment context = mContextWeakReference.get();
+            if (context != null) {
+                //context.mProgressDialog.dismiss();
+
+                if (photoUris != null && photoUris.size() > 0) {
+                    context.mPhotoUris.clear();
+                    context.mPhotoUris.addAll(photoUris);
+                    context.adapter.notifyDataSetChanged();
+                }
+            }
+        }
+    }
 
 
 }
