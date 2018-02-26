@@ -737,8 +737,8 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 				if(modeCloud==FileExplorerActivityLollipop.SELECT){
 					if(!selectFile)
 					{
-						separator.setVisibility(View.VISIBLE);
-						optionsBar.setVisibility(View.VISIBLE);
+						separator.setVisibility(View.GONE);
+						optionsBar.setVisibility(View.GONE);
 					}
 					else
 					{
