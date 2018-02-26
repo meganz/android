@@ -1701,5 +1701,33 @@
 
     <string name="account_suspended_multiple_breaches_ToS" context="Message error shown when trying to log in on an account has been suspended due to multiple breaches of Terms of Service">Your account has been suspended due to multiple breaches of Mega\'s Terms of Service. Please check your email inbox.</string>
     <string name="account_suspended_breache_ToS" context="Message error shown when trying to log in on an account has been suspended due to breach of Terms of Service">Your account was terminated due to breach of Mega\'s Terms of Service, such as abuse of rights of others; sharing and/or importing illegal data; or system abuse.</string>
+
+    <string name="number_of_versions" formatted="false" context="Number of versions of a file shown on the screen info of the file">%1$d versions</string>
+    <string name="title_section_versions" context="Title of the section Versions for files">Versions</string>
+
+    <string name="header_current_section_item" context="Header of the item to show the current version of a file in a list">Current version</string>
+    <plurals name="header_previous_section_item" context="Header of the item to show the previous versions of a file in a list">
+        <item context="file item" quantity="one">Previous version</item>
+        <item context="file items" quantity="other">Previous versions</item>
+    </plurals>
+
+    <string name="general_revert" context="option menu to revert a file version">Revert</string>
+    <string name="menu_item_clear_versions" context="option menu to clear all the previous versions">Clear previous versions</string>
+    <plurals name="title_dialog_delete_version" context="Title of the dialog to confirm that a version os going to be deleted">
+        <item context="version item" quantity="one">Delete version?</item>
+        <item context="version items" quantity="other">Delete versions?</item>
+    </plurals>
+
+    <string name="content_dialog_delete_version" context="Content of the dialog to confirm that a version is going to be deleted">This version will be permanently removed.</string>
+    <string name="content_dialog_delete_multiple_version" context="Content of the dialog to confirm that several versions are going to be deleted">These %d versions will be permanently removed.</string>
+
+    <string name="chat_upload_title_notification" context="Title of the notification shown when a file is uploading to a chat">Chat uploading</string>
+
+    <string name="settings_chat_upload_quality" context="Label for the option on setting to set up the quality of multimedia files uploaded to the chat">Chat media quality</string>
+
+    <string-array name="settings_chat_upload_quality_entries" context="the options for the option on setting to set up the quality of multimedia files uploaded to the chat">
+        <item context="the options of what to upload.">Original</item>
+        <item context="the options of what to upload.">Medium</item>
+    </string-array>
 </resources>
 
