@@ -206,7 +206,7 @@
     <string name="tour_access_text">Get fully encrypted access anywhere, anytime</string>
 
     <string name="create_account_text" context="button that allows the user to create an account">Create account</string>
-    <string name="name_text" context="Name of the user">First Name</string>
+    <string name="name_text" context="Name of the user">Name</string>
     <string name="lastname_text" context="Last name of the user">Last Name</string>
     <string name="tos" context="text placed on the checkbox of acceptation of the Terms of Service">I agree with MEGA\'s [A]Terms of Service[/A]</string>
     <string name="already_account" context="Does the user already have a MEGA account">Already have an account?</string>
@@ -1676,8 +1676,8 @@
     <string name="context_empty_incoming" context="Text of the empty screen when there are not elements in Incoming">Incoming Shared folders</string>
     <string name="context_empty_outgoing" context="Text of the empty screen when there are not elements in Outgoing">Outgoing Shared folders</string>
 
-    <string name="tab_sent_requests" context="Title of the sent requests tab. Capital letters">Sent Requests</string>
-    <string name="tab_received_requests" context="Title of the received requests tab. Capital letters">Received Requests</string>
+    <string name="tab_sent_requests" context="Title of the sent requests tab. Capital letters">Sent requests</string>
+    <string name="tab_received_requests" context="Title of the received requests tab. Capital letters">Received requests</string>
     <string name="overquota_alert_title" context="Title dialog overquota error">Storage quota exceeded</string>
 
     <string name="invalid_link" context="error message shown when an account confirmation link or reset password link is invalid for unknown reasons">Invalid link, please ask for a new valid link</string>
