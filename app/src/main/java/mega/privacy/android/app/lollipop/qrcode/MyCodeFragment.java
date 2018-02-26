@@ -105,7 +105,7 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener, Me
     private Bitmap qrCodeBitmap;
     private File qrFile = null;
 
-    private ProgressDialog processingDialog;
+    public static ProgressDialog processingDialog;
 
     public static MyCodeFragment newInstance() {
         log("newInstance");
@@ -130,6 +130,9 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener, Me
 
         if (savedInstanceState != null){
             handle = savedInstanceState.getLong("handle");
+            contactLink = savedInstanceState.getString("contactLink");
+            qrcode_link.setText(contactLink);
+            qrcode_copy_link.setEnabled(true);
         }
 
     }
@@ -170,6 +173,7 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener, Me
         super.onSaveInstanceState(outState);
 
         outState.putLong("handle", handle);
+        outState.putString("contactLink", contactLink);
     }
 
     @Override
@@ -243,7 +247,7 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener, Me
         log("createQRCode");
 
         Bitmap qrCode = Bitmap.createBitmap(WIDTH,WIDTH, Bitmap.Config.ARGB_8888);
-        int width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 100, getResources().getDisplayMetrics());
+        int width = 180;
         Canvas c = new Canvas(qrCode);
         int pos = (c.getWidth()/2) - (width/2);
 

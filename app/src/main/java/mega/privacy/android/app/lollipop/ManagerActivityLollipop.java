@@ -11580,11 +11580,17 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				File imgFile = new File(filePath);
 
 				String newPath = null;
+				File qrFile = null;
 				if (getExternalCacheDir() != null){
 					newPath = getExternalCacheDir().getAbsolutePath() + "/" + myEmail + "Temp.jpg";
+					qrFile = new File(getExternalCacheDir().getAbsolutePath(), myEmail + "QRcode.jpg");
 				}else{
 					log("getExternalCacheDir() is NULL");
 					newPath = getCacheDir().getAbsolutePath() + "/" + myEmail + "Temp.jpg";
+					qrFile = new File(getCacheDir().getAbsolutePath(), myEmail + "QRcode.jpg");
+				}
+				if (qrFile.exists()) {
+					qrFile.delete();
 				}
 
 				if(newPath!=null) {
@@ -12245,12 +12251,19 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						File imgFile = new File(avatarPath);
 //						String name = Util.getPhotoSyncName(imgFile.lastModified(), imgFile.getAbsolutePath());
 						String newPath = null;
+						File qrFile = null;
 						if (getExternalCacheDir() != null){
 							newPath = getExternalCacheDir().getAbsolutePath() + "/" + myAccountInfo.getMyUser().getEmail() + "Temp.jpg";
+							qrFile = new File(getExternalCacheDir().getAbsolutePath(), myAccountInfo.getMyUser().getEmail() + "QRcode.jpg");
 						}
 						else{
 							log("getExternalCacheDir() is NULL");
 							newPath = getCacheDir().getAbsolutePath() + "/" + myAccountInfo.getMyUser().getEmail() + "Temp.jpg";
+							qrFile = new File(getCacheDir().getAbsolutePath(), myAccountInfo.getMyUser().getEmail() + "QRcode.jpg");
+						}
+
+						if (qrFile.exists()) {
+							qrFile.delete();
 						}
 
 						if(newPath!=null){

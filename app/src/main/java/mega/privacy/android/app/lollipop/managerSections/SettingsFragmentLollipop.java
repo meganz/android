@@ -48,7 +48,6 @@ import mega.privacy.android.app.lollipop.MyAccountInfo;
 import mega.privacy.android.app.lollipop.PinLockActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatPreferencesActivity;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
-import mega.privacy.android.app.lollipop.qrcode.QRCodeActivity;
 import mega.privacy.android.app.lollipop.tasks.ClearCacheTask;
 import mega.privacy.android.app.lollipop.tasks.ClearOfflineTask;
 import mega.privacy.android.app.lollipop.tasks.GetCacheSizeTask;
@@ -56,16 +55,20 @@ import mega.privacy.android.app.lollipop.tasks.GetOfflineSizeTask;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatPresenceConfig;
+import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
+import nz.mega.sdk.MegaRequest;
+import nz.mega.sdk.MegaRequestListenerInterface;
 
 
 //import android.support.v4.preference.PreferenceFragment;
 
 @SuppressLint("NewApi")
-public class SettingsFragmentLollipop extends PreferenceFragment implements OnPreferenceClickListener, OnPreferenceChangeListener{
+public class SettingsFragmentLollipop extends PreferenceFragment implements OnPreferenceClickListener, OnPreferenceChangeListener, MegaRequestListenerInterface{
 
 	Context context;
 	private MegaApiAndroid megaApi;
@@ -215,6 +218,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 	boolean askMe = false;
 	boolean fileNames = false;
 	boolean advancedDevices = false;
+	boolean autoAccept;
 	
 	DatabaseHandler dbH;
 	
@@ -998,12 +1002,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 
 		useHttpsOnly.setChecked(useHttpsOnlyValue);
 
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-			qrCodeAutoAcceptSwitch.setChecked(false);
-		}
-		else{
-			qrCodeAutoAcceptCheck.setChecked(false);
-		}
+		megaApi.getContactLinksOption(this);
 	}
 
 	@Override
@@ -1863,7 +1862,12 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			((ManagerActivityLollipop)context).askConfirmationDeleteAccount();
 		}
 		else if (preference.getKey().compareTo(KEY_QR_CODE_AUTO_ACCEPT) == 0){
-
+			if (autoAccept){
+				megaApi.setContactLinksOption(true, this);
+			}
+			else {
+				megaApi.setContactLinksOption(false, this);
+			}
 		}
 		
 		return true;
@@ -2278,5 +2282,62 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 
 	private static void log(String log) {
 		Util.log("SettingsFragmentLollipop", log);
+	}
+
+	@Override
+	public void onRequestStart(MegaApiJava api, MegaRequest request) {
+
+	}
+
+	@Override
+	public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
+
+	}
+
+	@Override
+	public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
+	log("onRequestFinish  MegaRequest: "+request.getType());
+
+		if(request.getType()==MegaRequest.TYPE_GET_ATTR_USER){
+			if (e.getErrorCode() == MegaError.API_OK){
+				autoAccept = request.getFlag();
+				log("OK GET ATTR USER: "+autoAccept);
+				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+					qrCodeAutoAcceptSwitch.setChecked(autoAccept);
+				}
+				else{
+					qrCodeAutoAcceptCheck.setChecked(autoAccept);
+				}
+			}
+			else if (e.getErrorCode() == MegaError.API_ENOENT){
+				log("Error getContactLinkOption");
+			}
+		}
+		if (request.getType()==MegaRequest.TYPE_SET_ATTR_USER){
+			if (e.getErrorCode() == MegaError.API_OK){
+				log("OK SET ATTR USER: "+request.getText());
+
+				if (autoAccept){
+					autoAccept = false;
+				}
+				else{
+					autoAccept = true;
+				}
+				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+					qrCodeAutoAcceptSwitch.setChecked(autoAccept);
+				}
+				else{
+					qrCodeAutoAcceptCheck.setChecked(autoAccept);
+				}
+			}
+			else{
+				log("Error setContactLinkOption");
+			}
+		}
+	}
+
+	@Override
+	public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) {
+
 	}
 }
