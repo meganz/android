@@ -63,7 +63,6 @@ import mega.privacy.android.app.lollipop.megachat.PendingMessage;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.PreviewUtils;
 import mega.privacy.android.app.utils.RTFFormatter;
-import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.TimeChatUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -341,7 +340,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     int height = pdfiumCore.getPageHeightPoint(pdfDocument, pageNumber);
                     Bitmap bmp = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
                     pdfiumCore.renderPageBitmap(pdfDocument, bmp, pageNumber, 0, 0, width, height);
-                    Bitmap preview = ThumbnailUtilsLollipop.resizeBitmapUpload(bmp, width, height);
+                    Bitmap preview = PreviewUtils.resizeBitmapUpload(bmp, width, height);
                     out = new FileOutputStream(previewFile);
                     boolean result = preview.compress(Bitmap.CompressFormat.JPEG, 100, out); // bmp is your Bitmap instance
                     pdfiumCore.closeDocument(pdfDocument);

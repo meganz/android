@@ -1,17 +1,15 @@
 package mega.privacy.android.app.utils;
 
-import java.io.File;
-import java.io.IOException;
-
-import mega.privacy.android.app.PreviewCache;
-import nz.mega.sdk.MegaNode;
-
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.media.ExifInterface;
 import android.media.MediaMetadataRetriever;
 import android.provider.MediaStore;
+
+import java.io.File;
+
+import mega.privacy.android.app.PreviewCache;
+import nz.mega.sdk.MegaNode;
 
 
 public class PreviewUtils {
@@ -114,6 +112,25 @@ public class PreviewUtils {
 		log("PREVIEW_SIZE " + bmpFile.getAbsolutePath() + "____ " + bmpFile.length());
 		Bitmap bmp = BitmapFactory.decodeFile(bmpFile.getAbsolutePath(), bOpts);
 		return bmp;
+	}
+
+	public static Bitmap resizeBitmapUpload(Bitmap bitmap, int width, int height) {
+		Bitmap resizeBitmap = null;
+		int resizeWidth, resizeHeight;
+		float resize;
+
+		if (width > height) {
+			resize = (float) 1000 / width;
+		}
+		else {
+			resize = (float) 1000 / height;
+		}
+		resizeWidth = (int) (width * resize);
+		resizeHeight = (int) (height * resize);
+
+		resizeBitmap = Bitmap.createScaledBitmap(bitmap, resizeWidth, resizeHeight, false);
+
+		return resizeBitmap;
 	}
 	
 	private static void log(String log) {

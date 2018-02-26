@@ -698,7 +698,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 							int height = pdfiumCore.getPageHeightPoint(pdfDocument, pageNumber);
 							Bitmap bmp = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
 							pdfiumCore.renderPageBitmap(pdfDocument, bmp, pageNumber, 0, 0, width, height);
-							Bitmap resizedBitmap = ThumbnailUtilsLollipop.resizeBitmapUpload(bmp, width, height);
+							Bitmap resizedBitmap = PreviewUtils.resizeBitmapUpload(bmp, width, height);
 							out = new FileOutputStream(preview);
 							boolean result = resizedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, out); // bmp is your Bitmap instance
 							if(result){
