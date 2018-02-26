@@ -94,7 +94,8 @@ public class ScanCodeFragment extends Fragment implements ZXingScannerView.Resul
     MegaApiAndroid megaApi;
     DatabaseHandler dbH = null;
     Handler handler;
-    long handle;
+    long handle = -1;
+    long handleContactLink = -1;
     private boolean success = true;
 
     public static ScanCodeFragment newInstance() {
@@ -177,6 +178,7 @@ public class ScanCodeFragment extends Fragment implements ZXingScannerView.Resul
     public void onResume() {
         log("onResume");
         super.onResume();
+        scannerView.startCamera();
         scannerView.setResultHandler(this);
     }
 
@@ -236,6 +238,7 @@ public class ScanCodeFragment extends Fragment implements ZXingScannerView.Resul
         LayoutInflater inflater = getActivity().getLayoutInflater();
         String contactLink = rawResult.getText();
         String[] s = contactLink.split("C!");
+
         handle = MegaApiAndroid.base64ToHandle(s[1].trim());
         log("Contact link: "+contactLink+ " s[1]: "+s[1]+" handle: "+handle);
         if (megaApi == null){
@@ -258,10 +261,12 @@ public class ScanCodeFragment extends Fragment implements ZXingScannerView.Resul
         inviteAlertDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
             @Override
             public void onDismiss(DialogInterface dialog) {
+                log("onDismiss");
                 scannerView.startCamera();
                 onResume();
             }
         });
+
         scannerView.stopCamera();
     }
 
@@ -313,7 +318,8 @@ public class ScanCodeFragment extends Fragment implements ZXingScannerView.Resul
     }
 
     public void sendInvitation () {
-        megaApi.inviteContact(myEmail, null, MegaContactRequest.INVITE_ACTION_ADD, (QRCodeActivity) context);
+        log("sendInvitation");
+        megaApi.inviteContact(myEmail, null, MegaContactRequest.INVITE_ACTION_ADD, handleContactLink, (QRCodeActivity) context);
     }
 
     public void setAvatar(){
@@ -418,7 +424,7 @@ public class ScanCodeFragment extends Fragment implements ZXingScannerView.Resul
         if (dbH == null) {
             dbH = DatabaseHandler.getDbHandler(context);
         }
-        MegaContactDB contactDB = dbH.findContactByHandle(String.valueOf(myUser.getHandle()+""));
+        MegaContactDB contactDB = dbH.findContactByHandle(String.valueOf(myUser+""));
         String fullName = "";
         if(contactDB!=null){
             ContactController cC = new ContactController(context);
@@ -482,6 +488,7 @@ public class ScanCodeFragment extends Fragment implements ZXingScannerView.Resul
                 log("Contact link query " + request.getNodeHandle() + "_" + MegaApiAndroid.handleToBase64(request.getNodeHandle()) + "_" + request.getEmail() + "_" + request.getName() + "_" + request.getText());
 
                 this.request = request;
+                handleContactLink = request.getNodeHandle();
                 myEmail = request.getEmail();
                 myUser = megaApi.getContact(myEmail);
                 contactName.setText(request.getName() + " " + request.getText());
@@ -489,6 +496,9 @@ public class ScanCodeFragment extends Fragment implements ZXingScannerView.Resul
                 setAvatar();
 
                 inviteAlertDialog.show();
+            }
+            else if (e.getErrorCode() == MegaError.API_EEXIST){
+                showAlertDialog(R.string.invite_not_sent, R.string.invite_not_sent_text_already_contact, true);
             }
             else {
                 showAlertDialog( R.string.invite_not_sent, R.string.invite_not_sent_text, false);
