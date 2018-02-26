@@ -18,6 +18,7 @@ import android.os.IBinder;
 import android.os.ParcelFileDescriptor;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
+import android.provider.MediaStore;
 import android.support.v4.app.NotificationCompat;
 import android.widget.RemoteViews;
 
@@ -26,6 +27,7 @@ import com.shockwave.pdfium.PdfiumCore;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -554,7 +556,49 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
                     ThumbnailUtilsLollipop.createThumbnailVideo(this, transfer.getPath(), megaApi, transfer.getNodeHandle());
 
                     MegaNode node = megaApi.getNodeByHandle(transfer.getNodeHandle());
+
+					File previewDir = PreviewUtils.getPreviewFolder(this);
+					File preview = new File(previewDir, MegaApiAndroid.handleToBase64(transfer.getNodeHandle()) + ".jpg");
+
+					Bitmap bmPreview = PreviewUtils.createVideoPreview(transfer.getPath(), MediaStore.Video.Thumbnails.FULL_SCREEN_KIND);
+
                     if(node!=null){
+						if(bmPreview!=null){
+							try {
+								preview.createNewFile();
+
+								FileOutputStream out = null;
+								try {
+									out = new FileOutputStream(preview);
+//									Bitmap resizedBitmap = ThumbnailUtilsLollipop.resizeBitmapUpload(bmPreview, bmPreview.getWidth(), bmPreview.getHeight());
+									boolean result = bmPreview.compress(Bitmap.CompressFormat.JPEG, 100, out); // bmp is your Bitmap instance
+									if(result){
+										log("Compress OK!");
+										megaApi.setPreview(node, preview.getAbsolutePath(), this);
+									}
+									else{
+										log("Not Compress");
+									}
+								} catch (Exception e) {
+									log("Error with FileOutputStream: "+e.getMessage());
+								} finally {
+									try {
+										if (out != null) {
+											out.close();
+										}
+									} catch (IOException e) {
+										log("Error: "+e.getMessage());
+									}
+								}
+
+							} catch (IOException e1) {
+								log("Error creating new preview file: "+e1.getMessage());
+							}
+						}
+						else{
+							log("Create video preview NULL");
+						}
+
                         MediaMetadataRetriever retriever = new MediaMetadataRetriever();
                         retriever.setDataSource(transfer.getPath());
 
@@ -681,8 +725,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 						int height = pdfiumCore.getPageHeightPoint(pdfDocument, pageNumber);
 						Bitmap bmp = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
 						pdfiumCore.renderPageBitmap(pdfDocument, bmp, pageNumber, 0, 0, width, height);
-						Bitmap resizedBitmap;
-						resizedBitmap = Bitmap.createScaledBitmap(bmp, width, height, false);
+						Bitmap resizedBitmap = PreviewUtils.resizeBitmapUpload(bmp, width, height);
 						out = new FileOutputStream(preview);
 						boolean result = resizedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, out); // bmp is your Bitmap instance
 						if(result){

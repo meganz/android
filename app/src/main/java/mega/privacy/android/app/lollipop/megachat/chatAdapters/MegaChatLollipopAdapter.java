@@ -12,6 +12,7 @@ import android.graphics.Typeface;
 import android.media.ExifInterface;
 import android.os.AsyncTask;
 import android.os.ParcelFileDescriptor;
+import android.provider.MediaStore;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
@@ -329,9 +330,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 try {
 
                     PdfiumCore pdfiumCore = new PdfiumCore(context);
-
-                    Bitmap preview = null;
-                    boolean result = false;
                     File previewDir = PreviewUtils.getPreviewFolder(context);
                     String[] previewName = currentFile.getName().split(".pdf");
                     File previewFile = new File(previewDir, previewName[0] + ".jpg");
@@ -342,9 +340,9 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     int height = pdfiumCore.getPageHeightPoint(pdfDocument, pageNumber);
                     Bitmap bmp = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
                     pdfiumCore.renderPageBitmap(pdfDocument, bmp, pageNumber, 0, 0, width, height);
-                    preview = Bitmap.createScaledBitmap(bmp, width, height, false);
+                    Bitmap preview = PreviewUtils.resizeBitmapUpload(bmp, width, height);
                     out = new FileOutputStream(previewFile);
-                    result = preview.compress(Bitmap.CompressFormat.JPEG, 100, out); // bmp is your Bitmap instance
+                    boolean result = preview.compress(Bitmap.CompressFormat.JPEG, 100, out); // bmp is your Bitmap instance
                     pdfiumCore.closeDocument(pdfDocument);
 
                     if (preview != null && result){
@@ -364,6 +362,55 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                             out.close();
                     } catch (Exception e) {
                     }
+                }
+            }
+            else if (MimeTypeList.typeForName(filePath).isVideo()){
+                log("Is video");
+                File previewDir = PreviewUtils.getPreviewFolder(context);
+                String[] previewName = currentFile.getName().split(".pdf");
+                File previewFile = new File(previewDir, previewName[0] + ".jpg");
+
+                Bitmap bmPreview = PreviewUtils.createVideoPreview(filePath, MediaStore.Video.Thumbnails.FULL_SCREEN_KIND);
+                if(bmPreview==null){
+                    log("Create video preview NULL");
+//                    bmPreview= ThumbnailUtilsLollipop.loadVideoThumbnail(filePath, context);
+                }
+                else{
+                    log("Create Video preview worked!");
+                }
+
+                if(bmPreview!=null){
+					try {
+                        previewFile.createNewFile();
+                        FileOutputStream out = null;
+                        try {
+                            out = new FileOutputStream(previewFile);
+//                            Bitmap resizedBitmap = ThumbnailUtilsLollipop.resizeBitmapUpload(bmPreview, bmPreview.getWidth(), bmPreview.getHeight());
+                            boolean result = bmPreview.compress(Bitmap.CompressFormat.JPEG, 100, out); // bmp is your Bitmap instance
+                            if (result){
+                                log("Compress OK");
+                                long fingerprintCache = MegaApiAndroid.base64ToHandle(megaApi.getFingerprint(previewFile.getPath()));
+                                PreviewUtils.setPreviewCache(fingerprintCache, bmPreview);
+                                return bmPreview;
+                            }
+                        } catch (Exception e) {
+                            log("Error with FileOutputStream: "+e.getMessage());
+                        } finally {
+                            try {
+                                if (out != null) {
+                                    out.close();
+                                }
+                            } catch (IOException e) {
+                                log("Error: "+e.getMessage());
+                            }
+                        }
+
+                    } catch (IOException e1) {
+                        log("Error creating new preview file: "+e1.getMessage());
+                    }
+                }
+                else{
+                    log("Create video preview NULL");
                 }
             }
 
@@ -878,6 +925,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     long fingerprintCache = MegaApiAndroid.base64ToHandle(megaApi.getFingerprint(paths.get(0)));
 
                     if (MimeTypeList.typeForName(paths.get(0)).isImage() || MimeTypeList.typeForName(paths.get(0)).isPdf() || MimeTypeList.typeForName(paths.get(0)).isVideo()){
+
                         ((ViewHolderMessageChat) holder).ownTriangleIconFile.setVisibility(View.GONE);
 
                         preview = PreviewUtils.getPreviewFromCache(fingerprintCache);
