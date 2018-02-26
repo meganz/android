@@ -93,12 +93,17 @@ public class ChatFileStorageFragment extends BottomSheetDialogFragment{
     String downloadLocationDefaultPath = Util.downloadDIR;
 
 
+//    @Override
+//    public void onSaveInstanceState(Bundle outState) {
+//        super.onSaveInstanceState(outState);
+////        if(recyclerView.getLayoutManager()!=null){
+////            outState.putParcelable(BUNDLE_RECYCLER_LAYOUT, recyclerView.getLayoutManager().onSaveInstanceState());
+////        }
+//    }
     @Override
     public void onSaveInstanceState(Bundle outState) {
+        outState.putString("ggg", "gg");
         super.onSaveInstanceState(outState);
-        if(recyclerView.getLayoutManager()!=null){
-            outState.putParcelable(BUNDLE_RECYCLER_LAYOUT, recyclerView.getLayoutManager().onSaveInstanceState());
-        }
     }
 
     public static ChatFileStorageFragment newInstance() {
