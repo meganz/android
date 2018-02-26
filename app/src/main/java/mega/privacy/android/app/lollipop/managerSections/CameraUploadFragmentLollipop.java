@@ -589,7 +589,6 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	
 	@Override
 	public void onCreate (Bundle savedInstanceState){
-
 		log("onCreate");
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
