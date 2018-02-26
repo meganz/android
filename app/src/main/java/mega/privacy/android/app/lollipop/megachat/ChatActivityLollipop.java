@@ -164,6 +164,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     boolean pendingMessagesLoaded = false;
 
+    boolean isFirstTimeStorage = true;
+
     boolean startVideo = false;
     boolean activityVisible = false;
 
@@ -1466,14 +1468,11 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     }
 
     public boolean checkPermissionsReadStorage(){
-        log("********* checkPermissionsReadStorage");
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 
             boolean hasReadStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
             if (!hasReadStoragePermission) {
-                log("*********checkPermissionsReadStorage -> NOT hasReadStoragePermission");
-
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, Constants.REQUEST_READ_STORAGE);
                 return false;
             }
@@ -1522,14 +1521,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 break;
             }
             case Constants.REQUEST_READ_STORAGE:{
-                log("*********onRequestPermissionsResult -> 1");
-
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    log("*********onRequestPermissionsResult -> 2");
-
                     if(checkPermissionsReadStorage()){
-                        log("*********onRequestPermissionsResult ->checkPermissionsReadStorage ");
-
                         this.attachFromFileStorage();
                     }
                 }
@@ -2181,22 +2174,16 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
                     fileStorageLayout.setVisibility(View.VISIBLE);
 
-                    log("********************** 1 onClick ");
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                        log("********************** 1.1 onClick -> versiones > ");
-
                         boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
                         if (!hasStoragePermission) {
-                            log("********************** 1.1.1 onClick -> NOT hasStoragePermission ");
                             ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},Constants.REQUEST_READ_STORAGE);
 
                         }else{
-                            log("********************** 1.1.2 onClick -> hasStoragePermission ");
                             this.attachFromFileStorage();
                         }
                     }
                     else{
-                        log("********************** 1.2 onClick -> versiones < ");
                         this.attachFromFileStorage();
                     }
                 }
@@ -2207,11 +2194,20 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     }
 
     public void attachFromFileStorage(){
-        log("***********attachaFromFileStorage");
-        fileStorageF = ChatFileStorageFragment.newInstance();
-        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        ft.replace(R.id.fragment_container_file_storage, fileStorageF, "fileStorageF");
-        ft.commitNow();
+
+        if (isFirstTimeStorage) {
+            fileStorageF = ChatFileStorageFragment.newInstance();
+
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fragment_container_file_storage, fileStorageF,"fileStorageF")
+                    .commitNowAllowingStateLoss();
+            isFirstTimeStorage = false;
+        }
+//        fileStorageF = ChatFileStorageFragment.newInstance();
+//        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+//        ft.replace(R.id.fragment_container_file_storage, fileStorageF, "fileStorageF");
+//        ft.commitNow();
 
         //ft.commitAllowingStateLoss();
     }
@@ -2286,8 +2282,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
         else{
             log("Error sending message (2)!");
-            //EL mensaje no se ha enviado, mostrar error al usuario pero no cambiar interfaz
-
         }
     }
 
@@ -5131,21 +5125,12 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
    @Override
     protected void onResume(){
-        log("onResume");
         super.onResume();
 
         MegaApplication.setShowPinScreen(true);
 
         activityVisible = true;
-
         setLastMessageSeen();
-       if(fileStorageLayout.isShown()){
-           if(fileStorageF != null){
-               fileStorageF.clearSelections();
-               fileStorageF.hideMultipleSelect();
-           }
-           fileStorageLayout.setVisibility(View.GONE);
-       }
 
         if (emojiKeyboardShown){
             keyboardButton.setImageResource(R.drawable.ic_emoticon_white);
