@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.support.annotation.Nullable;
 import android.support.v4.content.FileProvider;
@@ -15,7 +14,6 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.DisplayMetrics;
 import android.util.SparseBooleanArray;
 import android.view.Display;
@@ -25,7 +23,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -33,8 +30,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.File;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -47,7 +42,6 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.scrollBar.SectionTitleProvider;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
-import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.MegaMonthPicLollipop;
 import mega.privacy.android.app.lollipop.MyAccountInfo;
@@ -1068,19 +1062,28 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
     }
 
     public void onNodeClick(MegaPhotoSyncGridTitleAdapterLollipop.ViewHolderPhotoTitleSyncGridTitle holder, int positionInNodes){
-        log("onNodeClick");
 
         if (!multipleSelect){
             MegaNode n = megaApi.getNodeByHandle(holder.getDocument());
             if (n != null){
                 if (!n.isFolder()){
                     if (MimeTypeThumbnail.typeForName(n.getName()).isImage()){
-
                         Intent intent = new Intent(context, FullScreenImageViewerLollipop.class);
                         intent.putExtra("position", positionInNodes);
                         intent.putExtra("parentNodeHandle", megaApi.getParentNode(n).getHandle());
-                        intent.putExtra("adapterType", Constants.PHOTO_SYNC_ADAPTER);
                         intent.putExtra("orderGetChildren", orderGetChildren);
+                        if(((ManagerActivityLollipop)context).isFirstNavigationLevel() == true){
+                            intent.putExtra("adapterType", Constants.PHOTO_SYNC_ADAPTER);
+
+                        }else{
+                            intent.putExtra("adapterType", Constants.SEARCH_BY_ADAPTER);
+                            long[] arrayHandles = new long[nodes.size()];
+                            for(int i = 0; i < nodes.size(); i++) {
+                                arrayHandles[i] = nodes.get(i).getHandle();
+                            }
+                            intent.putExtra("handlesNodesSearch",arrayHandles);
+                        }
+
                         MyAccountInfo accountInfo = ((ManagerActivityLollipop)context).getMyAccountInfo();
                         if(accountInfo!=null){
                             intent.putExtra("typeAccount", accountInfo.getAccountType());

@@ -443,7 +443,8 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
                                 if (chatSettings == null) {
 
                                     log("1 - onCreate: ERROR----> Switch OFF chat");
-                                    chatSettings = new ChatSettings(false + "", true + "", "", true + "");
+                                    chatSettings = new ChatSettings();
+                                    chatSettings.setEnabled(false+"");
                                     dbH.setChatSettings(chatSettings);
                                 } else {
 
