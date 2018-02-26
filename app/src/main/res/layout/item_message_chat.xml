@@ -152,8 +152,9 @@
                         <RelativeLayout
                             android:id="@+id/gradient_own_message_thumb_portrait"
                             android:layout_width="152dp"
-                            android:layout_height="212dp"
+                            android:layout_height="30dp"
                             android:layout_gravity="center_horizontal|center_vertical"
+                            android:layout_alignBottom="@+id/content_own_message_thumb_portrait"
                             android:background="@drawable/gradient_chat_video" />
 
                         <ImageView
@@ -262,9 +263,10 @@
                             <RelativeLayout
                                 android:id="@+id/gradient_own_message_thumb_landscape"
                                 android:layout_width="212dp"
-                                android:layout_height="152dp"
+                                android:layout_height="30dp"
                                 android:layout_gravity="center_horizontal|center_vertical"
-                                android:background="@drawable/gradient_chat_video" />
+                                android:background="@drawable/gradient_chat_video"
+                                android:layout_alignBottom="@+id/content_own_message_thumb_landscape" />
 
                             <ImageView
                                 android:id="@+id/video_icon_own_message_thumb_landscape"
@@ -653,8 +655,9 @@
                             <RelativeLayout
                                 android:id="@+id/gradient_contact_message_thumb_portrait"
                                 android:layout_width="152dp"
-                                android:layout_height="212dp"
+                                android:layout_height="30dp"
                                 android:layout_gravity="center_horizontal|center_vertical"
+                                android:layout_alignBottom="@+id/content_contact_message_thumb_portrait"
                                 android:background="@drawable/gradient_chat_video" />
 
                             <ImageView
@@ -716,7 +719,8 @@
                             <RelativeLayout
                                 android:id="@+id/gradient_contact_message_thumb_landscape"
                                 android:layout_width="212dp"
-                                android:layout_height="152dp"
+                                android:layout_height="30dp"
+                                android:layout_alignBottom="@+id/content_contact_message_thumb_landscape"
                                 android:layout_gravity="center_horizontal|center_vertical"
                                 android:background="@drawable/gradient_chat_video" />
 
