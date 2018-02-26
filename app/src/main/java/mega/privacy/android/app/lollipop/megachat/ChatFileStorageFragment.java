@@ -35,6 +35,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
@@ -61,8 +62,10 @@ public class ChatFileStorageFragment extends BottomSheetDialogFragment{
     RecyclerView recyclerView;
     private RecyclerView.LayoutManager mLayoutManager;
 
+    TextView emptyTextView;
 //    public ProgressDialog mProgressDialog;
     public ArrayList<String> mPhotoUris;
+    public ArrayList<String> imagesPath = new ArrayList<>();
 
     MegaChatFileStorageAdapter adapter;
     ChatFileStorageFragment fileStorageFragment = this;
@@ -80,19 +83,12 @@ public class ChatFileStorageFragment extends BottomSheetDialogFragment{
     DisplayMetrics outMetrics;
     Display display;
 
-    private int height = -1;
-    private boolean heightseted = false;
-    private int heightReal = -1;
-    private int heightDisplay;
-
     DatabaseHandler dbH;
     MegaPreferences prefs;
 
     public ActionMode actionMode;
     RelativeLayout rlfragment;
 
-//    ArrayList<Bitmap> thumBitmap = new ArrayList<>();
-//    ArrayList<String> imagesPath = new ArrayList<>();
     ArrayList<Integer> posSelected = new ArrayList<>();
     String downloadLocationDefaultPath = Util.downloadDIR;
 
@@ -167,7 +163,6 @@ public class ChatFileStorageFragment extends BottomSheetDialogFragment{
         scaleW = Util.getScaleW(outMetrics, density);
         scaleH = Util.getScaleH(outMetrics, density);
 
-        heightDisplay = outMetrics.heightPixels;
         int heightFrag = Util.scaleWidthPx(240, outMetrics);
 
         ((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
@@ -179,11 +174,12 @@ public class ChatFileStorageFragment extends BottomSheetDialogFragment{
 
         View v = inflater.inflate(R.layout.fragment_filestorage, container, false);
         rlfragment = (RelativeLayout) v.findViewById(R.id.relative_layout_frag);
-        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, heightFrag);
+        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, heightFrag);
         rlfragment.setLayoutParams(params);
 
+        emptyTextView = (TextView) v.findViewById(R.id.empty_textview);
+
         recyclerView = (RecyclerView) v.findViewById(R.id.file_storage_grid_view_browser);
-//        recyclerView.setPadding(0, 0, 0, Util.scaleHeightPx(80, outMetrics));
         recyclerView.setClipToPadding(false);
         recyclerView.setHasFixedSize(true);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -203,14 +199,14 @@ public class ChatFileStorageFragment extends BottomSheetDialogFragment{
                 }
             });
 
-
             if (adapter == null){
                 adapter = new MegaChatFileStorageAdapter(context, this, recyclerView, aB, mPhotoUris, dimImages);
                 adapter.setHasStableIds(true);
 
             }else{
                 adapter.setDimensionPhotos(dimImages);
-                adapter.setNodes(mPhotoUris);
+                //adapter.setNodes(mPhotoUris);
+                setNodes(mPhotoUris);
             }
 
             adapter.setMultipleSelect(false);
@@ -218,16 +214,20 @@ public class ChatFileStorageFragment extends BottomSheetDialogFragment{
             recyclerView.setLayoutManager(mLayoutManager);
             recyclerView.setAdapter(adapter);
 
-
             //fetch photos from gallery
             new FetchPhotosTask(fileStorageFragment).execute();
+
+            if (adapter.getItemCount() == 0){
+                recyclerView.setVisibility(View.GONE);
+                emptyTextView.setVisibility(View.VISIBLE);
+            }else{
+                recyclerView.setVisibility(View.VISIBLE);
+                emptyTextView.setVisibility(View.GONE);
+            }
+
         }
 
-//        if (adapter.getItemCount() == 0){
-//            recyclerView.setVisibility(View.VISIBLE);
-//        }else{
-//            recyclerView.setVisibility(View.VISIBLE);
-//        }
+
             return v;
     }
 
@@ -269,9 +269,11 @@ public class ChatFileStorageFragment extends BottomSheetDialogFragment{
                 adapter.setNodes(mPhotoUris);
 
                 if (adapter.getItemCount() == 0){
-                    recyclerView.setVisibility(View.VISIBLE);
+                    recyclerView.setVisibility(View.GONE);
+                    emptyTextView.setVisibility(View.VISIBLE);
                 }else{
                     recyclerView.setVisibility(View.VISIBLE);
+                    emptyTextView.setVisibility(View.GONE);
                 }
             }
             else{
@@ -409,10 +411,12 @@ public class ChatFileStorageFragment extends BottomSheetDialogFragment{
         String filePath;
         if(isMultipleselect()){
             for(Integer element:posSelected){
-                filePath = mPhotoUris.get(element);
-               ((ChatActivityLollipop) getActivity()).uploadPicture(filePath);
+                //filePath = mPhotoUris.get(element);
+                filePath = imagesPath.get(element);
+                ((ChatActivityLollipop) getActivity()).uploadPicture(filePath);
             }
-            adapter.clearSelections();
+            clearSelections();
+            hideMultipleSelect();
         }
     }
 
@@ -425,12 +429,9 @@ public class ChatFileStorageFragment extends BottomSheetDialogFragment{
 
         @Override
         protected void onPreExecute() {
-            Log.d("************","************ onPreExecute");
-
             ChatFileStorageFragment context = mContextWeakReference.get();
             if (context != null) {
                 //context.mProgressDialog.show();
-
             }
         }
 
@@ -454,6 +455,7 @@ public class ChatFileStorageFragment extends BottomSheetDialogFragment{
                     List<String> photoUris = new ArrayList<>(cursor.getCount());
                     while (cursor.moveToNext()) {
                         photoUris.add("file://" + cursor.getString(dataColumn));
+                        context.createImagesPath(cursor.getString(dataColumn));
                     }
                     cursor.close();
 
@@ -471,15 +473,24 @@ public class ChatFileStorageFragment extends BottomSheetDialogFragment{
             ChatFileStorageFragment context = mContextWeakReference.get();
             if (context != null) {
                 //context.mProgressDialog.dismiss();
-
                 if (photoUris != null && photoUris.size() > 0) {
                     context.mPhotoUris.clear();
                     context.mPhotoUris.addAll(photoUris);
                     context.adapter.notifyDataSetChanged();
                 }
+                if (context.adapter.getItemCount() == 0){
+                    context.recyclerView.setVisibility(View.GONE);
+                    context.emptyTextView.setVisibility(View.VISIBLE);
+                }else{
+                    context.recyclerView.setVisibility(View.VISIBLE);
+                    context.emptyTextView.setVisibility(View.GONE);
+                }
             }
         }
     }
 
+    public void createImagesPath(String path){
+        imagesPath.add(path);
+    }
 
 }

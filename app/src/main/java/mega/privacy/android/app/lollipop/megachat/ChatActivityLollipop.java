@@ -212,6 +212,13 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     ImageButton pickCloudDriveButton;
     ImageButton pickFileStorageButton;
 
+    RelativeLayout rLKeyboardButton;
+    RelativeLayout rLMediaButton;
+    RelativeLayout rLSendContactButton ;
+    RelativeLayout rLPickFileSystemButton;
+    RelativeLayout rLPickCloudDriveButton;
+    RelativeLayout rLPickFileStorageButton;
+
     EmojiconEditText textChat;
     ImageButton sendIcon;
     RelativeLayout messagesContainerLayout;
@@ -490,6 +497,13 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         writingLayout = (RelativeLayout) findViewById(R.id.writing_linear_layout_chat);
         disabledWritingLayout = (RelativeLayout) findViewById(R.id.writing_disabled_linear_layout_chat);
 
+        rLKeyboardButton = (RelativeLayout) findViewById(R.id.rl_keyboard_icon_chat);
+        rLMediaButton = (RelativeLayout) findViewById(R.id.rl_media_icon_chat);
+        rLSendContactButton = (RelativeLayout) findViewById(R.id.rl_send_contact_icon_chat);
+        rLPickFileSystemButton = (RelativeLayout) findViewById(R.id.rl_pick_file_system_icon_chat);
+        rLPickFileStorageButton = (RelativeLayout) findViewById(R.id.rl_pick_file_storage_icon_chat);
+        rLPickCloudDriveButton = (RelativeLayout) findViewById(R.id.rl_pick_cloud_drive_icon_chat);
+
         keyboardButton = (ImageButton) findViewById(R.id.keyboard_icon_chat);
         mediaButton = (ImageButton) findViewById(R.id.media_icon_chat);
         sendContactButton = (ImageButton) findViewById(R.id.send_contact_icon_chat);
@@ -498,19 +512,28 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         pickCloudDriveButton = (ImageButton) findViewById(R.id.pick_cloud_drive_icon_chat);
 
         textChat = (EmojiconEditText) findViewById(R.id.edit_text_chat);
+
+        rLKeyboardButton.setOnClickListener(this);
+        rLMediaButton.setOnClickListener(this);
+        rLSendContactButton.setOnClickListener(this);
+        rLPickFileSystemButton.setOnClickListener(this);
+        rLPickFileStorageButton.setOnClickListener(this);
+        rLPickCloudDriveButton.setOnClickListener(this);
+
         keyboardButton.setOnClickListener(this);
         mediaButton.setOnClickListener(this);
         sendContactButton.setOnClickListener(this);
         pickFileSystemButton.setOnClickListener(this);
-        pickCloudDriveButton.setOnClickListener(this);
         pickFileStorageButton.setOnClickListener(this);
+        pickCloudDriveButton.setOnClickListener(this);
 
+        fragmentContainerFileStorage = (FrameLayout) findViewById(R.id.fragment_container_file_storage);
         fileStorageLayout = (RelativeLayout) findViewById(R.id.relative_layout_file_storage);
-
         fileStorageLayout.setVisibility(View.GONE);
 
 //        imageView = (ImageView) findViewById(R.id.imageView);
-       fragmentContainerFileStorage = (FrameLayout) findViewById(R.id.fragment_container_file_storage);
+
+
        // GridView gallery = (GridView) findViewById(R.id.galleryGridView);
 
         //gallery.setAdapter(new ImageAdapter(this));
@@ -531,7 +554,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 //        });
 
         textChat.addTextChangedListener(new TextWatcher() {
-
             public void afterTextChanged(Editable s) {}
 
             public void beforeTextChanged(CharSequence s, int start,
@@ -604,8 +626,11 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     removeEmojiconFragment();
                 }
                 if(fileStorageLayout.isShown()){
+                    if(FileStorageF != null){
+                        FileStorageF.clearSelections();
+                        FileStorageF.hideMultipleSelect();
+                    }
                     fileStorageLayout.setVisibility(View.GONE);
-
                 }
                 return false;
             }
@@ -621,6 +646,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     removeEmojiconFragment();
                 }
                 if(fileStorageLayout.isShown()){
+                    if(FileStorageF != null){
+                        FileStorageF.clearSelections();
+                        FileStorageF.hideMultipleSelect();
+                    }
                     fileStorageLayout.setVisibility(View.GONE);
                 }
                 textChat.requestFocus();
@@ -1870,12 +1899,11 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             keyboardButton.setImageResource(R.drawable.ic_emoticon_white);
             removeEmojiconFragment();
         }else if(fileStorageLayout.isShown()){
-            fileStorageLayout.setVisibility(View.GONE);
-            if(adapter != null){
-                log("####Fragment != null");
-
-                adapter.clearSelections();
+            if(FileStorageF != null){
+                FileStorageF.clearSelections();
+                FileStorageF.hideMultipleSelect();
             }
+            fileStorageLayout.setVisibility(View.GONE);
         }else{
             finish();
         }
@@ -1887,7 +1915,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     @Override
     public void onClick(View v) {
-
+        log("onClick");
         if(megaChatApi.isSignalActivityRequired()){
             megaChatApi.signalPresenceActivity();
         }
@@ -1934,11 +1962,13 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
                 break;
             }
-            case R.id.keyboard_icon_chat:{
+            case R.id.keyboard_icon_chat:
+            case R.id.rl_keyboard_icon_chat:{
                 log("open emoji keyboard:  " + emojiKeyboardShown);
                 if(fileStorageLayout.isShown()){
                     if(FileStorageF != null){
                         FileStorageF.clearSelections();
+                        FileStorageF.hideMultipleSelect();
                     }
                     fileStorageLayout.setVisibility(View.GONE);
                 }
@@ -1977,9 +2007,14 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 break;
             }
 
-            case R.id.media_icon_chat:{
+            case R.id.media_icon_chat:
+            case R.id.rl_media_icon_chat:{
 
                 if(fileStorageLayout.isShown()){
+                    if(FileStorageF != null){
+                        FileStorageF.clearSelections();
+                        FileStorageF.hideMultipleSelect();
+                    }
                     fileStorageLayout.setVisibility(View.GONE);
                 }
                 if (emojiKeyboardShown) {
@@ -1993,13 +2028,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     }else{
                         imm.hideSoftInputFromWindow(textChat.getWindowToken(), 0);
                     }
-                }
-
-                if(fileStorageLayout.isShown()){
-                    if(FileStorageF != null){
-                        FileStorageF.clearSelections();
-                    }
-                    fileStorageLayout.setVisibility(View.GONE);
                 }
 
                 isTakePicture = true;
@@ -2029,10 +2057,13 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
                 break;
             }
-            case R.id.send_contact_icon_chat:{
+
+            case R.id.send_contact_icon_chat:
+            case R.id.rl_send_contact_icon_chat:{
                 if(fileStorageLayout.isShown()){
                     if(FileStorageF != null){
                         FileStorageF.clearSelections();
+                        FileStorageF.hideMultipleSelect();
                     }
                     fileStorageLayout.setVisibility(View.GONE);
                 }
@@ -2052,10 +2083,13 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
                 break;
             }
-            case R.id.pick_file_system_icon_chat:{
+
+            case R.id.pick_file_system_icon_chat:
+            case R.id.rl_pick_file_system_icon_chat:{
                 if(fileStorageLayout.isShown()){
                     if(FileStorageF != null){
                         FileStorageF.clearSelections();
+                        FileStorageF.hideMultipleSelect();
                     }
                     fileStorageLayout.setVisibility(View.GONE);
                 }
@@ -2075,10 +2109,13 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 attachPhotoVideo();
                 break;
             }
-            case R.id.pick_cloud_drive_icon_chat:{
+
+            case R.id.pick_cloud_drive_icon_chat:
+            case R.id.rl_pick_cloud_drive_icon_chat:{
                 if(fileStorageLayout.isShown()){
                     if(FileStorageF != null){
                         FileStorageF.clearSelections();
+                        FileStorageF.hideMultipleSelect();
                     }
                     fileStorageLayout.setVisibility(View.GONE);
                 }
@@ -2100,7 +2137,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 break;
             }
 
-            case R.id.pick_file_storage_icon_chat:{
+            case R.id.pick_file_storage_icon_chat:
+            case R.id.rl_pick_file_storage_icon_chat:{
                 if (emojiKeyboardShown) {
                     keyboardButton.setImageResource(R.drawable.ic_emoticon_white);
                     removeEmojiconFragment();
@@ -2117,6 +2155,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 if(fileStorageLayout.isShown()){
                     if(FileStorageF != null){
                         FileStorageF.clearSelections();
+                        FileStorageF.hideMultipleSelect();
                     }
                     fileStorageLayout.setVisibility(View.GONE);
                 }else{
@@ -5075,11 +5114,12 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         activityVisible = true;
 
         setLastMessageSeen();
-       fileStorageLayout.setVisibility(View.GONE);
-       if(adapter != null){
-           log("####Fragment != null");
 
-           adapter.clearSelections();
+       fileStorageLayout.setVisibility(View.GONE);
+       if(FileStorageF != null){
+           FileStorageF.clearSelections();
+           FileStorageF.hideMultipleSelect();
+
        }
 
         if (emojiKeyboardShown){
@@ -5193,8 +5233,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     }
 
     public void uploadPicture(String imagePath){
-        log("==========uploadPicture");
-
+        log("uploadPicture");
         Intent intent = new Intent(this, ChatUploadService.class);
         File selfie = new File(imagePath);
 
@@ -5203,28 +5242,19 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         if(idPendingMsg!=-1){
             intent.putExtra(ChatUploadService.EXTRA_ID_PEND_MSG, idPendingMsg);
         }
-
-        log("name of the file: "+selfie.getName());
-        log("size of the file: "+selfie.length());
-
         PendingNodeAttachment nodeAttachment = null;
 
         if(sendOriginalAttachments){
-            log("==========sendOriginalAttachments");
+            log("sendOriginalAttachments");
 
             String fingerprint = megaApi.getFingerprint(selfie.getAbsolutePath());
 
             //Add node to db
             long idNode = dbH.setNodeAttachment(selfie.getAbsolutePath(), selfie.getName(), fingerprint);
-
             dbH.setMsgNode(idPendingMsg, idNode);
-
             nodeAttachment = new PendingNodeAttachment(selfie.getAbsolutePath(), fingerprint, selfie.getName());
 
-        }
-        else{
-            log("========== NOT sendOriginalAttachments");
-
+        }else{
             File previewDir = PreviewUtils.getPreviewFolder(this);
             String nameFilePreview = idChat+"_"+selfie.getName();
             File preview = new File(previewDir, nameFilePreview);
@@ -5232,8 +5262,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             boolean isPreview = megaApi.createPreview(selfie.getAbsolutePath(), preview.getAbsolutePath());
 
             if(isPreview){
-                log("========== YES Preview");
-
                 log("Preview: "+preview.getAbsolutePath());
                 String fingerprint = megaApi.getFingerprint(preview.getAbsolutePath());
 
@@ -5243,10 +5271,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 dbH.setMsgNode(idPendingMsg, idNode);
 
                 nodeAttachment = new PendingNodeAttachment(preview.getAbsolutePath(), fingerprint, selfie.getName());
-            }
-            else{
-                log("==========  NO Preview");
-
+            }else{
                 log("No preview");
                 String fingerprint = megaApi.getFingerprint(selfie.getAbsolutePath());
 
