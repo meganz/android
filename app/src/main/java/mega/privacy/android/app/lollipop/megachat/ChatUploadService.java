@@ -985,7 +985,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 	@Override
 	public void onTransferTemporaryError(MegaApiJava api,
 			MegaTransfer transfer, MegaError e) {
-		log(transfer.getPath() + "\nDownload Temporary Error: " + e.getErrorString() + "__" + e.getErrorCode());
+		log(transfer.getPath() + "\nUpload Temporary Error: " + e.getErrorString() + "__" + e.getErrorCode());
 
 		if(e.getErrorCode() == MegaError.API_EOVERQUOTA) {
 			log("API_EOVERQUOTA error!!");
