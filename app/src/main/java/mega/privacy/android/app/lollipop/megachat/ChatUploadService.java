@@ -429,13 +429,6 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 					File preview = new File(previewDir, MegaApiAndroid.handleToBase64(transfer.getNodeHandle()) + ".jpg");
 
 					Bitmap bmPreview = PreviewUtils.createVideoPreview(transfer.getPath(), MediaStore.Video.Thumbnails.FULL_SCREEN_KIND);
-					if(bmPreview==null){
-						log("Create video preview NULL");
-//						bmPreview= ThumbnailUtilsLollipop.loadVideoThumbnail(transfer.getPath(), this);
-					}
-					else{
-						log("Create Video preview worked!");
-					}
 
                     if(node!=null){
 						if(bmPreview!=null){
@@ -600,7 +593,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 						int height = pdfiumCore.getPageHeightPoint(pdfDocument, pageNumber);
 						Bitmap bmp = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
 						pdfiumCore.renderPageBitmap(pdfDocument, bmp, pageNumber, 0, 0, width, height);
-						Bitmap resizedBitmap = ThumbnailUtilsLollipop.resizeBitmapUpload(bmp, width, height);
+						Bitmap resizedBitmap = PreviewUtils.resizeBitmapUpload(bmp, width, height);
 						out = new FileOutputStream(preview);
 						boolean result = resizedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, out); // bmp is your Bitmap instance
 						if(result){
