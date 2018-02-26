@@ -23,7 +23,6 @@ import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.graphics.Shader.TileMode;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -250,6 +249,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	ContactController cC;
 	AccountController aC;
 	MyAccountInfo myAccountInfo;
+
+	long[] searchDate = null;
 
 	MegaNode selectedNode;
 	MegaOffline selectedOfflineNode;
@@ -10055,7 +10056,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
 
 		refreshAfterMovingToRubbish();
-
 	}
 
 	public void showConfirmationLeaveIncomingShare (final MegaNode n){
@@ -10344,6 +10344,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 	public void showContactOptionsPanel(MegaContactAdapter user){
 		log("showContactOptionsPanel");
+
+		if(!Util.isOnline(this)){
+			showSnackbar(getString(R.string.error_server_connection_problem));
+			return;
+		}
+
 		if(user!=null){
 			this.selectedUser = user;
 			ContactsBottomSheetDialogFragment bottomSheetDialogFragment = new ContactsBottomSheetDialogFragment();
@@ -11138,7 +11144,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				log("Return.....");
 				return;
 			}
-			final long[] searchDate = intent.getLongArrayExtra("SELECTED_DATE");
+			searchDate = intent.getLongArrayExtra("SELECTED_DATE");
 			typeOfSearch = searchDate;
 			if (cuFL != null){
 				if(cuFL.isAdded()){
@@ -11146,9 +11152,27 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					MegaNode nps = megaApi.getNodeByHandle(cameraUploadHandle);
 					if (nps != null){
 						ArrayList<MegaNode> nodes = megaApi.getChildren(nps, MegaApiJava.ORDER_MODIFICATION_DESC);
-						ArrayList<MegaNode> nodesSearch = cuFL.searchDate(searchDate, nodes);
-						cuFL.setNodes(nodesSearch);
-						isSearchEnabled = true;
+						if(searchByDate != null){
+							ArrayList<MegaNode> nodesSearch = cuFL.searchDate(searchDate, nodes);
+							cuFL.setNodes(nodesSearch);
+							isSearchEnabled = true;
+						}
+
+					}
+				}
+			}
+
+			if (muFLol != null){
+				if(muFLol.isAdded()){
+					long cameraUploadHandle = muFLol.getPhotoSyncHandle();
+					MegaNode nps = megaApi.getNodeByHandle(cameraUploadHandle);
+					if (nps != null){
+						ArrayList<MegaNode> nodes = megaApi.getChildren(nps, MegaApiJava.ORDER_MODIFICATION_DESC);
+						if(searchByDate != null){
+							ArrayList<MegaNode> nodesSearch = muFLol.searchDate(searchDate, nodes);
+							muFLol.setNodes(nodesSearch);
+							isSearchEnabled = true;
+						}
 					}
 				}
 			}
@@ -13553,9 +13577,17 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				if (nps != null){
 					log("nps != null");
 					ArrayList<MegaNode> nodes = megaApi.getChildren(nps, MegaApiJava.ORDER_MODIFICATION_DESC);
-//						cuFL.setNodes(megaApi.getFileFolderChildren(nps, MegaApiJava.ORDER_MODIFICATION_DESC));
 
-					cuFL.setNodes(nodes);
+					if(firstNavigationLevel){
+						cuFL.setNodes(nodes);
+					}else{
+						if(searchByDate != null){
+							ArrayList<MegaNode> nodesSearch = cuFL.searchDate(searchDate, nodes);
+							cuFL.setNodes(nodesSearch);
+							isSearchEnabled = true;
+						}
+
+					}
 				}
 			}
 		}
@@ -13568,8 +13600,16 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				if (nps != null){
 					log("nps != null");
 					ArrayList<MegaNode> nodes = megaApi.getChildren(nps, MegaApiJava.ORDER_MODIFICATION_DESC);
-//						muFLol.setNodes(megaApi.getFileFolderChildren(nps, MegaApiJava.ORDER_MODIFICATION_DESC));
-					muFLol.setNodes(nodes);
+					if(firstNavigationLevel){
+						muFLol.setNodes(nodes);
+					}else{
+						if(searchByDate != null){
+							ArrayList<MegaNode> nodesSearch = muFLol.searchDate(searchDate, nodes);
+							muFLol.setNodes(nodesSearch);
+							isSearchEnabled = true;
+						}
+
+					}
 				}
 			}
 		}

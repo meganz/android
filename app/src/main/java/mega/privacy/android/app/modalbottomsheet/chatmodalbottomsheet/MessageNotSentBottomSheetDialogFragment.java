@@ -22,6 +22,8 @@ import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatRoom;
+import nz.mega.sdk.MegaHandleList;
+import nz.mega.sdk.MegaNodeList;
 
 public class MessageNotSentBottomSheetDialogFragment extends BottomSheetDialogFragment implements View.OnClickListener {
 
@@ -117,8 +119,13 @@ public class MessageNotSentBottomSheetDialogFragment extends BottomSheetDialogFr
                 originalMsg = megaChatApi.getMessage(selectedChat.getChatId(), selectedMessage.getMessage().getTempId());
                 if(originalMsg!=null){
                     if(originalMsg.isEditable()){
-                        optionRetryLayout.setVisibility(View.VISIBLE);
-                        optionRetryLayout.setOnClickListener(this);
+                        if((selectedChat.getOwnPrivilege()==MegaChatRoom.PRIV_STANDARD)||(selectedChat.getOwnPrivilege()==MegaChatRoom.PRIV_MODERATOR)){
+                            optionRetryLayout.setVisibility(View.VISIBLE);
+                            optionRetryLayout.setOnClickListener(this);
+                        }
+                        else{
+                            optionRetryLayout.setVisibility(View.GONE);
+                        }
                     }
                     else{
                         optionRetryLayout.setVisibility(View.GONE);
@@ -130,8 +137,13 @@ public class MessageNotSentBottomSheetDialogFragment extends BottomSheetDialogFr
                 }
             }
             else{
-                optionRetryLayout.setVisibility(View.VISIBLE);
-                optionRetryLayout.setOnClickListener(this);
+                if((selectedChat.getOwnPrivilege()==MegaChatRoom.PRIV_STANDARD)||(selectedChat.getOwnPrivilege()==MegaChatRoom.PRIV_MODERATOR)){
+                    optionRetryLayout.setVisibility(View.VISIBLE);
+                    optionRetryLayout.setOnClickListener(this);
+                }
+                else{
+                    optionRetryLayout.setVisibility(View.GONE);
+                }
             }
         }
 
@@ -157,20 +169,50 @@ public class MessageNotSentBottomSheetDialogFragment extends BottomSheetDialogFr
             case R.id.msg_not_sent_retry_layout: {
                 log("retry option click");
                 if(selectedMessage!=null&&selectedChat!=null){
-                    log("selectedMessage content: "+selectedMessage.getMessage().getContent());
+                    if(selectedMessage.getMessage().getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT){
 
-                    ((ChatActivityLollipop) context).removeMsgNotSent();
-                    megaChatApi.removeUnsentMessage(selectedChat.getChatId(), selectedMessage.getMessage().getRowId());
+                        MegaNodeList nodeList = selectedMessage.getMessage().getMegaNodeList();
+                        if(nodeList!=null){
+                            long nodeHandle = nodeList.get(0).getHandle();
 
-                    if(selectedMessage.getMessage().isEdited()){
-                        log("Message is edited --> edit");
-                        if(originalMsg!=null){
-                            ((ChatActivityLollipop) context).editMessageMS(selectedMessage.getMessage().getContent(), originalMsg);
+                            ((ChatActivityLollipop) context).removeMsgNotSent();
+                            megaChatApi.removeUnsentMessage(selectedChat.getChatId(), selectedMessage.getMessage().getRowId());
+
+                            ((ChatActivityLollipop) context).retryNodeAttachment(nodeHandle);
+                        }
+                        else{
+                            log("Error the nodeList cannot be recovered");
                         }
                     }
+                    else if(selectedMessage.getMessage().getType()==MegaChatMessage.TYPE_CONTACT_ATTACHMENT){
+                        long userCount  = selectedMessage.getMessage().getUsersCount();
+
+                        MegaHandleList handleList = MegaHandleList.createInstance();
+
+                        for(int i=0; i<userCount;i++){
+                            long handle = selectedMessage.getMessage().getUserHandle(i);
+                            handleList.addMegaHandle(handle);
+                        }
+
+                        ((ChatActivityLollipop) context).removeMsgNotSent();
+                        megaChatApi.removeUnsentMessage(selectedChat.getChatId(), selectedMessage.getMessage().getRowId());
+
+                        ((ChatActivityLollipop) context).retryContactAttachment(handleList);
+                    }
                     else{
-                        log("Message NOT edited --> send");
-                        ((ChatActivityLollipop) context).sendMessage(selectedMessage.getMessage().getContent());
+                        ((ChatActivityLollipop) context).removeMsgNotSent();
+                        megaChatApi.removeUnsentMessage(selectedChat.getChatId(), selectedMessage.getMessage().getRowId());
+
+                        if(selectedMessage.getMessage().isEdited()){
+                            log("Message is edited --> edit");
+                            if(originalMsg!=null){
+                                ((ChatActivityLollipop) context).editMessageMS(selectedMessage.getMessage().getContent(), originalMsg);
+                            }
+                        }
+                        else{
+                            log("Message NOT edited --> send");
+                            ((ChatActivityLollipop) context).sendMessage(selectedMessage.getMessage().getContent());
+                        }
                     }
                 }
                 else{

@@ -13,6 +13,7 @@ public class PendingMessage {
     long id;
     long uploadTimestamp;
     int state;
+    String videoDownSampled;
 
     public PendingMessage(long id, long chatId, ArrayList<String> filePaths, int state) {
         this.id = id;
@@ -112,6 +113,14 @@ public class PendingMessage {
             names.add(nodeAttachments.get(i).getName());
         }
         return names;
+    }
+
+    public String getVideoDownSampled() {
+        return videoDownSampled;
+    }
+
+    public void setVideoDownSampled(String videoDownSampled) {
+        this.videoDownSampled = videoDownSampled;
     }
 
     public int getState() {
