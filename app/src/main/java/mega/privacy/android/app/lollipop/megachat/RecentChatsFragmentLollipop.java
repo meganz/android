@@ -61,14 +61,6 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
 
     private static final String BUNDLE_RECYCLER_LAYOUT = "classname.recycler.layout";
 
-    //define source of MediaStore.Images.Media, internal or external storage
-    final Uri sourceUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
-    final Uri thumbUri = MediaStore.Images.Thumbnails.EXTERNAL_CONTENT_URI;
-    final String thumb_DATA = MediaStore.Images.Thumbnails.DATA;
-    final String thumb_IMAGE_ID = MediaStore.Images.Thumbnails.IMAGE_ID;
-
-    SimpleCursorAdapter mySimpleCursorAdapter;
-
     MegaApiAndroid megaApi;
     MegaChatApiAndroid megaChatApi;
 
