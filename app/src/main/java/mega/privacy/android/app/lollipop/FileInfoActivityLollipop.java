@@ -117,6 +117,8 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
 	boolean firstIncomingLevel=true;
 
+	ArrayList<MegaNode> nodeVersions;
+
 	RelativeLayout iconToolbarLayout;
 	ImageView iconToolbarView;
 	ImageView iconToolbarViewLink;
@@ -165,6 +167,10 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 	ImageView publicLinkIcon;
 	Button publicLinkButton;
 
+	RelativeLayout versionsLayout;
+	Button versionsButton;
+	View separatorVersions;
+
 //	ImageView publicLinkImage;
 	SwitchCompat offlineSwitch;
 
@@ -210,7 +216,6 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 	MenuItem leaveMenuItem;
 
 	MegaNode node;
-	long handle;
 
 	boolean availableOfflineBoolean = false;
 
@@ -319,9 +324,9 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 				firstIncomingLevel = extras.getBoolean("firstLevel");
 			}
 			accountType = extras.getInt("typeAccount", MegaAccountDetails.ACCOUNT_TYPE_FREE);
-			handle = extras.getLong("handle", -1);
-			log("Handle of the selected node: "+handle);
-			node = megaApi.getNodeByHandle(handle);
+			long handleNode = extras.getLong("handle", -1);
+			log("Handle of the selected node: "+handleNode);
+			node = megaApi.getNodeByHandle(handleNode);
 			if (node == null){
 				log("Node is NULL");
 				finish();
@@ -384,8 +389,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
 			offlineSwitch = (SwitchCompat) findViewById(R.id.file_properties_switch);
 
-			final long handleNode = node.getHandle();
-			MegaNode parent = megaApi.getNodeByHandle(handleNode);
+			MegaNode parent = megaApi.getNodeByHandle(node.getHandle());
 			while (megaApi.getParentNode(parent) != null){
 				parent = megaApi.getParentNode(parent);
 			}
@@ -488,6 +492,24 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 		    modifiedLayout = (RelativeLayout) findViewById(R.id.file_properties_modified_layout);
 			modifiedTextView = (TextView) findViewById(R.id.file_properties_info_data_modified);
 
+			//Versions Layout
+			versionsLayout = (RelativeLayout) findViewById(R.id.file_properties_versions_layout);
+			versionsButton = (Button) findViewById(R.id.file_properties_text_number_versions);
+			separatorVersions = (View) findViewById(R.id.separator_versions);
+
+			if(megaApi.hasVersions(node)){
+				versionsLayout.setVisibility(View.VISIBLE);
+				versionsButton.setText(String.format(getString(R.string.number_of_versions), megaApi.getNumVersions(node)));
+				versionsButton.setOnClickListener(this);
+				separatorVersions.setVisibility(View.VISIBLE);
+
+				nodeVersions = megaApi.getVersions(node);
+			}
+			else{
+				versionsLayout.setVisibility(View.GONE);
+				separatorVersions.setVisibility(View.GONE);
+			}
+
 		}
 		else{
 			log("Extras is NULL");
@@ -530,7 +552,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 		leaveMenuItem = menu.findItem(R.id.cab_menu_file_info_leave);
 
 
-		MegaNode parent = megaApi.getNodeByHandle(handle);
+		MegaNode parent = megaApi.getNodeByHandle(node.getHandle());
 		while (megaApi.getParentNode(parent) != null){
 			parent = megaApi.getParentNode(parent);
 		}
@@ -657,9 +679,6 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 				if (node.isFolder()){
 					shareMenuItem.setVisible(true);
 					menu.findItem(R.id.cab_menu_file_info_share_folder).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-
-
-
 				}
 				else{
 					shareMenuItem.setVisible(false);
@@ -1353,6 +1372,12 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 
 		switch (v.getId()) {
+			case R.id.file_properties_text_number_versions:{
+                Intent i = new Intent(this, VersionsFileActivity.class);
+                i.putExtra("handle", node.getHandle());
+                startActivity(i);
+				break;
+			}
 			case R.id.file_properties_link_button:{
 				log("copy link button");
 				if(Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
@@ -2185,7 +2210,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 				if (preview.exists()) {
 					if (preview.length() > 0) {
 						Bitmap bitmap = PreviewUtils.getBitmapForCache(preview, this);
-						PreviewUtils.previewCache.put(handle, bitmap);
+						PreviewUtils.previewCache.put(node.getHandle(), bitmap);
 						if (iconToolbarView != null){
 							imageToolbarView.setImageBitmap(bitmap);
 							imageToolbarLayout.setVisibility(View.VISIBLE);
@@ -2544,28 +2569,102 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 		log("onNodesUpdate");
 
 		boolean thisNode = false;
+		boolean anyChild = false;
 		if(nodes==null){
 			return;
 		}
-
+		MegaNode n = null;
 		Iterator<MegaNode> it = nodes.iterator();
 		while (it.hasNext()){
-			MegaNode n = it.next();
-			if (n != null){
-				if (n.getHandle() == handle){
+			MegaNode nodeToCheck = it.next();
+			if (nodeToCheck != null){
+				if (nodeToCheck.getHandle() == node.getHandle()){
 					thisNode = true;
+					n = nodeToCheck;
+					break;
+				}
+				else{
+					for(int j=0; j<nodeVersions.size();j++){
+						if(nodeToCheck.getHandle()==nodeVersions.get(j).getHandle()){
+							if(anyChild==false){
+								anyChild = true;
+								break;
+							}
+						}
+					}
 				}
 			}
 		}
 
-		if (!thisNode){
+		if ((!thisNode)&&(!anyChild)){
 			log("exit onNodesUpdate - Not related to this node");
 			return;
 		}
 
-		if (handle != -1){
-			log("node updated");
-			node = megaApi.getNodeByHandle(handle);
+		//Check if the parent handle has changed
+		if(n!=null){
+			if(n.hasChanged(MegaNode.CHANGE_TYPE_PARENT)){
+				MegaNode oldParent = megaApi.getParentNode(node);
+				MegaNode newParent = megaApi.getParentNode(n);
+				if(oldParent.getHandle()==newParent.getHandle()){
+					log("New version added");
+					node = newParent;
+				}
+				else{
+					node = n;
+				}
+				if(megaApi.hasVersions(node)){
+					nodeVersions = megaApi.getVersions(node);
+				}
+				else{
+					nodeVersions = null;
+				}
+			}
+			else if(n.hasChanged(MegaNode.CHANGE_TYPE_REMOVED)){
+				if(thisNode){
+					if(nodeVersions!=null){
+						node = nodeVersions.get(1);
+						if(megaApi.hasVersions(node)){
+							nodeVersions = megaApi.getVersions(node);
+						}
+						else{
+							nodeVersions = null;
+						}
+					}
+					else{
+						finish();
+					}
+				}
+				else if(anyChild){
+					if(megaApi.hasVersions(n)){
+						nodeVersions = megaApi.getVersions(n);
+					}
+					else{
+						nodeVersions = null;
+					}
+				}
+
+			}
+			else{
+				node = n;
+				if(megaApi.hasVersions(node)){
+					nodeVersions = megaApi.getVersions(node);
+				}
+				else{
+					nodeVersions = null;
+				}
+			}
+		}
+		else{
+			if(anyChild){
+				if(megaApi.hasVersions(node)){
+					nodeVersions = megaApi.getVersions(node);
+				}
+				else{
+					nodeVersions = null;
+				}
+
+			}
 		}
 
 		if (moveToRubbish){
@@ -2590,10 +2689,14 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 			publicLinkLayout.setVisibility(View.GONE);
 			publicLinkCopyLayout.setVisibility(View.GONE);
 			iconToolbarViewLink.setVisibility(View.GONE);
-
 		}
 
 		if (node.isFolder()){
+			long sizeFile=megaApi.getSize(node);
+			sizeTextView.setText(Formatter.formatFileSize(this, sizeFile));
+
+			contentTextView.setText(MegaApiUtils.getInfoFolder(node, this));
+
 			if (node.isInShare()){
 				imageId = R.drawable.ic_folder_incoming;
 			}
@@ -2656,22 +2759,37 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 					dividerSharedLayout.setVisibility(View.VISIBLE);
 					usersSharedWithTextButton.setText((sl.size())+" "+getResources().getQuantityString(R.plurals.general_num_users,(sl.size()-1)));
 				}
-
-				if (node.getCreationTime() != 0){
-					try {addedTextView.setText(DateUtils.getRelativeTimeSpanString(node.getCreationTime() * 1000));}catch(Exception ex)	{addedTextView.setText("");}
-
-					if (node.getModificationTime() != 0){
-						try {modifiedTextView.setText(DateUtils.getRelativeTimeSpanString(node.getModificationTime() * 1000));}catch(Exception ex)	{modifiedTextView.setText("");}
-					}
-					else{
-						try {modifiedTextView.setText(DateUtils.getRelativeTimeSpanString(node.getCreationTime() * 1000));}catch(Exception ex)	{modifiedTextView.setText("");}
-					}
-				}
-				else{
-					addedTextView.setText("");
-					modifiedTextView.setText("");
-				}
 			}
+		}
+		else{
+
+			sizeTextView.setText(Formatter.formatFileSize(this, node.getSize()));
+		}
+
+		if (node.getCreationTime() != 0){
+			try {addedTextView.setText(DateUtils.getRelativeTimeSpanString(node.getCreationTime() * 1000));}catch(Exception ex)	{addedTextView.setText("");}
+
+			if (node.getModificationTime() != 0){
+				try {modifiedTextView.setText(DateUtils.getRelativeTimeSpanString(node.getModificationTime() * 1000));}catch(Exception ex)	{modifiedTextView.setText("");}
+			}
+			else{
+				try {modifiedTextView.setText(DateUtils.getRelativeTimeSpanString(node.getCreationTime() * 1000));}catch(Exception ex)	{modifiedTextView.setText("");}
+			}
+		}
+		else{
+			addedTextView.setText("");
+			modifiedTextView.setText("");
+		}
+
+		if(megaApi.hasVersions(node)){
+			versionsLayout.setVisibility(View.VISIBLE);
+			versionsButton.setText(String.format(getString(R.string.number_of_versions), megaApi.getNumVersions(node)));
+			versionsButton.setOnClickListener(this);
+			separatorVersions.setVisibility(View.VISIBLE);
+		}
+		else{
+			versionsLayout.setVisibility(View.GONE);
+			separatorVersions.setVisibility(View.GONE);
 		}
 	}
 
