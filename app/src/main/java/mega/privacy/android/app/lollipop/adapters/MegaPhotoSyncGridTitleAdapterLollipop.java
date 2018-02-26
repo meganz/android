@@ -1068,19 +1068,28 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
     }
 
     public void onNodeClick(MegaPhotoSyncGridTitleAdapterLollipop.ViewHolderPhotoTitleSyncGridTitle holder, int positionInNodes){
-        log("onNodeClick");
 
         if (!multipleSelect){
             MegaNode n = megaApi.getNodeByHandle(holder.getDocument());
             if (n != null){
                 if (!n.isFolder()){
                     if (MimeTypeThumbnail.typeForName(n.getName()).isImage()){
-
                         Intent intent = new Intent(context, FullScreenImageViewerLollipop.class);
                         intent.putExtra("position", positionInNodes);
                         intent.putExtra("parentNodeHandle", megaApi.getParentNode(n).getHandle());
-                        intent.putExtra("adapterType", Constants.PHOTO_SYNC_ADAPTER);
                         intent.putExtra("orderGetChildren", orderGetChildren);
+                        if(((ManagerActivityLollipop)context).isFirstNavigationLevel() == true){
+                            intent.putExtra("adapterType", Constants.PHOTO_SYNC_ADAPTER);
+
+                        }else{
+                            intent.putExtra("adapterType", Constants.SEARCH_BY_ADAPTER);
+                            long[] arrayHandles = new long[nodes.size()];
+                            for(int i = 0; i < nodes.size(); i++) {
+                                arrayHandles[i] = nodes.get(i).getHandle();
+                            }
+                            intent.putExtra("handlesNodesSearch",arrayHandles);
+                        }
+
                         MyAccountInfo accountInfo = ((ManagerActivityLollipop)context).getMyAccountInfo();
                         if(accountInfo!=null){
                             intent.putExtra("typeAccount", accountInfo.getAccountType());
