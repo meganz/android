@@ -102,7 +102,6 @@ public class ChatFileStorageFragment extends BottomSheetDialogFragment{
 //    }
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        outState.putString("ggg", "gg");
         super.onSaveInstanceState(outState);
     }
 
