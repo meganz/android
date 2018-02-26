@@ -142,6 +142,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         @Override
         protected void onPostExecute(Integer param){
             if (param == 0){
+                log("Preview recovered from folder");
                 int position = holder.getCurrentPosition();
 
                 AndroidMegaChatMessage message = messages.get(position-1);
@@ -203,6 +204,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             preview = PreviewUtils.getPreviewFromFolder(node, context);
 
             if (preview != null){
+                PreviewUtils.previewCache.put(node.getHandle(), preview);
                 return 0;
             }
             else{
@@ -277,7 +279,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             }
         }
     }
-
 
     private class ChatUploadingPreviewAsyncTask extends AsyncTask<String, Void, Bitmap> {
 
@@ -2153,10 +2154,17 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                                 ((ViewHolderMessageChat)holder).errorUploadingLandscape.setVisibility(View.GONE);
                                                 ((ViewHolderMessageChat)holder).transparentCoatingLandscape.setVisibility(View.GONE);
 
-                                                ((ViewHolderMessageChat)holder).errorUploadingPortrait.setVisibility(View.VISIBLE);
-                                                ((ViewHolderMessageChat)holder).transparentCoatingPortrait.setVisibility(View.VISIBLE);
+                                                if((status==MegaChatMessage.STATUS_SERVER_REJECTED)||(status==MegaChatMessage.STATUS_SENDING_MANUAL)) {
+                                                    ((ViewHolderMessageChat)holder).errorUploadingPortrait.setVisibility(View.VISIBLE);
+                                                    ((ViewHolderMessageChat)holder).transparentCoatingPortrait.setVisibility(View.VISIBLE);
+                                                    ((ViewHolderMessageChat)holder).retryAlert.setVisibility(View.VISIBLE);
+                                                }
+                                                else{
+                                                    ((ViewHolderMessageChat)holder).errorUploadingPortrait.setVisibility(View.GONE);
+                                                    ((ViewHolderMessageChat)holder).transparentCoatingPortrait.setVisibility(View.GONE);
+                                                    ((ViewHolderMessageChat)holder).retryAlert.setVisibility(View.GONE);
+                                                }
 
-                                                ((ViewHolderMessageChat)holder).retryAlert.setVisibility(View.VISIBLE);
                                                 ((ViewHolderMessageChat)holder).ownTriangleIconFile.setVisibility(View.GONE);
 
                                                 ((ViewHolderMessageChat) holder).gradientOwnMessageThumbLand.setVisibility(View.GONE);
@@ -2193,10 +2201,17 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                                 ((ViewHolderMessageChat) holder).errorUploadingPortrait.setVisibility(View.GONE);
                                                 ((ViewHolderMessageChat) holder).transparentCoatingPortrait.setVisibility(View.GONE);
 
-                                                ((ViewHolderMessageChat) holder).errorUploadingLandscape.setVisibility(View.VISIBLE);
-                                                ((ViewHolderMessageChat) holder).transparentCoatingLandscape.setVisibility(View.VISIBLE);
+                                                if((status==MegaChatMessage.STATUS_SERVER_REJECTED)||(status==MegaChatMessage.STATUS_SENDING_MANUAL)) {
+                                                    ((ViewHolderMessageChat) holder).errorUploadingLandscape.setVisibility(View.VISIBLE);
+                                                    ((ViewHolderMessageChat) holder).transparentCoatingLandscape.setVisibility(View.VISIBLE);
+                                                    ((ViewHolderMessageChat) holder).retryAlert.setVisibility(View.VISIBLE);
+                                                }
+                                                else{
+                                                    ((ViewHolderMessageChat) holder).errorUploadingLandscape.setVisibility(View.GONE);
+                                                    ((ViewHolderMessageChat) holder).transparentCoatingLandscape.setVisibility(View.GONE);
+                                                    ((ViewHolderMessageChat) holder).retryAlert.setVisibility(View.GONE);
+                                                }
 
-                                                ((ViewHolderMessageChat) holder).retryAlert.setVisibility(View.VISIBLE);
                                                 ((ViewHolderMessageChat) holder).ownTriangleIconFile.setVisibility(View.GONE);
 
                                                 ((ViewHolderMessageChat) holder).gradientOwnMessageThumbPort.setVisibility(View.GONE);
