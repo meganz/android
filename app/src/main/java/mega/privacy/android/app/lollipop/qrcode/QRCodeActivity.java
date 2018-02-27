@@ -189,6 +189,9 @@ public class QRCodeActivity extends PinActivityLollipop implements MegaRequestLi
                 break;
             }
         }
+        if (contacts) {
+            ScanCodeFragment.scannerView.startCamera();
+        }
 
         return super.onCreateOptionsMenu(menu);
     }

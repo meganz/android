@@ -131,8 +131,6 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener, Me
         if (savedInstanceState != null){
             handle = savedInstanceState.getLong("handle");
             contactLink = savedInstanceState.getString("contactLink");
-            qrcode_link.setText(contactLink);
-            qrcode_copy_link.setEnabled(true);
         }
 
     }
@@ -200,6 +198,11 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener, Me
         qrcode_copy_link = (Button) v.findViewById(R.id.qr_code_button_copy_link);
         qrcode_copy_link.setEnabled(false);
         qrcode_copy_link.setOnClickListener(this);
+
+        if (contactLink != null){
+            qrcode_link.setText(contactLink);
+            qrcode_copy_link.setEnabled(true);
+        }
 
         Configuration configuration = getResources().getConfiguration();
         int width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 280, getResources().getDisplayMetrics());
