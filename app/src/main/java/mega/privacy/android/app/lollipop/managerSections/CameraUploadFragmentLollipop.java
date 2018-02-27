@@ -105,6 +105,8 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	private RecyclerView.LayoutManager mLayoutManager;
 	FastScroller fastScroller;
 
+	long[] arrayHandles = null;
+
 	ImageView emptyImageView;
 	LinearLayout emptyTextView;
 	TextView emptyTextViewFirst;
@@ -1586,6 +1588,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	}
 	
 	public void itemClick(int position) {
+
 		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 		
 		PhotoSyncHolder psHPosition = nodesArray.get(position);
@@ -1617,7 +1620,20 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 							}
 							Intent intent = new Intent(context, FullScreenImageViewerLollipop.class);
 							intent.putExtra("position", positionInNodes);
-							intent.putExtra("adapterType", Constants.FILE_BROWSER_ADAPTER);
+							if(((ManagerActivityLollipop)context).isFirstNavigationLevel() == true){
+								intent.putExtra("adapterType", Constants.PHOTO_SYNC_ADAPTER);
+								arrayHandles = null;
+
+							}else{
+								intent.putExtra("adapterType", Constants.SEARCH_BY_ADAPTER);
+								arrayHandles = new long[nodes.size()];
+								for(int i = 0; i < nodes.size(); i++) {
+									arrayHandles[i] = nodes.get(i).getHandle();
+								}
+								intent.putExtra("handlesNodesSearch",arrayHandles);
+
+							}
+
 							intent.putExtra("isFolderLink", false);
 							if (megaApi.getParentNode(psHMegaNode).getType() == MegaNode.TYPE_ROOT){
 								intent.putExtra("parentNodeHandle", -1L);
@@ -1923,6 +1939,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 
 	public void setNodes(ArrayList<MegaNode> nodes){
 		this.nodes = nodes;
+
 		if (((ManagerActivityLollipop)context).isListCameraUploads()){
 			this.nodesArray.clear();
 			int month = 0;
@@ -2498,4 +2515,6 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 		return nodesResult;
 		//setNodes(nodesResult);
 	}
+
+
 }

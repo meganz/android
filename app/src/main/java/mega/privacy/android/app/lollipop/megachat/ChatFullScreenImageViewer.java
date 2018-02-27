@@ -135,10 +135,10 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.activity_chat_full_screen_image_viewer, menu);
 
-		downloadIcon = menu.findItem(R.id.full_image_viewer_download);
+		downloadIcon = menu.findItem(R.id.chat_full_image_viewer_download);
 		importIcon = menu.findItem(R.id.chat_full_image_viewer_import);
-		saveForOfflineIcon = menu.findItem(R.id.full_image_viewer_save_for_offline);
-		removeIcon = menu.findItem(R.id.full_image_viewer_remove);
+		saveForOfflineIcon = menu.findItem(R.id.chat_full_image_viewer_save_for_offline);
+		removeIcon = menu.findItem(R.id.chat_full_image_viewer_remove);
 
 		return super.onCreateOptionsMenu(menu);
 	}
@@ -147,25 +147,39 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 	public boolean onPrepareOptionsMenu(Menu menu) {
 		log("onPrepareOptionsMenu");
 
-		MegaNode node = messages.get(positionG).getMegaNodeList().get(0);
+		MegaNode node = null;
 
-		if(megaApi.userHandleToBase64(messages.get(positionG).getUserHandle()).equals(megaApi.getMyUserHandle())){
-			if((megaApi.getNodeByHandle(node.getHandle()))==null){
-				log("The node is not mine");
-				removeIcon.setVisible(false);
+		if(!messages.isEmpty()){
+			if(messages.get(positionG).getMegaNodeList()!=null && messages.get(positionG).getMegaNodeList().size()>0){
+				node = messages.get(positionG).getMegaNodeList().get(0);
 			}
-			else{
-				if(messages.get(positionG).isDeletable()){
-					removeIcon.setVisible(true);
-				}
-				else{
+		}
+
+		if(node!=null){
+			if(megaApi.userHandleToBase64(messages.get(positionG).getUserHandle()).equals(megaApi.getMyUserHandle())){
+				if((megaApi.getNodeByHandle(node.getHandle()))==null){
+					log("The node is not mine");
 					removeIcon.setVisible(false);
 				}
+				else{
+					if(messages.get(positionG).isDeletable()){
+						removeIcon.setVisible(true);
+					}
+					else{
+						removeIcon.setVisible(false);
+					}
+				}
+			}
+			else{
+				log("The message is not mine");
+				removeIcon.setVisible(false);
 			}
 		}
 		else{
-			log("The message is not mine");
 			removeIcon.setVisible(false);
+			downloadIcon.setVisible(false);
+			importIcon.setVisible(false);
+			saveForOfflineIcon.setVisible(false);
 		}
 
 		return super.onPrepareOptionsMenu(menu);
@@ -207,12 +221,12 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 				importNode(node);
 				break;
 			}
-			case R.id.full_image_viewer_save_for_offline: {
+			case R.id.chat_full_image_viewer_save_for_offline: {
 				log("save for offline option");
 				showSnackbar("Coming soon...");
 				break;
 			}
-			case R.id.full_image_viewer_remove: {
+			case R.id.chat_full_image_viewer_remove: {
 				log("remove option");
 				MegaChatMessage msg = messages.get(positionG);
 				showConfirmationDeleteNode(chatId, msg);

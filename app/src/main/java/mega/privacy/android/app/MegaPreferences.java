@@ -72,7 +72,7 @@ public class MegaPreferences{
 		this.preferredSortOthers = preferredSortOthers;
 		this.firstTimeChat = firstTimeChat;
 	}
-	
+
 	public String getFirstTime (){
 		return firstTime;
 	}
