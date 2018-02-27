@@ -26,7 +26,7 @@ import nz.mega.sdk.MegaChatApi;
 
 public class DatabaseHandler extends SQLiteOpenHelper {
 	
-	private static final int DATABASE_VERSION = 36;
+	private static final int DATABASE_VERSION = 37;
     private static final String DATABASE_NAME = "megapreferences"; 
     private static final String TABLE_PREFERENCES = "preferences";
     private static final String TABLE_CREDENTIALS = "credentials";
@@ -119,6 +119,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	private static final String KEY_CHAT_SOUND_NOTIFICATIONS = "chatnotificationsound";
 	private static final String KEY_CHAT_VIBRATION_ENABLED = "chatvibrationenabled";
 	private static final String KEY_CHAT_STATUS = "chatstatus";
+	private static final String KEY_CHAT_SEND_ORIGINALS = "sendoriginalsattachments";
 
 	private static final String KEY_INVALIDATE_SDK_CACHE = "invalidatesdkcache";
 
@@ -220,7 +221,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 		String CREATE_CHAT_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_CHAT_SETTINGS + "("
 				+ KEY_ID + " INTEGER PRIMARY KEY, " + KEY_CHAT_ENABLED + " BOOLEAN, " + KEY_CHAT_NOTIFICATIONS_ENABLED + " BOOLEAN, " +
-				KEY_CHAT_SOUND_NOTIFICATIONS+ " TEXT, "+KEY_CHAT_VIBRATION_ENABLED+ " BOOLEAN, "+ KEY_CHAT_STATUS + " TEXT"+")";
+				KEY_CHAT_SOUND_NOTIFICATIONS+ " TEXT, "+KEY_CHAT_VIBRATION_ENABLED+ " BOOLEAN, "+ KEY_CHAT_STATUS + " TEXT, "+ KEY_CHAT_SEND_ORIGINALS + " BOOLEAN"+")";
 		db.execSQL(CREATE_CHAT_TABLE);
 
 		String CREATE_COMPLETED_TRANSFER_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_COMPLETED_TRANSFERS + "("
@@ -537,6 +538,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		if (oldVersion <= 35){
 			db.execSQL("ALTER TABLE " + TABLE_ATTRIBUTES + " ADD COLUMN " + KEY_SHOW_COPYRIGHT + " TEXT;");
 			db.execSQL("UPDATE " + TABLE_ATTRIBUTES + " SET " + KEY_SHOW_COPYRIGHT + " = '" + encrypt("true") + "';");
+		}
+
+		if (oldVersion <= 36){
+			db.execSQL("ALTER TABLE " + TABLE_CHAT_SETTINGS + " ADD COLUMN " + KEY_CHAT_SEND_ORIGINALS + " BOOLEAN;");
+			db.execSQL("UPDATE " + TABLE_CHAT_SETTINGS + " SET " + KEY_CHAT_SEND_ORIGINALS + " = '" + encrypt("false") + "';");
 		}
 	}
 	
@@ -1139,7 +1145,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			String notificationSound = decrypt(cursor.getString(3));
 			String vibrationEnabled = decrypt(cursor.getString(4));
 			String chatStatus = decrypt(cursor.getString(5));
-			chatSettings = new ChatSettings(enabled, notificationsEnabled, notificationSound, vibrationEnabled);
+			String sendOriginalAttachments = decrypt(cursor.getString(6));
+			chatSettings = new ChatSettings(enabled, notificationsEnabled, notificationSound, vibrationEnabled, sendOriginalAttachments);
 		}
 		cursor.close();
 
@@ -1157,6 +1164,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		values.put(KEY_CHAT_SOUND_NOTIFICATIONS, encrypt(chatSettings.getNotificationsSound()));
 		values.put(KEY_CHAT_VIBRATION_ENABLED, encrypt(chatSettings.getVibrationEnabled()));
 
+		values.put(KEY_CHAT_SEND_ORIGINALS, encrypt(chatSettings.getSendOriginalAttachments()));
+
 		db.insert(TABLE_CHAT_SETTINGS, null, values);
 	}
 
@@ -1173,6 +1182,23 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		}
 		else{
 			values.put(KEY_CHAT_ENABLED, encrypt(enabled));
+			db.insert(TABLE_CHAT_SETTINGS, null, values);
+		}
+		cursor.close();
+	}
+
+	public void setSendOriginalAttachments(String originalAttachments){
+		log("setEnabledChat");
+
+		String selectQuery = "SELECT * FROM " + TABLE_CHAT_SETTINGS;
+		ContentValues values = new ContentValues();
+		Cursor cursor = db.rawQuery(selectQuery, null);
+		if (cursor.moveToFirst()){
+			String UPDATE_CHAT_TABLE = "UPDATE " + TABLE_CHAT_SETTINGS + " SET " + KEY_CHAT_SEND_ORIGINALS + "= '" + encrypt(originalAttachments) + "' WHERE " + KEY_ID + " = '1'";
+			db.execSQL(UPDATE_CHAT_TABLE);
+		}
+		else{
+			values.put(KEY_CHAT_SEND_ORIGINALS, encrypt(originalAttachments));
 			db.insert(TABLE_CHAT_SETTINGS, null, values);
 		}
 		cursor.close();

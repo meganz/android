@@ -221,27 +221,8 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         chatSettings = dbH.getChatSettings();
         if(chatSettings==null){
             log("chatSettings is null --> enable chat by default");
-            chatSettings = new ChatSettings(true+"", true + "", "",true + "");
+            chatSettings = new ChatSettings();
             dbH.setChatSettings(chatSettings);
-        }
-        else{
-            MegaPreferences prefs = dbH.getPreferences();
-            if(prefs!=null) {
-                if (prefs.getFirstTimeChat() != null){
-                    if (Boolean.parseBoolean(prefs.getFirstTimeChat()) == true){
-                        log("firstTimeChat true --> enable chat by default");
-                        chatSettings = new ChatSettings(true+"", true + "", "",true + "");
-                        dbH.setChatSettings(chatSettings);
-//                        dbH.setFirstTimeChat(false);
-                    }
-                }
-                else{
-                    log("firstTimeChat is null --> enable chat by default");
-                    chatSettings = new ChatSettings(true+"", true + "", "",true + "");
-                    dbH.setChatSettings(chatSettings);
-//                    dbH.setFirstTimeChat(false);
-                }
-            }
         }
 
         display = ((Activity)context).getWindowManager().getDefaultDisplay();
@@ -818,7 +799,8 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                         // chat cannot initialize, disable chat completely
                         if(chatSettings==null) {
                             log("1 - enableChat: ERROR----> Switch OFF chat");
-                            chatSettings = new ChatSettings(false+"", true + "", "",true + "");
+                            chatSettings = new ChatSettings();
+                            chatSettings.setEnabled(false+"");
                             dbH.setChatSettings(chatSettings);
                         }
                         else{
@@ -919,7 +901,8 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                         log("startFastLogin: condition ret == MegaChatApi.INIT_ERROR");
                         if(chatSettings==null) {
                             log("1 - startFastLogin: ERROR----> Switch OFF chat");
-                            chatSettings = new ChatSettings(false+"", true + "", "",true + "");
+                            chatSettings = new ChatSettings();
+                            chatSettings.setEnabled(false+"");
                             dbH.setChatSettings(chatSettings);
                         }
                         else{
@@ -1120,7 +1103,8 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
                     if(chatSettings==null) {
                         log("1 - ERROR----> Switch OFF chat");
-                        chatSettings = new ChatSettings(false+"", true + "", "",true + "");
+                        chatSettings = new ChatSettings();
+                        chatSettings.setEnabled(false+"");
                         dbH.setChatSettings(chatSettings);
                     }
                     else{
@@ -1682,7 +1666,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
                 if(chatSettings==null) {
                     log("1 - Reset chat setting enable");
-                    chatSettings = new ChatSettings(true+"", true + "", "",true + "");
+                    chatSettings = new ChatSettings();
                     dbH.setChatSettings(chatSettings);
                 }
                 else{
@@ -1832,7 +1816,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
                 if(chatSettings==null) {
                     log("1 - Reset chat setting enable");
-                    chatSettings = new ChatSettings(true+"", true + "", "",true + "");
+                    chatSettings = new ChatSettings();
                     dbH.setChatSettings(chatSettings);
                 }
                 else{
@@ -2365,7 +2349,8 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 log("newState == MegaChatApi.INIT_ERROR");
                 if (chatSettings == null) {
                     log("1 - onChatInitStateUpdate: ERROR----> Switch OFF chat");
-                    chatSettings = new ChatSettings(false + "", true + "", "", true + "");
+                    chatSettings = new ChatSettings();
+                    chatSettings.setEnabled(false+"");
                     dbH.setChatSettings(chatSettings);
                 } else {
                     log("2 - onChatInitStateUpdate: ERROR----> Switch OFF chat");

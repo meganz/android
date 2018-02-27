@@ -362,7 +362,8 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 										log("shouldRun: condition ret == MegaChatApi.INIT_ERROR");
 										if(chatSettings==null) {
 											log("1 - shouldRun: ERROR----> Switch OFF chat");
-											chatSettings = new ChatSettings(false+"", true + "", "",true + "");
+											chatSettings = new ChatSettings();
+											chatSettings.setEnabled(false+"");
 											dbH.setChatSettings(chatSettings);
 										}
 										else{

@@ -1845,6 +1845,18 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         super.onActivityResult(requestCode, resultCode, intent);
     }
 
+    public void retryNodeAttachment(long nodeHandle){
+        megaChatApi.attachNode(idChat, nodeHandle, this);
+    }
+
+    public void retryContactAttachment(MegaHandleList handleList){
+        log("retryContactAttachment");
+        MegaChatMessage contactMessage = megaChatApi.attachContacts(idChat, handleList);
+        if(contactMessage!=null){
+            sendMessageToUI(contactMessage);
+        }
+    }
+
     public void showConfirmationClearChat(final MegaChatRoom c){
         log("showConfirmationClearChat");
 
@@ -2852,53 +2864,57 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     }
                     else{
 
-                        if(m.getMessage().getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT){
+                        if((m.getMessage().getStatus()==MegaChatMessage.STATUS_SERVER_REJECTED)||(m.getMessage().getStatus()==MegaChatMessage.STATUS_SENDING_MANUAL)){
+                            if(m.getMessage().getUserHandle()==megaChatApi.getMyUserHandle()) {
+                                if (!(m.getMessage().isManagementMessage())) {
+                                    log("selected message handle: " + m.getMessage().getTempId());
+                                    log("selected message rowId: " + m.getMessage().getRowId());
+                                    if ((m.getMessage().getStatus() == MegaChatMessage.STATUS_SERVER_REJECTED) || (m.getMessage().getStatus() == MegaChatMessage.STATUS_SENDING_MANUAL)) {
+                                        log("show not sent message panel");
+                                        showMsgNotSentPanel(m, position);
+                                    }
+                                }
+                            }
+                        }
+                        else{
+                            if(m.getMessage().getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT){
 
-                            MegaNodeList nodeList = m.getMessage().getMegaNodeList();
-                            if(nodeList.size()==1){
-                                MegaNode node = nodeList.get(0);
+                                MegaNodeList nodeList = m.getMessage().getMegaNodeList();
+                                if(nodeList.size()==1){
+                                    MegaNode node = nodeList.get(0);
 
-                                if (MimeTypeList.typeForName(node.getName()).isImage()){
-                                    if(node.hasPreview()){
-                                        log("Show full screen viewer");
-                                        showFullScreenViewer(m.getMessage().getMsgId());
+                                    if (MimeTypeList.typeForName(node.getName()).isImage()){
+                                        if(node.hasPreview()){
+                                            log("Show full screen viewer");
+                                            showFullScreenViewer(m.getMessage().getMsgId());
+                                        }
+                                        else{
+                                            log("Image without preview - show node attachment panel for one node");
+                                            showNodeAttachmentBottomSheet(m, position);
+                                        }
                                     }
                                     else{
-                                        log("Image without preview - show node attachment panel for one node");
+                                        log("NOT Image - show node attachment panel for one node");
                                         showNodeAttachmentBottomSheet(m, position);
                                     }
                                 }
                                 else{
-                                    log("NOT Image - show node attachment panel for one node");
+                                    log("show node attachment panel");
                                     showNodeAttachmentBottomSheet(m, position);
                                 }
                             }
-                            else{
-                                log("show node attachment panel");
-                                showNodeAttachmentBottomSheet(m, position);
-                            }
-                        }
-                        if(m.getMessage().getType()==MegaChatMessage.TYPE_CONTACT_ATTACHMENT){
-                            log("show contact attachment panel");
-                            if (m != null) {
-                                if (m.getMessage().getUsersCount() == 1) {
-                                    long userHandle = m.getMessage().getUserHandle(0);
-                                    if(userHandle != megaApi.getMyUser().getHandle()){
+                            else if(m.getMessage().getType()==MegaChatMessage.TYPE_CONTACT_ATTACHMENT){
+                                log("show contact attachment panel");
+                                if (m != null) {
+                                    if (m.getMessage().getUsersCount() == 1) {
+                                        long userHandle = m.getMessage().getUserHandle(0);
+                                        if(userHandle != megaApi.getMyUser().getHandle()){
+                                            showContactAttachmentBottomSheet(m, position);
+                                        }
+                                    }
+                                    else{
                                         showContactAttachmentBottomSheet(m, position);
                                     }
-                                }
-                                else{
-                                    showContactAttachmentBottomSheet(m, position);
-                                }
-                            }
-                        }
-                        else if(m.getMessage().getUserHandle()==megaChatApi.getMyUserHandle()) {
-                            if(!(m.getMessage().isManagementMessage())){
-                                log("selected message handle: "+m.getMessage().getTempId());
-                                log("selected message rowId: "+m.getMessage().getRowId());
-                                if((m.getMessage().getStatus()==MegaChatMessage.STATUS_SERVER_REJECTED)||(m.getMessage().getStatus()==MegaChatMessage.STATUS_SENDING_MANUAL)){
-                                    log("show not sent message panel");
-                                    showMsgNotSentPanel(m, position);
                                 }
                             }
                         }
@@ -3374,6 +3390,29 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 }
                 else{
                     log("NOOOT MESSAGE EDITED");
+                    int resultModify = -1;
+                    if(msg.getUserHandle()==megaChatApi.getMyUserHandle()){
+                        if(msg.getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT){
+                            log("Modify my message and node attachment");
+
+                            long idMsg =  dbH.findPendingMessageByIdTempKarere(msg.getTempId());
+                            log("----The id of my pending message is: "+idMsg);
+                            if(idMsg!=-1){
+                                resultModify = modifyAttachmentReceived(androidMsg, idMsg);
+                                dbH.removePendingMessageById(idMsg);
+                                if(resultModify==-1){
+                                    log("Node attachment message not in list -> resultModify -1");
+//                            AndroidMegaChatMessage msgToAppend = new AndroidMegaChatMessage(msg);
+//                            appendMessagePosition(msgToAppend);
+                                }
+                                else{
+                                    log("onMessageLoaded: Modify attachment");
+                                    return;
+                                }
+                            }
+                        }
+                    }
+
                     int returnValue = modifyMessageReceived(androidMsg, true);
                     if(returnValue!=-1){
                         log("onMessageLoaded: Message " + returnValue + " modified!");
@@ -3661,7 +3700,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }
         }
         else{
-            log("Status change");
+            int statusMsg = msg.getStatus();
+            log("Status change: "+statusMsg);
             log("Temporal id: "+msg.getTempId());
             log("Final id: "+msg.getMsgId());
 
@@ -3697,7 +3737,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 log("-----------Timestamp: "+msg.getTimestamp());
 
                 if(msg.getStatus()==MegaChatMessage.STATUS_SERVER_REJECTED){
-                    log("onMessageLoaded: STATUS_SERVER_REJECTED----- "+msg.getStatus());
+                    log("onMessageUpdate: STATUS_SERVER_REJECTED----- "+msg.getStatus());
                     //Buscar en la de sending por temporal id.
 
                 }
@@ -3870,6 +3910,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 }
             }
             else{
+
                 log("This message is uploading");
             }
         }
@@ -3897,13 +3938,18 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     if(indexToChange<lastI){
                         //Check if there is already any MANUAL_SENDING in the queue
                         AndroidMegaChatMessage previousMessage = messages.get(lastI);
-                        if(previousMessage.getMessage().getStatus()==MegaChatMessage.STATUS_SENDING_MANUAL){
-                            log("More MANUAL SENDING in queue");
-                            log("Removed index: "+indexToChange);
-                            messages.remove(indexToChange);
-                            appendMessageAnotherMS(msg);
-                            adapter.notifyDataSetChanged();
-                            return indexToChange;
+                        if(previousMessage.isUploading()){
+                            log("Previous message is uploading");
+                        }
+                        else{
+                            if(previousMessage.getMessage().getStatus()==MegaChatMessage.STATUS_SENDING_MANUAL){
+                                log("More MANUAL SENDING in queue");
+                                log("Removed index: "+indexToChange);
+                                messages.remove(indexToChange);
+                                appendMessageAnotherMS(msg);
+                                adapter.notifyDataSetChanged();
+                                return indexToChange;
+                            }
                         }
                     }
                 }
@@ -4173,18 +4219,20 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }
             else{
                 log("status of message: "+msg.getMessage().getStatus());
-                while(messages.get(lastIndex).isUploading()){
-                    log("one less index is uploading");
-                    lastIndex--;
-                }
-                while(messages.get(lastIndex).getMessage().getStatus()==MegaChatMessage.STATUS_SENDING_MANUAL){
-                    log("one less index is MANUAL SENDING");
-                    lastIndex--;
-                }
-                if(msg.getMessage().getStatus()==MegaChatMessage.STATUS_SERVER_RECEIVED||msg.getMessage().getStatus()==MegaChatMessage.STATUS_NOT_SEEN){
-                    while(messages.get(lastIndex).getMessage().getStatus()==MegaChatMessage.STATUS_SENDING){
-                        log("one less index");
+                if(lastIndex>=0){
+                    while(messages.get(lastIndex).isUploading()){
+                        log("one less index is uploading");
                         lastIndex--;
+                    }
+                    while(messages.get(lastIndex).getMessage().getStatus()==MegaChatMessage.STATUS_SENDING_MANUAL){
+                        log("one less index is MANUAL SENDING");
+                        lastIndex--;
+                    }
+                    if(msg.getMessage().getStatus()==MegaChatMessage.STATUS_SERVER_RECEIVED||msg.getMessage().getStatus()==MegaChatMessage.STATUS_NOT_SEEN){
+                        while(messages.get(lastIndex).getMessage().getStatus()==MegaChatMessage.STATUS_SENDING){
+                            log("one less index");
+                            lastIndex--;
+                        }
                     }
                 }
                 lastIndex++;
