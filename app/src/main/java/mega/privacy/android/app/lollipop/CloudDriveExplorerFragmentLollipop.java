@@ -84,6 +84,14 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 		if (!adapter.isMultipleSelect()){
 			adapter.setMultipleSelect(true);
 			actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
+
+			if(modeCloud==FileExplorerActivityLollipop.SELECT){
+				if(selectFile) {
+					if (((FileExplorerActivityLollipop) context).multiselect) {
+						activateButton(true);
+					}
+				}
+			}
 		}
 	}
 
@@ -347,6 +355,7 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 					separator.setVisibility(View.VISIBLE);
 					optionsBar.setVisibility(View.VISIBLE);
 					optionButton.setText(getString(R.string.context_send));
+					activateButton(false);
 				}
 				else{
 					separator.setVisibility(View.GONE);
@@ -992,6 +1001,15 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 		if (actionMode != null) {
 			actionMode.finish();
 		}
+
+		if(modeCloud==FileExplorerActivityLollipop.SELECT){
+			if(selectFile) {
+				if (((FileExplorerActivityLollipop) context).multiselect) {
+					activateButton(false);
+				}
+			}
+		}
+
 	}
 
 	public RecyclerView getListView(){
