@@ -93,6 +93,7 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 	private Button dialogButton;
 	private AlertDialog inviteAlertDialog;
 	private AlertDialog requestedAlertDialog;
+	private long handleContactLink = -1;
 	
 	MegaApiAndroid megaApi;
 	MyAccountInfo myAccountInfo;
@@ -157,6 +158,7 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 
 				myEmail = request.getEmail();
 				myUser = megaApi.getContact(myEmail);
+				handleContactLink = request.getNodeHandle();
 				contactName.setText(request.getName() + " " + request.getText());
 				contactMail.setText(request.getEmail());
 				setAvatar();
@@ -374,7 +376,7 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 	public void onClick(View v) {
 		switch (v.getId()){
 			case R.id.accept_contact_invite: {
-				megaApi.inviteContact(myEmail, null, MegaContactRequest.INVITE_ACTION_ADD, (ManagerActivityLollipop) context);
+				megaApi.inviteContact(myEmail, null, MegaContactRequest.INVITE_ACTION_ADD, handleContactLink, (ManagerActivityLollipop) context);
 				if (inviteAlertDialog != null){
 					inviteAlertDialog.dismiss();
 				}

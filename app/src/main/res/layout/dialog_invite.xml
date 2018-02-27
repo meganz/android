@@ -26,9 +26,9 @@
 
     <Button
         android:id="@+id/dialog_invite_button"
-        android:layout_width="64dp"
+        android:layout_width="wrap_content"
         android:layout_height="36dp"
-        android:layout_marginLeft="-16dp"
+        android:layout_marginLeft="-10dp"
         android:textAlignment="center"
         android:background="@android:color/transparent"
         android:elevation="0dp"

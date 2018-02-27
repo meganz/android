@@ -109,6 +109,7 @@ public class QRCodeSaveBottomSheetDialogFragment extends BottomSheetDialogFragme
             intent.putExtra(UploadService.EXTRA_NAME, info.getTitle());
             intent.putExtra(UploadService.EXTRA_PARENT_HASH, parentNode.getHandle());
             intent.putExtra(UploadService.EXTRA_SIZE, info.getSize());
+            intent.putExtra("qrfile", true);
             getActivity().startService(intent);
         }
         else {
