@@ -101,10 +101,13 @@ public class ShareContactsAdapter extends RecyclerView.Adapter<ShareContactsAdap
                 holder.textViewName.setText(contact.getEmail());
             }
         }
-        else {
+        else if (contact.getMegaContactAdapter()){
             if (contact.getFullName() != null){
                 holder.textViewName.setText(contact.getFullName());
             }
+        }
+        else {
+            holder.textViewName.setText(contact.getEmail());
         }
     }
 

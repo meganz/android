@@ -299,6 +299,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 	boolean firstNavigationLevel = true;
     DrawerLayout drawerLayout;
+    ArrayList<MegaUser> contacts = new ArrayList<>();
+    ArrayList<MegaUser> visibleContacts = new ArrayList<>();
 
     public boolean openFolderFromSearch = false;
 
@@ -4587,9 +4589,34 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
     		}
 			case CHAT:{
 				log("chat selected");
+				if (megaApi != null) {
+					contacts = megaApi.getContacts();
+					for (int i=0;i<contacts.size();i++){
+						if (contacts.get(i).getVisibility() == MegaUser.VISIBILITY_VISIBLE){
+
+							MegaContactDB contactDB = dbH.findContactByHandle(String.valueOf(contacts.get(i).getHandle()+""));
+							String fullName = "";
+							if(contactDB!=null){
+								ContactController cC = new ContactController(this);
+								fullName = cC.getFullName(contactDB.getName(), contactDB.getLastName(), contacts.get(i).getEmail());
+							}
+							else{
+								//No name, ask for it and later refresh!!
+								log("CONTACT DB is null");
+								fullName = contacts.get(i).getEmail();
+							}
+							visibleContacts.add(contacts.get(i));
+						}
+					}
+				}
 				selectDrawerItemChat();
 				supportInvalidateOptionsMenu();
-				showFabButton();
+				if (visibleContacts.size() == 0 || visibleContacts.isEmpty() || visibleContacts == null){
+					hideFabButton();
+				}
+				else {
+					showFabButton();
+				}
 				break;
 			}
     	}
@@ -14293,7 +14320,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				break;
 			}
 			case CHAT:{
-				fabButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_chat_white));
 				if(megaChatApi!=null){
 					if(megaChatApi.getChatRooms().size()==0){
 						fabButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_chat_white));
@@ -14303,7 +14329,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				else{
 					fabButton.setVisibility(View.GONE);
 				}
-
 				break;
 			}
 			case SEARCH:{
