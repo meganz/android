@@ -2608,7 +2608,13 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 				MegaNode newParent = megaApi.getParentNode(n);
 				if(oldParent.getHandle()==newParent.getHandle()){
 					log("New version added");
-					node = newParent;
+					if(newParent.isFile()){
+						log("New version added");
+						node = newParent;
+					}
+					else{
+						finish();
+					}
 				}
 				else{
 					node = n;

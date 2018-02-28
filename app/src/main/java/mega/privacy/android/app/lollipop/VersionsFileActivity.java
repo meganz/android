@@ -595,12 +595,18 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 				MegaNode oldParent = megaApi.getParentNode(node);
 				MegaNode newParent = megaApi.getParentNode(n);
 				if(oldParent.getHandle()==newParent.getHandle()){
-					log("New version added");
-					node = newParent;
+					if(newParent.isFile()){
+						log("New version added");
+						node = newParent;
+					}
+					else{
+						finish();
+					}
 				}
 				else{
 					node = n;
 				}
+				log("Node name: "+node.getName());
 				if(megaApi.hasVersions(node)){
 					nodeVersions = megaApi.getVersions(node);
 				}
@@ -650,15 +656,17 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 				}
 				else{
 					nodeVersions = null;
+					finish();
 				}
 
 			}
 		}
 
-		log("After update - nodeVersions size: "+nodeVersions.size());
 		if(nodeVersions.size()==1){
 			finish();
 		}
+
+		log("After update - nodeVersions size: "+nodeVersions.size());
 
 		if(adapter!=null){
 			adapter.setNodes(nodeVersions);
