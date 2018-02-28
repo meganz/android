@@ -338,8 +338,6 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
 
     @Override
     public ViewHolderPhotoTitleSyncGridTitle onCreateViewHolder(ViewGroup parent, int viewType) {
-        log("onBindViewHolder");
-
         log("onCreateViewHolder");
 
         dbH = DatabaseHandler.getDbHandler(context);
@@ -446,7 +444,6 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
     }
 
     public class ViewHolderPhotoTitleSyncGridTitle extends RecyclerView.ViewHolder implements ThumbnailUtilsLollipop.ThumbnailInterface{
-
         private RelativeLayout layout_title;
         private TextView title;
         private ImageView photo;
@@ -996,7 +993,6 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
      */
     public void hideMultipleSelect() {
         log("hideMultipleSelect");
-
         this.multipleSelect = false;
         ((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_TRANSPARENT_BLACK);
 //        clearSelections();
@@ -1007,7 +1003,6 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
     }
 
     public void selectAll(){
-
         this.multipleSelect = true;
         if(nodes != null){
             for(int i=0; i<nodes.size(); i++){
@@ -1032,7 +1027,6 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
 
     public void clearSelections() {
         log("clearSelections");
-
         hideMultipleSelect();
         for (int i = 0; i < checkedItems.size(); i++) {
             if (checkedItems.valueAt(i) == true) {
@@ -1046,7 +1040,6 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
     }
 
     public boolean isChecked(int totalPosition){
-
         if (!multipleSelect){
             return false;
         }
@@ -1062,6 +1055,7 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
     }
 
     public void onNodeClick(MegaPhotoSyncGridTitleAdapterLollipop.ViewHolderPhotoTitleSyncGridTitle holder, int positionInNodes){
+        log("onNodeClick");
 
         if (!multipleSelect){
             MegaNode n = megaApi.getNodeByHandle(holder.getDocument());
@@ -1254,6 +1248,7 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
     }
 
     private void updateActionModeTitle() {
+
         log("updateActionModeTitle");
         if (actionMode == null){
             log("actionMode null");
@@ -1406,7 +1401,6 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
                 return 1;
             }
             case TYPE_NO_TYPE:
-                log("Error, NO TYPE");
                 break;
         }
         return 0;

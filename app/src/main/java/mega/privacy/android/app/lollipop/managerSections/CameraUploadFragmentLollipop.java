@@ -625,7 +625,6 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		
 		log("onCreateView");		
 		
 		if (megaApi == null){
