@@ -575,7 +575,6 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 										File oldPreview = new File(previewDir, transfer.getFileName()+".jpg");
 										if (oldPreview.exists()){
 											log("preview exists!!!");
-											oldPreview.renameTo(preview);
 											oldPreview.delete();
 										}
 										megaApi.setPreview(node, preview.getAbsolutePath(), this);
@@ -736,10 +735,9 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 							log("Compress OK!");
 							File oldPreview = new File(previewDir, transfer.getFileName()+".jpg");
 							if (oldPreview.exists()){
-								oldPreview.renameTo(preview);
 								oldPreview.delete();
 							}
-							megaApi.setPreview(pdfNode, preview.getAbsolutePath());
+							megaApi.setPreview(pdfNode, preview.getAbsolutePath(), this);
 						}
 						else{
 							log("Not Compress");
@@ -1012,6 +1010,9 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 		log("onRequestStart: " + request.getName());
 		if (request.getType() == MegaRequest.TYPE_COPY){
 			updateProgressNotification();
+		}
+		else if (request.getType() == MegaRequest.TYPE_SET_ATTR_FILE) {
+			log("TYPE_SET_ATTR_FILE");
 		}
 	}
 
