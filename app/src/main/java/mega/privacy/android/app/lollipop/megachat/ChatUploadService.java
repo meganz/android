@@ -1,6 +1,7 @@
 package mega.privacy.android.app.lollipop.megachat;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -115,9 +116,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 
 		megaApi = app.getMegaApi();
 		megaChatApi = app.getMegaChatApi();
-
 		megaApi.addTransferListener(this);
-
 		pendingMessages = new ArrayList<>();
 
 		dbH = DatabaseHandler.getDbHandler(getApplicationContext());
@@ -559,13 +558,12 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 
 					File previewDir = PreviewUtils.getPreviewFolder(this);
 					File preview = new File(previewDir, MegaApiAndroid.handleToBase64(transfer.getNodeHandle()) + ".jpg");
-
 					Bitmap bmPreview = PreviewUtils.createVideoPreview(transfer.getPath(), MediaStore.Video.Thumbnails.FULL_SCREEN_KIND);
 
                     if(node!=null){
 						if(bmPreview!=null){
-							try {
-								preview.createNewFile();
+//							try {
+//								preview.createNewFile();
 
 								FileOutputStream out = null;
 								try {
@@ -574,6 +572,11 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 									boolean result = bmPreview.compress(Bitmap.CompressFormat.JPEG, 100, out); // bmp is your Bitmap instance
 									if(result){
 										log("Compress OK!");
+										File oldPreview = new File(previewDir, transfer.getFileName()+".jpg");
+										if (oldPreview.exists()){
+											log("preview exists!!!");
+											oldPreview.delete();
+										}
 										megaApi.setPreview(node, preview.getAbsolutePath(), this);
 									}
 									else{
@@ -590,10 +593,10 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 										log("Error: "+e.getMessage());
 									}
 								}
-
-							} catch (IOException e1) {
-								log("Error creating new preview file: "+e1.getMessage());
-							}
+//
+//							} catch (IOException e1) {
+//								log("Error creating new preview file: "+e1.getMessage());
+//							}
 						}
 						else{
 							log("Create video preview NULL");
@@ -730,7 +733,11 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 						boolean result = resizedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, out); // bmp is your Bitmap instance
 						if(result){
 							log("Compress OK!");
-							megaApi.setPreview(pdfNode, preview.getAbsolutePath());
+							File oldPreview = new File(previewDir, transfer.getFileName()+".jpg");
+							if (oldPreview.exists()){
+								oldPreview.delete();
+							}
+							megaApi.setPreview(pdfNode, preview.getAbsolutePath(), this);
 						}
 						else{
 							log("Not Compress");
@@ -752,7 +759,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
                 }
 
                 attachNodes(transfer);
-            }
+			}
             else{
                 log("Upload Error: " + transfer.getFileName() + "_" + error.getErrorCode() + "___" + error.getErrorString());
 
@@ -1004,12 +1011,24 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 		if (request.getType() == MegaRequest.TYPE_COPY){
 			updateProgressNotification();
 		}
+		else if (request.getType() == MegaRequest.TYPE_SET_ATTR_FILE) {
+			log("TYPE_SET_ATTR_FILE");
+		}
 	}
 
 	@Override
 	public void onRequestFinish(MegaApiJava api, MegaRequest request,
 			MegaError e) {
 		log("UPLOAD: onRequestFinish "+request.getRequestString());
+		if (request.getType() == MegaRequest.TYPE_SET_ATTR_FILE) {
+			if (e.getErrorCode()==MegaError.API_OK){
+				log("preview upload OK");
+			}
+			else {
+				log("preview upload NOT OK");
+			}
+		}
+
 	}
 
 	@Override
@@ -1148,8 +1167,6 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 
 					}
 				}
-
-
 			}
 		}
 

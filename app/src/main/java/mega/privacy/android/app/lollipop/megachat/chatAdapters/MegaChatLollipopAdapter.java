@@ -332,8 +332,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                     PdfiumCore pdfiumCore = new PdfiumCore(context);
                     File previewDir = PreviewUtils.getPreviewFolder(context);
-                    String[] previewName = currentFile.getName().split(".pdf");
-                    File previewFile = new File(previewDir, previewName[0] + ".jpg");
+                    File previewFile = new File(previewDir, currentFile.getName() + ".jpg");
 
                     PdfDocument pdfDocument = pdfiumCore.newDocument(ParcelFileDescriptor.open(currentFile, ParcelFileDescriptor.MODE_READ_ONLY));
                     pdfiumCore.openPage(pdfDocument, pageNumber);
@@ -368,8 +367,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             else if (MimeTypeList.typeForName(filePath).isVideo()){
                 log("Is video");
                 File previewDir = PreviewUtils.getPreviewFolder(context);
-                String[] previewName = currentFile.getName().split(".pdf");
-                File previewFile = new File(previewDir, previewName[0] + ".jpg");
+                File previewFile = new File(previewDir, currentFile.getName() + ".jpg");
 
                 Bitmap bmPreview = PreviewUtils.createVideoPreview(filePath, MediaStore.Video.Thumbnails.FULL_SCREEN_KIND);
                 if(bmPreview==null){
