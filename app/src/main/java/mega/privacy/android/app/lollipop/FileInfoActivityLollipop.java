@@ -2584,11 +2584,13 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 					break;
 				}
 				else{
-					for(int j=0; j<nodeVersions.size();j++){
-						if(nodeToCheck.getHandle()==nodeVersions.get(j).getHandle()){
-							if(anyChild==false){
-								anyChild = true;
-								break;
+					if(nodeVersions!=null){
+						for(int j=0; j<nodeVersions.size();j++){
+							if(nodeToCheck.getHandle()==nodeVersions.get(j).getHandle()){
+								if(anyChild==false){
+									anyChild = true;
+									break;
+								}
 							}
 						}
 					}
