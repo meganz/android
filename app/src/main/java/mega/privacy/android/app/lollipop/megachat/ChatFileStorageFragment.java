@@ -447,11 +447,13 @@ public class ChatFileStorageFragment extends BottomSheetDialogFragment{
                 //get photos from gallery
                 String[] projection = new String[]{
                         MediaStore.Images.Media.DATA,
+                        MediaStore.Images.Media._ID
                 };
 
                 Uri uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+                String orderBy = MediaStore.Images.Media._ID + " DESC";
 
-                Cursor cursor = context.getActivity().getContentResolver().query(uri, projection, "", null, "");
+                Cursor cursor = context.getActivity().getContentResolver().query(uri, projection, "", null, orderBy);
 
                 if (cursor != null) {
                     int dataColumn = cursor.getColumnIndex(MediaStore.Images.Media.DATA);
