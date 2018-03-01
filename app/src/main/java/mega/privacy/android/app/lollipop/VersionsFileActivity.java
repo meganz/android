@@ -656,25 +656,25 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 				}
 				else{
 					nodeVersions = null;
-					finish();
 				}
 
 			}
 		}
 
-		if(nodeVersions.size()==1){
+		if(nodeVersions == null ||nodeVersions.size()==1){
 			finish();
 		}
-
-		log("After update - nodeVersions size: "+nodeVersions.size());
-
-		if(adapter!=null){
-			adapter.setNodes(nodeVersions);
-			adapter.notifyDataSetChanged();
-		}
 		else{
-			adapter = new VersionsFileAdapter(this, nodeVersions, listView);
-			listView.setAdapter(adapter);
+			log("After update - nodeVersions size: "+nodeVersions.size());
+
+			if(adapter!=null){
+				adapter.setNodes(nodeVersions);
+				adapter.notifyDataSetChanged();
+			}
+			else{
+				adapter = new VersionsFileAdapter(this, nodeVersions, listView);
+				listView.setAdapter(adapter);
+			}
 		}
 
 //		for(int i=0; i<nodes.size();i++){
