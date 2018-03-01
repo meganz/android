@@ -925,6 +925,10 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 	private void refreshProperties(){
 		log("refreshProperties");
 
+		if(node==null){
+			finish();
+		}
+
 		boolean result=true;
 
 		if(node.isExported()){
@@ -1004,6 +1008,19 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 						megaApi.getPreview(node, previewFile.getAbsolutePath(), this);
 					}
 				}
+			}
+
+			if(megaApi.hasVersions(node)){
+				versionsLayout.setVisibility(View.VISIBLE);
+				versionsButton.setText(String.format(getString(R.string.number_of_versions), megaApi.getNumVersions(node)));
+				versionsButton.setOnClickListener(this);
+				separatorVersions.setVisibility(View.VISIBLE);
+
+				nodeVersions = megaApi.getVersions(node);
+			}
+			else{
+				versionsLayout.setVisibility(View.GONE);
+				separatorVersions.setVisibility(View.GONE);
 			}
 		}
 		else{ //Folder
@@ -2631,12 +2648,19 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 			else if(n.hasChanged(MegaNode.CHANGE_TYPE_REMOVED)){
 				if(thisNode){
 					if(nodeVersions!=null){
-						node = nodeVersions.get(1);
-						if(megaApi.hasVersions(node)){
-							nodeVersions = megaApi.getVersions(node);
+//						node = nodeVersions.get(1);
+						long nodeHandle = nodeVersions.get(1).getHandle();
+						if(megaApi.getNodeByHandle(nodeHandle)!=null){
+							node = megaApi.getNodeByHandle(nodeHandle);
+							if(megaApi.hasVersions(node)){
+								nodeVersions = megaApi.getVersions(node);
+							}
+							else{
+								nodeVersions = null;
+							}
 						}
 						else{
-							nodeVersions = null;
+							finish();
 						}
 					}
 					else{

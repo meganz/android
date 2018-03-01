@@ -101,9 +101,11 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 		@Override
 		protected String doInBackground(String... params) {
 			long sizeNumber = 0;
-			for(int i=0; i<nodeVersions.size();i++){
-				MegaNode node = nodeVersions.get(i);
-				sizeNumber = sizeNumber + node.getSize();
+			if(nodeVersions!=null){
+				for(int i=0; i<nodeVersions.size();i++){
+					MegaNode node = nodeVersions.get(i);
+					sizeNumber = sizeNumber + node.getSize();
+				}
 			}
 			String size = Util.getSizeString(sizeNumber);
 			log("doInBackground-AsyncTask GetVersionsSizeTask: "+size);
@@ -675,6 +677,9 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 				adapter = new VersionsFileAdapter(this, nodeVersions, listView);
 				listView.setAdapter(adapter);
 			}
+
+			GetVersionsSizeTask getVersionsSizeTask = new GetVersionsSizeTask();
+			getVersionsSizeTask.execute();
 		}
 
 //		for(int i=0; i<nodes.size();i++){
