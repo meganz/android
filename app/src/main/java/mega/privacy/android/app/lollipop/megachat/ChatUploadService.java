@@ -1,7 +1,6 @@
 package mega.privacy.android.app.lollipop.megachat;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -389,13 +388,41 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 		updateProgressNotification();
 	}
 
-	public void finishDownsampling(String returnedFile){
+	public void finishDownsampling(String returnedFile, boolean success){
 		log("finishDownsampling");
-
 		numberVideosPending--;
-		mapVideoDownsampling.put(returnedFile, 100);
-		File downFile = new File(returnedFile);
-		megaApi.startUpload(downFile.getPath(), parentNode);
+
+		File downFile = null;
+
+		if(success){
+			mapVideoDownsampling.put(returnedFile, 100);
+			downFile = new File(returnedFile);
+		}
+		else{
+			mapVideoDownsampling.remove(returnedFile);
+
+			for(int i=0; i<pendingMessages.size();i++){
+				PendingMessage pendMsg = pendingMessages.get(i);
+
+				if(pendMsg.getVideoDownSampled().equals(returnedFile)){
+					pendMsg.setVideoDownSampled(null);
+
+					ArrayList<PendingNodeAttachment> nodesAttached = pendMsg.getNodeAttachments();
+					if(nodesAttached.size()==1){
+						log("Just one file to send in the message");
+						PendingNodeAttachment nodeAttachment = nodesAttached.get(0);
+						downFile = new File(nodeAttachment.getFilePath());
+					}
+				}
+			}
+			if(downFile!=null){
+				mapVideoDownsampling.put(downFile.getAbsolutePath(), 100);
+			}
+		}
+
+		if(downFile!=null){
+			megaApi.startUpload(downFile.getPath(), parentNode);
+		}
 	}
 
 	@SuppressLint("NewApi")

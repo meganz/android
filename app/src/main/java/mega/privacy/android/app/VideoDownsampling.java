@@ -81,12 +81,19 @@ public class VideoDownsampling {
 
         @Override
         public void run() {
+            VideoUpload video = queue.peek();
+
+            String out = video.outFile;
+
             try {
                 while(!queue.isEmpty()){
                     mChanger.prepareAndChangeResolution();
                 }
             } catch (Throwable th) {
                 mThrowable = th;
+                if(out!=null){
+                    ((ChatUploadService)context).finishDownsampling(out, false);
+                }
             }
         }
 
@@ -256,11 +263,13 @@ public class VideoDownsampling {
                 if (exception == null)
                     exception = e;
             }
-            ((ChatUploadService)context).finishDownsampling(mOutputFile);
         }
         if (exception != null){
             log("VideoDownsampling Exception: "+exception.toString());
             throw exception;
+        }
+        else{
+            ((ChatUploadService)context).finishDownsampling(mOutputFile, true);
         }
     }
 

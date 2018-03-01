@@ -2671,7 +2671,6 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 				else{
 					nodeVersions = null;
 				}
-
 			}
 		}
 
