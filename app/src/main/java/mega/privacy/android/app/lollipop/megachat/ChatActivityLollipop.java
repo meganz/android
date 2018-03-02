@@ -8,19 +8,15 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
-import android.provider.ContactsContract;
 import android.provider.MediaStore;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v4.view.GestureDetectorCompat;
@@ -44,18 +40,14 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.BaseAdapter;
 import android.widget.CheckBox;
 import android.widget.FrameLayout;
-import android.widget.GridView;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -64,9 +56,7 @@ import android.widget.Toast;
 import com.google.firebase.iid.FirebaseInstanceId;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -91,11 +81,9 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PinActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.listeners.MultipleGroupChatRequestListener;
-import mega.privacy.android.app.lollipop.managerSections.FileBrowserFragmentLollipop;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaChatLollipopAdapter;
 import mega.privacy.android.app.lollipop.tasks.FilePrepareTask;
-import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.AttachmentUploadBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ContactAttachmentBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.MessageNotSentBottomSheetDialogFragment;
@@ -2259,7 +2247,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     public void sendMessageUploading(AndroidMegaChatMessage androidMsgSent){
         log("sendMessageUploading");
 
-        log("Name of the file uploading: "+androidMsgSent.getPendingMessage().getNames().get(0));
+        log("Name of the file uploading: "+androidMsgSent.getPendingMessage().getName());
 
         int index = messages.size();
         if(androidMsgSent!=null){
@@ -5085,7 +5073,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                             dbH.setMsgNode(idPendingMsg, idNode);
 
                             nodeAttachment = new PendingNodeAttachment(info.getFileAbsolutePath(), fingerprint, info.getTitle());
-
                         }
                         else{
                             File previewDir = PreviewUtils.getPreviewFolder(this);
@@ -5129,16 +5116,14 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         nodeAttachment = new PendingNodeAttachment(info.getFileAbsolutePath(), fingerprint, info.getTitle());
                     }
 
-                    ArrayList<PendingNodeAttachment> nodeAttachments = new ArrayList<>();
-                    nodeAttachments.add(nodeAttachment);
-                    PendingMessage newPendingMsg = new PendingMessage(idPendingMsg, idChat, nodeAttachments, timestamp, PendingMessage.STATE_SENDING);
+                    PendingMessage newPendingMsg = new PendingMessage(idPendingMsg, idChat, nodeAttachment, timestamp, PendingMessage.STATE_SENDING);
                     AndroidMegaChatMessage newNodeAttachmentMsg = new AndroidMegaChatMessage(newPendingMsg, true);
                     sendMessageUploading(newNodeAttachmentMsg);
 
 //                ArrayList<String> filePaths = newPendingMsg.getFilePaths();
 //                filePaths.add("/home/jfjf.jpg");
 
-                    intent.putStringArrayListExtra(ChatUploadService.EXTRA_FILEPATHS, newPendingMsg.getFilePaths());
+                    intent.putExtra(ChatUploadService.EXTRA_FILEPATH, newPendingMsg.getFilePath());
                     intent.putExtra(ChatUploadService.EXTRA_CHAT_ID, idChat);
 
                     startService(intent);
@@ -5342,13 +5327,11 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }
         }
 
-        ArrayList<PendingNodeAttachment> nodeAttachments = new ArrayList<>();
-        nodeAttachments.add(nodeAttachment);
-        PendingMessage newPendingMsg = new PendingMessage(idPendingMsg, idChat, nodeAttachments, timestamp, PendingMessage.STATE_SENDING);
+        PendingMessage newPendingMsg = new PendingMessage(idPendingMsg, idChat, nodeAttachment, timestamp, PendingMessage.STATE_SENDING);
         AndroidMegaChatMessage newNodeAttachmentMsg = new AndroidMegaChatMessage(newPendingMsg, true);
         sendMessageUploading(newNodeAttachmentMsg);
 
-        intent.putStringArrayListExtra(ChatUploadService.EXTRA_FILEPATHS, newPendingMsg.getFilePaths());
+        intent.putExtra(ChatUploadService.EXTRA_FILEPATH, newPendingMsg.getFilePath());
         intent.putExtra(ChatUploadService.EXTRA_CHAT_ID, idChat);
 
         startService(intent);

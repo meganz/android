@@ -912,83 +912,76 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             ((ViewHolderMessageChat)holder).contentOwnMessageContactName.setVisibility(View.GONE);
             ((ViewHolderMessageChat)holder).contentOwnMessageContactEmail.setVisibility(View.GONE);
 
-            ArrayList<String> paths = message.getPendingMessage().getFilePaths();
-            ArrayList<String> names = message.getPendingMessage().getNames();
-            if(paths != null){
+            String path = message.getPendingMessage().getFilePath();
+            String name = message.getPendingMessage().getName();
+            if(path != null){
 
-                if(paths.size()==1) {
-                    log("One attachment in uploading message");
-                    Bitmap preview = null;
-                    ((ViewHolderMessageChat)holder).filePathUploading = paths.get(0);
-                    log("Path of the file: "+paths.get(0));
-                    long fingerprintCache = MegaApiAndroid.base64ToHandle(megaApi.getFingerprint(paths.get(0)));
+                Bitmap preview = null;
+                ((ViewHolderMessageChat)holder).filePathUploading = path;
+                log("Path of the file: "+path);
+                long fingerprintCache = MegaApiAndroid.base64ToHandle(megaApi.getFingerprint(path));
 
-                    if (MimeTypeList.typeForName(paths.get(0)).isImage() || MimeTypeList.typeForName(paths.get(0)).isPdf() || MimeTypeList.typeForName(paths.get(0)).isVideo()){
+                if (MimeTypeList.typeForName(path).isImage() || MimeTypeList.typeForName(path).isPdf() || MimeTypeList.typeForName(path).isVideo()){
 
-                        ((ViewHolderMessageChat) holder).ownTriangleIconFile.setVisibility(View.GONE);
+                    ((ViewHolderMessageChat) holder).ownTriangleIconFile.setVisibility(View.GONE);
 
-                        preview = PreviewUtils.getPreviewFromCache(fingerprintCache);
-                        if (preview != null){
-                            setUploadingPreview((ViewHolderMessageChat)holder, preview);
-                            log("preview!");
+                    preview = PreviewUtils.getPreviewFromCache(fingerprintCache);
+                    if (preview != null){
+                        setUploadingPreview((ViewHolderMessageChat)holder, preview);
+                        log("preview!");
 
-                        }else{
-                            log("No preview!");
-                            if(message.getPendingMessage().getState()== PendingMessage.STATE_ERROR){
-                                ((ViewHolderMessageChat)holder).ownTriangleIconFile.setVisibility(View.VISIBLE);
-                                ((ViewHolderMessageChat)holder).retryAlert.setVisibility(View.VISIBLE);
-                            }
-                            try{
-                                new ChatUploadingPreviewAsyncTask(((ViewHolderMessageChat)holder)).execute(paths.get(0));
-
-                            }
-                            catch(Exception e){
-                                //Too many AsyncTasks
-                            }
-                        }
                     }else{
-
+                        log("No preview!");
                         if(message.getPendingMessage().getState()== PendingMessage.STATE_ERROR){
                             ((ViewHolderMessageChat)holder).ownTriangleIconFile.setVisibility(View.VISIBLE);
                             ((ViewHolderMessageChat)holder).retryAlert.setVisibility(View.VISIBLE);
                         }
+                        try{
+                            new ChatUploadingPreviewAsyncTask(((ViewHolderMessageChat)holder)).execute(path);
 
-                    }
-
-                    String name = names.get(0);
-                    log("Node Name: " + name);
-
-                    if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-                        log("Landscape configuration");
-                        float width = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MAX_WIDTH_FILENAME_LAND, context.getResources().getDisplayMetrics());
-                        ((ViewHolderMessageChat)holder).contentOwnMessageFileName.setMaxWidth((int) width);
-                        ((ViewHolderMessageChat)holder).contentOwnMessageFileSize.setMaxWidth((int) width);
-                    }
-                    else{
-                        log("Portrait configuration");
-                        float width = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MAX_WIDTH_FILENAME_PORT, context.getResources().getDisplayMetrics());
-                        ((ViewHolderMessageChat)holder).contentOwnMessageFileName.setMaxWidth((int) width);
-                        ((ViewHolderMessageChat)holder).contentOwnMessageFileSize.setMaxWidth((int) width);
-                    }
-
-                    ((ViewHolderMessageChat) holder).contentOwnMessageFileName.setText(name);
-                    ((ViewHolderMessageChat) holder).contentOwnMessageFileThumb.setImageResource(MimeTypeList.typeForName(name).getIconResourceId());
-                    ((ViewHolderMessageChat)holder).contentOwnMessageFileLayout.setBackground(ContextCompat.getDrawable(context, R.drawable.light_rounded_chat_own_message));
-
-                    log("State of the message: "+message.getPendingMessage().getState());
-                    if(message.getPendingMessage().getState()== PendingMessage.STATE_ERROR){
-                        ((ViewHolderMessageChat)holder).contentOwnMessageFileSize.setText(R.string.attachment_uploading_state_error);
-                    }else{
-                        ((ViewHolderMessageChat)holder).contentOwnMessageFileSize.setText(R.string.attachment_uploading_state_uploading);
+                        }
+                        catch(Exception e){
+                            //Too many AsyncTasks
+                        }
                     }
                 }else{
-                    log("Several attachments in uploading message");
-                    ((ViewHolderMessageChat)holder).contentOwnMessageFileThumb.setImageResource(MimeTypeList.typeForName(names.get(0)).getIconResourceId());
-                    ((ViewHolderMessageChat)holder).contentOwnMessageFileName.setText(context.getResources().getQuantityString(R.plurals.new_general_num_files, paths.size(), paths.size()));
+
+                    if(message.getPendingMessage().getState()== PendingMessage.STATE_ERROR){
+                        ((ViewHolderMessageChat)holder).ownTriangleIconFile.setVisibility(View.VISIBLE);
+                        ((ViewHolderMessageChat)holder).retryAlert.setVisibility(View.VISIBLE);
+                    }
+
                 }
+
+                log("Node Name: " + name);
+
+                if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+                    log("Landscape configuration");
+                    float width = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MAX_WIDTH_FILENAME_LAND, context.getResources().getDisplayMetrics());
+                    ((ViewHolderMessageChat)holder).contentOwnMessageFileName.setMaxWidth((int) width);
+                    ((ViewHolderMessageChat)holder).contentOwnMessageFileSize.setMaxWidth((int) width);
+                }
+                else{
+                    log("Portrait configuration");
+                    float width = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MAX_WIDTH_FILENAME_PORT, context.getResources().getDisplayMetrics());
+                    ((ViewHolderMessageChat)holder).contentOwnMessageFileName.setMaxWidth((int) width);
+                    ((ViewHolderMessageChat)holder).contentOwnMessageFileSize.setMaxWidth((int) width);
+                }
+
+                ((ViewHolderMessageChat) holder).contentOwnMessageFileName.setText(name);
+                ((ViewHolderMessageChat) holder).contentOwnMessageFileThumb.setImageResource(MimeTypeList.typeForName(name).getIconResourceId());
+                ((ViewHolderMessageChat)holder).contentOwnMessageFileLayout.setBackground(ContextCompat.getDrawable(context, R.drawable.light_rounded_chat_own_message));
+
+                log("State of the message: "+message.getPendingMessage().getState());
+                if(message.getPendingMessage().getState()== PendingMessage.STATE_ERROR){
+                    ((ViewHolderMessageChat)holder).contentOwnMessageFileSize.setText(R.string.attachment_uploading_state_error);
+                }else{
+                    ((ViewHolderMessageChat)holder).contentOwnMessageFileSize.setText(R.string.attachment_uploading_state_uploading);
+                }
+
             }
             else{
-                log("Paths are null");
+                log("Path is null");
             }
         }
         else{
@@ -4423,7 +4416,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     for(int i=messages.size()-1;i>=0;i--){
                         AndroidMegaChatMessage message = messages.get(i);
                         if(message.isUploading()){
-                            String path = message.getPendingMessage().getFilePaths().get(0);
+                            String path = message.getPendingMessage().getFilePath();
                             if(path.equals(holder.filePathUploading)){
                                 currentPosition = i+1;
                                 log("Found current position: "+currentPosition);
@@ -4441,7 +4434,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 AndroidMegaChatMessage message = messages.get(currentPosition-1);
                 if(message.getPendingMessage()!=null) {
                     log("State of the message: " + message.getPendingMessage().getState());
-                    log("Attachment: "+message.getPendingMessage().getFilePaths().get(0));
+                    log("Attachment: "+message.getPendingMessage().getFilePath());
 
                     if (bitmap.getWidth() < bitmap.getHeight()) {
                         log("Portrait show preview");
