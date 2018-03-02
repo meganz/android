@@ -1163,13 +1163,11 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 								nodeAttachment = new PendingNodeAttachment(info.getFileAbsolutePath(), fingerprint, info.getTitle());
 							}
 
-							ArrayList<PendingNodeAttachment> nodeAttachments = new ArrayList<>();
-							nodeAttachments.add(nodeAttachment);
-							PendingMessage newPendingMsg = new PendingMessage(idPendingMsg, idChat, nodeAttachments, timestamp, PendingMessage.STATE_SENDING);
+							PendingMessage newPendingMsg = new PendingMessage(idPendingMsg, idChat, nodeAttachment, timestamp, PendingMessage.STATE_SENDING);
 //							AndroidMegaChatMessage newNodeAttachmentMsg = new AndroidMegaChatMessage(newPendingMsg, true);
 //							sendMessageUploading(newNodeAttachmentMsg);
 
-							intent.putStringArrayListExtra(ChatUploadService.EXTRA_FILEPATHS, newPendingMsg.getFilePaths());
+							intent.putExtra(ChatUploadService.EXTRA_FILEPATH, newPendingMsg.getFilePath());
 							intent.putExtra(ChatUploadService.EXTRA_CHAT_ID, idChat);
 
 							startService(intent);

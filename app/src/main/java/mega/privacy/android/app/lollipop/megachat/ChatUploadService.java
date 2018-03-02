@@ -63,7 +63,7 @@ import nz.mega.sdk.MegaTransferListenerInterface;
 public class ChatUploadService extends Service implements MegaTransferListenerInterface, MegaRequestListenerInterface, MegaChatRequestListenerInterface {
 
 	public static String ACTION_CANCEL = "CANCEL_UPLOAD";
-	public static String EXTRA_FILEPATHS = "MEGA_FILE_PATH";
+	public static String EXTRA_FILEPATH = "MEGA_FILE_PATH";
 	public static String EXTRA_SIZE = "MEGA_SIZE";
 	public static String EXTRA_CHAT_ID = "CHAT_ID";
 	public static String EXTRA_ID_PEND_MSG = "ID_PEND_MSG";
@@ -190,8 +190,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 	protected void onHandleIntent(final Intent intent) {
 		log("onHandleIntent");
 
-		ArrayList<String> filePaths = intent.getStringArrayListExtra(EXTRA_FILEPATHS);
-		log("Number of files to upload: "+filePaths.size());
+		String filePath = intent.getStringExtra(EXTRA_FILEPATH);
 
 		long chatId = intent.getLongExtra(EXTRA_CHAT_ID, -1);
 
@@ -204,90 +203,90 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 
 			log("The chat id is: "+chatId);
 
-			PendingMessage newMessage = new PendingMessage(idPendMsg, chatId, filePaths, PendingMessage.STATE_SENDING);
+			PendingMessage newMessage = new PendingMessage(idPendMsg, chatId, filePath, PendingMessage.STATE_SENDING);
 
 			parentNode = megaApi.getNodeByPath("/"+Constants.CHAT_FOLDER);
 			if(parentNode != null){
 				log("The destination "+Constants.CHAT_FOLDER+ " already exists");
-				for(int i=0; i<filePaths.size();i++){
-					if(!wl.isHeld()){
-						wl.acquire();
-					}
 
-					if(!lock.isHeld()){
-						lock.acquire();
-					}
-					log("Chat file uploading: "+filePaths.get(i));
+				if(!wl.isHeld()){
+					wl.acquire();
+				}
 
-					File file = new File(filePaths.get(i));
+				if(!lock.isHeld()){
+					lock.acquire();
+				}
+				log("Chat file uploading: "+filePath);
 
-					if(MimeTypeList.typeForName(file.getName()).isMp4Video()&&(!sendOriginalAttachments)){
-						try {
-							totalVideos++;
-							numberVideosPending++;
-							File defaultDownloadLocation = null;
-							if (Environment.getExternalStorageDirectory() != null){
-								defaultDownloadLocation = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.chatTempDIR + "/");
-							}
-							else{
-								defaultDownloadLocation = getFilesDir();
-							}
+				File file = new File(filePath);
 
-							defaultDownloadLocation.mkdirs();
-
-							File outFile = new File(defaultDownloadLocation.getAbsolutePath(), file.getName());
-							int index = 0;
-							if(outFile!=null){
-								while(outFile.exists()){
-									if(index>0){
-										outFile = new File(defaultDownloadLocation.getAbsolutePath(), file.getName());
-									}
-
-									index++;
-									String outFilePath = outFile.getAbsolutePath();
-									String[] splitByDot = outFilePath.split("\\.");
-									String ext="";
-									if(splitByDot!=null && splitByDot.length>1)
-										ext = splitByDot[splitByDot.length-1];
-									String fileName = outFilePath.substring(outFilePath.lastIndexOf(File.separator)+1, outFilePath.length());
-									if(ext.length()>0)
-										fileName=fileName.replace("."+ext, "_"+index+".mp4");
-									else
-										fileName=fileName.concat("_"+index+".mp4");
-
-									outFile = new File(defaultDownloadLocation.getAbsolutePath(), fileName);
-								}
-							}
-
-							outFile.createNewFile();
-
-							if(outFile==null){
-								numberVideosPending--;
-								totalVideos--;
-								pendingMessages.add(newMessage);
-								megaApi.startUpload(filePaths.get(i), parentNode);
-							}
-							else{
-								newMessage.setVideoDownSampled(outFile.getAbsolutePath());
-								pendingMessages.add(newMessage);
-								mapVideoDownsampling.put(outFile.getAbsolutePath(), 0);
-								if(videoDownsampling==null){
-									videoDownsampling = new VideoDownsampling(this);
-								}
-								videoDownsampling.changeResolution(file, outFile.getAbsolutePath());
-							}
-
-						} catch (Throwable throwable) {
-							pendingMessages.add(newMessage);
-							megaApi.startUpload(filePaths.get(i), parentNode);
-							log("EXCEPTION: Video cannot be downsampled");
+				if(MimeTypeList.typeForName(file.getName()).isMp4Video()&&(!sendOriginalAttachments)){
+					try {
+						totalVideos++;
+						numberVideosPending++;
+						File defaultDownloadLocation = null;
+						if (Environment.getExternalStorageDirectory() != null){
+							defaultDownloadLocation = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.chatTempDIR + "/");
 						}
-					}
-					else{
+						else{
+							defaultDownloadLocation = getFilesDir();
+						}
+
+						defaultDownloadLocation.mkdirs();
+
+						File outFile = new File(defaultDownloadLocation.getAbsolutePath(), file.getName());
+						int index = 0;
+						if(outFile!=null){
+							while(outFile.exists()){
+								if(index>0){
+									outFile = new File(defaultDownloadLocation.getAbsolutePath(), file.getName());
+								}
+
+								index++;
+								String outFilePath = outFile.getAbsolutePath();
+								String[] splitByDot = outFilePath.split("\\.");
+								String ext="";
+								if(splitByDot!=null && splitByDot.length>1)
+									ext = splitByDot[splitByDot.length-1];
+								String fileName = outFilePath.substring(outFilePath.lastIndexOf(File.separator)+1, outFilePath.length());
+								if(ext.length()>0)
+									fileName=fileName.replace("."+ext, "_"+index+".mp4");
+								else
+									fileName=fileName.concat("_"+index+".mp4");
+
+								outFile = new File(defaultDownloadLocation.getAbsolutePath(), fileName);
+							}
+						}
+
+						outFile.createNewFile();
+
+						if(outFile==null){
+							numberVideosPending--;
+							totalVideos--;
+							pendingMessages.add(newMessage);
+							megaApi.startUpload(filePath, parentNode);
+						}
+						else{
+							newMessage.setVideoDownSampled(outFile.getAbsolutePath());
+							pendingMessages.add(newMessage);
+							mapVideoDownsampling.put(outFile.getAbsolutePath(), 0);
+							if(videoDownsampling==null){
+								videoDownsampling = new VideoDownsampling(this);
+							}
+							videoDownsampling.changeResolution(file, outFile.getAbsolutePath());
+						}
+
+					} catch (Throwable throwable) {
 						pendingMessages.add(newMessage);
-						megaApi.startUpload(filePaths.get(i), parentNode);
+						megaApi.startUpload(filePath, parentNode);
+						log("EXCEPTION: Video cannot be downsampled");
 					}
 				}
+				else{
+					pendingMessages.add(newMessage);
+					megaApi.startUpload(filePath, parentNode);
+				}
+
 			}
 			else{
 				log("Chat folder NOT exists --> STOP service");
@@ -408,12 +407,9 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 					if(pendMsg.getVideoDownSampled().equals(returnedFile)){
 						pendMsg.setVideoDownSampled(null);
 
-						ArrayList<PendingNodeAttachment> nodesAttached = pendMsg.getNodeAttachments();
-						if(nodesAttached.size()==1){
-							PendingNodeAttachment nodeAttachment = nodesAttached.get(0);
-							downFile = new File(nodeAttachment.getFilePath());
-							log("Found the downFile");
-						}
+						PendingNodeAttachment nodeAttachment = pendMsg.getNodeAttachment();
+						downFile = new File(nodeAttachment.getFilePath());
+						log("Found the downFile");
 					}
 				}
 				else{
@@ -818,45 +814,19 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 					for(int i=0; i<pendingMessages.size();i++){
 						PendingMessage pendMsg = pendingMessages.get(i);
 
-						ArrayList<PendingNodeAttachment> nodesAttached = pendMsg.getNodeAttachments();
-						if(nodesAttached.size()==1){
-							log("Just one file to send in the message");
-							PendingNodeAttachment nodeAttachment = nodesAttached.get(0);
+						PendingNodeAttachment nodeAttachment = pendMsg.getNodeAttachment();
 
+						if(nodeAttachment.getFilePath().equals(transfer.getPath())){
 							if(nodeAttachment.getFilePath().equals(transfer.getPath())){
-								if(nodeAttachment.getFilePath().equals(transfer.getPath())){
 
-									dbH.updatePendingMessage(pendMsg.getId(), -1+"", PendingMessage.STATE_ERROR);
-									launchErrorToChat(pendMsg);
+								dbH.updatePendingMessage(pendMsg.getId(), -1+"", PendingMessage.STATE_ERROR);
+								launchErrorToChat(pendMsg);
 
-									if (megaApi.getNumPendingUploads() == 0 && transfersCount==0 && numberVideosPending<=0 && requestSent<=0){
-										onQueueComplete();
-									}
-									return;
+								if (megaApi.getNumPendingUploads() == 0 && transfersCount==0 && numberVideosPending<=0 && requestSent<=0){
+									onQueueComplete();
 								}
+								return;
 							}
-						}
-						else{
-							log("More than one to send in message");
-//						for(int j=0; j<nodesAttached.size();j++) {
-//							PendingNodeAttachment nodeAttachment = nodesAttached.get(j);
-//
-//							if(nodeAttachment.getFilePath().equals(transfer.getPath())){
-//								nodeAttachment.setNodeHandle(transfer.getNodeHandle());
-//
-//								if(nodeAttachment.getFilePath().equals(transfer.getPath())){
-//
-//									dbH.updatePendingMessage(pendMsg.getId(), -1+"", PendingMessage.STATE_ERROR);
-//									pendMsg.setState(PendingMessage.STATE_ERROR);
-//									launchErrorToChat(pendMsg);
-//
-//									if (megaApi.getNumPendingUploads() == 0 && transfersCount==0){
-//										onQueueComplete();
-//									}
-//									return;
-//								}
-//							}
-//						}
 						}
 					}
 				}
@@ -885,44 +855,40 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 		for(int i=0; i<pendingMessages.size();i++){
 			PendingMessage pendMsg = pendingMessages.get(i);
 
-			ArrayList<PendingNodeAttachment> nodesAttached = pendMsg.getNodeAttachments();
-			if(nodesAttached.size()==1){
-				log("Just one file to send in the message: "+pendMsg.getId());
-				PendingNodeAttachment nodeAttachment = nodesAttached.get(0);
-				boolean videofound = false;				;
-				if(Util.isVideoFile(transfer.getPath())){
-					log("Attach video file");
-					if(pendMsg.getVideoDownSampled()!=null){
-						String path = pendMsg.getVideoDownSampled();
-						if(path.equals(transfer.getPath())){
-							log("NodeHANDLE of the nodeAttachment: "+nodeAttachment.getNodeHandle());
-							if(nodeAttachment.getNodeHandle()==-1){
-								nodeAttachment.setNodeHandle(transfer.getNodeHandle());
-								videofound = true;
-								if(megaChatApi!=null){
-									log("Send node: "+transfer.getNodeHandle()+ " to chat: "+pendMsg.getChatId());
-                                    requestSent++;
-									megaChatApi.attachNode(pendMsg.getChatId(), transfer.getNodeHandle(), this);
-									try{
-										//Delete the local temp video file
-										File f = new File(transfer.getPath());
+			PendingNodeAttachment nodeAttachment = pendMsg.getNodeAttachment();
+			boolean videofound = false;				;
+			if(Util.isVideoFile(transfer.getPath())){
+				log("Attach video file");
+				if(pendMsg.getVideoDownSampled()!=null){
+					String path = pendMsg.getVideoDownSampled();
+					if(path.equals(transfer.getPath())){
+						log("NodeHANDLE of the nodeAttachment: "+nodeAttachment.getNodeHandle());
+						if(nodeAttachment.getNodeHandle()==-1){
+							nodeAttachment.setNodeHandle(transfer.getNodeHandle());
+							videofound = true;
+							if(megaChatApi!=null){
+								log("Send node: "+transfer.getNodeHandle()+ " to chat: "+pendMsg.getChatId());
+								requestSent++;
+								megaChatApi.attachNode(pendMsg.getChatId(), transfer.getNodeHandle(), this);
+								try{
+									//Delete the local temp video file
+									File f = new File(transfer.getPath());
 
-										if (f.exists()) {
-											boolean deleted = f.delete();
-											if(!deleted){
-												log("ERROR: Local file not deleted!");
-											}
+									if (f.exists()) {
+										boolean deleted = f.delete();
+										if(!deleted){
+											log("ERROR: Local file not deleted!");
 										}
 									}
-									catch(Exception e){
-										log("Local file not deleted!");
-									}
-
 								}
+								catch(Exception e){
+									log("Local file not deleted!");
+								}
+
 							}
-							else{
-								log("Already attached");
-							}
+						}
+						else{
+							log("Already attached");
 						}
 					}
 				}
@@ -944,46 +910,6 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 						}
 					}
 				}
-			}
-			else{
-				log("More than one to send in message");
-//						for(int j=0; j<nodesAttached.size();j++) {
-//							PendingNodeAttachment nodeAttachment = nodesAttached.get(j);
-//
-//							if(nodeAttachment.getFilePath().equals(transfer.getPath())){
-//								nodeAttachment.setNodeHandle(transfer.getNodeHandle());
-//
-//								if(!(pendMsg.getState()==PendingMessage.STATE_ERROR)){
-//									if(pendMsg.isNodeHandlesCompleted()){
-//										log("All files of the message uploaded! SEND!");
-//										if(megaChatApi!=null){
-//											log("Send the message to the chat");
-//											MegaNodeList nodeList = MegaNodeList.createInstance();
-//
-//											for(int k=0; k<nodesAttached.size();k++){
-//												MegaNode node = megaApi.getNodeByHandle(nodesAttached.get(k).getNodeHandle());
-//												if(node!=null){
-//													log("Node to send: "+node.getName());
-//													nodeList.addNode(node);
-//												}
-//											}
-//											megaChatApi.attachNodes(pendMsg.getChatId(), nodeList, this);
-//
-//											return;
-//										}
-//									}
-//									else{
-//										log("Waiting for more nodes...");
-//
-//										if (megaApi.getNumPendingUploads() == 0 && transfersCount==0){
-//											onQueueComplete();
-//										}
-//										return;
-//									}
-//								}
-//							}
-
-//						}
 			}
 		}
 	}
@@ -1104,47 +1030,15 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 
 					//Check node handles - if match add to DB the karere temp id of the message
 
-					ArrayList<Long> nodeHandles = pendMsg.getNodeHandles();
-					log("Node handles list: "+nodeHandles.size());
-					if(nodeHandles.size()==1){
-						log("nodeHandles one file to send in the message");
-						MegaNode node = nodeList.get(0);
-						if(node.getHandle()==nodeHandles.get(0)){
-							log("The message MATCH!!");
-							long tempId = request.getMegaChatMessage().getTempId();
-							log("The tempId of the message is: "+tempId);
-							dbH.updatePendingMessage(pendMsg.getId(), tempId+"", PendingMessage.STATE_SENT);
-							pendingMessages.remove(i);
-							break;
-						}
-					}
-					else{
-						log("nodeHandles more than one to send in message");
-						boolean found = false;
-						int counter = 0;
-
-						for(int j=0;j<nodeList.size();j++){
-							MegaNode node = nodeList.get(j);
-							for(int k=0;k<nodeHandles.get(k);k++){
-								if(node.getHandle()==nodeHandles.get(k)){
-									found = true;
-									counter++;
-									log("The node MATCH!! Counter: "+counter);
-									break;
-								}
-							}
-							if(!found){
-								break;
-							}
-						}
-
-						if(nodeList.size() == counter){
-							long tempId = request.getMegaChatMessage().getTempId();
-							log("The tempId of the message is: "+tempId);
-							dbH.updatePendingMessage(pendMsg.getId(), tempId+"", PendingMessage.STATE_SENT);
-							pendingMessages.remove(i);
-							break;
-						}
+					long nodeHandle = pendMsg.getNodeHandle();
+					MegaNode node = nodeList.get(0);
+					if(node.getHandle()==nodeHandle){
+						log("The message MATCH!!");
+						long tempId = request.getMegaChatMessage().getTempId();
+						log("The tempId of the message is: "+tempId);
+						dbH.updatePendingMessage(pendMsg.getId(), tempId+"", PendingMessage.STATE_SENT);
+						pendingMessages.remove(i);
+						break;
 					}
 				}
 			}
@@ -1156,47 +1050,14 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 				for(int i=0; i<pendingMessages.size();i++){
 					PendingMessage pendMsg = pendingMessages.get(i);
 					//Check node handles - if match add to DB the karere temp id of the message
-					ArrayList<Long> nodeHandles = pendMsg.getNodeHandles();
-					log("Node handles list: "+nodeHandles.size());
-					if(nodeHandles.size()==1){
-						log("nodeHandles one file to send in the message");
-						MegaNode node = nodeList.get(0);
-						if(node.getHandle()==nodeHandles.get(0)){
-							log("The message MATCH!!");
-							dbH.updatePendingMessage(pendMsg.getId(), -1+"", PendingMessage.STATE_ERROR);
+					long nodeHandle = pendMsg.getNodeHandle();
+					MegaNode node = nodeList.get(0);
+					if(node.getHandle()==nodeHandle){
+						log("The message MATCH!!");
+						dbH.updatePendingMessage(pendMsg.getId(), -1+"", PendingMessage.STATE_ERROR);
 
-							launchErrorToChat(pendMsg);
-							break;
-						}
-					}
-					else{
-						log("nodeHandles more than one to send in message");
-						boolean found = false;
-						int counter = 0;
-
-						for(int j=0;j<nodeList.size();j++){
-							MegaNode node = nodeList.get(j);
-							for(int k=0;k<nodeHandles.get(k);k++){
-								if(node.getHandle()==nodeHandles.get(k)){
-									found = true;
-									counter++;
-									log("The node MATCH!! Counter: "+counter);
-									break;
-								}
-							}
-							if(!found){
-								break;
-							}
-						}
-
-						if(nodeList.size() == counter){
-							log("The message MATCH for multiple nodes!!");
-							dbH.updatePendingMessage(pendMsg.getId(), -1+"", PendingMessage.STATE_ERROR);
-
-							launchErrorToChat(pendMsg);
-							break;
-						}
-
+						launchErrorToChat(pendMsg);
+						break;
 					}
 				}
 			}
