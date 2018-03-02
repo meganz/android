@@ -2469,14 +2469,15 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	protected void onResume(){
 		log("onResume");
 		super.onResume();
+		if (adapterType != Constants.OFFLINE_ADAPTER){
+			if (imageHandles.get(positionG) != -1){
+				log("node updated");
+				node = megaApi.getNodeByHandle(imageHandles.get(positionG));
+			}
 
-		if (imageHandles.get(positionG) != -1){
-			log("node updated");
-			node = megaApi.getNodeByHandle(imageHandles.get(positionG));
-		}
-
-		if (node == null){
-			finish();
+			if (node == null){
+				finish();
+			}
 		}
 	}
 

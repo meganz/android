@@ -404,15 +404,20 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 			for(int i=0; i<pendingMessages.size();i++){
 				PendingMessage pendMsg = pendingMessages.get(i);
 
-				if(pendMsg.getVideoDownSampled().equals(returnedFile)){
-					pendMsg.setVideoDownSampled(null);
+				if(pendMsg.getVideoDownSampled()!=null){
+					if(pendMsg.getVideoDownSampled().equals(returnedFile)){
+						pendMsg.setVideoDownSampled(null);
 
-					ArrayList<PendingNodeAttachment> nodesAttached = pendMsg.getNodeAttachments();
-					if(nodesAttached.size()==1){
-						log("Just one file to send in the message");
-						PendingNodeAttachment nodeAttachment = nodesAttached.get(0);
-						downFile = new File(nodeAttachment.getFilePath());
+						ArrayList<PendingNodeAttachment> nodesAttached = pendMsg.getNodeAttachments();
+						if(nodesAttached.size()==1){
+							PendingNodeAttachment nodeAttachment = nodesAttached.get(0);
+							downFile = new File(nodeAttachment.getFilePath());
+							log("Found the downFile");
+						}
 					}
+				}
+				else{
+					log("Error message could not been downsampled");
 				}
 			}
 			if(downFile!=null){
