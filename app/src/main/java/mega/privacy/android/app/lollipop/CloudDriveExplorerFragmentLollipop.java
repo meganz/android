@@ -141,15 +141,34 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 			if (selected.size() != 0) {
 
 				MenuItem unselect = menu.findItem(R.id.cab_menu_unselect_all);
+
 				if(selected.size()==adapter.getItemCount()){
 					menu.findItem(R.id.cab_menu_select_all).setVisible(false);
 					unselect.setTitle(getString(R.string.action_unselect_all));
 					unselect.setVisible(true);
-				}
-				else{
-					menu.findItem(R.id.cab_menu_select_all).setVisible(true);
+
+				}else{
+					if(modeCloud==FileExplorerActivityLollipop.SELECT){
+						if(selectFile){
+							if(((FileExplorerActivityLollipop)context).multiselect){
+								if(selected.size() == adapter.getFilesNodes()){
+									menu.findItem(R.id.cab_menu_select_all).setVisible(false);
+								}else{
+									menu.findItem(R.id.cab_menu_select_all).setVisible(true);
+								}
+							}
+						}
+					}else{
+						menu.findItem(R.id.cab_menu_select_all).setVisible(true);
+					}
+
 					unselect.setTitle(getString(R.string.action_unselect_all));
 					unselect.setVisible(true);
+
+//					menu.findItem(R.id.cab_menu_select_all).setVisible(true);
+//					unselect.setTitle(getString(R.string.action_unselect_all));
+//					unselect.setVisible(true);
+
 				}
 			}
 			else{

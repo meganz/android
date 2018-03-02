@@ -131,6 +131,15 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 
 		return nodes.size();
 	}
+	public int getFilesNodes(){
+		int files = 0;
+		for (MegaNode document : nodes) {
+			if (document.isFile()) {
+				files++;
+			}
+		}
+		return files;
+	}
 
 	public Object getItem(int position) {
 		return nodes.get(position);
