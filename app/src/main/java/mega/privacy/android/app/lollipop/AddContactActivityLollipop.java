@@ -242,10 +242,12 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                             for (int i = 0; i < phoneContacts.size(); i++) {
                                 boolean found = false;
                                 for (int j = 0; j < addedContactsShare.size(); j++) {
-                                    if (phoneContacts.get(i).getEmail().equals(addedContactsShare.get(j).getEmail())) {
-                                        log("found true");
-                                        found = true;
-                                        break;
+                                    if (addedContactsShare.get(j).getPhoneContactInfo()){
+                                        if (phoneContacts.get(i).getEmail().equals(addedContactsShare.get(j).getEmail())) {
+                                            log("found true");
+                                            found = true;
+                                            break;
+                                        }
                                     }
                                 }
                                 if (!found) {
@@ -1129,9 +1131,11 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                 for (int i=0; i<visibleContactsMEGA.size(); i++){
                     found = false;
                     for (int j=0; j<addedContactsShare.size(); j++){
-                        if (visibleContactsMEGA.get(i).getMegaUser().getEmail().equals(addedContactsShare.get(j).getMegaUser().getEmail())){
-                            found = true;
-                            break;
+                        if (addedContactsShare.get(j).getMegaContactAdapter()){
+                            if (visibleContactsMEGA.get(i).getMegaUser().getEmail().equals(addedContactsShare.get(j).getMegaUser().getEmail())){
+                                found = true;
+                                break;
+                            }
                         }
                     }
                     if (!found){
@@ -1144,9 +1148,11 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                     found = false;
                     if ((visibleContactsMEGA.get(i).getFullName().toUpperCase().contains(inputString.toUpperCase()) || visibleContactsMEGA.get(i).getMegaUser().getEmail().toUpperCase().contains(inputString.toUpperCase()))){
                         for (int j=0; j<addedContactsShare.size(); j++){
-                            if (visibleContactsMEGA.get(i).getMegaUser().getEmail().equals(addedContactsShare.get(j).getMegaUser().getEmail())){
-                                found = true;
-                                break;
+                            if (addedContactsShare.get(j).getMegaContactAdapter()){
+                                if (visibleContactsMEGA.get(i).getMegaUser().getEmail().equals(addedContactsShare.get(j).getMegaUser().getEmail())){
+                                    found = true;
+                                    break;
+                                }
                             }
                         }
                         if (!found){
