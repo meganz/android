@@ -18,7 +18,6 @@ import android.os.IBinder;
 import android.os.ParcelFileDescriptor;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
-import android.provider.MediaStore;
 import android.support.v4.app.NotificationCompat;
 import android.widget.RemoteViews;
 
@@ -27,7 +26,6 @@ import com.shockwave.pdfium.PdfiumCore;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -580,55 +578,16 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 
                 if(Util.isVideoFile(transfer.getPath())){
                     log("Is video!!!");
-                    ThumbnailUtilsLollipop.createThumbnailVideo(this, transfer.getPath(), megaApi, transfer.getNodeHandle());
-
-                    MegaNode node = megaApi.getNodeByHandle(transfer.getNodeHandle());
 
 					File previewDir = PreviewUtils.getPreviewFolder(this);
 					File preview = new File(previewDir, MegaApiAndroid.handleToBase64(transfer.getNodeHandle()) + ".jpg");
-					Bitmap bmPreview = PreviewUtils.createVideoPreview(transfer.getPath(), MediaStore.Video.Thumbnails.FULL_SCREEN_KIND);
+					File thumbDir = ThumbnailUtils.getThumbFolder(this);
+					File thumb = new File(thumbDir, MegaApiAndroid.handleToBase64(transfer.getNodeHandle()) + ".jpg");
+					megaApi.createThumbnail(transfer.getPath(), thumb.getAbsolutePath());
+					megaApi.createPreview(transfer.getPath(), preview.getAbsolutePath());
 
+                    MegaNode node = megaApi.getNodeByHandle(transfer.getNodeHandle());
                     if(node!=null){
-						if(bmPreview!=null){
-//							try {
-//								preview.createNewFile();
-
-								FileOutputStream out = null;
-								try {
-									out = new FileOutputStream(preview);
-//									Bitmap resizedBitmap = ThumbnailUtilsLollipop.resizeBitmapUpload(bmPreview, bmPreview.getWidth(), bmPreview.getHeight());
-									boolean result = bmPreview.compress(Bitmap.CompressFormat.JPEG, 100, out); // bmp is your Bitmap instance
-									if(result){
-										log("Compress OK!");
-										File oldPreview = new File(previewDir, transfer.getFileName()+".jpg");
-										if (oldPreview.exists()){
-											log("preview exists!!!");
-											oldPreview.delete();
-										}
-										megaApi.setPreview(node, preview.getAbsolutePath(), this);
-									}
-									else{
-										log("Not Compress");
-									}
-								} catch (Exception e) {
-									log("Error with FileOutputStream: "+e.getMessage());
-								} finally {
-									try {
-										if (out != null) {
-											out.close();
-										}
-									} catch (IOException e) {
-										log("Error: "+e.getMessage());
-									}
-								}
-//
-//							} catch (IOException e1) {
-//								log("Error creating new preview file: "+e1.getMessage());
-//							}
-						}
-						else{
-							log("Create video preview NULL");
-						}
 
                         MediaMetadataRetriever retriever = new MediaMetadataRetriever();
                         retriever.setDataSource(transfer.getPath());
