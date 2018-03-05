@@ -415,7 +415,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	public long parentHandleRubbish;
 	public long parentHandleIncoming;
 	public boolean isSearchEnabled;
-	public long[] typeOfSearch;
 	public long parentHandleOutgoing;
 	public long parentHandleSearch;
 	public long parentHandleInbox;
@@ -1048,8 +1047,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		outState.putSerializable("drawerItem", drawerItem);
 
 		outState.putBoolean("isSearchEnabled", isSearchEnabled);
-		outState.putLongArray("typeOfSearch",typeOfSearch);
-
+		outState.putLongArray("searchDate",searchDate);
 
 		if(parentHandleIncoming!=-1){
 			outState.putInt("deepBrowserTreeIncoming", deepBrowserTreeIncoming);
@@ -1134,7 +1132,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			deepBrowserTreeIncoming = savedInstanceState.getInt("deepBrowserTreeIncoming", 0);
 			deepBrowserTreeOutgoing = savedInstanceState.getInt("deepBrowserTreeOutgoing", 0);
 			isSearchEnabled = savedInstanceState.getBoolean("isSearchEnabled");
-			typeOfSearch = savedInstanceState.getLongArray("typeOfSearch");
+			searchDate = savedInstanceState.getLongArray("searchDate");
 
 			drawerItem = (DrawerItem) savedInstanceState.getSerializable("drawerItem");
 			log("DrawerItem onCreate = " + drawerItem);
@@ -11145,7 +11143,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				return;
 			}
 			searchDate = intent.getLongArrayExtra("SELECTED_DATE");
-			typeOfSearch = searchDate;
 			if (cuFL != null){
 				if(cuFL.isAdded()){
 					long cameraUploadHandle = cuFL.getPhotoSyncHandle();
@@ -13422,7 +13419,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	}
 
 	public long[] getTypeOfSearch(){
-		return  typeOfSearch;
+		return  searchDate;
 	}
 
 	public boolean getIsSearchEnabled(){
