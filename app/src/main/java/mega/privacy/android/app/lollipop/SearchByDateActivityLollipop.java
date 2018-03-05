@@ -558,6 +558,8 @@ public class SearchByDateActivityLollipop extends PinActivityLollipop implements
             intent.putExtra("SELECTED_DATE",selectedDate);
             setResult(RESULT_OK, intent);
             finish();
+        }else{
+            finish();
         }
     }
 
