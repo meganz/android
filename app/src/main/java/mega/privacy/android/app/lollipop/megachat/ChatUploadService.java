@@ -813,9 +813,9 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 		//Find the pending message
 		for(int i=0; i<pendingMessages.size();i++){
 			PendingMessage pendMsg = pendingMessages.get(i);
-
 			PendingNodeAttachment nodeAttachment = pendMsg.getNodeAttachment();
-			boolean videofound = false;				;
+
+			boolean videofound = false;
 			if(Util.isVideoFile(transfer.getPath())){
 				log("Attach video file");
 				if(pendMsg.getVideoDownSampled()!=null){
@@ -851,22 +851,22 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 						}
 					}
 				}
+			}
 
-				if(!videofound){
-					log("Not video found");
-					if(nodeAttachment.getFilePath().equals(transfer.getPath())){
-						log("NodeHANDLE of the nodeAttachment: "+nodeAttachment.getNodeHandle());
-						if(nodeAttachment.getNodeHandle()==-1){
-							nodeAttachment.setNodeHandle(transfer.getNodeHandle());
-							if(megaChatApi!=null){
-								log("Send node: "+transfer.getNodeHandle()+ " to chat: "+pendMsg.getChatId());
-                                requestSent++;
-								megaChatApi.attachNode(pendMsg.getChatId(), transfer.getNodeHandle(), this);
-							}
+			if(!videofound){
+				log("Not video found");
+				if(nodeAttachment.getFilePath().equals(transfer.getPath())){
+					log("NodeHANDLE of the nodeAttachment: "+nodeAttachment.getNodeHandle());
+					if(nodeAttachment.getNodeHandle()==-1){
+						nodeAttachment.setNodeHandle(transfer.getNodeHandle());
+						if(megaChatApi!=null){
+							log("Send node: "+transfer.getNodeHandle()+ " to chat: "+pendMsg.getChatId());
+							requestSent++;
+							megaChatApi.attachNode(pendMsg.getChatId(), transfer.getNodeHandle(), this);
 						}
-						else{
-							log("Already attached");
-						}
+					}
+					else{
+						log("Already attached");
 					}
 				}
 			}
