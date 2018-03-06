@@ -1733,5 +1733,7 @@
         <item context="the options of what to upload.">Medium</item>
     </string-array>
 
+    <string name="missed_call_notification_title" context="Title of the notification for a missed call">Missed call</string>
+
 </resources>
 
