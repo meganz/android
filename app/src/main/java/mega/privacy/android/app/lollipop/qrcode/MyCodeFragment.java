@@ -92,8 +92,6 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener, Me
 
     private RelativeLayout relativeContainerQRCode;
     private RelativeLayout relativeQRCode;
-//    private RoundedImageView avatarImage;
-//    private TextView initialLetter;
     private ImageView avatarImage;
     private ImageView qrcode;
     private TextView qrcode_link;
@@ -267,12 +265,10 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener, Me
         Map<EncodeHintType, ErrorCorrectionLevel> hints = new HashMap<>();
         hints.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.H);
 
-        QRCodeWriter qrCodeWriter = new QRCodeWriter();
         BitMatrix bitMatrix = null;
 
-        DisplayMetrics displaymetrics = new DisplayMetrics();
         try {
-            bitMatrix = new MultiFormatWriter().encode(contactLink, BarcodeFormat.QR_CODE, WIDTH, WIDTH, hints);
+            bitMatrix = new MultiFormatWriter().encode(contactLink, BarcodeFormat.QR_CODE, 40, 40, hints);
         } catch (WriterException e) {
             e.printStackTrace();
             return null;
@@ -280,16 +276,48 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener, Me
         int w = bitMatrix.getWidth();
         int h = bitMatrix.getHeight();
         int[] pixels = new int[w * h];
+        int color = getResources().getColor(R.color.lollipop_primary_color);
+        float resize = 12.2f;
+
+        Bitmap bitmap = Bitmap.createBitmap(WIDTH, WIDTH, Bitmap.Config.ARGB_8888);
+        Canvas c = new Canvas(bitmap);
+        Paint paint = new Paint();
+        paint.setAntiAlias(true);
+        paint.setColor(WHITE);
+        c.drawRect(0, 0, WIDTH, WIDTH, paint);
+        paint.setColor(color);
 
         for (int y = 0; y < h; y++) {
             int offset = y * w;
             for (int x = 0; x < w; x++) {
-                pixels[offset + x] = bitMatrix.get(x, y) ? getResources().getColor(R.color.lollipop_primary_color) : WHITE;
+                pixels[offset + x] = bitMatrix.get(x, y) ? color : WHITE;
+                if (pixels[offset + x] == color){
+                    c.drawCircle(x*resize, y*resize, 5, paint);
+                }
+                log("pixels[offset + x]: "+Integer.toString(pixels[offset + x])+ " offset+x: "+(offset+x));
             }
         }
+        paint.setColor(WHITE);
+        c.drawRect(3*resize, 3*resize, 11.5f*resize, 11.5f*resize, paint);
+        c.drawRect(28.5f*resize, 3*resize, 37*resize, 11.5f*resize, paint);
+        c.drawRect(3*resize, 28.5f*resize, 11.5f*resize, 37*resize, paint);
 
-        Bitmap bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
-        bitmap.setPixels(pixels, 0, WIDTH, 0, 0, w, h);
+        paint.setColor(color);
+        c.drawRoundRect(3.75f*resize, 3.75f*resize, 10.75f*resize, 10.75f*resize, 30, 30, paint);
+        c.drawRoundRect(29.25f*resize, 3.75f*resize, 36.25f*resize, 10.75f*resize, 30, 30, paint);
+        c.drawRoundRect(3.75f*resize, 29.25f*resize, 10.75f*resize, 36.25f*resize, 30, 30, paint);
+
+        paint.setColor(WHITE);
+        c.drawRoundRect(4.75f*resize, 4.75f*resize, 9.75f*resize, 9.75f*resize, 25, 25, paint);
+        c.drawRoundRect(30.25f*resize, 4.75f*resize, 35.25f*resize, 9.75f*resize, 25, 25, paint);
+        c.drawRoundRect(4.75f*resize, 30.25f*resize, 9.75f*resize, 35.25f*resize, 25, 25, paint);
+
+        paint.setColor(color);
+        c.drawCircle(7.25f*resize, 7.25f*resize, 17.5f, paint);
+        c.drawCircle(32.75f*resize, 7.25f*resize, 17.5f, paint);
+        c.drawCircle(7.25f*resize, 32.75f*resize, 17.5f, paint);
+
+//        bitmap.setPixels(pixels, 0, w, 0, 0, w,  h);
 
         return bitmap;
     }
