@@ -2,11 +2,13 @@ package mega.privacy.android.app.lollipop;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.ActivityManager;
 import android.app.Dialog;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -18,6 +20,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.StatFs;
 import android.provider.OpenableColumns;
 import android.support.design.widget.AppBarLayout;
@@ -58,6 +61,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -85,7 +89,10 @@ import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatError;
 import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaChatRequestListenerInterface;
+import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
+import nz.mega.sdk.MegaEvent;
+import nz.mega.sdk.MegaGlobalListenerInterface;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
@@ -93,7 +100,7 @@ import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaTransferListenerInterface;
 import nz.mega.sdk.MegaUser;
 
-public class PdfViewerActivityLollipop extends PinActivityLollipop implements OnPageChangeListener, OnLoadCompleteListener, OnPageErrorListener, View.OnClickListener, MegaRequestListenerInterface, MegaChatRequestListenerInterface, MegaTransferListenerInterface {
+public class PdfViewerActivityLollipop extends PinActivityLollipop implements OnPageChangeListener, OnLoadCompleteListener, OnPageErrorListener, View.OnClickListener, MegaRequestListenerInterface, MegaChatRequestListenerInterface, MegaTransferListenerInterface{
 
     public static int REQUEST_CODE_SELECT_CHAT = 1005;
 
@@ -131,7 +138,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
     Uri uri;
     String pdfFileName;
     boolean inside = false;
-    long handle;
+    long handle = -1;
     boolean isFolderLink = false;
     public static boolean isScrolling = false;
     public static boolean scroll = false;
@@ -163,6 +170,9 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
     Drawable properties;
     Drawable download;
 
+    private String downloadLocationDefaultPath = "";
+    private boolean renamed = false;
+
     @Override
     public void onCreate (Bundle savedInstanceState){
         log("onCreate");
@@ -170,7 +180,12 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
         super.onCreate(savedInstanceState);
 
         if (savedInstanceState != null) {
+            log("saveInstanceState");
             currentPage = savedInstanceState.getInt("currentPage");
+            handle = savedInstanceState.getLong("HANDLE");
+            pdfFileName = savedInstanceState.getString("pdfFileName");
+            uri = Uri.parse(savedInstanceState.getString("uri"));
+            renamed = savedInstanceState.getBoolean("renamed");
         }
         else {
             currentPage = 0;
@@ -191,11 +206,13 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
         isFolderLink = intent.getBooleanExtra("isFolderLink", false);
         type = intent.getIntExtra("adapterType", 0);
 
-        uri = intent.getData();
-        if (uri == null){
-            log("uri null");
-            finish();
-            return;
+        if (!renamed){
+            uri = intent.getData();
+            if (uri == null){
+                log("uri null");
+                finish();
+                return;
+            }
         }
 
         if (type == Constants.OFFLINE_ADAPTER){
@@ -322,9 +339,14 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
+        log("onSaveInstanceState");
         super.onSaveInstanceState(outState);
 
         outState.putInt("currentPage", currentPage);
+        outState.putLong("HANDLE", handle);
+        outState.putString("pdfFileName", pdfFileName);
+        outState.putString("uri", uri.toString());
+        outState.putBoolean("renamed", renamed);
     }
 
     class LoadPDFStream extends AsyncTask<String, Void, InputStream> {
@@ -701,6 +723,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
                 i.putExtra("imageId", MimeTypeMime.typeForName(node.getName()).getIconResourceId());
                 i.putExtra("name", node.getName());
                 startActivity(i);
+                renamed = false;
                 break;
             }
         }
@@ -737,6 +760,93 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
         checkLogin();
     }
 
+    public void updateFile (){
+        MegaNode file = null;
+        if (pdfFileName != null && handle != -1 ) {
+            file = megaApi.getNodeByHandle(handle);
+            if (file != null){
+                log("Pdf File: "+pdfFileName+" node file: "+file.getName());
+                if (!pdfFileName.equals(file.getName())) {
+                    log("updateFile");
+
+                    pdfFileName = file.getName();
+                    if (aB != null){
+                        tB = (Toolbar) findViewById(R.id.toolbar_pdf_viewer);
+                        if(tB==null){
+                            log("Tb is Null");
+                            return;
+                        }
+                        tB.setVisibility(View.VISIBLE);
+                        setSupportActionBar(tB);
+                        aB = getSupportActionBar();
+                    }
+                    aB.setTitle(pdfFileName);
+                    setTitle(pdfFileName);
+                    invalidateOptionsMenu();
+
+                    if (megaApi == null){
+                        MegaApplication app = (MegaApplication)getApplication();
+                        megaApi = app.getMegaApi();
+                        megaApi.addTransferListener(this);
+                    }
+                    if (megaApi.httpServerIsRunning() == 0) {
+                        megaApi.httpServerStart();
+                    }
+
+                    ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
+                    ActivityManager activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+                    activityManager.getMemoryInfo(mi);
+
+                    if(mi.totalMem>Constants.BUFFER_COMP){
+                        log("Total mem: "+mi.totalMem+" allocate 32 MB");
+                        megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
+                    }
+                    else{
+                        log("Total mem: "+mi.totalMem+" allocate 16 MB");
+                        megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
+                    }
+
+                    String url = megaApi.httpServerGetLocalLink(file);
+                    getDownloadLocation();
+                    String localPath = Util.getLocalFile(this, file.getName(), file.getSize(), downloadLocationDefaultPath);
+
+                    if (localPath != null){
+                        File mediaFile = new File(localPath);
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && prefs.getStorageDownloadLocation().contains(Environment.getExternalStorageDirectory().getPath())) {
+                            uri = FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", mediaFile);
+                        }
+                        else{
+                            uri = Uri.fromFile(mediaFile);
+                        }
+                    }
+                    else {
+                        uri = Uri.parse(url);
+                    }
+                    renamed = true;
+                }
+            }
+        }
+    }
+
+    public void getDownloadLocation(){
+        if (dbH == null){
+            dbH = DatabaseHandler.getDbHandler(getApplicationContext());
+        }
+
+        prefs = dbH.getPreferences();
+        if (prefs != null){
+            if (prefs.getStorageAskAlways() != null){
+                if (!Boolean.parseBoolean(prefs.getStorageAskAlways())){
+                    if (prefs.getStorageDownloadLocation() != null){
+                        if (prefs.getStorageDownloadLocation().compareTo("") != 0){
+                            downloadLocationDefaultPath = prefs.getStorageDownloadLocation();
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     @SuppressLint("NewApi")
     public void downloadNode(ArrayList<Long> handleList){
 
@@ -752,7 +862,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
         }
 
         boolean askMe = true;
-        String downloadLocationDefaultPath = "";
+
         prefs = dbH.getPreferences();
         if (prefs != null){
             if (prefs.getStorageAskAlways() != null){
@@ -1300,6 +1410,8 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
     protected void onResume() {
         super.onResume();
         log("onResume");
+
+        updateFile();
     }
 
     @Override
