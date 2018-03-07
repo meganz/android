@@ -27,8 +27,12 @@ public class RTFFormatter {
     boolean formatted = false;
     boolean recursive = false;
     Typeface font;
-    Pattern pMultiQuote = Pattern.compile("(?<=[\\W\\d]|^)(```)(.*?)(```)(?=[\\W\\d]|$)");
-    Pattern pQuote = Pattern.compile("(?<=[\\W\\d]|^)(`)(.*?)(`)(?=[\\W\\d]|$)");
+    Pattern pMultiQuote = Pattern.compile("(?<=[\\W\\d]|^)(```)(.*?" +
+            "|.*?\\n.*?\\n*?.*?" +
+            "|.*?\\n.*?\\n.*?\\n*?.*?" +
+            "|.*?\\n.*?\\n.*?\\n.*?\\n*?.*?" +
+            "|.*?\\n.*?\\n.*?\\n.*?\\n.*?\\n*?.*?)(```)(?=[\\W\\d]|$)", Pattern.MULTILINE);
+    Pattern pQuote = Pattern.compile("(?<=[\\W\\d]|^)(`)(.*?[^\\n.]*?[^\\n]*?.*?)(`)(?=[\\W\\d]|$)");
     Pattern pItalic = Pattern.compile("(?<=[\\W\\d]|^)(\\_)([^_\\n]*?)(\\_)(?=[\\W\\d]|$)");
     Pattern pBold = Pattern.compile("(?<=[\\W\\d]|^)(\\*)([^\\s][^*\\n]*?|[^*\\n]*?[^\\s])(\\*)(?=[\\W\\d]|$)");
 
@@ -59,7 +63,6 @@ public class RTFFormatter {
             Matcher mMultiQuote = pMultiQuote.matcher(messageContent);
 
             if (mMultiQuote != null && mMultiQuote.find()) {
-
                 log("Multiquote found!");
 
                 int startBold = -1;
@@ -470,6 +473,11 @@ public class RTFFormatter {
             messageContent = sb.toString();
 
             log("Message content T: "+messageContent);
+
+            Matcher mMultiQuote = pMultiQuote.matcher(messageContent);
+            if (mMultiQuote != null && mMultiQuote.find()){
+                setRTFFormat();
+            }
 
             start = messageContent.indexOf(" `");
             while(start!=-1){
