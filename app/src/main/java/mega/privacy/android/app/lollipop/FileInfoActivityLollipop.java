@@ -149,6 +149,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 	LinearLayout availableOfflineLayout;
 
 	RelativeLayout sizeLayout;
+	RelativeLayout locationLayout;
 	RelativeLayout contentLayout;
 	RelativeLayout addedLayout;
 	RelativeLayout modifiedLayout;
@@ -176,6 +177,9 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
 	TextView sizeTextView;
 	TextView sizeTitleTextView;
+
+    TextView locationTextView;
+    TextView locationTitleTextView;
 
 	TextView contentTextView;
 	TextView contentTitleTextView;
@@ -406,12 +410,22 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
         infoIcon = (ImageView) findViewById(R.id.file_properties_info_image);
 
+        //Size Layout
         sizeLayout = (RelativeLayout) findViewById(R.id.file_properties_size_layout);
         sizeTitleTextView  = (TextView) findViewById(R.id.file_properties_info_menu_size);
         sizeTextView = (TextView) findViewById(R.id.file_properties_info_data_size);
 
+        //Location Layout
+        locationLayout = (RelativeLayout) findViewById(R.id.file_properties_location_layout);
+        locationTitleTextView  = (TextView) findViewById(R.id.file_properties_info_menu_location);
+        locationTextView = (TextView) findViewById(R.id.file_properties_info_data_location);
+        locationTextView.setText("Cloud Drive");
+        locationTextView.setOnClickListener(this);
+
         //Content Layout
         contentLayout = (RelativeLayout) findViewById(R.id.file_properties_content_layout);
+        contentTitleTextView  = (TextView) findViewById(R.id.file_properties_info_menu_content);
+        contentTextView = (TextView) findViewById(R.id.file_properties_info_data_content);
 
         publicLinkLayout = (RelativeLayout) findViewById(R.id.file_properties_link_layout);
         publicLinkCopyLayout = (RelativeLayout) findViewById(R.id.file_properties_copy_layout);
@@ -422,8 +436,6 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
         publicLinkButton.setText(getString(R.string.context_copy));
         publicLinkButton.setOnClickListener(this);
 
-        contentTitleTextView  = (TextView) findViewById(R.id.file_properties_info_menu_content);
-        contentTextView = (TextView) findViewById(R.id.file_properties_info_data_content);
 
         //Added Layout
 
@@ -1581,6 +1593,10 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 				}
 				break;
 			}
+            case R.id.file_properties_info_data_location:{
+                this.finish();
+                break;
+            }
 		}
 	}
 

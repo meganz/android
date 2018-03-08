@@ -1484,6 +1484,7 @@
     <string name="file_properties_info_content" context="header of a status field for what content a user has shared to you">Contains</string>
     <string name="file_properties_info_added" context="when was the file added in MEGA">Created</string>
     <string name="file_properties_shared_folder_public_link_name">Link</string>
+    <string name="file_properties_info_location" context="location of the file or folder">Location</string>
 
     <string name="file_properties_shared_folder_full_access" context="Refers to access rights for a file folder.">Full access</string>
     <string name="file_properties_shared_folder_read_only" context="Refers to access rights for a file folder.">Read-only</string>
