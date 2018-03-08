@@ -1087,6 +1087,9 @@ public class OfflineFragmentLollipop extends Fragment{
 
 						Intent videoIntent = new Intent(context, AudioVideoPlayerLollipop.class);
 						videoIntent.putExtra("HANDLE", Long.parseLong(currentNode.getHandle()));
+						videoIntent.putExtra("adapterType", Constants.OFFLINE_ADAPTER);
+						videoIntent.putExtra("FILENAME", currentNode.getName());
+						videoIntent.putExtra("path", currentFile.getAbsolutePath());
 						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
 							videoIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
 						}
@@ -1101,6 +1104,9 @@ public class OfflineFragmentLollipop extends Fragment{
 
 						Intent audioIntent = new Intent(context, AudioVideoPlayerLollipop.class);
 						audioIntent.putExtra("HANDLE", Long.parseLong(currentNode.getHandle()));
+						audioIntent.putExtra("adapterType", Constants.OFFLINE_ADAPTER);
+						audioIntent.putExtra("FILENAME", currentNode.getName());
+						audioIntent.putExtra("path", currentFile.getAbsolutePath());
 						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
 							audioIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
 						}
@@ -1114,17 +1120,17 @@ public class OfflineFragmentLollipop extends Fragment{
 						log("Pdf file");
 
 						//String localPath = Util.getLocalFile(context, currentFile.getName(), currentFile.get, currentFile.getParent());
-						File pdfFile = new File(currentFile.getAbsolutePath());
 
 						Intent pdfIntent = new Intent(context, PdfViewerActivityLollipop.class);
 						pdfIntent.putExtra("APP", true);
 						pdfIntent.putExtra("HANDLE", Long.parseLong(currentNode.getHandle()));
 						pdfIntent.putExtra("adapterType", Constants.OFFLINE_ADAPTER);
+						pdfIntent.putExtra("path", currentFile.getAbsolutePath());
 						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-							pdfIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", pdfFile), MimeTypeList.typeForName(currentFile.getName()).getType());
+							pdfIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
 						}
 						else{
-							pdfIntent.setDataAndType(Uri.fromFile(pdfFile), MimeTypeList.typeForName(currentFile.getName()).getType());
+							pdfIntent.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
 						}
 						pdfIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 						context.startActivity(pdfIntent);
