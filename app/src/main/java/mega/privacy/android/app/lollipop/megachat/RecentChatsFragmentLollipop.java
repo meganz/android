@@ -125,12 +125,6 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         log("onCreateView");
 
-        if(aB!=null){
-            aB.setTitle(getString(R.string.section_chat));
-            aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
-            ((ManagerActivityLollipop)context).setFirstNavigationLevel(true);
-        }
-
         display = ((Activity) context).getWindowManager().getDefaultDisplay();
         outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);

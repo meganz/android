@@ -77,7 +77,6 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 	RecyclerView listFragment;
 //	ImageView emptyImageViewFragment;
 //	TextView emptyTextViewFragment;
-	ActionBar aB;
 	boolean incoming = false;
 	boolean inbox = false;
 	DatabaseHandler dbH = null;
@@ -449,7 +448,6 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 		this.listFragment = recyclerView;
 //		this.emptyImageViewFragment = emptyImageView;
 //		this.emptyTextViewFragment = emptyTextView;
-		this.aB = aB;
 		this.type = type;
 
 		if (megaApi == null) {

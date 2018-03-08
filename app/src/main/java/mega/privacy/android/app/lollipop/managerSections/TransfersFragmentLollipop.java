@@ -5,8 +5,6 @@ import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -34,7 +32,6 @@ import nz.mega.sdk.MegaTransfer;
 public class TransfersFragmentLollipop extends Fragment {
 
 	Context context;
-	ActionBar aB;
 	RecyclerView listView;
 	MegaTransfersLollipopAdapter adapter;
 	
@@ -87,16 +84,8 @@ public class TransfersFragmentLollipop extends Fragment {
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
 		}
 		
-		if (aB == null){
-			aB = ((AppCompatActivity)context).getSupportActionBar();
-		}
-		
-		aB.setTitle(getResources().getString(R.string.section_transfers));
-		aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
-		((ManagerActivityLollipop)context).setFirstNavigationLevel(true);
 		((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
-//		aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
-		
+
 		display = ((Activity)context).getWindowManager().getDefaultDisplay();
 		outMetrics = new DisplayMetrics ();
 	    display.getMetrics(outMetrics);
@@ -181,7 +170,6 @@ public class TransfersFragmentLollipop extends Fragment {
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         context = activity;
-        aB = ((AppCompatActivity)activity).getSupportActionBar();
     }
 
 	public void transferUpdate(MegaTransfer transfer){

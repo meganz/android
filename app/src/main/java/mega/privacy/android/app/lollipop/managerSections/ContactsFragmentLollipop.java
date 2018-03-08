@@ -7,7 +7,6 @@ import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -63,9 +62,7 @@ public class ContactsFragmentLollipop extends Fragment{
 	MyAccountInfo myAccountInfo;
 	TextView initialLetter;
 
-
 	Context context;
-	ActionBar aB;
 	RecyclerView recyclerView;
 	MegaContactsLollipopAdapter adapter;
 
@@ -448,18 +445,6 @@ public class ContactsFragmentLollipop extends Fragment{
 
 			((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 
-			if (aB != null){
-				aB.setTitle(getString(R.string.section_contacts));
-			}
-			else{
-				if (context != null) {
-					aB = ((AppCompatActivity) context).getSupportActionBar();
-					if (aB != null) {
-						aB.setTitle(getString(R.string.section_contacts));
-					}
-				}
-			}
-
 			return v;
 		}
 		else{
@@ -544,19 +529,6 @@ public class ContactsFragmentLollipop extends Fragment{
 			}
 
 			((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
-
-			if (aB != null){
-				aB.setTitle(getString(R.string.section_contacts));
-			}
-			else{
-				if (context != null) {
-					aB = ((AppCompatActivity) context).getSupportActionBar();
-					if (aB != null) {
-						aB.setTitle(getString(R.string.section_contacts));
-					}
-				}
-			}
-
 			return v;
 		}			
 	}
@@ -610,7 +582,6 @@ public class ContactsFragmentLollipop extends Fragment{
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         context = activity;
-        aB = ((AppCompatActivity)activity).getSupportActionBar();
     }
 
     public void itemClick(int position) {
