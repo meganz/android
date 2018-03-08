@@ -163,6 +163,8 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
     Drawable properties;
     Drawable download;
 
+    private String path;
+
     @Override
     public void onCreate (Bundle savedInstanceState){
         log("onCreate");
@@ -190,6 +192,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
         }
         isFolderLink = intent.getBooleanExtra("isFolderLink", false);
         type = intent.getIntExtra("adapterType", 0);
+        path = intent.getStringExtra("path");
 
         uri = intent.getData();
         if (uri == null){
@@ -200,6 +203,9 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
 
         if (type == Constants.OFFLINE_ADAPTER){
             isOffLine = true;
+        }
+        else {
+            isOffLine = false;
         }
 
         setContentView(R.layout.activity_pdfviewer);
@@ -695,11 +701,26 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
                 break;
             }
             case R.id.pdfviewer_properties: {
-                MegaNode node = megaApi.getNodeByHandle(handle);
                 Intent i = new Intent(this, FileInfoActivityLollipop.class);
-                i.putExtra("handle", node.getHandle());
-                i.putExtra("imageId", MimeTypeMime.typeForName(node.getName()).getIconResourceId());
-                i.putExtra("name", node.getName());
+                if (isOffLine){
+                    i.putExtra("name", pdfFileName);
+                    i.putExtra("imageId", MimeTypeMime.typeForName(pdfFileName).getIconResourceId());
+                    i.putExtra("adapterType", Constants.OFFLINE_ADAPTER);
+                    i.putExtra("path", path);
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                        i.setDataAndType(uri, MimeTypeList.typeForName(pdfFileName).getType());
+                    }
+                    else{
+                        i.setDataAndType(uri, MimeTypeList.typeForName(pdfFileName).getType());
+                    }
+                    i.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                }
+                else {
+                    MegaNode node = megaApi.getNodeByHandle(handle);
+                    i.putExtra("handle", node.getHandle());
+                    i.putExtra("imageId", MimeTypeMime.typeForName(node.getName()).getIconResourceId());
+                    i.putExtra("name", node.getName());
+                }
                 startActivity(i);
                 break;
             }
