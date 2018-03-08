@@ -2347,9 +2347,10 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 
 		if(searchByDate[0] == 1){
 			log("option day");
+
 			cal.setTimeInMillis(searchByDate[1]);
 			int selectedYear = cal.get(Calendar.YEAR);
-			int selectedMonth = (cal.get(Calendar.MONTH) + 1);
+			int selectedMonth = (cal.get(Calendar.MONTH));
 			int selectedDay = cal.get(Calendar.DAY_OF_MONTH);
 
 			//Title
@@ -2361,15 +2362,15 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			aB.setTitle(formattedDate);
 
 			int nodeDay, nodeMonth, nodeYear;
-			SimpleDateFormat df = new SimpleDateFormat("yyyy");
-
 			for (MegaNode node : nodes){
 				Date d = new Date(node.getModificationTime()*1000);
-				nodeDay = d.getDay();
-				nodeMonth = (d.getMonth() + 1);
-				nodeYear = Integer.parseInt(df.format(d));
+				Calendar calNode = Calendar.getInstance();
+				calNode.setTime(d);
+				nodeDay = calNode.get(Calendar.DAY_OF_MONTH);
+				nodeMonth = calNode.get(Calendar.MONTH);
+				nodeYear = calNode.get(Calendar.YEAR);
 
-				if((selectedYear == nodeYear) && (selectedMonth == nodeMonth) && (selectedDay == nodeDay )){
+				if((selectedYear == nodeYear) && (selectedMonth == nodeMonth) && (selectedDay == nodeDay)){
 					nodesResult.add(node);
 				}
 			}
@@ -2377,51 +2378,44 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 		}else if(searchByDate[0] == 2){
 
 			if(searchByDate[2] == 1){
-
 				log("option last month");
 				int selectedDay = cal.get(Calendar.DAY_OF_MONTH);
-				int selectedMonth = (cal.get(Calendar.MONTH) + 1);
+				int selectedMonth = cal.get(Calendar.MONTH);
 				int selectedYear = cal.get(Calendar.YEAR);
 
-				if(selectedMonth == 1){
-					selectedMonth = 12;
+				if(selectedMonth == 0){
+					selectedMonth = 11;
 					selectedYear = selectedYear - 1;
 				}else{
 					selectedMonth = selectedMonth - 1;
 				}
 
 				//Title
-				int selectedMonthTitle = selectedMonth;
 				SimpleDateFormat titleFormat = new SimpleDateFormat("MMMM");
 				Calendar calTitle = Calendar.getInstance();
-				if (selectedMonthTitle == 1){
-					selectedMonthTitle = 12;
-
-				}else{
-					selectedMonthTitle = selectedMonthTitle - 1;
-
-				}
-				calTitle.set(selectedYear, selectedMonthTitle, selectedDay);
+				calTitle.set(selectedYear, selectedMonth, selectedDay);
 				Date date = calTitle.getTime();
 				String formattedDate = titleFormat.format(date);
 				aB.setTitle(formattedDate);
 
 				int nodeMonth, nodeYear;
-				SimpleDateFormat df = new SimpleDateFormat("yyyy");
 
 				for (MegaNode node : nodes){
 					Date d = new Date(node.getModificationTime()*1000);
-					nodeMonth = (d.getMonth() + 1);
-					nodeYear = Integer.parseInt(df.format(d));
+					Calendar calNode = Calendar.getInstance();
+					calNode.setTime(d);
+					nodeMonth = calNode.get(Calendar.MONTH);
+					nodeYear = calNode.get(Calendar.YEAR);
 
 					if((selectedYear == nodeYear) && (selectedMonth == nodeMonth)){
 						nodesResult.add(node);
 					}
 				}
 
+
+
 			}else if(searchByDate[2] == 2){
 				log("option last year");
-
 				int selectedYear = (cal.get(Calendar.YEAR) - 1);
 
 				//Title
@@ -2429,11 +2423,12 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 				aB.setTitle(formattedDate);
 
 				int nodeYear;
-				SimpleDateFormat df = new SimpleDateFormat("yyyy");
-
 				for (MegaNode node : nodes){
 					Date d = new Date(node.getModificationTime()*1000);
-					nodeYear = Integer.parseInt(df.format(d));
+					Calendar calNode = Calendar.getInstance();
+					calNode.setTime(d);
+					nodeYear = calNode.get(Calendar.YEAR);
+
 					if(selectedYear == nodeYear){
 						nodesResult.add(node);
 					}
@@ -2445,20 +2440,21 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 
 			cal.setTimeInMillis(searchByDate[3]);
 			int selectedYearFrom = cal.get(Calendar.YEAR);
-			int selectedMonthFrom = (cal.get(Calendar.MONTH) + 1);
+			int selectedMonthFrom = cal.get(Calendar.MONTH);
 			int selectedDayFrom = cal.get(Calendar.DAY_OF_MONTH);
 
 			calTo.setTimeInMillis(searchByDate[4]);
 			int selectedYearTo = calTo.get(Calendar.YEAR);
-			int selectedMonthTo = (calTo.get(Calendar.MONTH) + 1);
+			int selectedMonthTo = calTo.get(Calendar.MONTH);
 			int selectedDayTo = calTo.get(Calendar.DAY_OF_MONTH);
 
 			//Title
 			SimpleDateFormat titleFormat = new SimpleDateFormat("d MMM");
 			Calendar calTitleFrom = Calendar.getInstance();
 			Calendar calTitleTo = Calendar.getInstance();
-			calTitleFrom.set(selectedYearFrom, cal.get(Calendar.MONTH), selectedDayFrom);
-			calTitleTo.set(selectedYearTo, calTo.get(Calendar.MONTH), selectedDayTo);
+
+			calTitleFrom.set(selectedYearFrom, selectedMonthFrom, selectedDayFrom);
+			calTitleTo.set(selectedYearTo, selectedMonthTo, selectedDayTo);
 			Date dateFrom = calTitleFrom.getTime();
 			Date dateTo = calTitleTo.getTime();
 
@@ -2469,15 +2465,15 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			aB.setTitle(formattedDate);
 
 			int nodeDay, nodeMonth, nodeYear;
-			SimpleDateFormat df = new SimpleDateFormat("yyyy");
-
 
 			for (MegaNode node : nodes){
 				int period = 0;
 				Date d = new Date(node.getModificationTime()*1000);
-				nodeDay = d.getDay();
-				nodeMonth = (d.getMonth() + 1);
-				nodeYear = Integer.parseInt(df.format(d));
+				Calendar calNode = Calendar.getInstance();
+				calNode.setTime(d);
+				nodeDay = calNode.get(Calendar.DAY_OF_MONTH);
+				nodeMonth = calNode.get(Calendar.MONTH);
+				nodeYear = calNode.get(Calendar.YEAR);
 
 				//Period From
 				if(selectedYearFrom < nodeYear){

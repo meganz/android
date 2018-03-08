@@ -417,7 +417,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	public long parentHandleRubbish;
 	public long parentHandleIncoming;
 	public boolean isSearchEnabled;
-	public long[] typeOfSearch;
 	public long parentHandleOutgoing;
 	public long parentHandleSearch;
 	public long parentHandleInbox;
@@ -1050,8 +1049,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		outState.putSerializable("drawerItem", drawerItem);
 
 		outState.putBoolean("isSearchEnabled", isSearchEnabled);
-		outState.putLongArray("typeOfSearch",typeOfSearch);
-
+		outState.putLongArray("searchDate",searchDate);
 
 		if(parentHandleIncoming!=-1){
 			outState.putInt("deepBrowserTreeIncoming", deepBrowserTreeIncoming);
@@ -1136,7 +1134,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			deepBrowserTreeIncoming = savedInstanceState.getInt("deepBrowserTreeIncoming", 0);
 			deepBrowserTreeOutgoing = savedInstanceState.getInt("deepBrowserTreeOutgoing", 0);
 			isSearchEnabled = savedInstanceState.getBoolean("isSearchEnabled");
-			typeOfSearch = savedInstanceState.getLongArray("typeOfSearch");
+			searchDate = savedInstanceState.getLongArray("searchDate");
 
 			drawerItem = (DrawerItem) savedInstanceState.getSerializable("drawerItem");
 			log("DrawerItem onCreate = " + drawerItem);
@@ -3424,6 +3422,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 			case SEARCH:{
 				aB.setSubtitle(null);
+
 				if(parentHandleSearch==-1){
 					if(searchQuery!=null){
 						if(!searchQuery.isEmpty()){
@@ -4277,7 +4276,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
     		}
     		case SAVED_FOR_OFFLINE:{
 				aB.setSubtitle(null);
-    			tB.setVisibility(View.VISIBLE);
+				tB.setVisibility(View.VISIBLE);
 
     			if (oFLol == null){
 					log("New OfflineFragment");
@@ -4318,7 +4317,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
     		}
     		case CAMERA_UPLOADS:{
 				aB.setSubtitle(null);
-    			tB.setVisibility(View.VISIBLE);
+				tB.setVisibility(View.VISIBLE);
 
 				log("FirstTimeCam: " + firstTimeCam);
     			if (cuFL == null){
@@ -4398,7 +4397,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
     		}
     		case MEDIA_UPLOADS:{
 				aB.setSubtitle(null);
-    			tB.setVisibility(View.VISIBLE);
+				tB.setVisibility(View.VISIBLE);
 
 				if (nV != null){
 					Menu nVMenu = nV.getMenu();
@@ -4460,7 +4459,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
     		}
     		case INBOX:{
 				aB.setSubtitle(null);
-    			tB.setVisibility(View.VISIBLE);
+				tB.setVisibility(View.VISIBLE);
 				iFLol = new InboxFragmentLollipop().newInstance();
 
 //				MegaNode node = megaApi.getNodeByHandle(parentHandleInbox);
@@ -4543,7 +4542,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
     		}
     		case SETTINGS:{
 				aB.setSubtitle(null);
-    			tB.setVisibility(View.VISIBLE);
+				tB.setVisibility(View.VISIBLE);
 
     			drawerLayout.closeDrawer(Gravity.LEFT);
     			aB.setTitle(getString(R.string.action_settings));
@@ -11189,7 +11188,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				return;
 			}
 			searchDate = intent.getLongArrayExtra("SELECTED_DATE");
-			typeOfSearch = searchDate;
 			if (cuFL != null){
 				if(cuFL.isAdded()){
 					long cameraUploadHandle = cuFL.getPhotoSyncHandle();
@@ -12497,10 +12495,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 			if(e.getErrorCode()==MegaChatError.ERROR_OK){
 				log("CONNECT CHAT finished ");
-
-				if(rChatFL!=null){
-					if(rChatFL.isAdded()){
-						rChatFL.onlineStatusUpdate(megaChatApi.getOnlineStatus());
+				if(drawerItem == DrawerItem.CHAT){
+					if(rChatFL!=null){
+						if(rChatFL.isAdded()){
+							rChatFL.onlineStatusUpdate(megaChatApi.getOnlineStatus());
+						}
 					}
 				}
 			}
@@ -13466,7 +13465,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	}
 
 	public long[] getTypeOfSearch(){
-		return  typeOfSearch;
+		return  searchDate;
 	}
 
 	public boolean getIsSearchEnabled(){
@@ -14711,11 +14710,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			if(Util.isChatEnabled()){
 				if(userHandle == megaChatApi.getMyUserHandle()){
 					log("My own status update");
-					if(rChatFL!=null){
-						if(rChatFL.isAdded()){
-							rChatFL.onlineStatusUpdate(status);
+					if(drawerItem == DrawerItem.CHAT){
+							if(rChatFL!=null){
+								if(rChatFL.isAdded()){
+									rChatFL.onlineStatusUpdate(status);
+
+								}
+							}
 						}
-					}
 				}
 				else{
 					log("Status update for the user: "+userHandle);
@@ -14765,12 +14767,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 		if(newState==MegaChatApi.CHAT_CONNECTION_ONLINE && chatid==-1){
 			log("Online Connection: "+chatid);
-			if (rChatFL != null){
-				if(rChatFL.isAdded()){
-					rChatFL.setChats();
-					rChatFL.setStatus();
+				if (rChatFL != null){
+					if(rChatFL.isAdded()){
+						rChatFL.setChats();
+						if(drawerItem == DrawerItem.CHAT){
+							rChatFL.setStatus();
+						}
+					}
 				}
-			}
 		}
 	}
 
