@@ -11149,10 +11149,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					MegaNode nps = megaApi.getNodeByHandle(cameraUploadHandle);
 					if (nps != null){
 						ArrayList<MegaNode> nodes = megaApi.getChildren(nps, MegaApiJava.ORDER_MODIFICATION_DESC);
-						if(searchByDate != null){
+                        if((searchByDate) != null && (searchDate!=null)){
 							ArrayList<MegaNode> nodesSearch = cuFL.searchDate(searchDate, nodes);
 							cuFL.setNodes(nodesSearch);
 							isSearchEnabled = true;
+						}else{
+							cuFL.setNodes(nodes);
+
 						}
 
 					}
@@ -11165,10 +11168,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					MegaNode nps = megaApi.getNodeByHandle(cameraUploadHandle);
 					if (nps != null){
 						ArrayList<MegaNode> nodes = megaApi.getChildren(nps, MegaApiJava.ORDER_MODIFICATION_DESC);
-						if(searchByDate != null){
+						if((searchByDate) != null && (searchDate!=null)){
 							ArrayList<MegaNode> nodesSearch = muFLol.searchDate(searchDate, nodes);
 							muFLol.setNodes(nodesSearch);
 							isSearchEnabled = true;
+						}else{
+							muFLol.setNodes(nodes);
+
 						}
 					}
 				}
@@ -13566,6 +13572,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 		onNodesInboxUpdate();
 
+
 		if (cuFL != null){
 			if(cuFL.isAdded()){
 				long cameraUploadHandle = cuFL.getPhotoSyncHandle();
@@ -13578,11 +13585,20 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					if(firstNavigationLevel){
 						cuFL.setNodes(nodes);
 					}else{
-						if(searchByDate != null){
-							ArrayList<MegaNode> nodesSearch = cuFL.searchDate(searchDate, nodes);
-							cuFL.setNodes(nodesSearch);
-							isSearchEnabled = true;
-						}
+					    if(getIsSearchEnabled()){
+                            if((searchByDate != null)&&(searchDate !=null)){
+                                ArrayList<MegaNode> nodesSearch = cuFL.searchDate(searchDate, nodes);
+                                cuFL.setNodes(nodesSearch);
+                                isSearchEnabled = true;
+                            }else{
+                                cuFL.setNodes(nodes);
+
+                            }
+                        }else{
+                            cuFL.setNodes(nodes);
+
+                        }
+
 
 					}
 				}
@@ -13600,11 +13616,18 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					if(firstNavigationLevel){
 						muFLol.setNodes(nodes);
 					}else{
-						if(searchByDate != null){
-							ArrayList<MegaNode> nodesSearch = muFLol.searchDate(searchDate, nodes);
-							muFLol.setNodes(nodesSearch);
-							isSearchEnabled = true;
-						}
+                        if(getIsSearchEnabled()){
+                            if((searchByDate != null)&&(searchDate !=null)){
+                                ArrayList<MegaNode> nodesSearch = muFLol.searchDate(searchDate, nodes);
+                                muFLol.setNodes(nodesSearch);
+                                isSearchEnabled = true;
+                            }else{
+                                muFLol.setNodes(nodes);
+                            }
+                        }else{
+                            muFLol.setNodes(nodes);
+
+                        }
 
 					}
 				}
