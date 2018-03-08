@@ -3277,10 +3277,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						if (parentNode != null){
 							if(megaApi.getRootNode()!=null){
 								if (parentNode.getHandle() == megaApi.getRootNode().getHandle() || parentHandleBrowser == -1){
-									log("setToolbarTitle: cloud DRIVE 202");
 									aB.setTitle(getString(R.string.section_cloud_drive));
 									firstNavigationLevel = true;
-
 								}
 								else{
 									aB.setTitle(parentNode.getName());
@@ -3294,13 +3292,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						else{
 							if(megaApi.getRootNode()!=null){
 								parentHandleBrowser = megaApi.getRootNode().getHandle();
-								log("setToolbarTitle: cloud DRIVE 204");
 								aB.setTitle(getString(R.string.section_cloud_drive));
-								aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 								firstNavigationLevel = true;
 							}
 							else{
 								parentHandleBrowser = -1;
+								firstNavigationLevel = true;
 							}
 						}
 						break;
@@ -3309,23 +3306,17 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						log("setToolbarTitle: rubbish TAB");
 						if(parentHandleRubbish == megaApi.getRubbishNode().getHandle() || parentHandleRubbish == -1){
 							aB.setTitle(getResources().getString(R.string.section_rubbish_bin));
-							log("aB.setHomeAsUpIndicator_156");
-							aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 							firstNavigationLevel = true;
 						}
 						else{
 							MegaNode node = megaApi.getNodeByHandle(parentHandleRubbish);
 							aB.setTitle(node.getName());
-							log("indicator_arrow_back_969");
-							aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
 							firstNavigationLevel = false;
 						}
 						break;
 					}
 					default: {
 						aB.setTitle(getResources().getString(R.string.section_rubbish_bin));
-						log("aB.setHomeAsUpIndicator_8889");
-						aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 						firstNavigationLevel = true;
 						break;
 					}
@@ -3346,14 +3337,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 							if(parentHandleIncoming!=-1){
 								MegaNode node = megaApi.getNodeByHandle(parentHandleIncoming);
 								aB.setTitle(node.getName());
-								log("indicator_arrow_back_896");
-								aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
 								firstNavigationLevel = false;
 							}
 							else{
 								aB.setTitle(getResources().getString(R.string.section_shared_items));
-								log("aB.setHomeAsUpIndicator_22");
-								aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 								firstNavigationLevel = true;
 							}
 						}
@@ -3370,13 +3357,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 							if (parentHandleOutgoing != -1) {
 								MegaNode node = megaApi.getNodeByHandle(parentHandleOutgoing);
 								aB.setTitle(node.getName());
-								log("indicator_arrow_back_895");
-								aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
 								firstNavigationLevel = false;
 							} else {
 								aB.setTitle(getResources().getString(R.string.section_shared_items));
-								log("aB.setHomeAsUpIndicator_20");
-								aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 								firstNavigationLevel = true;
 							}
 						}
@@ -3384,26 +3367,50 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					}
 					default: {
 						aB.setTitle(getResources().getString(R.string.section_shared_items));
-						log("aB.setHomeAsUpIndicator_28");
-						aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 						firstNavigationLevel = true;
 						break;
 					}
 				}
 				break;
 			}
+			case SAVED_FOR_OFFLINE: {
+				aB.setSubtitle(null);
+
+				if(pathNavigationOffline!=null){
+
+					log("AFTER PathNavigation is: "+pathNavigationOffline);
+					if (pathNavigationOffline.equals("/")){
+						aB.setTitle(getString(R.string.section_saved_for_offline));
+						firstNavigationLevel=true;
+					}
+					else{
+						log("The pathNavigation is: "+pathNavigationOffline);
+						String title = pathNavigationOffline;
+						int index=title.lastIndexOf("/");
+						title=title.substring(0,index);
+						index=title.lastIndexOf("/");
+						title=title.substring(index+1,title.length());
+						aB.setTitle(title);
+						firstNavigationLevel=false;
+					}
+				}
+				else{
+					log("PathNavigation is NULL");
+					aB.setTitle(getString(R.string.section_saved_for_offline));
+					firstNavigationLevel=true;
+				}
+
+				break;
+			}
 			case INBOX:{
+				aB.setSubtitle(null);
 				if(parentHandleInbox==megaApi.getInboxNode().getHandle()||parentHandleInbox==-1){
 					aB.setTitle(getResources().getString(R.string.section_inbox));
-					log("aB.setHomeAsUpIndicator_886");
-					aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 					firstNavigationLevel = true;
 				}
 				else{
 					MegaNode node = megaApi.getNodeByHandle(parentHandleInbox);
 					aB.setTitle(node.getName());
-					log("indicator_arrow_back_893");
-					aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
 					firstNavigationLevel = false;
 				}
 				break;
@@ -3411,13 +3418,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			case CONTACTS:{
 				aB.setSubtitle(null);
 				aB.setTitle(getString(R.string.section_contacts));
-				aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 				firstNavigationLevel = true;
 				break;
 			}
 			case CHAT:{
-
-
+				tB.setVisibility(View.VISIBLE);
+				aB.setTitle(getString(R.string.section_chat));
+				firstNavigationLevel = true;
 				break;
 			}
 			case SEARCH:{
@@ -3426,29 +3433,24 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				if(parentHandleSearch==-1){
 					if(searchQuery!=null){
 						if(!searchQuery.isEmpty()){
-							log("aB.setHomeAsUpIndicator_4911");
 							aB.setTitle(getString(R.string.action_search)+": "+searchQuery);
-							aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+							firstNavigationLevel = true;
 						}
 						else{
-							log("aB.setHomeAsUpIndicator_481");
 							aB.setTitle(getString(R.string.action_search)+": "+"");
-							aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+							firstNavigationLevel = true;
 						}
 					}
 					else{
-						log("aB.setHomeAsUpIndicator_6611");
 						aB.setTitle(getString(R.string.action_search)+": "+"");
-						aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+						firstNavigationLevel = true;
 					}
 				}
 				else{
 					MegaNode parentNode = megaApi.getNodeByHandle(parentHandleSearch);
 					if (parentNode != null){
 						aB.setTitle(parentNode.getName());
-						log("aB.setHomeAsUpIndicator_9053");
-						aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
-						setFirstNavigationLevel(false);
+						firstNavigationLevel = false;
 					}
 				}
 				break;
@@ -3456,8 +3458,55 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			case SETTINGS:{
 				aB.setSubtitle(null);
 				aB.setTitle(getString(R.string.action_settings));
-				aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 				firstNavigationLevel = true;
+				break;
+			}
+			case ACCOUNT:{
+				aB.setSubtitle(null);
+				if(accountFragment==Constants.MY_ACCOUNT_FRAGMENT){
+					aB.setTitle(getString(R.string.section_account));
+					setFirstNavigationLevel(true);
+				}
+				else if(accountFragment==Constants.MONTHLY_YEARLY_FRAGMENT){
+					aB.setTitle(R.string.action_upgrade_account);
+					setFirstNavigationLevel(false);
+				}
+				else if(accountFragment==Constants.UPGRADE_ACCOUNT_FRAGMENT){
+					aB.setTitle(R.string.action_upgrade_account);
+					setFirstNavigationLevel(false);
+				}
+				else{
+					aB.setTitle(getString(R.string.section_account));
+					setFirstNavigationLevel(true);
+				}
+				break;
+			}
+			case TRANSFERS:{
+				aB.setSubtitle(null);
+				aB.setTitle(getString(R.string.section_transfers));
+				setFirstNavigationLevel(true);
+				break;
+			}
+			case CAMERA_UPLOADS:{
+				aB.setSubtitle(null);
+				if(isSearchEnabled){
+					setFirstNavigationLevel(false);
+				}
+				else{
+					setFirstNavigationLevel(true);
+				}
+				aB.setTitle(getString(R.string.section_photo_sync));
+				break;
+			}
+			case MEDIA_UPLOADS:{
+				aB.setSubtitle(null);
+				if(isSearchEnabled){
+					setFirstNavigationLevel(false);
+				}
+				else{
+					setFirstNavigationLevel(true);
+				}
+				aB.setTitle(getString(R.string.section_secondary_media_uploads));
 				break;
 			}
 			default:{
@@ -3815,6 +3864,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			viewPagerShares.setVisibility(View.VISIBLE);
 		}
 
+		setToolbarTitle();
+
 		drawerLayout.closeDrawer(Gravity.LEFT);
 	}
 
@@ -3996,13 +4047,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				fragmentContainer.setVisibility(View.GONE);
 				accountFragment=Constants.MY_ACCOUNT_FRAGMENT;
 
-				if(aB!=null){
-					aB.setTitle(getString(R.string.section_account));
-					log("indicator_menu_white_559");
-					aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
-					setFirstNavigationLevel(true);
-				}
-
 				tabLayoutMyAccount.setVisibility(View.VISIBLE);
 				viewPagerMyAccount.setVisibility(View.VISIBLE);
 
@@ -4083,7 +4127,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				});
 
 				drawerLayout.closeDrawer(Gravity.LEFT);
-
+				setToolbarTitle();
 				supportInvalidateOptionsMenu();
 				showFabButton();
 				break;
@@ -4182,9 +4226,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 		}
 
-		aB.setTitle(getString(R.string.section_transfers));
-		aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
-		firstNavigationLevel = true;
+		setToolbarTitle();
 
 		showFabButton();
 
@@ -4200,14 +4242,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			megaApi.createFolder(Constants.CHAT_FOLDER, megaApi.getRootNode(), null);
 		}
 
-		tB.setVisibility(View.VISIBLE);
-
-		if (aB == null){
-			aB = getSupportActionBar();
-		}
-		aB.setTitle(getString(R.string.section_chat));
-		aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
-		firstNavigationLevel = true;
+		setToolbarTitle();
 
 		tabLayoutShares.setVisibility(View.GONE);
 		viewPagerShares.setVisibility(View.GONE);
@@ -4275,7 +4310,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
     			break;
     		}
     		case SAVED_FOR_OFFLINE:{
-				aB.setSubtitle(null);
+
 				tB.setVisibility(View.VISIBLE);
 
     			if (oFLol == null){
@@ -4289,7 +4324,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 //    				oFLol.setPathNavigation("/");
     				oFLol.setIsList(isList);
 					oFLol.findNodes();
-					oFLol.setTitle();
     			}
 
     			tabLayoutCloud.setVisibility(View.GONE);
@@ -4312,11 +4346,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
     			drawerLayout.closeDrawer(Gravity.LEFT);
 
     			supportInvalidateOptionsMenu();
+    			setToolbarTitle();
 				showFabButton();
     			break;
     		}
     		case CAMERA_UPLOADS:{
-				aB.setSubtitle(null);
 				tB.setVisibility(View.VISIBLE);
 
 				log("FirstTimeCam: " + firstTimeCam);
@@ -4334,8 +4368,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				else{
 					cuFL.setFirstTimeCam(firstTimeCam);
 				}
-
-				invalidateOptionsMenu();
 
     			tabLayoutCloud.setVisibility(View.GONE);
     			viewPagerCDrive.setVisibility(View.GONE);
@@ -4391,12 +4423,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 				drawerLayout.closeDrawer(Gravity.LEFT);
 
+				setToolbarTitle();
     			supportInvalidateOptionsMenu();
 				showFabButton();
       			break;
     		}
     		case MEDIA_UPLOADS:{
-				aB.setSubtitle(null);
+
 				tB.setVisibility(View.VISIBLE);
 
 				if (nV != null){
@@ -4417,8 +4450,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
                     }
 				}
 
-				invalidateOptionsMenu();
-
     			tabLayoutCloud.setVisibility(View.GONE);
     			viewPagerCDrive.setVisibility(View.GONE);
 				tabLayoutContacts.setVisibility(View.GONE);
@@ -4431,10 +4462,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				viewPagerTransfers.setVisibility(View.GONE);
 
 				fragmentContainer.setVisibility(View.VISIBLE);
-
-//				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-//				ft.replace(R.id.fragment_container, muFLol, "muFLol");
-//    			ft.commitNow();
 
 				FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
 				Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("muFLol");
@@ -4454,45 +4481,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				drawerLayout.closeDrawer(Gravity.LEFT);
 
     			supportInvalidateOptionsMenu();
+    			setToolbarTitle();
 				showFabButton();
       			break;
     		}
     		case INBOX:{
-				aB.setSubtitle(null);
+
 				tB.setVisibility(View.VISIBLE);
 				iFLol = new InboxFragmentLollipop().newInstance();
-
-//				MegaNode node = megaApi.getNodeByHandle(parentHandleInbox);
-//				log("Selected Inbox with parent: "+parentHandleInbox);
-////					log("inSFLol deepBrowserTreeIncoming: "+deepBrowserTreeInbox);
-//				if (node != null){
-//					log("Go to inbox node: "+node.getName());
-//
-//					ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleInbox), orderCloud);
-//					iFLol.setNodes(nodes);
-//
-//					if(parentHandleInbox==megaApi.getInboxNode().getHandle()){
-//						aB.setTitle(getResources().getString(R.string.section_inbox));
-//						log("aB.setHomeAsUpIndicator_886");
-//						aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
-//						firstNavigationLevel = true;
-//					}
-//					else{
-//						aB.setTitle(node.getName());
-//						log("indicator_arrow_back_893");
-//						aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
-//						firstNavigationLevel = false;
-//					}
-//				}
-//				else{
-//					log("The Node is NULL");
-//					ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getInboxNode(), orderCloud);
-//					iFLol.setNodes(nodes);
-//					aB.setTitle(getResources().getString(R.string.section_inbox));
-//					log("aB.setHomeAsUpIndicator_16");
-//					aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
-//					firstNavigationLevel = true;
-//				}
 
     			tabLayoutCloud.setVisibility(View.GONE);
     			viewPagerCDrive.setVisibility(View.GONE);
@@ -4530,7 +4526,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					openFolderFromSearch = false;
 				}
     			supportInvalidateOptionsMenu();
-				setToolbarTitle();
+
 				showFabButton();
     			break;
     		}
@@ -4545,9 +4541,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				tB.setVisibility(View.VISIBLE);
 
     			drawerLayout.closeDrawer(Gravity.LEFT);
-    			aB.setTitle(getString(R.string.action_settings));
-    			aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
-    			setFirstNavigationLevel(true);
+
     			supportInvalidateOptionsMenu();
 
 				tabLayoutContacts.setVisibility(View.GONE);
@@ -4576,6 +4570,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 				fragmentContainer.setVisibility(View.VISIBLE);
 
+				setToolbarTitle();
 				supportInvalidateOptionsMenu();
 				showFabButton();
 				break;
@@ -4784,11 +4779,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	public void showmyF(int paymentMethod, int type){
 		log("showmyF");
 
-		aB.setTitle(R.string.action_upgrade_account);
-		aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
-		setFirstNavigationLevel(false);
-
 		accountFragment = Constants.MONTHLY_YEARLY_FRAGMENT;
+		setToolbarTitle();
 
 		tabLayoutCloud.setVisibility(View.GONE);
 		viewPagerCDrive.setVisibility(View.GONE);
@@ -4819,11 +4811,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	public void showUpAF(){
 		log("showUpAF");
 
-		aB.setTitle(R.string.action_upgrade_account);
-		aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
-		setFirstNavigationLevel(false);
-
 		accountFragment=Constants.UPGRADE_ACCOUNT_FRAGMENT;
+		setToolbarTitle();
 
 		tabLayoutContacts.setVisibility(View.GONE);
 		viewPagerContacts.setVisibility(View.GONE);
@@ -4896,10 +4885,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			public boolean onQueryTextSubmit(String query) {
 				searchQuery = "" + query;
 				selectDrawerItemLollipop(DrawerItem.SEARCH);
-				aB.setTitle(getString(R.string.action_search)+": "+searchQuery);
-				log("aB.setHomeAsUpIndicator_49");
-				aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
-				setFirstNavigationLevel(true);
+				setToolbarTitle();
 				supportInvalidateOptionsMenu();
 				log("Search query: " + query);
 				textSubmitted = true;
@@ -6148,12 +6134,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 								if (nps != null){
 									ArrayList<MegaNode> nodes = megaApi.getChildren(nps, MegaApiJava.ORDER_MODIFICATION_DESC);
 									cuFL.setNodes(nodes);
-									aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
-									setFirstNavigationLevel(true);
-									aB.setTitle(getString(R.string.section_photo_sync));
 									isSearchEnabled=false;
+									setToolbarTitle();
 									invalidateOptionsMenu();
-
 								}
 								return true;
 							}
@@ -6168,9 +6151,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 								if (nps != null){
 									ArrayList<MegaNode> nodes = megaApi.getChildren(nps, MegaApiJava.ORDER_MODIFICATION_DESC);
 									muFLol.setNodes(nodes);
-									aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
-									setFirstNavigationLevel(true);
-									aB.setTitle(getString(R.string.section_secondary_media_uploads));
+									setToolbarTitle();
 									isSearchEnabled=false;
 									invalidateOptionsMenu();
 								}
@@ -10753,8 +10734,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
     	if ((intent != null) && Intent.ACTION_SEARCH.equals(intent.getAction())){
     		searchQuery = intent.getStringExtra(SearchManager.QUERY);
     		parentHandleSearch = -1;
-    		aB.setTitle(getString(R.string.action_search)+": "+searchQuery);
-			aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+    		setToolbarTitle();
     		isSearching = true;
 
     		if (searchMenuItem != null) {

@@ -7,8 +7,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.LayoutInflater;
@@ -44,7 +42,6 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 	static int HEIGHT_PAYMENT_METHODS_LAYOUT=50;
 
 //	View v = null;
-	private ActionBar aB;
 	private MegaApiAndroid megaApi;
 	public MyAccountInfo myAccountInfo;
 
@@ -187,10 +184,6 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
 		}
 
-		if (aB == null){
-			aB = ((AppCompatActivity)context).getSupportActionBar();
-		}
-		
 		Display display = ((Activity) context).getWindowManager().getDefaultDisplay();
 		outMetrics = new DisplayMetrics();
 		display.getMetrics(outMetrics);
@@ -998,7 +991,6 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 	public void onAttach(Activity activity) {
 		super.onAttach(activity);
 		context = activity;
-		aB = ((AppCompatActivity)activity).getSupportActionBar();
 	}
 	
 	public static void log(String log) {
