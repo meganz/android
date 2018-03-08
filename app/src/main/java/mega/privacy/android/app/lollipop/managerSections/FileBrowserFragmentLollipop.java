@@ -1090,16 +1090,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 				if ((n.getHandle()==Long.parseLong(secondaryMediaHandle))){
 					log("Click on Media Uploads");
 					((ManagerActivityLollipop)context).secondaryMediaUploadsClicked();
-					log("aB.setTitle "+n.getName());
-					if(aB==null){
-						aB = ((AppCompatActivity)context).getSupportActionBar();
-					}
-					if(aB==null){
-						log("AB still is NULL");
-					}
-
-					aB.setTitle(n.getName());
-					log("indicator_arrow_back_003");
 					return;
 				}
 			}
@@ -1112,34 +1102,13 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 				dbH.setSecondaryFolderHandle(n.getHandle());
 				log("FOUND Media Uploads!!: "+n.getHandle());
 				((ManagerActivityLollipop)context).secondaryMediaUploadsClicked();
-				log("aB.setTitle "+n.getName());
-				if(aB==null){
-					aB = ((AppCompatActivity)context).getSupportActionBar();
-				}
-				if(aB==null){
-					log("AB still is NULL");
-				}
-
-				aB.setTitle(n.getName());
-				log("indicator_arrow_back_696");
 				return;
 			}
 		}
-		log("aB.setTitle "+n.getName());
-		if(aB==null){
-			aB = ((AppCompatActivity)context).getSupportActionBar();
-		}
-		if(aB==null){
-			log("AB still is NULL");
-		}
 
-		aB.setTitle(n.getName());
-		log("indicator_arrow_back_036");
-		aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
-		((ManagerActivityLollipop)context).setFirstNavigationLevel(false);
-		((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
+		((ManagerActivityLollipop)context).parentHandleBrowser = n.getHandle();
 
-		((ManagerActivityLollipop)context).setParentHandleBrowser(n.getHandle());
+		((ManagerActivityLollipop)context).setToolbarTitle();
 
 		MegaNode infoNode = megaApi.getNodeByHandle(((ManagerActivityLollipop)context).parentHandleBrowser);
 
@@ -1301,20 +1270,10 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 				emptyImageView.setVisibility(View.GONE);
 				emptyTextView.setVisibility(View.GONE);
 
-				if (parentNode.getHandle() == megaApi.getRootNode().getHandle()){
-					log("Parent is ROOT");
-					aB.setTitle(getString(R.string.section_cloud_drive));
-					aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
-					((ManagerActivityLollipop)context).setFirstNavigationLevel(true);
-				}
-				else{
-					aB.setTitle(parentNode.getName());
-					log("indicator_arrow_back_033");
-					aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
-					((ManagerActivityLollipop)context).setFirstNavigationLevel(false);
-				}
-				((ManagerActivityLollipop)context).setParentHandleBrowser(parentNode.getHandle());
+				((ManagerActivityLollipop)context).parentHandleBrowser = parentNode.getHandle();
 				((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
+
+				((ManagerActivityLollipop)context).setToolbarTitle();
 
 				nodes = megaApi.getChildren(parentNode, ((ManagerActivityLollipop)context).orderCloud);
 				adapter.setNodes(nodes);
@@ -1488,14 +1447,12 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 				MegaNode infoNode = megaApi.getRootNode();
 				if (infoNode !=  null){
 					contentText.setText(MegaApiUtils.getInfoFolder(infoNode, context));
-	//				aB.setTitle(getString(R.string.section_cloud_drive));
 				}
 			}
 			else{
 				MegaNode infoNode = megaApi.getNodeByHandle(((ManagerActivityLollipop)context).parentHandleBrowser);
 				if (infoNode !=  null){
 					contentText.setText(MegaApiUtils.getInfoFolder(infoNode, context));
-	//				aB.setTitle(infoNode.getName());
 				}
 			}
 			log("contentText: "+contentText.getText());
