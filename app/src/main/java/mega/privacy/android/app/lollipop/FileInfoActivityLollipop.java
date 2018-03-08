@@ -259,266 +259,303 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
 	String contactMail;
 
+    private int adapterType;
+ 	private String path;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 
 		super.onCreate(savedInstanceState);
 		log("onCreate");
-		if (megaApi == null){
-			MegaApplication app = (MegaApplication)getApplication();
-			megaApi = app.getMegaApi();
-		}
-		if(megaApi==null||megaApi.getRootNode()==null){
-			log("Refresh session - sdk");
-			Intent intent = new Intent(this, LoginActivityLollipop.class);
-			intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
-			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-			startActivity(intent);
-			finish();
-			return;
-		}
-		if(Util.isChatEnabled()){
-			if (megaChatApi == null){
-				megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
-			}
 
-			if(megaChatApi==null||megaChatApi.getInitState()== MegaChatApi.INIT_ERROR){
-				log("Refresh session - karere");
-				Intent intent = new Intent(this, LoginActivityLollipop.class);
-				intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
-				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-				startActivity(intent);
-				finish();
-				return;
-			}
-		}
+        fileInfoActivity = this;
+        handler = new Handler();
 
-		megaApi.addGlobalListener(this);
+        Bundle extras = getIntent().getExtras();
+        if (extras != null) {
+            imageId = extras.getInt("imageId");
+        }
 
-		fileInfoActivity = this;
-		handler = new Handler();
+        display = getWindowManager().getDefaultDisplay();
+        outMetrics = new DisplayMetrics ();
+        display.getMetrics(outMetrics);
+        density  = getResources().getDisplayMetrics().density;
+
+        scaleW = Util.getScaleW(outMetrics, density);
+        scaleH = Util.getScaleH(outMetrics, density);
+
+        if (scaleH < scaleW){
+            scaleText = scaleH;
+        }
+        else{
+            scaleText = scaleW;
+        }
+
+        adapterType = getIntent().getIntExtra("adapterType", 0);
+        path = getIntent().getStringExtra("path");
+
+        setContentView(R.layout.activity_file_info);
+
+        permissionInfo = (TextView) findViewById(R.id.file_properties_permission_info);
+        permissionInfo.setVisibility(View.GONE);
+
+        fragmentContainer = (CoordinatorLayout) findViewById(R.id.file_info_fragment_container);
+
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        aB = getSupportActionBar();
+        collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.file_info_collapse_toolbar);
+
+        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+            collapsingToolbar.setExpandedTitleMarginBottom(Util.scaleHeightPx(60, outMetrics));
+        }
+        else
+        {
+
+            collapsingToolbar.setExpandedTitleMarginBottom(Util.scaleHeightPx(35, outMetrics));
+        }
+        collapsingToolbar.setExpandedTitleMarginStart((int) getResources().getDimension(R.dimen.recycler_view_separator));
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+
+        aB.setHomeButtonEnabled(true);
+        aB.setDisplayHomeAsUpEnabled(true);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            Window window = this.getWindow();
+            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+            window.setStatusBarColor(ContextCompat.getColor(this, R.color.transparent_black));
+        }
+
+        iconToolbarLayout = (RelativeLayout) findViewById(R.id.file_info_icon_layout);
+
+        iconToolbarView = (ImageView) findViewById(R.id.file_info_toolbar_icon);
+        iconToolbarView.setImageResource(imageId);
+        iconToolbarViewLink=(ImageView) findViewById(R.id.file_properties_public_link_image_title);
+
+        imageToolbarLayout = (RelativeLayout) findViewById(R.id.file_info_image_layout);
+        imageToolbarView = (ImageView) findViewById(R.id.file_info_toolbar_image);
+        imageToolbarLayout.setVisibility(View.GONE);
+
+        //Available Offline Layout
+
+        availableOfflineLayout = (LinearLayout) findViewById(R.id.available_offline_layout);
+        availableOfflineLayout.setVisibility(View.VISIBLE);
+
+        availableOfflineView = (TextView) findViewById(R.id.file_properties_available_offline_text);
+
+        offlineSwitch = (SwitchCompat) findViewById(R.id.file_properties_switch);
+
+        //Share with Layout
+
+        sharedLayout = (RelativeLayout) findViewById(R.id.file_properties_shared_layout);
+        sharedLayout.setOnClickListener(this);
+
+        shareIcon = (ImageView) findViewById(R.id.file_properties_shared_image);
+
+        usersSharedWithTextButton = (Button) findViewById(R.id.file_properties_shared_info_button);
+        usersSharedWithTextButton.setOnClickListener(this);
+
+        dividerSharedLayout = (View) findViewById(R.id.divider_shared_layout);
+
+        //Permissions Layout
+        //permissionsLayout = (RelativeLayout) findViewById(R.id.file_properties_permissions_layout);
+        //permissionsLayout.setVisibility(View.GONE);
+
+
+        //permissionsIcon = (ImageView) findViewById(R.id.file_properties_permissions_image);
+
+        //permissionLabel = (TextView) findViewById(R.id.file_properties_permission_label);
+        appBarLayout = (AppBarLayout) findViewById(R.id.app_bar);
+
+        //Owner Layout
+        ownerLayout = (RelativeLayout) findViewById(R.id.file_properties_owner_layout);
+        ownerRoundeImage= (RoundedImageView) findViewById(R.id.contact_list_thumbnail);
+        ownerLetter = (TextView) findViewById(R.id.contact_list_initial_letter);
+
+        ownerLinear = (LinearLayout) findViewById(R.id.file_properties_owner_linear);
+        ownerLabel =  (TextView) findViewById(R.id.file_properties_owner_label);
+        ownerLabelowner = (TextView) findViewById(R.id.file_properties_owner_label_owner);
+        String ownerString = "("+getString(R.string.file_properties_owner)+")";
+        ownerLabelowner.setText(ownerString);
+        ownerInfo = (TextView) findViewById(R.id.file_properties_owner_info);
+
+
+        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+            log("Landscape configuration");
+            float width1 = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MAX_WIDTH_FILENAME_LAND, getResources().getDisplayMetrics());
+            float width2 = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MAX_WIDTH_FILENAME_LAND_2, getResources().getDisplayMetrics());
+
+            ownerLabel.setMaxWidth((int) width1);
+            ownerInfo.setMaxWidth((int) width2);
+
+        }
+        else{
+            log("Portrait configuration");
+            float width1 = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MAX_WIDTH_FILENAME_PORT, getResources().getDisplayMetrics());
+            float width2 = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MAX_WIDTH_FILENAME_PORT_2, getResources().getDisplayMetrics());
+
+            ownerLabel.setMaxWidth((int) width1);
+            ownerInfo.setMaxWidth((int) width2);
+        }
+
+        ownerLayout.setVisibility(View.GONE);
+
+        //Info Layout
+        infoTittle = (TextView) findViewById(R.id.file_properties_info_menu_info);
+
+        infoIcon = (ImageView) findViewById(R.id.file_properties_info_image);
+
+        sizeLayout = (RelativeLayout) findViewById(R.id.file_properties_size_layout);
+        sizeTitleTextView  = (TextView) findViewById(R.id.file_properties_info_menu_size);
+        sizeTextView = (TextView) findViewById(R.id.file_properties_info_data_size);
+
+        //Content Layout
+        contentLayout = (RelativeLayout) findViewById(R.id.file_properties_content_layout);
+
+        publicLinkLayout = (RelativeLayout) findViewById(R.id.file_properties_link_layout);
+        publicLinkCopyLayout = (RelativeLayout) findViewById(R.id.file_properties_copy_layout);
+
+        publicLinkText = (TextView) findViewById(R.id.file_properties_link_text);
+        publicLinkIcon = (ImageView) findViewById(R.id.file_properties_public_link_image);
+        publicLinkButton = (Button) findViewById(R.id.file_properties_link_button);
+        publicLinkButton.setText(getString(R.string.context_copy));
+        publicLinkButton.setOnClickListener(this);
+
+        contentTitleTextView  = (TextView) findViewById(R.id.file_properties_info_menu_content);
+        contentTextView = (TextView) findViewById(R.id.file_properties_info_data_content);
+
+        //Added Layout
+
+        addedLayout = (RelativeLayout) findViewById(R.id.file_properties_added_layout);
+        addedTextView = (TextView) findViewById(R.id.file_properties_info_data_added);
+
+        //Modified Layout
+        modifiedLayout = (RelativeLayout) findViewById(R.id.file_properties_modified_layout);
+        modifiedTextView = (TextView) findViewById(R.id.file_properties_info_data_modified);
+
+        //Versions Layout
+        versionsLayout = (RelativeLayout) findViewById(R.id.file_properties_versions_layout);
+        versionsButton = (Button) findViewById(R.id.file_properties_text_number_versions);
+        separatorVersions = (View) findViewById(R.id.separator_versions);
+
+        if (adapterType == Constants.OFFLINE_ADAPTER){
+            iconToolbarViewLink.setVisibility(View.GONE);
+            collapsingToolbar.setTitle(getIntent().getStringExtra("name"));
+            availableOfflineLayout.setVisibility(View.GONE);
+            sharedLayout.setVisibility(View.GONE);
+            dividerSharedLayout.setVisibility(View.GONE);
+            publicLinkLayout.setVisibility(View.GONE);
+            publicLinkCopyLayout.setVisibility(View.GONE);
+            contentLayout.setVisibility(View.GONE);
+            addedLayout.setVisibility(View.GONE);
+            modifiedLayout.setVisibility(View.GONE);
+            versionsLayout.setVisibility(View.GONE);
+            separatorVersions.setVisibility(View.GONE);
+
+            if (path != null){
+                log("Path no NULL");
+                File file = new File (path);
+                sizeTextView.setText(Util.getSizeString(file.length()));
+                log("Path: "+file.getAbsolutePath()+ " size: "+file.length());
+            }
+            else {
+                log("Path is NULL");
+            }
+        }
+        else {
+            if (megaApi == null){
+                MegaApplication app = (MegaApplication)getApplication();
+                megaApi = app.getMegaApi();
+            }
+            if(megaApi==null||megaApi.getRootNode()==null){
+                log("Refresh session - sdk");
+                Intent intent = new Intent(this, LoginActivityLollipop.class);
+                intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
+                finish();
+                return;
+            }
+            if(Util.isChatEnabled()) {
+                if (megaChatApi == null) {
+                    megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
+                }
+
+                if (megaChatApi == null || megaChatApi.getInitState() == MegaChatApi.INIT_ERROR) {
+                    log("Refresh session - karere");
+                    Intent intent = new Intent(this, LoginActivityLollipop.class);
+                    intent.putExtra("visibleFragment", Constants.LOGIN_FRAGMENT);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(intent);
+                    finish();
+                    return;
+                }
+            }
+
+            megaApi.addGlobalListener(this);
 
 //		dbH = new DatabaseHandler(getApplicationContext());
-		dbH = DatabaseHandler.getDbHandler(getApplicationContext());
+            dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 
-		display = getWindowManager().getDefaultDisplay();
-		outMetrics = new DisplayMetrics ();
-	    display.getMetrics(outMetrics);
-	    density  = getResources().getDisplayMetrics().density;
+            if (extras != null){
+                imageId = extras.getInt("imageId");
+                from = extras.getInt("from");
+                if(from==FROM_INCOMING_SHARES){
+                    firstIncomingLevel = extras.getBoolean("firstLevel");
+                }
+                accountType = extras.getInt("typeAccount", MegaAccountDetails.ACCOUNT_TYPE_FREE);
+                long handleNode = extras.getLong("handle", -1);
+                log("Handle of the selected node: "+handleNode);
+                node = megaApi.getNodeByHandle(handleNode);
+                if (node == null){
+                    log("Node is NULL");
+                    finish();
+                    return;
+                }
 
-	    scaleW = Util.getScaleW(outMetrics, density);
-	    scaleH = Util.getScaleH(outMetrics, density);
+                String name = node.getName();
 
-		if (scaleH < scaleW){
-			scaleText = scaleH;
-		}
-		else{
-			scaleText = scaleW;
-		}
+                collapsingToolbar.setTitle(name);
 
-		Bundle extras = getIntent().getExtras();
-		if (extras != null){
-			imageId = extras.getInt("imageId");
-			from = extras.getInt("from");
-			if(from==FROM_INCOMING_SHARES){
-				firstIncomingLevel = extras.getBoolean("firstLevel");
-			}
-			accountType = extras.getInt("typeAccount", MegaAccountDetails.ACCOUNT_TYPE_FREE);
-			long handleNode = extras.getLong("handle", -1);
-			log("Handle of the selected node: "+handleNode);
-			node = megaApi.getNodeByHandle(handleNode);
-			if (node == null){
-				log("Node is NULL");
-				finish();
-				return;
-			}
+                MegaNode parent = megaApi.getNodeByHandle(node.getHandle());
+                while (megaApi.getParentNode(parent) != null){
+                    parent = megaApi.getParentNode(parent);
+                }
 
-			String name = node.getName();
+                if (parent.getHandle() != megaApi.getRubbishNode().getHandle()){
+                    offlineSwitch.setEnabled(true);
+                    offlineSwitch.setOnClickListener(this);
+                    availableOfflineView.setTextColor(getResources().getColor(R.color.name_my_account));
+                }else{
+                    offlineSwitch.setEnabled(false);
+                    availableOfflineView.setTextColor(getResources().getColor(R.color.invite_button_deactivated));
 
-			setContentView(R.layout.activity_file_info);
+                }
 
-			permissionInfo = (TextView) findViewById(R.id.file_properties_permission_info);
-			permissionInfo.setVisibility(View.GONE);
+                if(megaApi.hasVersions(node)){
+                    versionsLayout.setVisibility(View.VISIBLE);
+                    versionsButton.setText(String.format(getString(R.string.number_of_versions), megaApi.getNumVersions(node)));
+                    versionsButton.setOnClickListener(this);
+                    separatorVersions.setVisibility(View.VISIBLE);
 
-			fragmentContainer = (CoordinatorLayout) findViewById(R.id.file_info_fragment_container);
+                    nodeVersions = megaApi.getVersions(node);
+                }
+                else{
+                    versionsLayout.setVisibility(View.GONE);
+                    separatorVersions.setVisibility(View.GONE);
+                }
 
-			toolbar = (Toolbar) findViewById(R.id.toolbar);
-			setSupportActionBar(toolbar);
-			aB = getSupportActionBar();
-			collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.file_info_collapse_toolbar);
+            }
+            else{
+                log("Extras is NULL");
+            }
 
-			if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-				collapsingToolbar.setExpandedTitleMarginBottom(Util.scaleHeightPx(60, outMetrics));
-			}
-			else
-			{
+            refreshProperties();
+            supportInvalidateOptionsMenu();
 
-				collapsingToolbar.setExpandedTitleMarginBottom(Util.scaleHeightPx(35, outMetrics));
-			}
-			collapsingToolbar.setExpandedTitleMarginStart((int) getResources().getDimension(R.dimen.recycler_view_separator));
-			getSupportActionBar().setDisplayShowTitleEnabled(false);
-
-			collapsingToolbar.setTitle(name);
-
-			aB.setHomeButtonEnabled(true);
-			aB.setDisplayHomeAsUpEnabled(true);
-
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-				Window window = this.getWindow();
-				window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-				window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-				window.setStatusBarColor(ContextCompat.getColor(this, R.color.transparent_black));
-			}
-
-			iconToolbarLayout = (RelativeLayout) findViewById(R.id.file_info_icon_layout);
-
-			iconToolbarView = (ImageView) findViewById(R.id.file_info_toolbar_icon);
-			iconToolbarView.setImageResource(imageId);
-			iconToolbarViewLink=(ImageView) findViewById(R.id.file_properties_public_link_image_title);
-
-			imageToolbarLayout = (RelativeLayout) findViewById(R.id.file_info_image_layout);
-			imageToolbarView = (ImageView) findViewById(R.id.file_info_toolbar_image);
-			imageToolbarLayout.setVisibility(View.GONE);
-
-			//Available Offline Layout
-
-			availableOfflineLayout = (LinearLayout) findViewById(R.id.available_offline_layout);
-			availableOfflineLayout.setVisibility(View.VISIBLE);
-
-			availableOfflineView = (TextView) findViewById(R.id.file_properties_available_offline_text);
-
-			offlineSwitch = (SwitchCompat) findViewById(R.id.file_properties_switch);
-
-			MegaNode parent = megaApi.getNodeByHandle(node.getHandle());
-			while (megaApi.getParentNode(parent) != null){
-				parent = megaApi.getParentNode(parent);
-			}
-
-			if (parent.getHandle() != megaApi.getRubbishNode().getHandle()){
-				offlineSwitch.setEnabled(true);
-				offlineSwitch.setOnClickListener(this);
-				availableOfflineView.setTextColor(getResources().getColor(R.color.name_my_account));
-			}else{
-				offlineSwitch.setEnabled(false);
-				availableOfflineView.setTextColor(getResources().getColor(R.color.invite_button_deactivated));
-
-			}
-
-			//Share with Layout
-
-			sharedLayout = (RelativeLayout) findViewById(R.id.file_properties_shared_layout);
-			sharedLayout.setOnClickListener(this);
-
-			shareIcon = (ImageView) findViewById(R.id.file_properties_shared_image);
-
-			usersSharedWithTextButton = (Button) findViewById(R.id.file_properties_shared_info_button);
-			usersSharedWithTextButton.setOnClickListener(this);
-
-			dividerSharedLayout = (View) findViewById(R.id.divider_shared_layout);
-
-			//Permissions Layout
-			//permissionsLayout = (RelativeLayout) findViewById(R.id.file_properties_permissions_layout);
-			//permissionsLayout.setVisibility(View.GONE);
-
-
-		    //permissionsIcon = (ImageView) findViewById(R.id.file_properties_permissions_image);
-
-			//permissionLabel = (TextView) findViewById(R.id.file_properties_permission_label);
-			appBarLayout = (AppBarLayout) findViewById(R.id.app_bar);
-
-			//Owner Layout
-			ownerLayout = (RelativeLayout) findViewById(R.id.file_properties_owner_layout);
-			ownerRoundeImage= (RoundedImageView) findViewById(R.id.contact_list_thumbnail);
-			ownerLetter = (TextView) findViewById(R.id.contact_list_initial_letter);
-
-			ownerLinear = (LinearLayout) findViewById(R.id.file_properties_owner_linear);
-			ownerLabel =  (TextView) findViewById(R.id.file_properties_owner_label);
-			ownerLabelowner = (TextView) findViewById(R.id.file_properties_owner_label_owner);
-			String ownerString = "("+getString(R.string.file_properties_owner)+")";
-			ownerLabelowner.setText(ownerString);
-			ownerInfo = (TextView) findViewById(R.id.file_properties_owner_info);
-
-
-			if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-				log("Landscape configuration");
-				float width1 = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MAX_WIDTH_FILENAME_LAND, getResources().getDisplayMetrics());
-				float width2 = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MAX_WIDTH_FILENAME_LAND_2, getResources().getDisplayMetrics());
-
-				ownerLabel.setMaxWidth((int) width1);
-				ownerInfo.setMaxWidth((int) width2);
-
-			}
-			else{
-				log("Portrait configuration");
-				float width1 = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MAX_WIDTH_FILENAME_PORT, getResources().getDisplayMetrics());
-				float width2 = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MAX_WIDTH_FILENAME_PORT_2, getResources().getDisplayMetrics());
-
-				ownerLabel.setMaxWidth((int) width1);
-				ownerInfo.setMaxWidth((int) width2);
-			}
-
-			ownerLayout.setVisibility(View.GONE);
-
-			//Info Layout
-			infoTittle = (TextView) findViewById(R.id.file_properties_info_menu_info);
-
-		    infoIcon = (ImageView) findViewById(R.id.file_properties_info_image);
-
-			sizeLayout = (RelativeLayout) findViewById(R.id.file_properties_size_layout);
-			sizeTitleTextView  = (TextView) findViewById(R.id.file_properties_info_menu_size);
-			sizeTextView = (TextView) findViewById(R.id.file_properties_info_data_size);
-
-			//Content Layout
-			contentLayout = (RelativeLayout) findViewById(R.id.file_properties_content_layout);
-
-			publicLinkLayout = (RelativeLayout) findViewById(R.id.file_properties_link_layout);
-			publicLinkCopyLayout = (RelativeLayout) findViewById(R.id.file_properties_copy_layout);
-
-			publicLinkText = (TextView) findViewById(R.id.file_properties_link_text);
-			publicLinkIcon = (ImageView) findViewById(R.id.file_properties_public_link_image);
-			publicLinkButton = (Button) findViewById(R.id.file_properties_link_button);
-			publicLinkButton.setText(getString(R.string.context_copy));
-			publicLinkButton.setOnClickListener(this);
-
-			contentTitleTextView  = (TextView) findViewById(R.id.file_properties_info_menu_content);
-			contentTextView = (TextView) findViewById(R.id.file_properties_info_data_content);
-
-			//Added Layout
-
-			addedLayout = (RelativeLayout) findViewById(R.id.file_properties_added_layout);
-		    addedTextView = (TextView) findViewById(R.id.file_properties_info_data_added);
-
-		    //Modified Layout
-		    modifiedLayout = (RelativeLayout) findViewById(R.id.file_properties_modified_layout);
-			modifiedTextView = (TextView) findViewById(R.id.file_properties_info_data_modified);
-
-			//Versions Layout
-			versionsLayout = (RelativeLayout) findViewById(R.id.file_properties_versions_layout);
-			versionsButton = (Button) findViewById(R.id.file_properties_text_number_versions);
-			separatorVersions = (View) findViewById(R.id.separator_versions);
-
-			if(megaApi.hasVersions(node)){
-				versionsLayout.setVisibility(View.VISIBLE);
-				versionsButton.setText(String.format(getString(R.string.number_of_versions), megaApi.getNumVersions(node)));
-				versionsButton.setOnClickListener(this);
-				separatorVersions.setVisibility(View.VISIBLE);
-
-				nodeVersions = megaApi.getVersions(node);
-			}
-			else{
-				versionsLayout.setVisibility(View.GONE);
-				separatorVersions.setVisibility(View.GONE);
-			}
-
-		}
-		else{
-			log("Extras is NULL");
-		}
-
-		refreshProperties();
-		supportInvalidateOptionsMenu();
-
-		((MegaApplication) getApplication()).sendSignalPresenceActivity();
+            ((MegaApplication) getApplication()).sendSignalPresenceActivity();
+        }
 	}
 
 	@Override
@@ -552,201 +589,210 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 		deleteMenuItem = menu.findItem(R.id.cab_menu_file_info_delete);
 		leaveMenuItem = menu.findItem(R.id.cab_menu_file_info_leave);
 
-		MegaNode parent = megaApi.getNodeByHandle(node.getHandle());
-		if(parent != null){
 
-			while (megaApi.getParentNode(parent) != null){
-				parent = megaApi.getParentNode(parent);
+		if (adapterType == Constants.OFFLINE_ADAPTER){
+            downloadMenuItem.setVisible(false);
+            shareMenuItem.setVisible(false);
+            getLinkMenuItem.setVisible(false);
+            editLinkMenuItem.setVisible(false);
+            removeLinkMenuItem.setVisible(false);
+            renameMenuItem.setVisible(false);
+            moveMenuItem.setVisible(false);
+            copyMenuItem.setVisible(false);
+            rubbishMenuItem.setVisible(false);
+            deleteMenuItem.setVisible(false);
+            leaveMenuItem.setVisible(false);
+        }
+        else {
+            MegaNode parent = megaApi.getNodeByHandle(node.getHandle());
+            if(parent != null) {
 
-			}
-			if (parent.getHandle() == megaApi.getRubbishNode().getHandle()){
-				downloadMenuItem.setVisible(false);
-				shareMenuItem.setVisible(false);
-				getLinkMenuItem.setVisible(false);
-				editLinkMenuItem.setVisible(false);
-				removeLinkMenuItem.setVisible(false);
-				renameMenuItem.setVisible(false);
-				moveMenuItem.setVisible(true);
-				copyMenuItem.setVisible(false);
-				rubbishMenuItem.setVisible(false);
-				deleteMenuItem.setVisible(true);
-				leaveMenuItem.setVisible(false);
-			}else{
+                while (megaApi.getParentNode(parent) != null) {
+                    parent = megaApi.getParentNode(parent);
 
-				if(node.isExported()){
-					getLinkMenuItem.setVisible(false);
-					menu.findItem(R.id.cab_menu_file_info_get_link).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
-					editLinkMenuItem.setVisible(true);
-					removeLinkMenuItem.setVisible(true);
-					menu.findItem(R.id.cab_menu_file_info_remove_link).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-				}else{
+                }
+                if (parent.getHandle() == megaApi.getRubbishNode().getHandle()) {
+                    downloadMenuItem.setVisible(false);
+                    shareMenuItem.setVisible(false);
+                    getLinkMenuItem.setVisible(false);
+                    editLinkMenuItem.setVisible(false);
+                    removeLinkMenuItem.setVisible(false);
+                    renameMenuItem.setVisible(false);
+                    moveMenuItem.setVisible(true);
+                    copyMenuItem.setVisible(false);
+                    rubbishMenuItem.setVisible(false);
+                    deleteMenuItem.setVisible(true);
+                    leaveMenuItem.setVisible(false);
+                } else {
 
-					getLinkMenuItem.setVisible(true);
-					menu.findItem(R.id.cab_menu_file_info_get_link).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-					editLinkMenuItem.setVisible(false);
-					removeLinkMenuItem.setVisible(false);
-					menu.findItem(R.id.cab_menu_file_info_remove_link).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
-				}
+                    if (node.isExported()) {
+                        getLinkMenuItem.setVisible(false);
+                        menu.findItem(R.id.cab_menu_file_info_get_link).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+                        editLinkMenuItem.setVisible(true);
+                        removeLinkMenuItem.setVisible(true);
+                        menu.findItem(R.id.cab_menu_file_info_remove_link).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+                    } else {
 
-				if(from==FROM_INCOMING_SHARES){
+                        getLinkMenuItem.setVisible(true);
+                        menu.findItem(R.id.cab_menu_file_info_get_link).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+                        editLinkMenuItem.setVisible(false);
+                        removeLinkMenuItem.setVisible(false);
+                        menu.findItem(R.id.cab_menu_file_info_remove_link).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+                    }
 
-					downloadMenuItem.setVisible(true);
+                    if (from == FROM_INCOMING_SHARES) {
 
-					shareMenuItem.setVisible(false);
-					menu.findItem(R.id.cab_menu_file_info_share_folder).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+                        downloadMenuItem.setVisible(true);
 
-					deleteMenuItem.setVisible(false);
+                        shareMenuItem.setVisible(false);
+                        menu.findItem(R.id.cab_menu_file_info_share_folder).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
 
-					if(firstIncomingLevel){
-						leaveMenuItem.setVisible(true);
-						menu.findItem(R.id.cab_menu_file_info_leave).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+                        deleteMenuItem.setVisible(false);
 
-					}
-					else{
-						leaveMenuItem.setVisible(false);
-						menu.findItem(R.id.cab_menu_file_info_leave).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+                        if (firstIncomingLevel) {
+                            leaveMenuItem.setVisible(true);
+                            menu.findItem(R.id.cab_menu_file_info_leave).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
-					}
+                        } else {
+                            leaveMenuItem.setVisible(false);
+                            menu.findItem(R.id.cab_menu_file_info_leave).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
 
-					int accessLevel= megaApi.getAccess(node);
-					log("Node: "+node.getName());
+                        }
 
-					switch(accessLevel){
+                        int accessLevel = megaApi.getAccess(node);
+                        log("Node: " + node.getName());
 
-						case MegaShare.ACCESS_OWNER:
-						case MegaShare.ACCESS_FULL:{
-							if(firstIncomingLevel){
-								rubbishMenuItem.setVisible(false);
-							}
-							else{
-								rubbishMenuItem.setVisible(true);
-							}
-							renameMenuItem.setVisible(true);
-							moveMenuItem.setVisible(false);
-							copyMenuItem.setVisible(true);
-							menu.findItem(R.id.cab_menu_file_info_copy).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+                        switch (accessLevel) {
 
-							getLinkMenuItem.setVisible(false);
-							menu.findItem(R.id.cab_menu_file_info_get_link).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
-							editLinkMenuItem.setVisible(false);
-							removeLinkMenuItem.setVisible(false);
-							menu.findItem(R.id.cab_menu_file_info_remove_link).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
-							break;
-						}
-						case MegaShare.ACCESS_READ:{
-							renameMenuItem.setVisible(false);
-							moveMenuItem.setVisible(false);
-							copyMenuItem.setVisible(true);
-							menu.findItem(R.id.cab_menu_file_info_copy).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+                            case MegaShare.ACCESS_OWNER:
+                            case MegaShare.ACCESS_FULL: {
+                                if (firstIncomingLevel) {
+                                    rubbishMenuItem.setVisible(false);
+                                } else {
+                                    rubbishMenuItem.setVisible(true);
+                                }
+                                renameMenuItem.setVisible(true);
+                                moveMenuItem.setVisible(false);
+                                copyMenuItem.setVisible(true);
+                                menu.findItem(R.id.cab_menu_file_info_copy).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
 
-							rubbishMenuItem.setVisible(false);
+                                getLinkMenuItem.setVisible(false);
+                                menu.findItem(R.id.cab_menu_file_info_get_link).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+                                editLinkMenuItem.setVisible(false);
+                                removeLinkMenuItem.setVisible(false);
+                                menu.findItem(R.id.cab_menu_file_info_remove_link).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+                                break;
+                            }
+                            case MegaShare.ACCESS_READ: {
+                                renameMenuItem.setVisible(false);
+                                moveMenuItem.setVisible(false);
+                                copyMenuItem.setVisible(true);
+                                menu.findItem(R.id.cab_menu_file_info_copy).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
-							getLinkMenuItem.setVisible(false);
-							menu.findItem(R.id.cab_menu_file_info_get_link).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+                                rubbishMenuItem.setVisible(false);
 
-							editLinkMenuItem.setVisible(false);
-							removeLinkMenuItem.setVisible(false);
-							menu.findItem(R.id.cab_menu_file_info_remove_link).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+                                getLinkMenuItem.setVisible(false);
+                                menu.findItem(R.id.cab_menu_file_info_get_link).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
 
-							break;
-						}
-						case MegaShare.ACCESS_READWRITE:{
-							renameMenuItem.setVisible(false);
-							moveMenuItem.setVisible(false);
-							copyMenuItem.setVisible(true);
-							menu.findItem(R.id.cab_menu_file_info_copy).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+                                editLinkMenuItem.setVisible(false);
+                                removeLinkMenuItem.setVisible(false);
+                                menu.findItem(R.id.cab_menu_file_info_remove_link).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
 
-							rubbishMenuItem.setVisible(false);
+                                break;
+                            }
+                            case MegaShare.ACCESS_READWRITE: {
+                                renameMenuItem.setVisible(false);
+                                moveMenuItem.setVisible(false);
+                                copyMenuItem.setVisible(true);
+                                menu.findItem(R.id.cab_menu_file_info_copy).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
-							getLinkMenuItem.setVisible(false);
-							menu.findItem(R.id.cab_menu_file_info_get_link).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+                                rubbishMenuItem.setVisible(false);
 
-							editLinkMenuItem.setVisible(false);
-							removeLinkMenuItem.setVisible(false);
-							menu.findItem(R.id.cab_menu_file_info_remove_link).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
-							break;
-						}
-					}
-				}
-				else{
-					downloadMenuItem.setVisible(true);
+                                getLinkMenuItem.setVisible(false);
+                                menu.findItem(R.id.cab_menu_file_info_get_link).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
 
-					if (node.isFolder()){
-						shareMenuItem.setVisible(true);
-						menu.findItem(R.id.cab_menu_file_info_share_folder).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-					}
-					else{
-						shareMenuItem.setVisible(false);
-						menu.findItem(R.id.cab_menu_file_info_share_folder).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+                                editLinkMenuItem.setVisible(false);
+                                removeLinkMenuItem.setVisible(false);
+                                menu.findItem(R.id.cab_menu_file_info_remove_link).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+                                break;
+                            }
+                        }
+                    } else {
+                        downloadMenuItem.setVisible(true);
 
-					}
+                        if (node.isFolder()) {
+                            shareMenuItem.setVisible(true);
+                            menu.findItem(R.id.cab_menu_file_info_share_folder).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+                        } else {
+                            shareMenuItem.setVisible(false);
+                            menu.findItem(R.id.cab_menu_file_info_share_folder).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
 
-					rubbishMenuItem.setVisible(true);
-					deleteMenuItem.setVisible(false);
-					leaveMenuItem.setVisible(false);
-					menu.findItem(R.id.cab_menu_file_info_leave).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+                        }
 
-					renameMenuItem.setVisible(true);
-					moveMenuItem.setVisible(true);
-					copyMenuItem.setVisible(true);
-				}
-			}
+                        rubbishMenuItem.setVisible(true);
+                        deleteMenuItem.setVisible(false);
+                        leaveMenuItem.setVisible(false);
+                        menu.findItem(R.id.cab_menu_file_info_leave).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
 
-			if(node.hasPreview()||node.hasThumbnail()){
+                        renameMenuItem.setVisible(true);
+                        moveMenuItem.setVisible(true);
+                        copyMenuItem.setVisible(true);
+                    }
+                }
 
-				upArrow.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.white), PorterDuff.Mode.SRC_ATOP);
-				getSupportActionBar().setHomeAsUpIndicator(upArrow);
+                if (node.hasPreview() || node.hasThumbnail()) {
 
-				drawableDots.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.white), PorterDuff.Mode.SRC_ATOP);
-				toolbar.setOverflowIcon(drawableDots);
+                    upArrow.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.white), PorterDuff.Mode.SRC_ATOP);
+                    getSupportActionBar().setHomeAsUpIndicator(upArrow);
 
-				if(removeLinkMenuItem!=null){
-					drawableRemoveLink.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.white), PorterDuff.Mode.SRC_ATOP);
-					removeLinkMenuItem.setIcon(drawableRemoveLink);
-				}
-				if(getLinkMenuItem!=null){
-					drawableLink.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.white), PorterDuff.Mode.SRC_ATOP);
-					getLinkMenuItem.setIcon(drawableLink);
-				}
+                    drawableDots.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.white), PorterDuff.Mode.SRC_ATOP);
+                    toolbar.setOverflowIcon(drawableDots);
 
-				collapsingToolbar.setCollapsedTitleTextColor(ContextCompat.getColor(this, R.color.white));
-				collapsingToolbar.setExpandedTitleColor(ContextCompat.getColor(this, R.color.white));
-				collapsingToolbar.setStatusBarScrimColor(ContextCompat.getColor(this, R.color.lollipop_dark_primary_color));
+                    if (removeLinkMenuItem != null) {
+                        drawableRemoveLink.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.white), PorterDuff.Mode.SRC_ATOP);
+                        removeLinkMenuItem.setIcon(drawableRemoveLink);
+                    }
+                    if (getLinkMenuItem != null) {
+                        drawableLink.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.white), PorterDuff.Mode.SRC_ATOP);
+                        getLinkMenuItem.setIcon(drawableLink);
+                    }
+
+                    collapsingToolbar.setCollapsedTitleTextColor(ContextCompat.getColor(this, R.color.white));
+                    collapsingToolbar.setExpandedTitleColor(ContextCompat.getColor(this, R.color.white));
+                    collapsingToolbar.setStatusBarScrimColor(ContextCompat.getColor(this, R.color.lollipop_dark_primary_color));
 
 
-				if(iconToolbarViewLink.getVisibility()==View.VISIBLE){
-					iconToolbarViewLink.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.white), PorterDuff.Mode.SRC_ATOP);
-					iconToolbarViewLink.setAlpha(0.8f);
-				}
-			}
+                    if (iconToolbarViewLink.getVisibility() == View.VISIBLE) {
+                        iconToolbarViewLink.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.white), PorterDuff.Mode.SRC_ATOP);
+                        iconToolbarViewLink.setAlpha(0.8f);
+                    }
+                }
 			/*Folder*/
-			else{
+                else {
 
-				appBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
-					@Override
-					public void onOffsetChanged(AppBarLayout appBarLayout, int offset) {
-						if (offset < -200) {
-							upArrow.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.white), PorterDuff.Mode.SRC_ATOP);
-							getSupportActionBar().setHomeAsUpIndicator(upArrow);
-							drawableDots.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.white), PorterDuff.Mode.SRC_ATOP);
-							toolbar.setOverflowIcon(drawableDots);
-						} else {
-							upArrow.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.white), PorterDuff.Mode.SRC_ATOP);
-							getSupportActionBar().setHomeAsUpIndicator(upArrow);
-							getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-							drawableDots.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.white), PorterDuff.Mode.SRC_ATOP);
-							toolbar.setOverflowIcon(drawableDots);
-						}
-					}
-				});
+                    appBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
+                        @Override
+                        public void onOffsetChanged(AppBarLayout appBarLayout, int offset) {
+                            if (offset < -200) {
+                                upArrow.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.white), PorterDuff.Mode.SRC_ATOP);
+                                getSupportActionBar().setHomeAsUpIndicator(upArrow);
+                                drawableDots.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.white), PorterDuff.Mode.SRC_ATOP);
+                                toolbar.setOverflowIcon(drawableDots);
+                            } else {
+                                upArrow.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.white), PorterDuff.Mode.SRC_ATOP);
+                                getSupportActionBar().setHomeAsUpIndicator(upArrow);
+                                getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+                                drawableDots.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.white), PorterDuff.Mode.SRC_ATOP);
+                                toolbar.setOverflowIcon(drawableDots);
+                            }
+                        }
+                    });
 
-				collapsingToolbar.setCollapsedTitleTextColor(ContextCompat.getColor(this, R.color.white));
-				collapsingToolbar.setExpandedTitleColor(ContextCompat.getColor(this, R.color.name_my_account));
-			}
-
-
-		}
-
+                    collapsingToolbar.setCollapsedTitleTextColor(ContextCompat.getColor(this, R.color.white));
+                    collapsingToolbar.setExpandedTitleColor(ContextCompat.getColor(this, R.color.name_my_account));
+                }
+            }
+        }
 
 		return super.onCreateOptionsMenu(menu);
 	}
@@ -2866,9 +2912,11 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 		log("onResume-FileInfoActivityLollipop");
 		super.onResume();
 
-		refreshProperties();
-		supportInvalidateOptionsMenu();
-		((MegaApplication) getApplication()).sendSignalPresenceActivity();
+        if (adapterType != Constants.OFFLINE_ADAPTER){
+            refreshProperties();
+            supportInvalidateOptionsMenu();
+            ((MegaApplication) getApplication()).sendSignalPresenceActivity();
+        }
 	}
 
 	public void downloadTo(String parentPath, String url, long size, long [] hashes){
