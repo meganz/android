@@ -6,7 +6,6 @@ import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -48,7 +47,6 @@ public class SentRequestsFragmentLollipop extends Fragment {
 	MegaApiAndroid megaApi;	
 	
 	Context context;
-	ActionBar aB;
 	RecyclerView listView;
 	MegaContactRequestLollipopAdapter adapterList;
 
@@ -437,7 +435,6 @@ public class SentRequestsFragmentLollipop extends Fragment {
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         context = activity;
-        aB = ((AppCompatActivity)activity).getSupportActionBar();
     }
 
 	public void itemClick(int position) {
