@@ -305,7 +305,7 @@ public class ShareInfo {
 
 			if (context.getExternalCacheDir() != null){
 				if (title != null){
-					if (title.contains("../")){
+					if (title.contains("../") || title.contains(("..%2F"))){
 						log("External path traversal: " + title);
 						return;
 					}
@@ -318,7 +318,7 @@ public class ShareInfo {
 			}
 			else{
 				if (title != null){
-					if (title.contains("../")){
+					if (title.contains("../") || title.contains(("..%2F"))){
 						log("Internal path traversal: " + title);
 						return;
 					}
