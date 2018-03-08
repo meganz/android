@@ -444,7 +444,8 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 							if(chatSettings==null) {
 
 								log("1 - onCreate: ERROR----> Switch OFF chat");
-								chatSettings = new ChatSettings(false+"", true + "", "",true + "");
+								chatSettings = new ChatSettings();
+								chatSettings.setEnabled(false+"");
 								dbH.setChatSettings(chatSettings);
 							}
 							else{
@@ -805,10 +806,8 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		if (viewPagerExplorer != null){
 		    int index = viewPagerExplorer.getCurrentItem();
 			if(index==0){				
-				//CLOUD TAB				
-				String cFTag2 = getFragmentTag(R.id.explorer_tabs_pager, 0);		
-				log("Tag: "+ cFTag2);
-				if(intent.getAction().equals(ACTION_MULTISELECT_FILE)){
+				//CLOUD TAB
+				if(intent.getAction().equals(ACTION_MULTISELECT_FILE)||intent.getAction().equals(ACTION_SELECT_FILE)){
 					createFolderMenuItem.setVisible(false);
 				}
 				else{

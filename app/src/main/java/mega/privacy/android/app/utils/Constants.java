@@ -92,6 +92,7 @@ public class Constants {
 	public static final int REQUEST_READ_CONTACTS = 3;
 	public static final int RECORD_AUDIO = 4;
 	public static final int REQUEST_UPLOAD_CONTACT = 5;
+	public static final int REQUEST_READ_STORAGE = 6;
 
 	public static final int PRO_LITE = 4;
 	public static final int FREE = 0;
@@ -164,6 +165,8 @@ public class Constants {
 	final public static int NODE_ATTACHMENT_ADAPTER = 2015;
 	final public static int INCOMING_SHARES_PROVIDER_ADAPTER = 2016;
 	final public static int CLOUD_DRIVE_PROVIDER_ADAPTER = 2017;
+	final public static int SEARCH_BY_ADAPTER = 2018;
+
 
 	final public static int ACCOUNT_DETAILS_MIN_DIFFERENCE = 5;
 	final public static int PAYMENT_METHODS_MIN_DIFFERENCE = 720;

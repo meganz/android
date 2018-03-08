@@ -104,6 +104,7 @@ public class Util {
 	public static String profilePicDIR ="MEGA/MEGA Profile Images";
 	public static String logDIR = "MEGA/MEGA Logs";
 	public static String advancesDevicesDIR = "MEGA/MEGA Temp";
+	public static String chatTempDIR = "MEGA/MEGA Temp/Chat";
 	public static String oldMKFile = "/MEGA/MEGAMasterKey.txt";
 	public static String rKFile = "/MEGA/MEGARecoveryKey.txt";
 	

@@ -53,6 +53,7 @@ import mega.privacy.android.app.lollipop.tasks.ClearOfflineTask;
 import mega.privacy.android.app.lollipop.tasks.GetCacheSizeTask;
 import mega.privacy.android.app.lollipop.tasks.GetOfflineSizeTask;
 import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.DBUtil;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApi;
@@ -190,6 +191,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 	Preference advancedFeaturesOffline;
 
 	ListPreference statusChatListPreference;
+	ListPreference chatAttachmentsChatListPreference;
 	
 	TwoLineCheckPreference storageAskMeAlways;
 	TwoLineCheckPreference storageAdvancedDevices;
@@ -287,6 +289,9 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			autoAwayCheck = (TwoLineCheckPreference) findPreference(KEY_AUTOAWAY_ENABLE);
 			autoAwayCheck.setOnPreferenceClickListener(this);
 		}
+
+		chatAttachmentsChatListPreference = (ListPreference) findPreference("settings_chat_send_originals");
+		chatAttachmentsChatListPreference.setOnPreferenceChangeListener(this);
 
 		statusChatListPreference = (ListPreference) findPreference("settings_chat_list_status");
 		statusChatListPreference.setOnPreferenceChangeListener(this);
@@ -786,12 +791,22 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			else{
 				waitPresenceConfig();
 			}
+
+			boolean sendOriginalAttachment = DBUtil.isSendOriginalAttachments(context);
+			if(sendOriginalAttachment){
+				chatAttachmentsChatListPreference.setValue(1+"");
+			}
+			else{
+				chatAttachmentsChatListPreference.setValue(0+"");
+			}
+			chatAttachmentsChatListPreference.setSummary(chatAttachmentsChatListPreference.getEntry());
 		}
 		else{
 			preferenceScreen.removePreference(chatStatusCategory);
 			preferenceScreen.removePreference(chatNotificationsCategory);
 			preferenceScreen.removePreference(autoawayChatCategory);
 			preferenceScreen.removePreference(persistenceChatCategory);
+			chatEnabledCategory.removePreference(chatAttachmentsChatListPreference);
 		}
 
 		advancedFeaturesCache.setSummary(getString(R.string.settings_advanced_features_calculating));
@@ -1111,6 +1126,25 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			statusChatListPreference.setSummary(statusChatListPreference.getEntry());
 			int newStatus= Integer.parseInt((String)newValue);
 			megaChatApi.setOnlineStatus(newStatus, (ManagerActivityLollipop) context);
+		}
+		else if (preference.getKey().compareTo("settings_chat_send_originals") == 0){
+			log("onPreferenceChage: change send originals chat");
+			if (!Util.isOnline(context)){
+				((ManagerActivityLollipop)context).showSnackbar(getString(R.string.error_server_connection_problem));
+				return false;
+			}
+
+			int newStatus= Integer.parseInt((String)newValue);
+			if(newStatus==0){
+				dbH.setSendOriginalAttachments(false+"");
+				chatAttachmentsChatListPreference.setValue(0+"");
+			}
+			else if(newStatus==1){
+				dbH.setSendOriginalAttachments(true+"");
+				chatAttachmentsChatListPreference.setValue(1+"");
+			}
+			chatAttachmentsChatListPreference.setSummary(chatAttachmentsChatListPreference.getEntry());
+//			dbH.setSendOriginalAttachments();
 		}
 		return true;
 	}
@@ -1626,6 +1660,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 				preferenceScreen.addPreference(chatNotificationsCategory);
 				preferenceScreen.addPreference(chatStatusCategory);
 				preferenceScreen.addPreference(chatAutoAwayPreference);
+				chatEnabledCategory.addPreference(chatAttachmentsChatListPreference);
 			}
 			else{
 				log("DISCONNECT CHAT!!!");
@@ -2077,12 +2112,6 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			chatStatusCategory.setEnabled(false);
 			cameraUploadCategory.setEnabled(false);
 		}
-
-		if(!Util.isOnline(context)){
-			chatEnabledCategory.setEnabled(false);
-			chatStatusCategory.setEnabled(false);
-			cameraUploadCategory.setEnabled(false);
-		}
 		super.onResume();
 	}
 	
@@ -2247,6 +2276,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 		getPreferenceScreen().removePreference(chatStatusCategory);
 		getPreferenceScreen().removePreference(autoawayChatCategory);
 		getPreferenceScreen().removePreference(persistenceChatCategory);
+		chatEnabledCategory.removePreference(chatAttachmentsChatListPreference);
 	}
 
 
