@@ -14656,6 +14656,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		megaChatApi.logout(this);
 		app.disableMegaChatApi();
 		megaChatApi=null;
+
+		updateNavigationToolbarIcon();
 	}
 
 	@Override
