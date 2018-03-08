@@ -154,6 +154,7 @@ import mega.privacy.android.app.lollipop.managerSections.SentRequestsFragmentLol
 import mega.privacy.android.app.lollipop.managerSections.SettingsFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.TransfersFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.UpgradeAccountFragmentLollipop;
+import mega.privacy.android.app.lollipop.megachat.BadgeDrawerArrowDrawable;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.lollipop.megachat.RecentChatsFragmentLollipop;
@@ -237,7 +238,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 	AlertDialog evaluateAppDialog;
 
-
 	MegaNode inboxNode = null;
 
 	boolean mkLayoutVisible = false;
@@ -259,6 +259,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 	public long selectedChatItemId;
 //	String fullNameChat;
+
+	private BadgeDrawerArrowDrawable badgeDrawable;
 
 	//COLLECTION FAB BUTTONS
 	CoordinatorLayout fabButtonsLayout;
@@ -1373,15 +1375,16 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		tB.setVisibility(View.VISIBLE);
 		setSupportActionBar(tB);
 		aB = getSupportActionBar();
+
 		aB.setHomeButtonEnabled(true);
         aB.setDisplayHomeAsUpEnabled(true);
-//        aB.setDisplayShowHomeEnabled(true);
-//        getSupportActionBar().setCustomView(R.layout.custom_action_bar_top);
 
         //Set navigation view
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         nV = (NavigationView) findViewById(R.id.navigation_view);
         nV.setNavigationItemSelectedListener(this);
+
+		badgeDrawable = new BadgeDrawerArrowDrawable(getSupportActionBar().getThemedContext());
 
 		usedSpaceLayout = (RelativeLayout) findViewById(R.id.nv_used_space_layout);
 
@@ -2380,7 +2383,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
     				parentHandleBrowser = intent.getLongExtra("parentHandle", -1);
     				intent.removeExtra("parentHandle");
-    				setParentHandleBrowser(parentHandleBrowser);
 
 					if(cloudPageAdapter!=null){
 						cloudPageAdapter.notifyDataSetChanged();
@@ -3279,13 +3281,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 								if (parentNode.getHandle() == megaApi.getRootNode().getHandle() || parentHandleBrowser == -1){
 									log("setToolbarTitle: cloud DRIVE 202");
 									aB.setTitle(getString(R.string.section_cloud_drive));
-									aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 									firstNavigationLevel = true;
+
 								}
 								else{
 									aB.setTitle(parentNode.getName());
-									log("indicator_arrow_back_887");
-									aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
 									firstNavigationLevel = false;
 								}
 							}
@@ -3332,7 +3332,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						break;
 					}
 				}
-				aB.setSubtitle(null);
+
 				break;
 			}
 			case SHARED_ITEMS:{
@@ -3465,6 +3465,50 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				log("setToolbarTitle: default GONE");
 
 				break;
+			}
+		}
+
+		updateNavigationToolbarIcon();
+	}
+
+	public void updateNavigationToolbarIcon(){
+
+		if(Util.isChatEnabled()){
+			int numberUnread = megaChatApi.getUnreadChats();
+
+			if(numberUnread==0){
+
+				if(isFirstNavigationLevel()){
+					aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+				}
+				else{
+					aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+				}
+			}
+			else{
+				if(isFirstNavigationLevel()){
+					badgeDrawable.setProgress(0.0f);
+				}
+				else{
+					badgeDrawable.setProgress(1.0f);
+				}
+
+				if(numberUnread>9){
+					badgeDrawable.setText("9+");
+				}
+				else{
+					badgeDrawable.setText(numberUnread+"");
+				}
+
+				aB.setHomeAsUpIndicator(badgeDrawable);
+			}
+		}
+		else{
+			if(isFirstNavigationLevel()){
+				aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+			}
+			else{
+				aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
 			}
 		}
 	}
@@ -14631,6 +14675,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			if(item.hasChanged(MegaChatListItem.CHANGE_TYPE_UNREAD_COUNT)) {
 				log("Change unread count: " + item.getTitle());
 				setChatTitleSection();
+				updateNavigationToolbarIcon();
 			}
 		}
 	}
@@ -14828,18 +14873,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		return parentHandleInbox;
 	}
 
-	public void onConfigurationChanged(Configuration newConfig) {
-		super.onConfigurationChanged(newConfig);
-
-		if(newConfig.orientation==Configuration.ORIENTATION_LANDSCAPE){
-
-			log("onConfigurationChanged: changed to LANDSCAPE");
-		}else{
-
-			log("onConfigurationChanged: changed to PORTRAIT");
-		}
-	}
-
 	@Override
 	public void onChatCallUpdate(MegaChatApiJava api, MegaChatCall call) {
 		log("onChatCallUpdate");
@@ -14876,10 +14909,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				}
 			}
 		}
-
 	}
 
 	public void setChatTitleSection(){
+		log("setChatTitleSection");
 		if (nV != null){
 			Menu nVMenu = nV.getMenu();
 			MenuItem chat = nVMenu.findItem(R.id.navigation_item_chat);
@@ -14908,7 +14941,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 		}
 	}
-
 
 	public void showEvaluatedAppDialog(){
 		if(megaChatApi.isSignalActivityRequired()){
