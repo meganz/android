@@ -91,6 +91,7 @@ import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaEvent;
+import nz.mega.sdk.MegaFolderInfo;
 import nz.mega.sdk.MegaGlobalListenerInterface;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
@@ -1068,6 +1069,8 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 			}
 		}
 		else{ //Folder
+
+            megaApi.getFolderInfo(node, this);
 			contentTextView.setVisibility(View.VISIBLE);
 			contentTitleTextView.setVisibility(View.VISIBLE);
 
@@ -2281,6 +2284,17 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 				}
 			}
 		}
+		else if(request.getType() == MegaRequest.TYPE_FOLDER_INFO){
+            if (e.getErrorCode() == MegaError.API_OK){
+                MegaFolderInfo info = request.getMegaFolderInfo();
+                log("Num versions: "+info.getNumVersions());
+                log("Num versions size: "+info.getVersionsSize());
+            }
+            else{
+                //Hide texts of info
+            }
+
+        }
 		else if (request.getType() == MegaRequest.TYPE_RENAME){
 
 			try {
