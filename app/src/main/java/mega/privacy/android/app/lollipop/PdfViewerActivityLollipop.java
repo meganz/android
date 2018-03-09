@@ -170,19 +170,18 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
         log("onCreate");
 
         super.onCreate(savedInstanceState);
+        Intent intent = getIntent();
+        if (intent == null){
+            log("intent null");
+            finish();
+            return;
+        }
 
         if (savedInstanceState != null) {
             currentPage = savedInstanceState.getInt("currentPage");
         }
         else {
             currentPage = 0;
-        }
-
-        Intent intent = getIntent();
-        if (intent == null){
-            log("intent null");
-            finish();
-            return;
         }
 
         Bundle bundle = getIntent().getExtras();
@@ -1309,6 +1308,19 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
     protected void onStop() {
         super.onStop();
         log("onStop");
+
+        if (chat != null) {
+            chat.setColorFilter(null);
+        }
+        if (download != null){
+            download.setColorFilter(null);
+        }
+        if (properties != null){
+            properties.setColorFilter(null);
+        }
+        if (share != null) {
+            share.setColorFilter(null);
+        }
     }
 
     @Override
@@ -1321,6 +1333,19 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
     protected void onResume() {
         super.onResume();
         log("onResume");
+
+        if (chat != null) {
+            chat.setColorFilter(getResources().getColor(R.color.lollipop_primary_color), PorterDuff.Mode.SRC_ATOP);
+        }
+        if (download != null){
+            download.setColorFilter(getResources().getColor(R.color.lollipop_primary_color), PorterDuff.Mode.SRC_ATOP);
+        }
+        if (properties != null){
+            properties.setColorFilter(getResources().getColor(R.color.lollipop_primary_color), PorterDuff.Mode.SRC_ATOP);
+        }
+        if (share != null) {
+            share.setColorFilter(getResources().getColor(R.color.lollipop_primary_color), PorterDuff.Mode.SRC_ATOP);
+        }
     }
 
     @Override

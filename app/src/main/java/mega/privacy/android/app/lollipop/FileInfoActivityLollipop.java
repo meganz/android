@@ -265,6 +265,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
     private int adapterType;
  	private String path;
+ 	private File file;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -419,7 +420,6 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
         locationLayout = (RelativeLayout) findViewById(R.id.file_properties_location_layout);
         locationTitleTextView  = (TextView) findViewById(R.id.file_properties_info_menu_location);
         locationTextView = (TextView) findViewById(R.id.file_properties_info_data_location);
-        locationTextView.setText("Cloud Drive");
         locationTextView.setOnClickListener(this);
 
         //Content Layout
@@ -467,8 +467,15 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
             if (path != null){
                 log("Path no NULL");
-                File file = new File (path);
+                file = new File (path);
                 sizeTextView.setText(Util.getSizeString(file.length()));
+                String location = file.getParentFile().getName();
+                if (location.equals("MEGA Offline")){
+                    locationTextView.setText(getResources().getString(R.string.section_saved_for_offline) + " ("+ getResources().getString(R.string.section_saved_for_offline) +")");
+                }
+                else {
+                    locationTextView.setText(location + " ("+ getResources().getString(R.string.section_saved_for_offline) +")");
+                }
                 log("Path: "+file.getAbsolutePath()+ " size: "+file.length());
             }
             else {
@@ -534,6 +541,8 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
                 while (megaApi.getParentNode(parent) != null){
                     parent = megaApi.getParentNode(parent);
                 }
+
+                locationTextView.setText(megaApi.getParentNode(node).getName()+" ("+ parent.getName() +")");
 
                 if (parent.getHandle() != megaApi.getRubbishNode().getHandle()){
                     offlineSwitch.setEnabled(true);
@@ -1594,6 +1603,17 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 				break;
 			}
             case R.id.file_properties_info_data_location:{
+
+                //Not work right
+                Intent intent = new Intent(this, ManagerActivityLollipop.class);
+                if (adapterType == Constants.OFFLINE_ADAPTER){
+
+                }
+                else {
+                    intent.setAction(Constants.ACTION_OPEN_FOLDER);
+                    intent.putExtra("PARENT_HANDLE", megaApi.getParentNode(node).getHandle());
+                }
+                startActivity(intent);
                 this.finish();
                 break;
             }
