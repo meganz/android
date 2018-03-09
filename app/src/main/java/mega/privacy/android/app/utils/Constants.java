@@ -189,7 +189,7 @@ public class Constants {
 	public static int NOTIFICATION_UPLOAD_FINAL = 5;
 	public static int NOTIFICATION_CAMERA_UPLOADS_FINAL = 6;
 	public static int NOTIFICATION_PUSH_CLOUD_DRIVE = 7;
-	public static int NOTIFICATION_PUSH_CHAT = 8;
+	public static int NOTIFICATION_GENERAL_PUSH_CHAT = 8;
 	public static int NOTIFICATION_PUSH_CONTACT = 9;
 	public static int NOTIFICATION_STREAMING_OVERQUOTA= 10;
 	public static int NOTIFICATION_CALL_IN_PROGRESS = 11;
