@@ -1192,6 +1192,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			previewDir = getDir("previewsMEGA", 0);
 		}
 
+		try {
+			NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+			notificationManager.cancelAll();
+		}
+		catch (Exception e){
+			log("Exception NotificationManager - remove all notifications");
+		}
+
 		dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 
 		managerActivity = this;
