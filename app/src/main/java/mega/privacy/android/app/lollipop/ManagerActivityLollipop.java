@@ -1864,33 +1864,79 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					}
 					else if (getIntent().getAction().equals(Constants.ACTION_OPEN_FOLDER)) {
 						log("Open after LauncherFileExplorerActivityLollipop ");
+						boolean locationFileInfo = getIntent().getBooleanExtra("locationFileInfo", false);
 						long handleIntent = getIntent().getLongExtra("PARENT_HANDLE", -1);
-						int access = -1;
-						if (handleIntent != -1) {
-							MegaNode parentIntentN = megaApi.getNodeByHandle(handleIntent);
-							if (parentIntentN != null) {
-								access = megaApi.getAccess(parentIntentN);
-								switch (access) {
-									case MegaShare.ACCESS_OWNER:
-									case MegaShare.ACCESS_UNKNOWN: {
-										log("The intent set the parentHandleBrowser to " + handleIntent);
-										parentHandleBrowser = handleIntent;
-										break;
-									}
-									case MegaShare.ACCESS_READ:
-									case MegaShare.ACCESS_READWRITE:
-									case MegaShare.ACCESS_FULL: {
-										log("The intent set the parentHandleIncoming to " + handleIntent);
-										parentHandleIncoming = handleIntent;
-										drawerItem = DrawerItem.SHARED_ITEMS;
+						if (locationFileInfo){
+							boolean offlineAdapter = getIntent().getBooleanExtra("offline_adapter", false);
+							if (offlineAdapter){
+								drawerItem = DrawerItem.SAVED_FOR_OFFLINE;
+								selectDrawerItemLollipop(drawerItem);
+								selectDrawerItemPending=false;
+							}
+							else {
+								long fragmentHandle = getIntent().getLongExtra("fragmentHandle", -1);
+								if (fragmentHandle == megaApi.getRootNode().getHandle()){
+									drawerItem = DrawerItem.CLOUD_DRIVE;
+									indexCloud = 0;
+									setParentHandleBrowser(handleIntent);
+									selectDrawerItemLollipop(drawerItem);
+									selectDrawerItemPending=false;
+								}
+								else if (fragmentHandle == megaApi.getRubbishNode().getHandle()){
+									drawerItem = DrawerItem.CLOUD_DRIVE;
+									indexCloud = 1;
+									setParentHandleRubbish(handleIntent);
+									selectDrawerItemLollipop(drawerItem);
+									selectDrawerItemPending=false;
+								}
+								else if (fragmentHandle == megaApi.getInboxNode().getHandle()){
+									drawerItem = DrawerItem.INBOX;
+									setParentHandleInbox(handleIntent);
+									selectDrawerItemLollipop(drawerItem);
+									selectDrawerItemPending=false;
+								}
+								else {
+									//Incoming
+									drawerItem = DrawerItem.SHARED_ITEMS;
+									indexShares = 0;
+									MegaNode parentIntentN = megaApi.getNodeByHandle(handleIntent);
+									if (parentIntentN != null){
 										deepBrowserTreeIncoming = MegaApiUtils.calculateDeepBrowserTreeIncoming(parentIntentN, this);
-										log("After calculate deepBrowserTreeIncoming: "+deepBrowserTreeIncoming);
-										break;
 									}
-									default: {
-										log("DEFAULT: The intent set the parentHandleBrowser to " + handleIntent);
-										parentHandleBrowser = handleIntent;
-										break;
+									setParentHandleIncoming(handleIntent);
+									selectDrawerItemLollipop(drawerItem);
+									selectDrawerItemPending=false;
+								}
+							}
+						}
+						else {
+							int access = -1;
+							if (handleIntent != -1) {
+								MegaNode parentIntentN = megaApi.getNodeByHandle(handleIntent);
+								if (parentIntentN != null) {
+									access = megaApi.getAccess(parentIntentN);
+									switch (access) {
+										case MegaShare.ACCESS_OWNER:
+										case MegaShare.ACCESS_UNKNOWN: {
+											log("The intent set the parentHandleBrowser to " + handleIntent);
+											parentHandleBrowser = handleIntent;
+											break;
+										}
+										case MegaShare.ACCESS_READ:
+										case MegaShare.ACCESS_READWRITE:
+										case MegaShare.ACCESS_FULL: {
+											log("The intent set the parentHandleIncoming to " + handleIntent);
+											parentHandleIncoming = handleIntent;
+											drawerItem = DrawerItem.SHARED_ITEMS;
+											deepBrowserTreeIncoming = MegaApiUtils.calculateDeepBrowserTreeIncoming(parentIntentN, this);
+											log("After calculate deepBrowserTreeIncoming: "+deepBrowserTreeIncoming);
+											break;
+										}
+										default: {
+											log("DEFAULT: The intent set the parentHandleBrowser to " + handleIntent);
+											parentHandleBrowser = handleIntent;
+											break;
+										}
 									}
 								}
 							}
