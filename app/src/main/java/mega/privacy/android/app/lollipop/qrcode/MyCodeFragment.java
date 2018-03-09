@@ -85,7 +85,7 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener, Me
     DatabaseHandler dbH = null;
     Handler handler;
 
-    long handle;
+    long handle = -1;
     String contactLink = null;
 
     private ActionBar aB;
@@ -226,10 +226,10 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener, Me
         qrFile = queryIfQRExists();
         if (qrFile != null && qrFile.exists()) {
             setImageQR();
-            megaApi.contactLinkCreate(this);
+            megaApi.contactLinkCreate(false, this);
         }
         else {
-            megaApi.contactLinkCreate(this);
+            megaApi.contactLinkCreate(false, this);
             ProgressDialog temp = null;
             try{
                 temp = new ProgressDialog(context);
@@ -523,6 +523,10 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener, Me
     public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
 
         if (request.getType() == MegaRequest.TYPE_CONTACT_LINK_CREATE) {
+            boolean reset = false;
+            if (handle != -1 && handle != request.getNodeHandle()){
+                reset = true;
+            }
             if (e.getErrorCode() == MegaError.API_OK) {
                 log("Contact link create LONG: " + request.getNodeHandle());
                 log("Contact link create BASE64: " + "https://mega.nz/C!" + MegaApiAndroid.handleToBase64(request.getNodeHandle()));
@@ -538,6 +542,16 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener, Me
                 else{
                     qrCodeFile = new File(context.getCacheDir().getAbsolutePath(), myEmail + "QRcode.jpg");
                 }
+                if (reset && qrCodeFile!= null && qrCodeFile.exists()){
+                    qrCodeFile.delete();
+                    qrCodeFile = null;
+                    if (context.getExternalCacheDir() != null){
+                        qrCodeFile = new File(context.getExternalCacheDir().getAbsolutePath(), myEmail + "QRcode.jpg");
+                    }
+                    else{
+                        qrCodeFile = new File(context.getCacheDir().getAbsolutePath(), myEmail + "QRcode.jpg");
+                    }
+                }
                 if (qrCodeFile != null && !qrCodeFile.exists()) {
                     try {
                         FileOutputStream out = new FileOutputStream(qrCodeFile);
@@ -548,8 +562,16 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener, Me
                 }
                 qrcode.setImageBitmap(qrCodeBitmap);
                 qrcode_copy_link.setEnabled(true);
+                if (reset){
+                    ((QRCodeActivity) context).resetSuccessfully(true);
+                }
                 if (processingDialog != null) {
                     processingDialog.dismiss();
+                }
+            }
+            else {
+                if (reset){
+                    ((QRCodeActivity) context).resetSuccessfully(false);
                 }
             }
         }
@@ -565,7 +587,6 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener, Me
         if (request.getType() == MegaRequest.TYPE_CONTACT_LINK_DELETE){
             if (e.getErrorCode() == MegaError.API_OK){
                 log("Contact link delete:" + e.getErrorCode() + "_" + request.getNodeHandle() + "_"  + MegaApiAndroid.handleToBase64(request.getNodeHandle()));
-                ((QRCodeActivity) context).resetSuccessfully(true);
                 File qrCodeFile = null;
                 if (context.getExternalCacheDir() != null){
                     qrCodeFile = new File(context.getExternalCacheDir().getAbsolutePath(), myEmail + "QRcode.jpg");
@@ -576,9 +597,6 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener, Me
                 if (qrCodeFile != null && qrCodeFile.exists()){
                     qrCodeFile.delete();
                 }
-            }
-            else {
-                ((QRCodeActivity) context).resetSuccessfully(false);
             }
         }
     }
@@ -594,7 +612,7 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener, Me
         if (megaApi == null){
             megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
         }
-        megaApi.contactLinkDelete(handle, this);
-        megaApi.contactLinkCreate(this);
+//        megaApi.contactLinkDelete(handle, this);
+        megaApi.contactLinkCreate(true, this);
     }
 }
