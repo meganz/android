@@ -615,7 +615,7 @@ public final class NotificationBuilder {
                 .setContentTitle("Chat activity").setContentText("You may have new messages")
                 .setOngoing(false);
 
-        mNotificationManager.notify(Constants.NOTIFICATION_PUSH_CHAT, mBuilderCompat.build());
+        mNotificationManager.notify(Constants.NOTIFICATION_GENERAL_PUSH_CHAT, mBuilderCompat.build());
     }
 
     public static void log(String message) {
