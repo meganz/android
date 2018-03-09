@@ -105,14 +105,14 @@ public final class NotificationBuilder {
             Notification notification = buildNotificationPreN(uriParameter, unreadChats, vibration, GROUP_KEY, email);
             log("Notification id: "+getNotificationIdByHandle(item.getChatId()));
             if(notification!=null){
-                notificationManager.notify(getNotificationIdByHandle(item.getChatId()), notification);
+                notificationManager.notify(Constants.NOTIFICATION_PRE_N_CHAT, notification);
             }
         }
         else{
             log("Android 4 - no bundled - no inbox style");
             Notification notification = buildNotification(uriParameter, item, vibration, GROUP_KEY, email);
             log("Notification id: "+getNotificationIdByHandle(item.getChatId()));
-            notificationManager.notify(getNotificationIdByHandle(item.getChatId()), notification);
+            notificationManager.notify(Constants.NOTIFICATION_PRE_N_CHAT, notification);
         }
     }
 
