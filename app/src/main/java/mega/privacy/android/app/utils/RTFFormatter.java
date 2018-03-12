@@ -29,7 +29,7 @@ public class RTFFormatter {
     Typeface font;
     Pattern pMultiQuote = Pattern.compile("(?<=[\\W\\d]|^)(```)(.*?)(```)(?=[\\W\\d]|$)");
     Pattern pQuote = Pattern.compile("(?<=[\\W\\d]|^)(`)([^`]+?.*?[^\\n.]*?[^\\n]*?.*?[^`]+?)(`)(?=[\\W\\d]|$)");
-    Pattern pItalic = Pattern.compile("(?<=[\\W\\d]|^)(\\_)([^_\\n]*?)(\\_)(?=[\\W\\d]|$)");
+    Pattern pItalic = Pattern.compile("(?<=[\\W\\d]|^)(\\_)([^_\\n]*?.*?)(\\_)(?=[\\W\\d]|$)");
     Pattern pBold = Pattern.compile("(?<=[\\W\\d]|^)(\\*)([^\\s][^*\\n]*?|[^*\\n]*?[^\\s])(\\*)(?=[\\W\\d]|$)");
 
     public boolean isFormatted() {
