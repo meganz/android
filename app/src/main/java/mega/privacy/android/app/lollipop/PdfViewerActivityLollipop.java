@@ -566,6 +566,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
                 startService(intent);
             }
             filePreparedInfos = null;
+            this.finish();
         }
     }
 

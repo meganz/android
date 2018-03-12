@@ -608,6 +608,8 @@ public class InboxFragmentLollipop extends Fragment{
 					log("FILENAME: " + file.getName() + "TYPE: "+mimeType);
 
 					Intent pdfIntent = new Intent(context, PdfViewerActivityLollipop.class);
+					pdfIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+					pdfIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
 					pdfIntent.putExtra("APP", true);
 					String localPath = Util.getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
 					if (localPath != null){
