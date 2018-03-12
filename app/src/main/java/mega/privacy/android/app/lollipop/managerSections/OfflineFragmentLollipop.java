@@ -1122,6 +1122,8 @@ public class OfflineFragmentLollipop extends Fragment{
 						//String localPath = Util.getLocalFile(context, currentFile.getName(), currentFile.get, currentFile.getParent());
 
 						Intent pdfIntent = new Intent(context, PdfViewerActivityLollipop.class);
+						pdfIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+						pdfIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
 						pdfIntent.putExtra("APP", true);
 						pdfIntent.putExtra("HANDLE", Long.parseLong(currentNode.getHandle()));
 						pdfIntent.putExtra("adapterType", Constants.OFFLINE_ADAPTER);
