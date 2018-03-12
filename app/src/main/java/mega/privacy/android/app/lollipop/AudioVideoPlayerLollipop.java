@@ -156,6 +156,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
     private boolean isOffline;
     private int adapterType;
     private String path;
+    private String pathNavigation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -183,9 +184,11 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
         adapterType = getIntent().getIntExtra("adapterType", 0);
         if (adapterType == Constants.OFFLINE_ADAPTER){
             isOffline = true;
+            pathNavigation = intent.getStringExtra("pathNavigation");
         }
         else {
             isOffline = false;
+            pathNavigation = null;
         }
 
         Bundle bundle = intent.getExtras();
@@ -397,7 +400,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
                 if (playbackState == ExoPlayer.STATE_BUFFERING){
                     audioContainer.setVisibility(View.GONE);
 
-                    if (loading && !transferOverquota){
+                    if (loading && !transferOverquota && !isOffline){
                         try {
                             statusDialog.setCanceledOnTouchOutside(false);
                             statusDialog.show();
@@ -591,6 +594,9 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
                     i.putExtra("imageId", MimeTypeMime.typeForName(fileName).getIconResourceId());
                     i.putExtra("adapterType", Constants.OFFLINE_ADAPTER);
                     i.putExtra("path", path);
+                    if (pathNavigation != null){
+                        i.putExtra("pathNavigation", pathNavigation);
+                    }
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                         i.setDataAndType(uri, MimeTypeList.typeForName(fileName).getType());
                     }
