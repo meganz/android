@@ -167,6 +167,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     boolean noMoreNoSentMessages = false;
 
+    private BadgeDrawerArrowDrawable badgeDrawable;
+
     ChatController chatC;
     boolean scrollingUp = false;
 
@@ -377,7 +379,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             if(token!=null){
                 messageToShow.append("FCM TOKEN: " +token);
             }
-            messageToShow.append("\nCHAT ID: " + MegaApiJava.handleToBase64(idChat));
+            messageToShow.append("\nCHAT ID: " + MegaApiJava.userHandleToBase64(idChat));
             messageToShow.append("\nMY USER HANDLE: " +MegaApiJava.userHandleToBase64(megaChatApi.getMyUserHandle()));
             if(androidM!=null){
                 MegaChatMessage m = androidM.getMessage();
@@ -385,8 +387,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     messageToShow.append("\nMESSAGE TYPE: " +m.getType());
                     messageToShow.append("\nMESSAGE TIMESTAMP: " +m.getTimestamp());
                     messageToShow.append("\nMESSAGE USERHANDLE: " +MegaApiJava.userHandleToBase64(m.getUserHandle()));
-                    messageToShow.append("\nMESSAGE ID: " +MegaApiJava.handleToBase64(m.getMsgId()));
-                    messageToShow.append("\nMESSAGE TEMP ID: " +MegaApiJava.handleToBase64(m.getTempId()));
+                    messageToShow.append("\nMESSAGE ID: " +MegaApiJava.userHandleToBase64(m.getMsgId()));
+                    messageToShow.append("\nMESSAGE TEMP ID: " +MegaApiJava.userHandleToBase64(m.getTempId()));
                 }
             }
 
@@ -469,12 +471,14 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }
         });
 
+        badgeDrawable = new BadgeDrawerArrowDrawable(getSupportActionBar().getThemedContext());
+
         display = getWindowManager().getDefaultDisplay();
         outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
         density  = getResources().getDisplayMetrics().density;
 
-        aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+        updateNavigationToolbarIcon();
 
         fragmentContainer = (CoordinatorLayout) findViewById(R.id.fragment_container_chat);
 
@@ -800,7 +804,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         finish();
                     }
 
-                    log("Call to open chat");
+                    log("Chat handle: "+chatRoom.getChatId()+"****"+MegaApiJava.userHandleToBase64(idChat));
+
                     boolean result = megaChatApi.openChatRoom(idChat, this);
 
                     if(!result){
@@ -5210,7 +5215,31 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     @Override
     public void onChatListItemUpdate(MegaChatApiJava api, MegaChatListItem item) {
+        if(item.hasChanged(MegaChatListItem.CHANGE_TYPE_UNREAD_COUNT)) {
+            updateNavigationToolbarIcon();
+        }
+    }
 
+    public void updateNavigationToolbarIcon(){
+
+        int numberUnread = megaChatApi.getUnreadChats();
+
+        if(numberUnread==0){
+            aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+        }
+        else{
+
+            badgeDrawable.setProgress(1.0f);
+
+            if(numberUnread>9){
+                badgeDrawable.setText("9+");
+            }
+            else{
+                badgeDrawable.setText(numberUnread+"");
+            }
+
+            aB.setHomeAsUpIndicator(badgeDrawable);
+        }
     }
 
     @Override
