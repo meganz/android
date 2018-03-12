@@ -164,6 +164,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
     Drawable download;
 
     private String path;
+    private String pathNavigation;
 
     @Override
     public void onCreate (Bundle savedInstanceState){
@@ -202,9 +203,11 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
 
         if (type == Constants.OFFLINE_ADAPTER){
             isOffLine = true;
+            pathNavigation = intent.getStringExtra("pathNavigation");
         }
         else {
             isOffLine = false;
+            pathNavigation = null;
         }
 
         setContentView(R.layout.activity_pdfviewer);
@@ -706,6 +709,9 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
                     i.putExtra("imageId", MimeTypeMime.typeForName(pdfFileName).getIconResourceId());
                     i.putExtra("adapterType", Constants.OFFLINE_ADAPTER);
                     i.putExtra("path", path);
+                    if (pathNavigation != null){
+                        i.putExtra("pathNavigation", pathNavigation);
+                    }
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                         i.setDataAndType(uri, MimeTypeList.typeForName(pdfFileName).getType());
                     }

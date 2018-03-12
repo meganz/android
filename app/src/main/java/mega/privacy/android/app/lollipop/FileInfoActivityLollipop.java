@@ -267,6 +267,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
  	private String path;
  	private File file;
  	private long fragmentHandle  = -1;
+ 	private String pathNavigation;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -296,6 +297,10 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
         else{
             scaleText = scaleW;
         }
+
+
+//		  dbH = new DatabaseHandler(getApplicationContext());
+        dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 
         adapterType = getIntent().getIntExtra("adapterType", 0);
         path = getIntent().getStringExtra("path");
@@ -471,6 +476,9 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
                 file = new File (path);
                 sizeTextView.setText(Util.getSizeString(file.length()));
                 String location = file.getParentFile().getName();
+                if (location.equals("in")){
+                    location = file.getParentFile().getParentFile().getName();
+                }
                 if (location.equals("MEGA Offline")){
                     locationTextView.setText(getResources().getString(R.string.section_saved_for_offline) + " ("+ getResources().getString(R.string.section_saved_for_offline) +")");
                 }
@@ -482,6 +490,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
             else {
                 log("Path is NULL");
             }
+            pathNavigation = getIntent().getStringExtra("pathNavigation");
         }
         else {
             if (megaApi == null){
@@ -515,11 +524,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
             megaApi.addGlobalListener(this);
 
-//		dbH = new DatabaseHandler(getApplicationContext());
-            dbH = DatabaseHandler.getDbHandler(getApplicationContext());
-
             if (extras != null){
-                imageId = extras.getInt("imageId");
                 from = extras.getInt("from");
                 if(from==FROM_INCOMING_SHARES){
                     firstIncomingLevel = extras.getBoolean("firstLevel");
@@ -1634,6 +1639,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
                     intent.putExtra("offline_adapter", true);
                     if (path != null){
                         intent.putExtra("path", path);
+                        intent.putExtra("pathNavigation", pathNavigation);
                     }
                 }
                 else {

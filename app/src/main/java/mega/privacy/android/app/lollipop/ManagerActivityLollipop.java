@@ -1870,6 +1870,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 							boolean offlineAdapter = getIntent().getBooleanExtra("offline_adapter", false);
 							if (offlineAdapter){
 								drawerItem = DrawerItem.SAVED_FOR_OFFLINE;
+								String pathNavigation = getIntent().getStringExtra("pathNavigation");
+								setPathNavigationOffline(pathNavigation);
 								selectDrawerItemLollipop(drawerItem);
 								selectDrawerItemPending=false;
 							}
