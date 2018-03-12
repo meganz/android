@@ -30,7 +30,7 @@ public class RTFFormatter {
     Pattern pMultiQuote = Pattern.compile("(?<=[\\W\\d]|^)(```)(.*?)(```)(?=[\\W\\d]|$)");
     Pattern pQuote = Pattern.compile("(?<=[\\W\\d]|^)(`)([^`]+?.*?[^\\n.]*?[^\\n]*?.*?[^`]+?)(`)(?=[\\W\\d]|$)");
     Pattern pItalic = Pattern.compile("(?<=[\\W\\d]|^)(\\_)([^_\\n]*?.*?)(\\_)(?=[\\W\\d]|$)");
-    Pattern pBold = Pattern.compile("(?<=[\\W\\d]|^)(\\*)([^\\s][^*\\n]*?|[^*\\n]*?[^\\s])(\\*)(?=[\\W\\d]|$)");
+    Pattern pBold = Pattern.compile("(?<=[\\W\\d]|^)(\\*)([^\\s][^*\\n]*?.*?|[^*\\n]*?[^\\s].*?)(\\*)(?=[\\W\\d]|$)");
 
     public boolean isFormatted() {
         return formatted;
@@ -571,23 +571,102 @@ public class RTFFormatter {
         if(end==-1){
             end = messageContent.indexOf("`\n");
             if (end == -1){
-                end = messageContent.lastIndexOf("`");
-                log("FINISH End position: "+end);
+                end = messageContent.indexOf("`");
+                if (end == -1){
+                    end = messageContent.lastIndexOf("`");
+                    log("FINISH End position: "+end);
 
-                StringBuilder sb = new StringBuilder(messageContent);
-                sb.deleteCharAt(end);
-                messageContent = sb.toString();
+                    StringBuilder sb = new StringBuilder(messageContent);
+                    sb.deleteCharAt(end);
+                    messageContent = sb.toString();
 
-                log("Message content: "+messageContent);
+                    log("Message content: "+messageContent);
 
-                substring = messageContent.substring(0, end);
+                    substring = messageContent.substring(0, end);
 
-                ssb.append(substring, new CustomTypefaceSpan("", font));
+                    ssb.append(substring, new CustomTypefaceSpan("", font));
 
-                sb = new StringBuilder(messageContent);
-                sb.delete(0, end);
+                    sb = new StringBuilder(messageContent);
+                    sb.delete(0, end);
 //            sb.insert(0, '\n');
-                messageContent = sb.toString();
+                    messageContent = sb.toString();
+                }
+                else {
+                    log("End position: "+end);
+                    StringBuilder sb = new StringBuilder(messageContent);
+                    sb.deleteCharAt(end);
+                    messageContent = sb.toString();
+
+                    log("Message content B: "+messageContent);
+                    substring = messageContent.substring(0, end);
+
+                    ssb.append(substring, new CustomTypefaceSpan("", font));
+
+                    sb = new StringBuilder(messageContent);
+                    sb.delete(0, end);
+                    messageContent = sb.toString();
+
+                    log("Message content T: "+messageContent);
+
+                    Matcher mMultiQuote = pMultiQuote.matcher(messageContent);
+                    if (mMultiQuote != null && mMultiQuote.find()){
+                        setRTFFormat();
+                    }
+
+                    start = messageContent.indexOf(" `");
+                    while(start!=-1){
+
+                        start = start +1;
+
+                        sb = new StringBuilder(messageContent);
+                        sb.deleteCharAt(start);
+                        messageContent = sb.toString();
+
+                        log("(B) Start position: "+start);
+                        substring = messageContent.substring(0, start);
+                        ssb.append(substring);
+
+                        sb = new StringBuilder(messageContent);
+                        sb.delete(0, start);
+                        messageContent = sb.toString();
+
+                        log("Message content C: "+messageContent);
+                        end = messageContent.indexOf("` ");
+                        if(end==-1){
+                            end = messageContent.lastIndexOf("`");
+
+                            sb = new StringBuilder(messageContent);
+                            sb.deleteCharAt(end);
+                            messageContent = sb.toString();
+
+                            log("(B)FINISH End position: "+end);
+                            substring = messageContent.substring(0, end);
+                            ssb.append(substring, new CustomTypefaceSpan("", font));
+
+                            sb = new StringBuilder(messageContent);
+                            sb.delete(0, end);
+                            messageContent = sb.toString();
+
+                            break;
+                        }
+                        else{
+                            log("End position: "+end);
+                            sb = new StringBuilder(messageContent);
+                            sb.deleteCharAt(end);
+                            messageContent = sb.toString();
+                            log("Message content D: "+messageContent);
+
+                            substring = messageContent.substring(0, end);
+                            ssb.append(substring, new CustomTypefaceSpan("", font));
+
+                            sb = new StringBuilder(messageContent);
+                            sb.delete(0, end);
+                            messageContent = sb.toString();
+
+                            start = messageContent.indexOf(" `");
+                        }
+                    }
+                }
             }
             else {
                 log("End position: "+end);
