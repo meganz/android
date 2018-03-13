@@ -5222,23 +5222,28 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     public void updateNavigationToolbarIcon(){
 
-        int numberUnread = megaChatApi.getUnreadChats();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            int numberUnread = megaChatApi.getUnreadChats();
 
-        if(numberUnread==0){
-            aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
-        }
-        else{
-
-            badgeDrawable.setProgress(1.0f);
-
-            if(numberUnread>9){
-                badgeDrawable.setText("9+");
+            if(numberUnread==0){
+                aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
             }
             else{
-                badgeDrawable.setText(numberUnread+"");
-            }
 
-            aB.setHomeAsUpIndicator(badgeDrawable);
+                badgeDrawable.setProgress(1.0f);
+
+                if(numberUnread>9){
+                    badgeDrawable.setText("9+");
+                }
+                else{
+                    badgeDrawable.setText(numberUnread+"");
+                }
+
+                aB.setHomeAsUpIndicator(badgeDrawable);
+            }
+        }
+        else{
+            aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
         }
     }
 
