@@ -416,6 +416,14 @@ public class RTFFormatter {
             else{
                 ssb.append(substring, new CustomTypefaceSpan("", font));
             }
+
+            String emoji = messageContent;
+            if(EmojiManager.isEmoji(emoji)){
+                log("The last element is emoji");
+                ssb.append(emoji);
+
+                messageContent = "";
+            }
         }
         else{
             log("End position: "+end);
@@ -605,6 +613,14 @@ public class RTFFormatter {
                     sb = new StringBuilder(messageContent);
                     sb.delete(0, end);
                     messageContent = sb.toString();
+
+                    String emoji = messageContent;
+                    if(EmojiManager.isEmoji(emoji)){
+                        log("The last element is emoji");
+                        ssb.append(emoji);
+
+                        messageContent = "";
+                    }
 
                     log("Message content T: "+messageContent);
 
@@ -1027,6 +1043,15 @@ public class RTFFormatter {
                 sb = new StringBuilder(messageContent);
                 sb.delete(0, end);
                 messageContent = sb.toString();
+
+
+                String emoji = messageContent;
+                if(EmojiManager.isEmoji(emoji)){
+                    log("The last element is emoji");
+                    ssb.append(emoji);
+
+                    messageContent = "";
+                }
             }
             else {
                 log("End position: "+end);
@@ -2033,6 +2058,14 @@ public class RTFFormatter {
                 sb = new StringBuilder(messageContent);
                 sb.delete(0, end);
                 messageContent = sb.toString();
+
+                String emoji = messageContent;
+                if(EmojiManager.isEmoji(emoji)){
+                    log("The last element is emoji");
+                    ssb.append(emoji);
+
+                    messageContent = "";
+                }
             }
             else {
                 log("End position: "+end);
