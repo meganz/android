@@ -477,13 +477,16 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
                 sizeTextView.setText(Util.getSizeString(file.length()));
                 String location = file.getParentFile().getName();
                 if (location.equals("in")){
-                    location = file.getParentFile().getParentFile().getName();
-                }
-                if (location.equals("MEGA Offline")){
                     locationTextView.setText(getResources().getString(R.string.section_saved_for_offline) + " ("+ getResources().getString(R.string.section_saved_for_offline) +")");
                 }
                 else {
-                    locationTextView.setText(location + " ("+ getResources().getString(R.string.section_saved_for_offline) +")");
+                    String offlineLocation = file.getParentFile().getParentFile().getName() + '/' + location;
+                    if (offlineLocation.equals(Util.offlineDIR)){
+                        locationTextView.setText(getResources().getString(R.string.section_saved_for_offline) + " ("+ getResources().getString(R.string.section_saved_for_offline) +")");
+                    }
+                    else {
+                        locationTextView.setText(location + " ("+ getResources().getString(R.string.section_saved_for_offline) +")");
+                    }
                 }
                 log("Path: "+file.getAbsolutePath()+ " size: "+file.length());
             }
