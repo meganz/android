@@ -1194,14 +1194,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			previewDir = getDir("previewsMEGA", 0);
 		}
 
-		try {
-			NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-			notificationManager.cancelAll();
-		}
-		catch (Exception e){
-			log("Exception NotificationManager - remove all notifications");
-		}
-
 		dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 
 		managerActivity = this;
@@ -2308,6 +2300,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
     	super.onPostResume();
 
 		((MegaApplication) getApplication()).sendSignalPresenceActivity();
+
+		try {
+			NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+			notificationManager.cancelAll();
+		}
+		catch (Exception e){
+			log("Exception NotificationManager - remove all notifications");
+		}
 
 		if (isSearching){
 			selectDrawerItemLollipop(DrawerItem.SEARCH);
@@ -3568,12 +3568,39 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	}
 
 	public void updateNavigationToolbarIcon(){
+		//Just working on 4.4.+
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+			if(Util.isChatEnabled()){
+				int numberUnread = megaChatApi.getUnreadChats();
 
-		if(Util.isChatEnabled()){
-			int numberUnread = megaChatApi.getUnreadChats();
+				if(numberUnread==0){
 
-			if(numberUnread==0){
+					if(isFirstNavigationLevel()){
+						aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+					}
+					else{
+						aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+					}
+				}
+				else{
+					if(isFirstNavigationLevel()){
+						badgeDrawable.setProgress(0.0f);
+					}
+					else{
+						badgeDrawable.setProgress(1.0f);
+					}
 
+					if(numberUnread>9){
+						badgeDrawable.setText("9+");
+					}
+					else{
+						badgeDrawable.setText(numberUnread+"");
+					}
+
+					aB.setHomeAsUpIndicator(badgeDrawable);
+				}
+			}
+			else{
 				if(isFirstNavigationLevel()){
 					aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 				}
@@ -3581,25 +3608,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
 				}
 			}
-			else{
-				if(isFirstNavigationLevel()){
-					badgeDrawable.setProgress(0.0f);
-				}
-				else{
-					badgeDrawable.setProgress(1.0f);
-				}
-
-				if(numberUnread>9){
-					badgeDrawable.setText("9+");
-				}
-				else{
-					badgeDrawable.setText(numberUnread+"");
-				}
-
-				aB.setHomeAsUpIndicator(badgeDrawable);
-			}
-		}
-		else{
+		} else {
 			if(isFirstNavigationLevel()){
 				aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 			}

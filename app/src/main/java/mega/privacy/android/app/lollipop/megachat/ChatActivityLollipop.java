@@ -117,9 +117,6 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUser;
 
-
-
-
 public class ChatActivityLollipop extends PinActivityLollipop implements MegaChatRequestListenerInterface, MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatRoomListenerInterface, RecyclerView.OnItemTouchListener, GestureDetector.OnGestureListener, View.OnClickListener, EmojiconGridFragment.OnEmojiconClickedListener,EmojiconsFragment.OnEmojiconBackspaceClickedListener {
 
     public static int NUMBER_MESSAGES_TO_LOAD = 20;
@@ -166,6 +163,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     public long idChat;
 
     boolean noMoreNoSentMessages = false;
+
+    private BadgeDrawerArrowDrawable badgeDrawable;
 
     ChatController chatC;
     boolean scrollingUp = false;
@@ -377,7 +376,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             if(token!=null){
                 messageToShow.append("FCM TOKEN: " +token);
             }
-            messageToShow.append("\nCHAT ID: " + MegaApiJava.handleToBase64(idChat));
+            messageToShow.append("\nCHAT ID: " + MegaApiJava.userHandleToBase64(idChat));
             messageToShow.append("\nMY USER HANDLE: " +MegaApiJava.userHandleToBase64(megaChatApi.getMyUserHandle()));
             if(androidM!=null){
                 MegaChatMessage m = androidM.getMessage();
@@ -385,8 +384,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     messageToShow.append("\nMESSAGE TYPE: " +m.getType());
                     messageToShow.append("\nMESSAGE TIMESTAMP: " +m.getTimestamp());
                     messageToShow.append("\nMESSAGE USERHANDLE: " +MegaApiJava.userHandleToBase64(m.getUserHandle()));
-                    messageToShow.append("\nMESSAGE ID: " +MegaApiJava.handleToBase64(m.getMsgId()));
-                    messageToShow.append("\nMESSAGE TEMP ID: " +MegaApiJava.handleToBase64(m.getTempId()));
+                    messageToShow.append("\nMESSAGE ID: " +MegaApiJava.userHandleToBase64(m.getMsgId()));
+                    messageToShow.append("\nMESSAGE TEMP ID: " +MegaApiJava.userHandleToBase64(m.getTempId()));
                 }
             }
 
@@ -469,12 +468,14 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }
         });
 
+        badgeDrawable = new BadgeDrawerArrowDrawable(getSupportActionBar().getThemedContext());
+
         display = getWindowManager().getDefaultDisplay();
         outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
         density  = getResources().getDisplayMetrics().density;
 
-        aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+        updateNavigationToolbarIcon();
 
         fragmentContainer = (CoordinatorLayout) findViewById(R.id.fragment_container_chat);
 
@@ -796,11 +797,24 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     log("Recover chat with id: " + idChat);
                     chatRoom = megaChatApi.getChatRoom(idChat);
                     if(chatRoom==null){
-                        log("Chatroom is NULL - finisg activity!!");
+                        log("Chatroom is NULL - finish activity!!");
                         finish();
                     }
 
-                    log("Call to open chat");
+                    ChatItemPreferences prefs = dbH.findChatPreferencesByHandle(Long.toString(idChat));
+                    if(prefs!=null){
+                        String written = prefs.getWrittenText();
+                        if(written!=null && (!written.isEmpty())){
+                            textChat.setText(written);
+                        }
+                    }
+                    else{
+                        prefs = new ChatItemPreferences(Long.toString(idChat), Boolean.toString(true), "", "");
+                        dbH.setChatItemPreferences(prefs);
+                    }
+
+                    log("Chat handle: "+chatRoom.getChatId()+"****"+MegaApiJava.userHandleToBase64(idChat));
+
                     boolean result = megaChatApi.openChatRoom(idChat, this);
 
                     if(!result){
@@ -4802,14 +4816,37 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     }
 
     @Override
+    protected void onStop() {
+        log("onStop()");
+
+        try{
+            if(textChat!=null){
+                String written = textChat.getText().toString();
+                if(written!=null){
+                    dbH.setWrittenTextItem(Long.toString(idChat), textChat.getText().toString());
+                }
+            }
+            else{
+                log("textChat is NULL");
+            }
+
+        }
+        catch (Exception e){
+            log("Written message not stored on DB");
+        }
+
+        MegaApplication.setOpenChatId(-1);
+
+        super.onStop();
+    }
+
+    @Override
     protected void onDestroy(){
         log("onDestroy()");
 
         megaChatApi.closeChatRoom(idChat, this);
         log("removeChatListener");
         megaChatApi.removeChatListener(this);
-
-        MegaApplication.setOpenChatId(-1);
 
         super.onDestroy();
     }
@@ -5210,7 +5247,36 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     @Override
     public void onChatListItemUpdate(MegaChatApiJava api, MegaChatListItem item) {
+        if(item.hasChanged(MegaChatListItem.CHANGE_TYPE_UNREAD_COUNT)) {
+            updateNavigationToolbarIcon();
+        }
+    }
 
+    public void updateNavigationToolbarIcon(){
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            int numberUnread = megaChatApi.getUnreadChats();
+
+            if(numberUnread==0){
+                aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+            }
+            else{
+
+                badgeDrawable.setProgress(1.0f);
+
+                if(numberUnread>9){
+                    badgeDrawable.setText("9+");
+                }
+                else{
+                    badgeDrawable.setText(numberUnread+"");
+                }
+
+                aB.setHomeAsUpIndicator(badgeDrawable);
+            }
+        }
+        else{
+            aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+        }
     }
 
     @Override

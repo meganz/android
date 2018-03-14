@@ -7,12 +7,22 @@ public class ChatItemPreferences {
     String notificationsEnabled = "";
     String ringtone= "";
     String notificationsSound = "";
+    String writtenText = "";
+
+    public ChatItemPreferences(String chatHandle, String notificationsEnabled, String ringtone, String notificationsSound, String writtenText) {
+        this.chatHandle = chatHandle;
+        this.notificationsEnabled = notificationsEnabled;
+        this.notificationsSound = notificationsSound;
+        this.ringtone = ringtone;
+        this.writtenText = writtenText;
+    }
 
     public ChatItemPreferences(String chatHandle, String notificationsEnabled, String ringtone, String notificationsSound) {
         this.chatHandle = chatHandle;
         this.notificationsEnabled = notificationsEnabled;
         this.notificationsSound = notificationsSound;
         this.ringtone = ringtone;
+        this.writtenText = "";
     }
 
     public String getChatHandle() {
@@ -45,5 +55,13 @@ public class ChatItemPreferences {
 
     public void setRingtone(String ringtone) {
         this.ringtone = ringtone;
+    }
+
+    public String getWrittenText() {
+        return writtenText;
+    }
+
+    public void setWrittenText(String writtenText) {
+        this.writtenText = writtenText;
     }
 }
