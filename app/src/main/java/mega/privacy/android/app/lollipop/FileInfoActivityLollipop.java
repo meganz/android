@@ -571,7 +571,19 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
                         fragmentHandle = megaApi.getInboxNode().getHandle();
                     }
 
-                    locationTextView.setText(megaApi.getParentNode(node).getName()+" ("+ parent.getName() +")");
+                    if (megaApi.getParentNode(node) == null){ // It is because of the parent node is Incoming Shares
+                        locationTextView.setText(getResources().getString(R.string.title_incoming_shares_explorer)+" ("+ getResources().getString(R.string.title_incoming_shares_explorer) +")");
+                    }
+                    else {
+                        if (parent.getHandle() == megaApi.getRootNode().getHandle() ||
+                                parent.getHandle() == megaApi.getRubbishNode().getHandle() ||
+                                parent.getHandle() == megaApi.getInboxNode().getHandle()){
+                            locationTextView.setText(megaApi.getParentNode(node).getName()+" ("+ parent.getName() +")");
+                        }
+                        else {
+                            locationTextView.setText(megaApi.getParentNode(node).getName()+" ("+ getResources().getString(R.string.title_incoming_shares_explorer) +")");
+                        }
+                    }
                 }
 
                 if (parent.getHandle() != megaApi.getRubbishNode().getHandle()){
