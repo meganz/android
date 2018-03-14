@@ -117,9 +117,6 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUser;
 
-
-
-
 public class ChatActivityLollipop extends PinActivityLollipop implements MegaChatRequestListenerInterface, MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatRoomListenerInterface, RecyclerView.OnItemTouchListener, GestureDetector.OnGestureListener, View.OnClickListener, EmojiconGridFragment.OnEmojiconClickedListener,EmojiconsFragment.OnEmojiconBackspaceClickedListener {
 
     public static int NUMBER_MESSAGES_TO_LOAD = 20;
@@ -800,8 +797,20 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     log("Recover chat with id: " + idChat);
                     chatRoom = megaChatApi.getChatRoom(idChat);
                     if(chatRoom==null){
-                        log("Chatroom is NULL - finisg activity!!");
+                        log("Chatroom is NULL - finish activity!!");
                         finish();
+                    }
+
+                    ChatItemPreferences prefs = dbH.findChatPreferencesByHandle(Long.toString(idChat));
+                    if(prefs!=null){
+                        String written = prefs.getWrittenText();
+                        if(written!=null && (!written.isEmpty())){
+                            textChat.setText(written);
+                        }
+                    }
+                    else{
+                        prefs = new ChatItemPreferences(Long.toString(idChat), Boolean.toString(true), "", "");
+                        dbH.setChatItemPreferences(prefs);
                     }
 
                     log("Chat handle: "+chatRoom.getChatId()+"****"+MegaApiJava.userHandleToBase64(idChat));
@@ -4807,14 +4816,37 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     }
 
     @Override
+    protected void onStop() {
+        log("onStop()");
+
+        try{
+            if(textChat!=null){
+                String written = textChat.getText().toString();
+                if(written!=null){
+                    dbH.setWrittenTextItem(Long.toString(idChat), textChat.getText().toString());
+                }
+            }
+            else{
+                log("textChat is NULL");
+            }
+
+        }
+        catch (Exception e){
+            log("Written message not stored on DB");
+        }
+
+        MegaApplication.setOpenChatId(-1);
+
+        super.onStop();
+    }
+
+    @Override
     protected void onDestroy(){
         log("onDestroy()");
 
         megaChatApi.closeChatRoom(idChat, this);
         log("removeChatListener");
         megaChatApi.removeChatListener(this);
-
-        MegaApplication.setOpenChatId(-1);
 
         super.onDestroy();
     }
