@@ -541,8 +541,12 @@ public class NodeController {
         catch(Exception ex){}
 
         log("availableFreeSpace: " + availableFreeSpace + "__ sizeToDownload: " + sizeC);
+//        ((ManagerActivityLollipop) context).showSnackbarNotSpace();
+
         if(availableFreeSpace < sizeC) {
-            ((ManagerActivityLollipop) context).showSnackbar(context.getString(R.string.error_not_enough_free_space));
+
+            ((ManagerActivityLollipop) context).showSnackbarNotSpace();
+
             log("Not enough space");
             return;
         }
