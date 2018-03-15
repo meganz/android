@@ -29,14 +29,14 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
-import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
-import mega.privacy.android.app.lollipop.megachat.ChatFullScreenImageViewer;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.ZipBrowserActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.AndroidMegaChatMessage;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
+import mega.privacy.android.app.lollipop.megachat.ChatFullScreenImageViewer;
 import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
@@ -1307,13 +1307,13 @@ public class ChatController {
         if(availableFreeSpace < sizeC) {
 
             if(context instanceof ChatActivityLollipop){
-                ((ChatActivityLollipop) context).showSnackbar(context.getString(R.string.error_not_enough_free_space));
+                ((ChatActivityLollipop) context).showSnackbarNotSpace();
             }
             else if(context instanceof NodeAttachmentActivityLollipop){
-                ((NodeAttachmentActivityLollipop) context).showSnackbar(context.getString(R.string.error_not_enough_free_space));
+                ((NodeAttachmentActivityLollipop) context).showSnackbarNotSpace();
             }
             else if(context instanceof ChatFullScreenImageViewer){
-                ((ChatFullScreenImageViewer) context).showSnackbar(context.getString(R.string.error_not_enough_free_space));
+                ((ChatFullScreenImageViewer) context).showSnackbarNotSpace();
             }
             log("Not enough space");
             return;
