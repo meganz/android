@@ -347,7 +347,12 @@ public class NodeController {
                     intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, size);
                     intent.setClass(context, FileStorageActivityLollipop.class);
                     intent.putExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES, hashes);
-                    ((ManagerActivityLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
+                    if(context instanceof ManagerActivityLollipop){
+                        ((ManagerActivityLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
+                    }
+                    else if(context instanceof FullScreenImageViewerLollipop){
+                        ((FullScreenImageViewerLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
+                    }
                 }
                 else{
                     Dialog downloadLocationDialog;
@@ -372,7 +377,12 @@ public class NodeController {
                                     intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, sizeFinal);
                                     intent.setClass(context, FileStorageActivityLollipop.class);
                                     intent.putExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES, hashesFinal);
-                                    ((ManagerActivityLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
+                                    if(context instanceof ManagerActivityLollipop){
+                                        ((ManagerActivityLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
+                                    }
+                                    else if(context instanceof FullScreenImageViewerLollipop){
+                                        ((FullScreenImageViewerLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
+                                    }
                                     break;
                                 }
                                 case 1:{
@@ -381,7 +391,12 @@ public class NodeController {
                                         String path = fs[1].getAbsolutePath();
                                         File defaultPathF = new File(path);
                                         defaultPathF.mkdirs();
-                                        ((ManagerActivityLollipop) context).showSnackbar(context.getString(R.string.general_download) + ": "  + defaultPathF.getAbsolutePath());
+                                        if(context instanceof ManagerActivityLollipop){
+                                            ((ManagerActivityLollipop) context).showSnackbar(context.getString(R.string.general_download) + ": "  + defaultPathF.getAbsolutePath());
+                                        }
+                                        else if(context instanceof FullScreenImageViewerLollipop){
+                                            ((FullScreenImageViewerLollipop) context).showSnackbar(context.getString(R.string.general_download) + ": "  + defaultPathF.getAbsolutePath());
+                                        }
                                         checkSizeBeforeDownload(path, null, sizeFinal, hashesFinal);
                                     }
                                     break;
@@ -406,7 +421,12 @@ public class NodeController {
                 intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, size);
                 intent.setClass(context, FileStorageActivityLollipop.class);
                 intent.putExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES, hashes);
-                ((ManagerActivityLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
+                if(context instanceof ManagerActivityLollipop){
+                    ((ManagerActivityLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
+                }
+                else if(context instanceof FullScreenImageViewerLollipop){
+                    ((FullScreenImageViewerLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
+                }
             }
         }
         else{
@@ -474,8 +494,8 @@ public class NodeController {
                     if(context instanceof ManagerActivityLollipop){
                         ((ManagerActivityLollipop) context).openAdvancedDevices(hashes[0]);
                     }
-                   else{
-                        log("ManagerActivityLollipop is not CONTEXT");
+                    else if(context instanceof FullScreenImageViewerLollipop){
+                        ((FullScreenImageViewerLollipop) context).openAdvancedDevices(hashes[0]);
                     }
                 }
                 else
@@ -492,7 +512,12 @@ public class NodeController {
                 intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, size);
                 intent.setClass(context, FileStorageActivityLollipop.class);
                 intent.putExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES, hashes);
-                ((ManagerActivityLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
+                if(context instanceof ManagerActivityLollipop){
+                    ((ManagerActivityLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
+                }
+                else if(context instanceof FullScreenImageViewerLollipop){
+                    ((FullScreenImageViewerLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
+                }
             }
         }
         else{
@@ -541,11 +566,16 @@ public class NodeController {
         catch(Exception ex){}
 
         log("availableFreeSpace: " + availableFreeSpace + "__ sizeToDownload: " + sizeC);
-//        ((ManagerActivityLollipop) context).showSnackbarNotSpace();
+//        ((FullScreenImageViewerLollipop) context).showSnackbarNotSpace();
 
         if(availableFreeSpace < sizeC) {
 
-            ((ManagerActivityLollipop) context).showSnackbarNotSpace();
+            if(context instanceof ManagerActivityLollipop){
+                ((ManagerActivityLollipop) context).showSnackbarNotSpace();
+            }
+            else if(context instanceof FullScreenImageViewerLollipop){
+                ((FullScreenImageViewerLollipop) context).showSnackbarNotSpace();
+            }
 
             log("Not enough space");
             return;
@@ -571,10 +601,14 @@ public class NodeController {
             //100MB=104857600
             //10MB=10485760
             //1MB=1048576
-            if(sizeC>104857600){
-                log("Show size confirmacion: "+sizeC);
+            if(sizeC>104857600) {
+                log("Show size confirmacion: " + sizeC);
                 //Show alert
-                ((ManagerActivityLollipop) context).askSizeConfirmationBeforeDownload(parentPathC, urlC, sizeC, hashesC);
+                if (context instanceof ManagerActivityLollipop) {
+                    ((ManagerActivityLollipop) context).askSizeConfirmationBeforeDownload(parentPathC, urlC, sizeC, hashesC);
+                } else if (context instanceof FullScreenImageViewerLollipop) {
+                    ((FullScreenImageViewerLollipop) context).askSizeConfirmationBeforeDownload(parentPathC, urlC, sizeC, hashesC);
+                }
             }
             else{
                 checkInstalledAppBeforeDownload(parentPathC, urlC, sizeC, hashesC);
@@ -644,7 +678,12 @@ public class NodeController {
             //Check if show the alert message
             if(confirmationToDownload){
                 //Show message
-                ((ManagerActivityLollipop) context).askConfirmationNoAppInstaledBeforeDownload(parentPathC, urlC, sizeC, hashesC, nodeToDownload);
+                if(context instanceof ManagerActivityLollipop){
+                    ((ManagerActivityLollipop) context).askConfirmationNoAppInstaledBeforeDownload(parentPathC, urlC, sizeC, hashesC, nodeToDownload);
+                }
+                else if(context instanceof FullScreenImageViewerLollipop){
+                    ((FullScreenImageViewerLollipop) context).askConfirmationNoAppInstaledBeforeDownload(parentPathC, urlC, sizeC, hashesC, nodeToDownload);
+                }
             }
             else{
                 download(parentPathC, urlC, sizeC, hashesC);
@@ -659,9 +698,13 @@ public class NodeController {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             boolean hasStoragePermission = (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
             if (!hasStoragePermission) {
-                ActivityCompat.requestPermissions(((ManagerActivityLollipop) context),
-                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                        Constants.REQUEST_WRITE_STORAGE);
+
+                if(context instanceof ManagerActivityLollipop){
+                    ActivityCompat.requestPermissions(((ManagerActivityLollipop) context), new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, Constants.REQUEST_WRITE_STORAGE);
+                }
+                else if(context instanceof FullScreenImageViewerLollipop){
+                    ActivityCompat.requestPermissions(((FullScreenImageViewerLollipop) context), new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, Constants.REQUEST_WRITE_STORAGE);
+                }
             }
         }
 
@@ -796,11 +839,22 @@ public class NodeController {
                                         log("call to startActivity(intentShare)");
                                         context.startActivity(intentShare);
                                     }
-                                    ((ManagerActivityLollipop) context).showSnackbar(context.getString(R.string.general_already_downloaded));
+
+                                    if(context instanceof ManagerActivityLollipop){
+                                        ((ManagerActivityLollipop) context).showSnackbar(context.getString(R.string.general_already_downloaded));
+                                    }
+                                    else if(context instanceof FullScreenImageViewerLollipop){
+                                        ((FullScreenImageViewerLollipop) context).showSnackbar(context.getString(R.string.general_already_downloaded));
+                                    }
                                 }
                             }
                             catch (Exception e){
-                                ((ManagerActivityLollipop) context).showSnackbar(context.getString(R.string.general_already_downloaded));
+                                if(context instanceof ManagerActivityLollipop){
+                                    ((ManagerActivityLollipop) context).showSnackbar(context.getString(R.string.general_already_downloaded));
+                                }
+                                else if(context instanceof FullScreenImageViewerLollipop){
+                                    ((FullScreenImageViewerLollipop) context).showSnackbar(context.getString(R.string.general_already_downloaded));
+                                }
                             }
                         }
                         return;
@@ -882,7 +936,12 @@ public class NodeController {
                 if (numberOfNodesPending > 0){
                     msg = msg + context.getString(R.string.pending_multiple, numberOfNodesPending);
                 }
-                ((ManagerActivityLollipop) context).showSnackbar(msg);
+                if(context instanceof ManagerActivityLollipop){
+                    ((ManagerActivityLollipop) context).showSnackbar(msg);
+                }
+                else if(context instanceof FullScreenImageViewerLollipop){
+                    ((FullScreenImageViewerLollipop) context).showSnackbar(msg);
+                }
             }
         }
     }

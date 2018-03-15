@@ -1963,6 +1963,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						getIntent().setAction(null);
 						setIntent(null);
 					}
+					else if(getIntent().getAction().equals(Constants.ACTION_SHOW_SETTINGS)) {
+						log("Chat notification: SHOW_SETTINGS");
+						selectDrawerItemPending=false;
+						moveToSettingsSection();
+						getIntent().setAction(null);
+						setIntent(null);
+					}
 					else if(getIntent().getAction().equals(Constants.ACTION_INCOMING_SHARED_FOLDER_NOTIFICATION)){
 						log("IPC link - go to received request in Contacts");
 						drawerItem=DrawerItem.SHARED_ITEMS;
@@ -10788,15 +10795,15 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 
 		switch(v.getId()){
-			case R.id.custom_search:{
-				if (searchMenuItem != null) {
-					MenuItemCompat.expandActionView(searchMenuItem);
-				}
-				else{
-					log("searchMenuItem == null");
-				}
-				break;
-			}
+//			case R.id.custom_search:{
+//				if (searchMenuItem != null) {
+//					MenuItemCompat.expandActionView(searchMenuItem);
+//				}
+//				else{
+//					log("searchMenuItem == null");
+//				}
+//				break;
+//			}
 			case R.id.btnLeft_cancel:{
 				getProLayout.setVisibility(View.GONE);
 				outSpaceLayout.setVisibility(View.GONE);
@@ -14789,14 +14796,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 		if(newState==MegaChatApi.CHAT_CONNECTION_ONLINE && chatid==-1){
 			log("Online Connection: "+chatid);
-				if (rChatFL != null){
-					if(rChatFL.isAdded()){
-						rChatFL.setChats();
-						if(drawerItem == DrawerItem.CHAT){
-							rChatFL.setStatus();
-						}
+			if (rChatFL != null){
+				if(rChatFL.isAdded()){
+					rChatFL.setChats();
+					if(drawerItem == DrawerItem.CHAT){
+						rChatFL.setStatus();
 					}
 				}
+			}
 		}
 	}
 
