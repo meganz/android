@@ -57,6 +57,7 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop.Mode;
+import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.PreviewUtils;
@@ -1097,7 +1098,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 		if (hashes == null){
 			if(url != null) {
 				if(availableFreeSpace < size) {
-					Snackbar.make(fragmentContainer, getString(R.string.error_not_enough_free_space), Snackbar.LENGTH_LONG).show();
+					showSnackbarNotSpace();
 					return;
 				}
 
@@ -1170,7 +1171,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 						String path = dlFiles.get(document);
 
 						if(availableFreeSpace < document.getSize()){
-							Snackbar.make(fragmentContainer, getString(R.string.error_not_enough_free_space), Snackbar.LENGTH_LONG).show();
+							showSnackbarNotSpace();
 							continue;
 						}
 
@@ -1185,7 +1186,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 				}
 				else if(url != null) {
 					if(availableFreeSpace < size) {
-						Snackbar.make(fragmentContainer, getString(R.string.error_not_enough_free_space), Snackbar.LENGTH_LONG).show();
+						showSnackbarNotSpace();
 						continue;
 					}
 
@@ -1213,6 +1214,13 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 		TextView snackbarTextView = (TextView)snackbar.getView().findViewById(android.support.design.R.id.snackbar_text);
 		snackbarTextView.setMaxLines(5);
 		snackbar.show();
+	}
+
+	public void showSnackbarNotSpace(){
+		log("showSnackbarNotSpace");
+		Snackbar mySnackbar = Snackbar.make(fragmentContainer, R.string.error_not_enough_free_space, Snackbar.LENGTH_LONG);
+		mySnackbar.setAction("Settings", new SnackbarNavigateOption(this));
+		mySnackbar.show();
 	}
 	
 	@SuppressLint("NewApi") 
