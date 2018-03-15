@@ -243,55 +243,29 @@ public class RTFFormatter {
         boolean italic = false;
         int startBold;
         int startMultiquote;
+        String substring;
 
         if (message.contains("```")){
-            if (a.equals("```")){
-                StringBuilder sb = new StringBuilder(message);
-                sb.delete(0,3);
-                message = sb.toString();
-
-                if (message.contains("```")){
-                    Matcher mBold = pBold.matcher(messageContent);
-
-                    if(mBold!=null){
-                        if(mBold.find()) {
-                            bold = true;
-                            startBold = messageContent.indexOf(("*"));
-                            startMultiquote = messageContent.indexOf(("```"));
-                            if (startMultiquote < startBold) {
-                                applyMultiQuoteFormat();
-                                formatted = true;
-                            }
-                        }
-                    }
-
-                    int startItalic = -1;
-
-                    Matcher mItalic = pItalic.matcher(messageContent);
-
-                    if(mItalic!=null) {
-                        if(mItalic.find()) {
-                            italic = true;
-                            startItalic = messageContent.indexOf(("_"));
-                            startMultiquote = messageContent.indexOf(("```"));
-                            if (startMultiquote < startItalic) {
-                                applyMultiQuoteFormat();
-                                formatted = true;
-                            }
-                        }
-                    }
-
-                    if(!bold && !italic){
-                        applyMultiQuoteFormat();
-                        formatted = true;
-                    }
+            log("Check if there is emoji at the beginning of the string");
+            start = messageContent.indexOf("```");
+            String emoji = messageContent.substring(0, start);
+            if(EmojiManager.isEmoji(emoji)){
+                log("The first element is emoji");
+                substring = messageContent.substring(0, start);
+                if(ssb==null){
+                    ssb = new SimpleSpanBuilder();
                 }
+                ssb.append(substring+'\n');
+
+                StringBuilder sb = new StringBuilder(messageContent);
+                sb.delete(0, start);
+                messageContent = sb.toString();
+                queryIfMultiQuoteFormat();
             }
             else {
-                start = message.indexOf(" ```");
-                if (start != -1){
+                if (a.equals("```")){
                     StringBuilder sb = new StringBuilder(message);
-                    sb.delete(start, start+3);
+                    sb.delete(0,3);
                     message = sb.toString();
 
                     if (message.contains("```")){
@@ -328,6 +302,51 @@ public class RTFFormatter {
                         if(!bold && !italic){
                             applyMultiQuoteFormat();
                             formatted = true;
+                        }
+                    }
+                }
+                else {
+                    start = message.indexOf(" ```");
+                    if (start != -1){
+                        StringBuilder sb = new StringBuilder(message);
+                        sb.delete(start, start+3);
+                        message = sb.toString();
+
+                        if (message.contains("```")){
+                            Matcher mBold = pBold.matcher(messageContent);
+
+                            if(mBold!=null){
+                                if(mBold.find()) {
+                                    bold = true;
+                                    startBold = messageContent.indexOf(("*"));
+                                    startMultiquote = messageContent.indexOf(("```"));
+                                    if (startMultiquote < startBold) {
+                                        applyMultiQuoteFormat();
+                                        formatted = true;
+                                    }
+                                }
+                            }
+
+                            int startItalic = -1;
+
+                            Matcher mItalic = pItalic.matcher(messageContent);
+
+                            if(mItalic!=null) {
+                                if(mItalic.find()) {
+                                    italic = true;
+                                    startItalic = messageContent.indexOf(("_"));
+                                    startMultiquote = messageContent.indexOf(("```"));
+                                    if (startMultiquote < startItalic) {
+                                        applyMultiQuoteFormat();
+                                        formatted = true;
+                                    }
+                                }
+                            }
+
+                            if(!bold && !italic){
+                                applyMultiQuoteFormat();
+                                formatted = true;
+                            }
                         }
                     }
                 }
