@@ -10,6 +10,9 @@ import mega.privacy.android.app.lollipop.FileLinkActivityLollipop;
 import mega.privacy.android.app.lollipop.FolderLinkActivityLollipop;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
+import mega.privacy.android.app.lollipop.megachat.ChatFullScreenImageViewer;
+import mega.privacy.android.app.lollipop.megachat.NodeAttachmentActivityLollipop;
 import mega.privacy.android.app.utils.Constants;
 
 public class SnackbarNavigateOption implements View.OnClickListener{
@@ -60,6 +63,27 @@ public class SnackbarNavigateOption implements View.OnClickListener{
             settingIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             ((ContactFileListActivityLollipop)context).startActivity(settingIntent);
             ((ContactFileListActivityLollipop)context).finish();
+        }
+        else if(context instanceof ChatActivityLollipop){
+            Intent settingIntent = new Intent(context, ManagerActivityLollipop.class);
+            settingIntent.setAction(Constants.ACTION_SHOW_SETTINGS);
+            settingIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            ((ChatActivityLollipop)context).startActivity(settingIntent);
+            ((ChatActivityLollipop)context).finish();
+        }
+        else if(context instanceof NodeAttachmentActivityLollipop){
+            Intent settingIntent = new Intent(context, ManagerActivityLollipop.class);
+            settingIntent.setAction(Constants.ACTION_SHOW_SETTINGS);
+            settingIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            ((NodeAttachmentActivityLollipop)context).startActivity(settingIntent);
+            ((NodeAttachmentActivityLollipop)context).finish();
+        }
+        else if(context instanceof ChatFullScreenImageViewer){
+            Intent settingIntent = new Intent(context, ManagerActivityLollipop.class);
+            settingIntent.setAction(Constants.ACTION_SHOW_SETTINGS);
+            settingIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            ((ChatFullScreenImageViewer)context).startActivity(settingIntent);
+            ((ChatFullScreenImageViewer)context).finish();
         }
     }
 }
