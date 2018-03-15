@@ -1520,7 +1520,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		        boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
 				if (hasStoragePermission) {
 					if(nC==null){
-						nC = new NodeController(context);
+						nC = new NodeController(this);
 					}
 
 					nC.prepareForDownload(handleListM);
@@ -2116,10 +2116,9 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			log("URL: " + url + "___SIZE: " + size);
 
 			if(nC==null){
-				nC = new NodeController(context);
+				nC = new NodeController(this);
 			}
 			nC.checkSizeBeforeDownload(parentPath, url, size, hashes);
-			Snackbar.make(fragmentContainer, getString(R.string.download_began), Snackbar.LENGTH_LONG).show();
 		}
 		else if (requestCode == Constants.WRITE_SD_CARD_REQUEST_CODE && resultCode == RESULT_OK) {
 
@@ -2133,7 +2132,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			}
 
 			Uri treeUri = intent.getData();
-			log("--------------Create the document : "+treeUri);
+			log("--------------Create the node : "+treeUri);
 			long handleToDownload = intent.getLongExtra("handleToDownload", -1);
 			log("The recovered handle is: "+handleToDownload);
 			//Now, call to the DownloadService
@@ -2311,7 +2310,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 							dbH.setAttrAskSizeDownload("false");
 						}
 						if(nC==null){
-							nC = new NodeController(context);
+							nC = new NodeController(fullScreenImageViewer);
 						}
 						nC.checkInstalledAppBeforeDownload(parentPathC, urlC, sizeC, hashesC);
 					}
@@ -2359,7 +2358,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 							dbH.setAttrAskNoAppDownload("false");
 						}
 						if(nC==null){
-							nC = new NodeController(context);
+							nC = new NodeController(fullScreenImageViewer);
 						}
 						nC.download(parentPathC, urlC, sizeC, hashesC);
 					}
