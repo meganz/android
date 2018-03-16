@@ -29,7 +29,6 @@ import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
@@ -45,8 +44,6 @@ import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Locale;
 
 import mega.privacy.android.app.DatabaseHandler;
@@ -55,7 +52,6 @@ import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
-import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.lollipop.megachat.NotificationBuilder;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
@@ -709,110 +705,110 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
 
         shown = true;
 
-        try{
-            NotificationManager mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-            mNotificationManager.cancel(Constants.NOTIFICATION_GENERAL_PUSH_CHAT);
-        }
-        catch (Exception e){
-            log("EXCEPTION: General notification not REMOVED."+e.getMessage());
-        }
-
-        removeListeners();
-
-        ArrayList<MegaChatListItem> unreadChats = megaChatApi.getUnreadChatListItems();
-        if (unreadChats != null) {
-            log("Size of unread: " + unreadChats.size());
-
-            for (int i = 0; i < unreadChats.size(); i++) {
-                MegaChatListItem itemA = unreadChats.get(i);
-                log("Item: " + itemA.getTitle() + " message: " + itemA.getLastMessage());
-            }
-            Collections.sort(unreadChats, new Comparator<MegaChatListItem>() {
-
-                public int compare(MegaChatListItem c1, MegaChatListItem c2) {
-                    long timestamp1 = c1.getLastTimestamp();
-                    long timestamp2 = c2.getLastTimestamp();
-
-                    long result = timestamp2 - timestamp1;
-                    return (int) result;
-                }
-            });
-
-            if (unreadChats.size() > 0) {
-                MegaChatListItem item = unreadChats.get(0);
-                log("showChatNotification last item: " + item.getTitle() + " message: " + item.getLastMessage());
-
-                ChatSettings chatSettings = dbH.getChatSettings();
-                String email = megaChatApi.getContactEmail(item.getPeerHandle());
-
-                if (chatSettings != null) {
-                    if (chatSettings.getNotificationsEnabled().equals("true")) {
-                        log("Notifications ON for all chats");
-
-                        ChatItemPreferences chatItemPreferences = dbH.findChatPreferencesByHandle(String.valueOf(item.getChatId()));
-
-                        if (chatItemPreferences == null) {
-                            log("No preferences for this item");
-                            String soundString = chatSettings.getNotificationsSound();
-                            Uri uri = Uri.parse(soundString);
-                            log("Uri: " + uri);
-
-                            if (soundString.equals("true") || soundString.equals("")) {
-
-                                Uri defaultSoundUri2 = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-                                notificationBuilder.sendBundledNotification(defaultSoundUri2, unreadChats, chatSettings.getVibrationEnabled(), email);
-                            } else if (soundString.equals("-1")) {
-                                log("Silent notification");
-                                notificationBuilder.sendBundledNotification(null, unreadChats, chatSettings.getVibrationEnabled(), email);
-                            } else {
-                                Ringtone sound = RingtoneManager.getRingtone(this, uri);
-                                if (sound == null) {
-                                    log("Sound is null");
-                                    notificationBuilder.sendBundledNotification(null, unreadChats, chatSettings.getVibrationEnabled(), email);
-                                } else {
-                                    notificationBuilder.sendBundledNotification(uri, unreadChats, chatSettings.getVibrationEnabled(), email);
-                                }
-                            }
-                        } else {
-                            log("Preferences FOUND for this item");
-                            if (chatItemPreferences.getNotificationsEnabled().equals("true")) {
-                                log("Notifications ON for this chat");
-                                String soundString = chatItemPreferences.getNotificationsSound();
-                                Uri uri = Uri.parse(soundString);
-                                log("Uri: " + uri);
-
-                                if (soundString.equals("true")) {
-
-                                    Uri defaultSoundUri2 = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-                                    notificationBuilder.sendBundledNotification(defaultSoundUri2, unreadChats, chatSettings.getVibrationEnabled(), email);
-                                } else if (soundString.equals("-1")) {
-                                    log("Silent notification");
-                                    notificationBuilder.sendBundledNotification(null, unreadChats, chatSettings.getVibrationEnabled(), email);
-                                } else {
-                                    Ringtone sound = RingtoneManager.getRingtone(this, uri);
-                                    if (sound == null) {
-                                        log("Sound is null");
-                                        notificationBuilder.sendBundledNotification(null, unreadChats, chatSettings.getVibrationEnabled(), email);
-                                    } else {
-                                        notificationBuilder.sendBundledNotification(uri, unreadChats, chatSettings.getVibrationEnabled(), email);
-
-                                    }
-                                }
-                            } else {
-                                log("Notifications OFF for this chats");
-                            }
-                        }
-                    } else {
-                        log("Notifications OFF");
-                    }
-                } else {
-                    log("Notifications DEFAULT ON");
-
-                    Uri defaultSoundUri2 = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-                    notificationBuilder.sendBundledNotification(defaultSoundUri2, unreadChats, "true", email);
-                }
-            }
-        }
+//        try{
+//            NotificationManager mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+//            mNotificationManager.cancel(Constants.NOTIFICATION_GENERAL_PUSH_CHAT);
+//        }
+//        catch (Exception e){
+//            log("EXCEPTION: General notification not REMOVED."+e.getMessage());
+//        }
+//
+//        removeListeners();
+//
+//        ArrayList<MegaChatListItem> unreadChats = megaChatApi.getUnreadChatListItems();
+//        if (unreadChats != null) {
+//            log("Size of unread: " + unreadChats.size());
+//
+//            for (int i = 0; i < unreadChats.size(); i++) {
+//                MegaChatListItem itemA = unreadChats.get(i);
+//                log("Item: " + itemA.getTitle() + " message: " + itemA.getLastMessage());
+//            }
+//            Collections.sort(unreadChats, new Comparator<MegaChatListItem>() {
+//
+//                public int compare(MegaChatListItem c1, MegaChatListItem c2) {
+//                    long timestamp1 = c1.getLastTimestamp();
+//                    long timestamp2 = c2.getLastTimestamp();
+//
+//                    long result = timestamp2 - timestamp1;
+//                    return (int) result;
+//                }
+//            });
+//
+//            if (unreadChats.size() > 0) {
+//                MegaChatListItem item = unreadChats.get(0);
+//                log("showChatNotification last item: " + item.getTitle() + " message: " + item.getLastMessage());
+//
+//                ChatSettings chatSettings = dbH.getChatSettings();
+//                String email = megaChatApi.getContactEmail(item.getPeerHandle());
+//
+//                if (chatSettings != null) {
+//                    if (chatSettings.getNotificationsEnabled().equals("true")) {
+//                        log("Notifications ON for all chats");
+//
+//                        ChatItemPreferences chatItemPreferences = dbH.findChatPreferencesByHandle(String.valueOf(item.getChatId()));
+//
+//                        if (chatItemPreferences == null) {
+//                            log("No preferences for this item");
+//                            String soundString = chatSettings.getNotificationsSound();
+//                            Uri uri = Uri.parse(soundString);
+//                            log("Uri: " + uri);
+//
+//                            if (soundString.equals("true") || soundString.equals("")) {
+//
+//                                Uri defaultSoundUri2 = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+//                                notificationBuilder.sendBundledNotification(defaultSoundUri2, unreadChats, chatSettings.getVibrationEnabled(), email);
+//                            } else if (soundString.equals("-1")) {
+//                                log("Silent notification");
+//                                notificationBuilder.sendBundledNotification(null, unreadChats, chatSettings.getVibrationEnabled(), email);
+//                            } else {
+//                                Ringtone sound = RingtoneManager.getRingtone(this, uri);
+//                                if (sound == null) {
+//                                    log("Sound is null");
+//                                    notificationBuilder.sendBundledNotification(null, unreadChats, chatSettings.getVibrationEnabled(), email);
+//                                } else {
+//                                    notificationBuilder.sendBundledNotification(uri, unreadChats, chatSettings.getVibrationEnabled(), email);
+//                                }
+//                            }
+//                        } else {
+//                            log("Preferences FOUND for this item");
+//                            if (chatItemPreferences.getNotificationsEnabled().equals("true")) {
+//                                log("Notifications ON for this chat");
+//                                String soundString = chatItemPreferences.getNotificationsSound();
+//                                Uri uri = Uri.parse(soundString);
+//                                log("Uri: " + uri);
+//
+//                                if (soundString.equals("true")) {
+//
+//                                    Uri defaultSoundUri2 = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+//                                    notificationBuilder.sendBundledNotification(defaultSoundUri2, unreadChats, chatSettings.getVibrationEnabled(), email);
+//                                } else if (soundString.equals("-1")) {
+//                                    log("Silent notification");
+//                                    notificationBuilder.sendBundledNotification(null, unreadChats, chatSettings.getVibrationEnabled(), email);
+//                                } else {
+//                                    Ringtone sound = RingtoneManager.getRingtone(this, uri);
+//                                    if (sound == null) {
+//                                        log("Sound is null");
+//                                        notificationBuilder.sendBundledNotification(null, unreadChats, chatSettings.getVibrationEnabled(), email);
+//                                    } else {
+//                                        notificationBuilder.sendBundledNotification(uri, unreadChats, chatSettings.getVibrationEnabled(), email);
+//
+//                                    }
+//                                }
+//                            } else {
+//                                log("Notifications OFF for this chats");
+//                            }
+//                        }
+//                    } else {
+//                        log("Notifications OFF");
+//                    }
+//                } else {
+//                    log("Notifications DEFAULT ON");
+//
+//                    Uri defaultSoundUri2 = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+//                    notificationBuilder.sendBundledNotification(defaultSoundUri2, unreadChats, "true", email);
+//                }
+//            }
+//        }
     }
 
     @Override
