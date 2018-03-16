@@ -12493,7 +12493,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				}
 			}
 
-			megaChatApi = null;
 			if (app != null){
 				app.disableMegaChatApi();
 			}
