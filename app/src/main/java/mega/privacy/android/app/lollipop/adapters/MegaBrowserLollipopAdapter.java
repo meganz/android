@@ -107,7 +107,6 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 			super(v);
 		}
 		public ImageView imageView;
-		public RelativeLayout itemLayout;
 		public ImageView permissionsIcon;
 		public RelativeLayout threeDotsLayout;
 	}
@@ -361,7 +360,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 //	}
 //
 	private boolean isItemChecked(int position) {
-        return selectedItems.get(position);
+		return selectedItems.get(position);
     }
 
 	public int getSelectedItemCount() {
@@ -476,9 +475,8 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 
 		if (viewType == MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST){
 			log("onCreateViewHolder -> type: ITEM_VIEW_TYPE_LIST");
-		
+
 			View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_file_list, parent, false);
-		
 			ViewHolderBrowserList holderList = new ViewHolderBrowserList(v);
 			holderList.itemLayout = (RelativeLayout) v.findViewById(R.id.file_list_item_layout);
 			holderList.imageView = (ImageView) v.findViewById(R.id.file_list_thumbnail);
@@ -544,11 +542,11 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 
 			holderGrid.savedOffline.setVisibility(View.INVISIBLE);
 			holderGrid.publicLinkImage.setVisibility(View.GONE);
-			
+
 			holderGrid.itemLayout.setTag(holderGrid);
 			holderGrid.itemLayout.setOnClickListener(this);
 			holderGrid.itemLayout.setOnLongClickListener(this);
-			
+
 			holderGrid.imageButtonThreeDots.setTag(holderGrid);
 			holderGrid.imageButtonThreeDots.setOnClickListener(this);
 
@@ -920,7 +918,6 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 						paramsMultiselect.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
 						paramsMultiselect.setMargins(0, 0, 0, 0);
 						holder.imageView.setLayoutParams(paramsMultiselect);
-
 						holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.new_multiselect_color));
 						holder.imageView.setImageResource(R.drawable.ic_select_folder);
 					}
@@ -1379,7 +1376,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 		if (nodes != null){
 			return nodes.get(position);
 		}
-		
+
 		return null;
 	}
 
