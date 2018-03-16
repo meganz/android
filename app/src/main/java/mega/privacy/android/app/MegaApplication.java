@@ -407,8 +407,6 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 			}
 		}
 		catch (Exception e){}
-
-		megaChatApi = null;
 	}
 
 	public void enableChat(){
@@ -758,8 +756,6 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 					this.startActivity(tourIntent);
 				}
 			}
-
-			megaChatApi = null;
 		}
 	}
 
