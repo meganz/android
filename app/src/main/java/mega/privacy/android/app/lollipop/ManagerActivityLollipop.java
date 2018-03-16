@@ -2258,6 +2258,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 
+		try {
+			NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+			notificationManager.cancelAll();
+		}
+		catch (Exception e){
+			log("Exception NotificationManager - remove all notifications");
+		}
+
 		if (isSearching){
 			selectDrawerItemLollipop(DrawerItem.SEARCH);
 			isSearching = false;

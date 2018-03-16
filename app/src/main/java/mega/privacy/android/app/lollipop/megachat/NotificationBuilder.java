@@ -110,14 +110,14 @@ public final class NotificationBuilder {
             Notification notification = buildNotificationPreN(uriParameter, unreadChats, vibration, GROUP_KEY, email);
             log("Notification id: "+getNotificationIdByHandle(item.getChatId()));
             if(notification!=null){
-                notificationManager.notify(getNotificationIdByHandle(item.getChatId()), notification);
+                notificationManager.notify(Constants.NOTIFICATION_PRE_N_CHAT, notification);
             }
         }
         else{
             log("Android 4 - no bundled - no inbox style");
             Notification notification = buildNotification(uriParameter, item, vibration, GROUP_KEY, email);
             log("Notification id: "+getNotificationIdByHandle(item.getChatId()));
-            notificationManager.notify(getNotificationIdByHandle(item.getChatId()), notification);
+            notificationManager.notify(Constants.NOTIFICATION_PRE_N_CHAT, notification);
         }
     }
 
@@ -615,7 +615,7 @@ public final class NotificationBuilder {
                 .setContentTitle("Chat activity").setContentText("You may have new messages")
                 .setOngoing(false);
 
-        mNotificationManager.notify(Constants.NOTIFICATION_PUSH_CHAT, mBuilderCompat.build());
+        mNotificationManager.notify(Constants.NOTIFICATION_GENERAL_PUSH_CHAT, mBuilderCompat.build());
     }
 
     public static void log(String message) {

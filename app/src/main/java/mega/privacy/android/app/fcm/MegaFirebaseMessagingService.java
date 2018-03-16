@@ -216,10 +216,13 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
                     }
 
                 }else if(remoteMessageType.equals("2")){
+                    log("CHAT notification");
                     String gSession = credentials.getSession();
                     if (megaApi.getRootNode() == null){
                         log("RootNode = null");
                         performLoginProccess(gSession);
+
+                        shown = false;
 
                         h = new Handler(Looper.getMainLooper());
                         h.postDelayed(
@@ -240,12 +243,9 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
                         );
                     }
                     else{
-                        log("Other notification");
-//                        if(Util.isChatEnabled()){
-//                            if(!shown) {
-//                                showChatNotification();
-//                            }
-//                        }
+                        if(Util.isChatEnabled()){
+                            showChatNotification();
+                        }
                     }
                 }
 
@@ -708,6 +708,15 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
         log("showChatNotification");
 
         shown = true;
+
+        try{
+            NotificationManager mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+            mNotificationManager.cancel(Constants.NOTIFICATION_GENERAL_PUSH_CHAT);
+        }
+        catch (Exception e){
+            log("EXCEPTION: General notification not REMOVED."+e.getMessage());
+        }
+
         removeListeners();
 
         ArrayList<MegaChatListItem> unreadChats = megaChatApi.getUnreadChatListItems();
