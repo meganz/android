@@ -1,17 +1,8 @@
-<!--
- <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/file_grid_item_complete_layout"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    android:background="@color/white">
--->
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/file_grid_item_layout"
-    android:layout_width="172dp"
+    android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:layout_alignParentLeft="true"
-    android:layout_alignParentTop="true"
-    android:layout_margin="3dp"
+    android:layout_margin="6dp"
     android:background="@drawable/background_item_grid"
     android:descendantFocusability="blocksDescendants" >
 
