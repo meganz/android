@@ -78,7 +78,44 @@ public final class AdvancedNotificationBuilder {
         this.megaChatApi = megaChatApi;
     }
 
+    public void updateNotificationAfterDeletion(long chatId, MegaChatMessage msg){
+
+        MegaChatRoom chat = megaChatApi.getChatRoom(chatId);
+
+        String notificationExists = getNotificationIdByHandle(chat.getChatId(), msg.getMsgId());
+        if(notificationExists.equals("-1")){
+            log("No notif exists to update");
+        }
+        else{
+            int notificationId = (notificationExists).hashCode();
+            if(chat.getUnreadCount()>0){
+                MegaChatListItem item = megaChatApi.getChatListItem(chatId);
+                if(item.getLastMessageType()!=MegaChatMessage.TYPE_INVALID){
+                    sendBundledNotification(null, null, chatId, item.getLastMessageId(), item.getLastMessage(), item.getLastMessageSender());
+                }
+                else{
+                    notificationManager.cancel(notificationId);
+                    removeNotification(chatId);
+                    if(!isAnyNotificationShown()){
+                        notificationManager.cancel(SUMMARY_ID);
+                    }
+                }
+            }
+            else{
+                notificationManager.cancel(notificationId);
+                removeNotification(chatId);
+                if(!isAnyNotificationShown()){
+                    notificationManager.cancel(SUMMARY_ID);
+                }
+            }
+        }
+    }
+
     public void sendBundledNotification(Uri uriParameter, String vibration, long chatId, MegaChatMessage msg) {
+        sendBundledNotification(uriParameter, vibration, chatId, msg.getMsgId(), msg.getContent(), msg.getUserHandle());
+    }
+
+    public void sendBundledNotification(Uri uriParameter, String vibration, long chatId, long msgId, String msgContent, long msgUserHandle) {
 
         MegaChatRoom chat = megaChatApi.getChatRoom(chatId);
 
@@ -88,9 +125,9 @@ public final class AdvancedNotificationBuilder {
 
             String manufacturer = "xiaomi";
             if(!manufacturer.equalsIgnoreCase(Build.MANUFACTURER)) {
-                Notification notification = buildNotification(uriParameter, vibration, GROUP_KEY, chat, msg);
-                log("Notification id--- "+getNotificationIdByHandle(chat.getChatId(), msg.getMsgId()));
-                int notificationId = Integer.parseInt(getNotificationIdByHandle(chat.getChatId(), msg.getMsgId()));
+                Notification notification = buildNotification(uriParameter, vibration, GROUP_KEY, chat, msgContent, msgUserHandle);
+                log("Notification id--- "+getNotificationIdByHandle(chat.getChatId(), msgId));
+                int notificationId = (getNotificationIdByHandle(chat.getChatId(), msgId)).hashCode();
                 notificationManager.notify(notificationId, notification);
                 Notification summary = buildSummary(GROUP_KEY);
                 notificationManager.notify(SUMMARY_ID, summary);
@@ -201,7 +238,7 @@ public final class AdvancedNotificationBuilder {
         }
     }
 
-    public Notification buildNotification(Uri uriParameter, String vibration, String groupKey, MegaChatRoom chat, MegaChatMessage msg) {
+    public Notification buildNotification(Uri uriParameter, String vibration, String groupKey, MegaChatRoom chat, String msgContent, long msgUserHandle) {
         log("buildNotification");
         Intent intent = new Intent(context, ManagerActivityLollipop.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -253,19 +290,18 @@ public final class AdvancedNotificationBuilder {
 
             if(chat.isGroup()){
 
-                long lastMsgSender = msg.getUserHandle();
-                String nameAction = getParticipantShortName(lastMsgSender);
+                String nameAction = getParticipantShortName(msgUserHandle);
 
                 if(nameAction.isEmpty()){
-                    notificationBuilder.setContentText(msg.getContent());
+                    notificationBuilder.setContentText(msgContent);
                 }
                 else{
-                    String source = nameAction+": "+msg.getContent();
+                    String source = nameAction+": "+msgContent;
                     notificationBuilder.setContentText(source);
                 }
             }
             else{
-                notificationBuilder.setContentText(msg.getContent());
+                notificationBuilder.setContentText(msgContent);
             }
             notificationBuilder.setSound(uriParameter);
             if(vibration!=null){
@@ -296,14 +332,13 @@ public final class AdvancedNotificationBuilder {
 
             if(chat.isGroup()){
 
-                long lastMsgSender = msg.getUserHandle();
-                String nameAction = getParticipantShortName(lastMsgSender);
+                String nameAction = getParticipantShortName(msgUserHandle);
 
                 if(nameAction.isEmpty()){
-                    notificationBuilder.setContentText(msg.getContent());
+                    notificationBuilder.setContentText(msgContent);
                 }
                 else{
-                    String source = "<b>"+nameAction+": </b>"+msg.getContent();
+                    String source = "<b>"+nameAction+": </b>"+msgContent;
 
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                         notificationContent = Html.fromHtml(source,Html.FROM_HTML_MODE_LEGACY);
@@ -314,7 +349,7 @@ public final class AdvancedNotificationBuilder {
                 }
             }
             else{
-                notificationBuilder.setContentText(msg.getContent());
+                notificationBuilder.setContentText(msgContent);
             }
 
             //		NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
@@ -574,6 +609,19 @@ public final class AdvancedNotificationBuilder {
         }
     }
 
+    public void removeNotification(long chatHandle){
+        String chatString = MegaApiJava.userHandleToBase64(chatHandle);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.remove(chatString);
+        editor.apply();
+    }
+
+    public boolean isAnyNotificationShown(){
+        if((sharedPreferences.getAll()).isEmpty())
+            return false;
+        return true;
+    }
+
     public void showSimpleNotification(){
         log("showSimpleNotification");
 
@@ -599,7 +647,7 @@ public final class AdvancedNotificationBuilder {
     }
 
     public static void log(String message) {
-        Util.log("NotificationBuilder", message);
+        Util.log("AdvancedNotificationBuilder", message);
     }
 
 }
