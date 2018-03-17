@@ -402,6 +402,7 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 			else{
 				megaChatApi = new MegaChatApiAndroid(megaApi);
 				megaChatApi.addChatRequestListener(this);
+				megaChatApi.addChatNotificationListener(this);
 			}
 		}
 
@@ -412,6 +413,7 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 		try {
 			if (megaChatApi != null) {
 				megaChatApi.removeChatRequestListener(this);
+				megaChatApi.removeChatNotificationListener(this);
 			}
 		}
 		catch (Exception e){}
@@ -707,6 +709,7 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 			try{
 				if (megaChatApi != null){
 					megaChatApi.removeChatRequestListener(this);
+					megaChatApi.removeChatNotificationListener(this);
 				}
 			}
 			catch (Exception exc){}
@@ -785,8 +788,35 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 	public void onChatNotification(MegaChatApiJava api, long chatid, MegaChatMessage msg) {
 		log("onChatNotification");
 
-		showChatNotification(chatid, msg);
+		if(msg!=null){
+			if(msg.getType()==MegaChatMessage.TYPE_NORMAL||msg.getType()==MegaChatMessage.TYPE_CONTACT_ATTACHMENT||msg.getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT){
+				if(msg.isDeleted()){
+					log("Message deleted");
+					updateChatNotificationAfterDeletion(chatid, msg);
+				}
+				else if(msg.isEdited()){
+					log("Message edited");
+//					showChatNotification(chatid, msg);
+				}
+				else{
+					log("New normal message");
+					showChatNotification(chatid, msg);
+				}
+			}
+			else if(msg.getType()==MegaChatMessage.TYPE_REVOKE_NODE_ATTACHMENT){
 
+			}
+			else if(msg.getType()==MegaChatMessage.TYPE_TRUNCATE){
+
+			}
+		}
+	}
+
+	public void updateChatNotificationAfterDeletion(long chatid, MegaChatMessage msg){
+		AdvancedNotificationBuilder notificationBuilder;
+		notificationBuilder =  AdvancedNotificationBuilder.newInstance(this, megaApi, megaChatApi);
+
+		notificationBuilder.updateNotificationAfterDeletion(chatid, msg);
 	}
 
 	public void showChatNotification(long chatid, MegaChatMessage msg){
