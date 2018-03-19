@@ -846,7 +846,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                             setAsRead=false;
                         }
 
-                        MegaApplication.setOpenChatId(idChat);
                         messages = new ArrayList<AndroidMegaChatMessage>();
                         bufferMessages = new ArrayList<AndroidMegaChatMessage>();
                         bufferManualSending = new ArrayList<AndroidMegaChatMessage>();
@@ -4843,8 +4842,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             log("Written message not stored on DB");
         }
 
-        MegaApplication.setOpenChatId(-1);
-
         super.onStop();
     }
 
@@ -5206,6 +5203,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         super.onResume();
 
         MegaApplication.setShowPinScreen(true);
+        MegaApplication.setOpenChatId(idChat);
 
         activityVisible = true;
         setLastMessageSeen();
@@ -5250,6 +5248,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         super.onPause();
 
         activityVisible = false;
+        MegaApplication.setOpenChatId(-1);
     }
 
 
