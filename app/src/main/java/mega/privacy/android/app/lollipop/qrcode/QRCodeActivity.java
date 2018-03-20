@@ -65,6 +65,7 @@ public class QRCodeActivity extends PinActivityLollipop implements MegaRequestLi
     private MenuItem saveMenuItem;
     private MenuItem settingsMenuItem;
     private MenuItem resetQRMenuItem;
+    private MenuItem deleteQRMenuItem;
 
     private TabLayout tabLayoutQRCode;
     private ViewPager viewPagerQRCode;
@@ -168,6 +169,7 @@ public class QRCodeActivity extends PinActivityLollipop implements MegaRequestLi
         saveMenuItem = menu.findItem(R.id.qr_code_save);
         settingsMenuItem = menu.findItem(R.id.qr_code_settings);
         resetQRMenuItem = menu.findItem(R.id.qr_code_reset);
+        deleteQRMenuItem = menu.findItem(R.id.qr_code_delete);
 
         Drawable share = getResources().getDrawable(R.drawable.ic_social_share_white);
         share.setColorFilter(getResources().getColor(R.color.white), PorterDuff.Mode.SRC_ATOP);
@@ -179,6 +181,7 @@ public class QRCodeActivity extends PinActivityLollipop implements MegaRequestLi
                 saveMenuItem.setVisible(true);
                 settingsMenuItem.setVisible(true);
                 resetQRMenuItem.setVisible(true);
+                deleteQRMenuItem.setVisible(true);
                 break;
             }
             case 1: {
@@ -186,6 +189,7 @@ public class QRCodeActivity extends PinActivityLollipop implements MegaRequestLi
                 saveMenuItem.setVisible(false);
                 settingsMenuItem.setVisible(false);
                 resetQRMenuItem.setVisible(false);
+                deleteQRMenuItem.setVisible(false);
                 break;
             }
         }
@@ -228,6 +232,10 @@ public class QRCodeActivity extends PinActivityLollipop implements MegaRequestLi
             }
             case R.id.qr_code_reset: {
                 resetQR();
+                break;
+            }
+            case R.id.qr_code_delete: {
+                deleteQR();
                 break;
             }
         }
@@ -333,6 +341,16 @@ public class QRCodeActivity extends PinActivityLollipop implements MegaRequestLi
         myCodeFragment.resetQRCode();
     }
 
+    public void deleteQR () {
+        log("deleteQR");
+
+        if (myCodeFragment == null) {
+            log("MyCodeFragment is NULL");
+            myCodeFragment = (MyCodeFragment) qrCodePageAdapter.instantiateItem(viewPagerQRCode, 0);
+        }
+        myCodeFragment.deleteQRCode();
+    }
+
     public void resetSuccessfully (boolean success) {
         log("resetSuccessfully");
         if (success){
@@ -397,5 +415,23 @@ public class QRCodeActivity extends PinActivityLollipop implements MegaRequestLi
     @Override
     public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) {
 
+    }
+
+    public void deleteSuccessfully() {
+        log("deleteSuccessfully");
+        shareMenuItem.setVisible(false);
+        saveMenuItem.setVisible(false);
+        settingsMenuItem.setVisible(true);
+        resetQRMenuItem.setVisible(true);
+        deleteQRMenuItem.setVisible(false);
+    }
+
+    public void createSuccessfully() {
+        log("createSuccesfully");
+        shareMenuItem.setVisible(true);
+        saveMenuItem.setVisible(true);
+        settingsMenuItem.setVisible(true);
+        resetQRMenuItem.setVisible(true);
+        deleteQRMenuItem.setVisible(true);
     }
 }
