@@ -4,6 +4,7 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
+import android.app.NotificationManager;
 import android.app.ProgressDialog;
 import android.app.SearchManager;
 import android.content.Context;
@@ -2507,6 +2508,17 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	    		}
 	    		case SHARED_ITEMS:{
 	    			log("onPostResume: case SHARED ITEMS");
+
+					try {
+						NotificationManager notificationManager =
+								(NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+						notificationManager.cancel(Constants.NOTIFICATION_PUSH_CLOUD_DRIVE);
+					}
+					catch (Exception e){
+						log("Exception NotificationManager - remove contact notification");
+					}
+
 					setToolbarTitle();
 					log("onPostResume: shared tabs visible");
 					tabLayoutShares.setVisibility(View.VISIBLE);
@@ -2519,6 +2531,17 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					break;
 				}
 				case CONTACTS:{
+
+					try {
+						NotificationManager notificationManager =
+								(NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+						notificationManager.cancel(Constants.NOTIFICATION_PUSH_CONTACT);
+					}
+					catch (Exception e){
+						log("Exception NotificationManager - remove contact notification");
+					}
+
 					setToolbarTitle();
 					break;
 				}
@@ -2527,6 +2550,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					break;
 				}
 				case CHAT:{
+
 					if (nV != null){
 						Menu nVMenu = nV.getMenu();
 						resetNavigationViewMenu(nVMenu);
@@ -3825,6 +3849,16 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		log("selectDrawerItemSharedItems");
 		tB.setVisibility(View.VISIBLE);
 
+		try {
+			NotificationManager notificationManager =
+					(NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+			notificationManager.cancel(Constants.NOTIFICATION_PUSH_CLOUD_DRIVE);
+		}
+		catch (Exception e){
+			log("Exception NotificationManager - remove contact notification");
+		}
+
 		tabLayoutContacts.setVisibility(View.GONE);
 		viewPagerContacts.setVisibility(View.GONE);
 		tabLayoutCloud.setVisibility(View.GONE);
@@ -3881,6 +3915,16 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	public void selectDrawerItemContacts (){
 		log("selectDrawerItemContacts");
 		tB.setVisibility(View.VISIBLE);
+
+		try {
+			NotificationManager notificationManager =
+					(NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+			notificationManager.cancel(Constants.NOTIFICATION_PUSH_CONTACT);
+		}
+		catch (Exception e){
+			log("Exception NotificationManager - remove contact notification");
+		}
 
 		if (aB == null){
 			aB = getSupportActionBar();
