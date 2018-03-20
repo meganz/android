@@ -920,7 +920,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         if(megaChatApi.getConnectionState()!=MegaChatApi.CONNECTED){
             log("Chat not connected");
             aB.setSubtitle(getString(R.string.invalid_connection_state));
-            tB.setOnClickListener(null);
+            tB.setOnClickListener(this);
         }
         else{
             int permission = chatRoom.getOwnPrivilege();
@@ -968,9 +968,28 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             else{
                 log("Check permissions one to one chat");
                 if(permission==MegaChatRoom.PRIV_RO) {
-                    tB.setOnClickListener(null);
-
                     log("Permission RO");
+
+                    if(megaApi!=null){
+                       if(megaApi.getRootNode()!=null){
+                           long chatHandle = chatRoom.getChatId();
+                           MegaChatRoom chat = megaChatApi.getChatRoom(chatHandle);
+                           long userHandle = chat.getPeerHandle(0);
+                           String userHandleEncoded = MegaApiAndroid.userHandleToBase64(userHandle);
+                           MegaUser user = megaApi.getContact(userHandleEncoded);
+
+                           if(user!=null){
+                               if(user.getVisibility() == MegaUser.VISIBILITY_VISIBLE){
+                                   tB.setOnClickListener(this);
+                               }else{
+                                   tB.setOnClickListener(null);
+                               }
+                           }
+                       }
+                    }else{
+                        tB.setOnClickListener(null);
+                    }
+
                     writingContainerLayout.setVisibility(View.GONE);
 
                     mediaButton.setVisibility(View.GONE);
