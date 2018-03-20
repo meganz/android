@@ -167,9 +167,6 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 
 				inviteAlertDialog.show();
 			}
-			else if (e.getErrorCode() == MegaError.API_EEXIST){
-				showAlertDialog( R.string.invite_not_sent, R.string.invite_not_sent_text_already_contact, false);
-			}
 			else {
 				showAlertDialog( R.string.invite_not_sent, R.string.invite_not_sent_link_text, false);
 			}
