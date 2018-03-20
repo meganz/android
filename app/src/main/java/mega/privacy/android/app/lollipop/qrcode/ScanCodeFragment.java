@@ -387,7 +387,8 @@ public class ScanCodeFragment extends Fragment implements ZXingScannerView.Resul
             log("my avatar NOT exists!");
             log("Call to getUserAvatar");
             log("DO NOT Retry!");
-            setDefaultAvatar();
+            megaApi.getUserAvatar(myEmail, avatar.getPath(), this);
+//            setDefaultAvatar();
         }
     }
 
@@ -421,14 +422,9 @@ public class ScanCodeFragment extends Fragment implements ZXingScannerView.Resul
         int avatarTextSize = getAvatarTextSize(density);
         log("DENSITY: " + density + ":::: " + avatarTextSize);
 
-        if (dbH == null) {
-            dbH = DatabaseHandler.getDbHandler(context);
-        }
-        MegaContactDB contactDB = dbH.findContactByHandle(String.valueOf(myUser+""));
         String fullName = "";
-        if(contactDB!=null){
-            ContactController cC = new ContactController(context);
-            fullName = cC.getFullName(contactDB.getName(), contactDB.getLastName(),myEmail);
+        if(contactName.getText() != null){
+            fullName = contactName.getText().toString();
         }
         else{
             //No name, ask for it and later refresh!!
@@ -481,7 +477,6 @@ public class ScanCodeFragment extends Fragment implements ZXingScannerView.Resul
     @Override
     public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
 
-
 //        megaApi.contactLinkQuery(request.getNodeHandle(), this);
         if (request.getType() == MegaRequest.TYPE_CONTACT_LINK_QUERY){
             if (e.getErrorCode() == MegaError.API_OK){
@@ -490,7 +485,6 @@ public class ScanCodeFragment extends Fragment implements ZXingScannerView.Resul
                 this.request = request;
                 handleContactLink = request.getNodeHandle();
                 myEmail = request.getEmail();
-                myUser = megaApi.getContact(myEmail);
                 contactName.setText(request.getName() + " " + request.getText());
                 contactMail.setText(request.getEmail());
                 setAvatar();
@@ -502,6 +496,16 @@ public class ScanCodeFragment extends Fragment implements ZXingScannerView.Resul
             }
             else {
                 showAlertDialog( R.string.invite_not_sent, R.string.invite_not_sent_text, false);
+            }
+        }
+        else if (request.getType() == MegaRequest.TYPE_GET_ATTR_USER) {
+            if (e.getErrorCode() == MegaError.API_OK) {
+                log("Get user avatar OK");
+                setAvatar();
+            }
+            else {
+                log("Get user avatal FAIL");
+                setDefaultAvatar();
             }
         }
     }

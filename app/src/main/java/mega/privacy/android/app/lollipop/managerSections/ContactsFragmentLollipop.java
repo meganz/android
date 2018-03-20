@@ -157,7 +157,9 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 				log("Contact link query " + request.getNodeHandle() + "_" + MegaApiAndroid.handleToBase64(request.getNodeHandle()) + "_" + request.getEmail() + "_" + request.getName() + "_" + request.getText());
 
 				myEmail = request.getEmail();
-				myUser = megaApi.getContact(myEmail);
+				if (megaApi == null){
+					megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
+				}
 				handleContactLink = request.getNodeHandle();
 				contactName.setText(request.getName() + " " + request.getText());
 				contactMail.setText(request.getEmail());
@@ -165,8 +167,21 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 
 				inviteAlertDialog.show();
 			}
+			else if (e.getErrorCode() == MegaError.API_EEXIST){
+				showAlertDialog( R.string.invite_not_sent, R.string.invite_not_sent_text_already_contact, false);
+			}
 			else {
 				showAlertDialog( R.string.invite_not_sent, R.string.invite_not_sent_link_text, false);
+			}
+		}
+		else if (request.getType() == MegaRequest.TYPE_GET_ATTR_USER) {
+			if (e.getErrorCode() == MegaError.API_OK) {
+				log("Get user avatar OK");
+				setAvatar();
+			}
+			else {
+				log("Get user avatal FAIL");
+				setDefaultAvatar();
 			}
 		}
 	}
@@ -241,7 +256,8 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 			log("my avatar NOT exists!");
 			log("Call to getUserAvatar");
 			log("DO NOT Retry!");
-			setDefaultAvatar();
+			megaApi.getUserAvatar(myEmail, avatar.getPath(), this);
+//			setDefaultAvatar();
 		}
 	}
 
@@ -274,15 +290,9 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 		float density = ((Activity) context).getResources().getDisplayMetrics().density;
 		int avatarTextSize = getAvatarTextSize(density);
 		log("DENSITY: " + density + ":::: " + avatarTextSize);
-
-		if (dbH == null) {
-			dbH = DatabaseHandler.getDbHandler(context);
-		}
-		MegaContactDB contactDB = dbH.findContactByHandle(String.valueOf(myUser.getHandle()+""));
 		String fullName = "";
-		if(contactDB!=null){
-			ContactController cC = new ContactController(context);
-			fullName = cC.getFullName(contactDB.getName(), contactDB.getLastName(),myEmail);
+		if(contactName.getText() != null){
+			fullName = contactName.getText().toString();
 		}
 		else{
 			//No name, ask for it and later refresh!!

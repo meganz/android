@@ -105,6 +105,9 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener, Me
 
     public static ProgressDialog processingDialog;
 
+    private boolean copyLink = true;
+    private boolean createQR = false;
+
     public static MyCodeFragment newInstance() {
         log("newInstance");
         MyCodeFragment fragment = new MyCodeFragment();
@@ -194,6 +197,9 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener, Me
         qrcode = (ImageView) v.findViewById(R.id.qr_code_image);
         qrcode_link = (TextView) v.findViewById(R.id.qr_code_link);
         qrcode_copy_link = (Button) v.findViewById(R.id.qr_code_button_copy_link);
+        copyLink = true;
+        createQR = false;
+        qrcode_copy_link.setText(getResources().getString(R.string.button_copy_link));
         qrcode_copy_link.setEnabled(false);
         qrcode_copy_link.setOnClickListener(this);
 
@@ -220,26 +226,7 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener, Me
             params.setMargins(0, top, 0, bottom);
             relativeContainerQRCode.setLayoutParams(params);
         }
-        if (megaApi == null) {
-            megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
-        }
-        qrFile = queryIfQRExists();
-        if (qrFile != null && qrFile.exists()) {
-            setImageQR();
-            megaApi.contactLinkCreate(false, this);
-        }
-        else {
-            megaApi.contactLinkCreate(false, this);
-            ProgressDialog temp = null;
-            try{
-                temp = new ProgressDialog(context);
-                temp.setMessage(getString(R.string.generatin_qr));
-                temp.show();
-            }
-            catch(Exception e){
-            }
-            processingDialog = temp;
-        }
+        createLink();
 
         return v;
     }
@@ -486,7 +473,12 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener, Me
         log("onClick");
         switch (v.getId()) {
             case R.id.qr_code_button_copy_link: {
-                copyLink();
+                if (copyLink) {
+                    copyLink();
+                }
+                else {
+                    createLink();
+                }
                 break;
             }
         }
@@ -499,6 +491,29 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener, Me
         ClipData clip = ClipData.newPlainText("label", contactLink);
         clipboardManager.setPrimaryClip(clip);
         showSnackbar(getString(R.string.qrcode_link_copied));
+    }
+
+    public void createLink () {
+        if (megaApi == null) {
+            megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
+        }
+        qrFile = queryIfQRExists();
+        if (qrFile != null && qrFile.exists()) {
+            setImageQR();
+            megaApi.contactLinkCreate(false, this);
+        }
+        else {
+            megaApi.contactLinkCreate(false, this);
+            ProgressDialog temp = null;
+            try{
+                temp = new ProgressDialog(context);
+                temp.setMessage(getString(R.string.generatin_qr));
+                temp.show();
+            }
+            catch(Exception e){
+            }
+            processingDialog = temp;
+        }
     }
 
     public void showSnackbar(String s){
@@ -524,7 +539,7 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener, Me
 
         if (request.getType() == MegaRequest.TYPE_CONTACT_LINK_CREATE) {
             boolean reset = false;
-            if (handle != -1 && handle != request.getNodeHandle()){
+            if (handle != -1 && handle != request.getNodeHandle() && copyLink){
                 reset = true;
             }
             if (e.getErrorCode() == MegaError.API_OK) {
@@ -565,6 +580,13 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener, Me
                 if (reset){
                     ((QRCodeActivity) context).resetSuccessfully(true);
                 }
+                if (createQR){
+                    ((QRCodeActivity) context).showSnackbar(getResources().getString(R.string.qrcode_create_successfully));
+                    ((QRCodeActivity) context).createSuccessfully();
+                    qrcode_copy_link.setText(getResources().getString(R.string.button_copy_link));
+                    createQR = false;
+                    copyLink = true;
+                }
                 if (processingDialog != null) {
                     processingDialog.dismiss();
                 }
@@ -597,6 +619,16 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener, Me
                 if (qrCodeFile != null && qrCodeFile.exists()){
                     qrCodeFile.delete();
                 }
+                ((QRCodeActivity) context).showSnackbar(getResources().getString(R.string.qrcode_delete_successfully));
+                qrcode.setImageBitmap(Bitmap.createBitmap(WIDTH, WIDTH, Bitmap.Config.ARGB_8888));
+                qrcode_copy_link.setText(getResources().getString(R.string.button_create_qr));
+                copyLink = false;
+                createQR = true;
+                qrcode_link.setText("");
+                ((QRCodeActivity) context).deleteSuccessfully();
+            }
+            else {
+                ((QRCodeActivity) context).showSnackbar(getResources().getString(R.string.qrcode_delete_not_successfully));
             }
         }
     }
@@ -614,5 +646,14 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener, Me
         }
 //        megaApi.contactLinkDelete(handle, this);
         megaApi.contactLinkCreate(true, this);
+    }
+
+    public void deleteQRCode() {
+        log("deleteQRCode");
+
+        if (megaApi == null) {
+            megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
+        }
+        megaApi.contactLinkDelete(handle, this);
     }
 }

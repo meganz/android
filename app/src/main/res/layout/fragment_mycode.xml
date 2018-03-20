@@ -62,7 +62,7 @@
             android:paddingLeft="16dp"
             android:paddingRight="16dp"
             android:textSize="14sp"
-            android:text="copy link"/>
+            android:text="@string/button_copy_link"/>
 
     </LinearLayout>
 

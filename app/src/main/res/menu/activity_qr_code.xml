@@ -30,4 +30,11 @@
         MEGA:showAsAction="never"
         android:visible="true" />
 
+    <item
+        android:id="@+id/qr_code_delete"
+        android:orderInCategory="110"
+        android:title="@string/action_delete_qr"
+        MEGA:showAsAction="never"
+        android:visible="true" />
+
 </menu>
