@@ -361,6 +361,12 @@ public class NodeController {
                     else if(context instanceof ContactFileListActivityLollipop){
                         ((ContactFileListActivityLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
                     }
+                    else if(context instanceof PdfViewerActivityLollipop){
+                        ((PdfViewerActivityLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
+                    }
+                    else if(context instanceof AudioVideoPlayerLollipop){
+                        ((AudioVideoPlayerLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
+                    }
                 }
                 else{
                     Dialog downloadLocationDialog;
@@ -398,6 +404,12 @@ public class NodeController {
                                     else if(context instanceof ContactFileListActivityLollipop){
                                         ((ContactFileListActivityLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
                                     }
+                                    else if(context instanceof PdfViewerActivityLollipop){
+                                        ((PdfViewerActivityLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
+                                    }
+                                    else if(context instanceof AudioVideoPlayerLollipop){
+                                        ((AudioVideoPlayerLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
+                                    }
                                     break;
                                 }
                                 case 1:{
@@ -417,6 +429,12 @@ public class NodeController {
                                         }
                                         else if(context instanceof ContactFileListActivityLollipop){
                                             ((ContactFileListActivityLollipop) context).showSnackbar(context.getString(R.string.general_download) + ": "  + defaultPathF.getAbsolutePath());
+                                        }
+                                        else if(context instanceof PdfViewerActivityLollipop){
+                                            ((PdfViewerActivityLollipop) context).showSnackbar(context.getString(R.string.general_download) + ": "  + defaultPathF.getAbsolutePath());
+                                        }
+                                        else if(context instanceof AudioVideoPlayerLollipop){
+                                            ((AudioVideoPlayerLollipop) context).showSnackbar(context.getString(R.string.general_download) + ": "  + defaultPathF.getAbsolutePath());
                                         }
                                         checkSizeBeforeDownload(path, null, sizeFinal, hashesFinal);
                                     }
@@ -454,6 +472,12 @@ public class NodeController {
                 }
                 else if(context instanceof ContactFileListActivityLollipop){
                     ((ContactFileListActivityLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
+                }
+                else if (context instanceof PdfViewerActivityLollipop){
+                    ((PdfViewerActivityLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
+                }
+                else if (context instanceof AudioVideoPlayerLollipop){
+                    ((AudioVideoPlayerLollipop)  context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
                 }
             }
         }
@@ -531,6 +555,12 @@ public class NodeController {
                     else if(context instanceof ContactFileListActivityLollipop){
                         ((ContactFileListActivityLollipop) context).openAdvancedDevices(hashes[0]);
                     }
+                    else if(context instanceof PdfViewerActivityLollipop){
+                        ((PdfViewerActivityLollipop) context).openAdvancedDevices(hashes[0]);
+                    }
+                    else if(context instanceof AudioVideoPlayerLollipop){
+                        ((AudioVideoPlayerLollipop) context).openAdvancedDevices(hashes[0]);
+                    }
                 }
                 else
                 {
@@ -557,6 +587,12 @@ public class NodeController {
                 }
                 else if(context instanceof ContactFileListActivityLollipop){
                     ((ContactFileListActivityLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
+                }
+                else if (context instanceof PdfViewerActivityLollipop){
+                    ((PdfViewerActivityLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
+                }
+                else if (context instanceof AudioVideoPlayerLollipop){
+                    ((AudioVideoPlayerLollipop)  context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
                 }
             }
         }
@@ -606,66 +642,78 @@ public class NodeController {
         catch(Exception ex){}
 
         log("availableFreeSpace: " + availableFreeSpace + "__ sizeToDownload: " + sizeC);
-//        ((ContactFileListActivityLollipop) context).showSnackbarNotSpace();
+        ((ManagerActivityLollipop) context).showSnackbarNotSpace();
 
-        if(availableFreeSpace < sizeC) {
-
-            if(context instanceof ManagerActivityLollipop){
-                ((ManagerActivityLollipop) context).showSnackbarNotSpace();
-            }
-            else if(context instanceof FullScreenImageViewerLollipop){
-                ((FullScreenImageViewerLollipop) context).showSnackbarNotSpace();
-            }
-            else if(context instanceof FileInfoActivityLollipop){
-                ((FileInfoActivityLollipop) context).showSnackbarNotSpace();
-            }
-            else if(context instanceof ContactFileListActivityLollipop){
-                ((ContactFileListActivityLollipop) context).showSnackbarNotSpace();
-            }
-
-            log("Not enough space");
-            return;
-        }
-
-        if (dbH == null){
-            dbH = DatabaseHandler.getDbHandler(context.getApplicationContext());
-        }
-
-        String ask=dbH.getAttributes().getAskSizeDownload();
-
-        if(ask==null){
-            ask="true";
-        }
-
-        if(ask.equals("false")){
-            log("SIZE: Do not ask before downloading");
-            checkInstalledAppBeforeDownload(parentPathC, urlC, sizeC, hashesC);
-        }
-        else{
-            log("SIZE: Ask before downloading");
-            //Check size to download
-            //100MB=104857600
-            //10MB=10485760
-            //1MB=1048576
-            if(sizeC>104857600) {
-                log("Show size confirmacion: " + sizeC);
-                //Show alert
-                if (context instanceof ManagerActivityLollipop) {
-                    ((ManagerActivityLollipop) context).askSizeConfirmationBeforeDownload(parentPathC, urlC, sizeC, hashesC);
-                } else if (context instanceof FullScreenImageViewerLollipop) {
-                    ((FullScreenImageViewerLollipop) context).askSizeConfirmationBeforeDownload(parentPathC, urlC, sizeC, hashesC);
-                }
-                else if(context instanceof FileInfoActivityLollipop){
-                    ((FileInfoActivityLollipop) context).askSizeConfirmationBeforeDownload(parentPathC, urlC, sizeC, hashesC);
-                }
-                else if(context instanceof ContactFileListActivityLollipop){
-                    ((ContactFileListActivityLollipop) context).askSizeConfirmationBeforeDownload(parentPathC, urlC, sizeC, hashesC);
-                }
-            }
-            else{
-                checkInstalledAppBeforeDownload(parentPathC, urlC, sizeC, hashesC);
-            }
-        }
+//        if(availableFreeSpace < sizeC) {
+//
+//            if(context instanceof ManagerActivityLollipop){
+//                ((ManagerActivityLollipop) context).showSnackbarNotSpace();
+//            }
+//            else if(context instanceof FullScreenImageViewerLollipop){
+//                ((FullScreenImageViewerLollipop) context).showSnackbarNotSpace();
+//            }
+//            else if(context instanceof FileInfoActivityLollipop){
+//                ((FileInfoActivityLollipop) context).showSnackbarNotSpace();
+//            }
+//            else if(context instanceof ContactFileListActivityLollipop){
+//                ((ContactFileListActivityLollipop) context).showSnackbarNotSpace();
+//            }
+//            else if(context instanceof PdfViewerActivityLollipop){
+//                ((PdfViewerActivityLollipop) context).showSnackbarNotSpace();
+//            }
+//            else if (context instanceof AudioVideoPlayerLollipop){
+//                ((AudioVideoPlayerLollipop) context).showSnackbarNotSpace();
+//            }
+//
+//            log("Not enough space");
+//            return;
+//        }
+//
+//        if (dbH == null){
+//            dbH = DatabaseHandler.getDbHandler(context.getApplicationContext());
+//        }
+//
+//        String ask=dbH.getAttributes().getAskSizeDownload();
+//
+//        if(ask==null){
+//            ask="true";
+//        }
+//
+//        if(ask.equals("false")){
+//            log("SIZE: Do not ask before downloading");
+//            checkInstalledAppBeforeDownload(parentPathC, urlC, sizeC, hashesC);
+//        }
+//        else{
+//            log("SIZE: Ask before downloading");
+//            //Check size to download
+//            //100MB=104857600
+//            //10MB=10485760
+//            //1MB=1048576
+//            if(sizeC>104857600) {
+//                log("Show size confirmacion: " + sizeC);
+//                //Show alert
+//                if (context instanceof ManagerActivityLollipop) {
+//                    ((ManagerActivityLollipop) context).askSizeConfirmationBeforeDownload(parentPathC, urlC, sizeC, hashesC);
+//                } else if (context instanceof FullScreenImageViewerLollipop) {
+//                    ((FullScreenImageViewerLollipop) context).askSizeConfirmationBeforeDownload(parentPathC, urlC, sizeC, hashesC);
+//                }
+//                else if(context instanceof FileInfoActivityLollipop){
+//                    ((FileInfoActivityLollipop) context).askSizeConfirmationBeforeDownload(parentPathC, urlC, sizeC, hashesC);
+//                }
+//                else if(context instanceof ContactFileListActivityLollipop){
+//                    ((ContactFileListActivityLollipop) context).askSizeConfirmationBeforeDownload(parentPathC, urlC, sizeC, hashesC);
+//                }
+//                else if(context instanceof PdfViewerActivityLollipop){
+//                    ((PdfViewerActivityLollipop) context).askSizeConfirmationBeforeDownload(parentPathC, urlC, sizeC, hashesC);
+//                }
+//                else if(context instanceof AudioVideoPlayerLollipop){
+//                    ((AudioVideoPlayerLollipop) context).askSizeConfirmationBeforeDownload(parentPathC, urlC, sizeC, hashesC);
+//                }
+//            }
+//            else{
+//                checkInstalledAppBeforeDownload(parentPathC, urlC, sizeC, hashesC);
+//            }
+//        }
     }
 
     //Old proceedToDownload
@@ -742,6 +790,12 @@ public class NodeController {
                 else if(context instanceof ContactFileListActivityLollipop){
                     ((ContactFileListActivityLollipop) context).askConfirmationNoAppInstaledBeforeDownload(parentPathC, urlC, sizeC, hashesC, nodeToDownload);
                 }
+                else if(context instanceof PdfViewerActivityLollipop){
+                    ((PdfViewerActivityLollipop) context).askConfirmationNoAppInstaledBeforeDownload(parentPathC, urlC, sizeC, hashesC, nodeToDownload);
+                }
+                else if(context instanceof AudioVideoPlayerLollipop){
+                    ((AudioVideoPlayerLollipop) context).askConfirmationNoAppInstaledBeforeDownload(parentPathC, urlC, sizeC, hashesC, nodeToDownload);
+                }
             }
             else{
                 download(parentPathC, urlC, sizeC, hashesC);
@@ -768,6 +822,12 @@ public class NodeController {
                 }
                 else if(context instanceof ContactFileListActivityLollipop){
                     ActivityCompat.requestPermissions(((ContactFileListActivityLollipop) context), new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, Constants.REQUEST_WRITE_STORAGE);
+                }
+                else if(context instanceof PdfViewerActivityLollipop){
+                    ActivityCompat.requestPermissions(((PdfViewerActivityLollipop) context), new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, Constants.REQUEST_WRITE_STORAGE);
+                }
+                else if(context instanceof AudioVideoPlayerLollipop){
+                    ActivityCompat.requestPermissions(((AudioVideoPlayerLollipop) context), new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, Constants.REQUEST_WRITE_STORAGE);
                 }
             }
         }
@@ -916,6 +976,12 @@ public class NodeController {
                                     else if(context instanceof ContactFileListActivityLollipop){
                                         ((ContactFileListActivityLollipop) context).showSnackbar(context.getString(R.string.general_already_downloaded));
                                     }
+                                    else if(context instanceof PdfViewerActivityLollipop){
+                                        ((PdfViewerActivityLollipop) context).showSnackbar(context.getString(R.string.general_already_downloaded));
+                                    }
+                                    else if(context instanceof AudioVideoPlayerLollipop){
+                                        ((AudioVideoPlayerLollipop) context).showSnackbar(context.getString(R.string.general_already_downloaded));
+                                    }
                                 }
                             }
                             catch (Exception e){
@@ -930,6 +996,12 @@ public class NodeController {
                                 }
                                 else if(context instanceof ContactFileListActivityLollipop){
                                     ((ContactFileListActivityLollipop) context).showSnackbar(context.getString(R.string.general_already_downloaded));
+                                }
+                                else if(context instanceof PdfViewerActivityLollipop){
+                                    ((PdfViewerActivityLollipop) context).showSnackbar(context.getString(R.string.general_already_downloaded));
+                                }
+                                else if(context instanceof AudioVideoPlayerLollipop){
+                                    ((AudioVideoPlayerLollipop) context).showSnackbar(context.getString(R.string.general_already_downloaded));
                                 }
                             }
                         }
@@ -1023,6 +1095,12 @@ public class NodeController {
                 }
                 else if(context instanceof ContactFileListActivityLollipop){
                     ((ContactFileListActivityLollipop) context).showSnackbar(msg);
+                }
+                else if(context instanceof PdfViewerActivityLollipop){
+                    ((PdfViewerActivityLollipop) context).showSnackbar(msg);
+                }
+                else if(context instanceof AudioVideoPlayerLollipop){
+                    ((AudioVideoPlayerLollipop) context).showSnackbar(msg);
                 }
             }
         }
