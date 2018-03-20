@@ -462,12 +462,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         aB.setDisplayHomeAsUpEnabled(true);
         aB.setDisplayShowHomeEnabled(true);
 
-        tB.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View view) {
-                showGroupInfoActivity();
-            }
-        });
+        tB.setOnClickListener(this);
 
         badgeDrawable = new BadgeDrawerArrowDrawable(getSupportActionBar().getThemedContext());
 
@@ -925,10 +920,13 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         if(megaChatApi.getConnectionState()!=MegaChatApi.CONNECTED){
             log("Chat not connected");
             aB.setSubtitle(getString(R.string.invalid_connection_state));
+            tB.setOnClickListener(null);
         }
         else{
             int permission = chatRoom.getOwnPrivilege();
             if (chatRoom.isGroup()) {
+                tB.setOnClickListener(this);
+
                 log("Check permissions group chat");
                 if(permission==MegaChatRoom.PRIV_RO) {
                     log("Permission RO");
@@ -970,6 +968,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             else{
                 log("Check permissions one to one chat");
                 if(permission==MegaChatRoom.PRIV_RO) {
+                    tB.setOnClickListener(null);
+
                     log("Permission RO");
                     writingContainerLayout.setVisibility(View.GONE);
 
@@ -982,6 +982,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     aB.setSubtitle(getString(R.string.observer_permission_label_participants_panel));
                 }
                 else if(permission==MegaChatRoom.PRIV_RM) {
+                    tB.setOnClickListener(this);
+
                     log("Permission RM");
                     writingContainerLayout.setVisibility(View.GONE);
 
@@ -994,6 +996,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     aB.setSubtitle(null);
                 }
                 else{
+                    tB.setOnClickListener(this);
+
                     long userHandle = chatRoom.getPeerHandle(0);
                     setStatus(userHandle);
                     writingContainerLayout.setVisibility(View.VISIBLE);
@@ -2203,6 +2207,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     }
                 }
 
+                break;
+            }
+            case R.id.toolbar_chat:{
+                showGroupInfoActivity();
                 break;
             }
 		}
