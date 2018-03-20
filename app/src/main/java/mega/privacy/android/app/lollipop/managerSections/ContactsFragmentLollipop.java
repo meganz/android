@@ -452,7 +452,7 @@ public class ContactsFragmentLollipop extends Fragment{
 			View v = inflater.inflate(R.layout.fragment_contactsgrid, container, false);
 			
 			recyclerView = (RecyclerView) v.findViewById(R.id.contacts_grid_view);
-			recyclerView.setPadding(0, 0, 0, Util.scaleHeightPx(80, outMetrics));
+//			recyclerView.setPadding(0, 0, 0, Util.scaleHeightPx(80, outMetrics));
 			recyclerView.setClipToPadding(false);
 			recyclerView.setHasFixedSize(true);
 			((CustomizedGridRecyclerView) recyclerView).setWrapContent();

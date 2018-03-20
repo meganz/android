@@ -478,7 +478,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
-		log("onSaveInstanceState");
 		super.onSaveInstanceState(outState);
 		if(recyclerView.getLayoutManager()!=null){
 			outState.putParcelable(BUNDLE_RECYCLER_LAYOUT, recyclerView.getLayoutManager().onSaveInstanceState());
@@ -523,7 +522,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
 		log("onCreateView");
-
 		if(!isAdded()){
 			return null;
 		}
@@ -562,6 +560,8 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
 		if (((ManagerActivityLollipop)context).isList){
+			log("FileBrowserFragmentLollipop isList");
+
 			log("isList");
 			View v = inflater.inflate(R.layout.fragment_filebrowserlist, container, false);
 
@@ -569,7 +569,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			recyclerView = (RecyclerView) v.findViewById(R.id.file_list_view_browser);
 			fastScroller = (FastScroller) v.findViewById(R.id.fastscroll);
 
-			recyclerView.setPadding(0, 0, 0, Util.scaleHeightPx(85, outMetrics));
+//			recyclerView.setPadding(0, 0, 0, Util.scaleHeightPx(85, outMetrics));
 			recyclerView.setClipToPadding(false);
 			recyclerView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
 			mLayoutManager = new LinearLayoutManager(context);
@@ -632,16 +632,17 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 		}
 		else{
 			log("Grid View");
-			
+			log("FileBrowserFragmentLollipop isGrid");
 			View v = inflater.inflate(R.layout.fragment_filebrowsergrid, container, false);
 
 			recyclerView = (CustomizedGridRecyclerView) v.findViewById(R.id.file_grid_view_browser);
 			fastScroller = (FastScroller) v.findViewById(R.id.fastscroll);
 
-			recyclerView.setPadding(0, 0, 0, Util.scaleHeightPx(80, outMetrics));
-			recyclerView.setClipToPadding(false);
+			//recyclerView.setPadding(0, 0, 0, Util.scaleHeightPx(80, outMetrics));
 
+			recyclerView.setClipToPadding(false);
 			recyclerView.setHasFixedSize(true);
+
 			gridLayoutManager = (CustomizedGridLayoutManager) recyclerView.getLayoutManager();
 //			gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
 //				@Override
@@ -650,7 +651,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 //				}
 //			});
 			recyclerView.setItemAnimator(new DefaultItemAnimator());
-			
 			progressBar = (ProgressBar) v.findViewById(R.id.file_grid_download_progress_bar);
 
 			emptyImageView = (ImageView) v.findViewById(R.id.file_grid_empty_image);
@@ -784,7 +784,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 
 	@Override
     public void onAttach(Activity activity) {
-		log("onAttach");
+		log("onAttach1");
         super.onAttach(activity);
         context = activity;
         aB = ((AppCompatActivity)activity).getSupportActionBar();
@@ -792,6 +792,8 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 
 	@Override
 	public void onAttach(Context context) {
+		log("onAttach2");
+
 		super.onAttach(context);
 		this.context = context;
 		aB = ((AppCompatActivity)context).getSupportActionBar();
