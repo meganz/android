@@ -121,6 +121,7 @@ import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.components.EditTextCursorWatcher;
 import mega.privacy.android.app.components.RoundedImageView;
+import mega.privacy.android.app.fcm.AdvancedNotificationBuilder;
 import mega.privacy.android.app.lollipop.adapters.CloudDrivePagerAdapter;
 import mega.privacy.android.app.lollipop.adapters.ContactsPageAdapter;
 import mega.privacy.android.app.lollipop.adapters.MyAccountPageAdapter;
@@ -4244,6 +4245,18 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	public void selectDrawerItemChat(){
 		log("selectDrawerItemChat");
 
+		((MegaApplication)getApplication()).setRecentChatVisible(true);
+
+		try {
+			AdvancedNotificationBuilder notificationBuilder;
+			notificationBuilder =  AdvancedNotificationBuilder.newInstance(this, megaApi, megaChatApi);
+
+			notificationBuilder.removeAllChatNotifications();
+		}
+		catch (Exception e){
+			log("Exception NotificationManager - remove all notifications");
+		}
+
 		MegaNode parentNode = megaApi.getNodeByPath("/"+Constants.CHAT_FOLDER);
 		if(parentNode == null){
 			log("Create folder: "+Constants.CHAT_FOLDER);
@@ -4303,6 +4316,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	@SuppressLint("NewApi")
 	public void selectDrawerItemLollipop(DrawerItem item){
     	log("selectDrawerItemLollipop: "+item);
+
+		((MegaApplication)getApplication()).setRecentChatVisible(false);
 
     	switch (item){
 			case CLOUD_DRIVE:{

@@ -309,7 +309,7 @@
 	-->
 	<string name="contacts_explorer_list_empty_text" context="Add new contacts before sharing.">Add a new contact to share</string>
 	
-	<string name="error_not_enough_free_space" context="Error message">Not enough free local space in your device</string>
+	<string name="error_not_enough_free_space" context="Error message">Not enough free space on your device</string>
 
 	<string name="option_link_without_key" context="Alert Dialog to get link">Link without key</string>
 	<string name="option_decryption_key" context="Alert Dialog to get link">Decryption key</string>

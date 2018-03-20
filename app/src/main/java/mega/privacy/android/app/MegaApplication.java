@@ -560,7 +560,12 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 	}
 
 	public static boolean isRecentChatVisible() {
-		return recentChatVisible;
+		if(activityVisible){
+			return recentChatVisible;
+		}
+		else{
+			return false;
+		}
 	}
 
 	public static void setRecentChatVisible(boolean recentChatVisible) {
@@ -807,31 +812,36 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 	public void onChatNotification(MegaChatApiJava api, long chatid, MegaChatMessage msg) {
 		log("onChatNotification: "+msg.getContent());
 
-		if(msg!=null){
-			if(msg.getStatus()==MegaChatMessage.STATUS_NOT_SEEN){
-				if(msg.getType()==MegaChatMessage.TYPE_NORMAL||msg.getType()==MegaChatMessage.TYPE_CONTACT_ATTACHMENT||msg.getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT||msg.getType()==MegaChatMessage.TYPE_REVOKE_NODE_ATTACHMENT){
-					if(msg.isDeleted()){
-						log("Message deleted");
-						updateChatNotification(chatid, msg);
+		try{
+			if(msg!=null){
+				if(msg.getStatus()==MegaChatMessage.STATUS_NOT_SEEN){
+					if(msg.getType()==MegaChatMessage.TYPE_NORMAL||msg.getType()==MegaChatMessage.TYPE_CONTACT_ATTACHMENT||msg.getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT||msg.getType()==MegaChatMessage.TYPE_REVOKE_NODE_ATTACHMENT){
+						if(msg.isDeleted()){
+							log("Message deleted");
+							updateChatNotification(chatid, msg);
+						}
+						else if(msg.isEdited()){
+							log("Message edited");
+							updateChatNotification(chatid, msg);
+						}
+						else{
+							log("New normal message");
+							showChatNotification(chatid, msg);
+						}
 					}
-					else if(msg.isEdited()){
-						log("Message edited");
-						updateChatNotification(chatid, msg);
-					}
-					else{
-						log("New normal message");
+					else if(msg.getType()==MegaChatMessage.TYPE_TRUNCATE){
+						log("New TRUNCATE message");
 						showChatNotification(chatid, msg);
 					}
 				}
-				else if(msg.getType()==MegaChatMessage.TYPE_TRUNCATE){
-					log("New TRUNCATE message");
-					showChatNotification(chatid, msg);
+				else{
+					log("Message SEEN");
+					removeChatSeenNotification(chatid, msg);
 				}
 			}
-			else{
-				log("Message SEEN");
-				removeChatSeenNotification(chatid, msg);
-			}
+		}
+		catch (Exception e){
+			log("EXCEPTION when showing chat notification");
 		}
 	}
 
@@ -865,10 +875,12 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 		chatNotificationReceived = true;
 
 		if(openChatId == chatid){
+			log("Do not show notification - opened chat");
 			return;
 		}
 
-		if(recentChatVisible){
+		if(isRecentChatVisible()){
+			log("Do not show notification - recent chats shown");
 			return;
 		}
 

@@ -209,7 +209,7 @@ public final class AdvancedNotificationBuilder {
 
         log("SDK android version: "+Build.VERSION.SDK_INT);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            log("more than Build.VERSION_CODES.N");
+            log("sendBundledNotification: POST Android N");
 
             String manufacturer = "xiaomi";
             if(!manufacturer.equalsIgnoreCase(Build.MANUFACTURER)) {
@@ -222,7 +222,7 @@ public final class AdvancedNotificationBuilder {
                 notificationManager.notify(SUMMARY_ID, summary);
             }
             else{
-
+                log("sendBundledNotification: XIAOMI POST Android N");
                 Notification notification = buildNotificationPreN(uriParameter, vibration);
 
                 if(notification!=null){
@@ -233,8 +233,8 @@ public final class AdvancedNotificationBuilder {
                 }
             }
         }
-        else if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
-            log("more than Build.VERSION_CODES.LOLLIPOP");
+        else {
+            log("sendBundledNotification: PRE Android N");
             Notification notification = buildNotificationPreN(uriParameter, vibration);
 
             if(notification!=null){
@@ -244,12 +244,7 @@ public final class AdvancedNotificationBuilder {
                 notificationManager.cancel(Constants.NOTIFICATION_PRE_N_CHAT);
             }
         }
-        else{
-//            log("Android 4 - no bundled - no inbox style");
-//            Notification notification = buildNotification(uriParameter, item, vibration, GROUP_KEY, email);
-//            log("Notification id: "+getNotificationIdByHandle(item.getChatId()));
-//            notificationManager.notify(Constants.NOTIFICATION_PRE_N_CHAT, notification);
-        }
+
     }
 
     public Notification buildNotificationPreN(Uri uriParameter, String vibration){
@@ -429,6 +424,7 @@ public final class AdvancedNotificationBuilder {
                 .setAutoCancel(true)
                 .setShowWhen(true)
                 .setGroup(groupKey)
+//                .setSortKey(String.valueOf(System.currentTimeMillis()))
                 .setSound(defaultSoundUri)
                 .setContentIntent(pendingIntent);
 
