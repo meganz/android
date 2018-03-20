@@ -839,7 +839,7 @@
     <string name="settings_disable_logs" context="Confirmation message when disabling logs in the app">Logs are now disabled</string>
 
     <string name="search_open_location" context="Option in the sliding panel to open the folder which contains the file selected after performing a search">Open location</string>
-    <string name="servers_busy" context="message when a request cannot be performed because the servers are busy">Servers are too busy. Please wait.</string>
+    <string name="servers_busy" context="message when a request cannot be performed because the servers are busy">This process is taking longer than expected. Please wait.</string>
 
     <string name="my_account_free" context="Label in My Account section to show user account type">Free Account</string>
     <string name="my_account_prolite" context="Label in My Account section to show user account type">Lite Account</string>
