@@ -28,10 +28,12 @@ import android.util.DisplayMetrics;
 import android.util.SparseBooleanArray;
 import android.util.TypedValue;
 import android.view.Display;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -641,12 +643,13 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             //Own messages
             holder.ownMessageLayout = (RelativeLayout) v.findViewById(R.id.message_chat_own_message_layout);
             holder.titleOwnMessage = (RelativeLayout) v.findViewById(R.id.title_own_message_layout);
+            holder.timeOwnText = (TextView) v.findViewById(R.id.message_chat_time_text);
+
 //        holder.meText = (TextView) v.findViewById(R.id.message_chat_me_text);
 
             holder.previewFramePort = (RelativeLayout) v.findViewById(R.id.preview_frame_portrait);
             holder.previewFrameLand = (RelativeLayout) v.findViewById(R.id.preview_frame_landscape);
 
-            holder.timeOwnText = (TextView) v.findViewById(R.id.message_chat_time_text);
             holder.contentOwnMessageLayout = (RelativeLayout) v.findViewById(R.id.content_own_message_layout);
             holder.contentOwnMessageText = (WrapEmojiconTextView) v.findViewById(R.id.content_own_message_text);
 
@@ -719,7 +722,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.ownManagementMessageLayout = (RelativeLayout) v.findViewById(R.id.own_management_message_layout);
             //Margins
             RelativeLayout.LayoutParams ownManagementParams = (RelativeLayout.LayoutParams)holder.ownManagementMessageLayout.getLayoutParams();
-            ownManagementParams.addRule(RelativeLayout.ALIGN_RIGHT);
+            ownManagementParams.addRule(RelativeLayout.ALIGN_LEFT);
             ownManagementParams.setMargins(0, 0, 0, Util.scaleHeightPx(4, outMetrics));
             holder.ownManagementMessageLayout.setLayoutParams(ownManagementParams);
 
@@ -851,6 +854,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
         ((ViewHolderMessageChat) holder).retryAlert.setVisibility(View.GONE);
         ((ViewHolderMessageChat) holder).ownManagementMessageLayout.setVisibility(View.GONE);
+        mofidyPropertiesHour();
+
         ((ViewHolderMessageChat)holder).contentOwnMessageText.setVisibility(View.VISIBLE);
         ((ViewHolderMessageChat)holder).iconOwnTypeDocLandPreview.setVisibility(View.GONE);
         ((ViewHolderMessageChat)holder).iconOwnTypeDocPortraitPreview.setVisibility(View.GONE);
@@ -1130,6 +1135,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                 ((ViewHolderMessageChat)holder).contentOwnMessageLayout.setVisibility(View.GONE);
                 ((ViewHolderMessageChat)holder).ownManagementMessageLayout.setVisibility(View.VISIBLE);
+                mofidyPropertiesHour();
 
                 if (!multipleSelect) {
 //            ((ViewHolderMessageChat)holder).imageButtonThreeDots.setVisibility(View.VISIBLE);
@@ -1502,6 +1508,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                 ((ViewHolderMessageChat)holder).contentOwnMessageLayout.setVisibility(View.GONE);
                 ((ViewHolderMessageChat)holder).ownManagementMessageLayout.setVisibility(View.VISIBLE);
+                mofidyPropertiesHour();
+
                 log("Visible own management message!");
 
                 if (!multipleSelect) {
@@ -1829,6 +1837,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                         ((ViewHolderMessageChat)holder).contentOwnMessageLayout.setVisibility(View.VISIBLE);
                         ((ViewHolderMessageChat)holder).ownManagementMessageLayout.setVisibility(View.GONE);
+                        mofidyPropertiesHour();
 
                         if (!multipleSelect) {
 
@@ -1862,6 +1871,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                         ((ViewHolderMessageChat)holder).ownManagementMessageText.setTextColor(ContextCompat.getColor(context, R.color.accentColor));
                         ((ViewHolderMessageChat)holder).ownManagementMessageText.setText(context.getString(R.string.text_deleted_message));
                         ((ViewHolderMessageChat)holder).ownManagementMessageLayout.setVisibility(View.VISIBLE);
+                        mofidyPropertiesHour();
 
                         ((ViewHolderMessageChat)holder).previewFrameLand.setVisibility(View.GONE);
                         ((ViewHolderMessageChat) holder).contentOwnMessageThumbLand.setVisibility(View.GONE);
@@ -2395,6 +2405,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                         ((ViewHolderMessageChat)holder).contentOwnMessageLayout.setVisibility(View.VISIBLE);
                         ((ViewHolderMessageChat)holder).ownManagementMessageLayout.setVisibility(View.GONE);
+                        mofidyPropertiesHour();
 
                         if (!multipleSelect) {
 
@@ -2444,6 +2455,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     }
                     ((ViewHolderMessageChat)holder).ownManagementMessageText.setText(result);
                     ((ViewHolderMessageChat)holder).ownManagementMessageLayout.setVisibility(View.VISIBLE);
+                    mofidyPropertiesHour();
 
                     if (!multipleSelect) {
 
@@ -2499,6 +2511,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     ((ViewHolderMessageChat)holder).ownManagementMessageText.setText(result);
 
                     ((ViewHolderMessageChat)holder).ownManagementMessageLayout.setVisibility(View.VISIBLE);
+                    mofidyPropertiesHour();
 
                     if (!multipleSelect) {
 
@@ -2533,6 +2546,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                     ((ViewHolderMessageChat)holder).contentOwnMessageLayout.setVisibility(View.VISIBLE);
                     ((ViewHolderMessageChat)holder).ownManagementMessageLayout.setVisibility(View.GONE);
+                    mofidyPropertiesHour();
 
                     ((ViewHolderMessageChat)holder).contentOwnMessageLayout.setBackgroundColor(ContextCompat.getColor(context, android.R.color.transparent));
 
@@ -4405,6 +4419,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
             holder.contentOwnMessageLayout.setVisibility(View.VISIBLE);
             holder.ownManagementMessageLayout.setVisibility(View.GONE);
+            mofidyPropertiesHour();
+
             if(bitmap!=null){
                 log("Bitmap not null - Update uploading my preview");
 
@@ -4630,5 +4646,25 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             log("The duration is: "+hours+" "+minutes+" "+seconds);
         }
         return timeString;
+    }
+
+    public void mofidyPropertiesHour(){
+        if(holder.ownManagementMessageLayout.getVisibility() == View.VISIBLE){
+            holder.titleOwnMessage.setGravity(Gravity.LEFT);
+            holder.timeOwnText.setGravity(Gravity.LEFT);
+            RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams)  holder.timeOwnText.getLayoutParams();
+            params.rightMargin = Util.scaleWidthPx(0, outMetrics);
+            params.leftMargin = Util.scaleWidthPx(48, outMetrics);
+            holder.timeOwnText.setLayoutParams(params);
+
+        }else if(holder.ownManagementMessageLayout.getVisibility() == View.GONE){
+            holder.titleOwnMessage.setGravity(Gravity.RIGHT);
+            holder.timeOwnText.setGravity(Gravity.RIGHT);
+            RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams)  holder.timeOwnText.getLayoutParams();
+            params.rightMargin = Util.scaleWidthPx(16, outMetrics);
+            params.leftMargin = Util.scaleWidthPx(0, outMetrics);
+            holder.timeOwnText.setLayoutParams(params);
+        }
+
     }
 }
