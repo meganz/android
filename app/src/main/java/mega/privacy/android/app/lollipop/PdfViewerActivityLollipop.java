@@ -164,25 +164,25 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
     Drawable download;
 
     private String path;
+    private String pathNavigation;
 
     @Override
     public void onCreate (Bundle savedInstanceState){
         log("onCreate");
 
         super.onCreate(savedInstanceState);
+        Intent intent = getIntent();
+        if (intent == null){
+            log("intent null");
+            finish();
+            return;
+        }
 
         if (savedInstanceState != null) {
             currentPage = savedInstanceState.getInt("currentPage");
         }
         else {
             currentPage = 0;
-        }
-
-        Intent intent = getIntent();
-        if (intent == null){
-            log("intent null");
-            finish();
-            return;
         }
 
         Bundle bundle = getIntent().getExtras();
@@ -203,9 +203,11 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
 
         if (type == Constants.OFFLINE_ADAPTER){
             isOffLine = true;
+            pathNavigation = intent.getStringExtra("pathNavigation");
         }
         else {
             isOffLine = false;
+            pathNavigation = null;
         }
 
         setContentView(R.layout.activity_pdfviewer);
@@ -708,6 +710,9 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
                     i.putExtra("imageId", MimeTypeMime.typeForName(pdfFileName).getIconResourceId());
                     i.putExtra("adapterType", Constants.OFFLINE_ADAPTER);
                     i.putExtra("path", path);
+                    if (pathNavigation != null){
+                        i.putExtra("pathNavigation", pathNavigation);
+                    }
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                         i.setDataAndType(uri, MimeTypeList.typeForName(pdfFileName).getType());
                     }
@@ -1310,6 +1315,19 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
     protected void onStop() {
         super.onStop();
         log("onStop");
+
+        if (chat != null) {
+            chat.setColorFilter(null);
+        }
+        if (download != null){
+            download.setColorFilter(null);
+        }
+        if (properties != null){
+            properties.setColorFilter(null);
+        }
+        if (share != null) {
+            share.setColorFilter(null);
+        }
     }
 
     @Override
@@ -1322,6 +1340,19 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
     protected void onResume() {
         super.onResume();
         log("onResume");
+
+        if (chat != null) {
+            chat.setColorFilter(getResources().getColor(R.color.lollipop_primary_color), PorterDuff.Mode.SRC_ATOP);
+        }
+        if (download != null){
+            download.setColorFilter(getResources().getColor(R.color.lollipop_primary_color), PorterDuff.Mode.SRC_ATOP);
+        }
+        if (properties != null){
+            properties.setColorFilter(getResources().getColor(R.color.lollipop_primary_color), PorterDuff.Mode.SRC_ATOP);
+        }
+        if (share != null) {
+            share.setColorFilter(getResources().getColor(R.color.lollipop_primary_color), PorterDuff.Mode.SRC_ATOP);
+        }
     }
 
     @Override
