@@ -151,7 +151,8 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 					if(modeCloud==FileExplorerActivityLollipop.SELECT){
 						if(selectFile){
 							if(((FileExplorerActivityLollipop)context).multiselect){
-								if(selected.size() == adapter.getFilesNodes()){
+								MegaNode node = megaApi.getNodeByHandle(parentHandle);
+								if(selected.size() == megaApi.getNumChildFiles(node)){
 									menu.findItem(R.id.cab_menu_select_all).setVisible(false);
 								}else{
 									menu.findItem(R.id.cab_menu_select_all).setVisible(true);
