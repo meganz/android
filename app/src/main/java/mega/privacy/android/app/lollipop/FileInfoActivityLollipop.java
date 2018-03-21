@@ -169,6 +169,13 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 	Button usersSharedWithTextButton;
 	View dividerSharedLayout;
 
+    RelativeLayout folderVersionsLayout;
+    RelativeLayout folderCurrentVersionsLayout;
+    RelativeLayout folderPreviousVersionsLayout;
+    TextView folderVersionsText;
+    TextView folderCurrentVersionsText;
+    TextView folderPreviousVersionsText;
+
 	TextView availableOfflineView;
 
 	ImageView publicLinkIcon;
@@ -304,7 +311,6 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
             scaleText = scaleW;
         }
 
-
 //		  dbH = new DatabaseHandler(getApplicationContext());
         dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 
@@ -428,6 +434,19 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
         sizeTitleTextView  = (TextView) findViewById(R.id.file_properties_info_menu_size);
         sizeTextView = (TextView) findViewById(R.id.file_properties_info_data_size);
 
+        //Folder Versions Layout
+        folderVersionsLayout = (RelativeLayout) findViewById(R.id.file_properties_folder_versions_layout);
+        folderVersionsText = (TextView) findViewById(R.id.file_properties_info_data_folder_versions);
+        folderVersionsLayout.setVisibility(View.GONE);
+
+        folderCurrentVersionsLayout = (RelativeLayout) findViewById(R.id.file_properties_folder_current_versions_layout);
+        folderCurrentVersionsText = (TextView) findViewById(R.id.file_properties_info_data_folder_current_versions);
+        folderCurrentVersionsLayout.setVisibility(View.GONE);
+
+        folderPreviousVersionsLayout = (RelativeLayout) findViewById(R.id.file_properties_folder_previous_versions_layout);
+        folderPreviousVersionsText = (TextView) findViewById(R.id.file_properties_info_data_folder_previous_versions);
+        folderPreviousVersionsLayout.setVisibility(View.GONE);
+
         //Location Layout
         locationLayout = (RelativeLayout) findViewById(R.id.file_properties_location_layout);
         locationTitleTextView  = (TextView) findViewById(R.id.file_properties_info_menu_location);
@@ -448,9 +467,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
         publicLinkButton.setText(getString(R.string.context_copy));
         publicLinkButton.setOnClickListener(this);
 
-
         //Added Layout
-
         addedLayout = (RelativeLayout) findViewById(R.id.file_properties_added_layout);
         addedTextView = (TextView) findViewById(R.id.file_properties_info_data_added);
 
@@ -603,7 +620,9 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
                 if(megaApi.hasVersions(node)){
                     versionsLayout.setVisibility(View.VISIBLE);
-                    versionsButton.setText(String.format(getString(R.string.number_of_versions), megaApi.getNumVersions(node)));
+
+                    String text = getResources().getQuantityString(R.plurals.number_of_versions, megaApi.getNumVersions(node), megaApi.getNumVersions(node));
+                    versionsButton.setText(text);
                     versionsButton.setOnClickListener(this);
                     separatorVersions.setVisibility(View.VISIBLE);
 
@@ -1127,7 +1146,8 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
 			if(megaApi.hasVersions(node)){
 				versionsLayout.setVisibility(View.VISIBLE);
-				versionsButton.setText(String.format(getString(R.string.number_of_versions), megaApi.getNumVersions(node)));
+                String text = getResources().getQuantityString(R.plurals.number_of_versions, megaApi.getNumVersions(node), megaApi.getNumVersions(node));
+                versionsButton.setText(text);
 				versionsButton.setOnClickListener(this);
 				separatorVersions.setVisibility(View.VISIBLE);
 
@@ -2265,13 +2285,41 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 		else if(request.getType() == MegaRequest.TYPE_FOLDER_INFO){
             if (e.getErrorCode() == MegaError.API_OK){
                 MegaFolderInfo info = request.getMegaFolderInfo();
-                log("Num versions: "+info.getNumVersions());
-                log("Num versions size: "+info.getVersionsSize());
+                int numVersions = info.getNumVersions();
+                log("Num versions: "+numVersions);
+                if(numVersions>0){
+                    folderVersionsLayout.setVisibility(View.VISIBLE);
+                    String text = getResources().getQuantityString(R.plurals.number_of_versions_inside_folder, numVersions, numVersions);
+                    folderVersionsText.setText(text);
+
+                    long currentVersions = info.getCurrentSize();
+                    log("Current versions: "+currentVersions);
+                    if(currentVersions>0){
+                        folderCurrentVersionsText.setText(Util.getSizeString(currentVersions));
+                        folderCurrentVersionsLayout.setVisibility(View.VISIBLE);
+                    }
+
+                }
+                else{
+                    folderVersionsLayout.setVisibility(View.GONE);
+                    folderCurrentVersionsLayout.setVisibility(View.GONE);
+                }
+
+                long previousVersions = info.getVersionsSize();
+                log("Previous versions: "+previousVersions);
+                if(previousVersions>0){
+                    folderPreviousVersionsText.setText(Util.getSizeString(previousVersions));
+                    folderPreviousVersionsLayout.setVisibility(View.VISIBLE);
+                }
+                else{
+                    folderPreviousVersionsLayout.setVisibility(View.GONE);
+                }
             }
             else{
-                //Hide texts of info
+                folderPreviousVersionsLayout.setVisibility(View.GONE);
+                folderVersionsLayout.setVisibility(View.GONE);
+                folderCurrentVersionsLayout.setVisibility(View.GONE);
             }
-
         }
 		else if (request.getType() == MegaRequest.TYPE_RENAME){
 
@@ -2857,7 +2905,8 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
 		if(megaApi.hasVersions(node)){
 			versionsLayout.setVisibility(View.VISIBLE);
-			versionsButton.setText(String.format(getString(R.string.number_of_versions), megaApi.getNumVersions(node)));
+            String text = getResources().getQuantityString(R.plurals.number_of_versions, megaApi.getNumVersions(node), megaApi.getNumVersions(node));
+            versionsButton.setText(text);
 			versionsButton.setOnClickListener(this);
 			separatorVersions.setVisibility(View.VISIBLE);
 		}
