@@ -1705,7 +1705,11 @@
 
     <string name="file_storage_empty_folder" context="In a chat conversation when you try to send device's images but there aren't available images">No files</string>
 
-    <string name="number_of_versions" formatted="false" context="Number of versions of a file shown on the screen info of the file">%1$d versions</string>
+    <plurals name="number_of_versions" formatted="false" context="Number of versions of a file shown on the screen info of the file">
+        <item context="version item" quantity="one">%1$d version</item>
+        <item context="version items" quantity="other">%1$d versions</item>
+    </plurals>
+
     <string name="title_section_versions" context="Title of the section Versions for files">Versions</string>
 
     <string name="header_current_section_item" context="Header of the item to show the current version of a file in a list">Current version</string>
@@ -1736,5 +1740,12 @@
     <string name="missed_call_notification_title" context="Title of the notification for a missed call">Missed call</string>
     <string name="file_properties_info_location" cotext="Refers to a location of file">Location</string>
 
+    <string name="file_properties_folder_current_versions" cotext="Title of the label to show the size of the current files inside a folder">Current versions</string>
+    <string name="file_properties_folder_previous_versions" cotext="Title of the label to show the size of the versioned files inside a folder">Previous versions</string>
+
+    <plurals name="number_of_versions_inside_folder" formatted="false" context="Number of versioned files inside a folder shown on the screen info of the folder">
+        <item context="version item" quantity="one">%1$d versioned file</item>
+        <item context="version items" quantity="other">%1$d versioned files</item>
+    </plurals>
 </resources>
 
