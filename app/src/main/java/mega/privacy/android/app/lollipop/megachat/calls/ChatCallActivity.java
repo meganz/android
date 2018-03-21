@@ -884,43 +884,12 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
             megaChatApi.removeChatVideoListener(this);
         }
 
-        if(thePlayer!=null){
-            thePlayer.stop();
-            thePlayer.release();
-            thePlayer=null;
-        }
-
-        if (toneGenerator != null) {
-            toneGenerator.stopTone();
-            toneGenerator.release();
-            toneGenerator = null;
-        }
-
-        if(ringtone!=null){
-            ringtone.stop();
-        }
-
-        if (timer!=null){
-            timer.cancel();
-            timer = null;
-        }
-
-        if (ringerTimer != null) {
-            ringerTimer.cancel();
-            ringerTimer = null;
-        }
-
-        if (vibrator != null){
-            if (vibrator.hasVibrator()){
-                vibrator.cancel();
-            }
-        }
+        stopAudioSignals();
 
         MegaApplication.activityPaused();
 
         super.onDestroy();
     }
-
 
     @Override
     public void onBackPressed() {
@@ -1042,7 +1011,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
 
     @Override
     public void onChatCallUpdate(MegaChatApiJava api, MegaChatCall call) {
-
+        log("onChatCallUpdate: "+call.getStatus());
         this.callChat = call;
         if(callChat.hasChanged(MegaChatCall.CHANGE_TYPE_STATUS)){
             int callStatus = callChat.getStatus();
@@ -1071,32 +1040,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                     updateLocalVideoStatus();
                     updateRemoteVideoStatus();
 
-                    if(thePlayer!=null){
-                        thePlayer.stop();
-                        thePlayer.release();
-                        thePlayer=null;
-                    }
-
-                    if (toneGenerator != null) {
-                        toneGenerator.stopTone();
-                        toneGenerator.release();
-                        toneGenerator = null;
-                    }
-
-                    if (ringtone!=null){
-                        ringtone.stop();
-                    }
-
-                    if (ringerTimer != null) {
-                        ringerTimer.cancel();
-                        ringerTimer = null;
-                    }
-
-                    if (vibrator != null){
-                        if (vibrator.hasVibrator()){
-                            vibrator.cancel();
-                        }
-                    }
+                    stopAudioSignals();
 
                     rtcAudioManager.start(null);
 
@@ -1118,37 +1062,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                 }
                 case MegaChatCall.CALL_STATUS_DESTROYED:{
 
-                    if(thePlayer != null){
-                        thePlayer.stop();
-                        thePlayer.release();
-                        thePlayer=null;
-                    }
-
-                    if (toneGenerator != null) {
-                        toneGenerator.stopTone();
-                        toneGenerator.release();
-                        toneGenerator = null;
-                    }
-
-                    if(ringtone != null){
-                        ringtone.stop();
-                    }
-
-                    if (timer != null){
-                        timer.cancel();
-                        timer = null;
-                    }
-
-                    if (ringerTimer != null) {
-                        ringerTimer.cancel();
-                        ringerTimer = null;
-                    }
-
-                    if (vibrator != null){
-                        if (vibrator.hasVibrator()) {
-                            vibrator.cancel();
-                        }
-                    }
+                    stopAudioSignals();
 
                     rtcAudioManager.stop();
                     MegaApplication.activityPaused();
@@ -1182,6 +1096,69 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
         else{
             log("CHANGE_TYPE_RINGING_STATUS: "+call.getChanges());
         }
+    }
+
+    public void stopAudioSignals(){
+        log("stopAudioSignals");
+
+        try{
+            if(thePlayer!=null){
+                thePlayer.stop();
+                thePlayer.release();
+            }
+        }
+        catch(Exception e){
+            log("Exception stopping player");
+        }
+
+        try{
+            if (toneGenerator != null) {
+                toneGenerator.stopTone();
+                toneGenerator.release();
+            }
+        }
+        catch(Exception e){
+            log("Exception stopping tone generator");
+        }
+
+        try{
+            if(ringtone != null){
+                ringtone.stop();
+            }
+        }
+        catch(Exception e){
+            log("Exception stopping ring tone");
+        }
+
+        try{
+            if (timer != null){
+                timer.cancel();
+            }
+
+            if (ringerTimer != null) {
+                ringerTimer.cancel();
+            }
+
+        }
+        catch(Exception e){
+            log("Exception stopping ringing timer");
+        }
+
+        try{
+            if (vibrator != null){
+                if (vibrator.hasVibrator()) {
+                    vibrator.cancel();
+                }
+            }
+        }
+        catch(Exception e){
+            log("Exception stopping vibrator");
+        }
+
+        thePlayer=null;
+        toneGenerator = null;
+        timer = null;
+        ringerTimer = null;
     }
 
     public void showMissedCallNotification() {
