@@ -16,6 +16,7 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
+import android.service.notification.StatusBarNotification;
 import android.util.Log;
 
 import org.webrtc.AndroidVideoTrackSourceObserver;
@@ -814,6 +815,10 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 
 		try{
 			if(msg!=null){
+
+				NotificationManager mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+				mNotificationManager.cancel(Constants.NOTIFICATION_GENERAL_PUSH_CHAT);
+
 				if(msg.getStatus()==MegaChatMessage.STATUS_NOT_SEEN){
 					if(msg.getType()==MegaChatMessage.TYPE_NORMAL||msg.getType()==MegaChatMessage.TYPE_CONTACT_ATTACHMENT||msg.getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT||msg.getType()==MegaChatMessage.TYPE_REVOKE_NODE_ATTACHMENT){
 						if(msg.isDeleted()){
@@ -852,6 +857,21 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
 			notificationBuilder.updateNotification(chatid, msg);
 		}
+		else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
+
+			NotificationManager mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+			StatusBarNotification[] notifs = mNotificationManager.getActiveNotifications();
+			boolean shown=false;
+			for(int i = 0; i< notifs.length; i++){
+				if(notifs[i].getId()==Constants.NOTIFICATION_PRE_N_CHAT){
+					shown = true;
+					break;
+				}
+			}
+			if(shown){
+				notificationBuilder.sendBundledNotification(null, null, chatid, msg);
+			}
+		}
 		else{
 			notificationBuilder.sendBundledNotification(null, null, chatid, msg);
 		}
@@ -863,6 +883,21 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
 			notificationBuilder.removeSeenNotification(chatid, msg);
+		}
+		else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
+
+			NotificationManager mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+			StatusBarNotification[] notifs = mNotificationManager.getActiveNotifications();
+			boolean shown=false;
+			for(int i = 0; i< notifs.length; i++){
+				if(notifs[i].getId()==Constants.NOTIFICATION_PRE_N_CHAT){
+					shown = true;
+					break;
+				}
+			}
+			if(shown){
+				notificationBuilder.sendBundledNotification(null, null, chatid, msg);
+			}
 		}
 		else{
 			notificationBuilder.sendBundledNotification(null, null, chatid, msg);
@@ -886,14 +921,6 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 
 		AdvancedNotificationBuilder notificationBuilder;
 		notificationBuilder =  AdvancedNotificationBuilder.newInstance(this, megaApi, megaChatApi);
-
-        try{
-            NotificationManager mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-            mNotificationManager.cancel(Constants.NOTIFICATION_GENERAL_PUSH_CHAT);
-        }
-        catch (Exception e){
-            log("EXCEPTION: General notification not REMOVED."+e.getMessage());
-        }
 
 		ChatSettings chatSettings = dbH.getChatSettings();
 
