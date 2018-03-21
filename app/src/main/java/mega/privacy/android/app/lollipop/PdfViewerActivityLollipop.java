@@ -707,7 +707,6 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
             }
             case R.id.pdfviewer_download: {
                 downloadFile();
-                finish();
                 break;
             }
             case R.id.pdfviewer_chat: {
