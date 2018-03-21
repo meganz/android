@@ -642,78 +642,78 @@ public class NodeController {
         catch(Exception ex){}
 
         log("availableFreeSpace: " + availableFreeSpace + "__ sizeToDownload: " + sizeC);
-        ((ManagerActivityLollipop) context).showSnackbarNotSpace();
+//        ((FileInfoActivityLollipop) context).showSnackbarNotSpace();
 
-//        if(availableFreeSpace < sizeC) {
-//
-//            if(context instanceof ManagerActivityLollipop){
-//                ((ManagerActivityLollipop) context).showSnackbarNotSpace();
-//            }
-//            else if(context instanceof FullScreenImageViewerLollipop){
-//                ((FullScreenImageViewerLollipop) context).showSnackbarNotSpace();
-//            }
-//            else if(context instanceof FileInfoActivityLollipop){
-//                ((FileInfoActivityLollipop) context).showSnackbarNotSpace();
-//            }
-//            else if(context instanceof ContactFileListActivityLollipop){
-//                ((ContactFileListActivityLollipop) context).showSnackbarNotSpace();
-//            }
-//            else if(context instanceof PdfViewerActivityLollipop){
-//                ((PdfViewerActivityLollipop) context).showSnackbarNotSpace();
-//            }
-//            else if (context instanceof AudioVideoPlayerLollipop){
-//                ((AudioVideoPlayerLollipop) context).showSnackbarNotSpace();
-//            }
-//
-//            log("Not enough space");
-//            return;
-//        }
-//
-//        if (dbH == null){
-//            dbH = DatabaseHandler.getDbHandler(context.getApplicationContext());
-//        }
-//
-//        String ask=dbH.getAttributes().getAskSizeDownload();
-//
-//        if(ask==null){
-//            ask="true";
-//        }
-//
-//        if(ask.equals("false")){
-//            log("SIZE: Do not ask before downloading");
-//            checkInstalledAppBeforeDownload(parentPathC, urlC, sizeC, hashesC);
-//        }
-//        else{
-//            log("SIZE: Ask before downloading");
-//            //Check size to download
-//            //100MB=104857600
-//            //10MB=10485760
-//            //1MB=1048576
-//            if(sizeC>104857600) {
-//                log("Show size confirmacion: " + sizeC);
-//                //Show alert
-//                if (context instanceof ManagerActivityLollipop) {
-//                    ((ManagerActivityLollipop) context).askSizeConfirmationBeforeDownload(parentPathC, urlC, sizeC, hashesC);
-//                } else if (context instanceof FullScreenImageViewerLollipop) {
-//                    ((FullScreenImageViewerLollipop) context).askSizeConfirmationBeforeDownload(parentPathC, urlC, sizeC, hashesC);
-//                }
-//                else if(context instanceof FileInfoActivityLollipop){
-//                    ((FileInfoActivityLollipop) context).askSizeConfirmationBeforeDownload(parentPathC, urlC, sizeC, hashesC);
-//                }
-//                else if(context instanceof ContactFileListActivityLollipop){
-//                    ((ContactFileListActivityLollipop) context).askSizeConfirmationBeforeDownload(parentPathC, urlC, sizeC, hashesC);
-//                }
-//                else if(context instanceof PdfViewerActivityLollipop){
-//                    ((PdfViewerActivityLollipop) context).askSizeConfirmationBeforeDownload(parentPathC, urlC, sizeC, hashesC);
-//                }
-//                else if(context instanceof AudioVideoPlayerLollipop){
-//                    ((AudioVideoPlayerLollipop) context).askSizeConfirmationBeforeDownload(parentPathC, urlC, sizeC, hashesC);
-//                }
-//            }
-//            else{
-//                checkInstalledAppBeforeDownload(parentPathC, urlC, sizeC, hashesC);
-//            }
-//        }
+        if(availableFreeSpace < sizeC) {
+
+            if(context instanceof ManagerActivityLollipop){
+                ((ManagerActivityLollipop) context).showSnackbarNotSpace();
+            }
+            else if(context instanceof FullScreenImageViewerLollipop){
+                ((FullScreenImageViewerLollipop) context).showSnackbarNotSpace();
+            }
+            else if(context instanceof FileInfoActivityLollipop){
+                ((FileInfoActivityLollipop) context).showSnackbarNotSpace();
+            }
+            else if(context instanceof ContactFileListActivityLollipop){
+                ((ContactFileListActivityLollipop) context).showSnackbarNotSpace();
+            }
+            else if(context instanceof PdfViewerActivityLollipop){
+                ((PdfViewerActivityLollipop) context).showSnackbarNotSpace();
+            }
+            else if (context instanceof AudioVideoPlayerLollipop){
+                ((AudioVideoPlayerLollipop) context).showSnackbarNotSpace();
+            }
+
+            log("Not enough space");
+            return;
+        }
+
+        if (dbH == null){
+            dbH = DatabaseHandler.getDbHandler(context.getApplicationContext());
+        }
+
+        String ask=dbH.getAttributes().getAskSizeDownload();
+
+        if(ask==null){
+            ask="true";
+        }
+
+        if(ask.equals("false")){
+            log("SIZE: Do not ask before downloading");
+            checkInstalledAppBeforeDownload(parentPathC, urlC, sizeC, hashesC);
+        }
+        else{
+            log("SIZE: Ask before downloading");
+            //Check size to download
+            //100MB=104857600
+            //10MB=10485760
+            //1MB=1048576
+            if(sizeC>104857600) {
+                log("Show size confirmacion: " + sizeC);
+                //Show alert
+                if (context instanceof ManagerActivityLollipop) {
+                    ((ManagerActivityLollipop) context).askSizeConfirmationBeforeDownload(parentPathC, urlC, sizeC, hashesC);
+                } else if (context instanceof FullScreenImageViewerLollipop) {
+                    ((FullScreenImageViewerLollipop) context).askSizeConfirmationBeforeDownload(parentPathC, urlC, sizeC, hashesC);
+                }
+                else if(context instanceof FileInfoActivityLollipop){
+                    ((FileInfoActivityLollipop) context).askSizeConfirmationBeforeDownload(parentPathC, urlC, sizeC, hashesC);
+                }
+                else if(context instanceof ContactFileListActivityLollipop){
+                    ((ContactFileListActivityLollipop) context).askSizeConfirmationBeforeDownload(parentPathC, urlC, sizeC, hashesC);
+                }
+                else if(context instanceof PdfViewerActivityLollipop){
+                    ((PdfViewerActivityLollipop) context).askSizeConfirmationBeforeDownload(parentPathC, urlC, sizeC, hashesC);
+                }
+                else if(context instanceof AudioVideoPlayerLollipop){
+                    ((AudioVideoPlayerLollipop) context).askSizeConfirmationBeforeDownload(parentPathC, urlC, sizeC, hashesC);
+                }
+            }
+            else{
+                checkInstalledAppBeforeDownload(parentPathC, urlC, sizeC, hashesC);
+            }
+        }
     }
 
     //Old proceedToDownload

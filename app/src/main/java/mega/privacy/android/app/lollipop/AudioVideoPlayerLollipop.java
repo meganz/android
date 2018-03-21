@@ -616,9 +616,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
             }
             case R.id.full_video_viewer_download: {
                 log("Download option");
-
                 downloadFile();
-                finish();
                 break;
             }
         }
