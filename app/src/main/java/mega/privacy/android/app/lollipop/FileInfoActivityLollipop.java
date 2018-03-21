@@ -155,6 +155,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 	LinearLayout availableOfflineLayout;
 
 	RelativeLayout sizeLayout;
+	RelativeLayout locationLayout;
 	RelativeLayout contentLayout;
 	RelativeLayout addedLayout;
 	RelativeLayout modifiedLayout;
@@ -182,6 +183,9 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
 	TextView sizeTextView;
 	TextView sizeTitleTextView;
+
+    TextView locationTextView;
+    TextView locationTitleTextView;
 
 	TextView contentTextView;
 	TextView contentTitleTextView;
@@ -267,6 +271,9 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
     private int adapterType;
  	private String path;
+ 	private File file;
+ 	private long fragmentHandle  = -1;
+ 	private String pathNavigation;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -296,6 +303,10 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
         else{
             scaleText = scaleW;
         }
+
+
+//		  dbH = new DatabaseHandler(getApplicationContext());
+        dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 
         adapterType = getIntent().getIntExtra("adapterType", 0);
         path = getIntent().getStringExtra("path");
@@ -412,12 +423,21 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
         infoIcon = (ImageView) findViewById(R.id.file_properties_info_image);
 
+        //Size Layout
         sizeLayout = (RelativeLayout) findViewById(R.id.file_properties_size_layout);
         sizeTitleTextView  = (TextView) findViewById(R.id.file_properties_info_menu_size);
         sizeTextView = (TextView) findViewById(R.id.file_properties_info_data_size);
 
+        //Location Layout
+        locationLayout = (RelativeLayout) findViewById(R.id.file_properties_location_layout);
+        locationTitleTextView  = (TextView) findViewById(R.id.file_properties_info_menu_location);
+        locationTextView = (TextView) findViewById(R.id.file_properties_info_data_location);
+        locationTextView.setOnClickListener(this);
+
         //Content Layout
         contentLayout = (RelativeLayout) findViewById(R.id.file_properties_content_layout);
+        contentTitleTextView  = (TextView) findViewById(R.id.file_properties_info_menu_content);
+        contentTextView = (TextView) findViewById(R.id.file_properties_info_data_content);
 
         publicLinkLayout = (RelativeLayout) findViewById(R.id.file_properties_link_layout);
         publicLinkCopyLayout = (RelativeLayout) findViewById(R.id.file_properties_copy_layout);
@@ -428,8 +448,6 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
         publicLinkButton.setText(getString(R.string.context_copy));
         publicLinkButton.setOnClickListener(this);
 
-        contentTitleTextView  = (TextView) findViewById(R.id.file_properties_info_menu_content);
-        contentTextView = (TextView) findViewById(R.id.file_properties_info_data_content);
 
         //Added Layout
 
@@ -461,13 +479,27 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
             if (path != null){
                 log("Path no NULL");
-                File file = new File (path);
+                file = new File (path);
                 sizeTextView.setText(Util.getSizeString(file.length()));
+                String location = file.getParentFile().getName();
+                if (location.equals("in")){
+                    locationTextView.setText(getResources().getString(R.string.section_saved_for_offline) + " ("+ getResources().getString(R.string.section_saved_for_offline) +")");
+                }
+                else {
+                    String offlineLocation = file.getParentFile().getParentFile().getName() + '/' + location;
+                    if (offlineLocation.equals(Util.offlineDIR)){
+                        locationTextView.setText(getResources().getString(R.string.section_saved_for_offline) + " ("+ getResources().getString(R.string.section_saved_for_offline) +")");
+                    }
+                    else {
+                        locationTextView.setText(location + " ("+ getResources().getString(R.string.section_saved_for_offline) +")");
+                    }
+                }
                 log("Path: "+file.getAbsolutePath()+ " size: "+file.length());
             }
             else {
                 log("Path is NULL");
             }
+            pathNavigation = getIntent().getStringExtra("pathNavigation");
         }
         else {
             if (megaApi == null){
@@ -501,11 +533,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
             megaApi.addGlobalListener(this);
 
-//		dbH = new DatabaseHandler(getApplicationContext());
-            dbH = DatabaseHandler.getDbHandler(getApplicationContext());
-
             if (extras != null){
-                imageId = extras.getInt("imageId");
                 from = extras.getInt("from");
                 if(from==FROM_INCOMING_SHARES){
                     firstIncomingLevel = extras.getBoolean("firstLevel");
@@ -527,6 +555,40 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
                 MegaNode parent = megaApi.getNodeByHandle(node.getHandle());
                 while (megaApi.getParentNode(parent) != null){
                     parent = megaApi.getParentNode(parent);
+                }
+                if (from == FROM_INCOMING_SHARES){
+                    fragmentHandle = -1;
+                    if (megaApi.getParentNode(node) != null){
+                        locationTextView.setText(megaApi.getParentNode(node).getName()+" ("+ getResources().getString(R.string.title_incoming_shares_explorer) +")");
+                    }
+                    else {
+                        locationTextView.setText(getResources().getString(R.string.title_incoming_shares_explorer)+" ("+ getResources().getString(R.string.title_incoming_shares_explorer) +")");
+                    }
+                }
+                else{
+                    if (parent.getHandle() == megaApi.getRootNode().getHandle()){
+                        fragmentHandle = megaApi.getRootNode().getHandle();
+                    }
+                    else if (parent.getHandle() == megaApi.getRubbishNode().getHandle()){
+                        fragmentHandle = megaApi.getRubbishNode().getHandle();
+                    }
+                    else if (parent.getHandle() == megaApi.getInboxNode().getHandle()){
+                        fragmentHandle = megaApi.getInboxNode().getHandle();
+                    }
+
+                    if (megaApi.getParentNode(node) == null){ // It is because of the parent node is Incoming Shares
+                        locationTextView.setText(getResources().getString(R.string.title_incoming_shares_explorer)+" ("+ getResources().getString(R.string.title_incoming_shares_explorer) +")");
+                    }
+                    else {
+                        if (parent.getHandle() == megaApi.getRootNode().getHandle() ||
+                                parent.getHandle() == megaApi.getRubbishNode().getHandle() ||
+                                parent.getHandle() == megaApi.getInboxNode().getHandle()){
+                            locationTextView.setText(megaApi.getParentNode(node).getName()+" ("+ parent.getName() +")");
+                        }
+                        else {
+                            locationTextView.setText(megaApi.getParentNode(node).getName()+" ("+ getResources().getString(R.string.title_incoming_shares_explorer) +")");
+                        }
+                    }
                 }
 
                 if (parent.getHandle() != megaApi.getRubbishNode().getHandle()){
@@ -1592,6 +1654,30 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 				}
 				break;
 			}
+            case R.id.file_properties_info_data_location:{
+
+                Intent intent = new Intent(this, ManagerActivityLollipop.class);
+                intent.setAction(Constants.ACTION_OPEN_FOLDER);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                intent.putExtra("locationFileInfo", true);
+                if (adapterType == Constants.OFFLINE_ADAPTER){
+                    intent.putExtra("offline_adapter", true);
+                    if (path != null){
+                        intent.putExtra("path", path);
+                        intent.putExtra("pathNavigation", pathNavigation);
+                    }
+                }
+                else {
+                    if (megaApi.getParentNode(node) != null){
+                        intent.putExtra("PARENT_HANDLE", megaApi.getParentNode(node).getHandle());
+                    }
+                    intent.putExtra("fragmentHandle", fragmentHandle);
+                }
+                startActivity(intent);
+                this.finish();
+                break;
+            }
 		}
 	}
 

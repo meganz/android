@@ -1734,6 +1734,7 @@
     </string-array>
 
     <string name="missed_call_notification_title" context="Title of the notification for a missed call">Missed call</string>
+    <string name="file_properties_info_location" cotext="Refers to a location of file">Location</string>
 
 </resources>
 
