@@ -102,6 +102,7 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUser;
 
+import static android.provider.Settings.System.DEFAULT_RINGTONE_URI;
 import static android.view.View.GONE;
 import static mega.privacy.android.app.utils.Util.context;
 
@@ -531,8 +532,8 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                     flagContactAvatar = false;
                     setProfileContactAvatar();
 
-                    Uri ringtoneUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE);
-                    ringtone = RingtoneManager.getRingtone(this, ringtoneUri);
+                    ringtone = RingtoneManager.getRingtone(this, DEFAULT_RINGTONE_URI);
+
                     ringerTimer = new Timer();
                     MyRingerTask myRingerTask = new MyRingerTask();
                     ringerTimer.schedule(myRingerTask, 0, 500);
