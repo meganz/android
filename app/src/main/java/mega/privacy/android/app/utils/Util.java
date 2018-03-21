@@ -669,10 +669,6 @@ public class Util {
 		context = c;
 	}
 
-	public static Context getContext(){
-		return context;
-	}
-
 	public static void setDBH(DatabaseHandler d){
 		dbH = d;
 	}
