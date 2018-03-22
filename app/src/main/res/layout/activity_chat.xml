@@ -70,12 +70,12 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_alignParentRight="true"
-                            android:layout_marginRight="10dp"
+                            android:layout_marginRight="16dp"
+                            android:layout_centerVertical="true"
                             android:background="@null"
                             android:layout_alignBottom="@id/edit_text_chat"
                             android:tint="@color/accentColor"
-                            android:src="@drawable/ic_send_black"
-                            android:layout_marginBottom="3dp"/>
+                            android:src="@drawable/ic_send_black"/>
 
                         <mega.privacy.android.app.components.emojicon.EmojiconEditText
                             android:id="@id/edit_text_chat"
