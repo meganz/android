@@ -644,16 +644,10 @@ public class ChatController {
                 } else if (message.getType() == MegaChatMessage.TYPE_TRUNCATE) {
                     log("Message type TRUNCATE");
 
-                    if (chatRoom.isGroup()) {
-                        String textToShow = String.format(context.getString(R.string.non_format_history_cleared_by), fullNameTitle);
-                        builder.append(textToShow);
-                        return builder.toString();
+                    String textToShow = String.format(context.getString(R.string.non_format_history_cleared_by), fullNameTitle);
+                    builder.append(textToShow);
+                    return builder.toString();
 
-                    } else {
-                        String textToShow = context.getString(R.string.history_cleared_message);
-                        builder.append(textToShow);
-                        return builder.toString();
-                    }
                 } else if (message.getType() == MegaChatMessage.TYPE_CHAT_TITLE) {
                     log("Message type CHANGE TITLE " + message.getContent());
 
