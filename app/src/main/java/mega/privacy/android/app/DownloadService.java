@@ -249,7 +249,8 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 								log("condition ret == MegaChatApi.INIT_ERROR");
 								if (chatSettings == null) {
 									log("ERROR----> Switch OFF chat");
-									chatSettings = new ChatSettings(false + "", true + "", "", true + "");
+									chatSettings = new ChatSettings();
+									chatSettings.setEnabled(false+"");
 									dbH.setChatSettings(chatSettings);
 								} else {
 									log("ERROR----> Switch OFF chat");
@@ -603,6 +604,8 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 						log("Pdf file");
 						Intent pdfIntent = new Intent(this, PdfViewerActivityLollipop.class);
 						pdfIntent.putExtra("APP", true);
+						pdfIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+						pdfIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
 						pdfIntent.putExtra("HANDLE", currentDocument.getHandle());
 						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && !externalFile) {
 							pdfIntent.setDataAndType(FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());

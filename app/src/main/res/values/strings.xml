@@ -3,11 +3,12 @@
 
     <string name="app_name" context="Not translate">MEGA</string>
     <string name="pdf_app_name" context="Not translate">MEGA PDF Viewer</string>
-    <string name="app_version" context="Not translate">3.3.2 (182)</string>
-    <string name="sdk_version" context="Not translate">986431f</string>
-    <string name="karere_version" context="Not translate">1097d4e</string>
+    <string name="app_version" context="Not translate">3.3.3 (186)</string>
+    <string name="sdk_version" context="Not translate">2b434ec</string>
+    <string name="karere_version" context="Not translate">d3c8938</string>
+
     <!--
-    <string name="full_description_text" context="Full description text of the app in the Google Play page of the app">MEGA is a secure cloud storage service that gives you 50 GB free storage space. Unlike other cloud storage providers, your data is encrypted and decrypted by your client devices only and never by us.\nUpload your files from your smartphone or tablet then search, store, download, stream, view, share, rename or delete your files any time, from any device, anywhere. Share folders with your contacts and see their updates in real time.\nThe encryption process means we cannot access or reset your password so you MUST remember it (unless you have your Master Key backed up) or you will lose access to your stored files.\nInside the app you can upgrade your storage space and transfer quota quota with a monthly or yearly subscription.\nPRO LITE subscription: 4.99 € per month or 49.99 € per year gives you 200 GB of storage space and 1 TB of transfer quota per month.\nPRO I subscription: 9.99 € per month or 99.99 € per year gives you 500 GB of storage space and 2 TB of transfer quota per month.\nPRO II subscription: 19.99 € per month or 199.99 € per year gives you 2 TB of storage space and 4 TB of transfer quota per month.\nPRO III subscription: 29.99 € per month or 299.99 € per year gives you 4 TB of storage space and 8 TB of transfer quota per month.\nSubscriptions are renewed automatically for successive subscription periods of the same duration and at the same price as the initial period chosen. To manage your subscriptions, simply click on the Play Store icon on your handset, sign in with your Google ID (if you haven\'t already done so) and then click on the MEGA app. You\'ll be able to manage your subscription there.\nFor more info, please check our website: \n https://mega.nz/mobile_terms.html \n https://mega.nz/mobile_privacy.html \nNew Terms of Service apply effective from 20 February 2016. See https://mega.nz/TermsOfService2016.pdf \n Note: For desktop access to your files Mega needs to use HTML5 compatible browsers to handle our advanced features. We recommend Mozilla Firefox and Google Chrome. However the mobile versions of browsers cannot access the Mega cloud storage system.</string>
+    <string name="full_description_text" context="Full description text of the app in the Google Play page of the app">MEGA provides user-controlled encrypted cloud storage and chat through standard web browsers, together with dedicated apps for mobile devices. Unlike other cloud storage providers, your data is encrypted and decrypted by your client devices only and never by us.\n\nUpload your files from your smartphone or tablet then search, store, download, stream, view, share, rename or delete your files any time, from any device, anywhere. Share folders with your contacts and see their updates in real time. The encryption process means we cannot access or reset your password so you MUST remember it (unless you have your Recovery Key backed up) or you will lose access to your stored files.\n\nEnd-to-end user-encrypted MEGA video chat allows for total privacy, and has been available through the browser since 2016. It has been extended to our mobile app, with chat history accessible across multiple devices. Users can also easily add files to a chat from their MEGA cloud drive.\n\nMEGA offers a generous 50 GB free storage for all registered users with bonus achievements, and offers paid plans with much higher limits:\n\n\nPRO LITE subscription: 4.99 € per month or 49.99 € per year gives you 200 GB of storage space and 1 TB of transfer quota per month.\nPRO I subscription: 9.99 € per month or 99.99 € per year gives you 1 TB of storage space and 2 TB of transfer quota per month.\nPRO II subscription: 19.99 € per month or 199.99 € per year gives you 4 TB of storage space and 8 TB of transfer quota per month.\nPRO III subscription: 29.99 € per month or 299.99 € per year gives you 8 TB of storage space and 16 TB of transfer quota per month.\n\nSubscriptions are renewed automatically for successive subscription periods of the same duration and at the same price as the initial period chosen. To manage your subscriptions, simply click on the Play Store icon on your handset, sign in with your Google ID (if you haven't already done so) and then click on the MEGA app. You'll be able to manage your subscription there.\n\nApp Permissions:\nWRITE_EXTERNAL_STORAGE -> Download your files from MEGA to your device and upload files from your device to MEGA\nCAMERA -> Take a picture and upload your photos to MEGA\nREAD_CONTACTS -> Easily add contacts from your device as MEGA contacts\nRECORD_AUDIO &amp; CAPTURE_VIDEO_OUTPUT (mic and camera) -> MEGA provides for end-to-end encrypted audio/video calls\n\n\nTo enhance users' confidence in the MEGA system, all of the client-side code is published, so interested security researchers can evaluate the encryption process. The code of our mobile app is located on: https://github.com/meganz/android\n\nFor more info, please check our website:\nSee https://mega.nz/terms\n\n\nDesktop - https://mega.nz/</string>
     -->
     <!--
     <string name="short_description_text" context="Short description text of the app in the Google Play page of the app">MEGA is Cloud Storage with Powerful Always-On Privacy. 50GB for free</string>
@@ -206,7 +207,7 @@
     <string name="tour_access_text">Get fully encrypted access anywhere, anytime</string>
 
     <string name="create_account_text" context="button that allows the user to create an account">Create account</string>
-    <string name="name_text" context="Name of the user">First Name</string>
+    <string name="name_text" context="Name of the user">Name</string>
     <string name="lastname_text" context="Last name of the user">Last Name</string>
     <string name="tos" context="text placed on the checkbox of acceptation of the Terms of Service">I agree with MEGA\'s [A]Terms of Service[/A]</string>
     <string name="already_account" context="Does the user already have a MEGA account">Already have an account?</string>
@@ -308,7 +309,7 @@
 	-->
 	<string name="contacts_explorer_list_empty_text" context="Add new contacts before sharing.">Add a new contact to share</string>
 	
-	<string name="error_not_enough_free_space" context="Error message">Not enough free space</string>
+	<string name="error_not_enough_free_space" context="Error message">Not enough free local space in your device</string>
 
 	<string name="option_link_without_key" context="Alert Dialog to get link">Link without key</string>
 	<string name="option_decryption_key" context="Alert Dialog to get link">Decryption key</string>
@@ -838,7 +839,7 @@
     <string name="settings_disable_logs" context="Confirmation message when disabling logs in the app">Logs are now disabled</string>
 
     <string name="search_open_location" context="Option in the sliding panel to open the folder which contains the file selected after performing a search">Open location</string>
-    <string name="servers_busy" context="message when a request cannot be performed because the servers are busy">Servers are too busy. Please wait.</string>
+    <string name="servers_busy" context="message when a request cannot be performed because the servers are busy">This process is taking longer than expected. Please wait.</string>
 
     <string name="my_account_free" context="Label in My Account section to show user account type">Free Account</string>
     <string name="my_account_prolite" context="Label in My Account section to show user account type">Lite Account</string>
@@ -1709,8 +1710,8 @@
     <string name="context_empty_incoming" context="Text of the empty screen when there are not elements in Incoming">Incoming Shared folders</string>
     <string name="context_empty_outgoing" context="Text of the empty screen when there are not elements in Outgoing">Outgoing Shared folders</string>
 
-    <string name="tab_sent_requests" context="Title of the sent requests tab. Capital letters">Sent Requests</string>
-    <string name="tab_received_requests" context="Title of the received requests tab. Capital letters">Received Requests</string>
+    <string name="tab_sent_requests" context="Title of the sent requests tab. Capital letters">Sent requests</string>
+    <string name="tab_received_requests" context="Title of the received requests tab. Capital letters">Received requests</string>
     <string name="overquota_alert_title" context="Title dialog overquota error">Storage quota exceeded</string>
 
     <string name="invalid_link" context="error message shown when an account confirmation link or reset password link is invalid for unknown reasons">Invalid link, please ask for a new valid link</string>
@@ -1735,5 +1736,49 @@
     <string name="account_suspended_multiple_breaches_ToS" context="Message error shown when trying to log in on an account has been suspended due to multiple breaches of Terms of Service">Your account has been suspended due to multiple breaches of Mega\'s Terms of Service. Please check your email inbox.</string>
     <string name="account_suspended_breache_ToS" context="Message error shown when trying to log in on an account has been suspended due to breach of Terms of Service">Your account was terminated due to breach of Mega\'s Terms of Service, such as abuse of rights of others; sharing and/or importing illegal data; or system abuse.</string>
 
+    <string name="file_storage_empty_folder" context="In a chat conversation when you try to send device's images but there aren't available images">No files</string>
+
+    <plurals name="number_of_versions" formatted="false" context="Number of versions of a file shown on the screen info of the file">
+        <item context="version item" quantity="one">%1$d version</item>
+        <item context="version items" quantity="other">%1$d versions</item>
+    </plurals>
+
+    <string name="title_section_versions" context="Title of the section Versions for files">Versions</string>
+
+    <string name="header_current_section_item" context="Header of the item to show the current version of a file in a list">Current version</string>
+    <plurals name="header_previous_section_item" context="Header of the item to show the previous versions of a file in a list">
+        <item context="file item" quantity="one">Previous version</item>
+        <item context="file items" quantity="other">Previous versions</item>
+    </plurals>
+
+    <string name="general_revert" context="option menu to revert a file version">Revert</string>
+    <string name="menu_item_clear_versions" context="option menu to clear all the previous versions">Clear previous versions</string>
+    <plurals name="title_dialog_delete_version" context="Title of the dialog to confirm that a version os going to be deleted">
+        <item context="version item" quantity="one">Delete version?</item>
+        <item context="version items" quantity="other">Delete versions?</item>
+    </plurals>
+
+    <string name="content_dialog_delete_version" context="Content of the dialog to confirm that a version is going to be deleted">This version will be permanently removed.</string>
+    <string name="content_dialog_delete_multiple_version" context="Content of the dialog to confirm that several versions are going to be deleted">These %d versions will be permanently removed.</string>
+
+    <string name="chat_upload_title_notification" context="Title of the notification shown when a file is uploading to a chat">Chat uploading</string>
+
+    <string name="settings_chat_upload_quality" context="Label for the option on setting to set up the quality of multimedia files uploaded to the chat">Chat media quality</string>
+
+    <string-array name="settings_chat_upload_quality_entries" context="the options for the option on setting to set up the quality of multimedia files uploaded to the chat">
+        <item context="the options of what to upload.">Original</item>
+        <item context="the options of what to upload.">Medium</item>
+    </string-array>
+
+    <string name="missed_call_notification_title" context="Title of the notification for a missed call">Missed call</string>
+    <string name="file_properties_info_location" cotext="Refers to a location of file">Location</string>
+
+    <string name="file_properties_folder_current_versions" cotext="Title of the label to show the size of the current files inside a folder">Current versions</string>
+    <string name="file_properties_folder_previous_versions" cotext="Title of the label to show the size of the versioned files inside a folder">Previous versions</string>
+
+    <plurals name="number_of_versions_inside_folder" formatted="false" context="Number of versioned files inside a folder shown on the screen info of the folder">
+        <item context="version item" quantity="one">%1$d versioned file</item>
+        <item context="version items" quantity="other">%1$d versioned files</item>
+    </plurals>
 </resources>
 

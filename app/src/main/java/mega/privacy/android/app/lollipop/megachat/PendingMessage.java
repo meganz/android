@@ -1,7 +1,5 @@
 package mega.privacy.android.app.lollipop.megachat;
 
-import java.util.ArrayList;
-
 public class PendingMessage {
 
     public static int STATE_SENDING = 0;
@@ -9,35 +7,25 @@ public class PendingMessage {
     public static int STATE_ERROR = -1;
 
     long chatId;
-    ArrayList<PendingNodeAttachment> nodeAttachments = new ArrayList<>();
+//    ArrayList<PendingNodeAttachment> nodeAttachments = new ArrayList<>();
     long id;
     long uploadTimestamp;
     int state;
+    String videoDownSampled;
+    PendingNodeAttachment nodeAttachment;
 
-    public PendingMessage(long id, long chatId, ArrayList<String> filePaths, int state) {
+    public PendingMessage(long id, long chatId, String filePath, int state) {
         this.id = id;
         this.chatId = chatId;
         this.state = state;
-        for(int i=0;i<filePaths.size();i++){
-            PendingNodeAttachment nodeAttachment = new PendingNodeAttachment(filePaths.get(i));
-            nodeAttachments.add(nodeAttachment);
-        }
+
+        PendingNodeAttachment nodeAttachment = new PendingNodeAttachment(filePath);
+        this.nodeAttachment = nodeAttachment;
     }
 
-    public PendingMessage(long id, long chatId, ArrayList<String> filePaths, ArrayList<String> fingerprints, ArrayList<String> names, long uploadTimestamp) {
+    public PendingMessage(long id, long chatId, PendingNodeAttachment nodeAttachment, long uploadTimestamp, int state) {
         this.chatId = chatId;
-        this.id = id;
-        this.uploadTimestamp = uploadTimestamp;
-
-        for(int i=0;i<filePaths.size();i++){
-            PendingNodeAttachment nodeAttachment = new PendingNodeAttachment(filePaths.get(i), fingerprints.get(i), names.get(i));
-            nodeAttachments.add(nodeAttachment);
-        }
-    }
-
-    public PendingMessage(long id, long chatId, ArrayList<PendingNodeAttachment> nodeAttachments, long uploadTimestamp, int state) {
-        this.chatId = chatId;
-        this.nodeAttachments = nodeAttachments;
+        this.nodeAttachment = nodeAttachment;
         this.id = id;
         this.uploadTimestamp = uploadTimestamp;
         this.state = state;
@@ -49,12 +37,12 @@ public class PendingMessage {
         this.uploadTimestamp = uploadTimestamp;
     }
 
-    public ArrayList<PendingNodeAttachment> getNodeAttachments() {
-        return nodeAttachments;
+    public PendingNodeAttachment getNodeAttachment() {
+        return nodeAttachment;
     }
 
-    public void setNodeAttachments(ArrayList<PendingNodeAttachment> nodeAttachments) {
-        this.nodeAttachments = nodeAttachments;
+    public void setNodeAttachment(PendingNodeAttachment nodeAttachment) {
+        this.nodeAttachment = nodeAttachment;
     }
 
     public long getChatId() {
@@ -81,37 +69,24 @@ public class PendingMessage {
         this.uploadTimestamp = uploadTimestamp;
     }
 
-    public boolean isNodeHandlesCompleted(){
-        for(int i=0;i<nodeAttachments.size();i++){
-            if(nodeAttachments.get(i).getNodeHandle()==-1){
-                return false;
-            }
-        }
-        return true;
+    public long getNodeHandle(){
+        return nodeAttachment.getNodeHandle();
     }
 
-    public ArrayList<Long> getNodeHandles(){
-        ArrayList<Long> nodeHandles = new ArrayList<>();
-        for(int i=0;i<nodeAttachments.size();i++){
-            nodeHandles.add(nodeAttachments.get(i).getNodeHandle());
-        }
-        return nodeHandles;
+    public String getFilePath(){
+        return nodeAttachment.getFilePath();
     }
 
-    public ArrayList<String> getFilePaths(){
-        ArrayList<String> filePaths = new ArrayList<>();
-        for(int i=0;i<nodeAttachments.size();i++){
-            filePaths.add(nodeAttachments.get(i).getFilePath());
-        }
-        return filePaths;
+    public String getName(){
+        return nodeAttachment.getName();
     }
 
-    public ArrayList<String> getNames(){
-        ArrayList<String> names = new ArrayList<>();
-        for(int i=0;i<nodeAttachments.size();i++){
-            names.add(nodeAttachments.get(i).getName());
-        }
-        return names;
+    public String getVideoDownSampled() {
+        return videoDownSampled;
+    }
+
+    public void setVideoDownSampled(String videoDownSampled) {
+        this.videoDownSampled = videoDownSampled;
     }
 
     public int getState() {

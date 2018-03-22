@@ -11,8 +11,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
-import android.graphics.PorterDuff;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -65,7 +63,6 @@ import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.trackselection.TrackSelection;
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 import com.google.android.exoplayer2.trackselection.TrackSelector;
-import com.google.android.exoplayer2.ui.PlaybackControlView;
 import com.google.android.exoplayer2.ui.SimpleExoPlayerView;
 import com.google.android.exoplayer2.upstream.BandwidthMeter;
 import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
@@ -156,6 +153,11 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
 
     ArrayList<Long> handleListM = new ArrayList<Long>();
 
+    private boolean isOffline;
+    private int adapterType;
+    private String path;
+    private String pathNavigation;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -178,6 +180,17 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
             finish();
             return;
         }
+        path = intent.getStringExtra("path");
+        adapterType = getIntent().getIntExtra("adapterType", 0);
+        if (adapterType == Constants.OFFLINE_ADAPTER){
+            isOffline = true;
+            pathNavigation = intent.getStringExtra("pathNavigation");
+        }
+        else {
+            isOffline = false;
+            pathNavigation = null;
+        }
+
         Bundle bundle = intent.getExtras();
         if (bundle != null) {
             handle = bundle.getLong("HANDLE");
@@ -387,7 +400,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
                 if (playbackState == ExoPlayer.STATE_BUFFERING){
                     audioContainer.setVisibility(View.GONE);
 
-                    if (loading && !transferOverquota){
+                    if (loading && !transferOverquota && !isOffline){
                         try {
                             statusDialog.setCanceledOnTouchOutside(false);
                             statusDialog.show();
@@ -575,11 +588,29 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
             case R.id.full_video_viewer_properties: {
                 log("Info option");
 
-                MegaNode node = megaApi.getNodeByHandle(handle);
                 Intent i = new Intent(this, FileInfoActivityLollipop.class);
-                i.putExtra("handle", node.getHandle());
-                i.putExtra("imageId", MimeTypeMime.typeForName(node.getName()).getIconResourceId());
-                i.putExtra("name", node.getName());
+                if (isOffline){
+                    i.putExtra("name", fileName);
+                    i.putExtra("imageId", MimeTypeMime.typeForName(fileName).getIconResourceId());
+                    i.putExtra("adapterType", Constants.OFFLINE_ADAPTER);
+                    i.putExtra("path", path);
+                    if (pathNavigation != null){
+                        i.putExtra("pathNavigation", pathNavigation);
+                    }
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                        i.setDataAndType(uri, MimeTypeList.typeForName(fileName).getType());
+                    }
+                    else{
+                        i.setDataAndType(uri, MimeTypeList.typeForName(fileName).getType());
+                    }
+                    i.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                }
+                else {
+                    MegaNode node = megaApi.getNodeByHandle(handle);
+                    i.putExtra("handle", node.getHandle());
+                    i.putExtra("imageId", MimeTypeMime.typeForName(node.getName()).getIconResourceId());
+                    i.putExtra("name", node.getName());
+                }
                 startActivity(i);
                 break;
             }
@@ -880,7 +911,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
         if(uri!=null){
             if (!isUrl) {
                 Intent share = new Intent(android.content.Intent.ACTION_SEND);
-                share.setType("application/pdf");
+                share.setType(MimeTypeList.typeForName(fileName).getType()+"/*");
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                     log("Use provider to share");
                     share.putExtra(Intent.EXTRA_STREAM, Uri.parse(uri.toString()));
