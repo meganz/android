@@ -17,6 +17,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.StatFs;
 import android.provider.OpenableColumns;
 import android.support.design.widget.AppBarLayout;
@@ -27,6 +28,8 @@ import android.support.v4.content.FileProvider;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
+import android.util.DisplayMetrics;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -35,7 +38,9 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -69,9 +74,11 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.UserCredentials;
+import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerActivity;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.lollipop.tasks.FilePrepareTask;
+import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.Util;
@@ -164,6 +171,10 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
     private String path;
     private String pathNavigation;
 
+    NodeController nC;
+    private android.support.v7.app.AlertDialog downloadConfirmationDialog;
+    private DisplayMetrics outMetrics;
+
     @Override
     public void onCreate (Bundle savedInstanceState){
         log("onCreate");
@@ -207,6 +218,10 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
             isOffLine = false;
             pathNavigation = null;
         }
+
+        Display display = getWindowManager().getDefaultDisplay();
+        outMetrics = new DisplayMetrics ();
+        display.getMetrics(outMetrics);
 
         setContentView(R.layout.activity_pdfviewer);
 
@@ -536,7 +551,11 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
         }
         ArrayList<Long> handleList = new ArrayList<Long>();
         handleList.add(node.getHandle());
-        downloadNode(handleList);
+
+        if(nC==null){
+            nC = new NodeController(this);
+        }
+        nC.prepareForDownload(handleList);
     }
 
     public void onIntentProcessed(List<ShareInfo> infos) {
@@ -688,7 +707,6 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
             }
             case R.id.pdfviewer_download: {
                 downloadFile();
-                finish();
                 break;
             }
             case R.id.pdfviewer_chat: {
@@ -762,123 +780,6 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
         checkLogin();
     }
 
-    @SuppressLint("NewApi")
-    public void downloadNode(ArrayList<Long> handleList){
-
-        long size = 0;
-        long[] hashes = new long[handleList.size()];
-        for (int i=0;i<handleList.size();i++){
-            hashes[i] = handleList.get(i);
-            size += megaApi.getNodeByHandle(hashes[i]).getSize();
-        }
-
-        if (dbH == null){
-            dbH = DatabaseHandler.getDbHandler(getApplicationContext());
-        }
-
-        boolean askMe = true;
-        String downloadLocationDefaultPath = "";
-        prefs = dbH.getPreferences();
-        if (prefs != null){
-            if (prefs.getStorageAskAlways() != null){
-                if (!Boolean.parseBoolean(prefs.getStorageAskAlways())){
-                    if (prefs.getStorageDownloadLocation() != null){
-                        if (prefs.getStorageDownloadLocation().compareTo("") != 0){
-                            askMe = false;
-                            downloadLocationDefaultPath = prefs.getStorageDownloadLocation();
-                        }
-                    }
-                }
-            }
-        }
-
-        if (askMe){
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                File[] fs = getExternalFilesDirs(null);
-                if (fs.length > 1){
-                    if (fs[1] == null){
-                        Intent intent = new Intent(FileStorageActivityLollipop.Mode.PICK_FOLDER.getAction());
-                        intent.putExtra(FileStorageActivityLollipop.EXTRA_BUTTON_PREFIX, getString(R.string.context_download_to));
-                        intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, size);
-                        intent.setClass(this, FileStorageActivityLollipop.class);
-                        intent.putExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES, hashes);
-                        startActivityForResult(intent, REQUEST_CODE_SELECT_LOCAL_FOLDER);
-                    }
-                    else{
-                        Dialog downloadLocationDialog;
-                        String[] sdCardOptions = getResources().getStringArray(R.array.settings_storage_download_location_array);
-                        AlertDialog.Builder b=new AlertDialog.Builder(this);
-
-                        b.setTitle(getResources().getString(R.string.settings_storage_download_location));
-                        final long sizeFinal = size;
-                        final long[] hashesFinal = new long[hashes.length];
-                        for (int i=0; i< hashes.length; i++){
-                            hashesFinal[i] = hashes[i];
-                        }
-
-                        b.setItems(sdCardOptions, new DialogInterface.OnClickListener() {
-
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                switch(which){
-                                    case 0:{
-                                        Intent intent = new Intent(FileStorageActivityLollipop.Mode.PICK_FOLDER.getAction());
-                                        intent.putExtra(FileStorageActivityLollipop.EXTRA_BUTTON_PREFIX, getString(R.string.context_download_to));
-                                        intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, sizeFinal);
-                                        intent.setClass(getApplicationContext(), FileStorageActivityLollipop.class);
-                                        intent.putExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES, hashesFinal);
-                                        startActivityForResult(intent, REQUEST_CODE_SELECT_LOCAL_FOLDER);
-                                        break;
-                                    }
-                                    case 1:{
-                                        File[] fs = getExternalFilesDirs(null);
-                                        if (fs.length > 1){
-                                            String path = fs[1].getAbsolutePath();
-                                            File defaultPathF = new File(path);
-                                            defaultPathF.mkdirs();
-                                            Toast.makeText(getApplicationContext(), getString(R.string.general_download) + ": "  + defaultPathF.getAbsolutePath() , Toast.LENGTH_LONG).show();
-                                            downloadTo(path, null, sizeFinal, hashesFinal);
-                                        }
-                                        break;
-                                    }
-                                }
-                            }
-                        });
-                        b.setNegativeButton(getResources().getString(R.string.general_cancel), new DialogInterface.OnClickListener() {
-
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.cancel();
-                            }
-                        });
-                        downloadLocationDialog = b.create();
-                        downloadLocationDialog.show();
-                    }
-                }
-                else{
-                    Intent intent = new Intent(FileStorageActivityLollipop.Mode.PICK_FOLDER.getAction());
-                    intent.putExtra(FileStorageActivityLollipop.EXTRA_BUTTON_PREFIX, getString(R.string.context_download_to));
-                    intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, size);
-                    intent.setClass(this, FileStorageActivityLollipop.class);
-                    intent.putExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES, hashes);
-                    startActivityForResult(intent, REQUEST_CODE_SELECT_LOCAL_FOLDER);
-                }
-            }
-            else{
-                Intent intent = new Intent(FileStorageActivityLollipop.Mode.PICK_FOLDER.getAction());
-                intent.putExtra(FileStorageActivityLollipop.EXTRA_BUTTON_PREFIX, getString(R.string.context_download_to));
-                intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, size);
-                intent.setClass(this, FileStorageActivityLollipop.class);
-                intent.putExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES, hashes);
-                startActivityForResult(intent, REQUEST_CODE_SELECT_LOCAL_FOLDER);
-            }
-        }
-        else{
-            downloadTo(downloadLocationDefaultPath, null, size, hashes);
-            finish();
-        }
-    }
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
         log("-------------------onActivityResult " + requestCode + "____" + resultCode);
@@ -909,169 +810,18 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
                 log("megaChatApi is Null - cannot attach nodes");
             }
         }
-
-        if (requestCode == Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER && resultCode == RESULT_OK) {
-            log("onActivityResult: REQUEST_CODE_SELECT_LOCAL_FOLDER");
-            if (intent == null) {
-                log("Return.....");
-                return;
-            }
-
+        else if (requestCode == REQUEST_CODE_SELECT_LOCAL_FOLDER && resultCode == RESULT_OK) {
+            log("local folder selected");
             String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
-            log("parentPath: "+parentPath);
+            String url = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_URL);
             long size = intent.getLongExtra(FileStorageActivityLollipop.EXTRA_SIZE, 0);
-            log("size: "+size);
             long[] hashes = intent.getLongArrayExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES);
-            log("hashes size: "+hashes.length);
+            log("URL: " + url + "___SIZE: " + size);
 
-            downloadTo(parentPath, null, size, hashes);
-            finish();
-        }
-    }
-
-    public void downloadTo(String parentPath, String url, long size, long [] hashes){
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
-            if (!hasStoragePermission) {
-                ActivityCompat.requestPermissions(this,
-                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                        Constants.REQUEST_WRITE_STORAGE);
+            if(nC==null){
+                nC = new NodeController(this);
             }
-        }
-
-        double availableFreeSpace = Double.MAX_VALUE;
-        try{
-            StatFs stat = new StatFs(parentPath);
-            availableFreeSpace = (double)stat.getAvailableBlocks() * (double)stat.getBlockSize();
-        }
-        catch(Exception ex){}
-
-
-        if (hashes == null){
-            if(url != null) {
-                if(availableFreeSpace < size) {
-                    Snackbar.make(pdfviewerContainer, getString(R.string.error_not_enough_free_space), Snackbar.LENGTH_LONG).show();
-                    return;
-                }
-                Intent service = new Intent(this, DownloadService.class);
-                service.putExtra(DownloadService.EXTRA_URL, url);
-                service.putExtra(DownloadService.EXTRA_SIZE, size);
-                service.putExtra(DownloadService.EXTRA_PATH, parentPath);
-                service.putExtra(DownloadService.EXTRA_FOLDER_LINK, isFolderLink);
-                startService(service);
-            }
-        }
-        else{
-            if(hashes.length == 1){
-                MegaNode tempNode = megaApi.getNodeByHandle(hashes[0]);
-                if((tempNode != null) && tempNode.getType() == MegaNode.TYPE_FILE){
-                    log("ISFILE");
-                    String localPath = Util.getLocalFile(this, tempNode.getName(), tempNode.getSize(), parentPath);
-                    if(localPath != null){
-                        try {
-                            Util.copyFile(new File(localPath), new File(parentPath, tempNode.getName()));
-                        }
-                        catch(Exception e) {}
-
-                        try {
-
-                            Intent viewIntent = new Intent(Intent.ACTION_VIEW);
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                                viewIntent.setDataAndType(FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", new File(localPath)), MimeTypeList.typeForName(tempNode.getName()).getType());
-                            } else {
-                                viewIntent.setDataAndType(Uri.fromFile(new File(localPath)), MimeTypeList.typeForName(tempNode.getName()).getType());
-                            }
-                            viewIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                            if (MegaApiUtils.isIntentAvailable(this, viewIntent))
-                                startActivity(viewIntent);
-                            else {
-                                Intent intentShare = new Intent(Intent.ACTION_SEND);
-                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                                    intentShare.setDataAndType(FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", new File(localPath)), MimeTypeList.typeForName(tempNode.getName()).getType());
-                                } else {
-                                    intentShare.setDataAndType(Uri.fromFile(new File(localPath)), MimeTypeList.typeForName(tempNode.getName()).getType());
-                                }
-                                intentShare.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                                if (MegaApiUtils.isIntentAvailable(this, intentShare))
-                                    startActivity(intentShare);
-                                String message = getString(R.string.general_already_downloaded) + ": " + localPath;
-                                Snackbar.make(pdfviewerContainer, message, Snackbar.LENGTH_LONG).show();
-                            }
-                        }
-                        catch (Exception e){
-                            String message = getString(R.string.general_already_downloaded) + ": " + localPath;
-                            Snackbar.make(pdfviewerContainer, message, Snackbar.LENGTH_LONG).show();
-                        }
-                        return;
-                    }
-                }
-            }
-
-            for (long hash : hashes) {
-                MegaNode node = megaApi.getNodeByHandle(hash);
-                if(node != null){
-                    Map<MegaNode, String> dlFiles = new HashMap<MegaNode, String>();
-                    if (node.getType() == MegaNode.TYPE_FOLDER) {
-                        getDlList(dlFiles, node, new File(parentPath, new String(node.getName())));
-                    } else {
-                        dlFiles.put(node, parentPath);
-                    }
-
-                    for (MegaNode document : dlFiles.keySet()) {
-
-                        String path = dlFiles.get(document);
-
-                        if(availableFreeSpace < document.getSize()){
-                            Snackbar.make(pdfviewerContainer, getString(R.string.error_not_enough_free_space), Snackbar.LENGTH_LONG).show();
-                            continue;
-                        }
-
-                        Intent service = new Intent(this, DownloadService.class);
-                        service.putExtra(DownloadService.EXTRA_HASH, document.getHandle());
-                        service.putExtra(DownloadService.EXTRA_URL, url);
-                        service.putExtra(DownloadService.EXTRA_SIZE, document.getSize());
-                        service.putExtra(DownloadService.EXTRA_PATH, path);
-                        service.putExtra(DownloadService.EXTRA_FOLDER_LINK, isFolderLink);
-                        startService(service);
-                    }
-                }
-                else if(url != null) {
-                    if(availableFreeSpace < size) {
-                        Snackbar.make(pdfviewerContainer, getString(R.string.error_not_enough_free_space), Snackbar.LENGTH_LONG).show();
-                        continue;
-                    }
-
-                    Intent service = new Intent(this, DownloadService.class);
-                    service.putExtra(DownloadService.EXTRA_HASH, hash);
-                    service.putExtra(DownloadService.EXTRA_URL, url);
-                    service.putExtra(DownloadService.EXTRA_SIZE, size);
-                    service.putExtra(DownloadService.EXTRA_PATH, parentPath);
-                    service.putExtra(DownloadService.EXTRA_FOLDER_LINK, isFolderLink);
-                    startService(service);
-                }
-                else {
-                    log("node not found");
-                }
-            }
-        }
-    }
-
-    private void getDlList(Map<MegaNode, String> dlFiles, MegaNode parent, File folder) {
-
-        if (megaApi.getRootNode() == null)
-            return;
-
-        folder.mkdir();
-        ArrayList<MegaNode> nodeList = megaApi.getChildren(parent, orderGetChildren);
-        for(int i=0; i<nodeList.size(); i++){
-            MegaNode document = nodeList.get(i);
-            if (document.getType() == MegaNode.TYPE_FOLDER) {
-                File subfolder = new File(folder, new String(document.getName()));
-                getDlList(dlFiles, document, subfolder);
-            }
-            else {
-                dlFiles.put(document, folder.getAbsolutePath());
-            }
+            nC.checkSizeBeforeDownload(parentPath, url, size, hashes);
         }
     }
 
@@ -1483,5 +1233,160 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
     @Override
     public boolean onTransferData(MegaApiJava api, MegaTransfer transfer, byte[] buffer) {
         return false;
+    }
+
+    public void showSnackbar(String s){
+        log("showSnackbar");
+        Snackbar snackbar = Snackbar.make(pdfviewerContainer, s, Snackbar.LENGTH_LONG);
+        TextView snackbarTextView = (TextView)snackbar.getView().findViewById(android.support.design.R.id.snackbar_text);
+        snackbarTextView.setMaxLines(5);
+        snackbar.show();
+    }
+
+    public void openAdvancedDevices (long handleToDownload){
+        log("openAdvancedDevices");
+//		handleToDownload = handle;
+        String externalPath = Util.getExternalCardPath();
+
+        if(externalPath!=null){
+            log("ExternalPath for advancedDevices: "+externalPath);
+            MegaNode node = megaApi.getNodeByHandle(handleToDownload);
+            if(node!=null){
+
+//				File newFile =  new File(externalPath+"/"+node.getName());
+                File newFile =  new File(node.getName());
+                log("File: "+newFile.getPath());
+                Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
+
+                // Filter to only show results that can be "opened", such as
+                // a file (as opposed to a list of contacts or timezones).
+                intent.addCategory(Intent.CATEGORY_OPENABLE);
+
+                // Create a file with the requested MIME type.
+                String mimeType = MimeTypeList.getMimeType(newFile);
+                log("Mimetype: "+mimeType);
+                intent.setType(mimeType);
+                intent.putExtra(Intent.EXTRA_TITLE, node.getName());
+                intent.putExtra("handleToDownload", handleToDownload);
+                try{
+                    startActivityForResult(intent, Constants.WRITE_SD_CARD_REQUEST_CODE);
+                }
+                catch(Exception e){
+                    log("Exception in External SDCARD");
+                    Environment.getExternalStorageDirectory();
+                    Toast toast = Toast.makeText(this, getString(R.string.no_external_SD_card_detected), Toast.LENGTH_LONG);
+                    toast.show();
+                }
+            }
+        }
+        else{
+            log("No external SD card");
+            Environment.getExternalStorageDirectory();
+            Toast toast = Toast.makeText(this, getString(R.string.no_external_SD_card_detected), Toast.LENGTH_LONG);
+            toast.show();
+        }
+    }
+
+    public void showSnackbarNotSpace(){
+        log("showSnackbarNotSpace");
+        Snackbar mySnackbar = Snackbar.make(pdfviewerContainer, R.string.error_not_enough_free_space, Snackbar.LENGTH_LONG);
+        mySnackbar.setAction("Settings", new SnackbarNavigateOption(this));
+        mySnackbar.show();
+    }
+
+    public void askSizeConfirmationBeforeDownload(String parentPath, String url, long size, long [] hashes){
+        log("askSizeConfirmationBeforeDownload");
+
+        final String parentPathC = parentPath;
+        final String urlC = url;
+        final long [] hashesC = hashes;
+        final long sizeC=size;
+
+        android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this);
+        LinearLayout confirmationLayout = new LinearLayout(this);
+        confirmationLayout.setOrientation(LinearLayout.VERTICAL);
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        params.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleHeightPx(10, outMetrics), Util.scaleWidthPx(17, outMetrics), 0);
+
+        final CheckBox dontShowAgain =new CheckBox(this);
+        dontShowAgain.setText(getString(R.string.checkbox_not_show_again));
+        dontShowAgain.setTextColor(getResources().getColor(R.color.text_secondary));
+
+        confirmationLayout.addView(dontShowAgain, params);
+
+        builder.setView(confirmationLayout);
+
+//				builder.setTitle(getString(R.string.confirmation_required));
+
+        builder.setMessage(getString(R.string.alert_larger_file, Util.getSizeString(sizeC)));
+        builder.setPositiveButton(getString(R.string.general_download),
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        if(dontShowAgain.isChecked()){
+                            dbH.setAttrAskSizeDownload("false");
+                        }
+                        if(nC==null){
+                            nC = new NodeController(PdfViewerActivityLollipop.this);
+                        }
+                        nC.checkInstalledAppBeforeDownload(parentPathC, urlC, sizeC, hashesC);
+                    }
+                });
+        builder.setNegativeButton(getString(android.R.string.cancel), new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                if(dontShowAgain.isChecked()){
+                    dbH.setAttrAskSizeDownload("false");
+                }
+            }
+        });
+
+        downloadConfirmationDialog = builder.create();
+        downloadConfirmationDialog.show();
+    }
+
+    public void askConfirmationNoAppInstaledBeforeDownload (String parentPath, String url, long size, long [] hashes, String nodeToDownload){
+        log("askConfirmationNoAppInstaledBeforeDownload");
+
+        final String parentPathC = parentPath;
+        final String urlC = url;
+        final long [] hashesC = hashes;
+        final long sizeC=size;
+
+        android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this);
+        LinearLayout confirmationLayout = new LinearLayout(this);
+        confirmationLayout.setOrientation(LinearLayout.VERTICAL);
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        params.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleHeightPx(10, outMetrics), Util.scaleWidthPx(17, outMetrics), 0);
+
+        final CheckBox dontShowAgain =new CheckBox(this);
+        dontShowAgain.setText(getString(R.string.checkbox_not_show_again));
+        dontShowAgain.setTextColor(getResources().getColor(R.color.text_secondary));
+
+        confirmationLayout.addView(dontShowAgain, params);
+
+        builder.setView(confirmationLayout);
+
+//				builder.setTitle(getString(R.string.confirmation_required));
+        builder.setMessage(getString(R.string.alert_no_app, nodeToDownload));
+        builder.setPositiveButton(getString(R.string.general_download),
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        if(dontShowAgain.isChecked()){
+                            dbH.setAttrAskNoAppDownload("false");
+                        }
+                        if(nC==null){
+                            nC = new NodeController(PdfViewerActivityLollipop.this);
+                        }
+                        nC.download(parentPathC, urlC, sizeC, hashesC);
+                    }
+                });
+        builder.setNegativeButton(getString(android.R.string.cancel), new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                if(dontShowAgain.isChecked()){
+                    dbH.setAttrAskNoAppDownload("false");
+                }
+            }
+        });
+        downloadConfirmationDialog = builder.create();
+        downloadConfirmationDialog.show();
     }
 }

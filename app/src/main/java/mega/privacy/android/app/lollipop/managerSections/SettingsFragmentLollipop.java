@@ -22,6 +22,7 @@ import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceScreen;
 import android.preference.SwitchPreference;
+import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.provider.DocumentFile;
@@ -249,6 +250,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 	public int numberOfClicksSDK = 0;
 	public int numberOfClicksKarere = 0;
 	public int numberOfClicksAppVersion = 0;
+	ListView listView;
 	
 	@Override
     public void onCreate(Bundle savedInstanceState) {
@@ -266,8 +268,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 		prefs = dbH.getPreferences();
 		chatSettings = dbH.getChatSettings();
 		
-		super.onCreate(savedInstanceState);	
-        
+		super.onCreate(savedInstanceState);
         addPreferencesFromResource(R.xml.preferences);
 
 		preferenceScreen = (PreferenceScreen) findPreference("general_preference_screen");
@@ -1018,6 +1019,37 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 		useHttpsOnly.setChecked(useHttpsOnlyValue);
 
 		megaApi.getContactLinksOption(this);
+	}
+
+	@Override
+	public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+		super.onViewCreated(view, savedInstanceState);
+		log("onViewCreated");
+		if (((ManagerActivityLollipop) context).openSettingsStorage) {
+			listView = (ListView) view.findViewById(android.R.id.list);
+			goToCategoryStorage();
+		}
+	}
+
+	public void goToCategoryStorage(){
+		log("goToCategoryStorage");
+		for (int i=0; i<getPreferenceScreen().getPreferenceCount(); i++){
+			String key = getPreferenceScreen().getPreference(i).getKey();
+			if (key.equals(storageCategory.getKey())){
+				((ManagerActivityLollipop) context).openSettingsStorage = false;
+				listView.clearFocus();
+				final int finalI = i;
+				listView.postDelayed(new Runnable() {
+					@Override
+					public void run() {
+//						listView.requestFocusFromTouch();
+						listView.setSelection(finalI+8);
+//						listView.requestFocus();
+					}
+				}, 200);
+				break;
+			}
+		}
 	}
 
 	@Override
