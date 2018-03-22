@@ -310,6 +310,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
     public boolean openFolderFromSearch = false;
 
+    public boolean openSettingsStorage = false;
+
 	public enum DrawerItem {
 		CLOUD_DRIVE, SAVED_FOR_OFFLINE, CAMERA_UPLOADS, INBOX, SHARED_ITEMS, CONTACTS, SETTINGS, ACCOUNT, SEARCH, TRANSFERS, MEDIA_UPLOADS, CHAT;
 
@@ -2043,6 +2045,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						log("Chat notification: SHOW_SETTINGS");
 						selectDrawerItemPending=false;
 						moveToSettingsSection();
+						getIntent().setAction(null);
+						setIntent(null);
+					}
+					else if (getIntent().getAction().equals(Constants.ACTION_SHOW_SETTINGS_STORAGE)) {
+						log("ACTION_SHOW_SETTINGS_STORAGE");
+						selectDrawerItemPending=false;
+						moveToSettingsSectionStorage();
 						getIntent().setAction(null);
 						setIntent(null);
 					}
@@ -4681,7 +4690,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
     				getSupportFragmentManager().beginTransaction().remove(currentFragment).commitNow();
     			}
 
-				if(sttFLol==null){
+    			if (sttFLol != null){
+					if (openSettingsStorage){
+						sttFLol.goToCategoryStorage();
+					}
+				}
+				else {
 					sttFLol = new SettingsFragmentLollipop();
 				}
 
@@ -4756,6 +4770,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	}
 
 	public void moveToSettingsSection(){
+		drawerItem=DrawerItem.SETTINGS;
+		selectDrawerItemLollipop(drawerItem);
+	}
+
+	public void moveToSettingsSectionStorage(){
+		openSettingsStorage = true;
 		drawerItem=DrawerItem.SETTINGS;
 		selectDrawerItemLollipop(drawerItem);
 	}
