@@ -840,7 +840,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 		}
 	}
 
-    public void itemClick(int position) {
+    public void itemClick(int position, int[] screenPosition) {
 		log("item click position: " + position);
 		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 		if (adapter.isMultipleSelect()){
@@ -894,6 +894,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 						intent.putExtra("typeAccount", accountInfo.getAccountType());
 					}
 					intent.putExtra("orderGetChildren", ((ManagerActivityLollipop)context).orderCloud);
+					intent.putExtra("screenPosition", screenPosition);
 					startActivity(intent);
 
 				}
