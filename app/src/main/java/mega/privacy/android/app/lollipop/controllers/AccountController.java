@@ -111,16 +111,23 @@ public class AccountController {
         String myEmail = myContact.getEmail();
         if(myEmail!=null){
             File avatar = null;
+            File qrFile = null;
             if (context.getExternalCacheDir() != null){
                 avatar = new File(context.getExternalCacheDir().getAbsolutePath(), myEmail + ".jpg");
+                qrFile = new File(context.getExternalCacheDir().getAbsolutePath(), myEmail + "QRcode.jpg");
             }
             else{
                 avatar = new File(context.getCacheDir().getAbsolutePath(), myEmail + ".jpg");
+                qrFile = new File(context.getCacheDir().getAbsolutePath(), myEmail + "QRcode.jpg");
             }
 
             if (avatar.exists()) {
                 log("avatar to delete: " + avatar.getAbsolutePath());
                 avatar.delete();
+            }
+
+            if (qrFile.exists()){
+                qrFile.delete();
             }
         }
 
