@@ -6,15 +6,12 @@ import android.app.ActivityManager;
 import android.app.Dialog;
 import android.app.Notification;
 import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
-import android.graphics.PorterDuff;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -42,7 +39,6 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
-import android.widget.RemoteViews;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -68,7 +64,6 @@ import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.trackselection.TrackSelection;
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 import com.google.android.exoplayer2.trackselection.TrackSelector;
-import com.google.android.exoplayer2.ui.PlaybackControlView;
 import com.google.android.exoplayer2.ui.SimpleExoPlayerView;
 import com.google.android.exoplayer2.upstream.BandwidthMeter;
 import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
@@ -89,7 +84,6 @@ import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.MimeTypeMime;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerActivity;
-import mega.privacy.android.app.receivers.NetworkStateReceiver;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
 import nz.mega.sdk.MegaApiAndroid;
@@ -161,6 +155,10 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
 
     private String downloadLocationDefaultPath = "";
     private boolean renamed = false;
+    private boolean isOffline;
+    private int adapterType;
+    private String path;
+    private String pathNavigation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -188,6 +186,17 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
             finish();
             return;
         }
+        path = intent.getStringExtra("path");
+        adapterType = getIntent().getIntExtra("adapterType", 0);
+        if (adapterType == Constants.OFFLINE_ADAPTER){
+            isOffline = true;
+            pathNavigation = intent.getStringExtra("pathNavigation");
+        }
+        else {
+            isOffline = false;
+            pathNavigation = null;
+        }
+
         Bundle bundle = intent.getExtras();
         if (bundle != null) {
             handle = bundle.getLong("HANDLE");
@@ -398,7 +407,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
                 if (playbackState == ExoPlayer.STATE_BUFFERING){
                     audioContainer.setVisibility(View.GONE);
 
-                    if (loading && !transferOverquota){
+                    if (loading && !transferOverquota && !isOffline){
                         try {
                             statusDialog.setCanceledOnTouchOutside(false);
                             statusDialog.show();
@@ -590,11 +599,29 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
             case R.id.full_video_viewer_properties: {
                 log("Info option");
 
-                MegaNode node = megaApi.getNodeByHandle(handle);
                 Intent i = new Intent(this, FileInfoActivityLollipop.class);
-                i.putExtra("handle", node.getHandle());
-                i.putExtra("imageId", MimeTypeMime.typeForName(node.getName()).getIconResourceId());
-                i.putExtra("name", node.getName());
+                if (isOffline){
+                    i.putExtra("name", fileName);
+                    i.putExtra("imageId", MimeTypeMime.typeForName(fileName).getIconResourceId());
+                    i.putExtra("adapterType", Constants.OFFLINE_ADAPTER);
+                    i.putExtra("path", path);
+                    if (pathNavigation != null){
+                        i.putExtra("pathNavigation", pathNavigation);
+                    }
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                        i.setDataAndType(uri, MimeTypeList.typeForName(fileName).getType());
+                    }
+                    else{
+                        i.setDataAndType(uri, MimeTypeList.typeForName(fileName).getType());
+                    }
+                    i.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                }
+                else {
+                    MegaNode node = megaApi.getNodeByHandle(handle);
+                    i.putExtra("handle", node.getHandle());
+                    i.putExtra("imageId", MimeTypeMime.typeForName(node.getName()).getIconResourceId());
+                    i.putExtra("name", node.getName());
+                }
                 startActivity(i);
                 renamed = false;
                 break;
@@ -896,7 +923,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
         if(uri!=null){
             if (!isUrl) {
                 Intent share = new Intent(android.content.Intent.ACTION_SEND);
-                share.setType("application/pdf");
+                share.setType(MimeTypeList.typeForName(fileName).getType()+"/*");
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                     log("Use provider to share");
                     share.putExtra(Intent.EXTRA_STREAM, Uri.parse(uri.toString()));
@@ -1277,58 +1304,6 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
         Intent upgradeIntent = new Intent(this, ManagerActivityLollipop.class);
         upgradeIntent.setAction(Constants.ACTION_SHOW_UPGRADE_ACCOUNT);
         startActivity(upgradeIntent);
-    }
-
-    private void showOverquotaNotification(){
-        log("showOverquotaNotification");
-
-        PendingIntent pendingIntent = null;
-
-        String info = "Streaming";
-        Notification notification = null;
-
-        String contentText = getString(R.string.download_show_info);
-        String message = getString(R.string.title_depleted_transfer_overquota);
-
-        int currentapiVersion = android.os.Build.VERSION.SDK_INT;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            mBuilder
-                    .setSmallIcon(R.drawable.ic_stat_notify_download)
-                    .setOngoing(false).setContentTitle(message).setSubText(info)
-                    .setContentText(contentText)
-                    .setOnlyAlertOnce(true);
-
-            if(pendingIntent!=null){
-                mBuilder.setContentIntent(pendingIntent);
-            }
-            notification = mBuilder.build();
-        }
-        else if (currentapiVersion >= android.os.Build.VERSION_CODES.ICE_CREAM_SANDWICH)
-        {
-            mBuilder
-                    .setSmallIcon(R.drawable.ic_stat_notify_download)
-                    .setOngoing(false).setContentTitle(message).setContentInfo(info)
-                    .setContentText(contentText)
-                    .setOnlyAlertOnce(true);
-
-            if(pendingIntent!=null){
-                mBuilder.setContentIntent(pendingIntent);
-            }
-            notification = mBuilder.getNotification();
-        }
-        else
-        {
-            notification = new Notification(R.drawable.ic_stat_notify_download, null, 1);
-            notification.contentView = new RemoteViews(getApplicationContext().getPackageName(), R.layout.download_progress);
-            if(pendingIntent!=null){
-                notification.contentIntent = pendingIntent;
-            }
-            notification.contentView.setImageViewResource(R.id.status_icon, R.drawable.ic_stat_notify_download);
-            notification.contentView.setTextViewText(R.id.status_text, message);
-            notification.contentView.setTextViewText(R.id.progress_text, info);
-        }
-
-        mNotificationManager.notify(Constants.NOTIFICATION_STREAMING_OVERQUOTA, notification);
     }
 
     @Override

@@ -6,7 +6,6 @@ import android.app.ActivityManager;
 import android.app.Dialog;
 import android.app.Notification;
 import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -41,7 +40,6 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
-import android.widget.RemoteViews;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -172,12 +170,20 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
 
     private String downloadLocationDefaultPath = "";
     private boolean renamed = false;
+    private String path;
+    private String pathNavigation;
 
     @Override
     public void onCreate (Bundle savedInstanceState){
         log("onCreate");
 
         super.onCreate(savedInstanceState);
+        Intent intent = getIntent();
+        if (intent == null){
+            log("intent null");
+            finish();
+            return;
+        }
 
         if (savedInstanceState != null) {
             log("saveInstanceState");
@@ -191,13 +197,6 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
             currentPage = 0;
         }
 
-        Intent intent = getIntent();
-        if (intent == null){
-            log("intent null");
-            finish();
-            return;
-        }
-
         Bundle bundle = getIntent().getExtras();
         if (bundle != null){
             inside = bundle.getBoolean("APP");
@@ -205,6 +204,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
         }
         isFolderLink = intent.getBooleanExtra("isFolderLink", false);
         type = intent.getIntExtra("adapterType", 0);
+        path = intent.getStringExtra("path");
 
         if (!renamed){
             uri = intent.getData();
@@ -217,6 +217,11 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
 
         if (type == Constants.OFFLINE_ADAPTER){
             isOffLine = true;
+            pathNavigation = intent.getStringExtra("pathNavigation");
+        }
+        else {
+            isOffLine = false;
+            pathNavigation = null;
         }
 
         setContentView(R.layout.activity_pdfviewer);
@@ -582,6 +587,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
                 startService(intent);
             }
             filePreparedInfos = null;
+            this.finish();
         }
     }
 
@@ -717,11 +723,29 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
                 break;
             }
             case R.id.pdfviewer_properties: {
-                MegaNode node = megaApi.getNodeByHandle(handle);
                 Intent i = new Intent(this, FileInfoActivityLollipop.class);
-                i.putExtra("handle", node.getHandle());
-                i.putExtra("imageId", MimeTypeMime.typeForName(node.getName()).getIconResourceId());
-                i.putExtra("name", node.getName());
+                if (isOffLine){
+                    i.putExtra("name", pdfFileName);
+                    i.putExtra("imageId", MimeTypeMime.typeForName(pdfFileName).getIconResourceId());
+                    i.putExtra("adapterType", Constants.OFFLINE_ADAPTER);
+                    i.putExtra("path", path);
+                    if (pathNavigation != null){
+                        i.putExtra("pathNavigation", pathNavigation);
+                    }
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                        i.setDataAndType(uri, MimeTypeList.typeForName(pdfFileName).getType());
+                    }
+                    else{
+                        i.setDataAndType(uri, MimeTypeList.typeForName(pdfFileName).getType());
+                    }
+                    i.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                }
+                else {
+                    MegaNode node = megaApi.getNodeByHandle(handle);
+                    i.putExtra("handle", node.getHandle());
+                    i.putExtra("imageId", MimeTypeMime.typeForName(node.getName()).getIconResourceId());
+                    i.putExtra("name", node.getName());
+                }
                 startActivity(i);
                 renamed = false;
                 break;
@@ -1398,6 +1422,19 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
     protected void onStop() {
         super.onStop();
         log("onStop");
+
+        if (chat != null) {
+            chat.setColorFilter(null);
+        }
+        if (download != null){
+            download.setColorFilter(null);
+        }
+        if (properties != null){
+            properties.setColorFilter(null);
+        }
+        if (share != null) {
+            share.setColorFilter(null);
+        }
     }
 
     @Override
@@ -1412,6 +1449,19 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
         log("onResume");
 
         updateFile();
+
+        if (chat != null) {
+            chat.setColorFilter(getResources().getColor(R.color.lollipop_primary_color), PorterDuff.Mode.SRC_ATOP);
+        }
+        if (download != null){
+            download.setColorFilter(getResources().getColor(R.color.lollipop_primary_color), PorterDuff.Mode.SRC_ATOP);
+        }
+        if (properties != null){
+            properties.setColorFilter(getResources().getColor(R.color.lollipop_primary_color), PorterDuff.Mode.SRC_ATOP);
+        }
+        if (share != null) {
+            share.setColorFilter(getResources().getColor(R.color.lollipop_primary_color), PorterDuff.Mode.SRC_ATOP);
+        }
     }
 
     @Override
@@ -1508,59 +1558,6 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
         upgradeIntent.setAction(Constants.ACTION_SHOW_UPGRADE_ACCOUNT);
         startActivity(upgradeIntent);
     }
-
-    private void showOverquotaNotification(){
-        log("showOverquotaNotification");
-
-        PendingIntent pendingIntent = null;
-
-        String info = "Streaming";
-        Notification notification = null;
-
-        String contentText = getString(R.string.download_show_info);
-        String message = getString(R.string.title_depleted_transfer_overquota);
-
-        int currentapiVersion = android.os.Build.VERSION.SDK_INT;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            mBuilder
-                    .setSmallIcon(R.drawable.ic_stat_notify_download)
-                    .setOngoing(false).setContentTitle(message).setSubText(info)
-                    .setContentText(contentText)
-                    .setOnlyAlertOnce(true);
-
-            if(pendingIntent!=null){
-                mBuilder.setContentIntent(pendingIntent);
-            }
-            notification = mBuilder.build();
-        }
-        else if (currentapiVersion >= android.os.Build.VERSION_CODES.ICE_CREAM_SANDWICH)
-        {
-            mBuilder
-                    .setSmallIcon(R.drawable.ic_stat_notify_download)
-                    .setOngoing(false).setContentTitle(message).setContentInfo(info)
-                    .setContentText(contentText)
-                    .setOnlyAlertOnce(true);
-
-            if(pendingIntent!=null){
-                mBuilder.setContentIntent(pendingIntent);
-            }
-            notification = mBuilder.getNotification();
-        }
-        else
-        {
-            notification = new Notification(R.drawable.ic_stat_notify_download, null, 1);
-            notification.contentView = new RemoteViews(getApplicationContext().getPackageName(), R.layout.download_progress);
-            if(pendingIntent!=null){
-                notification.contentIntent = pendingIntent;
-            }
-            notification.contentView.setImageViewResource(R.id.status_icon, R.drawable.ic_stat_notify_download);
-            notification.contentView.setTextViewText(R.id.status_text, message);
-            notification.contentView.setTextViewText(R.id.progress_text, info);
-        }
-
-        mNotificationManager.notify(Constants.NOTIFICATION_STREAMING_OVERQUOTA, notification);
-    }
-
 
     @Override
     public void onTransferStart(MegaApiJava api, MegaTransfer transfer) {

@@ -8,8 +8,8 @@ android {
         applicationId "mega.privacy.android.app"
         minSdkVersion 16
         targetSdkVersion 25
-        versionCode 184
-        versionName "3.3.3 (184)"
+        versionCode 186
+        versionName "3.3.3 (186)"
     }
 
     sourceSets.main {
@@ -67,8 +67,9 @@ dependencies {
     compile 'com.android.support:cardview-v7:25.3.1'
     compile 'com.vdurmont:emoji-java:3.3.0'
     compile 'com.google.android.exoplayer:exoplayer:2.6.0'
+    compile 'com.google.zxing:core:3.3.1'
+    compile 'me.dm7.barcodescanner:zxing:1.9.8'
     compile "com.squareup.picasso:picasso:2.4.0"
-
 }
 
 apply plugin: 'com.google.gms.google-services'

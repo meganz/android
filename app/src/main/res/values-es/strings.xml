@@ -255,7 +255,7 @@
 	<string name="contact_shared_files" context="title of the screen where the folders are shown with the contact owner of those folders">Carpetas entrantes con</string>
 	<string name="contacts_list_empty_text" context="Adding new relationships (contacts) using the actions.">Añadir nuevos contactos usando el botón inferior.</string>		
 	<!-- <string name="no_contacts" context="When an user wants to share a folder but has not any contact yet">No hay contactos en la cuenta. Añádelos en la pantalla de Contactos</string> -->
-	<string name="error_not_enough_free_space" context="Error message">No hay suficiente espacio</string>
+	<string name="error_not_enough_free_space" context="Error message">No hay suficiente espacio local en tu dispositivo</string>
 	<!-- <string name="session_problem" context="if a link to a folder cannot be fetched">Existe un problema con la sesión de usuario</string> -->
 
 	<string name="contacts_explorer_list_empty_text" context="Add new contacts before sharing.">Añade un nuevo contacto para compartir</string>
