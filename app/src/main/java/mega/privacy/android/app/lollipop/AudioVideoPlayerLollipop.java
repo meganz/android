@@ -3,7 +3,6 @@ package mega.privacy.android.app.lollipop;
 import android.Manifest;
 import android.app.Notification;
 import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -38,7 +37,6 @@ import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
-import android.widget.RemoteViews;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -154,6 +152,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
     private boolean isOffline;
     private int adapterType;
     private String path;
+    private String pathNavigation;
 
     NodeController nC;
     private android.support.v7.app.AlertDialog downloadConfirmationDialog;
@@ -185,9 +184,11 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
         adapterType = getIntent().getIntExtra("adapterType", 0);
         if (adapterType == Constants.OFFLINE_ADAPTER){
             isOffline = true;
+            pathNavigation = intent.getStringExtra("pathNavigation");
         }
         else {
             isOffline = false;
+            pathNavigation = null;
         }
 
         Bundle bundle = intent.getExtras();
@@ -403,7 +404,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
                 if (playbackState == ExoPlayer.STATE_BUFFERING){
                     audioContainer.setVisibility(View.GONE);
 
-                    if (loading && !transferOverquota){
+                    if (loading && !transferOverquota && !isOffline){
                         try {
                             statusDialog.setCanceledOnTouchOutside(false);
                             statusDialog.show();
@@ -597,6 +598,9 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
                     i.putExtra("imageId", MimeTypeMime.typeForName(fileName).getIconResourceId());
                     i.putExtra("adapterType", Constants.OFFLINE_ADAPTER);
                     i.putExtra("path", path);
+                    if (pathNavigation != null){
+                        i.putExtra("pathNavigation", pathNavigation);
+                    }
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                         i.setDataAndType(uri, MimeTypeList.typeForName(fileName).getType());
                     }
@@ -957,58 +961,6 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
         Intent upgradeIntent = new Intent(this, ManagerActivityLollipop.class);
         upgradeIntent.setAction(Constants.ACTION_SHOW_UPGRADE_ACCOUNT);
         startActivity(upgradeIntent);
-    }
-
-    private void showOverquotaNotification(){
-        log("showOverquotaNotification");
-
-        PendingIntent pendingIntent = null;
-
-        String info = "Streaming";
-        Notification notification = null;
-
-        String contentText = getString(R.string.download_show_info);
-        String message = getString(R.string.title_depleted_transfer_overquota);
-
-        int currentapiVersion = android.os.Build.VERSION.SDK_INT;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            mBuilder
-                    .setSmallIcon(R.drawable.ic_stat_notify_download)
-                    .setOngoing(false).setContentTitle(message).setSubText(info)
-                    .setContentText(contentText)
-                    .setOnlyAlertOnce(true);
-
-            if(pendingIntent!=null){
-                mBuilder.setContentIntent(pendingIntent);
-            }
-            notification = mBuilder.build();
-        }
-        else if (currentapiVersion >= android.os.Build.VERSION_CODES.ICE_CREAM_SANDWICH)
-        {
-            mBuilder
-                    .setSmallIcon(R.drawable.ic_stat_notify_download)
-                    .setOngoing(false).setContentTitle(message).setContentInfo(info)
-                    .setContentText(contentText)
-                    .setOnlyAlertOnce(true);
-
-            if(pendingIntent!=null){
-                mBuilder.setContentIntent(pendingIntent);
-            }
-            notification = mBuilder.getNotification();
-        }
-        else
-        {
-            notification = new Notification(R.drawable.ic_stat_notify_download, null, 1);
-            notification.contentView = new RemoteViews(getApplicationContext().getPackageName(), R.layout.download_progress);
-            if(pendingIntent!=null){
-                notification.contentIntent = pendingIntent;
-            }
-            notification.contentView.setImageViewResource(R.id.status_icon, R.drawable.ic_stat_notify_download);
-            notification.contentView.setTextViewText(R.id.status_text, message);
-            notification.contentView.setTextViewText(R.id.progress_text, info);
-        }
-
-        mNotificationManager.notify(Constants.NOTIFICATION_STREAMING_OVERQUOTA, notification);
     }
 
     @Override

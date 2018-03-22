@@ -63,7 +63,7 @@
                         android:id="@+id/writing_linear_layout_chat"
                         android:layout_width="match_parent"
                         android:focusableInTouchMode="true"
-                        android:layout_height="48dp">
+                        android:layout_height="wrap_content">
 
                         <ImageButton
                             android:id="@+id/send_message_icon_chat"
@@ -92,8 +92,8 @@
                             android:layout_toLeftOf="@+id/send_message_icon_chat"
                             android:inputType="textMultiLine|textCapSentences"
                             emojicon:emojiconSize="16sp"
-                            android:minLines="2"
-                            android:lines="6"
+                            android:minLines="1"
+                            android:maxLines="5"
                             android:textColor="@color/black"/>
 
                         <RelativeLayout

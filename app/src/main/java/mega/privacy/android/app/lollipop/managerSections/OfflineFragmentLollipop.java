@@ -1090,6 +1090,7 @@ public class OfflineFragmentLollipop extends Fragment{
 						videoIntent.putExtra("adapterType", Constants.OFFLINE_ADAPTER);
 						videoIntent.putExtra("FILENAME", currentNode.getName());
 						videoIntent.putExtra("path", currentFile.getAbsolutePath());
+						videoIntent.putExtra("pathNavigation", pathNavigation);
 						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
 							videoIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
 						}
@@ -1107,6 +1108,7 @@ public class OfflineFragmentLollipop extends Fragment{
 						audioIntent.putExtra("adapterType", Constants.OFFLINE_ADAPTER);
 						audioIntent.putExtra("FILENAME", currentNode.getName());
 						audioIntent.putExtra("path", currentFile.getAbsolutePath());
+						audioIntent.putExtra("pathNavigation", pathNavigation);
 						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
 							audioIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
 						}
@@ -1115,7 +1117,7 @@ public class OfflineFragmentLollipop extends Fragment{
 						}
 						audioIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 						startActivity(audioIntent);
-          }
+          			}
 					else if (MimeTypeList.typeForName(currentFile.getName()).isPdf()){
 						log("Pdf file");
 
@@ -1128,6 +1130,7 @@ public class OfflineFragmentLollipop extends Fragment{
 						pdfIntent.putExtra("HANDLE", Long.parseLong(currentNode.getHandle()));
 						pdfIntent.putExtra("adapterType", Constants.OFFLINE_ADAPTER);
 						pdfIntent.putExtra("path", currentFile.getAbsolutePath());
+						pdfIntent.putExtra("pathNavigation", pathNavigation);
 						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
 							pdfIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
 						}
@@ -1274,7 +1277,8 @@ public class OfflineFragmentLollipop extends Fragment{
 		}
 	}
 	
-	public int onBackPressed(){
+	public int
+	onBackPressed(){
 		log("onBackPressed");
 		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
@@ -1304,10 +1308,10 @@ public class OfflineFragmentLollipop extends Fragment{
 					((ManagerActivityLollipop)context).setToolbarTitle();
 				}
 
-				ArrayList<MegaOffline> mOffListNavigation= new ArrayList<MegaOffline>();				
-				mOffListNavigation=dbH.findByPath(pathNavigation);
+//				ArrayList<MegaOffline> mOffListNavigation= new ArrayList<MegaOffline>();
+				mOffList = dbH.findByPath(pathNavigation);
 				
-				contentText.setText(getInfoFolder(mOffListNavigation));
+				contentText.setText(getInfoFolder(mOffList));
 				
 				if(orderGetChildren == MegaApiJava.ORDER_DEFAULT_DESC){
 					sortByNameDescending();
@@ -1316,7 +1320,7 @@ public class OfflineFragmentLollipop extends Fragment{
 					sortByNameAscending();
 				}
 
-				setNodes(mOffListNavigation);
+				setNodes(mOffList);
 
 				int lastVisiblePosition = 0;
 				if(!lastPositionStack.empty()){

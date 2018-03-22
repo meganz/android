@@ -18,7 +18,6 @@ import android.os.IBinder;
 import android.os.ParcelFileDescriptor;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
-import android.provider.MediaStore;
 import android.support.v4.app.NotificationCompat;
 import android.text.format.Formatter;
 import android.widget.RemoteViews;
@@ -28,7 +27,6 @@ import com.shockwave.pdfium.PdfiumCore;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.HashMap;
 
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
@@ -69,6 +67,8 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 
 	private boolean isForeground = false;
 	private boolean canceled;
+
+	private boolean isQRFile = false;
 
 	MegaApplication app;
 	MegaApiAndroid megaApi;
@@ -180,6 +180,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 		log("onHandleIntent");
 
 		final File file = new File(intent.getStringExtra(EXTRA_FILEPATH));
+		isQRFile = intent.getBooleanExtra("qrfile", false);
 		if(file!=null){
 			log("File to manage: "+file.getAbsolutePath());
 		}
@@ -503,9 +504,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 			transfersCount--;
 
 			if (error.getErrorCode() == MegaError.API_EOVERQUOTA) {
-				if (transfer.getType() == MegaTransfer.TYPE_UPLOAD) {
 					isOverquota = true;
-				}
 			}
 
 			if (!transfer.isFolderTransfer()) {
@@ -549,56 +548,17 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 
 					if (Util.isVideoFile(transfer.getPath())) {
 						log("Is video!!!");
-						ThumbnailUtilsLollipop.createThumbnailVideo(this, transfer.getPath(), megaApi, transfer.getNodeHandle());
-
-						MegaNode node = megaApi.getNodeByHandle(transfer.getNodeHandle());
 
 						File previewDir = PreviewUtils.getPreviewFolder(this);
 						File preview = new File(previewDir, MegaApiAndroid.handleToBase64(transfer.getNodeHandle()) + ".jpg");
+						File thumbDir = ThumbnailUtils.getThumbFolder(this);
+						File thumb = new File(thumbDir, MegaApiAndroid.handleToBase64(transfer.getNodeHandle()) + ".jpg");
+						megaApi.createThumbnail(transfer.getPath(), thumb.getAbsolutePath());
+						megaApi.createPreview(transfer.getPath(), preview.getAbsolutePath());
 
-						Bitmap bmPreview = PreviewUtils.createVideoPreview(transfer.getPath(), MediaStore.Video.Thumbnails.FULL_SCREEN_KIND);
-						if(bmPreview==null){
-							log("Create video preview NULL");
-//							bmPreview= ThumbnailUtilsLollipop.loadVideoThumbnail(transfer.getPath(), this);
-						}
-						else{
-							log("Create Video preview worked!");
-						}
+						MegaNode node = megaApi.getNodeByHandle(transfer.getNodeHandle());
+
 						if (node != null) {
-							if(bmPreview!=null){
-								try {
-									preview.createNewFile();
-									FileOutputStream out = null;
-									try {
-										out = new FileOutputStream(preview);
-//										Bitmap resizedBitmap = ThumbnailUtilsLollipop.resizeBitmapUpload(bmPreview, bmPreview.getWidth(), bmPreview.getHeight());
-										boolean result = bmPreview.compress(Bitmap.CompressFormat.JPEG, 100, out); // bmp is your Bitmap instance
-										if(result){
-											log("Compress OK!");
-											megaApi.setPreview(node, preview.getAbsolutePath(), this);
-										}
-										else{
-											log("Not Compress");
-										}
-									} catch (Exception e) {
-										log("Error with FileOutputStream: "+e.getMessage());
-									} finally {
-										try {
-											if (out != null) {
-												out.close();
-											}
-										} catch (IOException e) {
-											log("Error: "+e.getMessage());
-										}
-									}
-
-								} catch (IOException e1) {
-									log("Error creating new preview file: "+e1.getMessage());
-								}
-							}
-							else{
-								log("Create video preview NULL");
-							}
 							MediaMetadataRetriever retriever = new MediaMetadataRetriever();
 							retriever.setDataSource(transfer.getPath());
 
@@ -732,13 +692,13 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 					}
 				}
 
-				if (getApplicationContext().getExternalCacheDir() != null) {
+				if (getApplicationContext().getExternalCacheDir() != null && !isQRFile) {
 					File localFile = new File(getApplicationContext().getExternalCacheDir(), transfer.getFileName());
 					if (localFile.exists()) {
 						log("Delete file!: " + localFile.getAbsolutePath());
 						localFile.delete();
 					}
-				} else {
+				} else if (!isQRFile){
 					File localFile = new File(getApplicationContext().getCacheDir(), transfer.getFileName());
 					if (localFile.exists()) {
 						log("Delete file!: " + localFile.getAbsolutePath());
@@ -818,7 +778,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 				.setContentTitle(message).setContentText(contentText)
 				.setOngoing(false);
 
-		mNotificationManager.notify(notificationIdFinal, mBuilderCompat.build());
+		mNotificationManager.notify(Constants.NOTIFICATION_STORAGE_OVERQUOTA, mBuilderCompat.build());
 	}
 
 	@Override

@@ -131,6 +131,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     private AlertDialog errorOpenChatDialog;
 
     private android.support.v7.app.AlertDialog downloadConfirmationDialog;
+    private AlertDialog overquotaDialog;
 
     boolean sendOriginalAttachments = false;
 
@@ -462,12 +463,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         aB.setDisplayHomeAsUpEnabled(true);
         aB.setDisplayShowHomeEnabled(true);
 
-        tB.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View view) {
-                showGroupInfoActivity();
-            }
-        });
+        tB.setOnClickListener(this);
 
         badgeDrawable = new BadgeDrawerArrowDrawable(getSupportActionBar().getThemedContext());
 
@@ -846,7 +842,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                             setAsRead=false;
                         }
 
-                        MegaApplication.setOpenChatId(idChat);
                         messages = new ArrayList<AndroidMegaChatMessage>();
                         bufferMessages = new ArrayList<AndroidMegaChatMessage>();
                         bufferManualSending = new ArrayList<AndroidMegaChatMessage>();
@@ -925,10 +920,13 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         if(megaChatApi.getConnectionState()!=MegaChatApi.CONNECTED){
             log("Chat not connected");
             aB.setSubtitle(getString(R.string.invalid_connection_state));
+            tB.setOnClickListener(this);
         }
         else{
             int permission = chatRoom.getOwnPrivilege();
             if (chatRoom.isGroup()) {
+                tB.setOnClickListener(this);
+
                 log("Check permissions group chat");
                 if(permission==MegaChatRoom.PRIV_RO) {
                     log("Permission RO");
@@ -971,6 +969,27 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 log("Check permissions one to one chat");
                 if(permission==MegaChatRoom.PRIV_RO) {
                     log("Permission RO");
+
+                    if(megaApi!=null){
+                       if(megaApi.getRootNode()!=null){
+                           long chatHandle = chatRoom.getChatId();
+                           MegaChatRoom chat = megaChatApi.getChatRoom(chatHandle);
+                           long userHandle = chat.getPeerHandle(0);
+                           String userHandleEncoded = MegaApiAndroid.userHandleToBase64(userHandle);
+                           MegaUser user = megaApi.getContact(userHandleEncoded);
+
+                           if(user!=null){
+                               if(user.getVisibility() == MegaUser.VISIBILITY_VISIBLE){
+                                   tB.setOnClickListener(this);
+                               }else{
+                                   tB.setOnClickListener(null);
+                               }
+                           }
+                       }
+                    }else{
+                        tB.setOnClickListener(null);
+                    }
+
                     writingContainerLayout.setVisibility(View.GONE);
 
                     mediaButton.setVisibility(View.GONE);
@@ -982,6 +1001,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     aB.setSubtitle(getString(R.string.observer_permission_label_participants_panel));
                 }
                 else if(permission==MegaChatRoom.PRIV_RM) {
+                    tB.setOnClickListener(this);
+
                     log("Permission RM");
                     writingContainerLayout.setVisibility(View.GONE);
 
@@ -994,6 +1015,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     aB.setSubtitle(null);
                 }
                 else{
+                    tB.setOnClickListener(this);
+
                     long userHandle = chatRoom.getPeerHandle(0);
                     setStatus(userHandle);
                     writingContainerLayout.setVisibility(View.VISIBLE);
@@ -2203,6 +2226,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     }
                 }
 
+                break;
+            }
+            case R.id.toolbar_chat:{
+                showGroupInfoActivity();
                 break;
             }
 		}
@@ -4903,6 +4930,12 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     else{
                         log("Error. The idPendMsg is -1");
                     }
+
+                    boolean isOverquota = intent.getBooleanExtra("IS_OVERQUOTA", false);
+                    if(isOverquota){
+                        showOverquotaAlert();
+                    }
+
                     return;
                 }
                 else if(intent.getAction().equals(Constants.ACTION_NEW_CHAT)){
@@ -5206,6 +5239,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         super.onResume();
 
         MegaApplication.setShowPinScreen(true);
+        MegaApplication.setOpenChatId(idChat);
 
         activityVisible = true;
         setLastMessageSeen();
@@ -5442,5 +5476,44 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
     }
 
+    private void showOverquotaAlert(){
+        log("showOverquotaAlert");
+        dbH.setCamSyncEnabled(false);
 
+        if(overquotaDialog==null){
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle(getString(R.string.overquota_alert_title));
+            builder.setMessage(getString(R.string.overquota_alert_text));
+
+            builder.setPositiveButton(getString(R.string.my_account_upgrade_pro), new android.content.DialogInterface.OnClickListener() {
+
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    showUpgradeAccount();
+                }
+            });
+            builder.setNegativeButton(getString(R.string.general_cancel), new android.content.DialogInterface.OnClickListener() {
+
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                    overquotaDialog=null;
+                }
+            });
+
+            overquotaDialog = builder.create();
+            overquotaDialog.setCanceledOnTouchOutside(false);
+            overquotaDialog.show();
+        }
+        else{
+            overquotaDialog.show();
+        }
+    }
+
+    public void showUpgradeAccount(){
+        log("showUpgradeAccount");
+        Intent upgradeIntent = new Intent(this, ManagerActivityLollipop.class);
+        upgradeIntent.setAction(Constants.ACTION_SHOW_UPGRADE_ACCOUNT);
+        startActivity(upgradeIntent);
+    }
 }
