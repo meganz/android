@@ -5,7 +5,6 @@ import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.app.Notification;
 import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -37,7 +36,6 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
-import android.widget.RemoteViews;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -83,7 +81,6 @@ import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.MimeTypeMime;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerActivity;
-import mega.privacy.android.app.receivers.NetworkStateReceiver;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
 import nz.mega.sdk.MegaApiAndroid;
@@ -1203,58 +1200,6 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
         Intent upgradeIntent = new Intent(this, ManagerActivityLollipop.class);
         upgradeIntent.setAction(Constants.ACTION_SHOW_UPGRADE_ACCOUNT);
         startActivity(upgradeIntent);
-    }
-
-    private void showOverquotaNotification(){
-        log("showOverquotaNotification");
-
-        PendingIntent pendingIntent = null;
-
-        String info = "Streaming";
-        Notification notification = null;
-
-        String contentText = getString(R.string.download_show_info);
-        String message = getString(R.string.title_depleted_transfer_overquota);
-
-        int currentapiVersion = android.os.Build.VERSION.SDK_INT;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            mBuilder
-                    .setSmallIcon(R.drawable.ic_stat_notify_download)
-                    .setOngoing(false).setContentTitle(message).setSubText(info)
-                    .setContentText(contentText)
-                    .setOnlyAlertOnce(true);
-
-            if(pendingIntent!=null){
-                mBuilder.setContentIntent(pendingIntent);
-            }
-            notification = mBuilder.build();
-        }
-        else if (currentapiVersion >= android.os.Build.VERSION_CODES.ICE_CREAM_SANDWICH)
-        {
-            mBuilder
-                    .setSmallIcon(R.drawable.ic_stat_notify_download)
-                    .setOngoing(false).setContentTitle(message).setContentInfo(info)
-                    .setContentText(contentText)
-                    .setOnlyAlertOnce(true);
-
-            if(pendingIntent!=null){
-                mBuilder.setContentIntent(pendingIntent);
-            }
-            notification = mBuilder.getNotification();
-        }
-        else
-        {
-            notification = new Notification(R.drawable.ic_stat_notify_download, null, 1);
-            notification.contentView = new RemoteViews(getApplicationContext().getPackageName(), R.layout.download_progress);
-            if(pendingIntent!=null){
-                notification.contentIntent = pendingIntent;
-            }
-            notification.contentView.setImageViewResource(R.id.status_icon, R.drawable.ic_stat_notify_download);
-            notification.contentView.setTextViewText(R.id.status_text, message);
-            notification.contentView.setTextViewText(R.id.progress_text, info);
-        }
-
-        mNotificationManager.notify(Constants.NOTIFICATION_STREAMING_OVERQUOTA, notification);
     }
 
     @Override
