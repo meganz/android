@@ -500,12 +500,12 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
                 sizeTextView.setText(Util.getSizeString(file.length()));
                 String location = file.getParentFile().getName();
                 if (location.equals("in")){
-                    locationTextView.setText(getResources().getString(R.string.section_saved_for_offline) + " ("+ getResources().getString(R.string.section_saved_for_offline) +")");
+                    locationTextView.setText(getResources().getString(R.string.section_saved_for_offline));
                 }
                 else {
                     String offlineLocation = file.getParentFile().getParentFile().getName() + '/' + location;
                     if (offlineLocation.equals(Util.offlineDIR)){
-                        locationTextView.setText(getResources().getString(R.string.section_saved_for_offline) + " ("+ getResources().getString(R.string.section_saved_for_offline) +")");
+                        locationTextView.setText(getResources().getString(R.string.section_saved_for_offline));
                     }
                     else {
                         locationTextView.setText(location + " ("+ getResources().getString(R.string.section_saved_for_offline) +")");
@@ -579,7 +579,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
                         locationTextView.setText(megaApi.getParentNode(node).getName()+" ("+ getResources().getString(R.string.title_incoming_shares_explorer) +")");
                     }
                     else {
-                        locationTextView.setText(getResources().getString(R.string.title_incoming_shares_explorer)+" ("+ getResources().getString(R.string.title_incoming_shares_explorer) +")");
+                        locationTextView.setText(getResources().getString(R.string.title_incoming_shares_explorer));
                     }
                 }
                 else{
@@ -594,13 +594,18 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
                     }
 
                     if (megaApi.getParentNode(node) == null){ // It is because of the parent node is Incoming Shares
-                        locationTextView.setText(getResources().getString(R.string.title_incoming_shares_explorer)+" ("+ getResources().getString(R.string.title_incoming_shares_explorer) +")");
+                        locationTextView.setText(getResources().getString(R.string.title_incoming_shares_explorer));
                     }
                     else {
                         if (parent.getHandle() == megaApi.getRootNode().getHandle() ||
                                 parent.getHandle() == megaApi.getRubbishNode().getHandle() ||
                                 parent.getHandle() == megaApi.getInboxNode().getHandle()){
-                            locationTextView.setText(megaApi.getParentNode(node).getName()+" ("+ parent.getName() +")");
+                            if (megaApi.getParentNode(node).getHandle() == parent.getHandle()){
+                                locationTextView.setText(megaApi.getParentNode(node).getName());
+                            }
+                            else {
+                                locationTextView.setText(megaApi.getParentNode(node).getName()+" ("+ parent.getName() +")");
+                            }
                         }
                         else {
                             locationTextView.setText(megaApi.getParentNode(node).getName()+" ("+ getResources().getString(R.string.title_incoming_shares_explorer) +")");
