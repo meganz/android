@@ -1,5 +1,6 @@
 package mega.privacy.android.app.components.dragger;
 
+import android.animation.AnimatorSet;
 import android.app.Activity;
 import android.content.Context;
 import android.support.annotation.Nullable;
@@ -33,7 +34,7 @@ public class DraggableView extends FrameLayout {
     boolean draggable = true;
     boolean inlineMove = false;
     boolean vertical = true;
-    boolean rotationEnabled;
+    boolean rotationEnabled = false;
     float rotationValue;
     boolean animating;
     float minVelocity;
@@ -324,14 +325,15 @@ public class DraggableView extends FrameLayout {
                 ViewCompat.animate(this).scaleX(1f).setDuration(200);
                 ViewCompat.animate(this).scaleY(1f).setDuration(200);
             } else {
-                animateExit = viewAnimator.animateExit(DraggableView.this, direction, exitDirection);
-
-                ViewCompat.animate(this).scaleX(0f).setDuration(200);
-                ViewCompat.animate(this).scaleY(0f).setDuration(200);
                 Activity activity = (Activity) getContext();
-                activity.finish();
+                animateExit = viewAnimator.animateExit(DraggableView.this, direction, exitDirection, activity, screenPosition);
 
-                activity.overridePendingTransition(0, android.R.anim.fade_out);
+//                ViewCompat.animate(this).scaleX(0f).setDuration(200);
+//                ViewCompat.animate(this).scaleY(0f).setDuration(200);
+//                Activity activity = (Activity) getContext();
+//                activity.finish();
+
+//                activity.overridePendingTransition(0, android.R.anim.fade_out);
 
             }
         }
@@ -374,7 +376,6 @@ public class DraggableView extends FrameLayout {
                         if (draggableListener != null){
                             draggableListener.onViewPositionChanged(Math.abs(getPercentY()));
                         }
-                        log("diffMotionX: "+diffMotionX+" diffMotionY: "+diffMotionY);
                         if (vertical) {
                             if (!inlineMove) {
                                 ViewCompat.setTranslationX(this, originalViewX + diffMotionX);

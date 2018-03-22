@@ -1405,9 +1405,16 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 		}
 
 		int[] screenPosition = new int[2];
-		ImageView imageView = (ImageView) v.findViewById(R.id.file_list_thumbnail);
-		screenPosition[0] = imageView.getLeft() + (imageView.getWidth() / 2);
-		screenPosition[0] = imageView.getTop() + (imageView.getHeight() / 2);
+		ImageView imageView;
+		if (adapterType == MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST) {
+			imageView = (ImageView) v.findViewById(R.id.file_list_thumbnail);
+		}
+		else {
+			imageView = (ImageView) v.findViewById(R.id.file_grid_thumbnail);
+		}
+		imageView.getLocationOnScreen(screenPosition);
+		screenPosition[0] += imageView.getWidth() / 2;
+		screenPosition[1] += imageView.getHeight() / 2;
 
 		final MegaNode n = (MegaNode) getItem(currentPosition);
 
@@ -1514,9 +1521,16 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
 		int[] screenPosition = new int[2];
-		ImageView imageView = (ImageView) view.findViewById(R.id.file_list_thumbnail);
-		screenPosition[0] = imageView.getLeft() + (imageView.getWidth() / 2);
-		screenPosition[0] = imageView.getTop() + (imageView.getHeight() / 2);
+		ImageView imageView;
+		if (adapterType == MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST) {
+			imageView = (ImageView) view.findViewById(R.id.file_list_thumbnail);
+		}
+		else {
+			imageView = (ImageView) view.findViewById(R.id.file_grid_thumbnail);
+		}
+		imageView.getLocationOnScreen(screenPosition);
+		screenPosition[0] += imageView.getWidth() / 2;
+		screenPosition[1] += imageView.getHeight() / 2;
 
 		ViewHolderBrowser holder = (ViewHolderBrowser) view.getTag();
 		int currentPosition = holder.getAdapterPosition();

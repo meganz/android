@@ -775,18 +775,18 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		relativeImageViewerLayout = (RelativeLayout) findViewById(R.id.full_image_viewer_layout);
 
 		//draggableView = (DraggableView) findViewById(R.id.draggable_view);
-		draggableView.setDragListener(new DraggableView.DraggableViewListenerAdapter() {
-			@Override
-			public void onDraggedEnded(DraggableView draggableView, Direction direction) {
-				super.onDraggedEnded(draggableView, direction);
-			}
-
-			@Override
-			public void onDraggedStarted(DraggableView draggableView, Direction direction) {
-				super.onDraggedStarted(draggableView, direction);
-			}
-		});
-//		draggableView.setViewAnimator(new ExitViewAnimator());
+//		draggableView.setDragListener(new DraggableView.DraggableViewListenerAdapter() {
+//			@Override
+//			public void onDraggedEnded(DraggableView draggableView, Direction direction) {
+//				super.onDraggedEnded(draggableView, direction);
+//			}
+//
+//			@Override
+//			public void onDraggedStarted(DraggableView draggableView, Direction direction) {
+//				super.onDraggedStarted(draggableView, direction);
+//			}
+//		});
+		draggableView.setViewAnimator(new ExitViewAnimator());
 
 		handler = new Handler();
 		fullScreenImageViewer = this;
