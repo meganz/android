@@ -2674,6 +2674,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
 		boolean thisNode = false;
 		boolean anyChild = false;
+		boolean updateContentFoder = false;
 		if(nodes==null){
 			return;
 		}
@@ -2688,19 +2689,35 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 					break;
 				}
 				else{
-					if(nodeVersions!=null){
-						for(int j=0; j<nodeVersions.size();j++){
-							if(nodeToCheck.getHandle()==nodeVersions.get(j).getHandle()){
-								if(anyChild==false){
-									anyChild = true;
-									break;
-								}
-							}
-						}
-					}
+                    if(node.isFolder()){
+                        MegaNode parent = megaApi.getNodeByHandle(nodeToCheck.getParentHandle());
+                        while(parent!=null){
+                            if(parent.getHandle() == node.getHandle()){
+                                updateContentFoder = true;
+                                break;
+                            }
+                            parent = megaApi.getNodeByHandle(parent.getParentHandle());
+                        }
+                    }
+                    else{
+                        if(nodeVersions!=null){
+                            for(int j=0; j<nodeVersions.size();j++){
+                                if(nodeToCheck.getHandle()==nodeVersions.get(j).getHandle()){
+                                    if(anyChild==false){
+                                        anyChild = true;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
 				}
 			}
 		}
+
+		if(updateContentFoder){
+		    megaApi.getFolderInfo(node, this);
+        }
 
 		if ((!thisNode)&&(!anyChild)){
 			log("exit onNodesUpdate - Not related to this node");
