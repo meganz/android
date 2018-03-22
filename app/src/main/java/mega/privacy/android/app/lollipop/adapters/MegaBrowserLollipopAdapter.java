@@ -1404,6 +1404,11 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 			return;
 		}
 
+		int[] screenPosition = new int[2];
+		ImageView imageView = (ImageView) v.findViewById(R.id.file_list_thumbnail);
+		screenPosition[0] = imageView.getLeft() + (imageView.getWidth() / 2);
+		screenPosition[0] = imageView.getTop() + (imageView.getHeight() / 2);
+
 		final MegaNode n = (MegaNode) getItem(currentPosition);
 
 		switch (v.getId()) {
@@ -1448,7 +1453,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 					}
 					else{
 						log("click layout FileBrowserFragmentLollipop!");
-						((FileBrowserFragmentLollipop) fragment).itemClick(currentPosition);
+						((FileBrowserFragmentLollipop) fragment).itemClick(currentPosition, screenPosition);
 					}
 				}
 				else{
@@ -1496,7 +1501,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 				}
 				else{
 					log("click layout FileBrowserFragmentLollipop!");
-					((FileBrowserFragmentLollipop) fragment).itemClick(currentPosition);
+					((FileBrowserFragmentLollipop) fragment).itemClick(currentPosition, screenPosition);
 				}
 				break;
 			}
@@ -1507,6 +1512,11 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 	public boolean onLongClick(View view) {
 		log("OnLongCLick");
 		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
+
+		int[] screenPosition = new int[2];
+		ImageView imageView = (ImageView) view.findViewById(R.id.file_list_thumbnail);
+		screenPosition[0] = imageView.getLeft() + (imageView.getWidth() / 2);
+		screenPosition[0] = imageView.getTop() + (imageView.getHeight() / 2);
 
 		ViewHolderBrowser holder = (ViewHolderBrowser) view.getTag();
 		int currentPosition = holder.getAdapterPosition();
@@ -1546,7 +1556,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 		else{
 			log("click layout FileBrowserFragmentLollipop!");
 			((FileBrowserFragmentLollipop) fragment).activateActionMode();
-			((FileBrowserFragmentLollipop) fragment).itemClick(currentPosition);
+			((FileBrowserFragmentLollipop) fragment).itemClick(currentPosition, screenPosition);
 		}
 
 		return true;
