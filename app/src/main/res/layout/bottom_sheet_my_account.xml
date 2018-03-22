@@ -45,6 +45,7 @@
             android:paddingBottom="2dp"
             android:layout_marginLeft="5dp"
             android:paddingTop="2dp"
+            android:src="@drawable/ic_b_qr"
             android:visibility="visible" />
 
         <TextView
