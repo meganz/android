@@ -140,6 +140,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 	MenuItem newChatMenuItem;
 
 	FrameLayout cloudDriveFrameLayout;
+	private long fragmentHandle  = -1;
 
 	private String gSession;
     UserCredentials credentials;
@@ -488,8 +489,6 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 	}
 	
 	private void afterLoginAndFetch(){
-		log("afterLoginAndFetch");
-		
 		handler = new Handler();
 
 		log("SHOW action bar");
@@ -689,7 +688,6 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 					}
 				}
 				else if (intent.getAction().equals(ACTION_PICK_IMPORT_FOLDER)){
-					log("action = ACTION_PICK_IMPORT_FOLDER");
 					mode = IMPORT;
 
 					if (mTabsAdapterExplorer == null){
@@ -1382,9 +1380,17 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			if(parentNode == null){
 				parentNode = megaApi.getRootNode();
 			}
+
+			if(tabShown==CLOUD_TAB){
+				fragmentHandle= megaApi.getRootNode().getHandle();
+			}else if(tabShown == INCOMING_TAB){
+				fragmentHandle = -1;
+			}
 			
 			Intent intent = new Intent();
 			intent.putExtra("IMPORT_TO", parentNode.getHandle());
+			intent.putExtra("fragmentH",fragmentHandle);
+
 			setResult(RESULT_OK, intent);
 			log("finish!");
 			finishActivity();
