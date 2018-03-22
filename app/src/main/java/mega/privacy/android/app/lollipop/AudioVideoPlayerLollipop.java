@@ -1,9 +1,11 @@
 package mega.privacy.android.app.lollipop;
 
 import android.Manifest;
+import android.app.ActivityManager;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -18,6 +20,7 @@ import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
@@ -128,7 +131,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
     private RelativeLayout audioVideoPlayerContainer;
     
     private RelativeLayout audioContainer;
-    private long handle;
+    private long handle = -1;
     int countChat = 0;
     int successSent = 0;
     int errorSent = 0;
@@ -149,6 +152,8 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
 
     ArrayList<Long> handleListM = new ArrayList<Long>();
 
+    private String downloadLocationDefaultPath = "";
+    private boolean renamed = false;
     private boolean isOffline;
     private int adapterType;
     private String path;
@@ -169,6 +174,10 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
 
         if (savedInstanceState != null) {
             currentPosition = savedInstanceState.getLong("currentPosition");
+            fileName = savedInstanceState.getString("fileName");
+            handle = savedInstanceState.getLong("handle");
+            uri = Uri.parse(savedInstanceState.getString("uri"));
+            renamed = savedInstanceState.getBoolean("renamed");
         }
         else {
             currentPosition = 0;
@@ -197,13 +206,14 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
             fileName = bundle.getString("FILENAME");
         }
         isFolderLink = intent.getBooleanExtra("isFolderLink", false);
-        
-        uri = intent.getData();
-        //Uri uri = Uri.parse("https://youtu.be/upUpVb3cLfk");
-        if (uri == null){
-            log("uri null");
-            finish();
-            return;
+
+        if (!renamed){
+            uri = intent.getData();
+            if (uri == null){
+                log("uri null");
+                finish();
+                return;
+            }
         }
         log("uri: "+uri);
 
@@ -473,6 +483,10 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
 
         currentPosition = player.getCurrentPosition();
         outState.putLong("currentPosition", currentPosition);
+        outState.putLong("handle", handle);
+        outState.putString("fileName", fileName);
+        outState.putString("uri", uri.toString());
+        outState.putBoolean("renamed", renamed);
     }
 
     public String getFileName(Uri uri) {
@@ -616,6 +630,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
                     i.putExtra("name", node.getName());
                 }
                 startActivity(i);
+                renamed = false;
                 break;
             }
             case R.id.full_video_viewer_download: {
@@ -766,6 +781,8 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
     protected void onResume() {
         super.onResume();
         log("onResume");
+
+        updateFile();
     }
 
     @Override
@@ -786,6 +803,93 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
         }
 
         super.onDestroy();
+    }
+
+    public void updateFile (){
+        log("updateFile");
+
+        MegaNode file = null;
+
+        if (fileName != null){
+            file = megaApi.getNodeByHandle(handle);
+            if (file != null){
+                if (!fileName.equals(file.getName())) {
+                    fileName = file.getName();
+                    if (aB != null){
+                        tB = (Toolbar) findViewById(R.id.call_toolbar);
+                        if(tB==null){
+                            log("Tb is Null");
+                            return;
+                        }
+                        tB.setVisibility(View.VISIBLE);
+                        setSupportActionBar(tB);
+                        aB = getSupportActionBar();
+                    }
+                    aB.setTitle(fileName);
+                    setTitle(fileName);
+                    invalidateOptionsMenu();
+
+                    if (megaApi == null){
+                        MegaApplication app = (MegaApplication)getApplication();
+                        megaApi = app.getMegaApi();
+                        megaApi.addTransferListener(this);
+                    }
+                    if (megaApi.httpServerIsRunning() == 0) {
+                        megaApi.httpServerStart();
+                    }
+
+                    ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
+                    ActivityManager activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+                    activityManager.getMemoryInfo(mi);
+
+                    if(mi.totalMem>Constants.BUFFER_COMP){
+                        log("Total mem: "+mi.totalMem+" allocate 32 MB");
+                        megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
+                    }
+                    else{
+                        log("Total mem: "+mi.totalMem+" allocate 16 MB");
+                        megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
+                    }
+
+                    String url = megaApi.httpServerGetLocalLink(file);
+                    getDownloadLocation();
+                    String localPath = mega.privacy.android.app.utils.Util.getLocalFile(this, file.getName(), file.getSize(), downloadLocationDefaultPath);
+
+                    if (localPath != null){
+                        File mediaFile = new File(localPath);
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && prefs.getStorageDownloadLocation().contains(Environment.getExternalStorageDirectory().getPath())) {
+                            uri = FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", mediaFile);
+                        }
+                        else{
+                            uri = Uri.fromFile(mediaFile);
+                        }
+                    }
+                    else {
+                        uri = Uri.parse(url);
+                    }
+                    renamed = true;
+                }
+            }
+        }
+    }
+
+    public void getDownloadLocation(){
+        if (dbH == null){
+            dbH = DatabaseHandler.getDbHandler(getApplicationContext());
+        }
+
+        prefs = dbH.getPreferences();
+        if (prefs != null){
+            if (prefs.getStorageAskAlways() != null){
+                if (!Boolean.parseBoolean(prefs.getStorageAskAlways())){
+                    if (prefs.getStorageDownloadLocation() != null){
+                        if (prefs.getStorageDownloadLocation().compareTo("") != 0){
+                            downloadLocationDefaultPath = prefs.getStorageDownloadLocation();
+                        }
+                    }
+                }
+            }
+        }
     }
 
     public static void log(String message) {
