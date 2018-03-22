@@ -198,6 +198,7 @@ public class Constants {
 	public static int NOTIFICATION_CALL_IN_PROGRESS = 11;
 	public static int NOTIFICATION_MISSED_CALL = 12;
 	public static int NOTIFICATION_PRE_N_CHAT = 13;
+	public static int NOTIFICATION_STORAGE_OVERQUOTA = 14;
 
 	public static String CHAT_FOLDER = "My chat files";
 

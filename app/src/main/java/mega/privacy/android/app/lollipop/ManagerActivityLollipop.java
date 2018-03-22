@@ -2348,14 +2348,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 
-		try {
-			NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-			notificationManager.cancelAll();
-		}
-		catch (Exception e){
-			log("Exception NotificationManager - remove all notifications");
-		}
-
 		if (isSearching){
 			selectDrawerItemLollipop(DrawerItem.SEARCH);
 			isSearching = false;
@@ -2648,6 +2640,19 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 							rChatFL.setStatus();
 						}
 					}
+					break;
+				}
+				case ACCOUNT:{
+					setToolbarTitle();
+
+					try {
+						NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+						notificationManager.cancel(Constants.NOTIFICATION_STORAGE_OVERQUOTA);
+					}
+					catch (Exception e){
+						log("Exception NotificationManager - remove all notifications");
+					}
+
 					break;
 				}
     		}

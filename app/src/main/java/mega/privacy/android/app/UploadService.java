@@ -504,9 +504,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 			transfersCount--;
 
 			if (error.getErrorCode() == MegaError.API_EOVERQUOTA) {
-				if (transfer.getType() == MegaTransfer.TYPE_UPLOAD) {
 					isOverquota = true;
-				}
 			}
 
 			if (!transfer.isFolderTransfer()) {
@@ -780,7 +778,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 				.setContentTitle(message).setContentText(contentText)
 				.setOngoing(false);
 
-		mNotificationManager.notify(notificationIdFinal, mBuilderCompat.build());
+		mNotificationManager.notify(Constants.NOTIFICATION_STORAGE_OVERQUOTA, mBuilderCompat.build());
 	}
 
 	@Override

@@ -131,6 +131,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     private AlertDialog errorOpenChatDialog;
 
     private android.support.v7.app.AlertDialog downloadConfirmationDialog;
+    private AlertDialog overquotaDialog;
 
     boolean sendOriginalAttachments = false;
 
@@ -841,7 +842,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                             setAsRead=false;
                         }
 
-                        MegaApplication.setOpenChatId(idChat);
                         messages = new ArrayList<AndroidMegaChatMessage>();
                         bufferMessages = new ArrayList<AndroidMegaChatMessage>();
                         bufferManualSending = new ArrayList<AndroidMegaChatMessage>();
@@ -4930,6 +4930,12 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     else{
                         log("Error. The idPendMsg is -1");
                     }
+
+                    boolean isOverquota = intent.getBooleanExtra("IS_OVERQUOTA", false);
+                    if(isOverquota){
+                        showOverquotaAlert();
+                    }
+
                     return;
                 }
                 else if(intent.getAction().equals(Constants.ACTION_NEW_CHAT)){
@@ -5233,6 +5239,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         super.onResume();
 
         MegaApplication.setShowPinScreen(true);
+        MegaApplication.setOpenChatId(idChat);
 
         activityVisible = true;
         setLastMessageSeen();
@@ -5469,5 +5476,44 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
     }
 
+    private void showOverquotaAlert(){
+        log("showOverquotaAlert");
+        dbH.setCamSyncEnabled(false);
 
+        if(overquotaDialog==null){
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle(getString(R.string.overquota_alert_title));
+            builder.setMessage(getString(R.string.overquota_alert_text));
+
+            builder.setPositiveButton(getString(R.string.my_account_upgrade_pro), new android.content.DialogInterface.OnClickListener() {
+
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    showUpgradeAccount();
+                }
+            });
+            builder.setNegativeButton(getString(R.string.general_cancel), new android.content.DialogInterface.OnClickListener() {
+
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                    overquotaDialog=null;
+                }
+            });
+
+            overquotaDialog = builder.create();
+            overquotaDialog.setCanceledOnTouchOutside(false);
+            overquotaDialog.show();
+        }
+        else{
+            overquotaDialog.show();
+        }
+    }
+
+    public void showUpgradeAccount(){
+        log("showUpgradeAccount");
+        Intent upgradeIntent = new Intent(this, ManagerActivityLollipop.class);
+        upgradeIntent.setAction(Constants.ACTION_SHOW_UPGRADE_ACCOUNT);
+        startActivity(upgradeIntent);
+    }
 }
