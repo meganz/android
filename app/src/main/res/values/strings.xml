@@ -1127,7 +1127,6 @@
     <string name="invalid_status" context="Info label about the status of the user">No connection</string>
 
     <string name="text_deleted_message" context="Text shown when a message has been deleted in the chat">This message has been deleted</string>
-    <string name="history_cleared_message" context="Text shown when the chat history was cleared by me">Chat history was cleared</string>
     <string name="text_deleted_message_by" context="Text shown when a message has been deleted in the chat">[A]This message has been deleted by [/A][B]%1$s[/B]</string>
 
     <string name="confirmation_delete_several_messages" context="Confirmation before deleting messages">Remove messages?</string>
@@ -1213,7 +1212,7 @@
     -->
 
     <string name="non_format_text_deleted_message_by" context="Text shown when a message has been deleted in the chat">This message has been deleted by %1$s</string>
-    <string name="non_format_history_cleared_by" context="Text shown when the chat history was cleared by someone">Chat history cleared by %1$s</string>
+    <string name="non_format_history_cleared_by" context="Text shown when the chat history was cleared by someone">%1$s cleared the chat history</string>
 
     <!--
     <string name="non_format_text_cleared_history" context="Text shown when a user cleared the history of a chat">%1$s cleared the chat history</string>
