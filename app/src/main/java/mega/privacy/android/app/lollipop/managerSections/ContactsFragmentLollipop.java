@@ -13,7 +13,6 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
@@ -99,9 +98,7 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 	MyAccountInfo myAccountInfo;
 	TextView initialLetter;
 
-
 	Context context;
-	ActionBar aB;
 	RecyclerView recyclerView;
 	MegaContactsLollipopAdapter adapter;
 
@@ -742,18 +739,6 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 
 			((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 
-			if (aB != null){
-				aB.setTitle(getString(R.string.section_contacts));
-			}
-			else{
-				if (context != null) {
-					aB = ((AppCompatActivity) context).getSupportActionBar();
-					if (aB != null) {
-						aB.setTitle(getString(R.string.section_contacts));
-					}
-				}
-			}
-
 			return v;
 		}
 		else{
@@ -761,7 +746,7 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 			View v = inflater.inflate(R.layout.fragment_contactsgrid, container, false);
 			
 			recyclerView = (RecyclerView) v.findViewById(R.id.contacts_grid_view);
-			recyclerView.setPadding(0, 0, 0, Util.scaleHeightPx(80, outMetrics));
+//			recyclerView.setPadding(0, 0, 0, Util.scaleHeightPx(80, outMetrics));
 			recyclerView.setClipToPadding(false);
 			recyclerView.setHasFixedSize(true);
 			((CustomizedGridRecyclerView) recyclerView).setWrapContent();
@@ -838,19 +823,6 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 			}
 
 			((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
-
-			if (aB != null){
-				aB.setTitle(getString(R.string.section_contacts));
-			}
-			else{
-				if (context != null) {
-					aB = ((AppCompatActivity) context).getSupportActionBar();
-					if (aB != null) {
-						aB.setTitle(getString(R.string.section_contacts));
-					}
-				}
-			}
-
 			return v;
 		}			
 	}
@@ -904,7 +876,6 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         context = activity;
-        aB = ((AppCompatActivity)activity).getSupportActionBar();
     }
 
     public void itemClick(int position) {

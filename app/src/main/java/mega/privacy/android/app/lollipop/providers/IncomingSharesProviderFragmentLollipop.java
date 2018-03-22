@@ -19,7 +19,6 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -368,7 +367,7 @@ public class IncomingSharesProviderFragmentLollipop extends Fragment{
 				MegaNode n = nodes.get(position);
 				hashes = new long[1];
 				hashes[0] = n.getHandle();
-				((FileProviderActivity) context).downloadTo(n.getSize(), hashes);
+				((FileProviderActivity) context).downloadAndAttach(n.getSize(), hashes);
 			}
 		}
 	}

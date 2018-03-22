@@ -280,7 +280,8 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 				return CHECK_FILE_TO_UPLOAD_SAME_FILE_IN_FOLDER;
 			}
 			else{
-				return CHECK_FILE_TO_UPLOAD_OVERWRITE;
+				return CHECK_FILE_TO_UPLOAD_UPLOAD;
+				//return CHECK_FILE_TO_UPLOAD_OVERWRITE;
 			}
 		}
 	}
@@ -549,9 +550,16 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 
 					if (Util.isVideoFile(transfer.getPath())) {
 						log("Is video!!!");
-						ThumbnailUtilsLollipop.createThumbnailVideo(this, transfer.getPath(), megaApi, transfer.getNodeHandle());
+
+						File previewDir = PreviewUtils.getPreviewFolder(this);
+						File preview = new File(previewDir, MegaApiAndroid.handleToBase64(transfer.getNodeHandle()) + ".jpg");
+						File thumbDir = ThumbnailUtils.getThumbFolder(this);
+						File thumb = new File(thumbDir, MegaApiAndroid.handleToBase64(transfer.getNodeHandle()) + ".jpg");
+						megaApi.createThumbnail(transfer.getPath(), thumb.getAbsolutePath());
+						megaApi.createPreview(transfer.getPath(), preview.getAbsolutePath());
 
 						MegaNode node = megaApi.getNodeByHandle(transfer.getNodeHandle());
+
 						if (node != null) {
 							MediaMetadataRetriever retriever = new MediaMetadataRetriever();
 							retriever.setDataSource(transfer.getPath());
@@ -653,7 +661,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 							int height = pdfiumCore.getPageHeightPoint(pdfDocument, pageNumber);
 							Bitmap bmp = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
 							pdfiumCore.renderPageBitmap(pdfDocument, bmp, pageNumber, 0, 0, width, height);
-							Bitmap resizedBitmap = Bitmap.createScaledBitmap(bmp, width, height, false);
+							Bitmap resizedBitmap = PreviewUtils.resizeBitmapUpload(bmp, width, height);
 							out = new FileOutputStream(preview);
 							boolean result = resizedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, out); // bmp is your Bitmap instance
 							if(result){

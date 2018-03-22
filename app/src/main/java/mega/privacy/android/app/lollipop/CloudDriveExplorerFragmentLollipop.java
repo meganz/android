@@ -84,6 +84,14 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 		if (!adapter.isMultipleSelect()){
 			adapter.setMultipleSelect(true);
 			actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
+
+			if(modeCloud==FileExplorerActivityLollipop.SELECT){
+				if(selectFile) {
+					if (((FileExplorerActivityLollipop) context).multiselect) {
+						activateButton(true);
+					}
+				}
+			}
 		}
 	}
 
@@ -133,15 +141,35 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 			if (selected.size() != 0) {
 
 				MenuItem unselect = menu.findItem(R.id.cab_menu_unselect_all);
+
 				if(selected.size()==adapter.getItemCount()){
 					menu.findItem(R.id.cab_menu_select_all).setVisible(false);
 					unselect.setTitle(getString(R.string.action_unselect_all));
 					unselect.setVisible(true);
-				}
-				else{
-					menu.findItem(R.id.cab_menu_select_all).setVisible(true);
+
+				}else{
+					if(modeCloud==FileExplorerActivityLollipop.SELECT){
+						if(selectFile){
+							if(((FileExplorerActivityLollipop)context).multiselect){
+								MegaNode node = megaApi.getNodeByHandle(parentHandle);
+								if(selected.size() == megaApi.getNumChildFiles(node)){
+									menu.findItem(R.id.cab_menu_select_all).setVisible(false);
+								}else{
+									menu.findItem(R.id.cab_menu_select_all).setVisible(true);
+								}
+							}
+						}
+					}else{
+						menu.findItem(R.id.cab_menu_select_all).setVisible(true);
+					}
+
 					unselect.setTitle(getString(R.string.action_unselect_all));
 					unselect.setVisible(true);
+
+//					menu.findItem(R.id.cab_menu_select_all).setVisible(true);
+//					unselect.setTitle(getString(R.string.action_unselect_all));
+//					unselect.setVisible(true);
+
 				}
 			}
 			else{
@@ -347,6 +375,7 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 					separator.setVisibility(View.VISIBLE);
 					optionsBar.setVisibility(View.VISIBLE);
 					optionButton.setText(getString(R.string.context_send));
+					activateButton(false);
 				}
 				else{
 					separator.setVisibility(View.GONE);
@@ -737,8 +766,8 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 				if(modeCloud==FileExplorerActivityLollipop.SELECT){
 					if(!selectFile)
 					{
-						separator.setVisibility(View.VISIBLE);
-						optionsBar.setVisibility(View.VISIBLE);
+						separator.setVisibility(View.GONE);
+						optionsBar.setVisibility(View.GONE);
 					}
 					else
 					{
@@ -992,6 +1021,15 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 		if (actionMode != null) {
 			actionMode.finish();
 		}
+
+		if(modeCloud==FileExplorerActivityLollipop.SELECT){
+			if(selectFile) {
+				if (((FileExplorerActivityLollipop) context).multiselect) {
+					activateButton(false);
+				}
+			}
+		}
+
 	}
 
 	public RecyclerView getListView(){

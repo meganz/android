@@ -26,7 +26,6 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
-import android.text.InputType;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Display;
@@ -41,8 +40,6 @@ import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
-import android.widget.CompoundButton;
-import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -344,7 +341,8 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 								log("onCreate: condition ret == MegaChatApi.INIT_ERROR");
 								if(chatSettings==null) {
 									log("1 - onCreate: ERROR----> Switch OFF chat");
-									chatSettings = new ChatSettings(false+"", true + "", "",true + "");
+									chatSettings = new ChatSettings();
+									chatSettings.setEnabled(false+"");
 									dbH.setChatSettings(chatSettings);
 								}
 								else{
@@ -648,9 +646,9 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 	     return "android:switcher:" + viewPagerId + ":" + fragmentPosition;
 	}
 
-	public void downloadTo(long size, long [] hashes){
+	public void downloadAndAttach(long size, long [] hashes){
 		
-		log("downloadTo");
+		log("downloadAndAttach");
 		
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 			boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
@@ -850,7 +848,7 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 				for (int i=0; i<totalHashes.size(); i++){
 					hashes[i] = totalHashes.get(i);
 				}
-                downloadTo(selectedNodes.size(), hashes);
+                downloadAndAttach(selectedNodes.size(), hashes);
 				break;
 			}
 		}

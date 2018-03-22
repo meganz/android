@@ -92,6 +92,7 @@ public class Constants {
 	public static final int REQUEST_READ_CONTACTS = 3;
 	public static final int RECORD_AUDIO = 4;
 	public static final int REQUEST_UPLOAD_CONTACT = 5;
+	public static final int REQUEST_READ_STORAGE = 6;
 
 	public static final int PRO_LITE = 4;
 	public static final int FREE = 0;
@@ -135,6 +136,7 @@ public class Constants {
 	public static String ACTION_OPEN_HANDLE_NODE = "ACTION_OPEN_HANDLE_NODE";
 	public static String ACTION_OPEN_FILE_LINK_ROOTNODES_NULL = "ACTION_OPEN_FILE_LINK_ROOTNODES_NULL";
 	public static String ACTION_OPEN_FOLDER_LINK_ROOTNODES_NULL = "ACTION_OPEN_FOLDER_LINK_ROOTNODES_NULL";
+	public static String ACTION_SHOW_SETTINGS = "ACTION_SHOW_SETTINGS";
 
 	public static String ACTION_CHAT_SHOW_MESSAGES = "CHAT_SHOW_MESSAGES";
 	public static String ACTION_NEW_CHAT = "NEW_CHAT";
@@ -166,6 +168,8 @@ public class Constants {
 	final public static int NODE_ATTACHMENT_ADAPTER = 2015;
 	final public static int INCOMING_SHARES_PROVIDER_ADAPTER = 2016;
 	final public static int CLOUD_DRIVE_PROVIDER_ADAPTER = 2017;
+	final public static int SEARCH_BY_ADAPTER = 2018;
+
 
 	final public static int ACCOUNT_DETAILS_MIN_DIFFERENCE = 5;
 	final public static int PAYMENT_METHODS_MIN_DIFFERENCE = 720;
@@ -188,10 +192,12 @@ public class Constants {
 	public static int NOTIFICATION_UPLOAD_FINAL = 5;
 	public static int NOTIFICATION_CAMERA_UPLOADS_FINAL = 6;
 	public static int NOTIFICATION_PUSH_CLOUD_DRIVE = 7;
-	public static int NOTIFICATION_PUSH_CHAT = 8;
+	public static int NOTIFICATION_GENERAL_PUSH_CHAT = 8;
 	public static int NOTIFICATION_PUSH_CONTACT = 9;
 	public static int NOTIFICATION_STREAMING_OVERQUOTA= 10;
-	public static int NOTIFICATION_CALL_IN_PROGRESS = 8;
+	public static int NOTIFICATION_CALL_IN_PROGRESS = 11;
+	public static int NOTIFICATION_MISSED_CALL = 12;
+	public static int NOTIFICATION_PRE_N_CHAT = 13;
 
 	public static String CHAT_FOLDER = "My chat files";
 
