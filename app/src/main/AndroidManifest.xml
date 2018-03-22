@@ -2,8 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="mega.privacy.android.app"
     android:installLocation="internalOnly"
-    android:versionCode="184"
-    android:versionName="3.3.3 (184)" >
+    android:versionCode="186"
+    android:versionName="3.3.3 (186)" >
 
     <uses-sdk
         android:minSdkVersion="16"
@@ -333,7 +333,9 @@
 
         <activity
             android:name="mega.privacy.android.app.lollipop.PdfViewerActivityLollipop"
-            android:label="@string/pdf_app_name">
+            android:label="@string/pdf_app_name"
+            android:launchMode="singleInstance"
+            android:finishOnTaskLaunch="true">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
@@ -367,6 +369,12 @@
 
         <activity
             android:name="mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop"
+            android:label="@string/app_name"
+            android:launchMode="singleInstance">
+        </activity>
+
+        <activity
+            android:name="mega.privacy.android.app.lollipop.qrcode.QRCodeActivity"
             android:label="@string/app_name">
         </activity>
 

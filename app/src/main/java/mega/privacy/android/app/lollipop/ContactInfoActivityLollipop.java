@@ -83,6 +83,7 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 
+import static android.provider.Settings.System.DEFAULT_RINGTONE_URI;
 import static mega.privacy.android.app.utils.Util.context;
 
 
@@ -813,9 +814,10 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 					}
 				}
 
-				Uri defaultRingtoneUri = RingtoneManager.getActualDefaultRingtoneUri(getApplicationContext(), RingtoneManager.TYPE_RINGTONE);
-				Ringtone defaultRingtone = RingtoneManager.getRingtone(this, defaultRingtoneUri);
-				ringtoneText.setText(defaultRingtone.getTitle(this));
+				Ringtone defaultRingtone = RingtoneManager.getRingtone(this, DEFAULT_RINGTONE_URI);
+				if(defaultRingtone!=null){
+					ringtoneText.setText(defaultRingtone.getTitle(this));
+				}
 			}
 		}
 	}

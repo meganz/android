@@ -362,7 +362,7 @@ public class CloudDriveProviderFragmentLollipop extends Fragment{
 				MegaNode n = nodes.get(position);
 				hashes = new long[1];
 				hashes[0]=n.getHandle();
-				((FileProviderActivity) context).downloadTo(n.getSize(), hashes);
+				((FileProviderActivity) context).downloadAndAttach(n.getSize(), hashes);
 			}
 		}
 

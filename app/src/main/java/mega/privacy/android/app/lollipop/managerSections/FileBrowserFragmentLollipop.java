@@ -478,7 +478,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
-		log("onSaveInstanceState");
 		super.onSaveInstanceState(outState);
 		if(recyclerView.getLayoutManager()!=null){
 			outState.putParcelable(BUNDLE_RECYCLER_LAYOUT, recyclerView.getLayoutManager().onSaveInstanceState());
@@ -523,7 +522,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
 		log("onCreateView");
-
 		if(!isAdded()){
 			return null;
 		}
@@ -562,6 +560,8 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
 		if (((ManagerActivityLollipop)context).isList){
+			log("FileBrowserFragmentLollipop isList");
+
 			log("isList");
 			View v = inflater.inflate(R.layout.fragment_filebrowserlist, container, false);
 
@@ -569,7 +569,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			recyclerView = (RecyclerView) v.findViewById(R.id.file_list_view_browser);
 			fastScroller = (FastScroller) v.findViewById(R.id.fastscroll);
 
-			recyclerView.setPadding(0, 0, 0, Util.scaleHeightPx(85, outMetrics));
+//			recyclerView.setPadding(0, 0, 0, Util.scaleHeightPx(85, outMetrics));
 			recyclerView.setClipToPadding(false);
 			recyclerView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
 			mLayoutManager = new LinearLayoutManager(context);
@@ -632,16 +632,17 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 		}
 		else{
 			log("Grid View");
-			
+			log("FileBrowserFragmentLollipop isGrid");
 			View v = inflater.inflate(R.layout.fragment_filebrowsergrid, container, false);
 
 			recyclerView = (CustomizedGridRecyclerView) v.findViewById(R.id.file_grid_view_browser);
 			fastScroller = (FastScroller) v.findViewById(R.id.fastscroll);
 
-			recyclerView.setPadding(0, 0, 0, Util.scaleHeightPx(80, outMetrics));
-			recyclerView.setClipToPadding(false);
+			//recyclerView.setPadding(0, 0, 0, Util.scaleHeightPx(80, outMetrics));
 
+			recyclerView.setClipToPadding(false);
 			recyclerView.setHasFixedSize(true);
+
 			gridLayoutManager = (CustomizedGridLayoutManager) recyclerView.getLayoutManager();
 //			gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
 //				@Override
@@ -650,7 +651,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 //				}
 //			});
 			recyclerView.setItemAnimator(new DefaultItemAnimator());
-			
 			progressBar = (ProgressBar) v.findViewById(R.id.file_grid_download_progress_bar);
 
 			emptyImageView = (ImageView) v.findViewById(R.id.file_grid_empty_image);
@@ -784,7 +784,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 
 	@Override
     public void onAttach(Activity activity) {
-		log("onAttach");
+		log("onAttach1");
         super.onAttach(activity);
         context = activity;
         aB = ((AppCompatActivity)activity).getSupportActionBar();
@@ -792,6 +792,8 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 
 	@Override
 	public void onAttach(Context context) {
+		log("onAttach2");
+
 		super.onAttach(context);
 		this.context = context;
 		aB = ((AppCompatActivity)context).getSupportActionBar();
@@ -980,6 +982,8 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 					log("FILENAME: " + file.getName() + "TYPE: "+mimeType);
 
 					Intent pdfIntent = new Intent(context, PdfViewerActivityLollipop.class);
+					pdfIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+					pdfIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
 					pdfIntent.putExtra("APP", true);
 					String localPath = Util.getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
 					if (localPath != null){
@@ -1090,16 +1094,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 				if ((n.getHandle()==Long.parseLong(secondaryMediaHandle))){
 					log("Click on Media Uploads");
 					((ManagerActivityLollipop)context).secondaryMediaUploadsClicked();
-					log("aB.setTitle "+n.getName());
-					if(aB==null){
-						aB = ((AppCompatActivity)context).getSupportActionBar();
-					}
-					if(aB==null){
-						log("AB still is NULL");
-					}
-
-					aB.setTitle(n.getName());
-					log("indicator_arrow_back_003");
 					return;
 				}
 			}
@@ -1112,34 +1106,13 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 				dbH.setSecondaryFolderHandle(n.getHandle());
 				log("FOUND Media Uploads!!: "+n.getHandle());
 				((ManagerActivityLollipop)context).secondaryMediaUploadsClicked();
-				log("aB.setTitle "+n.getName());
-				if(aB==null){
-					aB = ((AppCompatActivity)context).getSupportActionBar();
-				}
-				if(aB==null){
-					log("AB still is NULL");
-				}
-
-				aB.setTitle(n.getName());
-				log("indicator_arrow_back_696");
 				return;
 			}
 		}
-		log("aB.setTitle "+n.getName());
-		if(aB==null){
-			aB = ((AppCompatActivity)context).getSupportActionBar();
-		}
-		if(aB==null){
-			log("AB still is NULL");
-		}
 
-		aB.setTitle(n.getName());
-		log("indicator_arrow_back_036");
-		aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
-		((ManagerActivityLollipop)context).setFirstNavigationLevel(false);
-		((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
+		((ManagerActivityLollipop)context).parentHandleBrowser = n.getHandle();
 
-		((ManagerActivityLollipop)context).setParentHandleBrowser(n.getHandle());
+		((ManagerActivityLollipop)context).setToolbarTitle();
 
 		MegaNode infoNode = megaApi.getNodeByHandle(((ManagerActivityLollipop)context).parentHandleBrowser);
 
@@ -1301,20 +1274,10 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 				emptyImageView.setVisibility(View.GONE);
 				emptyTextView.setVisibility(View.GONE);
 
-				if (parentNode.getHandle() == megaApi.getRootNode().getHandle()){
-					log("Parent is ROOT");
-					aB.setTitle(getString(R.string.section_cloud_drive));
-					aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
-					((ManagerActivityLollipop)context).setFirstNavigationLevel(true);
-				}
-				else{
-					aB.setTitle(parentNode.getName());
-					log("indicator_arrow_back_033");
-					aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
-					((ManagerActivityLollipop)context).setFirstNavigationLevel(false);
-				}
-				((ManagerActivityLollipop)context).setParentHandleBrowser(parentNode.getHandle());
+				((ManagerActivityLollipop)context).parentHandleBrowser = parentNode.getHandle();
 				((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
+
+				((ManagerActivityLollipop)context).setToolbarTitle();
 
 				nodes = megaApi.getChildren(parentNode, ((ManagerActivityLollipop)context).orderCloud);
 				adapter.setNodes(nodes);
@@ -1488,14 +1451,12 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 				MegaNode infoNode = megaApi.getRootNode();
 				if (infoNode !=  null){
 					contentText.setText(MegaApiUtils.getInfoFolder(infoNode, context));
-	//				aB.setTitle(getString(R.string.section_cloud_drive));
 				}
 			}
 			else{
 				MegaNode infoNode = megaApi.getNodeByHandle(((ManagerActivityLollipop)context).parentHandleBrowser);
 				if (infoNode !=  null){
 					contentText.setText(MegaApiUtils.getInfoFolder(infoNode, context));
-	//				aB.setTitle(infoNode.getName());
 				}
 			}
 			log("contentText: "+contentText.getText());

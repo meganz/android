@@ -5,8 +5,6 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.text.Html;
 import android.text.Spanned;
 import android.util.DisplayMetrics;
@@ -41,7 +39,6 @@ public class MyStorageFragmentLollipop extends Fragment implements MegaRequestLi
 
 	Context context;
 	MyAccountInfo myAccountInfo;
-	ActionBar aB;
 
 	MegaUser myUser;
 
@@ -94,16 +91,6 @@ public class MyStorageFragmentLollipop extends Fragment implements MegaRequestLi
 		log("onCreateView");
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
-		}
-
-		if (aB == null){
-			aB = ((AppCompatActivity)context).getSupportActionBar();
-		}
-
-		if(aB!=null){
-			aB.setTitle(getString(R.string.section_account));
-			aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
-			((ManagerActivityLollipop)context).setFirstNavigationLevel(true);
 		}
 
 		Display display = ((Activity) context).getWindowManager().getDefaultDisplay();
@@ -364,7 +351,6 @@ public class MyStorageFragmentLollipop extends Fragment implements MegaRequestLi
 		log("onAttach");
 		super.onAttach(activity);
 		context = activity;
-		aB = ((AppCompatActivity)context).getSupportActionBar();
 	}
 
 	@Override
@@ -372,7 +358,6 @@ public class MyStorageFragmentLollipop extends Fragment implements MegaRequestLi
 		log("onAttach context");
 		super.onAttach(context);
 		this.context = context;
-		aB = ((AppCompatActivity)context).getSupportActionBar();
 	}
 
 	public int onBackPressed(){

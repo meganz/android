@@ -125,12 +125,6 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         log("onCreateView");
 
-        if(aB!=null){
-            aB.setTitle(getString(R.string.section_chat));
-            aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
-            ((ManagerActivityLollipop)context).setFirstNavigationLevel(true);
-        }
-
         display = ((Activity) context).getWindowManager().getDefaultDisplay();
         outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
@@ -218,6 +212,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
 
                 if((initState==MegaChatApi.INIT_ONLINE_SESSION)){
                     log("Connected state is: "+megaChatApi.getConnectionState());
+
                     if(megaChatApi.getConnectionState()==MegaChatApi.CONNECTED){
                         if(chats!=null){
                             chats.clear();
@@ -229,7 +224,12 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
                         chats = megaChatApi.getActiveChatListItems();
 
                         if(chats==null || chats.isEmpty()){
-                            showEmptyChatScreen();
+                            if(Util.isOnline(context)){
+                                showEmptyChatScreen();
+                            }
+                            else{
+                                showNoConnectionScreen();
+                            }
                         }
                         else{
                             log("chats no: "+chats.size());
@@ -257,29 +257,14 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
                             listView.setAdapter(adapterList);
                             adapterList.setPositionClicked(-1);
 
-                            if (adapterList.getItemCount() == 0){
-                                log("adapterList.getItemCount() == 0");
-
-                                if(Util.isOnline(context)){
-                                    listView.setVisibility(View.GONE);
-                                    emptyLayout.setVisibility(View.VISIBLE);
-                                }
-                                else{
-                                    showNoConnectionScreen();
-                                }
-                            }
-                            else{
-                                log("adapterList.getItemCount() NOT = 0");
-                                listView.setVisibility(View.VISIBLE);
-                                emptyLayout.setVisibility(View.GONE);
-                            }
+                            listView.setVisibility(View.VISIBLE);
+                            emptyLayout.setVisibility(View.GONE);
                         }
                     }
                     else{
                         log("Show chat screen connecting...");
                         showConnectingChatScreen();
                     }
-
                 }
                 else if(initState == MegaChatApi.INIT_OFFLINE_SESSION){
                     log("Init with OFFLINE session");

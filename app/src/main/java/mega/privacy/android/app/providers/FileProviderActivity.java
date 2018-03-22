@@ -646,9 +646,9 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 	     return "android:switcher:" + viewPagerId + ":" + fragmentPosition;
 	}
 
-	public void downloadTo(long size, long [] hashes){
+	public void downloadAndAttach(long size, long [] hashes){
 		
-		log("downloadTo");
+		log("downloadAndAttach");
 		
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 			boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
@@ -848,7 +848,7 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 				for (int i=0; i<totalHashes.size(); i++){
 					hashes[i] = totalHashes.get(i);
 				}
-                downloadTo(selectedNodes.size(), hashes);
+                downloadAndAttach(selectedNodes.size(), hashes);
 				break;
 			}
 		}
