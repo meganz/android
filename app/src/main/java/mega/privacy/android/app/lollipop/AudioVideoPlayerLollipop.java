@@ -16,6 +16,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.StatFs;
+import android.provider.ContactsContract;
 import android.provider.OpenableColumns;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.Snackbar;
@@ -36,6 +37,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.RemoteViews;
 import android.widget.TextView;
@@ -82,6 +84,8 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.MimeTypeMime;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.components.dragger.DraggableView;
+import mega.privacy.android.app.components.dragger.ExitViewAnimator;
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerActivity;
 import mega.privacy.android.app.receivers.NetworkStateReceiver;
 import mega.privacy.android.app.utils.Constants;
@@ -100,7 +104,10 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaTransferListenerInterface;
 
-public class AudioVideoPlayerLollipop extends PinActivityLollipop implements VideoRendererEventListener, MegaChatRequestListenerInterface, MegaTransferListenerInterface, AudioRendererEventListener{
+import static android.graphics.Color.BLACK;
+import static android.graphics.Color.TRANSPARENT;
+
+public class AudioVideoPlayerLollipop extends PinActivityLollipop implements VideoRendererEventListener, MegaChatRequestListenerInterface, MegaTransferListenerInterface, AudioRendererEventListener, DraggableView.DraggableListener{
 
     public static int REQUEST_CODE_SELECT_CHAT = 1005;
     public static int REQUEST_CODE_SELECT_LOCAL_FOLDER = 1004;
@@ -130,6 +137,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
     private MenuItem downloadIcon;
 
     private RelativeLayout audioVideoPlayerContainer;
+    private RelativeLayout playerLayout;
     
     private RelativeLayout audioContainer;
     private long handle;
@@ -158,12 +166,17 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
     private String path;
     private String pathNavigation;
 
+    private DraggableView draggableView;
+    private ImageView ivShadow;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         log("onCreate");
 
         setContentView(R.layout.activity_audiovideoplayer);
+
+        draggableView.setViewAnimator(new ExitViewAnimator());
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
@@ -248,6 +261,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
         }
 
         containerAudioVideoPlayer = (RelativeLayout) findViewById(R.id.audiovideoplayer_container);
+        playerLayout = (RelativeLayout) findViewById(R.id.player_layout);
 
         audioContainer = (RelativeLayout) findViewById(R.id.audio_container);
         audioContainer.setVisibility(View.GONE);
@@ -1286,5 +1300,71 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
     @Override
     public void onAudioDisabled(DecoderCounters counters) {
 
+    }
+
+    @Override
+    public void onViewPositionChanged(float fractionScreen) {
+        ivShadow.setAlpha(1 - fractionScreen);
+    }
+
+    @Override
+    public void setContentView(int layoutResID) {
+        super.setContentView(getContainer());
+        View view = LayoutInflater.from(this).inflate(layoutResID, null);
+        draggableView.addView(view);
+    }
+
+    private View getContainer() {
+        RelativeLayout container = new RelativeLayout(this);
+        draggableView = new DraggableView(this);
+        if (getIntent() != null) {
+            draggableView.setScreenPosition(getIntent().getIntArrayExtra("screenPosition"));
+        }
+        draggableView.setDraggableListener(this);
+        ivShadow = new ImageView(this);
+        ivShadow.setBackgroundColor(getResources().getColor(R.color.black_p50));
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
+        container.addView(ivShadow, params);
+        container.addView(draggableView);
+        return container;
+    }
+
+    @Override
+    public void onDragActivated(boolean activated) {
+        if (activated) {
+            if (aB != null && aB.isShowing()) {
+                if(tB != null) {
+                    tB.animate().translationY(-220).setDuration(0)
+                            .withEndAction(new Runnable() {
+                                @Override
+                                public void run() {
+                                    aB.hide();
+                                }
+                            }).start();
+                    getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+                }
+                else {
+                    aB.hide();
+                }
+                simpleExoPlayerView.hideController();
+            }
+            containerAudioVideoPlayer.setBackgroundColor(TRANSPARENT);
+            containerAudioVideoPlayer.setElevation(0);
+            playerLayout.setBackgroundColor(TRANSPARENT);
+            playerLayout.setElevation(0);
+            appBarLayout.setBackgroundColor(TRANSPARENT);
+            appBarLayout.setElevation(0);
+        }
+        else {
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    showActionStatusBar();
+                    containerAudioVideoPlayer.setBackgroundColor(BLACK);
+                    playerLayout.setBackgroundColor(BLACK);
+                    appBarLayout.setBackgroundColor(BLACK);
+                }
+            }, 300);
+        }
     }
 }

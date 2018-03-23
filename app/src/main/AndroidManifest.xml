@@ -371,7 +371,8 @@
         <activity
             android:name="mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop"
             android:label="@string/app_name"
-            android:launchMode="singleInstance">
+            android:launchMode="singleInstance"
+            android:theme="@style/Theme.Swipe.Back">
         </activity>
 
         <activity
