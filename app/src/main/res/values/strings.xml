@@ -48,6 +48,7 @@
     -->
     <string name="general_loading" context="state previous to import a file">Loading</string>
     <string name="general_importing" context="state while importing the file">Importing</string>
+    <string name="general_forwarding" context="state while importing the file">Forwarding</string>
     <string name="general_import" context="Import button. When the user clicks this button the file will be imported to his account.">Import</string>
     <string name="general_storage" context="Text listed before the amount of storage a user gets with a certain package. For example: &quot;1TB Storage&quot;.">Storage</string>
     <string name="general_bandwidth" context="Text listed before the amount of bandwidth a user gets with a certain package. For example: &quot;8TB Bandwidth&quot;. Can also be translated as data transfer.">Transfer Quota</string>
@@ -1779,5 +1780,9 @@
         <item context="version item" quantity="one">%1$d versioned file</item>
         <item context="version items" quantity="other">%1$d versioned files</item>
     </plurals>
+
+    <string name="messages_forwarded_success" context="Alert message after forwarding one or several messages to several chats">Messages forwarded</string>
+    <string name="messages_forwarded_error" context="Error message after forwarding one or several messages to several chats">Error. Not correctly forwarded</string>
+
 </resources>
 
