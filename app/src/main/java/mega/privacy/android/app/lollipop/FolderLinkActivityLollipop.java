@@ -1033,14 +1033,21 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 					target = megaApi.getRootNode();
 				}
 			}
-			
-			if(selectedNode!=null){
-				if (target != null){
-					log("Target node: "+target.getName());
-					selectedNode = megaApiFolder.authorizeNode(selectedNode);
-					if (selectedNode != null){
-						megaApi.copyNode(selectedNode, target, this);
 
+			if(adapterList.isMultipleSelect()){
+				log("is multiple select");
+				List<MegaNode> nodes = adapterList.getSelectedNodes();
+				if(nodes.size() != 0){
+					if (target != null){
+						log("Target node: "+target.getName());
+						for(MegaNode node : nodes ){
+							node = megaApiFolder.authorizeNode(node);
+							if(node != null){
+								megaApi.copyNode(node,target,this);
+							}else{
+								Snackbar.make(fragmentContainer, getString(R.string.context_no_copied), Snackbar.LENGTH_LONG).show();
+							}
+						}
 						Intent startIntent = new Intent(this, ManagerActivityLollipop.class);
 						if(toHandle!=-1){
 							startIntent.setAction(Constants.ACTION_OPEN_FOLDER);
@@ -1048,24 +1055,44 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 							startIntent.putExtra("offline_adapter", false);
 							startIntent.putExtra("locationFileInfo", true);
 							startIntent.putExtra("fragmentHandle", fragmentHandle);
-
 						}
 						startActivity(startIntent);
-
-					}
-					else{
+					}else{
 						Snackbar.make(fragmentContainer, getString(R.string.context_no_copied), Snackbar.LENGTH_LONG).show();
 					}
+				}else{
+					log("selected Nodes selectes is empty");
+					Snackbar.make(fragmentContainer, getString(R.string.context_no_copied), Snackbar.LENGTH_LONG).show();
 				}
-				else{
+			}else{
+				log("no multiple select");
+				if(selectedNode!=null){
+					if (target != null){
+						log("Target node: "+target.getName());
+						selectedNode = megaApiFolder.authorizeNode(selectedNode);
+						if (selectedNode != null){
+							megaApi.copyNode(selectedNode, target, this);
+
+							Intent startIntent = new Intent(this, ManagerActivityLollipop.class);
+							if(toHandle!=-1){
+								startIntent.setAction(Constants.ACTION_OPEN_FOLDER);
+								startIntent.putExtra("PARENT_HANDLE", toHandle);
+								startIntent.putExtra("offline_adapter", false);
+								startIntent.putExtra("locationFileInfo", true);
+								startIntent.putExtra("fragmentHandle", fragmentHandle);
+							}
+							startActivity(startIntent);
+						}else{
+							Snackbar.make(fragmentContainer, getString(R.string.context_no_copied), Snackbar.LENGTH_LONG).show();
+						}
+					}else{
+						Snackbar.make(fragmentContainer, getString(R.string.context_no_copied), Snackbar.LENGTH_LONG).show();
+					}
+				}else{
+					log("selected Node is NULL");
 					Snackbar.make(fragmentContainer, getString(R.string.context_no_copied), Snackbar.LENGTH_LONG).show();
 				}
 			}
-			else{
-				log("selected Node is NULL");
-				Snackbar.make(fragmentContainer, getString(R.string.context_no_copied), Snackbar.LENGTH_LONG).show();
-			}
-			
 		}
 	}
 
