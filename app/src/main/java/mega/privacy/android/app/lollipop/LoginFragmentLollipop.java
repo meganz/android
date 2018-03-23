@@ -1788,7 +1788,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 readyToManager();
 
             }else{
-                log("Error fetch nodes");
+                log("Error fetch nodes: "+error.getErrorCode());
                 String errorMessage;
                 if (error.getErrorCode() == MegaError.API_ESID){
                     errorMessage = getString(R.string.error_server_expired_session);
