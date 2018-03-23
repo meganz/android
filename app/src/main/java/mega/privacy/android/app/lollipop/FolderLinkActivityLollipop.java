@@ -1993,7 +1993,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 		startActivity(intent);
 		finish();
 	}
-	public void copiedSuccesfull(){
+	public void successfulCopy(){
 
 		Intent startIntent = new Intent(this, ManagerActivityLollipop.class);
 		if(toHandle!=-1){
