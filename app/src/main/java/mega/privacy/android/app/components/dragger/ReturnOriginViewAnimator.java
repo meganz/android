@@ -57,7 +57,7 @@ public abstract class ReturnOriginViewAnimator<D extends DraggableView> implemen
     }
 
     @Override
-    public boolean animateExit(@NonNull final D draggableView, final Direction direction, int duration, Activity activity, int[] screenPosition) {
+    public boolean animateExit(@NonNull final D draggableView, final Direction direction, int duration, Activity activity, int[] screenPosition, boolean portrait) {
         log("animateExit");
         return false;
     }

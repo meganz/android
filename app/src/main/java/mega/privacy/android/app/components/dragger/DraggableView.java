@@ -3,6 +3,7 @@ package mega.privacy.android.app.components.dragger;
 import android.animation.AnimatorSet;
 import android.app.Activity;
 import android.content.Context;
+import android.content.res.Configuration;
 import android.support.annotation.Nullable;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v4.view.MotionEventCompat;
@@ -15,10 +16,11 @@ import android.widget.FrameLayout;
 
 import mega.privacy.android.app.utils.Util;
 
-public class DraggableView extends FrameLayout {
+public class DraggableView extends FrameLayout{
 
     boolean animate = false;
     int[] screenPosition;
+    boolean portrait;
 
     public static final int DEFAULT_EXIT_DURATION = 150;
 
@@ -220,9 +222,11 @@ public class DraggableView extends FrameLayout {
     }
 
     public void setScreenPosition(int[] screenPosition) {
-        this.screenPosition = screenPosition;
-        log("Screen Position: "+screenPosition[0]+" "+screenPosition[1]);
+        if (screenPosition != null){
+            this.screenPosition = screenPosition;
+        }
     }
+
 
     @Override
     public boolean onInterceptTouchEvent(MotionEvent event) {
@@ -324,16 +328,24 @@ public class DraggableView extends FrameLayout {
                 animateToOrigin(returnOriginDuration);
                 ViewCompat.animate(this).scaleX(1f).setDuration(200);
                 ViewCompat.animate(this).scaleY(1f).setDuration(200);
+                animate = false;
+                if (draggableListener != null){
+                    draggableListener.onDragActivated(animate);
+                }
+
             } else {
                 Activity activity = (Activity) getContext();
-                animateExit = viewAnimator.animateExit(DraggableView.this, direction, exitDirection, activity, screenPosition);
+                if (activity.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT){
+                    portrait = true;
+                }
+                else {
+                    portrait = false;
+                }
+                animateExit = viewAnimator.animateExit(DraggableView.this, direction, exitDirection, activity, screenPosition, portrait);
 
-//                ViewCompat.animate(this).scaleX(0f).setDuration(200);
-//                ViewCompat.animate(this).scaleY(0f).setDuration(200);
-//                Activity activity = (Activity) getContext();
-//                activity.finish();
-
-//                activity.overridePendingTransition(0, android.R.anim.fade_out);
+                if (draggableListener != null){
+                    draggableListener.onDragActivated(true);
+                }
 
             }
         }
@@ -358,7 +370,7 @@ public class DraggableView extends FrameLayout {
                     case MotionEvent.ACTION_CANCEL:
                         actionUp();
                         animate  = false;
-                        draggableListener.onDragActivated(animate);
+//                        draggableListener.onDragActivated(animate);
                         break;
                     case MotionEvent.ACTION_MOVE: {
                         if (!animate){

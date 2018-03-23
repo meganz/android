@@ -15,72 +15,85 @@ import mega.privacy.android.app.utils.Util;
 public class ExitViewAnimator<D extends DraggableView> extends ReturnOriginViewAnimator<D> {
 
     @Override
-    public boolean animateExit(@NonNull final D draggableView, final Direction direction, int duration, final Activity activity, int[] screenPosition) {
+    public boolean animateExit(@NonNull final D draggableView, final Direction direction, int duration, final Activity activity, final int[] screenPosition, boolean portrait) {
         log("animateExit");
-        draggableView.setDraggable(false);
         draggableView.setAnimating(true);
 
-//        int translation = 0;
-//        switch (direction) {
-//            case LEFT:
-//                translation = (int) -(draggableView.getParentWidth());
-//                break;
-//            case RIGHT:
-//                translation = (int) (draggableView.getParentWidth());
-//                break;
-//            case TOP:
-//                translation = (int) -draggableView.getHeight() * 3;
-//                break;
-//            case BOTTOM:
-//                translation = (int) draggableView.getHeight() * 3;
-//                break;
-//        }
-//
-        ViewPropertyAnimatorCompat animator = null;
-//
-//        switch (direction) {
-//            case LEFT:
-//            case RIGHT:
-//                animator = ViewCompat.animate(draggableView).withLayer().translationX(translation);
-//                break;
-//            case TOP:
-//            case BOTTOM:
-//                animator = ViewCompat.animate(draggableView).withLayer().translationY(translation);
-//                break;
-//        }
-        animator = ViewCompat.animate(draggableView).withLayer().translationY(screenPosition[0]).translationX(screenPosition[1]).scaleX(0.1f).scaleY(0.1f);
-        log("screenPosition: "+screenPosition[0]+" "+screenPosition[1]);
-        final AtomicBoolean willUpdate = new AtomicBoolean(true);
+        float scaleX;
+        float scaleY;
+        if (portrait){
+            scaleX = screenPosition[2] / draggableView.getParentWidth();
+            scaleY = screenPosition[3] / (draggableView.getParentHeight());//300
+        }
+        else {
+            scaleX = screenPosition[2] / (draggableView.getParentWidth());
+            scaleY = screenPosition[3] / (draggableView.getParentHeight());
+        }
+        if (screenPosition != null){
+            ViewCompat.animate(draggableView)
+                    .withLayer()
+                    .translationX(screenPosition[0]-(draggableView.getWidth()/2))
+                    .translationY(screenPosition[1]-(draggableView.getHeight()/2))
+                    .scaleX(scaleX)
+                    .scaleY(scaleY)
+                    .rotation(0f)
 
-        animator
-            .setDuration(500)
-            .setUpdateListener(new ViewPropertyAnimatorUpdateListener() {
-                @Override
-                public void onAnimationUpdate(View view) {
-                    if(willUpdate.get()) {
-                        notifyDraggableViewUpdated(draggableView);
-                    }
-                }
-            })
-            .setListener(new ViewPropertyAnimatorListenerAdapter() {
-                @Override
-                public void onAnimationEnd(View view) {
-                    willUpdate.set(false);
+                    .setUpdateListener(new ViewPropertyAnimatorUpdateListener() {
+                        @Override
+                        public void onAnimationUpdate(View view) {
+                            notifyDraggableViewUpdated(draggableView);
+                        }
+                    })
 
-//                    DraggableView.DraggableViewListener dragListener = draggableView.getDragListener();
-//                    if (dragListener != null) {
-//                        dragListener.onDraggedEnded(draggableView, direction);
-//                    }
+                    .setDuration(ANIMATION_RETURN_TO_ORIGIN_DURATION)
 
-                    draggableView.setAnimating(false);
+                    .setListener(new ViewPropertyAnimatorListenerAdapter() {
+                        @Override
+                        public void onAnimationEnd(View view) {
+                            DraggableView.DraggableViewListener dragListener = draggableView.getDragListener();
+                            if (dragListener != null) {
+                                dragListener.onDragCancelled(draggableView);
+                                dragListener.onDrag(draggableView, screenPosition[0], screenPosition[1]);
+                            }
 
-                    activity.finish();
-                    activity.overridePendingTransition(0, android.R.anim.fade_out);
-                }
-            });
+                            draggableView.setAnimating(false);
+                            activity.finish();
+                            activity.overridePendingTransition(0, android.R.anim.fade_out);
+                        }
+                    });
+        }
+        else {
+            ViewCompat.animate(draggableView)
+                    .withLayer()
+                    .scaleX(scaleX)
+                    .scaleY(scaleY)
+                    .rotation(0f)
 
+                    .setUpdateListener(new ViewPropertyAnimatorUpdateListener() {
+                        @Override
+                        public void onAnimationUpdate(View view) {
+                            notifyDraggableViewUpdated(draggableView);
+                        }
+                    })
 
-//        activity.finish();
+                    .setDuration(ANIMATION_RETURN_TO_ORIGIN_DURATION)
+
+                    .setListener(new ViewPropertyAnimatorListenerAdapter() {
+                        @Override
+                        public void onAnimationEnd(View view) {
+                            DraggableView.DraggableViewListener dragListener = draggableView.getDragListener();
+                            if (dragListener != null) {
+                                dragListener.onDragCancelled(draggableView);
+                                dragListener.onDrag(draggableView, screenPosition[0], screenPosition[1]);
+                            }
+
+                            draggableView.setAnimating(false);
+                            activity.finish();
+                            activity.overridePendingTransition(0, android.R.anim.fade_out);
+                        }
+                    });
+        }
+
 
         return true;
     }

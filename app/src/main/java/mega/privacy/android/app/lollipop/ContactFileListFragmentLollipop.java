@@ -575,7 +575,7 @@ public class ContactFileListFragmentLollipop extends Fragment{
 		super.onDestroy();
 	}
 	
-	public void itemClick(int position) {
+	public void itemClick(int position, int[] screenPosition) {
 		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
 		if (adapter.isMultipleSelect()){
@@ -658,6 +658,13 @@ public class ContactFileListFragmentLollipop extends Fragment{
 					} else {
 						intent.putExtra("parentNodeHandle", megaApi.getParentNode(contactNodes.get(position)).getHandle());
 					}
+					intent.putExtra("screenPosition", screenPosition);
+					if (((ManagerActivityLollipop)context).isList){
+						intent.putExtra("itemList", true);
+					}
+					else {
+						intent.putExtra("itemList", false);
+					}
 					((ContactFileListActivityLollipop)context).startActivity(intent);
 				} 
 				else if (MimeTypeList.typeForName(contactNodes.get(position).getName()).isVideoReproducible()	|| MimeTypeList.typeForName(contactNodes.get(position).getName()).isAudio()) {
@@ -690,6 +697,13 @@ public class ContactFileListFragmentLollipop extends Fragment{
 					}
 					else {
 						mediaIntent = new Intent(context, AudioVideoPlayerLollipop.class);
+					}
+					mediaIntent.putExtra("screenPosition", screenPosition);
+					if (((ManagerActivityLollipop)context).isList){
+						mediaIntent.putExtra("itemList", true);
+					}
+					else {
+						mediaIntent.putExtra("itemList", false);
 					}
 					mediaIntent.putExtra("HANDLE", file.getHandle());
 					mediaIntent.putExtra("FILENAME", file.getName());

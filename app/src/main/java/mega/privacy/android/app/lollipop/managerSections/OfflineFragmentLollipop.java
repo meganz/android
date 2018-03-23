@@ -903,7 +903,7 @@ public class OfflineFragmentLollipop extends Fragment{
         aB = ((AppCompatActivity)activity).getSupportActionBar();
     }
 
-    public void itemClick(int position) {
+    public void itemClick(int position, int[] screenPosition) {
 		log("itemClick");
 		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
@@ -1072,7 +1072,13 @@ public class OfflineFragmentLollipop extends Fragment{
 						intent.putExtra("offlinePathDirectory", currentFile.getParent());
 						intent.putExtra("pathNavigation", pathNavigation);
 						intent.putExtra("orderGetChildren", orderGetChildren);
-
+						intent.putExtra("screenPosition", screenPosition);
+						if (((ManagerActivityLollipop)context).isList){
+							intent.putExtra("itemList", true);
+						}
+						else {
+							intent.putExtra("itemList", false);
+						}
 						if (context instanceof ManagerActivityLollipop){
 							MyAccountInfo accountInfo = ((ManagerActivityLollipop)context).getMyAccountInfo();
 							if(accountInfo!=null){
@@ -1091,6 +1097,13 @@ public class OfflineFragmentLollipop extends Fragment{
 						videoIntent.putExtra("FILENAME", currentNode.getName());
 						videoIntent.putExtra("path", currentFile.getAbsolutePath());
 						videoIntent.putExtra("pathNavigation", pathNavigation);
+						videoIntent.putExtra("screenPosition", screenPosition);
+						if (((ManagerActivityLollipop)context).isList){
+							videoIntent.putExtra("itemList", true);
+						}
+						else {
+							videoIntent.putExtra("itemList", false);
+						}
 						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
 							videoIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
 						}
@@ -1109,6 +1122,13 @@ public class OfflineFragmentLollipop extends Fragment{
 						audioIntent.putExtra("FILENAME", currentNode.getName());
 						audioIntent.putExtra("path", currentFile.getAbsolutePath());
 						audioIntent.putExtra("pathNavigation", pathNavigation);
+						audioIntent.putExtra("screenPosition", screenPosition);
+						if (((ManagerActivityLollipop)context).isList){
+							audioIntent.putExtra("itemList", true);
+						}
+						else {
+							audioIntent.putExtra("itemList", false);
+						}
 						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
 							audioIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
 						}

@@ -5,7 +5,7 @@ import android.support.annotation.NonNull;
 
 public interface ViewAnimator<D extends DraggableView> {
 
-    boolean animateExit(@NonNull final D draggableView, final Direction direction, int duration, Activity activity, int[] screenPosition);
+    boolean animateExit(@NonNull final D draggableView, final Direction direction, int duration, Activity activity, int[] screenPosition, boolean portrait);
 
     boolean animateToOrigin(@NonNull final D draggableView, final int duration);
 
