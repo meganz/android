@@ -60,7 +60,7 @@ public class MultipleRequestListenerLink implements MegaRequestListenerInterface
 
                     }else{
                         log("OK");
-                        ((FolderLinkActivityLollipop) context).copiedSuccesfull();
+                        ((FolderLinkActivityLollipop) context).successfulCopy();
                     }
                 }
                 break;
