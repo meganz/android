@@ -122,6 +122,7 @@ import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.components.EditTextCursorWatcher;
 import mega.privacy.android.app.components.RoundedImageView;
+import mega.privacy.android.app.fcm.AdvancedNotificationBuilder;
 import mega.privacy.android.app.lollipop.adapters.CloudDrivePagerAdapter;
 import mega.privacy.android.app.lollipop.adapters.ContactsPageAdapter;
 import mega.privacy.android.app.lollipop.adapters.MyAccountPageAdapter;
@@ -2615,6 +2616,17 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	    		}
 	    		case SHARED_ITEMS:{
 	    			log("onPostResume: case SHARED ITEMS");
+
+					try {
+						NotificationManager notificationManager =
+								(NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+						notificationManager.cancel(Constants.NOTIFICATION_PUSH_CLOUD_DRIVE);
+					}
+					catch (Exception e){
+						log("Exception NotificationManager - remove contact notification");
+					}
+
 					setToolbarTitle();
 					log("onPostResume: shared tabs visible");
 					tabLayoutShares.setVisibility(View.VISIBLE);
@@ -2627,6 +2639,17 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					break;
 				}
 				case CONTACTS:{
+
+					try {
+						NotificationManager notificationManager =
+								(NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+						notificationManager.cancel(Constants.NOTIFICATION_PUSH_CONTACT);
+					}
+					catch (Exception e){
+						log("Exception NotificationManager - remove contact notification");
+					}
+
 					setToolbarTitle();
 					break;
 				}
@@ -2635,6 +2658,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					break;
 				}
 				case CHAT:{
+
 					if (nV != null){
 						Menu nVMenu = nV.getMenu();
 						resetNavigationViewMenu(nVMenu);
@@ -3946,6 +3970,16 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		log("selectDrawerItemSharedItems");
 		tB.setVisibility(View.VISIBLE);
 
+		try {
+			NotificationManager notificationManager =
+					(NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+			notificationManager.cancel(Constants.NOTIFICATION_PUSH_CLOUD_DRIVE);
+		}
+		catch (Exception e){
+			log("Exception NotificationManager - remove contact notification");
+		}
+
 		tabLayoutContacts.setVisibility(View.GONE);
 		viewPagerContacts.setVisibility(View.GONE);
 		tabLayoutCloud.setVisibility(View.GONE);
@@ -4002,6 +4036,16 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	public void selectDrawerItemContacts (){
 		log("selectDrawerItemContacts");
 		tB.setVisibility(View.VISIBLE);
+
+		try {
+			NotificationManager notificationManager =
+					(NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+			notificationManager.cancel(Constants.NOTIFICATION_PUSH_CONTACT);
+		}
+		catch (Exception e){
+			log("Exception NotificationManager - remove contact notification");
+		}
 
 		if (aB == null){
 			aB = getSupportActionBar();
@@ -4366,6 +4410,18 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	public void selectDrawerItemChat(){
 		log("selectDrawerItemChat");
 
+		((MegaApplication)getApplication()).setRecentChatVisible(true);
+
+		try {
+			AdvancedNotificationBuilder notificationBuilder;
+			notificationBuilder =  AdvancedNotificationBuilder.newInstance(this, megaApi, megaChatApi);
+
+			notificationBuilder.removeAllChatNotifications();
+		}
+		catch (Exception e){
+			log("Exception NotificationManager - remove all notifications");
+		}
+
 		MegaNode parentNode = megaApi.getNodeByPath("/"+Constants.CHAT_FOLDER);
 		if(parentNode == null){
 			log("Create folder: "+Constants.CHAT_FOLDER);
@@ -4425,6 +4481,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	@SuppressLint("NewApi")
 	public void selectDrawerItemLollipop(DrawerItem item){
     	log("selectDrawerItemLollipop: "+item);
+
+		((MegaApplication)getApplication()).setRecentChatVisible(false);
 
     	switch (item){
 			case CLOUD_DRIVE:{

@@ -4930,8 +4930,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             log("Written message not stored on DB");
         }
 
-        MegaApplication.setOpenChatId(-1);
-
         super.onStop();
     }
 
@@ -5367,6 +5365,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         super.onPause();
 
         activityVisible = false;
+        MegaApplication.setOpenChatId(-1);
     }
 
 
