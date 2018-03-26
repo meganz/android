@@ -895,12 +895,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 					}
 					intent.putExtra("orderGetChildren", ((ManagerActivityLollipop)context).orderCloud);
 					intent.putExtra("screenPosition", screenPosition);
-					if (((ManagerActivityLollipop)context).isList){
-						intent.putExtra("itemList", true);
-					}
-					else {
-						intent.putExtra("itemList", false);
-					}
 					startActivity(intent);
 
 				}
@@ -936,12 +930,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 						mediaIntent = new Intent(context, AudioVideoPlayerLollipop.class);
 					}
 					mediaIntent.putExtra("screenPosition", screenPosition);
-					if (((ManagerActivityLollipop)context).isList){
-						mediaIntent.putExtra("itemList", true);
-					}
-					else {
-						mediaIntent.putExtra("itemList", false);
-					}
 					mediaIntent.putExtra("FILENAME", file.getName());
 					String localPath = Util.getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
 					if (localPath != null){

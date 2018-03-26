@@ -6,7 +6,6 @@ import android.support.v4.view.ViewCompat;
 import android.support.v4.view.ViewPropertyAnimatorListenerAdapter;
 import android.support.v4.view.ViewPropertyAnimatorUpdateListener;
 import android.view.View;
-
 import mega.privacy.android.app.utils.Util;
 
 public abstract class ReturnOriginViewAnimator<D extends DraggableView> implements ViewAnimator<D> {
@@ -57,7 +56,7 @@ public abstract class ReturnOriginViewAnimator<D extends DraggableView> implemen
     }
 
     @Override
-    public boolean animateExit(@NonNull final D draggableView, final Direction direction, int duration, Activity activity, int[] screenPosition, boolean portrait) {
+    public boolean animateExit(@NonNull final D draggableView, final Direction direction, int duration, Activity activity, int[] screenPosition, View currentView) {
         log("animateExit");
         return false;
     }

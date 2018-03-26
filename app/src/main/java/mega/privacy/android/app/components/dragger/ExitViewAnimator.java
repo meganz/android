@@ -3,32 +3,39 @@ package mega.privacy.android.app.components.dragger;
 import android.app.Activity;
 import android.support.annotation.NonNull;
 import android.support.v4.view.ViewCompat;
-import android.support.v4.view.ViewPropertyAnimatorCompat;
 import android.support.v4.view.ViewPropertyAnimatorListenerAdapter;
 import android.support.v4.view.ViewPropertyAnimatorUpdateListener;
+import android.view.SurfaceView;
 import android.view.View;
 
-import java.util.concurrent.atomic.AtomicBoolean;
-
+import mega.privacy.android.app.components.TouchImageView;
 import mega.privacy.android.app.utils.Util;
 
 public class ExitViewAnimator<D extends DraggableView> extends ReturnOriginViewAnimator<D> {
 
     @Override
-    public boolean animateExit(@NonNull final D draggableView, final Direction direction, int duration, final Activity activity, final int[] screenPosition, boolean portrait) {
+    public boolean animateExit(@NonNull final D draggableView, final Direction direction, int duration, final Activity activity, final int[] screenPosition, View currentView) {
         log("animateExit");
         draggableView.setAnimating(true);
 
         float scaleX;
         float scaleY;
-        if (portrait){
-            scaleX = screenPosition[2] / draggableView.getParentWidth();
-            scaleY = screenPosition[3] / (draggableView.getParentHeight());//300
+        TouchImageView touchImageView = null;
+        SurfaceView surfaceView;
+
+        if (currentView instanceof TouchImageView){
+            touchImageView = (TouchImageView) currentView;
+            scaleX = ((float)screenPosition[2]) / touchImageView.getImageWidth();
+            scaleY = ((float)screenPosition[3]) / touchImageView.getImageHeight();
+            log("Scale: "+scaleX+" "+scaleY+" dimensions: "+touchImageView.getImageWidth()+" "+touchImageView.getImageHeight()+ " position: "+screenPosition[0]+" "+screenPosition[1]);
         }
         else {
-            scaleX = screenPosition[2] / (draggableView.getParentWidth());
-            scaleY = screenPosition[3] / (draggableView.getParentHeight());
+            surfaceView = (SurfaceView) currentView;
+            scaleX = ((float)screenPosition[2]) / ((float)surfaceView.getWidth());
+            scaleY = ((float)screenPosition[3]) / ((float)surfaceView.getHeight());
+            log("Scale: "+scaleX+" "+scaleY+" dimensions: "+surfaceView.getWidth()+" "+surfaceView.getHeight()+ " position: "+screenPosition[2]+" "+screenPosition[3]);
         }
+
         if (screenPosition != null){
             ViewCompat.animate(draggableView)
                     .withLayer()

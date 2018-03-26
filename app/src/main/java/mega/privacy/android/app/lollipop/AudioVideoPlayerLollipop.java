@@ -1354,6 +1354,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
             playerLayout.setElevation(0);
             appBarLayout.setBackgroundColor(TRANSPARENT);
             appBarLayout.setElevation(0);
+            draggableView.setCurrentView(simpleExoPlayerView.getVideoSurfaceView());
         }
         else {
             handler.postDelayed(new Runnable() {

@@ -2620,6 +2620,14 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			relativeImageViewerLayout.setElevation(0);
 			appBarLayout.setBackgroundColor(TRANSPARENT);
 			appBarLayout.setElevation(0);
+			if (adapterType == Constants.OFFLINE_ADAPTER){
+				adapterOffline.getVisibleImage(positionG).resetZoom();
+				draggableView.setCurrentView(adapterOffline.getVisibleImage(positionG));
+			}
+			else {
+				adapterMega.getVisibleImage(positionG).resetZoom();
+				draggableView.setCurrentView(adapterMega.getVisibleImage(positionG));
+			}
 		}
 		else {
 			handler.postDelayed(new Runnable() {

@@ -910,17 +910,14 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 			case R.id.offline_list_item_layout:
 			case R.id.offline_grid_item_layout:{
 				int[] screenPosition = new int[2];
-				ImageView imageView;
-				if (adapterType == MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST) {
-					imageView = (ImageView) v.findViewById(R.id.offline_list_thumbnail);
-				}
-				else {
-					imageView = (ImageView) v.findViewById(R.id.offline_grid_thumbnail);
-				}
+				RelativeLayout imageView = holder.itemLayout;
 				imageView.getLocationOnScreen(screenPosition);
-				screenPosition[0] += imageView.getWidth() / 2;
-				screenPosition[1] += imageView.getHeight() / 2;
-				fragment.itemClick(currentPosition, screenPosition);
+				int[] dimens = new int[4];
+				dimens[0] = (imageView.getWidth() / 2) + screenPosition[0];
+				dimens[1] = (imageView.getHeight() / 2) + screenPosition[1];
+				dimens[2] = imageView.getWidth();
+				dimens[3] = imageView.getHeight();
+				fragment.itemClick(currentPosition, dimens);
 				break;
 			}			
 			case R.id.offline_list_three_dots_layout:

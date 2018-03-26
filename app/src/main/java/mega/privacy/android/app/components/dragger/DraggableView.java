@@ -1,9 +1,7 @@
 package mega.privacy.android.app.components.dragger;
 
-import android.animation.AnimatorSet;
 import android.app.Activity;
 import android.content.Context;
-import android.content.res.Configuration;
 import android.support.annotation.Nullable;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v4.view.MotionEventCompat;
@@ -13,14 +11,13 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.FrameLayout;
-
 import mega.privacy.android.app.utils.Util;
 
 public class DraggableView extends FrameLayout{
 
     boolean animate = false;
     int[] screenPosition;
-    boolean portrait;
+    View currentView;
 
     public static final int DEFAULT_EXIT_DURATION = 150;
 
@@ -227,6 +224,9 @@ public class DraggableView extends FrameLayout{
         }
     }
 
+    public void setCurrentView (View v) {
+        currentView = v;
+    }
 
     @Override
     public boolean onInterceptTouchEvent(MotionEvent event) {
@@ -335,13 +335,7 @@ public class DraggableView extends FrameLayout{
 
             } else {
                 Activity activity = (Activity) getContext();
-                if (activity.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT){
-                    portrait = true;
-                }
-                else {
-                    portrait = false;
-                }
-                animateExit = viewAnimator.animateExit(DraggableView.this, direction, exitDirection, activity, screenPosition, portrait);
+                animateExit = viewAnimator.animateExit(DraggableView.this, direction, exitDirection, activity, screenPosition, currentView);
 
                 if (draggableListener != null){
                     draggableListener.onDragActivated(true);
