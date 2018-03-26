@@ -64,6 +64,7 @@
 /MegaChatMessage.java
 /MegaChatPresenceConfig.java
 /MegaChatRoomListener.java
+/MegaChatNotificationListener.java
 /MegaEvent.java
 /MegaHandleList.java
 /MegaStringMap.java
