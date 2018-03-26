@@ -1939,7 +1939,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
         if (request.getType() == MegaChatRequest.TYPE_LOGOUT){
 
-            megaChatApi = null;
             ((MegaApplication) ((Activity)context).getApplication()).disableMegaChatApi();
             Util.resetAndroidLogger();
         }
