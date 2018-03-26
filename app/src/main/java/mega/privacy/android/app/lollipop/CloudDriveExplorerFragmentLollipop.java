@@ -173,10 +173,7 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 				}
 			}
 			else{
-				log("*********** 7 ClearSelection FALSE, SelectAll TRUE");
-
 				menu.findItem(R.id.cab_menu_select_all).setVisible(true);
-
 				menu.findItem(R.id.cab_menu_unselect_all).setVisible(false);
 			}
 
