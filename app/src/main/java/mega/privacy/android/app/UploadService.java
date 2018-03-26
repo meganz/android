@@ -68,6 +68,8 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 	private boolean isForeground = false;
 	private boolean canceled;
 
+	private boolean isQRFile = false;
+
 	MegaApplication app;
 	MegaApiAndroid megaApi;
 	MegaChatApiAndroid megaChatApi;
@@ -178,6 +180,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 		log("onHandleIntent");
 
 		final File file = new File(intent.getStringExtra(EXTRA_FILEPATH));
+		isQRFile = intent.getBooleanExtra("qrfile", false);
 		if(file!=null){
 			log("File to manage: "+file.getAbsolutePath());
 		}
@@ -501,9 +504,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 			transfersCount--;
 
 			if (error.getErrorCode() == MegaError.API_EOVERQUOTA) {
-				if (transfer.getType() == MegaTransfer.TYPE_UPLOAD) {
 					isOverquota = true;
-				}
 			}
 
 			if (!transfer.isFolderTransfer()) {
@@ -691,13 +692,13 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 					}
 				}
 
-				if (getApplicationContext().getExternalCacheDir() != null) {
+				if (getApplicationContext().getExternalCacheDir() != null && !isQRFile) {
 					File localFile = new File(getApplicationContext().getExternalCacheDir(), transfer.getFileName());
 					if (localFile.exists()) {
 						log("Delete file!: " + localFile.getAbsolutePath());
 						localFile.delete();
 					}
-				} else {
+				} else if (!isQRFile){
 					File localFile = new File(getApplicationContext().getCacheDir(), transfer.getFileName());
 					if (localFile.exists()) {
 						log("Delete file!: " + localFile.getAbsolutePath());
@@ -777,7 +778,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 				.setContentTitle(message).setContentText(contentText)
 				.setOngoing(false);
 
-		mNotificationManager.notify(notificationIdFinal, mBuilderCompat.build());
+		mNotificationManager.notify(Constants.NOTIFICATION_STORAGE_OVERQUOTA, mBuilderCompat.build());
 	}
 
 	@Override
