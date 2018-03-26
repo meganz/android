@@ -139,10 +139,10 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 			List<MegaNode> selected = adapter.getSelectedNodes();
 
 			if (selected.size() != 0) {
-
 				MenuItem unselect = menu.findItem(R.id.cab_menu_unselect_all);
+				MegaNode nodeS = megaApi.getNodeByHandle(parentHandle);
 
-				if(selected.size()==adapter.getItemCount()){
+				if(selected.size() == megaApi.getNumChildFiles(nodeS)){
 					menu.findItem(R.id.cab_menu_select_all).setVisible(false);
 					unselect.setTitle(getString(R.string.action_unselect_all));
 					unselect.setVisible(true);
@@ -173,7 +173,10 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 				}
 			}
 			else{
+				log("*********** 7 ClearSelection FALSE, SelectAll TRUE");
+
 				menu.findItem(R.id.cab_menu_select_all).setVisible(true);
+
 				menu.findItem(R.id.cab_menu_unselect_all).setVisible(false);
 			}
 
