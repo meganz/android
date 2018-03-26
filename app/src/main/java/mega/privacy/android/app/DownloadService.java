@@ -604,8 +604,6 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 						log("Pdf file");
 						Intent pdfIntent = new Intent(this, PdfViewerActivityLollipop.class);
 						pdfIntent.putExtra("APP", true);
-						pdfIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-						pdfIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
 						pdfIntent.putExtra("HANDLE", currentDocument.getHandle());
 						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && !externalFile) {
 							pdfIntent.setDataAndType(FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
