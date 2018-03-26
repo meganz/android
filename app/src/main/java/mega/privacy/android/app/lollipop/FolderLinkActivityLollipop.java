@@ -765,7 +765,6 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 	}
 	
 	@SuppressLint("NewApi") public void onFolderClick(long handle, long size){
-
 		long[] hashes = new long[1];
 		
 		hashes[0] = handle;		
@@ -1024,9 +1023,6 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 		}
 		else if (requestCode == Constants.REQUEST_CODE_SELECT_IMPORT_FOLDER && resultCode == RESULT_OK){
 
-			//******************
-
-			//***********
 			if(!Util.isOnline(this)) {
 				try{
 					statusDialog.dismiss();
@@ -1035,14 +1031,6 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 				Snackbar.make(fragmentContainer, getString(R.string.error_server_connection_problem), Snackbar.LENGTH_LONG).show();
 				return;
 			}
-
-
-//			if(!Util.isOnline(this)){
-//				Snackbar.make(fragmentContainer, getString(R.string.error_server_connection_problem), Snackbar.LENGTH_LONG).show();
-//				return;
-//			}
-
-
 
 			toHandle = intent.getLongExtra("IMPORT_TO", 0);
 			fragmentHandle = intent.getLongExtra("fragmentH", -1);
@@ -1205,8 +1193,6 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_COPY){
-			log("*********FolderLinkActivityLollipop-TYPE_COPY");
-
 			if (e.getErrorCode() != MegaError.API_OK) {
 				log("ERROR: "+e.getErrorString());
 				if(e.getErrorCode()==MegaError.API_EOVERQUOTA){
@@ -1908,33 +1894,52 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 		switch(v.getId()){
 			case R.id.folder_link_file_link_button_download:
 			case R.id.folder_link_button_download:{
-				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-					boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
-					if (!hasStoragePermission) {
-						ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, Constants.REQUEST_WRITE_STORAGE);
-						
-						downloadCompleteFolder = true;
-						
-						return;
+				if(adapterList.isMultipleSelect()){
+
+					List<MegaNode> documents = adapterList.getSelectedNodes();
+					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+						boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
+						if (!hasStoragePermission) {
+							ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, Constants.REQUEST_WRITE_STORAGE);
+							downloadCompleteFolder = false;
+							handleListM.clear();
+							for (int i=0;i<documents.size();i++){
+								handleListM.add(documents.get(i).getHandle());
+							}
+							return;
+						}
+					}
+					ArrayList<Long> handleList = new ArrayList<Long>();
+					for (int i=0;i<documents.size();i++){
+						handleList.add(documents.get(i).getHandle());
+					}
+					onFileClick(handleList);
+
+				}else{
+					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+						boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
+						if (!hasStoragePermission) {
+							ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, Constants.REQUEST_WRITE_STORAGE);
+							downloadCompleteFolder = true;
+							return;
+						}
+					}
+
+					MegaNode rootNode = null;
+					if(megaApiFolder.getRootNode()!=null){
+						rootNode = megaApiFolder.getRootNode();
+					}
+					if(rootNode!=null){
+						MegaNode parentNode = megaApiFolder.getNodeByHandle(parentHandle);
+						if (parentNode != null){
+							onFolderClick(parentNode.getHandle(),parentNode.getSize());
+						}else{
+							onFolderClick(rootNode.getHandle(),rootNode.getSize());
+						}
+					}else{
+						log("rootNode null!!");
 					}
 				}
-				
-				MegaNode rootNode = null;	  
-				if(megaApiFolder.getRootNode()!=null){
-					rootNode = megaApiFolder.getRootNode();
-				}
-	        	if(rootNode!=null){
-					MegaNode parentNode = megaApiFolder.getNodeByHandle(parentHandle);
-					if (parentNode != null){
-						onFolderClick(parentNode.getHandle(),parentNode.getSize());
-					}
-					else{
-						onFolderClick(rootNode.getHandle(),rootNode.getSize());
-					}
-	        	}
-	        	else{
-	        		log("rootNode null!!");
-	        	}
 				break;
 			}
 			case R.id.folder_link_file_link_button_import:
