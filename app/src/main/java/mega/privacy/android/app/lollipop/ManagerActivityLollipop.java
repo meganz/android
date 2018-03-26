@@ -2641,8 +2641,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				case CONTACTS:{
 
 					try {
-						NotificationManager notificationManager =
-								(NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+						NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
 						notificationManager.cancel(Constants.NOTIFICATION_PUSH_CONTACT);
 					}

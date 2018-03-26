@@ -857,7 +857,7 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
 			notificationBuilder.updateNotification(chatid, msg);
 		}
-		else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
+		else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 
 			NotificationManager mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 			StatusBarNotification[] notifs = mNotificationManager.getActiveNotifications();
@@ -884,7 +884,7 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
 			notificationBuilder.removeSeenNotification(chatid, msg);
 		}
-		else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
+		else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 
 			NotificationManager mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 			StatusBarNotification[] notifs = mNotificationManager.getActiveNotifications();
