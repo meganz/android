@@ -22,6 +22,7 @@ import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceScreen;
 import android.preference.SwitchPreference;
+import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.provider.DocumentFile;
@@ -56,16 +57,20 @@ import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.DBUtil;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatPresenceConfig;
+import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
+import nz.mega.sdk.MegaRequest;
+import nz.mega.sdk.MegaRequestListenerInterface;
 
 
 //import android.support.v4.preference.PreferenceFragment;
 
 @SuppressLint("NewApi")
-public class SettingsFragmentLollipop extends PreferenceFragment implements OnPreferenceClickListener, OnPreferenceChangeListener{
+public class SettingsFragmentLollipop extends PreferenceFragment implements OnPreferenceClickListener, OnPreferenceChangeListener, MegaRequestListenerInterface{
 
 	Context context;
 	private MegaApiAndroid megaApi;
@@ -87,6 +92,9 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 	public static String CATEGORY_STORAGE = "settings_storage";
 	public static String CATEGORY_CAMERA_UPLOAD = "settings_camera_upload";
 	public static String CATEGORY_ADVANCED_FEATURES = "advanced_features";
+	public static String CATEGORY_QR_CODE = "settings_qrcode";
+
+	public static String KEY_QR_CODE_AUTO_ACCEPT = "settings_qrcode_autoaccept";
 
 	public static String KEY_PIN_LOCK_ENABLE = "settings_pin_lock_enable";
 	public static String KEY_PIN_LOCK_CODE = "settings_pin_lock_code";
@@ -140,6 +148,11 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 	
 	public final static int STORAGE_DOWNLOAD_LOCATION_INTERNAL_SD_CARD = 1001;
 	public final static int STORAGE_DOWNLOAD_LOCATION_EXTERNAL_SD_CARD = 1002;
+
+
+	PreferenceCategory qrCodeCategory;
+	SwitchPreference qrCodeAutoAcceptSwitch;
+	TwoLineCheckPreference qrCodeAutoAcceptCheck;
 
 	PreferenceScreen preferenceScreen;
 
@@ -208,6 +221,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 	boolean askMe = false;
 	boolean fileNames = false;
 	boolean advancedDevices = false;
+	boolean autoAccept;
 	
 	DatabaseHandler dbH;
 	
@@ -236,6 +250,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 	public int numberOfClicksSDK = 0;
 	public int numberOfClicksKarere = 0;
 	public int numberOfClicksAppVersion = 0;
+	ListView listView;
 	
 	@Override
     public void onCreate(Bundle savedInstanceState) {
@@ -253,8 +268,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 		prefs = dbH.getPreferences();
 		chatSettings = dbH.getChatSettings();
 		
-		super.onCreate(savedInstanceState);	
-        
+		super.onCreate(savedInstanceState);
         addPreferencesFromResource(R.xml.preferences);
 
 		preferenceScreen = (PreferenceScreen) findPreference("general_preference_screen");
@@ -268,6 +282,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 		advancedFeaturesCategory = (PreferenceCategory) findPreference(CATEGORY_ADVANCED_FEATURES);
 		autoawayChatCategory = (PreferenceCategory) findPreference(CATEGORY_AUTOAWAY_CHAT);
 		persistenceChatCategory = (PreferenceCategory) findPreference(CATEGORY_PERSISTENCE_CHAT);
+		qrCodeCategory = (PreferenceCategory) findPreference(CATEGORY_QR_CODE);
 
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 			pinLockEnableSwitch = (SwitchPreference) findPreference(KEY_PIN_LOCK_ENABLE);
@@ -278,6 +293,9 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 
 			autoAwaySwitch = (SwitchPreference) findPreference(KEY_AUTOAWAY_ENABLE);
 			autoAwaySwitch.setOnPreferenceClickListener(this);
+
+			qrCodeAutoAcceptSwitch = (SwitchPreference) findPreference(KEY_QR_CODE_AUTO_ACCEPT);
+			qrCodeAutoAcceptSwitch.setOnPreferenceClickListener(this);
 		}
 		else{
 			pinLockEnableCheck = (TwoLineCheckPreference) findPreference(KEY_PIN_LOCK_ENABLE);
@@ -288,6 +306,9 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 
 			autoAwayCheck = (TwoLineCheckPreference) findPreference(KEY_AUTOAWAY_ENABLE);
 			autoAwayCheck.setOnPreferenceClickListener(this);
+
+			qrCodeAutoAcceptCheck = (TwoLineCheckPreference) findPreference(KEY_QR_CODE_AUTO_ACCEPT);
+			qrCodeAutoAcceptCheck.setOnPreferenceClickListener(this);
 		}
 
 		chatAttachmentsChatListPreference = (ListPreference) findPreference("settings_chat_send_originals");
@@ -996,6 +1017,39 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 		log("Value of useHttpsOnly: "+useHttpsOnlyValue);
 
 		useHttpsOnly.setChecked(useHttpsOnlyValue);
+
+		megaApi.getContactLinksOption(this);
+	}
+
+	@Override
+	public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+		super.onViewCreated(view, savedInstanceState);
+		log("onViewCreated");
+		if (((ManagerActivityLollipop) context).openSettingsStorage) {
+			listView = (ListView) view.findViewById(android.R.id.list);
+			goToCategoryStorage();
+		}
+	}
+
+	public void goToCategoryStorage(){
+		log("goToCategoryStorage");
+		for (int i=0; i<getPreferenceScreen().getPreferenceCount(); i++){
+			String key = getPreferenceScreen().getPreference(i).getKey();
+			if (key.equals(storageCategory.getKey())){
+				((ManagerActivityLollipop) context).openSettingsStorage = false;
+				listView.clearFocus();
+				final int finalI = i;
+				listView.postDelayed(new Runnable() {
+					@Override
+					public void run() {
+//						listView.requestFocusFromTouch();
+						listView.setSelection(finalI+8);
+//						listView.requestFocus();
+					}
+				}, 200);
+				break;
+			}
+		}
 	}
 
 	@Override
@@ -1874,6 +1928,14 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			log("Cancel account preference");
 			((ManagerActivityLollipop)context).askConfirmationDeleteAccount();
 		}
+		else if (preference.getKey().compareTo(KEY_QR_CODE_AUTO_ACCEPT) == 0){
+			if (autoAccept){
+				megaApi.setContactLinksOption(true, this);
+			}
+			else {
+				megaApi.setContactLinksOption(false, this);
+			}
+		}
 		
 		return true;
 	}
@@ -2282,5 +2344,62 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 
 	private static void log(String log) {
 		Util.log("SettingsFragmentLollipop", log);
+	}
+
+	@Override
+	public void onRequestStart(MegaApiJava api, MegaRequest request) {
+
+	}
+
+	@Override
+	public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
+
+	}
+
+	@Override
+	public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
+	log("onRequestFinish  MegaRequest: "+request.getType());
+
+		if(request.getType()==MegaRequest.TYPE_GET_ATTR_USER){
+			if (e.getErrorCode() == MegaError.API_OK){
+				autoAccept = request.getFlag();
+				log("OK GET ATTR USER: "+autoAccept);
+				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+					qrCodeAutoAcceptSwitch.setChecked(autoAccept);
+				}
+				else{
+					qrCodeAutoAcceptCheck.setChecked(autoAccept);
+				}
+			}
+			else if (e.getErrorCode() == MegaError.API_ENOENT){
+				log("Error getContactLinkOption");
+			}
+		}
+		if (request.getType()==MegaRequest.TYPE_SET_ATTR_USER){
+			if (e.getErrorCode() == MegaError.API_OK){
+				log("OK SET ATTR USER: "+request.getText());
+
+				if (autoAccept){
+					autoAccept = false;
+				}
+				else{
+					autoAccept = true;
+				}
+				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+					qrCodeAutoAcceptSwitch.setChecked(autoAccept);
+				}
+				else{
+					qrCodeAutoAcceptCheck.setChecked(autoAccept);
+				}
+			}
+			else{
+				log("Error setContactLinkOption");
+			}
+		}
+	}
+
+	@Override
+	public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) {
+
 	}
 }

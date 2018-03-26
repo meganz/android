@@ -122,6 +122,7 @@ import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.components.EditTextCursorWatcher;
 import mega.privacy.android.app.components.RoundedImageView;
+import mega.privacy.android.app.fcm.AdvancedNotificationBuilder;
 import mega.privacy.android.app.lollipop.adapters.CloudDrivePagerAdapter;
 import mega.privacy.android.app.lollipop.adapters.ContactsPageAdapter;
 import mega.privacy.android.app.lollipop.adapters.MyAccountPageAdapter;
@@ -158,6 +159,8 @@ import mega.privacy.android.app.lollipop.megachat.BadgeDrawerArrowDrawable;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.lollipop.megachat.RecentChatsFragmentLollipop;
+import mega.privacy.android.app.lollipop.qrcode.QRCodeActivity;
+import mega.privacy.android.app.lollipop.qrcode.ScanCodeFragment;
 import mega.privacy.android.app.lollipop.tasks.CheckOfflineNodesTask;
 import mega.privacy.android.app.lollipop.tasks.FilePrepareTask;
 import mega.privacy.android.app.lollipop.tasks.FillDBContactsTask;
@@ -213,6 +216,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			NodeOptionsBottomSheetDialogFragment.CustomHeight, ContactsBottomSheetDialogFragment.CustomHeight{
 
 	public int accountFragment;
+
+	private long handleInviteContact = 0;
 
 	public ArrayList<Integer> transfersInProgress;
 	public MegaTransferData transferData;
@@ -305,6 +310,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
     DrawerLayout drawerLayout;
 
     public boolean openFolderFromSearch = false;
+
+    public boolean openSettingsStorage = false;
 
 	public enum DrawerItem {
 		CLOUD_DRIVE, SAVED_FOR_OFFLINE, CAMERA_UPLOADS, INBOX, SHARED_ITEMS, CONTACTS, SETTINGS, ACCOUNT, SEARCH, TRANSFERS, MEDIA_UPLOADS, CHAT;
@@ -506,6 +513,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	private MenuItem newChatMenuItem;
 	private MenuItem setStatusMenuItem;
 	private MenuItem clearCompletedTransfers;
+	private MenuItem scanQRcode;
 
 	int fromTakePicture = -1;
 
@@ -1352,6 +1360,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 		handler = new Handler();
 
+		Bundle bundle = getIntent().getExtras();
+		if (bundle != null) {
+			drawerItem = (DrawerItem) bundle.getSerializable("drawerItem");
+		}
+
 		log("Set view");
 		setContentView(R.layout.activity_manager);
 //		long num = 11179220468180L;
@@ -1612,6 +1625,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		if (rootNode == null){
 			log("Root node is NULL");
 			 if (getIntent() != null){
+			 	log("Action: "+getIntent().getAction());
 				if (getIntent().getAction() != null){
 					if (getIntent().getAction().equals(Constants.ACTION_IMPORT_LINK_FETCH_NODES)){
 						Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
@@ -1733,6 +1747,23 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						startActivity(intent);
 						finish();
 						return;
+					}
+					else if (getIntent().getAction().equals(Constants.ACTION_INVITE_CONTACT)){
+						log("Login loin");
+						handleInviteContact = getIntent().getLongExtra("handle", 0);
+						if (handleInviteContact != 0){
+							Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
+							intent.putExtra("handle", handleInviteContact);
+							intent.putExtra("visibleFragment", Constants.LOGIN_FRAGMENT);
+							intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+							intent.setAction(Constants.ACTION_INVITE_CONTACT);
+							startActivity(intent);
+							finish();
+							return;
+						}
+						else{
+							log("Error, no handle");
+						}
 					}
 				}
 			}
@@ -2018,6 +2049,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						getIntent().setAction(null);
 						setIntent(null);
 					}
+					else if (getIntent().getAction().equals(Constants.ACTION_SHOW_SETTINGS_STORAGE)) {
+						log("ACTION_SHOW_SETTINGS_STORAGE");
+						selectDrawerItemPending=false;
+						moveToSettingsSectionStorage();
+						getIntent().setAction(null);
+						setIntent(null);
+					}
 					else if(getIntent().getAction().equals(Constants.ACTION_INCOMING_SHARED_FOLDER_NOTIFICATION)){
 						log("IPC link - go to received request in Contacts");
 						drawerItem=DrawerItem.SHARED_ITEMS;
@@ -2103,6 +2141,17 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					else if (getIntent().getAction().equals(Constants.ACTION_IMPORT_LINK_FETCH_NODES)){
 						getIntent().setAction(null);
 						setIntent(null);
+					}
+					else if (getIntent().getAction().equals(Constants.ACTION_INVITE_CONTACT)){
+						handleInviteContact = getIntent().getLongExtra("handle", 0);
+						if (handleInviteContact != 0){
+							drawerItem = DrawerItem.CONTACTS;
+							indexContacts = 0;
+							selectDrawerItemLollipop(drawerItem);
+						}
+						else{
+							log("Error, no handle");
+						}
 					}
 				}
 	        }
@@ -2308,14 +2357,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
     	super.onPostResume();
 
 		((MegaApplication) getApplication()).sendSignalPresenceActivity();
-
-		try {
-			NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-			notificationManager.cancelAll();
-		}
-		catch (Exception e){
-			log("Exception NotificationManager - remove all notifications");
-		}
 
 		if (isSearching){
 			selectDrawerItemLollipop(DrawerItem.SEARCH);
@@ -2547,6 +2588,18 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					indexShares = 0;
 					selectDrawerItemLollipop(drawerItem);
 				}
+				else if(getIntent().getAction().equals(Constants.ACTION_INVITE_CONTACT)){
+					log("onPostResume: ACTION_INVITE_CONTACT");
+					handleInviteContact = getIntent().getLongExtra("handle", 0);
+					if (handleInviteContact != 0){
+						drawerItem = DrawerItem.CONTACTS;
+						indexContacts = 0;
+						selectDrawerItemLollipop(drawerItem);
+					}
+					else{
+						log("Error, no handle");
+					}
+				}
 
     			intent.setAction(null);
 				setIntent(null);
@@ -2563,6 +2616,17 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	    		}
 	    		case SHARED_ITEMS:{
 	    			log("onPostResume: case SHARED ITEMS");
+
+					try {
+						NotificationManager notificationManager =
+								(NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+						notificationManager.cancel(Constants.NOTIFICATION_PUSH_CLOUD_DRIVE);
+					}
+					catch (Exception e){
+						log("Exception NotificationManager - remove contact notification");
+					}
+
 					setToolbarTitle();
 					log("onPostResume: shared tabs visible");
 					tabLayoutShares.setVisibility(View.VISIBLE);
@@ -2575,6 +2639,17 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					break;
 				}
 				case CONTACTS:{
+
+					try {
+						NotificationManager notificationManager =
+								(NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+						notificationManager.cancel(Constants.NOTIFICATION_PUSH_CONTACT);
+					}
+					catch (Exception e){
+						log("Exception NotificationManager - remove contact notification");
+					}
+
 					setToolbarTitle();
 					break;
 				}
@@ -2583,6 +2658,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					break;
 				}
 				case CHAT:{
+
 					if (nV != null){
 						Menu nVMenu = nV.getMenu();
 						resetNavigationViewMenu(nVMenu);
@@ -2597,6 +2673,19 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 							rChatFL.setStatus();
 						}
 					}
+					break;
+				}
+				case ACCOUNT:{
+					setToolbarTitle();
+
+					try {
+						NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+						notificationManager.cancel(Constants.NOTIFICATION_STORAGE_OVERQUOTA);
+					}
+					catch (Exception e){
+						log("Exception NotificationManager - remove all notifications");
+					}
+
 					break;
 				}
     		}
@@ -3881,6 +3970,16 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		log("selectDrawerItemSharedItems");
 		tB.setVisibility(View.VISIBLE);
 
+		try {
+			NotificationManager notificationManager =
+					(NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+			notificationManager.cancel(Constants.NOTIFICATION_PUSH_CLOUD_DRIVE);
+		}
+		catch (Exception e){
+			log("Exception NotificationManager - remove contact notification");
+		}
+
 		tabLayoutContacts.setVisibility(View.GONE);
 		viewPagerContacts.setVisibility(View.GONE);
 		tabLayoutCloud.setVisibility(View.GONE);
@@ -3937,6 +4036,16 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	public void selectDrawerItemContacts (){
 		log("selectDrawerItemContacts");
 		tB.setVisibility(View.VISIBLE);
+
+		try {
+			NotificationManager notificationManager =
+					(NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+			notificationManager.cancel(Constants.NOTIFICATION_PUSH_CONTACT);
+		}
+		catch (Exception e){
+			log("Exception NotificationManager - remove contact notification");
+		}
 
 		if (aB == null){
 			aB = getSupportActionBar();
@@ -4002,7 +4111,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				}
 			}
 		}
-		else{
+		else {
 			log("contactsPageAdapter NOT null");
 			String sharesTag = getFragmentTag(R.id.contact_tabs_pager, 0);
 			cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(sharesTag);
@@ -4301,6 +4410,18 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	public void selectDrawerItemChat(){
 		log("selectDrawerItemChat");
 
+		((MegaApplication)getApplication()).setRecentChatVisible(true);
+
+		try {
+			AdvancedNotificationBuilder notificationBuilder;
+			notificationBuilder =  AdvancedNotificationBuilder.newInstance(this, megaApi, megaChatApi);
+
+			notificationBuilder.removeAllChatNotifications();
+		}
+		catch (Exception e){
+			log("Exception NotificationManager - remove all notifications");
+		}
+
 		MegaNode parentNode = megaApi.getNodeByPath("/"+Constants.CHAT_FOLDER);
 		if(parentNode == null){
 			log("Create folder: "+Constants.CHAT_FOLDER);
@@ -4360,6 +4481,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	@SuppressLint("NewApi")
 	public void selectDrawerItemLollipop(DrawerItem item){
     	log("selectDrawerItemLollipop: "+item);
+
+		((MegaApplication)getApplication()).setRecentChatVisible(false);
 
     	switch (item){
 			case CLOUD_DRIVE:{
@@ -4625,7 +4748,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
     				getSupportFragmentManager().beginTransaction().remove(currentFragment).commitNow();
     			}
 
-				if(sttFLol==null){
+    			if (sttFLol != null){
+					if (openSettingsStorage){
+						sttFLol.goToCategoryStorage();
+					}
+				}
+				else {
 					sttFLol = new SettingsFragmentLollipop();
 				}
 
@@ -4700,6 +4828,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	}
 
 	public void moveToSettingsSection(){
+		drawerItem=DrawerItem.SETTINGS;
+		selectDrawerItemLollipop(drawerItem);
+	}
+
+	public void moveToSettingsSectionStorage(){
+		openSettingsStorage = true;
 		drawerItem=DrawerItem.SETTINGS;
 		selectDrawerItemLollipop(drawerItem);
 	}
@@ -4996,6 +5130,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		pauseTransfersMenuIcon = menu.findItem(R.id.action_pause);
 		cancelAllTransfersMenuItem.setVisible(false);
 		clearCompletedTransfers.setVisible(false);
+		scanQRcode = menu.findItem(R.id.action_scan_qr);
+		scanQRcode.setVisible(false);
 
 		changePass = menu.findItem(R.id.action_menu_change_pass);
 
@@ -5560,6 +5696,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					thumbViewMenuItem.setVisible(true);
 					upgradeAccountMenuItem.setVisible(true);
 					searchMenuItem.setVisible(true);
+					scanQRcode.setVisible(true);
 
 					if (cFLol != null) {
 						if(cFLol.getItemCount()>0){
@@ -5569,6 +5706,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						else{
 							selectMenuItem.setVisible(false);
 							sortByMenuItem.setVisible(false);
+						}
+						if (handleInviteContact != 0) {
+							cFLol.invite(handleInviteContact);
+							handleInviteContact = 0;
 						}
 					}
 					else{
@@ -5614,6 +5755,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					//Show
 					addContactMenuItem.setVisible(true);
 					upgradeAccountMenuItem.setVisible(true);
+					scanQRcode.setVisible(true);
 
 					if (sRFLol != null) {
 						if(sRFLol.getItemCount()>0){
@@ -5694,6 +5836,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					killAllSessions.setVisible(false);
 					logoutMenuItem.setVisible(false);
 					forgotPassMenuItem.setVisible(false);
+					scanQRcode.setVisible(false);
 				}
 			}
 			else if (drawerItem == DrawerItem.SEARCH){
@@ -7633,6 +7776,15 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				if(maFLol!=null){
 					showConfirmationResetPasswordFromMyAccount();
 				}
+				return true;
+			}
+			case R.id.action_scan_qr: {
+				log("action menu scan QR code pressed");
+				ScanCodeFragment fragment = new ScanCodeFragment();
+				getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fragment).commit();
+				Intent intent = new Intent(this, QRCodeActivity.class);
+				intent.putExtra("contacts", true);
+				startActivity(intent);
 				return true;
 			}
             default:{
@@ -11635,11 +11787,17 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				File imgFile = new File(filePath);
 
 				String newPath = null;
+				File qrFile = null;
 				if (getExternalCacheDir() != null){
 					newPath = getExternalCacheDir().getAbsolutePath() + "/" + myEmail + "Temp.jpg";
+					qrFile = new File(getExternalCacheDir().getAbsolutePath(), myEmail + "QRcode.jpg");
 				}else{
 					log("getExternalCacheDir() is NULL");
 					newPath = getCacheDir().getAbsolutePath() + "/" + myEmail + "Temp.jpg";
+					qrFile = new File(getCacheDir().getAbsolutePath(), myEmail + "QRcode.jpg");
+				}
+				if (qrFile.exists()) {
+					qrFile.delete();
 				}
 
 				if(newPath!=null) {
@@ -12300,12 +12458,19 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						File imgFile = new File(avatarPath);
 //						String name = Util.getPhotoSyncName(imgFile.lastModified(), imgFile.getAbsolutePath());
 						String newPath = null;
+						File qrFile = null;
 						if (getExternalCacheDir() != null){
 							newPath = getExternalCacheDir().getAbsolutePath() + "/" + myAccountInfo.getMyUser().getEmail() + "Temp.jpg";
+							qrFile = new File(getExternalCacheDir().getAbsolutePath(), myAccountInfo.getMyUser().getEmail() + "QRcode.jpg");
 						}
 						else{
 							log("getExternalCacheDir() is NULL");
 							newPath = getCacheDir().getAbsolutePath() + "/" + myAccountInfo.getMyUser().getEmail() + "Temp.jpg";
+							qrFile = new File(getCacheDir().getAbsolutePath(), myAccountInfo.getMyUser().getEmail() + "QRcode.jpg");
+						}
+
+						if (qrFile.exists()) {
+							qrFile.delete();
 						}
 
 						if(newPath!=null){
