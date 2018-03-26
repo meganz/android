@@ -163,7 +163,7 @@ public final class AdvancedNotificationBuilder {
     }
 
     public void sendBundledNotification(Uri uriParameter, String vibration, long chatId, MegaChatMessage msg) {
-
+        log("(1) sendBundledNotification");
         String messageContent = "";
 
         if(msg.getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT){
@@ -194,6 +194,7 @@ public final class AdvancedNotificationBuilder {
 
         }
         else if(msg.getType()==MegaChatMessage.TYPE_TRUNCATE){
+            log("Type TRUNCATE message");
             messageContent = context.getString(R.string.history_cleared_message);
         }
         else{
@@ -204,7 +205,7 @@ public final class AdvancedNotificationBuilder {
     }
 
     public void sendBundledNotification(Uri uriParameter, String vibration, long chatId, long msgId, String msgContent, long msgUserHandle) {
-
+        log("sendBundledNotification: "+msgUserHandle+"_"+msgContent+"_"+msgId);
         MegaChatRoom chat = megaChatApi.getChatRoom(chatId);
 
         log("SDK android version: "+Build.VERSION.SDK_INT);
