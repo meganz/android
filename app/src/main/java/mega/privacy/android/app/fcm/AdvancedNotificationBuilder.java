@@ -125,7 +125,7 @@ public final class AdvancedNotificationBuilder {
     }
 
     public void removeSeenNotification(long chatId, MegaChatMessage msg){
-        log("removeNotification");
+        log("removeSeenNotification");
         MegaChatRoom chat = megaChatApi.getChatRoom(chatId);
 
         String notificationExists = getNotificationIdByChatHandleAndMessageId(chat.getChatId(), msg.getMsgId());
@@ -826,7 +826,10 @@ public final class AdvancedNotificationBuilder {
         String chatString = MegaApiJava.userHandleToBase64(chatHandle);
 
         String id = sharedPreferences.getString(chatString, "-1");
-        return id;
+        if(id!=null && (!id.equals("-1")))
+            return chatString;
+        else
+            return null;
     }
 
     public String getNotificationIdByChatHandleAndMessageId(long chatHandle, long messageId) {
@@ -835,7 +838,7 @@ public final class AdvancedNotificationBuilder {
 
         String id = sharedPreferences.getString(chatString, "-1");
         if(id.equals(messageString))
-            return id;
+            return chatString;
         else
             return null;
 
