@@ -894,8 +894,6 @@ public class NodeController {
                             File pdfFile = new File(localPath);
 
                             Intent pdfIntent = new Intent(context, PdfViewerActivityLollipop.class);
-                            pdfIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                            pdfIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
                             pdfIntent.putExtra("APP", true);
                             pdfIntent.putExtra("HANDLE", tempNode.getHandle());
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && pdfFile.getAbsolutePath().contains(Environment.getExternalStorageDirectory().getPath())) {

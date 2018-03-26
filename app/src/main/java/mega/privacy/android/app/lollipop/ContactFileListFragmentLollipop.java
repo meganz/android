@@ -37,10 +37,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.File;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
 
@@ -61,7 +58,6 @@ import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
-import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaUser;
 
 
@@ -743,8 +739,6 @@ public class ContactFileListFragmentLollipop extends Fragment{
 					log("FILENAME: " + file.getName() + "TYPE: "+mimeType);
 
 					Intent pdfIntent = new Intent(context, PdfViewerActivityLollipop.class);
-					pdfIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-					pdfIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
 					pdfIntent.putExtra("APP", true);
 					String localPath = Util.getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
 					if (localPath != null){
