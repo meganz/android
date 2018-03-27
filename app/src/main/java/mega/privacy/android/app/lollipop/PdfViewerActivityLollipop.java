@@ -362,6 +362,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
             setIntent(intent);
             if (!intent.getBooleanExtra("isUrl", true)){
                 isUrl = false;
+                uri = intent.getData();
                 invalidateOptionsMenu();
             }
         }
