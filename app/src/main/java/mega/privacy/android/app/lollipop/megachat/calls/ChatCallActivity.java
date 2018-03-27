@@ -116,7 +116,6 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
     public static int REMOTE_VIDEO_ENABLED = 1;
     public static int REMOTE_VIDEO_DISABLED = 0;
 
-
     private LocalCameraCallFragment localCameraFragment;
     private LocalCameraCallFullScreenFragment localCameraFragmentFS = null;
 
@@ -280,6 +279,38 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
 //            }
 //        }
         return super.onOptionsItemSelected(item);
+    }
+
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        log("onNewIntent");
+
+        Bundle extras = getIntent().getExtras();
+        if (extras != null) {
+            long newChatId = extras.getLong("chatHandle", -1);
+            if(chatId==newChatId){
+                log("Its the same call");
+            }
+            else{
+
+            }
+//            log("Chat handle to call: " + chatId);
+//            if (chatId != -1) {
+//                chat = megaChatApi.getChatRoom(chatId);
+//                callChat = megaChatApi.getChatCall(chatId);
+//                if (callChat == null) {
+//                    megaChatApi.removeChatCallListener(this);
+//                    MegaApplication.activityPaused();
+//                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+//                        super.finishAndRemoveTask();
+//                    } else {
+//                        super.finish();
+//                    }
+//                    return;
+//                }
+//
+//            }
+        }
     }
 
     @Override
@@ -493,6 +524,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                     return;
                 }
 
+                log("Start call Service");
                 Intent intentService = new Intent(this, CallService.class);
                 intentService.putExtra("chatHandle", callChat.getChatid());
                 this.startService(intentService);
@@ -555,6 +587,8 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                     setProfileMyAvatar();
                     flagContactAvatar = true;
                     setProfileContactAvatar();
+
+                    stopAudioSignals();
 
                     updateLocalVideoStatus();
                     updateLocalAudioStatus();
@@ -1047,18 +1081,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
 
                     showInitialFABConfiguration();
                     startClock();
-                    if(callChat.hasRemoteAudio()){
-                        log("Remote audio is connected");
-                    }
-                    else{
-                        log("Remote audio is NOT connected");
-                    }
-                    if(callChat.hasRemoteVideo()){
-                        log("Remote video is connected");
-                    }
-                    else{
-                        log("Remote video is NOT connected");
-                    }
+
                     break;
                 }
                 case MegaChatCall.CALL_STATUS_DESTROYED:{
