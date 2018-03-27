@@ -333,7 +333,8 @@
 
         <activity
             android:name="mega.privacy.android.app.lollipop.PdfViewerActivityLollipop"
-            android:label="@string/pdf_app_name">
+            android:label="@string/pdf_app_name"
+            android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
