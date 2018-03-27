@@ -1785,5 +1785,12 @@
     <string name="messages_forwarded_success" context="Alert message after forwarding one or several messages to several chats">Messages forwarded</string>
     <string name="messages_forwarded_error" context="Error message after forwarding one or several messages to several chats">Error. Not correctly forwarded</string>
 
+    <string name="turn_on_notifications_title" context="The title of fragment Turn on Notifications">Turn on Notifications</string>
+    <string name="turn_on_notifications_subtitle" context="The subtitle of fragment Turn on Notifications">This way, you will see new messages\non your Android phone instantly.</string>
+    <string name="turn_on_notifications_first_step" context="First step to turn on notifications">Open Android phone</string>
+    <string name="turn_on_notifications_second_step" context="Second step to turn on notifications">Apps &amp; notifications</string>
+    <string name="turn_on_notifications_fourth_step" context="Fourth step to turn on notifications">App notifications</string>
+    <string name="turn_on_notifications_fifth_step" context="Fifth step to turn on notifications">Switch to On and select your preferences</string>
+
 </resources>
 
