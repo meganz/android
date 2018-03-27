@@ -33,6 +33,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -526,6 +527,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         RelativeLayout errorUploadingPortrait;
         RelativeLayout errorUploadingLandscape;
 
+        LinearLayout newMessagesLayout;
+
         TextView retryAlert;
         ImageView triangleIcon;
 
@@ -638,6 +641,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.dateLayout.setLayoutParams(dateLayoutParams);
 
             holder.dateText = (TextView) v.findViewById(R.id.message_chat_date_text);
+
+            holder.newMessagesLayout = (LinearLayout) v.findViewById(R.id.message_chat_new_relative_layout);
 
             //Own messages
             holder.ownMessageLayout = (RelativeLayout) v.findViewById(R.id.message_chat_own_message_layout);
@@ -999,6 +1004,15 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         }
     }
 
+    public void markAsSeen(MegaChatMessage msg){
+        log("markAsSeen");
+        if(((ChatActivityLollipop)context).activityVisible){
+            if(msg.getStatus()!=MegaChatMessage.STATUS_SEEN) {
+                megaChatApi.setMessageSeen(chatRoom.getChatId(), msg.getMsgId());
+            }
+        }
+    }
+
     public void onBindViewHolderMessage(RecyclerView.ViewHolder holder, int position) {
         log("onBindViewHolderMessage: " + position);
 
@@ -1176,6 +1190,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             }
             else{
                 log("CONTACT Message type ALTER PARTICIPANTS");
+
+                markAsSeen((message));
 
                 int privilege = message.getPrivilege();
                 log("Privilege of the user: "+privilege);
@@ -1404,6 +1420,9 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             log("PRIVILEGE CHANGE message");
             if(message.getHandleOfAction()==myUserHandle){
                 log("a moderator change my privilege");
+
+                markAsSeen((message));
+
                 int privilege = message.getPrivilege();
                 log("Privilege of the user: "+privilege);
 
@@ -2632,6 +2651,10 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             }else{
                 long userHandle = message.getUserHandle();
                 log("Contact message!!: "+userHandle);
+                String contentonBind = message.getContent();
+                log("Content onBind: "+contentonBind);
+
+                markAsSeen((message));
 
                 if(((ChatActivityLollipop) context).isGroup()){
 
@@ -3473,6 +3496,21 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 //        RelativeLayout.LayoutParams ownMessageParams = (RelativeLayout.LayoutParams)((ViewHolderMessageChat)holder).contentOwnMessageText.getLayoutParams();
 //        ownMessageParams.setMargins(Util.scaleWidthPx(11, outMetrics), Util.scaleHeightPx(-14, outMetrics), Util.scaleWidthPx(62, outMetrics), Util.scaleHeightPx(16, outMetrics));
 //        ((ViewHolderMessageChat)holder).contentOwnMessageText.setLayoutParams(ownMessageParams);
+
+        if(((ChatActivityLollipop)context).lastMessageSeen!=null){
+
+
+            if(((ChatActivityLollipop)context).lastMessageSeen.getMsgId() == message.getMsgId()){
+                ((ViewHolderMessageChat)holder).newMessagesLayout.setVisibility(View.VISIBLE);
+                ((ChatActivityLollipop)context).lastMessageSeen = null;
+            }
+            else{
+                ((ViewHolderMessageChat)holder).newMessagesLayout.setVisibility(View.GONE);
+            }
+        }
+        else{
+            ((ViewHolderMessageChat)holder).newMessagesLayout.setVisibility(View.GONE);
+        }
     }
 
     public void setUserAvatar(ViewHolderMessageChat holder, MegaChatMessage message){
