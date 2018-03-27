@@ -903,6 +903,9 @@ public class NodeController {
                                 pdfIntent.setDataAndType(Uri.fromFile(pdfFile), MimeTypeList.typeForName(tempNode.getName()).getType());
                             }
                             pdfIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                            pdfIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                            pdfIntent.putExtra("inside", true);
+                            pdfIntent.putExtra("isUrl", false);
                             context.startActivity(pdfIntent);
                         }
                         else if (MimeTypeList.typeForName(tempNode.getName()).isVideo()) {
@@ -918,6 +921,7 @@ public class NodeController {
                                 videoIntent.setDataAndType(Uri.fromFile(videoFile), MimeTypeList.typeForName(tempNode.getName()).getType());
                             }
                             videoIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                            videoIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                             context.startActivity(videoIntent);
                         }
                         else if (MimeTypeList.typeForName(tempNode.getName()).isAudio()) {
@@ -933,6 +937,7 @@ public class NodeController {
                                 audioIntent.setDataAndType(Uri.fromFile(audioFile), MimeTypeList.typeForName(tempNode.getName()).getType());
                             }
                             audioIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                            audioIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                             context.startActivity(audioIntent);
                         }
                         else {
