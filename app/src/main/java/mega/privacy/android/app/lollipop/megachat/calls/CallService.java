@@ -72,7 +72,6 @@ public class CallService extends Service implements MegaChatCallListenerInterfac
     public int onStartCommand(Intent intent, int flags, int startId) {
         log("onStartCommand");
 
-
         if(intent == null){
             stopSelf();
         }
@@ -91,6 +90,7 @@ public class CallService extends Service implements MegaChatCallListenerInterfac
     public void onChatCallUpdate(MegaChatApiJava api, MegaChatCall call) {
 
         if(call.getStatus()==MegaChatCall.CALL_STATUS_DESTROYED){
+            log("Destroy call Service");
             stopForeground(true);
             mNotificationManager.cancel(Constants.NOTIFICATION_CALL_IN_PROGRESS);
             stopSelf();
