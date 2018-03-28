@@ -7,6 +7,7 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.net.wifi.WifiManager;
 import android.net.wifi.WifiManager.WifiLock;
@@ -1059,10 +1060,9 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 					resultFile.setExecutable(true, false);
 
 					String filePath = transfer.getPath();
-
+					File f = new File(filePath);
 					try {
 						Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-						File f = new File(filePath);
 						Uri contentUri;
 						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
 							contentUri = FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", f);
@@ -1072,6 +1072,17 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 						mediaScanIntent.setData(contentUri);
 						mediaScanIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 						this.sendBroadcast(mediaScanIntent);
+					}
+					catch (Exception e){}
+
+					try {
+						MediaScannerConnection.scanFile(getApplicationContext(), new String[]{
+								f.getAbsolutePath()}, null, new MediaScannerConnection.OnScanCompletedListener() {
+							@Override
+							public void onScanCompleted(String path, Uri uri) {
+								log("File was scanned successfully");
+							}
+						});
 					}
 					catch (Exception e){}
 
