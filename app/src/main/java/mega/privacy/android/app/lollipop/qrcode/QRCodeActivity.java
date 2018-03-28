@@ -132,6 +132,7 @@ public class QRCodeActivity extends PinActivityLollipop implements MegaRequestLi
                 }
                 else {
                     qrCodeFragment = 1;
+                    ScanCodeFragment.scannerView.setAutoFocus(true);
                     ScanCodeFragment.scannerView.startCamera();
                     scanCodeFragment = (ScanCodeFragment) qrCodePageAdapter.instantiateItem(viewPagerQRCode, 1);
                 }
@@ -194,6 +195,7 @@ public class QRCodeActivity extends PinActivityLollipop implements MegaRequestLi
             }
         }
         if (contacts) {
+            ScanCodeFragment.scannerView.setAutoFocus(true);
             ScanCodeFragment.scannerView.startCamera();
         }
 
