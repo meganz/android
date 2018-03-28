@@ -46,6 +46,7 @@ import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatNotificationListenerInterface;
 import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaChatRequestListenerInterface;
+import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaEvent;
@@ -904,6 +905,18 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 		log("showChatNotification");
 
 		chatNotificationReceived = true;
+
+		MegaChatRoom chat = megaChatApi.getChatRoom(chatid);
+		if(chat!=null){
+			int unread = chat.getUnreadCount();
+			//Add Android version check if needed
+			if(unread==0){
+				//Remove badge indicator - no unread chats
+			}
+			else{
+				//Show badge with indicator = unread
+			}
+		}
 
 		if(openChatId == chatid){
 			log("Do not show notification - opened chat");
