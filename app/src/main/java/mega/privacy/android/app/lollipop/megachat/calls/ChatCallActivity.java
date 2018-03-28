@@ -292,7 +292,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                 log("Its the same call");
             }
             else{
-
+                log("New intent to the activity with a new chatId");
             }
 //            log("Chat handle to call: " + chatId);
 //            if (chatId != -1) {
