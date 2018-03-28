@@ -17,6 +17,7 @@ import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Typeface;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.Snackbar;
@@ -290,14 +291,27 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener, Me
         c.drawRect(3*resize, 28.5f*resize, 11.5f*resize, 37*resize, paint);
 
         paint.setColor(color);
-        c.drawRoundRect(3.75f*resize, 3.75f*resize, 10.75f*resize, 10.75f*resize, 30, 30, paint);
-        c.drawRoundRect(29.25f*resize, 3.75f*resize, 36.25f*resize, 10.75f*resize, 30, 30, paint);
-        c.drawRoundRect(3.75f*resize, 29.25f*resize, 10.75f*resize, 36.25f*resize, 30, 30, paint);
 
-        paint.setColor(WHITE);
-        c.drawRoundRect(4.75f*resize, 4.75f*resize, 9.75f*resize, 9.75f*resize, 25, 25, paint);
-        c.drawRoundRect(30.25f*resize, 4.75f*resize, 35.25f*resize, 9.75f*resize, 25, 25, paint);
-        c.drawRoundRect(4.75f*resize, 30.25f*resize, 9.75f*resize, 35.25f*resize, 25, 25, paint);
+        if (Build.VERSION.SDK_INT >= 21) {
+            c.drawRoundRect(3.75f * resize, 3.75f * resize, 10.75f * resize, 10.75f * resize, 30, 30, paint);
+            c.drawRoundRect(29.25f * resize, 3.75f * resize, 36.25f * resize, 10.75f * resize, 30, 30, paint);
+            c.drawRoundRect(3.75f * resize, 29.25f * resize, 10.75f * resize, 36.25f * resize, 30, 30, paint);
+
+            paint.setColor(WHITE);
+            c.drawRoundRect(4.75f * resize, 4.75f * resize, 9.75f * resize, 9.75f * resize, 25, 25, paint);
+            c.drawRoundRect(30.25f * resize, 4.75f * resize, 35.25f * resize, 9.75f * resize, 25, 25, paint);
+            c.drawRoundRect(4.75f * resize, 30.25f * resize, 9.75f * resize, 35.25f * resize, 25, 25, paint);
+        }
+        else {
+            c.drawRoundRect(new RectF(3.75f * resize, 3.75f * resize, 10.75f * resize, 10.75f * resize), 30, 30, paint);
+            c.drawRoundRect(new RectF(29.25f * resize, 3.75f * resize, 36.25f * resize, 10.75f * resize), 30, 30, paint);
+            c.drawRoundRect(new RectF(3.75f * resize, 29.25f * resize, 10.75f * resize, 36.25f * resize), 30, 30, paint);
+
+            paint.setColor(WHITE);
+            c.drawRoundRect(new RectF(4.75f * resize, 4.75f * resize, 9.75f * resize, 9.75f * resize), 25, 25, paint);
+            c.drawRoundRect(new RectF(30.25f * resize, 4.75f * resize, 35.25f * resize, 9.75f * resize), 25, 25, paint);
+            c.drawRoundRect(new RectF(4.75f * resize, 30.25f * resize, 9.75f * resize, 35.25f * resize), 25, 25, paint);
+        }
 
         paint.setColor(color);
         c.drawCircle(7.25f*resize, 7.25f*resize, 17.5f, paint);
