@@ -3536,7 +3536,12 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         log("onMessageLoaded: Last message seen received!");
                         lastSeenReceived=true;
                         positionToScroll = 0;
+                        log("(1) positionToScroll: "+positionToScroll);
                     }
+                }
+                else{
+                    log("lastMessageSeen is NULL");
+                    lastSeenReceived=true;
                 }
 
 //                megaChatApi.setMessageSeen(idChat, msg.getMsgId());
@@ -3544,6 +3549,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 if(positionToScroll>=0){
                     log("onMessageLoaded: Position to scroll up!");
                     positionToScroll++;
+                    log("(2) positionToScroll: "+positionToScroll);
                 }
 
                 bufferMessages.add(androidMsg);
@@ -3589,9 +3595,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         log("onMessageLoaded: Scroll to position: "+positionToScroll);
                         if(positionToScroll<messages.size()){
                             log("onMessageLoaded: message position to scroll: "+positionToScroll);
-                            messages.get(positionToScroll).setInfoToShow(AndroidMegaChatMessage.CHAT_ADAPTER_SHOW_ALL);
-                            adapter.notifyItemChanged(positionToScroll+1);
-                            mLayoutManager.scrollToPositionWithOffset(positionToScroll+1,Util.scaleHeightPx(20, outMetrics));
+                            mLayoutManager.scrollToPositionWithOffset(positionToScroll+1,Util.scaleHeightPx(30, outMetrics));
                         }
                         else{
                             log("Error, the position to scroll is more than size of messages");
@@ -3600,24 +3604,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 }
             }
 
-            for(int k=0; k<messages.size();k++){
-                log("Message k "+k+" "+messages.get(k).getMessage().getContent()+" "+messages.get(k).getInfoToShow());
-            }
             getMoreHistory = true;
-
-            //Before loading pending message, mark the last one to seen
-//            log("Mark last message as seen");
-//            if(!messages.isEmpty()){
-//                AndroidMegaChatMessage lastSeen = messages.get(messages.size()-1);
-//                if(lastSeen!=null){
-//                    if(!lastSeen.isUploading()){
-//                        if(lastSeen.getMessage()!=null){
-//                            boolean markAsRead = megaChatApi.setMessageSeen(idChat, lastSeen.getMessage().getMsgId());
-//                            log("LOAD NULL - Result of markAsRead: "+markAsRead);
-//                        }
-//                    }
-//                }
-//            }
 
             //Load pending messages
             if(!pendingMessagesLoaded){
