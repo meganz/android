@@ -4830,6 +4830,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 //getFlag - Returns true if it is a video-audio call or false for audio call
                 Intent i = new Intent(this, ChatCallActivity.class);
                 i.putExtra("chatHandle", chatRoom.getChatId());
+                i.putExtra("callInitiator", true);
                 startActivity(i);
             }
             else{

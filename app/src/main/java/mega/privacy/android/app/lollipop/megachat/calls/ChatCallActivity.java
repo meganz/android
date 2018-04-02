@@ -128,6 +128,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
     boolean flagMyAvatar;
 
     long chatId;
+    boolean callInitiator;
     long callId;
     MegaChatRoom chat;
     MegaChatCall callChat;
@@ -508,10 +509,12 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
 
             //Contact's avatar
             chatId = extras.getLong("chatHandle", -1);
-            log("Chat handle to call: " + chatId);
+            callInitiator = extras.getBoolean("callInitiator", false);
+            log("Chat handle to call: " + chatId+ " initiator: "+callInitiator);
             if (chatId != -1) {
                 chat = megaChatApi.getChatRoom(chatId);
                 callChat = megaChatApi.getChatCall(chatId);
+
                 if (callChat == null){
                     megaChatApi.removeChatCallListener(this);
                     MegaApplication.activityPaused();
@@ -1047,78 +1050,83 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
     @Override
     public void onChatCallUpdate(MegaChatApiJava api, MegaChatCall call) {
         log("onChatCallUpdate: "+call.getStatus());
-        this.callChat = call;
-        if(callChat.hasChanged(MegaChatCall.CHANGE_TYPE_STATUS)){
-            int callStatus = callChat.getStatus();
-            switch (callStatus){
-                case MegaChatCall.CALL_STATUS_IN_PROGRESS:{
 
-                    videoFAB.setOnClickListener(null);
-                    answerCallFAB.setOnTouchListener(null);
-                    videoFAB.setOnTouchListener(null);
-                    videoFAB.setOnClickListener(this);
-                    flagMyAvatar = true;
-                    setProfileMyAvatar();
-                    flagContactAvatar = false;
-                    setProfileContactAvatar();
+        if(call.getChatid()==chatId){
+            this.callChat = call;
 
-                    if (localCameraFragmentFS != null) {
-                        localCameraFragmentFS.setVideoFrame(false);
-                        FragmentTransaction ftFS = getSupportFragmentManager().beginTransaction();
-                        ftFS.remove(localCameraFragmentFS);
-                        localCameraFragmentFS = null;
-                        contactAvatarLayout.setVisibility(View.VISIBLE);
-                        parentFS.setVisibility(View.GONE);
-                        fragmentContainerLocalCameraFS.setVisibility(View.GONE);
+            if(callChat.hasChanged(MegaChatCall.CHANGE_TYPE_STATUS)){
+                int callStatus = callChat.getStatus();
+                switch (callStatus){
+                    case MegaChatCall.CALL_STATUS_IN_PROGRESS:{
+
+                        videoFAB.setOnClickListener(null);
+                        answerCallFAB.setOnTouchListener(null);
+                        videoFAB.setOnTouchListener(null);
+                        videoFAB.setOnClickListener(this);
+                        flagMyAvatar = true;
+                        setProfileMyAvatar();
+                        flagContactAvatar = false;
+                        setProfileContactAvatar();
+
+                        if (localCameraFragmentFS != null) {
+                            localCameraFragmentFS.setVideoFrame(false);
+                            FragmentTransaction ftFS = getSupportFragmentManager().beginTransaction();
+                            ftFS.remove(localCameraFragmentFS);
+                            localCameraFragmentFS = null;
+                            contactAvatarLayout.setVisibility(View.VISIBLE);
+                            parentFS.setVisibility(View.GONE);
+                            fragmentContainerLocalCameraFS.setVisibility(View.GONE);
+                        }
+
+                        updateLocalVideoStatus();
+                        updateRemoteVideoStatus();
+
+                        stopAudioSignals();
+
+                        rtcAudioManager.start(null);
+
+                        showInitialFABConfiguration();
+                        startClock();
+
+                        break;
                     }
+                    case MegaChatCall.CALL_STATUS_DESTROYED:{
 
-                    updateLocalVideoStatus();
-                    updateRemoteVideoStatus();
+                        stopAudioSignals();
 
-                    stopAudioSignals();
+                        rtcAudioManager.stop();
+                        MegaApplication.activityPaused();
+                        log("TERM code of the call: "+call.getTermCode());
 
-                    rtcAudioManager.start(null);
-
-                    showInitialFABConfiguration();
-                    startClock();
-
-                    break;
-                }
-                case MegaChatCall.CALL_STATUS_DESTROYED:{
-
-                    stopAudioSignals();
-
-                    rtcAudioManager.stop();
-                    MegaApplication.activityPaused();
-                    log("TERM code of the call: "+call.getTermCode());
-                    if(call.getTermCode()==MegaChatCall.TERM_CODE_ANSWER_TIMEOUT){
-                        showMissedCallNotification();
+                        if((call.getTermCode()==MegaChatCall.TERM_CODE_ANSWER_TIMEOUT) && (!callInitiator)){
+                            showMissedCallNotification();
+                        }
+                        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                            super.finishAndRemoveTask();
+                        }
+                        else {
+                            super.finish();
+                        }
+                        break;
                     }
-                    if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                        super.finishAndRemoveTask();
-                    }
-                    else {
-                        super.finish();
-                    }
-                    break;
                 }
             }
-        }
-        else if(call.hasChanged(MegaChatCall.CHANGE_TYPE_REMOTE_AVFLAGS)){
-            log("Remote flags have changed");
-            updateRemoteVideoStatus();
-            updateRemoteAudioStatus();
-        }
-        else if(call.hasChanged(MegaChatCall.CHANGE_TYPE_LOCAL_AVFLAGS)){
-            log("Local flags have changed");
-            updateLocalAudioStatus();
-            updateLocalVideoStatus();
-        }
-        else if(call.hasChanged(MegaChatCall.CHANGE_TYPE_RINGING_STATUS)){
-            log("CHANGE_TYPE_RINGING_STATUS");
-        }
-        else{
-            log("CHANGE_TYPE_RINGING_STATUS: "+call.getChanges());
+            else if(call.hasChanged(MegaChatCall.CHANGE_TYPE_REMOTE_AVFLAGS)){
+                log("Remote flags have changed");
+                updateRemoteVideoStatus();
+                updateRemoteAudioStatus();
+            }
+            else if(call.hasChanged(MegaChatCall.CHANGE_TYPE_LOCAL_AVFLAGS)){
+                log("Local flags have changed");
+                updateLocalAudioStatus();
+                updateLocalVideoStatus();
+            }
+            else if(call.hasChanged(MegaChatCall.CHANGE_TYPE_RINGING_STATUS)){
+                log("CHANGE_TYPE_RINGING_STATUS");
+            }
+            else{
+                log("CHANGE_TYPE_RINGING_STATUS: "+call.getChanges());
+            }
         }
     }
 
