@@ -236,12 +236,18 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener, Me
         log("createQRCode");
 
         Bitmap qrCode = Bitmap.createBitmap(WIDTH,WIDTH, Bitmap.Config.ARGB_8888);
-        int width = 180;
+        int width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 72, getResources().getDisplayMetrics());
         Canvas c = new Canvas(qrCode);
+        Paint paint = new Paint();
+        paint.setAntiAlias(true);
+        paint.setColor(WHITE);
         int pos = (c.getWidth()/2) - (width/2);
+        int border = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 4, getResources().getDisplayMetrics());
+        float radius = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 40, getResources().getDisplayMetrics());
 
         avatar = Bitmap.createScaledBitmap(avatar, width, width, false);
         c.drawBitmap(qr, 0f, 0f, null);
+        c.drawCircle(pos+radius-border, pos+radius-border, radius, paint);
         c.drawBitmap(avatar, pos, pos, null);
 
         return qrCode;
