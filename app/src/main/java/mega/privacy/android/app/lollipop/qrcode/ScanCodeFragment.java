@@ -5,7 +5,6 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -14,6 +13,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
@@ -25,24 +25,21 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.EditText;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.budiyev.android.codescanner.CodeScanner;
+import com.budiyev.android.codescanner.CodeScannerView;
+import com.budiyev.android.codescanner.DecodeCallback;
 import com.google.zxing.Result;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Locale;
 
-import me.dm7.barcodescanner.zxing.ZXingScannerView;
+//import me.dm7.barcodescanner.zxing.ZXingScannerView;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
-import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -50,16 +47,14 @@ import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
-import nz.mega.sdk.MegaUser;
 
-import static android.app.Activity.RESULT_OK;
 import static android.graphics.Color.WHITE;
 
 /**
  * Created by mega on 22/01/18.
  */
 
-public class ScanCodeFragment extends Fragment implements ZXingScannerView.ResultHandler, View.OnClickListener, MegaRequestListenerInterface{
+public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.ResultHandler, */View.OnClickListener, MegaRequestListenerInterface{
 
     public static int DEFAULT_AVATAR_WIDTH_HEIGHT = 150;
     public static int WIDTH = 500;
@@ -71,7 +66,9 @@ public class ScanCodeFragment extends Fragment implements ZXingScannerView.Resul
 
     private Context context;
 
-    public static ZXingScannerView scannerView;
+//    public static ZXingScannerView scannerView;
+    public CodeScanner codeScanner;
+    CodeScannerView codeScannerView;
 
     private final int MY_PERMISSIONS_REQUEST_CAMERA = 1010;
 
@@ -89,14 +86,19 @@ public class ScanCodeFragment extends Fragment implements ZXingScannerView.Resul
     private TextView dialogText;
     private Button dialogButton;
 
-    MegaUser myUser;
-    String myEmail;
+    public String myEmail;
     MegaApiAndroid megaApi;
     DatabaseHandler dbH = null;
     Handler handler;
     long handle = -1;
     long handleContactLink = -1;
     private boolean success = true;
+
+    private boolean inviteShown = false;
+    private boolean dialogshown = false;
+    public int dialogTitleContent = -1;
+    public int dialogTextContent = -1;
+    private String contactNameContent;
 
     public static ScanCodeFragment newInstance() {
         log("newInstance");
@@ -109,6 +111,17 @@ public class ScanCodeFragment extends Fragment implements ZXingScannerView.Resul
         log("onCreate");
 
         super.onCreate(savedInstanceState);
+
+        if (savedInstanceState != null) {
+            inviteShown = savedInstanceState.getBoolean("inviteShown", false);
+            dialogshown = savedInstanceState.getBoolean("dialogshown", false);
+            dialogTitleContent = savedInstanceState.getInt("dialogTitleContent", -1);
+            dialogTextContent = savedInstanceState.getInt("dialogTextContent", -1);
+            contactNameContent = savedInstanceState.getString("contactNameContent");
+            myEmail = savedInstanceState.getString("myEmail");
+            success = savedInstanceState.getBoolean("success", true);
+            handleContactLink = savedInstanceState.getLong("handleContactLink", 0);
+        }
 
         if (ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.CAMERA}, MY_PERMISSIONS_REQUEST_CAMERA);
@@ -143,16 +156,29 @@ public class ScanCodeFragment extends Fragment implements ZXingScannerView.Resul
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         log("onCreateView");
 
-        scannerView = new ZXingScannerView(getActivity());
+//        scannerView = new ZXingScannerView(getActivity());
 
-//        TextView textView = new TextView(getActivity());
-//        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
-//        layoutParams.setMargins(70, 100, 70, 0);
-//        layoutParams.addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE);
-//        textView.setLayoutParams(layoutParams);
-//        textView.setText("Line up the QR code to scan it with your device's camera");
-//        textView.setTextColor(getResources().getColor(R.color.white));
-//        scannerView.addView(textView);
+        View view = inflater.inflate(R.layout.fragment_scan_code, container, false);
+
+        codeScannerView = (CodeScannerView) view.findViewById(R.id.scanner_view);
+        codeScanner = new CodeScanner(context, codeScannerView);
+        codeScanner.setDecodeCallback(new DecodeCallback() {
+            @Override
+            public void onDecoded(@NonNull final Result result) {
+                ((QRCodeActivity)context).runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        invite(result);
+                    }
+                });
+            }
+        });
+        codeScannerView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                codeScanner.startPreview();
+            }
+        });
 
         if (aB == null){
             aB = ((AppCompatActivity)context).getSupportActionBar();
@@ -164,42 +190,70 @@ public class ScanCodeFragment extends Fragment implements ZXingScannerView.Resul
             aB.setDisplayHomeAsUpEnabled(true);
         }
 
-        return scannerView;
+        if (inviteShown){
+            showInviteDialog();
+        }
+        else if (dialogshown){
+            showAlertDialog(dialogTitleContent, dialogTextContent, success);
+        }
+
+//        return scannerView;
+        return view;
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if (inviteShown){
+            outState.putBoolean("inviteShown",inviteShown);
+            outState.putString("contactNameContent", contactNameContent);
+        }
+        if (dialogshown){
+            outState.putBoolean("dialogshown", dialogshown);
+            outState.putInt("dialogTitleContent", dialogTitleContent);
+            outState.putInt("dialogTextContent", dialogTextContent);
+        }
+        outState.putString("myEmail", myEmail);
+        outState.putBoolean("success", success);
+        outState.putLong("handleContactLink", handleContactLink);
     }
 
     @Override
     public void onStart(){
         log("onStart");
         super.onStart();
-        scannerView.setAutoFocus(true);
-        scannerView.startCamera();
+//        scannerView.setAutoFocus(true);
+//        scannerView.startCamera();
     }
 
     @Override
     public void onResume() {
         log("onResume");
         super.onResume();
-        scannerView.setAutoFocus(true);
-        scannerView.startCamera();
-        scannerView.setResultHandler(this);
+//        scannerView.setAutoFocus(true);
+//        scannerView.startCamera();
+//        scannerView.setResultHandler(this);
+        codeScanner.startPreview();
     }
 
     @Override
     public void onPause() {
         log("onPause");
         super.onPause();
-        scannerView.stopCamera();
+//        scannerView.stopCamera();
+        codeScanner.releaseResources();
     }
 
-    @Override
-    public void handleResult(Result rawResult) {
-        log("handleResult");
-
-        invite(rawResult);
-    }
+//    @Override
+//    public void handleResult(Result rawResult) {
+//        log("handleResult");
+//
+//        invite(rawResult);
+//    }
 
     public void showAlertDialog (int title, int text, final boolean success) {
-        scannerView.stopCamera();
+//        scannerView.stopCamera();
+        codeScanner.releaseResources();
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         LayoutInflater inflater = getActivity().getLayoutInflater();
         View v = inflater.inflate(R.layout.dialog_invite, null);
@@ -210,16 +264,19 @@ public class ScanCodeFragment extends Fragment implements ZXingScannerView.Resul
         dialogButton = (Button) v.findViewById(R.id.dialog_invite_button);
         dialogButton.setOnClickListener(this);
         this.success = success;
-//            dialogTitle.setText(getResources().getString(R.string.invite_accepted));
-//            dialogText.setText(getResources().getString(R.string.invite_accepted_text, myEmail));
 
+        if (dialogTitleContent == -1){
+            dialogTitleContent = title;
+        }
+        if (dialogTextContent == -1) {
+            dialogTextContent = text;
+        }
+        dialogTitle.setText(getResources().getString(dialogTitleContent));
         if (success){
-            dialogTitle.setText(getResources().getString(title));
-            dialogText.setText(getResources().getString(text, myEmail));
+            dialogText.setText(getResources().getString(dialogTextContent, myEmail));
         }
         else {
-            dialogTitle.setText(getResources().getString(title));
-            dialogText.setText(getResources().getString(text));
+            dialogText.setText(getResources().getString(dialogTextContent));
         }
 
         requestedAlertDialog = builder.create();
@@ -227,11 +284,14 @@ public class ScanCodeFragment extends Fragment implements ZXingScannerView.Resul
             @Override
             public void onDismiss(DialogInterface dialog) {
                 if (success){
-                    scannerView.stopCamera();
+//                    scannerView.stopCamera();
+                    dialogshown = false;
+                    codeScanner.releaseResources();
                     getActivity().finish();
                 }
             }
         });
+        dialogshown = true;
         requestedAlertDialog.show();
     }
 
@@ -264,13 +324,16 @@ public class ScanCodeFragment extends Fragment implements ZXingScannerView.Resul
             @Override
             public void onDismiss(DialogInterface dialog) {
                 log("onDismiss");
-                scannerView.setAutoFocus(true);
-                scannerView.startCamera();
-                onResume();
+//                scannerView.setAutoFocus(true);
+//                scannerView.startCamera();
+//                onResume();
+                inviteShown = false;
+                codeScanner.startPreview();
             }
         });
 
-        scannerView.stopCamera();
+//        scannerView.stopCamera();
+        codeScanner.releaseResources();
     }
 
     @Override
@@ -304,7 +367,8 @@ public class ScanCodeFragment extends Fragment implements ZXingScannerView.Resul
                 break;
             }
             case R.id.dialog_invite_button: {
-                scannerView.stopCamera();
+//                scannerView.stopCamera();
+                codeScanner.releaseResources();
                 if (requestedAlertDialog != null){
                     requestedAlertDialog.dismiss();
                 }
@@ -312,9 +376,10 @@ public class ScanCodeFragment extends Fragment implements ZXingScannerView.Resul
                     getActivity().finish();
                 }
                 else {
-                    scannerView.setAutoFocus(true);
-                    scannerView.startCamera();
-                    onResume();
+//                    scannerView.setAutoFocus(true);
+//                    scannerView.startCamera();
+//                    onResume();
+                    codeScanner.startPreview();
                 }
                 break;
             }
@@ -403,7 +468,7 @@ public class ScanCodeFragment extends Fragment implements ZXingScannerView.Resul
         Paint p = new Paint();
         p.setAntiAlias(true);
 
-        String color = megaApi.getUserAvatarColor(myUser);
+        String color = megaApi.getUserAvatarColor(MegaApiAndroid.handleToBase64(handleContactLink).trim());
         if(color!=null){
             log("The color to set the avatar is "+color);
             p.setColor(Color.parseColor(color));
@@ -478,6 +543,43 @@ public class ScanCodeFragment extends Fragment implements ZXingScannerView.Resul
 
     }
 
+    void showInviteDialog (){
+        if (inviteAlertDialog != null){
+            contactName.setText(contactNameContent);
+            contactMail.setText(myEmail);
+            setAvatar();
+        }
+        else {
+            AlertDialog.Builder builder = new AlertDialog.Builder(context);
+            LayoutInflater inflater = getActivity().getLayoutInflater();
+
+            View v = inflater.inflate(R.layout.dialog_accept_contact, null);
+            builder.setView(v);
+            invite = (Button) v.findViewById(R.id.accept_contact_invite);
+            invite.setOnClickListener(this);
+            avatarImage = (RoundedImageView) v.findViewById(R.id.accept_contact_avatar);
+            initialLetter = (TextView) v.findViewById(R.id.accept_contact_initial_letter);
+            contactName = (TextView) v.findViewById(R.id.accept_contact_name);
+            contactMail = (TextView) v.findViewById(R.id.accept_contact_mail);
+
+            inviteAlertDialog = builder.create();
+            inviteAlertDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                @Override
+                public void onDismiss(DialogInterface dialog) {
+                    log("onDismiss");
+                    inviteShown = false;
+                    codeScanner.startPreview();
+                }
+            });
+            contactName.setText(contactNameContent);
+            contactMail.setText(myEmail);
+            setAvatar();
+        }
+        codeScanner.releaseResources();
+        inviteAlertDialog.show();
+        inviteShown = true;
+    }
+
     @Override
     public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
 
@@ -487,19 +589,20 @@ public class ScanCodeFragment extends Fragment implements ZXingScannerView.Resul
                 log("Contact link query " + request.getNodeHandle() + "_" + MegaApiAndroid.handleToBase64(request.getNodeHandle()) + "_" + request.getEmail() + "_" + request.getName() + "_" + request.getText());
 
                 this.request = request;
-                handleContactLink = request.getNodeHandle();
                 myEmail = request.getEmail();
-                contactName.setText(request.getName() + " " + request.getText());
-                contactMail.setText(request.getEmail());
-                setAvatar();
-
-                inviteAlertDialog.show();
+                handleContactLink = request.getNodeHandle();
+                contactNameContent = request.getName() + " " + request.getText();
+                showInviteDialog();
             }
             else if (e.getErrorCode() == MegaError.API_EEXIST){
-                showAlertDialog(R.string.invite_not_sent, R.string.invite_not_sent_text_already_contact, true);
+                dialogTitleContent = R.string.invite_not_sent;
+                dialogTextContent = R.string.invite_not_sent_text_already_contact;
+                showAlertDialog(dialogTitleContent, dialogTextContent, true);
             }
             else {
-                showAlertDialog( R.string.invite_not_sent, R.string.invite_not_sent_text, false);
+                dialogTitleContent = R.string.invite_not_sent;
+                dialogTextContent = R.string.invite_not_sent_text;
+                showAlertDialog(dialogTitleContent, dialogTextContent, false);
             }
         }
         else if (request.getType() == MegaRequest.TYPE_GET_ATTR_USER) {
@@ -508,7 +611,7 @@ public class ScanCodeFragment extends Fragment implements ZXingScannerView.Resul
                 setAvatar();
             }
             else {
-                log("Get user avatal FAIL");
+                log("Get user avatar FAIL");
                 setDefaultAvatar();
             }
         }
