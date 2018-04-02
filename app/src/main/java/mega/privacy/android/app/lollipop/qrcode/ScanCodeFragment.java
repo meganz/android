@@ -171,6 +171,7 @@ public class ScanCodeFragment extends Fragment implements ZXingScannerView.Resul
     public void onStart(){
         log("onStart");
         super.onStart();
+        scannerView.setAutoFocus(true);
         scannerView.startCamera();
     }
 
@@ -178,6 +179,7 @@ public class ScanCodeFragment extends Fragment implements ZXingScannerView.Resul
     public void onResume() {
         log("onResume");
         super.onResume();
+        scannerView.setAutoFocus(true);
         scannerView.startCamera();
         scannerView.setResultHandler(this);
     }
@@ -262,6 +264,7 @@ public class ScanCodeFragment extends Fragment implements ZXingScannerView.Resul
             @Override
             public void onDismiss(DialogInterface dialog) {
                 log("onDismiss");
+                scannerView.setAutoFocus(true);
                 scannerView.startCamera();
                 onResume();
             }
@@ -309,6 +312,7 @@ public class ScanCodeFragment extends Fragment implements ZXingScannerView.Resul
                     getActivity().finish();
                 }
                 else {
+                    scannerView.setAutoFocus(true);
                     scannerView.startCamera();
                     onResume();
                 }

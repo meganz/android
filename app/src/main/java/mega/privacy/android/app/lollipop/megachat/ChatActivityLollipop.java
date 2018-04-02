@@ -80,7 +80,7 @@ import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PinActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
-import mega.privacy.android.app.lollipop.listeners.MultipleForwardChatListener;
+import mega.privacy.android.app.lollipop.listeners.MultipleAttachChatListener;
 import mega.privacy.android.app.lollipop.listeners.MultipleGroupChatRequestListener;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaChatLollipopAdapter;
@@ -1795,7 +1795,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             long[] idMessages = intent.getLongArrayExtra("ID_MESSAGES");
             log("Send "+idMessages.length+" messages");
 
-            MultipleForwardChatListener listener = null;
+            MultipleAttachChatListener listener = null;
             if(chatHandles.length==1){
                 for(int i=0;i<idMessages.length;i++){
                     MegaChatMessage messageToForward = megaChatApi.getMessage(idChat, idMessages[i]);
@@ -1827,7 +1827,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                             }
                             case MegaChatMessage.TYPE_NODE_ATTACHMENT:{
                                 if(listener == null){
-                                    listener = new MultipleForwardChatListener (this, chatHandles[0]);
+                                    listener = new MultipleAttachChatListener(this, chatHandles[0]);
                                 }
                                 MegaNodeList nodeList = messageToForward.getMegaNodeList();
                                 if(nodeList != null) {
@@ -1878,7 +1878,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                                 }
                                 case MegaChatMessage.TYPE_NODE_ATTACHMENT:{
                                     if(listener == null){
-                                        listener = new MultipleForwardChatListener (this, -1);
+                                        listener = new MultipleAttachChatListener(this, -1);
                                     }
                                     MegaNodeList nodeList = messageToForward.getMegaNodeList();
                                     if(nodeList != null) {
