@@ -45,6 +45,7 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.ZipBrowserActivityLollipop;
 import mega.privacy.android.app.lollipop.listeners.MultipleRequestListener;
+import mega.privacy.android.app.lollipop.megachat.ChatExplorerActivity;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
@@ -162,6 +163,42 @@ public class NodeController {
 
                 megaApi.moveNode(megaApi.getNodeByHandle(moveHandles[0]), parent, (ManagerActivityLollipop) context);
             }
+        }
+    }
+
+    public void selectChatsToSendNodes(ArrayList<MegaNode> nodes){
+        log("selectChatsToSendNodes");
+
+        int size = nodes.size();
+        long[] longArray = new long[size];
+
+        for(int i=0;i<nodes.size();i++){
+            longArray[i] = nodes.get(0).getHandle();
+        }
+
+        selectChatsToSendNodes(longArray);
+    }
+
+    public void selectChatsToSendNode(MegaNode node){
+        log("selectChatsToSendNode");
+
+        long[] longArray = new long[1];
+        longArray[0] = node.getHandle();
+
+        selectChatsToSendNodes(longArray);
+    }
+
+    public void selectChatsToSendNodes(long[] longArray){
+        log("selectChatsToSendNodes");
+
+        Intent i = new Intent(context, ChatExplorerActivity.class);
+        i.putExtra("NODE_HANDLES", longArray);
+
+        if(context instanceof FullScreenImageViewerLollipop){
+            ((FullScreenImageViewerLollipop) context).startActivityForResult(i, Constants.REQUEST_CODE_SELECT_CHAT);
+        }
+        else if(context instanceof ManagerActivityLollipop){
+            ((ManagerActivityLollipop) context).startActivityForResult(i, Constants.REQUEST_CODE_SELECT_CHAT);
         }
     }
 

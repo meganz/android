@@ -1785,5 +1785,13 @@
     <string name="messages_forwarded_success" context="Alert message after forwarding one or several messages to several chats">Messages forwarded</string>
     <string name="messages_forwarded_error" context="Error message after forwarding one or several messages to several chats">Error. Not correctly forwarded</string>
 
+    <plurals name="files_send_to_chat_success" context="Alert message after sending to chat one or several messages to several chats">
+        <item context="version item" quantity="one">File sent</item>
+        <item context="version items" quantity="other">Files sent</item>
+    </plurals>
+    <string name="files_send_to_chat_error" context="Error message after sending to chat one or several messages to several chats">Error. Not correctly sent</string>
+
+    <string name="context_send_file_to_chat" context="menu option to send a file to a chat">Send to chat</string>
+
 </resources>
 
