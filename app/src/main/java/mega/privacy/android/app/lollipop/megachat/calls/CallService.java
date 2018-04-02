@@ -89,11 +89,13 @@ public class CallService extends Service implements MegaChatCallListenerInterfac
     @Override
     public void onChatCallUpdate(MegaChatApiJava api, MegaChatCall call) {
 
-        if(call.getStatus()==MegaChatCall.CALL_STATUS_DESTROYED){
-            log("Destroy call Service");
-            stopForeground(true);
-            mNotificationManager.cancel(Constants.NOTIFICATION_CALL_IN_PROGRESS);
-            stopSelf();
+        if(call.getChatid()==chatId){
+            if(call.getStatus()==MegaChatCall.CALL_STATUS_DESTROYED){
+                log("Destroy call Service");
+                stopForeground(true);
+                mNotificationManager.cancel(Constants.NOTIFICATION_CALL_IN_PROGRESS);
+                stopSelf();
+            }
         }
     }
 
