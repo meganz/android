@@ -30,10 +30,10 @@ public class Constants {
 	public static int REQUEST_ADD_PARTICIPANTS = 1019;
 	public static int ENABLE_CHAT = 1020;
 	public static int REQUEST_SEND_CONTACTS = 1021;
-
 	public static int REQUEST_CODE_IMPORT_CHAT_NODE = 1022;
 	public static int REQUEST_CODE_IMPORT_CHAT_NODE_LIST = 1023;
 	public static int ACTION_SEARCH_BY_DATE = 1024;
+	public static int REQUEST_CODE_SELECT_CHAT = 1025;
 
 	public static String ACTION_REFRESH = "ACTION_REFRESH";
 	public static String ACTION_ENABLE_CHAT = "ACTION_ENABLE_CHAT";
