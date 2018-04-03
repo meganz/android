@@ -518,6 +518,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 	int fromTakePicture = -1;
 
+	private AlertDialog rememberPasswordDialog;
+	private boolean showRememberPasswordDialog = false;
+	private CheckBox showRememberPaswordCheckBox;
+	private Button testPwdButton;
+	private Button backupRecoveryKeyButton;
+	private Button dismissButton;
+
 	//Billing
 
 	// (arbitrary) request code for the purchase flow
@@ -2328,9 +2335,32 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				selectDrawerItemLollipop(drawerItem);
 			}
 		}
-
+//		megaApi.shouldShowPasswordReminderDialog(false, this);
+		showRememberPasswordDialog();
 		log("END onCreate");
 //		showTransferOverquotaDialog();
+	}
+
+	void showRememberPasswordDialog(){
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		LayoutInflater inflater = getLayoutInflater();
+		View v = inflater.inflate(R.layout.dialog_remember_password, null);
+		builder.setView(v);
+
+		showRememberPasswordDialog = false;
+		showRememberPaswordCheckBox = (CheckBox) v.findViewById(R.id.dialog_remember_pwd_checkbox);
+		testPwdButton = (Button) v.findViewById(R.id.dialog_remember_pwd_test_button);
+		backupRecoveryKeyButton = (Button) v.findViewById(R.id.dialog_remember_pwd_backup_recoverykey_button);
+		dismissButton = (Button) v.findViewById(R.id.dialog_remember_pwd_dismiss_button);
+
+		showRememberPaswordCheckBox.setOnClickListener(this);
+		testPwdButton.setOnClickListener(this);
+		backupRecoveryKeyButton.setOnClickListener(this);
+		dismissButton.setOnClickListener(this);
+
+		rememberPasswordDialog = builder.create();
+
+		rememberPasswordDialog.show();
 	}
 
 	@Override
@@ -11035,6 +11065,27 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					}
 					selectDrawerItemLollipop(drawerItem);
 				}
+
+				break;
+			}
+			case R.id.dialog_remember_pwd_checkbox: {
+				if (showRememberPaswordCheckBox.isChecked()){
+					showRememberPasswordDialog = false;
+				}
+				else {
+					showRememberPasswordDialog = true;
+				}
+				break;
+			}
+			case R.id.dialog_remember_pwd_test_button: {
+
+				break;
+			}
+			case R.id.dialog_remember_pwd_backup_recoverykey_button: {
+
+				break;
+			}
+			case R.id.dialog_remember_pwd_dismiss_button: {
 
 				break;
 			}
