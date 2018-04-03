@@ -908,7 +908,7 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 
 		MegaChatRoom chat = megaChatApi.getChatRoom(chatid);
 		if(chat!=null){
-			int unread = chat.getUnreadCount();
+			int unread = megaChatApi.getUnreadChats();
 			//Add Android version check if needed
 			if(unread==0){
 				//Remove badge indicator - no unread chats
