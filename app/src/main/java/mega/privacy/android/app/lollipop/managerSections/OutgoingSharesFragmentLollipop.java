@@ -78,6 +78,8 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 	LinearLayout emptyLinearLayout;
 	TextView emptyTextViewFirst;
 
+	boolean allFiles = true;
+
 	MegaBrowserLollipopAdapter adapter;
 	OutgoingSharesFragmentLollipop outgoingSharesFragment = this;
 	RelativeLayout transfersOverViewLayout;
@@ -117,6 +119,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 		boolean showLink = false;
 		boolean showRemoveLink = false;
 		boolean showTrash = false;
+		boolean showSendToChat = false;
 		boolean showShare = false;
 		boolean showEditLink = false;
 
@@ -215,6 +218,14 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 					((ManagerActivityLollipop) context).showGetLinkActivity(documents.get(0).getHandle());
 					break;
 				}
+				case R.id.cab_menu_send_to_chat:{
+					log("Send files to chat");
+					ArrayList<MegaNode> nodesSelected = adapter.getArrayListSelectedNodes();
+					((ManagerActivityLollipop) context).sendToChat(nodesSelected);
+					clearSelections();
+					hideMultipleSelect();
+					break;
+				}
 				case R.id.cab_menu_trash:{
 					ArrayList<Long> handleList = new ArrayList<Long>();
 					for (int i=0;i<documents.size();i++){
@@ -281,6 +292,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 				showMove = true;
 				showShare = true;
 				showCopy = true;
+				allFiles = true;
 
 				for(int i=0; i<selected.size();i++)	{
 					if(megaApi.checkMove(selected.get(i), megaApi.getRubbishNode()).getErrorCode() != MegaError.API_OK)	{
@@ -288,6 +300,19 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 						showMove = false;
 						break;
 					}
+				}
+
+				//showSendToChat
+				for(int i=0; i<selected.size();i++)	{
+					if(!selected.get(i).isFile()){
+						allFiles = false;
+					}
+				}
+
+				if(allFiles){
+					showSendToChat = true;
+				}else{
+					showSendToChat = false;
 				}
 
 				if(selected.size()==adapter.getItemCount()){
@@ -327,6 +352,9 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 			
 			menu.findItem(R.id.cab_menu_download).setVisible(true);
 			menu.findItem(R.id.cab_menu_download).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+
+			menu.findItem(R.id.cab_menu_send_to_chat).setVisible(showSendToChat);
+			menu.findItem(R.id.cab_menu_send_to_chat).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
 			menu.findItem(R.id.cab_menu_rename).setVisible(showRename);
 			menu.findItem(R.id.cab_menu_copy).setVisible(showCopy);

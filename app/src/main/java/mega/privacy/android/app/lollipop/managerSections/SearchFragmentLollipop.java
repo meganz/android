@@ -96,6 +96,7 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 	DisplayMetrics outMetrics;
 	Display display;
 
+	boolean allFiles = true;
 	DatabaseHandler dbH;
 	MegaPreferences prefs;
 	String downloadLocationDefaultPath = Util.downloadDIR;
@@ -161,6 +162,14 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 					}
 					break;
 				}
+				case R.id.cab_menu_send_to_chat:{
+					log("Send files to chat");
+					ArrayList<MegaNode> nodesSelected = adapter.getArrayListSelectedNodes();
+					((ManagerActivityLollipop) context).sendToChat(nodesSelected);
+					clearSelections();
+					hideMultipleSelect();
+					break;
+				}
 				case R.id.cab_menu_trash:{
 					ArrayList<Long> handleList = new ArrayList<Long>();
 					for (int i=0;i<documents.size();i++){
@@ -205,6 +214,7 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 			MenuItem unselect = menu.findItem(R.id.cab_menu_unselect_all);
 
 			boolean showDownload = false;
+			boolean showSendToChat = false;
 			boolean showRename = false;
 			boolean showCopy = false;
 			boolean showMove = false;
@@ -228,6 +238,7 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 				showTrash = true;
 				showMove = true;
 				showCopy = true;
+				allFiles = true;
 
 				for(int i=0; i<selected.size();i++)	{
 					if(megaApi.checkMove(selected.get(i), megaApi.getRubbishNode()).getErrorCode() != MegaError.API_OK)	{
@@ -236,6 +247,19 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 						break;
 					}
 				}
+				//showSendToChat
+				for(int i=0; i<selected.size();i++)	{
+					if(!selected.get(i).isFile()){
+						allFiles = false;
+					}
+				}
+
+				if(allFiles){
+					showSendToChat = true;
+				}else{
+					showSendToChat = false;
+				}
+
 
 				if(selected.size()==adapter.getItemCount()){
 					menu.findItem(R.id.cab_menu_select_all).setVisible(false);
@@ -294,6 +318,10 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 			}
 			
 			menu.findItem(R.id.cab_menu_download).setVisible(showDownload);
+
+			menu.findItem(R.id.cab_menu_send_to_chat).setVisible(showSendToChat);
+			menu.findItem(R.id.cab_menu_send_to_chat).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+
 			menu.findItem(R.id.cab_menu_rename).setVisible(showRename);
 			menu.findItem(R.id.cab_menu_copy).setVisible(showCopy);
 			menu.findItem(R.id.cab_menu_move).setVisible(showMove);
