@@ -108,7 +108,7 @@ public class CallService extends Service implements MegaChatCallListenerInterfac
 
         Intent intent = new Intent(this, ChatCallActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        intent.setAction(Long.toString(System.currentTimeMillis()));
+//        intent.setAction(Long.toString(System.currentTimeMillis()));
         intent.putExtra("chatHandle", chatId);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 , intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
