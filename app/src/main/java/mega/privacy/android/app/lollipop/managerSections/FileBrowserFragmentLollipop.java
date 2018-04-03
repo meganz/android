@@ -118,7 +118,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 	LinearLayoutManager mLayoutManager;
 	CustomizedGridLayoutManager gridLayoutManager;
 	MegaNode selectedNode = null;
-
+	boolean allFiles = true;
 	String downloadLocationDefaultPath = Util.downloadDIR;
 
 	public void activateActionMode(){
@@ -268,8 +268,15 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 					((ManagerActivityLollipop) context).showGetLinkActivity(documents.get(0).getHandle());
 					break;
 				}
-
-
+				case R.id.cab_menu_send_to_chat:{
+					log("Send files to chat");
+					ArrayList<MegaNode> nodesSelected = adapter.getArrayListSelectedNodes();
+					NodeController nC = new NodeController(context);
+					nC.selectChatsToSendNodes(nodesSelected);
+					clearSelections();
+					hideMultipleSelect();
+					break;
+				}
 				case R.id.cab_menu_trash:{
 					ArrayList<Long> handleList = new ArrayList<Long>();
 					for (int i=0;i<documents.size();i++){
@@ -317,6 +324,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			List<MegaNode> selected = adapter.getSelectedNodes();
 
 			boolean showDownload = false;
+			boolean showSendToChat = false;
 			boolean showRename = false;
 			boolean showCopy = false;
 			boolean showMove = false;
@@ -356,6 +364,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 				showMove = true;
 				showCopy = true;
 				showShare = true;
+				allFiles = true;
 
 				for(int i=0; i<selected.size();i++)	{
 					if(megaApi.checkMove(selected.get(i), megaApi.getRubbishNode()).getErrorCode() != MegaError.API_OK)	{
@@ -364,15 +373,27 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 						break;
 					}
 					//if(showShare){
-						if(selected.get(i).isFile()){
-							showShare = false;
-						}else{
-							if(selected.size()==1){
-								showShare=true;
-							}
-
+					if(selected.get(i).isFile()){
+						showShare = false;
+					}else{
+						if(selected.size()==1){
+							showShare=true;
 						}
+					}
 					//}
+				}
+
+				//showSendToChat
+				for(int i=0; i<selected.size();i++)	{
+					if(!selected.get(i).isFile()){
+						allFiles = false;
+					}
+				}
+
+				if(allFiles){
+					showSendToChat = true;
+				}else{
+					showSendToChat = false;
 				}
 
 				MenuItem unselect = menu.findItem(R.id.cab_menu_unselect_all);
@@ -395,6 +416,9 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 
 			menu.findItem(R.id.cab_menu_download).setVisible(showDownload);
 			menu.findItem(R.id.cab_menu_download).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+
+			menu.findItem(R.id.cab_menu_send_to_chat).setVisible(showSendToChat);
+			menu.findItem(R.id.cab_menu_send_to_chat).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
 			menu.findItem(R.id.cab_menu_rename).setVisible(showRename);
 

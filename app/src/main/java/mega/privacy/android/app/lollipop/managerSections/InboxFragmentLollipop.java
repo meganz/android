@@ -63,7 +63,7 @@ import nz.mega.sdk.MegaNode;
 
 public class InboxFragmentLollipop extends Fragment{
 
-	public static int GRID_WIDTH =400;
+	public static int GRID_WIDTH = 400;
 	
 	Context context;
 	RecyclerView recyclerView;
@@ -84,7 +84,7 @@ public class InboxFragmentLollipop extends Fragment{
 	Stack<Integer> lastPositionStack;
 	
 	MegaApiAndroid megaApi;
-
+	boolean allFiles = true;
 	String downloadLocationDefaultPath = Util.downloadDIR;
 	
 	private ActionMode actionMode;
@@ -162,6 +162,15 @@ public class InboxFragmentLollipop extends Fragment{
 					hideMultipleSelect();
 					break;
 				}
+				case R.id.cab_menu_send_to_chat:{
+					log("Send files to chat");
+					ArrayList<MegaNode> nodesSelected = adapter.getArrayListSelectedNodes();
+					NodeController nC = new NodeController(context);
+					nC.selectChatsToSendNodes(nodesSelected);
+					clearSelections();
+					hideMultipleSelect();
+					break;
+				}
 				case R.id.cab_menu_trash:{
 					ArrayList<Long> handleList = new ArrayList<Long>();
 					for (int i=0;i<documents.size();i++){
@@ -206,6 +215,7 @@ public class InboxFragmentLollipop extends Fragment{
 		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
 			List<MegaNode> selected = adapter.getSelectedNodes();
 			boolean showDownload = false;
+			boolean showSendToChat = false;
 			boolean showRename = false;
 			boolean showCopy = false;
 			boolean showMove = false;
@@ -238,7 +248,7 @@ public class InboxFragmentLollipop extends Fragment{
 				else{
 					showRename = false;
 				}
-
+				allFiles = true;
 				showDownload = true;
 				showTrash = true;
 				showMove = true;
@@ -249,6 +259,18 @@ public class InboxFragmentLollipop extends Fragment{
 						showMove = false;
 						break;
 					}
+				}
+				//showSendToChat
+				for(int i=0; i<selected.size();i++)	{
+					if(!selected.get(i).isFile()){
+						allFiles = false;
+					}
+				}
+
+				if(allFiles){
+					showSendToChat = true;
+				}else{
+					showSendToChat = false;
 				}
 			}
 			else{
@@ -261,6 +283,10 @@ public class InboxFragmentLollipop extends Fragment{
 				menu.findItem(R.id.cab_menu_download).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 			}
 
+			menu.findItem(R.id.cab_menu_send_to_chat).setVisible(showSendToChat);
+			if(showSendToChat) {
+				menu.findItem(R.id.cab_menu_send_to_chat).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+			}
 			menu.findItem(R.id.cab_menu_rename).setVisible(showRename);
 
 			menu.findItem(R.id.cab_menu_copy).setVisible(showCopy);
