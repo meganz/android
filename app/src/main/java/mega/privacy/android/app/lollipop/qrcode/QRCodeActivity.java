@@ -4,14 +4,11 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.PersistableBundle;
 import android.os.StatFs;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
@@ -22,7 +19,6 @@ import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
-import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -194,10 +190,11 @@ public class QRCodeActivity extends PinActivityLollipop implements MegaRequestLi
                 break;
             }
         }
-        if (contacts) {
-//            ScanCodeFragment.scannerView.setAutoFocus(true);
-//            ScanCodeFragment.scannerView.startCamera();
-        }
+
+//        if (contacts) {
+////            ScanCodeFragment.scannerView.setAutoFocus(true);
+////            ScanCodeFragment.scannerView.startCamera();
+//        }
 
         return super.onCreateOptionsMenu(menu);
     }

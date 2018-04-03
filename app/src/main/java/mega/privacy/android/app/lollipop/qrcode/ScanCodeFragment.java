@@ -35,7 +35,6 @@ import com.google.zxing.Result;
 import java.io.File;
 import java.util.Locale;
 
-//import me.dm7.barcodescanner.zxing.ZXingScannerView;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
@@ -49,6 +48,8 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 
 import static android.graphics.Color.WHITE;
+
+//import me.dm7.barcodescanner.zxing.ZXingScannerView;
 
 /**
  * Created by mega on 22/01/18.
@@ -218,13 +219,13 @@ public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.Res
         outState.putLong("handleContactLink", handleContactLink);
     }
 
-    @Override
-    public void onStart(){
-        log("onStart");
-        super.onStart();
-//        scannerView.setAutoFocus(true);
-//        scannerView.startCamera();
-    }
+//    @Override
+//    public void onStart(){
+//        log("onStart");
+//        super.onStart();
+////        scannerView.setAutoFocus(true);
+////        scannerView.startCamera();
+//    }
 
     @Override
     public void onResume() {
