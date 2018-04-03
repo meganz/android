@@ -27,9 +27,9 @@ public class RTFFormatter {
     boolean formatted = false;
     boolean recursive = false;
     Typeface font;
-    Pattern pMultiQuote = Pattern.compile("(?<=[\\W\\d]|^)(```)(.*?)(```)(?=[\\W\\d]|$)");
+    Pattern pMultiQuote = Pattern.compile("(?<=[\\W\\d]|^)(```)([^```]+?.*?)(```)(?=[\\W\\d]|$)");
     Pattern pQuote = Pattern.compile("(?<=[\\W\\d]|^)(`)([^`]+?.*?[^\\n.]*?[^\\n]*?.*?[^`]+?)(`)(?=[\\W\\d]|$)");
-    Pattern pItalic = Pattern.compile("(?<=[\\W\\d]|^)(\\_)([^_\\n]*?.*?)(\\_)(?=[\\W\\d]|$)");
+    Pattern pItalic = Pattern.compile("(?<=[\\W\\d]|^)(\\_)([^_]+?[^_\\n]*?.*?)(\\_)(?=[\\W\\d]|$)");
     Pattern pBold = Pattern.compile("(?<=[\\W\\d]|^)(\\*)([^\\s][^*\\n]*?.*?|[^*\\n]*?[^\\s].*?)(\\*)(?=[\\W\\d]|$)");
 
     public boolean isFormatted() {
@@ -235,117 +235,121 @@ public class RTFFormatter {
     public void queryIfMultiQuoteFormat(){
         log("queryIfMultiQuoteFormat");
 
-        String a = messageContent.substring(0,3);
-        String message = messageContent;
-        int start;
-        int end;
-        boolean bold = false;
-        boolean italic = false;
-        int startBold;
-        int startMultiquote;
-        String substring;
+        if (messageContent.length() > 6){
 
-        if (message.contains("```")){
-            log("Check if there is emoji at the beginning of the string");
-            start = messageContent.indexOf("```");
-            String emoji = messageContent.substring(0, start);
-            if(EmojiManager.isEmoji(emoji)){
-                log("The first element is emoji");
-                substring = messageContent.substring(0, start);
-                if(ssb==null){
-                    ssb = new SimpleSpanBuilder();
-                }
-                ssb.append(substring+'\n');
+            String a = messageContent.substring(0,3);
+            String message = messageContent;
+            int start;
+            boolean bold = false;
+            boolean italic = false;
+            int startBold;
+            int startMultiquote;
+            String substring;
 
-                StringBuilder sb = new StringBuilder(messageContent);
-                sb.delete(0, start);
-                messageContent = sb.toString();
-                queryIfMultiQuoteFormat();
-            }
-            else {
-                if (a.equals("```")){
-                    StringBuilder sb = new StringBuilder(message);
-                    sb.delete(0,3);
-                    message = sb.toString();
-
-                    if (message.contains("```")){
-                        Matcher mBold = pBold.matcher(messageContent);
-
-                        if(mBold!=null){
-                            if(mBold.find()) {
-                                bold = true;
-                                startBold = messageContent.indexOf(("*"));
-                                startMultiquote = messageContent.indexOf(("```"));
-                                if (startMultiquote < startBold) {
-                                    applyMultiQuoteFormat();
-                                    formatted = true;
-                                }
-                            }
-                        }
-
-                        int startItalic = -1;
-
-                        Matcher mItalic = pItalic.matcher(messageContent);
-
-                        if(mItalic!=null) {
-                            if(mItalic.find()) {
-                                italic = true;
-                                startItalic = messageContent.indexOf(("_"));
-                                startMultiquote = messageContent.indexOf(("```"));
-                                if (startMultiquote < startItalic) {
-                                    applyMultiQuoteFormat();
-                                    formatted = true;
-                                }
-                            }
-                        }
-
-                        if(!bold && !italic){
-                            applyMultiQuoteFormat();
-                            formatted = true;
-                        }
+            if (message.contains("```")){
+                log("Check if there is emoji at the beginning of the string");
+                start = messageContent.indexOf("```");
+                String emoji = messageContent.substring(0, start);
+                if(EmojiManager.isEmoji(emoji)){
+                    log("The first element is emoji");
+                    substring = messageContent.substring(0, start);
+                    if(ssb==null){
+                        ssb = new SimpleSpanBuilder();
                     }
+                    ssb.append(substring+'\n');
+
+                    StringBuilder sb = new StringBuilder(messageContent);
+                    sb.delete(0, start);
+                    messageContent = sb.toString();
+                    queryIfMultiQuoteFormat();
                 }
                 else {
-                    start = message.indexOf(" ```");
-                    if (start != -1){
+                    if (a.equals("```")){
                         StringBuilder sb = new StringBuilder(message);
-                        sb.delete(start, start+3);
+                        sb.delete(0,3);
                         message = sb.toString();
+                        if (message.length() > 3){
+                            if (message.contains("```")){
+                                Matcher mBold = pBold.matcher(messageContent);
 
-                        if (message.contains("```")){
-                            Matcher mBold = pBold.matcher(messageContent);
+                                if(mBold!=null){
+                                    if(mBold.find()) {
+                                        bold = true;
+                                        startBold = messageContent.indexOf(("*"));
+                                        startMultiquote = messageContent.indexOf(("```"));
+                                        if (startMultiquote < startBold) {
+                                            applyMultiQuoteFormat();
+                                            formatted = true;
+                                        }
+                                    }
+                                }
 
-                            if(mBold!=null){
-                                if(mBold.find()) {
-                                    bold = true;
-                                    startBold = messageContent.indexOf(("*"));
-                                    startMultiquote = messageContent.indexOf(("```"));
-                                    if (startMultiquote < startBold) {
+                                int startItalic = -1;
+
+                                Matcher mItalic = pItalic.matcher(messageContent);
+
+                                if(mItalic!=null) {
+                                    if(mItalic.find()) {
+                                        italic = true;
+                                        startItalic = messageContent.indexOf(("_"));
+                                        startMultiquote = messageContent.indexOf(("```"));
+                                        if (startMultiquote < startItalic) {
+                                            applyMultiQuoteFormat();
+                                            formatted = true;
+                                        }
+                                    }
+                                }
+
+                                if(!bold && !italic){
+                                    applyMultiQuoteFormat();
+                                    formatted = true;
+                                }
+                            }
+                        }
+                    }
+                    else {
+                        start = message.indexOf(" ```");
+                        if (start != -1){
+                            StringBuilder sb = new StringBuilder(message);
+                            sb.delete(start, start+3);
+                            message = sb.toString();
+                            if (message.length() > 3){
+                                if (message.contains("```")){
+                                    Matcher mBold = pBold.matcher(messageContent);
+
+                                    if(mBold!=null){
+                                        if(mBold.find()) {
+                                            bold = true;
+                                            startBold = messageContent.indexOf(("*"));
+                                            startMultiquote = messageContent.indexOf(("```"));
+                                            if (startMultiquote < startBold) {
+                                                applyMultiQuoteFormat();
+                                                formatted = true;
+                                            }
+                                        }
+                                    }
+
+                                    int startItalic = -1;
+
+                                    Matcher mItalic = pItalic.matcher(messageContent);
+
+                                    if(mItalic!=null) {
+                                        if(mItalic.find()) {
+                                            italic = true;
+                                            startItalic = messageContent.indexOf(("_"));
+                                            startMultiquote = messageContent.indexOf(("```"));
+                                            if (startMultiquote < startItalic) {
+                                                applyMultiQuoteFormat();
+                                                formatted = true;
+                                            }
+                                        }
+                                    }
+
+                                    if(!bold && !italic){
                                         applyMultiQuoteFormat();
                                         formatted = true;
                                     }
                                 }
-                            }
-
-                            int startItalic = -1;
-
-                            Matcher mItalic = pItalic.matcher(messageContent);
-
-                            if(mItalic!=null) {
-                                if(mItalic.find()) {
-                                    italic = true;
-                                    startItalic = messageContent.indexOf(("_"));
-                                    startMultiquote = messageContent.indexOf(("```"));
-                                    if (startMultiquote < startItalic) {
-                                        applyMultiQuoteFormat();
-                                        formatted = true;
-                                    }
-                                }
-                            }
-
-                            if(!bold && !italic){
-                                applyMultiQuoteFormat();
-                                formatted = true;
                             }
                         }
                     }
