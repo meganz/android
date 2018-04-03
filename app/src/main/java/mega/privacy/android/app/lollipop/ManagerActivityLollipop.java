@@ -30,6 +30,7 @@ import android.os.Environment;
 import android.os.Handler;
 import android.provider.ContactsContract;
 import android.provider.MediaStore;
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.BottomSheetDialogFragment;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
@@ -40,6 +41,7 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v4.provider.DocumentFile;
@@ -297,6 +299,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 //	boolean tranfersPaused = false;
     Toolbar tB;
     ActionBar aB;
+    AppBarLayout abL;
 
 	int selectedPaymentMethod;
 	int selectedAccountType;
@@ -316,7 +319,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
     public boolean openSettingsStorage = false;
 
 	public enum DrawerItem {
-		CLOUD_DRIVE, SAVED_FOR_OFFLINE, CAMERA_UPLOADS, INBOX, SHARED_ITEMS, CONTACTS, SETTINGS, ACCOUNT, SEARCH, TRANSFERS, MEDIA_UPLOADS, CHAT, TURN_ON_NOTIFICATIONS;
+		CLOUD_DRIVE, SAVED_FOR_OFFLINE, CAMERA_UPLOADS, INBOX, SHARED_ITEMS, CONTACTS, SETTINGS, ACCOUNT, SEARCH, TRANSFERS, MEDIA_UPLOADS, CHAT;
 
 		public String getTitle(Context context) {
 			switch(this)
@@ -335,13 +338,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				case TRANSFERS: return context.getString(R.string.section_transfers);
 				case MEDIA_UPLOADS: return context.getString(R.string.section_secondary_media_uploads);
 				case CHAT: return context.getString(R.string.section_chat);
-				case TURN_ON_NOTIFICATIONS: return context.getString(R.string.turn_on_notifications_title);
 			}
 			return null;
 		}
 	}
 
-
+	public boolean turnOnNotifications = false;
 
 	static DrawerItem drawerItem = null;
 	static DrawerItem lastDrawerItem = null;
@@ -1375,6 +1377,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 //		long num = 11179220468180L;
 //		dbH.setSecondaryFolderHandle(num);
 		//Set toolbar
+		abL = (AppBarLayout) findViewById(R.id.app_bar_layout);
+
 		tB = (Toolbar) findViewById(R.id.toolbar);
 		if(tB==null){
 			log("Tb is Null");
@@ -2328,10 +2332,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 
 	        //INITIAL FRAGMENT
-//			if(selectDrawerItemPending){
-//				selectDrawerItemLollipop(drawerItem);
-//			}
-			selectDrawerItemLollipop(DrawerItem.TURN_ON_NOTIFICATIONS);
+			if(selectDrawerItemPending){
+				selectDrawerItemLollipop(drawerItem);
+			}
 		}
 
 		log("END onCreate");
@@ -2342,6 +2345,110 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	protected void onResume(){
 		log("onResume");
 		super.onResume();
+
+//		dbH.setShowNotifOff(true);
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+			queryIfNotificationsAreOn();
+		}
+	}
+
+	void queryIfNotificationsAreOn(){
+		log("queryIfNotificationsAreOn");
+
+		if (dbH == null){
+			dbH = DatabaseHandler.getDbHandler(getApplicationContext());
+		}
+
+		if (megaApi == null){
+			megaApi = ((MegaApplication)getApplication()).getMegaApi();
+		}
+
+		if (megaChatApi == null){
+			megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
+		}
+
+		NotificationManagerCompat nf = NotificationManagerCompat.from(this);
+		log ("NotificationsEnabled: "+nf.areNotificationsEnabled());
+		if (!nf.areNotificationsEnabled()){
+			log("off");
+			if (dbH.getShowNotifOff() == null || dbH.getShowNotifOff().equals("true")){
+				if ((megaApi.getContacts().size() >= 1) || (megaChatApi.getActiveChatListItems().size() >= 1)){
+					setTurnOnNotificationsFragment();
+				}
+			}
+		}
+
+	}
+
+	public void deleteTurnOnNotificationsFragment(){
+		log("deleteTurnOnNotificationsFragment");
+		turnOnNotifications = false;
+
+		tB.setVisibility(View.VISIBLE);
+		abL.setVisibility(View.VISIBLE);
+
+ 		tonF = null;
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+			Window window = this.getWindow();
+//			window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+//			window.addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+//			window.setStatusBarColor(ContextCompat.getColor(this, R.color.lollipop_dark_primary_color));
+			window.setStatusBarColor(0);
+		}
+		if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.GINGERBREAD){
+			requestWindowFeature(Window.FEATURE_NO_TITLE);
+			this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+		}
+		drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
+		supportInvalidateOptionsMenu();
+		selectDrawerItemLollipop(drawerItem);
+	}
+
+	void setTurnOnNotificationsFragment(){
+		log("setTurnOnNotificationsFragment");
+		aB.setSubtitle(null);
+		tB.setVisibility(View.GONE);
+
+		Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+		if (currentFragment != null){
+			getSupportFragmentManager().beginTransaction().remove(currentFragment).commitNow();
+		}
+
+		if (tonF == null){
+			tonF = new TurnOnNotificationsFragment();
+		}
+		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+		ft.replace(R.id.fragment_container, tonF, "tonF");
+		ft.commitNowAllowingStateLoss();
+
+		tabLayoutContacts.setVisibility(View.GONE);
+		viewPagerContacts.setVisibility(View.GONE);
+		tabLayoutShares.setVisibility(View.GONE);
+		viewPagerShares.setVisibility(View.GONE);
+		tabLayoutCloud.setVisibility(View.GONE);
+		viewPagerCDrive.setVisibility(View.GONE);
+		tabLayoutMyAccount.setVisibility(View.GONE);
+		viewPagerMyAccount.setVisibility(View.GONE);
+		tabLayoutTransfers.setVisibility(View.GONE);
+		viewPagerTransfers.setVisibility(View.GONE);
+		abL.setVisibility(View.GONE);
+
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+			Window window = this.getWindow();
+			window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+			window.setStatusBarColor(ContextCompat.getColor(this, R.color.turn_on_notifications_statusbar));
+		}
+		if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.GINGERBREAD){
+			requestWindowFeature(Window.FEATURE_NO_TITLE);
+			getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+		}
+
+		fragmentContainer.setVisibility(View.VISIBLE);
+		drawerLayout.closeDrawer(Gravity.LEFT);
+		drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+		supportInvalidateOptionsMenu();
+		hideFabButton();
 	}
 
 	@Override
@@ -3655,12 +3762,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				aB.setTitle(getString(R.string.section_secondary_media_uploads));
 				break;
 			}
-//			case TURN_ON_NOTIFICATIONS:{
-//				aB.setSubtitle(null);
-//				aB.setTitle(null);
-//				firstNavigationLevel = true;
-//				break;
-//			}
 			default:{
 				log("setToolbarTitle: default GONE");
 
@@ -4714,7 +4815,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
     			break;
     		}
     		case SHARED_ITEMS:{
-
 				selectDrawerItemSharedItems();
 				if (openFolderFromSearch){
 					onNodesSharedUpdate();
@@ -4777,8 +4877,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
     		}
     		case SEARCH:{
 
-    			tB.setVisibility(View.VISIBLE);
-
 				if (nV != null){
 					Menu nVMenu = nV.getMenu();
 					MenuItem hidden = nVMenu.findItem(R.id.navigation_item_hidden);
@@ -4829,56 +4927,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				selectDrawerItemChat();
 				supportInvalidateOptionsMenu();
 				showFabButton();
-				break;
-			}
-			case TURN_ON_NOTIFICATIONS:{
-				aB.setSubtitle(null);
-				tB.setVisibility(View.GONE);
-
-				drawerLayout.closeDrawer(Gravity.LEFT);
-
-				supportInvalidateOptionsMenu();
-
-				tabLayoutContacts.setVisibility(View.GONE);
-				viewPagerContacts.setVisibility(View.GONE);
-				tabLayoutShares.setVisibility(View.GONE);
-				viewPagerShares.setVisibility(View.GONE);
-				tabLayoutCloud.setVisibility(View.GONE);
-				viewPagerCDrive.setVisibility(View.GONE);
-				tabLayoutMyAccount.setVisibility(View.GONE);
-				viewPagerMyAccount.setVisibility(View.GONE);
-				tabLayoutTransfers.setVisibility(View.GONE);
-				viewPagerTransfers.setVisibility(View.GONE);
-
-				Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
-				if (currentFragment != null){
-					getSupportFragmentManager().beginTransaction().remove(currentFragment).commitNow();
-				}
-
-				if (tonF == null){
-					tonF = new TurnOnNotificationsFragment();
-				}
-
-				android.app.FragmentTransaction ft = getFragmentManager().beginTransaction();
-				ft.replace(R.id.fragment_container, tonF, "tonF");
-				ft.commit();
-
-				fragmentContainer.setVisibility(View.VISIBLE);
-
-				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-					Window window = this.getWindow();
-					window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-					window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-					window.setStatusBarColor(ContextCompat.getColor(this, R.color.turn_on_notifications_statusbar));
-				}
-				if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.GINGERBREAD){
-					requestWindowFeature(Window.FEATURE_NO_TITLE);
-					this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-				}
-
-				setToolbarTitle();
-				supportInvalidateOptionsMenu();
-				hideFabButton();
 				break;
 			}
     	}
@@ -8058,6 +8106,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		catch (Exception ex) {}
 
 		log("DRAWERITEM: " + drawerItem);
+
+		if (turnOnNotifications){
+			deleteTurnOnNotificationsFragment();
+			return;
+		}
 
 		if (drawerItem == DrawerItem.CLOUD_DRIVE){
 
