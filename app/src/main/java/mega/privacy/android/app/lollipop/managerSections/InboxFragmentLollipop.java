@@ -165,7 +165,8 @@ public class InboxFragmentLollipop extends Fragment{
 				case R.id.cab_menu_send_to_chat:{
 					log("Send files to chat");
 					ArrayList<MegaNode> nodesSelected = adapter.getArrayListSelectedNodes();
-					((ManagerActivityLollipop) context).sendToChat(nodesSelected);
+					NodeController nC = new NodeController(context);
+					nC.selectChatsToSendNodes(nodesSelected);
 					clearSelections();
 					hideMultipleSelect();
 					break;
