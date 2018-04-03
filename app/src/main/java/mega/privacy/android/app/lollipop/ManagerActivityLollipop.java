@@ -15335,7 +15335,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 		});
 
-
 	}
 
 	public String getDeviceName() {
