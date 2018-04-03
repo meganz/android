@@ -2359,8 +2359,23 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		dismissButton.setOnClickListener(this);
 
 		rememberPasswordDialog = builder.create();
-
+		rememberPasswordDialog.setCancelable(false);
+		rememberPasswordDialog.setCanceledOnTouchOutside(false);
+		rememberPasswordDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+			@Override
+			public void onDismiss(DialogInterface dialog) {
+				log("Do not show me again not checked");
+				if (showRememberPasswordDialog){
+					log("Do not show me again");
+					passwordReminderDialogBlocked();
+				}
+			}
+		});
 		rememberPasswordDialog.show();
+	}
+
+	void passwordReminderDialogBlocked(){
+		megaApi.passwordReminderDialogBlocked(this);
 	}
 
 	@Override
@@ -11070,23 +11085,27 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 			case R.id.dialog_remember_pwd_checkbox: {
 				if (showRememberPaswordCheckBox.isChecked()){
+					log("showRememberPaswordCheckBox checked");
 					showRememberPasswordDialog = false;
 				}
 				else {
+					log("showRememberPaswordCheckBox not checked");
 					showRememberPasswordDialog = true;
 				}
 				break;
 			}
 			case R.id.dialog_remember_pwd_test_button: {
-
+				Intent intent = new Intent(this, TestPasswordActivity.class);
+				rememberPasswordDialog.dismiss();
 				break;
 			}
 			case R.id.dialog_remember_pwd_backup_recoverykey_button: {
-
+				exportRecoveryKey();
+				rememberPasswordDialog.dismiss();
 				break;
 			}
 			case R.id.dialog_remember_pwd_dismiss_button: {
-
+				rememberPasswordDialog.dismiss();
 				break;
 			}
 //			case R.id.top_control_bar:{
@@ -11112,6 +11131,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 //				break;
 //			}
 		}
+	}
+
+	void exportRecoveryKey (){
+		AccountController aC = new AccountController(this);
+		aC.exportMK();
 	}
 
 	public void showConfirmationRemoveMK(){
@@ -12987,6 +13011,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 			else if(request.getParamType() == MegaApiJava.USER_ATTR_PWD_REMINDER){
 				log("MK exported - USER_ATTR_PWD_REMINDER finished");
+				log("New value of attribute USER_ATTR_PWD_REMINDER: " +request.getText());
 			}
 			if (request.getParamType() == MegaApiJava.USER_ATTR_AVATAR) {
 
