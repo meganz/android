@@ -15335,7 +15335,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 		});
 
-
 	}
 
 	public String getDeviceName() {
@@ -15359,6 +15358,4 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			return Character.toUpperCase(first) + s.substring(1);
 		}
 	}
-
-
 }
