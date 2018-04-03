@@ -42,6 +42,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
+import android.util.TimeUtils;
 import android.view.Display;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -59,6 +60,7 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationSet;
 import android.view.animation.AnimationUtils;
 import android.view.animation.TranslateAnimation;
+import android.widget.Chronometer;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -67,11 +69,13 @@ import android.widget.TextView;
 
 import java.io.File;
 import java.nio.ByteBuffer;
+import java.security.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 import java.util.TimeZone;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.TimeUnit;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
@@ -111,6 +115,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
     DatabaseHandler dbH = null;
     ChatItemPreferences chatPrefs = null;
     MegaUser myUser;
+    Chronometer myChrono;
 
     public static int REMOTE_VIDEO_NOT_INIT = -1;
     public static int REMOTE_VIDEO_ENABLED = 1;
@@ -371,7 +376,6 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
         }
 
         megaChatApi.addChatCallListener(this);
-
         myUser = megaApi.getMyUser();
 
         dbH = DatabaseHandler.getDbHandler(getApplicationContext());
@@ -410,6 +414,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
         aB.setHomeButtonEnabled(false);
         aB.setDisplayHomeAsUpEnabled(false);
         aB.setTitle(" ");
+        myChrono = new Chronometer(context);
 
         linearFAB = (LinearLayout) findViewById(R.id.linear_buttons);
         RelativeLayout.LayoutParams layoutCompress = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
@@ -597,6 +602,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                     updateLocalAudioStatus();
                     updateRemoteAudioStatus();
                     updateRemoteVideoStatus();
+                    startClock();
                 }
                 else{
                     log("Outgoing call");
@@ -1893,20 +1899,24 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
         return df.format(d);
     }
 
-
     private void startClock(){
-        startTime = SystemClock.uptimeMillis();
-        customHandler.postDelayed(updateTimerThread, 0);
+        long seconds = 0;
+
+        if(callChat!=null){
+            seconds = callChat.getDuration();
+        }
+        long baseTime = SystemClock.uptimeMillis() - (seconds*1000);
+        myChrono.setBase(baseTime);
+        customHandler.postDelayed(updateTimerThread, 1000);
     }
 
     private Runnable updateTimerThread = new Runnable() {
         public void run() {
-            timeInMilliseconds = SystemClock.uptimeMillis() - startTime;
-            aB.setSubtitle(getDateFromMillis(timeInMilliseconds));
-            customHandler.postDelayed(this, 1000);
+            long elapsedTime = SystemClock.uptimeMillis() - myChrono.getBase();
+            aB.setSubtitle(getDateFromMillis(elapsedTime));
+            customHandler.postDelayed(this, 0);
         }
     };
-
 
 
 //    private void startClock(){
