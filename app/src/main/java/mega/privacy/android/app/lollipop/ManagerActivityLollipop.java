@@ -15360,5 +15360,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		}
 	}
 
+	public void sendToChat(ArrayList<MegaNode> nodes){
+		if(nodes.size() == 0){
+			log("no selected node");
+			return;
+		}
+
+		nC.selectChatsToSendNodes(nodes);
+	}
+
 
 }

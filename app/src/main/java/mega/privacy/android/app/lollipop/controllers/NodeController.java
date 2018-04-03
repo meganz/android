@@ -173,7 +173,7 @@ public class NodeController {
         long[] longArray = new long[size];
 
         for(int i=0;i<nodes.size();i++){
-            longArray[i] = nodes.get(0).getHandle();
+            longArray[i] = nodes.get(i).getHandle();
         }
 
         selectChatsToSendNodes(longArray);
