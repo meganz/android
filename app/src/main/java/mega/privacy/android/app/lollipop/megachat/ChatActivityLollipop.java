@@ -3756,7 +3756,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         int resultModify = -1;
         if(msg.isDeleted()){
             log("The message has been deleted");
-            deleteMessage(msg);
+            deleteMessage(msg, false);
             return;
         }
 
@@ -3782,7 +3782,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
             if(revokedCount==nodeList.size()){
                 log("All the attachments have been revoked");
-                deleteMessage(msg);
+                deleteMessage(msg, false);
             }
             else{
                 log("One attachment revoked, modify message");
@@ -3865,15 +3865,13 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 resultModify = modifyMessageReceived(androidMsg, true);
                 log("onMessageUpdate: resultModify: "+resultModify);
             }
+            else if(msg.getStatus()==MegaChatMessage.STATUS_SERVER_REJECTED){
+                log("onMessageUpdate: STATUS_SERVER_REJECTED----- "+msg.getStatus());
+                deleteMessage(msg, true);
+            }
             else{
                 log("-----------Status : "+msg.getStatus());
                 log("-----------Timestamp: "+msg.getTimestamp());
-
-                if(msg.getStatus()==MegaChatMessage.STATUS_SERVER_REJECTED){
-                    log("onMessageUpdate: STATUS_SERVER_REJECTED----- "+msg.getStatus());
-                    //Buscar en la de sending por temporal id.
-
-                }
 
                 resultModify = modifyMessageReceived(androidMsg, false);
                 log("onMessageUpdate: resultModify: "+resultModify);
@@ -3908,7 +3906,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
     }
 
-    public void deleteMessage(MegaChatMessage msg){
+    public void deleteMessage(MegaChatMessage msg, boolean rejected){
         log("deleteMessage");
 
         int indexToChange = -1;
@@ -3921,9 +3919,17 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             log("Index: " + itr.nextIndex());
 
             if(!messageToCheck.isUploading()){
-                if (messageToCheck.getMessage().getMsgId() == msg.getMsgId()) {
-                    indexToChange = itr.nextIndex();
-                    break;
+                if(rejected){
+                    if (messageToCheck.getMessage().getTempId() == msg.getTempId()) {
+                        indexToChange = itr.nextIndex();
+                        break;
+                    }
+                }
+                else{
+                    if (messageToCheck.getMessage().getMsgId() == msg.getMsgId()) {
+                        indexToChange = itr.nextIndex();
+                        break;
+                    }
                 }
             }
         }
@@ -3960,7 +3966,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         else{
             log("index to change not found");
         }
-
     }
 
     public int modifyAttachmentReceived(AndroidMegaChatMessage msg, long idPendMsg){
