@@ -7,6 +7,10 @@ import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Environment;
+import android.support.v7.app.AlertDialog;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.Button;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -33,7 +37,7 @@ import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaUser;
 
-public class AccountController {
+public class AccountController implements View.OnClickListener{
 
     Context context;
     MegaApiAndroid megaApi;
@@ -42,6 +46,9 @@ public class AccountController {
     MegaPreferences prefs = null;
 
     static int count = 0;
+
+    AlertDialog recoveryKeyExportedDialog;
+    Button recoveryKeyExportedButton;
 
     public AccountController(Context context){
         log("AccountController created");
@@ -158,23 +165,39 @@ public class AccountController {
             out = new BufferedWriter(fileWriter);
             out.write(key);
             out.close();
-            String message = context.getString(R.string.toast_master_key, path);
-            try{
-                message = message.replace("[A]", "\n");
-            }
-            catch (Exception e){}
+//            String message = context.getString(R.string.toast_master_key, path);
+//            try{
+//                message = message.replace("[A]", "\n");
+//            }
+//            catch (Exception e){}
             ((ManagerActivityLollipop) context).invalidateOptionsMenu();
             MyAccountFragmentLollipop mAF = ((ManagerActivityLollipop) context).getMyAccountFragment();
             if(mAF!=null){
                 mAF.setMkButtonText();
             }
-            Util.showAlert(((ManagerActivityLollipop) context), message, null);
+//            Util.showAlert(((ManagerActivityLollipop) context), message, null);
+            showConfirmationExportedDialog();
 
         }catch (FileNotFoundException e) {
             e.printStackTrace();
         }catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    void showConfirmationExportedDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        LayoutInflater inflater = ((ManagerActivityLollipop)context).getLayoutInflater();
+        View v = inflater.inflate(R.layout.dialog_recovery_key_exported, null);
+        builder.setView(v);
+
+        recoveryKeyExportedButton = (Button) v.findViewById(R.id.dialog_recovery_key_button);
+        recoveryKeyExportedButton.setOnClickListener(this);
+
+        recoveryKeyExportedDialog = builder.create();
+        recoveryKeyExportedDialog.setCancelable(false);
+        recoveryKeyExportedDialog.setCanceledOnTouchOutside(false);
+        recoveryKeyExportedDialog.show();
     }
 
 //    public void updateMK(){
@@ -418,5 +441,15 @@ public class AccountController {
 
     public static void log(String message) {
         Util.log("AccountController", message);
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()){
+            case R.id.dialog_recovery_key_button:{
+                recoveryKeyExportedDialog.dismiss();
+                break;
+            }
+        }
     }
 }
