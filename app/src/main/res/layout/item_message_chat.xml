@@ -940,7 +940,6 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:gravity="right"
-        android:layout_below="@+id/message_chat_contact_message_layout"
         android:visibility="gone">
 
         <TextView

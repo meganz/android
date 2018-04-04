@@ -139,7 +139,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     ProgressDialog dialog;
     ProgressDialog statusDialog;
 
-    public MegaChatMessage lastMessageSeen = null;
+    MegaChatMessage myLastMessageOnLoad = null;
+
+//    public MegaChatMessage lastMessageSeen = null;
+    public long lastMessageSeen = -1;
     boolean lastSeenReceived = false;
     int positionToScroll = -1;
 
@@ -879,14 +882,15 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         long unread = chatRoom.getUnreadCount();
         //                        stateHistory = megaChatApi.loadMessages(idChat, NUMBER_MESSAGES_TO_LOAD);
         if (unread == 0) {
-            lastMessageSeen = null;
+            lastMessageSeen = -1;
             lastSeenReceived = true;
             log("loadMessages unread is 0");
             stateHistory = megaChatApi.loadMessages(idChat, NUMBER_MESSAGES_TO_LOAD);
         } else {
-            lastMessageSeen = megaChatApi.getLastMessageSeen(idChat);
-            if (lastMessageSeen != null) {
-                log("Id of last message seen: " + lastMessageSeen.getMsgId());
+            lastMessageSeen = megaChatApi.getLastMessageSeenId(idChat);
+
+            if (lastMessageSeen != -1) {
+                log("Id of last message seen: " + lastMessageSeen);
             } else {
                 log("Error the last message seen shouldn't be NULL");
             }
@@ -3395,8 +3399,12 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             log("TYPE: "+msg.getType());
 //            log("ROW id: "+msg.getR)
 
-            String content = msg.getContent();
-            log("Content onMessageUpdate: "+content);
+            if(msg.getUserHandle()==megaChatApi.getMyUserHandle()){
+                if(myLastMessageOnLoad==null){
+                    myLastMessageOnLoad = new MegaChatMessage();
+                    myLastMessageOnLoad = msg;
+                }
+            }
 
             if(msg.isDeleted()){
                 log("DELETED MESSAGE!!!!");
@@ -3531,16 +3539,19 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 }
 
                 AndroidMegaChatMessage androidMsg = new AndroidMegaChatMessage(msg);
-                if (lastMessageSeen != null) {
-                    if(lastMessageSeen.getMsgId()==msg.getMsgId()){
+                if (lastMessageSeen != -1) {
+                    if(lastMessageSeen==msg.getMsgId()){
                         log("onMessageLoaded: Last message seen received!");
                         lastSeenReceived=true;
                         positionToScroll = 0;
+                        if(myLastMessageOnLoad!=null){
+                            lastMessageSeen = myLastMessageOnLoad.getMsgId();
+                        }
                         log("(1) positionToScroll: "+positionToScroll);
                     }
                 }
                 else{
-                    log("lastMessageSeen is NULL");
+                    log("lastMessageSeen is -1");
                     lastSeenReceived=true;
                 }
 
@@ -3824,13 +3835,13 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         long unread = chatRoom.getUnreadCount();
         //                        stateHistory = megaChatApi.loadMessages(idChat, NUMBER_MESSAGES_TO_LOAD);
         if (unread == 0) {
-            lastMessageSeen = null;
+            lastMessageSeen = -1;
             lastSeenReceived = true;
             log("onHistoryReloaded: loadMessages unread is 0");
         } else {
-            lastMessageSeen = megaChatApi.getLastMessageSeen(idChat);
-            if (lastMessageSeen != null) {
-                log("onHistoryReloaded: Id of last message seen: " + lastMessageSeen.getMsgId());
+            lastMessageSeen = megaChatApi.getLastMessageSeenId(idChat);
+            if (lastMessageSeen != -1) {
+                log("onHistoryReloaded: Id of last message seen: " + lastMessageSeen);
             } else {
                 log("onHistoryReloaded: Error the last message seen shouldn't be NULL");
             }
