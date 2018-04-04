@@ -3497,12 +3497,22 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 //        ownMessageParams.setMargins(Util.scaleWidthPx(11, outMetrics), Util.scaleHeightPx(-14, outMetrics), Util.scaleWidthPx(62, outMetrics), Util.scaleHeightPx(16, outMetrics));
 //        ((ViewHolderMessageChat)holder).contentOwnMessageText.setLayoutParams(ownMessageParams);
 
-        if(((ChatActivityLollipop)context).lastMessageSeen!=null){
+        if(((ChatActivityLollipop)context).lastMessageSeen!=-1){
 
+            if(((ChatActivityLollipop)context).lastMessageSeen == message.getMsgId()){
 
-            if(((ChatActivityLollipop)context).lastMessageSeen.getMsgId() == message.getMsgId()){
+                RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) ((ViewHolderMessageChat)holder).newMessagesLayout.getLayoutParams();
+
+                if(message.getUserHandle()==megaChatApi.getMyUserHandle()){
+                    params.addRule(RelativeLayout.BELOW, R.id.message_chat_own_message_layout);
+                }
+                else{
+                    params.addRule(RelativeLayout.BELOW, R.id.message_chat_contact_message_layout);
+                }
+
+                ((ViewHolderMessageChat)holder).newMessagesLayout.setLayoutParams(params);
+
                 ((ViewHolderMessageChat)holder).newMessagesLayout.setVisibility(View.VISIBLE);
-                ((ChatActivityLollipop)context).lastMessageSeen = null;
             }
             else{
                 ((ViewHolderMessageChat)holder).newMessagesLayout.setVisibility(View.GONE);
