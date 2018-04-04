@@ -141,19 +141,17 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 	MegaPreferences prefs = null;
 
 	boolean decryptionIntroduced=false;
-
 	public static int REQUEST_CODE_SELECT_LOCAL_FOLDER = 1004;
-	
 	private ActionMode actionMode;
 	
 	boolean downloadCompleteFolder = false;
 	FolderLinkActivityLollipop folderLinkActivityLollipop = this;
 
 	MegaNode pN = null;
-
 	boolean fileLinkFolderLink = false;
 
 	String downloadLocationDefaultPath = Util.downloadDIR;
+	public static final int FOLDER_LINK = 2;
 
 	public void activateActionMode(){
 		log("activateActionMode");
@@ -1056,7 +1054,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 							node = megaApiFolder.authorizeNode(node);
 							if(node != null){
 								cont ++;
-								importLinkMultipleListener = new MultipleRequestListenerLink(this, cont, cont);
+								importLinkMultipleListener = new MultipleRequestListenerLink(this, cont, cont, FOLDER_LINK);
 								megaApi.copyNode(node, target, importLinkMultipleListener);
 								//megaApi.copyNode(node, target, this);
 							}else{
@@ -1078,9 +1076,8 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 						selectedNode = megaApiFolder.authorizeNode(selectedNode);
 						if (selectedNode != null){
 							cont ++;
-							importLinkMultipleListener = new MultipleRequestListenerLink(this, cont, cont);
+							importLinkMultipleListener = new MultipleRequestListenerLink(this, cont, cont, FOLDER_LINK);
 							megaApi.copyNode(selectedNode, target, importLinkMultipleListener);
-							//megaApi.copyNode(selectedNode, target, this);
 						}else{
 							Snackbar.make(fragmentContainer, getString(R.string.context_no_copied), Snackbar.LENGTH_LONG).show();
 						}
