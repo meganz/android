@@ -57,6 +57,7 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop.Mode;
+import mega.privacy.android.app.lollipop.listeners.MultipleRequestListenerLink;
 import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
@@ -85,6 +86,11 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 	ProgressDialog statusDialog;
 	AlertDialog decryptionKeyDialog;
 
+	long toHandle = 0;
+	long fragmentHandle = -1;
+	int cont = 0;
+	MultipleRequestListenerLink importLinkMultipleListener = null;
+
 	RelativeLayout fragmentContainer;
 	ImageView iconView;
 	TextView nameView;
@@ -103,7 +109,9 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 
 	boolean importClicked = false;
 	MegaNode target = null;
-	
+
+	public static final int FILE_LINK = 1;
+
 	@Override
 	public void onDestroy(){
 		if(megaApi != null)
@@ -935,45 +943,50 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 			downloadTo (parentPath, url, size, hashes);
 //			Snackbar.make(fragmentContainer, getString(R.string.download_began), Snackbar.LENGTH_LONG).show();
 		}
-		else if (requestCode == Constants.REQUEST_CODE_SELECT_IMPORT_FOLDER && resultCode == RESULT_OK){
-			if(!Util.isOnline(this)) {
-				try{
+		else if (requestCode == Constants.REQUEST_CODE_SELECT_IMPORT_FOLDER && resultCode == RESULT_OK) {
+			if (!Util.isOnline(this)) {
+				try {
 					statusDialog.dismiss();
-				} catch(Exception ex) {};
+				} catch (Exception ex) {
+				}
+				;
 
 				Snackbar.make(fragmentContainer, getString(R.string.error_server_connection_problem), Snackbar.LENGTH_LONG).show();
 				return;
 			}
-			
-			final long toHandle = intent.getLongExtra("IMPORT_TO", 0);
-			
+
+			toHandle = intent.getLongExtra("IMPORT_TO", 0);
+			fragmentHandle = intent.getLongExtra("fragmentH", -1);
+
+			MegaNode target = megaApi.getNodeByHandle(toHandle);
+			if (target == null) {
+				if (megaApi.getRootNode() != null) {
+					target = megaApi.getRootNode();
+				}
+			}
+
 			statusDialog = new ProgressDialog(this);
 			statusDialog.setMessage(getString(R.string.general_importing));
 			statusDialog.show();
 
-			target = null;
-			target = megaApi.getNodeByHandle(toHandle);
-			if(target == null){
-				target = megaApi.getRootNode();
-			}
-
-			if (document != null){
-				log("DOCUMENT: " + document.getName() + "_" + document.getHandle());
-				if (target != null){
-					log("TARGET: " + target.getName() + "_" + target.getHandle());
-					megaApi.copyNode(document, target, this);
+			if (document != null) {
+				if (target != null) {
+					log("Target node: " + target.getName());
+					cont++;
+					importLinkMultipleListener = new MultipleRequestListenerLink(this, cont, cont, FILE_LINK);
+					megaApi.copyNode(document, target, importLinkMultipleListener);
+				} else {
+					log("TARGET == null");
 				}
-				else{
-					log("TARGET: null");
-				}
-			}
-			else{
-				log("DOCUMENT: null");
-				if (target != null){
+			} else {
+				log("selected Node is NULL");
+				if (target != null) {
 					importClicked = true;
 				}
 			}
+
 		}
+
 	}
 
 //	int numberOfNodesToDownload = 0;
@@ -1446,6 +1459,24 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 			downloadTo(downloadLocationDefaultPath, urlM, sizeM, hashesM);
 		}
 	}
+
+	public void successfulCopy(){
+		Intent startIntent = new Intent(this, ManagerActivityLollipop.class);
+		if(toHandle!=-1){
+			startIntent.setAction(Constants.ACTION_OPEN_FOLDER);
+			startIntent.putExtra("PARENT_HANDLE", toHandle);
+			startIntent.putExtra("offline_adapter", false);
+			startIntent.putExtra("locationFileInfo", true);
+			startIntent.putExtra("fragmentHandle", fragmentHandle);
+		}
+		startActivity(startIntent);
+
+		try{
+			statusDialog.dismiss();
+		} catch(Exception ex){}
+
+		finish();
+	}
 	
 	@Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
@@ -1460,4 +1491,12 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 	        }
         }
     }
+
+	public void errorOverquota() {
+		Intent intent = new Intent(this, ManagerActivityLollipop.class);
+		intent.setAction(Constants.ACTION_OVERQUOTA_STORAGE);
+		startActivity(intent);
+		finish();
+	}
+
 }

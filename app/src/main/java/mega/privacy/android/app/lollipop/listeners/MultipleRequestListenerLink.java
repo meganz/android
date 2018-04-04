@@ -3,6 +3,7 @@ package mega.privacy.android.app.lollipop.listeners;
 import android.content.Context;
 
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.lollipop.FileLinkActivityLollipop;
 import mega.privacy.android.app.lollipop.FolderLinkActivityLollipop;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiJava;
@@ -18,12 +19,16 @@ public class MultipleRequestListenerLink implements MegaRequestListenerInterface
     int max_items = 0;
     int success = 0;
     String message;
+    int elementToImport = 0;
+    public static final int FILE_LINK = 1;
+    public static final int FOLDER_LINK = 2;
 
-    public MultipleRequestListenerLink( Context context, int counter, int max_items) {
+    public MultipleRequestListenerLink( Context context, int counter, int max_items, int elementToImport) {
         super();
         this.context = context;
         this.counter = counter;
         this.max_items = max_items;
+        this.elementToImport = elementToImport;
     }
 
     @Override
@@ -46,7 +51,11 @@ public class MultipleRequestListenerLink implements MegaRequestListenerInterface
                     if((success == 0) && (e.getErrorCode()==MegaError.API_EOVERQUOTA)){
                         //first error is OVERQUOTA
                         counter = -1;
-                        ((FolderLinkActivityLollipop) context).errorOverquota();
+                        if(elementToImport == FOLDER_LINK){
+                            ((FolderLinkActivityLollipop) context).errorOverquota();
+                        }else if(elementToImport == FILE_LINK){
+                            ((FileLinkActivityLollipop) context).errorOverquota();
+                        }
                     }
                 }else{
                     success ++;
@@ -56,11 +65,19 @@ public class MultipleRequestListenerLink implements MegaRequestListenerInterface
                     if(error == max_items){
                         //all copies failed
                         message = context.getString(R.string.context_no_copied);
-                        ((FolderLinkActivityLollipop) context).showSnackbar(message);
 
+                        if(elementToImport == FOLDER_LINK){
+                            ((FolderLinkActivityLollipop) context).showSnackbar(message);
+                        }else if(elementToImport == FILE_LINK){
+                            ((FileLinkActivityLollipop) context).showSnackbar(message);
+                        }
                     }else{
                         log("OK");
-                        ((FolderLinkActivityLollipop) context).successfulCopy();
+                        if(elementToImport == FOLDER_LINK){
+                            ((FolderLinkActivityLollipop) context).successfulCopy();
+                        }else if(elementToImport == FILE_LINK){
+                            ((FileLinkActivityLollipop) context).successfulCopy();
+                        }
                     }
                 }
                 break;

@@ -1374,7 +1374,6 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			this.backToCloud(handle);
 		}
 		else if (mode == IMPORT){
-			log("mode IMPORT");
 			long parentHandle = handle;
 			MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
 			if(parentNode == null){
