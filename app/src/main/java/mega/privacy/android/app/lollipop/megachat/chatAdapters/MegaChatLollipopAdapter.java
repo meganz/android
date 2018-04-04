@@ -1076,8 +1076,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 ((ViewHolderMessageChat)holder).ownMessageLayout.setVisibility(View.VISIBLE);
                 ((ViewHolderMessageChat)holder).contactMessageLayout.setVisibility(View.GONE);
 
-
-
                 int privilege = message.getPrivilege();
                 log("Privilege of me: "+privilege);
                 String textToShow = "";
@@ -2651,8 +2649,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             }else{
                 long userHandle = message.getUserHandle();
                 log("Contact message!!: "+userHandle);
-                String contentonBind = message.getContent();
-                log("Content onBind: "+contentonBind);
 
                 markAsSeen((message));
 
@@ -3500,6 +3496,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         if(((ChatActivityLollipop)context).lastMessageSeen!=-1){
 
             if(((ChatActivityLollipop)context).lastMessageSeen == message.getMsgId()){
+
+                log("onBindViewHolder:Last message id match!");
 
                 RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) ((ViewHolderMessageChat)holder).newMessagesLayout.getLayoutParams();
 
