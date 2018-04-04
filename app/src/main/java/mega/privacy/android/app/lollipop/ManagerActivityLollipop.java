@@ -216,6 +216,8 @@ import nz.mega.sdk.MegaUtilsAndroid;
 public class ManagerActivityLollipop extends PinActivityLollipop implements NetworkStateReceiver.NetworkStateReceiverListener, MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatCallListenerInterface,MegaChatRequestListenerInterface, OnNavigationItemSelectedListener, MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener,
 			NodeOptionsBottomSheetDialogFragment.CustomHeight, ContactsBottomSheetDialogFragment.CustomHeight{
 
+	final String ACTION_RECOVERY_KEY_EXPORTED = "RECOVERY_KEY_EXPORTED";
+
 	public int accountFragment;
 
 	private long handleInviteContact = 0;
@@ -519,7 +521,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	int fromTakePicture = -1;
 
 	private AlertDialog rememberPasswordDialog;
-	private boolean showRememberPasswordDialog = false;
+	private boolean passwordReminderDialogSkipped = false;
+	private boolean passwordReminderDialogBlocked = false;
 	private CheckBox showRememberPaswordCheckBox;
 	private Button testPwdButton;
 	private Button backupRecoveryKeyButton;
@@ -1115,6 +1118,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		else {
 			textsearchQuery = false;
 		}
+		if (passwordReminderDialogBlocked){
+			outState.putBoolean("passwordReminderDialogBlocked", passwordReminderDialogBlocked);
+		}
 	}
 
 	@Override
@@ -1169,6 +1175,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			searchQuery = savedInstanceState.getString("searchQuery");
 			textsearchQuery = savedInstanceState.getBoolean("textsearchQuery");
 			levelsSearch = savedInstanceState.getInt("levelsSearch");
+			passwordReminderDialogBlocked = savedInstanceState.getBoolean("passwordReminderDialogBlocked", false);
 		}
 		else{
 			log("Bundle is NULL");
@@ -2347,11 +2354,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		View v = inflater.inflate(R.layout.dialog_remember_password, null);
 		builder.setView(v);
 
-		showRememberPasswordDialog = false;
 		showRememberPaswordCheckBox = (CheckBox) v.findViewById(R.id.dialog_remember_pwd_checkbox);
 		testPwdButton = (Button) v.findViewById(R.id.dialog_remember_pwd_test_button);
 		backupRecoveryKeyButton = (Button) v.findViewById(R.id.dialog_remember_pwd_backup_recoverykey_button);
 		dismissButton = (Button) v.findViewById(R.id.dialog_remember_pwd_dismiss_button);
+		if (passwordReminderDialogBlocked){
+			showRememberPaswordCheckBox.setChecked(true);
+		}
 
 		showRememberPaswordCheckBox.setOnClickListener(this);
 		testPwdButton.setOnClickListener(this);
@@ -2365,9 +2374,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			@Override
 			public void onDismiss(DialogInterface dialog) {
 				log("Do not show me again not checked");
-				if (showRememberPasswordDialog){
+				if (passwordReminderDialogBlocked){
 					log("Do not show me again");
 					passwordReminderDialogBlocked();
+				}
+				else if (passwordReminderDialogSkipped){
+					passwordReminderDialogSkiped();
 				}
 			}
 		});
@@ -2376,6 +2388,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 	void passwordReminderDialogBlocked(){
 		megaApi.passwordReminderDialogBlocked(this);
+	}
+
+	void passwordReminderDialogSkiped(){
+		megaApi.passwordReminderDialogSkipped(this);
 	}
 
 	@Override
@@ -2618,6 +2634,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					else{
 						log("Error, no handle");
 					}
+				}
+				else if (getIntent().getAction().equals(ACTION_RECOVERY_KEY_EXPORTED)){
+					log("onPostResume: ACTION_RECOVERY_KEY_EXPORTED");
+					exportRecoveryKey();
 				}
 
     			intent.setAction(null);
@@ -11085,26 +11105,30 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 			case R.id.dialog_remember_pwd_checkbox: {
 				if (showRememberPaswordCheckBox.isChecked()){
-					log("showRememberPaswordCheckBox checked");
-					showRememberPasswordDialog = false;
+					log("passwordReminderDialogBlocked checked");
+					passwordReminderDialogBlocked = true;
 				}
 				else {
 					log("showRememberPaswordCheckBox not checked");
-					showRememberPasswordDialog = true;
+					passwordReminderDialogBlocked = false;
 				}
 				break;
 			}
 			case R.id.dialog_remember_pwd_test_button: {
-				Intent intent = new Intent(this, TestPasswordActivity.class);
+				passwordReminderDialogSkipped = false;
 				rememberPasswordDialog.dismiss();
+				Intent intent = new Intent(this, TestPasswordActivity.class);
+				startActivity(intent);
 				break;
 			}
 			case R.id.dialog_remember_pwd_backup_recoverykey_button: {
-				exportRecoveryKey();
+				passwordReminderDialogSkipped = false;
 				rememberPasswordDialog.dismiss();
+				exportRecoveryKey();
 				break;
 			}
 			case R.id.dialog_remember_pwd_dismiss_button: {
+				passwordReminderDialogSkipped = true;
 				rememberPasswordDialog.dismiss();
 				break;
 			}
@@ -13011,7 +13035,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 			else if(request.getParamType() == MegaApiJava.USER_ATTR_PWD_REMINDER){
 				log("MK exported - USER_ATTR_PWD_REMINDER finished");
-				log("New value of attribute USER_ATTR_PWD_REMINDER: " +request.getText());
+				if (e.getErrorCode() == MegaError.API_OK){
+					log("New value of attribute USER_ATTR_PWD_REMINDER: " +request.getText());
+					if (request.getFlag()){
+						showRememberPasswordDialog();
+					}
+				}
 			}
 			if (request.getParamType() == MegaApiJava.USER_ATTR_AVATAR) {
 
