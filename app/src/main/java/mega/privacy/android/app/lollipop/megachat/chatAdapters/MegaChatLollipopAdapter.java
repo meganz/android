@@ -98,6 +98,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
     MegaChatApiAndroid megaChatApi;
     boolean multipleSelect;
     private SparseBooleanArray selectedItems;
+    boolean visibilityNew = false;
 
     private MegaChatLollipopAdapter megaChatAdapter;
 
@@ -3511,13 +3512,16 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 ((ViewHolderMessageChat)holder).newMessagesLayout.setLayoutParams(params);
 
                 ((ViewHolderMessageChat)holder).newMessagesLayout.setVisibility(View.VISIBLE);
+                visibilityNew = true;
             }
             else{
                 ((ViewHolderMessageChat)holder).newMessagesLayout.setVisibility(View.GONE);
+                visibilityNew = false;
             }
         }
         else{
             ((ViewHolderMessageChat)holder).newMessagesLayout.setVisibility(View.GONE);
+            visibilityNew = false;
         }
     }
 
@@ -4744,6 +4748,10 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             log("The duration is: "+hours+" "+minutes+" "+seconds);
         }
         return timeString;
+    }
+
+    public boolean isVisibleNew(){
+        return visibilityNew;
     }
 
 }
