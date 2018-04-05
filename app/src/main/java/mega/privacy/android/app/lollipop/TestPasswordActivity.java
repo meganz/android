@@ -10,18 +10,23 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
+import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.modalbottomsheet.RecoveryKeyBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -36,6 +41,9 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 public class TestPasswordActivity extends PinActivityLollipop implements View.OnClickListener, MegaRequestListenerInterface {
 
     final String ACTION_RECOVERY_KEY_EXPORTED = "RECOVERY_KEY_EXPORTED";
+    final String ACTION_RECOVERY_KEY_LOGOUT = "RECOVERY_KEY_LOGOUT";
+    final String ACTION_REQUEST_DOWNLOAD_FOLDER_LOGOUT = "REQUEST_DOWNLOAD_FOLDER_LOGOUT";
+    private static int REQUEST_DOWNLOAD_FOLDER = 1111;
 
     private EditText passwordEditText;
     private ImageView passwordToggle;
@@ -50,6 +58,7 @@ public class TestPasswordActivity extends PinActivityLollipop implements View.On
 
     private boolean passwdVisibility = false;
     private boolean passwordCorrect = false;
+    private boolean logout = false;
 
     MegaApiAndroid megaApi;
 
@@ -58,6 +67,12 @@ public class TestPasswordActivity extends PinActivityLollipop implements View.On
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_test_password);
+        if (getIntent() == null){
+            log("intent NULL");
+            return;
+        }
+
+        logout = getIntent().getBooleanExtra("rememberPasswordLogout", false);
 
         megaApi = ((MegaApplication)getApplication()).getMegaApi();
 
@@ -125,6 +140,19 @@ public class TestPasswordActivity extends PinActivityLollipop implements View.On
         confirmPasswordButton.setOnClickListener(this);
         backupRecoveryKeyButton.setOnClickListener(this);
         dismissButton.setOnClickListener(this);
+
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        if (logout) {
+            backupRecoveryKeyButton.setText(R.string.option_export_recovery_key);
+            dismissButton.setText(R.string.option_logout_anyway);
+            params.setMargins((int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 24, getResources().getDisplayMetrics()), (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, getResources().getDisplayMetrics()), 0, (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 50, getResources().getDisplayMetrics()));
+       }
+        else {
+            backupRecoveryKeyButton.setText(R.string.action_export_master_key);
+            dismissButton.setText(R.string.general_dismiss);
+            params.setMargins((int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 7, getResources().getDisplayMetrics()), (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, getResources().getDisplayMetrics()), 0, (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 50, getResources().getDisplayMetrics()));
+        }
+        dismissButton.setLayoutParams(params);
     }
 
     void quitError(){
@@ -194,6 +222,25 @@ public class TestPasswordActivity extends PinActivityLollipop implements View.On
     }
 
     @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        super.onActivityResult(requestCode, resultCode, intent);
+
+        if (requestCode == REQUEST_DOWNLOAD_FOLDER && resultCode == RESULT_OK){
+            log("REQUEST_DOWNLOAD_FOLDER");
+            String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
+            if (parentPath != null){
+                log("parentPath no NULL");
+                String[] split = Util.rKFile.split("/");
+                parentPath = parentPath+"/"+split[split.length-1];
+                Intent newIntent = new Intent(this, ManagerActivityLollipop.class);
+                newIntent.putExtra("parentPath", parentPath);
+                intent.setAction(ACTION_REQUEST_DOWNLOAD_FOLDER_LOGOUT);
+                startActivity(intent);
+            }
+        }
+    }
+
+    @Override
     public void onClick(View v) {
 
         switch (v.getId()){
@@ -220,15 +267,29 @@ public class TestPasswordActivity extends PinActivityLollipop implements View.On
                 break;
             }
             case R.id.test_password_backup_button:{
-                Intent intent = new Intent(this, ManagerActivityLollipop.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                intent.setAction(ACTION_RECOVERY_KEY_EXPORTED);
-                startActivity(intent);
+                if (logout){
+                    RecoveryKeyBottomSheetDialogFragment recoveryKeyBottomSheetDialogFragment = new RecoveryKeyBottomSheetDialogFragment();
+                    recoveryKeyBottomSheetDialogFragment.show(getSupportFragmentManager(), recoveryKeyBottomSheetDialogFragment.getTag());
+                }
+                else {
+                    Intent intent = new Intent(this, ManagerActivityLollipop.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    intent.setAction(ACTION_RECOVERY_KEY_EXPORTED);
+                    startActivity(intent);
+                }
                 break;
             }
             case R.id.test_password_dismiss_button:{
                 megaApi.passwordReminderDialogSkipped(this);
-                this.finish();
+                if (logout){
+                    Intent intent = new Intent(this, ManagerActivityLollipop.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    intent.setAction(ACTION_RECOVERY_KEY_LOGOUT);
+                    startActivity(intent);
+                }
+                else {
+                    this.finish();
+                }
                 break;
             }
         }

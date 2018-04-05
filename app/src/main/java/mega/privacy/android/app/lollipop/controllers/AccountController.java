@@ -1,12 +1,18 @@
 package mega.privacy.android.app.lollipop.controllers;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.NotificationManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Environment;
+import android.os.StatFs;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,9 +20,12 @@ import android.widget.Button;
 
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.channels.FileChannel;
 
 import mega.privacy.android.app.CameraSyncService;
 import mega.privacy.android.app.DatabaseHandler;
@@ -29,6 +38,7 @@ import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PinLockActivityLollipop;
 import mega.privacy.android.app.lollipop.managerSections.MyAccountFragmentLollipop;
+import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.PreviewUtils;
 import mega.privacy.android.app.utils.ThumbnailUtils;
 import mega.privacy.android.app.utils.Util;
@@ -142,12 +152,14 @@ public class AccountController implements View.OnClickListener{
         megaApi.setAvatar(null, (ManagerActivityLollipop)context);
     }
 
-    public void exportMK(){
+    public void exportMK(String path){
         log("exportMK");
         if (!Util.isOnline(context)){
             ((ManagerActivityLollipop) context).showSnackbar(context.getString(R.string.error_server_connection_problem));
             return;
         }
+
+        boolean pathNull = false;
 
         String key = megaApi.exportMasterKey();
         megaApi.masterKeyExported((ManagerActivityLollipop) context);
@@ -159,8 +171,32 @@ public class AccountController implements View.OnClickListener{
             log("Path main Dir: " + mainDirPath);
             mainDir.mkdirs();
 
-            final String path = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
+            if (path == null){
+                path = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
+                pathNull = true;
+            }
             log("Export in: "+path);
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                boolean hasStoragePermission = (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
+                if (!hasStoragePermission) {
+                    ActivityCompat.requestPermissions((ManagerActivityLollipop) context, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, Constants.REQUEST_WRITE_STORAGE);
+                }
+            }
+
+            double availableFreeSpace = Double.MAX_VALUE;
+            try{
+                StatFs stat = new StatFs(path);
+                availableFreeSpace = (double)stat.getAvailableBlocks() * (double)stat.getBlockSize();
+            }
+            catch(Exception ex){}
+
+            File file = new File(path);
+            if(availableFreeSpace < file.length()) {
+                ((ManagerActivityLollipop) context).showSnackbar(context.getString(R.string.error_not_enough_free_space));
+                return;
+            }
+
             FileWriter fileWriter= new FileWriter(path);
             out = new BufferedWriter(fileWriter);
             out.write(key);
@@ -170,13 +206,19 @@ public class AccountController implements View.OnClickListener{
 //                message = message.replace("[A]", "\n");
 //            }
 //            catch (Exception e){}
-            ((ManagerActivityLollipop) context).invalidateOptionsMenu();
-            MyAccountFragmentLollipop mAF = ((ManagerActivityLollipop) context).getMyAccountFragment();
-            if(mAF!=null){
-                mAF.setMkButtonText();
+            if (pathNull){
+                ((ManagerActivityLollipop) context).invalidateOptionsMenu();
+                MyAccountFragmentLollipop mAF = ((ManagerActivityLollipop) context).getMyAccountFragment();
+                if(mAF!=null){
+                    mAF.setMkButtonText();
+                }
+
+                showConfirmationExportedDialog();
+            }
+            else {
+                showConfirmDialogRecoveryKeySaved();
             }
 //            Util.showAlert(((ManagerActivityLollipop) context), message, null);
-            showConfirmationExportedDialog();
 
         }catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -195,8 +237,6 @@ public class AccountController implements View.OnClickListener{
         recoveryKeyExportedButton.setOnClickListener(this);
 
         recoveryKeyExportedDialog = builder.create();
-        recoveryKeyExportedDialog.setCancelable(false);
-        recoveryKeyExportedDialog.setCanceledOnTouchOutside(false);
         recoveryKeyExportedDialog.show();
     }
 
@@ -237,14 +277,31 @@ public class AccountController implements View.OnClickListener{
         oldMKFile.renameTo(newMKFile);
     }
 
-    public void copyMK(){
+    public void copyMK(boolean logout){
         log("copyMK");
         String key = megaApi.exportMasterKey();
         megaApi.masterKeyExported((ManagerActivityLollipop) context);
         android.content.ClipboardManager clipboard = (android.content.ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
         android.content.ClipData clip = android.content.ClipData.newPlainText("Copied Text", key);
         clipboard.setPrimaryClip(clip);
-        Util.showAlert(((ManagerActivityLollipop) context), context.getString(R.string.copy_MK_confirmation), null);
+        if (logout){
+            showConfirmDialogRecoveryKeySaved();
+        }
+        else {
+            Util.showAlert(((ManagerActivityLollipop) context), context.getString(R.string.copy_MK_confirmation), null);
+        }
+    }
+
+    void showConfirmDialogRecoveryKeySaved(){
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setMessage(context.getString(R.string.copy_MK_confirmation));
+        builder.setPositiveButton(context.getString(R.string.action_logout), new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                logout(context, megaApi);
+            }
+        });
+        builder.show();
     }
 
     public void removeMK() {
