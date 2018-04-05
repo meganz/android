@@ -4,14 +4,11 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.PersistableBundle;
 import android.os.StatFs;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
@@ -22,7 +19,6 @@ import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
-import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -132,7 +128,8 @@ public class QRCodeActivity extends PinActivityLollipop implements MegaRequestLi
                 }
                 else {
                     qrCodeFragment = 1;
-                    ScanCodeFragment.scannerView.startCamera();
+//                    ScanCodeFragment.scannerView.setAutoFocus(true);
+//                    ScanCodeFragment.scannerView.startCamera();
                     scanCodeFragment = (ScanCodeFragment) qrCodePageAdapter.instantiateItem(viewPagerQRCode, 1);
                 }
             }
@@ -193,9 +190,11 @@ public class QRCodeActivity extends PinActivityLollipop implements MegaRequestLi
                 break;
             }
         }
-        if (contacts) {
-            ScanCodeFragment.scannerView.startCamera();
-        }
+
+//        if (contacts) {
+////            ScanCodeFragment.scannerView.setAutoFocus(true);
+////            ScanCodeFragment.scannerView.startCamera();
+//        }
 
         return super.onCreateOptionsMenu(menu);
     }
@@ -387,27 +386,34 @@ public class QRCodeActivity extends PinActivityLollipop implements MegaRequestLi
     public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
 
         if(request.getNumber()==MegaContactRequest.INVITE_ACTION_ADD){
+            scanCodeFragment.myEmail = request.getEmail();
             if (e.getErrorCode() == MegaError.API_OK){
                 log("OK INVITE CONTACT: "+request.getEmail());
                 if (scanCodeFragment == null) {
                     log("MyCodeFragment is NULL");
                     scanCodeFragment = (ScanCodeFragment) qrCodePageAdapter.instantiateItem(viewPagerQRCode, 1);
                 }
-                scanCodeFragment.showAlertDialog(R.string.invite_sent, R.string.invite_sent_text, true);
+                scanCodeFragment.dialogTitleContent = R.string.invite_sent;
+                scanCodeFragment.dialogTextContent = R.string.invite_sent_text;
+                scanCodeFragment.showAlertDialog(scanCodeFragment.dialogTitleContent, scanCodeFragment.dialogTextContent, true);
             }
             else if (e.getErrorCode() == MegaError.API_EACCESS){
                 if (scanCodeFragment == null) {
                     log("MyCodeFragment is NULL");
                     scanCodeFragment = (ScanCodeFragment) qrCodePageAdapter.instantiateItem(viewPagerQRCode, 1);
                 }
-                scanCodeFragment.showAlertDialog(R.string.invite_not_sent, R.string.invite_not_sent_text_error, false);
+                scanCodeFragment.dialogTitleContent = R.string.invite_not_sent;
+                scanCodeFragment.dialogTextContent = R.string.invite_not_sent_text_error;
+                scanCodeFragment.showAlertDialog(scanCodeFragment.dialogTitleContent, scanCodeFragment.dialogTextContent, false);
             }
             else if (e.getErrorCode() == MegaError.API_EEXIST){
                 if (scanCodeFragment == null) {
                     log("MyCodeFragment is NULL");
                     scanCodeFragment = (ScanCodeFragment) qrCodePageAdapter.instantiateItem(viewPagerQRCode, 1);
                 }
-                scanCodeFragment.showAlertDialog(R.string.invite_not_sent, R.string.invite_not_sent_text_already_contact, true);
+                scanCodeFragment.dialogTitleContent = R.string.invite_not_sent;
+                scanCodeFragment.dialogTextContent = R.string.invite_not_sent_text_already_contact;
+                scanCodeFragment.showAlertDialog(scanCodeFragment.dialogTitleContent, scanCodeFragment.dialogTextContent, true);
             }
         }
     }

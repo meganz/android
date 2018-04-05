@@ -7,6 +7,7 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.net.wifi.WifiManager;
 import android.net.wifi.WifiManager.WifiLock;
@@ -611,8 +612,10 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 						else{
 							pdfIntent.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
 						}
-						pdfIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 						pdfIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+						pdfIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+						pdfIntent.putExtra("inside", true);
+						pdfIntent.putExtra("isUrl", false);
 						startActivity(pdfIntent);
 					}
 					else if (MimeTypeList.typeForName(currentFile.getName()).isVideo()) {
@@ -627,6 +630,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 							videoIntent.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
 						}
 						videoIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+						videoIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 						startActivity(videoIntent);
 					}
 					else if (MimeTypeList.typeForName(currentFile.getName()).isAudio()) {
@@ -641,6 +645,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 							audioIntent.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
 						}
 						audioIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+						audioIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 						startActivity(audioIntent);
 					}
 					else if (MimeTypeList.typeForName(currentFile.getName()).isDocument()) {
@@ -652,7 +657,6 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 						} else {
 							viewIntent.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
 						}
-						viewIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 						viewIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 
 						if (MegaApiUtils.isIntentAvailable(this, viewIntent))
@@ -1059,10 +1063,9 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 					resultFile.setExecutable(true, false);
 
 					String filePath = transfer.getPath();
-
+					File f = new File(filePath);
 					try {
 						Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-						File f = new File(filePath);
 						Uri contentUri;
 						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
 							contentUri = FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", f);
@@ -1072,6 +1075,17 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 						mediaScanIntent.setData(contentUri);
 						mediaScanIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 						this.sendBroadcast(mediaScanIntent);
+					}
+					catch (Exception e){}
+
+					try {
+						MediaScannerConnection.scanFile(getApplicationContext(), new String[]{
+								f.getAbsolutePath()}, null, new MediaScannerConnection.OnScanCompletedListener() {
+							@Override
+							public void onScanCompleted(String path, Uri uri) {
+								log("File was scanned successfully");
+							}
+						});
 					}
 					catch (Exception e){}
 

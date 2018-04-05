@@ -932,4 +932,35 @@
         </RelativeLayout>
 
     </RelativeLayout>
+
+    <!--NEW LAYOUT -->
+    <LinearLayout
+        android:id="@+id/message_chat_new_relative_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="right"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/message_chat_new_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:text="NEW"
+            android:layout_marginRight="24dp"
+            android:textSize="12sp"
+            android:textColor="@color/lollipop_primary_color"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginLeft="12dp"
+            android:layout_marginRight="12dp"
+            android:layout_marginBottom="4dp"
+            android:background="@color/lollipop_primary_color"/>
+
+    </LinearLayout>
+
+
 </RelativeLayout>

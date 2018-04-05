@@ -11,12 +11,14 @@
 
         <RelativeLayout
             android:id="@+id/qr_code_relative_container"
-            android:layout_width="280dp"
-            android:layout_height="280dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:gravity="center"
             android:layout_marginTop="60dp"
             android:layout_marginBottom="58dp"
+            android:layout_marginRight="60dp"
+            android:layout_marginLeft="60dp"
             android:layout_above="@+id/qr_code_link">
 
             <ImageView
