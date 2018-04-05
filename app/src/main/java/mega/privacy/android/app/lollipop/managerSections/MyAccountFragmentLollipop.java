@@ -537,8 +537,11 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 
 			case R.id.logout_button:{
 				log("Logout button");
-				AccountController aC = new AccountController(context);
-				aC.logout(context, megaApi);
+//				megaApi.shouldShowPasswordReminderDialog(true, this);
+				((ManagerActivityLollipop) getContext()).showRememberPasswordDialog(true);
+
+//				AccountController aC = new AccountController(this);
+//				aC.logout(this, megaApi);
 				break;
 			}
 			case R.id.my_account_relative_layout_avatar:{
@@ -572,14 +575,14 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 				log("Copy Master Key button");
 				hideMKLayout();
 				AccountController aC = new AccountController(context);
-				aC.copyMK();
+				aC.copyMK(false);
 				break;
 			}
 			case R.id.save_MK_button:{
 				log("Save Master Key button");
 				hideMKLayout();
 				AccountController aC = new AccountController(context);
-				aC.exportMK();
+				aC.exportMK(null);
 				break;
 			}
 			case R.id.my_account_account_type_button:{
