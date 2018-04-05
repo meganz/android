@@ -1526,6 +1526,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		//TABS section Contacts
 		tabLayoutContacts =  (TabLayout) findViewById(R.id.sliding_tabs_contacts);
 		viewPagerContacts = (ViewPager) findViewById(R.id.contact_tabs_pager);
+		viewPagerContacts.setOffscreenPageLimit(3);
 
 		if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
 			tabLayoutContacts.setTabMode(TabLayout.MODE_FIXED);
