@@ -182,19 +182,25 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
 
                         MegaHandleList handleList = megaChatApi.getChatCalls();
                         if(handleList!=null){
-                            if(handleList.size()==0){
-                                log("NO calls in progress");
-                            }
-                            else if(handleList.size()==1){
+                            long numberOfCalls = handleList.size();
+                            log("Number of calls in progress: "+numberOfCalls);
+                            if(numberOfCalls==1){
+
                                 long chatId = handleList.get(0);
 
                                 MegaChatCall call = megaChatApi.getChatCall(chatId);
                                 if(call!=null){
-                                    launchCallActivity(call);
+                                    if(call.getStatus()<=MegaChatCall.CALL_STATUS_IN_PROGRESS){
+                                        launchCallActivity(call);
+                                    }
+                                    else{
+                                        log("Launch not in correct status");
+                                    }
                                 }
                             }
                             else{
                                 log("MORE than one call in progress - not supported yet");
+
                             }
                         }
                     }
@@ -390,7 +396,12 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
         log("onChatCallUpdate: " + call.getChatid() + " " + call.getStatus());
 
         if(call.hasChanged(MegaChatCall.CHANGE_TYPE_STATUS)){
-            launchCallActivity(call);
+            if(call.getStatus()<=MegaChatCall.CALL_STATUS_IN_PROGRESS){
+                launchCallActivity(call);
+            }
+            else{
+                log("Launch not in correct status");
+            }
         }
 
         if(call.hasRemoteAudio()){
@@ -408,23 +419,17 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
     }
 
     public void launchCallActivity(MegaChatCall call){
-        log("launchCallActivity");
+        log("launchCallActivity: "+call.getStatus());
         MegaApplication.setShowPinScreen(false);
 
-        if(call.getStatus()==MegaChatCall.CALL_STATUS_RING_IN){
-
-            Intent i = new Intent(this, ChatCallActivity.class);
-            i.putExtra("chatHandle", call.getChatid());
-            i.putExtra("callId", call.getId());
-            i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        Intent i = new Intent(this, ChatCallActivity.class);
+        i.putExtra("chatHandle", call.getChatid());
+        i.putExtra("callId", call.getId());
+        i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 //            i.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
-            startActivity(i);
+        startActivity(i);
 
-            removeListeners();
-        }
-        else{
-            log("Not in RINGING status");
-        }
+        removeListeners();
     }
 
     public void showSharedFolderNotification(MegaNode n) {
