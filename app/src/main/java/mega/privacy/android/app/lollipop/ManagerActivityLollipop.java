@@ -12683,7 +12683,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 	@Override
 	public void onRequestFinish(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
-		log("onRequestFinish(CHAT)");
+		log("onRequestFinish(CHAT): " + request.getRequestString()+"_"+e.getErrorCode());
 
 		if(request.getType() == MegaChatRequest.TYPE_TRUNCATE_HISTORY){
 			log("Truncate history request finish.");
@@ -12784,8 +12784,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 		}
 		else if (request.getType() == MegaChatRequest.TYPE_LOGOUT){
+			log("onRequestFinish(CHAT): " + MegaChatRequest.TYPE_LOGOUT);
 
-			log("Disable chat finish logout");
+			if (e.getErrorCode() != MegaError.API_OK){
+				log("onRequestFinish(CHAT):MegaChatRequest.TYPE_LOGOUT:ERROR");
+			}
 			if(sttFLol!=null){
 				if(sttFLol.isAdded()){
 					sttFLol.hidePreferencesChat();
@@ -12825,12 +12828,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 	@SuppressLint("NewApi") @Override
 	public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
-		log("onRequestFinish: " + request.getRequestString());
+		log("onRequestFinish: " + request.getRequestString()+"_"+e.getErrorCode());
 
-		if (request.getType() == MegaRequest.TYPE_FETCH_NODES){
-			log("fecthnodes request finished");
-		}
-		else if (request.getType() == MegaRequest.TYPE_CREDIT_CARD_CANCEL_SUBSCRIPTIONS){
+		if (request.getType() == MegaRequest.TYPE_CREDIT_CARD_CANCEL_SUBSCRIPTIONS){
 			if (e.getErrorCode() == MegaError.API_OK){
 				Snackbar.make(fragmentContainer, getString(R.string.cancel_subscription_ok), Snackbar.LENGTH_LONG).show();
 			}
@@ -12840,28 +12840,34 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			megaApi.creditCardQuerySubscriptions(myAccountInfo);
 		}
 		else if (request.getType() == MegaRequest.TYPE_LOGOUT){
-			log("logout finished");
+			log("onRequestFinish: " + MegaRequest.TYPE_LOGOUT);
 
-			if(Util.isChatEnabled()){
-				log("END logout sdk request - wait chat logout");
+			if (e.getErrorCode() == MegaError.API_OK){
+				log("onRequestFinish:OK:" + MegaRequest.TYPE_LOGOUT);
+				if(Util.isChatEnabled()){
+					log("END logout sdk request - wait chat logout");
+				}
+				else{
+					log("END logout sdk request - chat disabled");
+					if (dbH == null){
+						dbH = DatabaseHandler.getDbHandler(getApplicationContext());
+					}
+					if (dbH != null){
+						dbH.clearEphemeral();
+					}
+
+					AccountController aC = new AccountController(this);
+					aC.logoutConfirmed(this);
+
+					Intent tourIntent = new Intent(this, LoginActivityLollipop.class);
+					tourIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+					this.startActivity(tourIntent);
+
+					finish();
+				}
 			}
 			else{
-				log("END logout sdk request - chat disabled");
-				if (dbH == null){
-					dbH = DatabaseHandler.getDbHandler(getApplicationContext());
-				}
-				if (dbH != null){
-					dbH.clearEphemeral();
-				}
-
-				AccountController aC = new AccountController(this);
-				aC.logoutConfirmed(this);
-
-				Intent tourIntent = new Intent(this, LoginActivityLollipop.class);
-				tourIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-				this.startActivity(tourIntent);
-
-				finish();
+				showSnackbar(getString(R.string.email_verification_text_error));
 			}
 		}
 		else if(request.getType() == MegaRequest.TYPE_SET_ATTR_USER) {

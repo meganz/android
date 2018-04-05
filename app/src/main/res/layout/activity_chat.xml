@@ -33,6 +33,7 @@
                 android:layout_height="wrap_content"
                 android:minHeight="?attr/actionBarSize"
                 android:background="?attr/colorPrimary"
+                android:elevation="4dp"
                 app:titleTextAppearance="@style/ToolbarTitle"
                 app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
                 app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
@@ -346,6 +347,23 @@
 
             </RelativeLayout>
 
+            <RelativeLayout
+                android:id="@+id/call_in_progress_layout"
+                android:layout_width="match_parent"
+                android:layout_height="36dp"
+                android:layout_below="@+id/toolbar_chat"
+                android:background="@color/accentColor">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/white"
+                    android:textSize="14sp"
+                    android:layout_centerVertical="true"
+                    android:layout_centerHorizontal="true"
+                    android:text="Tap to return to call"/>
+
+            </RelativeLayout>
             <!--<android.support.design.widget.CoordinatorLayout-->
                 <!--android:layout_width="wrap_content"-->
                 <!--android:layout_height="wrap_content"-->
