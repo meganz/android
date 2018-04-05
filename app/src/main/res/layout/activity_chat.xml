@@ -49,10 +49,44 @@
                 android:orientation="vertical">
                 <LinearLayout
                     android:layout_width="match_parent"
-
                     android:layout_height="wrap_content"
                     android:background="@color/white"
                     android:orientation="vertical">
+
+                    <RelativeLayout
+                        android:id="@+id/message_jump"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+                        <RelativeLayout
+                            android:layout_width="163dp"
+                            android:layout_height="36dp"
+                            android:layout_centerInParent="true"
+                            android:layout_marginBottom="12dp"
+                            android:background="@drawable/dark_rounded_jump_to_latest">
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_centerInParent="true"
+                                android:orientation="horizontal">
+                                <ImageView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:src="@drawable/ic_new_messages"
+                                    android:layout_marginRight="12dp"/>
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/message_jump_end"
+                                    android:layout_gravity="center_vertical"
+                                    android:gravity="center_vertical"
+                                    android:textSize="14sp"
+                                    android:textColor="@color/white"
+                                    android:singleLine="true"
+                                    android:fontFamily="Roboto"
+                                    android:ellipsize="end"/>
+                            </LinearLayout>
+                        </RelativeLayout>
+                    </RelativeLayout>
                     <LinearLayout
                         android:id="@+id/separator_file"
                         android:layout_width="match_parent"

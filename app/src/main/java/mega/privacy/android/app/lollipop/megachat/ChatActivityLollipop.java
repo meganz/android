@@ -196,6 +196,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     RelativeLayout writingContainerLayout;
     RelativeLayout writingLayout;
     RelativeLayout disabledWritingLayout;
+    RelativeLayout messageJump;
     RelativeLayout chatRelativeLayout;
     RelativeLayout userTypingLayout;
     TextView userTypingText;
@@ -484,7 +485,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         fragmentContainer = (CoordinatorLayout) findViewById(R.id.fragment_container_chat);
 
         writingContainerLayout = (RelativeLayout) findViewById(R.id.writing_container_layout_chat_layout);
-
+        messageJump = (RelativeLayout) findViewById(R.id.message_jump);
         writingLayout = (RelativeLayout) findViewById(R.id.writing_linear_layout_chat);
         disabledWritingLayout = (RelativeLayout) findViewById(R.id.writing_disabled_linear_layout_chat);
 
@@ -823,7 +824,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         dbH.setChatItemPreferences(prefs);
                     }
 
-                    log("Chat handle: "+chatRoom.getChatId()+"****"+MegaApiJava.userHandleToBase64(idChat));
+//                    log("Chat handle: "+chatRoom.getChatId()+"****"+MegaApiJava.userHandleToBase64(idChat));
 
                     boolean result = megaChatApi.openChatRoom(idChat, this);
 
@@ -858,6 +859,12 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                             adapter = new MegaChatLollipopAdapter(this, chatRoom, messages, listView);
                             adapter.setHasStableIds(true);
                             listView.setAdapter(adapter);
+                        }
+//                        log("******* new is visible? "+adapter.isVisibleNew());
+                        if(adapter.isVisibleNew()){
+                            messageJump.setVisibility(View.VISIBLE);
+                        }else {
+                            messageJump.setVisibility(View.GONE);
                         }
 
                         log("Result of open chat: " + result);
