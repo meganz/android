@@ -134,6 +134,7 @@ import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.lollipop.listeners.ContactNameListener;
 import mega.privacy.android.app.lollipop.listeners.FabButtonListener;
+import mega.privacy.android.app.lollipop.listeners.MultipleAttachChatListener;
 import mega.privacy.android.app.lollipop.managerSections.CameraUploadFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.CentiliFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.CompletedTransfersFragmentLollipop;
@@ -2011,26 +2012,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					}
 					else if(getIntent().getAction().equals(Constants.ACTION_CHAT_NOTIFICATION_MESSAGE)){
 						log("Chat notitificacion received");
-						drawerItem=DrawerItem.CHAT;
-						selectDrawerItemLollipop(drawerItem);
-						selectDrawerItemPending=false;
+
 						long chatId = getIntent().getLongExtra("CHAT_ID", -1);
 						if(chatId!=-1){
-							MegaChatRoom chat = megaChatApi.getChatRoom(chatId);
-							if(chat!=null){
-								log("open chat with id: " + chatId);
-								Intent intentToChat = new Intent(this, ChatActivityLollipop.class);
-								intentToChat.setAction(Constants.ACTION_CHAT_SHOW_MESSAGES);
-								intentToChat.putExtra("CHAT_ID", chatId);
-								this.startActivity(intentToChat);
-							}
-							else{
-								log("Error, chat is NULL");
-							}
+							openChat(chatId);
 						}
-						else{
-							log("Error, chat id is -1");
-						}
+
+						selectDrawerItemPending=false;
 						getIntent().setAction(null);
 						setIntent(null);
 					}
@@ -2557,24 +2545,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				}
 				else if(getIntent().getAction().equals(Constants.ACTION_CHAT_NOTIFICATION_MESSAGE)){
 					log("onPostResume: ACTION_CHAT_NOTIFICATION_MESSAGE");
-					drawerItem=DrawerItem.CHAT;
-					selectDrawerItemLollipop(drawerItem);
+
 					long chatId = getIntent().getLongExtra("CHAT_ID", -1);
 					if(chatId!=-1){
-						MegaChatRoom chat = megaChatApi.getChatRoom(chatId);
-						if(chat!=null){
-							log("open chat with id: " + chatId);
-							Intent intentToChat = new Intent(this, ChatActivityLollipop.class);
-							intentToChat.setAction(Constants.ACTION_CHAT_SHOW_MESSAGES);
-							intentToChat.putExtra("CHAT_ID", chatId);
-							this.startActivity(intentToChat);
-						}
-						else{
-							log("Error, chat is NULL");
-						}
-					}
-					else{
-						log("Error, chat id is -1");
+						openChat(chatId);
 					}
 				}
 				else if(getIntent().getAction().equals(Constants.ACTION_CHAT_SUMMARY)) {
@@ -2689,6 +2663,29 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				}
     		}
     	}
+	}
+
+	public void openChat(long chatId){
+		log("openChat: "+chatId);
+//		drawerItem=DrawerItem.CHAT;
+//		selectDrawerItemLollipop(drawerItem);
+
+		if(chatId!=-1){
+			MegaChatRoom chat = megaChatApi.getChatRoom(chatId);
+			if(chat!=null){
+				log("open chat with id: " + chatId);
+				Intent intentToChat = new Intent(this, ChatActivityLollipop.class);
+				intentToChat.setAction(Constants.ACTION_CHAT_SHOW_MESSAGES);
+				intentToChat.putExtra("CHAT_ID", chatId);
+				this.startActivity(intentToChat);
+			}
+			else{
+				log("Error, chat is NULL");
+			}
+		}
+		else{
+			log("Error, chat id is -1");
+		}
 	}
 
 	public void showMuteIcon(MegaChatListItem item){
@@ -11343,6 +11340,54 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				log("resultCode for CHOOSE_PICTURE_PROFILE_CODE: "+resultCode);
 			}
 		}
+		else if (requestCode == Constants.REQUEST_CODE_SELECT_CHAT && resultCode == RESULT_OK){
+			log("Attach nodes to chats: REQUEST_CODE_SELECT_CHAT");
+
+			long[] chatHandles = intent.getLongArrayExtra("SELECTED_CHATS");
+			log("Send to "+chatHandles.length+" chats");
+
+			long[] nodeHandles = intent.getLongArrayExtra("NODE_HANDLES");
+			log("Send "+nodeHandles.length+" nodes");
+
+			int countChat = chatHandles.length;
+			if(countChat==1){
+
+				if(nodeHandles.length==1){
+					//One chat, one file
+					MultipleAttachChatListener listener = new MultipleAttachChatListener(this, chatHandles[0], false);
+					megaChatApi.attachNode(chatHandles[0], nodeHandles[0], listener);
+				}
+				else{
+					//One chat, many files
+					MultipleAttachChatListener listener = new MultipleAttachChatListener(this, chatHandles[0], true);
+					for(int i=0;i<nodeHandles.length;i++){
+						megaChatApi.attachNode(chatHandles[0], nodeHandles[i], listener);
+					}
+				}
+
+			}
+			else if(countChat>1){
+
+				if(nodeHandles.length==1){
+					//Many chats, one file
+					MultipleAttachChatListener listener = new MultipleAttachChatListener(this, -1, false);
+					for(int i=0;i<chatHandles.length;i++){
+						megaChatApi.attachNode(chatHandles[i], nodeHandles[0], listener);
+					}
+
+				}
+				else{
+					//Many chat, many files
+					MultipleAttachChatListener listener = new MultipleAttachChatListener(this, -1, true);
+					for(int i=0;i<chatHandles.length;i++){
+						for(int j=0;j<nodeHandles.length;j++){
+							megaChatApi.attachNode(chatHandles[i], nodeHandles[j], listener);
+						}
+
+					}
+				}
+			}
+		}
 		else if (requestCode == Constants.WRITE_SD_CARD_REQUEST_CODE && resultCode == RESULT_OK) {
 
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -12638,7 +12683,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 	@Override
 	public void onRequestFinish(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
-		log("onRequestFinish(CHAT)");
+		log("onRequestFinish(CHAT): " + request.getRequestString()+"_"+e.getErrorCode());
 
 		if(request.getType() == MegaChatRequest.TYPE_TRUNCATE_HISTORY){
 			log("Truncate history request finish.");
@@ -12739,8 +12784,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 		}
 		else if (request.getType() == MegaChatRequest.TYPE_LOGOUT){
+			log("onRequestFinish(CHAT): " + MegaChatRequest.TYPE_LOGOUT);
 
-			log("Disable chat finish logout");
+			if (e.getErrorCode() != MegaError.API_OK){
+				log("onRequestFinish(CHAT):MegaChatRequest.TYPE_LOGOUT:ERROR");
+			}
 			if(sttFLol!=null){
 				if(sttFLol.isAdded()){
 					sttFLol.hidePreferencesChat();
@@ -12780,12 +12828,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 	@SuppressLint("NewApi") @Override
 	public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
-		log("onRequestFinish: " + request.getRequestString());
+		log("onRequestFinish: " + request.getRequestString()+"_"+e.getErrorCode());
 
-		if (request.getType() == MegaRequest.TYPE_FETCH_NODES){
-			log("fecthnodes request finished");
-		}
-		else if (request.getType() == MegaRequest.TYPE_CREDIT_CARD_CANCEL_SUBSCRIPTIONS){
+		if (request.getType() == MegaRequest.TYPE_CREDIT_CARD_CANCEL_SUBSCRIPTIONS){
 			if (e.getErrorCode() == MegaError.API_OK){
 				Snackbar.make(fragmentContainer, getString(R.string.cancel_subscription_ok), Snackbar.LENGTH_LONG).show();
 			}
@@ -12795,28 +12840,34 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			megaApi.creditCardQuerySubscriptions(myAccountInfo);
 		}
 		else if (request.getType() == MegaRequest.TYPE_LOGOUT){
-			log("logout finished");
+			log("onRequestFinish: " + MegaRequest.TYPE_LOGOUT);
 
-			if(Util.isChatEnabled()){
-				log("END logout sdk request - wait chat logout");
+			if (e.getErrorCode() == MegaError.API_OK){
+				log("onRequestFinish:OK:" + MegaRequest.TYPE_LOGOUT);
+				if(Util.isChatEnabled()){
+					log("END logout sdk request - wait chat logout");
+				}
+				else{
+					log("END logout sdk request - chat disabled");
+					if (dbH == null){
+						dbH = DatabaseHandler.getDbHandler(getApplicationContext());
+					}
+					if (dbH != null){
+						dbH.clearEphemeral();
+					}
+
+					AccountController aC = new AccountController(this);
+					aC.logoutConfirmed(this);
+
+					Intent tourIntent = new Intent(this, LoginActivityLollipop.class);
+					tourIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+					this.startActivity(tourIntent);
+
+					finish();
+				}
 			}
 			else{
-				log("END logout sdk request - chat disabled");
-				if (dbH == null){
-					dbH = DatabaseHandler.getDbHandler(getApplicationContext());
-				}
-				if (dbH != null){
-					dbH.clearEphemeral();
-				}
-
-				AccountController aC = new AccountController(this);
-				aC.logoutConfirmed(this);
-
-				Intent tourIntent = new Intent(this, LoginActivityLollipop.class);
-				tourIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-				this.startActivity(tourIntent);
-
-				finish();
+				showSnackbar(getString(R.string.email_verification_text_error));
 			}
 		}
 		else if(request.getType() == MegaRequest.TYPE_SET_ATTR_USER) {
@@ -15290,7 +15341,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 		});
 
-
 	}
 
 	public String getDeviceName() {
@@ -15314,6 +15364,4 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			return Character.toUpperCase(first) + s.substring(1);
 		}
 	}
-
-
 }

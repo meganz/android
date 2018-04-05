@@ -73,7 +73,6 @@ import mega.privacy.android.app.components.TouchImageView;
 import mega.privacy.android.app.lollipop.adapters.MegaFullScreenImageAdapterLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaOfflineFullScreenImageAdapterLollipop;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
-import mega.privacy.android.app.lollipop.megachat.ChatExplorerActivity;
 import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.PreviewUtils;
@@ -166,7 +165,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
     public static int REQUEST_CODE_SELECT_MOVE_FOLDER = 1001;
 	public static int REQUEST_CODE_SELECT_COPY_FOLDER = 1002;
 	public static int REQUEST_CODE_SELECT_LOCAL_FOLDER = 1004;
-	public static int REQUEST_CODE_SELECT_CHAT = 1005;
+
 	
 	MegaNode node;
 
@@ -554,9 +553,11 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				long[] longArray = new long[1];
 				longArray[0] = imageHandles.get(positionG);
 
-				Intent i = new Intent(this, ChatExplorerActivity.class);
-				i.putExtra("NODE_HANDLES", longArray);
-				startActivityForResult(i, REQUEST_CODE_SELECT_CHAT);
+				if(nC ==null){
+					nC = new NodeController(this);
+				}
+
+				nC.selectChatsToSendNodes(longArray);
 				break;
 			}
 
@@ -2217,7 +2218,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				}
 			}
 		}
-		else if (requestCode == REQUEST_CODE_SELECT_CHAT && resultCode == RESULT_OK){
+		else if (requestCode == Constants.REQUEST_CODE_SELECT_CHAT && resultCode == RESULT_OK){
 			long[] chatHandles = intent.getLongArrayExtra("SELECTED_CHATS");
 			log("Send to "+chatHandles.length+" chats");
 

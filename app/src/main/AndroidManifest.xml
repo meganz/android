@@ -2,8 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="mega.privacy.android.app"
     android:installLocation="internalOnly"
-    android:versionCode="189"
-    android:versionName="3.3.4 (189)" >
+    android:versionCode="190"
+    android:versionName="3.3.4 (190)" >
 
     <uses-sdk
         android:minSdkVersion="16"
@@ -333,7 +333,8 @@
 
         <activity
             android:name="mega.privacy.android.app.lollipop.PdfViewerActivityLollipop"
-            android:label="@string/pdf_app_name">
+            android:label="@string/pdf_app_name"
+            android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
