@@ -486,6 +486,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
         writingContainerLayout = (RelativeLayout) findViewById(R.id.writing_container_layout_chat_layout);
         messageJump = (RelativeLayout) findViewById(R.id.message_jump);
+        messageJump.setVisibility(View.GONE);
         writingLayout = (RelativeLayout) findViewById(R.id.writing_linear_layout_chat);
         disabledWritingLayout = (RelativeLayout) findViewById(R.id.writing_disabled_linear_layout_chat);
 
@@ -859,14 +860,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                             adapter = new MegaChatLollipopAdapter(this, chatRoom, messages, listView);
                             adapter.setHasStableIds(true);
                             listView.setAdapter(adapter);
-                        }
-//                        log("******* new is visible? "+adapter.isVisibleNew());
-                        if(adapter.isVisibleNew()){
-                            messageJump.setVisibility(View.VISIBLE);
-                        }else {
-                            messageJump.setVisibility(View.GONE);
-                        }
 
+                        }
                         log("Result of open chat: " + result);
 
                         aB.setTitle(chatRoom.getTitle());
@@ -5646,6 +5641,18 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         Intent upgradeIntent = new Intent(this, ManagerActivityLollipop.class);
         upgradeIntent.setAction(Constants.ACTION_SHOW_UPGRADE_ACCOUNT);
         startActivity(upgradeIntent);
+    }
+
+    public void showJumpMessage(){
+        int lastMessage = messages.size()-1;
+        int lastVisiblePosition = mLayoutManager.findLastVisibleItemPosition()-1;
+        log("****lastMessage("+lastMessage+"), lastRecyclerViewPosition("+lastVisiblePosition+")");
+
+        if(lastMessage > lastVisiblePosition){
+            messageJump.setVisibility(View.VISIBLE);
+        }else{
+            messageJump.setVisibility(View.GONE);
+        }
     }
 
     @Override

@@ -140,6 +140,6 @@
     <color name="pass_good">#FF13E03C</color>
 
     <color name="color_background_versions">#FFF2F2F2</color>
-    <color name="color_background_jump_to_least">#CC323232</color>
+    <color name="color_background_jump_to_least">#70323232</color>
 
 </resources>
