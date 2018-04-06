@@ -347,7 +347,7 @@
                     android:layout_centerHorizontal="true"
                     android:layout_alignParentBottom="true"
                     android:layout_marginBottom="12dp"
-                    android:id="@+id/message_jump"
+                    android:id="@+id/message_jump_layout"
                     android:animateLayoutChanges="true"
                     android:background="@drawable/dark_rounded_jump_to_latest">
                     <LinearLayout
@@ -361,9 +361,9 @@
                             android:src="@drawable/ic_new_messages"
                             android:layout_marginRight="12dp"/>
                         <TextView
+                            android:id="@+id/message_jump_text"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="@string/message_jump_end"
                             android:layout_marginRight="5dp"
                             android:layout_gravity="center_vertical"
                             android:gravity="center_vertical"
