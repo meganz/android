@@ -98,7 +98,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
     MegaChatApiAndroid megaChatApi;
     boolean multipleSelect;
     private SparseBooleanArray selectedItems;
-    boolean visibilityNew = false;
 
     private MegaChatLollipopAdapter megaChatAdapter;
 
@@ -1413,7 +1412,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             } //END CONTACT MANAGEMENT MESSAGE
         }
         else if(message.getType()==MegaChatMessage.TYPE_PRIV_CHANGE){
-
             ((ViewHolderMessageChat)holder).layoutAvatarMessages.setVisibility(View.INVISIBLE);
 
             log("PRIVILEGE CHANGE message");
@@ -1746,7 +1744,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         else{
             //OTHER TYPE OF MESSAGES
             ((ViewHolderMessageChat)holder).layoutAvatarMessages.setVisibility(View.VISIBLE);
-
             if(message.getUserHandle()==myUserHandle) {
                 log("MY message!!");
                 log("MY message handle!!: "+message.getMsgId());
@@ -3512,16 +3509,15 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 ((ViewHolderMessageChat)holder).newMessagesLayout.setLayoutParams(params);
 
                 ((ViewHolderMessageChat)holder).newMessagesLayout.setVisibility(View.VISIBLE);
-                visibilityNew = true;
+                ((ChatActivityLollipop)context).showJumpMessage();
             }
             else{
                 ((ViewHolderMessageChat)holder).newMessagesLayout.setVisibility(View.GONE);
-                visibilityNew = false;
+
             }
         }
         else{
             ((ViewHolderMessageChat)holder).newMessagesLayout.setVisibility(View.GONE);
-            visibilityNew = false;
         }
     }
 
@@ -4748,10 +4744,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             log("The duration is: "+hours+" "+minutes+" "+seconds);
         }
         return timeString;
-    }
-
-    public boolean isVisibleNew(){
-        return visibilityNew;
     }
 
 }
