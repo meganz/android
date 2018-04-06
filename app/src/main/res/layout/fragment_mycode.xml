@@ -27,18 +27,6 @@
                 android:layout_centerInParent="true"
                 android:id="@+id/qr_code_image"/>
 
-            <RelativeLayout
-                android:id="@+id/qr_code_relative_layout_avatar"
-                android:layout_width="108dp"
-                android:layout_height="108dp"
-                android:layout_centerInParent="true">
-
-                <ImageView
-                    android:id="@+id/qr_code_avatar"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent" />
-            </RelativeLayout>
-
         </RelativeLayout>
 
         <TextView

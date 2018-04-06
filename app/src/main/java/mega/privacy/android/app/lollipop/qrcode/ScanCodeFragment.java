@@ -71,13 +71,12 @@ public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.Res
     public CodeScanner codeScanner;
     CodeScannerView codeScannerView;
 
-    private final int MY_PERMISSIONS_REQUEST_CAMERA = 1010;
-
     private AlertDialog inviteAlertDialog;
     private AlertDialog requestedAlertDialog;
     private MegaRequest request;
 
     private Button invite;
+    private Button view;
     private RoundedImageView avatarImage;
     private TextView initialLetter;
     private TextView contactName;
@@ -101,6 +100,8 @@ public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.Res
     public int dialogTextContent = -1;
     private String contactNameContent;
 
+    private boolean isContact = false;
+
     public static ScanCodeFragment newInstance() {
         log("newInstance");
         ScanCodeFragment fragment = new ScanCodeFragment();
@@ -114,6 +115,7 @@ public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.Res
         super.onCreate(savedInstanceState);
 
         if (savedInstanceState != null) {
+            isContact = savedInstanceState.getBoolean("isContact", false);
             inviteShown = savedInstanceState.getBoolean("inviteShown", false);
             dialogshown = savedInstanceState.getBoolean("dialogshown", false);
             dialogTitleContent = savedInstanceState.getInt("dialogTitleContent", -1);
@@ -124,33 +126,12 @@ public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.Res
             handleContactLink = savedInstanceState.getLong("handleContactLink", 0);
         }
 
-        if (ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.CAMERA}, MY_PERMISSIONS_REQUEST_CAMERA);
-        }
-
         if (megaApi == null){
             megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
         }
 
         dbH = DatabaseHandler.getDbHandler(context);
         handler = new Handler();
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
-        switch (requestCode) {
-            case MY_PERMISSIONS_REQUEST_CAMERA: {
-                // If request is cancelled, the result arrays are empty.
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    // permission was granted, yay! Do the
-                    // contacts-related task you need to do.
-                } else {
-                    // permission denied, boo! Disable the
-                    // functionality that depends on this permission.
-                }
-                return;
-            }
-        }
     }
 
     @Override
@@ -208,6 +189,7 @@ public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.Res
         if (inviteShown){
             outState.putBoolean("inviteShown",inviteShown);
             outState.putString("contactNameContent", contactNameContent);
+            outState.putBoolean("isContact", isContact);
         }
         if (dialogshown){
             outState.putBoolean("dialogshown", dialogshown);
@@ -219,13 +201,13 @@ public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.Res
         outState.putLong("handleContactLink", handleContactLink);
     }
 
-//    @Override
-//    public void onStart(){
-//        log("onStart");
-//        super.onStart();
-////        scannerView.setAutoFocus(true);
-////        scannerView.startCamera();
-//    }
+    @Override
+    public void onStart(){
+        log("onStart");
+        super.onStart();
+//        scannerView.setAutoFocus(true);
+//        scannerView.startCamera();
+    }
 
     @Override
     public void onResume() {
@@ -382,6 +364,10 @@ public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.Res
 //                    onResume();
                     codeScanner.startPreview();
                 }
+                break;
+            }
+            case R.id.view_contact: {
+
                 break;
             }
         }
@@ -558,6 +544,17 @@ public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.Res
             builder.setView(v);
             invite = (Button) v.findViewById(R.id.accept_contact_invite);
             invite.setOnClickListener(this);
+            view = (Button) v.findViewById(R.id.view_contact);
+            view.setOnClickListener(this);
+
+            if (isContact){
+                invite.setVisibility(View.GONE);
+                view.setVisibility(View.VISIBLE);
+            }
+            else {
+                invite.setVisibility(View.VISIBLE);
+                view.setVisibility(View.GONE);
+            }
             avatarImage = (RoundedImageView) v.findViewById(R.id.accept_contact_avatar);
             initialLetter = (TextView) v.findViewById(R.id.accept_contact_initial_letter);
             contactName = (TextView) v.findViewById(R.id.accept_contact_name);
@@ -593,6 +590,12 @@ public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.Res
                 myEmail = request.getEmail();
                 handleContactLink = request.getNodeHandle();
                 contactNameContent = request.getName() + " " + request.getText();
+                if (megaApi.getContact(myEmail) != null){
+                    isContact = true;
+                }
+                else {
+                    isContact = false;
+                }
                 showInviteDialog();
             }
             else if (e.getErrorCode() == MegaError.API_EEXIST){
