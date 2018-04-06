@@ -1794,7 +1794,8 @@
 
     <string name="context_send_file_to_chat" context="menu option to send a file to a chat">Send to chat</string>
 
-    <string name="message_jump_end" context="text of the label to show that you have messages unread">Jump to latest</string>
+    <string name="message_jump_end" context="text of the label to show that you have messages unread in the chat conversation">Jump to latest</string>
+    <string name="message_new_messages" context="text of the label to show that you have new messages in the chat conversation">New messages</string>
 
 </resources>
 

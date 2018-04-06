@@ -150,6 +150,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     boolean isTakePicture = false;
 
+    String textJumpMessage = "";
+
     MegaApiAndroid megaApi;
     MegaChatApiAndroid megaChatApi;
     Handler handlerReceive;
@@ -197,6 +199,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     RelativeLayout writingLayout;
     RelativeLayout disabledWritingLayout;
     RelativeLayout messageJump;
+    TextView messageJumpText;
     RelativeLayout chatRelativeLayout;
     RelativeLayout userTypingLayout;
     TextView userTypingText;
@@ -485,8 +488,12 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         fragmentContainer = (CoordinatorLayout) findViewById(R.id.fragment_container_chat);
 
         writingContainerLayout = (RelativeLayout) findViewById(R.id.writing_container_layout_chat_layout);
-        messageJump = (RelativeLayout) findViewById(R.id.message_jump);
+        messageJump = (RelativeLayout) findViewById(R.id.message_jump_layout);
+        messageJumpText = (TextView) findViewById(R.id.message_jump_text);
+        textJumpMessage = getResources().getString(R.string.message_jump_end);
+        messageJumpText.setText(textJumpMessage);
         messageJump.setVisibility(View.GONE);
+
         writingLayout = (RelativeLayout) findViewById(R.id.writing_linear_layout_chat);
         disabledWritingLayout = (RelativeLayout) findViewById(R.id.writing_disabled_linear_layout_chat);
 
@@ -700,8 +707,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     if (dy > 0) {
                         // Scrolling up
                         scrollingUp = true;
-                        if((messageJump.getVisibility() == View.VISIBLE)&&((messages.size()-1) == (mLayoutManager.findLastVisibleItemPosition()-1))){
-                            messageJump.animate().alpha(0.0f).setDuration(1000);
+                        if((messages.size()-1) == (mLayoutManager.findLastVisibleItemPosition()-1)){
+                            hideMessageJump();
                         }
                     } else {
                         // Scrolling down
@@ -803,6 +810,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     selectedMessageId = savedInstanceState.getLong("selectedMessageId", -1);
                     log("Handle of the message: "+selectedMessageId);
                     selectedPosition = savedInstanceState.getInt("selectedPosition", -1);
+                    textJumpMessage = savedInstanceState.getString("textOfMessageJump", null);
+                    messageJumpText.setText(textJumpMessage);
                 }
 
                 if(idChat!=-1) {
@@ -2317,7 +2326,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 showGroupInfoActivity();
                 break;
             }
-            case R.id.message_jump:{
+            case R.id.message_jump_layout:{
                 log("onClick:jump to least");
                 goToEnd();
                 break;
@@ -3749,7 +3758,13 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             if((softKeyboardShown || emojiKeyboardShown)&&(messages.size()==1)){
                 mLayoutManager.scrollToPosition(messages.size());
             }
+
             log("DONT scroll to end");
+            textJumpMessage = getResources().getString(R.string.message_new_messages);
+            messageJumpText.setText(textJumpMessage);
+            if(messageJump.getVisibility()!=View.VISIBLE){
+                messageJump.setVisibility(View.VISIBLE);
+            }
         }
 
 //        mLayoutManager.setStackFromEnd(true);
@@ -5180,6 +5195,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         outState.putLong("idChat", idChat);
         outState.putLong("selectedMessageId", selectedMessageId);
         outState.putInt("selectedPosition", selectedPosition);
+        outState.putString("textOfMessageJump", textJumpMessage);
     }
 
     public void askSizeConfirmationBeforeChatDownload(String parentPath, ArrayList<MegaNode> nodeList, long size){
@@ -5658,6 +5674,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         int lastMessage = messages.size()-1;
         int lastVisiblePosition = mLayoutManager.findLastVisibleItemPosition()-1;
         if(lastMessage > lastVisiblePosition){
+            messageJumpText.setText(textJumpMessage);
             messageJump.setVisibility(View.VISIBLE);
         }else{
             messageJump.setVisibility(View.GONE);
@@ -5680,8 +5697,21 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         int index = messages.size()-1;
         final int indexToScroll = index+1;
         mLayoutManager.scrollToPositionWithOffset(indexToScroll,Util.scaleHeightPx(20, outMetrics));
+        hideMessageJump();
+    }
+
+    public void hideMessageJump(){
         if(messageJump.getVisibility() == View.VISIBLE){
-            messageJump.animate().alpha(0.0f).setDuration(1000);
+            messageJump.animate()
+                        .alpha(0.0f)
+                        .setDuration(1000)
+                        .withEndAction(new Runnable() {
+                            @Override public void run() {
+                                messageJump.setVisibility(View.GONE);
+                            }
+                        })
+                        .start();
+
         }
     }
 }
