@@ -42,7 +42,6 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
-import android.util.TimeUtils;
 import android.view.Display;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -69,13 +68,11 @@ import android.widget.TextView;
 
 import java.io.File;
 import java.nio.ByteBuffer;
-import java.security.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 import java.util.TimeZone;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.TimeUnit;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
@@ -287,35 +284,72 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
         return super.onOptionsItemSelected(item);
     }
 
+    public void updateScreenStatusInProgress(){
+        log("updateScreenStatusInProgress");
+        relativeVideo.getLayoutParams().height= RelativeLayout.LayoutParams.WRAP_CONTENT;
+        relativeVideo.getLayoutParams().width= RelativeLayout.LayoutParams.WRAP_CONTENT;
+        flagMyAvatar = false;
+        setProfileMyAvatar();
+        flagContactAvatar = true;
+        setProfileContactAvatar();
+
+        stopAudioSignals();
+
+        updateLocalVideoStatus();
+        updateLocalAudioStatus();
+        updateRemoteAudioStatus();
+        updateRemoteVideoStatus();
+        startClock();
+    }
+
+    public void setCallInfo(){
+        log("setCallInfo");
+
+        fullName = chat.getTitle();
+        email = chat.getPeerEmail(0);
+        userHandle = chat.getPeerHandle(0);
+
+        if (fullName.trim() != null) {
+            if (fullName.trim().isEmpty()) {
+                log("1 - Put email as fullname");
+                String[] splitEmail = email.split("[@._]");
+                fullName = splitEmail[0];
+            }
+        } else {
+            log("2 - Put email as fullname");
+            String[] splitEmail = email.split("[@._]");
+            fullName = splitEmail[0];
+        }
+
+        aB.setTitle(fullName);
+    }
+
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         log("onNewIntent");
 
-        Bundle extras = getIntent().getExtras();
+        Bundle extras = intent.getExtras();
+        log(getIntent().getAction());
         if (extras != null) {
             long newChatId = extras.getLong("chatHandle", -1);
+            log("New chat id: "+newChatId);
             if(chatId==newChatId){
                 log("Its the same call");
             }
             else{
                 log("New intent to the activity with a new chatId");
+                chatId = newChatId;
+                chat = megaChatApi.getChatRoom(chatId);
+                callChat = megaChatApi.getChatCall(chatId);
+
+                setCallInfo();
+                updateScreenStatusInProgress();
+
+                log("Start call Service");
+                Intent intentService = new Intent(this, CallService.class);
+                intentService.putExtra("chatHandle", callChat.getChatid());
+                this.startService(intentService);
             }
-//            log("Chat handle to call: " + chatId);
-//            if (chatId != -1) {
-//                chat = megaChatApi.getChatRoom(chatId);
-//                callChat = megaChatApi.getChatCall(chatId);
-//                if (callChat == null) {
-//                    megaChatApi.removeChatCallListener(this);
-//                    MegaApplication.activityPaused();
-//                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-//                        super.finishAndRemoveTask();
-//                    } else {
-//                        super.finish();
-//                    }
-//                    return;
-//                }
-//
-//            }
         }
     }
 
@@ -542,23 +576,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                 int callStatus = callChat.getStatus();
                 log("The status of the callChat is: " + callStatus);
 
-                fullName = chat.getTitle();
-                email = chat.getPeerEmail(0);
-                userHandle = chat.getPeerHandle(0);
-
-                if (fullName.trim() != null) {
-                    if (fullName.trim().isEmpty()) {
-                        log("1 - Put email as fullname");
-                        String[] splitEmail = email.split("[@._]");
-                        fullName = splitEmail[0];
-                    }
-                } else {
-                    log("2 - Put email as fullname");
-                    String[] splitEmail = email.split("[@._]");
-                    fullName = splitEmail[0];
-                }
-
-                aB.setTitle(fullName);
+                setCallInfo();
 
                 if(callStatus==MegaChatCall.CALL_STATUS_RING_IN){
                     log("Incoming call");
@@ -589,20 +607,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                     }
                 }
                 else if(callStatus==MegaChatCall.CALL_STATUS_IN_PROGRESS){
-                    relativeVideo.getLayoutParams().height= RelativeLayout.LayoutParams.WRAP_CONTENT;
-                    relativeVideo.getLayoutParams().width= RelativeLayout.LayoutParams.WRAP_CONTENT;
-                    flagMyAvatar = false;
-                    setProfileMyAvatar();
-                    flagContactAvatar = true;
-                    setProfileContactAvatar();
-
-                    stopAudioSignals();
-
-                    updateLocalVideoStatus();
-                    updateLocalAudioStatus();
-                    updateRemoteAudioStatus();
-                    updateRemoteVideoStatus();
-                    startClock();
+                    updateScreenStatusInProgress();
                 }
                 else{
                     log("Outgoing call");
@@ -1055,9 +1060,9 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
 
     @Override
     public void onChatCallUpdate(MegaChatApiJava api, MegaChatCall call) {
-        log("onChatCallUpdate: "+call.getStatus());
 
         if(call.getChatid()==chatId){
+            log("onChatCallUpdate: "+call.getStatus());
             this.callChat = call;
 
             if(callChat.hasChanged(MegaChatCall.CHANGE_TYPE_STATUS)){
@@ -1096,13 +1101,17 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
 
                         break;
                     }
+                    case MegaChatCall.CALL_STATUS_TERMINATING:{
+                        log("Terminating call of chat: "+chatId);
+                        break;
+                    }
                     case MegaChatCall.CALL_STATUS_DESTROYED:{
+                        log("CALL_STATUS_DESTROYED:TERM code of the call: "+call.getTermCode());
 
                         stopAudioSignals();
 
                         rtcAudioManager.stop();
                         MegaApplication.activityPaused();
-                        log("TERM code of the call: "+call.getTermCode());
 
                         if((call.getTermCode()==MegaChatCall.TERM_CODE_ANSWER_TIMEOUT) && (!callInitiator)){
                             showMissedCallNotification();
