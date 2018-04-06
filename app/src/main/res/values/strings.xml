@@ -1794,5 +1794,7 @@
 
     <string name="context_send_file_to_chat" context="menu option to send a file to a chat">Send to chat</string>
 
+    <string name="notification_subtitle_incoming" context="notification subtitle of incoming calls">Incoming call</string>
+
 </resources>
 

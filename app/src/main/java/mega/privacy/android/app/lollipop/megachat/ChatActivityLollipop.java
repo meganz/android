@@ -3637,62 +3637,72 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 bufferSending.clear();
             }
 
-            log("onMessageLoaded:numberToLoad: "+numberToLoad+" bufferSize: "+bufferMessages.size()+" messagesSize"+messages.size());
+            log("onMessageLoaded:numberToLoad: "+numberToLoad+" bufferSize: "+bufferMessages.size()+" messagesSize: "+messages.size());
             if((bufferMessages.size()+messages.size())>=numberToLoad){
-
-                if(bufferMessages.size()!=0){
-                    loadBufferMessages();
-
-                    if(lastSeenReceived==false){
-                        log("onMessageLoaded: last message seen NOT received");
-                        if(stateHistory!=MegaChatApi.SOURCE_NONE){
-                            log("onMessageLoaded:F->loadMessages");
-                            stateHistory = megaChatApi.loadMessages(idChat, NUMBER_MESSAGES_TO_LOAD);
-                        }
-                    }
-                    else{
-                        log("onMessageLoaded: last message seen received");
-                        if(positionToScroll>0){
-                            log("onMessageLoaded: Scroll to position: "+positionToScroll);
-                            if(positionToScroll<messages.size()){
-                                mLayoutManager.scrollToPositionWithOffset(positionToScroll+1,Util.scaleHeightPx(30, outMetrics));
-                            }
-                            else{
-                                log("Error, the position to scroll is more than size of messages");
-                            }
-                        }
+                fullHistoryReceivedOnLoad();
+            }
+            else{
+                log("onMessageLoaded:lessNumberReceived");
+                if((stateHistory!=MegaChatApi.SOURCE_NONE)&&(stateHistory!=MegaChatApi.SOURCE_ERROR)){
+                    log("But more history exists --> loadMessages");
+                    log("G->loadMessages unread is 0");
+                    stateHistory = megaChatApi.loadMessages(idChat, NUMBER_MESSAGES_TO_LOAD);
+                    log("New state of history: "+stateHistory);
+                    getMoreHistory = false;
+                    if(stateHistory==MegaChatApi.SOURCE_NONE || stateHistory==MegaChatApi.SOURCE_ERROR){
+                        fullHistoryReceivedOnLoad();
                     }
                 }
                 else{
-                    log("onMessageLoaded:bufferEmpty");
-                }
-
-                log("onMessageLoaded:getMoreHistoryTRUE");
-                getMoreHistory = true;
-
-                //Load pending messages
-                if(!pendingMessagesLoaded){
-                    pendingMessagesLoaded = true;
-                    loadPendingMessages();
-                    if(positionToScroll<=0){
-                        log("positionToScroll is 0 - no unread messages");
-                        mLayoutManager.scrollToPosition(messages.size());
-                    }
-                }
-
-                if(messages.size()<NUMBER_MESSAGES_BEFORE_LOAD){
-                    log("Less than 8 messages in UI: "+messages.size()+ " stateHistory is: "+stateHistory);
-                    if((stateHistory!=MegaChatApi.SOURCE_NONE)&&(stateHistory!=MegaChatApi.SOURCE_ERROR)){
-                        log("But more history exists --> loadMessages");
-                        log("G->loadMessages unread is 0");
-                        stateHistory = megaChatApi.loadMessages(idChat, NUMBER_MESSAGES_TO_LOAD);
-                        log("New state of history: "+stateHistory);
-                        getMoreHistory = false;
-                    }
+                    fullHistoryReceivedOnLoad();
                 }
             }
         }
         log("END onMessageLoaded-----------messages.size="+messages.size());
+    }
+
+    public void fullHistoryReceivedOnLoad(){
+        log("fullHistoryReceivedOnLoad");
+
+        if(bufferMessages.size()!=0){
+            loadBufferMessages();
+
+            if(lastSeenReceived==false){
+                log("fullHistoryReceivedOnLoad: last message seen NOT received");
+                if(stateHistory!=MegaChatApi.SOURCE_NONE){
+                    log("fullHistoryReceivedOnLoad:F->loadMessages");
+                    stateHistory = megaChatApi.loadMessages(idChat, NUMBER_MESSAGES_TO_LOAD);
+                }
+            }
+            else{
+                log("fullHistoryReceivedOnLoad: last message seen received");
+                if(positionToScroll>0){
+                    log("fullHistoryReceivedOnLoad: Scroll to position: "+positionToScroll);
+                    if(positionToScroll<messages.size()){
+                        mLayoutManager.scrollToPositionWithOffset(positionToScroll+1,Util.scaleHeightPx(30, outMetrics));
+                    }
+                    else{
+                        log("Error, the position to scroll is more than size of messages");
+                    }
+                }
+            }
+        }
+        else{
+            log("fullHistoryReceivedOnLoad:bufferEmpty");
+        }
+
+        log("fullHistoryReceivedOnLoad:getMoreHistoryTRUE");
+        getMoreHistory = true;
+
+        //Load pending messages
+        if(!pendingMessagesLoaded){
+            pendingMessagesLoaded = true;
+            loadPendingMessages();
+            if(positionToScroll<=0){
+                log("positionToScroll is 0 - no unread messages");
+                mLayoutManager.scrollToPosition(messages.size());
+            }
+        }
     }
 
     @Override
