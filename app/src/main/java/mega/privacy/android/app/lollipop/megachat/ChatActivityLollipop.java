@@ -523,6 +523,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         pickFileStorageButton.setOnClickListener(this);
         pickCloudDriveButton.setOnClickListener(this);
 
+        messageJump.setOnClickListener(this);
+
+
         fragmentContainerFileStorage = (FrameLayout) findViewById(R.id.fragment_container_file_storage);
         fileStorageLayout = (RelativeLayout) findViewById(R.id.relative_layout_file_storage);
         fileStorageLayout.setVisibility(View.GONE);
@@ -697,6 +700,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     if (dy > 0) {
                         // Scrolling up
                         scrollingUp = true;
+                        if((messageJump.getVisibility() == View.VISIBLE)&&((messages.size()-1) == (mLayoutManager.findLastVisibleItemPosition()-1))){
+                            messageJump.animate().alpha(0.0f).setDuration(1000);
+                        }
                     } else {
                         // Scrolling down
                         scrollingUp = false;
@@ -2309,6 +2315,11 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             case R.id.toolbar_chat:{
                 log("onClick:toolbar_chat");
                 showGroupInfoActivity();
+                break;
+            }
+            case R.id.message_jump:{
+                log("onClick:jump to least");
+                goToEnd();
                 break;
             }
 		}
@@ -5646,8 +5657,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     public void showJumpMessage(){
         int lastMessage = messages.size()-1;
         int lastVisiblePosition = mLayoutManager.findLastVisibleItemPosition()-1;
-        log("****lastMessage("+lastMessage+"), lastRecyclerViewPosition("+lastVisiblePosition+")");
-
         if(lastMessage > lastVisiblePosition){
             messageJump.setVisibility(View.VISIBLE);
         }else{
@@ -5664,6 +5673,15 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 callInProgressLayout.setVisibility(View.GONE);
                 callInProgressLayout.setOnClickListener(null);
             }
+        }
+    }
+
+    public void goToEnd(){
+        int index = messages.size()-1;
+        final int indexToScroll = index+1;
+        mLayoutManager.scrollToPositionWithOffset(indexToScroll,Util.scaleHeightPx(20, outMetrics));
+        if(messageJump.getVisibility() == View.VISIBLE){
+            messageJump.animate().alpha(0.0f).setDuration(1000);
         }
     }
 }

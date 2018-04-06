@@ -343,11 +343,12 @@
 
                 <RelativeLayout
                     android:layout_width="163dp"
-                    android:layout_height="36dp"
+                    android:layout_height="45dp"
                     android:layout_centerHorizontal="true"
                     android:layout_alignParentBottom="true"
                     android:layout_marginBottom="12dp"
                     android:id="@+id/message_jump"
+                    android:animateLayoutChanges="true"
                     android:background="@drawable/dark_rounded_jump_to_latest">
                     <LinearLayout
                         android:layout_width="wrap_content"
