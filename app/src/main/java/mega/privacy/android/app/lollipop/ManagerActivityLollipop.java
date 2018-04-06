@@ -223,7 +223,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 	final String ACTION_RECOVERY_KEY_COPY_TO_CLIPBOARD = "ACTION_RECOVERY_KEY_COPY_TO_CLIPBOARD";
 	final String ACTION_RECOVERY_KEY_EXPORTED = "RECOVERY_KEY_EXPORTED";
-	final String ACTION_RECOVERY_KEY_LOGOUT = "RECOVERY_KEY_LOGOUT";
 	final String ACTION_REQUEST_DOWNLOAD_FOLDER_LOGOUT = "REQUEST_DOWNLOAD_FOLDER_LOGOUT";
 	private static int REQUEST_DOWNLOAD_FOLDER = 1111;
 
@@ -2413,7 +2412,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		rememberPasswordDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
 			@Override
 			public void onDismiss(DialogInterface dialog) {
-				log("Do not show me again not checked");
+				passwordReminderDialogBlocked = false;
 				if (passwordReminderDialogBlocked){
 					log("Do not show me again");
 					passwordReminderDialogBlocked();
@@ -2683,11 +2682,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				else if (getIntent().getAction().equals(ACTION_RECOVERY_KEY_EXPORTED)){
 					log("onPostResume: ACTION_RECOVERY_KEY_EXPORTED");
 					exportRecoveryKey();
-				}
-				else if (getIntent().getAction().equals(ACTION_RECOVERY_KEY_LOGOUT)){
-					log("onPostResume: ACTION_RECOVERY_KEY_LOGOUT");
-					AccountController ac = new AccountController(this);
-					ac.logout(this, megaApi);
 				}
 				else if (getIntent().getAction().equals(ACTION_REQUEST_DOWNLOAD_FOLDER_LOGOUT)){
 					String parentPath = intent.getStringExtra("parentPath");
