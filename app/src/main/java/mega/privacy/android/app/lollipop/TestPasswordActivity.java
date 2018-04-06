@@ -11,7 +11,6 @@ import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
 import android.util.TypedValue;
-import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,8 +23,10 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.modalbottomsheet.RecoveryKeyBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -41,7 +42,6 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 public class TestPasswordActivity extends PinActivityLollipop implements View.OnClickListener, MegaRequestListenerInterface {
 
     final String ACTION_RECOVERY_KEY_EXPORTED = "RECOVERY_KEY_EXPORTED";
-    final String ACTION_RECOVERY_KEY_LOGOUT = "RECOVERY_KEY_LOGOUT";
     final String ACTION_REQUEST_DOWNLOAD_FOLDER_LOGOUT = "REQUEST_DOWNLOAD_FOLDER_LOGOUT";
     private static int REQUEST_DOWNLOAD_FOLDER = 1111;
 
@@ -61,6 +61,7 @@ public class TestPasswordActivity extends PinActivityLollipop implements View.On
     private boolean logout = false;
 
     MegaApiAndroid megaApi;
+    DatabaseHandler dbH;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -72,7 +73,13 @@ public class TestPasswordActivity extends PinActivityLollipop implements View.On
             return;
         }
 
-        logout = getIntent().getBooleanExtra("rememberPasswordLogout", false);
+        if (savedInstanceState != null){
+            logout = savedInstanceState.getBoolean("logout", false);
+        }
+        else {
+            logout = getIntent().getBooleanExtra("rememberPasswordLogout", false);
+        }
+
 
         megaApi = ((MegaApplication)getApplication()).getMegaApi();
 
@@ -155,6 +162,12 @@ public class TestPasswordActivity extends PinActivityLollipop implements View.On
         dismissButton.setLayoutParams(params);
     }
 
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean("logout", logout);
+    }
+
     void quitError(){
         if(containerPasswordError.getVisibility() != View.GONE){
             containerPasswordError.setVisibility(View.GONE);
@@ -234,8 +247,9 @@ public class TestPasswordActivity extends PinActivityLollipop implements View.On
                 parentPath = parentPath+"/"+split[split.length-1];
                 Intent newIntent = new Intent(this, ManagerActivityLollipop.class);
                 newIntent.putExtra("parentPath", parentPath);
-                intent.setAction(ACTION_REQUEST_DOWNLOAD_FOLDER_LOGOUT);
-                startActivity(intent);
+                newIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                newIntent.setAction(ACTION_REQUEST_DOWNLOAD_FOLDER_LOGOUT);
+                startActivity(newIntent);
             }
         }
     }
@@ -282,14 +296,10 @@ public class TestPasswordActivity extends PinActivityLollipop implements View.On
             case R.id.test_password_dismiss_button:{
                 megaApi.passwordReminderDialogSkipped(this);
                 if (logout){
-                    Intent intent = new Intent(this, ManagerActivityLollipop.class);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    intent.setAction(ACTION_RECOVERY_KEY_LOGOUT);
-                    startActivity(intent);
+                    AccountController ac = new AccountController(this);
+                    ac.logout(this, megaApi);
                 }
-                else {
-                    this.finish();
-                }
+                this.finish();
                 break;
             }
         }
@@ -313,6 +323,31 @@ public class TestPasswordActivity extends PinActivityLollipop implements View.On
     public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
         if(request.getParamType() == MegaApiJava.USER_ATTR_PWD_REMINDER && e.getErrorCode() == MegaError.API_OK){
             log("New value of attribute USER_ATTR_PWD_REMINDER: " +request.getText());
+        }
+        else if (request.getType() == MegaRequest.TYPE_LOGOUT){
+            log("logout finished");
+
+            if(Util.isChatEnabled()){
+                log("END logout sdk request - wait chat logout");
+            }
+            else{
+                log("END logout sdk request - chat disabled");
+                if (dbH == null){
+                    dbH = DatabaseHandler.getDbHandler(getApplicationContext());
+                }
+                if (dbH != null){
+                    dbH.clearEphemeral();
+                }
+
+                AccountController aC = new AccountController(this);
+                aC.logoutConfirmed(this);
+
+                Intent tourIntent = new Intent(this, LoginActivityLollipop.class);
+                tourIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                this.startActivity(tourIntent);
+
+                finish();
+            }
         }
     }
 

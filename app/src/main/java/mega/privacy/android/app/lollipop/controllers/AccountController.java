@@ -37,6 +37,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PinLockActivityLollipop;
+import mega.privacy.android.app.lollipop.TestPasswordActivity;
 import mega.privacy.android.app.lollipop.managerSections.MyAccountFragmentLollipop;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.PreviewUtils;
@@ -356,6 +357,9 @@ public class AccountController implements View.OnClickListener{
         }
         else if (context instanceof PinLockActivityLollipop){
             megaApi.logout((PinLockActivityLollipop)context);
+        }
+        else if (context instanceof TestPasswordActivity){
+            megaApi.logout(((TestPasswordActivity)context));
         }
         else{
             megaApi.logout();
