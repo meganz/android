@@ -411,6 +411,11 @@
         </service>
 
         <service
+            android:name="mega.privacy.android.app.lollipop.megachat.calls.CallNotificationIntentService"
+            android:exported="false" >
+        </service>
+
+        <service
             android:name="UploadService"
             android:exported="false" >
         </service>
