@@ -200,6 +200,7 @@ public class Constants {
 	public static int NOTIFICATION_MISSED_CALL = 12;
 	public static int NOTIFICATION_PRE_N_CHAT = 13;
 	public static int NOTIFICATION_STORAGE_OVERQUOTA = 14;
+	public static int NOTIFICATION_INCOMING_CALL = 15;
 
 	public static String CHAT_FOLDER = "My chat files";
 
