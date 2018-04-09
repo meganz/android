@@ -164,7 +164,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
 //    AndroidMegaChatMessage selectedMessage;
     int selectedPosition;
-//    int newPosition;
     public long selectedMessageId = -1;
 
     MegaChatRoom chatRoom;
@@ -272,6 +271,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     boolean isHideJump = false;
     int typeMessageJump = 0;
     boolean visibilityMessageJump=false;
+    boolean isTurn = false;
 
     View.OnFocusChangeListener focus = new View.OnFocusChangeListener() {
         @Override
@@ -813,7 +813,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     selectedMessageId = savedInstanceState.getLong("selectedMessageId", -1);
                     log("Handle of the message: "+selectedMessageId);
                     selectedPosition = savedInstanceState.getInt("selectedPosition", -1);
-
                     typeMessageJump = savedInstanceState.getInt("typeMessageJump",2);
                     visibilityMessageJump = savedInstanceState.getBoolean("visibilityMessageJump",false);
 
@@ -826,6 +825,12 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                             messageJumpLayout.setVisibility(View.VISIBLE);
                         }
                     }
+
+                    lastMessageSeen = savedInstanceState.getLong("lastMessageSeen",-1);
+                    if(lastMessageSeen != -1){
+                        isTurn = true;
+                    }
+
                 }
 
                 if(idChat!=-1) {
@@ -930,9 +935,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             stateHistory = megaChatApi.loadMessages(idChat, NUMBER_MESSAGES_TO_LOAD);
             numberToLoad=NUMBER_MESSAGES_TO_LOAD;
         } else {
-
-            lastMessageSeen = megaChatApi.getLastMessageSeenId(idChat);
-
+            if(!isTurn){
+                lastMessageSeen = megaChatApi.getLastMessageSeenId(idChat);
+            }
             if (lastMessageSeen != -1) {
                 log("loadHistory:lastSeenId: " + lastMessageSeen);
             } else {
@@ -3787,6 +3792,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             if(typeMessageJump !=  TYPE_MESSAGE_NEW_MESSAGE){
                 messageJumpText.setText(getResources().getString(R.string.message_new_messages));
                 typeMessageJump = TYPE_MESSAGE_NEW_MESSAGE;
+            }
+
+            if(messageJumpLayout.getVisibility() != View.VISIBLE){
                 messageJumpLayout.setVisibility(View.VISIBLE);
             }
         }
@@ -5227,7 +5235,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
         outState.putBoolean("visibilityMessageJump",visibilityMessageJump);
 
-//        outState.putInt("newPosition",newPosition);
+        outState.putLong("lastMessageSeen",lastMessageSeen);
     }
 
     public void askSizeConfirmationBeforeChatDownload(String parentPath, ArrayList<MegaNode> nodeList, long size){
@@ -5745,14 +5753,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                             }
                         })
                         .start();
-
         }
     }
-
-//    public void positionNewKnow(int position){
-//        log("***** positionNEW: "+position);
-//        newPosition=position;
-//    }
-
 
 }
