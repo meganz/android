@@ -1,11 +1,9 @@
 package mega.privacy.android.app.lollipop.qrcode;
 
-
-import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.pm.PackageManager;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -14,9 +12,7 @@ import android.graphics.Paint;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -33,12 +29,14 @@ import com.budiyev.android.codescanner.DecodeCallback;
 import com.google.zxing.Result;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Locale;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
+import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -46,6 +44,7 @@ import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
+import nz.mega.sdk.MegaUser;
 
 import static android.graphics.Color.WHITE;
 
@@ -284,39 +283,47 @@ public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.Res
         String contactLink = rawResult.getText();
         String[] s = contactLink.split("C!");
 
-        handle = MegaApiAndroid.base64ToHandle(s[1].trim());
-        log("Contact link: "+contactLink+ " s[1]: "+s[1]+" handle: "+handle);
-        if (megaApi == null){
-            megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
+        if (s.length<=1){
+            codeScanner.releaseResources();
+            codeScanner.startPreview();
         }
-        megaApi.contactLinkQuery(handle, this);
+        else{
+            handle = MegaApiAndroid.base64ToHandle(s[1].trim());
+            log("Contact link: "+contactLink+ " s[1]: "+s[1]+" handle: "+handle);
+            if (megaApi == null){
+                megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
+            }
+            megaApi.contactLinkQuery(handle, this);
 
-        View v = inflater.inflate(R.layout.dialog_accept_contact, null);
-        builder.setView(v);
+            View v = inflater.inflate(R.layout.dialog_accept_contact, null);
+            builder.setView(v);
 
-        invite = (Button) v.findViewById(R.id.accept_contact_invite);
-        invite.setOnClickListener(this);
+            invite = (Button) v.findViewById(R.id.accept_contact_invite);
+            invite.setOnClickListener(this);
+            view = (Button) v.findViewById(R.id.view_contact);
+            view.setOnClickListener(this);
 
-        avatarImage = (RoundedImageView) v.findViewById(R.id.accept_contact_avatar);
-        initialLetter = (TextView) v.findViewById(R.id.accept_contact_initial_letter);
-        contactName = (TextView) v.findViewById(R.id.accept_contact_name);
-        contactMail = (TextView) v.findViewById(R.id.accept_contact_mail);
+            avatarImage = (RoundedImageView) v.findViewById(R.id.accept_contact_avatar);
+            initialLetter = (TextView) v.findViewById(R.id.accept_contact_initial_letter);
+            contactName = (TextView) v.findViewById(R.id.accept_contact_name);
+            contactMail = (TextView) v.findViewById(R.id.accept_contact_mail);
 
-        inviteAlertDialog = builder.create();
-        inviteAlertDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
-            @Override
-            public void onDismiss(DialogInterface dialog) {
-                log("onDismiss");
+            inviteAlertDialog = builder.create();
+            inviteAlertDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                @Override
+                public void onDismiss(DialogInterface dialog) {
+                    log("onDismiss");
 //                scannerView.setAutoFocus(true);
 //                scannerView.startCamera();
 //                onResume();
-                inviteShown = false;
-                codeScanner.startPreview();
-            }
-        });
+                    inviteShown = false;
+                    codeScanner.startPreview();
+                }
+            });
 
 //        scannerView.stopCamera();
-        codeScanner.releaseResources();
+            codeScanner.releaseResources();
+        }
     }
 
     @Override
@@ -367,7 +374,14 @@ public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.Res
                 break;
             }
             case R.id.view_contact: {
-
+                codeScanner.releaseResources();
+                if (inviteAlertDialog != null){
+                    inviteAlertDialog.dismiss();
+                }
+                Intent intent = new Intent(context, ContactInfoActivityLollipop.class);
+                intent.putExtra("name", myEmail);
+                startActivity(intent);
+                ((QRCodeActivity) context).finish();
                 break;
             }
         }
@@ -534,6 +548,16 @@ public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.Res
         if (inviteAlertDialog != null){
             contactName.setText(contactNameContent);
             contactMail.setText(myEmail);
+            if (isContact){
+                contactMail.setText(getResources().getString(R.string.context_contact_already_exists, myEmail));
+                invite.setVisibility(View.GONE);
+                view.setVisibility(View.VISIBLE);
+            }
+            else {
+                contactMail.setText(myEmail);
+                invite.setVisibility(View.VISIBLE);
+                view.setVisibility(View.GONE);
+            }
             setAvatar();
         }
         else {
@@ -578,6 +602,21 @@ public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.Res
         inviteShown = true;
     }
 
+    boolean queryIfIsContact() {
+
+        ArrayList<MegaUser> contacts = megaApi.getContacts();
+
+        for (int i=0; i<contacts.size(); i++){
+            if (contacts.get(i).getVisibility() == MegaUser.VISIBILITY_VISIBLE){
+                log("Contact mail[i]="+i+":"+contacts.get(i).getEmail()+" contact mail request: "+myEmail);
+                if (contacts.get(i).getEmail().equals(myEmail)){
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     @Override
     public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
 
@@ -590,7 +629,7 @@ public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.Res
                 myEmail = request.getEmail();
                 handleContactLink = request.getNodeHandle();
                 contactNameContent = request.getName() + " " + request.getText();
-                if (megaApi.getContact(myEmail) != null){
+                if (queryIfIsContact()){
                     isContact = true;
                 }
                 else {
