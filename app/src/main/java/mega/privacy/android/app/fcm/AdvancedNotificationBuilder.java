@@ -36,11 +36,13 @@ import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.NonContactInfo;
+import mega.privacy.android.app.lollipop.megachat.calls.CallNotificationIntentService;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApiAndroid;
+import nz.mega.sdk.MegaChatCall;
 import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatRoom;
@@ -351,7 +353,7 @@ public final class AdvancedNotificationBuilder {
             notificationBuilder.setSound(uriParameter);
             if(vibration!=null){
                 if(vibration.equals("true")){
-                    notificationBuilder.setVibrate(new long[] {0, 1000});
+                    notificationBuilder.setVibrate(new long[] {0, 500});
                 }
             }
             String textToShow = String.format(context.getString(R.string.number_messages_chat_notification), unreadChats.size());
@@ -472,7 +474,7 @@ public final class AdvancedNotificationBuilder {
         notificationBuilder.setSound(uriParameter);
         if(vibration!=null){
             if(vibration.equals("true")){
-                notificationBuilder.setVibrate(new long[] {0, 1000});
+                notificationBuilder.setVibrate(new long[] {0, 500});
             }
         }
         notificationBuilder.setStyle(bigTextStyle);
@@ -550,7 +552,7 @@ public final class AdvancedNotificationBuilder {
             notificationBuilder.setSound(uriParameter);
             if(vibration!=null){
                 if(vibration.equals("true")){
-                    notificationBuilder.setVibrate(new long[] {0, 1000});
+                    notificationBuilder.setVibrate(new long[] {0, 500});
                 }
 
             }
@@ -606,7 +608,7 @@ public final class AdvancedNotificationBuilder {
             notificationBuilder.setSound(uriParameter);
             if(vibration!=null){
                 if(vibration.equals("true")){
-                    notificationBuilder.setVibrate(new long[] {0, 1000});
+                    notificationBuilder.setVibrate(new long[] {0, 500});
                 }
             }
 
@@ -901,6 +903,70 @@ public final class AdvancedNotificationBuilder {
 
         mNotificationManager.notify(Constants.NOTIFICATION_GENERAL_PUSH_CHAT, mBuilderCompat.build());
     }
+
+    public void showIncomingCallNotification(MegaChatCall callToAnswer, MegaChatCall callInProgress) {
+        log("showIncomingCallNotification");
+
+        MegaChatRoom chatToAnswer = megaChatApi.getChatRoom(callToAnswer.getChatid());
+
+        MegaChatRoom chatInProgress = megaChatApi.getChatRoom(callInProgress.getChatid());
+        long chatHandleInProgress = -1;
+        if(chatInProgress!=null){
+            chatHandleInProgress = callInProgress.getChatid();
+        }
+        log("showIncomingCallNotification:chatInProgress: "+callInProgress.getChatid());
+
+//        int notificationId = Constants.NOTIFICATION_INCOMING_CALL;
+        long chatCallId = callToAnswer.getId();
+        String notificationCallId = MegaApiJava.userHandleToBase64(chatCallId);
+        int notificationId = (notificationCallId).hashCode();
+
+        Intent ignoreIntent = new Intent(context, CallNotificationIntentService.class);
+        ignoreIntent.putExtra("chatHandleInProgress", chatHandleInProgress);
+        ignoreIntent.putExtra("chatHandleToAnswer", callToAnswer.getChatid());
+        ignoreIntent.setAction(CallNotificationIntentService.IGNORE);
+        PendingIntent pendingIntentIgnore = PendingIntent.getService(context, 0 /* Request code */, ignoreIntent,  PendingIntent.FLAG_CANCEL_CURRENT);
+
+        Intent answerIntent = new Intent(context, CallNotificationIntentService.class);
+        answerIntent.putExtra("chatHandleInProgress", chatHandleInProgress);
+        answerIntent.putExtra("chatHandleToAnswer", callToAnswer.getChatid());
+        answerIntent.setAction(CallNotificationIntentService.ANSWER);
+        PendingIntent pendingIntentAnswer = PendingIntent.getService(context, 1 /* Request code */, answerIntent,  PendingIntent.FLAG_CANCEL_CURRENT);
+
+        NotificationCompat.Action actionAnswer = new NotificationCompat.Action.Builder(-1, "ANSWER", pendingIntentAnswer).build();
+        NotificationCompat.Action actionIgnore = new NotificationCompat.Action.Builder(-1, "IGNORE", pendingIntentIgnore).build();
+
+        long[] pattern = {0, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000};
+
+        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context)
+                .setSmallIcon(R.drawable.ic_stat_notify_download)
+                .setContentTitle(chatToAnswer.getPeerFullname(0))
+                .setContentText(context.getString(R.string.notification_subtitle_incoming))
+                .setStyle(new NotificationCompat.BigTextStyle()
+                        .bigText(chatToAnswer.getPeerFullname(0)))
+                .setPriority(NotificationManager.IMPORTANCE_HIGH)
+                .setAutoCancel(false)
+                .setVibrate(pattern)
+                .setColor(ContextCompat.getColor(context,R.color.mega))
+                .addAction(actionIgnore)
+                .addAction(actionAnswer);
+
+        notificationBuilder.setFullScreenIntent(pendingIntentAnswer, true);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+            Bitmap largeIcon = createDefaultAvatar(chatToAnswer);
+            if(largeIcon!=null){
+                notificationBuilder.setLargeIcon(largeIcon);
+            }
+        }
+
+        if(notificationManager == null){
+            mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        }
+
+        notificationManager.notify(notificationId, notificationBuilder.build());
+    }
+
 
     public static void log(String message) {
         Util.log("AdvancedNotificationBuilder", message);
