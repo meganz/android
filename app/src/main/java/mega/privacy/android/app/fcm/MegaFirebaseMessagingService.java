@@ -17,7 +17,6 @@ package mega.privacy.android.app.fcm;
  */
 
 
-import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -53,7 +52,6 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
-import mega.privacy.android.app.lollipop.megachat.calls.CallNotificationIntentService;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
@@ -67,7 +65,6 @@ import nz.mega.sdk.MegaChatCallListenerInterface;
 import nz.mega.sdk.MegaChatError;
 import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaChatRequestListenerInterface;
-import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaEvent;
@@ -205,22 +202,32 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
                                 log("MORE than one call in progress: "+numberOfCalls);
                                 MegaChatCall callInProgress = null;
                                 MegaChatCall callIncoming = null;
-                                for(int i=0; i<handleList.get(i); i++){
+
+                                for(int i=0; i<handleList.size(); i++){
                                     MegaChatCall call = megaChatApi.getChatCall(handleList.get(i));
                                     if(call!=null){
+                                        log("Call ChatID: "+call.getChatid()+" Status: "+call.getStatus());
                                         if(call.getStatus()>=MegaChatCall.CALL_STATUS_IN_PROGRESS){
                                             callInProgress = call;
-                                            log("Call in progress: "+callInProgress.getChatid());
-                                        }
-                                        else{
-                                            callIncoming = call;
-                                            log("Call incoming: "+callIncoming.getChatid());
+                                            log("FOUND Call in progress: "+callInProgress.getChatid());
                                         }
                                     }
                                 }
 
-                                showIncomingCallNotification(callIncoming, callInProgress);
+                                for(int i=0; i<handleList.size(); i++){
+                                    MegaChatCall call = megaChatApi.getChatCall(handleList.get(i));
+                                    if(call!=null){
 
+                                        if(call.getStatus()<MegaChatCall.CALL_STATUS_IN_PROGRESS){
+                                            callIncoming = call;
+                                            log("FOUND Call incoming: "+callIncoming.getChatid());
+                                        }
+                                    }
+                                }
+
+                                if(callIncoming!=null){
+                                    showIncomingCallNotification(callIncoming, callInProgress);
+                                }
                             }
                             else{
                                 log("ERROR. No calls to launch");
@@ -590,58 +597,7 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
 
         removeListeners();
 
-        MegaChatRoom chat = megaChatApi.getChatRoom(callToAnswer.getChatid());
-
-        log("showIncomingCallNotification:chatInProgress: "+callInProgress.getChatid());
-        MegaChatRoom chatInProgress = megaChatApi.getChatRoom(callInProgress.getChatid());
-
-        if(chatInProgress!=null){
-            log("Name: "+chatInProgress.getPeerFullname(0));
-        }
-        int notificationId = Constants.NOTIFICATION_INCOMING_CALL;
-
-        Intent ignoreIntent = new Intent(this, CallNotificationIntentService.class);
-        ignoreIntent.putExtra("chatHandleInProgress", callInProgress.getChatid());
-        ignoreIntent.putExtra("chatHandleToAnswer", callToAnswer.getChatid());
-        ignoreIntent.setAction(CallNotificationIntentService.IGNORE);
-        PendingIntent pendingIntentIgnore = PendingIntent.getService(this, 0 /* Request code */, ignoreIntent, 0);
-
-        Intent answerIntent = new Intent(this, CallNotificationIntentService.class);
-        answerIntent.putExtra("chatHandleInProgress", callInProgress.getChatid());
-        answerIntent.putExtra("chatHandleToAnswer", callToAnswer.getChatid());
-        answerIntent.setAction(CallNotificationIntentService.ANSWER);
-        PendingIntent pendingIntentAnswer = PendingIntent.getService(this, 1 /* Request code */, answerIntent, 0);
-
-        NotificationCompat.Action actionAnswer = new NotificationCompat.Action.Builder(-1, "ANSWER", pendingIntentAnswer).build();
-        NotificationCompat.Action actionIgnore = new NotificationCompat.Action.Builder(-1, "IGNORE", pendingIntentIgnore).build();
-
-        Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
-                .setSmallIcon(R.drawable.ic_stat_notify_download)
-                .setContentTitle(chat.getPeerFullname(0))
-                .setContentText(getString(R.string.notification_subtitle_incoming))
-                .setStyle(new NotificationCompat.BigTextStyle()
-                .bigText(chat.getPeerFullname(0)))
-                .setPriority(NotificationManager.IMPORTANCE_HIGH)
-                .setAutoCancel(false)
-                .setDefaults(Notification.DEFAULT_ALL)
-                .setColor(ContextCompat.getColor(this,R.color.mega))
-                .addAction(actionIgnore)
-                .addAction(actionAnswer);
-
-        notificationBuilder.setFullScreenIntent(pendingIntentAnswer, true);
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
-            Bitmap largeIcon = createDefaultAvatar(chat.getPeerEmail(0));
-            if(largeIcon!=null){
-                notificationBuilder.setLargeIcon(largeIcon);
-            }
-        }
-
-        NotificationManager notificationManager =
-                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-
-        notificationManager.notify(notificationId, notificationBuilder.build());
+        notificationBuilder.showIncomingCallNotification(callToAnswer, callInProgress);
     }
 
     public void showContactRequestNotification(MegaContactRequest crToShow) {
