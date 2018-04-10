@@ -1,6 +1,7 @@
 package mega.privacy.android.app.lollipop;
 
 import android.Manifest;
+import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -15,6 +16,8 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
+import android.provider.ContactsContract;
+import android.support.annotation.NonNull;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
@@ -70,6 +73,10 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.EditTextCursorWatcher;
 import mega.privacy.android.app.components.ExtendedViewPager;
 import mega.privacy.android.app.components.TouchImageView;
+import mega.privacy.android.app.components.dragger.Direction;
+import mega.privacy.android.app.components.dragger.DraggableView;
+import mega.privacy.android.app.components.dragger.ExitViewAnimator;
+import mega.privacy.android.app.components.dragger.ViewAnimator;
 import mega.privacy.android.app.lollipop.adapters.MegaFullScreenImageAdapterLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaOfflineFullScreenImageAdapterLollipop;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
@@ -97,9 +104,12 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 
+import static android.graphics.Color.BLACK;
+import static android.graphics.Color.TRANSPARENT;
+import static android.view.Gravity.BOTTOM;
 import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.TYPE_EXPORT_REMOVE;
 
-public class FullScreenImageViewerLollipop extends PinActivityLollipop implements OnPageChangeListener, MegaRequestListenerInterface, OnItemClickListener, MegaGlobalListenerInterface, MegaChatRequestListenerInterface {
+public class FullScreenImageViewerLollipop extends PinActivityLollipop implements OnPageChangeListener, MegaRequestListenerInterface, OnItemClickListener, MegaGlobalListenerInterface, MegaChatRequestListenerInterface, DraggableView.DraggableListener{
 	
 	private DisplayMetrics outMetrics;
 
@@ -191,6 +201,10 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	ArrayList<MegaOffline> mOffList;
 	ArrayList<MegaOffline> mOffListImages;
 
+	DraggableView draggableView;
+	public static int screenHeight;
+	RelativeLayout relativeImageViewerLayout;
+	ImageView ivShadow;
 
 	@Override
 	public void onDestroy(){
@@ -585,6 +599,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				Display display = getWindowManager().getDefaultDisplay();
 				DisplayMetrics outMetrics = new DisplayMetrics();
 				display.getMetrics(outMetrics);
+				screenHeight = outMetrics.heightPixels;
 				float density = getResources().getDisplayMetrics().density;
 
 				float scaleW = Util.getScaleW(outMetrics, density);
@@ -757,6 +772,10 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_full_screen_image_viewer);
+
+		relativeImageViewerLayout = (RelativeLayout) findViewById(R.id.full_image_viewer_layout);
+
+		draggableView.setViewAnimator(new ExitViewAnimator());
 
 		handler = new Handler();
 		fullScreenImageViewer = this;
@@ -2549,5 +2568,78 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	@Override
 	public void onRequestTemporaryError(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
 
+	}
+
+	@Override
+	public void onViewPositionChanged(float fractionScreen) {
+		ivShadow.setAlpha(1 - fractionScreen);
+	}
+
+	@Override
+	public void setContentView(int layoutResID) {
+		super.setContentView(getContainer());
+		View view = LayoutInflater.from(this).inflate(layoutResID, null);
+		draggableView.addView(view);
+	}
+
+	private View getContainer() {
+		RelativeLayout container = new RelativeLayout(this);
+		draggableView = new DraggableView(this);
+		if (getIntent() != null) {
+			draggableView.setScreenPosition(getIntent().getIntArrayExtra("screenPosition"));
+		}
+		draggableView.setDraggableListener(this);
+		ivShadow = new ImageView(this);
+		ivShadow.setBackgroundColor(getResources().getColor(R.color.black_p50));
+		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
+		container.addView(ivShadow, params);
+		container.addView(draggableView);
+		return container;
+	}
+
+	@Override
+	public void onDragActivated(boolean activated) {
+		if (activated) {
+			if (aB != null && aB.isShowing()) {
+				if(tB != null) {
+					tB.animate().translationY(-220).setDuration(0)
+							.withEndAction(new Runnable() {
+								@Override
+								public void run() {
+									aB.hide();
+								}
+							}).start();
+					bottomLayout.animate().translationY(220).setDuration(0).start();
+					getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+				} else {
+					aB.hide();
+				}
+			}
+			fragmentContainer.setBackgroundColor(TRANSPARENT);
+			fragmentContainer.setElevation(0);
+			relativeImageViewerLayout.setBackgroundColor(TRANSPARENT);
+			relativeImageViewerLayout.setElevation(0);
+			appBarLayout.setBackgroundColor(TRANSPARENT);
+			appBarLayout.setElevation(0);
+			if (adapterType == Constants.OFFLINE_ADAPTER){
+				adapterOffline.getVisibleImage(positionG).resetZoom();
+				draggableView.setCurrentView(adapterOffline.getVisibleImage(positionG));
+			}
+			else {
+				adapterMega.getVisibleImage(positionG).resetZoom();
+				draggableView.setCurrentView(adapterMega.getVisibleImage(positionG));
+			}
+		}
+		else {
+			handler.postDelayed(new Runnable() {
+				@Override
+				public void run() {
+					showActionBar();
+					fragmentContainer.setBackgroundColor(BLACK);
+					relativeImageViewerLayout.setBackgroundColor(BLACK);
+					appBarLayout.setBackgroundColor(BLACK);
+				}
+			}, 300);
+		}
 	}
 }

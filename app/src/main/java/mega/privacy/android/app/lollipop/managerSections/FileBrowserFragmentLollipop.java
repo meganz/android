@@ -864,8 +864,8 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 		}
 	}
 
-    public void itemClick(int position) {
-		log("itemClick:position: " + position);
+    public void itemClick(int position, int[] screenPosition) {
+		log("item click position: " + position);
 		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 		if (adapter.isMultipleSelect()){
 			log("itemClick:multiselectON");
@@ -921,6 +921,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 						intent.putExtra("typeAccount", accountInfo.getAccountType());
 					}
 					intent.putExtra("orderGetChildren", ((ManagerActivityLollipop)context).orderCloud);
+					intent.putExtra("screenPosition", screenPosition);
 					startActivity(intent);
 
 				}
@@ -943,7 +944,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 						mediaIntent = new Intent(context, AudioVideoPlayerLollipop.class);
 						internalIntent=true;
 					}
-
+					mediaIntent.putExtra("screenPosition", screenPosition);
 					mediaIntent.putExtra("FILENAME", file.getName());
 					String localPath = Util.getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
 					if (localPath != null){

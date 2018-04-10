@@ -419,7 +419,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 		
 			ViewHolderOfflineList holder = null;
 			
-			View v = inflater.inflate(R.layout.item_offline_list, parent, false);	
+			View v = inflater.inflate(R.layout.item_offline_list, parent, false);
 				
 			holder = new ViewHolderOfflineList(v);
 			holder.itemLayout = (RelativeLayout) v.findViewById(R.id.offline_list_item_layout);
@@ -909,7 +909,15 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 		switch (v.getId()){
 			case R.id.offline_list_item_layout:
 			case R.id.offline_grid_item_layout:{
-				fragment.itemClick(currentPosition);								
+				int[] screenPosition = new int[2];
+				RelativeLayout imageView = holder.itemLayout;
+				imageView.getLocationOnScreen(screenPosition);
+				int[] dimens = new int[4];
+				dimens[0] = (imageView.getWidth() / 2) + screenPosition[0];
+				dimens[1] = (imageView.getHeight() / 2) + screenPosition[1];
+				dimens[2] = imageView.getWidth();
+				dimens[3] = imageView.getHeight();
+				fragment.itemClick(currentPosition, dimens);
 				break;
 			}			
 			case R.id.offline_list_three_dots_layout:
@@ -935,7 +943,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 		MegaOffline item = mOffList.get(currentPosition);
 		if(!(item.getHandle().equals("0"))){
 			fragment.activateActionMode();
-			fragment.itemClick(currentPosition);
+			fragment.itemClick(currentPosition, null);
 		}
 
 		return true;

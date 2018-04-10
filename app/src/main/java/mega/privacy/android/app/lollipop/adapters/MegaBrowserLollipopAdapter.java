@@ -1440,29 +1440,29 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 
 				if(multipleSelect){
 					if(type==Constants.RUBBISH_BIN_ADAPTER){
-						((RubbishBinFragmentLollipop) fragment).itemClick(currentPosition);
+						((RubbishBinFragmentLollipop) fragment).itemClick(currentPosition, null);
 					}
 					else if(type==Constants.INBOX_ADAPTER){
-						((InboxFragmentLollipop) fragment).itemClick(currentPosition);
+						((InboxFragmentLollipop) fragment).itemClick(currentPosition, null);
 					}
 					else if(type==Constants.INCOMING_SHARES_ADAPTER){
-						((IncomingSharesFragmentLollipop) fragment).itemClick(currentPosition);
+						((IncomingSharesFragmentLollipop) fragment).itemClick(currentPosition, null);
 					}
 					else if(type==Constants.OUTGOING_SHARES_ADAPTER){
-						((OutgoingSharesFragmentLollipop) fragment).itemClick(currentPosition);
+						((OutgoingSharesFragmentLollipop) fragment).itemClick(currentPosition, null);
 					}
 					else if(type==Constants.CONTACT_FILE_ADAPTER){
-						((ContactFileListFragmentLollipop) fragment).itemClick(currentPosition);
+						((ContactFileListFragmentLollipop) fragment).itemClick(currentPosition, null);
 					}
 					else if(type==Constants.FOLDER_LINK_ADAPTER){
 						((FolderLinkActivityLollipop) context).itemClick(currentPosition);
 					}
 					else if(type==Constants.SEARCH_ADAPTER){
-						((SearchFragmentLollipop) fragment).itemClick(currentPosition);
+						((SearchFragmentLollipop) fragment).itemClick(currentPosition, null);
 					}
 					else{
 						log("click layout FileBrowserFragmentLollipop!");
-						((FileBrowserFragmentLollipop) fragment).itemClick(currentPosition);
+						((FileBrowserFragmentLollipop) fragment).itemClick(currentPosition, null);
 					}
 				}
 				else{
@@ -1484,33 +1484,48 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 			}
 			case R.id.file_list_item_layout:
 			case R.id.file_grid_item_layout:{
+				int[] screenPosition = new int[2];
+				ImageView imageView;
+				if (adapterType == MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST) {
+					imageView = (ImageView) v.findViewById(R.id.file_list_thumbnail);
+				}
+				else {
+					imageView = (ImageView) v.findViewById(R.id.file_grid_thumbnail);
+				}
+				imageView.getLocationOnScreen(screenPosition);
+				int [] dimens = new int[4];
+				dimens[0] = (imageView.getWidth() / 2) + screenPosition[0];
+				dimens[1] = (imageView.getHeight() / 2) + screenPosition[1];
+				dimens[2] = imageView.getWidth();
+				dimens[3] = imageView.getHeight();
+
 				if(type==Constants.RUBBISH_BIN_ADAPTER){
-					((RubbishBinFragmentLollipop) fragment).itemClick(currentPosition);
+					((RubbishBinFragmentLollipop) fragment).itemClick(currentPosition, dimens);
 				}
 				else if(type==Constants.INBOX_ADAPTER){
-					((InboxFragmentLollipop) fragment).itemClick(currentPosition);
+					((InboxFragmentLollipop) fragment).itemClick(currentPosition, dimens);
 				}
 				else if(type==Constants.INCOMING_SHARES_ADAPTER){
-					((IncomingSharesFragmentLollipop) fragment).itemClick(currentPosition);
+					((IncomingSharesFragmentLollipop) fragment).itemClick(currentPosition, dimens);
 				}
 				else if(type==Constants.OUTGOING_SHARES_ADAPTER){
-					((OutgoingSharesFragmentLollipop) fragment).itemClick(currentPosition);
+					((OutgoingSharesFragmentLollipop) fragment).itemClick(currentPosition, dimens);
 				}
 				else if(type==Constants.CONTACT_FILE_ADAPTER){
-					((ContactFileListFragmentLollipop) fragment).itemClick(currentPosition);
+					((ContactFileListFragmentLollipop) fragment).itemClick(currentPosition, dimens);
 				}
 				else if(type==Constants.FOLDER_LINK_ADAPTER){
 					((FolderLinkActivityLollipop) context).itemClick(currentPosition);
 				}
 				else if(type==Constants.SEARCH_ADAPTER){
-					((SearchFragmentLollipop) fragment).itemClick(currentPosition);
+					((SearchFragmentLollipop) fragment).itemClick(currentPosition, dimens);
 				}
 				else if(type==Constants.NODE_ATTACHMENT_ADAPTER){
 					log("Node attachment adapter");
 				}
 				else{
 					log("click layout FileBrowserFragmentLollipop!");
-					((FileBrowserFragmentLollipop) fragment).itemClick(currentPosition);
+					((FileBrowserFragmentLollipop) fragment).itemClick(currentPosition, dimens);
 				}
 				break;
 			}
@@ -1527,23 +1542,23 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 
 		if(type==Constants.RUBBISH_BIN_ADAPTER){
 			((RubbishBinFragmentLollipop) fragment).activateActionMode();
-			((RubbishBinFragmentLollipop) fragment).itemClick(currentPosition);
+			((RubbishBinFragmentLollipop) fragment).itemClick(currentPosition, null);
 		}
 		else if(type==Constants.INBOX_ADAPTER){
 			((InboxFragmentLollipop) fragment).activateActionMode();
-			((InboxFragmentLollipop) fragment).itemClick(currentPosition);
+			((InboxFragmentLollipop) fragment).itemClick(currentPosition, null);
 		}
 		else if(type==Constants.INCOMING_SHARES_ADAPTER){
 			((IncomingSharesFragmentLollipop) fragment).activateActionMode();
-			((IncomingSharesFragmentLollipop) fragment).itemClick(currentPosition);
+			((IncomingSharesFragmentLollipop) fragment).itemClick(currentPosition, null);
 		}
 		else if(type==Constants.OUTGOING_SHARES_ADAPTER){
 			((OutgoingSharesFragmentLollipop) fragment).activateActionMode();
-			((OutgoingSharesFragmentLollipop) fragment).itemClick(currentPosition);
+			((OutgoingSharesFragmentLollipop) fragment).itemClick(currentPosition, null);
 		}
 		else if(type==Constants.CONTACT_FILE_ADAPTER){
 			((ContactFileListFragmentLollipop) fragment).activateActionMode();
-			((ContactFileListFragmentLollipop) fragment).itemClick(currentPosition);
+			((ContactFileListFragmentLollipop) fragment).itemClick(currentPosition, null);
 		}
 		else if(type==Constants.FOLDER_LINK_ADAPTER){
 			log("FOLDER_LINK_ADAPTER");
@@ -1552,7 +1567,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 		}
 		else if(type==Constants.SEARCH_ADAPTER){
 			((SearchFragmentLollipop) fragment).activateActionMode();
-			((SearchFragmentLollipop) fragment).itemClick(currentPosition);
+			((SearchFragmentLollipop) fragment).itemClick(currentPosition, null);
 		}
 		else if(type==Constants.NODE_ATTACHMENT_ADAPTER){
 			log("NODE_ATTACHMENT_ADAPTER - no multiselect");
@@ -1560,7 +1575,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 		else{
 			log("click layout FileBrowserFragmentLollipop!");
 			((FileBrowserFragmentLollipop) fragment).activateActionMode();
-			((FileBrowserFragmentLollipop) fragment).itemClick(currentPosition);
+			((FileBrowserFragmentLollipop) fragment).itemClick(currentPosition, null);
 		}
 
 		return true;
