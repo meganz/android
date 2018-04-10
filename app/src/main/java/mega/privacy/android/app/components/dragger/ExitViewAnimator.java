@@ -9,6 +9,7 @@ import android.view.SurfaceView;
 import android.view.View;
 
 import mega.privacy.android.app.components.TouchImageView;
+import mega.privacy.android.app.lollipop.managerSections.FileBrowserFragmentLollipop;
 import mega.privacy.android.app.utils.Util;
 
 public class ExitViewAnimator<D extends DraggableView> extends ReturnOriginViewAnimator<D> {
@@ -66,6 +67,7 @@ public class ExitViewAnimator<D extends DraggableView> extends ReturnOriginViewA
                             draggableView.setAnimating(false);
                             activity.finish();
                             activity.overridePendingTransition(0, android.R.anim.fade_out);
+                            FileBrowserFragmentLollipop.imageDrag.setVisibility(View.VISIBLE);
                         }
                     });
         }
