@@ -938,18 +938,26 @@ public final class AdvancedNotificationBuilder {
 
         long[] pattern = {0, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000};
 
+        //No sound just vibration
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context)
                 .setSmallIcon(R.drawable.ic_stat_notify_download)
                 .setContentTitle(chatToAnswer.getPeerFullname(0))
                 .setContentText(context.getString(R.string.notification_subtitle_incoming))
                 .setStyle(new NotificationCompat.BigTextStyle()
                 .bigText(chatToAnswer.getPeerFullname(0)))
-                .setPriority(NotificationManager.IMPORTANCE_HIGH)
                 .setAutoCancel(false)
                 .setVibrate(pattern)
                 .setColor(ContextCompat.getColor(context,R.color.mega))
                 .addAction(actionIgnore)
                 .addAction(actionAnswer);
+
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.N_MR1){
+            //API 25 = Android 7.1
+            notificationBuilder.setPriority(Notification.PRIORITY_HIGH);
+        }
+        else{
+            notificationBuilder.setPriority(NotificationManager.IMPORTANCE_HIGH);
+        }
 
         notificationBuilder.setFullScreenIntent(pendingIntentAnswer, true);
 
