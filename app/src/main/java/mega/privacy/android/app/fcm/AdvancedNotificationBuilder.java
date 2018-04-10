@@ -943,7 +943,7 @@ public final class AdvancedNotificationBuilder {
                 .setContentTitle(chatToAnswer.getPeerFullname(0))
                 .setContentText(context.getString(R.string.notification_subtitle_incoming))
                 .setStyle(new NotificationCompat.BigTextStyle()
-                        .bigText(chatToAnswer.getPeerFullname(0)))
+                .bigText(chatToAnswer.getPeerFullname(0)))
                 .setPriority(NotificationManager.IMPORTANCE_HIGH)
                 .setAutoCancel(false)
                 .setVibrate(pattern)

@@ -1415,11 +1415,11 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
             ((ViewHolderMessageChat)holder).layoutAvatarMessages.setVisibility(View.INVISIBLE);
 
+            markAsSeen((message));
+
             log("PRIVILEGE CHANGE message");
             if(message.getHandleOfAction()==myUserHandle){
                 log("a moderator change my privilege");
-
-                markAsSeen((message));
 
                 int privilege = message.getPrivilege();
                 log("Privilege of the user: "+privilege);
