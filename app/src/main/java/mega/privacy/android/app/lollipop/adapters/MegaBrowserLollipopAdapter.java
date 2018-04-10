@@ -1462,7 +1462,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 					}
 					else{
 						log("click layout FileBrowserFragmentLollipop!");
-						((FileBrowserFragmentLollipop) fragment).itemClick(currentPosition, null);
+						((FileBrowserFragmentLollipop) fragment).itemClick(currentPosition, null, null);
 					}
 				}
 				else{
@@ -1525,7 +1525,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 				}
 				else{
 					log("click layout FileBrowserFragmentLollipop!");
-					((FileBrowserFragmentLollipop) fragment).itemClick(currentPosition, dimens);
+					((FileBrowserFragmentLollipop) fragment).itemClick(currentPosition, dimens, imageView);
 				}
 				break;
 			}
@@ -1575,7 +1575,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 		else{
 			log("click layout FileBrowserFragmentLollipop!");
 			((FileBrowserFragmentLollipop) fragment).activateActionMode();
-			((FileBrowserFragmentLollipop) fragment).itemClick(currentPosition, null);
+			((FileBrowserFragmentLollipop) fragment).itemClick(currentPosition, null, null);
 		}
 
 		return true;

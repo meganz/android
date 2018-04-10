@@ -84,6 +84,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.dragger.DraggableView;
 import mega.privacy.android.app.components.dragger.ExitViewAnimator;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
+import mega.privacy.android.app.lollipop.managerSections.FileBrowserFragmentLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerActivity;
 import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption;
 import mega.privacy.android.app.utils.Constants;
@@ -1115,6 +1116,12 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
     }
 
     @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        FileBrowserFragmentLollipop.imageDrag.setVisibility(View.VISIBLE);
+    }
+
+    @Override
     public void setContentView(int layoutResID) {
         super.setContentView(getContainer());
         View view = LayoutInflater.from(this).inflate(layoutResID, null);
@@ -1162,6 +1169,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
             appBarLayout.setBackgroundColor(TRANSPARENT);
             appBarLayout.setElevation(0);
             draggableView.setCurrentView(simpleExoPlayerView.getVideoSurfaceView());
+            FileBrowserFragmentLollipop.imageDrag.setVisibility(View.GONE);
         }
         else {
             handler.postDelayed(new Runnable() {

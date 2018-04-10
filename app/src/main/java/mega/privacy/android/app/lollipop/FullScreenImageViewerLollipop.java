@@ -1,7 +1,6 @@
 package mega.privacy.android.app.lollipop;
 
 import android.Manifest;
-import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -16,8 +15,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
-import android.provider.ContactsContract;
-import android.support.annotation.NonNull;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
@@ -39,8 +36,10 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.view.WindowManager;
+import android.view.animation.DecelerateInterpolator;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
@@ -73,13 +72,12 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.EditTextCursorWatcher;
 import mega.privacy.android.app.components.ExtendedViewPager;
 import mega.privacy.android.app.components.TouchImageView;
-import mega.privacy.android.app.components.dragger.Direction;
 import mega.privacy.android.app.components.dragger.DraggableView;
 import mega.privacy.android.app.components.dragger.ExitViewAnimator;
-import mega.privacy.android.app.components.dragger.ViewAnimator;
 import mega.privacy.android.app.lollipop.adapters.MegaFullScreenImageAdapterLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaOfflineFullScreenImageAdapterLollipop;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
+import mega.privacy.android.app.lollipop.managerSections.FileBrowserFragmentLollipop;
 import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.PreviewUtils;
@@ -106,11 +104,16 @@ import nz.mega.sdk.MegaUser;
 
 import static android.graphics.Color.BLACK;
 import static android.graphics.Color.TRANSPARENT;
-import static android.view.Gravity.BOTTOM;
 import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.TYPE_EXPORT_REMOVE;
 
 public class FullScreenImageViewerLollipop extends PinActivityLollipop implements OnPageChangeListener, MegaRequestListenerInterface, OnItemClickListener, MegaGlobalListenerInterface, MegaChatRequestListenerInterface, DraggableView.DraggableListener{
-	
+
+	int[] screenPosition;
+	int mLeftDelta;
+	int mTopDelta;
+	float mWidthScale;
+	float mHeightScale;
+
 	private DisplayMetrics outMetrics;
 
 	private boolean aBshown = true;
@@ -1268,19 +1271,87 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			viewPager.setAdapter(adapterMega);
 			
 			viewPager.setCurrentItem(positionG);
-	
+
 			viewPager.setOnPageChangeListener(this);
 
 			ArrayAdapter<String> arrayAdapter;
 
-
-
 			((MegaApplication) getApplication()).sendSignalPresenceActivity();
 		}
 
+		if (savedInstanceState == null && adapterMega!= null){
+			ViewTreeObserver observer = viewPager.getViewTreeObserver();
+			observer.addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
+				@Override
+				public boolean onPreDraw() {
+
+					viewPager.getViewTreeObserver().removeOnPreDrawListener(this);
+					int[] screenLocation = new int[2];
+					int[] location = new int[2];
+					FileBrowserFragmentLollipop.imageDrag.getLocationOnScreen(location);
+					viewPager.getLocationOnScreen(screenLocation);
+					mLeftDelta = location[0] - screenLocation[0];
+					mTopDelta = location[1] -screenLocation[1];
+
+					mWidthScale = (float) screenPosition[2] / viewPager.getWidth();
+					mHeightScale = (float) screenPosition[3] / viewPager.getHeight();
+
+					runEnterAnimation();
+
+					return true;
+				}
+			});
+		}
 
 	}
-	
+
+	public void runEnterAnimation() {
+		final long duration = 400;
+		if (aB != null && aB.isShowing()) {
+			if(tB != null) {
+				tB.animate().translationY(-220).setDuration(0)
+						.withEndAction(new Runnable() {
+							@Override
+							public void run() {
+								aB.hide();
+							}
+						}).start();
+				bottomLayout.animate().translationY(220).setDuration(0).start();
+				getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+			} else {
+				aB.hide();
+			}
+		}
+
+		fragmentContainer.setBackgroundColor(TRANSPARENT);
+		fragmentContainer.setElevation(0);
+		relativeImageViewerLayout.setBackgroundColor(TRANSPARENT);
+		relativeImageViewerLayout.setElevation(0);
+		appBarLayout.setBackgroundColor(TRANSPARENT);
+
+		viewPager.setPivotX(0);
+		viewPager.setPivotY(0);
+		viewPager.setScaleX(mWidthScale);
+		viewPager.setScaleY(mHeightScale);
+		viewPager.setTranslationX(mLeftDelta);
+		viewPager.setPivotY(mTopDelta);
+
+		ivShadow.setAlpha(0);
+
+		viewPager.animate().setDuration(duration).scaleX(1).scaleY(1).translationX(0).translationY(0).setInterpolator(new DecelerateInterpolator()).withEndAction(new Runnable() {
+			@Override
+			public void run() {
+				showActionBar();
+				fragmentContainer.setBackgroundColor(BLACK);
+				relativeImageViewerLayout.setBackgroundColor(BLACK);
+				appBarLayout.setBackgroundColor(BLACK);
+			}
+		});
+
+
+		ivShadow.animate().setDuration(duration).alpha(1);
+	}
+
 	public void sortByNameDescending(){
 		
 		ArrayList<String> foldersOrder = new ArrayList<String>();
@@ -2451,6 +2522,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	public void onBackPressed() {
 		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 		super.onBackPressed();
+		FileBrowserFragmentLollipop.imageDrag.setVisibility(View.VISIBLE);
 	}
 
 	@Override
@@ -2586,7 +2658,8 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		RelativeLayout container = new RelativeLayout(this);
 		draggableView = new DraggableView(this);
 		if (getIntent() != null) {
-			draggableView.setScreenPosition(getIntent().getIntArrayExtra("screenPosition"));
+			screenPosition = getIntent().getIntArrayExtra("screenPosition");
+			draggableView.setScreenPosition(screenPosition);
 		}
 		draggableView.setDraggableListener(this);
 		ivShadow = new ImageView(this);
@@ -2629,6 +2702,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				adapterMega.getVisibleImage(positionG).resetZoom();
 				draggableView.setCurrentView(adapterMega.getVisibleImage(positionG));
 			}
+			FileBrowserFragmentLollipop.imageDrag.setVisibility(View.GONE);
 		}
 		else {
 			handler.postDelayed(new Runnable() {
