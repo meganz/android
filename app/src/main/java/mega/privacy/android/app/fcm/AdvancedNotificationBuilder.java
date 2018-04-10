@@ -17,8 +17,8 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
 import android.preference.PreferenceManager;
+import android.service.notification.StatusBarNotification;
 import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.content.ContextCompat;
 import android.text.Html;
 import android.text.SpannableStringBuilder;
@@ -46,6 +46,7 @@ import nz.mega.sdk.MegaChatCall;
 import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatRoom;
+import nz.mega.sdk.MegaHandleList;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaNodeList;
 import nz.mega.sdk.MegaUser;
@@ -56,15 +57,13 @@ public final class AdvancedNotificationBuilder {
     private static final int SUMMARY_ID = 0;
 
     private final Context context;
-    private final NotificationManagerCompat notificationManager;
+    private NotificationManager notificationManager;
     private final SharedPreferences sharedPreferences;
     DatabaseHandler dbH;
     MegaApiAndroid megaApi;
     MegaChatApiAndroid megaChatApi;
 
     private NotificationCompat.Builder mBuilderCompat;
-    private Notification.Builder mBuilder;
-    private NotificationManager mNotificationManager;
 
     public static AdvancedNotificationBuilder newInstance(Context context, MegaApiAndroid megaApi, MegaChatApiAndroid megaChatApi) {
         Context appContext = context.getApplicationContext();
@@ -72,12 +71,12 @@ public final class AdvancedNotificationBuilder {
         if (safeContext == null) {
             safeContext = appContext;
         }
-        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(safeContext);
+        NotificationManager notificationManager = (NotificationManager) safeContext.getSystemService(Context.NOTIFICATION_SERVICE);
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(safeContext);
         return new AdvancedNotificationBuilder(safeContext, notificationManager, sharedPreferences, megaApi, megaChatApi);
     }
 
-    public AdvancedNotificationBuilder(Context context, NotificationManagerCompat notificationManager, SharedPreferences sharedPreferences, MegaApiAndroid megaApi, MegaChatApiAndroid megaChatApi) {
+    public AdvancedNotificationBuilder(Context context, NotificationManager notificationManager, SharedPreferences sharedPreferences, MegaApiAndroid megaApi, MegaChatApiAndroid megaChatApi) {
         this.context = context.getApplicationContext();
         this.notificationManager = notificationManager;
         this.sharedPreferences = sharedPreferences;
@@ -885,7 +884,9 @@ public final class AdvancedNotificationBuilder {
 
         mBuilderCompat = new NotificationCompat.Builder(context);
 
-        mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        if(notificationManager == null){
+            notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        }
 
         Intent intent = new Intent(context, ManagerActivityLollipop.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -901,7 +902,7 @@ public final class AdvancedNotificationBuilder {
                 .setContentTitle("Chat activity").setContentText("You may have new messages")
                 .setOngoing(false);
 
-        mNotificationManager.notify(Constants.NOTIFICATION_GENERAL_PUSH_CHAT, mBuilderCompat.build());
+        notificationManager.notify(Constants.NOTIFICATION_GENERAL_PUSH_CHAT, mBuilderCompat.build());
     }
 
     public void showIncomingCallNotification(MegaChatCall callToAnswer, MegaChatCall callInProgress) {
@@ -925,18 +926,20 @@ public final class AdvancedNotificationBuilder {
         ignoreIntent.putExtra("chatHandleInProgress", chatHandleInProgress);
         ignoreIntent.putExtra("chatHandleToAnswer", callToAnswer.getChatid());
         ignoreIntent.setAction(CallNotificationIntentService.IGNORE);
-        PendingIntent pendingIntentIgnore = PendingIntent.getService(context, 0 /* Request code */, ignoreIntent,  PendingIntent.FLAG_CANCEL_CURRENT);
+        int requestCodeIgnore = notificationId + 1;
+        PendingIntent pendingIntentIgnore = PendingIntent.getService(context, requestCodeIgnore /* Request code */, ignoreIntent,  PendingIntent.FLAG_CANCEL_CURRENT);
 
         Intent answerIntent = new Intent(context, CallNotificationIntentService.class);
         answerIntent.putExtra("chatHandleInProgress", chatHandleInProgress);
         answerIntent.putExtra("chatHandleToAnswer", callToAnswer.getChatid());
         answerIntent.setAction(CallNotificationIntentService.ANSWER);
-        PendingIntent pendingIntentAnswer = PendingIntent.getService(context, 1 /* Request code */, answerIntent,  PendingIntent.FLAG_CANCEL_CURRENT);
+        int requestCodeAnswer = notificationId + 2;
+        PendingIntent pendingIntentAnswer = PendingIntent.getService(context, requestCodeAnswer /* Request code */, answerIntent,  PendingIntent.FLAG_CANCEL_CURRENT);
 
         NotificationCompat.Action actionAnswer = new NotificationCompat.Action.Builder(-1, "ANSWER", pendingIntentAnswer).build();
         NotificationCompat.Action actionIgnore = new NotificationCompat.Action.Builder(-1, "IGNORE", pendingIntentIgnore).build();
 
-        long[] pattern = {0, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000};
+        long[] pattern = {0, 1000, 1000, 1000, 1000, 1000, 1000};
 
         //No sound just vibration
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context)
@@ -969,12 +972,86 @@ public final class AdvancedNotificationBuilder {
         }
 
         if(notificationManager == null){
-            mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+            notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         }
 
         notificationManager.notify(notificationId, notificationBuilder.build());
     }
 
+    public void checkQueuedCalls(){
+        log("checkQueuedCalls");
+
+        MegaHandleList handleList = megaChatApi.getChatCalls();
+        if(handleList!=null){
+            long numberOfCalls = handleList.size();
+            log("checkQueuedCalls: Number of calls in progress: "+numberOfCalls);
+            if (numberOfCalls>1){
+                log("checkQueuedCalls: MORE than one call in progress: "+numberOfCalls);
+                MegaChatCall callInProgress = null;
+                MegaChatCall callIncoming = null;
+
+                for(int i=0; i<handleList.size(); i++){
+                    MegaChatCall call = megaChatApi.getChatCall(handleList.get(i));
+                    if(call!=null){
+                        log("Call ChatID: "+call.getChatid()+" Status: "+call.getStatus());
+                        if(call.getStatus()>=MegaChatCall.CALL_STATUS_IN_PROGRESS){
+                            callInProgress = call;
+                            log("FOUND Call in progress: "+callInProgress.getChatid());
+                        }
+                    }
+                }
+
+                for(int i=0; i<handleList.size(); i++){
+                    MegaChatCall call = megaChatApi.getChatCall(handleList.get(i));
+                    if(call!=null){
+
+                        if(call.getStatus()<MegaChatCall.CALL_STATUS_IN_PROGRESS && (!call.isIgnored())){
+
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                                if(notificationManager == null){
+                                    notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+                                }
+
+                                StatusBarNotification[] notifs = notificationManager.getActiveNotifications();
+                                boolean shown=false;
+
+                                long chatCallId = call.getId();
+                                String notificationCallId = MegaApiJava.userHandleToBase64(chatCallId);
+                                int notificationId = (notificationCallId).hashCode();
+
+                                log("Active Notifications: "+ notifs.length);
+                                for(int k = 0; k< notifs.length; k++){
+                                    if(notifs[k].getId()==notificationId){
+                                        log("Notification for this call already shown");
+                                        shown = true;
+                                        break;
+                                    }
+                                }
+
+                                if(!shown){
+                                    callIncoming = call;
+                                    log("Build.VERSION_CODES.M:FOUND Call incoming and NOT shown and NOT ignored: "+callIncoming.getChatid());
+                                    break;
+                                }
+                            }
+                            else{
+                                callIncoming = call;
+                                log("FOUND Call incoming and NOT shown and NOT ignored: "+callIncoming.getChatid());
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                if(callIncoming!=null){
+                    showIncomingCallNotification(callIncoming, callInProgress);
+                }
+            }
+            else{
+                log("checkQueuedCalls: No calls to launch");
+            }
+        }
+    }
 
     public static void log(String message) {
         Util.log("AdvancedNotificationBuilder", message);
