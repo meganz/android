@@ -671,7 +671,7 @@ public class IncomingSharesFragmentLollipop extends Fragment{
         context = activity;
     }
 
-    public void itemClick(int position) {
+    public void itemClick(int position, int[] screenPosition) {
     	log("itemClick");
 		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
@@ -786,6 +786,7 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 
 					intent.putExtra("orderGetChildren", ((ManagerActivityLollipop)context).orderOthers);
 					intent.putExtra("fromShared", true);
+					intent.putExtra("screenPosition", screenPosition);
 					startActivity(intent);
 				}
 				else if (MimeTypeList.typeForName(nodes.get(position).getName()).isVideoReproducible() || MimeTypeList.typeForName(nodes.get(position).getName()).isAudio() ){
@@ -819,6 +820,7 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 					else {
 						mediaIntent = new Intent(context, AudioVideoPlayerLollipop.class);
 					}
+					mediaIntent.putExtra("screenPosition", screenPosition);
 					mediaIntent.putExtra("HANDLE", file.getHandle());
 					mediaIntent.putExtra("FILENAME", file.getName());
 					String localPath = Util.getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);

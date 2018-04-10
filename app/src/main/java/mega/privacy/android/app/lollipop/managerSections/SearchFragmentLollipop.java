@@ -511,7 +511,7 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 		}
 	}
 	
-    public void itemClick(int position) {
+    public void itemClick(int position, int[] screenPosition) {
 		log("itemClick: "+position);
 		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
@@ -621,6 +621,7 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 					}
 
 					intent.putExtra("orderGetChildren", ((ManagerActivityLollipop)context).orderCloud);
+					intent.putExtra("screenPosition", screenPosition);
 					startActivity(intent);
 				}
 				else if (MimeTypeList.typeForName(nodes.get(position).getName()).isVideoReproducible() || MimeTypeList.typeForName(nodes.get(position).getName()).isAudio() ){
@@ -654,6 +655,7 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 					else {
 						mediaIntent = new Intent(context, AudioVideoPlayerLollipop.class);
 					}
+					mediaIntent.putExtra("screenPosition", screenPosition);
 					mediaIntent.putExtra("HANDLE", file.getHandle());
 					mediaIntent.putExtra("FILENAME", file.getName());
 					String localPath = Util.getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);

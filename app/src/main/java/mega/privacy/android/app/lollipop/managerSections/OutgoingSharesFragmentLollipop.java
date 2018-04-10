@@ -899,7 +899,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
         context = activity;
     }
 
-    public void itemClick(int position) {
+    public void itemClick(int position, int[] screenPosition) {
 		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
     	if (adapter.isMultipleSelect()){
 			log("multiselect ON");
@@ -1013,6 +1013,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 						intent.putExtra("parentNodeHandle", megaApi.getParentNode(nodes.get(position)).getHandle());
 					}
 					intent.putExtra("orderGetChildren", ((ManagerActivityLollipop)context).orderOthers);
+					intent.putExtra("screenPosition", screenPosition);
 					startActivity(intent);
 							
 				}
@@ -1047,6 +1048,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 					else {
 						mediaIntent = new Intent(context, AudioVideoPlayerLollipop.class);
 					}
+					mediaIntent.putExtra("screenPosition", screenPosition);
 					mediaIntent.putExtra("HANDLE", file.getHandle());
 					mediaIntent.putExtra("FILENAME", file.getName());
 					String localPath = Util.getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
