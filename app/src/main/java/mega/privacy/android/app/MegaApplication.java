@@ -1022,7 +1022,7 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 
 	@Override
 	public void onChatCallUpdate(MegaChatApiJava api, MegaChatCall call) {
-		if(call.getStatus()>MegaChatCall.CALL_STATUS_TERMINATING){
+		if(call.getStatus()>=MegaChatCall.CALL_STATUS_IN_PROGRESS){
 			clearIncomingCallNotification(call.getId());
 		}
 	}

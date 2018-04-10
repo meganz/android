@@ -61,10 +61,10 @@ import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatCall;
-import nz.mega.sdk.MegaChatCallListenerInterface;
 import nz.mega.sdk.MegaChatError;
 import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaChatRequestListenerInterface;
+import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaEvent;
@@ -76,7 +76,7 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 
-public class MegaFirebaseMessagingService extends FirebaseMessagingService implements MegaGlobalListenerInterface, MegaRequestListenerInterface, MegaChatRequestListenerInterface, MegaChatCallListenerInterface {
+public class MegaFirebaseMessagingService extends FirebaseMessagingService implements MegaGlobalListenerInterface, MegaRequestListenerInterface, MegaChatRequestListenerInterface {
 
     MegaApplication app;
     MegaApiAndroid megaApi;
@@ -101,7 +101,6 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
         app = (MegaApplication) getApplication();
         megaApi = app.getMegaApi();
         megaChatApi = app.getMegaChatApi();
-        megaChatApi.addChatCallListener(this);
         megaApi.addGlobalListener(this);
         dbH = DatabaseHandler.getDbHandler(getApplicationContext());
     }
@@ -200,34 +199,7 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
                             }
                             else if (numberOfCalls>1){
                                 log("MORE than one call in progress: "+numberOfCalls);
-                                MegaChatCall callInProgress = null;
-                                MegaChatCall callIncoming = null;
-
-                                for(int i=0; i<handleList.size(); i++){
-                                    MegaChatCall call = megaChatApi.getChatCall(handleList.get(i));
-                                    if(call!=null){
-                                        log("Call ChatID: "+call.getChatid()+" Status: "+call.getStatus());
-                                        if(call.getStatus()>=MegaChatCall.CALL_STATUS_IN_PROGRESS){
-                                            callInProgress = call;
-                                            log("FOUND Call in progress: "+callInProgress.getChatid());
-                                        }
-                                    }
-                                }
-
-                                for(int i=0; i<handleList.size(); i++){
-                                    MegaChatCall call = megaChatApi.getChatCall(handleList.get(i));
-                                    if(call!=null){
-
-                                        if(call.getStatus()<MegaChatCall.CALL_STATUS_IN_PROGRESS){
-                                            callIncoming = call;
-                                            log("FOUND Call incoming: "+callIncoming.getChatid());
-                                        }
-                                    }
-                                }
-
-                                if(callIncoming!=null){
-                                    showIncomingCallNotification(callIncoming, callInProgress);
-                                }
+                                checkQueuedCalls();
                             }
                             else{
                                 log("ERROR. No calls to launch");
@@ -421,34 +393,6 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
 
     }
 
-    @Override
-    public void onChatCallUpdate(MegaChatApiJava api, MegaChatCall call) {
-        log("onChatCallUpdate: " + call.getChatid() + " " + call.getStatus());
-
-        if(call.hasChanged(MegaChatCall.CHANGE_TYPE_STATUS)){
-            if(call.getStatus()<=MegaChatCall.CALL_STATUS_IN_PROGRESS){
-                log("Call in progress launch callActivity");
-                launchCallActivity(call);
-            }
-            else{
-                log("Launch not in correct status");
-            }
-        }
-
-        if(call.hasRemoteAudio()){
-            log("Remote audio is connected");
-        }
-        else{
-            log("Remote audio is NOT connected");
-        }
-        if(call.hasRemoteVideo()){
-            log("Remote video is connected");
-        }
-        else{
-            log("Remote video is NOT connected");
-        }
-    }
-
     public void launchCallActivity(MegaChatCall call){
         log("launchCallActivity: "+call.getStatus());
         MegaApplication.setShowPinScreen(false);
@@ -460,6 +404,8 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
 //            i.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
         startActivity(i);
 
+        MegaChatRoom chatRoom = megaChatApi.getChatRoom(call.getChatid());
+        log("Launch call: "+chatRoom.getTitle());
         removeListeners();
     }
 
@@ -592,14 +538,6 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
 //        }
     }
 
-    public void showIncomingCallNotification(MegaChatCall callToAnswer, MegaChatCall callInProgress) {
-        log("showIncomingCallNotification");
-
-        removeListeners();
-
-        notificationBuilder.showIncomingCallNotification(callToAnswer, callInProgress);
-    }
-
     public void showContactRequestNotification(MegaContactRequest crToShow) {
         log("showContactRequestNotification");
 
@@ -648,6 +586,19 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
         notificationManager.notify(notificationId, notificationBuilder.build());
+    }
+
+    public void checkQueuedCalls(){
+        log("checkQueuedCalls");
+        removeListeners();
+
+        try{
+            AdvancedNotificationBuilder notificationBuilder = AdvancedNotificationBuilder.newInstance(this, megaApi, megaChatApi);
+            notificationBuilder.checkQueuedCalls();
+        }
+        catch (Exception e){
+            log("EXCEPTION: "+e.getMessage());
+        }
     }
 
     public Bitmap createDefaultAvatar(String email){
@@ -771,7 +722,6 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
     }
 
     public void removeListeners(){
-        megaChatApi.removeChatCallListener(this);
         megaApi.removeGlobalListener(this);
     }
 }

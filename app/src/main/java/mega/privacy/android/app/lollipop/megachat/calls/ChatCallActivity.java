@@ -338,6 +338,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
             }
             else{
                 log("New intent to the activity with a new chatId");
+                //Check the new call if in progress
                 chatId = newChatId;
                 chat = megaChatApi.getChatRoom(chatId);
                 callChat = megaChatApi.getChatCall(chatId);
