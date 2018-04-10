@@ -813,6 +813,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     selectedMessageId = savedInstanceState.getLong("selectedMessageId", -1);
                     log("Handle of the message: "+selectedMessageId);
                     selectedPosition = savedInstanceState.getInt("selectedPosition", -1);
+                    isHideJump = savedInstanceState.getBoolean("isHideJump",false);
                     typeMessageJump = savedInstanceState.getInt("typeMessageJump",2);
                     visibilityMessageJump = savedInstanceState.getBoolean("visibilityMessageJump",false);
 
@@ -929,7 +930,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         long unreadCount = chatRoom.getUnreadCount();
         //                        stateHistory = megaChatApi.loadMessages(idChat, NUMBER_MESSAGES_TO_LOAD);
         if (unreadCount == 0) {
-            lastMessageSeen = -1;
+            if(!isTurn) {
+                lastMessageSeen = -1;
+            }
             lastSeenReceived = true;
             log("loadHistory:C->loadMessages:unread is 0");
             stateHistory = megaChatApi.loadMessages(idChat, NUMBER_MESSAGES_TO_LOAD);
@@ -938,6 +941,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             if(!isTurn){
                 lastMessageSeen = megaChatApi.getLastMessageSeenId(idChat);
             }
+
             if (lastMessageSeen != -1) {
                 log("loadHistory:lastSeenId: " + lastMessageSeen);
             } else {
@@ -3951,6 +3955,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             log("onHistoryReloaded: loadMessages unread is 0");
         } else {
             lastMessageSeen = megaChatApi.getLastMessageSeenId(idChat);
+
             if (lastMessageSeen != -1) {
                 log("onHistoryReloaded: Id of last message seen: " + lastMessageSeen);
             } else {
@@ -5234,8 +5239,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             visibilityMessageJump = false;
         }
         outState.putBoolean("visibilityMessageJump",visibilityMessageJump);
-
         outState.putLong("lastMessageSeen",lastMessageSeen);
+        outState.putBoolean("isHideJump",isHideJump);
     }
 
     public void askSizeConfirmationBeforeChatDownload(String parentPath, ArrayList<MegaNode> nodeList, long size){
