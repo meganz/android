@@ -276,11 +276,26 @@ public final class AdvancedNotificationBuilder {
 
             NotificationCompat.BigTextStyle bigTextStyle = new NotificationCompat.BigTextStyle();
 
-            Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-
             notificationBuilder.setColor(ContextCompat.getColor(context,R.color.mega))
-                    .setShowWhen(true)
-                    .setSound(defaultSoundUri);
+                    .setShowWhen(true);
+
+            if(uriParameter!=null){
+                notificationBuilder.setSound(uriParameter);
+            }
+
+            if(vibration!=null){
+                if(vibration.equals("true")){
+                    notificationBuilder.setVibrate(new long[] {0, 500});
+                }
+            }
+
+            if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.N_MR1){
+                //API 25 = Android 7.1
+                notificationBuilder.setPriority(Notification.PRIORITY_HIGH);
+            }
+            else{
+                notificationBuilder.setPriority(NotificationManager.IMPORTANCE_HIGH);
+            }
 
             Spanned firstLine = null;
 
@@ -349,12 +364,6 @@ public final class AdvancedNotificationBuilder {
 
             }
 
-            notificationBuilder.setSound(uriParameter);
-            if(vibration!=null){
-                if(vibration.equals("true")){
-                    notificationBuilder.setVibrate(new long[] {0, 500});
-                }
-            }
             String textToShow = String.format(context.getString(R.string.number_messages_chat_notification), unreadChats.size());
             bigTextStyle.setBigContentTitle(textToShow);
             bigTextStyle.bigText(notificationContent);
@@ -415,8 +424,6 @@ public final class AdvancedNotificationBuilder {
             title = chat.getTitle();
         }
 
-        Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-
         Spanned notificationContent;
 
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context)
@@ -427,8 +434,26 @@ public final class AdvancedNotificationBuilder {
                 .setShowWhen(true)
                 .setGroup(groupKey)
 //                .setSortKey(String.valueOf(System.currentTimeMillis()))
-                .setSound(defaultSoundUri)
+
                 .setContentIntent(pendingIntent);
+
+        if(uriParameter!=null){
+            notificationBuilder.setSound(uriParameter);
+        }
+
+        if(vibration!=null){
+            if(vibration.equals("true")){
+                notificationBuilder.setVibrate(new long[] {0, 500});
+            }
+        }
+
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.N_MR1){
+            //API 25 = Android 7.1
+            notificationBuilder.setPriority(Notification.PRIORITY_HIGH);
+        }
+        else{
+            notificationBuilder.setPriority(NotificationManager.IMPORTANCE_HIGH);
+        }
 
         NotificationCompat.BigTextStyle bigTextStyle = new NotificationCompat.BigTextStyle();
 
@@ -470,16 +495,9 @@ public final class AdvancedNotificationBuilder {
             notificationBuilder.setLargeIcon(largeIcon);
         }
 
-        notificationBuilder.setSound(uriParameter);
-        if(vibration!=null){
-            if(vibration.equals("true")){
-                notificationBuilder.setVibrate(new long[] {0, 500});
-            }
-        }
         notificationBuilder.setStyle(bigTextStyle);
 
         return notificationBuilder.build();
-
     }
 
     public Notification buildSingleNotificationPreN(Uri uriParameter, MegaChatListItem item, String vibration) {
