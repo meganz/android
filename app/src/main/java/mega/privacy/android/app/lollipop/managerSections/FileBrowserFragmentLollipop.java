@@ -87,7 +87,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 	LinearLayout emptyTextView;
 	TextView emptyTextViewFirst;
 
-	MegaBrowserLollipopAdapter adapter;
+	public static MegaBrowserLollipopAdapter adapter;
 	FileBrowserFragmentLollipop fileBrowserFragment = this;
 	TextView contentText;
 	RelativeLayout contentTextLayout;
@@ -118,8 +118,8 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 	ArrayList<MegaNode> nodes;
 	public ActionMode actionMode;
 
-	LinearLayoutManager mLayoutManager;
-	CustomizedGridLayoutManager gridLayoutManager;
+	public static LinearLayoutManager mLayoutManager;
+	public static CustomizedGridLayoutManager gridLayoutManager;
 	MegaNode selectedNode = null;
 	boolean allFiles = true;
 	String downloadLocationDefaultPath = Util.downloadDIR;

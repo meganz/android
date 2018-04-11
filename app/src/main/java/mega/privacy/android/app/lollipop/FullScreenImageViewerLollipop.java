@@ -74,6 +74,7 @@ import mega.privacy.android.app.components.ExtendedViewPager;
 import mega.privacy.android.app.components.TouchImageView;
 import mega.privacy.android.app.components.dragger.DraggableView;
 import mega.privacy.android.app.components.dragger.ExitViewAnimator;
+import mega.privacy.android.app.lollipop.adapters.MegaBrowserLollipopAdapter;
 import mega.privacy.android.app.lollipop.adapters.MegaFullScreenImageAdapterLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaOfflineFullScreenImageAdapterLollipop;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
@@ -1348,8 +1349,52 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			}
 		});
 
-
 		ivShadow.animate().setDuration(duration).alpha(1);
+	}
+
+	public void updateCurrentImage(){
+		Long handle = adapterMega.getImageHandle(positionG);
+		MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(handle));
+		ArrayList<MegaNode> listNodes = megaApi.getChildren(parentNode);
+
+		for (int i=0; i<listNodes.size(); i++){
+			if (listNodes.get(i).getHandle() == handle){
+				if (FileBrowserFragmentLollipop.adapter.getAdapterType() == MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST){
+					View v = FileBrowserFragmentLollipop.mLayoutManager.findViewByPosition(i);
+					FileBrowserFragmentLollipop.imageDrag = (ImageView) v.findViewById(R.id.file_list_thumbnail);
+				}
+				else {
+					View v = FileBrowserFragmentLollipop.gridLayoutManager.findViewByPosition(i);
+					FileBrowserFragmentLollipop.imageDrag = (ImageView)v.findViewById(R.id.file_grid_thumbnail);
+				}
+				int[] position = new int[2];
+				ImageView image = FileBrowserFragmentLollipop.imageDrag;
+				image.getLocationOnScreen(position);
+				screenPosition[0] = (image.getWidth() / 2) + position[0];
+				screenPosition[1] = (image.getHeight() / 2) + position[1];
+				screenPosition[2] = image.getWidth();
+				screenPosition[3] = image.getHeight();
+				draggableView.setScreenPosition(screenPosition);
+				break;
+			}
+		}
+	}
+
+	public void updateScrollPosition(){
+		Long handle = adapterMega.getImageHandle(positionG);
+		MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(handle));
+		ArrayList<MegaNode> listNodes = megaApi.getChildren(parentNode);
+
+		for (int i=0; i<listNodes.size(); i++){
+			if (listNodes.get(i).getHandle() == handle){
+				if (FileBrowserFragmentLollipop.adapter.getAdapterType() == MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST){
+					FileBrowserFragmentLollipop.mLayoutManager.scrollToPosition(i);
+				}
+				else {
+					FileBrowserFragmentLollipop.gridLayoutManager.scrollToPosition(i);
+				}
+			}
+		}
 	}
 
 	public void sortByNameDescending(){
@@ -1581,7 +1626,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				int oldPosition = positionG;
 				int newPosition = viewPager.getCurrentItem();
 				positionG = newPosition;
-				
+
 				try{
 					if ((adapterType == Constants.OFFLINE_ADAPTER)){
 						fileNameTextView.setText(mOffListImages.get(positionG).getName());
@@ -1599,6 +1644,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				}
 				catch(Exception e){}
 //				title.setText(names.get(positionG));
+				updateScrollPosition();
 			}
 		}
 	}
@@ -2673,6 +2719,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	@Override
 	public void onDragActivated(boolean activated) {
 		if (activated) {
+			updateCurrentImage();
 			if (aB != null && aB.isShowing()) {
 				if(tB != null) {
 					tB.animate().translationY(-220).setDuration(0)
