@@ -814,7 +814,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     log("Handle of the message: "+selectedMessageId);
                     selectedPosition = savedInstanceState.getInt("selectedPosition", -1);
                     isHideJump = savedInstanceState.getBoolean("isHideJump",false);
-                    typeMessageJump = savedInstanceState.getInt("typeMessageJump",2);
+                    typeMessageJump = savedInstanceState.getInt("typeMessageJump",-1);
                     visibilityMessageJump = savedInstanceState.getBoolean("visibilityMessageJump",false);
 
                     if(visibilityMessageJump){
