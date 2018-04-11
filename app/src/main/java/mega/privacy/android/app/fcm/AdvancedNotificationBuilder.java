@@ -983,7 +983,7 @@ public final class AdvancedNotificationBuilder {
         notificationBuilder.setFullScreenIntent(pendingIntentAnswer, true);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
-            Bitmap largeIcon = createDefaultAvatar(chatToAnswer);
+            Bitmap largeIcon = setUserAvatar(chatToAnswer);
             if(largeIcon!=null){
                 notificationBuilder.setLargeIcon(largeIcon);
             }
