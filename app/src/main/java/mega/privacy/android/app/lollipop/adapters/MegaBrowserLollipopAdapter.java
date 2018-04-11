@@ -480,6 +480,10 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 		this.adapterType = adapterType;
 	}
 
+	public int getAdapterType(){
+		return adapterType;
+	}
+
 	@Override
 	public ViewHolderBrowser onCreateViewHolder(ViewGroup parent, int viewType) {
 		log("onCreateViewHolder");

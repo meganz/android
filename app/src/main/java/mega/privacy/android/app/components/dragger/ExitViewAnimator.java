@@ -99,6 +99,7 @@ public class ExitViewAnimator<D extends DraggableView> extends ReturnOriginViewA
                             draggableView.setAnimating(false);
                             activity.finish();
                             activity.overridePendingTransition(0, android.R.anim.fade_out);
+                            FileBrowserFragmentLollipop.imageDrag.setVisibility(View.VISIBLE);
                         }
                     });
         }
