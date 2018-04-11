@@ -122,12 +122,16 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
     ViewGroup parent;
     ViewGroup parentFS;
 
-    boolean flagContactAvatar;
+    // flagMyAvatar if true - small avatar circle is contact's avatar
+    // flagMyAvatar if false - small avatar circle is my avatar
     boolean flagMyAvatar;
+
+    // flagContactAvatar if true - big avatar circle is contact's avatar
+    // flagContactAvatar if false - big avatar circle is my avatar
+    boolean flagContactAvatar;
 
     long chatId;
     boolean callInitiator;
-    long callId;
     MegaChatRoom chat;
     MegaChatCall callChat;
     private MegaApiAndroid megaApi = null;
