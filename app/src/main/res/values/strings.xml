@@ -1793,6 +1793,10 @@
 
     <string name="context_send_file_to_chat" context="menu option to send a file to a chat">Send to chat</string>
 
+
+    <string name="message_jump_latest" context="text of the label to show that you have messages unread in the chat conversation">Jump to latest</string>
+    <string name="message_new_messages" context="text of the label to show that you have new messages in the chat conversation">New messages</string>
+
     <string name="notification_subtitle_incoming" context="notification subtitle of incoming calls">Incoming call</string>
 
 </resources>

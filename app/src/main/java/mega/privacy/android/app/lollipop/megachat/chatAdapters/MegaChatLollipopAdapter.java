@@ -1412,7 +1412,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             } //END CONTACT MANAGEMENT MESSAGE
         }
         else if(message.getType()==MegaChatMessage.TYPE_PRIV_CHANGE){
-
             ((ViewHolderMessageChat)holder).layoutAvatarMessages.setVisibility(View.INVISIBLE);
 
             markAsSeen((message));
@@ -1745,7 +1744,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         else{
             //OTHER TYPE OF MESSAGES
             ((ViewHolderMessageChat)holder).layoutAvatarMessages.setVisibility(View.VISIBLE);
-
             if(message.getUserHandle()==myUserHandle) {
                 log("MY message!!");
                 log("MY message handle!!: "+message.getMsgId());
@@ -3509,11 +3507,12 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 }
 
                 ((ViewHolderMessageChat)holder).newMessagesLayout.setLayoutParams(params);
-
                 ((ViewHolderMessageChat)holder).newMessagesLayout.setVisibility(View.VISIBLE);
+                ((ChatActivityLollipop)context).showJumpMessage();
             }
             else{
                 ((ViewHolderMessageChat)holder).newMessagesLayout.setVisibility(View.GONE);
+
             }
         }
         else{
