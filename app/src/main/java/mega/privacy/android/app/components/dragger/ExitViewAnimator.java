@@ -9,7 +9,7 @@ import android.view.SurfaceView;
 import android.view.View;
 
 import mega.privacy.android.app.components.TouchImageView;
-import mega.privacy.android.app.lollipop.managerSections.FileBrowserFragmentLollipop;
+import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.utils.Util;
 
 public class ExitViewAnimator<D extends DraggableView> extends ReturnOriginViewAnimator<D> {
@@ -67,13 +67,17 @@ public class ExitViewAnimator<D extends DraggableView> extends ReturnOriginViewA
                             draggableView.setAnimating(false);
                             activity.finish();
                             activity.overridePendingTransition(0, android.R.anim.fade_out);
-                            FileBrowserFragmentLollipop.imageDrag.setVisibility(View.VISIBLE);
+                            if (activity instanceof FullScreenImageViewerLollipop){
+                                ((FullScreenImageViewerLollipop) activity).setImageDragVisibility(View.VISIBLE);
+                            }
                         }
                     });
         }
         else {
             ViewCompat.animate(draggableView)
                     .withLayer()
+                    .translationX(0.5f)
+                    .translationY(0.5f)
                     .scaleX(scaleX)
                     .scaleY(scaleY)
                     .rotation(0f)
@@ -99,7 +103,9 @@ public class ExitViewAnimator<D extends DraggableView> extends ReturnOriginViewA
                             draggableView.setAnimating(false);
                             activity.finish();
                             activity.overridePendingTransition(0, android.R.anim.fade_out);
-                            FileBrowserFragmentLollipop.imageDrag.setVisibility(View.VISIBLE);
+                            if (activity instanceof FullScreenImageViewerLollipop){
+                                ((FullScreenImageViewerLollipop) activity).setImageDragVisibility(View.VISIBLE);
+                            }
                         }
                     });
         }

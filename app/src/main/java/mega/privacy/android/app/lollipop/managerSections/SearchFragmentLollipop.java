@@ -66,17 +66,19 @@ import nz.mega.sdk.MegaShare;
 
 public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 
+	public static ImageView imageDrag;
+
 	Context context;
 	RecyclerView recyclerView;
-	LinearLayoutManager mLayoutManager;
-	CustomizedGridLayoutManager gridLayoutManager;
+	public static LinearLayoutManager mLayoutManager;
+	public static CustomizedGridLayoutManager gridLayoutManager;
 	FastScroller fastScroller;
 
 	ImageView emptyImageView;
 	LinearLayout emptyTextView;
 	TextView emptyTextViewFirst;
 
-	MegaBrowserLollipopAdapter adapter;
+	public static MegaBrowserLollipopAdapter adapter;
 	SearchFragmentLollipop searchFragment = this;
 	TextView contentText;
 	RelativeLayout contentTextLayout;
@@ -511,7 +513,7 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 		}
 	}
 	
-    public void itemClick(int position, int[] screenPosition) {
+    public void itemClick(int position, int[] screenPosition, ImageView imageView) {
 		log("itemClick: "+position);
 		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
@@ -623,6 +625,8 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 					intent.putExtra("orderGetChildren", ((ManagerActivityLollipop)context).orderCloud);
 					intent.putExtra("screenPosition", screenPosition);
 					startActivity(intent);
+					((ManagerActivityLollipop) context).overridePendingTransition(0,0);
+					imageDrag = imageView;
 				}
 				else if (MimeTypeList.typeForName(nodes.get(position).getName()).isVideoReproducible() || MimeTypeList.typeForName(nodes.get(position).getName()).isAudio() ){
 					MegaNode file = nodes.get(position);
@@ -658,6 +662,7 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 					mediaIntent.putExtra("screenPosition", screenPosition);
 					mediaIntent.putExtra("HANDLE", file.getHandle());
 					mediaIntent.putExtra("FILENAME", file.getName());
+					imageDrag = imageView;
 					String localPath = Util.getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
 					if (localPath != null){
 						File mediaFile = new File(localPath);

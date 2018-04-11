@@ -61,13 +61,15 @@ import nz.mega.sdk.MegaNode;
 
 public class RubbishBinFragmentLollipop extends Fragment {
 
+	public static ImageView imageDrag;
+
 	public static int GRID_WIDTH =400;
 	
 	Context context;
 	RecyclerView recyclerView;
-	LinearLayoutManager mLayoutManager;
-	CustomizedGridLayoutManager gridLayoutManager;
-	MegaBrowserLollipopAdapter adapter;
+	public static LinearLayoutManager mLayoutManager;
+	public static  CustomizedGridLayoutManager gridLayoutManager;
+	public static MegaBrowserLollipopAdapter adapter;
 	public RubbishBinFragmentLollipop rubbishBinFragment = this;
 
 	ArrayList<MegaNode> nodes;
@@ -539,7 +541,7 @@ public class RubbishBinFragmentLollipop extends Fragment {
         context = activity;
     }
 
-    public void itemClick(int position, int[] screenPosition) {
+    public void itemClick(int position, int[] screenPosition, ImageView imageView) {
 		log("itemClick: "+position);
 		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
@@ -648,6 +650,8 @@ public class RubbishBinFragmentLollipop extends Fragment {
 					intent.putExtra("orderGetChildren", ((ManagerActivityLollipop)context).orderCloud);
 					intent.putExtra("screenPosition", screenPosition);
 					startActivity(intent);
+					((ManagerActivityLollipop) context).overridePendingTransition(0,0);
+					imageDrag = imageView;
 				}
 				else if (MimeTypeList.typeForName(nodes.get(position).getName()).isVideoReproducible() || MimeTypeList.typeForName(nodes.get(position).getName()).isAudio() ){
 					MegaNode file = nodes.get(position);
@@ -698,6 +702,7 @@ public class RubbishBinFragmentLollipop extends Fragment {
 						mediaIntent.setDataAndType(Uri.parse(url), mimeType);
 					}
 					mediaIntent.putExtra("HANDLE", file.getHandle());
+					imageDrag = imageView;
 					if (MegaApiUtils.isIntentAvailable(context, mediaIntent)){
 						startActivity(mediaIntent);
 					}

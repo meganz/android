@@ -63,6 +63,8 @@ import nz.mega.sdk.MegaUser;
 
 public class ContactFileListFragmentLollipop extends Fragment{
 
+	public static ImageView imageDrag;
+
 	MegaApiAndroid megaApi;
 	ActionBar aB;
 	Context context;
@@ -73,14 +75,14 @@ public class ContactFileListFragmentLollipop extends Fragment{
 	CoordinatorLayout mainLayout;
 
 	RecyclerView listView;
-	LinearLayoutManager mLayoutManager;
+	public static LinearLayoutManager mLayoutManager;
 	ImageView emptyImageView;
 	TextView emptyTextView;
 
 	MegaUser contact;
 	ArrayList<MegaNode> contactNodes;
 
-	MegaBrowserLollipopAdapter adapter;
+	public static MegaBrowserLollipopAdapter adapter;
 
 	FloatingActionButton fab;
 
@@ -571,7 +573,7 @@ public class ContactFileListFragmentLollipop extends Fragment{
 		super.onDestroy();
 	}
 	
-	public void itemClick(int position, int[] screenPosition) {
+	public void itemClick(int position, int[] screenPosition, ImageView imageView) {
 		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
 		if (adapter.isMultipleSelect()){
@@ -656,6 +658,8 @@ public class ContactFileListFragmentLollipop extends Fragment{
 					}
 					intent.putExtra("screenPosition", screenPosition);
 					((ContactFileListActivityLollipop)context).startActivity(intent);
+					((ManagerActivityLollipop) context).overridePendingTransition(0,0);
+					imageDrag = imageView;
 				} 
 				else if (MimeTypeList.typeForName(contactNodes.get(position).getName()).isVideoReproducible()	|| MimeTypeList.typeForName(contactNodes.get(position).getName()).isAudio()) {
 					MegaNode file = contactNodes.get(position);
@@ -691,6 +695,7 @@ public class ContactFileListFragmentLollipop extends Fragment{
 					mediaIntent.putExtra("screenPosition", screenPosition);
 					mediaIntent.putExtra("HANDLE", file.getHandle());
 					mediaIntent.putExtra("FILENAME", file.getName());
+					imageDrag = imageView;
 					String localPath = Util.getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
 					if (localPath != null){
 						File mediaFile = new File(localPath);

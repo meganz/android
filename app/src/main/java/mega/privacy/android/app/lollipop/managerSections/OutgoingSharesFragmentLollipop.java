@@ -67,11 +67,13 @@ import nz.mega.sdk.MegaShare;
 
 public class OutgoingSharesFragmentLollipop extends Fragment{
 
+	public static ImageView imageDrag;
+
 	Context context;
 
 	RecyclerView recyclerView;
-	LinearLayoutManager mLayoutManager;
-	CustomizedGridLayoutManager gridLayoutManager;
+	public static LinearLayoutManager mLayoutManager;
+	public static CustomizedGridLayoutManager gridLayoutManager;
 	FastScroller fastScroller;
 
 	ImageView emptyImageView;
@@ -80,7 +82,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 
 	boolean allFiles = true;
 
-	MegaBrowserLollipopAdapter adapter;
+	public static MegaBrowserLollipopAdapter adapter;
 	OutgoingSharesFragmentLollipop outgoingSharesFragment = this;
 	RelativeLayout transfersOverViewLayout;
 
@@ -899,7 +901,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
         context = activity;
     }
 
-    public void itemClick(int position, int[] screenPosition) {
+    public void itemClick(int position, int[] screenPosition, ImageView imageView) {
 		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
     	if (adapter.isMultipleSelect()){
 			log("multiselect ON");
@@ -1000,7 +1002,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 				if (MimeTypeList.typeForName(nodes.get(position).getName()).isImage()){
 					Intent intent = new Intent(context, FullScreenImageViewerLollipop.class);
 					intent.putExtra("position", position);
-					intent.putExtra("adapterType", Constants.FILE_BROWSER_ADAPTER);
+					intent.putExtra("adapterType", Constants.OUTGOING_SHARES_ADAPTER);
 					intent.putExtra("isFolderLink", false);
 					MyAccountInfo accountInfo = ((ManagerActivityLollipop)context).getMyAccountInfo();
 					if(accountInfo!=null){
@@ -1015,7 +1017,8 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 					intent.putExtra("orderGetChildren", ((ManagerActivityLollipop)context).orderOthers);
 					intent.putExtra("screenPosition", screenPosition);
 					startActivity(intent);
-							
+					((ManagerActivityLollipop) context).overridePendingTransition(0,0);
+					imageDrag = imageView;
 				}
 				else if (MimeTypeList.typeForName(nodes.get(position).getName()).isVideoReproducible() || MimeTypeList.typeForName(nodes.get(position).getName()).isAudio() ){
 					MegaNode file = nodes.get(position);
@@ -1051,6 +1054,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 					mediaIntent.putExtra("screenPosition", screenPosition);
 					mediaIntent.putExtra("HANDLE", file.getHandle());
 					mediaIntent.putExtra("FILENAME", file.getName());
+					imageDrag = imageView;
 					String localPath = Util.getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
 					if (localPath != null){
 						File mediaFile = new File(localPath);

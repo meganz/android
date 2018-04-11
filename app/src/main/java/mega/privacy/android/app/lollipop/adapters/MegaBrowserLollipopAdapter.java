@@ -1444,25 +1444,25 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 
 				if(multipleSelect){
 					if(type==Constants.RUBBISH_BIN_ADAPTER){
-						((RubbishBinFragmentLollipop) fragment).itemClick(currentPosition, null);
+						((RubbishBinFragmentLollipop) fragment).itemClick(currentPosition, null, null);
 					}
 					else if(type==Constants.INBOX_ADAPTER){
-						((InboxFragmentLollipop) fragment).itemClick(currentPosition, null);
+						((InboxFragmentLollipop) fragment).itemClick(currentPosition, null, null);
 					}
 					else if(type==Constants.INCOMING_SHARES_ADAPTER){
-						((IncomingSharesFragmentLollipop) fragment).itemClick(currentPosition, null);
+						((IncomingSharesFragmentLollipop) fragment).itemClick(currentPosition, null, null);
 					}
 					else if(type==Constants.OUTGOING_SHARES_ADAPTER){
-						((OutgoingSharesFragmentLollipop) fragment).itemClick(currentPosition, null);
+						((OutgoingSharesFragmentLollipop) fragment).itemClick(currentPosition, null, null);
 					}
 					else if(type==Constants.CONTACT_FILE_ADAPTER){
-						((ContactFileListFragmentLollipop) fragment).itemClick(currentPosition, null);
+						((ContactFileListFragmentLollipop) fragment).itemClick(currentPosition, null, null);
 					}
 					else if(type==Constants.FOLDER_LINK_ADAPTER){
-						((FolderLinkActivityLollipop) context).itemClick(currentPosition);
+						((FolderLinkActivityLollipop) context).itemClick(currentPosition, null, null);
 					}
 					else if(type==Constants.SEARCH_ADAPTER){
-						((SearchFragmentLollipop) fragment).itemClick(currentPosition, null);
+						((SearchFragmentLollipop) fragment).itemClick(currentPosition, null, null);
 					}
 					else{
 						log("click layout FileBrowserFragmentLollipop!");
@@ -1504,25 +1504,25 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 				dimens[3] = imageView.getHeight();
 
 				if(type==Constants.RUBBISH_BIN_ADAPTER){
-					((RubbishBinFragmentLollipop) fragment).itemClick(currentPosition, dimens);
+					((RubbishBinFragmentLollipop) fragment).itemClick(currentPosition, dimens, imageView);
 				}
 				else if(type==Constants.INBOX_ADAPTER){
-					((InboxFragmentLollipop) fragment).itemClick(currentPosition, dimens);
+					((InboxFragmentLollipop) fragment).itemClick(currentPosition, dimens, imageView);
 				}
 				else if(type==Constants.INCOMING_SHARES_ADAPTER){
-					((IncomingSharesFragmentLollipop) fragment).itemClick(currentPosition, dimens);
+					((IncomingSharesFragmentLollipop) fragment).itemClick(currentPosition, dimens, imageView);
 				}
 				else if(type==Constants.OUTGOING_SHARES_ADAPTER){
-					((OutgoingSharesFragmentLollipop) fragment).itemClick(currentPosition, dimens);
+					((OutgoingSharesFragmentLollipop) fragment).itemClick(currentPosition, dimens, imageView);
 				}
 				else if(type==Constants.CONTACT_FILE_ADAPTER){
-					((ContactFileListFragmentLollipop) fragment).itemClick(currentPosition, dimens);
+					((ContactFileListFragmentLollipop) fragment).itemClick(currentPosition, dimens, imageView);
 				}
 				else if(type==Constants.FOLDER_LINK_ADAPTER){
-					((FolderLinkActivityLollipop) context).itemClick(currentPosition);
+					((FolderLinkActivityLollipop) context).itemClick(currentPosition, dimens, imageView);
 				}
 				else if(type==Constants.SEARCH_ADAPTER){
-					((SearchFragmentLollipop) fragment).itemClick(currentPosition, dimens);
+					((SearchFragmentLollipop) fragment).itemClick(currentPosition, dimens, imageView);
 				}
 				else if(type==Constants.NODE_ATTACHMENT_ADAPTER){
 					log("Node attachment adapter");
@@ -1546,32 +1546,32 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 
 		if(type==Constants.RUBBISH_BIN_ADAPTER){
 			((RubbishBinFragmentLollipop) fragment).activateActionMode();
-			((RubbishBinFragmentLollipop) fragment).itemClick(currentPosition, null);
+			((RubbishBinFragmentLollipop) fragment).itemClick(currentPosition, null, null);
 		}
 		else if(type==Constants.INBOX_ADAPTER){
 			((InboxFragmentLollipop) fragment).activateActionMode();
-			((InboxFragmentLollipop) fragment).itemClick(currentPosition, null);
+			((InboxFragmentLollipop) fragment).itemClick(currentPosition, null, null);
 		}
 		else if(type==Constants.INCOMING_SHARES_ADAPTER){
 			((IncomingSharesFragmentLollipop) fragment).activateActionMode();
-			((IncomingSharesFragmentLollipop) fragment).itemClick(currentPosition, null);
+			((IncomingSharesFragmentLollipop) fragment).itemClick(currentPosition, null, null);
 		}
 		else if(type==Constants.OUTGOING_SHARES_ADAPTER){
 			((OutgoingSharesFragmentLollipop) fragment).activateActionMode();
-			((OutgoingSharesFragmentLollipop) fragment).itemClick(currentPosition, null);
+			((OutgoingSharesFragmentLollipop) fragment).itemClick(currentPosition, null, null);
 		}
 		else if(type==Constants.CONTACT_FILE_ADAPTER){
 			((ContactFileListFragmentLollipop) fragment).activateActionMode();
-			((ContactFileListFragmentLollipop) fragment).itemClick(currentPosition, null);
+			((ContactFileListFragmentLollipop) fragment).itemClick(currentPosition, null, null);
 		}
 		else if(type==Constants.FOLDER_LINK_ADAPTER){
 			log("FOLDER_LINK_ADAPTER");
 			((FolderLinkActivityLollipop) context).activateActionMode();
-			((FolderLinkActivityLollipop) context).itemClick(currentPosition);
+			((FolderLinkActivityLollipop) context).itemClick(currentPosition, null, null);
 		}
 		else if(type==Constants.SEARCH_ADAPTER){
 			((SearchFragmentLollipop) fragment).activateActionMode();
-			((SearchFragmentLollipop) fragment).itemClick(currentPosition, null);
+			((SearchFragmentLollipop) fragment).itemClick(currentPosition, null, null);
 		}
 		else if(type==Constants.NODE_ATTACHMENT_ADAPTER){
 			log("NODE_ATTACHMENT_ADAPTER - no multiselect");
