@@ -82,6 +82,8 @@ public class CallService extends Service implements MegaChatCallListenerInterfac
             log("Chat handle to call: " + chatId);
         }
 
+        MegaApplication.setOpenCallChatId(chatId);
+
         showCallInProgressNotification();
         return START_NOT_STICKY;
     }
@@ -270,6 +272,8 @@ public class CallService extends Service implements MegaChatCallListenerInterfac
         }
 
         mNotificationManager.cancel(Constants.NOTIFICATION_CALL_IN_PROGRESS);
+
+        MegaApplication.setOpenCallChatId(-1);
 
         super.onDestroy();
     }
