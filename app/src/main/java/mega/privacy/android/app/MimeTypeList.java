@@ -1,16 +1,16 @@
 package mega.privacy.android.app;
 
-import java.io.File;
-import java.util.HashMap;
-
-import mega.privacy.android.app.utils.Util;
-
 import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.util.SparseArray;
 import android.webkit.MimeTypeMap;
+
+import java.io.File;
+import java.util.HashMap;
+
+import mega.privacy.android.app.utils.Util;
 
 
 /*
@@ -185,6 +185,10 @@ public class MimeTypeList {
 
 	public boolean isVideoNotSupported() {
 		return extension.equals("flv") || extension.equals("avi") || extension.equals("wmv");
+	}
+
+	public boolean isMp4Video() {
+		return type.startsWith("video/") || extension.equals("mp4");
 	}
 
 	/*

@@ -5,6 +5,7 @@ import android.content.Context;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaAttributes;
+import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 
 public class DBUtil {
 
@@ -164,6 +165,34 @@ public class DBUtil {
         }else{
             log("DatabaseHandler is NULL - API call getExtendedAccountDetails");
             return true;
+        }
+    }
+
+    public static boolean isSendOriginalAttachments (Context context){
+        log("isSendOriginalAttachments");
+        dbH = DatabaseHandler.getDbHandler(context);
+
+        if(dbH!=null){
+            ChatSettings chatSettings = dbH.getChatSettings();
+            boolean sendOriginalAttachments;
+
+            if(chatSettings!=null){
+                if(chatSettings.getEnabled()!=null){
+                    sendOriginalAttachments = Boolean.parseBoolean(chatSettings.getSendOriginalAttachments());
+                    return sendOriginalAttachments;
+                }
+                else{
+                    sendOriginalAttachments=false;
+                    return sendOriginalAttachments;
+                }
+            }
+            else{
+                sendOriginalAttachments=false;
+                return sendOriginalAttachments;
+            }
+        }
+        else{
+            return false;
         }
     }
 

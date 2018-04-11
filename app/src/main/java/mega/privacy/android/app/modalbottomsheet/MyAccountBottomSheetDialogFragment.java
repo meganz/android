@@ -19,6 +19,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
+import mega.privacy.android.app.lollipop.qrcode.QRCodeActivity;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -35,6 +36,7 @@ public class MyAccountBottomSheetDialogFragment extends BottomSheetDialogFragmen
     public LinearLayout optionChoosePicture;
     public LinearLayout optionTakePicture;
     public LinearLayout optionRemovePicture;
+    public LinearLayout optionQRcode;
 
     DisplayMetrics outMetrics;
     private int heightDisplay;
@@ -54,6 +56,7 @@ public class MyAccountBottomSheetDialogFragment extends BottomSheetDialogFragmen
 
         dbH = DatabaseHandler.getDbHandler(getActivity());
     }
+
     @Override
     public void setupDialog(final Dialog dialog, int style) {
 
@@ -73,10 +76,12 @@ public class MyAccountBottomSheetDialogFragment extends BottomSheetDialogFragmen
         optionChoosePicture= (LinearLayout) contentView.findViewById(R.id.my_account_choose_photo_layout);
         optionTakePicture = (LinearLayout) contentView.findViewById(R.id.my_account_take_photo_layout);
         optionRemovePicture = (LinearLayout) contentView.findViewById(R.id.my_account_delete_layout);
+        optionQRcode = (LinearLayout) contentView.findViewById(R.id.my_account_my_QR_code);
 
         optionChoosePicture.setOnClickListener(this);
         optionTakePicture.setOnClickListener(this);
         optionRemovePicture.setOnClickListener(this);
+        optionQRcode.setOnClickListener(this);
 
         if(aC.existsAvatar()){
             optionRemovePicture.setVisibility(View.VISIBLE);
@@ -125,6 +130,12 @@ public class MyAccountBottomSheetDialogFragment extends BottomSheetDialogFragmen
             case R.id.my_account_delete_layout:{
                 log("option delete avatar");
                 ((ManagerActivityLollipop) context).showConfirmationDeleteAvatar();
+                break;
+            }
+            case R.id.my_account_my_QR_code: {
+                log("option QR code");
+                Intent intent = new Intent(context, QRCodeActivity.class);
+                startActivity(intent);
                 break;
             }
         }

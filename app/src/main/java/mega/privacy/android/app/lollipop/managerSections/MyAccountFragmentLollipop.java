@@ -14,8 +14,6 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.LayoutInflater;
@@ -51,7 +49,6 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 	public static int DEFAULT_AVATAR_WIDTH_HEIGHT = 150; //in pixels
 
 	Context context;
-	ActionBar aB;
 	MyAccountInfo myAccountInfo;
 
 	RelativeLayout avatarLayout;
@@ -137,6 +134,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 			return null;
 		}
 
+		log("My user handle: "+myUser.getHandle()+"****"+MegaApiJava.userHandleToBase64(myUser.getHandle()));
 		avatarLayout = (RelativeLayout) v.findViewById(R.id.my_account_relative_layout_avatar);
 		avatarLayout.setOnClickListener(this);
 
@@ -522,7 +520,6 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		log("onAttach");
 		super.onAttach(activity);
 		context = activity;
-		aB = ((AppCompatActivity)activity).getSupportActionBar();
 	}
 
 	@Override
@@ -530,7 +527,6 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		log("onAttach context");
 		super.onAttach(context);
 		this.context = context;
-		aB = ((AppCompatActivity)getActivity()).getSupportActionBar();
 	}
 
 	@Override
