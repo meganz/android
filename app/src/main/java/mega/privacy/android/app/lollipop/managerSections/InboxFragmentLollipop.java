@@ -63,13 +63,15 @@ import nz.mega.sdk.MegaNode;
 
 public class InboxFragmentLollipop extends Fragment{
 
+	public static ImageView imageDrag;
+
 	public static int GRID_WIDTH = 400;
 	
 	Context context;
 	RecyclerView recyclerView;
-	LinearLayoutManager mLayoutManager;
-	CustomizedGridLayoutManager gridLayoutManager;
-	MegaBrowserLollipopAdapter adapter;
+	public static LinearLayoutManager mLayoutManager;
+	public static CustomizedGridLayoutManager gridLayoutManager;
+	public static MegaBrowserLollipopAdapter adapter;
 	public InboxFragmentLollipop inboxFragment = this;
 	MegaNode inboxNode;
 
@@ -486,7 +488,7 @@ public class InboxFragmentLollipop extends Fragment{
         context = activity;
     }
 	
-	public void itemClick(int position, int[] screenPosition) {
+	public void itemClick(int position, int[] screenPosition, ImageView imageView) {
 		log("itemClick");
 		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
@@ -536,7 +538,7 @@ public class InboxFragmentLollipop extends Fragment{
 				if (MimeTypeList.typeForName(nodes.get(position).getName()).isImage()){
 					Intent intent = new Intent(context, FullScreenImageViewerLollipop.class);
 					intent.putExtra("position", position);
-					intent.putExtra("adapterType", Constants.RUBBISH_BIN_ADAPTER);
+					intent.putExtra("adapterType", Constants.INBOX_ADAPTER);
 					if (megaApi.getParentNode(nodes.get(position)).getType() == MegaNode.TYPE_RUBBISH){
 						intent.putExtra("parentNodeHandle", -1L);
 					}
@@ -550,6 +552,8 @@ public class InboxFragmentLollipop extends Fragment{
 					intent.putExtra("orderGetChildren", ((ManagerActivityLollipop)context).orderCloud);
 					intent.putExtra("screenPosition", screenPosition);
 					startActivity(intent);
+					((ManagerActivityLollipop) context).overridePendingTransition(0,0);
+					imageDrag = imageView;
 				}
 				else if (MimeTypeList.typeForName(nodes.get(position).getName()).isVideoReproducible() || MimeTypeList.typeForName(nodes.get(position).getName()).isAudio() ){
 					MegaNode file = nodes.get(position);
@@ -585,6 +589,7 @@ public class InboxFragmentLollipop extends Fragment{
 					mediaIntent.putExtra("screenPosition", screenPosition);
 					mediaIntent.putExtra("HANDLE", file.getHandle());
 					mediaIntent.putExtra("FILENAME", file.getName());
+					imageDrag = imageView;
 					String localPath = Util.getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
 					if (localPath != null){
 						File mediaFile = new File(localPath);

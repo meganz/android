@@ -67,17 +67,19 @@ import nz.mega.sdk.MegaShare;
 
 public class IncomingSharesFragmentLollipop extends Fragment{
 
+	public static ImageView imageDrag;
+
 	Context context;
 	RecyclerView recyclerView;
-	LinearLayoutManager mLayoutManager;
-	CustomizedGridLayoutManager gridLayoutManager;
+	public static LinearLayoutManager mLayoutManager;
+	public static CustomizedGridLayoutManager gridLayoutManager;
 	FastScroller fastScroller;
 
 	ImageView emptyImageView;
 	LinearLayout emptyTextView;
 	TextView emptyTextViewFirst;
 
-	MegaBrowserLollipopAdapter adapter;
+	public static MegaBrowserLollipopAdapter adapter;
 	IncomingSharesFragmentLollipop incomingSharesFragment = this;
 
 	RelativeLayout transfersOverViewLayout;
@@ -671,7 +673,7 @@ public class IncomingSharesFragmentLollipop extends Fragment{
         context = activity;
     }
 
-    public void itemClick(int position, int[] screenPosition) {
+    public void itemClick(int position, int[] screenPosition, ImageView imageView) {
     	log("itemClick");
 		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
@@ -771,7 +773,7 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 				if (MimeTypeList.typeForName(nodes.get(position).getName()).isImage()){
 					Intent intent = new Intent(context, FullScreenImageViewerLollipop.class);
 					intent.putExtra("position", position);
-					intent.putExtra("adapterType", Constants.FILE_BROWSER_ADAPTER);
+					intent.putExtra("adapterType", Constants.INCOMING_SHARES_ADAPTER);
 					intent.putExtra("isFolderLink", false);
 					if (megaApi.getParentNode(nodes.get(position)).getType() == MegaNode.TYPE_ROOT){
 						intent.putExtra("parentNodeHandle", -1L);
@@ -788,6 +790,8 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 					intent.putExtra("fromShared", true);
 					intent.putExtra("screenPosition", screenPosition);
 					startActivity(intent);
+					((ManagerActivityLollipop) context).overridePendingTransition(0,0);
+					imageDrag = imageView;
 				}
 				else if (MimeTypeList.typeForName(nodes.get(position).getName()).isVideoReproducible() || MimeTypeList.typeForName(nodes.get(position).getName()).isAudio() ){
 					MegaNode file = nodes.get(position);
@@ -823,6 +827,7 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 					mediaIntent.putExtra("screenPosition", screenPosition);
 					mediaIntent.putExtra("HANDLE", file.getHandle());
 					mediaIntent.putExtra("FILENAME", file.getName());
+					imageDrag = imageView;
 					String localPath = Util.getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
 					if (localPath != null){
 						File mediaFile = new File(localPath);

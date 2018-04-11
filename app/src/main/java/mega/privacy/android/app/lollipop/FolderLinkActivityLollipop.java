@@ -2,6 +2,7 @@ package mega.privacy.android.app.lollipop;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.ActivityManager;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
@@ -19,6 +20,7 @@ import android.os.StatFs;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.ActionBar;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -68,9 +70,11 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop.Mode;
 import mega.privacy.android.app.lollipop.adapters.MegaBrowserLollipopAdapter;
+import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.modalbottomsheet.FolderLinkBottomSheetDialogFragment;
 import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption;
 import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.PreviewUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -83,6 +87,8 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 
 public class FolderLinkActivityLollipop extends PinActivityLollipop implements MegaRequestListenerInterface, OnClickListener{
+
+	public static ImageView imageDrag;
 	
 	FolderLinkActivityLollipop folderLinkActivity = this;
 	MegaApiAndroid megaApi;
@@ -100,7 +106,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 	String folderKey;
 	String folderSubHandle;
 	RecyclerView listView;
-	LinearLayoutManager mLayoutManager;
+	public static LinearLayoutManager mLayoutManager;
 	MegaNode selectedNode;
 	ImageView emptyImageView;
 	TextView emptyTextView;
@@ -114,7 +120,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 	DisplayMetrics outMetrics;
 	long parentHandle = -1;
 	ArrayList<MegaNode> nodes;
-	MegaBrowserLollipopAdapter adapterList;
+	public static MegaBrowserLollipopAdapter adapterList;
 
 	ImageView fileLinkIconView;
 	TextView fileLinkNameView;
@@ -1510,7 +1516,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 	
 	ArrayList<Long> handleListM = new ArrayList<Long>();
 
-	public void itemClick(int position) {
+	public void itemClick(int position, int[] screenPosition, ImageView imageView) {
 		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 
 		if (adapterList.isMultipleSelect()){
@@ -1577,9 +1583,12 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 					}
 					intent.putExtra("orderGetChildren", orderGetChildren);
 					intent.putExtra("isFolderLink", true);
+					intent.putExtra("screenPosition", screenPosition);
 					startActivity(intent);
+					overridePendingTransition(0,0);
+					imageDrag = imageView;
 				}
-				/*else if (MimeTypeList.typeForName(nodes.get(position).getName()).isVideo() || MimeTypeList.typeForName(nodes.get(position).getName()).isAudio() ){
+				else if (MimeTypeList.typeForName(nodes.get(position).getName()).isVideo() || MimeTypeList.typeForName(nodes.get(position).getName()).isAudio() ){
 					MegaNode file = nodes.get(position);
 
 					if (megaApi.httpServerIsRunning() == 0) {
@@ -1612,6 +1621,8 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 					}
 					mediaIntent.putExtra("HANDLE", file.getHandle());
 					mediaIntent.putExtra("FILENAME", file.getName());
+					mediaIntent.putExtra("screenPosition", screenPosition);
+					imageDrag = imageView;
 					String localPath = Util.getLocalFile(FolderLinkActivityLollipop.this, file.getName(), file.getSize(), downloadLocationDefaultPath);
 					if (localPath != null){
 						File mediaFile = new File(localPath);
@@ -1691,7 +1702,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 						NodeController nC = new NodeController(FolderLinkActivityLollipop.this);
 						nC.prepareForDownload(handleList);
 					}
-				}*/
+				}
 				else{
 					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 						boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
