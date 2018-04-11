@@ -7,7 +7,7 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.media.MediaMetadataRetriever;
+import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.net.wifi.WifiManager;
 import android.net.wifi.WifiManager.WifiLock;
@@ -246,13 +246,12 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 							chatSettings = dbH.getChatSettings();
 							if (ret == MegaChatApi.INIT_NO_CACHE) {
 								log("condition ret == MegaChatApi.INIT_NO_CACHE");
-								megaApi.invalidateCache();
-
 							} else if (ret == MegaChatApi.INIT_ERROR) {
 								log("condition ret == MegaChatApi.INIT_ERROR");
 								if (chatSettings == null) {
 									log("ERROR----> Switch OFF chat");
-									chatSettings = new ChatSettings(false + "", true + "", "", true + "");
+									chatSettings = new ChatSettings();
+									chatSettings.setEnabled(false+"");
 									dbH.setChatSettings(chatSettings);
 								} else {
 									log("ERROR----> Switch OFF chat");
@@ -594,23 +593,33 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 					//
 					//					log("Lanzo intent al manager.....");
 					//				}
+					Boolean externalFile;
+					if (!currentFile.getAbsolutePath().contains(Environment.getExternalStorageDirectory().getPath())){
+						externalFile = true;
+					}
+					else {
+						externalFile = false;
+					}
+
 					if (MimeTypeList.typeForName(currentFile.getName()).isPdf()){
 						log("Pdf file");
 						Intent pdfIntent = new Intent(this, PdfViewerActivityLollipop.class);
 						pdfIntent.putExtra("APP", true);
-						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+						pdfIntent.putExtra("HANDLE", currentDocument.getHandle());
+						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && !externalFile) {
 							pdfIntent.setDataAndType(FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
 						}
 						else{
 							pdfIntent.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
 						}
-						pdfIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 						pdfIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+						pdfIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+						pdfIntent.putExtra("inside", true);
+						pdfIntent.putExtra("isUrl", false);
 						startActivity(pdfIntent);
 					}
 					else if (MimeTypeList.typeForName(currentFile.getName()).isVideoReproducible() || MimeTypeList.typeForName(currentFile.getName()).isAudio()) {
 						log("Video/Audio file");
-
 						Intent mediaIntent;
 						if (MimeTypeList.typeForName(currentFile.getName()).isVideoNotSupported()){
 							mediaIntent = new Intent(Intent.ACTION_VIEW);
@@ -627,6 +636,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 							mediaIntent.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
 						}
 						mediaIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+						mediaIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 						startActivity(mediaIntent);
 					}
 					else if (MimeTypeList.typeForName(currentFile.getName()).isDocument()) {
@@ -638,7 +648,6 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 						} else {
 							viewIntent.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
 						}
-						viewIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 						viewIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 
 						if (MegaApiUtils.isIntentAvailable(this, viewIntent))
@@ -1024,20 +1033,6 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 								log("The video has not thumb");
 								ThumbnailUtilsLollipop.createThumbnailVideo(this, transfer.getPath(), megaApi, transfer.getNodeHandle());
 							}
-							if(videoNode.getDuration()<1){
-								log("The video has not duration!!!");
-								MediaMetadataRetriever retriever = new MediaMetadataRetriever();
-								retriever.setDataSource(transfer.getPath());
-								String time = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
-								if(time!=null){
-									double seconds = Double.parseDouble(time)/1000;
-									log("The original duration is: "+seconds);
-									int secondsAprox = (int) Math.round(seconds);
-									log("The duration aprox is: "+secondsAprox);
-
-									megaApi.setNodeDuration(videoNode, secondsAprox, null);
-								}
-							}
 						}
 						else{
 							log("videoNode is NULL");
@@ -1059,10 +1054,9 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 					resultFile.setExecutable(true, false);
 
 					String filePath = transfer.getPath();
-
+					File f = new File(filePath);
 					try {
 						Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-						File f = new File(filePath);
 						Uri contentUri;
 						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
 							contentUri = FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", f);
@@ -1072,6 +1066,17 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 						mediaScanIntent.setData(contentUri);
 						mediaScanIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 						this.sendBroadcast(mediaScanIntent);
+					}
+					catch (Exception e){}
+
+					try {
+						MediaScannerConnection.scanFile(getApplicationContext(), new String[]{
+								f.getAbsolutePath()}, null, new MediaScannerConnection.OnScanCompletedListener() {
+							@Override
+							public void onScanCompleted(String path, Uri uri) {
+								log("File was scanned successfully");
+							}
+						});
 					}
 					catch (Exception e){}
 

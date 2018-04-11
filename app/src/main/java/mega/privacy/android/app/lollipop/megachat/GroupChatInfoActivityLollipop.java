@@ -630,17 +630,13 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         if(fullName!=null){
             if(fullName.isEmpty()){
                 log("1-Put email as fullname");
-                String participantEmail = chat.getPeerEmail(i);
-                String[] splitEmail = participantEmail.split("[@._]");
-                fullName = splitEmail[0];
+                fullName = chat.getPeerEmail(i);
                 return fullName;
             }
             else{
                 if (fullName.trim().length() <= 0){
                     log("2-Put email as fullname");
-                    String participantEmail = chat.getPeerEmail(i);
-                    String[] splitEmail = participantEmail.split("[@._]");
-                    fullName = splitEmail[0];
+                    fullName = chat.getPeerEmail(i);
                     return fullName;
                 }
                 else{
@@ -650,9 +646,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         }
         else{
             log("3-Put email as fullname");
-            String participantEmail = chat.getPeerEmail(i);
-            String[] splitEmail = participantEmail.split("[@._]");
-            fullName = splitEmail[0];
+            fullName = chat.getPeerEmail(i);
             return fullName;
         }
     }
@@ -1499,7 +1493,6 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
                 if(request.getText()!=null) {
                     log("NEW title: "+request.getText());
                     infoTitleChatText.setText(request.getText());
-                    aB.setTitle(request.getText());
                 }
             }
             else{
@@ -1657,7 +1650,6 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
                 log("NEW title: "+chat.getTitle());
                 infoTitleChatText.setText(chat.getTitle());
-                aB.setTitle(chat.getTitle());
 
                 if (chat.getTitle().length() > 0){
                     String chatTitle = chat.getTitle().trim();

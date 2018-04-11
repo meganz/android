@@ -39,10 +39,7 @@
             android:layout_height="55dp"
             android:background="@drawable/gradient_cam_uploads"
             android:id="@+id/cell_photosync_title_gradient_effect"
-            android:layout_alignParentBottom="true"
-            >
-
-        </RelativeLayout>
+            android:layout_alignParentBottom="true"/>
 
         <ImageView
             android:id="@+id/cell_photosync_title_menu_long_click_select"
@@ -74,8 +71,7 @@
                 android:layout_height="wrap_content"
                 android:src="@drawable/ic_play_arrow_white_24dp"
                 android:background="@null"
-                android:layout_alignParentLeft="true"
-                />
+                android:layout_alignParentLeft="true"/>
 
         </RelativeLayout>
 

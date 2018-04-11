@@ -101,7 +101,8 @@ public class MyAccountInfo implements MegaRequestListenerInterface {
     public void setAccountDetails(){
 
         if(accountInfo==null){
-            log("Error because accoun info is NUll in setAccountDetails");
+            log("Error because account info is NUll in setAccountDetails");
+            return;
         }
 
         long totalStorage = accountInfo.getStorageMax();
