@@ -344,7 +344,7 @@
                 <RelativeLayout
                     android:id="@+id/message_jump_layout"
                     android:layout_width="163dp"
-                    android:layout_height="45dp"
+                    android:layout_height="36dp"
                     android:layout_centerHorizontal="true"
                     android:layout_alignParentBottom="true"
                     android:layout_marginBottom="12dp"
