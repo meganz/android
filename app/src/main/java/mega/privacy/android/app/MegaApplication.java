@@ -546,6 +546,8 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 
 	private static long openChatId = -1;
 
+	private static long openCallChatId = -1;
+
 	private static boolean recentChatVisible = false;
 	private static boolean chatNotificationReceived = false;
 
@@ -561,6 +563,14 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 
 	public static void setOpenChatId(long openChatId){
 		MegaApplication.openChatId = openChatId;
+	}
+
+	public static long getOpenCallChatId() {
+		return openCallChatId;
+	}
+
+	public static void setOpenCallChatId(long openCallChatId) {
+		MegaApplication.openCallChatId = openCallChatId;
 	}
 
 	public static boolean isRecentChatVisible() {
@@ -1022,8 +1032,26 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 
 	@Override
 	public void onChatCallUpdate(MegaChatApiJava api, MegaChatCall call) {
-		if(call.getStatus()>MegaChatCall.CALL_STATUS_TERMINATING){
+		if(call.getStatus()>=MegaChatCall.CALL_STATUS_IN_PROGRESS){
 			clearIncomingCallNotification(call.getId());
+		}
+
+		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP_MR1){
+			if(call.getStatus()==MegaChatCall.CALL_STATUS_DESTROYED){
+				if(call.getTermCode()==MegaChatCall.TERM_CODE_ANSWER_TIMEOUT){
+					log("onChatCallUpdate:TERM_CODE_ANSWER_TIMEOUT");
+					if(call.isLocalTermCode()==false){
+						log("onChatCallUpdate:localTermCodeNotLocal");
+						try{
+							AdvancedNotificationBuilder notificationBuilder = AdvancedNotificationBuilder.newInstance(this, megaApi, megaChatApi);
+							notificationBuilder.showMissedCallNotification(call);
+						}
+						catch(Exception e){
+							log("EXCEPTION when showing missed call notification: "+e.getMessage());
+						}
+					}
+				}
+			}
 		}
 	}
 
