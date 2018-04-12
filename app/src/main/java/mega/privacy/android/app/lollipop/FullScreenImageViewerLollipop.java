@@ -77,10 +77,13 @@ import mega.privacy.android.app.components.dragger.ExitViewAnimator;
 import mega.privacy.android.app.lollipop.adapters.MegaBrowserLollipopAdapter;
 import mega.privacy.android.app.lollipop.adapters.MegaFullScreenImageAdapterLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaOfflineFullScreenImageAdapterLollipop;
+import mega.privacy.android.app.lollipop.adapters.MegaOfflineLollipopAdapter;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
+import mega.privacy.android.app.lollipop.managerSections.CameraUploadFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.FileBrowserFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.InboxFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.IncomingSharesFragmentLollipop;
+import mega.privacy.android.app.lollipop.managerSections.OfflineFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.OutgoingSharesFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.RubbishBinFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.SearchFragmentLollipop;
@@ -212,6 +215,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 
 	DraggableView draggableView;
 	public static int screenHeight;
+	int screenWidth;
 	RelativeLayout relativeImageViewerLayout;
 	ImageView ivShadow;
 
@@ -609,6 +613,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				DisplayMetrics outMetrics = new DisplayMetrics();
 				display.getMetrics(outMetrics);
 				screenHeight = outMetrics.heightPixels;
+				screenWidth = outMetrics.widthPixels;
 				float density = getResources().getDisplayMetrics().density;
 
 				float scaleW = Util.getScaleW(outMetrics, density);
@@ -1292,15 +1297,24 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				public boolean onPreDraw() {
 
 					viewPager.getViewTreeObserver().removeOnPreDrawListener(this);
-					int[] screenLocation = new int[2];
 					int[] location = new int[2];
-					getLocationOnScreen(location);
-					viewPager.getLocationOnScreen(screenLocation);
-					mLeftDelta = location[0] - screenLocation[0];
-					mTopDelta = location[1] -screenLocation[1];
+					viewPager.getLocationOnScreen(location);
+					int[] getlocation = new int[2];
+					getLocationOnScreen(getlocation);
+					if (screenPosition != null){
+						mLeftDelta = getlocation[0] - location[0];
+						mTopDelta = getlocation[1] - location[1];
 
-					mWidthScale = (float) screenPosition[2] / viewPager.getWidth();
-					mHeightScale = (float) screenPosition[3] / viewPager.getHeight();
+						mWidthScale = (float) screenPosition[2] / viewPager.getWidth();
+						mHeightScale = (float) screenPosition[3] / viewPager.getHeight();
+					}
+					else {
+						mLeftDelta = (screenWidth/2) - location[0];
+						mTopDelta = (screenHeight/2) - location[1];
+
+						mWidthScale = (float) (screenWidth/4) / viewPager.getWidth();
+						mHeightScale = (float) (screenHeight/4) / viewPager.getHeight();
+					}
 
 					runEnterAnimation();
 
@@ -1336,6 +1350,12 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		else if (adapterType == Constants.FILE_BROWSER_ADAPTER){
 			FileBrowserFragmentLollipop.imageDrag.setVisibility(visibility);
 		}
+		else if (adapterType == Constants.PHOTO_SYNC_ADAPTER ||adapterType == Constants.SEARCH_BY_ADAPTER) {
+			CameraUploadFragmentLollipop.imageDrag.setVisibility(visibility);
+		}
+		else if (adapterType == Constants.OFFLINE_ADAPTER) {
+			OfflineFragmentLollipop.imageDrag.setVisibility(visibility);
+		}
 	}
 
 	void getLocationOnScreen(int[] location){
@@ -1362,6 +1382,12 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		}
 		else if (adapterType == Constants.FILE_BROWSER_ADAPTER){
 			FileBrowserFragmentLollipop.imageDrag.getLocationOnScreen(location);
+		}
+		else if (adapterType == Constants.PHOTO_SYNC_ADAPTER || adapterType == Constants.SEARCH_BY_ADAPTER){
+			CameraUploadFragmentLollipop.imageDrag.getLocationOnScreen(location);
+		}
+		else if (adapterType == Constants.OFFLINE_ADAPTER){
+			OfflineFragmentLollipop.imageDrag.getLocationOnScreen(location);
 		}
 	}
 
@@ -1412,24 +1438,71 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	}
 
 	public void updateCurrentImage(){
-		Long handle = adapterMega.getImageHandle(positionG);
-		MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(handle));
-		ArrayList<MegaNode> listNodes = megaApi.getChildren(parentNode);
 		setImageDragVisibility(View.VISIBLE);
-		for (int i=0; i<listNodes.size(); i++){
-			if (listNodes.get(i).getHandle() == handle){
-				ImageView image = getImageView(i);
-
-				int[] position = new int[2];
-				image.getLocationOnScreen(position);
-				screenPosition[0] = (image.getWidth() / 2) + position[0];
-				screenPosition[1] = (image.getHeight() / 2) + position[1];
-				screenPosition[2] = image.getWidth();
-				screenPosition[3] = image.getHeight();
-				draggableView.setScreenPosition(screenPosition);
-				break;
+		ImageView image = null;
+	    if (adapterType == Constants.OFFLINE_ADAPTER){
+	        String name = mOffListImages.get(positionG).getName();
+            for (int i=0; i<mOffList.size(); i++){
+				log("Name: "+name+" mOfflist name: "+mOffList.get(i).getName());
+                if (mOffList.get(i).getName().equals(name)){
+                    image = getImageView(i);
+                    break;
+                }
+            }
+        }
+        else if (adapterType == Constants.PHOTO_SYNC_ADAPTER || adapterType == Constants.SEARCH_BY_ADAPTER){
+	    	Long handle = adapterMega.getImageHandle(positionG);
+			if (CameraUploadFragmentLollipop.adapterList != null){
+				ArrayList<CameraUploadFragmentLollipop.PhotoSyncHolder> listNodes = CameraUploadFragmentLollipop.nodesArray;
+				for (int i=0; i<listNodes.size(); i++){
+					if (listNodes.get(i).getHandle() == handle){
+						image = getImageView(i);
+						break;
+					}
+				}
+			}
+			else if (CameraUploadFragmentLollipop.adapterGrid != null){
+				ArrayList<MegaMonthPicLollipop> listNodes = CameraUploadFragmentLollipop.monthPics;
+				ArrayList<Long> handles;
+				int count = 0;
+				boolean found = false;
+				for (int i=0; i<listNodes.size(); i++){
+					handles = listNodes.get(i).getNodeHandles();
+					for (int j=0; j<handles.size(); j++){
+						count++;
+						String h1 = handles.get(j).toString();
+						String h2 = handle.toString();
+						if (h1.equals(h2)){
+							image = getImageView(count);
+							found = true;
+							break;
+						}
+					}
+					count++;
+					if (found){
+						break;
+					}
+				}
 			}
 		}
+        else {
+            Long handle = adapterMega.getImageHandle(positionG);
+            MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(handle));
+            ArrayList<MegaNode> listNodes = megaApi.getChildren(parentNode);
+            for (int i=0; i<listNodes.size(); i++){
+                if (listNodes.get(i).getHandle() == handle){
+                    image = getImageView(i);
+                    break;
+                }
+            }
+        }
+		int[] position = new int[2];
+		image.getLocationOnScreen(position);
+		screenPosition[0] = (image.getWidth() / 2) + position[0];
+		screenPosition[1] = (image.getHeight() / 2) + position[1];
+		screenPosition[2] = image.getWidth();
+		screenPosition[3] = image.getHeight();
+		draggableView.setScreenPosition(screenPosition);
 	}
 
 	public ImageView getImageView (int i) {
@@ -1511,20 +1584,91 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			}
 			image = FileBrowserFragmentLollipop.imageDrag;
 		}
+		else if (adapterType == Constants.PHOTO_SYNC_ADAPTER || adapterType == Constants.SEARCH_BY_ADAPTER){
+			if (CameraUploadFragmentLollipop.adapterList != null){
+				View v = CameraUploadFragmentLollipop.mLayoutManager.findViewByPosition(i);
+				CameraUploadFragmentLollipop.imageDrag = (ImageView) v.findViewById(R.id.photo_sync_list_thumbnail);
+			}
+			else if (CameraUploadFragmentLollipop.adapterGrid != null){
+				View v = CameraUploadFragmentLollipop.mLayoutManager.findViewByPosition(i);
+				CameraUploadFragmentLollipop.imageDrag = (ImageView) v.findViewById(R.id.cell_photosync_grid_title_thumbnail);
+			}
+			image = CameraUploadFragmentLollipop.imageDrag;
+		}
+		else if (adapterType == Constants.OFFLINE_ADAPTER){
+			if (OfflineFragmentLollipop.adapter.getAdapterType() == MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_LIST){
+				View v = OfflineFragmentLollipop.mLayoutManager.findViewByPosition(i);
+				OfflineFragmentLollipop.imageDrag = (ImageView) v.findViewById(R.id.offline_list_thumbnail);
+			}
+			else {
+				View v = OfflineFragmentLollipop.gridLayoutManager.findViewByPosition(i);
+				OfflineFragmentLollipop.imageDrag = (ImageView)v.findViewById(R.id.offline_grid_thumbnail);
+			}
+			image = OfflineFragmentLollipop.imageDrag;
+		}
 
 		return image;
 	}
 
 	public void updateScrollPosition(){
-		Long handle = adapterMega.getImageHandle(positionG);
-		MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(handle));
-		ArrayList<MegaNode> listNodes = megaApi.getChildren(parentNode);
+	    if (adapterType == Constants.OFFLINE_ADAPTER){
+	        String name = mOffListImages.get(positionG).getName();
 
-		for (int i=0; i<listNodes.size(); i++){
-			if (listNodes.get(i).getHandle() == handle){
-				scrollToPosition(i);
+            for (int i=0; i<mOffList.size(); i++){
+            	log("Name: "+name+" mOfflist name: "+mOffList.get(i).getName());
+                if (mOffList.get(i).getName().equals(name)){
+                    scrollToPosition(i);
+                    break;
+                }
+            }
+        }
+		else if (adapterType == Constants.PHOTO_SYNC_ADAPTER || adapterType == Constants.SEARCH_BY_ADAPTER){
+			Long handle = adapterMega.getImageHandle(positionG);
+			if (CameraUploadFragmentLollipop.adapterList != null){
+				ArrayList<CameraUploadFragmentLollipop.PhotoSyncHolder> listNodes = CameraUploadFragmentLollipop.nodesArray;
+				for (int i=0; i<listNodes.size(); i++){
+					if (listNodes.get(i).getHandle() == handle){
+						scrollToPosition(i);
+						break;
+					}
+				}
+			}
+			else if (CameraUploadFragmentLollipop.adapterGrid != null){
+				ArrayList<MegaMonthPicLollipop> listNodes = CameraUploadFragmentLollipop.monthPics;
+				ArrayList<Long> handles;
+				int count = 0;
+				boolean found = false;
+				for (int i=0; i<listNodes.size(); i++){
+					handles = listNodes.get(i).getNodeHandles();
+					for (int j=0; j<handles.size(); j++){
+						count++;
+						String h1 = handles.get(j).toString();
+						String h2 = handle.toString();
+						if (h1.equals(h2)){
+							scrollToPosition(count);
+							found = true;
+							break;
+						}
+					}
+					count++;
+					if (found){
+						break;
+					}
+				}
 			}
 		}
+        else {
+            Long handle = adapterMega.getImageHandle(positionG);
+            MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(handle));
+            ArrayList<MegaNode> listNodes = megaApi.getChildren(parentNode);
+
+            for (int i=0; i<listNodes.size(); i++){
+                if (listNodes.get(i).getHandle() == handle){
+                    scrollToPosition(i);
+                    break;
+                }
+            }
+        }
 	}
 
 	void scrollToPosition (int i) {
@@ -1580,6 +1724,17 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			}
 			else {
 				FileBrowserFragmentLollipop.gridLayoutManager.scrollToPosition(i);
+			}
+		}
+		else if (adapterType == Constants.PHOTO_SYNC_ADAPTER || adapterType == Constants.SEARCH_BY_ADAPTER) {
+			CameraUploadFragmentLollipop.mLayoutManager.scrollToPosition(i);
+		}
+		else if (adapterType == Constants.OFFLINE_ADAPTER){
+			if (OfflineFragmentLollipop.adapter.getAdapterType() == MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_LIST){
+				OfflineFragmentLollipop.mLayoutManager.scrollToPosition(i);
+			}
+			else {
+				OfflineFragmentLollipop.gridLayoutManager.scrollToPosition(i);
 			}
 		}
 	}

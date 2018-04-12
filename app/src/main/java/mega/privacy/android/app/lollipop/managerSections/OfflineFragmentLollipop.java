@@ -62,14 +62,16 @@ import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaNode;
 
 public class OfflineFragmentLollipop extends Fragment{
+
+	public static ImageView imageDrag;
 	
 	MegaPreferences prefs;
 	
 	Context context;
 	ActionBar aB;
 	RecyclerView recyclerView;
-	LinearLayoutManager mLayoutManager;
-	CustomizedGridLayoutManager gridLayoutManager;
+	public static LinearLayoutManager mLayoutManager;
+	public static CustomizedGridLayoutManager gridLayoutManager;
 
 	Stack<Integer> lastPositionStack;
 	
@@ -77,10 +79,10 @@ public class OfflineFragmentLollipop extends Fragment{
 	LinearLayout emptyTextView;
 	TextView emptyTextViewFirst;
 
-	MegaOfflineLollipopAdapter adapter;
+	public static MegaOfflineLollipopAdapter adapter;
 	OfflineFragmentLollipop offlineFragment = this;
 	DatabaseHandler dbH = null;
-	ArrayList<MegaOffline> mOffList= null;
+	public static ArrayList<MegaOffline> mOffList= null;
 	String pathNavigation = null;
 	TextView contentText;
 	boolean isList = true;
@@ -903,7 +905,7 @@ public class OfflineFragmentLollipop extends Fragment{
         aB = ((AppCompatActivity)activity).getSupportActionBar();
     }
 
-    public void itemClick(int position, int[] screenPosition) {
+    public void itemClick(int position, int[] screenPosition, ImageView imageView) {
 		log("itemClick");
 		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
@@ -1079,8 +1081,9 @@ public class OfflineFragmentLollipop extends Fragment{
 								intent.putExtra("typeAccount", accountInfo.getAccountType());
 							}
 						}
-
 						startActivity(intent);
+						((ManagerActivityLollipop) context).overridePendingTransition(0,0);
+						imageDrag = imageView;
 					}
 					else if (MimeTypeList.typeForName(currentFile.getName()).isVideo()) {
 						log("Video file");
