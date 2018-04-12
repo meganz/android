@@ -17,6 +17,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
+import android.provider.ContactsContract;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
@@ -90,6 +91,8 @@ import nz.mega.sdk.MegaShare;
 
 public class CameraUploadFragmentLollipop extends Fragment implements OnClickListener, RecyclerView.OnItemTouchListener, GestureDetector.OnGestureListener, MegaRequestListenerInterface{
 
+	public static ImageView imageDrag;
+
 	public static int GRID_WIDTH = 154;
 
 	public static int GRID_LARGE = 3;
@@ -102,7 +105,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	private ActionBar aB;
 	private RecyclerView listView;
 	private GestureDetectorCompat detector;
-	private RecyclerView.LayoutManager mLayoutManager;
+	public static RecyclerView.LayoutManager mLayoutManager;
 	FastScroller fastScroller;
 
 	long[] arrayHandles = null;
@@ -121,8 +124,8 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	private DatabaseHandler dbH;
 	private MegaPreferences prefs;
 
-	private MegaPhotoSyncListAdapterLollipop adapterList;
-	private MegaPhotoSyncGridTitleAdapterLollipop adapterGrid;
+	public static MegaPhotoSyncListAdapterLollipop adapterList;
+	public static MegaPhotoSyncGridTitleAdapterLollipop adapterGrid;
 	private MegaApiAndroid megaApi;
 
 //	long parentHandle = -1;
@@ -133,9 +136,9 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	private ArrayList<MegaNode> nodes;
 	private ArrayList<MegaNode> searchNodes;
 
-	private ArrayList<PhotoSyncHolder> nodesArray = new ArrayList<CameraUploadFragmentLollipop.PhotoSyncHolder>();
+	public static ArrayList<PhotoSyncHolder> nodesArray = new ArrayList<CameraUploadFragmentLollipop.PhotoSyncHolder>();
 	private ArrayList<PhotoSyncGridHolder> nodesArrayGrid = new ArrayList<CameraUploadFragmentLollipop.PhotoSyncGridHolder>();
-	private ArrayList<MegaMonthPicLollipop> monthPics = new ArrayList<MegaMonthPicLollipop>();
+	public static ArrayList<MegaMonthPicLollipop> monthPics = new ArrayList<MegaMonthPicLollipop>();
 	private long[] searchByDate;
 
 	private ActionMode actionMode;
@@ -150,6 +153,10 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 		public long handle;
 		public String monthYear;
 		public String nodeDate;
+
+		public long getHandle(){
+			return handle;
+		}
 	}
 	
 	public class PhotoSyncGridHolder{
@@ -184,7 +191,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 				
 					actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());			
 	
-			        itemClick(position);
+			        itemClick(position, null, null);
 			        super.onLongPress(e);
 		        }
 			}
@@ -679,8 +686,6 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 				return v;
 			}
 		}
-
-
 
 		if (((ManagerActivityLollipop) context).isListCameraUploads()) {
 			View v = inflater.inflate(R.layout.fragment_filebrowserlist, container, false);
@@ -1570,7 +1575,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 		}
 	}
 	
-	public void itemClick(int position) {
+	public void itemClick(int position, ImageView imageView, int[] screenPosition) {
 
 		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 		
@@ -1629,8 +1634,10 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 								intent.putExtra("typeAccount", accountInfo.getAccountType());
 							}
 							intent.putExtra("orderGetChildren", ((ManagerActivityLollipop)context).orderCamera);
+							intent.putExtra("screenPosition", screenPosition);
 							startActivity(intent);
-									
+							((ManagerActivityLollipop) context).overridePendingTransition(0,0);
+							imageDrag = imageView;
 						}
 						else if (MimeTypeList.typeForName(psHMegaNode.getName()).isVideo()){
 
@@ -2493,6 +2500,5 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 		return nodesResult;
 		//setNodes(nodesResult);
 	}
-
 
 }

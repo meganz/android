@@ -61,7 +61,7 @@ import nz.mega.sdk.MegaShare;
 
 
 public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaPhotoSyncGridAdapterLollipop.ViewHolderPhotoSyncGrid> {
-	
+
 	private class Media {
 		public String filePath;
 		public long timestamp;
@@ -465,6 +465,15 @@ public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaP
 			MegaNode n = megaApi.getNodeByHandle(holder.documents.get(index));
 			if (n != null){
 				if (!n.isFolder()){
+					ImageView imageView = holder.imageViews.get(index);
+					int[] positionIV = new int[2];
+					imageView.getLocationOnScreen(positionIV);
+					int[] screenPosition = new int[4];
+					screenPosition[0] = positionIV[0];
+					screenPosition[1] = positionIV[1];
+					screenPosition[2] = imageView.getWidth();
+					screenPosition[3] = imageView.getHeight();
+
 					if (MimeTypeThumbnail.typeForName(n.getName()).isImage()){
 						
 						Intent intent = new Intent(context, FullScreenImageViewerLollipop.class);
@@ -483,7 +492,10 @@ public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaP
 						else{
 							intent.putExtra("parentNodeHandle", megaApi.getParentNode(nodes.get(positionInNodes)).getHandle());
 						}
+						intent.putExtra("screenPosition", screenPosition);
 						context.startActivity(intent);
+						((ManagerActivityLollipop) context).overridePendingTransition(0,0);
+						CameraUploadFragmentLollipop.imageDrag = imageView;
 					}
 					else if (MimeTypeThumbnail.typeForName(n.getName()).isVideo() || MimeTypeThumbnail.typeForName(n.getName()).isAudio() ){
 						MegaNode file = n;
