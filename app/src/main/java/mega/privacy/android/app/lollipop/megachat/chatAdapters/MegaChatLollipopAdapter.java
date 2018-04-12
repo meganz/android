@@ -528,6 +528,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         RelativeLayout errorUploadingLandscape;
 
         LinearLayout newMessagesLayout;
+        TextView newMessagesText;
 
         TextView retryAlert;
         ImageView triangleIcon;
@@ -643,6 +644,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.dateText = (TextView) v.findViewById(R.id.message_chat_date_text);
 
             holder.newMessagesLayout = (LinearLayout) v.findViewById(R.id.message_chat_new_relative_layout);
+            holder.newMessagesText = (TextView) v.findViewById(R.id.message_chat_new_text);
 
             //Own messages
             holder.ownMessageLayout = (RelativeLayout) v.findViewById(R.id.message_chat_own_message_layout);
@@ -1004,15 +1006,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         }
     }
 
-    public void markAsSeen(MegaChatMessage msg){
-        log("markAsSeen");
-        if(((ChatActivityLollipop)context).activityVisible){
-            if(msg.getStatus()!=MegaChatMessage.STATUS_SEEN) {
-                megaChatApi.setMessageSeen(chatRoom.getChatId(), msg.getMsgId());
-            }
-        }
-    }
-
     public void onBindViewHolderMessage(RecyclerView.ViewHolder holder, int position) {
         log("onBindViewHolderMessage: " + position);
 
@@ -1188,8 +1181,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             }
             else{
                 log("CONTACT Message type ALTER PARTICIPANTS");
-
-                markAsSeen((message));
 
                 int privilege = message.getPrivilege();
                 log("Privilege of the user: "+privilege);
@@ -1413,8 +1404,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         }
         else if(message.getType()==MegaChatMessage.TYPE_PRIV_CHANGE){
             ((ViewHolderMessageChat)holder).layoutAvatarMessages.setVisibility(View.INVISIBLE);
-
-            markAsSeen((message));
 
             log("PRIVILEGE CHANGE message");
             if(message.getHandleOfAction()==myUserHandle){
@@ -2648,8 +2637,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 long userHandle = message.getUserHandle();
                 log("Contact message!!: "+userHandle);
 
-                markAsSeen((message));
-
                 if(((ChatActivityLollipop) context).isGroup()){
 
                     ((ViewHolderMessageChat)holder).fullNameTitle = cC.getFullName(userHandle, chatRoom);
@@ -3491,9 +3478,9 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 //        ownMessageParams.setMargins(Util.scaleWidthPx(11, outMetrics), Util.scaleHeightPx(-14, outMetrics), Util.scaleWidthPx(62, outMetrics), Util.scaleHeightPx(16, outMetrics));
 //        ((ViewHolderMessageChat)holder).contentOwnMessageText.setLayoutParams(ownMessageParams);
 
-        if(((ChatActivityLollipop)context).lastMessageSeen!=-1){
+        if(((ChatActivityLollipop)context).lastIdMsgSeen !=-1){
 
-            if(((ChatActivityLollipop)context).lastMessageSeen == message.getMsgId()){
+            if(((ChatActivityLollipop)context).lastIdMsgSeen == message.getMsgId()){
 
                 log("onBindViewHolder:Last message id match!");
 
@@ -3505,6 +3492,18 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 else{
                     params.addRule(RelativeLayout.BELOW, R.id.message_chat_contact_message_layout);
                 }
+
+                String numberString;
+                long unreadMessages = Math.abs(((ChatActivityLollipop)context).generalUnreadCount);
+                if(((ChatActivityLollipop)context).generalUnreadCount<0){
+                    numberString = "+"+((ChatActivityLollipop)context).generalUnreadCount;
+                }
+                else{
+                    numberString = ((ChatActivityLollipop)context).generalUnreadCount+"";
+                }
+
+                String contentUnreadText = context.getResources().getQuantityString(R.plurals.number_unread_messages, (int)unreadMessages, numberString);
+                ((ViewHolderMessageChat)holder).newMessagesText.setText(contentUnreadText);
 
                 ((ViewHolderMessageChat)holder).newMessagesLayout.setLayoutParams(params);
                 ((ViewHolderMessageChat)holder).newMessagesLayout.setVisibility(View.VISIBLE);
