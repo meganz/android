@@ -152,6 +152,13 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
     private MenuItem downloadMenuItem;
     private MenuItem propertiesMenuItem;
     private MenuItem chatMenuItem;
+    private MenuItem getlinkMenuItem;
+    private MenuItem renameMenuItem;
+    private MenuItem moveMenuItem;
+    private MenuItem copyMenuItem;
+    private MenuItem moveToTrashMenuItem;
+    private MenuItem removeMenuItem;
+    private MenuItem removelinkMenuItem;
 
     private List<ShareInfo> filePreparedInfos;
     ArrayList<Long> handleListM = new ArrayList<Long>();
@@ -174,6 +181,9 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
     NodeController nC;
     private android.support.v7.app.AlertDialog downloadConfirmationDialog;
     private DisplayMetrics outMetrics;
+
+    private RelativeLayout bottomLayout;
+    private TextView fileNameTextView;
 
     @Override
     public void onCreate (Bundle savedInstanceState){
@@ -274,11 +284,23 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
         tB.setVisibility(View.VISIBLE);
         setSupportActionBar(tB);
         aB = getSupportActionBar();
-        Drawable upArrow = getResources().getDrawable(R.drawable.ic_arrow_back_black);
-        upArrow.setColorFilter(getResources().getColor(R.color.lollipop_primary_color), PorterDuff.Mode.SRC_ATOP);
-        aB.setHomeAsUpIndicator(upArrow);
+        aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
         aB.setHomeButtonEnabled(true);
         aB.setDisplayHomeAsUpEnabled(true);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            Window window = this.getWindow();
+            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+            window.setStatusBarColor(ContextCompat.getColor(this, R.color.black));
+        }
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.GINGERBREAD){
+            requestWindowFeature(Window.FEATURE_NO_TITLE);
+            this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        }
+
+        bottomLayout = (RelativeLayout) findViewById(R.id.pdf_viewer_layout_bottom);
+        fileNameTextView = (TextView) findViewById(R.id.pdf_viewer_file_name);
 
         log("Overquota delay: "+megaApi.getBandwidthOverquotaDelay());
         if(megaApi.getBandwidthOverquotaDelay()>0){
@@ -325,7 +347,8 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
         pdfView.setOnClickListener(this);
 
         setTitle(pdfFileName);
-        aB.setTitle(pdfFileName);
+        aB.setTitle(" ");
+        fileNameTextView.setText(pdfFileName);
 
         uploadContainer = (RelativeLayout) findViewById(R.id.upload_container_layout_bottom);
         if (!inside) {
@@ -407,11 +430,23 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
             tB.setVisibility(View.VISIBLE);
             setSupportActionBar(tB);
             aB = getSupportActionBar();
-            Drawable upArrow = getResources().getDrawable(R.drawable.ic_arrow_back_black);
-            upArrow.setColorFilter(getResources().getColor(R.color.lollipop_primary_color), PorterDuff.Mode.SRC_ATOP);
-            aB.setHomeAsUpIndicator(upArrow);
+            aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
             aB.setHomeButtonEnabled(true);
             aB.setDisplayHomeAsUpEnabled(true);
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                Window window = this.getWindow();
+                window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+                window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+                window.setStatusBarColor(ContextCompat.getColor(this, R.color.black));
+            }
+            if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.GINGERBREAD){
+                requestWindowFeature(Window.FEATURE_NO_TITLE);
+                this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+            }
+
+            bottomLayout = (RelativeLayout) findViewById(R.id.pdf_viewer_layout_bottom);
+            fileNameTextView = (TextView) findViewById(R.id.pdf_viewer_file_name);
 
             log("Overquota delay: "+megaApi.getBandwidthOverquotaDelay());
             if(megaApi.getBandwidthOverquotaDelay()>0){
@@ -440,7 +475,8 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
 
             path = uri.getPath();
             setTitle(pdfFileName);
-            aB.setTitle(pdfFileName);
+            aB.setTitle(" ");
+            fileNameTextView.setText(pdfFileName);
 
             uploadContainer = (RelativeLayout) findViewById(R.id.upload_container_layout_bottom);
             uploadContainer.setVisibility(View.VISIBLE);
@@ -726,6 +762,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
         if(tB != null) {
             getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
             tB.animate().translationY(0).setDuration(200L).start();
+            bottomLayout.animate().translationY(0).setDuration(400L).start();
             uploadContainer.animate().translationY(0).setDuration(200L).start();
         }
     }
@@ -740,6 +777,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
                     aB.hide();
                 }
             }).start();
+            bottomLayout.animate().translationY(220).setDuration(400L).start();
             uploadContainer.animate().translationY(220).setDuration(200L).start();
         }
         else {
@@ -763,35 +801,28 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.activity_pdfviewer, menu);
 
-        shareMenuItem = menu.findItem(R.id.pdfviewer_share);
-        share = getResources().getDrawable(R.drawable.ic_social_share_white);
-        share.setColorFilter(getResources().getColor(R.color.lollipop_primary_color), PorterDuff.Mode.SRC_ATOP);
-        shareMenuItem.setIcon(share);
+        shareMenuItem = menu.findItem(R.id.pdf_viewer_share);
+        downloadMenuItem = menu.findItem(R.id.pdf_viewer_download);
+        chatMenuItem = menu.findItem(R.id.pdf_viewer_chat);
+        propertiesMenuItem = menu.findItem(R.id.pdf_viewer_properties);
+        getlinkMenuItem = menu.findItem(R.id.pdf_viewer_get_link);
+        renameMenuItem = menu.findItem(R.id.pdf_viewer_rename);
+        moveMenuItem = menu.findItem(R.id.pdf_viewer_move);
+        copyMenuItem = menu.findItem(R.id.pdf_viewer_copy);
+        moveToTrashMenuItem = menu.findItem(R.id.pdf_viewer_move_to_trash);
+        removeMenuItem = menu.findItem(R.id.pdf_viewer_remove);
+        removelinkMenuItem = menu.findItem(R.id.pdf_viewer_remove_link);
 
-        downloadMenuItem = menu.findItem(R.id.pdfviewer_download);
         if (isUrl){
             log("isURL");
             shareMenuItem.setVisible(false);
             downloadMenuItem.setVisible(true);
-            download = getResources().getDrawable(R.drawable.ic_download_white);
-            download.setColorFilter(getResources().getColor(R.color.lollipop_primary_color), PorterDuff.Mode.SRC_ATOP);
-
-            downloadMenuItem.setIcon(download);
         }
         else {
             log("NOT isURL");
             downloadMenuItem.setVisible(false);
         }
 
-        chatMenuItem = menu.findItem(R.id.pdfviewer_chat);
-        chat = getResources().getDrawable(R.drawable.ic_chat_white);
-        chat.setColorFilter(getResources().getColor(R.color.lollipop_primary_color), PorterDuff.Mode.SRC_ATOP);
-        chatMenuItem.setIcon(chat);
-
-        propertiesMenuItem = menu.findItem(R.id.pdfviewer_properties);
-        properties = getResources().getDrawable(R.drawable.info_ic_white);
-        properties.setColorFilter(getResources().getColor(R.color.lollipop_primary_color), PorterDuff.Mode.SRC_ATOP);
-        propertiesMenuItem.setIcon(properties);
 
         if (inside){
             propertiesMenuItem.setVisible(true);
@@ -822,15 +853,15 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
                 finish();
                 break;
             }
-            case R.id.pdfviewer_share: {
+            case R.id.pdf_viewer_share: {
                 intentToSendFile();
                 break;
             }
-            case R.id.pdfviewer_download: {
+            case R.id.pdf_viewer_download: {
                 downloadFile();
                 break;
             }
-            case R.id.pdfviewer_chat: {
+            case R.id.pdf_viewer_chat: {
                 long[] longArray = new long[1];
 
                 longArray[0] = handle;
@@ -840,7 +871,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
                 startActivityForResult(i, REQUEST_CODE_SELECT_CHAT);
                 break;
             }
-            case R.id.pdfviewer_properties: {
+            case R.id.pdf_viewer_properties: {
                 Intent i = new Intent(this, FileInfoActivityLollipop.class);
                 if (isOffLine){
                     i.putExtra("name", pdfFileName);
@@ -922,8 +953,9 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
                         setSupportActionBar(tB);
                         aB = getSupportActionBar();
                     }
-                    aB.setTitle(pdfFileName);
+                    aB.setTitle(" ");
                     setTitle(pdfFileName);
+                    fileNameTextView.setText(pdfFileName);
                     invalidateOptionsMenu();
 
                     if (megaApi == null){
@@ -1274,7 +1306,6 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
 
             if(countChat==errorSent+successSent){
                 if(successSent==countChat){
-                    freeColorFilter();
                     if(countChat==1){
                         long handle = request.getChatHandle();
                         MegaChatListItem chatItem = megaChatApi.getChatListItem(handle);
@@ -1310,23 +1341,6 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
     protected void onStop() {
         super.onStop();
         log("onStop");
-
-        freeColorFilter();
-    }
-
-    void freeColorFilter(){
-        if (chat != null) {
-            chat.setColorFilter(null);
-        }
-        if (download != null){
-            download.setColorFilter(null);
-        }
-        if (properties != null){
-            properties.setColorFilter(null);
-        }
-        if (share != null) {
-            share.setColorFilter(null);
-        }
     }
 
     @Override
@@ -1341,19 +1355,6 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
         log("onResume");
 
         updateFile();
-
-        if (chat != null) {
-            chat.setColorFilter(getResources().getColor(R.color.lollipop_primary_color), PorterDuff.Mode.SRC_ATOP);
-        }
-        if (download != null){
-            download.setColorFilter(getResources().getColor(R.color.lollipop_primary_color), PorterDuff.Mode.SRC_ATOP);
-        }
-        if (properties != null){
-            properties.setColorFilter(getResources().getColor(R.color.lollipop_primary_color), PorterDuff.Mode.SRC_ATOP);
-        }
-        if (share != null) {
-            share.setColorFilter(getResources().getColor(R.color.lollipop_primary_color), PorterDuff.Mode.SRC_ATOP);
-        }
     }
 
     @Override
@@ -1369,7 +1370,6 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
         if (megaApi != null) {
             megaApi.removeTransferListener(this);
         }
-        freeColorFilter();
 
         super.onDestroy();
     }
