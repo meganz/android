@@ -1622,6 +1622,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 					mediaIntent.putExtra("HANDLE", file.getHandle());
 					mediaIntent.putExtra("FILENAME", file.getName());
 					mediaIntent.putExtra("screenPosition", screenPosition);
+					mediaIntent.putExtra("adapterType", Constants.FOLDER_LINK_ADAPTER);
 					imageDrag = imageView;
 					String localPath = Util.getLocalFile(FolderLinkActivityLollipop.this, file.getName(), file.getSize(), downloadLocationDefaultPath);
 					if (localPath != null){
@@ -1647,7 +1648,8 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 						ArrayList<Long> handleList = new ArrayList<Long>();
 						handleList.add(nodes.get(position).getHandle());
 						onFileClick(handleList);
-			  		}					
+			  		}
+			  		overridePendingTransition(0,0);
 				}
 				else if (MimeTypeList.typeForName(nodes.get(position).getName()).isPdf()){
 					MegaNode file = nodes.get(position);

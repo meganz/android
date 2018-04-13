@@ -33,8 +33,10 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.Surface;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.view.WindowManager;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ImageView;
@@ -84,7 +86,14 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.dragger.DraggableView;
 import mega.privacy.android.app.components.dragger.ExitViewAnimator;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
+import mega.privacy.android.app.lollipop.managerSections.CameraUploadFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.FileBrowserFragmentLollipop;
+import mega.privacy.android.app.lollipop.managerSections.InboxFragmentLollipop;
+import mega.privacy.android.app.lollipop.managerSections.IncomingSharesFragmentLollipop;
+import mega.privacy.android.app.lollipop.managerSections.OfflineFragmentLollipop;
+import mega.privacy.android.app.lollipop.managerSections.OutgoingSharesFragmentLollipop;
+import mega.privacy.android.app.lollipop.managerSections.RubbishBinFragmentLollipop;
+import mega.privacy.android.app.lollipop.managerSections.SearchFragmentLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerActivity;
 import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption;
 import mega.privacy.android.app.utils.Constants;
@@ -106,6 +115,14 @@ import static android.graphics.Color.BLACK;
 import static android.graphics.Color.TRANSPARENT;
 
 public class AudioVideoPlayerLollipop extends PinActivityLollipop implements VideoRendererEventListener, MegaChatRequestListenerInterface, MegaTransferListenerInterface, AudioRendererEventListener, DraggableView.DraggableListener{
+
+    int[] screenPosition;
+    int mLeftDelta;
+    int mTopDelta;
+    float mWidthScale;
+    float mHeightScale;
+    int screenWidth;
+    int screenHeight;
 
     public static int REQUEST_CODE_SELECT_CHAT = 1005;
     public static int REQUEST_CODE_SELECT_LOCAL_FOLDER = 1004;
@@ -238,6 +255,8 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
         Display display = getWindowManager().getDefaultDisplay();
         outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
+        screenHeight = outMetrics.heightPixels;
+        screenWidth = outMetrics.widthPixels;
 
         appBarLayout = (AppBarLayout) findViewById(R.id.app_bar);
 
@@ -487,6 +506,117 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
         player.setVideoDebugListener(this);
         player.setAudioDebugListener(this);
         simpleExoPlayerView.showController();
+
+        if (savedInstanceState == null){
+            ViewTreeObserver observer = simpleExoPlayerView.getViewTreeObserver();
+            observer.addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
+                @Override
+                public boolean onPreDraw() {
+
+                    simpleExoPlayerView.getViewTreeObserver().removeOnPreDrawListener(this);
+                    int[] location = new int[2];
+                    simpleExoPlayerView.getLocationOnScreen(location);
+                    int[] getlocation = new int[2];
+                    getLocationOnScreen(getlocation);
+                    if (screenPosition != null){
+                        mLeftDelta = getlocation[0] - location[0];
+                        mTopDelta = getlocation[1] - location[1];
+
+                        mWidthScale = (float) screenPosition[2] / simpleExoPlayerView.getWidth();
+                        mHeightScale = (float) screenPosition[3] / simpleExoPlayerView.getHeight();
+                    }
+                    else {
+                        mLeftDelta = (screenWidth/2) - location[0];
+                        mTopDelta = (screenHeight/2) - location[1];
+
+                        mWidthScale = (float) (screenWidth/4) / simpleExoPlayerView.getWidth();
+                        mHeightScale = (float) (screenHeight/4) / simpleExoPlayerView.getHeight();
+                    }
+
+                    runEnterAnimation();
+
+                    return true;
+                }
+            });
+        }
+    }
+
+    void getLocationOnScreen(int[] location){
+        if (adapterType == Constants.RUBBISH_BIN_ADAPTER){
+            RubbishBinFragmentLollipop.imageDrag.getLocationOnScreen(location);
+        }
+        else if (adapterType == Constants.INBOX_ADAPTER){
+            InboxFragmentLollipop.imageDrag.getLocationOnScreen(location);
+        }
+        else if (adapterType == Constants.INCOMING_SHARES_ADAPTER){
+            IncomingSharesFragmentLollipop.imageDrag.getLocationOnScreen(location);
+        }
+        else if (adapterType == Constants.OUTGOING_SHARES_ADAPTER){
+            OutgoingSharesFragmentLollipop.imageDrag.getLocationOnScreen(location);
+        }
+        else if (adapterType == Constants.CONTACT_FILE_ADAPTER){
+            ContactFileListFragmentLollipop.imageDrag.getLocationOnScreen(location);
+        }
+        else if (adapterType == Constants.FOLDER_LINK_ADAPTER){
+            FolderLinkActivityLollipop.imageDrag.getLocationOnScreen(location);
+        }
+        else if (adapterType == Constants.SEARCH_ADAPTER){
+            SearchFragmentLollipop.imageDrag.getLocationOnScreen(location);
+        }
+        else if (adapterType == Constants.FILE_BROWSER_ADAPTER){
+            FileBrowserFragmentLollipop.imageDrag.getLocationOnScreen(location);
+        }
+        else if (adapterType == Constants.PHOTO_SYNC_ADAPTER || adapterType == Constants.SEARCH_BY_ADAPTER){
+            CameraUploadFragmentLollipop.imageDrag.getLocationOnScreen(location);
+        }
+        else if (adapterType == Constants.OFFLINE_ADAPTER){
+            OfflineFragmentLollipop.imageDrag.getLocationOnScreen(location);
+        }
+    }
+
+    public void runEnterAnimation() {
+        final long duration = 400;
+        if (aB != null && aB.isShowing()) {
+            if(tB != null) {
+                tB.animate().translationY(-220).setDuration(0)
+                        .withEndAction(new Runnable() {
+                            @Override
+                            public void run() {
+                                aB.hide();
+                            }
+                        }).start();
+                getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+            } else {
+                aB.hide();
+            }
+        }
+        containerAudioVideoPlayer.setBackgroundColor(TRANSPARENT);
+        containerAudioVideoPlayer.setElevation(0);
+        playerLayout.setBackgroundColor(TRANSPARENT);
+        playerLayout.setElevation(0);
+        appBarLayout.setBackgroundColor(TRANSPARENT);
+        appBarLayout.setElevation(0);
+
+        simpleExoPlayerView.setPivotX(0);
+        simpleExoPlayerView.setPivotY(0);
+        simpleExoPlayerView.setScaleX(mWidthScale);
+        simpleExoPlayerView.setScaleY(mHeightScale);
+        simpleExoPlayerView.setTranslationX(mLeftDelta);
+        simpleExoPlayerView.setPivotY(mTopDelta);
+
+        ivShadow.setAlpha(0);
+
+        simpleExoPlayerView.animate().setDuration(duration).scaleX(1).scaleY(1).translationX(0).translationY(0).setInterpolator(new DecelerateInterpolator()).withEndAction(new Runnable() {
+            @Override
+            public void run() {
+                showActionStatusBar();
+                containerAudioVideoPlayer.setBackgroundColor(BLACK);
+                playerLayout.setBackgroundColor(BLACK);
+                appBarLayout.setBackgroundColor(BLACK);
+            }
+        });
+
+        ivShadow.animate().setDuration(duration).alpha(1);
     }
 
     @Override
@@ -1118,7 +1248,40 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        FileBrowserFragmentLollipop.imageDrag.setVisibility(View.VISIBLE);
+        setImageDragVisibility(View.VISIBLE);
+    }
+
+    public void setImageDragVisibility(int visibility){
+        if (adapterType == Constants.RUBBISH_BIN_ADAPTER){
+            RubbishBinFragmentLollipop.imageDrag.setVisibility(visibility);
+        }
+        else if (adapterType == Constants.INBOX_ADAPTER){
+            InboxFragmentLollipop.imageDrag.setVisibility(visibility);
+        }
+        else if (adapterType == Constants.INCOMING_SHARES_ADAPTER){
+            IncomingSharesFragmentLollipop.imageDrag.setVisibility(visibility);
+        }
+        else if (adapterType == Constants.OUTGOING_SHARES_ADAPTER){
+            OutgoingSharesFragmentLollipop.imageDrag.setVisibility(visibility);
+        }
+        else if (adapterType == Constants.CONTACT_FILE_ADAPTER){
+            ContactFileListFragmentLollipop.imageDrag.setVisibility(visibility);
+        }
+        else if (adapterType == Constants.FOLDER_LINK_ADAPTER){
+            FolderLinkActivityLollipop.imageDrag.setVisibility(visibility);
+        }
+        else if (adapterType == Constants.SEARCH_ADAPTER){
+            SearchFragmentLollipop.imageDrag.setVisibility(visibility);
+        }
+        else if (adapterType == Constants.FILE_BROWSER_ADAPTER){
+            FileBrowserFragmentLollipop.imageDrag.setVisibility(visibility);
+        }
+        else if (adapterType == Constants.PHOTO_SYNC_ADAPTER ||adapterType == Constants.SEARCH_BY_ADAPTER) {
+            CameraUploadFragmentLollipop.imageDrag.setVisibility(visibility);
+        }
+        else if (adapterType == Constants.OFFLINE_ADAPTER) {
+            OfflineFragmentLollipop.imageDrag.setVisibility(visibility);
+        }
     }
 
     @Override
@@ -1132,7 +1295,8 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
         RelativeLayout container = new RelativeLayout(this);
         draggableView = new DraggableView(this);
         if (getIntent() != null) {
-            draggableView.setScreenPosition(getIntent().getIntArrayExtra("screenPosition"));
+            screenPosition = getIntent().getIntArrayExtra("screenPosition");
+            draggableView.setScreenPosition(screenPosition);
         }
         draggableView.setDraggableListener(this);
         ivShadow = new ImageView(this);
@@ -1169,7 +1333,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
             appBarLayout.setBackgroundColor(TRANSPARENT);
             appBarLayout.setElevation(0);
             draggableView.setCurrentView(simpleExoPlayerView.getVideoSurfaceView());
-            FileBrowserFragmentLollipop.imageDrag.setVisibility(View.GONE);
+            setImageDragVisibility(View.GONE);
         }
         else {
             handler.postDelayed(new Runnable() {

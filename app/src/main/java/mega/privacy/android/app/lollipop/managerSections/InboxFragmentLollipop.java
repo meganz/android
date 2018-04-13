@@ -551,7 +551,7 @@ public class InboxFragmentLollipop extends Fragment{
 					}
 					intent.putExtra("orderGetChildren", ((ManagerActivityLollipop)context).orderCloud);
 					intent.putExtra("screenPosition", screenPosition);
-					startActivity(intent);
+					context.startActivity(intent);
 					((ManagerActivityLollipop) context).overridePendingTransition(0,0);
 					imageDrag = imageView;
 				}
@@ -589,6 +589,7 @@ public class InboxFragmentLollipop extends Fragment{
 					mediaIntent.putExtra("screenPosition", screenPosition);
 					mediaIntent.putExtra("HANDLE", file.getHandle());
 					mediaIntent.putExtra("FILENAME", file.getName());
+					mediaIntent.putExtra("adapterType", Constants.INBOX_ADAPTER);
 					imageDrag = imageView;
 					String localPath = Util.getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
 					if (localPath != null){
@@ -606,7 +607,7 @@ public class InboxFragmentLollipop extends Fragment{
 						mediaIntent.setDataAndType(Uri.parse(url), mimeType);
 					}
 					if (MegaApiUtils.isIntentAvailable(context, mediaIntent)){
-						startActivity(mediaIntent);
+						context.startActivity(mediaIntent);
 					}
 					else{
 						Toast.makeText(context, context.getResources().getString(R.string.intent_not_available), Toast.LENGTH_LONG).show();
@@ -616,6 +617,7 @@ public class InboxFragmentLollipop extends Fragment{
 						NodeController nC = new NodeController(context);
 						nC.prepareForDownload(handleList);
 					}
+					((ManagerActivityLollipop) context).overridePendingTransition(0,0);
 				}else if (MimeTypeList.typeForName(nodes.get(position).getName()).isPdf()){
 					MegaNode file = nodes.get(position);
 

@@ -789,7 +789,7 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 					intent.putExtra("orderGetChildren", ((ManagerActivityLollipop)context).orderOthers);
 					intent.putExtra("fromShared", true);
 					intent.putExtra("screenPosition", screenPosition);
-					startActivity(intent);
+					context.startActivity(intent);
 					((ManagerActivityLollipop) context).overridePendingTransition(0,0);
 					imageDrag = imageView;
 				}
@@ -825,6 +825,7 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 						mediaIntent = new Intent(context, AudioVideoPlayerLollipop.class);
 					}
 					mediaIntent.putExtra("screenPosition", screenPosition);
+					mediaIntent.putExtra("adapterType", Constants.INCOMING_SHARES_ADAPTER);
 					mediaIntent.putExtra("HANDLE", file.getHandle());
 					mediaIntent.putExtra("FILENAME", file.getName());
 					imageDrag = imageView;
@@ -844,7 +845,7 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 						mediaIntent.setDataAndType(Uri.parse(url), mimeType);
 					}
 			  		if (MegaApiUtils.isIntentAvailable(context, mediaIntent)){
-			  			startActivity(mediaIntent);
+			  			context.startActivity(mediaIntent);
 			  		}
 			  		else{
 			  			Toast.makeText(context, getResources().getString(R.string.intent_not_available), Toast.LENGTH_LONG).show();
@@ -854,6 +855,7 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 						NodeController nC = new NodeController(context);
 						nC.prepareForDownload(handleList);
 					}
+					((ManagerActivityLollipop) context).overridePendingTransition(0,0);
 				}else if (MimeTypeList.typeForName(nodes.get(position).getName()).isPdf()){
 					MegaNode file = nodes.get(position);
 

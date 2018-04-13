@@ -1131,6 +1131,18 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
                         Intent mediaIntent = new Intent(context, AudioVideoPlayerLollipop.class);
                         mediaIntent.putExtra("HANDLE", file.getHandle());
                         mediaIntent.putExtra("FILENAME", file.getName());
+                        mediaIntent.putExtra("screenPosition", screenPosition);
+                        if(((ManagerActivityLollipop)context).isFirstNavigationLevel() == true){
+                            mediaIntent.putExtra("adapterType", Constants.PHOTO_SYNC_ADAPTER);
+
+                        }else{
+                            mediaIntent.putExtra("adapterType", Constants.SEARCH_BY_ADAPTER);
+                            long[] arrayHandles = new long[nodes.size()];
+                            for(int i = 0; i < nodes.size(); i++) {
+                                arrayHandles[i] = nodes.get(i).getHandle();
+                            }
+                            mediaIntent.putExtra("handlesNodesSearch",arrayHandles);
+                        }
                         String localPath = Util.getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
                         if (localPath != null){
                             File mediaFile = new File(localPath);
@@ -1156,6 +1168,8 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
                             NodeController nC = new NodeController(context);
                             nC.prepareForDownload(handleList);
                         }
+                        ((ManagerActivityLollipop) context).overridePendingTransition(0,0);
+                        CameraUploadFragmentLollipop.imageDrag = imageView;
                     }
                     else if (MimeTypeList.typeForName(n.getName()).isPdf()){
                         MegaNode file = n;

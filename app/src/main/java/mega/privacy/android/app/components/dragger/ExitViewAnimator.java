@@ -9,6 +9,7 @@ import android.view.SurfaceView;
 import android.view.View;
 
 import mega.privacy.android.app.components.TouchImageView;
+import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.utils.Util;
 
@@ -32,6 +33,8 @@ public class ExitViewAnimator<D extends DraggableView> extends ReturnOriginViewA
         }
         else {
             surfaceView = (SurfaceView) currentView;
+            screenPosition[0] += screenPosition[2] / 2;
+            screenPosition[1] += screenPosition[3] / 2;
             scaleX = ((float)screenPosition[2]) / ((float)surfaceView.getWidth());
             scaleY = ((float)screenPosition[3]) / ((float)surfaceView.getHeight());
             log("Scale: "+scaleX+" "+scaleY+" dimensions: "+surfaceView.getWidth()+" "+surfaceView.getHeight()+ " position: "+screenPosition[2]+" "+screenPosition[3]);
@@ -70,6 +73,9 @@ public class ExitViewAnimator<D extends DraggableView> extends ReturnOriginViewA
                             if (activity instanceof FullScreenImageViewerLollipop){
                                 ((FullScreenImageViewerLollipop) activity).setImageDragVisibility(View.VISIBLE);
                             }
+                            else   {
+                                ((AudioVideoPlayerLollipop) activity).setImageDragVisibility(View.VISIBLE);
+                            }
                         }
                     });
         }
@@ -105,6 +111,9 @@ public class ExitViewAnimator<D extends DraggableView> extends ReturnOriginViewA
                             activity.overridePendingTransition(0, android.R.anim.fade_out);
                             if (activity instanceof FullScreenImageViewerLollipop){
                                 ((FullScreenImageViewerLollipop) activity).setImageDragVisibility(View.VISIBLE);
+                            }
+                            else   {
+                                ((AudioVideoPlayerLollipop) activity).setImageDragVisibility(View.VISIBLE);
                             }
                         }
                     });
