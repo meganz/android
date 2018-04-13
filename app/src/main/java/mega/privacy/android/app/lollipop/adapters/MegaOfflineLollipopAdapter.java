@@ -923,8 +923,8 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 				}
 				imageView.getLocationOnScreen(screenPosition);
 				int[] dimens = new int[4];
-				dimens[0] = (imageView.getWidth() / 2) + screenPosition[0];
-				dimens[1] = (imageView.getHeight() / 2) + screenPosition[1];
+				dimens[0] = screenPosition[0];
+				dimens[1] = screenPosition[1];
 				dimens[2] = imageView.getWidth();
 				dimens[3] = imageView.getHeight();
 				fragment.itemClick(currentPosition, dimens, imageView);

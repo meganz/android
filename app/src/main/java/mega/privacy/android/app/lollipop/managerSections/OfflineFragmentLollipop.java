@@ -1103,6 +1103,8 @@ public class OfflineFragmentLollipop extends Fragment{
 						}
 						videoIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 						startActivity(videoIntent);
+						((ManagerActivityLollipop) context).overridePendingTransition(0,0);
+						imageDrag = imageView;
 					}
 					else if (MimeTypeList.typeForName(currentFile.getName()).isAudio()) {
 						log("Audio file");
@@ -1122,6 +1124,8 @@ public class OfflineFragmentLollipop extends Fragment{
 						}
 						audioIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 						startActivity(audioIntent);
+						((ManagerActivityLollipop) context).overridePendingTransition(0,0);
+						imageDrag = imageView;
           			}
 					else if (MimeTypeList.typeForName(currentFile.getName()).isPdf()){
 						log("Pdf file");

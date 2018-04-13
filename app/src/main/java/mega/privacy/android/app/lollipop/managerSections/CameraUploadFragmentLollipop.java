@@ -1641,24 +1641,6 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 						}
 						else if (MimeTypeList.typeForName(psHMegaNode.getName()).isVideo()){
 
-							if (megaApi.httpServerIsRunning() == 0) {
-								megaApi.httpServerStart();
-							}
-
-							ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
-							ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
-							activityManager.getMemoryInfo(mi);
-
-							if(mi.totalMem>Constants.BUFFER_COMP){
-								log("Total mem: "+mi.totalMem+" allocate 32 MB");
-								megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
-							}
-							else{
-								log("Total mem: "+mi.totalMem+" allocate 16 MB");
-								megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
-							}
-
-							String url = megaApi.httpServerGetLocalLink(psHMegaNode);
 							String mimeType = MimeTypeList.typeForName(psHMegaNode.getName()).getType();
 							log("FILENAME: " + psHMegaNode.getName());
 					  		
@@ -1694,6 +1676,24 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 								mediaIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 							}
 							else {
+								if (megaApi.httpServerIsRunning() == 0) {
+									megaApi.httpServerStart();
+								}
+
+								ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
+								ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+								activityManager.getMemoryInfo(mi);
+
+								if(mi.totalMem>Constants.BUFFER_COMP){
+									log("Total mem: "+mi.totalMem+" allocate 32 MB");
+									megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
+								}
+								else{
+									log("Total mem: "+mi.totalMem+" allocate 16 MB");
+									megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
+								}
+
+								String url = megaApi.httpServerGetLocalLink(psHMegaNode);
 								mediaIntent.setDataAndType(Uri.parse(url), mimeType);
 							}
 					  		if (MegaApiUtils.isIntentAvailable(context, mediaIntent)){
