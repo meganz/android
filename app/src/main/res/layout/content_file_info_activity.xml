@@ -162,7 +162,6 @@
                     android:id="@+id/file_properties_text_number_versions"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/number_of_versions"
                     android:textAllCaps="true"
                     android:textSize="14sp"
                     android:stateListAnimator="@null"

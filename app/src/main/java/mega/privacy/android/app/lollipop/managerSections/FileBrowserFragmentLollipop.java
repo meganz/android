@@ -248,6 +248,8 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 						break;
 					}
 					((ManagerActivityLollipop) context).showGetLinkActivity(documents.get(0).getHandle());
+					clearSelections();
+					hideMultipleSelect();
 					break;
 				}
 				case R.id.cab_menu_share_link_remove:{
@@ -258,6 +260,8 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 						break;
 					}
 					((ManagerActivityLollipop) context).showConfirmationRemovePublicLink(documents.get(0));
+					clearSelections();
+					hideMultipleSelect();
 
 					break;
 				}
@@ -269,6 +273,8 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 						break;
 					}
 					((ManagerActivityLollipop) context).showGetLinkActivity(documents.get(0).getHandle());
+					clearSelections();
+					hideMultipleSelect();
 					break;
 				}
 				case R.id.cab_menu_send_to_chat:{

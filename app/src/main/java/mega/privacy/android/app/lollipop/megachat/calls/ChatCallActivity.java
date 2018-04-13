@@ -2,8 +2,6 @@ package mega.privacy.android.app.lollipop.megachat.calls;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -25,7 +23,6 @@ import android.media.MediaPlayer;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.media.ToneGenerator;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -36,7 +33,6 @@ import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -79,8 +75,8 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.OnSwipeTouchListener;
 import mega.privacy.android.app.components.RoundedImageView;
+import mega.privacy.android.app.fcm.AdvancedNotificationBuilder;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.listeners.UserAvatarListener;
 import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
 import mega.privacy.android.app.utils.Constants;
@@ -126,12 +122,16 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
     ViewGroup parent;
     ViewGroup parentFS;
 
-    boolean flagContactAvatar;
+    // flagMyAvatar if true - small avatar circle is contact's avatar
+    // flagMyAvatar if false - small avatar circle is my avatar
     boolean flagMyAvatar;
+
+    // flagContactAvatar if true - big avatar circle is contact's avatar
+    // flagContactAvatar if false - big avatar circle is my avatar
+    boolean flagContactAvatar;
 
     long chatId;
     boolean callInitiator;
-    long callId;
     MegaChatRoom chat;
     MegaChatCall callChat;
     private MegaApiAndroid megaApi = null;
@@ -338,9 +338,11 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
             }
             else{
                 log("New intent to the activity with a new chatId");
+                //Check the new call if in progress
                 chatId = newChatId;
                 chat = megaChatApi.getChatRoom(chatId);
                 callChat = megaChatApi.getChatCall(chatId);
+                callInitiator = false;
 
                 setCallInfo();
                 updateScreenStatusInProgress();
@@ -1113,9 +1115,16 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                         rtcAudioManager.stop();
                         MegaApplication.activityPaused();
 
-                        if((call.getTermCode()==MegaChatCall.TERM_CODE_ANSWER_TIMEOUT) && (!callInitiator)){
-                            showMissedCallNotification();
+                        try{
+                            if((call.getTermCode()==MegaChatCall.TERM_CODE_ANSWER_TIMEOUT) && (!callInitiator)){
+                                AdvancedNotificationBuilder notificationBuilder = AdvancedNotificationBuilder.newInstance(this, megaApi, megaChatApi);
+                                notificationBuilder.showMissedCallNotification(call);
+                            }
                         }
+                        catch(Exception e){
+                            log("EXCEPTION when showing missed call notification: "+e.getMessage());
+                        }
+
                         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                             super.finishAndRemoveTask();
                         }
@@ -1206,84 +1215,6 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
         toneGenerator = null;
         timer = null;
         ringerTimer = null;
-    }
-
-    public void showMissedCallNotification() {
-        log("showMissedCallNotification");
-
-        String notificationContent = chat.getPeerFullname(0);
-
-        int notificationId = Constants.NOTIFICATION_MISSED_CALL;
-
-        Intent intent = new Intent(context, ManagerActivityLollipop.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        intent.setAction(Constants.ACTION_CHAT_NOTIFICATION_MESSAGE);
-        intent.putExtra("CHAT_ID", chatId);
-        PendingIntent pendingIntent = PendingIntent.getActivity(context, (int)chatId , intent, PendingIntent.FLAG_ONE_SHOT);
-
-        Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
-                .setSmallIcon(R.drawable.ic_stat_notify_download)
-                .setContentTitle(getString(R.string.missed_call_notification_title))
-                .setContentText(notificationContent)
-                .setStyle(new NotificationCompat.BigTextStyle().bigText(notificationContent))
-                .setAutoCancel(true)
-                .setSound(defaultSoundUri)
-                .setColor(ContextCompat.getColor(this,R.color.mega))
-                .setContentIntent(pendingIntent);
-
-        if(chat.getPeerEmail(0)!=null){
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
-                Bitmap largeIcon = setUserAvatar();
-                if(largeIcon!=null){
-                    notificationBuilder.setLargeIcon(largeIcon);
-                }
-            }
-        }
-
-        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-
-        notificationManager.notify(notificationId, notificationBuilder.build());
-    }
-
-    public Bitmap setUserAvatar(){
-        log("setUserAvatar");
-
-        if(chat.isGroup()){
-            return createDefaultAvatar();
-        }
-        else{
-
-            File avatar = null;
-            if (context.getExternalCacheDir() != null){
-                avatar = new File(context.getExternalCacheDir().getAbsolutePath(), chat.getPeerEmail(0) + ".jpg");
-            }
-            else{
-                avatar = new File(context.getCacheDir().getAbsolutePath(), chat.getPeerEmail(0) + ".jpg");
-            }
-            Bitmap bitmap = null;
-            if (avatar.exists()){
-                if (avatar.length() > 0){
-                    BitmapFactory.Options bOpts = new BitmapFactory.Options();
-                    bOpts.inPurgeable = true;
-                    bOpts.inInputShareable = true;
-                    bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
-                    if (bitmap == null) {
-                        return createDefaultAvatar();
-                    }
-                    else{
-                        return Util.getCircleBitmap(bitmap);
-                    }
-                }
-                else{
-                    return createDefaultAvatar();
-                }
-            }
-            else{
-                return createDefaultAvatar();
-            }
-        }
     }
 
     public Bitmap createDefaultAvatar(){
