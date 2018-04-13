@@ -39,6 +39,7 @@
     -->
     <string name="general_loading" context="state previous to import a file">Chargement</string>
     <string name="general_importing" context="state while importing the file">Importation</string>
+    <string name="general_forwarding" context="state while importing the file">Forwarding</string>
     <string name="general_import" context="Import button. When the user clicks this button the file will be imported to his account.">Importer</string>
     <string name="general_storage" context="Text listed before the amount of storage a user gets with a certain package. For example: &quot;1TB Storage&quot;.">Espace de stockage</string>
     <string name="general_bandwidth" context="Text listed before the amount of bandwidth a user gets with a certain package. For example: &quot;8TB Bandwidth&quot;. Can also be translated as data transfer.">Quota de transfert</string>
@@ -198,7 +199,7 @@
     <string name="tour_access_text">Disposez d\'un accès entièrement chiffré n\'importe où, n\'importe quand.</string>
 
     <string name="create_account_text" context="button that allows the user to create an account">Créer un compte</string>
-    <string name="name_text" context="Name of the user">Prénom</string>
+    <string name="name_text" context="Name of the user">Nom</string>
     <string name="lastname_text" context="Last name of the user">Nom de famille</string>
     <string name="tos" context="text placed on the checkbox of acceptation of the Terms of Service">J\'accepte les [A]conditions générales d\'utilisation[/A] de MEGA</string>
     <string name="already_account" context="Does the user already have a MEGA account">Avez-vous un compte ?</string>
@@ -300,7 +301,7 @@
 	-->
 	<string name="contacts_explorer_list_empty_text" context="Add new contacts before sharing.">Ajouter un nouveau contact pour partager</string>
 	
-	<string name="error_not_enough_free_space" context="Error message">Pas assez d\'espace libre</string>
+	<string name="error_not_enough_free_space" context="Error message">Not enough free space on your device</string>
 
 	<string name="option_link_without_key" context="Alert Dialog to get link">Lien sans clé</string>
 	<string name="option_decryption_key" context="Alert Dialog to get link">Clé de déchiffrement</string>
@@ -414,7 +415,7 @@
     -->
     <string name="context_contact_invitation_deleted" context="success message when removing a contact request">La demande a été supprimée</string>
     <string name="context_contact_invitation_resent" context="success message when reinvite a contact">Demande renvoyée</string>
-    <string name="context_contact_request_sent" context="success message when sending a contact request">Request correctly sent to %s. The status can be consulted in the Sent Requests tab.</string>
+    <string name="context_contact_request_sent" context="success message when sending a contact request">La demande a été envoyée avec succès %s. L\'état peut être consulté dans l\'onglet Demandes envoyées.</string>
 
     <string name="context_contact_removed" context="success message when removing a contact">Contact supprimé</string>
     <string name="context_contact_not_removed" context="error message">Erreur. Le contact n\'a pas été supprimé</string>
@@ -555,7 +556,7 @@
     <string name="warning_out_space" context="Warning in Cloud drive when the user is runningut of space">You\'re running out of space!\n Do you want to upgrade your account?</string>
     -->
     <!--<string name="overquota_alert_title" context="Title dialog overquota error">Storage over quota</string>-->
-    <string name="overquota_alert_text" context="Dialog text overquota error">You have exceeded your storage limit. Would you like to upgrade your account?</string>
+    <string name="overquota_alert_text" context="Dialog text overquota error">Vous avez dépassé votre limite de stockage. Souhaitez-vous surclasser votre compte ?</string>
 
     <!--
     <string name="op_not_allowed" context="Dialod text overquota error">Operation not allowed</string>
@@ -779,7 +780,7 @@
     -->
 
     <string name="sortby_owner_mail" context="category in sort by action">Courriel du propriétaire</string>
-    <string name="sortby_name" context="category in sort by action">Prénom</string>
+    <string name="sortby_name" context="category in sort by action">Nom</string>
     <string name="sortby_name_ascending" context="sort files alphabetically ascending">Croissant</string>
     <string name="sortby_name_descending" context="sort files alphabetically descending">Décroissant</string>
 
@@ -830,7 +831,7 @@
     <string name="settings_disable_logs" context="Confirmation message when disabling logs in the app">La journalisation est maintenant désactivée</string>
 
     <string name="search_open_location" context="Option in the sliding panel to open the folder which contains the file selected after performing a search">Ouvrir l\'emplacement</string>
-    <string name="servers_busy" context="message when a request cannot be performed because the servers are busy">Les serveurs sont trop occupés. Veuillez patienter.</string>
+    <string name="servers_busy" context="message when a request cannot be performed because the servers are busy">This process is taking longer than expected. Please wait.</string>
 
     <string name="my_account_free" context="Label in My Account section to show user account type">Compte gratuit</string>
     <string name="my_account_prolite" context="Label in My Account section to show user account type">Compte Léger</string>
@@ -1063,7 +1064,7 @@
     <string name="remove_contact_shared_folder" context="Message to confirm if the user wants to delete a contact from a shared folder">Le contact %s sera retiré du dossier partagé.</string>
     <string name="remove_multiple_contacts_shared_folder" context="Message to confirm if the user wants to delete a multiple contacts from a shared folder">%d contacts seront retirés du dossier partagé.</string>
 
-    <string name="number_correctly_removed_from_shared" context="success message when removing a contact from a shared folder">%d contacts removed correctly from the shared folder</string>
+    <string name="number_correctly_removed_from_shared" context="success message when removing a contact from a shared folder">%d contacts ont été supprimés avec succès du dossier partagé</string>
     <string name="number_incorrectly_removed_from_shared" context="success message when removing a contact from a shared folder">&#160;et %d contacts n\'ont pas été retirés avec succès</string>
 
     <string name="contacts_list_empty_text_loading" context="Message shown while the contact list from the device is being read and then shown to the user">Chargement des contacts du téléphone&#8230;</string>
@@ -1093,7 +1094,7 @@
     -->
 
     <string name="clear_history_success" context="Message show when the history of a chat has been successfully deleted">L\'historique de la conversation a été effacé</string>
-    <string name="clear_history_error" context="Message show when the history of a chat hasn't been successfully deleted">Error. The history of the chat has not been cleared correctly</string>
+    <string name="clear_history_error" context="Message show when the history of a chat hasn't been successfully deleted">Erreur. L\'historique de la conversation n\'a pas été effacé correctement</string>
 
     <string name="add_participants_menu_item" context="Menu item to add participants to a chat">Ajouter des participants</string>
     <string name="remove_participant_menu_item" context="Menu item to remove a participants from a chat">Supprimer un participant</string>
@@ -1118,7 +1119,6 @@
     <string name="invalid_status" context="Info label about the status of the user">Aucune connexion</string>
 
     <string name="text_deleted_message" context="Text shown when a message has been deleted in the chat">Ce message a été supprimé</string>
-    <string name="history_cleared_message" context="Text shown when the chat history was cleared by me">L\'historique de la conversation a été effacé</string>
     <string name="text_deleted_message_by" context="Text shown when a message has been deleted in the chat">[A]Ce message a été supprimé par [/A][B]%1$s[/B]</string>
 
     <string name="confirmation_delete_several_messages" context="Confirmation before deleting messages">Supprimer les messages ?</string>
@@ -1156,7 +1156,7 @@
 
     <string name="add_participant_error_already_exists" context="Message show when a participant hasn't been successfully invited to a group chat">Ce participant fait déjà partie de cette conversation de groupe</string>
 
-    <string name="number_correctly_add_participant" context="success message when inviting multiple contacts to a group chat">%d participants were correctly invited</string>
+    <string name="number_correctly_add_participant" context="success message when inviting multiple contacts to a group chat">%d participants ont été invités avec succès</string>
     <string name="number_no_add_participant_request" context="error message when inviting multiple contacts to a group chat">%1$d participants ont été invités avec succès, mais %2$d participants n\'ont pas été invités.</string>
 
     <string name="message_permissions_changed" context="chat message when the permissions for a user has been changed">[A]%1$s[/A][B] a été changé en [/B][C]%2$s[/C][D] par [/D][E]%3$s[/E]</string>
@@ -1204,6 +1204,7 @@
     -->
 
     <string name="non_format_text_deleted_message_by" context="Text shown when a message has been deleted in the chat">Ce message a été supprimé par %1$s</string>
+    <string name="history_cleared_message" context="Text shown when the chat history was cleared by me">L\'historique de la conversation a été effacé</string>
     <string name="non_format_history_cleared_by" context="Text shown when the chat history was cleared by someone">L\'historique de la conversation a été effacé par %1$s</string>
 
     <!--
@@ -1220,7 +1221,7 @@
     <string name="messages_copied_clipboard" context="success alert when the user copy some messages to the clipboard">Copié vers le presse-papiers</string>
 
     <string name="chat_error_open_title" context="Title of the error dialog when opening a chat">Erreur de conversation !</string>
-    <string name="chat_error_open_message" context="Message of the error dialog when opening a chat">The chat could not be opened correctly</string>
+    <string name="chat_error_open_message" context="Message of the error dialog when opening a chat">Il n\'a pas été possible d\'ouvrir la discussion correctement</string>
 
     <string name="menu_choose_contact" context="Menu option to add a contact to your contact list.">Choisir un contact</string>
 
@@ -1452,7 +1453,7 @@
     <string name="error_deleting_user_avatar" context="Message when an error ocurred when deleting an user avatar">Erreur de suppression de l\'image de profil</string>
 
     <string name="error_changing_user_attributes" context="Message when an error ocurred when changing an user attribute">Une erreur est survenue lors du changement de nom</string>
-    <string name="success_changing_user_attributes" context="Message when an user attribute has been changed successfully">Your name has been correctly updated</string>
+    <string name="success_changing_user_attributes" context="Message when an user attribute has been changed successfully">Votre nom a été mis à jour avec succès</string>
 
     <string name="add_participant_success" context="Message show when a participant has been successfully invited to a group chat">Le participant a été ajouté</string>
     <string name="add_participant_error" context="Message show when a participant hasn't been successfully invited to a group chat">Erreur. Le participant n\'a pas été ajouté</string>
@@ -1467,7 +1468,7 @@
     <string name="attachment_upload_panel_photo">De l\'appareil</string>
 
     <string name="delete_account" context="Button and title of dialog shown when the user wants to delete permanently his account">Annuler le compte</string>
-    <string name="delete_account_text" context="Text shown in the alert dialog to confirm the cancellation of an account">If you cancel your account you will not be able to access your account data, your MEGA contacts or conversations.[Br]You will not be able to undo this action.</string>
+    <string name="delete_account_text" context="Text shown in the alert dialog to confirm the cancellation of an account">Si vous annulez votre compte, vous ne pourrez ni accéder aux données de votre compte, ni à vos contacts, ni à vos discussions MEGA.\nVous ne pourrez pas annuler cette action.</string>
     <string name="delete_button" context="Button in My Account section to confirm the account deletion">Supprimer</string>
 
     <string name="file_properties_info_info_file">Infos</string>
@@ -1618,7 +1619,7 @@
 
     <string name="audio_play" context="Label shown when audio file is playing">Fichier audio</string>
 
-    <string name="corrupt_pdf_dialog_text" context="when open PDF Viewer, the pdf that it try to open is damaged or does not exist">Error. The pdf file is corrupted or does not exist.</string>
+    <string name="corrupt_pdf_dialog_text" context="when open PDF Viewer, the pdf that it try to open is damaged or does not exist">Erreur. Le fichier PDF est corrompu ou n\'existe pas.</string>
 
     <string name="user_account_feedback" context="Label to include info of the user email in the feedback form">Compte utilisateur</string>
 
@@ -1638,43 +1639,77 @@
     <string name="rate_the_app_panel" context="Label to show rate the app">Oui, évaluer l\'appli</string>
     <string name="send_feedback_panel" context="Label to show send feedback">Non, envoyer une rétroaction</string>
 
-    <string name="link_advanced_options" context="title of the section advanced options on the get link screen">Advanced options</string>
+    <string name="link_advanced_options" context="title of the section advanced options on the get link screen">Options avancées</string>
 
-    <string name="no_contacts_permissions" context="Title of the section to invite contacts if the user has denied the contacts permmissions">No contacts permission granted</string>
+    <string name="no_contacts_permissions" context="Title of the section to invite contacts if the user has denied the contacts permmissions">Aucune permission de contact accordée</string>
 
-    <string name="footnote_achievements" context="Footnote to clarify the storage space is subject to the achievement program">* Subject to your participation in our achievement program</string>
+    <string name="footnote_achievements" context="Footnote to clarify the storage space is subject to the achievement program">* Sous réserve de votre participation à notre programme d\'objectifs</string>
 
-    <string name="external_play" context="Item menu option to reproduce audio or video in external reproductors">Open with</string>
+    <string name="choose_qr_option_panel" context="Option of the sliding panel to go to QR code section">Mon code QR</string>
+    <string name="section_qr_code" context="Title of the screen that shows the options to the QR code">Code QR</string>
+    <string name="action_reset_qr" context="Option in menu of section  My QR code to reset the QR code">Reset QR code</string>
+    <string name="action_delete_qr" context="Option in menu of section  My QR code to delete the QR code">Delete QR code</string>
+    <string name="save_cloud_drive" context="Option shown in QR code bottom sheet dialog to save QR code in Cloud Drive">To Cloud Drive</string>
+    <string name="save_file_system" context="Option shown in QR code bottom sheet dialog to save QR code in File System">To File System</string>
+    <string name="section_my_code" context="Title of QR code section">MY CODE</string>
+    <string name="section_scan_code" context="Title of QR code scan section">SCAN CODE</string>
+    <string name="settings_qrcode_autoaccept" context="Title of QR code settings that permits or not contacts that scan my QR code will be automatically added to my contact list">Accepter automatiquement</string>
+    <string name="setting_subtitle_qrcode_autoccept" context="Subtitle of QR code settings auto-accept">Contacts that scan your QR code will be automatically added to your contact list</string>
+    <string name="setting_subtitle_qrcode_reset" context="Subtitle of QR code settings that reset the code">Previous QR code will no longer be valid</string>
+    <string name="qrcode_link_copied" context="Text shown when it has been copied the QR code link">Link copied to the clipboard</string>
+    <string name="qrcode_reset_successfully" context="Text shown when it has been reseted the QR code successfully">QR code successfully reset</string>
+    <string name="qrcode_delete_successfully" context="Text shown when it has been deleted the QR code successfully">QR code successfully delete</string>
+    <string name="qrcode_reset_not_successfully" context="Text shown when it has not been reseted the QR code successfully">QR code not reset due to any error. Please, try again.</string>
+    <string name="qrcode_delete_not_successfully" context="Text shown when it has not been delete the QR code successfully">QR code not delete due to any error. Please, try again.</string>
+    <string name="invite_sent" context="Title of dialog shown when a contact request has been sent with QR code">Invite sent</string>
+    <string name="invite_sent_text" context="Text of dialog shown when a contact request has been sent with QR code">The user %s has been invited and will appear in your contact list once accepted.</string>
+    <string name="error_share_qr" context="Text shown when it tries to share the QR and occurs an error to process the action">An error ocur trying to share the QR file. Maybe the file does not exists. Try ir later.</string>
+    <string name="error_upload_qr" context="Text shown when it tries to upload to Cloud Drive the QR and occurs an error to process the action">An error occur trying to upload the QR file. Maybe the file does not exists. Try ir later.</string>
+    <string name="error_download_qr" context="Text shown when it tries to download to File System the QR and occurs an error to process the action">An error occur trying to download the QR file. Maybe the file does not exists. Try ir later.</string>
+    <string name="success_download_qr" context="Text shown when it tries to download to File System the QR and the action has success">The QR Code has been downloaded successfully to %s</string>
+    <string name="invite_not_sent" context="Title of dialog shown when a contact request has not been sent with QR code">Invite not sent</string>
+    <string name="invite_not_sent_text" context="Text of dialog shown when a contact request has not been sent with QR code">The QR code is invalid. Try to scann another valid code.</string>
+    <string name="invite_not_sent_text_already_contact" context="Text of dialog shown when a contact request has not been sent with QR code because of is already a contact">The invitation has not been sent. %s is already in your contacts list.</string>
+    <string name="invite_not_sent_text_error" context="Text of dialog shown when a contact request has not been sent with QR code because of some error">The invitation has not been sent. Some error occurred processing it.</string>
+    <string name="generatin_qr" context="Text of alert dialog informing that the qr is generating">Generating QR...</string>
+    <string name="menu_item_scan_code" context="Title of QR code scan menu item">Scan QR code</string>
+    <string name="invite_not_sent_link_text" context="Text of dialog shown when a contact request has not been sent with contact link">The contact link is invalid. Try with another valid link.</string>
+    <string name="button_copy_link" context="get the contact link and copy it">Copier le lien</string>
+    <string name="button_create_qr" context="Create QR code">Create QR code</string>
+    <string name="qrcode_create_successfully" context="Text shown when it has been created the QR code successfully">QR code successfully create</string>
+    <string name="qrcode_scan_help" context="Text shown in QR code scan fragment to help and guide the user in the action">Line up the QR code to scan it with your device's camera</string>
 
-    <string name="context_share" context="to share a file using Facebook, Whatsapp, etc">Share using</string>
+    <string name="external_play" context="Item menu option to reproduce audio or video in external reproductors">Ouvrir avec</string>
 
-    <string name="error_enable_chat_before_login" context="Message shown if the user choose enable button and he is not logged in">Please, log in before enabling the chat</string>
+    <string name="context_share" context="to share a file using Facebook, Whatsapp, etc">Partager avec</string>
+
+    <string name="error_enable_chat_before_login" context="Message shown if the user choose enable button and he is not logged in">Veuillez vous connecter avant d\'activer la discussion</string>
 
     <string name="label_set_period" context="title of a tag to search for a specific period within the search by date option in Camera upload">Set period</string>
 
     <string name="context_empty_chat_recent" context="Text of the empty screen when there are not chat conversations">[B]Invite friends to [/B][A]Chat[/A][B] and enjoy our encrypted platform with privacy and security.[/B]</string>
-    <string name="recent_chat_empty_enable_chat" context="Message shown when the user has no recent chats">[C]Enable [/C][B]Chat[/B][A][C] and enjoy our encrypted platform with privacy and security.[/C]</string>
+    <string name="recent_chat_empty_enable_chat" context="Message shown when the user has no recent chats">[C]Activez[/C] la [B]discussion[/B][A][C] et profitez de notre plateforme chiffrée, en toute confidentialité et sécurité.[/C]</string>
 
-    <string name="context_empty_camera_uploads" context="Text of the empty screen when there are not elements in Camera Uploads">[B]No media on [/B][A]Camera Uploads[/A][B].[/B]</string>
-    <string name="context_empty_rubbish_bin" context="Text of the empty screen when there are not elements in the Rubbish Bin">[B]Empty [/B][A]Rubbish Bin[/A][B].[/B]</string>
+    <string name="context_empty_camera_uploads" context="Text of the empty screen when there are not elements in Camera Uploads">[B]Aucun fichier multimédia dans les [/B][A]téléversements de la caméra[/A][B].[/B]</string>
+    <string name="context_empty_rubbish_bin" context="Text of the empty screen when there are not elements in the Rubbish Bin">[A]Corbeille [/A][B]vide[/B][B].[/B]</string>
 
-    <string name="context_empty_inbox" context="Text of the empty screen when there are not elements in Cloud Drive or Inbox">[B]No files on your [/B][A]%1$s[/A][B].[/B]</string>
-    <string name="context_empty_offline" context="Text of the empty screen when there are not elements in Saved for Offline">[B]No files [/B][A]%1$s[/A][B].[/B]</string>
-    <string name="context_empty_contacts" context="Text of the empty screen when there are not contacts">[B]No [/B][A]%1$s[/A][B].[/B]</string>
+    <string name="context_empty_inbox" context="Text of the empty screen when there are not elements in Cloud Drive or Inbox">[B]Aucun fichier dans votre [/B][A]%1$s[/A][B].[/B]</string>
+    <string name="context_empty_offline" context="Text of the empty screen when there are not elements in Saved for Offline">[B]Aucun fichier dans [/B][A]%1$s[/A][B].[/B]</string>
+    <string name="context_empty_contacts" context="Text of the empty screen when there are not contacts">[B]Aucun [/B][A]%1$s[/A][B].[/B]</string>
 
-    <string name="recent_chat_empty" context="Message shown when the user has no archived chats">[A]No[/A] [B]Conversations[/B]</string>
-    <string name="recent_chat_loading_conversations" context="Message shown when the chat is section is loading the conversations">[A]Loading[/A] [B]Conversations...[/B]</string>
+    <string name="recent_chat_empty" context="Message shown when the user has no archived chats">[A]Aucune[/A] [B]conversations[/B]</string>
+    <string name="recent_chat_loading_conversations" context="Message shown when the chat is section is loading the conversations">[A]Chargement des[/A] [B]conversations…[/B]</string>
 
-    <string name="context_empty_incoming" context="Text of the empty screen when there are not elements in Incoming">Incoming Shared folders</string>
-    <string name="context_empty_outgoing" context="Text of the empty screen when there are not elements in Outgoing">Outgoing Shared folders</string>
+    <string name="context_empty_incoming" context="Text of the empty screen when there are not elements in Incoming">Dossiers partagés entrants</string>
+    <string name="context_empty_outgoing" context="Text of the empty screen when there are not elements in Outgoing">Dossiers partagés sortants</string>
 
     <string name="tab_sent_requests" context="Title of the sent requests tab. Capital letters">Demandes envoyées</string>
     <string name="tab_received_requests" context="Title of the received requests tab. Capital letters">Demandes reçues</string>
     <string name="overquota_alert_title" context="Title dialog overquota error">Le quota de stockage a été dépassé</string>
 
-    <string name="invalid_link" context="error message shown when an account confirmation link or reset password link is invalid for unknown reasons">Invalid link, please ask for a new valid link</string>
+    <string name="invalid_link" context="error message shown when an account confirmation link or reset password link is invalid for unknown reasons">Le lien est invalide, veuillez demander un nouveau lien valide</string>
 
-    <string name="processing_link" context="Message shown when a link is being processing">Processing link...</string>
+    <string name="processing_link" context="Message shown when a link is being processing">Traitement du lien…</string>
 
     <string name="passwd_weak" context="Message shown when it is creating an acount and it is been introduced a very weak or weak password">Votre mot de passe est facile à deviner. Essayez de le rallonger. Combinez majuscules et minuscules. Ajoutez des caractères spéciaux. Ne pas utiliser des noms ou des mots du dictionnaire</string>
     <string name="passwd_medium" context="Message shown when it is creating an acount and it is been introduced a medium password">Votre mot de passe est assez bon pour continuer, mais il est recommandé de le renforcer.</string>
@@ -1687,41 +1722,69 @@
     <string name="pass_strong" context="Password strong">Robuste</string>
     <string name="wrong_passwd" context="Error shown when it is changing the password and the old password is incorrect">Mot de passe erroné</string>
 
-    <string name="title_notification_call_in_progress" context="Title of the notification shown on the action bar when there is a call in progress">Call in progress</string>
-    <string name="action_notification_call_in_progress" context="Subtitle of the notification shown on the action bar when there is a call in progress">Click to back to the call</string>
-    <string name="button_notification_call_in_progress" context="Button in the notification shown on the action bar when there is a call in progress">Return to the call</string>
+    <string name="title_notification_call_in_progress" context="Title of the notification shown on the action bar when there is a call in progress">Appel en cours</string>
+    <string name="action_notification_call_in_progress" context="Subtitle of the notification shown on the action bar when there is a call in progress">Cliquer pour retourner vers l\'appel</string>
+    <string name="button_notification_call_in_progress" context="Button in the notification shown on the action bar when there is a call in progress">Retourner vers l\'appel</string>
 
-    <string name="account_suspended_multiple_breaches_ToS" context="Message error shown when trying to log in on an account has been suspended due to multiple breaches of Terms of Service">Your account has been suspended due to multiple breaches of Mega's Terms of Service. Please check your email inbox.</string>
-    <string name="account_suspended_breache_ToS" context="Message error shown when trying to log in on an account has been suspended due to breach of Terms of Service">Your account was terminated due to breach of Mega's Terms of Service, such as abuse of rights of others; sharing and/or importing illegal data; or system abuse.</string>
+    <string name="account_suspended_multiple_breaches_ToS" context="Message error shown when trying to log in on an account has been suspended due to multiple breaches of Terms of Service">Votre compte a été désactivé en raison de non-respects répétés des conditions générales d\'utilisation de MEGA. Veuillez vérifier votre boîte de réception de courriels.</string>
+    <string name="account_suspended_breache_ToS" context="Message error shown when trying to log in on an account has been suspended due to breach of Terms of Service">Votre compte a été résilié à la suite d\'un non-respect des conditions générales d\'utilisation de MEGA, tel qu\'une violation des droits d\'autrui ; un partage ou une importation de données illégales ; ou un abus du système.</string>
 
     <string name="file_storage_empty_folder" context="In a chat conversation when you try to send device's images but there aren't available images">No files</string>
 
-    <string name="number_of_versions" formatted="false" context="Number of versions of a file shown on the screen info of the file">%1$d versions</string>
+    <plurals name="number_of_versions" formatted="false" context="Number of versions of a file shown on the screen info of the file">
+        <item context="version item" quantity="one">%1$d version</item>
+        <item context="version items" quantity="other">%1$d versions</item>
+    </plurals>
+
     <string name="title_section_versions" context="Title of the section Versions for files">Versions </string>
 
-    <string name="header_current_section_item" context="Header of the item to show the current version of a file in a list">Current version</string>
+    <string name="header_current_section_item" context="Header of the item to show the current version of a file in a list">Version actuelle</string>
     <plurals name="header_previous_section_item" context="Header of the item to show the previous versions of a file in a list">
-        <item context="file item" quantity="one">Previous version</item>
+        <item context="file item" quantity="one">Version précédente</item>
         <item context="file items" quantity="other">Versions précédentes</item>
     </plurals>
 
     <string name="general_revert" context="option menu to revert a file version">Revenir</string>
     <string name="menu_item_clear_versions" context="option menu to clear all the previous versions">Effacer les versions précédentes</string>
     <plurals name="title_dialog_delete_version" context="Title of the dialog to confirm that a version os going to be deleted">
-        <item context="version item" quantity="one">Delete version?</item>
-        <item context="version items" quantity="other">Delete versions?</item>
+        <item context="version item" quantity="one">Supprimer la version ?</item>
+        <item context="version items" quantity="other">Supprimer les versions ?</item>
     </plurals>
 
-    <string name="content_dialog_delete_version" context="Content of the dialog to confirm that a version is going to be deleted">This version will be permanently removed.</string>
-    <string name="content_dialog_delete_multiple_version" context="Content of the dialog to confirm that several versions are going to be deleted">These %d versions will be permanently removed.</string>
+    <string name="content_dialog_delete_version" context="Content of the dialog to confirm that a version is going to be deleted">Cette version sera supprimée irrémédiablement.</string>
+    <string name="content_dialog_delete_multiple_version" context="Content of the dialog to confirm that several versions are going to be deleted">Ces %d versions seront supprimées irrémédiablement.</string>
 
-    <string name="chat_upload_title_notification" context="Title of the notification shown when a file is uploading to a chat">Chat uploading</string>
+    <string name="chat_upload_title_notification" context="Title of the notification shown when a file is uploading to a chat">Téléversement vers la discussion</string>
 
-    <string name="settings_chat_upload_quality" context="Label for the option on setting to set up the quality of multimedia files uploaded to the chat">Chat media quality</string>
+    <string name="settings_chat_upload_quality" context="Label for the option on setting to set up the quality of multimedia files uploaded to the chat">Qualité des fichiers multimédias pour les discussions</string>
 
     <string-array name="settings_chat_upload_quality_entries" context="the options for the option on setting to set up the quality of multimedia files uploaded to the chat">
         <item context="the options of what to upload.">Original</item>
         <item context="the options of what to upload.">Moyen</item>
     </string-array>
+
+    <string name="missed_call_notification_title" context="Title of the notification for a missed call">Missed call</string>
+    <string name="file_properties_info_location" cotext="Refers to a location of file">Emplacement</string>
+
+    <string name="file_properties_folder_current_versions" cotext="Title of the label to show the size of the current files inside a folder">Current versions</string>
+    <string name="file_properties_folder_previous_versions" cotext="Title of the label to show the size of the versioned files inside a folder">Versions précédentes</string>
+
+    <plurals name="number_of_versions_inside_folder" formatted="false" context="Number of versioned files inside a folder shown on the screen info of the folder">
+        <item context="version item" quantity="one">%1$d versioned file</item>
+        <item context="version items" quantity="other">%1$d versioned files</item>
+    </plurals>
+
+    <string name="messages_forwarded_success" context="Alert message after forwarding one or several messages to several chats">Messages forwarded</string>
+    <string name="messages_forwarded_error" context="Error message after forwarding one or several messages to several chats">Error. Not correctly forwarded</string>
+
+    <plurals name="files_send_to_chat_success" context="Alert message after sending to chat one or several messages to several chats">
+        <item context="version item" quantity="one">Fichier envoyé</item>
+        <item context="version items" quantity="other">Files sent</item>
+    </plurals>
+    <string name="files_send_to_chat_error" context="Error message after sending to chat one or several messages to several chats">Error. Not correctly sent</string>
+
+    <string name="context_send_file_to_chat" context="menu option to send a file to a chat">Envoyer vers la discussion</string>
+
+    <string name="notification_subtitle_incoming" context="notification subtitle of incoming calls">Incoming call</string>
 
 </resources>

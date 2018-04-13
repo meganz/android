@@ -53,7 +53,7 @@ public class CallNotificationIntentService extends IntentService implements Mega
             megaChatApi.hangChatCall(chatHandleInProgress, this);
         } else if (IGNORE.equals(action)) {
             log("onHandleIntent:IGNORE");
-            checkQueuedCalls();
+            megaChatApi.setIgnoredCall(chatHandleToAnswer);
             stopSelf();
         } else {
             throw new IllegalArgumentException("Unsupported action: " + action);
@@ -107,7 +107,6 @@ public class CallNotificationIntentService extends IntentService implements Mega
             else{
                 log("onRequestFinish: ERROR:HANG_CALL: "+e.getErrorCode());
             }
-
         }
         else if(request.getType() == MegaChatRequest.TYPE_ANSWER_CHAT_CALL){
             log("onRequestFinish:TYPE_ANSWER_CHAT_CALL");
@@ -119,56 +118,12 @@ public class CallNotificationIntentService extends IntentService implements Mega
                 i.setAction("SECOND_CALL");
                 i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 this.startActivity(i);
-
-                checkQueuedCalls();
-
                 stopSelf();
             }
             else{
                 log("onRequestFinish: ERROR:ANSWER_CALL: "+e.getErrorCode());
             }
         }
-    }
-
-    public void checkQueuedCalls(){
-        log("checkQueuedCalls");
-
-//        MegaHandleList handleList = megaChatApi.getChatCalls();
-//        if(handleList!=null){
-//            long numberOfCalls = handleList.size();
-//            log("checkQueuedCalls: Number of calls in progress: "+numberOfCalls);
-//            if (numberOfCalls>1){
-//                log("checkQueuedCalls: MORE than one call in progress: "+numberOfCalls);
-//                MegaChatCall callInProgress = null;
-//                MegaChatCall callIncoming = null;
-//                for(int j=0; j<handleList.size(); j++){
-//                    MegaChatCall call = megaChatApi.getChatCall(handleList.get(j));
-//                    if(call!=null){
-//                        log("checkQueuedCalls: Call ChatID: "+call.getChatid()+" Status: "+call.getStatus());
-//                        if(call.getStatus()>=MegaChatCall.CALL_STATUS_IN_PROGRESS){
-//                            callInProgress = call;
-//                            log("checkQueuedCalls: Call in progress: "+callInProgress.getChatid());
-//                        }
-//                        else{
-//                            callIncoming = call;
-//                            log("checkQueuedCalls: Call incoming: "+callIncoming.getChatid());
-//                        }
-//                    }
-//
-//                    if(callInProgress!=null){
-//                        if(call.getStatus()<MegaChatCall.CALL_STATUS_IN_PROGRESS){
-//                            AdvancedNotificationBuilder notificationBuilder = AdvancedNotificationBuilder.newInstance(this, megaApi, megaChatApi);
-//                            notificationBuilder.showIncomingCallNotification(callIncoming, callInProgress);
-//                        }
-//                    }
-//                }
-//
-//            }
-//            else{
-//                log("checkQueuedCalls: No calls to launch");
-//            }
-//        }
-
     }
 
     @Override
