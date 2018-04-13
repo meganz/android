@@ -209,32 +209,33 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
 
                 }else if(remoteMessageType.equals("2")){
                     log("CHAT notification");
-                    String gSession = credentials.getSession();
-                    if (megaApi.getRootNode() == null){
-                        log("RootNode = null");
-                        performLoginProccess(gSession);
+                    if(Util.isChatEnabled()){
+                        String gSession = credentials.getSession();
+                        if (megaApi.getRootNode() == null){
+                            log("RootNode = null");
+                            performLoginProccess(gSession);
 
-                        h = new Handler(Looper.getMainLooper());
-                        h.postDelayed(
-                                new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        boolean shown = ((MegaApplication) getApplication()).isChatNotificationReceived();
-                                        if(!shown){
-                                            log("Show simple notification - no connection finished");
-                                            notificationBuilder.showSimpleNotification();
+                            h = new Handler(Looper.getMainLooper());
+                            h.postDelayed(
+                                    new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            boolean shown = ((MegaApplication) getApplication()).isChatNotificationReceived();
+                                            if(!shown){
+                                                log("Show simple notification - no connection finished");
+                                                notificationBuilder.showSimpleNotification();
+                                            }
+                                            else{
+                                                log("Notification already shown");
+                                            }
                                         }
-                                        else{
-                                            log("Notification already shown");
-                                        }
-                                    }
-                                },
-                                12000
-                        );
-                    }
-                    else{
-                        if(Util.isChatEnabled()){
+                                    },
+                                    12000
+                            );
+                        }
+                        else{
                             removeListeners();
+                            megaChatApi.pushReceived(true, ((MegaApplication) getApplication()));
                         }
                     }
                 }
@@ -378,6 +379,7 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
             //megaChatApi.setBackgroundStatus(true, this);
             if(e.getErrorCode()==MegaChatError.ERROR_OK){
                 log("Connected to chat!");
+                megaChatApi.pushReceived(true, ((MegaApplication) getApplication()));
             }
             else{
                 log("EEEERRRRROR WHEN CONNECTING " + e.getErrorString());
