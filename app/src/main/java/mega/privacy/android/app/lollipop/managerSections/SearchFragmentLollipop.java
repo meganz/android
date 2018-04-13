@@ -624,7 +624,7 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 
 					intent.putExtra("orderGetChildren", ((ManagerActivityLollipop)context).orderCloud);
 					intent.putExtra("screenPosition", screenPosition);
-					startActivity(intent);
+					context.startActivity(intent);
 					((ManagerActivityLollipop) context).overridePendingTransition(0,0);
 					imageDrag = imageView;
 				}
@@ -660,6 +660,7 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 						mediaIntent = new Intent(context, AudioVideoPlayerLollipop.class);
 					}
 					mediaIntent.putExtra("screenPosition", screenPosition);
+					mediaIntent.putExtra("adapterType", Constants.SEARCH_ADAPTER);
 					mediaIntent.putExtra("HANDLE", file.getHandle());
 					mediaIntent.putExtra("FILENAME", file.getName());
 					imageDrag = imageView;
@@ -688,7 +689,8 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 						handleList.add(nodes.get(position).getHandle());
 						NodeController nC = new NodeController(context);
 						nC.prepareForDownload(handleList);
-			  		}						
+			  		}
+			  		((ManagerActivityLollipop) context).overridePendingTransition(0,0);
 				}else if (MimeTypeList.typeForName(nodes.get(position).getName()).isPdf()){
 					MegaNode file = nodes.get(position);
 

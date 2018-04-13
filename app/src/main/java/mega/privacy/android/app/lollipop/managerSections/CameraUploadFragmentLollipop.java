@@ -1666,6 +1666,21 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 							Intent mediaIntent = new Intent(context, AudioVideoPlayerLollipop.class);
 							mediaIntent.putExtra("HANDLE", psHMegaNode.getHandle());
 							mediaIntent.putExtra("FILENAME", psHMegaNode.getName());
+							mediaIntent.putExtra("screenPosition", screenPosition);
+							if(((ManagerActivityLollipop)context).isFirstNavigationLevel() == true){
+								mediaIntent.putExtra("adapterType", Constants.PHOTO_SYNC_ADAPTER);
+								arrayHandles = null;
+
+							}else{
+								mediaIntent.putExtra("adapterType", Constants.SEARCH_BY_ADAPTER);
+								arrayHandles = new long[nodes.size()];
+								for(int i = 0; i < nodes.size(); i++) {
+									arrayHandles[i] = nodes.get(i).getHandle();
+								}
+								mediaIntent.putExtra("handlesNodesSearch",arrayHandles);
+
+							}
+
 							String localPath = Util.getLocalFile(context, psHMegaNode.getName(), psHMegaNode.getSize(), downloadLocationDefaultPath);
 							if (localPath != null){
 								File mediaFile = new File(localPath);
@@ -1692,6 +1707,8 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 								NodeController nC = new NodeController(context);
 								nC.prepareForDownload(handleList);
 					  		}
+							((ManagerActivityLollipop) context).overridePendingTransition(0,0);
+							imageDrag = imageView;
 						}
 						else{
 							adapterList.notifyDataSetChanged();

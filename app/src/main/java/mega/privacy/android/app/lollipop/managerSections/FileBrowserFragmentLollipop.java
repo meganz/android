@@ -925,7 +925,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 					}
 					intent.putExtra("orderGetChildren", ((ManagerActivityLollipop)context).orderCloud);
 					intent.putExtra("screenPosition", screenPosition);
-					startActivity(intent);
+					context.startActivity(intent);
 					((ManagerActivityLollipop) context).overridePendingTransition(0,0);
 					imageDrag = imageView;
 				}
@@ -950,6 +950,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 					}
 					mediaIntent.putExtra("screenPosition", screenPosition);
 					mediaIntent.putExtra("FILENAME", file.getName());
+					mediaIntent.putExtra("adapterType", Constants.FILE_BROWSER_ADAPTER);
 					String localPath = Util.getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
 					if (localPath != null){
 						File mediaFile = new File(localPath);
@@ -1036,6 +1037,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 							nC.prepareForDownload(handleList);
 						}
 					}
+					((ManagerActivityLollipop) context).overridePendingTransition(0,0);
 				}
 				else if (MimeTypeList.typeForName(nodes.get(position).getName()).isPdf()){
 					log("itemClick:isFile:isPdf");

@@ -649,7 +649,7 @@ public class RubbishBinFragmentLollipop extends Fragment {
 
 					intent.putExtra("orderGetChildren", ((ManagerActivityLollipop)context).orderCloud);
 					intent.putExtra("screenPosition", screenPosition);
-					startActivity(intent);
+					context.startActivity(intent);
 					((ManagerActivityLollipop) context).overridePendingTransition(0,0);
 					imageDrag = imageView;
 				}
@@ -686,6 +686,7 @@ public class RubbishBinFragmentLollipop extends Fragment {
 					}
 					mediaIntent.putExtra("screenPosition", screenPosition);
 					mediaIntent.putExtra("FILENAME", file.getName());
+					mediaIntent.putExtra("adapterType", Constants.RUBBISH_BIN_ADAPTER);
 					String localPath = Util.getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
 					if (localPath != null){
 						File mediaFile = new File(localPath);
@@ -704,7 +705,7 @@ public class RubbishBinFragmentLollipop extends Fragment {
 					mediaIntent.putExtra("HANDLE", file.getHandle());
 					imageDrag = imageView;
 					if (MegaApiUtils.isIntentAvailable(context, mediaIntent)){
-						startActivity(mediaIntent);
+						context.startActivity(mediaIntent);
 					}
 					else{
 						Toast.makeText(context, context.getResources().getString(R.string.intent_not_available), Toast.LENGTH_LONG).show();
@@ -714,6 +715,7 @@ public class RubbishBinFragmentLollipop extends Fragment {
 						NodeController nC = new NodeController(context);
 						nC.prepareForDownload(handleList);
 					}
+					((ManagerActivityLollipop) context).overridePendingTransition(0,0);
 				}
 				else if (MimeTypeList.typeForName(nodes.get(position).getName()).isPdf()){
 					MegaNode file = nodes.get(position);

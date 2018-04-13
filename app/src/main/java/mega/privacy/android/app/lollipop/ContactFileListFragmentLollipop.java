@@ -695,6 +695,7 @@ public class ContactFileListFragmentLollipop extends Fragment{
 					mediaIntent.putExtra("screenPosition", screenPosition);
 					mediaIntent.putExtra("HANDLE", file.getHandle());
 					mediaIntent.putExtra("FILENAME", file.getName());
+					mediaIntent.putExtra("adapterType", Constants.CONTACT_FILE_ADAPTER);
 					imageDrag = imageView;
 					String localPath = Util.getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
 					if (localPath != null){
@@ -721,6 +722,7 @@ public class ContactFileListFragmentLollipop extends Fragment{
 						handleList.add(contactNodes.get(position).getHandle());
 						((ContactFileListActivityLollipop)context).onFileClick(handleList);
 			  		}
+					((ContactFileListActivityLollipop) context).overridePendingTransition(0,0);
 				}else if (MimeTypeList.typeForName(contactNodes.get(position).getName()).isPdf()){
 					MegaNode file = contactNodes.get(position);
 
