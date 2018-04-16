@@ -957,6 +957,12 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 
 	@Override
 	public void onChatCallUpdate(MegaChatApiJava api, MegaChatCall call) {
+		log("onChatCallUpdate");
+
+		if (call.getStatus() == MegaChatCall.CALL_STATUS_DESTROYED) {
+			log("Call destroyed: "+call.getTermCode());
+		}
+
 		if (call.getStatus() >= MegaChatCall.CALL_STATUS_IN_PROGRESS) {
 			clearIncomingCallNotification(call.getId());
 		}
@@ -991,7 +997,7 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 				checkQueuedCalls();
 
 			} else {
-				log("ERROR. No calls to launch");
+				log("No calls in progress");
 			}
 		}
 

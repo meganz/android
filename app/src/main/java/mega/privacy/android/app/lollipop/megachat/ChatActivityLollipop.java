@@ -48,6 +48,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.CheckBox;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -155,6 +156,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     MegaChatApiAndroid megaChatApi;
     Handler handlerReceive;
     Handler handlerSend;
+
+    TextView emptyTextView;
+    ImageView emptyImageView;
+    LinearLayout emptyLayout;
 
     boolean pendingMessagesLoaded = false;
 
@@ -496,6 +501,42 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         display.getMetrics(outMetrics);
         density  = getResources().getDisplayMetrics().density;
 
+        emptyLayout = (LinearLayout) findViewById(R.id.empty_messages_layout);
+        emptyTextView = (TextView) findViewById(R.id.empty_text_chat_recent);
+        emptyImageView = (ImageView) findViewById(R.id.empty_image_view_chat);
+
+        LinearLayout.LayoutParams emptyTextViewParams1 = (LinearLayout.LayoutParams)emptyImageView.getLayoutParams();
+
+        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+            emptyImageView.setImageResource(R.drawable.chat_empty_landscape);
+            emptyTextViewParams1.setMargins(0, Util.scaleHeightPx(40, outMetrics), 0, Util.scaleHeightPx(24, outMetrics));
+        }else{
+            emptyImageView.setImageResource(R.drawable.ic_empty_chat_list);
+            emptyTextViewParams1.setMargins(0, Util.scaleHeightPx(100, outMetrics), 0, Util.scaleHeightPx(24, outMetrics));
+        }
+
+        emptyImageView.setLayoutParams(emptyTextViewParams1);
+
+        String textToShowB = String.format(getString(R.string.chat_loading_messages));
+
+        try{
+            textToShowB = textToShowB.replace("[A]", "<font color=\'#7a7a7a\'>");
+            textToShowB = textToShowB.replace("[/A]", "</font>");
+            textToShowB = textToShowB.replace("[B]", "<font color=\'#000000\'>");
+            textToShowB = textToShowB.replace("[/B]", "</font>");
+        }
+        catch (Exception e){}
+        Spanned resultB = null;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+            resultB = Html.fromHtml(textToShowB,Html.FROM_HTML_MODE_LEGACY);
+        } else {
+            resultB = Html.fromHtml(textToShowB);
+        }
+
+        emptyTextView.setText(resultB);
+        emptyTextView.setVisibility(View.VISIBLE);
+        emptyLayout.setVisibility(View.VISIBLE);
+
         updateNavigationToolbarIcon();
 
         fragmentContainer = (CoordinatorLayout) findViewById(R.id.fragment_container_chat);
@@ -691,6 +732,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         });
 
         chatRelativeLayout  = (RelativeLayout) findViewById(R.id.relative_chat_layout);
+        chatRelativeLayout.setVisibility(View.GONE);
 
         sendIcon = (ImageButton) findViewById(R.id.send_message_icon_chat);
         sendIcon.setOnClickListener(this);
@@ -3763,6 +3805,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 mLayoutManager.scrollToPosition(messages.size());
             }
         }
+
+        chatRelativeLayout.setVisibility(View.VISIBLE);
+        emptyLayout.setVisibility(View.GONE);
     }
 
     @Override

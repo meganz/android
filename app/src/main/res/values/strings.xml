@@ -1803,4 +1803,6 @@
         <item context="unread messages" quantity="other">%1$s unread messages</item>
     </plurals>
 
+    <string name="chat_loading_messages" context="Message shown when a chat is opened and the messages are being recovered">[A]Loading[/A] [B]Messages...[/B]</string>
+
 </resources>
